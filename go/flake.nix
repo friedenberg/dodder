@@ -32,14 +32,17 @@
             pname = "dodder";
             version = "0.0.1";
             src = ./.;
+            subPackages = [
+              "cmd/der"
+              "cmd/dodder"
+              "cmd/zit"
+            ];
             modules = ./gomod2nix.toml;
           };
 
         in {
 
-          packages.der = dodder;
           packages.dodder = dodder;
-          packages.zit = dodder;
           packages.default = dodder;
 
           docker = pkgs.dockerTools.buildImage {
@@ -47,7 +50,7 @@
             tag = "latest";
             copyToRoot = [dodder];
             config = {
-              Cmd = ["${dodder}/bin/der"];
+              Cmd = ["${dodder}/bin/dodder"];
               Env = [];
               ExposedPorts = {"9000/tcp" = {};};
             };
