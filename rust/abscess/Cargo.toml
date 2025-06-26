@@ -1,0 +1,19 @@
+[package]
+name = "abscess"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+age = { path = "vendor-rage/age" }
+anyhow = "1.0.79"
+clap = { version = "4.4.14", features = ["derive"] }
+flate2 = "1.0.28"
+hex = "0.4.3"
+hex-literal = "0.4.1"
+io_tee = "0.1.1"
+pcsc = "2.8.2"
+rand = "0.8.5"
+rust-crypto = "0.2.36"
+serde = { version = "1.0.195", features = ["derive"] }
+toml = "0.8.8"
+yubikey = { version = "0.8.0", features = ["untested"] }

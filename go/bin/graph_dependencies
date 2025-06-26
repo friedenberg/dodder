@@ -1,0 +1,65 @@
+#! /bin/bash -e
+
+print_matches() (
+	ag "code.linenisgreat.com/dodder/go/zit/$1" -l </dev/null |
+		cut -d'/' -f1-3 |
+		sort -u
+)
+
+print_edges_for_pkg() (
+	path="$1"
+	color="$2"
+	cmd_find="find $path -type d -mindepth 1 -maxdepth 1"
+
+	while read -r; do
+		pkg="$(echo -n "$REPLY" | cut -d'/' -f1-3)"
+		while read -r -a c; do
+			echo "  \"$(drop_src "$c")\" -> \"$(drop_src "$pkg")\" [ color = \"$color\"; penwidth = 2 ];"
+		done < <(print_matches "$pkg")
+	done < <($cmd_find)
+)
+
+print_subgraph() (
+	dir="$(drop_src "$1")"
+	color="$2"
+	echo
+	echo "  subgraph \"cluster_$dir\" {"
+	echo "    rankdir = TB;"
+	echo "    color = \"$color\";"
+	echo "    node [ color = \"$color\" ];"
+	echo "    edge [ color = \"$color\" ];"
+	echo "    label = \"$dir\";"
+	echo "    rank = min;"
+	while IFS= read -r -d ''; do
+		echo "    \"$(drop_src "$REPLY")\" [ label = \"$(drop_src "$(drop_src "$REPLY")")\" ];"
+	done < <(find "src/$dir" -type d -mindepth 1 -print0)
+	echo "  }"
+	echo
+)
+
+drop_src() (
+	echo "$1" | cut -d'/' -f2-4
+)
+
+print_all_subgraphs() (
+	while read -r; do
+		color="#$(openssl rand -hex 3)"
+		print_subgraph "$REPLY" "$color"
+		print_edges_for_pkg "$REPLY" "$color"
+	done < <(find src -type d -mindepth 1 -maxdepth 1 | sort)
+)
+
+print_dot() (
+	# first_pkg="$1"
+	echo 'digraph {'
+	echo '  node [ fontname = "Input Sans"; shape = rect ];'
+	echo '  newrank = true;'
+	echo '  splines = ortho;'
+	echo '  concentrate = true;'
+	# echo '  ranksep = "6.0";'
+	print_all_subgraphs
+	echo '}'
+)
+
+print_dot >"build/dot"
+dot -Tsvg <"build/dot" >"build/dot.svg"

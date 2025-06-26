@@ -1,0 +1,91 @@
+package store_fs
+
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/delta/editor"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+)
+
+func (s *Store) Open(
+	m checkout_mode.Mode,
+	ph interfaces.FuncIter[string],
+	zsc sku.SkuTypeSet,
+) (err error) {
+	wg := errors.MakeWaitGroupParallel()
+
+	if m.IncludesMetadata() {
+		wg.Do(func() error {
+			return s.openZettels(ph, zsc)
+		})
+	}
+
+	if m.IncludesBlob() {
+		wg.Do(func() error {
+			return s.openBlob(ph, zsc)
+		})
+	}
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) openZettels(
+	ph interfaces.FuncIter[string],
+	zsc sku.SkuTypeSet,
+) (err error) {
+	var filesZettels []string
+
+	if filesZettels, err = s.ToSliceFilesZettelen(zsc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var e editor.Editor
+
+	if e, err = editor.MakeEditorWithVimOptions(
+		ph,
+		vim_cli_options_builder.New().
+			WithCursorLocation(2, 3).
+			WithFileType("zit-object").
+			WithInsertMode().
+			Build(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.Run(filesZettels); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) openBlob(
+	ph interfaces.FuncIter[string],
+	zsc sku.SkuTypeSet,
+) (err error) {
+	var filesBlobs []string
+
+	if filesBlobs, err = s.ToSliceFilesBlobs(zsc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	opOpenFiles := OpenFiles{}
+
+	if err = opOpenFiles.Run(ph, filesBlobs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

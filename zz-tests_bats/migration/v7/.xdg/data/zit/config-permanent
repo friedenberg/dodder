@@ -1,0 +1,8 @@
+---
+! toml-config-immutable-v1
+---
+
+StoreVersion = 0
+Recipients = []
+CompressionType = ''
+LockInternalFiles = false

@@ -1,0 +1,137 @@
+
+default: test
+
+dir_git_root := shell("git rev-parse --show-toplevel")
+
+[group("clean")]
+clean-fixtures:
+  #! /bin/bash -ex
+
+  pushd "{{dir_git_root}}/pkgs/bravo/zit/zz-tests_bats" || exit
+
+  git reset HEAD migration/v*/
+  ./../bin/chflags.bash -R nouchg migration/v*/
+  git clean -fd migration/v*/
+  git checkout migration/
+
+[group("clean")]
+clean: clean-fixtures
+
+zit_current_version := "v" + shell("zit info store-version")
+
+[group("debug")]
+debug-env store_version=zit_current_version:
+  #! /bin/bash -ex
+  dir="$(mktemp -d)"
+  trap "rm -rf '$dir'" EXIT
+
+  cp -r migration/{{store_version}}/.xdg "$dir/.xdg"
+
+  echo 'source_env "{{invocation_dir()}}/.envrc"' >> "$dir/.envrc"
+  echo 'dotenv ./.env' >> "$dir/.envrc"
+  direnv allow "$dir/.envrc"
+  trap "direnv disallow \"$dir/.envrc\"" EXIT
+
+  cat - > "$dir/.env" <<-EOM
+    export XDG_DATA_HOME="$dir/.xdg/data"
+    export XDG_CONFIG_HOME="$dir/.xdg/config"
+    export XDG_STATE_HOME="$dir/.xdg/state"
+    export XDG_CACHE_HOME="$dir/.xdg/cache"
+    export XDG_RUNTIME_HOME="$dir/.xdg/runtime"
+  EOM
+
+  pushd "$dir"
+  direnv exec . "$SHELL"
+
+#   _   _           _       _
+#  | | | |_ __   __| | __ _| |_ ___
+#  | | | | '_ \ / _` |/ _` | __/ _ \
+#  | |_| | |_) | (_| | (_| | ||  __/
+#   \___/| .__/ \__,_|\__,_|\__\___|
+#        |_|
+
+[group("update")]
+update:
+
+#   ____        _ _     _
+#  | __ ) _   _(_) | __| |
+#  |  _ \| | | | | |/ _` |
+#  | |_) | |_| | | | (_| |
+#  |____/ \__,_|_|_|\__,_|
+#
+
+[group("build")]
+build:
+
+#    ____ _               _
+#   / ___| |__   ___  ___| | __
+#  | |   | '_ \ / _ \/ __| |/ /
+#  | |___| | | |  __/ (__|   <
+#   \____|_| |_|\___|\___|_|\_\
+#
+
+[group("check")]
+check:
+
+#   _____         _
+#  |_   _|__  ___| |_
+#    | |/ _ \/ __| __|
+#    | |  __/\__ \ |_
+#    |_|\___||___/\__|
+#
+
+[group("test")]
+test-generate_fixtures store_version:
+  which zit
+  ./migration/generate_fixture.bash {{store_version}}
+
+bats_timeout := "5"
+
+# runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
+[group("test")]
+test-targets *targets="*.bats":
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
+
+# runs specific bats test tags
+[group("test")]
+test-tags *tags:
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats \
+    --tap \
+    --jobs {{num_cpus()}} \
+    --filter-tags {{tags}} \
+    *.bats
+
+[group("test")]
+test-integration: (test-targets "*.bats")
+
+[group("test")]
+test-migration: (test-targets "migration/*.bats")
+
+[group("test")]
+test: (test-targets "*.bats" "migration/*.bats")
+
+#   ____  _        _
+#  / ___|| |_ __ _| |_ ___
+#  \___ \| __/ _` | __/ __|
+#   ___) | || (_| | |_\__ \
+#  |____/ \__\__,_|\__|___/
+#
+
+[group("stats")]
+@stats-skipped:
+  echo -n "skipped bats tests: "
+  ag '^\s+skip'  -c | cut -d: -f2 | paste -s -d + - | bc
+
+[group("stats")]
+@stats-todos:
+  #! /usr/bin/env -S fish
+  echo -n "todos: "
+  count-pattern '#\s*todo[-\w]*' | sort -n -r
+
+[group("stats")]
+@stats-loc:
+  echo -n "bats loc:"
+  find . -type f -print0 | xargs -0 wc -l | tail -n 1
+
+[group("stats")]
+@stats: stats-skipped stats-todos stats-loc

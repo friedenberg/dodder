@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(go test:*)",
+      "Bash(go build:*)",
+      "Bash(just build)",
+      "Bash(ls:*)",
+      "Bash(/nix/store/py4d89wsspd0s6rwgjz6lhsy5z3791sd-claude-code-1.0.17/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg \"^func \\([a-z]\\) [A-Z]\" --type go)",
+      "WebFetch(domain:docs.anthropic.com)"
+    ],
+    "deny": []
+  }
+}

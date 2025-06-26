@@ -1,0 +1,49 @@
+package object_id_provider
+
+import (
+	"path"
+	"sync"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+)
+
+const (
+	FilePathZettelIdYin  = "Yin"
+	FilePathZettelIdYang = "Yang"
+)
+
+type Provider struct {
+	sync.Locker
+	yin  provider
+	yang provider
+}
+
+func New(ps interfaces.Directory) (f *Provider, err error) {
+	providerPathYin := path.Join(ps.DirObjectId(), FilePathZettelIdYin)
+	providerPathYang := path.Join(ps.DirObjectId(), FilePathZettelIdYang)
+
+	f = &Provider{
+		Locker: &sync.Mutex{},
+	}
+
+	if f.yin, err = newProvider(providerPathYin); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if f.yang, err = newProvider(providerPathYang); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (hf *Provider) Left() provider {
+	return hf.yin
+}
+
+func (hf *Provider) Right() provider {
+	return hf.yang
+}

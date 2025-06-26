@@ -1,0 +1,26 @@
+#! /bin/bash -xe
+
+original="$1"
+shift
+new="$2"
+dir="${3:-.}"
+
+alias_files="$(mktemp)"
+
+get_alias_files() {
+	ag "$original" "$dir" -l0 >"$alias_files"
+}
+
+replace_aliases_everywhere() {
+	xargs -0 gsed -i -E "/$original += +$new/d" <"$alias_files"
+	xargs -0 gsed -i "s|\\<$original\\>|$new|g" <"$alias_files"
+	xargs -0 goimports -w <"$alias_files"
+}
+
+build() {
+	go build ./...
+}
+
+get_alias_files
+replace_aliases_everywhere
+build

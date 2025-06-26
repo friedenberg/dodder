@@ -1,0 +1,226 @@
+
+dir_build := absolute_path("build")
+
+default: build
+
+git-add-and-commit *PATHS:
+  #! /usr/bin/env fish
+  set -l argv {{PATHS}}
+  if test (count $argv) -gt 0
+    git add $argv
+  end
+
+  set -l diff_status (git diff --cached 2>&1)
+
+  if test -n "$diff_status"
+    echo "committing..." >&2
+
+    if not git commit -m update
+      return 1
+    end
+  else
+    echo "no changes, just pushing" >&2
+  end
+
+  echo "pushing..." >&2
+  git push
+
+#   ____  _
+#  / ___|| |__   _____      __
+#  \___ \| '_ \ / _ \ \ /\ / /
+#   ___) | | | | (_) \ V  V /
+#  |____/|_| |_|\___/ \_/\_/
+#
+
+show-go-package_deps package:
+  ./bin/list_package_deps {{package}}
+
+#    ____          _                          _
+#   / ___|___   __| | ___ _ __ ___   ___   __| |
+#  | |   / _ \ / _` |/ _ \ '_ ` _ \ / _ \ / _` |
+#  | |__| (_) | (_| |  __/ | | | | | (_) | (_| |
+#   \____\___/ \__,_|\___|_| |_| |_|\___/ \__,_|
+#
+
+# removes redundant go import aliases
+codemod-go-fix_redundant_import_aliases:
+  ./bin/fix_redundant_import_alisas.bash
+
+files_go := "src/ cmd/"
+
+# runs go imports on all go files
+codemod-go-imports: codemod-go-fix_redundant_import_aliases
+  goimports -w {{files_go}}
+
+# moves a go package from one src/<root>/<leaf> to another src/<root>/<leaf>
+codemod-go-move_package src dst: && codemod-go-imports build-go
+  #! /bin/bash -e
+
+  prefix=code.linenisgreat.com/dodder/go/zit
+  original="{{src}}"
+  renamed="{{dst}}"
+  original="${original%/}"
+  renamed="${renamed%/}"
+
+  original_pkg="$(basename "$original")"
+  renamed_pkg="$(basename "$renamed")"
+
+  gofmt -w -r "$original_pkg.E -> $renamed_pkg.E" ./
+  gofmt -w -r "$original_pkg -> $renamed_pkg" ./
+
+  mkdir -p "$renamed"
+
+  git mv $original/* "$renamed" || mv $original/* "$renamed"
+  find src -type d -empty -delete
+
+  # https://unix.stackexchange.com/questions/190334/sed-word-boundaries-on-macos
+  declare -r sed_script="
+    s|\\b$prefix/$original\\b|$prefix/$renamed|g;
+    s|^package $original_pkg\$|package $renamed_pkg|g;
+  "
+
+  ag "$prefix/$original" -l0 |
+    xargs -0 sed -i'' "$sed_script"
+
+#    ____ _
+#   / ___| | ___  __ _ _ __
+#  | |   | |/ _ \/ _` | '_ \
+#  | |___| |  __/ (_| | | | |
+#   \____|_|\___|\__,_|_| |_|
+#
+
+clean-go-cache:
+  go clean -cache
+
+clean-go-modcache:
+  go clean -modcache
+
+clean-go: clean-go-cache clean-go-modcache
+
+clean: clean-go
+
+#   _   _           _       _
+#  | | | |_ __   __| | __ _| |_ ___
+#  | | | | '_ \ / _` |/ _` | __/ _ \
+#  | |_| | |_) | (_| | (_| | ||  __/
+#   \___/| .__/ \__,_|\__,_|\__\___|
+#        |_|
+
+update-go:
+  env GOPROXY=direct go get -u -t ./...
+  go mod tidy
+
+update: update-go
+
+#   ____        _ _     _
+#  | __ ) _   _(_) | __| |
+#  |  _ \| | | | | |/ _` |
+#  | |_) | |_| | | | (_| |
+#  |____/ \__,_|_|_|\__,_|
+#
+
+build-go-generate:
+  go generate ./...
+
+
+build-go-binary:
+  mkdir -p build
+  go build -o build ./cmd/{der,dodder,zit}
+
+build-go: build-go-generate build-go-binary
+
+build-nix-gomod:
+  gomod2nix
+
+# TODO improve performance of this
+build-nix: build-nix-gomod
+  nix build
+
+build-docker: build-nix-gomod
+  docker load < "$(nix build ".#docker.x86_64-linux" --print-out-paths)"
+
+build: build-go #build-nix
+
+#    ____ _               _
+#   / ___| |__   ___  ___| | __
+#  | |   | '_ \ / _ \/ __| |/ /
+#  | |___| | | |  __/ (__|   <
+#   \____|_| |_|\___|\___|_|\_\
+#
+
+check-go-vuln:
+  govulncheck ./...
+
+check-go-vet:
+  go vet ./... || true
+
+check: check-go-vuln check-go-vet
+
+#   _____         _
+#  |_   _|__  ___| |_
+#    | |/ _ \/ __| __|
+#    | |  __/\__ \ |_
+#    |_|\___||___/\__|
+#
+
+test-go-unit:
+  go test -v ./...
+
+test-go: test-go-unit
+
+test-bats $PATH=(dir_build + ":" + env("PATH")):
+  just ../zz-tests_bats/test-generate_fixtures "$(build/zit info)"
+  just ../zz-tests_bats/test
+
+# test-bats-targets $PATH=(dir_build + ":" + env("PATH")):
+#   just zz-tests_bats/test-generate_fixtures "$(build/zit info)"
+#   just zz-tests_bats/test
+
+test: test-go test-bats
+
+#   ____  _        _
+#  / ___|| |_ __ _| |_ ___
+#  \___ \| __/ _` | __/ __|
+#   ___) | || (_| | |_\__ \
+#  |____/ \__\__,_|\__|___/
+#
+
+@stats-todos:
+  #! /usr/bin/env -S fish
+  echo "todos: "
+  count-pattern '(//|#)\s*todo[-\w]*' src | sort -n -r
+
+stats-loc: stats-loc-go
+
+stats-loc-go: stats-loc-go-app stats-loc-go-test
+
+@stats-loc-go-app:
+  echo -n "go app loc:"
+  find {{files_go}} -type f ! -iname '*_test.go' -print0 | xargs -0 wc -l | tail -n 1
+
+@stats-loc-go-test:
+  echo -n "go test loc:"
+  find {{files_go}} -type f -iname '*_test.go' -print0 | xargs -0 wc -l | tail -n 1
+
+@stats: stats-loc stats-todos
+
+#   ____             _
+#  |  _ \  ___ _ __ | | ___  _   _
+#  | | | |/ _ \ '_ \| |/ _ \| | | |
+#  | |_| |  __/ |_) | | (_) | |_| |
+#  |____/ \___| .__/|_|\___/ \__, |
+#             |_|            |___/
+
+deploy-docker: build-docker
+  docker tag zit:latest idealnesswagon5/zit:latest
+  docker push idealnesswagon5/zit:latest
+
+deploy-github: \
+    build-go \
+    test \
+    (git-add-and-commit \
+      "." \
+      "../{zz-pandoc,zz-vim,zz-tests_bats}" \
+      "gomod2nix.toml")
+
+deploy: deploy-github deploy-docker

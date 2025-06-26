@@ -1,0 +1,68 @@
+#! /bin/bash -e
+
+pkg="code.linenisgreat.com/dodder/go/zit"
+
+ag_print_matching() (
+  query="$1"
+  shift
+
+  ag "$query" \
+    --go \
+    --only-matching \
+    --no-file \
+    --no-color \
+    --no-group \
+    --no-break \
+    "$@"
+)
+
+ag_print_matching_with_file() (
+  query="$pkg/src/$1"
+  shift
+
+  ag "$query" \
+    --go \
+    --only-matching \
+    --no-number \
+    --no-color \
+    --no-group \
+    --no-break \
+    "$@"
+)
+
+print_matches() (
+  path="$1"
+  ag_print_matching "$pkg/src/[\\w/]+" "$path" | sort -u
+)
+
+print_basenames() (
+  while IFS= read -r; do
+    echo "${REPLY#"$pkg/src/"}"
+  done
+)
+
+print_final() (
+  dir="$(dirname "$1")"
+  dep="$2"
+
+  w="25"
+  printf "%${w}s %${w}s\n" "$dir" "$dep"
+)
+
+export -f print_final
+
+print_package_locations() (
+  loc="$1"
+  while IFS= read -r; do
+    ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
+      tr -d ' ' |
+      sed -e "s#$pkg/##g; s/\"//g" |
+      xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
+      sort -u
+  done
+)
+
+print_matches "$1" |
+  print_basenames |
+  print_package_locations "$1" |
+  sort -u -b -k2

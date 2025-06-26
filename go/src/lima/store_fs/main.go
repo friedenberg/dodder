@@ -1,0 +1,506 @@
+package store_fs
+
+import (
+	"encoding/gob"
+	"fmt"
+	"path/filepath"
+	"strings"
+	"sync"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
+	"code.linenisgreat.com/dodder/go/src/echo/fd"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
+)
+
+func init() {
+	gob.Register(sku.Transacted{})
+}
+
+func Make(
+	config sku.Config,
+	deletedPrinter interfaces.FuncIter[*fd.FD],
+	fileExtensions interfaces.FileExtensions,
+	envRepo env_repo.Env,
+) (fs *Store, err error) {
+	fs = &Store{
+		config:         config,
+		deletedPrinter: deletedPrinter,
+		envRepo:        envRepo,
+		fileEncoder:    MakeFileEncoder(envRepo, config),
+		fileExtensions: fileExtensions,
+		dir:            envRepo.GetCwd(),
+		dirInfo: makeObjectsWithDir(
+			fileExtensions,
+			envRepo,
+		),
+		deleted: collections_value.MakeMutableValueSet[*fd.FD](
+			nil,
+		),
+		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
+			nil,
+		),
+		objectFormatOptions: object_inventory_format.Options{Tai: true},
+		metadataTextParser: object_metadata.MakeTextParser(
+			object_metadata.Dependencies{
+				EnvDir:    envRepo,
+				BlobStore: envRepo,
+			},
+		),
+	}
+
+	return
+}
+
+type Store struct {
+	config              sku.Config
+	deletedPrinter      interfaces.FuncIter[*fd.FD]
+	metadataTextParser  object_metadata.TextParser
+	envRepo             env_repo.Env
+	fileEncoder         FileEncoder
+	inlineTypeChecker   ids.InlineTypeChecker
+	fileExtensions      interfaces.FileExtensions
+	dir                 string
+	objectFormatOptions object_inventory_format.Options
+
+	dirInfo
+
+	deleteLock      sync.Mutex
+	deleted         fd.MutableSet
+	deletedInternal fd.MutableSet
+}
+
+func (fs *Store) GetExternalStoreLike() store_workspace.StoreLike {
+	return fs
+}
+
+// Deletions of user objects that should be exposed to the user
+func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
+	external := co.GetSkuExternal()
+
+	var item *sku.FSItem
+
+	if item, err = s.ReadFSItemFromExternal(external); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s.deleteLock.Lock()
+	defer s.deleteLock.Unlock()
+
+	if err = item.MutableSetLike.Each(s.deleted.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// Deletions of "transient" internal objects that should not be exposed to the
+// user
+func (s *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
+	external := co.GetSkuExternal()
+
+	var i *sku.FSItem
+
+	if i, err = s.ReadFSItemFromExternal(external); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s.deleteLock.Lock()
+	defer s.deleteLock.Unlock()
+
+	if err = i.MutableSetLike.Each(s.deletedInternal.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (fs *Store) Flush() (err error) {
+	deleteOp := DeleteCheckout{}
+
+	if err = deleteOp.Run(
+		fs.config.IsDryRun(),
+		fs.envRepo,
+		fs.deletedPrinter,
+		fs.deleted,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = deleteOp.Run(
+		fs.config.IsDryRun(),
+		fs.envRepo,
+		nil,
+		fs.deletedInternal,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fs.deleted.Reset()
+	fs.deletedInternal.Reset()
+
+	return
+}
+
+func (fs *Store) String() (out string) {
+	if quiter.Len(
+		fs.dirInfo.probablyCheckedOut,
+		fs.definitelyNotCheckedOut,
+	) == 0 {
+		return
+	}
+
+	sb := &strings.Builder{}
+	sb.WriteRune(box.OpGroupOpen)
+
+	hasOne := false
+
+	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
+		if hasOne {
+			sb.WriteRune(box.OpOr)
+		}
+
+		sb.WriteString(v.String())
+
+		hasOne = true
+
+		return
+	}
+
+	fs.dirInfo.probablyCheckedOut.Each(
+		func(z *sku.FSItem) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	fs.definitelyNotCheckedOut.Each(
+		func(z *sku.FSItem) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	sb.WriteRune(box.OpGroupClose)
+
+	out = sb.String()
+	return
+}
+
+func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
+	if err = s.dirInfo.processRootDir(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ks = make([]*sku.FSItem, 0)
+	var l sync.Mutex
+
+	if err = s.All(
+		func(kfp *sku.FSItem) (err error) {
+			l.Lock()
+			defer l.Unlock()
+
+			ks = append(ks, kfp)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) GetFSItemsForDir(
+	fd *fd.FD,
+) (items []*sku.FSItem, err error) {
+	if !fd.IsDir() {
+		err = errors.ErrorWithStackf("not a directory: %q", fd)
+		return
+	}
+
+	if items, err = s.dirInfo.processDir(fd.GetPath()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO confirm against actual Object Id
+func (s *Store) GetFSItemsForString(
+	baseDir string,
+	value string,
+	tryPattern bool,
+) (items []*sku.FSItem, err error) {
+	if value == "." {
+		if items, err = s.GetExternalObjectIds(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	var fdee *fd.FD
+
+	if fdee, err = fd.MakeFromPath(baseDir, value, s.envRepo); err != nil {
+		if errors.IsNotExist(err) && tryPattern {
+			if items, err = s.dirInfo.processFDPattern(
+				value,
+				filepath.Join(s.dir, fmt.Sprintf("%s*", value)),
+				s.dir,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	if fdee.IsDir() {
+		if items, err = s.GetFSItemsForDir(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if _, items, err = s.dirInfo.processFD(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (store *Store) GetObjectIdsForString(
+	queryLiteral string,
+) (objectIds []sku.ExternalObjectId, err error) {
+	var items []*sku.FSItem
+
+	if items, err = store.GetFSItemsForString(
+		store.root,
+		queryLiteral,
+		false,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, item := range items {
+		var eoid ids.ExternalObjectId
+
+		if err = item.WriteToExternalObjectId(
+			&eoid,
+			store.envRepo,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		objectIds = append(objectIds, &eoid)
+	}
+
+	return
+}
+
+func (fs *Store) Get(
+	k interfaces.ObjectId,
+) (t *sku.FSItem, ok bool) {
+	return fs.dirInfo.probablyCheckedOut.Get(k.String())
+}
+
+func (store *Store) Initialize(
+	storeSupplies store_workspace.Supplies,
+) (err error) {
+	store.root = storeSupplies.WorkspaceDir
+	store.storeSupplies = storeSupplies
+	return
+}
+
+func (s *Store) ReadAllExternalItems() (err error) {
+	if err = s.dirInfo.processRootDir(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadFSItemFromExternal(
+	tg sku.TransactedGetter,
+) (item *sku.FSItem, err error) {
+	item = &sku.FSItem{} // TODO use pool or use dir_items?
+	item.Reset()
+
+	sk := tg.GetSku()
+
+	// TODO handle sort order
+	for _, field := range sk.Metadata.Fields {
+		var fdee *fd.FD
+
+		switch strings.ToLower(field.Key) {
+		case "object":
+			fdee = &item.Object
+
+		case "blob":
+			fdee = &item.Blob
+
+		case "conflict":
+			fdee = &item.Conflict
+
+		default:
+			err = errors.ErrorWithStackf("unexpected field: %#v", field)
+			return
+		}
+
+		// if we've already set one of object, blob, or conflict, don't set it again
+		// and instead add a new FD to the item
+		if !fdee.IsEmpty() {
+			fdee = &fd.FD{}
+		}
+
+		if err = fdee.SetIgnoreNotExists(field.Value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = item.Add(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = item.ExternalObjectId.SetObjectIdLike(
+		&sk.ObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// external.ObjectId.ResetWith(conflicted.GetSkuExternal().GetObjectId())
+	// TODO populate FD
+	if !sk.ExternalObjectId.IsEmpty() {
+		if err = item.ExternalObjectId.SetObjectIdLike(
+			&item.ExternalObjectId,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Store) WriteFSItemToExternal(
+	item *sku.FSItem,
+	tg sku.TransactedGetter,
+) (err error) {
+	external := tg.GetSku()
+	external.Metadata.Fields = external.Metadata.Fields[:0]
+
+	m := &external.Metadata
+	m.Tai = item.GetTai()
+
+	var mode checkout_mode.Mode
+
+	if mode, err = item.GetCheckoutModeOrError(); err != nil {
+		if sku.IsErrMergeConflict(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	switch mode {
+	case checkout_mode.BlobOnly:
+		before := item.Blob.String()
+		after := s.envRepo.Rel(before)
+
+		if err = external.ExternalObjectId.SetBlob(after); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		k := &item.ExternalObjectId
+
+		if err = external.ObjectId.SetObjectIdLike(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = external.ExternalObjectId.SetObjectIdLike(
+			&item.ExternalObjectId,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if external.ExternalObjectId.String() != k.String() {
+			err = errors.ErrorWithStackf(
+				"expected %q but got %q. %s",
+				k,
+				&external.ExternalObjectId,
+				item.Debug(),
+			)
+
+			return
+		}
+	}
+
+	if err = item.WriteToSku(
+		external,
+		s.envRepo,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fdees := quiter.SortedValues(item.MutableSetLike)
+
+	for _, f := range fdees {
+		field := object_metadata.Field{
+			Value:     f.GetPath(),
+			ColorType: string_format_writer.ColorTypeId,
+		}
+
+		switch {
+		case item.Object.Equals(f):
+			field.Key = "object"
+
+		case item.Conflict.Equals(f):
+			field.Key = "conflict"
+
+		case item.Blob.Equals(f):
+			fallthrough
+
+		default:
+			field.Key = "blob"
+		}
+
+		external.Metadata.Fields = append(external.Metadata.Fields, field)
+	}
+
+	return
+}
