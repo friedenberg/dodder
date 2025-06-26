@@ -35,7 +35,7 @@ func Make(
 		env_local.Make(env_ui.MakeDefault(), dir),
 		env_repo.Options{
 			BasePath:             p,
-			PermitNoZitDirectory: true,
+			PermitNoDodderDirectory: true,
 		},
 	); err != nil {
 		t.Fatalf("failed to make dir_layout: %s", err)

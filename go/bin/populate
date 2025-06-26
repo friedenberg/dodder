@@ -2,9 +2,9 @@
 
 dir="$(dirname "$0")/.."
 lines="${1:-0}"
-zit="$dir/build/zit"
+dodder="$dir/build/dodder"
 
-cmd="xargs -0 caffeinate -imsd $zit new -filter $dir/bin/z_to_zit.awk"
+cmd="xargs -0 caffeinate -imsd $dodder new -filter $dir/bin/z_to_zit.awk"
 
 if [[ "$lines" -eq 0 ]]; then
   find ~/Zettelkasten -type f -iname '*.md' -print0 \

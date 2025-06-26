@@ -6,12 +6,12 @@ trap "rm -rf '$tmp'" EXIT
 
 cmd_ag=(
   ag
-  '\b(\w+)\b "github.com/friedenberg/zit/src/\w+/\1"'
+  '\b(\w+)\b "github.com/friedenberg/dodder/src/\w+/\1"'
   -l0
 )
 
 if "${cmd_ag[@]}" >"$tmp"; then
-  xargs -0 sed -E -i'' 's#(\w+) ("github.com/friedenberg/zit/src/\w+/\1")#\2#g' <"$tmp"
+  xargs -0 sed -E -i'' 's#(\w+) ("github.com/friedenberg/dodder/src/\w+/\1")#\2#g' <"$tmp"
 fi
 
 goimports -w ./

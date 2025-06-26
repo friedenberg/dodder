@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -15,7 +15,7 @@ teardown() {
 }
 
 function revert_one_zettel { # @test
-	run_zit revert one/uno
+	run_dodder revert one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
@@ -23,7 +23,7 @@ function revert_one_zettel { # @test
 }
 
 function revert_all_zettels { # @test
-	run_zit revert :z
+	run_dodder revert :z
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
@@ -31,19 +31,19 @@ function revert_all_zettels { # @test
 }
 
 function revert_last { # @test
-	run_zit revert -last
+	run_dodder revert -last
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit last
+	run_dodder last
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]

@@ -16,37 +16,37 @@ teardown() {
 
 # bats test_tags=user_story:store_version
 function info_store_version { # @test
-	run_zit info
+	run_dodder info
 	assert_output
 }
 
 # bats test_tags=user_story:compression
 function info_compression_type { # @test
-	run_zit info compression-type
+	run_dodder info compression-type
 	assert_output 'zstd'
 }
 
 # bats test_tags=user_story:xdg
 function info_xdg { # @test
-	run_zit_init_disable_age
-	run_zit info xdg
+	run_dodder_init_disable_age
+	run_dodder info xdg
 	assert_output - <<-EOM
-		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.xdg/data/zit
-		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.xdg/config/zit
-		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.xdg/state/zit
-		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.xdg/cache/zit
-		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.xdg/runtime/zit
+		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.xdg/data/dodder
+		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.xdg/config/dodder
+		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.xdg/state/dodder
+		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.xdg/cache/dodder
+		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.xdg/runtime/dodder
 	EOM
 }
 
 function info_non_xdg { # @test
-	run_zit_init -override-xdg-with-cwd test-repo-id
-	run_zit info xdg
+	run_dodder_init -override-xdg-with-cwd test-repo-id
+	run_dodder info xdg
 	assert_output - <<-EOM
-		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.zit/local/share
-		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.zit/config
-		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.zit/local/state
-		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.zit/cache
-		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.zit/local/runtime
+		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.dodder/local/share
+		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.dodder/config
+		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.dodder/local/state
+		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.dodder/cache
+		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.dodder/local/runtime
 	EOM
 }

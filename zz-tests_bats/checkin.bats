@@ -6,11 +6,11 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
-	run_zit_init_workspace
+	run_dodder_init_workspace
 
-	run_zit checkout :z,t,e
+	run_dodder checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
@@ -85,7 +85,7 @@ function dirty_one_virtual() {
 }
 
 function checkin_simple_one_zettel { # @test
-	run_zit checkin one/uno.zettel
+	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -95,10 +95,10 @@ function checkin_simple_one_zettel { # @test
 }
 
 function checkin_two_zettel_hidden { # @test
-	run_zit dormant-add etikett-one tag-3
+	run_dodder dormant-add etikett-one tag-3
 	assert_success
 
-	run_zit checkin .z
+	run_dodder checkin .z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -111,7 +111,7 @@ function checkin_two_zettel_hidden { # @test
 
 function checkin_simple_one_zettel_virtual_etikett { # @test
 	dirty_one_virtual
-	run_zit checkin one/uno.zettel
+	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -119,7 +119,7 @@ function checkin_simple_one_zettel_virtual_etikett { # @test
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" %virtual etikett-one]
 	EOM
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
@@ -127,7 +127,7 @@ function checkin_simple_one_zettel_virtual_etikett { # @test
 }
 
 function checkin_complex_zettel_etikett_negation { # @test
-	run_zit checkin ^etikett-two.z
+	run_dodder checkin ^etikett-two.z
 	assert_success
 	assert_output - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -137,7 +137,7 @@ function checkin_complex_zettel_etikett_negation { # @test
 }
 
 function checkin_simple_all { # @test
-	run_zit checkin .
+	run_dodder checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -150,7 +150,7 @@ function checkin_simple_all { # @test
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format log :?z,e,t
+	run_dodder show -format log :?z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -170,7 +170,7 @@ function checkin_simple_all { # @test
 }
 
 function checkin_simple_all_dry_run { # @test
-	run_zit checkin -dry-run .
+	run_dodder checkin -dry-run .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -183,7 +183,7 @@ function checkin_simple_all_dry_run { # @test
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format log :z,e,t
+	run_dodder show -format log :z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -198,57 +198,57 @@ function checkin_simple_all_dry_run { # @test
 }
 
 function checkin_simple_typ { # @test
-	run_zit checkin .t
+	run_dodder checkin .t
 	assert_success
 	assert_output - <<-EOM
 		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 	EOM
 
-	run_zit show -format blob !md:t
+	run_dodder show -format blob !md:t
 	assert_success
 	assert_output - <<-EOM
 		binary = true
 		vim-syntax-type = "test"
 	EOM
 
-	run_zit last -format box-archive
+	run_dodder last -format box-archive
 	assert_success
 	assert_output --regexp - <<-'EOM'
 		\[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b .* !toml-type-v1]
 	EOM
 
-	run_zit show !md:t
+	run_dodder show !md:t
 	assert_success
 	assert_output - <<-EOM
 		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b !toml-type-v1]
 	EOM
 
-	run_zit show -format type.vim-syntax-type !md:typ
+	run_dodder show -format type.vim-syntax-type !md:typ
 	assert_success
 	assert_output 'toml'
 
-	run_zit show -format type.vim-syntax-type one/uno
+	run_dodder show -format type.vim-syntax-type one/uno
 	assert_success
 	assert_output 'test'
 }
 
 function checkin_simple_etikett { # @test
-	run_zit checkin zz-archive.tag
-	# run_zit checkin zz-archive.e
+	run_dodder checkin zz-archive.tag
+	# run_dodder checkin zz-archive.e
 	assert_success
 	assert_output - <<-EOM
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
-	run_zit last -format inventory-list-sans-tai
+	run_dodder last -format inventory-list-sans-tai
 	assert_success
 	assert_output --regexp - <<-'EOM'
 		\[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
 		\[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93 .*]
 	EOM
 
-	run_zit show -format blob zz-archive?e
+	run_dodder show -format blob zz-archive?e
 	assert_success
 	assert_output - <<-EOM
 		hide = true
@@ -271,14 +271,14 @@ function checkin_zettel_typ_has_commit_hook { # @test
 		"""
 	EOM
 
-	run_zit checkin -delete typ_with_hook.type
+	run_dodder checkin -delete typ_with_hook.type
 	assert_success
 	assert_output - <<-EOM
 		[!typ_with_hook @1f6b9061059a83822901612bc050dd7d966bb5a2ceb917549ca3881728854477 !toml-type-v1]
 		          deleted [typ_with_hook.type]
 	EOM
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# test lua
 		! typ_with_hook
@@ -295,7 +295,7 @@ function checkin_zettel_typ_has_commit_hook { # @test
 }
 
 function checkin_zettel_with_komment { # @test
-	run_zit checkin -print-inventory_list=true -comment "message" one/uno.zettel
+	run_dodder checkin -print-inventory_list=true -comment "message" one/uno.zettel
 	assert_success
 	assert_output --regexp - <<-'EOM'
 		\[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\]
@@ -307,7 +307,7 @@ function checkin_zettel_with_komment { # @test
 
 function checkin_via_organize { # @test
 	export EDITOR="true"
-	run_zit checkin -organize one/uno.zettel
+	run_dodder checkin -organize one/uno.zettel
 	assert_success
 	assert_output - <<-'EOM'
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -322,7 +322,7 @@ function checkin_dot_untracked_fs_blob() { # @test
 		newest body
 	EOM
 
-	run_zit checkin .
+	run_dodder checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -343,7 +343,7 @@ function checkin_explicit_untracked_fs_blob() { # @test
 		newest body
 	EOM
 
-	run_zit checkin test.md
+	run_dodder checkin test.md
 	assert_success
 	assert_output - <<-EOM
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
@@ -357,7 +357,7 @@ function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 	EOM
 
 	export EDITOR="true"
-	run_zit checkin -organize .
+	run_dodder checkin -organize .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -379,7 +379,7 @@ function checkin_explicit_organize_include_untracked_fs_blob() { # @test
 	EOM
 
 	export EDITOR="bash -c 'true'"
-	run_zit checkin -organize test.md </dev/null
+	run_dodder checkin -organize test.md </dev/null
 	assert_success
 	assert_output - <<-EOM
 		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
@@ -397,7 +397,7 @@ function checkin_explicit_organize_include_untracked_fs_blob_change_description(
 	EOM
 
 	export EDITOR="bash -c 'cat desired_end_state.md >\$0'"
-	run_zit checkin -organize test.md </dev/null
+	run_dodder checkin -organize test.md </dev/null
 	assert_success
 	assert_output - <<-EOM
 		[some_tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -412,7 +412,7 @@ function checkin_dot_organize_include_untracked_fs_blob() { # @test
 	EOM
 
 	export EDITOR="bash -c 'true'"
-	run_zit checkin -organize . </dev/null
+	run_dodder checkin -organize . </dev/null
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -433,7 +433,7 @@ function checkin_dot_include_untracked_fs_blob_with_spaces() { # @test
 		newest body
 	EOM
 
-	run_zit checkin "test with spaces.txt" </dev/null
+	run_dodder checkin "test with spaces.txt" </dev/null
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
@@ -448,7 +448,7 @@ function checkin_dot_organize_include_untracked_fs_blob_with_spaces() { # @test
 	EOM
 
 	export EDITOR="bash -c 'true'"
-	run_zit checkin -organize "test with spaces.txt" </dev/null
+	run_dodder checkin -organize "test with spaces.txt" </dev/null
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
@@ -467,13 +467,13 @@ function checkin_explicit_workspace_delete_files { # @test
 	export -f editor
 
 	export EDITOR="/bin/bash -c 'editor \$0'"
-	run_zit edit-config
+	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
 		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
 	EOM
 
-	cat >.zit-workspace <<-EOM
+	cat >.dodder-workspace <<-EOM
 		---
 		! toml-workspace_config-v0
 		---
@@ -484,7 +484,7 @@ function checkin_explicit_workspace_delete_files { # @test
 		tags = ["today"]
 	EOM
 
-	run_zit info-workspace query
+	run_dodder info-workspace query
 	assert_success
 	assert_output 'today'
 
@@ -510,7 +510,7 @@ function checkin_explicit_workspace_delete_files { # @test
 	# shellcheck disable=SC2016
 	export EDITOR='bash -c "editor $0"'
 
-	run_zit checkin -organize -delete 1.md 2.md
+	run_dodder checkin -organize -delete 1.md 2.md
 	assert_success
 	assert_output - <<-EOM
 		[today @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

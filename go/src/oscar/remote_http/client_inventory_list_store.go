@@ -157,7 +157,7 @@ func (client client) ImportInventoryList(
 
 	// TODO ensure that conflicts were addressed prior to importing
 	// if options.AllowMergeConflicts {
-	// 	request.Header.Add("x-zit-remote_transfer_options-allow_merge_conflicts", "true")
+	// 	request.Header.Add("x-dodder-remote_transfer_options-allow_merge_conflicts", "true")
 	// }
 
 	var response *http.Response

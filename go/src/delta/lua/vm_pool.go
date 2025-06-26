@@ -32,6 +32,29 @@ func (sp *VMPool) PrepareVM(
 	)
 
 	if sp.Require != nil {
+		vm.PreloadModule("der", func(s *lua.LState) int {
+			// register functions to the table
+			mod := s.SetFuncs(s.NewTable(), map[string]lua.LGFunction{
+				"require": sp.Require,
+			})
+
+			s.Push(mod)
+
+			return 1
+		})
+
+		vm.PreloadModule("dodder", func(s *lua.LState) int {
+			// register functions to the table
+			mod := s.SetFuncs(s.NewTable(), map[string]lua.LGFunction{
+				"require": sp.Require,
+			})
+
+			s.Push(mod)
+
+			return 1
+		})
+
+		// TODO eventually remove
 		vm.PreloadModule("zit", func(s *lua.LState) int {
 			// register functions to the table
 			mod := s.SetFuncs(s.NewTable(), map[string]lua.LGFunction{
@@ -43,9 +66,11 @@ func (sp *VMPool) PrepareVM(
 			return 1
 		})
 
-		tableZit := vm.Pool.Get()
-		vm.SetField(tableZit, "require", vm.NewFunction(sp.Require))
-		vm.SetGlobal("zit", tableZit)
+		table := vm.Pool.Get()
+		vm.SetField(table, "require", vm.NewFunction(sp.Require))
+		vm.SetGlobal("der", table)
+		vm.SetGlobal("dodder", table)
+		vm.SetGlobal("zit", table)
 	}
 
 	if sp.Searcher != nil {

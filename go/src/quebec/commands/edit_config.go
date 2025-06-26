@@ -84,7 +84,7 @@ func (c EditConfig) editInVim(
 
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().
-			WithFileType("zit-object").
+			WithFileType("dodder-object").
 			Build(),
 	}
 

@@ -12,14 +12,14 @@ teardown() {
 }
 
 function init_compression { # @test
-	run_zit info store-version
+	run_dodder info store-version
 	assert_success
 	assert_output --regexp '[0-9]+'
 
 	# shellcheck disable=SC2034
 	storeVersionCurrent="$output"
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function output_immutable_config() {
 		cat - <<-EOM
@@ -27,7 +27,7 @@ function init_compression { # @test
 			! toml-config-immutable-v1
 			---
 
-			public-key = 'zit-repo-public_key-v1.*'
+			public-key = 'dodder-repo-public_key-v1.*'
 			store-version = $storeVersionCurrent
 			repo-type = 'working-copy'
 			id = 'test-repo-id'
@@ -38,15 +38,15 @@ function init_compression { # @test
 		EOM
 	}
 
-	run_zit info-repo config-immutable
+	run_dodder info-repo config-immutable
 	assert_success
 	output_immutable_config | assert_output --regexp -
 
-	run_zit cat-blob "$(get_konfig_sha)"
+	run_dodder cat-blob "$(get_konfig_sha)"
 	assert_success
 
 	sha="$(get_konfig_sha)"
-	run zstd --decompress .xdg/data/zit/objects/blobs/"${sha:0:2}"/* --stdout
+	run zstd --decompress .xdg/data/dodder/objects/blobs/"${sha:0:2}"/* --stdout
 	assert_success
 }
 
@@ -56,29 +56,29 @@ function init_and_reindex { # @test
 
 	set_xdg "$wd"
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
-	run test -f .xdg/data/zit/config-permanent
+	run test -f .xdg/data/dodder/config-permanent
 	assert_success
 
-	run_zit show -format log :konfig
+	run_dodder show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show :t,konfig
+	run_dodder show :t,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show :t,konfig
+	run_dodder show :t,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -92,52 +92,52 @@ function init_and_deinit { # @test
 
 	set_xdg "$wd"
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
-	run test -f .xdg/data/zit/config-permanent
+	run test -f .xdg/data/dodder/config-permanent
 	assert_success
 
-	# run cat .zit/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
+	# run cat .dodder/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
 	# assert_output wow
-	run_zit show -format log :konfig
+	run_dodder show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
-	# run_zit deinit
+	# run_dodder deinit
 	# assert_success
 	# assert_output wow
 
-	# run test ! -f .zit/KonfigAngeboren
-	# run ls .zit/
+	# run test ! -f .dodder/KonfigAngeboren
+	# run ls .dodder/
 	# assert_success
 	# assert_output wow
 }
 
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit_init
-	age_id="$(zit info-repo age-encryption)"
+	run_dodder_init
+	age_id="$(dodder info-repo age-encryption)"
 
 	mkdir inner
 	pushd inner || exit 1
 
 	set_xdg "$(pwd)"
-	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id" test-repo-id
+	run_dodder init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id" test-repo-id
 	assert_success
 
-	run_zit info-repo age-encryption
+	run_dodder info-repo age-encryption
 	assert_success
 	assert_output "$age_id"
 }
 
 function init_with_non_xdg { # @test
-	run_zit_init -override-xdg-with-cwd test-repo-id
-	run tree .zit
+	run_dodder_init -override-xdg-with-cwd test-repo-id
+	run tree .dodder
 	assert_output
 
-	run_zit show +konfig,t
+	run_dodder show +konfig,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -147,14 +147,14 @@ function init_with_non_xdg { # @test
 
 function non_repo_failure { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit show +konfig,t
+	run_dodder show +konfig,t
 	assert_failure
-	assert_output --partial 'not in a zit directory'
+	assert_output --partial 'not in a dodder directory'
 }
 
 function init_and_init { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit_init -override-xdg-with-cwd test-repo-id
+	run_dodder_init -override-xdg-with-cwd test-repo-id
 	assert_success
 
 	{
@@ -167,30 +167,30 @@ function init_and_init { # @test
 		echo "body"
 	} >to_add
 
-	run_zit new -edit=false to_add
+	run_dodder new -edit=false to_add
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit init -lock-internal-files=false -override-xdg-with-cwd test-repo-id
+	run_dodder init -lock-internal-files=false -override-xdg-with-cwd test-repo-id
 	assert_failure
 	assert_output --partial ': file exists'
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit show :
+	run_dodder show :
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
@@ -198,17 +198,17 @@ function init_and_init { # @test
 }
 
 function init_next { # @test
-	run_zit info store-version-next
+	run_dodder info store-version-next
 	assert_success
 	assert_output --regexp '[0-9]+'
 
 	# shellcheck disable=SC2034
 	storeVersionNext="$output"
 
-	run_zit_init -next -override-xdg-with-cwd test-repo-id
+	run_dodder_init -next -override-xdg-with-cwd test-repo-id
 	assert_success
 
-	run_zit info-repo store-version
+	run_dodder info-repo store-version
 	assert_success
 	assert_output "$storeVersionNext"
 }

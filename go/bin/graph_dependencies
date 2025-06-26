@@ -1,7 +1,7 @@
 #! /bin/bash -e
 
 print_matches() (
-	ag "code.linenisgreat.com/dodder/go/zit/$1" -l </dev/null |
+	ag "code.linenisgreat.com/dodder/go/$1" -l </dev/null |
 		cut -d'/' -f1-3 |
 		sort -u
 )

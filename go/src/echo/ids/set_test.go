@@ -18,27 +18,27 @@ func TestNormalize(t *testing.T) {
 	testEntries := map[string]testEntry{
 		"removes all": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
 			ex: MakeTagSet(
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
 		},
 		"removes non": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 			ex: MakeTagSet(
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 		},
@@ -82,9 +82,9 @@ func TestRemovePrefixes(t *testing.T) {
 	testEntries := map[string]testEntry{
 		"removes all": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
 			ex:     MakeTagSet(),
@@ -92,38 +92,38 @@ func TestRemovePrefixes(t *testing.T) {
 		},
 		"removes non": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 			ex: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 			prefix: "xx",
 		},
 		"removes one": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 			ex: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 			),
 			prefix: "zz",
 		},
 		"removes most": {
 			ac: MakeTagSet(
-				MustTag("project-2021-zit"),
-				MustTag("project-2021-zit-test"),
-				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-2021-dodder"),
+				MustTag("project-2021-dodder-test"),
+				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 			ex: MakeTagSet(
@@ -145,7 +145,7 @@ func TestRemovePrefixes(t *testing.T) {
 
 func TestExpandedRight(t *testing.T) {
 	s := MakeTagSet(
-		MustTag("project-2021-zit"),
+		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
 
@@ -154,7 +154,7 @@ func TestExpandedRight(t *testing.T) {
 	expected := []string{
 		"project",
 		"project-2021",
-		"project-2021-zit",
+		"project-2021-dodder",
 		"zz",
 		"zz-archive",
 		"zz-archive-task",
@@ -174,14 +174,14 @@ func TestExpandedRight(t *testing.T) {
 
 func TestPrefixIntersection(t *testing.T) {
 	s := MakeTagSet(
-		MustTag("project-2021-zit"),
+		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
 
 	ex := IntersectPrefixes(s, MustTag("project"))
 
 	expected := []string{
-		"project-2021-zit",
+		"project-2021-dodder",
 	}
 
 	actual := quiter.SortedStrings(ex)
@@ -218,12 +218,12 @@ func TestPrefixIntersection(t *testing.T) {
 
 func TestDelta1(t *testing.T) {
 	from := MakeTagSet(
-		MustTag("project-2021-zit"),
+		MustTag("project-2021-dodder"),
 		MustTag("task-todo"),
 	)
 
 	to := MakeTagSet(
-		MustTag("project-2021-zit"),
+		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
 

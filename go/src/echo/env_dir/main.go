@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	EnvDir = "DIR_ZIT"
-	EnvBin = "BIN_ZIT"
+	EnvDir = "DIR_DODDER"
+	EnvBin = "BIN_DODDER"
 )
 
 type Env interface {
@@ -130,8 +130,8 @@ func MakeWithHome(
 		s.CancelWithError(err)
 	}
 
-	addedPath := "zit"
-	pathCwdXDGOverride := filepath.Join(s.cwd, ".zit")
+	addedPath := "dodder"
+	pathCwdXDGOverride := filepath.Join(s.cwd, ".dodder")
 
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
@@ -170,8 +170,8 @@ func MakeWithHomeAndInitialize(
 		s.CancelWithError(err)
 	}
 
-	addedPath := "zit"
-	pathCwdXDGOverride := filepath.Join(s.cwd, ".zit")
+	addedPath := "dodder"
+	pathCwdXDGOverride := filepath.Join(s.cwd, ".dodder")
 
 	if cwdXDGOverride {
 		xdg.Home = pathCwdXDGOverride
@@ -296,9 +296,9 @@ func (s env) Rel(
 
 func (h env) MakeCommonEnv() map[string]string {
 	return map[string]string{
-		"ZIT_BIN": h.GetExecPath(),
-		// TODO determine if ZIT_DIR is kept
-		// "ZIT_DIR": h.Dir(),
+		EnvBin: h.GetExecPath(),
+		// TODO determine if EnvDir is kept
+		// EnvDir: h.Dir(),
 	}
 }
 

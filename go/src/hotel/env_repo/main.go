@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
-const FileWorkspace = ".zit-workspace"
+const FileWorkspace = ".dodder-workspace"
 
 type Env struct {
 	env_local.Env
@@ -71,9 +71,9 @@ func Make(
 	// 	return
 	// }
 
-	if !o.PermitNoZitDirectory {
-		if ok := files.Exists(s.DirZit()); !ok {
-			err = errors.Wrap(ErrNotInZitDir{})
+	if !o.PermitNoDodderDirectory {
+		if ok := files.Exists(s.DirDodder()); !ok {
+			err = errors.Wrap(ErrNotInDodderDir{})
 			return
 		}
 	}

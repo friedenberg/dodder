@@ -16,7 +16,7 @@ func (e ErrFutureStoreVersion) Error() string {
 		strings.Join(
 			[]string{
 				"store version is from the future: %q",
-				"This means that this installation of zit is likely out of date.",
+				"This means that this installation of dodder is likely out of date.",
 			},
 			". ",
 		),

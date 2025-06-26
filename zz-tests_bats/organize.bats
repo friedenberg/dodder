@@ -6,9 +6,9 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
-	run_zit_init_workspace
+	run_dodder_init_workspace
 	export BATS_TEST_BODY=true
 }
 
@@ -19,26 +19,26 @@ teardown() {
 # bats file_tags=user_story:organize
 
 cmd_def_organize=(
-	"${cmd_zit_def[@]}"
+	"${cmd_dodder_def[@]}"
 	-prefix-joints=false
 	-refine=true
 )
 
 cmd_def_organize_prefix_joints=(
-	"${cmd_zit_def[@]}"
+	"${cmd_dodder_def[@]}"
 	-prefix-joints=true
 	-refine=true
 )
 
 function organize_empty { # @test
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only
 	assert_success
 	assert_output_unsorted - <<-EOM
 	EOM
 }
 
 function organize_empty_commit { # @test
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
 		- test
 	EOM
 
@@ -50,7 +50,7 @@ function organize_empty_commit { # @test
 
 function organize_simple { # @test
 	actual="$(mktemp)"
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only :z,e,t >"$actual"
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only :z,e,t >"$actual"
 	assert_success
 	assert_output_unsorted - <<-EOM
 
@@ -66,10 +66,10 @@ function organize_simple { # @test
 }
 
 function organize_simple_commit { # @test
-	run_zit checkout one/uno
+	run_dodder checkout one/uno
 	assert_success
 
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all, %virtual_etikett
 		- [   !md   ]
 		- [   tag  ]
@@ -96,7 +96,7 @@ function organize_simple_commit { # @test
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
 	EOM
 
-	run_zit show -format log new-etikett-for-all:z,e,t
+	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
@@ -112,13 +112,13 @@ function organize_simple_commit { # @test
 }
 
 function organize_simple_checkedout_matchesmutter { # @test
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
 		- [   !md   ]
 		- [   -tag  ]
@@ -145,7 +145,7 @@ function organize_simple_checkedout_matchesmutter { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit show -format log new-etikett-for-all:z,e,t
+	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
@@ -159,7 +159,7 @@ function organize_simple_checkedout_matchesmutter { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit status one/dos.zettel
+	run_dodder status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
@@ -167,7 +167,7 @@ function organize_simple_checkedout_matchesmutter { # @test
 }
 
 function organize_simple_checkedout_merge_no_conflict { # @test
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -185,7 +185,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 		not another one, now with a different body
 	EOM
 
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
 		- [   !md   ]
 		- [   -tag  ]
@@ -212,7 +212,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit show -format log new-etikett-for-all:z,e,t
+	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
@@ -226,7 +226,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit status one/dos.zettel
+	run_dodder status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM
 		          changed [one/dos.zettel @7ac3bdeb0ac8fd96cd7f8700a4bbc7a5d777fe26c50b52c20ecd726b255ec3d0 !md "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
@@ -251,7 +251,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 		binary = false
 	EOM
 
-	run_zit checkin -delete .t
+	run_dodder checkin -delete .t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [txt.type]
@@ -260,7 +260,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[!txt @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
 	EOM
 
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -278,7 +278,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 		not another one, conflict time
 	EOM
 
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 		---
 		- new-etikett-for-all
 		---
@@ -308,7 +308,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit show -format log new-etikett-for-all:z,e,t
+	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
@@ -322,7 +322,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit status one/dos.zettel
+	run_dodder status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM
 		       conflicted [one/dos.zettel]
@@ -330,7 +330,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 }
 
 function organize_hides_hidden_tags_from_organize { # @test
-	run_zit dormant-add zz-archive
+	run_dodder dormant-add zz-archive
 	assert_success
 	assert_output ''
 
@@ -338,36 +338,36 @@ function organize_hides_hidden_tags_from_organize { # @test
 	{
 		echo ---
 		echo "# split hinweis for usability"
-		echo - project-2021-zit
+		echo - project-2021-dodder
 		echo - zz-archive-task-done
 		echo ! md
 		echo ---
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
 		[project @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[project-2021 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[project-2021-zit @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[project-2021-dodder @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive-task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-archive-task-done @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-zit zz-archive-task-done]
+		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
 	EOM
 
-	run_zit show two/uno
+	run_dodder show two/uno
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-zit zz-archive-task-done]
+		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
 	EOM
 
-	run_zit organize -mode output-only project-2021-zit:z
+	run_dodder organize -mode output-only project-2021-dodder:z
 	assert_success
 	assert_output - <<-EOM
 		---
-		- project-2021-zit
+		- project-2021-dodder
 		---
 	EOM
 }
@@ -375,9 +375,9 @@ function organize_hides_hidden_tags_from_organize { # @test
 function organize_dry_run { # @test
 	expected_show="$(mktemp)"
 	# shellcheck disable=SC2154
-	zit show "${cmd_zit_def[@]}" -format log :z,e,t >"$expected_show"
+	dodder show "${cmd_dodder_def[@]}" -format log :z,e,t >"$expected_show"
 
-	run_zit organize -dry-run -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -dry-run -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
 		- [   !md   ]
 		- [   -tag  ]
@@ -390,13 +390,13 @@ function organize_dry_run { # @test
 	EOM
 	assert_success
 
-	run_zit show -format log :z,e,t
+	run_dodder show -format log :z,e,t
 	assert_success
 	assert_output_unsorted "$(cat "$expected_show")"
 }
 
 function organize_with_type_output { # @test
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only !md:z
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only !md:z
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -409,7 +409,7 @@ function organize_with_type_output { # @test
 }
 
 function organize_with_type_commit { # @test
-	run_zit organize -mode commit-directly !md:z <<-EOM
+	run_dodder organize -mode commit-directly !md:z <<-EOM
 		---
 		! txt
 		---
@@ -427,7 +427,7 @@ function organize_with_type_commit { # @test
 }
 
 function modify_description { # @test
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 
 		- [   !md   ]
 		- [   tag  ]
@@ -447,7 +447,7 @@ function modify_description { # @test
 
 function add_named { # @test
 	# TODO modify organize to not require query group or else accidentally output unchanged objektes
-	run_zit organize -mode commit-directly :e <<-EOM
+	run_dodder organize -mode commit-directly :e <<-EOM
 		# with-tag
 		- [added_tag]
 	EOM
@@ -469,18 +469,18 @@ function organize_v5_outputs_organize_one_etikett { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
 		[ok @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit show -format object-id o/u
+	run_dodder show -format object-id o/u
 	assert_success
 	assert_output 'one/uno'
 
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only ok
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only ok
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -502,7 +502,7 @@ function organize_v5_outputs_organize_two_tags { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[brown @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -510,7 +510,7 @@ function organize_v5_outputs_organize_two_tags { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" brown ok]
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only ok brown
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only ok brown
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -521,7 +521,7 @@ function organize_v5_outputs_organize_two_tags { # @test
 		- [two/uno !md] wow
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" \
+	run_dodder organize "${cmd_def_organize[@]}" \
 		-mode commit-directly \
 		ok brown <<-EOM
 			      # ok
@@ -534,7 +534,7 @@ function organize_v5_outputs_organize_two_tags { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit show -format text two/uno
+	run_dodder show -format text two/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -557,7 +557,7 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
 		[priority @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -567,7 +567,7 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" priority-1 priority-2 task]
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" \
+	run_dodder organize "${cmd_def_organize[@]}" \
 		-mode output-only \
 		-group-by priority task
 	assert_success
@@ -588,7 +588,7 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 	return
 
 	# shellcheck disable=2317
-	run_zit organize "${cmd_def_organize_prefix_joints[@]}" \
+	run_dodder organize "${cmd_def_organize_prefix_joints[@]}" \
 		-mode output-only \
 		-group-by priority task
 
@@ -623,7 +623,7 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[priority-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -642,7 +642,7 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
 		[priority-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -650,7 +650,7 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 	EOM
 
 	# add prefix joints
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by priority task
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only -group-by priority task
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -679,7 +679,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	to_add="$(mktemp)"
@@ -693,7 +693,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	to_add="$(mktemp)"
@@ -707,7 +707,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	expected_organize="$(mktemp)"
@@ -731,7 +731,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "- [two/uno !md] 3"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 
 	to_add="$(mktemp)"
@@ -745,7 +745,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -759,7 +759,7 @@ function organize_v5_commits_organize_one_tags_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit show -format text two/uno
+	run_dodder show -format text two/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 }
@@ -776,7 +776,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	expected="$(mktemp)"
@@ -786,7 +786,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo w-2022-07-07
 	} >"$expected"
 
-	# run zit cat -gattung hinweis
+	# run dodder cat -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 
 	to_add="$(mktemp)"
@@ -800,7 +800,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	{
@@ -821,7 +821,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit new -edit=false "$to_add"
+	run_dodder new -edit=false "$to_add"
 	assert_success
 
 	expected_organize="$(mktemp)"
@@ -840,7 +840,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "- [two/uno !md] 3"
 	} >"$expected_organize"
 
-	run_zit organize \
+	run_dodder organize \
 		"${cmd_def_organize[@]}" \
 		-mode commit-directly \
 		-group-by priority,w \
@@ -858,7 +858,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -872,17 +872,17 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 		echo "---"
 	} >"$to_add"
 
-	run_zit show -format text two/uno
+	run_dodder show -format text two/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
-	run_zit show -format text one/tres
+	run_dodder show -format text one/tres
 	assert_success
 
-	run_zit show -format text two/dos
+	run_dodder show -format text two/dos
 	assert_success
 
-	run_zit show -format text three/uno
+	run_dodder show -format text three/uno
 	assert_success
 
 	{
@@ -894,7 +894,7 @@ function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @tes
 	} >"$expected"
 
 	# TODO
-	# run zit cat-tags-schwanzen
+	# run dodder cat-tags-schwanzen
 	# assert_output "$(cat "$expected")"
 }
 
@@ -910,7 +910,7 @@ function organize_v5_commits_no_changes { # @test
 		echo "---"
 	} >"$one"
 
-	run_zit new -edit=false "$one"
+	run_dodder new -edit=false "$one"
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[priority-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -934,7 +934,7 @@ function organize_v5_commits_no_changes { # @test
 		echo "---"
 	} >"$two"
 
-	run_zit new -edit=false "$two"
+	run_dodder new -edit=false "$two"
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[w-2022-07-06 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -952,14 +952,14 @@ function organize_v5_commits_no_changes { # @test
 		echo "---"
 	} >"$three"
 
-	run_zit new -edit=false "$three"
+	run_dodder new -edit=false "$three"
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[two/dos @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
 	EOM
 
 	# TODO add prefix joints
-	run_zit organize "${cmd_def_organize[@]}" \
+	run_dodder organize "${cmd_def_organize[@]}" \
 		-mode output-only \
 		-group-by priority,w task
 	assert_success
@@ -981,7 +981,7 @@ function organize_v5_commits_no_changes { # @test
 
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" \
+	run_dodder organize "${cmd_def_organize[@]}" \
 		-mode commit-directly \
 		-group-by priority,w task \
 		<<-EOM
@@ -1027,7 +1027,7 @@ function organize_v5_commits_dependent_leaf { # @test
 		echo "---"
 	} >"$one"
 
-	run_zit new -edit=false "$one"
+	run_dodder new -edit=false "$one"
 	assert_success
 
 	two="$(mktemp)"
@@ -1041,7 +1041,7 @@ function organize_v5_commits_dependent_leaf { # @test
 		echo "---"
 	} >"$two"
 
-	run_zit new -edit=false "$two"
+	run_dodder new -edit=false "$two"
 	assert_success
 
 	three="$(mktemp)"
@@ -1055,7 +1055,7 @@ function organize_v5_commits_dependent_leaf { # @test
 		echo "---"
 	} >"$three"
 
-	run_zit new -edit=false "$three"
+	run_dodder new -edit=false "$three"
 	assert_success
 
 	expected_organize="$(mktemp)"
@@ -1071,7 +1071,7 @@ function organize_v5_commits_dependent_leaf { # @test
 		echo "###"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_dodder organize "${cmd_def_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 }
 
@@ -1084,9 +1084,9 @@ function organize_v5_zettels_in_correct_places { # @test
 		echo "---"
 	} >"$one"
 
-	run_zit new -edit=false "$one"
+	run_dodder new -edit=false "$one"
 
-	run_zit organize "${cmd_def_organize[@]}" \
+	run_dodder organize "${cmd_def_organize[@]}" \
 		-mode output-only -group-by inventory \
 		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 	assert_success
@@ -1103,7 +1103,7 @@ function organize_v5_zettels_in_correct_places { # @test
 
 function organize_v5_tags_correct { # @test
 
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
 		# test1
 		## -wow
 
@@ -1125,7 +1125,7 @@ function organize_v5_tags_correct { # @test
 		echo "---"
 	} >"one/uno.zettel"
 
-	run_zit checkin one/uno.zettel
+	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		[test4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -1133,7 +1133,7 @@ function organize_v5_tags_correct { # @test
 	EOM
 
 	# TODO-P2 fix issue with kennung schwanzen
-	# run_zit cat-tags-schwanzen
+	# run_dodder cat-tags-schwanzen
 	# assert_output - <<-EOM
 	# EOM
 
@@ -1146,7 +1146,7 @@ function organize_v5_tags_correct { # @test
 		echo "---"
 	} >"one/uno.zettel"
 
-	run_zit checkin one/uno.zettel
+	run_dodder checkin one/uno.zettel
 	assert_output - <<-EOM
 		[test1-ok @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
@@ -1154,13 +1154,13 @@ function organize_v5_tags_correct { # @test
 }
 
 function organize_remove_anchored_metadata { # @test
-	run_zit show tag-3:z
+	run_dodder show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly tag-3 <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly tag-3 <<-EOM
 		---
 		- tag-3
 		---
@@ -1172,20 +1172,20 @@ function organize_remove_anchored_metadata { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-4]
 	EOM
 
-	run_zit show tag-3:z
+	run_dodder show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 	EOM
 }
 
 function organize_update_checkout { # @test
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly :z <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly :z <<-EOM
 		---
 		- test
 		---
@@ -1200,7 +1200,7 @@ function organize_update_checkout { # @test
 		[test @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit status
+	run_dodder status
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4 test]
@@ -1208,13 +1208,13 @@ function organize_update_checkout { # @test
 }
 
 function organize_update_checkout_remove_tags { # @test
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly :z <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly :z <<-EOM
 		- [one/dos  !md] wow ok again
 		- [one/uno  !md] wow the first
 	EOM
@@ -1224,7 +1224,7 @@ function organize_update_checkout_remove_tags { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
 	EOM
 
-	run_zit status
+	run_dodder status
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]
@@ -1232,7 +1232,7 @@ function organize_update_checkout_remove_tags { # @test
 }
 
 function create_structured_zettels { # @test
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
 		---
 		- test
 		---
@@ -1250,7 +1250,7 @@ function create_structured_zettels { # @test
 }
 
 function description_with_literal_characters { # @test
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+	run_dodder organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
 		- [terb/ala !md payee] thoughts on quincey's contract / scope of work
 	EOM
 	assert_success
@@ -1262,7 +1262,7 @@ function description_with_literal_characters { # @test
 
 # [hemp/mr !task project-2021-zit-bugs today zz-inbox] fix issue with `zit organize project-2021-zit` causing deltas
 function tags_with_extended_tags_noop { # @test
-	run_zit organize -mode commit-directly :z <<-EOM
+	run_dodder organize -mode commit-directly :z <<-EOM
 		# new-etikett-for-all
 		- [one/dos   !md tag-3 tag-4] wow ok again
 		- [one/uno   !md tag-3 tag-4] wow the first
@@ -1277,7 +1277,7 @@ function tags_with_extended_tags_noop { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit organize -mode output-only new:z <<-EOM
+	run_dodder organize -mode output-only new:z <<-EOM
 		# new-etikett-for-all
 		- [one/dos   !md tag-3 tag-4] wow ok again
 		- [one/uno   !md tag-3 tag-4] wow the first
@@ -1292,7 +1292,7 @@ function tags_with_extended_tags_noop { # @test
 		- [one/uno !md new-etikett-for-all tag-3 tag-4] wow the first
 	EOM
 
-	run_zit organize -mode commit-directly new:z <<-EOM
+	run_dodder organize -mode commit-directly new:z <<-EOM
 		# new
 
 		- [one/dos !md new-etikett-for-all tag-3 tag-4] wow ok again
@@ -1313,13 +1313,13 @@ function organize_new_objects_default_tags { # @test
 	export -f editor
 
 	export EDITOR="/bin/bash -c 'editor \$0'"
-	run_zit edit-config
+	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
 		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
 	EOM
 
-	run_zit organize -mode output-only
+	run_dodder organize -mode output-only
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -1332,7 +1332,7 @@ function organize_new_objects_default_tags { # @test
 		echo "- new zettel object" >"$0"
 	)
 
-	run_zit organize
+	run_dodder organize
 	assert_success
 	assert_output - <<-EOM
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "new zettel object"]
@@ -1343,7 +1343,7 @@ function organize_new_objects_default_tags { # @test
 		echo "- new zettel object" >>"$0"
 	)
 
-	run_zit organize
+	run_dodder organize
 	assert_success
 	assert_output - <<-EOM
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -1354,7 +1354,7 @@ function organize_new_objects_default_tags { # @test
 
 # [nob/golb !task project-2021-zit-bugs project-2021-zit-v1 today zz-inbox] fix issue with newlines rendered in organize
 function object_with_newline_in_description { # @test
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# description that has
 		# newline
@@ -1367,7 +1367,7 @@ function object_with_newline_in_description { # @test
 }
 
 function organize_checked_out { # @test
-	run_zit checkout :z,e,t
+	run_dodder checkout :z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
@@ -1380,7 +1380,7 @@ function organize_checked_out { # @test
 		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit organize -mode output-only .
+	run_dodder organize -mode output-only .
 	assert_success
 	assert_output - <<-EOM
 
@@ -1401,7 +1401,7 @@ function organize_output_only_fs_blobs() { # @test
 		newest body
 	EOM
 
-	run_zit organize -mode output-only .
+	run_dodder organize -mode output-only .
 	assert_success
 	assert_output - <<-EOM
 
@@ -1415,7 +1415,7 @@ function organize_untracked_fs_blob_with_spaces() { # @test
 		newest body
 	EOM
 
-	run_zit organize -mode output-only "test with spaces.txt"
+	run_dodder organize -mode output-only "test with spaces.txt"
 	assert_success
 	assert_output_unsorted - <<-EOM
 
@@ -1434,13 +1434,13 @@ function organize_default_tags_workspace { # @test
 	export -f editor
 
 	export EDITOR="/bin/bash -c 'editor \$0'"
-	run_zit edit-config
+	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
 		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
 	EOM
 
-	cat >.zit-workspace <<-EOM
+	cat >.dodder-workspace <<-EOM
 		---
 		! toml-workspace_config-v0
 		---
@@ -1448,11 +1448,11 @@ function organize_default_tags_workspace { # @test
 		query = "today"
 	EOM
 
-	run_zit info-workspace query
+	run_dodder info-workspace query
 	assert_success
 	assert_output 'today'
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# test default tags
 		- tag-3
@@ -1472,7 +1472,7 @@ function organize_default_tags_workspace { # @test
 	EOM
 
 	actual="$(mktemp)"
-	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by tag :z,e,t >"$actual"
+	run_dodder organize "${cmd_def_organize[@]}" -mode output-only -group-by tag :z,e,t >"$actual"
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -1497,13 +1497,13 @@ function organize_dot_operator_workspace_delete_files { # @test
 	export -f editor
 
 	export EDITOR="/bin/bash -c 'editor \$0'"
-	run_zit edit-config
+	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
 		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
 	EOM
 
-	cat >.zit-workspace <<-EOM
+	cat >.dodder-workspace <<-EOM
 		---
 		! toml-workspace_config-v0
 		---
@@ -1511,7 +1511,7 @@ function organize_dot_operator_workspace_delete_files { # @test
 		query = "today"
 	EOM
 
-	run_zit info-workspace query
+	run_dodder info-workspace query
 	assert_success
 	assert_output 'today'
 
@@ -1535,7 +1535,7 @@ function organize_dot_operator_workspace_delete_files { # @test
 	# shellcheck disable=SC2016
 	export EDITOR='bash -c "editor $0"'
 
-	run_zit organize .
+	run_dodder organize .
 	assert_success
 	assert_output - <<-EOM
 		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

@@ -16,7 +16,7 @@ teardown() {
 function bootstrap {
 	mkdir -p "$1"
 	pushd "$1" || exit 1
-	run_zit_init -override-xdg-with-cwd "test-repo-id-them"
+	run_dodder_init -override-xdg-with-cwd "test-repo-id-them"
 
 	{
 		echo "---"
@@ -28,14 +28,14 @@ function bootstrap {
 		echo "body"
 	} >to_add
 
-	run_zit new -edit=false to_add
+	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# zettel with multiple etiketten
 		- this_is_the_first
@@ -58,11 +58,11 @@ function bootstrap {
 
 function print_their_xdg() {
 	pushd "$1" >/dev/null || exit 1
-	zit info xdg
+	dodder info xdg
 }
 
 function run_clone_default_with() {
-	run_zit clone \
+	run_dodder clone \
 		-age-identity none \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
@@ -71,10 +71,10 @@ function run_clone_default_with() {
 }
 
 function try_add_new_after_clone {
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# zettel after clone description
 		! md
@@ -215,7 +215,7 @@ function clone_history_default_allow_conflicts { # @test
 
 	assert_success
 
-	run_zit show +?z,t,e
+	run_dodder show +?z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
@@ -247,7 +247,7 @@ function clone_archive_history_default_allow_conflicts { # @test
 	assert_success
 	assert_output ''
 
-	run_zit show
+	run_dodder show
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
@@ -263,7 +263,7 @@ function clone_archive_history_default_allow_conflicts { # @test
 	EOM
 }
 
-# TODO fix issue with start_server spawning zit processes that do not get cleaned up later
+# TODO fix issue with start_server spawning dodder processes that do not get cleaned up later
 function clone_history_zettel_type_tag_port { # @test
 	skip
 	them="them"

@@ -20,7 +20,7 @@ func (cmd *EnvRepo) SetFlagSet(f *flag.FlagSet) {}
 
 func (cmd EnvRepo) MakeEnvRepo(
 	dep command.Request,
-	permitNoZitDirectory bool,
+	permitNoDodderDirectory bool,
 ) env_repo.Env {
 	dir := env_dir.MakeDefault(
 		dep,
@@ -36,8 +36,8 @@ func (cmd EnvRepo) MakeEnvRepo(
 	var repoLayout env_repo.Env
 
 	layoutOptions := env_repo.Options{
-		BasePath:             dep.Config.BasePath,
-		PermitNoZitDirectory: permitNoZitDirectory,
+		BasePath:                dep.Config.BasePath,
+		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 
 	{

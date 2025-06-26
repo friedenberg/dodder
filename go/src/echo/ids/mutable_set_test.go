@@ -10,14 +10,14 @@ func TestAddNormalized(t1 *testing.T) {
 	t := ui.T{T: t1}
 
 	sut := MakeTagMutableSet(
-		MustTag("project-2021-zit-test"),
-		MustTag("project-2021-zit-ewwwwww"),
+		MustTag("project-2021-dodder-test"),
+		MustTag("project-2021-dodder-ewwwwww"),
 		MustTag("zz-archive-task-done"),
 	)
 
 	sutEx := sut.CloneSetPtrLike()
 
-	toAdd := MustTag("project-2021-zit")
+	toAdd := MustTag("project-2021-dodder")
 
 	AddNormalizedTag(sut, &toAdd)
 
@@ -28,7 +28,7 @@ func TestAddNormalized(t1 *testing.T) {
 
 func TestAddNormalizedEmpty(t *testing.T) {
 	sut := MakeTagMutableSet()
-	toAdd := MustTag("project-2021-zit")
+	toAdd := MustTag("project-2021-dodder")
 
 	sutEx := MakeTagMutableSet(toAdd)
 

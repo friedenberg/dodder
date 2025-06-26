@@ -46,7 +46,7 @@ func (cmd InitArchive) Run(req command.Request) {
 
 	layoutOptions := env_repo.Options{
 		BasePath:             req.Config.BasePath,
-		PermitNoZitDirectory: true,
+		PermitNoDodderDirectory: true,
 	}
 
 	{

@@ -50,12 +50,12 @@ func (cmd Complete) Run(req command.Request) {
 	}
 
 	// TODO determine state:
-	// bare: `zit`
+	// bare: `dodder`
 	// subcommand or arg or flag:
-	//  - `zit subcommand`
-	//  - `zit subcommand -flag=true`
-	//  - `zit subcommand -flag value`
-	// flag: `zit subcommand -flag`
+	//  - `dodder subcommand`
+	//  - `dodder subcommand -flag=true`
+	//  - `dodder subcommand -flag value`
+	// flag: `dodder subcommand -flag`
 	lastArg, hasLastArg := commandLine.LastArg()
 
 	if !hasLastArg {

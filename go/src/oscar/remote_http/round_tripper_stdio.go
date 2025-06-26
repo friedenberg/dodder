@@ -30,7 +30,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	roundTripper.Path = envRepo.GetExecPath()
 
 	roundTripper.Args = []string{
-		"zit",
+		"dodder",
 		"serve",
 	}
 
@@ -61,7 +61,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 	roundTripper.Args = []string{
 		"ssh",
 		arg,
-		"zit",
+		"dodder",
 		"serve",
 	}
 

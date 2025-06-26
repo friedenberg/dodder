@@ -1,6 +1,6 @@
 #! /bin/bash -e
 
-pkg="code.linenisgreat.com/dodder/go/zit"
+pkg="code.linenisgreat.com/dodder/go"
 
 ag_print_matching() (
   query="$1"

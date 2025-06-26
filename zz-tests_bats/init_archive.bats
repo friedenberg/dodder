@@ -12,14 +12,14 @@ teardown() {
 }
 
 function init_archive { # @test
-	run_zit info store-version
+	run_dodder info store-version
 	assert_success
 	assert_output --regexp '[0-9]+'
 
 	# shellcheck disable=SC2034
 	storeVersionCurrent="$output"
 
-	run_zit init-archive \
+	run_dodder init-archive \
 		-age-identity none \
 		-lock-internal-files=false
 	assert_success
@@ -32,7 +32,7 @@ function init_archive { # @test
 			! toml-config-immutable-v1
 			---
 
-			public-key = 'zit-repo-public_key-v1.*'
+			public-key = 'dodder-repo-public_key-v1.*'
 			store-version = $storeVersionCurrent
 			repo-type = 'archive'
 			id = ''
@@ -43,19 +43,19 @@ function init_archive { # @test
 		EOM
 	}
 
-	run_zit info-repo config-immutable
+	run_dodder info-repo config-immutable
 	assert_success
 	output_immutable_config | assert_output --regexp -
 
-	run_zit cat-blob "$(get_konfig_sha)"
+	run_dodder cat-blob "$(get_konfig_sha)"
 	assert_success
 	assert_output
 
-	run_zit last
+	run_dodder last
 	assert_success
 	assert_output ''
 
-	run_zit show
+	run_dodder show
 	assert_success
 	assert_output ''
 }

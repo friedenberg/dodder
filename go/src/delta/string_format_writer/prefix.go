@@ -9,7 +9,7 @@ import (
 func StringPrefixFromOptions(
 	options options_print.V0,
 ) string {
-	if options.ZittishNewlines {
+	if options.Newlines {
 		return "\n  " + StringIndent
 	} else {
 		return " "

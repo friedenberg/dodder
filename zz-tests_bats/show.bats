@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -17,7 +17,7 @@ teardown() {
 # bats file_tags=user_story:query
 
 function show_simple_one_zettel { # @test
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -32,10 +32,10 @@ function show_simple_one_zettel { # @test
 }
 
 function show_simple_one_zettel_with_description_with_quotes { # @test
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# see these "quotes"
 		! md
@@ -48,7 +48,7 @@ function show_simple_one_zettel_with_description_with_quotes { # @test
 		[two/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "see these \"quotes\""]
 	EOM
 
-	run_zit show -format text two/uno:
+	run_dodder show -format text two/uno:
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -61,7 +61,7 @@ function show_simple_one_zettel_with_description_with_quotes { # @test
 }
 
 function show_simple_one_zettel_with_sigil { # @test
-	run_zit show -format text one/uno:
+	run_dodder show -format text one/uno:
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -76,7 +76,7 @@ function show_simple_one_zettel_with_sigil { # @test
 }
 
 function show_simple_one_zettel_with_sigil_and_genre { # @test
-	run_zit show -format text one/uno:zettel
+	run_dodder show -format text one/uno:zettel
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -91,16 +91,16 @@ function show_simple_one_zettel_with_sigil_and_genre { # @test
 }
 
 function show_simple_one_zettel_checked_out { # @test
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
-	run_zit checkout one/uno
+	run_dodder checkout one/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show one/uno.zettel
+	run_dodder show one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -108,22 +108,22 @@ function show_simple_one_zettel_checked_out { # @test
 }
 
 function show_simple_one_zettel_hidden { # @test
-	run_zit dormant-add tag-3
+	run_dodder dormant-add tag-3
 	assert_success
 	assert_output ''
 
-	run_zit show :z
+	run_dodder show :z
 	assert_success
 	assert_output ''
 
-	run_zit show :?z
+	run_dodder show :?z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -131,18 +131,18 @@ function show_simple_one_zettel_hidden { # @test
 }
 
 function show_simple_one_zettel_hidden_past { # @test
-	run_zit dormant-add tag-1
+	run_dodder dormant-add tag-1
 	assert_success
 	assert_output ''
 
-	run_zit show :?z
+	run_dodder show :?z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit show one/uno
+	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -150,7 +150,7 @@ function show_simple_one_zettel_hidden_past { # @test
 }
 
 function show_all_mutter { # @test
-	run_zit show -format mutter-sha :
+	run_dodder show -format mutter-sha :
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		.*
@@ -162,7 +162,7 @@ function show_all_mutter { # @test
 function show_simple_one_zettel_binary { # @test
 	skip
 	echo "binary file" >file.bin
-	run_zit add -delete file.bin
+	run_dodder add -delete file.bin
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [file.bin]
@@ -178,14 +178,14 @@ function show_simple_one_zettel_binary { # @test
 		binary = true
 	EOM
 
-	run_zit checkin -delete bin.type
+	run_dodder checkin -delete bin.type
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [bin.type]
 		[!bin @e07d72a74e0a01c23ddeb871751f6fcb43afec5fb81108c157537db96c6c1da0 !toml-type-v1]
 	EOM
 
-	run_zit show -format text two/uno
+	run_dodder show -format text two/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -196,14 +196,14 @@ function show_simple_one_zettel_binary { # @test
 }
 
 function show_history_one_zettel { # @test
-	run_zit show one/uno+z
+	run_dodder show one/uno+z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show -format text one/uno+z
+	run_dodder show -format text one/uno+z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		---
@@ -226,21 +226,21 @@ function show_history_one_zettel { # @test
 }
 
 function show_zettel_etikett { # @test
-	run_zit show tag-3:z
+	run_dodder show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format blob tag-3:z
+	run_dodder show -format blob tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
 		not another one
 	EOM
 
-	run_zit show -format sku-metadata-sans-tai tag-3:z
+	run_dodder show -format sku-metadata-sans-tai tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
@@ -252,7 +252,7 @@ function show_zettels_with_tag_no_workspace_folder { # @test
 	mkdir -p tag
 	echo "wow1" >tag/test1
 	echo "wow2" >tag/test2
-	run_zit show tag
+	run_dodder show tag
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -261,10 +261,10 @@ function show_zettels_with_tag_no_workspace_folder { # @test
 }
 
 function show_zettel_etikett_complex { # @test
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
-	run_zit checkout o/u
+	run_dodder checkout o/u
 	assert_success
 	assert_output - <<-EOM
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -282,27 +282,27 @@ function show_zettel_etikett_complex { # @test
 	EOM
 
 	# TODO support . operator for checked out
-	# run_zit show -verbose tag-3.z tag-5.z
+	# run_dodder show -verbose tag-3.z tag-5.z
 	# assert_success
 	# assert_output_unsorted - <<-EOM
 	# 	[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-5]
 	# EOM
 
-	run_zit checkin -delete one/uno.zettel
+	run_dodder checkin -delete one/uno.zettel
 
-	run_zit show [tag-3 tag-5]:z
+	run_dodder show [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-5]
 	EOM
 
-	run_zit show -format blob [tag-3 tag-5]:z
+	run_dodder show -format blob [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
 	EOM
 
-	run_zit show -format sku-metadata-sans-tai [tag-3 tag-5]:z
+	run_dodder show -format sku-metadata-sans-tai [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-5 "wow the first"
@@ -310,7 +310,7 @@ function show_zettel_etikett_complex { # @test
 }
 
 function show_complex_zettel_etikett_negation { # @test
-	run_zit show ^-etikett-two:z
+	run_dodder show ^-etikett-two:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -319,7 +319,7 @@ function show_complex_zettel_etikett_negation { # @test
 }
 
 function show_simple_all { # @test
-	run_zit show :z,t
+	run_dodder show :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -327,7 +327,7 @@ function show_simple_all { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format blob :z,t
+	run_dodder show -format blob :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		file-extension = 'md'
@@ -336,7 +336,7 @@ function show_simple_all { # @test
 		vim-syntax-type = 'markdown'
 	EOM
 
-	run_zit show -format sku-metadata-sans-tai :z,t
+	run_dodder show -format sku-metadata-sans-tai :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		Type !md $(get_type_blob_sha) !toml-type-v1
@@ -346,35 +346,35 @@ function show_simple_all { # @test
 }
 
 function show_simple_type_one { # @test
-	run_zit show !md:t
+	run_dodder show !md:t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
 function show_simple_type_one_history { # @test
-	run_zit show !md+t
+	run_dodder show !md+t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
 function show_simple_typ_schwanzen { # @test
-	run_zit show :t
+	run_dodder show :t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
 function show_simple_typ_history { # @test
-	run_zit show +t
+	run_dodder show +t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
 function show_simple_etikett_schwanzen { # @test
-	run_zit show :e
+	run_dodder show :e
 	assert_output_unsorted - <<-EOM
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -385,7 +385,7 @@ function show_simple_etikett_schwanzen { # @test
 }
 
 function show_simple_etikett_history { # @test
-	run_zit show +e
+	run_dodder show +e
 	assert_output_unsorted - <<-EOM
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -396,12 +396,12 @@ function show_simple_etikett_history { # @test
 }
 
 function show_konfig { # @test
-	run_zit show +konfig
+	run_dodder show +konfig
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
-	run_zit show -format text :konfig
+	run_dodder show -format text :konfig
 	assert_output - <<-EOM
 		[defaults]
 		type = '!md'
@@ -438,7 +438,7 @@ function show_konfig { # @test
 }
 
 function show_history_all { # @test
-	run_zit show -format sku-metadata-sans-tai +konfig,kasten,typ,etikett,zettel
+	run_dodder show -format sku-metadata-sans-tai +konfig,kasten,typ,etikett,zettel
 	assert_output_unsorted - <<-EOM
 		Tag tag e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Tag tag-1 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -470,14 +470,14 @@ function show_etikett_toml { # @test
 		"""
 	EOM
 
-	run_zit checkin -delete true.tag
+	run_dodder checkin -delete true.tag
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.tag]
 		[true @1379cb8d553a340a4d262b3be216659d8d8835ad0b4cc48005db8db264a395ed !toml-tag-v1]
 	EOM
 
-	run_zit show true
+	run_dodder show true
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -502,14 +502,14 @@ function show_etikett_lua_v1 { # @test
 		}
 	EOM
 
-	run_zit checkin -delete true.tag
+	run_dodder checkin -delete true.tag
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.tag]
 		[true @67b7eb3e9ea1c4b3404b34a0b2abcc09f450797c8cc801671463a79429aead37 !lua-tag-v1]
 	EOM
 
-	run_zit show true
+	run_dodder show true
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -536,14 +536,14 @@ function show_etikett_lua_v2 { # @test
 		}
 	EOM
 
-	run_zit checkin -delete true.tag
+	run_dodder checkin -delete true.tag
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.tag]
 		[true @ed8e3cf53e044fcc1ae040ed5203515d1c6d205decc745f0caafd5dee67efbab !lua-tag-v2]
 	EOM
 
-	run_zit show true
+	run_dodder show true
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -554,7 +554,7 @@ function show_etikett_lua_v2 { # @test
 }
 
 function show_tags_paths { # @test
-	run_zit show -format tags-path :e
+	run_dodder show -format tags-path :e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		tag [Paths: [TypeSelf:[tag]], All: [tag:[TypeSelf:[tag]]]]
@@ -566,19 +566,19 @@ function show_tags_paths { # @test
 }
 
 function show_tags_exact { # @test
-	run_zit show =tag:e
+	run_dodder show =tag:e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show =tag
+	run_dodder show =tag
 	assert_success
 	assert_output_unsorted ''
 }
 
 function show_inventory_lists { # @test
-	run_zit show :b
+	run_dodder show :b
 	assert_success
 	assert_output
 }
@@ -589,13 +589,13 @@ function show_inventory_list_blob_sort_correct { # @test
 		assert_success
 	}
 
-	run_zit show -format tai :b
+	run_dodder show -format tai :b
 	assert_success
 	assert_sorted_tais "$output"
 	mapfile -t tais <<<"$output"
 
 	for tai in "${tais[@]}"; do
-		run_zit show -format blob "$tai:b"
+		run_dodder show -format blob "$tai:b"
 		assert_success
 		listTais="$(echo -n "$output" | grep -o '[0-9]\+\.[0-9]\+')"
 		assert_sorted_tais "$listTais"
@@ -604,7 +604,7 @@ function show_inventory_list_blob_sort_correct { # @test
 
 # bats test_tags=user_story:builtin_types
 function show_builtin_type_md { # @test
-	run_zit show -format text !toml-type-v1:t
+	run_dodder show -format text !toml-type-v1:t
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -619,7 +619,7 @@ function show_builtin_type_md { # @test
 # bats file_tags=user_story:workspace
 
 function show_workspace_default { # @test
-	run_zit organize -mode commit-directly one/uno <<-EOM
+	run_dodder organize -mode commit-directly one/uno <<-EOM
 		- [one/uno !md tag-3 tag-4 tag-5] wow the first
 	EOM
 	assert_success
@@ -628,10 +628,10 @@ function show_workspace_default { # @test
 		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit init-workspace -query tag-5
+	run_dodder init-workspace -query tag-5
 	assert_success
 
-	run_zit show :
+	run_dodder show :
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
@@ -640,7 +640,7 @@ function show_workspace_default { # @test
 
 function show_workspace_exactly_one_zettel { # @test
 	skip
-	run_zit organize -mode commit-directly one/uno <<-EOM
+	run_dodder organize -mode commit-directly one/uno <<-EOM
 		- [one/uno !md tag-3 tag-4 tag-5] wow the first
 	EOM
 	assert_success
@@ -649,10 +649,10 @@ function show_workspace_exactly_one_zettel { # @test
 		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit init-workspace -query tag-3
+	run_dodder init-workspace -query tag-3
 	assert_success
 
-	run_zit show one/dos
+	run_dodder show one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]

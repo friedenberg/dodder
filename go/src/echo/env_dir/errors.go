@@ -76,7 +76,7 @@ func (e *ErrTempAlreadyExists) Error() string {
 }
 
 func (e *ErrTempAlreadyExists) ErrorCause() string {
-	return "Another zit previous process with the same PID likely terminated unexpectedly"
+	return "Another dodder previous process with the same PID likely terminated unexpectedly"
 }
 
 func (e *ErrTempAlreadyExists) ErrorRecovery() string {

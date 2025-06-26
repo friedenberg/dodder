@@ -12,7 +12,7 @@ type DirectoryPaths interface {
 	DirObjects(p ...string) string
 	DirInventoryLists() string
 	DirBlobs() string
-	DirZit(p ...string) string
+	DirDodder(p ...string) string
 	FileCacheDormant() string
 	FileCacheObjectId() string
 	FileConfigMutable() string

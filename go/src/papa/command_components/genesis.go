@@ -47,7 +47,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	layoutOptions := env_repo.Options{
 		BasePath:             req.Config.BasePath,
-		PermitNoZitDirectory: true,
+		PermitNoDodderDirectory: true,
 	}
 
 	{

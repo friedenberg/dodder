@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR/../" "$version"
 }
 
@@ -15,12 +15,12 @@ teardown() {
 }
 
 function migration_status_empty { # @test
-	run_zit status
+	run_dodder status
 	assert_failure
 }
 
 function migration_validate_schwanzen { # @test
-	run_zit show -format log :z,e,t
+	run_dodder show -format log :z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -34,7 +34,7 @@ function migration_validate_schwanzen { # @test
 }
 
 function migration_validate_history { # @test
-	run_zit show -format log +z,e,t
+	run_dodder show -format log +z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -49,11 +49,11 @@ function migration_validate_history { # @test
 }
 
 function migration_reindex { # @test
-	run_zit reindex
+	run_dodder reindex
   assert_success
   assert_output
 
-	run_zit show +e,konfig,t,z
+	run_dodder show +e,konfig,t,z
   assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]

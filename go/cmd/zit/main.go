@@ -48,9 +48,9 @@ func main() {
 			var normalError errors.StackTracer
 
 			if errors.As(err, &normalError) && !normalError.ShouldShowStackTrace() {
-				ui.Err().Printf("\n\nzit failed with error:\n%s", normalError.Error())
+				ui.Err().Printf("\n\ndodder (zit) failed with error:\n%s", normalError.Error())
 			} else {
-				ui.Err().Printf("\n\nzit failed with error:\n%s", err)
+				ui.Err().Printf("\n\ndodder (zit) failed with error:\n%s", err)
 			}
 		}
 

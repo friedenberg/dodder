@@ -9,14 +9,14 @@ teardown() {
 }
 
 function add { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f=to_add.md
 	{
 		echo test file
 	} >"$f"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f"
@@ -32,7 +32,7 @@ function add { # @test
 		          deleted [to_add.md]
 	EOM
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -46,7 +46,7 @@ function add { # @test
 }
 
 function add_with_dupe_added { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f=to_add.md
 	{
@@ -58,7 +58,7 @@ function add_with_dupe_added { # @test
 		echo test file
 	} >"$f2"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
@@ -75,7 +75,7 @@ function add_with_dupe_added { # @test
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -89,14 +89,14 @@ function add_with_dupe_added { # @test
 }
 
 function add_not_md { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f=to_add.pdf
 	{
 		echo test file
 	} >"$f"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		-each-blob "bash -c 'basename \$0'" \
@@ -117,7 +117,7 @@ function add_not_md { # @test
 		          deleted [to_add.pdf]
 	EOM
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -131,14 +131,14 @@ function add_not_md { # @test
 }
 
 function add_1 { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f=to_add.md
 	{
 		echo test file
 	} >"$f"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f"
@@ -159,7 +159,7 @@ function add_2 { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 	assert_success
 
 	f=to_add.md
@@ -172,7 +172,7 @@ function add_2 { # @test
 		echo test file 2
 	} >"$f2"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
@@ -195,7 +195,7 @@ function add_dot { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 	assert_success
 
 	f=to_add.md
@@ -208,7 +208,7 @@ function add_dot { # @test
 		echo test file 2
 	} >"$f2"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		.
@@ -231,7 +231,7 @@ function add_dot { # @test
 #	wd="$(mktemp -d)"
 #	cd "$wd" || exit 1
 
-#	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+#	run_dodder init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 #	assert_success
 
 #	f=to_add.md
@@ -239,7 +239,7 @@ function add_dot { # @test
 #		echo test file
 #	} >"$f"
 
-#	run_zit add \
+#	run_dodder add \
 #		-tags zz-inbox-2022-11-14 \
 #		"$f"
 
@@ -254,7 +254,7 @@ function add_dot { # @test
 #		[one/uno @8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 #	EOM
 
-#	run_zit checkout o/u
+#	run_dodder checkout o/u
 #	#TODO-P2 fix race condition
 #	assert_success
 #	assert_output - <<-EOM
@@ -271,7 +271,7 @@ function add_dot { # @test
 #		echo 'test file'
 #	} >one/uno.zettel
 
-#	run_zit checkin -delete one/uno.zettel
+#	run_dodder checkin -delete one/uno.zettel
 #	assert_success
 #	assert_output - <<-EOM
 #		[-new @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
@@ -281,13 +281,13 @@ function add_dot { # @test
 #		          deleted [one]
 #	EOM
 
-#	run zit add \
+#	run_dodder add \
 #		-predictable-zettel-ids \
 #		-delete \
 #		-tags new-etikett-2 \
 #		"$f"
 
-#	run zit show o/u
+#	run_dodder show o/u
 #	#TODO-P2 fix race condition
 #	assert_success
 #	assert_output - <<-EOM
@@ -303,7 +303,7 @@ function add_dot { # @test
 #}
 
 function add_several_with_spaces_in_filename { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f="to add.md"
 	{
@@ -316,7 +316,7 @@ function add_several_with_spaces_in_filename { # @test
 		echo two!!!!
 	} >"$f2"
 
-	run_zit add \
+	run_dodder add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
@@ -334,7 +334,7 @@ function add_several_with_spaces_in_filename { # @test
 		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format text one/uno
+	run_dodder show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -348,14 +348,14 @@ function add_several_with_spaces_in_filename { # @test
 }
 
 function add_each_blob { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	f="to add.md"
 	{
 		echo test file
 	} >"$f"
 
-	run_zit add \
+	run_dodder add \
 		-each-blob "cat" \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
@@ -377,7 +377,7 @@ function add_each_blob { # @test
 }
 
 function add_organize { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function editor() {
 		# shellcheck disable=SC2317
@@ -394,7 +394,7 @@ function add_organize { # @test
 		echo test file
 	} >"$f"
 
-	run_zit add \
+	run_dodder add \
 		-each-blob "cat" \
 		-organize \
 		-delete \

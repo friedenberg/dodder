@@ -1,5 +1,6 @@
 {
   inputs = {
+    nixpkgs.url = "flake:nixpkgs";
     nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2411.717296.tar.gz";
     utils.url = "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz";
 
@@ -27,8 +28,8 @@
             ];
           };
 
-          zit = pkgs.buildGoApplication {
-            pname = "zit";
+          dodder = pkgs.buildGoApplication {
+            pname = "dodder";
             version = "0.0.1";
             src = ./.;
             modules = ./gomod2nix.toml;
@@ -36,15 +37,17 @@
 
         in {
 
-          packages.zit = zit;
-          packages.default = zit;
+          packages.der = dodder;
+          packages.dodder = dodder;
+          packages.zit = dodder;
+          packages.default = dodder;
 
           docker = pkgs.dockerTools.buildImage {
-            name = "zit";
+            name = "dodder";
             tag = "latest";
-            copyToRoot = [zit];
+            copyToRoot = [dodder];
             config = {
-              Cmd = ["${zit}/bin/zit"];
+              Cmd = ["${dodder}/bin/der"];
               Env = [];
               ExposedPorts = {"9000/tcp" = {};};
             };

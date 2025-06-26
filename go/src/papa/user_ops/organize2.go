@@ -63,7 +63,7 @@ func (op Organize2) Run(
 	for {
 		openVimOp := OpenEditor{
 			VimOptions: vim_cli_options_builder.New().
-				WithFileType("zit-organize").
+				WithFileType("dodder-organize").
 				Build(),
 		}
 

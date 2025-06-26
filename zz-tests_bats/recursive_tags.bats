@@ -6,9 +6,9 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
-  run_zit_init_workspace
+  run_dodder_init_workspace
 
 	export BATS_TEST_BODY=true
 }
@@ -18,7 +18,7 @@ teardown() {
 }
 
 function recursive_tags_add_one { # @test
-	run_zit checkout tag-3:e
+	run_dodder checkout tag-3:e
 	assert_success
 	assert_output - <<-EOM
 		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -31,7 +31,7 @@ function recursive_tags_add_one { # @test
 
 	EOM
 
-	run_zit checkin -delete .e
+	run_dodder checkin -delete .e
 	assert_success
 	assert_output - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -39,7 +39,7 @@ function recursive_tags_add_one { # @test
 		          deleted [tag-3.tag]
 	EOM
 
-	run_zit show recurse:e,z
+	run_dodder show recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -50,7 +50,7 @@ function recursive_tags_add_one { # @test
 }
 
 function recursive_tags_add_one_super_tags { # @test
-	run_zit checkout tag-3:e
+	run_dodder checkout tag-3:e
 	assert_success
 	assert_output - <<-EOM
 		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -63,7 +63,7 @@ function recursive_tags_add_one_super_tags { # @test
 
 	EOM
 
-	run_zit checkin -delete .e
+	run_dodder checkin -delete .e
 	assert_success
 	assert_output - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -71,7 +71,7 @@ function recursive_tags_add_one_super_tags { # @test
 		          deleted [tag-3.tag]
 	EOM
 
-	run_zit organize -mode commit-directly <<-EOM
+	run_dodder organize -mode commit-directly <<-EOM
 		- [tag-3-sub]
 	EOM
 
@@ -80,13 +80,13 @@ function recursive_tags_add_one_super_tags { # @test
 		[tag-3-sub @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format tags-path tag-3-sub:e
+	run_dodder show -format tags-path tag-3-sub:e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 
-	run_zit show recurse:e,z
+	run_dodder show recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -96,7 +96,7 @@ function recursive_tags_add_one_super_tags { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format tags-path recurse:z,e
+	run_dodder show -format tags-path recurse:z,e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
@@ -106,7 +106,7 @@ function recursive_tags_add_one_super_tags { # @test
 		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 
-	run_zit show -format tags-path recurse:e,z
+	run_dodder show -format tags-path recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
@@ -118,7 +118,7 @@ function recursive_tags_add_one_super_tags { # @test
 }
 
 function recursive_tags_with_same_root { # @test
-	run_zit organize -mode commit-directly <<-EOM
+	run_dodder organize -mode commit-directly <<-EOM
 		- [project-one-crit priority-0_must]
 		- [project-one-general]
 	EOM
@@ -133,14 +133,14 @@ function recursive_tags_with_same_root { # @test
 		[project-one-general @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show priority-0_must:e
+	run_dodder show priority-0_must:e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[priority-0_must @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[project-one-crit @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 priority-0_must]
 	EOM
 
-	run_zit organize -mode commit-directly one/uno <<-EOM
+	run_dodder organize -mode commit-directly one/uno <<-EOM
 		# project-one-crit, project-one-general
 		- [one/uno]
 	EOM
@@ -150,7 +150,7 @@ function recursive_tags_with_same_root { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md project-one-crit project-one-general]
 	EOM
 
-	run_zit show priority-0_must:z
+	run_dodder show priority-0_must:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md project-one-crit project-one-general]

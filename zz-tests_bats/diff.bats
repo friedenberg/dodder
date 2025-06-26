@@ -6,13 +6,13 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
-	run_zit checkout :z,t,e
+	run_dodder checkout :z,t,e
 	assert_success
 
 	export BATS_TEST_BODY=true
@@ -23,7 +23,7 @@ teardown() {
 }
 
 function diff_all_same { # @test
-	run_zit diff .
+	run_dodder diff .
 	assert_success
 	assert_output_unsorted - <<-EOM
 	EOM
@@ -31,7 +31,7 @@ function diff_all_same { # @test
 
 function diff_all_diff { # @test
 	echo wowowow >>one/uno.zettel
-	run_zit diff one/uno.zettel
+	run_dodder diff one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		--- one/uno:zettel

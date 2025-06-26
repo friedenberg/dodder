@@ -26,11 +26,11 @@ func (c directoryV1) GetDirectoryPaths() interfaces.DirectoryPaths {
 }
 
 func (c directoryV1) FileCacheDormant() string {
-	return c.DirZit("dormant")
+	return c.DirDodder("dormant")
 }
 
 func (c directoryV1) FileTags() string {
-	return c.DirZit("tags")
+	return c.DirDodder("tags")
 }
 
 func (c directoryV1) FileLock() string {
@@ -38,37 +38,37 @@ func (c directoryV1) FileLock() string {
 }
 
 func (c directoryV1) FileConfigPermanent() string {
-	return c.DirZit("config-permanent")
+	return c.DirDodder("config-permanent")
 }
 
 func (c directoryV1) FileConfigMutable() string {
-	return c.DirZit("config-mutable")
+	return c.DirDodder("config-mutable")
 }
 
 func (s directoryV1) Dir(p ...string) string {
 	return filepath.Join(stringSliceJoin(s.Data, p)...)
 }
 
-func (s directoryV1) DirZit(p ...string) string {
+func (s directoryV1) DirDodder(p ...string) string {
 	return s.Dir(p...)
 }
 
 func (s directoryV1) DirCache(p ...string) string {
-	return s.DirZit(append([]string{"cache"}, p...)...)
+	return s.DirDodder(append([]string{"cache"}, p...)...)
 }
 
 func (s directoryV1) DirCacheRepo(p ...string) string {
 	// TODO switch to XDG cache
 	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
-	return s.DirZit(append([]string{"cache", "repo"}, p...)...)
+	return s.DirDodder(append([]string{"cache", "repo"}, p...)...)
 }
 
 func (s directoryV1) DirObjects(p ...string) string {
-	return s.DirZit(append([]string{"objects"}, p...)...)
+	return s.DirDodder(append([]string{"objects"}, p...)...)
 }
 
 func (s directoryV1) DirLostAndFound() string {
-	return s.DirZit("lost_and_found")
+	return s.DirDodder("lost_and_found")
 }
 
 func (s directoryV1) DirCacheObjects() string {
@@ -84,7 +84,7 @@ func (s directoryV1) DirCacheInventoryListLog() string {
 }
 
 func (s directoryV1) DirObjectId() string {
-	return s.DirZit("object_ids")
+	return s.DirDodder("object_ids")
 }
 
 func (s directoryV1) FileCacheObjectId() string {

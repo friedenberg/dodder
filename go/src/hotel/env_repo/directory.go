@@ -32,51 +32,51 @@ func (c directoryV0) GetDirectoryPaths() interfaces.DirectoryPaths {
 }
 
 func (c directoryV0) FileCacheDormant() string {
-	return c.DirZit("Schlummernd")
+	return c.DirDodder("Schlummernd")
 }
 
 func (c directoryV0) FileTags() string {
-	return c.DirZit("Etiketten")
+	return c.DirDodder("Etiketten")
 }
 
 func (c directoryV0) FileLock() string {
-	return c.DirZit("Lock")
+	return c.DirDodder("Lock")
 }
 
 func (c directoryV0) FileConfigPermanent() string {
-	return c.DirZit("KonfigAngeboren")
+	return c.DirDodder("KonfigAngeboren")
 }
 
 func (c directoryV0) FileConfigMutable() string {
-	return c.DirZit("KonfigErworben")
+	return c.DirDodder("KonfigErworben")
 }
 
 func (s directoryV0) Dir(p ...string) string {
 	return filepath.Join(stringSliceJoin(s.basePath, p)...)
 }
 
-func (s directoryV0) DirZit(p ...string) string {
-	return s.Dir(stringSliceJoin(".zit", p)...)
+func (s directoryV0) DirDodder(p ...string) string {
+	return s.Dir(stringSliceJoin(".dodder", p)...)
 }
 
 func (s directoryV0) DirCache(p ...string) string {
-	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
+	return s.DirDodder(append([]string{"Verzeichnisse"}, p...)...)
 }
 
 func (s directoryV0) DirCacheRepo(p ...string) string {
-	return s.DirZit(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
+	return s.DirDodder(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
 }
 
 func (s directoryV0) DirCacheDurable(p ...string) string {
-	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
+	return s.DirDodder(append([]string{"VerzeichnisseDurable"}, p...)...)
 }
 
 func (s directoryV0) DirObjects(p ...string) string {
-	return s.DirZit(append([]string{"Objekten2"}, p...)...)
+	return s.DirDodder(append([]string{"Objekten2"}, p...)...)
 }
 
 func (s directoryV0) DirLostAndFound() string {
-	return s.DirZit("Verloren+Gefunden")
+	return s.DirDodder("Verloren+Gefunden")
 }
 
 func (s directoryV0) DirCacheObjects() string {
@@ -92,7 +92,7 @@ func (s directoryV0) DirCacheInventoryListLog() string {
 }
 
 func (s directoryV0) DirObjectId() string {
-	return s.DirZit("Kennung")
+	return s.DirDodder("Kennung")
 }
 
 func (s directoryV0) FileCacheObjectId() string {

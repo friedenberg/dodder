@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -18,7 +18,7 @@ teardown() {
 
 function bootstrap_with_content {
 	set_xdg "$1"
-	run_zit_init
+	run_dodder_init
 
 	{
 		echo "---"
@@ -30,14 +30,14 @@ function bootstrap_with_content {
 		echo "body"
 	} >to_add
 
-	run_zit new -edit=false to_add
+	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# zettel with multiple etiketten
 		- this_is_the_first
@@ -61,7 +61,7 @@ function bootstrap_without_content_xdg {
 	set_xdg "$(realpath them)"
 
 	pushd them || exit 1
-	run_zit_init
+	run_dodder_init
 	assert_success
 	popd || exit 1
 }
@@ -70,7 +70,7 @@ function bootstrap_without_content {
 	mkdir -p them || exit 1
 
 	pushd them || exit 1
-	run_zit_init -override-xdg-with-cwd test-repo-id-them
+	run_dodder_init -override-xdg-with-cwd test-repo-id-them
 	assert_success
 	popd || exit 1
 }
@@ -79,13 +79,13 @@ function bootstrap_archive {
 	mkdir -p them || exit 1
 
 	pushd them || exit 1
-	run_zit init \
+	run_dodder init \
 		-override-xdg-with-cwd \
 		-repo-type archive \
 		-lock-internal-files=false \
 		test-repo-id-them
 
-	run_zit info-repo type
+	run_dodder info-repo type
 	assert_success
 	assert_output 'archive'
 
@@ -96,16 +96,16 @@ function bootstrap_archive {
 function push_history_zettel_typ_etikett_no_conflicts { # @test
 	them="them"
 	set_xdg "$them"
-	run_zit_init
+	run_dodder_init
 
 	function print_their_xdg() (
 		set_xdg "$them"
-		zit info xdg
+		dodder info xdg
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
 		them
@@ -114,7 +114,7 @@ function push_history_zettel_typ_etikett_no_conflicts { # @test
 		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
-	run_zit push /them:k +zettel,typ,etikett
+	run_dodder push /them:k +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -132,7 +132,7 @@ function push_history_zettel_typ_etikett_no_conflicts { # @test
 	EOM
 
 	set_xdg "$them"
-	run_zit show +zettel,typ,konfig,etikett,repo
+	run_dodder show +zettel,typ,konfig,etikett,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -155,17 +155,17 @@ function push_history_zettel_typ_etikett_yes_conflicts { # @test
 
 	function print_their_xdg() (
 		set_xdg "$them"
-		zit info xdg
+		dodder info xdg
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
 		them
 
-	run_zit push /them +zettel,typ,etikett
+	run_dodder push /them +zettel,typ,etikett
 
 	assert_failure
 	assert_output_unsorted - <<-EOM
@@ -189,14 +189,14 @@ function push_history_zettel_typ_etikett_yes_conflicts { # @test
 		needs merge
 	EOM
 
-	run_zit status .
+	run_dodder status .
 	assert_output - <<-EOM
 		       conflicted [one/dos]
 		       conflicted [one/uno]
 		        untracked [to_add @05b22ebd6705f9ac35e6e4736371df50b03d0e50f85865861fd1f377c4c76e23]
 	EOM
 
-	run_zit show +zettel,typ,konfig,etikett,repo
+	run_dodder show +zettel,typ,konfig,etikett,repo
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
@@ -216,12 +216,12 @@ function push_history_default { # @test
 
 	function print_their_xdg() (
 		set_xdg them
-		zit info xdg
+		dodder info xdg
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
 		them
@@ -230,11 +230,11 @@ function push_history_default { # @test
 		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
-	run_zit push /them
+	run_dodder push /them
 
 	assert_success
 
-	run_zit show +?z,e,t
+	run_dodder show +?z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -248,7 +248,7 @@ function push_history_default { # @test
 	EOM
 
 	set_xdg them
-	run_zit show +zettel,typ,konfig,etikett #,repo
+	run_dodder show +zettel,typ,konfig,etikett #,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
@@ -268,12 +268,12 @@ function push_history_default_only_blobs { # @test
 
 	function print_their_xdg() (
 		set_xdg them
-		zit info xdg
+		dodder info xdg
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
 		<(print_their_xdg) \
 		them
@@ -282,7 +282,7 @@ function push_history_default_only_blobs { # @test
 		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
-	run_zit push -include-objects=false /them
+	run_dodder push -include-objects=false /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -295,7 +295,7 @@ function push_history_default_only_blobs { # @test
 		copied Blob .* \(.* bytes)
 	EOM
 
-	run_zit show +?z,e,t
+	run_dodder show +?z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -309,7 +309,7 @@ function push_history_default_only_blobs { # @test
 	EOM
 
 	set_xdg them
-	run_zit show +zettel,typ,konfig,etikett,repo
+	run_dodder show +zettel,typ,konfig,etikett,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -320,7 +320,7 @@ function push_default_stdio_local_once { # @test
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type stdio-local \
 		them \
 		them
@@ -330,12 +330,12 @@ function push_default_stdio_local_once { # @test
 	EOM
 
 	export BATS_TEST_BODY=true
-	run_zit push /them
+	run_dodder push /them
 	assert_success
 	# TODO-P4 assert output of push
 
 	pushd them || exit 1
-	run_zit show :zettel
+	run_dodder show :zettel
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -348,7 +348,7 @@ function push_history_default_stdio_local_twice { # @test
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type stdio-local \
 		them \
 		them
@@ -357,7 +357,7 @@ function push_history_default_stdio_local_twice { # @test
 		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
 	EOM
 
-	run_zit push /them :z
+	run_dodder push /them :z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
 		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
@@ -367,7 +367,7 @@ function push_history_default_stdio_local_twice { # @test
 	EOM
 
 	pushd them || exit 1
-	run_zit show :zettel
+	run_dodder show :zettel
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -375,7 +375,7 @@ function push_history_default_stdio_local_twice { # @test
 	EOM
 	popd || exit 1
 
-	run_zit push /them :z
+	run_dodder push /them :z
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -386,7 +386,7 @@ function push_history_default_stdio_local_archive_twice { # @test
 	bootstrap_archive
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit remote-add \
+	run_dodder remote-add \
 		-remote-type stdio-local \
 		them \
 		them
@@ -395,7 +395,7 @@ function push_history_default_stdio_local_archive_twice { # @test
 		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
 	EOM
 
-	run_zit push /them
+	run_dodder push /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -411,7 +411,7 @@ function push_history_default_stdio_local_archive_twice { # @test
 	EOM
 
 	pushd them || exit 1
-	run_zit show
+	run_dodder show
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
@@ -431,7 +431,7 @@ function push_history_default_stdio_local_archive_twice { # @test
 	EOM
 	popd || exit 1
 
-	run_zit push /them
+	run_dodder push /them
 	assert_success
 	assert_output_unsorted ''
 }

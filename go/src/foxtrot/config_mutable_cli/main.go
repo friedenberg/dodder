@@ -43,7 +43,7 @@ func (c Config) GetCLIFlags() (flags []string) {
 }
 
 func (c *Config) SetFlagSet(flagSet *flag.FlagSet) {
-	flagSet.StringVar(&c.BasePath, "dir-zit", "", "")
+	flagSet.StringVar(&c.BasePath, "dir-dodder", "", "")
 
 	flagSet.Var(&c.Debug, "debug", "debugging options")
 	flagSet.BoolVar(&c.Todo, "todo", false, "")
@@ -64,7 +64,7 @@ func (c *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	c.ToolOptions.AddToFlags(flagSet)
 
 	flagSet.BoolVar(
-		&c.PrintOptions.ZittishNewlines,
+		&c.PrintOptions.Newlines,
 		"zittish-newlines",
 		false,
 		"add extra newlines to zittish to improve readability",

@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -15,7 +15,7 @@ teardown() {
 }
 
 function debug_options_all() { # @test
-	run_zit info -debug=all
+	run_dodder info -debug=all
 	assert_success
 
   run test -f cpu.pprof

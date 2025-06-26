@@ -53,7 +53,7 @@ func (s *Store) openZettels(
 		ph,
 		vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
-			WithFileType("zit-object").
+			WithFileType("dodder-object").
 			WithInsertMode().
 			Build(),
 	); err != nil {

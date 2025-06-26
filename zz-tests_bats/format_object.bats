@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -15,8 +15,8 @@ teardown() {
 }
 
 function format_simple { # @test
-	run_zit_init_workspace
-	run_zit checkout !md:t
+	run_dodder_init_workspace
+	run_dodder checkout !md:t
 	assert_success
 
 	cat >md.type <<-EOM
@@ -27,17 +27,17 @@ function format_simple { # @test
 		]
 	EOM
 
-	# run cat .zit/Objekten/Akten/*/*
+	# run cat .dodder/Objekten/Akten/*/*
 	# assert_output ''
 
-	run_zit checkin -delete .t
+	run_dodder checkin -delete .t
 	assert_success
 	assert_output - <<-EOM
 		[!md @21759bebd1a7937005f692b9394c0d2629361286b9fe837617e166c3ded687eb !toml-type-v1]
 		          deleted [md.type]
 	EOM
 
-	run_zit format-object -mode both one/uno text
+	run_dodder format-object -mode both one/uno text
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -50,7 +50,7 @@ function format_simple { # @test
 		last time
 	EOM
 
-	run_zit checkout one/uno
+	run_dodder checkout one/uno
 	assert_success
 	cat >one/uno.zettel <<-EOM
 		---
@@ -63,7 +63,7 @@ function format_simple { # @test
 		last time but new
 	EOM
 
-	run_zit format-object -mode both one/uno.zettel text
+	run_dodder format-object -mode both one/uno.zettel text
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -78,11 +78,11 @@ function format_simple { # @test
 }
 
 function show_simple_one_zettel_binary { # @test
-	run_zit init-workspace
+	run_dodder init-workspace
 	assert_success
 
 	echo "binary file" >file.bin
-	run_zit add -delete file.bin
+	run_dodder add -delete file.bin
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [file.bin]
@@ -90,7 +90,7 @@ function show_simple_one_zettel_binary { # @test
 		[two/uno @b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
 	EOM
 
-	run_zit checkout !bin:t
+	run_dodder checkout !bin:t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [bin.type @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
@@ -104,14 +104,14 @@ function show_simple_one_zettel_binary { # @test
 		binary = true
 	EOM
 
-	run_zit checkin -delete bin.type
+	run_dodder checkin -delete bin.type
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [bin.type]
 		[!bin @e07d72a74e0a01c23ddeb871751f6fcb43afec5fb81108c157537db96c6c1da0 !toml-type-v1]
 	EOM
 
-	run_zit format-object -mode both two/uno
+	run_dodder format-object -mode both two/uno
 	assert_success
 	assert_output - <<-EOM
 		---

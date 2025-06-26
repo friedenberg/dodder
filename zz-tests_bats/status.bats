@@ -6,9 +6,9 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
-  run_zit_init_workspace
+  run_dodder_init_workspace
 
 	export BATS_TEST_BODY=true
 }
@@ -18,7 +18,7 @@ teardown() {
 }
 
 function checkout_everything() {
-	run_zit checkout :z,t,e
+	run_dodder checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
@@ -33,7 +33,7 @@ function checkout_everything() {
 }
 
 function dirty_new_zettel() {
-	run_zit new -edit=false - <<-EOM
+	run_dodder new -edit=false - <<-EOM
 		---
 		# the new zettel
 		- etikett-one
@@ -112,7 +112,7 @@ function dirty_zz_archive_etikett() {
 
 function status_simple_one_zettel { # @test
 	checkout_everything
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -120,7 +120,7 @@ function status_simple_one_zettel { # @test
 
 	dirty_one_uno
 
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		          changed [one/uno.zettel @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
@@ -129,7 +129,7 @@ function status_simple_one_zettel { # @test
 
 function status_simple_one_zettel_akte_separate { # @test
 	checkout_everything
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -141,7 +141,7 @@ function status_simple_one_zettel_akte_separate { # @test
 		newest body but even newerests
 	EOM
 
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		          changed [one/uno @a958b1c8e2bc817fcb17292f6957c0dfc87c874dc33274f0c4f4efdcdd1429bb !md "wow the first" tag-3 tag-4
@@ -151,19 +151,19 @@ function status_simple_one_zettel_akte_separate { # @test
 
 function status_simple_one_zettel_akte_only { # @test
 	checkout_everything
-	run_zit clean one/uno.zettel
+	run_dodder clean one/uno.zettel
 	assert_success
 	# assert_output - <<-EOM
 	# 	          deleted [one/uno.zettel]
 	# EOM
 
-	run_zit checkout -mode blob one/uno
+	run_dodder checkout -mode blob one/uno
 	# assert_output - <<-EOM
 	# 	      checked out [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
 	# 	                   one/uno.md]
 	# EOM
 
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	# assert_output - <<-EOM
 	# 	             same [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
@@ -180,7 +180,7 @@ function status_simple_one_zettel_akte_only { # @test
 		uno.zettel
 	EOM
 
-	run_zit status one/uno.zettel
+	run_dodder status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		          changed [one/uno.zettel @e5ef6f74b2707b17d8670e5678151d676655c685c43beaeb6e995c9d127fab85 !md "wildly different" etikett-one
@@ -190,19 +190,19 @@ function status_simple_one_zettel_akte_only { # @test
 
 function status_zettel_akte_checkout { # @test
 	checkout_everything
-	run_zit clean .
+	run_dodder clean .
 	assert_success
 
 	dirty_new_zettel
 
-	run_zit checkout -mode blob two/uno
+	run_dodder checkout -mode blob two/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [two/uno @aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel" etikett-one
 		                   two/uno.txt]
 	EOM
 
-	run_zit status .z
+	run_dodder status .z
 	assert_success
 	assert_output - <<-EOM
 		             same [two/uno @aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel" etikett-one
@@ -212,28 +212,28 @@ function status_zettel_akte_checkout { # @test
 
 function status_zettel_hidden { # @test
 	checkout_everything
-	run_zit dormant-add tag-3
+	run_dodder dormant-add tag-3
 	assert_success
 
-	run_zit show :z
+	run_dodder show :z
 	assert_success
 	assert_output ''
 
-	run_zit show :?z
+	run_dodder show :?z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit status .z
+	run_dodder status .z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit status !md.z
+	run_dodder status !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -243,7 +243,7 @@ function status_zettel_hidden { # @test
 
 function status_zettelen_typ { # @test
 	checkout_everything
-	run_zit status !md.z
+	run_dodder status !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -253,7 +253,7 @@ function status_zettelen_typ { # @test
 	dirty_one_uno
 	dirty_one_dos
 
-	run_zit status !md.z
+	run_dodder status !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          changed [one/dos.zettel @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
@@ -263,7 +263,7 @@ function status_zettelen_typ { # @test
 
 function status_complex_zettel_etikett_negation { # @test
 	checkout_everything
-	run_zit status ^-etikett-two.z
+	run_dodder status ^-etikett-two.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -272,7 +272,7 @@ function status_complex_zettel_etikett_negation { # @test
 
 	dirty_one_uno
 
-	run_zit status ^-etikett-two.z
+	run_dodder status ^-etikett-two.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -282,7 +282,7 @@ function status_complex_zettel_etikett_negation { # @test
 
 function status_simple_all { # @test
 	checkout_everything
-	run_zit status
+	run_dodder status
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [md.type @$(get_type_blob_sha) !toml-type-v1]
@@ -301,7 +301,7 @@ function status_simple_all { # @test
 	dirty_zz_archive_etikett
 	dirty_da_new_typ
 
-	run_zit status .
+	run_dodder status .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -319,7 +319,7 @@ function status_simple_all { # @test
 
 function status_simple_typ { # @test
 	checkout_everything
-	run_zit status .t
+	run_dodder status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [md.type @$(get_type_blob_sha) !toml-type-v1]
@@ -328,7 +328,7 @@ function status_simple_typ { # @test
 	dirty_md_typ
 	dirty_da_new_typ
 
-	run_zit status .t
+	run_dodder status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
@@ -338,7 +338,7 @@ function status_simple_typ { # @test
 
 function status_simple_etikett { # @test
 	checkout_everything
-	run_zit status .e
+	run_dodder status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -350,7 +350,7 @@ function status_simple_etikett { # @test
 
 	dirty_zz_archive_etikett
 
-	run_zit status .e
+	run_dodder status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -364,7 +364,7 @@ function status_simple_etikett { # @test
 
 function status_conflict { # @test
 	checkout_everything
-	run_zit checkout one/dos
+	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -382,7 +382,7 @@ function status_conflict { # @test
 		not another one, conflict time
 	EOM
 
-	run_zit organize -mode commit-directly one/dos <<-EOM
+	run_dodder organize -mode commit-directly one/dos <<-EOM
 		---
 		! txt2
 		---
@@ -400,14 +400,14 @@ function status_conflict { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit show -format log new-etikett-for-all:z,e,t
+	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	run_zit status one/dos.zettel
+	run_dodder status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM
 		       conflicted [one/dos.zettel]
@@ -420,7 +420,7 @@ function status_added_untracked_only() { # @test
 		newest body
 	EOM
 
-	run_zit status .
+	run_dodder status .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		        untracked [test.md @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc]
@@ -434,7 +434,7 @@ function status_added_untracked() { # @test
 		newest body
 	EOM
 
-	run_zit status .
+	run_dodder status .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		        untracked [test.md @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc]
@@ -451,10 +451,10 @@ function status_added_untracked() { # @test
 
 # bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
 function status_dot_untracked_recognized_blob_only() { # @test
-	run_zit show -format blob one/uno
+	run_dodder show -format blob one/uno
 	echo "$output" >test.md
 
-	run_zit status .
+	run_dodder status .
 	assert_success
 	assert_output - <<-EOM
 		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
@@ -464,10 +464,10 @@ function status_dot_untracked_recognized_blob_only() { # @test
 
 # bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
 function status_explicit_untracked_recognized_blob_only() { # @test
-	run_zit show -format blob one/uno
+	run_dodder show -format blob one/uno
 	echo "$output" >test.md
 
-	run_zit status test.md
+	run_dodder status test.md
 	assert_success
 	assert_output - <<-EOM
 		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
@@ -478,10 +478,10 @@ function status_explicit_untracked_recognized_blob_only() { # @test
 # bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
 function status_dot_untracked_recognized_blob() { # @test
 	checkout_everything
-	run_zit show -format blob one/uno
+	run_dodder show -format blob one/uno
 	echo "$output" >test.md
 
-	run_zit status .
+	run_dodder status .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4

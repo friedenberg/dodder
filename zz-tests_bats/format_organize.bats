@@ -18,7 +18,7 @@ function format_organize_right_align { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -46,7 +46,7 @@ function format_organize_right_align { # @test
 		  ###        -2
 	EOM
 
-	run_zit format-organize -prefix-joints=true -refine=true "$to_add"
+	run_dodder format-organize -prefix-joints=true -refine=true "$to_add"
 	assert_success
 	assert_output "$(cat "$expected")"
 }
@@ -54,7 +54,7 @@ function format_organize_right_align { # @test
 # bats user_story:organize
 function format_organize_left_align { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	to_add="$(mktemp)"
 	cat - >"$to_add" <<-EOM
@@ -76,7 +76,7 @@ function format_organize_left_align { # @test
 		  ###        -2
 	EOM
 
-	run_zit format-organize -prefix-joints=true -refine "$to_add"
+	run_dodder format-organize -prefix-joints=true -refine "$to_add"
 	assert_success
 	assert_output "$(cat "$expected")"
 }
@@ -93,29 +93,29 @@ cat_organize() (
 
 		     # %project
 
-		    ##         -2021-zit
+		    ##         -2021-dodder
 
-		   ###                  -22q1-uws-140
+		   ###                     -22q1-uws-140
 
-		  ####                               -moving
+		  ####                                  -moving
 
 		- [io/poliwr] update billing addresses
 
-		  ####                               -mvp-main_room
+		  ####                                  -mvp-main_room
 
 		- [prot/nidora] Brainstorm where to place toolbox.md
 
-		   ###                  -commands
+		   ###                     -commands
 
 		- [mer/golb] use error types to generate specific exit status codes
 		- [tec/slowp] update output of commands to use new store
 
-		   ###                  -etiketten_and_organize
+		   ###                     -etiketten_and_organize
 
 		- [pe/mo] add etikett rule type for removing etiketts based on conditions
 		- [yttr/gole] use default etiketten with add
 
-		   ###                  -init
+		   ###                     -init
 
 		- [ph/hitmonc] Add bats test for initing more than once.md
 		- [rub/rap] add .exrc to init
@@ -124,14 +124,14 @@ cat_organize() (
 
 function outputs_organize_one_etikett { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_organize)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_organize)
 	assert_output "$(cat_organize)"
 }
 
 function format_organize_create_structured_zettels { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -145,7 +145,7 @@ function format_organize_create_structured_zettels { # @test
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -159,7 +159,7 @@ function format_organize_create_structured_zettels { # @test
 }
 
 function format_organize_create_bare_object_description_line_wrap { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -172,7 +172,7 @@ function format_organize_create_bare_object_description_line_wrap { # @test
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -185,7 +185,7 @@ function format_organize_create_bare_object_description_line_wrap { # @test
 
 # bats test_tags=user_story:external_ids
 function format_organize_with_fields_and_instructions { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -199,15 +199,15 @@ function format_organize_with_fields_and_instructions { # @test
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output "$(cat_body)"
 }
 
 # bats test_tags=user_story:external_ids
 function format_organize_untracked_fs_blob_with_spaces() { # @test
-	run_zit_init_disable_age
-	run_zit format-organize - <<-EOM
+	run_dodder_init_disable_age
+	run_dodder format-organize - <<-EOM
 
 		- ["test with spaces.txt"]
 	EOM
@@ -219,11 +219,11 @@ function format_organize_untracked_fs_blob_with_spaces() { # @test
 }
 
 # bats test_tags=user_story:external_ids
-# TODO [anti/deb !task zz-inbox] fix `zit organize .`
+# TODO [anti/deb !task zz-inbox] fix `dodder organize .`
 function format_organize_recognized_fs_blob_with_newlines() { # @test
 	skip
-	run_zit_init_disable_age
-	run_zit format-organize - <<-EOM
+	run_dodder_init_disable_age
+	run_dodder format-organize - <<-EOM
 		- [one/uno !pdf payee-x-heloc zz-inbox
 		                   "heloc-board/CO-OP Modified Clarity Comittment - letterhead.pdf"] CO-OP Modified Clarity Comittment - letterhead
 		- [two/dos !pdf area-money-tax
@@ -237,7 +237,7 @@ function format_organize_recognized_fs_blob_with_newlines() { # @test
 }
 
 function format_organize_with_new_spreading_several_lines { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -254,7 +254,7 @@ function format_organize_with_new_spreading_several_lines { # @test
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -269,7 +269,7 @@ function format_organize_with_new_spreading_several_lines { # @test
 }
 
 function format_organize_with_new_spreading_several_lines_and_ambiguous_heading { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -287,7 +287,7 @@ function format_organize_with_new_spreading_several_lines_and_ambiguous_heading 
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -305,7 +305,7 @@ function format_organize_with_new_spreading_several_lines_and_ambiguous_heading 
 }
 
 function format_organize_with_heading_having_space { # @test
-	run_zit_init_disable_age
+	run_dodder_init_disable_age
 
 	function cat_body {
 		cat <<-EOM
@@ -323,7 +323,7 @@ function format_organize_with_heading_having_space { # @test
 		EOM
 	}
 
-	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	run_dodder format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output - <<-EOM
 		---

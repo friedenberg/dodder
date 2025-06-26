@@ -7,7 +7,7 @@ dir_git_root := shell("git rev-parse --show-toplevel")
 clean-fixtures:
   #! /bin/bash -ex
 
-  pushd "{{dir_git_root}}/pkgs/bravo/zit/zz-tests_bats" || exit
+  pushd "{{dir_git_root}}/pkgs/bravo/dodder/zz-tests_bats" || exit
 
   git reset HEAD migration/v*/
   ./../bin/chflags.bash -R nouchg migration/v*/
@@ -17,10 +17,10 @@ clean-fixtures:
 [group("clean")]
 clean: clean-fixtures
 
-zit_current_version := "v" + shell("zit info store-version")
+dodder_current_version := "v" + shell("dodder info store-version")
 
 [group("debug")]
-debug-env store_version=zit_current_version:
+debug-env store_version=dodder_current_version:
   #! /bin/bash -ex
   dir="$(mktemp -d)"
   trap "rm -rf '$dir'" EXIT
@@ -82,7 +82,7 @@ check:
 
 [group("test")]
 test-generate_fixtures store_version:
-  which zit
+  which dodder
   ./migration/generate_fixture.bash {{store_version}}
 
 bats_timeout := "5"

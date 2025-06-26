@@ -262,8 +262,8 @@ func (se *stackWrapError) writeError(sb *strings.Builder) {
 	}
 
 	if se.next == nil && se.error == nil {
-		sb.WriteString("zit/alfa/stack_frame/stackWrapError: both next and error are nil.")
-		sb.WriteString("zit/alfa/stack_frame/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
+		sb.WriteString("dodder/alfa/stack_frame/stackWrapError: both next and error are nil.")
+		sb.WriteString("dodder/alfa/stack_frame/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
 	}
 }
 
@@ -281,8 +281,8 @@ func (se *stackWrapError) writeErrorNoStack(sb *strings.Builder) {
 	}
 
 	if se.next == nil && se.error == nil {
-		sb.WriteString("zit/alfa/stack_frame/stackWrapError: both next and error are nil.")
-		sb.WriteString("zit/alfa/stack_frame/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
+		sb.WriteString("dodder/alfa/stack_frame/stackWrapError: both next and error are nil.")
+		sb.WriteString("dodder/alfa/stack_frame/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
 	}
 }
 

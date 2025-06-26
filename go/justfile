@@ -56,7 +56,7 @@ codemod-go-imports: codemod-go-fix_redundant_import_aliases
 codemod-go-move_package src dst: && codemod-go-imports build-go
   #! /bin/bash -e
 
-  prefix=code.linenisgreat.com/dodder/go/zit
+  prefix=code.linenisgreat.com/dodder/go
   original="{{src}}"
   renamed="{{dst}}"
   original="${original%/}"
@@ -169,11 +169,11 @@ test-go-unit:
 test-go: test-go-unit
 
 test-bats $PATH=(dir_build + ":" + env("PATH")):
-  just ../zz-tests_bats/test-generate_fixtures "$(build/zit info)"
+  just ../zz-tests_bats/test-generate_fixtures "$(build/der info)"
   just ../zz-tests_bats/test
 
 # test-bats-targets $PATH=(dir_build + ":" + env("PATH")):
-#   just zz-tests_bats/test-generate_fixtures "$(build/zit info)"
+#   just zz-tests_bats/test-generate_fixtures "$(build/der info)"
 #   just zz-tests_bats/test
 
 test: test-go test-bats
@@ -212,8 +212,8 @@ stats-loc-go: stats-loc-go-app stats-loc-go-test
 #             |_|            |___/
 
 deploy-docker: build-docker
-  docker tag zit:latest idealnesswagon5/zit:latest
-  docker push idealnesswagon5/zit:latest
+  docker tag dodder:latest idealnesswagon5/dodder:latest
+  docker push idealnesswagon5/dodder:latest
 
 deploy-github: \
     build-go \

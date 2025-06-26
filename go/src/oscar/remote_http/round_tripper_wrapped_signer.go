@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	headerChallengeNonce    = "X-Zit-Challenge-Nonce"
-	headerChallengeResponse = "X-Zit-Challenge-Response"
-	headerRepoPublicKey     = "X-Zit-Repo-Public_Key"
-	headerSha256Sig         = "X-Zit-Sha256-Sig"
+	headerChallengeNonce    = "X-Dodder-Challenge-Nonce"
+	headerChallengeResponse = "X-Dodder-Challenge-Response"
+	headerRepoPublicKey     = "X-Dodder-Repo-Public_Key"
+	headerSha256Sig         = "X-Dodder-Sha256-Sig"
 )
 
 type RoundTripperBufioWrappedSigner struct {

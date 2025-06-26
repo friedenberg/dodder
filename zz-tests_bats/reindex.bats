@@ -6,9 +6,9 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
-  run_zit_init_workspace
+  run_dodder_init_workspace
 }
 
 teardown() {
@@ -16,9 +16,9 @@ teardown() {
 }
 
 function reindex_simple { # @test
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show +t,e,z,konfig
+	run_dodder show +t,e,z,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -33,7 +33,7 @@ function reindex_simple { # @test
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show -format tags-path :e,z,t
+	run_dodder show -format tags-path :e,z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		!md [Paths: [], All: []]
@@ -62,21 +62,21 @@ function reindex_simple_twice { # @test
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show +e,t,z,konfig
+	run_dodder show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show +e,t,z,konfig
+	run_dodder show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 }
 
 function reindex_after_changes { # @test
-	run_zit show !md:t
+	run_dodder show !md:t
 	assert_success
 	assert_output - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
@@ -87,14 +87,14 @@ function reindex_after_changes { # @test
 		vim-syntax-type = "test"
 	EOM
 
-	run_zit checkin .t
+	run_dodder checkin .t
 	assert_success
 	assert_output - <<-EOM
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 
 	function verify() {
-		run_zit show -format blob !md+t
+		run_dodder show -format blob !md+t
 		assert_success
 		assert_output - <<-EOM
 			file-extension = 'md'
@@ -103,7 +103,7 @@ function reindex_after_changes { # @test
 			vim-syntax-type = "test"
 		EOM
 
-		run_zit show -format blob !md:t
+		run_dodder show -format blob !md:t
 		assert_success
 		assert_output - <<-EOM
 			inline-akte = false
@@ -113,9 +113,9 @@ function reindex_after_changes { # @test
 
 	verify
 
-	run_zit reindex
+	run_dodder reindex
 	assert_success
-	run_zit show +e,t,z,konfig
+	run_dodder show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]

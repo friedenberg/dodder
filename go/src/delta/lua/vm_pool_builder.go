@@ -100,7 +100,7 @@ func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
 	return
 }
 
-func MakeVMPoolWithZitSearcher(
+func MakeVMPoolWithSearcher(
 	script string,
 	searcher LGFunction,
 	apply interfaces.FuncIter[*VM],
@@ -115,7 +115,7 @@ func MakeVMPoolWithZitSearcher(
 	return
 }
 
-func MakeVMPoolWithZitRequire(
+func MakeVMPoolWithRequire(
 	script string,
 	require LGFunction,
 	apply interfaces.FuncIter[*VM],

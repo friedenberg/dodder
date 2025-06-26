@@ -76,7 +76,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
-	if request.Headers.Get("x-zit-remote_transfer_options-allow_merge_conflicts") == "true" {
+	if request.Headers.Get("x-dodder-remote_transfer_options-allow_merge_conflicts") == "true" {
 		importerOptions.AllowMergeConflicts = true
 	}
 

@@ -3,7 +3,7 @@
 setup() {
 	load "$(dirname "$BATS_TEST_FILE")/common.bash"
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -12,7 +12,7 @@ teardown() {
 }
 
 function complete_show { # @test
-	run_zit complete show
+	run_dodder complete show
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		tag-1.*Tag
@@ -25,7 +25,7 @@ function complete_show { # @test
 
 function complete_show_all { # @test
 	skip
-	run_zit complete show :z,t,b,e
+	run_dodder complete show :z,t,b,e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		-after
@@ -50,7 +50,7 @@ function complete_show_all { # @test
 }
 
 function complete_show_zettels { # @test
-	run_zit complete show :z
+	run_dodder complete show :z
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		one/dos.*Zettel: !md wow ok again
@@ -59,7 +59,7 @@ function complete_show_zettels { # @test
 }
 
 function complete_show_types { # @test
-	run_zit complete show :t
+	run_dodder complete show :t
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		md.*Type
@@ -67,7 +67,7 @@ function complete_show_types { # @test
 }
 
 function complete_show_tags { # @test
-	run_zit complete show :e
+	run_dodder complete show :e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		tag-3.*Tag
@@ -76,7 +76,7 @@ function complete_show_tags { # @test
 }
 
 function complete_subcmd { # @test
-	run_zit complete
+	run_dodder complete
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		add
@@ -133,7 +133,7 @@ function complete_subcmd { # @test
 }
 
 function complete_complete { # @test
-	run_zit complete complete
+	run_dodder complete complete
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		-bash-style.*
@@ -142,7 +142,7 @@ function complete_complete { # @test
 }
 
 function complete_init_workspace { # @test
-	run_zit complete init-workspace
+	run_dodder complete init-workspace
 	assert_success
 
 	# shellcheck disable=SC2016
@@ -152,7 +152,7 @@ function complete_init_workspace { # @test
 	# shellcheck disable=SC2016
 	assert_output --regexp -- '-type.*type used for new objects in `new` and `organize`'
 
-	run_zit complete init-workspace -tags
+	run_dodder complete init-workspace -tags
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		tag-1.*Tag
@@ -162,7 +162,7 @@ function complete_init_workspace { # @test
 		tag.*Tag
 	EOM
 
-	run_zit complete init-workspace -query
+	run_dodder complete init-workspace -query
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		tag-1.*Tag
@@ -172,13 +172,13 @@ function complete_init_workspace { # @test
 		tag.*Tag
 	EOM
 
-	run_zit complete init-workspace -type
+	run_dodder complete init-workspace -type
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		!md.*Type
 	EOM
 
-	run_zit complete -in-progress="tag" init-workspace -tags tag
+	run_dodder complete -in-progress="tag" init-workspace -tags tag
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		tag-1.*Tag
@@ -190,7 +190,7 @@ function complete_init_workspace { # @test
 
 	mkdir -p workspaces/test
 
-	run_zit complete -in-progress="workspaces" init-workspace -tags tag workspaces
+	run_dodder complete -in-progress="workspaces" init-workspace -tags tag workspaces
 	assert_success
 
 	# shellcheck disable=SC2016
@@ -205,14 +205,14 @@ function complete_init_workspace { # @test
 
 function complete_checkin { # @test
 	touch wow.md
-	run_zit complete checkin -organize -delete
+	run_dodder complete checkin -organize -delete
 	assert_success
 
 	# shellcheck disable=SC2016
 	assert_output --regexp -- 'wow.md.*file'
 
 	touch wow.md
-	run_zit complete checkin -organize -delete --
+	run_dodder complete checkin -organize -delete --
 	assert_success
 
 	# shellcheck disable=SC2016

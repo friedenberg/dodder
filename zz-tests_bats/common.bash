@@ -23,7 +23,7 @@ DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 
 # {
 #   pushd "$BATS_CWD" >/dev/null 2>&1
-#   gmake build/zit || exit 1
+#   gmake build/dodder || exit 1
 # }
 
 {
@@ -48,7 +48,7 @@ cat_yang() (
   echo "seis"
 )
 
-cmd_zit_def=(
+cmd_dodder_def=(
   -debug no-tempdir-cleanup
   -abbreviate-zettel-ids=false
   -abbreviate-shas=false
@@ -64,11 +64,11 @@ cmd_zit_def=(
   -print-colors=false
 )
 
-export cmd_zit_def
+export cmd_dodder_def
 
 function copy_from_version {
   DIR="$1"
-  version="${2:-v$(zit info store-version)}"
+  version="${2:-v$(dodder info store-version)}"
   rm -rf "$BATS_TEST_TMPDIR/.xdg"
   cp -r "$DIR/migration/$version/.xdg" "$BATS_TEST_TMPDIR/.xdg"
 }
@@ -81,28 +81,28 @@ function chflags_and_rm {
   "$BATS_CWD/../bin/chflags.bash" -R nouchg "$BATS_TEST_TMPDIR"
 }
 
-function run_zit {
+function run_dodder {
   cmd="$1"
   shift
   #shellcheck disable=SC2068
-  run timeout --preserve-status "2s" zit "$cmd" ${cmd_zit_def[@]} "$@"
+  run timeout --preserve-status "2s" dodder "$cmd" ${cmd_dodder_def[@]} "$@"
 }
 
-function run_zit_stderr_unified {
+function run_dodder_stderr_unified {
   cmd="$1"
   shift
   #shellcheck disable=SC2068
-  run zit "$cmd" ${cmd_zit_def[@]} "$@"
+  run dodder "$cmd" ${cmd_dodder_def[@]} "$@"
 }
 
-function run_zit_init {
+function run_dodder_init {
   if [[ $# -eq 0 ]]; then
     args=("test")
   else
     args=("$@")
   fi
 
-  run_zit init \
+  run_dodder init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -lock-internal-files=false \
@@ -114,11 +114,11 @@ function run_zit_init {
 [konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
 
-  run_zit_init_workspace
+  run_dodder_init_workspace
 }
 
-function run_zit_init_workspace {
-  run_zit init-workspace
+function run_dodder_init_workspace {
+  run_dodder init-workspace
 }
 
 function get_konfig_sha() {
@@ -130,17 +130,17 @@ function get_type_blob_sha() {
 }
 
 run_find() {
-  run find . -maxdepth 2 ! -ipath './.xdg*' ! -iname '.zit-workspace'
+  run find . -maxdepth 2 ! -ipath './.xdg*' ! -iname '.dodder-workspace'
 }
 
-function run_zit_init_disable_age {
+function run_dodder_init_disable_age {
   if [[ $# -eq 0 ]]; then
     args=("test-repo-id")
   else
     args=("$@")
   fi
 
-  run_zit init \
+  run_dodder init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -age-identity none \
@@ -153,11 +153,11 @@ function run_zit_init_disable_age {
 [konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
 
-  run_zit cat-blob "$(get_konfig_sha)"
+  run_dodder cat-blob "$(get_konfig_sha)"
   assert_success
   assert_output
 
-  run_zit init-workspace
+  run_dodder init-workspace
 }
 
 function start_server {
@@ -169,7 +169,7 @@ function start_server {
     fi
 
     # shellcheck disable=SC2068
-    zit serve ${cmd_zit_def[@]} tcp :0
+    dodder serve ${cmd_dodder_def[@]} tcp :0
   }
 
   # shellcheck disable=SC2154
@@ -181,7 +181,7 @@ function start_server {
     export port="${BASH_REMATCH[2]}"
   else
     fail <<-EOM
-			unable to get port info from zit server.
+			unable to get port info from dodder server.
 			server output: $output
 		EOM
   fi

@@ -16,7 +16,7 @@ func PrintUsage(ctx errors.Context, in error) {
 		defer ctx.CancelWithError(in)
 	}
 
-	ui.Err().Print("Usage for zit:")
+	ui.Err().Print("Usage for dodder:")
 
 	commands := command.Commands()
 

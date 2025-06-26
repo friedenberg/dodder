@@ -90,7 +90,7 @@ func (w *Writer) zettelToItem(
 	w.addCommonMatches(z, a)
 
 	a.Text.Copy = ks
-	a.Uid = "zit://" + ks
+	a.Uid = "dodder://" + ks
 
 	{
 		var sb strings.Builder
@@ -123,7 +123,7 @@ func (w *Writer) etikettToItem(
 	w.addCommonMatches(z, a)
 
 	a.Text.Copy = e.String()
-	a.Uid = "zit://" + e.String()
+	a.Uid = "dodder://" + e.String()
 
 	return
 }
@@ -153,7 +153,7 @@ func (w *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
 	a.Match.ReadFromBuffer(&mb.Buffer)
 
 	a.Text.Copy = e.String()
-	a.Uid = "zit://" + e.String()
+	a.Uid = "dodder://" + e.String()
 
 	return
 }

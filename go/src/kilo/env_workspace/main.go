@@ -92,7 +92,7 @@ func Make(
 			break
 
 		} else if err != nil {
-			err = errors.BadRequestPrefix("failed to decode `.zit-workspace`", err)
+			err = errors.BadRequestPrefix("failed to decode `.dodder-workspace`", err)
 			return
 		} else {
 			out.blob = *object.Struct
@@ -152,9 +152,9 @@ type env struct {
 	isTemporary bool
 
 	// dir is populated on init to either the cwd, or a temporary directory,
-	// depending on whether $PWD/.zit-workspace exists.
+	// depending on whether $PWD/.dodder-workspace exists.
 	//
-	// Later, dir may be set to $PWD/.zit-workspace by CreateWorkspace
+	// Later, dir may be set to $PWD/.dodder-workspace by CreateWorkspace
 	dir string
 
 	configMutable config_mutable_blobs.Blob

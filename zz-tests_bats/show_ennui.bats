@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -15,11 +15,11 @@ teardown() {
 }
 
 function format_mutter_sha_one { # @test
-	run_zit show -format sha one/uno+
+	run_dodder show -format sha one/uno+
 	assert_success
 	sha="$(echo -n "$output" | head -n1)"
 
-	run_zit show -format mutter-sha one/uno
+	run_dodder show -format mutter-sha one/uno
 	assert_success
 	assert_output - <<-EOM
 		$sha
@@ -27,7 +27,7 @@ function format_mutter_sha_one { # @test
 }
 
 function format_mutter_one { # @test
-	run_zit show -format mutter one/uno
+	run_dodder show -format mutter one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
@@ -35,7 +35,7 @@ function format_mutter_one { # @test
 }
 
 function format_mutter_all { # @test
-	run_zit show -format mutter :
+	run_dodder show -format mutter :
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]

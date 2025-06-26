@@ -6,10 +6,10 @@ import (
 
 type Options struct {
 	BasePath             string
-	PermitNoZitDirectory bool
+	PermitNoDodderDirectory bool
 	MakeXDGDirectories   bool
 }
 
 func (o Options) GetReadOnlyBlobStorePath() string {
-	return os.Getenv("ZIT_READ_ONLY_BLOB_STORE_PATH")
+	return os.Getenv("DODDER_READ_ONLY_BLOB_STORE_PATH")
 }

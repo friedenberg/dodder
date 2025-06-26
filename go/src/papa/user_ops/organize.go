@@ -146,7 +146,7 @@ func (op Organize) RunWithSkuType(
 	for {
 		openVimOp := OpenEditor{
 			VimOptions: vim_cli_options_builder.New().
-				WithFileType("zit-organize").
+				WithFileType("dodder-organize").
 				Build(),
 		}
 

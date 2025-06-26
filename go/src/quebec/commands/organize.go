@@ -297,7 +297,7 @@ func (c Organize) readFromVim(
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().
-			WithFileType("zit-organize").
+			WithFileType("dodder-organize").
 			Build(),
 	}
 

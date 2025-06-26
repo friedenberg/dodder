@@ -1,16 +1,16 @@
 package env_repo
 
-type ErrNotInZitDir struct{}
+type ErrNotInDodderDir struct{}
 
-func (e ErrNotInZitDir) Error() string {
-	return "not in a zit directory"
+func (e ErrNotInDodderDir) Error() string {
+	return "not in a dodder directory"
 }
 
-func (e ErrNotInZitDir) ShouldShowStackTrace() bool {
+func (e ErrNotInDodderDir) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e ErrNotInZitDir) Is(target error) (ok bool) {
-	_, ok = target.(ErrNotInZitDir)
+func (e ErrNotInDodderDir) Is(target error) (ok bool) {
+	_, ok = target.(ErrNotInDodderDir)
 	return
 }

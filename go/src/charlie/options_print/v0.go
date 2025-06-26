@@ -9,7 +9,7 @@ type V0 struct {
 	PrintUnchanged      bool `toml:"print-unchanged"`
 	PrintColors         bool `toml:"print-colors"`
 	PrintInventoryLists bool `toml:"print-bestandsaufnahme"`
-	ZittishNewlines     bool `toml:"-"`
+	Newlines     bool `toml:"-"`
 }
 
 func (a *V0) Merge(b V0, mask V0) {
@@ -69,7 +69,7 @@ func (a *V0) Merge(b V0, mask V0) {
 		a.DescriptionInBox = b.DescriptionInBox
 	}
 
-	a.ZittishNewlines = b.ZittishNewlines
+	a.Newlines = b.Newlines
 }
 
 func (c V0) WithPrintShas(v bool) V0 {

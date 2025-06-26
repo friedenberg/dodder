@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit info store-version)"
+	version="v$(dodder info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 
@@ -15,7 +15,7 @@ teardown() {
 }
 
 function basic { # @test
-	run_zit export +e,konfig,t,z
+	run_dodder export +e,konfig,t,z
 	assert_success
 	assert_output --regexp - <<-EOM
 		\\[!md @$(get_type_blob_sha) .* !toml-type-v1]
