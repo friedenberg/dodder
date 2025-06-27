@@ -43,40 +43,6 @@ of user-supplied identifiers to generate unique combinations. Here's an example:
 At this time, contributions are welcome only after explicitly getting approval
 from one of the authors.
 
-## naming of components
-
-If you make the mistake of looking at the code and trying to make sense of it,
-you'll notice something pretty quickly: there are a lot of bizarre names:
-
--   Akte: file
--   Angeboren: congenital config (*cannot* be changed after init)
--   Bestandsaufnahme: inventory list (like a git commit)
--   Bezeichnung: description
--   Erworben: acquired config (*can* be changed after init)
--   Etikett: tag
--   Gattung: genre (of the object that is being stored)
--   Hinweis: identifier for a Zettel chain
--   Kasten: repo
--   Kennung: identifier
--   Konfig: configuration
--   Metadatei: metadata
--   Objekte: object
--   Schlussel: key
--   Schlummernd: "sleeping or dormant", objects that are hidden from ordinary
-    queries and must be explicitly recalled using the `?` operator, or
-    explicitly recalled using their direct `Kennnung` (id)
--   Schnittstellen: interface
--   Sku: stock-keeping unit, representing an entry in a Bestandsaufnahme
--   Standort: directory (all directory operations are consolidated here)
--   Typ: type
--   Umwelt: environment
--   Verweise: refs
--   Verzeichnisse: cache / index
--   Zettel: note / object
-
-The above non-exhaustive list captures some of them. These are all
-google-translate looked up names of I've used to describe components of
-
 # directory structure
 
 ## top-level
