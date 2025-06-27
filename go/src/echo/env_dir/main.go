@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	EnvDir = "DIR_DODDER"
-	EnvBin = "BIN_DODDER"
+	EnvDir                    = "DIR_DODDER" // TODO chang to dodder-prefixed
+	EnvBin                    = "BIN_DODDER" // TODO change to dodder-prefixed
+	EnvXDGUtilityNameOverride = "DODDER_XDG_UTILITY_OVERRIDE"
+	XDGUtilityName            = "dodder"
 )
 
 type Env interface {
@@ -117,7 +119,7 @@ func MakeDefaultAndInitialize(
 func MakeWithHome(
 	context errors.Context,
 	home string,
-	do debug.Options,
+	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
 ) (s env) {
 	s.Context = context
@@ -126,12 +128,17 @@ func MakeWithHome(
 		Home: home,
 	}
 
-	if err := s.beforeXDG.initialize(do); err != nil {
+	if err := s.beforeXDG.initialize(debugOptions); err != nil {
 		s.CancelWithError(err)
 	}
 
-	addedPath := "dodder"
-	pathCwdXDGOverride := filepath.Join(s.cwd, ".dodder")
+	addedPath := XDGUtilityName
+
+	if addedPathOverride := os.Getenv(EnvXDGUtilityNameOverride); addedPathOverride != "" {
+		addedPath = addedPathOverride
+	}
+
+	pathCwdXDGOverride := filepath.Join(s.cwd, fmt.Sprintf(".%s", addedPath))
 
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride

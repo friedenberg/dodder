@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
 type XDG struct {
@@ -99,33 +98,6 @@ func (x *XDG) InitializeStandardFromEnv(
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	return
-}
-
-func (x *XDG) InitializeFromDotenvFile(
-	addedPath string,
-	file string,
-) (err error) {
-	x.AddedPath = addedPath
-
-	var f *os.File
-
-	if f, err = files.Open(file); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	r := Dotenv{
-		XDG: x,
-	}
-
-	if _, err = r.ReadFrom(f); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
