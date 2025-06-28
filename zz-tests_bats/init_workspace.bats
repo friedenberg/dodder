@@ -20,7 +20,7 @@ function init_workspace_empty { # @test
 	run_dodder info-workspace
 	assert_failure
 	assert_output --partial - <<-EOM
-		not creating a workspace. aborting.
+		not in a workspace
 	EOM
 
 	run_dodder init-workspace
@@ -48,7 +48,7 @@ function init_workspace { # @test
 	run_dodder info-workspace
 	assert_failure
 	assert_output --partial - <<-EOM
-		not creating a workspace. aborting.
+		not in a workspace
 	EOM
 
 	run_dodder init-workspace -query "due" -tags today -type task

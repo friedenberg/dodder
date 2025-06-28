@@ -38,6 +38,6 @@ func (err ErrNotInWorkspace) Recover(ctx errors.RetryableContext, in error) {
 
 		ctx.Retry()
 	} else {
-		ctx.CancelWithBadRequestf("not creating a workspace. aborting.")
+		ctx.CancelWithBadRequestf(err.Error())
 	}
 }
