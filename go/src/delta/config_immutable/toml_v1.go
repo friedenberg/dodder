@@ -11,10 +11,11 @@ import (
 )
 
 type TomlV1Common struct {
-	StoreVersion StoreVersion    `toml:"store-version"`
-	RepoType     repo_type.Type  `toml:"repo-type"`
-	RepoId       ids.RepoId      `toml:"id"`
-	BlobStore    BlobStoreTomlV1 `toml:"blob-store"`
+	StoreVersion      StoreVersion    `toml:"store-version"`
+	RepoType          repo_type.Type  `toml:"repo-type"`
+	RepoId            ids.RepoId      `toml:"id"`
+	BlobStore         BlobStoreTomlV1 `toml:"blob-store"`
+	InventoryListType string          `toml:"inventory_list-type"`
 }
 
 type TomlV1Private struct {
@@ -31,6 +32,14 @@ func (k *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
 	k.BlobStore.SetFlagSet(f)
 	k.RepoType = repo_type.TypeWorkingCopy
 	f.Var(&k.RepoType, "repo-type", "")
+}
+
+func (config *TomlV1Common) GetInventoryListTypeString() string {
+	if config.InventoryListType == "" {
+		return InventoryListTypeV1
+	} else {
+		return config.InventoryListType
+	}
 }
 
 func (k *TomlV1Public) config() public   { return public{} }

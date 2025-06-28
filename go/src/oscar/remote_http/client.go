@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
@@ -242,7 +241,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		store_version.VCurrent,
+		client.localRepo.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)
@@ -283,6 +282,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			}
 
 			if options.AllowMergeConflicts {
+				// TODO move to constant
 				request.Header.Add("x-dodder-remote_transfer_options-allow_merge_conflicts", "true")
 			}
 
@@ -301,15 +301,17 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			return
 		}
 
-		br := bufio.NewReader(response.Body)
+		bufferedReader := bufio.NewReader(response.Body)
 
 		client.GetEnv().ContinueOrPanicOnDone()
 
 		var listMissingSkus *sku.List
 
 		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
-			builtin_types.GetOrPanic(builtin_types.InventoryListTypeV2).Type,
-			br,
+			builtin_types.GetOrPanic(
+				client.configImmutable.ImmutableConfig.GetInventoryListTypeString(),
+			).Type,
+			bufferedReader,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

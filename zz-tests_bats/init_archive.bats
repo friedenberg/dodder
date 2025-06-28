@@ -36,6 +36,7 @@ function init_archive { # @test
 			store-version = $storeVersionCurrent
 			repo-type = 'archive'
 			id = ''
+			inventory_list-type = '!inventory_list-v2'
 
 			\[blob-store]
 			compression-type = 'zstd'

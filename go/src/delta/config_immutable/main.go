@@ -9,6 +9,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
+const (
+	InventoryListTypeV0       = "!inventory_list-v0"
+	InventoryListTypeV1       = "!inventory_list-v1"
+	InventoryListTypeV2       = "!inventory_list-v2"
+	InventoryListTypeVCurrent = InventoryListTypeV2
+)
+
 type LatestPrivate = TomlV1Private
 
 type (
@@ -25,6 +32,7 @@ type configCommon interface {
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
+	GetInventoryListTypeString() string
 }
 
 type ConfigPublic interface {
@@ -59,6 +67,7 @@ func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 				CompressionType:   CompressionTypeDefault,
 				LockInternalFiles: true,
 			},
+			InventoryListType: InventoryListTypeV2,
 		},
 	}
 }

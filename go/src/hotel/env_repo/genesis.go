@@ -102,7 +102,7 @@ func (env Env) writeInventoryListLog() {
 		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
 	}
 
-	tipe := builtin_types.GetOrPanic(builtin_types.InventoryListTypeV2).Type
+	tipe := builtin_types.GetOrPanic(builtin_types.InventoryListTypeVCurrent).Type
 
 	subject := triple_hyphen_io.TypedStruct[struct{}]{
 		Type: &tipe,

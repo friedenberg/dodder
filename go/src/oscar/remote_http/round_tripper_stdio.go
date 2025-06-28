@@ -27,8 +27,10 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 
+	// TODO design a better way of selecting binaries (factoring in zit / dodder)
 	roundTripper.Path = envRepo.GetExecPath()
 
+	// TODO set first arg based on roundTripper.Path
 	roundTripper.Args = []string{
 		"dodder",
 		"serve",

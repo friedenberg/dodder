@@ -56,7 +56,7 @@ func (s directoryV0) Dir(p ...string) string {
 }
 
 func (s directoryV0) DirDodder(p ...string) string {
-	return s.Dir(stringSliceJoin(".dodder", p)...)
+	return s.Dir(stringSliceJoin(".zit", p)...)
 }
 
 func (s directoryV0) DirCache(p ...string) string {

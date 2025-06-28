@@ -31,6 +31,7 @@ function init_compression { # @test
 			store-version = $storeVersionCurrent
 			repo-type = 'working-copy'
 			id = 'test-repo-id'
+			inventory_list-type = '!inventory_list-v2'
 
 			\[blob-store]
 			compression-type = 'zstd'

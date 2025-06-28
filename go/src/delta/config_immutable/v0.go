@@ -102,3 +102,7 @@ func (k *v0Common) GetBlobEncryption() interfaces.BlobEncryption {
 func (k v0Common) GetLockInternalFiles() bool {
 	return k.LockInternalFiles
 }
+
+func (config v0Common) GetInventoryListTypeString() string {
+	return InventoryListTypeV0
+}

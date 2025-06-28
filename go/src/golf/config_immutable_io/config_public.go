@@ -8,7 +8,7 @@ import (
 
 type ConfigLoadedPublic struct {
 	ids.Type
-	ImmutableConfig          config_immutable.ConfigPublic
+	ImmutableConfig          config_immutable.ConfigPublic // TODO restructure this to avoid this extra call
 	BlobStoreImmutableConfig env_dir.Config // TODO extricate from env_dir
 }
 

@@ -27,7 +27,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -710,9 +709,10 @@ func (server *Server) handlePostInventoryList(
 			bufferedReader := ohio.BufferedReader(strings.NewReader(boxString))
 			defer pool.GetBufioReader().Put(bufferedReader)
 
-			// TODO read inventory list version somehow
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(
-				ids.MustType(builtin_types.InventoryListTypeV2),
+				ids.MustType(
+					server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetInventoryListTypeString(),
+				),
 				bufferedReader,
 			); err != nil {
 				response.Error(

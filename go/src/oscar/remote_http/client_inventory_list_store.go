@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -57,7 +56,7 @@ func (client client) ImportInventoryList(
 
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		store_version.VCurrent,
+		client.localRepo.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)

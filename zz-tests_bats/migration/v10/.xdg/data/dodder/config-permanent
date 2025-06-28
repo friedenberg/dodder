@@ -2,10 +2,11 @@
 ! toml-config-immutable-v1
 ---
 
-private-key = 'dodder-repo-private_key-v11vy83678pgg2nstcjzsmmrdcxgyf7p0t6yf2a7r5pqzujf7qlpnuss0v6q2'
+private-key = 'dodder-repo-private_key-v114numpk4f324r2tfu89pmjtqdh77xk5p2k0p57u33r8akcc87wgtqw5tnyv'
 store-version = 10
 repo-type = 'working-copy'
 id = 'test-repo-id'
+inventory_list-type = '!inventory_list-v2'
 
 [blob-store]
 compression-type = 'zstd'

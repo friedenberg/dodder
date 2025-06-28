@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
+// TODO move to mutable config
 const FileWorkspace = ".dodder-workspace"
 
 type Env struct {

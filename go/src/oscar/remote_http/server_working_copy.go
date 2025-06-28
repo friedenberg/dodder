@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -22,7 +21,9 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	request Request,
 	listSku *sku.Transacted,
 ) (response Response) {
-	listSkuType := builtin_types.GetOrPanic(builtin_types.InventoryListTypeV2).Type
+	listSkuType := builtin_types.GetOrPanic(
+		server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetInventoryListTypeString(),
+	).Type
 
 	blobStore := server.Repo.GetBlobStore()
 
@@ -81,7 +82,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	}
 
 	listFormat := server.Repo.GetInventoryListStore().FormatForVersion(
-		store_version.VCurrent,
+		repo.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
 	)
 
 	listMissingSkus := sku.MakeList()

@@ -3,6 +3,7 @@ package builtin_types
 import (
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -19,9 +20,10 @@ const (
 	ConfigTypeTomlV0 = "!toml-config-v0"
 	ConfigTypeTomlV1 = "!toml-config-v1"
 
-	InventoryListTypeV0 = "!inventory_list-v0"
-	InventoryListTypeV1 = "!inventory_list-v1"
-	InventoryListTypeV2 = "!inventory_list-v2"
+	InventoryListTypeV0       = config_immutable.InventoryListTypeV0
+	InventoryListTypeV1       = config_immutable.InventoryListTypeV1
+	InventoryListTypeV2       = config_immutable.InventoryListTypeV2
+	InventoryListTypeVCurrent = config_immutable.InventoryListTypeVCurrent
 
 	RepoTypeXDGDotenvV0 = "!toml-repo-dotenv_xdg-v0"
 	RepoTypeLocalPath   = "!toml-repo-local_path-v0"

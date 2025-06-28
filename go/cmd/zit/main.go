@@ -6,10 +6,13 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
 
 func main() {
+	os.Setenv(env_dir.EnvXDGUtilityNameOverride, "zit")
+
 	var exitStatus int
 
 	for {

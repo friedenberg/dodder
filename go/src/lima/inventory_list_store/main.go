@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
@@ -77,21 +76,7 @@ func (s *Store) Initialize(
 		options: op,
 	}
 
-	var blobType ids.Type
-
-	if store_version.LessOrEqual(
-		s.storeVersion,
-		store_version.V6,
-	) {
-		blobType = ids.MustType(builtin_types.InventoryListTypeV0)
-	} else if store_version.LessOrEqual(
-		s.storeVersion,
-		store_version.V9,
-	) {
-		blobType = ids.MustType(builtin_types.InventoryListTypeV1)
-	} else {
-		blobType = ids.MustType(builtin_types.InventoryListTypeV2)
-	}
+	blobType := ids.MustType(s.envRepo.GetConfigPublic().ImmutableConfig.GetInventoryListTypeString())
 
 	if store_version.LessOrEqual(
 		s.storeVersion,
