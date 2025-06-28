@@ -17,7 +17,10 @@ import (
 )
 
 // TODO move to mutable config
-const FileWorkspace = ".dodder-workspace"
+const (
+	FileWorkspaceTemplate = ".%s-workspace"
+	FileWorkspace         = ".dodder-workspace"
+)
 
 type Env struct {
 	env_local.Env

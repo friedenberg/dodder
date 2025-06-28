@@ -7,8 +7,6 @@ dir_git_root := shell("git rev-parse --show-toplevel")
 clean-fixtures:
   #! /bin/bash -ex
 
-  pushd "{{dir_git_root}}/pkgs/bravo/dodder/zz-tests_bats" || exit
-
   git reset HEAD migration/v*/
   ./../bin/chflags.bash -R nouchg migration/v*/
   git clean -fd migration/v*/

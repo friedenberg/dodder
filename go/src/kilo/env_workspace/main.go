@@ -1,10 +1,12 @@
 package env_workspace
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -64,40 +66,27 @@ func Make(
 
 	dir := out.GetCwd()
 
-	// TODO add workspace parent tree height limit?
-	for {
-		expectedWorkspaceConfigFilePath := filepath.Join(
-			dir,
-			env_repo.FileWorkspace,
-		)
+	workspaceFile := out.findWorkspaceFile(dir, env_repo.FileWorkspace)
 
+	if workspaceFile == "" {
+		workspaceFile = out.findWorkspaceFile(
+			dir,
+			fmt.Sprintf(env_repo.FileWorkspaceTemplate, "zit"),
+		)
+	}
+
+	if workspaceFile == "" {
+		out.isTemporary = true
+	} else {
 		if err = workspace_config_blobs.DecodeFromFile(
 			&object,
-			expectedWorkspaceConfigFilePath,
-		); errors.IsNotExist(err) {
-			// if we hit the root, reset to empty so that we trigger the isTemporary
-			// path
-			if dir == string(filepath.Separator) {
-				dir = ""
-			}
-
-			dir = filepath.Dir(dir)
-
-			if dir != "." {
-				continue
-			}
-
-			out.isTemporary = true
-			err = nil
-			break
-
-		} else if err != nil {
-			err = errors.BadRequestPrefix("failed to decode `.dodder-workspace`", err)
+			workspaceFile,
+		); err != nil {
+			err = errors.BadRequestf("failed to decode `%s`: %w", workspaceFile, err)
 			return
-		} else {
-			out.blob = *object.Struct
-			break
 		}
+
+		out.blob = *object.Struct
 	}
 
 	defaults := out.configMutable.GetDefaults()
@@ -163,6 +152,55 @@ type env struct {
 
 	storeFS *store_fs.Store
 	store   Store
+}
+
+func (env *env) findWorkspaceFile(
+	dir string,
+	name string,
+) (found string) {
+	// TODO add workspace parent tree height limit?
+	for {
+		expectedWorkspaceConfigFilePath := filepath.Join(
+			dir,
+			name,
+		)
+
+		if files.Exists(expectedWorkspaceConfigFilePath) {
+			found = expectedWorkspaceConfigFilePath
+			return
+		}
+
+		// if we hit the root, reset to empty so that we trigger the isTemporary
+		// path
+		if dir == string(filepath.Separator) {
+			dir = ""
+		}
+
+		dir = filepath.Dir(dir)
+
+		if dir != "." {
+			continue
+		}
+
+		return
+	}
+}
+
+func (env *env) tryLoad(
+	path string,
+	object *triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob],
+) (err error) {
+	if err = workspace_config_blobs.DecodeFromFile(
+		object,
+		path,
+	); err != nil {
+		err = errors.BadRequestPrefix("failed to decode `.dodder-workspace`", err)
+		return
+	}
+
+	env.blob = *object.Struct
+
+	return
 }
 
 func (env *env) GetWorkspaceDir() string {
