@@ -89,7 +89,7 @@ func (store *Store) ImportList(
 
 	if missingBlobs.Len() > 0 {
 		ui.Err().Printf(
-			"could not import the %d objects (blobs missing):\n",
+			"could not import %d objects (blobs missing):\n",
 			missingBlobs.Len(),
 		)
 
