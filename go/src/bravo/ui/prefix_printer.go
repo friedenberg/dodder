@@ -18,13 +18,13 @@ func (printer prefixPrinter) GetPrinter() Printer {
 	return printer
 }
 
-func (printer prefixPrinter) Print(v ...interface{}) error {
+func (printer prefixPrinter) Print(v ...any) error {
 	return printer.printer.Print(
-		append([]interface{}{printer.prefix}, v...)...,
+		append([]any{printer.prefix}, v...)...,
 	)
 }
 
-func (printer prefixPrinter) Printf(format string, v ...interface{}) error {
+func (printer prefixPrinter) Printf(format string, v ...any) error {
 	return printer.printer.Printf(
 		fmt.Sprintf("%s%s", printer.prefix, format),
 		v...,

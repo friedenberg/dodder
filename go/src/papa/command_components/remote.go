@@ -40,11 +40,11 @@ func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 func (cmd Remote) CreateRemoteObject(
 	req command.Request,
 	local repo.LocalRepo,
-) (remote repo.Repo, sk *sku.Transacted) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
+) (remote repo.Repo, remoteObject *sku.Transacted) {
+	remoteEnvRepo := cmd.MakeEnvRepo(req, false)
+	remoteTypedRepoBlobStore := typed_blob_store.MakeRepoStore(remoteEnvRepo)
 
-	sk = sku.GetTransactedPool().Get()
+	remoteObject = sku.GetTransactedPool().Get()
 
 	var blob repo_blobs.BlobMutable
 
@@ -58,16 +58,16 @@ func (cmd Remote) CreateRemoteObject(
 		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 			req,
 			xdgDotenvPath,
-			envRepo.GetOptions(),
+			remoteEnvRepo.GetOptions(),
 		)
 
-		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
+		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
 	case repo.RemoteTypeUrl:
 		url := req.PopArg("url")
 
-		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeUri).Type
+		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeUri).Type
 		var typedBlob repo_blobs.TomlUriV0
 
 		if err := typedBlob.Uri.Set(url); err != nil {
@@ -79,8 +79,8 @@ func (cmd Remote) CreateRemoteObject(
 	case repo.RemoteTypeStdioLocal:
 		path := req.PopArg("path")
 
-		sk.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
-		blob = &repo_blobs.TomlLocalPathV0{Path: envRepo.AbsFromCwdOrSame(path)}
+		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
+		blob = &repo_blobs.TomlLocalPathV0{Path: remoteEnvRepo.AbsFromCwdOrSame(path)}
 	}
 
 	remote = cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
@@ -92,15 +92,15 @@ func (cmd Remote) CreateRemoteObject(
 	{
 		var err error
 
-		if blobSha, _, err = typedRepoBlobStore.WriteTypedBlob(
-			sk.Metadata.Type,
+		if blobSha, _, err = remoteTypedRepoBlobStore.WriteTypedBlob(
+			remoteObject.Metadata.Type,
 			blob,
 		); err != nil {
 			req.CancelWithError(err)
 		}
 	}
 
-	sk.Metadata.Blob.ResetWithShaLike(blobSha)
+	remoteObject.Metadata.Blob.ResetWithShaLike(blobSha)
 
 	return
 }
