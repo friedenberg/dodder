@@ -164,7 +164,7 @@ check: check-go-vuln check-go-vet
 #
 
 test-go-unit:
-  go test -tags debug -v ./...
+  go test -tags test,debug -v ./...
 
 test-go: test-go-unit
 

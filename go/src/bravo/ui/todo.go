@@ -37,42 +37,42 @@ const (
 	P5
 )
 
-func TodoRecoverable(f string, a ...interface{}) (err error) {
+func TodoRecoverable(f string, a ...any) (err error) {
 	return printerErr.printfStack(1, "TODO: Make recoverable: "+f, a...)
 }
 
-func Todo(f string, a ...interface{}) (err error) {
+func Todo(f string, a ...any) (err error) {
 	return printerErr.printfStack(1, "TODO: "+f, a...)
 }
 
-func TodoP0(f string, a ...interface{}) (err error) {
+func TodoP0(f string, a ...any) (err error) {
 	return todo.printf(1, P0, f, a...)
 }
 
-func TodoP1(f string, a ...interface{}) (err error) {
+func TodoP1(f string, a ...any) (err error) {
 	return todo.printf(1, P1, f, a...)
 }
 
-func TodoP2(f string, a ...interface{}) (err error) {
+func TodoP2(f string, a ...any) (err error) {
 	return todo.printf(1, P2, f, a...)
 }
 
-func TodoP3(f string, a ...interface{}) (err error) {
+func TodoP3(f string, a ...any) (err error) {
 	return todo.printf(1, P3, f, a...)
 }
 
-func TodoP4(f string, a ...interface{}) (err error) {
+func TodoP4(f string, a ...any) (err error) {
 	return todo.printf(1, P4, f, a...)
 }
 
-func TodoP5(f string, a ...interface{}) (err error) {
+func TodoP5(f string, a ...any) (err error) {
 	return todo.printf(1, P5, f, a...)
 }
 
 func (p todoPrinter) Printf(
 	pr Priority,
 	f string,
-	a ...interface{},
+	a ...any,
 ) (err error) {
 	return p.printf(1, pr, f, a...)
 }
@@ -81,7 +81,7 @@ func (p todoPrinter) printf(
 	skip int,
 	pr Priority,
 	f string,
-	a ...interface{},
+	a ...any,
 ) (err error) {
 	if !p.on {
 		return
@@ -90,7 +90,7 @@ func (p todoPrinter) printf(
 	if p.includesStack {
 		si, _ := stack_frame.MakeFrame(1 + skip)
 		f = "%s %s" + f
-		a = append([]interface{}{pr, si}, a...)
+		a = append([]any{pr, si}, a...)
 	}
 
 	_, err = fmt.Fprintln(
