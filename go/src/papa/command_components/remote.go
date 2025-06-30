@@ -28,13 +28,12 @@ type Remote struct {
 	LocalWorkingCopy
 	LocalArchive
 
-	// TODO rename to ConnectionType
-	RemoteType repo.RemoteConnectionType
+	RemoteConnectionType repo.RemoteConnectionType
 }
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()))
+	f.Var(&cmd.RemoteConnectionType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()))
 }
 
 func (cmd Remote) CreateRemoteObject(
@@ -48,9 +47,9 @@ func (cmd Remote) CreateRemoteObject(
 
 	var blob repo_blobs.BlobMutable
 
-	switch cmd.RemoteType {
+	switch cmd.RemoteConnectionType {
 	default:
-		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
+		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteConnectionType)
 
 	case repo.RemoteConnectionTypeNativeDotenvXDG:
 		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
