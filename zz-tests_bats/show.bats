@@ -6,12 +6,11 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
+  setup_repo
 }
 
 teardown() {
-	rm_from_version "$version"
+  teardown_repo
 }
 
 # bats file_tags=user_story:query

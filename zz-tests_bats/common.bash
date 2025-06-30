@@ -81,6 +81,19 @@ function chflags_and_rm {
   "$BATS_CWD/../bin/chflags.bash" -R nouchg "$BATS_TEST_TMPDIR"
 }
 
+function setup_repo {
+  if [[ -z $DODDER_VERSION ]]; then
+    export DODDER_VERSION
+    DODDER_VERSION="v$(dodder info store-version)"
+  fi
+
+  copy_from_version "$DIR" "$DODDER_VERSION"
+}
+
+function teardown_repo {
+  rm_from_version "$DODDER_VERSION"
+}
+
 function run_dodder {
   cmd="$1"
   shift

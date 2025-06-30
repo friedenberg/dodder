@@ -15,10 +15,10 @@ clean-fixtures:
 [group("clean")]
 clean: clean-fixtures
 
-dodder_current_version := "v" + shell("dodder info store-version")
+export DODDER_VERSION := "v" + shell("dodder info store-version")
 
 [group("debug")]
-debug-env store_version=dodder_current_version:
+debug-env store_version=DODDER_VERSION:
   #! /bin/bash -ex
   dir="$(mktemp -d)"
   trap "rm -rf '$dir'" EXIT

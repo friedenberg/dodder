@@ -3,8 +3,8 @@ if exists("b:current_syntax")
   finish
 endif
 
-if $BIN_ZIT == ""
-  let $BIN_ZIT = "zit"
+if $BIN_DODDER == ""
+  let $BIN_DODDER = "dodder"
 endif
 
 let zettel = expand("%")
@@ -12,7 +12,7 @@ let zettel = expand("%")
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let cmdFormat = "$BIN_ZIT show -quiet -format type.vim-syntax-type " . zettel
+  let cmdFormat = "$BIN_DODDER show -quiet -format type.vim-syntax-type " . zettel
   let zettelTypSyntax = trim(system(cmdFormat))
 
   if v:shell_error
@@ -23,11 +23,11 @@ if zettel != ""
     let zettelTypSyntax = "markdown"
   endif
 
-  let zit_syntax_path = $HOME."/.local/share/zit/vim/syntax/".zettelTypSyntax.".vim"
+  let dodder_syntax_path = $HOME."/.local/share/dodder/vim/syntax/".zettelTypSyntax.".vim"
   let vim_syntax_path = $VIMRUNTIME."/syntax/" . zettelTypSyntax . ".vim"
 
-  if filereadable(zit_syntax_path)
-    execute "syntax include @akte" zit_syntax_path
+  if filereadable(dodder_syntax_path)
+    execute "syntax include @akte" dodder_syntax_path
   elseif filereadable(vim_syntax_path)
     execute "syntax include @akte" vim_syntax_path
   else
@@ -35,10 +35,10 @@ if zettel != ""
   endif
 endif
 
-syn region zitAkte start=// end=// contains=@akte
+syn region dodderAkte start=// end=// contains=@akte
 " TODO set comment strings for body
 
-let m = expand("<sfile>:h") . "/zit-metadata.vim"
+let m = expand("<sfile>:h") . "/dodder-metadata.vim"
 exec "source " . m
 
-let b:current_syntax = 'zit-object'
+let b:current_syntax = 'dodder-object'

@@ -3,10 +3,10 @@ setlocal list
 " TODO document
 let &l:t_ut = ''
 let &l:listchars = "tab:  ,trail:·,nbsp:·"
-let &l:equalprg = "$BIN_ZIT format-organize -metadata-header %"
+let &l:equalprg = "$BIN_DODDER format-organize -metadata-header %"
 
 let &l:foldmethod = "expr"
-let &l:foldexpr = "GetZitOrganizeFold()"
+let &l:foldexpr = "GetDodderOrganizeFold()"
 
 set foldtext=MyFoldText()
 function MyFoldText()
@@ -34,7 +34,7 @@ function! GetPreviousHeaderLineFoldLevel(lnum)
 endfunction
 
 " TODO implement against new organize syntax
-function! GetZitOrganizeFold()
+function! GetDodderOrganizeFold()
   let l = getline(a:lnum)
 
   if l =~? '\v^\s*#'
@@ -49,10 +49,10 @@ endfunction
 " TODO refactor into common
 function! GfOrganize()
   let l:cfile = expand("<cfile>")
-  let l:expanded = trim(system("$BIN_ZIT expand-hinweis " .. l:cfile))
+  let l:expanded = trim(system("$BIN_DODDER expand-hinweis " .. l:cfile))
 
   if !filereadable(l:expanded .. ".zettel")
-    echom trim(system("$BIN_ZIT checkout -mode both " .. l:expanded))
+    echom trim(system("$BIN_DODDER checkout -mode both " .. l:expanded))
   endif
 
   " let l:cmd = 'tabedit ' .. fnameescape(l:expanded .. ".zettel")

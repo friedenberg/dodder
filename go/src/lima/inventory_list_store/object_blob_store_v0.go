@@ -83,6 +83,11 @@ func (store *objectBlobStoreV0) WriteInventoryListObject(
 	bufferedWriter := ohio.BufferedWriter(blobStoreWriteCloser)
 	defer pool.GetBufioWriter().Put(bufferedWriter)
 
+	if err = object.CalculateObjectShas(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if _, err = store.typedBlobStore.WriteObjectToWriter(
 		store.blobType,
 		object,
@@ -93,11 +98,6 @@ func (store *objectBlobStoreV0) WriteInventoryListObject(
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = object.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

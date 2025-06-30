@@ -1,16 +1,16 @@
 
-let &l:equalprg = "$BIN_ZIT format-object -mode both %"
+let &l:equalprg = "$BIN_DODDER format-object -mode both %"
 " TODO-P3 use https://github.com/suy/vim-context-commentstring
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
 function! GfZettel()
   let l:h = expand("<cfile>")
-  let l:expanded = trim(system("$BIN_ZIT expand-zettel-id " . l:h))
+  let l:expanded = trim(system("$BIN_DODDER expand-zettel-id " . l:h))
   let l:f = l:expanded . ".zettel"
 
   if !filereadable(l:f)
-    echo system("$BIN_ZIT checkout -mode both " . l:expanded)
+    echo system("$BIN_DODDER checkout -mode both " . l:expanded)
   endif
 
   let l:cmd = 'tabedit ' . l:f
@@ -24,16 +24,16 @@ endfunction
 noremap <buffer> gf :call GfZettel()<CR>
 
 " TODO support external blob
-function! ZitAction()
-  let [l:items, l:processedItems] = ZitGetActionNames()
+function! DodderAction()
+  let [l:items, l:processedItems] = DodderGetActionNames()
 
-  func! ZitActionItemPicked(id, result) closure
+  func! DodderActionItemPicked(id, result) closure
     if a:result == -1
       return
     endif
 
     let l:val = substitute(l:items[a:result-1], '\t.*$', '', '')
-    execute("!$BIN_ZIT exec-action -action " . l:val .  " " . GetObjectId())
+    execute("!$BIN_DODDER exec-action -action " . l:val .  " " . GetObjectId())
   endfunc
 
   if len(l:items) == 0
@@ -44,12 +44,12 @@ function! ZitAction()
   call popup#menu(
         \ items,
         \ #{ title: "Run a Zettel-Typ-Specific Action", 
-        \ callback: 'ZitActionItemPicked', 
+        \ callback: 'DodderActionItemPicked', 
         \ line: 25, col: 40,
         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
 endfunction
 
-function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
+function! DodderMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
   let l:cmd_args_list = []
 
   let i = 0
@@ -60,7 +60,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     call add(l:cmd_args_list, "-i")
     call add(l:cmd_args_list, l:uti)
     let l:cmd_sub_args = [
-          \ "$BIN_ZIT", "format-object", "-mode blob",
+          \ "$BIN_DODDER", "format-object", "-mode blob",
           \ "-uti-group", a:uti_group,
           \ GetObjectId(),
           \ l:uti,
@@ -93,25 +93,25 @@ function! GetObjectId()
   return expand("%")
 endfunction
 
-function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("$BIN_ZIT show -format type.formatter-uti-groups " . GetObjectId()))
+function! DodderGetUTIGroups()
+  let l:rawItems = sort(systemlist("$BIN_DODDER show -format type.formatter-uti-groups " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
-function! ZitGetActionNames()
-  let l:rawItems = sort(systemlist("$BIN_ZIT show -format type.action-names " . GetObjectId()))
+function! DodderGetActionNames()
+  let l:rawItems = sort(systemlist("$BIN_DODDER show -format type.action-names " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
-function! ZitGetFormats()
-  let l:rawItems =  sort(systemlist("$BIN_ZIT show -format type.formatters " . GetObjectId()))
+function! DodderGetFormats()
+  let l:rawItems =  sort(systemlist("$BIN_DODDER show -format type.formatters " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
-function! ZitPreview()
-  let [l:formatIds, l:fileExtensions] = ZitGetFormats()
+function! DodderPreview()
+  let [l:formatIds, l:fileExtensions] = DodderGetFormats()
 
-  func! ZitPreviewMenuItemPicked(id, result) closure
+  func! DodderPreviewMenuItemPicked(id, result) closure
     if a:result == -1
       return
     endif
@@ -139,7 +139,7 @@ function! ZitPreview()
   endfunc
 
   if len(l:formatIds) == 1
-    call ZitPreviewMenuItemPicked("", 1)
+    call DodderPreviewMenuItemPicked("", 1)
     return
   endif
 
@@ -151,28 +151,28 @@ function! ZitPreview()
   call popup#menu(
         \ formatIds,
         \ #{ title: "Preview format", 
-        \ callback: 'ZitPreviewMenuItemPicked', 
+        \ callback: 'DodderPreviewMenuItemPicked', 
         \ line: 25, col: 40,
         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
 endfunction
 
-function! ZitCopy()
-  let [l:items, l:processedItems] = ZitGetUTIGroups()
+function! DodderCopy()
+  let [l:items, l:processedItems] = DodderGetUTIGroups()
 
-  func! ZitCopyMenuItemPicked(id, result) closure
+  func! DodderCopyMenuItemPicked(id, result) closure
     if a:result == -1
       return
     endif
 
     let l:uti_group = l:items[a:result-1]
     let l:val = substitute(l:processedItems[a:result-1], '\t.*$', '', '')
-    let l:cmd_args_list = ZitMakeUTIGroupCommand(l:uti_group, split(l:val))
+    let l:cmd_args_list = DodderMakeUTIGroupCommand(l:uti_group, split(l:val))
 
     execute("!tacky copy " . join(l:cmd_args_list, " "))
   endfunc
 
   if len(l:processedItems) == 1
-    call ZitCopyMenuItemPicked("", 1)
+    call DodderCopyMenuItemPicked("", 1)
     return
   endif
 
@@ -184,13 +184,13 @@ function! ZitCopy()
   call popup#menu(
         \ items,
         \ #{ title: "Copy format", 
-        \ callback: 'ZitCopyMenuItemPicked', 
+        \ callback: 'DodderCopyMenuItemPicked', 
         \ line: 25, col: 40,
         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
 endfunction
 
 let maplocalleader = "-"
 
-nnoremap <localleader>z :call ZitAction()<cr>
-nnoremap <localleader>c :call ZitCopy()<cr>
-nnoremap <localleader>p :call ZitPreview()<cr>
+nnoremap <localleader>z :call DodderAction()<cr>
+nnoremap <localleader>c :call DodderCopy()<cr>
+nnoremap <localleader>p :call DodderPreview()<cr>

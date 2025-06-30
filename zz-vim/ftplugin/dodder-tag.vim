@@ -22,10 +22,10 @@ let &l:commentstring = "# %s"
 " noremap gf :call Gf()<CR>
 
 " " TODO support external akte
-" function! ZitTypActionMenu()
+" function! DodderTypActionMenu()
 "   let l:items = systemlist("zit show -format typ-action-names " . expand("%:r"))
 
-"   func! ZitTypActionMenuItemPicked(id, result) closure
+"   func! DodderTypActionMenuItemPicked(id, result) closure
 "     if a:result == -1
 "       return
 "     endif
@@ -42,11 +42,11 @@ let &l:commentstring = "# %s"
 "   call popup_menu(
 "         \ items,
 "         \ #{ title: "Run a Zettel-Typ-Specific Action", 
-"         \ callback: 'ZitTypActionMenuItemPicked', 
+"         \ callback: 'DodderTypActionMenuItemPicked', 
 "         \ line: 25, col: 40,
 "         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
 " endfunction
 
 " let maplocalleader = "-"
 
-" nnoremap <localleader>z :call ZitTypActionMenu()<cr>
+" nnoremap <localleader>z :call DodderTypActionMenu()<cr>

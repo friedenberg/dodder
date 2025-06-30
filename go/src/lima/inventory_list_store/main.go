@@ -270,7 +270,7 @@ func (store *Store) Create(
 	}
 
 	if err = store.WriteInventoryListObject(object); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "OpenList: %d", openList.Len)
 		return
 	}
 
