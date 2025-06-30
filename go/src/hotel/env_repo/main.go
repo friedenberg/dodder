@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
@@ -27,7 +28,6 @@ type Env struct {
 
 	config config_immutable_io.ConfigLoadedPrivate
 
-	basePath              string
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
 
@@ -39,10 +39,10 @@ type Env struct {
 }
 
 func Make(
-	env env_local.Env,
+	envLocal env_local.Env,
 	o Options,
-) (s Env, err error) {
-	s.Env = env
+) (env Env, err error) {
+	env.Env = envLocal
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(env_dir.EnvDir)
 	}
@@ -54,20 +54,19 @@ func Make(
 		}
 	}
 
-	s.basePath = o.BasePath
-	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
+	env.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
 
 	dp := &directoryV1{}
 
 	if err = dp.init(
-		s.GetStoreVersion(),
-		s.GetXDG(),
+		env.GetStoreVersion(),
+		env.GetXDG(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.DirectoryPaths = dp
+	env.DirectoryPaths = dp
 
 	// TODO add support for failing on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
@@ -76,30 +75,23 @@ func Make(
 	// }
 
 	if !o.PermitNoDodderDirectory {
-		if ok := files.Exists(s.DirDodder()); !ok {
-			err = errors.Wrap(ErrNotInDodderDir{})
+		if ok := files.Exists(env.DirDodder()); !ok {
+			err = errors.Wrap(ErrNotInDodderDir{Expected: env.DirDodder()})
 			return
 		}
 	}
 
-	if err = s.MakeDirPerms(0o700, s.GetXDG().GetXDGPaths()...); err != nil {
+	if err = env.MakeDirPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.lockSmith = file_lock.New(env, s.FileLock(), "repo")
+	env.lockSmith = file_lock.New(envLocal, env.FileLock(), "repo")
 
-	// TODO switch to useing MakeCommonEnv()
-	{
-		if err = os.Setenv(env_dir.EnvDir, s.basePath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	envVars := env_vars.Make(env)
 
-		if err = os.Setenv(
-			env_dir.EnvBin,
-			s.GetExecPath(),
-		); err != nil {
+	for key, value := range envVars {
+		if err = os.Setenv(key, value); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -109,15 +101,15 @@ func Make(
 		decoder := config_immutable_io.CoderPrivate{}
 
 		if err = decoder.DecodeFromFile(
-			&s.config,
-			s.FileConfigPermanent(),
+			&env.config,
+			env.FileConfigPermanent(),
 		); err != nil {
 			errors.Wrap(err)
 			return
 		}
 	}
 
-	if err = s.setupStores(); err != nil {
+	if err = env.setupStores(); err != nil {
 		errors.Wrap(err)
 		return
 	}
