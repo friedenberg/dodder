@@ -29,12 +29,12 @@ type Remote struct {
 	LocalArchive
 
 	// TODO rename to ConnectionType
-	RemoteType repo.RemoteType
+	RemoteType repo.RemoteConnectionType
 }
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteTypes()))
+	f.Var(&cmd.RemoteType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()))
 }
 
 func (cmd Remote) CreateRemoteObject(
@@ -52,7 +52,7 @@ func (cmd Remote) CreateRemoteObject(
 	default:
 		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteType)
 
-	case repo.RemoteTypeNativeDotenvXDG:
+	case repo.RemoteConnectionTypeNativeDotenvXDG:
 		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
 
 		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
@@ -64,7 +64,7 @@ func (cmd Remote) CreateRemoteObject(
 		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
-	case repo.RemoteTypeUrl:
+	case repo.RemoteConnectionTypeUrl:
 		url := req.PopArg("url")
 
 		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeUri).Type
@@ -76,7 +76,7 @@ func (cmd Remote) CreateRemoteObject(
 
 		blob = &typedBlob
 
-	case repo.RemoteTypeStdioLocal:
+	case repo.RemoteConnectionTypeStdioLocal:
 		path := req.PopArg("path")
 
 		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
