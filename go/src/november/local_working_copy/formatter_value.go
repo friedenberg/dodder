@@ -397,15 +397,15 @@ func (repo *Repo) MakeFormatFunc(
 	case "json":
 		enc := json.NewEncoder(writer)
 
-		output = func(o *sku.Transacted) (err error) {
-			var j sku_fmt.Json
+		output = func(object *sku.Transacted) (err error) {
+			var jsonRepresentation sku_fmt.Json
 
-			if err = j.FromTransacted(o, repo.GetStore().GetEnvRepo()); err != nil {
+			if err = jsonRepresentation.FromTransacted(object, repo.GetStore().GetEnvRepo()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = enc.Encode(j); err != nil {
+			if err = enc.Encode(jsonRepresentation); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

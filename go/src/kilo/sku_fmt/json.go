@@ -15,101 +15,103 @@ import (
 )
 
 type Json struct {
-	BlobString  string   `json:"blob-string"`
 	BlobSha     string   `json:"blob-sha"`
+	BlobString  string   `json:"blob-string"`
+	Date        string   `json:"date"`
 	Description string   `json:"description"`
-	Tags        []string `json:"tags"`
+	Dormant     bool     `json:"dormant"`
 	ObjectId    string   `json:"object-id"`
 	Sha         string   `json:"sha"`
-	Type        string   `json:"type"`
+	Tags        []string `json:"tags"`
 	Tai         string   `json:"tai"`
-	Date        string   `json:"date"`
+	Type        string   `json:"type"`
 }
 
-func (j *Json) FromStringAndMetadata(
-	k string,
-	m *object_metadata.Metadata,
-	s env_repo.Env,
+func (json *Json) FromStringAndMetadata(
+	objectId string,
+	metadata *object_metadata.Metadata,
+	envRepo env_repo.Env,
 ) (err error) {
-	var r sha.ReadCloser
+	var readCloser sha.ReadCloser
 
-	if r, err = s.BlobReader(&m.Blob); err != nil {
+	if readCloser, err = envRepo.BlobReader(&metadata.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, r)
+	defer errors.DeferredCloser(&err, readCloser)
 
-	var out strings.Builder
+	var blobStringBuilder strings.Builder
 
-	if _, err = io.Copy(&out, r); err != nil {
+	if _, err = io.Copy(&blobStringBuilder, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	j.BlobString = out.String()
-	j.BlobSha = m.Blob.String()
-	j.Description = m.Description.String()
-	j.Tags = quiter.Strings(m.GetTags())
-	j.ObjectId = k
-	j.Sha = m.SelfMetadataWithoutTai.String()
-	j.Tai = m.Tai.String()
-	j.Date = m.Tai.Format(string_format_writer.StringFormatDateTime)
-	j.Type = m.Type.String()
+	json.BlobSha = metadata.Blob.String()
+	json.BlobString = blobStringBuilder.String()
+	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
+	json.Description = metadata.Description.String()
+	json.Dormant = metadata.Cache.Dormant.Bool()
+	json.ObjectId = objectId
+	json.Sha = metadata.SelfMetadataWithoutTai.String()
+	json.Tags = quiter.Strings(metadata.GetTags())
+	json.Tai = metadata.Tai.String()
+	json.Type = metadata.Type.String()
 	// TODO add support for "preview"
 
 	return
 }
 
-func (j *Json) FromTransacted(
-	sk *sku.Transacted,
-	s env_repo.Env,
+func (json *Json) FromTransacted(
+	object *sku.Transacted,
+	envRepo env_repo.Env,
 ) (err error) {
-	return j.FromStringAndMetadata(sk.ObjectId.String(), sk.GetMetadata(), s)
+	return json.FromStringAndMetadata(object.ObjectId.String(), object.GetMetadata(), envRepo)
 }
 
-func (j *Json) ToTransacted(sk *sku.Transacted, s env_repo.Env) (err error) {
-	var w sha.WriteCloser
+func (json *Json) ToTransacted(object *sku.Transacted, envRepo env_repo.Env) (err error) {
+	var writeCloser sha.WriteCloser
 
-	if w, err = s.BlobWriter(); err != nil {
+	if writeCloser, err = envRepo.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, w)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = io.Copy(w, strings.NewReader(j.BlobString)); err != nil {
+	if _, err = io.Copy(writeCloser, strings.NewReader(json.BlobString)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO-P1 support states of blob vs blob sha
-	sk.SetBlobSha(w.GetShaLike())
+	object.SetBlobSha(writeCloser.GetShaLike())
 
-	if err = sk.ObjectId.Set(j.ObjectId); err != nil {
+	if err = object.ObjectId.Set(json.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadata.Type.Set(j.Type); err != nil {
+	if err = object.Metadata.Type.Set(json.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadata.Description.Set(j.Description); err != nil {
+	if err = object.Metadata.Description.Set(json.Description); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var es ids.TagSet
 
-	if es, err = ids.MakeTagSetStrings(j.Tags...); err != nil {
+	if es, err = ids.MakeTagSetStrings(json.Tags...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sk.Metadata.SetTags(es)
-	sk.Metadata.GenerateExpandedTags()
+	object.Metadata.SetTags(es)
+	object.Metadata.GenerateExpandedTags()
 
 	return
 }
