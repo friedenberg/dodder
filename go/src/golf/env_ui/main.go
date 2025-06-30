@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
 )
 
+// TODO explore storing buffered writer and reader
 type Env interface {
 	// TODO remove and keep separate
 	errors.Context

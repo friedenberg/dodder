@@ -1,36 +1,36 @@
 package xdg
 
-func (x *XDG) getInitElements() []xdgInitElement {
+func (xdg *XDG) getInitElements() []xdgInitElement {
 	return []xdgInitElement{
 		{
 			standard:   "$HOME/.local/share",
 			overridden: "$HOME/local/share",
 			envKey:     "XDG_DATA_HOME",
-			out:        &x.Data,
+			out:        &xdg.Data,
 		},
 		{
 			standard:   "$HOME/.config",
 			overridden: "$HOME/config",
 			envKey:     "XDG_CONFIG_HOME",
-			out:        &x.Config,
+			out:        &xdg.Config,
 		},
 		{
 			standard:   "$HOME/.local/state",
 			overridden: "$HOME/local/state",
 			envKey:     "XDG_STATE_HOME",
-			out:        &x.State,
+			out:        &xdg.State,
 		},
 		{
 			standard:   "$HOME/.cache",
 			overridden: "$HOME/cache",
 			envKey:     "XDG_CACHE_HOME",
-			out:        &x.Cache,
+			out:        &xdg.Cache,
 		},
 		{
 			standard:   "$HOME/.local/runtime",
 			overridden: "$HOME/local/runtime",
 			envKey:     "XDG_RUNTIME_HOME",
-			out:        &x.Runtime,
+			out:        &xdg.Runtime,
 		},
 	}
 }

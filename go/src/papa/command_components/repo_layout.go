@@ -33,9 +33,9 @@ func (cmd EnvRepo) MakeEnvRepo(
 		env_ui.Options{},
 	)
 
-	var repoLayout env_repo.Env
+	var envRepo env_repo.Env
 
-	layoutOptions := env_repo.Options{
+	envRepoOptions := env_repo.Options{
 		BasePath:                dep.Config.BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
@@ -43,15 +43,15 @@ func (cmd EnvRepo) MakeEnvRepo(
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			env_local.Make(ui, dir),
-			layoutOptions,
+			envRepoOptions,
 		); err != nil {
 			ui.CancelWithError(err)
 		}
 	}
 
-	return repoLayout
+	return envRepo
 }
 
 func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(

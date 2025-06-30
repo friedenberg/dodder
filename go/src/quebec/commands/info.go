@@ -1,12 +1,13 @@
 package commands
 
 import (
+	"bufio"
 	"flag"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
-	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -57,14 +58,30 @@ func (c Info) Run(req command.Request) {
 		case "age-encryption":
 			ui.GetUI().Print(defaultConfig.GetBlobStoreConfigImmutable().GetBlobEncryption())
 
-		case "xdg":
-			ecksDeeGee := dir.GetXDG()
+		case "env":
+			envVars := env_vars.Make(dir)
+			var coder env_vars.BufferedCoderDotenv
+			bufferedWriter := bufio.NewWriter(ui.GetOutFile())
 
-			dotenv := xdg.Dotenv{
-				XDG: &ecksDeeGee,
+			if _, err := coder.EncodeTo(envVars, bufferedWriter); err != nil {
+				ui.CancelWithError(err)
 			}
 
-			if _, err := dotenv.WriteTo(ui.GetOutFile()); err != nil {
+			if err := bufferedWriter.Flush(); err != nil {
+				ui.CancelWithError(err)
+			}
+
+		case "xdg":
+			ecksDeeGee := dir.GetXDG()
+			envVars := env_vars.Make(ecksDeeGee)
+			var coder env_vars.BufferedCoderDotenv
+			bufferedWriter := bufio.NewWriter(ui.GetOutFile())
+
+			if _, err := coder.EncodeTo(envVars, bufferedWriter); err != nil {
+				ui.CancelWithError(err)
+			}
+
+			if err := bufferedWriter.Flush(); err != nil {
 				ui.CancelWithError(err)
 			}
 		}

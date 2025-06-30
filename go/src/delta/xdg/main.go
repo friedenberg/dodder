@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 )
 
 type XDG struct {
@@ -32,6 +33,14 @@ func (x XDG) GetXDGPaths() []string {
 		x.State,
 		x.Cache,
 		x.Runtime,
+	}
+}
+
+func (xdg XDG) AddToEnvVars(envVars env_vars.EnvVars) {
+	initElements := xdg.getInitElements()
+
+	for _, element := range initElements {
+		envVars[element.envKey] = *element.out
 	}
 }
 

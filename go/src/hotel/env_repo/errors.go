@@ -1,16 +1,20 @@
 package env_repo
 
-type ErrNotInDodderDir struct{}
+import "fmt"
 
-func (e ErrNotInDodderDir) Error() string {
-	return "not in a dodder directory"
+type ErrNotInDodderDir struct {
+	Expected string
 }
 
-func (e ErrNotInDodderDir) ShouldShowStackTrace() bool {
+func (err ErrNotInDodderDir) Error() string {
+	return fmt.Sprintf("not in a dodder directory. Looking for %s", err.Expected)
+}
+
+func (err ErrNotInDodderDir) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e ErrNotInDodderDir) Is(target error) (ok bool) {
+func (err ErrNotInDodderDir) Is(target error) (ok bool) {
 	_, ok = target.(ErrNotInDodderDir)
 	return
 }

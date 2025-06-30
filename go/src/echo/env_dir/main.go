@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
@@ -23,6 +24,7 @@ const (
 type Env interface {
 	IsDryRun() bool
 	GetCwd() string
+	AddToEnvVars(env_vars.EnvVars)
 	GetXDG() xdg.XDG
 	GetExecPath() string
 	GetTempLocal() TemporaryFS
@@ -245,6 +247,10 @@ func (h env) IsDryRun() bool {
 
 func (h env) GetPid() int {
 	return h.pid
+}
+
+func (env env) AddToEnvVars(envVars env_vars.EnvVars) {
+	envVars[EnvBin] = env.GetExecPath()
 }
 
 func (h env) GetExecPath() string {

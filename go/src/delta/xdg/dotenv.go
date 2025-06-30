@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+// TODO replace with env_vars.BufferedCoderDotenv
 type Dotenv struct {
 	*XDG
 }
