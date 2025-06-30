@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
+// TODO move to todo_debug and replace with no-op stubs
 var todo todoPrinter
 
 func init() {

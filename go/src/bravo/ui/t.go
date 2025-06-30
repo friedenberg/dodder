@@ -1,3 +1,5 @@
+//go:build debug
+
 package ui
 
 import (
@@ -53,13 +55,13 @@ func (t *T) Skip(skip int) *T {
 }
 
 func (t *T) ui(skip int, args ...interface{}) {
-	si := t.MakeStackInfo(t.skip+1+skip)
+	si := t.MakeStackInfo(t.skip + 1 + skip)
 	args = append([]interface{}{si}, args...)
 	fmt.Fprintln(os.Stderr, args...)
 }
 
 func (t *T) logf(skip int, format string, args ...interface{}) {
-	si := t.MakeStackInfo(t.skip+1+skip).StringNoFunctionName()
+	si := t.MakeStackInfo(t.skip + 1 + skip).StringNoFunctionName()
 	args = append([]interface{}{si}, args...)
 	fmt.Fprintf(os.Stderr, "%s "+format+"\n", args...)
 }

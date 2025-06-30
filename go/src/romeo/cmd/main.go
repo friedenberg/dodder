@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 
@@ -10,6 +11,7 @@ import (
 )
 
 func Run(name string) {
+	name = extendNameIfNecessary(name)
 	ctx := errors.MakeContextDefault()
 
 	ctx.SetCancelOnSignals(
@@ -27,6 +29,14 @@ func Run(name string) {
 	}
 }
 
+func extendNameIfNecessary(name string) string {
+	if name == "dodder" {
+		return name
+	} else {
+		return fmt.Sprintf("dodder (%s)", name)
+	}
+}
+
 func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus int) {
 	exitStatus = 1
 
@@ -34,7 +44,7 @@ func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus in
 
 	if errors.As(err, &signal) {
 		if signal.Signal != syscall.SIGHUP {
-			ui.Err().Print("dodder (%s) aborting due to signal: %s", name, signal.Signal)
+			ui.Err().Print("%s aborting due to signal: %s", name, signal.Signal)
 		}
 
 		return
@@ -47,13 +57,7 @@ func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus in
 		return
 	}
 
-	var normalError errors.StackTracer
-
-	if errors.As(err, &normalError) && !normalError.ShouldShowStackTrace() {
-		ui.Err().Printf("\n\ndodder (%s) failed with error:\n%s", name, normalError.Error())
-	} else {
-		ui.Err().Printf("\n\ndodder (%s) failed with error:\n%s", name, err)
-	}
+	errors.PrintStackTracerIfNecessary(ui.Err(), name, err)
 
 	return
 }

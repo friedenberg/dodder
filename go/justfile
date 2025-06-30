@@ -125,7 +125,7 @@ build-go-generate:
 
 build-go-binary:
   mkdir -p build
-  go build -o build ./cmd/{der,dodder,zit}
+  go build -tags debug -o build ./cmd/{der,dodder,zit}
 
 build-go: build-go-generate build-go-binary
 
@@ -164,7 +164,7 @@ check: check-go-vuln check-go-vet
 #
 
 test-go-unit:
-  go test -v ./...
+  go test -tags debug -v ./...
 
 test-go: test-go-unit
 

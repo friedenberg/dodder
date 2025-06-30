@@ -54,6 +54,7 @@ type Context interface {
 	MustFlush(flusher Flusher)
 	Cancel()
 
+	// TODO disambiguate between errors and exceptions
 	CancelWithError(err error)
 	CancelWithErrorAndFormat(err error, f string, values ...any)
 	CancelWithErrorf(f string, values ...any)

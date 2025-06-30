@@ -6,26 +6,26 @@ import (
 )
 
 type (
-	DecoderFrom[B any, R any] interface {
-		DecodeFrom(B, R) (int64, error)
+	DecoderFrom[OBJECT any, READER any] interface {
+		DecodeFrom(OBJECT, READER) (int64, error)
 	}
 
-	EncoderTo[B any, R any] interface {
-		EncodeTo(B, R) (int64, error)
+	EncoderTo[OBJECT any, READER any] interface {
+		EncodeTo(OBJECT, READER) (int64, error)
 	}
 
-	Coder[B any, R any, W any] interface {
-		DecoderFrom[B, R]
-		EncoderTo[B, W]
+	Coder[OBJECT any, READER any, WRITER any] interface {
+		DecoderFrom[OBJECT, READER]
+		EncoderTo[OBJECT, WRITER]
 	}
 
-	DecoderFromBufferedReader[B any] = DecoderFrom[B, *bufio.Reader]
-	EncoderToBufferedWriter[B any]   = EncoderTo[B, *bufio.Writer]
-	CoderBufferedReadWriter[B any]   = Coder[B, *bufio.Reader, *bufio.Writer]
+	DecoderFromBufferedReader[OBJECT any] = DecoderFrom[OBJECT, *bufio.Reader]
+	EncoderToBufferedWriter[OBJECT any]   = EncoderTo[OBJECT, *bufio.Writer]
+	CoderBufferedReadWriter[OBJECT any]   = Coder[OBJECT, *bufio.Reader, *bufio.Writer]
 
-	DecoderFromReader[B any] = DecoderFrom[B, io.Reader]
-	EncoderToWriter[B any]   = EncoderTo[B, io.Writer]
-	CoderReadWriter[B any]   = Coder[B, io.Reader, io.Writer]
+	DecoderFromReader[OBJECT any] = DecoderFrom[OBJECT, io.Reader]
+	EncoderToWriter[OBJECT any]   = EncoderTo[OBJECT, io.Writer]
+	CoderReadWriter[OBJECT any]   = Coder[OBJECT, io.Reader, io.Writer]
 
 	StringEncoderTo[T any] interface {
 		EncodeStringTo(T, WriterAndStringWriter) (int64, error)

@@ -21,8 +21,6 @@ function! GfZettel()
   " endtry
 endfunction
 
-noremap <buffer> gf :call GfZettel()<CR>
-
 " TODO support external blob
 function! DodderAction()
   let [l:items, l:processedItems] = DodderGetActionNames()
@@ -134,6 +132,7 @@ function! DodderPreview()
     let l:cmd_args =  join(l:cmd_args_list, " ")
     call system(l:cmd_args)
 
+    " TODO make platform agnostic
     let l:cmd_preview = "qlmanage -p "..l:tempfile..">/dev/null 2>&1 &"
     call system(l:cmd_preview)
   endfunc
@@ -168,6 +167,7 @@ function! DodderCopy()
     let l:val = substitute(l:processedItems[a:result-1], '\t.*$', '', '')
     let l:cmd_args_list = DodderMakeUTIGroupCommand(l:uti_group, split(l:val))
 
+    " TODO make platform agnostic
     execute("!tacky copy " . join(l:cmd_args_list, " "))
   endfunc
 
@@ -191,6 +191,7 @@ endfunction
 
 let maplocalleader = "-"
 
+noremap <buffer> gf :call GfZettel()<CR>
 nnoremap <localleader>z :call DodderAction()<cr>
 nnoremap <localleader>c :call DodderCopy()<cr>
 nnoremap <localleader>p :call DodderPreview()<cr>
