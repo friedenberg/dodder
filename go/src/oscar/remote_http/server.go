@@ -479,7 +479,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	if shString == "" {
 		var err error
 
-		if result, err = server.copyBlob(request.Body); err != nil {
+		if result, err = server.copyBlob(request.Body, nil); err != nil {
 			response.Error(err)
 			return
 		}
@@ -505,7 +505,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	{
 		var err error
 
-		if result, err = server.copyBlob(request.Body); err != nil {
+		if result, err = server.copyBlob(request.Body, &sh); err != nil {
 			response.Error(err)
 			return
 		}
@@ -526,7 +526,9 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
+	expected *sha.Sha,
 ) (result interfaces.Sha, err error) {
+	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.ShaWriteCloser
 
 	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
@@ -534,9 +536,28 @@ func (server *Server) copyBlob(
 		return
 	}
 
-	var n int64
+	blobExpectedShaString := "blob with unknown sha"
 
-	if n, err = io.Copy(writeCloser, reader); err != nil {
+	if expected != nil {
+		blobExpectedShaString = expected.String()
+	}
+
+	if err = errors.RunChildContextWithPrintTicker(
+		server.EnvLocal,
+		func(ctx errors.Context) {
+			if _, err := io.Copy(io.MultiWriter(writeCloser, &progressWriter), reader); err != nil {
+				ctx.CancelWithError(err)
+			}
+		},
+		func(time time.Time) {
+			ui.Err().Printf(
+				"Copying %s... (%s written)",
+				blobExpectedShaString,
+				progressWriter.GetWrittenHumanString(),
+			)
+		},
+		3*time.Second,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -555,7 +576,7 @@ func (server *Server) copyBlob(
 	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
 			Sha: result,
-			N:   n,
+			N:   progressWriter.GetWritten(),
 		},
 	); err != nil {
 		err = errors.Wrap(err)
