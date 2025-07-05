@@ -99,7 +99,7 @@ func TestBlech32(t1 *testing.T) {
 
 			// Valid string decoding should result in no error.
 			if err != nil {
-				t.Errorf("expected string to be valid bech32: %v", err)
+				t.Errorf("expected string to be valid blech32: %v", err)
 			}
 
 			// Check that it encodes to the same string.
