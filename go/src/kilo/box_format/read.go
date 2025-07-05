@@ -2,11 +2,13 @@ package box_format
 
 import (
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -231,31 +233,8 @@ LOOP_AFTER_OID:
 				Value: value.String(),
 			}
 
-			switch field.Key {
-			case "repo-pubkey":
-				var pubKey bech32.Value
-
-				if err = pubKey.Set(field.Value); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				object.Metadata.RepoPubKey = pubKey.Data
-
-			case "repo-sig":
-				var repoSig bech32.Value
-
-				if err = repoSig.Set(field.Value); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				object.Metadata.RepoSig.SetBytes(repoSig.Data)
-
-			default:
-				field.ColorType = string_format_writer.ColorTypeUserData
-				object.Metadata.Fields = append(object.Metadata.Fields, field)
-			}
+			field.ColorType = string_format_writer.ColorTypeUserData
+			object.Metadata.Fields = append(object.Metadata.Fields, field)
 
 			continue
 		}
@@ -290,9 +269,37 @@ LOOP_AFTER_OID:
 				return
 			}
 
-			if err = object.AddTagPtr(&e); err != nil {
-				err = errors.Wrap(err)
-				return
+			if e.IsDodderTag() {
+				value := e.String()
+
+				if strings.HasPrefix(value, repo_signing.HRPRepoPubKeyV1) {
+					var pubKey bech32.Value
+
+					if err = pubKey.Set(value); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					object.Metadata.RepoPubKey = pubKey.Data
+
+				} else if strings.HasPrefix(value, repo_signing.HRPRepoSigV1) {
+					var repoSig bech32.Value
+
+					if err = repoSig.Set(value); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					object.Metadata.RepoSig.SetBytes(repoSig.Data)
+				} else {
+					err = errors.Errorf("unsupported dodder tag: %q", value)
+					return
+				}
+			} else {
+				if err = object.AddTagPtr(&e); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 		default:

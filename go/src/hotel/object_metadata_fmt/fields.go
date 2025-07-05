@@ -95,7 +95,6 @@ func MetadataFieldRepoPubKey(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Key: "repo-pubkey",
 		Value: bech32.Value{
 			HRP:  repo_signing.HRPRepoPubKeyV1,
 			Data: metadata.RepoPubKey,
@@ -109,7 +108,6 @@ func MetadataFieldRepoSig(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Key: "repo-sig",
 		Value: bech32.Value{
 			HRP:  repo_signing.HRPRepoSigV1,
 			Data: metadata.RepoSig,
