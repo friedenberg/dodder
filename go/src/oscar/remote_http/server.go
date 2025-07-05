@@ -18,7 +18,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -205,9 +205,9 @@ func (server *Server) addSignatureIfNecessary(
 		return
 	}
 
-	var nonce bech32.Value
+	var nonce blech32.Value
 
-	if nonce, err = bech32.MakeValue(
+	if nonce, err = blech32.MakeValueWithExpectedHRP(
 		repo_signing.HRPRequestAuthChallengeV1,
 		nonceString,
 	); err != nil {
@@ -215,7 +215,7 @@ func (server *Server) addSignatureIfNecessary(
 		return
 	}
 
-	pubkey := bech32.Value{
+	pubkey := blech32.Value{
 		HRP:  repo_signing.HRPRepoPubKeyV1,
 		Data: server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPublicKey(),
 	}
@@ -224,7 +224,7 @@ func (server *Server) addSignatureIfNecessary(
 
 	key := server.Repo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
 
-	sig := bech32.Value{
+	sig := blech32.Value{
 		HRP: repo_signing.HRPRequestAuthResponseV1,
 	}
 

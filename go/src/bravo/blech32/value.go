@@ -1,4 +1,4 @@
-package bech32
+package blech32
 
 import "code.linenisgreat.com/dodder/go/src/alfa/errors"
 
@@ -8,18 +8,43 @@ type Value struct {
 	Data []byte
 }
 
-func MakeValue(expectedHRP string, input string) (value Value, err error) {
+func MakeValue(
+	hrp string,
+	data []byte,
+) Value {
+	return Value{
+		HRP:  hrp,
+		Data: data,
+	}
+}
+
+func MakeValueWithExpectedHRP(
+	expectedHRP string,
+	input string,
+) (value Value, err error) {
 	if err = value.Set(input); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if value.HRP != expectedHRP {
-		err = errors.Errorf("expected HRP %q but got %q", expectedHRP, value.HRP)
+		err = errors.Errorf(
+			"expected HRP %q but got %q",
+			expectedHRP,
+			value.HRP,
+		)
 		return
 	}
 
 	return
+}
+
+func (value Value) GetHRP() string {
+	return value.HRP
+}
+
+func (value Value) GetData() []byte {
+	return value.Data
 }
 
 func (value Value) String() string {

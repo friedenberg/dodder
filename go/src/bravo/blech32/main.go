@@ -19,9 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package bech32 is a modified version of the reference implementation of
-// BIP173.
-package bech32
+// Package blech32 is a modified version bech32 backage which itself is a
+// modified version of the reference implementation of BIP173. This package
+// changes the spec so that the last occurrence of `1` is actually a `-`
+// instead.
+package blech32
 
 import (
 	"bytes"
@@ -117,7 +119,7 @@ func convertBits(data []byte, frombits, tobits byte, pad bool) ([]byte, error) {
 	return ret, nil
 }
 
-// Encode encodes the HRP and a bytes slice to Bech32. If the HRP is uppercase,
+// Encode encodes the HRP and a bytes slice to Blech32. If the HRP is uppercase,
 // the output will be uppercase.
 func Encode(hrp string, data []byte) ([]byte, error) {
 	values, err := convertBits(data, 8, 5, true)
@@ -139,7 +141,7 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 	hrp = strings.ToLower(hrp)
 	var ret bytes.Buffer
 	ret.WriteString(hrp)
-	ret.WriteString("1")
+	ret.WriteString("-")
 	for _, p := range values {
 		ret.WriteByte(charset[p])
 	}
@@ -152,17 +154,17 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 	return bytes.ToUpper(ret.Bytes()), nil
 }
 
-// Decode decodes a Bech32 string. If the string is uppercase, the HRP will be
+// Decode decodes a Blech32 string. If the string is uppercase, the HRP will be
 // uppercase.
 // TODO switch to consuming []byte
 func Decode(s string) (hrp string, data []byte, err error) {
 	if strings.ToLower(s) != s && strings.ToUpper(s) != s {
 		return "", nil, fmt.Errorf("mixed case")
 	}
-	pos := strings.LastIndex(s, "1")
+	pos := strings.LastIndex(s, "-")
 	if pos < 1 || pos+7 > len(s) {
 		return "", nil, fmt.Errorf(
-			"separator '1' at invalid position: pos=%d, len=%d",
+			"separator '-' at invalid position: pos=%d, len=%d",
 			pos,
 			len(s),
 		)

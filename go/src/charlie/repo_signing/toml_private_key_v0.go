@@ -5,12 +5,12 @@ import (
 	"crypto/ed25519"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 // TODO hide inner fields
 type TomlPrivateKeyV0 struct {
-	PrivateKey bech32.Value `toml:"private-key,omitempty"`
+	PrivateKey blech32.Value `toml:"private-key,omitempty"`
 }
 
 func (b *TomlPrivateKeyV0) GeneratePrivateKey() (err error) {
@@ -42,7 +42,7 @@ func (b *TomlPrivateKeyV0) SetPrivateKey(key crypto.PrivateKey) {
 }
 
 func (b *TomlPrivateKeyV0) GetPublicKey() TomlPublicKeyV0 {
-	pub := bech32.Value{
+	pub := blech32.Value{
 		HRP:  HRPRepoPubKeyV1,
 		Data: b.GetPrivateKey().Public().(ed25519.PublicKey),
 	}

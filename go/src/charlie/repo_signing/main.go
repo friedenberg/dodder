@@ -4,18 +4,18 @@ import (
 	"crypto/ed25519"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 type Verifiable interface {
-	GetPubKeyAndSig() (bech32.Value, bech32.Value, error)
+	GetPubKeyAndSig() (blech32.Value, blech32.Value, error)
 }
 
-type VerifiableFunc func() (bech32.Value, bech32.Value, error)
+type VerifiableFunc func() (blech32.Value, blech32.Value, error)
 
 var _ = Verifiable(VerifiableFunc(nil))
 
-func (funk VerifiableFunc) GetPubKeyAndSig() (bech32.Value, bech32.Value, error) {
+func (funk VerifiableFunc) GetPubKeyAndSig() (blech32.Value, blech32.Value, error) {
 	return funk()
 }
 
@@ -45,7 +45,7 @@ func VerifySignatureOnVerifiable(
 	verifiable Verifiable,
 	message []byte,
 ) (err error) {
-	var publicKey, sig bech32.Value
+	var publicKey, sig blech32.Value
 
 	if publicKey, sig, err = verifiable.GetPubKeyAndSig(); err != nil {
 		err = errors.Wrap(err)

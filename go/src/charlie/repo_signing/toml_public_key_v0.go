@@ -3,12 +3,12 @@ package repo_signing
 import (
 	"crypto"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 // TODO hide inner fields
 type TomlPublicKeyV0 struct {
-	PublicKey bech32.Value `toml:"public-key,omitempty"`
+	PublicKey blech32.Value `toml:"public-key,omitempty"`
 }
 
 func (b TomlPublicKeyV0) GetPublicKey() PublicKey {

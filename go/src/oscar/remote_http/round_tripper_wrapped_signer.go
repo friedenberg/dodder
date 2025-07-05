@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 )
 
@@ -33,7 +33,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		return
 	}
 
-	nonce := bech32.Value{
+	nonce := blech32.Value{
 		HRP:  repo_signing.HRPRequestAuthChallengeV1,
 		Data: nonceBytes,
 	}
@@ -54,9 +54,9 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		return
 	}
 
-	var sig bech32.Value
+	var sig blech32.Value
 
-	if sig, err = bech32.MakeValue(
+	if sig, err = blech32.MakeValueWithExpectedHRP(
 		repo_signing.HRPRequestAuthResponseV1,
 		sigString,
 	); err != nil {
@@ -66,9 +66,9 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 
 	pubkeyString := response.Header.Get(headerRepoPublicKey)
 
-	var pubkey bech32.Value
+	var pubkey blech32.Value
 
-	if pubkey, err = bech32.MakeValue(
+	if pubkey, err = blech32.MakeValueWithExpectedHRP(
 		repo_signing.HRPRepoPubKeyV1,
 		pubkeyString,
 	); err != nil {
