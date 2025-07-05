@@ -7,21 +7,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func SortedValuesBy[E any](
-	c interfaces.SetLike[E],
-	sf func(E, E) bool,
-) (out []E) {
-	out = Elements(c)
+func SortedValuesBy[ELEMENT any](
+	set interfaces.SetLike[ELEMENT],
+	sortFunc func(ELEMENT, ELEMENT) bool,
+) (out []ELEMENT) {
+	out = Elements(set)
 
-	sort.Slice(out, func(i, j int) bool { return sf(out[i], out[j]) })
+	sort.Slice(out, func(i, j int) bool { return sortFunc(out[i], out[j]) })
 
 	return
 }
 
-func SortedValues[E interfaces.Value[E]](
-	c interfaces.SetLike[E],
-) (out []E) {
-	out = Elements(c)
+func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
+	set interfaces.SetLike[ELEMENT],
+) (out []ELEMENT) {
+	out = Elements(set)
 
 	sort.Slice(
 		out,
@@ -31,12 +31,12 @@ func SortedValues[E interfaces.Value[E]](
 	return
 }
 
-func Strings[E interfaces.Stringer](
-	cs ...interfaces.Collection[E],
+func Strings[ELEMENT interfaces.Stringer](
+	collections ...interfaces.Collection[ELEMENT],
 ) (out []string) {
 	l := 0
 
-	for _, c := range cs {
+	for _, c := range collections {
 		if c == nil {
 			continue
 		}
@@ -46,7 +46,7 @@ func Strings[E interfaces.Stringer](
 
 	out = make([]string, 0, l)
 
-	for _, c := range cs {
+	for _, c := range collections {
 		if c == nil {
 			continue
 		}
@@ -59,25 +59,25 @@ func Strings[E interfaces.Stringer](
 	return
 }
 
-func SortedStrings[E interfaces.Stringer](
-	cs ...interfaces.Collection[E],
+func SortedStrings[ELEMENT interfaces.Stringer](
+	collections ...interfaces.Collection[ELEMENT],
 ) (out []string) {
-	out = Strings(cs...)
+	out = Strings(collections...)
 
 	sort.Strings(out)
 
 	return
 }
 
-func StringDelimiterSeparated[E interfaces.Stringer](
-	d string,
-	cs ...interfaces.Collection[E],
+func StringDelimiterSeparated[ELEMENT interfaces.Stringer](
+	delimiter string,
+	collections ...interfaces.Collection[ELEMENT],
 ) string {
-	if cs == nil {
+	if collections == nil {
 		return ""
 	}
 
-	sorted := SortedStrings[E](cs...)
+	sorted := SortedStrings[ELEMENT](collections...)
 
 	if len(sorted) == 0 {
 		return ""
@@ -88,7 +88,7 @@ func StringDelimiterSeparated[E interfaces.Stringer](
 
 	for _, e1 := range sorted {
 		if !first {
-			sb.WriteString(d)
+			sb.WriteString(delimiter)
 		}
 
 		sb.WriteString(e1)
@@ -99,16 +99,16 @@ func StringDelimiterSeparated[E interfaces.Stringer](
 	return sb.String()
 }
 
-func StringCommaSeparated[E interfaces.Stringer](
-	cs ...interfaces.Collection[E],
+func StringCommaSeparated[ELEMENT interfaces.Stringer](
+	collections ...interfaces.Collection[ELEMENT],
 ) string {
-	return StringDelimiterSeparated(", ", cs...)
+	return StringDelimiterSeparated(", ", collections...)
 }
 
-func ReverseSortable(s sort.Interface) {
-	max := s.Len() / 2
+func ReverseSortable(sortable sort.Interface) {
+	max := sortable.Len() / 2
 
-	for i := 0; i < max; i++ {
-		s.Swap(i, s.Len()-1-i)
+	for i := range max {
+		sortable.Swap(i, sortable.Len()-1-i)
 	}
 }

@@ -5,6 +5,22 @@ import (
 	"os"
 )
 
+func DeferredRecover(err *error) {
+	if !debugBuild {
+		return
+	}
+
+	if r := recover(); r != nil {
+		switch r := r.(type) {
+		default:
+			*err = Join(*err, Errorf("panicked: %s", r))
+
+		case error:
+			*err = Join(*err, r)
+		}
+	}
+}
+
 func DeferredFlusher(
 	err *error,
 	f Flusher,

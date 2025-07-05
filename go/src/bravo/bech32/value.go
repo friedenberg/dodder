@@ -2,6 +2,7 @@ package bech32
 
 import "code.linenisgreat.com/dodder/go/src/alfa/errors"
 
+// TODO modify this to automatically append a `-` to `HRP` if necessary
 type Value struct {
 	HRP  string // human-readable part
 	Data []byte

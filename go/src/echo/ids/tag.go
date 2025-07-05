@@ -143,6 +143,10 @@ func (e tag) Parts() [3]string {
 	}
 }
 
+func (tag tag) IsDodderTag() bool {
+	return strings.HasPrefix(tag.value, "dodder-")
+}
+
 func (e tag) IsVirtual() bool {
 	return e.virtual
 }
