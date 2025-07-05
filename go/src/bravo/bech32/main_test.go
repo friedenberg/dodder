@@ -104,15 +104,15 @@ func TestBech32(t1 *testing.T) {
 			}
 
 			// Check that it encodes to the same string.
-			encoded, err := bech32.Encode(hrp, decoded)
+			actual, err := bech32.Encode(hrp, decoded)
 			if err != nil {
 				t.Errorf("encoding failed: %v", err)
 			}
-			if string(encoded) != expected {
+			if string(actual) != expected {
 				t.Errorf(
 					"expected data to encode to %v, but got %v",
 					expected,
-					encoded,
+					string(actual),
 				)
 			}
 
