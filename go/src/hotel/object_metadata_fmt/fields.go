@@ -14,11 +14,11 @@ import (
 )
 
 func MetadataShaString(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 	abbr ids.FuncAbbreviateString,
-) (v string, err error) {
-	s := &m.Blob
-	v = s.String()
+) (value string, err error) {
+	s := &metadata.Blob
+	value = s.String()
 
 	if abbr != nil {
 		var v1 string
@@ -31,7 +31,7 @@ func MetadataShaString(
 		}
 
 		if v1 != "" {
-			v = v1
+			value = v1
 		} else {
 			ui.Todo("abbreviate sha produced empty string")
 		}
@@ -74,31 +74,31 @@ func MetadataFieldError(
 }
 
 func MetadataFieldShaString(
-	v string,
+	value string,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     "@" + v,
+		Value:     "@" + value,
 		ColorType: string_format_writer.ColorTypeHash,
 	}
 }
 
 func MetadataFieldTai(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     m.Tai.String(),
+		Value:     metadata.Tai.String(),
 		ColorType: string_format_writer.ColorTypeHash,
 	}
 }
 
 func MetadataFieldRepoPubKey(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Key: "repo-pubkey",
 		Value: bech32.Value{
 			HRP:  repo_signing.HRPRepoPubKeyV1,
-			Data: m.RepoPubKey,
+			Data: metadata.RepoPubKey,
 		}.String(),
 		NoTruncate: true,
 		ColorType:  string_format_writer.ColorTypeHash,
@@ -106,13 +106,13 @@ func MetadataFieldRepoPubKey(
 }
 
 func MetadataFieldRepoSig(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Key: "repo-sig",
 		Value: bech32.Value{
 			HRP:  repo_signing.HRPRepoSigV1,
-			Data: m.RepoSig,
+			Data: metadata.RepoSig,
 		}.String(),
 		NoTruncate: true,
 		ColorType:  string_format_writer.ColorTypeHash,
@@ -120,27 +120,27 @@ func MetadataFieldRepoSig(
 }
 
 func MetadataFieldType(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     m.Type.String(),
+		Value:     metadata.Type.String(),
 		ColorType: string_format_writer.ColorTypeType,
 	}
 }
 
 func MetadataFieldTags(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) []string_format_writer.Field {
-	if m.Tags == nil {
+	if metadata.Tags == nil {
 		return nil
 	}
 
-	out := make([]string_format_writer.Field, 0, m.Tags.Len())
+	tags := make([]string_format_writer.Field, 0, metadata.Tags.Len())
 
-	m.Tags.EachPtr(
+	metadata.Tags.EachPtr(
 		func(t *ids.Tag) (err error) {
-			out = append(
-				out,
+			tags = append(
+				tags,
 				string_format_writer.Field{
 					Value: t.String(),
 				},
@@ -149,18 +149,18 @@ func MetadataFieldTags(
 		},
 	)
 
-	sort.Slice(out, func(i, j int) bool {
-		return out[i].Value < out[j].Value
+	sort.Slice(tags, func(i, j int) bool {
+		return tags[i].Value < tags[j].Value
 	})
 
-	return out
+	return tags
 }
 
 func MetadataFieldDescription(
-	m *object_metadata.Metadata,
+	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     m.Description.StringWithoutNewlines(),
+		Value:     metadata.Description.StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,
 	}
 }

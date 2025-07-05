@@ -25,8 +25,9 @@ type Metadata struct {
 	// InventoryListTai
 
 	Description descriptions.Description
-	Tags        ids.TagMutableSet // public for gob, but should be private
-	Type        ids.Type
+	// TODO refactor this to be an efficient structure backed by a slice
+	Tags ids.TagMutableSet // public for gob, but should be private
+	Type ids.Type
 
 	Shas
 	Tai ids.Tai
@@ -82,9 +83,9 @@ func (m *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 			return m.Cache.TagPaths.String()
 		},
 		func(value string) (err error) {
-			values := strings.Split(value, ",")
+			values := strings.SplitSeq(value, ",")
 
-			for _, tagString := range values {
+			for tagString := range values {
 				if err = m.AddTagString(tagString); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -165,19 +166,19 @@ func (m *Metadata) ResetTags() {
 	m.Cache.TagPaths.Reset()
 }
 
-func (z *Metadata) AddTagString(es string) (err error) {
-	if es == "" {
+func (metadata *Metadata) AddTagString(tagString string) (err error) {
+	if tagString == "" {
 		return
 	}
 
-	var e ids.Tag
+	var tag ids.Tag
 
-	if err = e.Set(es); err != nil {
+	if err = tag.Set(tagString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = z.AddTagPtr(&e); err != nil {
+	if err = metadata.AddTagPtr(&tag); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -282,7 +283,7 @@ func (a *Metadata) Subtract(
 	// ui.Debug().Print("after", b.Tags, a.Tags)
 }
 
-func (mp *Metadata) AddComment(f string, vals ...interface{}) {
+func (mp *Metadata) AddComment(f string, vals ...any) {
 	mp.Comments = append(mp.Comments, fmt.Sprintf(f, vals...))
 }
 

@@ -9,7 +9,7 @@ type V0 struct {
 	PrintUnchanged      bool `toml:"print-unchanged"`
 	PrintColors         bool `toml:"print-colors"`
 	PrintInventoryLists bool `toml:"print-bestandsaufnahme"`
-	Newlines     bool `toml:"-"`
+	Newlines            bool `toml:"-"`
 }
 
 func (a *V0) Merge(b V0, mask V0) {

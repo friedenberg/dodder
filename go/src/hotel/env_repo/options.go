@@ -5,9 +5,9 @@ import (
 )
 
 type Options struct {
-	BasePath             string
+	BasePath                string
 	PermitNoDodderDirectory bool
-	MakeXDGDirectories   bool
+	MakeXDGDirectories      bool
 }
 
 func (o Options) GetReadOnlyBlobStorePath() string {

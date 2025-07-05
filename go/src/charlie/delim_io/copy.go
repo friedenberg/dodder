@@ -29,7 +29,7 @@ func CopyWithPrefixOnDelim(
 	bufferedReader.Reset(source)
 
 	var (
-		isEOF    bool
+		isEOF      bool
 		lineNumber int
 	)
 

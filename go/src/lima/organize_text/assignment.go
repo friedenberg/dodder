@@ -73,9 +73,9 @@ func (a Assignment) MaxDepth() (d int) {
 }
 
 func (a Assignment) AlignmentSpacing() int {
-	if a.Transacted.Metadata.Tags.Len() == 1 && ids.IsDependentLeaf(a.Transacted.Metadata.Tags.Any()) {
+	if a.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(a.Transacted.Metadata.GetTags().Any()) {
 		return a.Parent.AlignmentSpacing() + len(
-			a.Parent.Transacted.Metadata.Tags.Any().String(),
+			a.Parent.Transacted.Metadata.GetTags().Any().String(),
 		)
 	}
 
@@ -107,7 +107,7 @@ func (a Assignment) String() (s string) {
 		s = a.Parent.String() + "."
 	}
 
-	return s + quiter.StringCommaSeparated(a.Transacted.Metadata.Tags)
+	return s + quiter.StringCommaSeparated(a.Transacted.Metadata.GetTags())
 }
 
 func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {

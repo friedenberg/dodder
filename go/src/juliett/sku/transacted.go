@@ -119,7 +119,9 @@ func (transacted *Transacted) GetObjectId() *ids.ObjectId {
 	return &transacted.ObjectId
 }
 
-func (transacted *Transacted) SetObjectIdLike(objectIdLike interfaces.ObjectId) (err error) {
+func (transacted *Transacted) SetObjectIdLike(
+	objectIdLike interfaces.ObjectId,
+) (err error) {
 	if err = transacted.ObjectId.SetWithIdLike(objectIdLike); err != nil {
 		err = errors.Wrap(err)
 		return

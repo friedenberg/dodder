@@ -8,7 +8,6 @@ import (
 	"golang.org/x/xerrors"
 )
 
-
 func New(text string) error {
 	return xerrors.New(text)
 }

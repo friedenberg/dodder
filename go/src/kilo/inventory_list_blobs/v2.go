@@ -22,11 +22,11 @@ type V2 struct {
 	V2ObjectCoder
 }
 
-func (v V2) GetListFormat() sku.ListFormat {
-	return v
+func (format V2) GetListFormat() sku.ListFormat {
+	return format
 }
 
-func (v V2) GetType() ids.Type {
+func (format V2) GetType() ids.Type {
 	return ids.MustType(builtin_types.InventoryListTypeV2)
 }
 
@@ -95,14 +95,14 @@ func (format V2) WriteInventoryListBlob(
 	return
 }
 
-func (s V2) WriteInventoryListObject(
+func (format V2) WriteInventoryListObject(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	var n1 int64
 	var n2 int
 
-	n1, err = s.Box.EncodeStringTo(object, bufferedWriter)
+	n1, err = format.Box.EncodeStringTo(object, bufferedWriter)
 	n += n1
 
 	if err != nil {
