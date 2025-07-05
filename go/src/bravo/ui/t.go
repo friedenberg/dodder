@@ -54,6 +54,20 @@ func (t *T) Skip(skip int) *T {
 	}
 }
 
+func (t *T) Run(id any, funk func(*T)) {
+	var description string
+
+	if stringId, ok := id.(string); ok {
+		description = stringId
+	} else {
+		description = fmt.Sprintf("%v", id)
+	}
+
+	t.T.Run(description, func(t1 *testing.T) {
+		funk(&T{T: t1})
+	})
+}
+
 func (t *T) ui(skip int, args ...interface{}) {
 	si := t.MakeStackInfo(t.skip + 1 + skip)
 	args = append([]interface{}{si}, args...)
