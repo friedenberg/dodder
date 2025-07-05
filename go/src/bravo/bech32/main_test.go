@@ -21,18 +21,27 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/bech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
-func TestBech32(t *testing.T) {
+func TestBech32(t1 *testing.T) {
+	t := ui.T{T: t1}
+
 	tests := []struct {
 		str   string
 		valid bool
 	}{
 		{"A12UEL5L", true}, // empty
 		{"a12uel5l", true},
-		{"an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs", true},
+		{
+			"an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs",
+			true,
+		},
 		{"abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw", true},
-		{"11qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqc8247j", true},
+		{
+			"11qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqc8247j",
+			true,
+		},
 		{"split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w", true},
 
 		// invalid checksum
@@ -41,13 +50,27 @@ func TestBech32(t *testing.T) {
 		{"s lit1checkupstagehandshakeupstreamerranterredcaperredp8hs2p", false},
 		{"split1cheo2y9e2w", false}, // invalid character (o) in data part
 		{"split1a2y9w", false},      // too short data part
-		{"1checkupstagehandshakeupstreamerranterredcaperred2y9e3w", false}, // empty hrp
+		{
+			"1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+			false,
+		}, // empty hrp
 		// invalid character (DEL) in hrp
-		{"spl" + string(rune(127)) + "t1checkupstagehandshakeupstreamerranterredcaperred2y9e3w", false},
+		{
+			"spl" + string(
+				rune(127),
+			) + "t1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+			false,
+		},
 
 		// long vectors that we do accept despite the spec, see Issue 453
-		{"long10pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7qfcsvr0", true},
-		{"an84characterslonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1569pvx", true},
+		{
+			"long10pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7qfcsvr0",
+			true,
+		},
+		{
+			"an84characterslonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1569pvx",
+			true,
+		},
 
 		// BIP 173 invalid vectors.
 		{"pzry9x0s0muk", false},
@@ -61,35 +84,47 @@ func TestBech32(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		str := test.str
-		hrp, decoded, err := bech32.Decode(str)
-		if !test.valid {
-			// Invalid string decoding should result in error.
-			if err == nil {
-				t.Errorf("expected decoding to fail for invalid string %v", test.str)
+		t.Run(test, func(t *ui.T) {
+			expected := test.str
+			hrp, decoded, err := bech32.Decode(expected)
+			if !test.valid {
+				// Invalid string decoding should result in error.
+				if err == nil {
+					t.Errorf(
+						"expected decoding to fail for invalid string %v",
+						test.str,
+					)
+				}
+				return
 			}
-			continue
-		}
 
-		// Valid string decoding should result in no error.
-		if err != nil {
-			t.Errorf("expected string to be valid bech32: %v", err)
-		}
+			// Valid string decoding should result in no error.
+			if err != nil {
+				t.Errorf("expected string to be valid bech32: %v", err)
+			}
 
-		// Check that it encodes to the same string.
-		encoded, err := bech32.Encode(hrp, decoded)
-		if err != nil {
-			t.Errorf("encoding failed: %v", err)
-		}
-		if string(encoded) != str {
-			t.Errorf("expected data to encode to %v, but got %v", str, encoded)
-		}
+			// Check that it encodes to the same string.
+			encoded, err := bech32.Encode(hrp, decoded)
+			if err != nil {
+				t.Errorf("encoding failed: %v", err)
+			}
+			if string(encoded) != expected {
+				t.Errorf(
+					"expected data to encode to %v, but got %v",
+					expected,
+					encoded,
+				)
+			}
 
-		// Flip a bit in the string an make sure it is caught.
-		pos := strings.LastIndexAny(str, "1")
-		flipped := str[:pos+1] + string((str[pos+1] ^ 1)) + str[pos+2:]
-		if _, _, err = bech32.Decode(flipped); err == nil {
-			t.Error("expected decoding to fail")
-		}
+			// Flip a bit in the string an make sure it is caught.
+			pos := strings.LastIndexAny(expected, "1")
+			flipped := expected[:pos+1] + string(
+				(expected[pos+1] ^ 1),
+			) + expected[pos+2:]
+			if _, _, err = bech32.Decode(flipped); err == nil {
+				t.Error("expected decoding to fail")
+			}
+		},
+		)
 	}
 }

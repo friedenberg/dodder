@@ -19,7 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package bech32 is a modified version of the reference implementation of BIP173.
+// Package bech32 is a modified version of the reference implementation of
+// BIP173.
 package bech32
 
 import (
@@ -30,7 +31,13 @@ import (
 
 var charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 
-var generator = []uint32{0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3}
+var generator = []uint32{
+	0x3b6a57b2,
+	0x26508e6d,
+	0x1ea119fa,
+	0x3d4233dd,
+	0x2a1462b3,
+}
 
 func polymod(values []byte) uint32 {
 	chk := uint32(1)
@@ -38,7 +45,7 @@ func polymod(values []byte) uint32 {
 		top := chk >> 25
 		chk = (chk & 0x1ffffff) << 5
 		chk = chk ^ uint32(v)
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			bit := top >> i & 1
 			if bit == 1 {
 				chk ^= generator[i]
@@ -84,7 +91,12 @@ func convertBits(data []byte, frombits, tobits byte, pad bool) ([]byte, error) {
 	maxv := byte(1<<tobits - 1)
 	for idx, value := range data {
 		if value>>frombits != 0 {
-			return nil, fmt.Errorf("invalid data range: data[%d]=%d (frombits=%d)", idx, value, frombits)
+			return nil, fmt.Errorf(
+				"invalid data range: data[%d]=%d (frombits=%d)",
+				idx,
+				value,
+				frombits,
+			)
 		}
 		acc = acc<<frombits | uint32(value)
 		bits += frombits
@@ -140,7 +152,8 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 	return bytes.ToUpper(ret.Bytes()), nil
 }
 
-// Decode decodes a Bech32 string. If the string is uppercase, the HRP will be uppercase.
+// Decode decodes a Bech32 string. If the string is uppercase, the HRP will be
+// uppercase.
 // TODO switch to consuming []byte
 func Decode(s string) (hrp string, data []byte, err error) {
 	if strings.ToLower(s) != s && strings.ToUpper(s) != s {
@@ -148,19 +161,31 @@ func Decode(s string) (hrp string, data []byte, err error) {
 	}
 	pos := strings.LastIndex(s, "1")
 	if pos < 1 || pos+7 > len(s) {
-		return "", nil, fmt.Errorf("separator '1' at invalid position: pos=%d, len=%d", pos, len(s))
+		return "", nil, fmt.Errorf(
+			"separator '1' at invalid position: pos=%d, len=%d",
+			pos,
+			len(s),
+		)
 	}
 	hrp = s[:pos]
 	for p, c := range hrp {
 		if c < 33 || c > 126 {
-			return "", nil, fmt.Errorf("invalid character human-readable part: s[%d]=%d", p, c)
+			return "", nil, fmt.Errorf(
+				"invalid character human-readable part: s[%d]=%d",
+				p,
+				c,
+			)
 		}
 	}
 	s = strings.ToLower(s)
 	for p, c := range s[pos+1:] {
 		d := strings.IndexRune(charset, c)
 		if d == -1 {
-			return "", nil, fmt.Errorf("invalid character data part: s[%d]=%v", p, c)
+			return "", nil, fmt.Errorf(
+				"invalid character data part: s[%d]=%v",
+				p,
+				c,
+			)
 		}
 		data = append(data, byte(d))
 	}
