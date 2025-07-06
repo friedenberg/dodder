@@ -9,26 +9,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPrivateTypedBlob struct {
-	ids.Type
-	ImmutableConfig config_immutable.ConfigPrivate
-}
+type ConfigPrivateTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.ConfigPrivate]
 
-type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]
+type typeWithConfigLoadedPrivate = *triple_hyphen_io2.TypedBlob[*ConfigPrivateTypedBlob]
 
-var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLoadedPrivate]{
+var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.ConfigPrivate]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
 	"":                              blobV0CoderPrivate{},
 }
 
-var coderPrivate = triple_hyphen_io.CoderToTypedBlob[*ConfigPrivateTypedBlob]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPrivateTypedBlob]{},
-	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPrivateTypedBlob](
+var coderPrivate = triple_hyphen_io2.CoderToTypedBlob[config_immutable.ConfigPrivate]{
+	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.ConfigPrivate]{},
+	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.ConfigPrivate](
 		typedCodersPrivate,
 	),
 }
@@ -72,10 +68,7 @@ func (CoderPrivate) DecodeFrom(
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPrivate.DecodeFrom(
-		&triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]{
-			Type: &subject.Type,
-			Blob: subject,
-		},
+		subject,
 		reader,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -90,10 +83,7 @@ func (CoderPrivate) EncodeTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(
-		&triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]{
-			Type: &subject.Type,
-			Blob: subject,
-		},
+		subject,
 		writer,
 	); err != nil {
 		err = errors.Wrap(err)

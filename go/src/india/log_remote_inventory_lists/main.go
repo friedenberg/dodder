@@ -37,7 +37,7 @@ type Log interface {
 }
 
 func Make(ctx errors.Context, envRepo env_repo.Env) (log Log) {
-	sv := envRepo.GetConfigPrivate().ImmutableConfig.GetStoreVersion()
+	sv := envRepo.GetConfigPrivate().Blob.GetStoreVersion()
 
 	if store_version.Less(sv, store_version.V8) {
 		ctx.CancelWithErrorf("unsupported store version: %s")

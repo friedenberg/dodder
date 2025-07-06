@@ -89,7 +89,7 @@ func (store *Store) Initialize(
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(
-					envRepo.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
 				),
 				envRepo.GetTempLocal(),
 			),
@@ -103,7 +103,7 @@ func (store *Store) Initialize(
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(
-					envRepo.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
 				),
 				envRepo.GetTempLocal(),
 			),
@@ -167,7 +167,7 @@ func (store *Store) FormatForVersion(
 		return inventory_list_blobs.V2{
 			V2ObjectCoder: inventory_list_blobs.V2ObjectCoder{
 				Box:                    store.box,
-				ImmutableConfigPrivate: store.envRepo.GetConfigPrivate().ImmutableConfig,
+				ImmutableConfigPrivate: store.envRepo.GetConfigPrivate().Blob,
 			},
 		}
 	}
@@ -209,7 +209,7 @@ func (store *Store) AddObjectToOpenList(
 	object *sku.Transacted,
 ) (err error) {
 	if err = object.Sign(
-		store.envRepo.GetConfigPrivate().ImmutableConfig,
+		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

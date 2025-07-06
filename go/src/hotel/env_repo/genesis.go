@@ -22,8 +22,8 @@ func (env *Env) Genesis(bb BigBang) {
 		return
 	}
 
-	env.config.Type = bb.Type
-	env.config.ImmutableConfig = bb.Config
+	env.config.Type = &bb.Type
+	env.config.Blob = bb.Config
 
 	if err := env.MakeDir(
 		env.DirObjectId(),
@@ -59,7 +59,7 @@ func (env *Env) Genesis(bb BigBang) {
 		}
 	}
 
-	if env.config.ImmutableConfig.GetRepoType() == repo_type.TypeWorkingCopy {
+	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := env.readAndTransferLines(
 			bb.Yin,
 			filepath.Join(env.DirObjectId(), "Yin"),

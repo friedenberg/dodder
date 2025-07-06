@@ -134,12 +134,12 @@ func (env Env) GetEnv() env_ui.Env {
 }
 
 func (env Env) GetConfigPublicBlob() config_immutable.ConfigPublic {
-	return env.config.ImmutableConfig.GetImmutableConfigPublic()
+	return env.config.Blob.GetImmutableConfigPublic()
 }
 
 func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return config_immutable_io.ConfigPublicTypedBlob{
-		Type:            env.config.Type,
+		Type:            *env.config.Type,
 		ImmutableConfig: env.GetConfigPublicBlob(),
 	}
 }
@@ -190,10 +190,10 @@ func (env Env) DataFileStoreVersion() string {
 }
 
 func (env Env) GetStoreVersion() interfaces.StoreVersion {
-	if env.config.ImmutableConfig == nil {
+	if env.config.Blob == nil {
 		return store_version.VCurrent
 	} else {
-		return env.config.ImmutableConfig.GetStoreVersion()
+		return env.config.Blob.GetStoreVersion()
 	}
 }
 
@@ -205,7 +205,7 @@ func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
 	return blob_store.MakeShardedFilesStore(
 		env.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
-			env.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+			env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
 		),
 		env.GetTempLocal(),
 	)

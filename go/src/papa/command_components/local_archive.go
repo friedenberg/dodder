@@ -21,7 +21,7 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 func (c LocalArchive) MakeLocalArchive(
 	envRepo env_repo.Env,
 ) repo.LocalRepo {
-	repoType := envRepo.GetConfigPrivate().ImmutableConfig.GetRepoType()
+	repoType := envRepo.GetConfigPrivate().Blob.GetRepoType()
 
 	switch repoType {
 	case repo_type.TypeArchive:

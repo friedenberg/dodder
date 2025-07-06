@@ -324,7 +324,7 @@ func (store *Store) GenerateConflictMarker(
 
 	for object := range conflicted.All() {
 		if err = object.Sign(
-			store.envRepo.GetConfigPrivate().ImmutableConfig,
+			store.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

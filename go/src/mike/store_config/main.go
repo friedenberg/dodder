@@ -133,7 +133,7 @@ func (c *store) Initialize(
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
-	c.immutable_config_private = envRepo.GetConfigPrivate().ImmutableConfig
+	c.immutable_config_private = envRepo.GetConfigPrivate().Blob
 
 	c.typedConfigBlobStore = typed_blob_store.MakeConfigStore(envRepo)
 

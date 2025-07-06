@@ -101,7 +101,7 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	}
 
 	if err = object.Sign(
-		store.envRepo.GetConfigPrivate().ImmutableConfig,
+		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

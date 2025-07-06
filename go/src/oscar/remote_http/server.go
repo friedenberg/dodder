@@ -222,7 +222,7 @@ func (server *Server) addSignatureIfNecessary(
 
 	header.Set(headerRepoPublicKey, pubkey.String())
 
-	key := server.Repo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
+	key := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	sig := blech32.Value{
 		HRP: repo_signing.HRPRequestAuthResponseV1,

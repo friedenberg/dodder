@@ -130,7 +130,7 @@ func (client client) ImportInventoryList(
 	}
 
 	{
-		key := client.localRepo.GetImmutableConfigPrivate().ImmutableConfig.GetPublicKey()
+		key := client.localRepo.GetImmutableConfigPrivate().Blob.GetPublicKey()
 
 		request.Header.Add(
 			headerRepoPublicKey,
@@ -139,7 +139,7 @@ func (client client) ImportInventoryList(
 	}
 
 	{
-		key := client.localRepo.GetImmutableConfigPrivate().ImmutableConfig.GetPrivateKey()
+		key := client.localRepo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 		var sig string
 

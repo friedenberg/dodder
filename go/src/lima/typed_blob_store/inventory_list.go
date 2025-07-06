@@ -54,7 +54,7 @@ func MakeInventoryStore(
 		v2: inventory_list_blobs.V2{
 			V2ObjectCoder: inventory_list_blobs.V2ObjectCoder{
 				Box:                    boxFormat,
-				ImmutableConfigPrivate: dirLayout.GetConfigPrivate().ImmutableConfig,
+				ImmutableConfigPrivate: dirLayout.GetConfigPrivate().Blob,
 			},
 		},
 	}
@@ -174,7 +174,7 @@ func (a InventoryList) WriteObjectToWriter(
 ) (n int64, err error) {
 	return a.objectCoders.EncodeTo(
 		&triple_hyphen_io.TypedBlob[*sku.Transacted]{
-			Type:   &tipe,
+			Type: &tipe,
 			Blob: object,
 		},
 		bufferedWriter,
