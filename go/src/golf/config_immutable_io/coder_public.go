@@ -8,9 +8,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
+
+// TODO refactor to common typed blob
+type ConfigPublicTypedBlob struct {
+	ids.Type
+	ImmutableConfig config_immutable.ConfigPublic // TODO restructure this to avoid this extra call
+}
 
 type typeWithConfigLoadedPublic = *triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]
 

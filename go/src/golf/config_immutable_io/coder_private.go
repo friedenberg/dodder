@@ -8,9 +8,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
+
+type ConfigPrivatedTypedBlob struct {
+	ids.Type
+	ImmutableConfig config_immutable.ConfigPrivate
+}
 
 type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]
 
