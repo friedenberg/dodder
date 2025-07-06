@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
 )
@@ -98,16 +98,16 @@ func (env Env) writeInventoryListLog() {
 		defer env.MustClose(file)
 	}
 
-	coder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlobEmpty]{
-		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
+	coder := triple_hyphen_io2.Coder[*triple_hyphen_io2.TypedBlobEmpty]{
+		Metadata: triple_hyphen_io2.TypedMetadataCoder[struct{}]{},
 	}
 
 	tipe := builtin_types.GetOrPanic(
 		builtin_types.InventoryListTypeVCurrent,
 	).Type
 
-	subject := triple_hyphen_io.TypedBlobEmpty{
-		Type: &tipe,
+	subject := triple_hyphen_io2.TypedBlobEmpty{
+		Type: tipe,
 	}
 
 	if _, err := coder.EncodeTo(&subject, file); err != nil {

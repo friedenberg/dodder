@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 )
 
 type textParser struct {
@@ -61,7 +61,7 @@ func (f textParser) ParseMetadata(
 
 	defer errors.DeferredCloser(&err, blobWriter)
 
-	mr := triple_hyphen_io.Reader{
+	mr := triple_hyphen_io2.Reader{
 		Metadata: mp,
 		Blob:     blobWriter,
 	}

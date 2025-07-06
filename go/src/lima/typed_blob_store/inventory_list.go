@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
@@ -27,7 +27,7 @@ type InventoryList struct {
 	v1           inventory_list_blobs.V1
 	v2           inventory_list_blobs.V2
 
-	objectCoders   triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted]
+	objectCoders   triple_hyphen_io2.CoderTypeMapWithoutType[sku.Transacted]
 	streamDecoders map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]
 }
 
@@ -59,7 +59,7 @@ func MakeInventoryStore(
 		},
 	}
 
-	s.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[*sku.Transacted](
+	s.objectCoders = triple_hyphen_io2.CoderTypeMapWithoutType[sku.Transacted](
 		map[string]interfaces.CoderBufferedReadWriter[*sku.Transacted]{
 			"": inventory_list_blobs.V0ObjectCoder{
 				V0: s.v0,
@@ -172,13 +172,14 @@ func (a InventoryList) WriteObjectToWriter(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	return a.objectCoders.EncodeTo(
-		&triple_hyphen_io.TypedBlob[*sku.Transacted]{
-			Type: &tipe,
-			Blob: object,
-		},
-		bufferedWriter,
-	)
+	// Create TypedBlob and reset its Blob field directly from source
+	typedBlob := &triple_hyphen_io2.TypedBlob[sku.Transacted]{
+		Type: tipe,
+		// Blob field is zero-value sku.Transacted
+	}
+	sku.TransactedResetter.ResetWith(&typedBlob.Blob, object)
+	
+	return a.objectCoders.EncodeTo(typedBlob, bufferedWriter)
 }
 
 func (store InventoryList) WriteBlobToWriter(
@@ -273,9 +274,9 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[iterSku]]{
-			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
-			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
+		decoder := triple_hyphen_io2.Decoder[*triple_hyphen_io2.TypedBlob[iterSku]]{
+			Metadata: triple_hyphen_io2.TypedMetadataCoder[iterSku]{},
+			Blob: triple_hyphen_io2.DecoderTypeMapWithoutType[iterSku](
 				a.streamDecoders,
 			),
 		}
@@ -284,8 +285,8 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
-				Type: &ids.Type{},
+			&triple_hyphen_io2.TypedBlob[iterSku]{
+				Type: ids.Type{},
 				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
@@ -317,7 +318,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
+		decoder := triple_hyphen_io2.DecoderTypeMapWithoutType[iterSku](
 			a.streamDecoders,
 		)
 
@@ -325,8 +326,8 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
-				Type: &tipe,
+			&triple_hyphen_io2.TypedBlob[iterSku]{
+				Type: tipe,
 				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
@@ -344,7 +345,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
+		decoder := triple_hyphen_io2.DecoderTypeMapWithoutType[iterSku](
 			a.streamDecoders,
 		)
 
@@ -352,8 +353,8 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
-				Type: &tipe,
+			&triple_hyphen_io2.TypedBlob[iterSku]{
+				Type: tipe,
 				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},

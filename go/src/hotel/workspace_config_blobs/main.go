@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
 )
@@ -22,15 +22,15 @@ type (
 	}
 )
 
-type TypeWithBlob = *triple_hyphen_io.TypedBlob[*Blob]
+type TypeWithBlob = *triple_hyphen_io2.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[TypeWithBlob]{
 	TypeV0: blobV0Coder{},
 }
 
-var Coder = triple_hyphen_io.Coder[TypeWithBlob]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*Blob]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
+var Coder = triple_hyphen_io2.Coder[TypeWithBlob]{
+	Metadata: triple_hyphen_io2.TypedMetadataCoder[*Blob]{},
+	Blob:     triple_hyphen_io2.CoderTypeMap[*Blob](typedCoders),
 }
 
 func DecodeFromFile(

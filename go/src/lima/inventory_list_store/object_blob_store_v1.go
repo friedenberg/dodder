@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
-// TODO add triple_hyphen_io coder
+// TODO add triple_hyphen_io2 coder
 type objectBlobStoreV1 struct {
 	envRepo        env_repo.Env
 	pathLog        string

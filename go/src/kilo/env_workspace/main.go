@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -60,8 +60,8 @@ func Make(
 		configMutable: config.GetMutableConfig(),
 	}
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
-		Type: &ids.Type{},
+	object := triple_hyphen_io2.TypedBlob[*workspace_config_blobs.Blob]{
+		Type: ids.Type{},
 	}
 
 	dir := out.GetCwd()
@@ -188,7 +188,7 @@ func (env *env) findWorkspaceFile(
 
 func (env *env) tryLoad(
 	path string,
-	object *triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob],
+	object *triple_hyphen_io2.TypedBlob[*workspace_config_blobs.Blob],
 ) (err error) {
 	if err = workspace_config_blobs.DecodeFromFile(
 		object,
@@ -252,8 +252,8 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
-		Type: &tipe,
+	object := triple_hyphen_io2.TypedBlob[*workspace_config_blobs.Blob]{
+		Type: tipe,
 		Blob: &env.blob,
 	}
 

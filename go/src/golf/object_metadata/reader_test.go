@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 )
 
 func Test1(t1 *testing.T) {
@@ -27,7 +27,7 @@ body
 	mr := &bytes.Buffer{}
 	ar := &bytes.Buffer{}
 
-	r := triple_hyphen_io.Reader{
+	r := triple_hyphen_io2.Reader{
 		Metadata: mr,
 		Blob:     ar,
 	}
@@ -74,7 +74,7 @@ metadatei
 	mr := &bytes.Buffer{}
 	ar := &bytes.Buffer{}
 
-	r := triple_hyphen_io.Reader{
+	r := triple_hyphen_io2.Reader{
 		Metadata: mr,
 		Blob:     ar,
 	}

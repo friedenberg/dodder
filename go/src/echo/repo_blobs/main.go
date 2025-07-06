@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
@@ -25,7 +25,7 @@ type BlobMutable interface {
 	SetPublicKey(crypto.PublicKey)
 }
 
-type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]
+type TypedBlob = triple_hyphen_io2.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
@@ -35,7 +35,7 @@ var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
 }
 
 var Coder = interfaces.CoderBufferedReadWriter[*TypedBlob](
-	triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
+	triple_hyphen_io2.CoderTypeMap[*Blob](typedCoders),
 )
 
 type coderToml[T Blob] struct {

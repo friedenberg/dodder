@@ -108,6 +108,59 @@ error formatting
 4.  Indexed for query and retrieval
 5.  Can be checked out to filesystem
 
+### sku.Transacted Pool Management
+
+**CRITICAL REQUIREMENT**: `sku.Transacted` objects must follow strict pool management and **NEVER** be dereferenced:
+
+-   **Never dereference `sku.Transacted` pointers**: Never use `*object` - this violates pool management
+-   **Use ResetWith for value structures**: When you need a value type, create a local value and use `ResetWith`
+-   **Pool management for persistence**: Use `sku.GetTransactedPool().Get()` and `object.CloneTransacted()` for objects that persist
+-   **Always return to pool**: Use `defer sku.GetTransactedPool().Put(object)` after cloning
+-   **Reset when needed**: Use `sku.TransactedResetter.Reset()` or `sku.TransactedResetter.ResetWith()` for clean state
+
+#### Correct Patterns:
+
+**For temporary value structures (no dereferencing - preferred pattern):**
+```go
+// Create target structure and reset its field directly from source
+typedBlob := &triple_hyphen_io2.TypedBlob[sku.Transacted]{
+    Type: tipe,
+    // Blob field is zero-value sku.Transacted
+}
+sku.TransactedResetter.ResetWith(&typedBlob.Blob, sourcePointer)
+// Use typedBlob directly - no copying, no dereferencing
+return encoder.EncodeTo(typedBlob, writer)
+```
+
+**For simple local values (alternative pattern):**
+```go
+// Create a local value structure and reset it with source data
+var valueObject sku.Transacted
+sku.TransactedResetter.ResetWith(&valueObject, sourcePointer)
+// Use valueObject directly as a value type
+```
+
+**For persistent objects (with pool management):**
+```go
+// Clone and return to pool for objects that persist
+clonedObject := originalObject.CloneTransacted()
+defer sku.GetTransactedPool().Put(clonedObject)
+
+// Get from pool and return
+newObject := sku.GetTransactedPool().Get()
+defer sku.GetTransactedPool().Put(newObject)
+sku.TransactedResetter.ResetWith(newObject, sourceObject)
+```
+
+#### NEVER DO:
+```go
+// INCORRECT: Direct dereferencing - NEVER DO THIS
+// value := *object  // VIOLATES POOL MANAGEMENT
+// someStruct.Field = *object  // VIOLATES POOL MANAGEMENT
+```
+
+This pattern ensures efficient memory usage, prevents memory leaks, and maintains strict separation between pointer-managed pool objects and temporary value structures.
+
 ### Testing Strategy
 
 -   Unit tests: `*_test.go` files throughout codebase

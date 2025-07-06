@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 )
 
 type Text struct {
@@ -72,7 +72,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		},
 	}
 
-	mr := triple_hyphen_io.Reader{
+	mr := triple_hyphen_io2.Reader{
 		Metadata: &r1,
 		Blob:     &r1.reader,
 	}
@@ -121,7 +121,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	mw := triple_hyphen_io.Writer{
+	mw := triple_hyphen_io2.Writer{
 		Blob: lw,
 	}
 

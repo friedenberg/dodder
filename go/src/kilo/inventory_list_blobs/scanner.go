@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -75,7 +75,7 @@ func (scanner *scanner) Scan() (ok bool) {
 	scanner.lastSku = nil
 
 	if !scanner.afterFirst {
-		scanner.err = triple_hyphen_io.ReadBoundaryFromPeeker(scanner.ringBuffer)
+		scanner.err = triple_hyphen_io2.ReadBoundaryFromPeeker(scanner.ringBuffer)
 
 		if errors.IsEOF(scanner.err) {
 			return
@@ -87,7 +87,7 @@ func (scanner *scanner) Scan() (ok bool) {
 		scanner.afterFirst = true
 	}
 
-	scanner.Offset += int64(len(triple_hyphen_io.Boundary) + 1)
+	scanner.Offset += int64(len(triple_hyphen_io2.Boundary) + 1)
 	scanner.ContentLength = 0
 
 	scanner.lastSku = sku.GetTransactedPool().Get()
@@ -110,7 +110,7 @@ func (scanner *scanner) Scan() (ok bool) {
 
 	oldErr := scanner.err
 
-	scanner.err = triple_hyphen_io.ReadBoundaryFromPeeker(scanner.ringBuffer)
+	scanner.err = triple_hyphen_io2.ReadBoundaryFromPeeker(scanner.ringBuffer)
 
 	if errors.IsNotNilAndNotEOF(scanner.err) {
 		scanner.err = errors.Wrap(errors.MakeMulti(scanner.err, oldErr))
