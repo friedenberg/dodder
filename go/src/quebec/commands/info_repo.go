@@ -24,7 +24,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 	// TODO should this be the private config flavor?
 	configTypedBlob := repo.GetConfigPublic()
-	configBlob := configTypedBlob.ImmutableConfig
+	configBlob := configTypedBlob.Blob
 
 	if len(args) == 0 {
 		args = []string{"store-version"}

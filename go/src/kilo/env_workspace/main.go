@@ -253,7 +253,7 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
 	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
-		Type:   &tipe,
+		Type: &tipe,
 		Blob: &env.blob,
 	}
 

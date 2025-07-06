@@ -77,7 +77,7 @@ func (store *Store) Initialize(
 	}
 
 	blobType := ids.MustType(
-		store.envRepo.GetConfigPublic().ImmutableConfig.GetInventoryListTypeString(),
+		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
 	)
 
 	if store_version.LessOrEqual(

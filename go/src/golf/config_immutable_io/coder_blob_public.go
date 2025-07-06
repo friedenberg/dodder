@@ -13,13 +13,13 @@ import (
 type blobV1CoderPublic struct{}
 
 func (blobV1CoderPublic) DecodeFrom(
-	subject typeWithConfigLoadedPublic,
-	r *bufio.Reader,
+	blob *config_immutable.ConfigPublic,
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	subject.Blob.ImmutableConfig = &config_immutable.TomlV1Public{}
-	td := toml.NewDecoder(r)
+	config := &config_immutable.TomlV1Public{}
+	td := toml.NewDecoder(bufferedReader)
 
-	if err = td.Decode(subject.Blob.ImmutableConfig); err != nil {
+	if err = td.Decode(config); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -28,16 +28,18 @@ func (blobV1CoderPublic) DecodeFrom(
 		}
 	}
 
+	*blob = config
+
 	return
 }
 
 func (blobV1CoderPublic) EncodeTo(
-	subject typeWithConfigLoadedPublic,
-	w *bufio.Writer,
+	blob *config_immutable.ConfigPublic,
+	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	te := toml.NewEncoder(w)
+	encoder := toml.NewEncoder(bufferedWriter)
 
-	if err = te.Encode(subject.Blob.ImmutableConfig); err != nil {
+	if err = encoder.Encode(*blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -52,14 +54,14 @@ func (blobV1CoderPublic) EncodeTo(
 type blobV0CoderPublic struct{}
 
 func (blobV0CoderPublic) DecodeFrom(
-	subject typeWithConfigLoadedPublic,
-	r *bufio.Reader,
+	blob *config_immutable.ConfigPublic,
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	subject.Blob.ImmutableConfig = &config_immutable.V0Public{}
+	config := &config_immutable.V0Public{}
 
-	dec := gob.NewDecoder(r)
+	dec := gob.NewDecoder(bufferedReader)
 
-	if err = dec.Decode(subject.Blob.ImmutableConfig); err != nil {
+	if err = dec.Decode(config); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -68,16 +70,18 @@ func (blobV0CoderPublic) DecodeFrom(
 		}
 	}
 
+	*blob = config
+
 	return
 }
 
 func (blobV0CoderPublic) EncodeTo(
-	subject typeWithConfigLoadedPublic,
-	w *bufio.Writer,
+	blob *config_immutable.ConfigPublic,
+	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	dec := gob.NewEncoder(w)
+	encoder := gob.NewEncoder(bufferedWriter)
 
-	if err = dec.Encode(subject.Blob.ImmutableConfig); err != nil {
+	if err = encoder.Encode(*blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

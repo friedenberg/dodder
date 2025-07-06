@@ -39,7 +39,7 @@ func (client client) ImportInventoryList(
 ) (err error) {
 	logEntry := log_remote_inventory_lists.Entry{
 		EntryType:  log_remote_inventory_lists.EntryTypeSent,
-		PublicKey:  client.configImmutable.ImmutableConfig.GetPublicKey(),
+		PublicKey:  client.configImmutable.Blob.GetPublicKey(),
 		Transacted: listSku,
 	}
 
@@ -56,7 +56,7 @@ func (client client) ImportInventoryList(
 
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
+		client.localRepo.GetImmutableConfigPublic().Blob.GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)

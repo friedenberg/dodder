@@ -15,8 +15,6 @@ import (
 
 type ConfigPrivateTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.ConfigPrivate]
 
-type typeWithConfigLoadedPrivate = *triple_hyphen_io2.TypedBlob[*ConfigPrivateTypedBlob]
-
 var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.ConfigPrivate]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
 	"":                              blobV0CoderPrivate{},

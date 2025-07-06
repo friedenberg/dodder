@@ -139,8 +139,8 @@ func (env Env) GetConfigPublicBlob() config_immutable.ConfigPublic {
 
 func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return config_immutable_io.ConfigPublicTypedBlob{
-		Type:            *env.config.Type,
-		ImmutableConfig: env.GetConfigPublicBlob(),
+		Type:            env.config.Type,
+		Blob: env.GetConfigPublicBlob(),
 	}
 }
 

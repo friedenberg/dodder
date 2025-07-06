@@ -9,27 +9,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-// TODO refactor to common typed blob
-type ConfigPublicTypedBlob struct {
-	ids.Type
-	ImmutableConfig config_immutable.ConfigPublic // TODO restructure this to avoid this extra call
-}
+type ConfigPublicTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.ConfigPublic]
 
-type typeWithConfigLoadedPublic = *triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]
-
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLoadedPublic]{
+var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.ConfigPublic]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
 	"":                              blobV0CoderPublic{},
 }
 
-var coderPublic = triple_hyphen_io.Coder[typeWithConfigLoadedPublic]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPublicTypedBlob]{},
-	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPublicTypedBlob](
+var coderPublic = triple_hyphen_io2.CoderToTypedBlob[config_immutable.ConfigPublic]{
+	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.ConfigPublic]{},
+	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.ConfigPublic](
 		typedCoders,
 	),
 }
@@ -69,14 +62,11 @@ func (coder CoderPublic) DecodeFromFile(
 }
 
 func (CoderPublic) DecodeFrom(
-	subject *ConfigPublicTypedBlob,
+	typedBlob *ConfigPublicTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPublic.DecodeFrom(
-		&triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]{
-			Type: &subject.Type,
-			Blob: subject,
-		},
+		typedBlob,
 		reader,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -87,14 +77,11 @@ func (CoderPublic) DecodeFrom(
 }
 
 func (CoderPublic) EncodeTo(
-	subject *ConfigPublicTypedBlob,
+	typedBlob *ConfigPublicTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPublic.EncodeTo(
-		&triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]{
-			Type: &subject.Type,
-			Blob: subject,
-		},
+		typedBlob,
 		writer,
 	); err != nil {
 		err = errors.Wrap(err)

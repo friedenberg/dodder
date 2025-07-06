@@ -158,12 +158,23 @@ func (server *Server) makeRouter(
 	// TODO add errors/context middlerware for capturing errors and panics
 	router := mux.NewRouter().UseEncodedPath()
 
-	router.HandleFunc("/config-immutable", makeHandler(server.handleGetConfigImmutable)).
-		Methods("GET")
+	router.HandleFunc(
+		"/config-immutable",
+		makeHandler(server.handleGetConfigImmutable),
+	).
+		Methods(
+			"GET",
+		)
 
 	{
-		router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsHeadOrGet)).
-			Methods("HEAD", "GET")
+		router.HandleFunc(
+			"/blobs/{sha}",
+			makeHandler(server.handleBlobsHeadOrGet),
+		).
+			Methods(
+				"HEAD",
+				"GET",
+			)
 
 		router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsPost)).
 			Methods("POST")
@@ -176,14 +187,29 @@ func (server *Server) makeRouter(
 		Methods("GET")
 
 	{
-		router.HandleFunc("/inventory_lists", makeHandler(server.handleGetInventoryList)).
-			Methods("GET")
+		router.HandleFunc(
+			"/inventory_lists",
+			makeHandler(server.handleGetInventoryList),
+		).
+			Methods(
+				"GET",
+			)
 
-		router.HandleFunc("/inventory_lists", makeHandler(server.handlePostInventoryList)).
-			Methods("POST")
+		router.HandleFunc(
+			"/inventory_lists",
+			makeHandler(server.handlePostInventoryList),
+		).
+			Methods(
+				"POST",
+			)
 
-		router.HandleFunc("/inventory_lists/{box}", makeHandler(server.handlePostInventoryList)).
-			Methods("POST")
+		router.HandleFunc(
+			"/inventory_lists/{box}",
+			makeHandler(server.handlePostInventoryList),
+		).
+			Methods(
+				"POST",
+			)
 	}
 
 	if server.Repo.GetEnv().GetCLIConfig().Verbose {
@@ -217,7 +243,7 @@ func (server *Server) addSignatureIfNecessary(
 
 	pubkey := blech32.Value{
 		HRP:  repo_signing.HRPRepoPubKeyV1,
-		Data: server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetPublicKey(),
+		Data: server.Repo.GetImmutableConfigPublic().Blob.GetPublicKey(),
 	}
 
 	header.Set(headerRepoPublicKey, pubkey.String())
@@ -257,9 +283,17 @@ func (server *Server) sigMiddleware(next http.Handler) http.Handler {
 func (server *Server) loggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, request *http.Request) {
-			ui.Log().Printf("serving request: %s %s", request.Method, request.URL.Path)
+			ui.Log().Printf(
+				"serving request: %s %s",
+				request.Method,
+				request.URL.Path,
+			)
 			next.ServeHTTP(responseWriter, request)
-			ui.Log().Printf("done serving request: %s %s", request.Method, request.URL.Path)
+			ui.Log().Printf(
+				"done serving request: %s %s",
+				request.Method,
+				request.URL.Path,
+			)
 		},
 	)
 }
@@ -422,11 +456,16 @@ func (server *Server) makeHandler(
 	}
 }
 
-func (server *Server) handleBlobsHeadOrGet(request Request) (response Response) {
+func (server *Server) handleBlobsHeadOrGet(
+	request Request,
+) (response Response) {
 	shString := request.Vars()["sha"]
 
 	if shString == "" {
-		response.ErrorWithStatus(http.StatusBadRequest, errors.ErrorWithStackf("empty sha"))
+		response.ErrorWithStatus(
+			http.StatusBadRequest,
+			errors.ErrorWithStackf("empty sha"),
+		)
 		return
 	}
 
@@ -732,7 +771,7 @@ func (server *Server) handlePostInventoryList(
 
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(
 				ids.MustType(
-					server.Repo.GetImmutableConfigPublic().ImmutableConfig.GetInventoryListTypeString(),
+					server.Repo.GetImmutableConfigPublic().Blob.GetInventoryListTypeString(),
 				),
 				bufferedReader,
 			); err != nil {
@@ -761,11 +800,13 @@ func (server *Server) handlePostInventoryList(
 	return
 }
 
-func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
+func (server *Server) handleGetConfigImmutable(
+	request Request,
+) (response Response) {
 	config := server.Repo.GetImmutableConfigPublic()
 	configLoaded := &config_immutable_io.ConfigPublicTypedBlob{
-		Type:            config.Type,
-		ImmutableConfig: config.ImmutableConfig,
+		Type: config.Type,
+		Blob: config.Blob,
 	}
 
 	encoder := config_immutable_io.CoderPublic{}

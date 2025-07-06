@@ -46,7 +46,7 @@ func (cmd Push) Run(req command.Request) {
 
 	remote := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
 
-	repoType := remote.GetImmutableConfigPublic().ImmutableConfig.GetRepoType()
+	repoType := remote.GetImmutableConfigPublic().Blob.GetRepoType()
 
 	switch repoType {
 	case repo_type.TypeWorkingCopy:

@@ -173,7 +173,7 @@ func (remote *client) MakeInventoryList(
 	}
 
 	listFormat := remote.GetInventoryListStore().FormatForVersion(
-		remote.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
+		remote.GetImmutableConfigPublic().Blob.GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -241,7 +241,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().ImmutableConfig.GetStoreVersion(),
+		client.localRepo.GetImmutableConfigPublic().Blob.GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)
@@ -309,7 +309,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
 			builtin_types.GetOrPanic(
-				client.configImmutable.ImmutableConfig.GetInventoryListTypeString(),
+				client.configImmutable.Blob.GetInventoryListTypeString(),
 			).Type,
 			bufferedReader,
 		); err != nil {
