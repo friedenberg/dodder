@@ -14,3 +14,7 @@ type ConfigPublicTypedBlob struct {
 func (typedBlob *ConfigPublicTypedBlob) GetType() ids.Type {
 	return typedBlob.Type
 }
+
+func (typedBlob *ConfigPublicTypedBlob) SetType(t ids.Type) {
+	typedBlob.Type = t
+}
