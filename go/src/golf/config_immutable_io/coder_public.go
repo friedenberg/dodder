@@ -8,12 +8,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type typeWithConfigLoadedPublic = *triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]
+type typeWithConfigLoadedPublic = *triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLoadedPublic]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
@@ -21,14 +20,16 @@ var typedCoders = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLo
 }
 
 var coderPublic = triple_hyphen_io.Coder[typeWithConfigLoadedPublic]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoadedPublic]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*ConfigLoadedPublic](typedCoders),
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPublicTypedBlob]{},
+	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPublicTypedBlob](
+		typedCoders,
+	),
 }
 
 type CoderPublic struct{}
 
 func (coder CoderPublic) DecodeFromFile(
-	object *ConfigLoadedPublic,
+	object *ConfigPublicTypedBlob,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -60,13 +61,13 @@ func (coder CoderPublic) DecodeFromFile(
 }
 
 func (CoderPublic) DecodeFrom(
-	subject *ConfigLoadedPublic,
+	subject *ConfigPublicTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPublic.DecodeFrom(
-		&triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]{
-			Type:   &subject.Type,
-			Struct: subject,
+		&triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]{
+			Type: &subject.Type,
+			Blob: subject,
 		},
 		reader,
 	); err != nil {
@@ -74,21 +75,17 @@ func (CoderPublic) DecodeFrom(
 		return
 	}
 
-	subject.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		subject.ImmutableConfig.GetBlobStoreConfigImmutable(),
-	)
-
 	return
 }
 
 func (CoderPublic) EncodeTo(
-	subject *ConfigLoadedPublic,
+	subject *ConfigPublicTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPublic.EncodeTo(
-		&triple_hyphen_io.TypedStruct[*ConfigLoadedPublic]{
-			Type:   &subject.Type,
-			Struct: subject,
+		&triple_hyphen_io.TypedBlob[*ConfigPublicTypedBlob]{
+			Type: &subject.Type,
+			Blob: subject,
 		},
 		writer,
 	); err != nil {

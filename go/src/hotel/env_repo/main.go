@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
@@ -26,7 +27,7 @@ const (
 type Env struct {
 	env_local.Env
 
-	config config_immutable_io.ConfigLoadedPrivate
+	config config_immutable_io.ConfigPrivatedTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -117,59 +118,66 @@ func Make(
 	return
 }
 
-func (s *Env) setupStores() (err error) {
-	s.local = s.MakeBlobStore()
-	s.CopyingBlobStore = blob_store.MakeCopyingBlobStore(s.Env, s.local, s.remote)
+func (env *Env) setupStores() (err error) {
+	env.local = env.MakeBlobStore()
+	env.CopyingBlobStore = blob_store.MakeCopyingBlobStore(
+		env.Env,
+		env.local,
+		env.remote,
+	)
 
 	return
 }
 
-func (a Env) GetEnv() env_ui.Env {
-	return a.Env
+func (env Env) GetEnv() env_ui.Env {
+	return env.Env
 }
 
-func (s Env) GetConfigPublic() config_immutable_io.ConfigLoadedPublic {
-	return config_immutable_io.ConfigLoadedPublic{
-		Type:                     s.config.Type,
-		ImmutableConfig:          s.config.ImmutableConfig.GetImmutableConfigPublic(),
-		BlobStoreImmutableConfig: s.config.BlobStoreImmutableConfig,
+func (env Env) GetConfigPublicBlob() config_immutable.ConfigPublic {
+	return env.config.ImmutableConfig.GetImmutableConfigPublic()
+}
+
+func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
+	return config_immutable_io.ConfigPublicTypedBlob{
+		Type:            env.config.Type,
+		ImmutableConfig: env.GetConfigPublicBlob(),
 	}
 }
 
-func (s Env) GetConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
-	return s.config
+func (env Env) GetConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
+	return env.config
 }
 
-func (s Env) GetLockSmith() interfaces.LockSmith {
-	return s.lockSmith
+func (env Env) GetLockSmith() interfaces.LockSmith {
+	return env.lockSmith
 }
 
 func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
 
-func (s Env) ResetCache() (err error) {
-	if err = files.SetAllowUserChangesRecursive(s.DirCache()); err != nil {
+func (env Env) ResetCache() (err error) {
+	if err = files.SetAllowUserChangesRecursive(env.DirCache()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = os.RemoveAll(s.DirCache()); err != nil {
+	if err = os.RemoveAll(env.DirCache()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
-	if err = s.MakeDir(s.DirCache()); err != nil {
+	if err = env.MakeDir(env.DirCache()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.MakeDir(s.DirCacheObjects()); err != nil {
+	if err = env.MakeDir(env.DirCacheObjects()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.MakeDir(s.DirCacheObjectPointers()); err != nil {
+	if err = env.MakeDir(env.DirCacheObjectPointers()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -177,15 +185,15 @@ func (s Env) ResetCache() (err error) {
 	return
 }
 
-func (h Env) DataFileStoreVersion() string {
-	return filepath.Join(h.GetXDG().Data, "version")
+func (env Env) DataFileStoreVersion() string {
+	return filepath.Join(env.GetXDG().Data, "version")
 }
 
-func (h Env) GetStoreVersion() interfaces.StoreVersion {
-	if h.config.ImmutableConfig == nil {
+func (env Env) GetStoreVersion() interfaces.StoreVersion {
+	if env.config.ImmutableConfig == nil {
 		return store_version.VCurrent
 	} else {
-		return h.config.ImmutableConfig.GetStoreVersion()
+		return env.config.ImmutableConfig.GetStoreVersion()
 	}
 }
 
@@ -193,12 +201,12 @@ func (env Env) Mover() (*env_dir.Mover, error) {
 	return env.local.Mover()
 }
 
-func (s Env) MakeBlobStore() blob_store.LocalBlobStore {
+func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
 	return blob_store.MakeShardedFilesStore(
-		s.DirBlobs(),
+		env.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
-			s.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
+			env.GetConfigPrivate().ImmutableConfig.GetBlobStoreConfigImmutable(),
 		),
-		s.GetTempLocal(),
+		env.GetTempLocal(),
 	)
 }

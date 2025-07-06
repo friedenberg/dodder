@@ -48,7 +48,7 @@ func MakeClient(
 
 type client struct {
 	envUI           env_ui.Env
-	configImmutable config_immutable_io.ConfigLoadedPublic
+	configImmutable config_immutable_io.ConfigPublicTypedBlob
 	http            http.Client
 	localRepo       repo.LocalRepo
 	typedBlobStore  typed_blob_store.InventoryList
@@ -101,7 +101,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
+func (client *client) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return client.configImmutable
 }
 

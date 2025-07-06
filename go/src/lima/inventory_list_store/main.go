@@ -122,11 +122,11 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
+func (store *Store) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return store.GetEnvRepo().GetConfigPublic()
 }
 
-func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

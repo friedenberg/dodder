@@ -25,7 +25,7 @@ type BlobMutable interface {
 	SetPublicKey(crypto.PublicKey)
 }
 
-type TypeWithBlob = triple_hyphen_io.TypedStruct[*Blob]
+type TypeWithBlob = triple_hyphen_io.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypeWithBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
@@ -56,7 +56,7 @@ func (coder coderToml[T]) DecodeFrom(
 	}
 
 	blob := Blob(coder.Blob)
-	subject.Struct = &blob
+	subject.Blob = &blob
 
 	return
 }
@@ -67,7 +67,7 @@ func (coderToml[_]) EncodeTo(
 ) (n int64, err error) {
 	encoder := toml.NewEncoder(writer)
 
-	if err = encoder.Encode(subject.Struct); err != nil {
+	if err = encoder.Encode(subject.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

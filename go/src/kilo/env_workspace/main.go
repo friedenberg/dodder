@@ -60,7 +60,7 @@ func Make(
 		configMutable: config.GetMutableConfig(),
 	}
 
-	object := triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
 		Type: &ids.Type{},
 	}
 
@@ -86,7 +86,7 @@ func Make(
 			return
 		}
 
-		out.blob = *object.Struct
+		out.blob = *object.Blob
 	}
 
 	defaults := out.configMutable.GetDefaults()
@@ -188,7 +188,7 @@ func (env *env) findWorkspaceFile(
 
 func (env *env) tryLoad(
 	path string,
-	object *triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob],
+	object *triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob],
 ) (err error) {
 	if err = workspace_config_blobs.DecodeFromFile(
 		object,
@@ -198,7 +198,7 @@ func (env *env) tryLoad(
 		return
 	}
 
-	env.blob = *object.Struct
+	env.blob = *object.Blob
 
 	return
 }
@@ -252,9 +252,9 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
 	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
 
-	object := triple_hyphen_io.TypedStruct[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
 		Type:   &tipe,
-		Struct: &env.blob,
+		Blob: &env.blob,
 	}
 
 	env.dir = env.GetCwd()

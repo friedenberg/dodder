@@ -10,34 +10,35 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-type TypedStruct[S any] struct {
-	Type   *ids.Type
-	Struct S
+type TypedBlob[BLOB any] struct {
+	// TODO determine why this needs to be a pointer
+	Type *ids.Type
+	Blob BLOB
 }
 
-func (typedStruct *TypedStruct[S]) GetType() *ids.Type {
-	if typedStruct.Type == nil {
-		typedStruct.Type = &ids.Type{}
+func (typedBlob *TypedBlob[S]) GetType() *ids.Type {
+	if typedBlob.Type == nil {
+		typedBlob.Type = &ids.Type{}
 	}
 
-	return typedStruct.Type
+	return typedBlob.Type
 }
 
-type CoderTypeMap[S any] map[string]interfaces.CoderBufferedReadWriter[*TypedStruct[S]]
+type CoderTypeMap[BLOB any] map[string]interfaces.CoderBufferedReadWriter[*TypedBlob[BLOB]]
 
-func (c CoderTypeMap[S]) DecodeFrom(
-	subject *TypedStruct[S],
+func (coderTypeMap CoderTypeMap[S]) DecodeFrom(
+	typedBlob *TypedBlob[S],
 	reader *bufio.Reader,
 ) (n int64, err error) {
-	t := subject.GetType()
-	coder, ok := c[t.String()]
+	tipe := typedBlob.GetType()
+	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
-		err = errors.ErrorWithStackf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
 
-	if n, err = coder.DecodeFrom(subject, reader); err != nil {
+	if n, err = coder.DecodeFrom(typedBlob, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -45,19 +46,19 @@ func (c CoderTypeMap[S]) DecodeFrom(
 	return
 }
 
-func (c CoderTypeMap[S]) EncodeTo(
-	subject *TypedStruct[S],
+func (coderTypeMap CoderTypeMap[S]) EncodeTo(
+	typedBlob *TypedBlob[S],
 	writer *bufio.Writer,
 ) (n int64, err error) {
-	t := subject.GetType()
-	coder, ok := c[t.String()]
+	tipe := typedBlob.GetType()
+	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
-		err = errors.ErrorWithStackf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
 
-	if n, err = coder.EncodeTo(subject, writer); err != nil {
+	if n, err = coder.EncodeTo(typedBlob, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,25 +66,25 @@ func (c CoderTypeMap[S]) EncodeTo(
 	return
 }
 
-type DecoderTypeMapWithoutType[S any] map[string]interfaces.DecoderFromBufferedReader[S]
+type DecoderTypeMapWithoutType[BLOB any] map[string]interfaces.DecoderFromBufferedReader[BLOB]
 
-func (c DecoderTypeMapWithoutType[S]) DecodeFrom(
-	subject *TypedStruct[S],
+func (decoderTypeMap DecoderTypeMapWithoutType[S]) DecodeFrom(
+	typedBlob *TypedBlob[S],
 	reader *bufio.Reader,
 ) (n int64, err error) {
-	t := subject.GetType()
-	coder, ok := c[t.String()]
+	tipe := typedBlob.GetType()
+	decoder, ok := decoderTypeMap[tipe.String()]
 
 	if !ok {
-		err = errors.ErrorWithStackf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
 
 	bufferedReader := ohio.BufferedReader(reader)
 	defer pool.GetBufioReader().Put(bufferedReader)
 
-	if n, err = coder.DecodeFrom(
-		subject.Struct,
+	if n, err = decoder.DecodeFrom(
+		typedBlob.Blob,
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -93,21 +94,21 @@ func (c DecoderTypeMapWithoutType[S]) DecodeFrom(
 	return
 }
 
-type CoderTypeMapWithoutType[S any] map[string]interfaces.CoderBufferedReadWriter[S]
+type CoderTypeMapWithoutType[BLOB any] map[string]interfaces.CoderBufferedReadWriter[BLOB]
 
-func (c CoderTypeMapWithoutType[S]) DecodeFrom(
-	subject *TypedStruct[S],
+func (coderTypeMap CoderTypeMapWithoutType[S]) DecodeFrom(
+	typedBlob *TypedBlob[S],
 	reader *bufio.Reader,
 ) (n int64, err error) {
-	t := subject.GetType()
-	coder, ok := c[t.String()]
+	tipe := typedBlob.GetType()
+	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
-		err = errors.ErrorWithStackf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
 
-	if n, err = coder.DecodeFrom(subject.Struct, reader); err != nil {
+	if n, err = coder.DecodeFrom(typedBlob.Blob, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,19 +116,19 @@ func (c CoderTypeMapWithoutType[S]) DecodeFrom(
 	return
 }
 
-func (c CoderTypeMapWithoutType[S]) EncodeTo(
-	subject *TypedStruct[S],
+func (coderTypeMap CoderTypeMapWithoutType[S]) EncodeTo(
+	typedBlob *TypedBlob[S],
 	writer *bufio.Writer,
 ) (n int64, err error) {
-	t := subject.Type
-	coder, ok := c[t.String()]
+	tipe := typedBlob.Type
+	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
-		err = errors.ErrorWithStackf("no coders available for type: %q", t)
+		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
 
-	if n, err = coder.EncodeTo(subject.Struct, writer); err != nil {
+	if n, err = coder.EncodeTo(typedBlob.Blob, writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

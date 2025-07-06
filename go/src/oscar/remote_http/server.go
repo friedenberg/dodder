@@ -763,7 +763,7 @@ func (server *Server) handlePostInventoryList(
 
 func (server *Server) handleGetConfigImmutable(request Request) (response Response) {
 	config := server.Repo.GetImmutableConfigPublic()
-	configLoaded := &config_immutable_io.ConfigLoadedPublic{
+	configLoaded := &config_immutable_io.ConfigPublicTypedBlob{
 		Type:            config.Type,
 		ImmutableConfig: config.ImmutableConfig,
 	}

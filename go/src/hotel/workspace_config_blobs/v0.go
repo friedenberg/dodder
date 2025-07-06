@@ -37,11 +37,11 @@ func (blobV0Coder) DecodeFrom(
 	reader *bufio.Reader,
 ) (n int64, err error) {
 	blob := Blob(&V0{})
-	subject.Struct = &blob
+	subject.Blob = &blob
 
 	dec := toml.NewDecoder(reader)
 
-	if err = dec.Decode(*subject.Struct); err != nil {
+	if err = dec.Decode(*subject.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -59,7 +59,7 @@ func (blobV0Coder) EncodeTo(
 ) (n int64, err error) {
 	dec := toml.NewEncoder(writer)
 
-	if err = dec.Encode(*subject.Struct); err != nil {
+	if err = dec.Encode(*subject.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

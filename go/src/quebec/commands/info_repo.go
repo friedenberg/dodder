@@ -23,8 +23,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 	repo := cmd.MakeEnvRepo(req, false)
 
 	// TODO should this be the private config flavor?
-	configLoaded := repo.GetConfigPublic()
-	c := configLoaded.ImmutableConfig
+	configTypedBlob := repo.GetConfigPublic()
+	configBlob := configTypedBlob.ImmutableConfig
 
 	if len(args) == 0 {
 		args = []string{"store-version"}
@@ -37,26 +37,28 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 		case "config-immutable":
 			if _, err := (config_immutable_io.CoderPublic{}).EncodeTo(
-				&configLoaded,
+				&configTypedBlob,
 				repo.GetUIFile(),
 			); err != nil {
 				repo.CancelWithError(err)
 			}
 
 		case "store-version":
-			repo.GetUI().Print(c.GetStoreVersion())
+			repo.GetUI().Print(configBlob.GetStoreVersion())
 
 		case "type":
-			repo.GetUI().Print(c.GetRepoType())
+			repo.GetUI().Print(configBlob.GetRepoType())
 
 		case "id":
-			repo.GetUI().Print(c.GetRepoId())
+			repo.GetUI().Print(configBlob.GetRepoId())
 
 		case "compression-type":
-			repo.GetUI().Print(c.GetBlobStoreConfigImmutable().GetBlobCompression())
+			repo.GetUI().Print(
+				configBlob.GetBlobStoreConfigImmutable().GetBlobCompression(),
+			)
 
 		case "age-encryption":
-			for _, i := range c.GetBlobStoreConfigImmutable().GetBlobEncryption().(*age.Age).Identities {
+			for _, i := range configBlob.GetBlobStoreConfigImmutable().GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 

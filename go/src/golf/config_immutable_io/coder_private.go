@@ -8,12 +8,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedStruct[*ConfigLoadedPrivate]
+type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]
 
 var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLoadedPrivate]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
@@ -21,14 +20,16 @@ var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[typeWithC
 }
 
 var coderPrivate = triple_hyphen_io.Coder[typeWithConfigLoadedPrivate]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigLoadedPrivate]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*ConfigLoadedPrivate](typedCodersPrivate),
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPrivatedTypedBlob]{},
+	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPrivatedTypedBlob](
+		typedCodersPrivate,
+	),
 }
 
 type CoderPrivate struct{}
 
 func (coder CoderPrivate) DecodeFromFile(
-	object *ConfigLoadedPrivate,
+	object *ConfigPrivatedTypedBlob,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -60,13 +61,13 @@ func (coder CoderPrivate) DecodeFromFile(
 }
 
 func (CoderPrivate) DecodeFrom(
-	subject *ConfigLoadedPrivate,
+	subject *ConfigPrivatedTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPrivate.DecodeFrom(
-		&triple_hyphen_io.TypedStruct[*ConfigLoadedPrivate]{
-			Type:   &subject.Type,
-			Struct: subject,
+		&triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]{
+			Type: &subject.Type,
+			Blob: subject,
 		},
 		reader,
 	); err != nil {
@@ -74,21 +75,17 @@ func (CoderPrivate) DecodeFrom(
 		return
 	}
 
-	subject.BlobStoreImmutableConfig = env_dir.MakeConfigFromImmutableBlobConfig(
-		subject.ImmutableConfig.GetBlobStoreConfigImmutable(),
-	)
-
 	return
 }
 
 func (CoderPrivate) EncodeTo(
-	subject *ConfigLoadedPrivate,
+	subject *ConfigPrivatedTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(
-		&triple_hyphen_io.TypedStruct[*ConfigLoadedPrivate]{
-			Type:   &subject.Type,
-			Struct: subject,
+		&triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]{
+			Type: &subject.Type,
+			Blob: subject,
 		},
 		writer,
 	); err != nil {

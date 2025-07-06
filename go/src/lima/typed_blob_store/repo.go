@@ -50,7 +50,7 @@ func (a RepoStore) ReadTypedBlob(
 		return
 	}
 
-	common = *blob.Struct
+	common = *blob.Blob
 
 	return
 }
@@ -74,7 +74,7 @@ func (store RepoStore) WriteTypedBlob(
 	if n, err = repo_blobs.Coder.EncodeTo(
 		&repo_blobs.TypeWithBlob{
 			Type:   &tipe,
-			Struct: &blob,
+			Blob: &blob,
 		},
 		bufferedWriter,
 	); err != nil {

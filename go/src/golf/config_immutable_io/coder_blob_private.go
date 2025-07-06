@@ -16,10 +16,10 @@ func (blobV1CoderPrivate) DecodeFrom(
 	subject typeWithConfigLoadedPrivate,
 	r *bufio.Reader,
 ) (n int64, err error) {
-	subject.Struct.ImmutableConfig = &config_immutable.TomlV1Private{}
+	subject.Blob.ImmutableConfig = &config_immutable.TomlV1Private{}
 	td := toml.NewDecoder(r)
 
-	if err = td.Decode(subject.Struct.ImmutableConfig); err != nil {
+	if err = td.Decode(subject.Blob.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -37,7 +37,7 @@ func (blobV1CoderPrivate) EncodeTo(
 ) (n int64, err error) {
 	te := toml.NewEncoder(w)
 
-	if err = te.Encode(subject.Struct.ImmutableConfig); err != nil {
+	if err = te.Encode(subject.Blob.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -55,11 +55,11 @@ func (blobV0CoderPrivate) DecodeFrom(
 	subject typeWithConfigLoadedPrivate,
 	r *bufio.Reader,
 ) (n int64, err error) {
-	subject.Struct.ImmutableConfig = &config_immutable.V0Private{}
+	subject.Blob.ImmutableConfig = &config_immutable.V0Private{}
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(subject.Struct.ImmutableConfig); err != nil {
+	if err = dec.Decode(subject.Blob.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -77,7 +77,7 @@ func (blobV0CoderPrivate) EncodeTo(
 ) (n int64, err error) {
 	dec := gob.NewEncoder(w)
 
-	if err = dec.Encode(subject.Struct.ImmutableConfig); err != nil {
+	if err = dec.Encode(subject.Blob.ImmutableConfig); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

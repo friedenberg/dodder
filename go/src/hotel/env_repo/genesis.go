@@ -98,13 +98,13 @@ func (env Env) writeInventoryListLog() {
 		defer env.MustClose(f)
 	}
 
-	encoder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedStruct[struct{}]]{
+	encoder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlob[struct{}]]{
 		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
 	}
 
 	tipe := builtin_types.GetOrPanic(builtin_types.InventoryListTypeVCurrent).Type
 
-	subject := triple_hyphen_io.TypedStruct[struct{}]{
+	subject := triple_hyphen_io.TypedBlob[struct{}]{
 		Type: &tipe,
 	}
 
@@ -113,7 +113,7 @@ func (env Env) writeInventoryListLog() {
 	}
 }
 
-func (s Env) readAndTransferLines(in, out string) (err error) {
+func (env Env) readAndTransferLines(in, out string) (err error) {
 	if in == "" {
 		return
 	}

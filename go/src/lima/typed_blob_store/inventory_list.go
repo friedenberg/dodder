@@ -173,9 +173,9 @@ func (a InventoryList) WriteObjectToWriter(
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	return a.objectCoders.EncodeTo(
-		&triple_hyphen_io.TypedStruct[*sku.Transacted]{
+		&triple_hyphen_io.TypedBlob[*sku.Transacted]{
 			Type:   &tipe,
-			Struct: object,
+			Blob: object,
 		},
 		bufferedWriter,
 	)
@@ -273,7 +273,7 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedStruct[iterSku]]{
+		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[iterSku]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
 			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
 				a.streamDecoders,
@@ -284,9 +284,9 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedStruct[iterSku]{
+			&triple_hyphen_io.TypedBlob[iterSku]{
 				Type: &ids.Type{},
-				Struct: func(sk *sku.Transacted) bool {
+				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},
@@ -325,9 +325,9 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedStruct[iterSku]{
+			&triple_hyphen_io.TypedBlob[iterSku]{
 				Type: &tipe,
-				Struct: func(sk *sku.Transacted) bool {
+				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},
@@ -352,9 +352,9 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 		defer pool.GetBufioReader().Put(bufferedReader)
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedStruct[iterSku]{
+			&triple_hyphen_io.TypedBlob[iterSku]{
 				Type: &tipe,
-				Struct: func(sk *sku.Transacted) bool {
+				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
 				},
 			},

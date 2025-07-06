@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
-func (s Env) ReadAllLevel2Files(
+func (env Env) ReadAllLevel2Files(
 	p string,
 	w interfaces.FuncIter[string],
 ) (err error) {
@@ -23,7 +23,7 @@ func (s Env) ReadAllLevel2Files(
 	return
 }
 
-func (s Env) ReadAllShas(
+func (env Env) ReadAllShas(
 	p string,
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
@@ -44,7 +44,7 @@ func (s Env) ReadAllShas(
 		return
 	}
 
-	if err = s.ReadAllLevel2Files(p, wf); err != nil {
+	if err = env.ReadAllLevel2Files(p, wf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -52,12 +52,12 @@ func (s Env) ReadAllShas(
 	return
 }
 
-func (s Env) ReadAllShasForBlobs(
+func (env Env) ReadAllShasForBlobs(
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
-	p := s.DirBlobs()
+	p := env.DirBlobs()
 
-	if err = s.ReadAllShas(p, w); err != nil {
+	if err = env.ReadAllShas(p, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

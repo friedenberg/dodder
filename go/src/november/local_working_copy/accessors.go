@@ -21,11 +21,11 @@ func (u *Repo) GetEnv() env_ui.Env {
 	return u
 }
 
-func (u *Repo) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
+func (u *Repo) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return u.GetEnvRepo().GetConfigPublic()
 }
 
-func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
 	return u.GetEnvRepo().GetConfigPrivate()
 }
 
