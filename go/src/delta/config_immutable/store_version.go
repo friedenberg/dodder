@@ -12,10 +12,10 @@ import (
 type StoreVersion = store_version.Version
 
 func ReadFromFile(
-	v *StoreVersion,
-	p string,
+	version *StoreVersion,
+	path string,
 ) (err error) {
-	if err = ReadFromFileOrVersion(v, p, store_version.VCurrent); err != nil {
+	if err = ReadFromFileOrVersion(version, path, store_version.VCurrent); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -24,17 +24,17 @@ func ReadFromFile(
 }
 
 func ReadFromFileOrVersion(
-	v *StoreVersion,
-	p string,
+	version *StoreVersion,
+	path string,
 	alternative StoreVersion,
 ) (err error) {
-	var b []byte
+	var bytes []byte
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		if errors.IsNotExist(err) {
-			*v = alternative
+			*version = alternative
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -43,12 +43,12 @@ func ReadFromFileOrVersion(
 		return
 	}
 
-	if b, err = io.ReadAll(f); err != nil {
+	if bytes, err = io.ReadAll(file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = v.Set(string(b)); err != nil {
+	if err = version.Set(string(bytes)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

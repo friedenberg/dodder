@@ -248,13 +248,13 @@ func (server *Server) addSignatureIfNecessary(
 
 	header.Set(headerRepoPublicKey, pubkey.String())
 
-	key := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
+	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	sig := blech32.Value{
 		HRP: repo_signing.HRPRequestAuthResponseV1,
 	}
 
-	if sig.Data, err = repo_signing.Sign(key, nonce.Data); err != nil {
+	if sig.Data, err = repo_signing.Sign(privateKey, nonce.Data); err != nil {
 		server.EnvLocal.CancelWithError(err)
 		return
 	}

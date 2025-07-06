@@ -13,35 +13,35 @@ type BlobStoreTomlV1 struct {
 	LockInternalFiles bool            `toml:"lock-internal-files"`
 }
 
-func (k *BlobStoreTomlV1) SetFlagSet(f *flag.FlagSet) {
-	k.CompressionType.SetFlagSet(f)
+func (blobStoreConfig *BlobStoreTomlV1) SetFlagSet(f *flag.FlagSet) {
+	blobStoreConfig.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(
-		&k.LockInternalFiles,
+		&blobStoreConfig.LockInternalFiles,
 		"lock-internal-files",
-		k.LockInternalFiles,
+		blobStoreConfig.LockInternalFiles,
 		"",
 	)
 
-	f.Var(&k.AgeEncryption, "age-identity", "add an age identity")
+	f.Var(&blobStoreConfig.AgeEncryption, "age-identity", "add an age identity")
 }
 
-func (k *BlobStoreTomlV1) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return k
+func (blobStoreConfig *BlobStoreTomlV1) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+	return blobStoreConfig
 }
 
-func (k *BlobStoreTomlV1) GetBlobCompression() interfaces.BlobCompression {
-	return &k.CompressionType
+func (blobStoreConfig *BlobStoreTomlV1) GetBlobCompression() interfaces.BlobCompression {
+	return &blobStoreConfig.CompressionType
 }
 
-func (k *BlobStoreTomlV1) GetBlobEncryption() interfaces.BlobEncryption {
-	return &k.AgeEncryption
+func (blobStoreConfig *BlobStoreTomlV1) GetBlobEncryption() interfaces.BlobEncryption {
+	return &blobStoreConfig.AgeEncryption
 }
 
-func (k *BlobStoreTomlV1) GetAgeEncryption() *age.Age {
-	return &k.AgeEncryption
+func (blobStoreConfig *BlobStoreTomlV1) GetAgeEncryption() *age.Age {
+	return &blobStoreConfig.AgeEncryption
 }
 
-func (k *BlobStoreTomlV1) GetLockInternalFiles() bool {
-	return k.LockInternalFiles
+func (blobStoreConfig *BlobStoreTomlV1) GetLockInternalFiles() bool {
+	return blobStoreConfig.LockInternalFiles
 }

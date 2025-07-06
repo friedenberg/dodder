@@ -26,13 +26,13 @@ type V0Private struct {
 	v0Common
 }
 
-func (k *V0Public) SetFlagSet(f *flag.FlagSet) {
-	k.CompressionType.SetFlagSet(f)
+func (config *V0Public) SetFlagSet(f *flag.FlagSet) {
+	config.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(
-		&k.LockInternalFiles,
+		&config.LockInternalFiles,
 		"lock-internal-files",
-		k.LockInternalFiles,
+		config.LockInternalFiles,
 		"",
 	)
 
@@ -40,67 +40,67 @@ func (k *V0Public) SetFlagSet(f *flag.FlagSet) {
 		"recipient",
 		"age recipients",
 		func(value string) (err error) {
-			k.Recipients = append(k.Recipients, value)
+			config.Recipients = append(config.Recipients, value)
 			return
 		},
 	)
 }
 
-func (k *V0Public) config() public   { return public{} }
-func (k *V0Private) config() private { return private{} }
+func (config *V0Public) config() public   { return public{} }
+func (config *V0Private) config() private { return private{} }
 
-func (k *V0Private) GetImmutableConfig() ConfigPrivate {
-	return k
+func (config *V0Private) GetImmutableConfig() ConfigPrivate {
+	return config
 }
 
-func (k *V0Private) GetImmutableConfigPublic() ConfigPublic {
+func (config *V0Private) GetImmutableConfigPublic() ConfigPublic {
 	return &V0Public{
-		v0Common: k.v0Common,
+		v0Common: config.v0Common,
 	}
 }
 
-func (k *V0Public) GetImmutableConfigPublic() ConfigPublic {
-	return k
+func (config *V0Public) GetImmutableConfigPublic() ConfigPublic {
+	return config
 }
 
-func (k *v0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return k
+func (config *v0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+	return config
 }
 
-func (k v0Common) GetStoreVersion() interfaces.StoreVersion {
-	return k.StoreVersion
+func (config v0Common) GetStoreVersion() interfaces.StoreVersion {
+	return config.StoreVersion
 }
 
-func (k v0Common) GetRepoType() repo_type.Type {
+func (config v0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (k v0Common) GetPrivateKey() repo_signing.PrivateKey {
+func (config v0Common) GetPrivateKey() repo_signing.PrivateKey {
 	panic(errors.ErrorWithStackf("not supported"))
 }
 
-func (k v0Common) GetPublicKey() repo_signing.PublicKey {
+func (config v0Common) GetPublicKey() repo_signing.PublicKey {
 	panic(errors.ErrorWithStackf("not supported"))
 }
 
-func (k v0Common) GetRepoId() ids.RepoId {
+func (config v0Common) GetRepoId() ids.RepoId {
 	return ids.RepoId{}
 }
 
-func (k *v0Common) GetAgeEncryption() *age.Age {
+func (config *v0Common) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 
-func (k *v0Common) GetBlobCompression() interfaces.BlobCompression {
-	return &k.CompressionType
+func (config *v0Common) GetBlobCompression() interfaces.BlobCompression {
+	return &config.CompressionType
 }
 
-func (k *v0Common) GetBlobEncryption() interfaces.BlobEncryption {
-	return k.GetAgeEncryption()
+func (config *v0Common) GetBlobEncryption() interfaces.BlobEncryption {
+	return config.GetAgeEncryption()
 }
 
-func (k v0Common) GetLockInternalFiles() bool {
-	return k.LockInternalFiles
+func (config v0Common) GetLockInternalFiles() bool {
+	return config.LockInternalFiles
 }
 
 func (config v0Common) GetInventoryListTypeString() string {

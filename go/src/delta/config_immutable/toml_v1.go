@@ -28,10 +28,10 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (k *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
-	k.BlobStore.SetFlagSet(f)
-	k.RepoType = repo_type.TypeWorkingCopy
-	f.Var(&k.RepoType, "repo-type", "")
+func (config *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
+	config.BlobStore.SetFlagSet(f)
+	config.RepoType = repo_type.TypeWorkingCopy
+	f.Var(&config.RepoType, "repo-type", "")
 }
 
 func (config *TomlV1Common) GetInventoryListTypeString() string {
@@ -42,48 +42,48 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	}
 }
 
-func (k *TomlV1Public) config() public   { return public{} }
-func (k *TomlV1Private) config() private { return private{} }
+func (config *TomlV1Public) config() public   { return public{} }
+func (config *TomlV1Private) config() private { return private{} }
 
-func (k *TomlV1Private) GetImmutableConfig() ConfigPrivate {
-	return k
+func (config *TomlV1Private) GetImmutableConfig() ConfigPrivate {
+	return config
 }
 
-func (k *TomlV1Private) GetImmutableConfigPublic() ConfigPublic {
+func (config *TomlV1Private) GetImmutableConfigPublic() ConfigPublic {
 	return &TomlV1Public{
-		TomlV1Common:    k.TomlV1Common,
-		TomlPublicKeyV0: k.TomlPrivateKeyV0.GetPublicKey(),
+		TomlV1Common:    config.TomlV1Common,
+		TomlPublicKeyV0: config.TomlPrivateKeyV0.GetPublicKey(),
 	}
 }
 
-func (k *TomlV1Private) GetPrivateKey() repo_signing.PrivateKey {
-	return repo_signing.NewKeyFromSeed(k.PrivateKey.Data)
+func (config *TomlV1Private) GetPrivateKey() repo_signing.PrivateKey {
+	return repo_signing.NewKeyFromSeed(config.PrivateKey.Data)
 }
 
-func (k *TomlV1Private) GetPublicKey() repo_signing.PublicKey {
-	return repo_signing.PublicKey(k.GetPrivateKey().Public().(ed25519.PublicKey))
+func (config *TomlV1Private) GetPublicKey() repo_signing.PublicKey {
+	return repo_signing.PublicKey(config.GetPrivateKey().Public().(ed25519.PublicKey))
 }
 
-func (k *TomlV1Public) GetImmutableConfigPublic() ConfigPublic {
-	return k
+func (config *TomlV1Public) GetImmutableConfigPublic() ConfigPublic {
+	return config
 }
 
-func (k TomlV1Public) GetPublicKey() repo_signing.PublicKey {
-	return k.PublicKey.Data
+func (config TomlV1Public) GetPublicKey() repo_signing.PublicKey {
+	return config.PublicKey.Data
 }
 
-func (k *TomlV1Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return &k.BlobStore
+func (config *TomlV1Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+	return &config.BlobStore
 }
 
-func (k *TomlV1Common) GetStoreVersion() interfaces.StoreVersion {
-	return k.StoreVersion
+func (config *TomlV1Common) GetStoreVersion() interfaces.StoreVersion {
+	return config.StoreVersion
 }
 
-func (k TomlV1Common) GetRepoType() repo_type.Type {
-	return k.RepoType
+func (config TomlV1Common) GetRepoType() repo_type.Type {
+	return config.RepoType
 }
 
-func (k TomlV1Common) GetRepoId() ids.RepoId {
-	return k.RepoId
+func (config TomlV1Common) GetRepoId() ids.RepoId {
+	return config.RepoId
 }

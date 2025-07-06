@@ -130,11 +130,11 @@ func (client client) ImportInventoryList(
 	}
 
 	{
-		key := client.localRepo.GetImmutableConfigPrivate().Blob.GetPublicKey()
+		pubKey := client.localRepo.GetImmutableConfigPublic().GetPublicKey()
 
 		request.Header.Add(
 			headerRepoPublicKey,
-			base64.URLEncoding.EncodeToString(key),
+			base64.URLEncoding.EncodeToString(pubKey),
 		)
 	}
 

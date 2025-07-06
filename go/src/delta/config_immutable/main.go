@@ -31,8 +31,9 @@ type configCommon interface {
 	GetPublicKey() repo_signing.PublicKey
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId
-	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 	GetInventoryListTypeString() string
+
+	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
 type ConfigPublic interface {
