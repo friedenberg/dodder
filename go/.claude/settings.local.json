@@ -13,7 +13,8 @@
       "Bash(just test-go-unit:*)",
       "Bash(just test:*)",
       "Bash(just codemod-go-imports:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
