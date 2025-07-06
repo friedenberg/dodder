@@ -36,8 +36,8 @@ func (repo *Repo) MakeFormatFunc(
 		writer = repo.GetUIFile()
 	}
 
-	if strings.HasPrefix(format, "type.") {
-		return repo.makeTypFormatter(strings.TrimPrefix(format, "type."), writer)
+	if after, ok := strings.CutPrefix(format, "type."); ok {
+		return repo.makeTypFormatter(after, writer)
 	}
 
 	switch format {
@@ -101,7 +101,10 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "box-archive":
-		p := repo.MakePrinterBoxArchive(writer, repo.GetConfig().GetCLIConfig().PrintOptions.PrintTime)
+		p := repo.MakePrinterBoxArchive(
+			writer,
+			repo.GetConfig().GetCLIConfig().PrintOptions.PrintTime,
+		)
 
 		output = func(tl *sku.Transacted) (err error) {
 			if err = p(tl); err != nil {
@@ -120,7 +123,12 @@ func (repo *Repo) MakeFormatFunc(
 
 	case "sha-mutter":
 		output = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintf(writer, "%s -> %s\n", tl.Metadata.Sha(), tl.Metadata.Mutter())
+			_, err = fmt.Fprintf(
+				writer,
+				"%s -> %s\n",
+				tl.Metadata.Sha(),
+				tl.Metadata.Mutter(),
+			)
 			return
 		}
 
@@ -613,7 +621,9 @@ func (repo *Repo) MakeFormatFunc(
 	case "probe-shas":
 		output = func(z *sku.Transacted) (err error) {
 			sh1 := sha.FromStringContent(z.GetObjectId().String())
-			sh2 := sha.FromStringContent(z.GetObjectId().String() + z.GetTai().String())
+			sh2 := sha.FromStringContent(
+				z.GetObjectId().String() + z.GetTai().String(),
+			)
 			defer sha.GetPool().Put(sh1)
 			defer sha.GetPool().Put(sh2)
 			_, err = fmt.Fprintln(writer, z.GetObjectId(), sh1, sh2)
@@ -860,7 +870,10 @@ func (u *Repo) makeTypFormatter(
 		}
 
 	case "formatter-uti-groups":
-		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(u.GetStore(), typeBlobStore)
+		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(
+			u.GetStore(),
+			typeBlobStore,
+		)
 
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fo.Format(out, o); err != nil {

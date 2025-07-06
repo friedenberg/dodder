@@ -205,7 +205,8 @@ func (f *BoxTransacted) addFieldsObjectIds(
 
 	switch {
 	// case internal.Value != "" && external.Value != "":
-	// 	if strings.HasPrefix(external.Value, strings.TrimPrefix(internal.Value, "!")) {
+	// 	if strings.HasPrefix(external.Value, strings.TrimPrefix(internal.Value,
+	// "!")) {
 	// 		box.Contents = append(box.Contents, external)
 	// 	} else {
 	// 		box.Contents = append(box.Contents, internal, external)
@@ -234,14 +235,14 @@ func (format *BoxTransacted) addFieldsMetadata(
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,
 ) (err error) {
-	m := object.GetMetadata()
+	metadata := object.GetMetadata()
 
 	if options.PrintShas &&
-		(options.PrintEmptyShas || !m.Blob.IsNull()) {
+		(options.PrintEmptyShas || !metadata.Blob.IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
-			m,
+			metadata,
 			format.abbr.Sha.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -257,41 +258,41 @@ func (format *BoxTransacted) addFieldsMetadata(
 	if options.PrintTai && object.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldTai(m),
+			object_metadata_fmt.MetadataFieldTai(metadata),
 		)
 	}
 
 	if format.isArchive && !object.Metadata.RepoSig.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldRepoPubKey(m),
-			object_metadata_fmt.MetadataFieldRepoSig(m),
+			object_metadata_fmt.MetadataFieldRepoPubKey(metadata),
+			object_metadata_fmt.MetadataFieldRepoSig(metadata),
 		)
 	}
 
-	if !m.Type.IsEmpty() {
+	if !metadata.Type.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldType(m),
+			object_metadata_fmt.MetadataFieldType(metadata),
 		)
 	}
 
-	b := m.Description
+	b := metadata.Description
 
 	if includeDescriptionInBox && !b.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldDescription(m),
+			object_metadata_fmt.MetadataFieldDescription(metadata),
 		)
 	}
 
 	box.Contents = append(
 		box.Contents,
-		object_metadata_fmt.MetadataFieldTags(m)...,
+		object_metadata_fmt.MetadataFieldTags(metadata)...,
 	)
 
 	if !options.ExcludeFields {
-		box.Contents = append(box.Contents, m.Fields...)
+		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 
 	return

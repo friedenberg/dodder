@@ -75,7 +75,9 @@ func (cmd Last) Run(dep command.Request) {
 
 func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
 	if (c.Edit || c.Organize) && c.Format.WasSet() {
-		repoLayout.CancelWithErrorf("cannot organize, edit, or specify format for Archive repos")
+		repoLayout.CancelWithErrorf(
+			"cannot organize, edit, or specify format for Archive repos",
+		)
 	}
 
 	// TODO replace with sku.ListFormat
@@ -175,14 +177,14 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 
 func (cmd Last) runWithInventoryList(
 	envRepo env_repo.Env,
-	archive repo.Repo,
+	repo repo.Repo,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var b *sku.Transacted
+	var listObject *sku.Transacted
 
-	inventoryListStore := archive.GetInventoryListStore()
+	inventoryListStore := repo.GetInventoryListStore()
 
-	if b, err = inventoryListStore.ReadLast(); err != nil {
+	if listObject, err = inventoryListStore.ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -191,17 +193,17 @@ func (cmd Last) runWithInventoryList(
 		envRepo,
 	)
 
-	var twb sku.TransactedWithBlob[*sku.List]
+	var listWithBlob sku.TransactedWithBlob[*sku.List]
 
-	if twb, _, err = inventoryListBlobStore.GetTransactedWithBlob(
-		b,
+	if listWithBlob, _, err = inventoryListBlobStore.GetTransactedWithBlob(
+		listObject,
 	); err != nil {
-		err = errors.Wrapf(err, "InventoryList: %q", sku.String(b))
+		err = errors.Wrapf(err, "InventoryList: %q", sku.String(listObject))
 		return
 	}
 
 	ui.TodoP3("support log line format for skus")
-	for sk := range twb.Blob.All() {
+	for sk := range listWithBlob.Blob.All() {
 		if err = funcIter(sk); err != nil {
 			err = errors.Wrap(err)
 			return

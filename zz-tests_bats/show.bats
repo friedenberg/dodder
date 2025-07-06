@@ -6,11 +6,11 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-  setup_repo
+	setup_repo
 }
 
 teardown() {
-  teardown_repo
+	teardown_repo
 }
 
 # bats file_tags=user_story:query
@@ -579,7 +579,12 @@ function show_tags_exact { # @test
 function show_inventory_lists { # @test
 	run_dodder show :b
 	assert_success
-	assert_output
+	assert_output --regexp - <<-'EOM'
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+	EOM
 }
 
 function show_inventory_list_blob_sort_correct { # @test
