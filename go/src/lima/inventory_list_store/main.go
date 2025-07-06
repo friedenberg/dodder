@@ -78,7 +78,7 @@ func (store *Store) Initialize(
 	}
 
 	blobType := ids.MustType(
-		store.envRepo.GetConfigPublicBlob().GetInventoryListTypeString(),
+		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
 	)
 
 	if store_version.LessOrEqual(
@@ -124,7 +124,7 @@ func (store *Store) GetEnv() env_ui.Env {
 }
 
 func (store *Store) GetImmutableConfigPublic() config_immutable.ConfigPublic {
-	return store.GetEnvRepo().GetConfigPublicBlob()
+	return store.GetEnvRepo().GetConfigPublic().Blob
 }
 
 func (store *Store) GetImmutableConfigPublicType() ids.Type {

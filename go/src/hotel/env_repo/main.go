@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
@@ -133,14 +132,10 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublicBlob() config_immutable.ConfigPublic {
-	return env.config.Blob.GetImmutableConfigPublic()
-}
-
 func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	return config_immutable_io.ConfigPublicTypedBlob{
-		Type:            env.config.Type,
-		Blob: env.GetConfigPublicBlob(),
+		Type: env.config.Type,
+		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 

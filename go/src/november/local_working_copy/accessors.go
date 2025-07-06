@@ -24,7 +24,7 @@ func (local *Repo) GetEnv() env_ui.Env {
 }
 
 func (local *Repo) GetImmutableConfigPublic() config_immutable.ConfigPublic {
-	return local.GetEnvRepo().GetConfigPublicBlob()
+	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 
 func (local *Repo) GetImmutableConfigPublicType() ids.Type {
