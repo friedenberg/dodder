@@ -48,24 +48,24 @@ func Genesis(
 	return
 }
 
-func (repo *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
-	if err = repo.Lock(); err != nil {
+func (local *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
+	if err = local.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, repo.Unlock)
+	defer errors.Deferred(&err, local.Unlock)
 
 	var defaultTypeObjectId ids.Type
 
-	if defaultTypeObjectId, err = repo.initDefaultTypeIfNecessaryAfterLock(
+	if defaultTypeObjectId, err = local.initDefaultTypeIfNecessaryAfterLock(
 		bb,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = repo.initDefaultConfigIfNecessaryAfterLock(
+	if err = local.initDefaultConfigIfNecessaryAfterLock(
 		bb,
 		defaultTypeObjectId,
 	); err != nil {
@@ -76,7 +76,7 @@ func (repo *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
 	return
 }
 
-func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
+func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	bb env_repo.BigBang,
 ) (defaultTypeObjectId ids.Type, err error) {
 	if bb.ExcludeDefaultType {
@@ -96,7 +96,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 	var sh interfaces.Sha
 
 	// TODO remove and replace with two-step process
-	if sh, _, err = repo.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
+	if sh, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
 		&defaultTypeBlob,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -114,7 +114,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 	o.Metadata.Blob.ResetWithShaLike(sh)
 	o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
-	if err = repo.GetStore().CreateOrUpdateDefaultProto(
+	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		o,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
@@ -125,7 +125,7 @@ func (repo *Repo) initDefaultTypeIfNecessaryAfterLock(
 	return
 }
 
-func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
+func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	bb env_repo.BigBang,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
@@ -137,7 +137,7 @@ func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
 	var tipe ids.Type
 
 	if sh, tipe, err = writeDefaultMutableConfig(
-		repo,
+		local,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -158,7 +158,7 @@ func (repo *Repo) initDefaultConfigIfNecessaryAfterLock(
 
 	newConfig.Metadata.Type.ResetWith(tipe)
 
-	if err = repo.GetStore().CreateOrUpdateDefaultProto(
+	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		newConfig,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {

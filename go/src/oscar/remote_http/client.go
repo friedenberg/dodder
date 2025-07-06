@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
@@ -78,7 +79,10 @@ func (client *client) Initialize() {
 		var err error
 
 		if response, err = client.http.Do(request); err != nil {
-			client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
+			client.envUI.CancelWithErrorAndFormat(
+				err,
+				"failed to read response",
+			)
 		}
 	}
 
@@ -88,7 +92,10 @@ func (client *client) Initialize() {
 		&client.configImmutable,
 		response.Body,
 	); err != nil {
-		client.envUI.CancelWithErrorAndFormat(err, "failed to read remote immutable config")
+		client.envUI.CancelWithErrorAndFormat(
+			err,
+			"failed to read remote immutable config",
+		)
 	}
 
 	client.logRemoteInventoryLists = log_remote_inventory_lists.Make(
@@ -101,8 +108,12 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
-	return client.configImmutable
+func (client *client) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+	return client.configImmutable.Blob
+}
+
+func (client *client) GetImmutableConfigPublicType() ids.Type {
+	return client.configImmutable.Type
 }
 
 func (client *client) GetInventoryListStore() sku.InventoryListStore {
@@ -173,7 +184,7 @@ func (remote *client) MakeInventoryList(
 	}
 
 	listFormat := remote.GetInventoryListStore().FormatForVersion(
-		remote.GetImmutableConfigPublic().Blob.GetStoreVersion(),
+		remote.GetImmutableConfigPublic().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()
@@ -241,7 +252,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().Blob.GetStoreVersion(),
+		client.localRepo.GetImmutableConfigPublic().GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)
@@ -283,7 +294,10 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 			if options.AllowMergeConflicts {
 				// TODO move to constant
-				request.Header.Add("x-dodder-remote_transfer_options-allow_merge_conflicts", "true")
+				request.Header.Add(
+					"x-dodder-remote_transfer_options-allow_merge_conflicts",
+					"true",
+				)
 			}
 
 			if response, err = client.http.Do(request); err != nil {

@@ -9,15 +9,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 )
 
-func (e *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
+func (local *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
 	organizeFlags organize_text.Flags,
 	metadata organize_text.Metadata,
 ) organize_text.Options {
 	options := organizeFlags.GetOptions(
-		e.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().GetCLIConfig().PrintOptions,
 		nil,
-		e.SkuFormatBoxCheckedOutNoColor(),
-		e.GetStore().GetAbbrStore().GetAbbr(),
+		local.SkuFormatBoxCheckedOutNoColor(),
+		local.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},
 	)
 
@@ -26,56 +26,56 @@ func (e *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
 	return options
 }
 
-func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
+func (local *Repo) MakeOrganizeOptionsWithQueryGroup(
 	organizeFlags organize_text.Flags,
 	qg *query.Query,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
-		e.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().GetCLIConfig().PrintOptions,
 		query.GetTags(qg),
-		e.SkuFormatBoxCheckedOutNoColor(),
-		e.GetStore().GetAbbrStore().GetAbbr(),
+		local.SkuFormatBoxCheckedOutNoColor(),
+		local.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},
 	)
 }
 
-func (repo *Repo) LockAndCommitOrganizeResults(
+func (local *Repo) LockAndCommitOrganizeResults(
 	results organize_text.OrganizeResults,
 ) (changeResults organize_text.Changes, err error) {
 	if changeResults, err = organize_text.ChangesFromResults(
-		repo.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().GetCLIConfig().PrintOptions,
 		results,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	repo.Must(repo.Lock)
+	local.Must(local.Lock)
 
 	count := changeResults.Changed.Len()
 
 	if count > 30 {
-		if !repo.Confirm(
+		if !local.Confirm(
 			fmt.Sprintf(
 				"a large number (%d) of objects are being changed. continue to commit?",
 				count,
 			),
 		) {
 			// TODO output organize file used
-			repo.CancelWithBadRequestf("aborting")
+			local.CancelWithBadRequestf("aborting")
 			return
 		}
 	}
 
 	var proto sku.Proto
 
-	workspace := repo.GetEnvWorkspace()
+	workspace := local.GetEnvWorkspace()
 	workspaceType := workspace.GetDefaults().GetType()
 
 	proto.Type = workspaceType
 
 	for _, changed := range changeResults.Changed.AllSkuAndIndex() {
-		if err = repo.GetStore().CreateOrUpdate(
+		if err = local.GetStore().CreateOrUpdate(
 			changed.GetSkuExternal(),
 			sku.CommitOptions{
 				Proto: proto,
@@ -89,23 +89,23 @@ func (repo *Repo) LockAndCommitOrganizeResults(
 		}
 	}
 
-	repo.Must(repo.Unlock)
+	local.Must(local.Unlock)
 
 	return
 }
 
-func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
-	oo.Config = e.GetConfig()
-	oo.Abbr = e.GetStore().GetAbbrStore().GetAbbr()
+func (local *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
+	oo.Config = local.GetConfig()
+	oo.Abbr = local.GetStore().GetAbbrStore().GetAbbr()
 
-	if !e.GetConfig().GetCLIConfig().IsDryRun() {
+	if !local.GetConfig().GetCLIConfig().IsDryRun() {
 		return
 	}
 
 	oo.AddPrototypeAndOption(
 		"dry-run",
 		&organize_text.OptionCommentDryRun{
-			MutableConfigDryRun: e.GetConfig(),
+			MutableConfigDryRun: local.GetConfig(),
 		},
 	)
 }

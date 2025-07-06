@@ -56,7 +56,7 @@ func (client client) ImportInventoryList(
 
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
 	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().Blob.GetStoreVersion(),
+		client.localRepo.GetImmutableConfigPublic().GetStoreVersion(),
 	)
 
 	buffer := bytes.NewBuffer(nil)

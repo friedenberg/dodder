@@ -8,12 +8,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-func (repo *Repo) MakeExternalQueryGroup(
+func (local *Repo) MakeExternalQueryGroup(
 	metaBuilder query.BuilderOption,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (queryGroup *query.Query, err error) {
-	builder := repo.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
+	builder := local.MakeQueryBuilderExcludingHidden(ids.MakeGenre(), metaBuilder)
 
 	if queryGroup, err = builder.BuildQueryGroupWithRepoId(
 		externalQueryOptions,
@@ -28,17 +28,17 @@ func (repo *Repo) MakeExternalQueryGroup(
 	return
 }
 
-func (repo *Repo) makeQueryBuilder() *query.Builder {
+func (local *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
-		repo.GetEnvRepo(),
-		repo.GetStore().GetTypedBlobStore(),
-		repo.GetStore().GetStreamIndex(),
-		repo.envLua.MakeLuaVMPoolBuilder(),
-		repo,
+		local.GetEnvRepo(),
+		local.GetStore().GetTypedBlobStore(),
+		local.GetStore().GetStreamIndex(),
+		local.envLua.MakeLuaVMPoolBuilder(),
+		local,
 	)
 }
 
-func (repo *Repo) MakeQueryBuilderExcludingHidden(
+func (local *Repo) MakeQueryBuilderExcludingHidden(
 	genre ids.Genre,
 	options query.BuilderOption,
 ) *query.Builder {
@@ -46,23 +46,23 @@ func (repo *Repo) MakeQueryBuilderExcludingHidden(
 		genre = ids.MakeGenre(genres.Zettel)
 	}
 
-	envWorkspace := repo.GetEnvWorkspace()
+	envWorkspace := local.GetEnvWorkspace()
 
 	options = query.BuilderOptions(
 		options,
 		query.BuilderOptionWorkspace{Env: envWorkspace},
 	)
 
-	return repo.makeQueryBuilder().
+	return local.makeQueryBuilder().
 		WithDefaultGenres(genre).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensions(repo.GetConfig().GetFileExtensions()).
-		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
-		WithHidden(repo.GetMatcherDormant()).
+		WithFileExtensions(local.GetConfig().GetFileExtensions()).
+		WithExpanders(local.GetStore().GetAbbrStore().GetAbbr()).
+		WithHidden(local.GetMatcherDormant()).
 		WithOptions(options)
 }
 
-func (repo *Repo) MakeQueryBuilder(
+func (local *Repo) MakeQueryBuilder(
 	dg ids.Genre,
 	options query.BuilderOption,
 ) *query.Builder {
@@ -70,17 +70,17 @@ func (repo *Repo) MakeQueryBuilder(
 		dg = ids.MakeGenre(genres.Zettel)
 	}
 
-	envWorkspace := repo.GetEnvWorkspace()
+	envWorkspace := local.GetEnvWorkspace()
 
 	options = query.BuilderOptions(
 		options,
 		query.BuilderOptionWorkspace{Env: envWorkspace},
 	)
 
-	return repo.makeQueryBuilder().
+	return local.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensions(repo.GetConfig().GetFileExtensions()).
-		WithExpanders(repo.GetStore().GetAbbrStore().GetAbbr()).
+		WithFileExtensions(local.GetConfig().GetFileExtensions()).
+		WithExpanders(local.GetStore().GetAbbrStore().GetAbbr()).
 		WithOptions(options)
 }

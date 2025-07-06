@@ -243,7 +243,7 @@ func (server *Server) addSignatureIfNecessary(
 
 	pubkey := blech32.Value{
 		HRP:  repo_signing.HRPRepoPubKeyV1,
-		Data: server.Repo.GetImmutableConfigPublic().Blob.GetPublicKey(),
+		Data: server.Repo.GetImmutableConfigPublic().GetPublicKey(),
 	}
 
 	header.Set(headerRepoPublicKey, pubkey.String())
@@ -771,7 +771,7 @@ func (server *Server) handlePostInventoryList(
 
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(
 				ids.MustType(
-					server.Repo.GetImmutableConfigPublic().Blob.GetInventoryListTypeString(),
+					server.Repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
 				),
 				bufferedReader,
 			); err != nil {
@@ -803,10 +803,9 @@ func (server *Server) handlePostInventoryList(
 func (server *Server) handleGetConfigImmutable(
 	request Request,
 ) (response Response) {
-	config := server.Repo.GetImmutableConfigPublic()
 	configLoaded := &config_immutable_io.ConfigPublicTypedBlob{
-		Type: config.Type,
-		Blob: config.Blob,
+		Type: server.Repo.GetImmutableConfigPublicType(),
+		Blob: server.Repo.GetImmutableConfigPublic(),
 	}
 
 	encoder := config_immutable_io.CoderPublic{}

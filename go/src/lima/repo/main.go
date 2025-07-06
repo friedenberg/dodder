@@ -2,8 +2,8 @@ package repo
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -14,7 +14,8 @@ import (
 // store
 type Repo interface {
 	GetEnv() env_ui.Env
-	GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob
+	GetImmutableConfigPublic() config_immutable.ConfigPublic
+	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.ObjectStore
 	GetTypedInventoryListBlobStore() typed_blob_store.InventoryList

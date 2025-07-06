@@ -6,10 +6,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (env *Repo) ReadObjectHistory(
+func (local *Repo) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
-	streamIndex := env.GetStore().GetStreamIndex()
+	streamIndex := local.GetStore().GetStreamIndex()
 
 	if skus, err = streamIndex.ReadManyObjectId(
 		oid,

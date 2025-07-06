@@ -30,30 +30,30 @@ var coderPrivate = triple_hyphen_io2.CoderToTypedBlob[config_immutable.ConfigPri
 type CoderPrivate struct{}
 
 func (coder CoderPrivate) DecodeFromFile(
-	object *ConfigPrivateTypedBlob,
-	p string,
+	typedBlob *ConfigPrivateTypedBlob,
+	path string,
 ) (err error) {
-	var r io.Reader
+	var reader io.Reader
 
 	{
-		var f *os.File
+		var file *os.File
 
-		if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+		if file, err = files.OpenExclusiveReadOnly(path); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
-				r = bytes.NewBuffer(nil)
+				reader = bytes.NewBuffer(nil)
 			} else {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			defer errors.DeferredCloser(&err, f)
+			defer errors.DeferredCloser(&err, file)
 
-			r = f
+			reader = file
 		}
 	}
 
-	if _, err = coder.DecodeFrom(object, r); err != nil {
+	if _, err = coder.DecodeFrom(typedBlob, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -62,11 +62,11 @@ func (coder CoderPrivate) DecodeFromFile(
 }
 
 func (CoderPrivate) DecodeFrom(
-	subject *ConfigPrivateTypedBlob,
+	typedBlob *ConfigPrivateTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPrivate.DecodeFrom(
-		subject,
+		typedBlob,
 		reader,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -77,11 +77,11 @@ func (CoderPrivate) DecodeFrom(
 }
 
 func (CoderPrivate) EncodeTo(
-	subject *ConfigPrivateTypedBlob,
+	typedBlob *ConfigPrivateTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(
-		subject,
+		typedBlob,
 		writer,
 	); err != nil {
 		err = errors.Wrap(err)

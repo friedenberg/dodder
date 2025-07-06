@@ -28,16 +28,16 @@ import (
 )
 
 // TODO switch to using fd.Std
-func (repo *Repo) MakeFormatFunc(
+func (local *Repo) MakeFormatFunc(
 	format string,
 	writer interfaces.WriterAndStringWriter,
 ) (output interfaces.FuncIter[*sku.Transacted], err error) {
 	if writer == nil {
-		writer = repo.GetUIFile()
+		writer = local.GetUIFile()
 	}
 
 	if after, ok := strings.CutPrefix(format, "type."); ok {
-		return repo.makeTypFormatter(after, writer)
+		return local.makeTypFormatter(after, writer)
 	}
 
 	switch format {
@@ -84,7 +84,7 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "box":
-		p := repo.SkuFormatBoxTransactedNoColor()
+		p := local.SkuFormatBoxTransactedNoColor()
 
 		output = func(tl *sku.Transacted) (err error) {
 			if _, err = p.EncodeStringTo(tl, writer); err != nil {
@@ -101,9 +101,9 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "box-archive":
-		p := repo.MakePrinterBoxArchive(
+		p := local.MakePrinterBoxArchive(
 			writer,
-			repo.GetConfig().GetCLIConfig().PrintOptions.PrintTime,
+			local.GetConfig().GetCLIConfig().PrintOptions.PrintTime,
 		)
 
 		output = func(tl *sku.Transacted) (err error) {
@@ -223,11 +223,11 @@ func (repo *Repo) MakeFormatFunc(
 
 	case "text":
 		formatter := typed_blob_store.MakeTextFormatter(
-			repo.GetStore().GetEnvRepo(),
+			local.GetStore().GetEnvRepo(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
-			repo.GetConfig(),
+			local.GetConfig(),
 			checkout_mode.None,
 		)
 
@@ -238,11 +238,11 @@ func (repo *Repo) MakeFormatFunc(
 
 	case "text-metadata_only":
 		formatter := typed_blob_store.MakeTextFormatter(
-			repo.GetStore().GetEnvRepo(),
+			local.GetStore().GetEnvRepo(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
-			repo.GetConfig(),
+			local.GetConfig(),
 			checkout_mode.MetadataOnly,
 		)
 
@@ -253,7 +253,7 @@ func (repo *Repo) MakeFormatFunc(
 
 	case "object":
 		fo := object_inventory_format.FormatForVersion(
-			repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
+			local.GetConfig().GetImmutableConfig().GetStoreVersion(),
 		)
 
 		o := object_inventory_format.Options{
@@ -400,7 +400,7 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "log":
-		output = repo.PrinterTransacted()
+		output = local.PrinterTransacted()
 
 	case "json":
 		enc := json.NewEncoder(writer)
@@ -408,7 +408,7 @@ func (repo *Repo) MakeFormatFunc(
 		output = func(object *sku.Transacted) (err error) {
 			var jsonRepresentation sku_fmt.Json
 
-			if err = jsonRepresentation.FromTransacted(object, repo.GetStore().GetEnvRepo()); err != nil {
+			if err = jsonRepresentation.FromTransacted(object, local.GetStore().GetEnvRepo()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -432,7 +432,7 @@ func (repo *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var j tomlJson
 
-			if err = j.FromTransacted(o, repo.GetStore().GetEnvRepo()); err != nil {
+			if err = j.FromTransacted(o, local.GetStore().GetEnvRepo()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -485,7 +485,7 @@ func (repo *Repo) MakeFormatFunc(
 
 			if j, err = sku_fmt.MakeJsonTomlBookmark(
 				o,
-				repo.GetStore().GetEnvRepo(),
+				local.GetStore().GetEnvRepo(),
 				tabs,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -510,7 +510,7 @@ func (repo *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
+			if r, err = local.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -528,7 +528,7 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "text-sku-prefix":
-		cliFmt := repo.SkuFormatBoxTransactedNoColor()
+		cliFmt := local.SkuFormatBoxTransactedNoColor()
 
 		output = func(o *sku.Transacted) (err error) {
 			sb := &strings.Builder{}
@@ -538,10 +538,10 @@ func (repo *Repo) MakeFormatFunc(
 				return
 			}
 
-			if repo.GetConfig().IsInlineType(o.GetType()) {
+			if local.GetConfig().IsInlineType(o.GetType()) {
 				var r sha.ReadCloser
 
-				if r, err = repo.GetStore().GetEnvRepo().BlobReader(
+				if r, err = local.GetStore().GetEnvRepo().BlobReader(
 					o.GetBlobSha(),
 				); err != nil {
 					err = errors.Wrap(err)
@@ -553,7 +553,7 @@ func (repo *Repo) MakeFormatFunc(
 				if _, err = delim_io.CopyWithPrefixOnDelim(
 					'\n',
 					sb.String(),
-					repo.GetOut(),
+					local.GetOut(),
 					r,
 					true,
 				); err != nil {
@@ -571,12 +571,12 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "blob-sku-prefix":
-		cliFmt := repo.SkuFormatBoxTransactedNoColor()
+		cliFmt := local.SkuFormatBoxTransactedNoColor()
 
 		output = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
+			if r, err = local.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -595,7 +595,7 @@ func (repo *Repo) MakeFormatFunc(
 			if _, err = delim_io.CopyWithPrefixOnDelim(
 				'\n',
 				sb.String(),
-				repo.GetOut(),
+				local.GetOut(),
 				r,
 				true,
 			); err != nil {
@@ -631,14 +631,14 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "mutter":
-		p := repo.PrinterTransacted()
+		p := local.PrinterTransacted()
 
 		output = func(z *sku.Transacted) (err error) {
 			if z.Metadata.Mutter().IsNull() {
 				return
 			}
 
-			if z, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+			if z, err = local.GetStore().GetStreamIndex().ReadOneObjectIdTai(
 				z.GetObjectId(),
 				z.Metadata.Cache.ParentTai,
 			); err != nil {
@@ -651,7 +651,7 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list":
-		p := repo.MakePrinterBoxArchive(repo.GetUIFile(), true)
+		p := local.MakePrinterBoxArchive(local.GetUIFile(), true)
 
 		output = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
@@ -663,7 +663,7 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "inventory-list-sans-tai":
-		p := repo.MakePrinterBoxArchive(repo.GetUIFile(), false)
+		p := local.MakePrinterBoxArchive(local.GetUIFile(), false)
 
 		output = func(o *sku.Transacted) (err error) {
 			if err = p(o); err != nil {
@@ -695,13 +695,13 @@ func (repo *Repo) MakeFormatFunc(
 		}
 
 	case "verzeichnisse":
-		p := repo.PrinterTransacted()
+		p := local.PrinterTransacted()
 
 		output = func(o *sku.Transacted) (err error) {
 			sk := sku.GetTransactedPool().Get()
 			defer sku.GetTransactedPool().Put(sk)
 
-			if err = repo.GetStore().GetStreamIndex().ReadOneObjectId(
+			if err = local.GetStore().GetStreamIndex().ReadOneObjectId(
 				o.GetObjectId(),
 				sk,
 			); err != nil {
@@ -725,7 +725,7 @@ func (repo *Repo) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
+			if r, err = local.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -760,7 +760,7 @@ func (repo *Repo) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = repo.GetStore().GetEnvRepo().BlobReader(
+			if r, err = local.GetStore().GetEnvRepo().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -817,14 +817,14 @@ func (repo *Repo) MakeFormatFunc(
 	return
 }
 
-func (u *Repo) makeTypFormatter(
+func (local *Repo) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	typeBlobStore := u.GetStore().GetTypedBlobStore().Type
+	typeBlobStore := local.GetStore().GetTypedBlobStore().Type
 
 	if out == nil {
-		out = u.GetUIFile()
+		out = local.GetUIFile()
 	}
 
 	switch v {
@@ -832,7 +832,7 @@ func (u *Repo) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var tt *sku.Transacted
 
-			if tt, err = u.GetStore().ReadTransactedFromObjectId(o.GetType()); err != nil {
+			if tt, err = local.GetStore().ReadTransactedFromObjectId(o.GetType()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -871,7 +871,7 @@ func (u *Repo) makeTypFormatter(
 
 	case "formatter-uti-groups":
 		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(
-			u.GetStore(),
+			local.GetStore(),
 			typeBlobStore,
 		)
 
@@ -907,7 +907,7 @@ func (u *Repo) makeTypFormatter(
 			// TODO switch to typed variant
 			var vp sku.LuaVMPoolV1
 
-			if vp, err = u.GetStore().MakeLuaVMPoolV1(o, script); err != nil {
+			if vp, err = local.GetStore().MakeLuaVMPoolV1(o, script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -923,7 +923,7 @@ func (u *Repo) makeTypFormatter(
 
 			f := vm.GetField(vm.Top, "on_pre_commit")
 
-			u.GetUI().Print(f.String())
+			local.GetUI().Print(f.String())
 
 			return
 		}
@@ -932,7 +932,7 @@ func (u *Repo) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var t *sku.Transacted
 
-			if t, err = u.GetStore().ReadTransactedFromObjectId(o.GetType()); err != nil {
+			if t, err = local.GetStore().ReadTransactedFromObjectId(o.GetType()); err != nil {
 				if collections.IsErrNotFound(err) {
 					err = nil
 				} else {

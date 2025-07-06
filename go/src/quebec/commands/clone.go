@@ -51,7 +51,7 @@ func (cmd Clone) Run(req command.Request) {
 	default:
 		req.CancelWithBadRequestf(
 			"unsupported repo type: %q (%T)",
-			local.GetImmutableConfigPublic().Blob.GetRepoType(),
+			local.GetImmutableConfigPublic().GetRepoType(),
 			local,
 		)
 

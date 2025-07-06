@@ -9,10 +9,10 @@ import (
 )
 
 // TODO rename
-func (repo *Repo) GetZettelFromObjectId(
+func (local *Repo) GetZettelFromObjectId(
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
-	builder := repo.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
+	builder := local.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
 
 	var query *pkg_query.Query
 
@@ -24,7 +24,7 @@ func (repo *Repo) GetZettelFromObjectId(
 		return
 	}
 
-	if sk, err = repo.GetStore().QueryExactlyOneExternal(query); err != nil {
+	if sk, err = local.GetStore().QueryExactlyOneExternal(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -32,10 +32,10 @@ func (repo *Repo) GetZettelFromObjectId(
 	return
 }
 
-func (repo *Repo) GetObjectFromObjectId(
+func (local *Repo) GetObjectFromObjectId(
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
-	builder := repo.MakeQueryBuilder(ids.MakeGenre(genres.All()...), nil)
+	builder := local.MakeQueryBuilder(ids.MakeGenre(genres.All()...), nil)
 
 	var queryGroup *pkg_query.Query
 
@@ -47,7 +47,7 @@ func (repo *Repo) GetObjectFromObjectId(
 		return
 	}
 
-	if sk, err = repo.GetStore().QueryExactlyOneExternal(queryGroup); err != nil {
+	if sk, err = local.GetStore().QueryExactlyOneExternal(queryGroup); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

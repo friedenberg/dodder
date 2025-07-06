@@ -22,7 +22,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	listSku *sku.Transacted,
 ) (response Response) {
 	listSkuType := builtin_types.GetOrPanic(
-		server.Repo.GetImmutableConfigPublic().Blob.GetInventoryListTypeString(),
+		server.Repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
 	).Type
 
 	blobStore := server.Repo.GetBlobStore()
@@ -82,7 +82,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	}
 
 	listFormat := server.Repo.GetInventoryListStore().FormatForVersion(
-		repo.GetImmutableConfigPublic().Blob.GetStoreVersion(),
+		repo.GetImmutableConfigPublic().GetStoreVersion(),
 	)
 
 	listMissingSkus := sku.MakeList()

@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -77,7 +78,7 @@ func (store *Store) Initialize(
 	}
 
 	blobType := ids.MustType(
-		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
+		store.envRepo.GetConfigPublicBlob().GetInventoryListTypeString(),
 	)
 
 	if store_version.LessOrEqual(
@@ -122,8 +123,12 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
-	return store.GetEnvRepo().GetConfigPublic()
+func (store *Store) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+	return store.GetEnvRepo().GetConfigPublicBlob()
+}
+
+func (store *Store) GetImmutableConfigPublicType() ids.Type {
+	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
 func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {

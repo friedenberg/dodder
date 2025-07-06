@@ -102,40 +102,40 @@ func MakeWithLayout(
 }
 
 // TODO investigate removing unnecessary resets like from organize
-func (u *Repo) Reset() (err error) {
-	return u.initialize(OptionsEmpty)
+func (local *Repo) Reset() (err error) {
+	return local.initialize(OptionsEmpty)
 }
 
-func (repo *Repo) initialize(
+func (local *Repo) initialize(
 	options Options,
 ) (err error) {
-	if err = repo.Flush(); err != nil {
+	if err = local.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
-	repo.sunrise = ids.NowTai()
+	local.sunrise = ids.NowTai()
 
-	if err = repo.dormantIndex.Load(
-		repo.envRepo,
+	if err = local.dormantIndex.Load(
+		local.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	objectFormat := object_inventory_format.FormatForVersion(
-		repo.envRepo.GetStoreVersion(),
+		local.envRepo.GetStoreVersion(),
 	)
 
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
-		repo.GetEnv(),
-		repo.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(true),
+		local.GetEnv(),
+		local.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(true),
 	)
 
-	if err = repo.config.Initialize(
-		repo.envRepo,
-		repo.GetCLIConfig(),
+	if err = local.config.Initialize(
+		local.envRepo,
+		local.GetCLIConfig(),
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil
@@ -143,49 +143,49 @@ func (repo *Repo) initialize(
 			err = errors.Wrapf(
 				err,
 				"CompressionType: %q",
-				repo.envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable().GetBlobCompression(),
+				local.envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable().GetBlobCompression(),
 			)
 			return
 		}
 	}
 
-	if repo.envWorkspace, err = env_workspace.Make(
-		repo.envRepo,
-		repo.config,
-		repo.PrinterFDDeleted(),
-		repo.GetEnvRepo(),
+	if local.envWorkspace, err = env_workspace.Make(
+		local.envRepo,
+		local.config,
+		local.PrinterFDDeleted(),
+		local.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if repo.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
+	if local.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{
 			Expected: repo_type.TypeWorkingCopy,
-			Actual:   repo.GetConfig().GetImmutableConfig().GetRepoType(),
+			Actual:   local.GetConfig().GetImmutableConfig().GetRepoType(),
 		}
 
 		return
 	}
 
-	if repo.storeAbbr, err = store_abbr.NewIndexAbbr(
-		repo.config.GetCLIConfig().PrintOptions,
-		repo.envRepo,
+	if local.storeAbbr, err = store_abbr.NewIndexAbbr(
+		local.config.GetCLIConfig().PrintOptions,
+		local.envRepo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
 	}
 
-	repo.envBox = env_box.Make(
-		repo.envRepo,
-		repo.envWorkspace.GetStoreFS(),
-		repo.storeAbbr,
+	local.envBox = env_box.Make(
+		local.envRepo,
+		local.envWorkspace.GetStoreFS(),
+		local.storeAbbr,
 	)
 
-	repo.envLua = env_lua.Make(
-		repo.envRepo,
-		repo.GetStore(),
-		repo.SkuFormatBoxTransactedNoColor(),
+	local.envLua = env_lua.Make(
+		local.envRepo,
+		local.GetStore(),
+		local.SkuFormatBoxTransactedNoColor(),
 	)
 
 	// for _, rb := range u.GetConfig().Recipients {
@@ -195,26 +195,26 @@ func (repo *Repo) initialize(
 	// 	}
 	// }
 
-	repo.typedBlobStore = typed_blob_store.MakeStores(
-		repo.envRepo,
-		repo.envLua,
+	local.typedBlobStore = typed_blob_store.MakeStores(
+		local.envRepo,
+		local.envLua,
 		objectFormat,
 		boxFormatArchive,
 	)
 
-	if err = repo.store.Initialize(
-		repo.config,
-		repo.envRepo,
-		repo.envWorkspace,
+	if err = local.store.Initialize(
+		local.config,
+		local.envRepo,
+		local.envWorkspace,
 		objectFormat,
-		repo.sunrise,
-		repo.envLua,
-		repo.makeQueryBuilder().
+		local.sunrise,
+		local.envLua,
+		local.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.All()...)),
 		boxFormatArchive,
-		repo.typedBlobStore,
-		&repo.dormantIndex,
-		repo.storeAbbr,
+		local.typedBlobStore,
+		&local.dormantIndex,
+		local.storeAbbr,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -222,16 +222,16 @@ func (repo *Repo) initialize(
 
 	ui.Log().Printf(
 		"store version: %s",
-		repo.GetConfig().GetImmutableConfig().GetStoreVersion(),
+		local.GetConfig().GetImmutableConfig().GetStoreVersion(),
 	)
 
-	if err = repo.envWorkspace.SetWorkspaceTypes(
+	if err = local.envWorkspace.SetWorkspaceTypes(
 		map[string]*env_workspace.Store{
 			"browser": {
 				StoreLike: store_browser.Make(
-					repo.config,
-					repo.GetEnvRepo(),
-					repo.PrinterTransactedDeleted(),
+					local.config,
+					local.GetEnvRepo(),
+					local.PrinterTransactedDeleted(),
 				),
 			},
 		},
@@ -240,8 +240,8 @@ func (repo *Repo) initialize(
 		return
 	}
 
-	if err = repo.envWorkspace.SetSupplies(
-		repo.store.MakeSupplies(ids.RepoId{}),
+	if err = local.envWorkspace.SetSupplies(
+		local.store.MakeSupplies(ids.RepoId{}),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -249,18 +249,18 @@ func (repo *Repo) initialize(
 
 	ui.Log().Print("done initing checkout store")
 
-	repo.store.SetUIDelegate(repo.GetUIStorePrinters())
+	local.store.SetUIDelegate(local.GetUIStorePrinters())
 
-	repo.storesInitialized = true
+	local.storesInitialized = true
 
 	return
 }
 
-func (repo *Repo) Flush() (err error) {
+func (local *Repo) Flush() (err error) {
 	waitGroup := errors.MakeWaitGroupParallel()
 
-	if repo.envWorkspace != nil {
-		waitGroup.Do(repo.envWorkspace.Flush)
+	if local.envWorkspace != nil {
+		waitGroup.Do(local.envWorkspace.Flush)
 	}
 
 	if err = waitGroup.GetError(); err != nil {
@@ -271,13 +271,13 @@ func (repo *Repo) Flush() (err error) {
 	return
 }
 
-func (u *Repo) PrintMatchedDormantIfNecessary() {
-	if !u.GetConfig().GetCLIConfig().PrintOptions.PrintMatchedDormant {
+func (local *Repo) PrintMatchedDormantIfNecessary() {
+	if !local.GetConfig().GetCLIConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}
 
-	c := u.GetMatcherDormant().Count()
-	ca := u.GetMatcherDormant().CountArchiviert()
+	c := local.GetMatcherDormant().Count()
+	ca := local.GetMatcherDormant().CountArchiviert()
 
 	if c != 0 || ca == 0 {
 		return
@@ -286,16 +286,16 @@ func (u *Repo) PrintMatchedDormantIfNecessary() {
 	ui.Err().Printf("%d archived objects matched", c)
 }
 
-func (u *Repo) MakeObjectIdIndex() ids.Index {
+func (local *Repo) MakeObjectIdIndex() ids.Index {
 	return ids.Index{}
 }
 
-func (u *Repo) GetMatcherDormant() query.DormantCounter {
-	return u.DormantCounter
+func (local *Repo) GetMatcherDormant() query.DormantCounter {
+	return local.DormantCounter
 }
 
-func (repo *Repo) GetWorkspaceStoreForQuery(
+func (local *Repo) GetWorkspaceStoreForQuery(
 	repoId ids.RepoId,
 ) (store_workspace.Store, bool) {
-	return repo.envWorkspace.GetStore(), true
+	return local.envWorkspace.GetStore(), true
 }

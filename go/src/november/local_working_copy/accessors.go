@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -17,66 +19,70 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
-func (u *Repo) GetEnv() env_ui.Env {
-	return u
+func (local *Repo) GetEnv() env_ui.Env {
+	return local
 }
 
-func (u *Repo) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
-	return u.GetEnvRepo().GetConfigPublic()
+func (local *Repo) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+	return local.GetEnvRepo().GetConfigPublicBlob()
 }
 
-func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
-	return u.GetEnvRepo().GetConfigPrivate()
+func (local *Repo) GetImmutableConfigPublicType() ids.Type {
+	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (repo *Repo) GetEnvLocal() env_local.Env {
-	return repo
+func (local *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
+	return local.GetEnvRepo().GetConfigPrivate()
 }
 
-func (repo *Repo) GetEnvWorkspace() env_workspace.Env {
-	return repo.envWorkspace
+func (local *Repo) GetEnvLocal() env_local.Env {
+	return local
 }
 
-func (u *Repo) GetEnvLua() env_lua.Env {
-	return u.envLua
+func (local *Repo) GetEnvWorkspace() env_workspace.Env {
+	return local.envWorkspace
 }
 
-func (u *Repo) GetTime() time.Time {
+func (local *Repo) GetEnvLua() env_lua.Env {
+	return local.envLua
+}
+
+func (local *Repo) GetTime() time.Time {
 	return time.Now()
 }
 
-func (u *Repo) GetConfig() store_config.Store {
-	return u.config
+func (local *Repo) GetConfig() store_config.Store {
+	return local.config
 }
 
-func (u *Repo) GetDormantIndex() *dormant_index.Index {
-	return &u.dormantIndex
+func (local *Repo) GetDormantIndex() *dormant_index.Index {
+	return &local.dormantIndex
 }
 
-func (u *Repo) GetEnvRepo() env_repo.Env {
-	return u.envRepo
+func (local *Repo) GetEnvRepo() env_repo.Env {
+	return local.envRepo
 }
 
-func (u *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
-	return u.typedBlobStore.InventoryList
+func (local *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+	return local.typedBlobStore.InventoryList
 }
 
-func (u *Repo) GetBlobStore() interfaces.BlobStore {
-	return u.GetEnvRepo()
+func (local *Repo) GetBlobStore() interfaces.BlobStore {
+	return local.GetEnvRepo()
 }
 
-func (repo *Repo) GetObjectStore() sku.ObjectStore {
-	return &repo.store
+func (local *Repo) GetObjectStore() sku.ObjectStore {
+	return &local.store
 }
 
-func (u *Repo) GetInventoryListStore() sku.InventoryListStore {
-	return u.GetStore().GetInventoryListStore()
+func (local *Repo) GetInventoryListStore() sku.InventoryListStore {
+	return local.GetStore().GetInventoryListStore()
 }
 
-func (u *Repo) GetStore() *store.Store {
-	return &u.store
+func (local *Repo) GetStore() *store.Store {
+	return &local.store
 }
 
-func (repo *Repo) GetAbbr() sku.AbbrStore {
-	return repo.storeAbbr
+func (local *Repo) GetAbbr() sku.AbbrStore {
+	return local.storeAbbr
 }

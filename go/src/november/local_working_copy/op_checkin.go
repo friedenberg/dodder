@@ -9,13 +9,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 )
 
-func (repo *Repo) Checkin(
+func (local *Repo) Checkin(
 	skus sku.SkuTypeSetMutable,
 	proto sku.Proto,
 	delete bool,
 	refreshCheckout bool,
 ) (processed sku.TransactedMutableSet, err error) {
-	repo.Must(repo.Lock)
+	local.Must(local.Lock)
 
 	processed = sku.MakeTransactedMutableSet()
 	sortedResults := quiter.ElementsSorted(
@@ -27,7 +27,7 @@ func (repo *Repo) Checkin(
 
 	for _, co := range sortedResults {
 		if refreshCheckout {
-			if err = repo.GetEnvWorkspace().GetStoreFS().RefreshCheckedOut(
+			if err = local.GetEnvWorkspace().GetStoreFS().RefreshCheckedOut(
 				co,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -44,7 +44,7 @@ func (repo *Repo) Checkin(
 				continue
 			}
 
-			if err = repo.GetStore().UpdateTransactedFromBlobs(
+			if err = local.GetStore().UpdateTransactedFromBlobs(
 				co,
 			); err != nil {
 				if errors.Is(err, env_workspace.ErrUnsupportedOperation{}) {
@@ -59,7 +59,7 @@ func (repo *Repo) Checkin(
 
 			proto.Apply(external, genres.Zettel)
 
-			if err = repo.GetStore().CreateOrUpdate(
+			if err = local.GetStore().CreateOrUpdate(
 				external,
 				sku.CommitOptions{
 					Proto: proto,
@@ -69,7 +69,7 @@ func (repo *Repo) Checkin(
 				return
 			}
 		} else {
-			if err = repo.GetStore().CreateOrUpdateCheckedOut(
+			if err = local.GetStore().CreateOrUpdateCheckedOut(
 				co,
 				!delete,
 			); err != nil {
@@ -82,7 +82,7 @@ func (repo *Repo) Checkin(
 			continue
 		}
 
-		if err = repo.GetStore().DeleteCheckedOut(co); err != nil {
+		if err = local.GetStore().DeleteCheckedOut(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -93,7 +93,7 @@ func (repo *Repo) Checkin(
 		}
 	}
 
-	repo.Must(repo.Unlock)
+	local.Must(local.Unlock)
 
 	return
 }

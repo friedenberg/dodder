@@ -83,7 +83,7 @@ func (cmd Remote) CreateRemoteObject(
 	}
 
 	remote = cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
-	remoteConfig := remote.GetImmutableConfigPublic().Blob
+	remoteConfig := remote.GetImmutableConfigPublic()
 	blob.SetPublicKey(remoteConfig.GetPublicKey())
 
 	var blobSha interfaces.Sha

@@ -13,7 +13,7 @@ import (
 )
 
 // TODO add support for checked out types
-func (repo *Repo) GetBlobFormatter(
+func (local *Repo) GetBlobFormatter(
 	tipe ids.Type,
 	formatId string,
 	utiGroup string,
@@ -25,7 +25,7 @@ func (repo *Repo) GetBlobFormatter(
 
 	var typeObject *sku.Transacted
 
-	if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(
+	if typeObject, err = local.GetStore().ReadTransactedFromObjectId(
 		tipe.GetType(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -34,7 +34,7 @@ func (repo *Repo) GetBlobFormatter(
 
 	var typeBlob type_blobs.Blob
 
-	if typeBlob, _, err = repo.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
+	if typeBlob, _, err = local.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
 		typeObject.GetType(),
 		typeObject.GetBlobSha(),
 	); err != nil {
@@ -42,7 +42,7 @@ func (repo *Repo) GetBlobFormatter(
 		return
 	}
 
-	defer repo.GetStore().GetTypedBlobStore().Type.PutTypedBlob(
+	defer local.GetStore().GetTypedBlobStore().Type.PutTypedBlob(
 		typeObject.GetType(),
 		typeBlob,
 	)

@@ -6,13 +6,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/importer"
 )
 
-func (repo *Repo) ImportList(
+func (local *Repo) ImportList(
 	list *sku.List,
 	i sku.Importer,
 ) (err error) {
-	repo.Must(repo.Lock)
+	local.Must(local.Lock)
 
-	if err = repo.GetInventoryListStore().ImportList(
+	if err = local.GetInventoryListStore().ImportList(
 		list,
 		i,
 	); err != nil {
@@ -22,7 +22,7 @@ func (repo *Repo) ImportList(
 		}
 	}
 
-	repo.Must(repo.Unlock)
+	local.Must(local.Unlock)
 
 	return
 }

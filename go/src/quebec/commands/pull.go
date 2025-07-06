@@ -71,7 +71,7 @@ func (cmd Pull) Run(req command.Request) {
 	case repo.Repo:
 		localWorkingCopy.CancelWithBadRequestf(
 			"unsupported repo type: %s (%T)",
-			remote.GetImmutableConfigPublic().Blob.GetRepoType(),
+			remote.GetImmutableConfigPublic().GetRepoType(),
 			remote,
 		)
 	}

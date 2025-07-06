@@ -8,14 +8,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-func (u *Repo) MakeInventoryList(
+func (local *Repo) MakeInventoryList(
 	queryGroup *query.Query,
 ) (list *sku.List, err error) {
 	list = sku.MakeList()
 
 	var l sync.Mutex
 
-	if err = u.GetStore().QueryTransacted(
+	if err = local.GetStore().QueryTransacted(
 		queryGroup,
 		func(sk *sku.Transacted) (err error) {
 			l.Lock()

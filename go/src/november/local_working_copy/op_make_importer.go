@@ -4,9 +4,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (repo *Repo) MakeImporter(
+func (local *Repo) MakeImporter(
 	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
 ) (importer sku.Importer) {
-	return repo.GetStore().MakeImporter(options, storeOptions)
+	return local.GetStore().MakeImporter(options, storeOptions)
 }
