@@ -22,20 +22,20 @@ func MakeRepoStore(
 	}
 }
 
-func (a RepoStore) ReadTypedBlob(
+func (store RepoStore) ReadTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Sha,
 ) (common repo_blobs.Blob, n int64, err error) {
 	var reader interfaces.ShaReadCloser
 
-	if reader, err = a.envRepo.BlobReader(blobSha); err != nil {
+	if reader, err = store.envRepo.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, reader)
 
-	blob := repo_blobs.TypeWithBlob{
+	typedBlob := repo_blobs.TypedBlob{
 		Type: &tipe,
 	}
 
@@ -43,14 +43,14 @@ func (a RepoStore) ReadTypedBlob(
 	defer pool.GetBufioReader().Put(bufferedReader)
 
 	if n, err = repo_blobs.Coder.DecodeFrom(
-		&blob,
+		&typedBlob,
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	common = *blob.Blob
+	common = *typedBlob.Blob
 
 	return
 }
@@ -72,8 +72,8 @@ func (store RepoStore) WriteTypedBlob(
 	defer pool.GetBufioWriter().Put(bufferedWriter)
 
 	if n, err = repo_blobs.Coder.EncodeTo(
-		&repo_blobs.TypeWithBlob{
-			Type:   &tipe,
+		&repo_blobs.TypedBlob{
+			Type: &tipe,
 			Blob: &blob,
 		},
 		bufferedWriter,

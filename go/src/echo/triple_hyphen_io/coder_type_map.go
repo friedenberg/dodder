@@ -5,8 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -24,11 +22,13 @@ func (typedBlob *TypedBlob[S]) GetType() *ids.Type {
 	return typedBlob.Type
 }
 
+type TypedBlobEmpty = TypedBlob[struct{}]
+
 type CoderTypeMap[BLOB any] map[string]interfaces.CoderBufferedReadWriter[*TypedBlob[BLOB]]
 
-func (coderTypeMap CoderTypeMap[S]) DecodeFrom(
-	typedBlob *TypedBlob[S],
-	reader *bufio.Reader,
+func (coderTypeMap CoderTypeMap[BLOB]) DecodeFrom(
+	typedBlob *TypedBlob[BLOB],
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	tipe := typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
@@ -38,7 +38,7 @@ func (coderTypeMap CoderTypeMap[S]) DecodeFrom(
 		return
 	}
 
-	if n, err = coder.DecodeFrom(typedBlob, reader); err != nil {
+	if n, err = coder.DecodeFrom(typedBlob, bufferedReader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,9 +46,9 @@ func (coderTypeMap CoderTypeMap[S]) DecodeFrom(
 	return
 }
 
-func (coderTypeMap CoderTypeMap[S]) EncodeTo(
-	typedBlob *TypedBlob[S],
-	writer *bufio.Writer,
+func (coderTypeMap CoderTypeMap[BLOB]) EncodeTo(
+	typedBlob *TypedBlob[BLOB],
+	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	tipe := typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
@@ -58,7 +58,7 @@ func (coderTypeMap CoderTypeMap[S]) EncodeTo(
 		return
 	}
 
-	if n, err = coder.EncodeTo(typedBlob, writer); err != nil {
+	if n, err = coder.EncodeTo(typedBlob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -68,9 +68,9 @@ func (coderTypeMap CoderTypeMap[S]) EncodeTo(
 
 type DecoderTypeMapWithoutType[BLOB any] map[string]interfaces.DecoderFromBufferedReader[BLOB]
 
-func (decoderTypeMap DecoderTypeMapWithoutType[S]) DecodeFrom(
-	typedBlob *TypedBlob[S],
-	reader *bufio.Reader,
+func (decoderTypeMap DecoderTypeMapWithoutType[BLOB]) DecodeFrom(
+	typedBlob *TypedBlob[BLOB],
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	tipe := typedBlob.GetType()
 	decoder, ok := decoderTypeMap[tipe.String()]
@@ -79,9 +79,6 @@ func (decoderTypeMap DecoderTypeMapWithoutType[S]) DecodeFrom(
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
 		return
 	}
-
-	bufferedReader := ohio.BufferedReader(reader)
-	defer pool.GetBufioReader().Put(bufferedReader)
 
 	if n, err = decoder.DecodeFrom(
 		typedBlob.Blob,
@@ -96,9 +93,9 @@ func (decoderTypeMap DecoderTypeMapWithoutType[S]) DecodeFrom(
 
 type CoderTypeMapWithoutType[BLOB any] map[string]interfaces.CoderBufferedReadWriter[BLOB]
 
-func (coderTypeMap CoderTypeMapWithoutType[S]) DecodeFrom(
-	typedBlob *TypedBlob[S],
-	reader *bufio.Reader,
+func (coderTypeMap CoderTypeMapWithoutType[BLOB]) DecodeFrom(
+	typedBlob *TypedBlob[BLOB],
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	tipe := typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
@@ -108,7 +105,7 @@ func (coderTypeMap CoderTypeMapWithoutType[S]) DecodeFrom(
 		return
 	}
 
-	if n, err = coder.DecodeFrom(typedBlob.Blob, reader); err != nil {
+	if n, err = coder.DecodeFrom(typedBlob.Blob, bufferedReader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,9 +113,9 @@ func (coderTypeMap CoderTypeMapWithoutType[S]) DecodeFrom(
 	return
 }
 
-func (coderTypeMap CoderTypeMapWithoutType[S]) EncodeTo(
-	typedBlob *TypedBlob[S],
-	writer *bufio.Writer,
+func (coderTypeMap CoderTypeMapWithoutType[BLOB]) EncodeTo(
+	typedBlob *TypedBlob[BLOB],
+	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	tipe := typedBlob.Type
 	coder, ok := coderTypeMap[tipe.String()]
@@ -128,7 +125,7 @@ func (coderTypeMap CoderTypeMapWithoutType[S]) EncodeTo(
 		return
 	}
 
-	if n, err = coder.EncodeTo(typedBlob.Blob, writer); err != nil {
+	if n, err = coder.EncodeTo(typedBlob.Blob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

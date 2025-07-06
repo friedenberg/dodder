@@ -25,23 +25,25 @@ type BlobMutable interface {
 	SetPublicKey(crypto.PublicKey)
 }
 
-type TypeWithBlob = triple_hyphen_io.TypedBlob[*Blob]
+type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]
 
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypeWithBlob]{
+var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
 	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
 	builtin_types.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
 	builtin_types.RepoTypeUri:         coderToml[TomlUriV0]{},
 	"":                                coderToml[TomlUriV0]{},
 }
 
-var Coder = interfaces.CoderBufferedReadWriter[*TypeWithBlob](triple_hyphen_io.CoderTypeMap[*Blob](typedCoders))
+var Coder = interfaces.CoderBufferedReadWriter[*TypedBlob](
+	triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
+)
 
 type coderToml[T Blob] struct {
 	Blob T
 }
 
 func (coder coderToml[T]) DecodeFrom(
-	subject *TypeWithBlob,
+	subject *TypedBlob,
 	reader *bufio.Reader,
 ) (n int64, err error) {
 	decoder := toml.NewDecoder(reader)
@@ -62,7 +64,7 @@ func (coder coderToml[T]) DecodeFrom(
 }
 
 func (coderToml[_]) EncodeTo(
-	subject *TypeWithBlob,
+	subject *TypedBlob,
 	writer *bufio.Writer,
 ) (n int64, err error) {
 	encoder := toml.NewEncoder(writer)

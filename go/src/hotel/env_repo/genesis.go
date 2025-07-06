@@ -84,31 +84,33 @@ func (env *Env) Genesis(bb BigBang) {
 }
 
 func (env Env) writeInventoryListLog() {
-	var f *os.File
+	var file *os.File
 
 	{
 		var err error
 
-		if f, err = files.CreateExclusiveWriteOnly(
+		if file, err = files.CreateExclusiveWriteOnly(
 			env.FileInventoryListLog(),
 		); err != nil {
 			env.CancelWithError(err)
 		}
 
-		defer env.MustClose(f)
+		defer env.MustClose(file)
 	}
 
-	encoder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlob[struct{}]]{
+	coder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlobEmpty]{
 		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
 	}
 
-	tipe := builtin_types.GetOrPanic(builtin_types.InventoryListTypeVCurrent).Type
+	tipe := builtin_types.GetOrPanic(
+		builtin_types.InventoryListTypeVCurrent,
+	).Type
 
-	subject := triple_hyphen_io.TypedBlob[struct{}]{
+	subject := triple_hyphen_io.TypedBlobEmpty{
 		Type: &tipe,
 	}
 
-	if _, err := encoder.EncodeTo(&subject, f); err != nil {
+	if _, err := coder.EncodeTo(&subject, file); err != nil {
 		env.CancelWithError(err)
 	}
 }

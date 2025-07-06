@@ -10,14 +10,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
-type Coder[O any] struct {
+type Coder[BLOB any] struct {
 	RequireMetadata bool
-	Metadata, Blob  interfaces.CoderBufferedReadWriter[O]
+	Metadata, Blob  interfaces.CoderBufferedReadWriter[BLOB]
 }
 
-func (mr *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
+func (coder *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.readMetadataFrom(object, &r)
+	n1, err = coder.readMetadataFrom(object, &r)
 	n += n1
 
 	if err != nil {
@@ -25,7 +25,7 @@ func (mr *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = mr.Blob.DecodeFrom(object, bufio.NewReader(r))
+	n1, err = coder.Blob.DecodeFrom(object, bufio.NewReader(r))
 	n += n1
 
 	if err != nil {
@@ -36,19 +36,19 @@ func (mr *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 	return
 }
 
-func (mr *Coder[O]) readMetadataFrom(
+func (coder *Coder[O]) readMetadataFrom(
 	object O,
-	r *io.Reader,
+	bufferedReader *io.Reader,
 ) (n int64, err error) {
 	var state readerState
-	br := bufio.NewReader(*r)
+	br := bufio.NewReader(*bufferedReader)
 
-	if mr.RequireMetadata && mr.Metadata == nil {
+	if coder.RequireMetadata && coder.Metadata == nil {
 		err = errors.ErrorWithStackf("metadata reader is nil")
 		return
 	}
 
-	if mr.Blob == nil {
+	if coder.Blob == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
 		return
 	}
@@ -79,12 +79,12 @@ LINE_READ_LOOP:
 		switch state {
 		case readerStateEmpty:
 			switch {
-			case mr.RequireMetadata && line != Boundary:
+			case coder.RequireMetadata && line != Boundary:
 				err = errors.ErrorWithStackf("expected %q but got %q", Boundary, line)
 				return
 
 			case line != Boundary:
-				*r = io.MultiReader(
+				*bufferedReader = io.MultiReader(
 					strings.NewReader(rawLine),
 					br,
 				)
@@ -94,7 +94,7 @@ LINE_READ_LOOP:
 
 			state += 1
 
-			metadataPipe = ohio.MakePipedDecoder(object, mr.Metadata)
+			metadataPipe = ohio.MakePipedDecoder(object, coder.Metadata)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
@@ -113,7 +113,7 @@ LINE_READ_LOOP:
 			}
 
 		case readerStateSecondBoundary:
-			*r = br
+			*bufferedReader = br
 			break LINE_READ_LOOP
 
 		default:

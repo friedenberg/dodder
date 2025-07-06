@@ -10,21 +10,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 )
 
-type TypedMetadataCoder[O any] struct{}
+type TypedMetadataCoder[BLOB any] struct{}
 
-func (TypedMetadataCoder[O]) DecodeFrom(
-	subject *TypedBlob[O],
-	reader *bufio.Reader,
+func (TypedMetadataCoder[BLOB]) DecodeFrom(
+	typedBlob *TypedBlob[BLOB],
+	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	bufferedReader := bufio.NewReader(reader)
-
 	// TODO scan for type directly
 	if n, err = format.ReadLines(
 		bufferedReader,
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": subject.Type.Set,
+					"!": typedBlob.Type.Set,
 				},
 			),
 		),
@@ -36,12 +34,16 @@ func (TypedMetadataCoder[O]) DecodeFrom(
 	return
 }
 
-func (TypedMetadataCoder[O]) EncodeTo(
-	subject *TypedBlob[O],
-	writer *bufio.Writer,
+func (TypedMetadataCoder[BLOB]) EncodeTo(
+	typedBlob *TypedBlob[BLOB],
+	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	var n1 int
-	n1, err = fmt.Fprintf(writer, "! %s\n", subject.Type.StringSansOp())
+	n1, err = fmt.Fprintf(
+		bufferedWriter,
+		"! %s\n",
+		typedBlob.Type.StringSansOp(),
+	)
 	n += int64(n1)
 
 	if err != nil {
