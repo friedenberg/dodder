@@ -10,11 +10,3 @@ type ConfigPublicTypedBlob struct {
 	ids.Type
 	ImmutableConfig config_immutable.ConfigPublic // TODO restructure this to avoid this extra call
 }
-
-func (typedBlob *ConfigPublicTypedBlob) GetType() ids.Type {
-	return typedBlob.Type
-}
-
-func (typedBlob *ConfigPublicTypedBlob) SetType(t ids.Type) {
-	typedBlob.Type = t
-}
