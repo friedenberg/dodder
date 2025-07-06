@@ -22,7 +22,7 @@ func (TypedMetadataCoder[BLOB]) DecodeFrom(
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"!": typedBlob.GetTypePtr().Set,
+					"!": typedBlob.Type.Set,
 				},
 			),
 		),

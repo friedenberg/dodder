@@ -22,7 +22,7 @@ func (env *Env) Genesis(bb BigBang) {
 		return
 	}
 
-	env.config.Type = &bb.Type
+	env.config.Type = bb.Type
 	env.config.Blob = bb.Config
 
 	if err := env.MakeDir(

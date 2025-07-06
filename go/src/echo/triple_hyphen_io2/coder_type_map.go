@@ -10,16 +10,8 @@ import (
 
 type TypedBlob[BLOB any] struct {
 	// TODO determine why this needs to be a pointer
-	Type *ids.Type
+	Type ids.Type
 	Blob BLOB
-}
-
-func (typedBlob *TypedBlob[BLOB]) GetTypePtr() *ids.Type {
-	if typedBlob.Type == nil {
-		typedBlob.Type = &ids.Type{}
-	}
-
-	return typedBlob.Type
 }
 
 type TypedBlobEmpty = TypedBlob[struct{}]
@@ -30,7 +22,7 @@ func (coderTypeMap CoderTypeMap[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetTypePtr()
+	tipe := typedBlob.Type
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
@@ -50,7 +42,7 @@ func (coderTypeMap CoderTypeMap[BLOB]) EncodeTo(
 	typedBlob *TypedBlob[BLOB],
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	tipe := typedBlob.GetTypePtr()
+	tipe := typedBlob.Type
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
@@ -72,7 +64,7 @@ func (decoderTypeMap DecoderTypeMapWithoutType[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetTypePtr()
+	tipe := typedBlob.Type
 	decoder, ok := decoderTypeMap[tipe.String()]
 
 	if !ok {
@@ -97,7 +89,7 @@ func (coderTypeMap CoderTypeMapWithoutType[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetTypePtr()
+	tipe := typedBlob.Type
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
