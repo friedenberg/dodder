@@ -14,21 +14,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPrivatedTypedBlob struct {
+type ConfigPrivateTypedBlob struct {
 	ids.Type
 	ImmutableConfig config_immutable.ConfigPrivate
 }
 
-type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]
+type typeWithConfigLoadedPrivate = *triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]
 
 var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[typeWithConfigLoadedPrivate]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
 	"":                              blobV0CoderPrivate{},
 }
 
-var coderPrivate = triple_hyphen_io.Coder[typeWithConfigLoadedPrivate]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPrivatedTypedBlob]{},
-	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPrivatedTypedBlob](
+var coderPrivate = triple_hyphen_io.CoderToTypedBlob[*ConfigPrivateTypedBlob]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*ConfigPrivateTypedBlob]{},
+	Blob: triple_hyphen_io.CoderTypeMap[*ConfigPrivateTypedBlob](
 		typedCodersPrivate,
 	),
 }
@@ -36,7 +36,7 @@ var coderPrivate = triple_hyphen_io.Coder[typeWithConfigLoadedPrivate]{
 type CoderPrivate struct{}
 
 func (coder CoderPrivate) DecodeFromFile(
-	object *ConfigPrivatedTypedBlob,
+	object *ConfigPrivateTypedBlob,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -68,11 +68,11 @@ func (coder CoderPrivate) DecodeFromFile(
 }
 
 func (CoderPrivate) DecodeFrom(
-	subject *ConfigPrivatedTypedBlob,
+	subject *ConfigPrivateTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPrivate.DecodeFrom(
-		&triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]{
+		&triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]{
 			Type: &subject.Type,
 			Blob: subject,
 		},
@@ -86,11 +86,11 @@ func (CoderPrivate) DecodeFrom(
 }
 
 func (CoderPrivate) EncodeTo(
-	subject *ConfigPrivatedTypedBlob,
+	subject *ConfigPrivateTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(
-		&triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]{
+		&triple_hyphen_io.TypedBlob[*ConfigPrivateTypedBlob]{
 			Type: &subject.Type,
 			Blob: subject,
 		},

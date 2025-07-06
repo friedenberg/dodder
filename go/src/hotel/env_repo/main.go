@@ -27,7 +27,7 @@ const (
 type Env struct {
 	env_local.Env
 
-	config config_immutable_io.ConfigPrivatedTypedBlob
+	config config_immutable_io.ConfigPrivateTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -144,7 +144,7 @@ func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
 	}
 }
 
-func (env Env) GetConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
+func (env Env) GetConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
 	return env.config
 }
 

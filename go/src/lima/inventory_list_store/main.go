@@ -126,7 +126,7 @@ func (store *Store) GetImmutableConfigPublic() config_immutable_io.ConfigPublicT
 	return store.GetEnvRepo().GetConfigPublic()
 }
 
-func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
+func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

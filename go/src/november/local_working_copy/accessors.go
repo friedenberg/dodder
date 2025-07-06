@@ -25,7 +25,7 @@ func (u *Repo) GetImmutableConfigPublic() config_immutable_io.ConfigPublicTypedB
 	return u.GetEnvRepo().GetConfigPublic()
 }
 
-func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivatedTypedBlob {
+func (u *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
 	return u.GetEnvRepo().GetConfigPrivate()
 }
 
