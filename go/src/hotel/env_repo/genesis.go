@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
@@ -58,6 +59,8 @@ func (env *Env) Genesis(bb BigBang) {
 			env.CancelWithError(err)
 		}
 	}
+
+	env.writeBlobStoreConfig(bb.Config)
 
 	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := env.readAndTransferLines(
@@ -160,6 +163,15 @@ func (env Env) readAndTransferLines(in, out string) (err error) {
 	}
 
 	return
+}
+
+func (env *Env) writeBlobStoreConfig(config config_immutable.ConfigPrivate) {
+	blobStoreConfig := config_immutable.DefaultLocalBlobStoreConfig()
+
+	blobStoreConfigPath := filepath.Join(env.DirBlobs(), config_immutable.BlobStoreConfigFilename)
+	if err := blobStoreConfig.WriteToFile(blobStoreConfigPath); err != nil {
+		env.CancelWithError(err)
+	}
 }
 
 func writeFile(p string, contents any) {

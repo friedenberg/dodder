@@ -161,6 +161,51 @@ sku.TransactedResetter.ResetWith(newObject, sourceObject)
 
 This pattern ensures efficient memory usage, prevents memory leaks, and maintains strict separation between pointer-managed pool objects and temporary value structures.
 
+### Interfaces and Versioned Structs with Typed Blob Store
+
+The system uses a sophisticated pattern for type-safe, versioned data structures:
+
+#### Interface-First Design
+
+- **Common Interfaces**: Define stable contracts in `src/alfa/interfaces/` (e.g., `BlobStoreConfigImmutable`)
+- **Versioned Implementations**: Multiple struct versions implement the same interface (e.g., `TomlV1Common`, `TomlV2Common`)
+- **Backward Compatibility**: Old versions remain functional while new versions add features
+
+#### Typed Blob Store Pattern
+
+- **Generic Type Safety**: `typed_blob_store.BlobStore[T, TPtr]` provides compile-time type checking
+- **Format Abstraction**: Each content type has a dedicated formatter handling serialization
+- **Version Resolution**: Triple-hyphen IO system maps type strings to appropriate decoders
+
+#### Example: Configuration Evolution
+
+```go
+// Common interface (stable)
+type BlobStoreConfigImmutable interface {
+    GetBlobCompression() BlobCompression
+    GetBlobEncryption() BlobEncryption
+    GetLockInternalFiles() bool
+}
+
+// V1 implementation (embedded config)
+type TomlV1Common struct {
+    BlobStore BlobStoreTomlV1 `toml:"blob-store"`
+}
+
+// V2 implementation (referenced config)
+type TomlV2Common struct {
+    BlobStores       map[string]BlobStoreReference `toml:"blob-stores"`
+    DefaultBlobStore string                        `toml:"default-blob-store"`
+}
+```
+
+#### Key Benefits
+
+- **Type Safety**: Compile-time verification of data structure compatibility
+- **Version Migration**: Gradual migration from old to new formats
+- **Interface Stability**: External code depends on interfaces, not implementations
+- **Extensibility**: New versions can add fields without breaking existing code
+
 ### Testing Strategy
 
 -   Unit tests: `*_test.go` files throughout codebase

@@ -36,6 +36,12 @@ type configCommon interface {
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
+type configCommonV2 interface {
+	configCommon
+	GetBlobStores() map[string]BlobStoreReference
+	GetDefaultBlobStore() string
+}
+
 type ConfigPublic interface {
 	config() public
 	configCommon
@@ -48,7 +54,7 @@ type ConfigPrivate interface {
 	GetPrivateKey() repo_signing.PrivateKey
 }
 
-type BlobStoreConfig interface {
+type BlobStoreConfigV1 interface {
 	interfaces.BlobStoreConfigImmutable
 	GetCompressionType() CompressionType
 	GetAgeEncryption() *age.Age
@@ -68,6 +74,27 @@ func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 				CompressionType:   CompressionTypeDefault,
 				LockInternalFiles: true,
 			},
+			InventoryListType: InventoryListTypeV2,
+		},
+	}
+}
+
+func DefaultV2() *TomlV2Private {
+	return DefaultV2WithVersion(store_version.VCurrent)
+}
+
+func DefaultV2WithVersion(storeVersion StoreVersion) *TomlV2Private {
+	return &TomlV2Private{
+		TomlV2Common: TomlV2Common{
+			StoreVersion: storeVersion,
+			RepoType:     repo_type.TypeWorkingCopy,
+			BlobStores: map[string]BlobStoreReference{
+				"default": {
+					Name: "default",
+					Type: BlobStoreTypeLocal,
+				},
+			},
+			DefaultBlobStore:  "default",
 			InventoryListType: InventoryListTypeV2,
 		},
 	}

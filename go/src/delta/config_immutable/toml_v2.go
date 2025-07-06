@@ -1,0 +1,102 @@
+package config_immutable
+
+import (
+	"crypto/ed25519"
+	"flag"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+)
+
+type BlobStoreReference struct {
+	Name string        `toml:"name"`
+	Type BlobStoreType `toml:"type"`
+}
+
+type TomlV2Common struct {
+	StoreVersion      StoreVersion                  `toml:"store-version"`
+	RepoType          repo_type.Type                `toml:"repo-type"`
+	RepoId            ids.RepoId                    `toml:"id"`
+	BlobStores        map[string]BlobStoreReference `toml:"blob-stores"`
+	DefaultBlobStore  string                        `toml:"default-blob-store"`
+	InventoryListType string                        `toml:"inventory_list-type"`
+}
+
+type TomlV2Private struct {
+	repo_signing.TomlPrivateKeyV0
+	TomlV2Common
+}
+
+type TomlV2Public struct {
+	repo_signing.TomlPublicKeyV0
+	TomlV2Common
+}
+
+func (config *TomlV2Common) SetFlagSet(f *flag.FlagSet) {
+	config.RepoType = repo_type.TypeWorkingCopy
+	f.Var(&config.RepoType, "repo-type", "")
+}
+
+func (config *TomlV2Common) GetInventoryListTypeString() string {
+	if config.InventoryListType == "" {
+		return InventoryListTypeV1
+	} else {
+		return config.InventoryListType
+	}
+}
+
+func (config *TomlV2Public) config() public   { return public{} }
+func (config *TomlV2Private) config() private { return private{} }
+
+func (config *TomlV2Private) GetImmutableConfig() ConfigPrivate {
+	return config
+}
+
+func (config *TomlV2Private) GetImmutableConfigPublic() ConfigPublic {
+	return &TomlV2Public{
+		TomlV2Common:    config.TomlV2Common,
+		TomlPublicKeyV0: config.TomlPrivateKeyV0.GetPublicKey(),
+	}
+}
+
+func (config *TomlV2Private) GetPrivateKey() repo_signing.PrivateKey {
+	return repo_signing.NewKeyFromSeed(config.PrivateKey.Data)
+}
+
+func (config *TomlV2Private) GetPublicKey() repo_signing.PublicKey {
+	return repo_signing.PublicKey(config.GetPrivateKey().Public().(ed25519.PublicKey))
+}
+
+func (config *TomlV2Public) GetImmutableConfigPublic() ConfigPublic {
+	return config
+}
+
+func (config TomlV2Public) GetPublicKey() repo_signing.PublicKey {
+	return config.PublicKey.Data
+}
+
+func (config *TomlV2Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+	return nil
+}
+
+func (config *TomlV2Common) GetStoreVersion() interfaces.StoreVersion {
+	return config.StoreVersion
+}
+
+func (config TomlV2Common) GetRepoType() repo_type.Type {
+	return config.RepoType
+}
+
+func (config TomlV2Common) GetRepoId() ids.RepoId {
+	return config.RepoId
+}
+
+func (config *TomlV2Common) GetBlobStores() map[string]BlobStoreReference {
+	return config.BlobStores
+}
+
+func (config *TomlV2Common) GetDefaultBlobStore() string {
+	return config.DefaultBlobStore
+}
