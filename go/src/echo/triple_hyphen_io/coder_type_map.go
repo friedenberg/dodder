@@ -30,7 +30,7 @@ func (coderTypeMap CoderTypeMap[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetType()
+	tipe := *typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
@@ -50,7 +50,7 @@ func (coderTypeMap CoderTypeMap[BLOB]) EncodeTo(
 	typedBlob *TypedBlob[BLOB],
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	tipe := typedBlob.GetType()
+	tipe := *typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {
@@ -72,7 +72,7 @@ func (decoderTypeMap DecoderTypeMapWithoutType[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetType()
+	tipe := *typedBlob.GetType()
 	decoder, ok := decoderTypeMap[tipe.String()]
 
 	if !ok {
@@ -97,7 +97,7 @@ func (coderTypeMap CoderTypeMapWithoutType[BLOB]) DecodeFrom(
 	typedBlob *TypedBlob[BLOB],
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	tipe := typedBlob.GetType()
+	tipe := *typedBlob.GetType()
 	coder, ok := coderTypeMap[tipe.String()]
 
 	if !ok {

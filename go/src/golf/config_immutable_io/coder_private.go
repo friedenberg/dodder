@@ -83,10 +83,7 @@ func (CoderPrivate) EncodeTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(
-		&triple_hyphen_io.TypedBlob[*ConfigPrivatedTypedBlob]{
-			Type: &subject.Type,
-			Blob: subject,
-		},
+		subject,
 		writer,
 	); err != nil {
 		err = errors.Wrap(err)
