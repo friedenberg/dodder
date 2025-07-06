@@ -36,15 +36,15 @@ func MakeShardedFilesStore(
 	}
 }
 
-func (s storeShardedFiles) GetBlobStore() interfaces.BlobStore {
-	return s
+func (store storeShardedFiles) GetBlobStore() interfaces.BlobStore {
+	return store
 }
 
-func (s storeShardedFiles) GetLocalBlobStore() interfaces.LocalBlobStore {
-	return s
+func (store storeShardedFiles) GetLocalBlobStore() interfaces.LocalBlobStore {
+	return store
 }
 
-func (s storeShardedFiles) HasBlob(
+func (store storeShardedFiles) HasBlob(
 	sh interfaces.Sha,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
@@ -52,17 +52,17 @@ func (s storeShardedFiles) HasBlob(
 		return
 	}
 
-	p := id.Path(sh.GetShaLike(), s.basePath)
+	p := id.Path(sh.GetShaLike(), store.basePath)
 	ok = files.Exists(p)
 
 	return
 }
 
-func (s storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+func (store storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		var sh sha.Sha
 
-		for path, err := range files.DirNamesLevel2(s.basePath) {
+		for path, err := range files.DirNamesLevel2(store.basePath) {
 			if err != nil {
 				if !yield(nil, err) {
 					return
@@ -74,6 +74,10 @@ func (s storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 				if !yield(nil, err) {
 					return
 				}
+			}
+
+			if sh.IsNull() {
+				continue
 			}
 
 			if !yield(&sh, nil) {
@@ -101,7 +105,7 @@ func (store storeShardedFiles) Mover() (mover *env_dir.Mover, err error) {
 	return
 }
 
-func (s storeShardedFiles) BlobReader(
+func (store storeShardedFiles) BlobReader(
 	sh interfaces.Sha,
 ) (r interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
@@ -109,7 +113,7 @@ func (s storeShardedFiles) BlobReader(
 		return
 	}
 
-	if r, err = s.blobReaderFrom(sh, s.basePath); err != nil {
+	if r, err = store.blobReaderFrom(sh, store.basePath); err != nil {
 		if !env_dir.IsErrBlobMissing(err) {
 			err = errors.Wrap(err)
 		}
@@ -138,7 +142,7 @@ func (store storeShardedFiles) blobWriterTo(
 	return
 }
 
-func (s storeShardedFiles) blobReaderFrom(
+func (store storeShardedFiles) blobReaderFrom(
 	sh sha.ShaLike,
 	p string,
 ) (r sha.ReadCloser, err error) {
@@ -150,7 +154,7 @@ func (s storeShardedFiles) blobReaderFrom(
 	p = id.Path(sh.GetShaLike(), p)
 
 	o := env_dir.FileReadOptions{
-		Config: s.Config,
+		Config: store.Config,
 		Path:   p,
 	}
 
@@ -168,7 +172,7 @@ func (s storeShardedFiles) blobReaderFrom(
 				err,
 				"Path: %q, Compression: %q",
 				p,
-				s.GetBlobCompression(),
+				store.GetBlobCompression(),
 			)
 		}
 

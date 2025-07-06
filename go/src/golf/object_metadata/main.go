@@ -37,56 +37,56 @@ type Metadata struct {
 	Fields   []Field
 }
 
-func (m *Metadata) GetMetadata() *Metadata {
-	return m
+func (metadata *Metadata) GetMetadata() *Metadata {
+	return metadata
 }
 
-func (m *Metadata) Sha() *sha.Sha {
-	return &m.SelfMetadataObjectIdParent
+func (metadata *Metadata) Sha() *sha.Sha {
+	return &metadata.SelfMetadataObjectIdParent
 }
 
-func (m *Metadata) Mutter() *sha.Sha {
-	return &m.ParentMetadataObjectIdParent
+func (metadata *Metadata) Mutter() *sha.Sha {
+	return &metadata.ParentMetadataObjectIdParent
 }
 
 // TODO replace with command_components.ObjectMetadata
-func (m *Metadata) SetFlagSet(f *flag.FlagSet) {
-	m.SetFlagSetDescription(
+func (metadata *Metadata) SetFlagSet(f *flag.FlagSet) {
+	metadata.SetFlagSetDescription(
 		f,
 		"the description to use for created or updated Zettels",
 	)
 
-	m.SetFlagSetTags(
+	metadata.SetFlagSetTags(
 		f,
 		"the tags to use for created or updated object",
 	)
 
-	m.SetFlagSetType(
+	metadata.SetFlagSetType(
 		f,
 		"the type for the created or updated object",
 	)
 }
 
-func (m *Metadata) SetFlagSetDescription(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetDescription(f *flag.FlagSet, usage string) {
 	f.Var(
-		&m.Description,
+		&metadata.Description,
 		"description",
 		usage,
 	)
 }
 
-func (m *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 	// TODO add support for tag_paths
 	fes := flag.Make(
 		flag_policy.FlagPolicyAppend,
 		func() string {
-			return m.Cache.TagPaths.String()
+			return metadata.Cache.TagPaths.String()
 		},
 		func(value string) (err error) {
 			values := strings.SplitSeq(value, ",")
 
 			for tagString := range values {
-				if err = m.AddTagString(tagString); err != nil {
+				if err = metadata.AddTagString(tagString); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -95,7 +95,7 @@ func (m *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 			return
 		},
 		func() {
-			m.ResetTags()
+			metadata.ResetTags()
 		},
 	)
 
@@ -106,42 +106,42 @@ func (m *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 	)
 }
 
-func (m *Metadata) SetFlagSetType(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetType(f *flag.FlagSet, usage string) {
 	f.Func(
 		"type",
 		usage,
 		func(v string) (err error) {
-			return m.Type.Set(v)
+			return metadata.Type.Set(v)
 		},
 	)
 }
 
-func (z *Metadata) UserInputIsEmpty() bool {
-	if !z.Description.IsEmpty() {
+func (metadata *Metadata) UserInputIsEmpty() bool {
+	if !metadata.Description.IsEmpty() {
 		return false
 	}
 
-	if z.Tags != nil && z.Tags.Len() > 0 {
+	if metadata.Tags != nil && metadata.Tags.Len() > 0 {
 		return false
 	}
 
-	if !ids.IsEmpty(z.Type) {
+	if !ids.IsEmpty(metadata.Type) {
 		return false
 	}
 
 	return true
 }
 
-func (z *Metadata) IsEmpty() bool {
-	if !z.Blob.IsNull() {
+func (metadata *Metadata) IsEmpty() bool {
+	if !metadata.Blob.IsNull() {
 		return false
 	}
 
-	if !z.UserInputIsEmpty() {
+	if !metadata.UserInputIsEmpty() {
 		return false
 	}
 
-	if !z.Tai.IsZero() {
+	if !metadata.Tai.IsZero() {
 		return false
 	}
 
@@ -149,21 +149,21 @@ func (z *Metadata) IsEmpty() bool {
 }
 
 // TODO fix issue with GetTags being nil sometimes
-func (m *Metadata) GetTags() ids.TagSet {
-	if m.Tags == nil {
-		m.Tags = ids.MakeTagMutableSet()
+func (metadata *Metadata) GetTags() ids.TagSet {
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	return m.Tags
+	return metadata.Tags
 }
 
-func (m *Metadata) ResetTags() {
-	if m.Tags == nil {
-		m.Tags = ids.MakeTagMutableSet()
+func (metadata *Metadata) ResetTags() {
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	m.Tags.Reset()
-	m.Cache.TagPaths.Reset()
+	metadata.Tags.Reset()
+	metadata.Cache.TagPaths.Reset()
 }
 
 func (metadata *Metadata) AddTagString(tagString string) (err error) {
@@ -186,35 +186,35 @@ func (metadata *Metadata) AddTagString(tagString string) (err error) {
 	return
 }
 
-func (m *Metadata) AddTagPtr(e *ids.Tag) (err error) {
+func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	if e == nil || e.String() == "" {
 		return
 	}
 
-	if m.Tags == nil {
-		m.Tags = ids.MakeTagMutableSet()
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	ids.AddNormalizedTag(m.Tags, e)
+	ids.AddNormalizedTag(metadata.Tags, e)
 	cs := catgut.MakeFromString(e.String())
-	m.Cache.TagPaths.AddTag(cs)
+	metadata.Cache.TagPaths.AddTag(cs)
 
 	return
 }
 
-func (m *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
-	if m.Tags == nil {
-		m.Tags = ids.MakeTagMutableSet()
+func (metadata *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	if err = m.Tags.Add(*e); err != nil {
+	if err = metadata.Tags.Add(*e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	cs := catgut.MakeFromString(e.String())
 
-	if err = m.Cache.TagPaths.AddTag(cs); err != nil {
+	if err = metadata.Cache.TagPaths.AddTag(cs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -240,36 +240,36 @@ func (metadata *Metadata) SetTags(tags ids.TagSet) {
 	errors.PanicIfError(tags.EachPtr(metadata.AddTagPtr))
 }
 
-func (z *Metadata) GetType() ids.Type {
-	return z.Type
+func (metadata *Metadata) GetType() ids.Type {
+	return metadata.Type
 }
 
-func (z *Metadata) GetTypePtr() *ids.Type {
-	return &z.Type
+func (metadata *Metadata) GetTypePtr() *ids.Type {
+	return &metadata.Type
 }
 
-func (z *Metadata) GetTai() ids.Tai {
-	return z.Tai
-}
-
-// TODO-P2 remove
-func (b *Metadata) EqualsSansTai(a *Metadata) bool {
-	return EqualerSansTai.Equals(a, b)
+func (metadata *Metadata) GetTai() ids.Tai {
+	return metadata.Tai
 }
 
 // TODO-P2 remove
-func (pz *Metadata) Equals(z1 *Metadata) bool {
-	return Equaler.Equals(pz, z1)
+func (metadata *Metadata) EqualsSansTai(a *Metadata) bool {
+	return EqualerSansTai.Equals(a, metadata)
 }
 
-func (a *Metadata) Subtract(
+// TODO-P2 remove
+func (metadata *Metadata) Equals(z1 *Metadata) bool {
+	return Equaler.Equals(metadata, z1)
+}
+
+func (metadata *Metadata) Subtract(
 	b *Metadata,
 ) {
-	if a.Type.String() == b.Type.String() {
-		a.Type = ids.Type{}
+	if metadata.Type.String() == b.Type.String() {
+		metadata.Type = ids.Type{}
 	}
 
-	if a.Tags == nil {
+	if metadata.Tags == nil {
 		return
 	}
 
@@ -277,27 +277,27 @@ func (a *Metadata) Subtract(
 
 	for e := range b.Tags.AllPtr() {
 		// ui.Debug().Print(e)
-		a.Tags.DelPtr(e)
+		metadata.Tags.DelPtr(e)
 	}
 
 	// ui.Debug().Print("after", b.Tags, a.Tags)
 }
 
-func (mp *Metadata) AddComment(f string, vals ...any) {
-	mp.Comments = append(mp.Comments, fmt.Sprintf(f, vals...))
+func (metadata *Metadata) AddComment(f string, vals ...any) {
+	metadata.Comments = append(metadata.Comments, fmt.Sprintf(f, vals...))
 }
 
-func (selbst *Metadata) SetMutter(mg Getter) (err error) {
+func (metadata *Metadata) SetMutter(mg Getter) (err error) {
 	mutter := mg.GetMetadata()
 
-	if err = selbst.Mutter().SetShaLike(
+	if err = metadata.Mutter().SetShaLike(
 		mutter.Sha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = selbst.ParentMetadataObjectIdParent.SetShaLike(
+	if err = metadata.ParentMetadataObjectIdParent.SetShaLike(
 		&mutter.SelfMetadataObjectIdParent,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -307,9 +307,9 @@ func (selbst *Metadata) SetMutter(mg Getter) (err error) {
 	return
 }
 
-func (m *Metadata) GenerateExpandedTags() {
-	m.Cache.SetExpandedTags(ids.ExpandMany(
-		m.GetTags(),
+func (metadata *Metadata) GenerateExpandedTags() {
+	metadata.Cache.SetExpandedTags(ids.ExpandMany(
+		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))
 }

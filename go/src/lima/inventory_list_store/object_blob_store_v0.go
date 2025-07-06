@@ -22,15 +22,15 @@ type objectBlobStoreV0 struct {
 	blobStore      interfaces.LocalBlobStore
 }
 
-func (store *objectBlobStoreV0) getType() ids.Type {
-	return store.blobType
+func (objectBlobStore *objectBlobStoreV0) getType() ids.Type {
+	return objectBlobStore.blobType
 }
 
-func (store *objectBlobStoreV0) getTypedBlobStore() typed_blob_store.InventoryList {
-	return store.typedBlobStore
+func (objectBlobStore *objectBlobStoreV0) getTypedBlobStore() typed_blob_store.InventoryList {
+	return objectBlobStore.typedBlobStore
 }
 
-func (store *objectBlobStoreV0) ReadOneSha(
+func (objectBlobStore *objectBlobStoreV0) ReadOneSha(
 	id interfaces.Stringer,
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
@@ -42,7 +42,7 @@ func (store *objectBlobStoreV0) ReadOneSha(
 
 	var readCloser sha.ReadCloser
 
-	if readCloser, err = store.blobStore.BlobReader(&sh); err != nil {
+	if readCloser, err = objectBlobStore.blobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -52,8 +52,8 @@ func (store *objectBlobStoreV0) ReadOneSha(
 	bufferedReader := ohio.BufferedReader(readCloser)
 	defer pool.GetBufioReader().Put(bufferedReader)
 
-	if object, err = store.typedBlobStore.ReadInventoryListObject(
-		store.blobType,
+	if object, err = objectBlobStore.typedBlobStore.ReadInventoryListObject(
+		objectBlobStore.blobType,
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -63,22 +63,22 @@ func (store *objectBlobStoreV0) ReadOneSha(
 	return
 }
 
-func (store *objectBlobStoreV0) WriteInventoryListObject(
+func (objectBlobStore *objectBlobStoreV0) WriteInventoryListObject(
 	object *sku.Transacted,
 ) (err error) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
+	objectBlobStore.lock.Lock()
+	defer objectBlobStore.lock.Unlock()
 
 	var blobStoreWriteCloser interfaces.ShaWriteCloser
 
-	if blobStoreWriteCloser, err = store.blobStore.BlobWriter(); err != nil {
+	if blobStoreWriteCloser, err = objectBlobStore.blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, blobStoreWriteCloser)
 
-	object.Metadata.Type = store.blobType
+	object.Metadata.Type = objectBlobStore.blobType
 
 	bufferedWriter := ohio.BufferedWriter(blobStoreWriteCloser)
 	defer pool.GetBufioWriter().Put(bufferedWriter)
@@ -88,8 +88,8 @@ func (store *objectBlobStoreV0) WriteInventoryListObject(
 		return
 	}
 
-	if _, err = store.typedBlobStore.WriteObjectToWriter(
-		store.blobType,
+	if _, err = objectBlobStore.typedBlobStore.WriteObjectToWriter(
+		objectBlobStore.blobType,
 		object,
 		bufferedWriter,
 	); err != nil {
@@ -117,6 +117,11 @@ func (objectBlobStore *objectBlobStoreV0) IterAllInventoryLists() iter.Seq2[*sku
 				if !yield(nil, err) {
 					return
 				}
+			}
+
+			// TODO make changes to prevent null shas from ever being written
+			if sh.IsNull() {
+				continue
 			}
 
 			var decodedList *sku.Transacted

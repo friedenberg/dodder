@@ -56,14 +56,14 @@ type objectBlobStore interface {
 	IterAllInventoryLists() iter.Seq2[*sku.Transacted, error]
 }
 
-func (s *Store) Initialize(
+func (store *Store) Initialize(
 	envRepo env_repo.Env,
 	clock ids.Clock,
 	typedBlobStore typed_blob_store.InventoryList,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
-	*s = Store{
+	*store = Store{
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
@@ -76,13 +76,15 @@ func (s *Store) Initialize(
 		options: op,
 	}
 
-	blobType := ids.MustType(s.envRepo.GetConfigPublic().ImmutableConfig.GetInventoryListTypeString())
+	blobType := ids.MustType(
+		store.envRepo.GetConfigPublic().ImmutableConfig.GetInventoryListTypeString(),
+	)
 
 	if store_version.LessOrEqual(
-		s.storeVersion,
+		store.storeVersion,
 		store_version.V8,
 	) {
-		s.objectBlobStore = &objectBlobStoreV0{
+		store.objectBlobStore = &objectBlobStoreV0{
 			blobType: blobType,
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
@@ -94,7 +96,7 @@ func (s *Store) Initialize(
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
-		s.objectBlobStore = &objectBlobStoreV1{
+		store.objectBlobStore = &objectBlobStoreV1{
 			envRepo:  envRepo,
 			pathLog:  envRepo.FileInventoryListLog(),
 			blobType: blobType,
@@ -112,36 +114,38 @@ func (s *Store) Initialize(
 	return
 }
 
-func (s *Store) SetUIDelegate(ud sku.UIStorePrinters) {
-	s.ui = ud
+func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {
+	store.ui = ud
 }
 
-func (s *Store) GetEnv() env_ui.Env {
-	return s.GetEnvRepo()
+func (store *Store) GetEnv() env_ui.Env {
+	return store.GetEnvRepo()
 }
 
-func (s *Store) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
-	return s.GetEnvRepo().GetConfigPublic()
+func (store *Store) GetImmutableConfigPublic() config_immutable_io.ConfigLoadedPublic {
+	return store.GetEnvRepo().GetConfigPublic()
 }
 
-func (s *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
-	return s.GetEnvRepo().GetConfigPrivate()
+func (store *Store) GetImmutableConfigPrivate() config_immutable_io.ConfigLoadedPrivate {
+	return store.GetEnvRepo().GetConfigPrivate()
 }
 
-func (s *Store) GetObjectStore() sku.ObjectStore {
-	return s
+func (store *Store) GetObjectStore() sku.ObjectStore {
+	return store
 }
 
-func (s *Store) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
-	return s.getTypedBlobStore()
+func (store *Store) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+	return store.getTypedBlobStore()
 }
 
-func (s *Store) Flush() (err error) {
+func (store *Store) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 	return wg.GetError()
 }
 
-func (store *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
+func (store *Store) FormatForVersion(
+	sv interfaces.StoreVersion,
+) sku.ListFormat {
 	if store_version.LessOrEqual(
 		sv,
 		store_version.V6,
@@ -169,24 +173,24 @@ func (store *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat 
 	}
 }
 
-func (s *Store) GetTai() ids.Tai {
-	if s.clock == nil {
+func (store *Store) GetTai() ids.Tai {
+	if store.clock == nil {
 		return ids.NowTai()
 	} else {
-		return s.clock.GetTai()
+		return store.clock.GetTai()
 	}
 }
 
-func (s *Store) GetEnvRepo() env_repo.Env {
-	return s.envRepo
+func (store *Store) GetEnvRepo() env_repo.Env {
+	return store.envRepo
 }
 
-func (s *Store) GetBlobStore() interfaces.BlobStore {
-	return &s.envRepo
+func (store *Store) GetBlobStore() interfaces.BlobStore {
+	return &store.envRepo
 }
 
-func (s *Store) GetInventoryListStore() sku.InventoryListStore {
-	return s
+func (store *Store) GetInventoryListStore() sku.InventoryListStore {
+	return store
 }
 
 func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
@@ -214,7 +218,12 @@ func (store *Store) AddObjectToOpenList(
 	format := store.FormatForVersion(store.storeVersion)
 
 	if _, err = format.WriteObjectToOpenList(object, openList); err != nil {
-		err = errors.Wrapf(err, "%#v, format: %#v", object.Metadata.Fields, format)
+		err = errors.Wrapf(
+			err,
+			"%#v, format: %#v",
+			object.Metadata.Fields,
+			format,
+		)
 		return
 	}
 
@@ -428,31 +437,29 @@ func (store *Store) ImportInventoryList(
 	return
 }
 
-func (s *Store) IterInventoryList(
+func (store *Store) IterInventoryList(
 	blobSha interfaces.Sha,
 ) iter.Seq2[*sku.Transacted, error] {
-	return s.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
-		s.getType(),
-		s.blobStore,
+	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
+		store.getType(),
+		store.blobStore,
 		blobSha,
 	)
 }
 
 func (store *Store) ReadLast() (max *sku.Transacted, err error) {
-	var maxSku sku.Transacted
+	max = sku.GetTransactedPool().Get()
 
-	for b, iterErr := range store.IterAllInventoryLists() {
+	for list, iterErr := range store.IterAllInventoryLists() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
 		}
 
-		if sku.TransactedLessor.LessPtr(&maxSku, b) {
-			sku.TransactedResetter.ResetWith(&maxSku, b)
+		if sku.TransactedLessor.LessPtr(max, list) {
+			sku.TransactedResetter.ResetWith(max, list)
 		}
 	}
-
-	max = &maxSku
 
 	return
 }

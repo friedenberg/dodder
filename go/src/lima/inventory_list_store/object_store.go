@@ -58,11 +58,11 @@ func (store *Store) ReadOneInto(
 }
 
 // TODO
-func (s *Store) ReadPrimitiveQuery(
+func (store *Store) ReadPrimitiveQuery(
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.ReadAllSkus(
+	if err = store.ReadAllSkus(
 		func(_, sk *sku.Transacted) (err error) {
 			if err = output(sk); err != nil {
 				err = errors.Wrap(err)
