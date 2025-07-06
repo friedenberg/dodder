@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -18,8 +17,8 @@ type ObjectId struct {
 	*ids.ObjectId
 }
 
-func (k ObjectId) reduce(b *buildState) (err error) {
-	if err = k.GetObjectId().Expand(b.builder.expanders); err != nil {
+func (expObjectId ObjectId) reduce(b *buildState) (err error) {
+	if err = expObjectId.GetObjectId().Expand(b.builder.expanders); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -28,32 +27,30 @@ func (k ObjectId) reduce(b *buildState) (err error) {
 }
 
 // TODO support exact
-func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-	sk := tg.GetSku()
+func (expObjectId ObjectId) ContainsSku(
+	objectGetter sku.TransactedGetter,
+) (ok bool) {
+	object := objectGetter.GetSku()
 
-	skMe := sk.GetMetadata()
+	metadata := object.GetMetadata()
 
 	method := ids.Contains
 
-	if exp.Exact {
+	if expObjectId.Exact {
 		method = ids.ContainsExactly
 	}
 
-	switch exp.GetGenre() {
+	switch expObjectId.GetGenre() {
 	case genres.Tag:
-		var idx int
-
-		if exp.Exact {
-			idx, ok = skMe.Cache.TagPaths.All.ContainsObjectIdTagExact(
-				exp.GetObjectId(),
+		if expObjectId.Exact {
+			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTagExact(
+				expObjectId.GetObjectId(),
 			)
 		} else {
-			idx, ok = skMe.Cache.TagPaths.All.ContainsObjectIdTag(
-				exp.GetObjectId(),
+			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTag(
+				expObjectId.GetObjectId(),
 			)
 		}
-
-		ui.Log().Print(exp, idx, ok, skMe.Cache.TagPaths.All, sk)
 
 		if ok {
 			return
@@ -62,22 +59,22 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		return
 
 	case genres.Type:
-		if method(skMe.GetType(), exp.GetObjectId()) {
+		if method(metadata.GetType(), expObjectId.GetObjectId()) {
 			ok = true
 			return
 		}
 
-		if e, isExternal := tg.(*sku.Transacted); isExternal {
-			if method(e.ExternalType, exp.GetObjectId()) {
+		if e, isExternal := objectGetter.(*sku.Transacted); isExternal {
+			if method(e.ExternalType, expObjectId.GetObjectId()) {
 				ok = true
 				return
 			}
 		}
 	}
 
-	idl := &sk.ObjectId
+	idl := &object.ObjectId
 
-	if !method(idl, exp.GetObjectId()) {
+	if !method(idl, expObjectId.GetObjectId()) {
 		return
 	}
 
@@ -86,18 +83,18 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	return
 }
 
-func (k ObjectId) String() string {
+func (expObjectId ObjectId) String() string {
 	var sb strings.Builder
 
-	if k.Exact {
+	if expObjectId.Exact {
 		sb.WriteRune('=')
 	}
 
-	if k.Virtual {
+	if expObjectId.Virtual {
 		sb.WriteRune('%')
 	}
 
-	sb.WriteString(ids.FormattedString(k.GetObjectId()))
+	sb.WriteString(ids.FormattedString(expObjectId.GetObjectId()))
 
 	return sb.String()
 }

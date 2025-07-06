@@ -20,21 +20,21 @@ type expSigilAndGenre struct {
 	Hidden sku.Query
 }
 
-func (a *expSigilAndGenre) IsEmpty() bool {
-	return a.Sigil == ids.SigilUnknown &&
-		a.Genre.IsEmpty() &&
-		a.exp.IsEmpty()
+func (expSigilAndGenre *expSigilAndGenre) IsEmpty() bool {
+	return expSigilAndGenre.Sigil == ids.SigilUnknown &&
+		expSigilAndGenre.Genre.IsEmpty() &&
+		expSigilAndGenre.exp.IsEmpty()
 }
 
-func (a *expSigilAndGenre) GetSigil() ids.Sigil {
-	return a.Sigil
+func (expSigilAndGenre *expSigilAndGenre) GetSigil() ids.Sigil {
+	return expSigilAndGenre.Sigil
 }
 
-func (q *expSigilAndGenre) addPinnedObjectId(
+func (expSigilAndGenre *expSigilAndGenre) addPinnedObjectId(
 	b *buildState,
 	k pinnedObjectId,
 ) (err error) {
-	if err = q.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
+	if err = expSigilAndGenre.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -42,7 +42,7 @@ func (q *expSigilAndGenre) addPinnedObjectId(
 	return
 }
 
-func (q *expSigilAndGenre) addExactObjectId(
+func (expSigilAndGenre *expSigilAndGenre) addExactObjectId(
 	b *buildState,
 	k ObjectId,
 	sigil ids.Sigil,
@@ -52,24 +52,32 @@ func (q *expSigilAndGenre) addExactObjectId(
 		return
 	}
 
-	q.Sigil.Add(sigil)
-	q.expObjectIds.internal[k.GetObjectId().String()] = k
-	q.Genre.Add(genres.Must(k))
+	expSigilAndGenre.Sigil.Add(sigil)
+	expSigilAndGenre.expObjectIds.internal[k.GetObjectId().String()] = k
+	expSigilAndGenre.Genre.Add(genres.Must(k))
 
 	return
 }
 
-func (a *expSigilAndGenre) ContainsObjectId(k *ids.ObjectId) bool {
-	if !a.Genre.Contains(k.GetGenre()) {
-		err := errors.ErrorWithStackf("checking query %#v for object id %#v, %q, %q", a, k, a, k)
+func (expSigilAndGenre *expSigilAndGenre) ContainsObjectId(
+	k *ids.ObjectId,
+) bool {
+	if !expSigilAndGenre.Genre.Contains(k.GetGenre()) {
+		err := errors.ErrorWithStackf(
+			"checking query %#v for object id %#v, %q, %q",
+			expSigilAndGenre,
+			k,
+			expSigilAndGenre,
+			k,
+		)
 		panic(err)
 	}
 
-	if len(a.expObjectIds.internal) == 0 {
+	if len(expSigilAndGenre.expObjectIds.internal) == 0 {
 		return false
 	}
 
-	_, ok := a.expObjectIds.internal[k.String()]
+	_, ok := expSigilAndGenre.expObjectIds.internal[k.String()]
 
 	return ok
 }
@@ -80,8 +88,14 @@ func (a *expSigilAndGenre) Clone() (b *expSigilAndGenre) {
 		Genre: a.Genre,
 		exp: exp{
 			expObjectIds: expObjectIds{
-				internal: make(map[string]ObjectId, len(a.expObjectIds.internal)),
-				external: make(map[string]sku.ExternalObjectId, len(a.expObjectIds.external)),
+				internal: make(
+					map[string]ObjectId,
+					len(a.expObjectIds.internal),
+				),
+				external: make(
+					map[string]sku.ExternalObjectId,
+					len(a.expObjectIds.external),
+				),
 			},
 		},
 		Hidden: a.Hidden,
@@ -126,41 +140,52 @@ func (q *expSigilAndGenre) Add(m sku.Query) (err error) {
 	return
 }
 
-func (a *expSigilAndGenre) Merge(b *expSigilAndGenre) (err error) {
-	a.Sigil.Add(b.Sigil)
+func (expSigilAndGenre *expSigilAndGenre) Merge(
+	b *expSigilAndGenre,
+) (err error) {
+	expSigilAndGenre.Sigil.Add(b.Sigil)
 
-	if a.expObjectIds.internal == nil {
-		a.expObjectIds.internal = make(map[string]ObjectId, len(b.expObjectIds.internal))
+	if expSigilAndGenre.expObjectIds.internal == nil {
+		expSigilAndGenre.expObjectIds.internal = make(
+			map[string]ObjectId,
+			len(b.expObjectIds.internal),
+		)
 	}
 
 	for _, k := range b.expObjectIds.internal {
-		a.expObjectIds.internal[k.GetObjectId().String()] = k
+		expSigilAndGenre.expObjectIds.internal[k.GetObjectId().String()] = k
 	}
 
-	if a.expObjectIds.external == nil {
-		a.expObjectIds.external = make(map[string]sku.ExternalObjectId, len(b.expObjectIds.external))
+	if expSigilAndGenre.expObjectIds.external == nil {
+		expSigilAndGenre.expObjectIds.external = make(
+			map[string]sku.ExternalObjectId,
+			len(b.expObjectIds.external),
+		)
 	}
 
 	for _, k := range b.expObjectIds.external {
-		a.expObjectIds.external[k.GetExternalObjectId().String()] = k
+		expSigilAndGenre.expObjectIds.external[k.GetExternalObjectId().String()] = k
 	}
 
-	a.expTagsOrTypes.Children = append(a.expTagsOrTypes.Children, b.expTagsOrTypes.Children...)
+	expSigilAndGenre.expTagsOrTypes.Children = append(
+		expSigilAndGenre.expTagsOrTypes.Children,
+		b.expTagsOrTypes.Children...)
 
 	return
 }
 
-func (q *expSigilAndGenre) StringDebug() string {
+func (expSigilAndGenre *expSigilAndGenre) StringDebug() string {
 	var sb strings.Builder
 
-	if q.expObjectIds.internal == nil || len(q.expObjectIds.internal) == 0 {
-		sb.WriteString(q.expTagsOrTypes.StringDebug())
+	if expSigilAndGenre.expObjectIds.internal == nil ||
+		len(expSigilAndGenre.expObjectIds.internal) == 0 {
+		sb.WriteString(expSigilAndGenre.expTagsOrTypes.StringDebug())
 	} else {
 		sb.WriteString("[[")
 
 		first := true
 
-		for _, k := range q.expObjectIds.internal {
+		for _, k := range expSigilAndGenre.expObjectIds.internal {
 			if !first {
 				sb.WriteString(", ")
 			}
@@ -171,28 +196,28 @@ func (q *expSigilAndGenre) StringDebug() string {
 		}
 
 		sb.WriteString(", ")
-		sb.WriteString(q.expTagsOrTypes.StringDebug())
+		sb.WriteString(expSigilAndGenre.expTagsOrTypes.StringDebug())
 		sb.WriteString("]")
 	}
 
-	if q.IsEmpty() && !q.IsLatestOrUnknown() {
-		sb.WriteString(q.Sigil.String())
-	} else if !q.IsEmpty() {
-		sb.WriteString(q.Sigil.String())
-		sb.WriteString(q.Genre.String())
+	if expSigilAndGenre.IsEmpty() && !expSigilAndGenre.IsLatestOrUnknown() {
+		sb.WriteString(expSigilAndGenre.Sigil.String())
+	} else if !expSigilAndGenre.IsEmpty() {
+		sb.WriteString(expSigilAndGenre.Sigil.String())
+		sb.WriteString(expSigilAndGenre.Genre.String())
 	}
 
 	return sb.String()
 }
 
-func (q *expSigilAndGenre) SortedObjectIds() []string {
-	out := make([]string, 0, q.expObjectIds.Len())
+func (expSigilAndGenre *expSigilAndGenre) SortedObjectIds() []string {
+	out := make([]string, 0, expSigilAndGenre.expObjectIds.Len())
 
-	for k := range q.expObjectIds.internal {
+	for k := range expSigilAndGenre.expObjectIds.internal {
 		out = append(out, k)
 	}
 
-	for k := range q.expObjectIds.external {
+	for k := range expSigilAndGenre.expObjectIds.external {
 		out = append(out, k)
 	}
 
@@ -201,12 +226,12 @@ func (q *expSigilAndGenre) SortedObjectIds() []string {
 	return out
 }
 
-func (q *expSigilAndGenre) String() string {
+func (expSigilAndGenre *expSigilAndGenre) String() string {
 	var sb strings.Builder
 
-	e := q.expTagsOrTypes.String()
+	e := expSigilAndGenre.expTagsOrTypes.String()
 
-	oids := q.SortedObjectIds()
+	oids := expSigilAndGenre.SortedObjectIds()
 
 	if len(oids) == 0 {
 		sb.WriteString(e)
@@ -231,55 +256,62 @@ func (q *expSigilAndGenre) String() string {
 
 		if e != "" {
 			sb.WriteString(", ")
-			sb.WriteString(q.expTagsOrTypes.String())
+			sb.WriteString(expSigilAndGenre.expTagsOrTypes.String())
 		}
 
 		sb.WriteString("]")
 	}
 
-	if q.Genre.IsEmpty() && !q.IsLatestOrUnknown() {
-		sb.WriteString(q.Sigil.String())
-	} else if !q.Genre.IsEmpty() {
-		sb.WriteString(q.Sigil.String())
-		sb.WriteString(q.Genre.String())
+	if expSigilAndGenre.Genre.IsEmpty() &&
+		!expSigilAndGenre.IsLatestOrUnknown() {
+		sb.WriteString(expSigilAndGenre.Sigil.String())
+	} else if !expSigilAndGenre.Genre.IsEmpty() {
+		sb.WriteString(expSigilAndGenre.Sigil.String())
+		sb.WriteString(expSigilAndGenre.Genre.String())
 	}
 
 	return sb.String()
 }
 
-func (q *expSigilAndGenre) ShouldHide(tg sku.TransactedGetter, k string) bool {
-	_, ok := q.expObjectIds.internal[k]
+func (expSigilAndGenre *expSigilAndGenre) ShouldHide(
+	objectGetter sku.TransactedGetter,
+	objectIdString string,
+) bool {
+	_, ok := expSigilAndGenre.expObjectIds.internal[objectIdString]
 
-	if q.IncludesHidden() || q.Hidden == nil || ok {
+	if expSigilAndGenre.IncludesHidden() || expSigilAndGenre.Hidden == nil ||
+		ok {
 		return false
 	}
 
-	return q.Hidden.ContainsSku(tg)
+	return expSigilAndGenre.Hidden.ContainsSku(objectGetter)
 }
 
-func (q *expSigilAndGenre) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-	sk := tg.GetSku()
+func (expSigilAndGenre *expSigilAndGenre) ContainsSku(
+	objectGetter sku.TransactedGetter,
+) (ok bool) {
+	object := objectGetter.GetSku()
 
-	k := sk.ObjectId.String()
+	objectIdString := object.ObjectId.String()
 
-	if q.ShouldHide(sk, k) {
+	genre := genres.Must(object)
+
+	if expSigilAndGenre.ShouldHide(object, objectIdString) {
 		return
 	}
 
-	g := genres.Must(sk)
-
-	if !q.Genre.ContainsOneOf(g) {
+	if !expSigilAndGenre.Genre.ContainsOneOf(genre) {
 		return
 	}
 
-	if _, ok = q.expObjectIds.internal[k]; ok {
+	if _, ok = expSigilAndGenre.expObjectIds.internal[objectIdString]; ok {
 		return
 	}
 
-	if len(q.expTagsOrTypes.Children) == 0 {
-		ok = len(q.expObjectIds.internal) == 0
+	if len(expSigilAndGenre.expTagsOrTypes.Children) == 0 {
+		ok = len(expSigilAndGenre.expObjectIds.internal) == 0
 		return
-	} else if !q.expTagsOrTypes.ContainsSku(tg) {
+	} else if !expSigilAndGenre.expTagsOrTypes.ContainsSku(objectGetter) {
 		return
 	}
 
@@ -288,40 +320,46 @@ func (q *expSigilAndGenre) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	return
 }
 
-func (q *expSigilAndGenre) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
+func (expSigilAndGenre *expSigilAndGenre) ContainsExternalSku(
+	el sku.ExternalLike,
+) (ok bool) {
 	sk := el.GetSku()
 
 	g := genres.Must(sk)
 
-	if !q.Genre.ContainsOneOf(g) {
+	if !expSigilAndGenre.Genre.ContainsOneOf(g) {
 		return
 	}
 
 	k := sk.ObjectId.String()
 
-	if q.ShouldHide(el, k) {
+	if expSigilAndGenre.ShouldHide(el, k) {
 		return
 	}
 
 	eoid := el.GetExternalObjectId().String()
-	ui.Log().Print(eoid, q.expObjectIds.external, q.expObjectIds.internal)
+	ui.Log().Print(
+		eoid,
+		expSigilAndGenre.expObjectIds.external,
+		expSigilAndGenre.expObjectIds.internal,
+	)
 
-	if _, ok = q.expObjectIds.external[eoid]; ok {
+	if _, ok = expSigilAndGenre.expObjectIds.external[eoid]; ok {
 		return
 	}
 
-	if _, ok = q.expObjectIds.external[k]; ok {
+	if _, ok = expSigilAndGenre.expObjectIds.external[k]; ok {
 		return
 	}
 
-	if _, ok = q.expObjectIds.internal[k]; ok {
+	if _, ok = expSigilAndGenre.expObjectIds.internal[k]; ok {
 		return
 	}
 
-	if len(q.expTagsOrTypes.Children) == 0 {
-		ok = q.expObjectIds.IsEmpty()
+	if len(expSigilAndGenre.expTagsOrTypes.Children) == 0 {
+		ok = expSigilAndGenre.expObjectIds.IsEmpty()
 		return
-	} else if !q.expTagsOrTypes.ContainsSku(el) {
+	} else if !expSigilAndGenre.expTagsOrTypes.ContainsSku(el) {
 		return
 	}
 

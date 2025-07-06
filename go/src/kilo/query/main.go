@@ -23,16 +23,16 @@ type Query struct {
 	defaultQuery *Query
 }
 
-func (q *Query) GetDefaultQuery() *Query {
-	return q.defaultQuery
+func (query *Query) GetDefaultQuery() *Query {
+	return query.defaultQuery
 }
 
-func (qg *Query) isDotOperatorActive() bool {
-	if qg.dotOperatorActive {
+func (query *Query) isDotOperatorActive() bool {
+	if query.dotOperatorActive {
 		return true
 	}
 
-	for _, oq := range qg.optimizedQueries {
+	for _, oq := range query.optimizedQueries {
 		if oq.Sigil.ContainsOneOf(ids.SigilExternal) {
 			return true
 		}
@@ -45,20 +45,20 @@ type reducer interface {
 	reduce(*buildState) error
 }
 
-func (qg *Query) reduce(b *buildState) (err error) {
-	for _, q := range qg.userQueries {
+func (query *Query) reduce(b *buildState) (err error) {
+	for _, q := range query.userQueries {
 		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = qg.addOptimized(b, q); err != nil {
+		if err = query.addOptimized(b, q); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for _, q := range qg.optimizedQueries {
+	for _, q := range query.optimizedQueries {
 		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -68,7 +68,7 @@ func (qg *Query) reduce(b *buildState) (err error) {
 	return
 }
 
-func (qg *Query) addExactExternalObjectId(
+func (query *Query) addExactExternalObjectId(
 	b *buildState,
 	k sku.ExternalObjectId,
 ) (err error) {
@@ -84,22 +84,22 @@ func (qg *Query) addExactExternalObjectId(
 	q.Genre.Add(genres.Must(k))
 	q.expObjectIds.external[k.String()] = k
 
-	if err = qg.add(q); err != nil {
+	if err = query.add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	qg.dotOperatorActive = true
+	query.dotOperatorActive = true
 
 	return
 }
 
-func (qg *Query) add(q *expSigilAndGenre) (err error) {
-	existing, ok := qg.userQueries[q.Genre]
+func (query *Query) add(q *expSigilAndGenre) (err error) {
+	existing, ok := query.userQueries[q.Genre]
 
 	if !ok {
 		existing = &expSigilAndGenre{
-			Hidden: qg.hidden,
+			Hidden: query.hidden,
 			Genre:  q.Genre,
 			exp: exp{
 				expObjectIds: expObjectIds{
@@ -114,12 +114,15 @@ func (qg *Query) add(q *expSigilAndGenre) (err error) {
 		return
 	}
 
-	qg.userQueries[q.Genre] = existing
+	query.userQueries[q.Genre] = existing
 
 	return
 }
 
-func (qg *Query) addOptimized(b *buildState, q *expSigilAndGenre) (err error) {
+func (query *Query) addOptimized(
+	b *buildState,
+	q *expSigilAndGenre,
+) (err error) {
 	q = q.Clone()
 	gs := q.Slice()
 
@@ -128,7 +131,7 @@ func (qg *Query) addOptimized(b *buildState, q *expSigilAndGenre) (err error) {
 	}
 
 	for _, g := range gs {
-		existing, ok := qg.optimizedQueries[g]
+		existing, ok := query.optimizedQueries[g]
 
 		if !ok {
 			existing = b.makeQuery()
@@ -140,14 +143,14 @@ func (qg *Query) addOptimized(b *buildState, q *expSigilAndGenre) (err error) {
 			return
 		}
 
-		qg.optimizedQueries[g] = existing
+		query.optimizedQueries[g] = existing
 	}
 
 	return
 }
 
-func (qg *Query) isEmpty() bool {
-	return len(qg.userQueries) == 0
+func (query *Query) isEmpty() bool {
+	return len(query.userQueries) == 0
 }
 
 func (queryGroup *Query) getExactlyOneExternalObjectId(
@@ -264,48 +267,48 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 	return
 }
 
-func (qg *Query) sortedUserQueries() []*expSigilAndGenre {
-	out := make([]*expSigilAndGenre, 0, len(qg.userQueries))
+func (query *Query) sortedUserQueries() []*expSigilAndGenre {
+	userQueries := make([]*expSigilAndGenre, 0, len(query.userQueries))
 
-	for _, g := range qg.userQueries {
-		out = append(out, g)
+	for _, userQuery := range query.userQueries {
+		userQueries = append(userQueries, userQuery)
 	}
 
-	sort.Slice(out, func(i, j int) bool {
-		l, r := out[i].Genre, out[j].Genre
+	sort.Slice(userQueries, func(i, j int) bool {
+		left, right := userQueries[i].Genre, userQueries[j].Genre
 
-		if l.IsEmpty() {
+		if left.IsEmpty() {
 			return false
 		}
 
-		if r.IsEmpty() {
+		if right.IsEmpty() {
 			return true
 		}
 
-		return l < r
+		return left < right
 	})
 
-	return out
+	return userQueries
 }
 
-func (qg *Query) containsSku(tg sku.TransactedGetter) (ok bool) {
-	if qg.defaultQuery != nil &&
-		!qg.defaultQuery.containsSku(tg) {
+func (query *Query) containsSku(objectGetter sku.TransactedGetter) (ok bool) {
+	if query.defaultQuery != nil &&
+		!query.defaultQuery.containsSku(objectGetter) {
 		return
 	}
 
-	sk := tg.GetSku()
+	object := objectGetter.GetSku()
 
-	if len(qg.optimizedQueries) == 0 && qg.matchOnEmpty {
+	if len(query.optimizedQueries) == 0 && query.matchOnEmpty {
 		ok = true
 		return
 	}
 
-	g := sk.GetGenre()
+	genre := object.GetGenre()
 
-	q, ok := qg.optimizedQueries[genres.Must(g)]
+	expSigilAndGenre, ok := query.optimizedQueries[genres.Must(genre)]
 
-	if !ok || !q.ContainsSku(tg) {
+	if !ok || !expSigilAndGenre.ContainsSku(objectGetter) {
 		ok = false
 		return
 	}

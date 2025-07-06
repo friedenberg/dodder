@@ -7,16 +7,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
 
-func (qg *Query) StringDebug() string {
+func (query *Query) StringDebug() string {
 	var sb strings.Builder
 
-	if qg.defaultQuery != nil {
-		fmt.Fprintf(&sb, "default: %q", qg.defaultQuery)
+	if query.defaultQuery != nil {
+		fmt.Fprintf(&sb, "default: %q", query.defaultQuery)
 	}
 
 	first := true
 
-	for _, g := range qg.sortedUserQueries() {
+	for _, g := range query.sortedUserQueries() {
 		if !first {
 			sb.WriteRune(' ')
 		}
@@ -30,7 +30,7 @@ func (qg *Query) StringDebug() string {
 	first = true
 
 	for _, g := range genres.All() {
-		q, ok := qg.optimizedQueries[g]
+		q, ok := query.optimizedQueries[g]
 
 		if !ok {
 			continue
@@ -48,7 +48,7 @@ func (qg *Query) StringDebug() string {
 	return sb.String()
 }
 
-func (qg *Query) StringOptimized() string {
+func (query *Query) StringOptimized() string {
 	var sb strings.Builder
 
 	first := true
@@ -68,7 +68,7 @@ func (qg *Query) StringOptimized() string {
 	// )
 
 	for _, g := range genres.All() {
-		q, ok := qg.optimizedQueries[g]
+		q, ok := query.optimizedQueries[g]
 
 		if !ok {
 			continue

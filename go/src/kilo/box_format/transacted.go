@@ -291,7 +291,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 		object_metadata_fmt.MetadataFieldTags(metadata)...,
 	)
 
-	if !options.ExcludeFields {
+	if !options.ExcludeFields && !format.isArchive {
 		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 

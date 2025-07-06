@@ -44,7 +44,7 @@ func GetTypes(qg *Query) ids.TypeSet {
 	return qg.types
 }
 
-func (qg *Query) String() string {
+func (query *Query) String() string {
 	var sb strings.Builder
 
 	first := true
@@ -63,7 +63,7 @@ func (qg *Query) String() string {
 	// 	},
 	// )
 
-	for _, userQuery := range qg.sortedUserQueries() {
+	for _, userQuery := range query.sortedUserQueries() {
 		// TODO determine why GS can be ""
 		userQueryString := userQuery.String()
 
