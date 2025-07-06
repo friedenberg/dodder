@@ -8,10 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-type BlobTyper[BLOB any, BLOB_PTR interfaces.Ptr[BLOB]] interface {
-	GetTypePtr() *ids.Type
-}
-
 type TypedBlob[BLOB any] struct {
 	// TODO determine why this needs to be a pointer
 	Type *ids.Type
