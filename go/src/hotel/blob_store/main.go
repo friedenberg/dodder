@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"iter"
+	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -63,7 +64,13 @@ func (store storeShardedFiles) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 		var sh sha.Sha
 
 		for path, err := range files.DirNamesLevel2(store.basePath) {
+			if errors.IsErrno(err, syscall.ENOTDIR) {
+				err = nil
+				continue
+			}
+
 			if err != nil {
+				err = errors.Wrap(err)
 				if !yield(nil, err) {
 					return
 				}

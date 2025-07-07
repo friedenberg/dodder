@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
+	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
@@ -198,37 +198,28 @@ func (env Env) Mover() (*env_dir.Mover, error) {
 }
 
 func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
+	// TODO use default blob store ref from config and initialize a blob store
 	return blob_store.MakeShardedFilesStore(
 		env.DirBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
-			env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
+			env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable(),
 		),
 		env.GetTempLocal(),
 	)
 }
 
-func (env Env) MakeBlobStoreFromConfig(blobStoreConfig config_immutable.BlobStoreConfig) blob_store.LocalBlobStore {
-	return blob_store.MakeShardedFilesStore(
-		env.DirBlobs(),
-		env_dir.MakeConfigFromImmutableBlobConfig(blobStoreConfig),
-		env.GetTempLocal(),
-	)
-}
+// func (env Env) MakeBlobStoreFromConfig(
+// 	blobStoreConfig config_immutable.BlobStoreConfig,
+// ) blob_store.LocalBlobStore {
+// 	return blob_store.MakeShardedFilesStore(
+// 		env.DirBlobs(),
+// 		env_dir.MakeConfigFromImmutableBlobConfig(blobStoreConfig),
+// 		env.GetTempLocal(),
+// 	)
+// }
 
-func (env Env) MakeBlobStoreFromName(name string) (blob_store.LocalBlobStore, error) {
-	if configV2, ok := env.config.Blob.(interface {
-		GetBlobStores() map[string]config_immutable.BlobStoreReference
-	}); ok {
-		blobStores := configV2.GetBlobStores()
-		if ref, exists := blobStores[name]; exists {
-			blobStoreConfig, err := config_immutable.ReadBlobStoreConfigFromDir(env.DirBlobs())
-			if err != nil {
-				return nil, err
-			}
-			if blobStoreConfig.GetBlobStoreType() == ref.Type {
-				return env.MakeBlobStoreFromConfig(blobStoreConfig), nil
-			}
-		}
-	}
-	return nil, errors.Errorf("blob store %q not found", name)
+func (env Env) MakeBlobStoreFromName(
+	name string,
+) (interfaces.BlobStore, error) {
+	return nil, todo.Implement()
 }

@@ -140,11 +140,7 @@ func (local *Repo) initialize(
 		if options.GetAllowConfigReadError() {
 			err = nil
 		} else {
-			err = errors.Wrapf(
-				err,
-				"CompressionType: %q",
-				local.envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable().GetBlobCompression(),
-			)
+			err = errors.Wrap(err)
 			return
 		}
 	}

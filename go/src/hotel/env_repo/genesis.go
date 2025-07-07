@@ -166,12 +166,7 @@ func (env Env) readAndTransferLines(in, out string) (err error) {
 }
 
 func (env *Env) writeBlobStoreConfig(config config_immutable.ConfigPrivate) {
-	blobStoreConfig := config_immutable.DefaultLocalBlobStoreConfig()
-
-	blobStoreConfigPath := filepath.Join(env.DirBlobs(), config_immutable.BlobStoreConfigFilename)
-	if err := blobStoreConfig.WriteToFile(blobStoreConfigPath); err != nil {
-		env.CancelWithError(err)
-	}
+	// TODO
 }
 
 func writeFile(p string, contents any) {

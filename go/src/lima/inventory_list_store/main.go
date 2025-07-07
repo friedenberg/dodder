@@ -87,6 +87,8 @@ func (store *Store) Initialize(
 	) {
 		store.objectBlobStore = &objectBlobStoreV0{
 			blobType: blobType,
+			// TODO use default blob store ref from config and initialize a blob
+			// store
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(
@@ -101,6 +103,7 @@ func (store *Store) Initialize(
 			envRepo:  envRepo,
 			pathLog:  envRepo.FileInventoryListLog(),
 			blobType: blobType,
+			// TODO use default blob store ref from config and initialize a blob
 			blobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(

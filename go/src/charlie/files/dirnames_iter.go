@@ -12,6 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
+// TODO migrate all dir walking to this package
+
 type WalkDirEntry struct {
 	Path    string
 	RelPath string
@@ -89,16 +91,16 @@ func DirNames2(p string) iter.Seq2[os.DirEntry, error] {
 	}
 }
 
-func DirNames(p string) (slice quiter.Slice[string], err error) {
+func DirNames(dirPath string) (slice quiter.Slice[string], err error) {
 	var names []os.DirEntry
 
-	if names, err = ReadDir(p); err != nil {
+	if names, err = ReadDir(dirPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for _, n := range names {
-		slice.Append(path.Join(p, n.Name()))
+	for _, dirEntry := range names {
+		slice.Append(path.Join(dirPath, dirEntry.Name()))
 	}
 
 	return
@@ -128,7 +130,7 @@ func DirNameWriterIgnoringHidden(
 }
 
 func DirNamesLevel2(
-	p string,
+	dirPath string,
 ) iter.Seq2[string, error] {
 	return func(yield func(string, error) bool) {
 		var topLevel quiter.Slice[string]
@@ -136,7 +138,7 @@ func DirNamesLevel2(
 		{
 			var err error
 
-			if topLevel, err = DirNames(p); err != nil {
+			if topLevel, err = DirNames(dirPath); err != nil {
 				yield("", err)
 				return
 			}
@@ -144,6 +146,7 @@ func DirNamesLevel2(
 
 		for topLevelDir := range topLevel.All() {
 			var secondLevel quiter.Slice[string]
+
 			{
 				var err error
 

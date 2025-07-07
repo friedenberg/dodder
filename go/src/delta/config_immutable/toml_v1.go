@@ -61,7 +61,9 @@ func (config *TomlV1Private) GetPrivateKey() repo_signing.PrivateKey {
 }
 
 func (config *TomlV1Private) GetPublicKey() repo_signing.PublicKey {
-	return repo_signing.PublicKey(config.GetPrivateKey().Public().(ed25519.PublicKey))
+	return repo_signing.PublicKey(
+		config.GetPrivateKey().Public().(ed25519.PublicKey),
+	)
 }
 
 func (config *TomlV1Public) GetImmutableConfigPublic() ConfigPublic {

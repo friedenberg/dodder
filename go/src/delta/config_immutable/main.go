@@ -42,11 +42,13 @@ type configCommonV2 interface {
 	GetDefaultBlobStore() string
 }
 
+// TODO rename to just `Public`
 type ConfigPublic interface {
 	config() public
 	configCommon
 }
 
+// TODO rename to just `Private`
 type ConfigPrivate interface {
 	configCommon
 	config() private
@@ -65,6 +67,7 @@ func Default() *TomlV1Private {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
+// TODO read callers of this and add blob store config there
 func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 	return &TomlV1Private{
 		TomlV1Common: TomlV1Common{
@@ -77,10 +80,6 @@ func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 			InventoryListType: InventoryListTypeV2,
 		},
 	}
-}
-
-func DefaultV2() *TomlV2Private {
-	return DefaultV2WithVersion(store_version.VCurrent)
 }
 
 func DefaultV2WithVersion(storeVersion StoreVersion) *TomlV2Private {
