@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-// TODO should this be private?
+// must be public for toml coding to function
 type TomlV1Common struct {
 	StoreVersion      StoreVersion    `toml:"store-version"`
 	RepoType          repo_type.Type  `toml:"repo-type"`

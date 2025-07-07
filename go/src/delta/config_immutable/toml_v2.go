@@ -15,13 +15,13 @@ type BlobStoreReference struct {
 	Type BlobStoreType `toml:"type"`
 }
 
+// must be public for toml coding to function
 type TomlV2Common struct {
-	StoreVersion      StoreVersion                  `toml:"store-version"`
-	RepoType          repo_type.Type                `toml:"repo-type"`
-	RepoId            ids.RepoId                    `toml:"id"`
-	BlobStores        map[string]BlobStoreReference `toml:"blob-stores"`
-	DefaultBlobStore  string                        `toml:"default-blob-store"`
-	InventoryListType string                        `toml:"inventory_list-type"`
+	StoreVersion      StoreVersion   `toml:"store-version"`
+	RepoType          repo_type.Type `toml:"repo-type"`
+	RepoId            ids.RepoId     `toml:"id"`
+	DefaultBlobStore  string         `toml:"default-blob-store"`
+	InventoryListType string         `toml:"inventory_list-type"`
 }
 
 type TomlV2Private struct {
@@ -66,7 +66,9 @@ func (config *TomlV2Private) GetPrivateKey() repo_signing.PrivateKey {
 }
 
 func (config *TomlV2Private) GetPublicKey() repo_signing.PublicKey {
-	return repo_signing.PublicKey(config.GetPrivateKey().Public().(ed25519.PublicKey))
+	return repo_signing.PublicKey(
+		config.GetPrivateKey().Public().(ed25519.PublicKey),
+	)
 }
 
 func (config *TomlV2Public) GetImmutableConfigPublic() Public {
@@ -91,10 +93,6 @@ func (config TomlV2Common) GetRepoType() repo_type.Type {
 
 func (config TomlV2Common) GetRepoId() ids.RepoId {
 	return config.RepoId
-}
-
-func (config *TomlV2Common) GetBlobStores() map[string]BlobStoreReference {
-	return config.BlobStores
 }
 
 func (config *TomlV2Common) GetDefaultBlobStore() string {
