@@ -126,7 +126,7 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+func (store *Store) GetImmutableConfigPublic() config_immutable.Public {
 	return store.GetEnvRepo().GetConfigPublic().Blob
 }
 

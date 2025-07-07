@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -25,42 +24,30 @@ type (
 
 // TODO make it impossible for private configs to be returned fy
 // GetImmutableConfigPublic
-type configCommon interface {
-	GetImmutableConfigPublic() ConfigPublic
+type common interface {
+	GetImmutableConfigPublic() Public
 	GetStoreVersion() interfaces.StoreVersion
 	GetPublicKey() repo_signing.PublicKey
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId
 	GetInventoryListTypeString() string
 
+	// TODO extricate
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
-type configCommonV2 interface {
-	configCommon
-	GetBlobStores() map[string]BlobStoreReference
-	GetDefaultBlobStore() string
-}
-
 // TODO rename to just `Public`
-type ConfigPublic interface {
+type Public interface {
 	config() public
-	configCommon
+	common
 }
 
 // TODO rename to just `Private`
-type ConfigPrivate interface {
-	configCommon
+type Private interface {
+	common
 	config() private
-	GetImmutableConfig() ConfigPrivate
+	GetImmutableConfig() Private
 	GetPrivateKey() repo_signing.PrivateKey
-}
-
-type BlobStoreConfigV1 interface {
-	interfaces.BlobStoreConfigImmutable
-	GetCompressionType() CompressionType
-	GetAgeEncryption() *age.Age
-	GetLockInternalFiles() bool
 }
 
 func Default() *TomlV1Private {
@@ -77,23 +64,6 @@ func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 				CompressionType:   CompressionTypeDefault,
 				LockInternalFiles: true,
 			},
-			InventoryListType: InventoryListTypeV2,
-		},
-	}
-}
-
-func DefaultV2WithVersion(storeVersion StoreVersion) *TomlV2Private {
-	return &TomlV2Private{
-		TomlV2Common: TomlV2Common{
-			StoreVersion: storeVersion,
-			RepoType:     repo_type.TypeWorkingCopy,
-			BlobStores: map[string]BlobStoreReference{
-				"default": {
-					Name: "default",
-					Type: BlobStoreTypeLocal,
-				},
-			},
-			DefaultBlobStore:  "default",
 			InventoryListType: InventoryListTypeV2,
 		},
 	}

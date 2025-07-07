@@ -13,7 +13,7 @@ import (
 type blobV1CoderPublic struct{}
 
 func (blobV1CoderPublic) DecodeFrom(
-	blob *config_immutable.ConfigPublic,
+	blob *config_immutable.Public,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	config := &config_immutable.TomlV1Public{}
@@ -34,7 +34,7 @@ func (blobV1CoderPublic) DecodeFrom(
 }
 
 func (blobV1CoderPublic) EncodeTo(
-	blob *config_immutable.ConfigPublic,
+	blob *config_immutable.Public,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	encoder := toml.NewEncoder(bufferedWriter)
@@ -54,7 +54,7 @@ func (blobV1CoderPublic) EncodeTo(
 type blobV0CoderPublic struct{}
 
 func (blobV0CoderPublic) DecodeFrom(
-	blob *config_immutable.ConfigPublic,
+	blob *config_immutable.Public,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	config := &config_immutable.V0Public{}
@@ -76,7 +76,7 @@ func (blobV0CoderPublic) DecodeFrom(
 }
 
 func (blobV0CoderPublic) EncodeTo(
-	blob *config_immutable.ConfigPublic,
+	blob *config_immutable.Public,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	encoder := gob.NewEncoder(bufferedWriter)

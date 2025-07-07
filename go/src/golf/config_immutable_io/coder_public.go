@@ -13,16 +13,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPublicTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.ConfigPublic]
+type ConfigPublicTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.Public]
 
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.ConfigPublic]{
+var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.Public]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
 	"":                              blobV0CoderPublic{},
 }
 
-var coderPublic = triple_hyphen_io2.CoderToTypedBlob[config_immutable.ConfigPublic]{
-	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.ConfigPublic]{},
-	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.ConfigPublic](
+var coderPublic = triple_hyphen_io2.CoderToTypedBlob[config_immutable.Public]{
+	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.Public]{},
+	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.Public](
 		typedCoders,
 	),
 }

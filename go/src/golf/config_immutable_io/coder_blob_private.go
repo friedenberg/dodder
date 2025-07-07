@@ -13,7 +13,7 @@ import (
 type blobV1CoderPrivate struct{}
 
 func (blobV1CoderPrivate) DecodeFrom(
-	blob *config_immutable.ConfigPrivate,
+	blob *config_immutable.Private,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	config := &config_immutable.TomlV1Private{}
@@ -34,7 +34,7 @@ func (blobV1CoderPrivate) DecodeFrom(
 }
 
 func (blobV1CoderPrivate) EncodeTo(
-	blob *config_immutable.ConfigPrivate,
+	blob *config_immutable.Private,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	encoder := toml.NewEncoder(bufferedWriter)
@@ -54,7 +54,7 @@ func (blobV1CoderPrivate) EncodeTo(
 type blobV0CoderPrivate struct{}
 
 func (blobV0CoderPrivate) DecodeFrom(
-	blob *config_immutable.ConfigPrivate,
+	blob *config_immutable.Private,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	config := &config_immutable.V0Private{}
@@ -76,7 +76,7 @@ func (blobV0CoderPrivate) DecodeFrom(
 }
 
 func (blobV0CoderPrivate) EncodeTo(
-	blob *config_immutable.ConfigPrivate,
+	blob *config_immutable.Private,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	dec := gob.NewEncoder(bufferedWriter)

@@ -108,7 +108,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+func (client *client) GetImmutableConfigPublic() config_immutable.Public {
 	return client.configImmutable.Blob
 }
 

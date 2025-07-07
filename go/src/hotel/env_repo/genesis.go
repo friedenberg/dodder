@@ -165,7 +165,7 @@ func (env Env) readAndTransferLines(in, out string) (err error) {
 	return
 }
 
-func (env *Env) writeBlobStoreConfig(config config_immutable.ConfigPrivate) {
+func (env *Env) writeBlobStoreConfig(config config_immutable.Private) {
 	// TODO
 }
 

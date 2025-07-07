@@ -13,16 +13,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPrivateTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.ConfigPrivate]
+type ConfigPrivateTypedBlob = triple_hyphen_io2.TypedBlob[config_immutable.Private]
 
-var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.ConfigPrivate]{
+var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[*config_immutable.Private]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
 	"":                              blobV0CoderPrivate{},
 }
 
-var coderPrivate = triple_hyphen_io2.CoderToTypedBlob[config_immutable.ConfigPrivate]{
-	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.ConfigPrivate]{},
-	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.ConfigPrivate](
+var coderPrivate = triple_hyphen_io2.CoderToTypedBlob[config_immutable.Private]{
+	Metadata: triple_hyphen_io2.TypedMetadataCoder[config_immutable.Private]{},
+	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[config_immutable.Private](
 		typedCodersPrivate,
 	),
 }

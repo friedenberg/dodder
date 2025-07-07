@@ -38,6 +38,7 @@ type (
 		GetBlobStoreConfigImmutable() BlobStoreConfigImmutable
 		GetBlobEncryption() BlobEncryption
 		GetBlobCompression() BlobCompression
+		// TODO move to custom config
 		GetLockInternalFiles() bool
 	}
 

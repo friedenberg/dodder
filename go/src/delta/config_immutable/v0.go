@@ -49,17 +49,17 @@ func (config *V0Public) SetFlagSet(f *flag.FlagSet) {
 func (config *V0Public) config() public   { return public{} }
 func (config *V0Private) config() private { return private{} }
 
-func (config *V0Private) GetImmutableConfig() ConfigPrivate {
+func (config *V0Private) GetImmutableConfig() Private {
 	return config
 }
 
-func (config *V0Private) GetImmutableConfigPublic() ConfigPublic {
+func (config *V0Private) GetImmutableConfigPublic() Public {
 	return &V0Public{
 		v0Common: config.v0Common,
 	}
 }
 
-func (config *V0Public) GetImmutableConfigPublic() ConfigPublic {
+func (config *V0Public) GetImmutableConfigPublic() Public {
 	return config
 }
 

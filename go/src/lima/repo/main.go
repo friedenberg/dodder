@@ -14,7 +14,7 @@ import (
 // store
 type Repo interface {
 	GetEnv() env_ui.Env
-	GetImmutableConfigPublic() config_immutable.ConfigPublic
+	GetImmutableConfigPublic() config_immutable.Public
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.ObjectStore

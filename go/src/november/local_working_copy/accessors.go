@@ -23,7 +23,7 @@ func (local *Repo) GetEnv() env_ui.Env {
 	return local
 }
 
-func (local *Repo) GetImmutableConfigPublic() config_immutable.ConfigPublic {
+func (local *Repo) GetImmutableConfigPublic() config_immutable.Public {
 	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 

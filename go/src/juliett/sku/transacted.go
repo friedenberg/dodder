@@ -252,7 +252,7 @@ func (transacted *Transacted) GetKey() string {
 }
 
 func (transacted *Transacted) Sign(
-	config config_immutable.ConfigPrivate,
+	config config_immutable.Private,
 ) (err error) {
 	transacted.Metadata.RepoPubKey = config.GetPublicKey()
 

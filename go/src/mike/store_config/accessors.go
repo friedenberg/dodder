@@ -21,7 +21,7 @@ func (c *store) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 
-func (kc *store) GetImmutableConfig() config_immutable.ConfigPrivate {
+func (kc *store) GetImmutableConfig() config_immutable.Private {
 	return kc.immutable_config_private
 }
 
