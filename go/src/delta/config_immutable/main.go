@@ -36,13 +36,11 @@ type common interface {
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
-// TODO rename to just `Public`
 type Public interface {
 	config() public
 	common
 }
 
-// TODO rename to just `Private`
 type Private interface {
 	common
 	config() private

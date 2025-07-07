@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 )
 
+// TODO move this to a new package, blob_store_config
 type BlobStoreType string
 
 const (

@@ -7,23 +7,28 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 )
 
+// TODO move this to the new package blob_store_config
 type BlobStoreTomlV1 struct {
 	AgeEncryption     age.Age         `toml:"age-encryption,omitempty"`
 	CompressionType   CompressionType `toml:"compression-type"`
 	LockInternalFiles bool            `toml:"lock-internal-files"`
 }
 
-func (blobStoreConfig *BlobStoreTomlV1) SetFlagSet(f *flag.FlagSet) {
-	blobStoreConfig.CompressionType.SetFlagSet(f)
+func (blobStoreConfig *BlobStoreTomlV1) SetFlagSet(flagSet *flag.FlagSet) {
+	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&blobStoreConfig.LockInternalFiles,
 		"lock-internal-files",
 		blobStoreConfig.LockInternalFiles,
 		"",
 	)
 
-	f.Var(&blobStoreConfig.AgeEncryption, "age-identity", "add an age identity")
+	flagSet.Var(
+		&blobStoreConfig.AgeEncryption,
+		"age-identity",
+		"add an age identity",
+	)
 }
 
 func (blobStoreConfig *BlobStoreTomlV1) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
@@ -35,10 +40,6 @@ func (blobStoreConfig *BlobStoreTomlV1) GetBlobCompression() interfaces.BlobComp
 }
 
 func (blobStoreConfig *BlobStoreTomlV1) GetBlobEncryption() interfaces.BlobEncryption {
-	return &blobStoreConfig.AgeEncryption
-}
-
-func (blobStoreConfig *BlobStoreTomlV1) GetAgeEncryption() *age.Age {
 	return &blobStoreConfig.AgeEncryption
 }
 

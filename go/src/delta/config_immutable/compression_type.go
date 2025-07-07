@@ -15,12 +15,12 @@ import (
 
 type ErrUnsupportedCompression string
 
-func (e ErrUnsupportedCompression) Error() string {
-	return fmt.Sprintf("unsupported compression type: %q", string(e))
+func (err ErrUnsupportedCompression) Error() string {
+	return fmt.Sprintf("unsupported compression type: %q", string(err))
 }
 
-func (e ErrUnsupportedCompression) Is(err error) (ok bool) {
-	_, ok = err.(ErrUnsupportedCompression)
+func (ErrUnsupportedCompression) Is(target error) (ok bool) {
+	_, ok = target.(ErrUnsupportedCompression)
 	return
 }
 
@@ -36,68 +36,70 @@ const (
 
 type CompressionType string
 
-func (ct *CompressionType) GetBlobCompression() interfaces.BlobCompression {
-	return ct
+func (compressionType *CompressionType) GetBlobCompression() interfaces.BlobCompression {
+	return compressionType
 }
 
-func (ct *CompressionType) SetFlagSet(f *flag.FlagSet) {
-	f.Var(ct, "compression-type", "")
+func (compressionType *CompressionType) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.Var(compressionType, "compression-type", "")
 }
 
-func (ct CompressionType) String() string {
-	return string(ct)
+func (compressionType CompressionType) String() string {
+	return string(compressionType)
 }
 
-func (ct *CompressionType) Set(v string) (err error) {
-	v1 := CompressionType(strings.TrimSpace(strings.ToLower(v)))
+func (compressionType *CompressionType) Set(value string) (err error) {
+	valueClean := CompressionType(strings.TrimSpace(strings.ToLower(value)))
 
-	switch v1 {
+	switch valueClean {
 	case CompressionTypeGzip,
 		CompressionTypeNone,
 		CompressionTypeEmpty,
 		CompressionTypeZstd,
 		CompressionTypeZlib:
-		*ct = v1
+		*compressionType = valueClean
 
 	default:
-		err = ErrUnsupportedCompression(v)
+		err = ErrUnsupportedCompression(value)
 	}
 
 	return
 }
 
-func (ct CompressionType) WrapReader(
-	r io.Reader,
-) (out io.ReadCloser, err error) {
-	switch ct {
+func (compressionType CompressionType) WrapReader(
+	readerIn io.Reader,
+) (readerOut io.ReadCloser, err error) {
+	switch compressionType {
 	case CompressionTypeGzip:
-		out, err = gzip.NewReader(r)
+		readerOut, err = gzip.NewReader(readerIn)
 
 	case CompressionTypeZlib:
-		out, err = zlib.NewReader(r)
+		readerOut, err = zlib.NewReader(readerIn)
 
 	case CompressionTypeZstd:
-		out = zstd.NewReader(r)
+		readerOut = zstd.NewReader(readerIn)
 
 	default:
-		out = io.NopCloser(r)
+		readerOut = io.NopCloser(readerIn)
 	}
 
 	return
 }
 
-func (ct CompressionType) WrapWriter(w io.Writer) (io.WriteCloser, error) {
-	switch ct {
+func (compressionType CompressionType) WrapWriter(
+	writerIn io.Writer,
+) (io.WriteCloser, error) {
+	switch compressionType {
 	case CompressionTypeGzip:
-		return gzip.NewWriter(w), nil
+		return gzip.NewWriter(writerIn), nil
 
 	case CompressionTypeZlib:
-		return zlib.NewWriter(w), nil
+		return zlib.NewWriter(writerIn), nil
 
 	case CompressionTypeZstd:
-		return zstd.NewWriter(w), nil
+		return zstd.NewWriter(writerIn), nil
 
 	default:
-		return files.NopWriteCloser{Writer: w}, nil
+		return files.NopWriteCloser{Writer: writerIn}, nil
 	}
 }

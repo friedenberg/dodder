@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
+// TODO should this be private?
 type TomlV1Common struct {
 	StoreVersion      StoreVersion    `toml:"store-version"`
 	RepoType          repo_type.Type  `toml:"repo-type"`
@@ -28,10 +29,10 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (config *TomlV1Common) SetFlagSet(f *flag.FlagSet) {
-	config.BlobStore.SetFlagSet(f)
+func (config *TomlV1Common) SetFlagSet(flagSet *flag.FlagSet) {
+	config.BlobStore.SetFlagSet(flagSet)
 	config.RepoType = repo_type.TypeWorkingCopy
-	f.Var(&config.RepoType, "repo-type", "")
+	flagSet.Var(&config.RepoType, "repo-type", "")
 }
 
 func (config *TomlV1Common) GetInventoryListTypeString() string {

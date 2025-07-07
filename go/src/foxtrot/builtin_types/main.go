@@ -9,6 +9,8 @@ import (
 )
 
 const (
+	// TODO figure out a more ergonomic way of incrementing and labeling as
+	// latest
 	TagTypeTomlV0 = "!toml-tag-v0"
 	TagTypeTomlV1 = "!toml-tag-v1"
 	TagTypeLuaV1  = "!lua-tag-v1"
@@ -30,6 +32,7 @@ const (
 	RepoTypeUri         = "!toml-repo-uri-v0"
 
 	ImmutableConfigV1 = "!toml-config-immutable-v1"
+	ImmutableConfigV2 = "!toml-config-immutable-v2"
 
 	ZettelIdListTypeV0 = "!zettel_id_list-v0"
 
@@ -92,11 +95,18 @@ func register(tipeString string, g genres.Genre, isDefault bool) {
 
 func registerBuiltinType(bt BuiltinType) {
 	if _, exists := allMap[bt.Type]; exists {
-		panic(fmt.Sprintf("builtin type registered more than once: %s", bt.Type))
+		panic(
+			fmt.Sprintf("builtin type registered more than once: %s", bt.Type),
+		)
 	}
 
 	if _, exists := defaults[bt.Genre]; exists && bt.Default {
-		panic(fmt.Sprintf("builtin default type registered more than once: %s", bt.Type))
+		panic(
+			fmt.Sprintf(
+				"builtin default type registered more than once: %s",
+				bt.Type,
+			),
+		)
 	}
 
 	allMap[bt.Type] = bt
