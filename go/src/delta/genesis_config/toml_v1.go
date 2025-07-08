@@ -13,11 +13,11 @@ import (
 
 // must be public for toml coding to function
 type TomlV1Common struct {
-	StoreVersion      StoreVersion                                `toml:"store-version"`
-	RepoType          repo_type.Type                              `toml:"repo-type"`
-	RepoId            ids.RepoId                                  `toml:"id"`
+	StoreVersion      StoreVersion                      `toml:"store-version"`
+	RepoType          repo_type.Type                    `toml:"repo-type"`
+	RepoId            ids.RepoId                        `toml:"id"`
 	BlobStore         blob_store_config.BlobStoreTomlV1 `toml:"blob-store"`
-	InventoryListType string                                      `toml:"inventory_list-type"`
+	InventoryListType string                            `toml:"inventory_list-type"`
 }
 
 type TomlV1Private struct {
@@ -80,7 +80,7 @@ func (config *TomlV1Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreCo
 	return &config.BlobStore
 }
 
-func (config *TomlV1Common) GetStoreVersion() interfaces.StoreVersion {
+func (config *TomlV1Common) GetStoreVersion() StoreVersion {
 	return config.StoreVersion
 }
 

@@ -19,12 +19,17 @@ var (
 	V8  = Version(values.Int(8))
 	V9  = Version(values.Int(9))
 	V10 = Version(values.Int(10))
+	V11 = Version(values.Int(11))
 
 	VCurrent = V10
-	VNext    = V10
+	VNext    = V11
 )
 
 type Version values.Int
+
+type Getter interface {
+	GetStoreVersion() Version
+}
 
 func Equals(
 	a interfaces.StoreVersion,

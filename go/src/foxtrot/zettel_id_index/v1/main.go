@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
 type index struct {
@@ -35,19 +36,19 @@ type index struct {
 }
 
 func MakeIndex(
-	k interfaces.Config,
-	s interfaces.Directory,
-	su interfaces.CacheIOFactory,
+	configCli repo_config_cli.Config,
+	directory interfaces.Directory,
+	cacheIOFactory interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
 		lock:               &sync.RWMutex{},
-		path:               s.FileCacheObjectId(),
-		nonRandomSelection: k.UsePredictableZettelIds(),
-		su:                 su,
+		path:               directory.FileCacheObjectId(),
+		nonRandomSelection: configCli.UsePredictableZettelIds(),
+		su:                 cacheIOFactory,
 		bitset:             collections.MakeBitset(0),
 	}
 
-	if i.oldHinweisenStore, err = object_id_provider.New(s); err != nil {
+	if i.oldHinweisenStore, err = object_id_provider.New(directory); err != nil {
 		if errors.IsNotExist(err) {
 			ui.TodoP4("determine which layer handles no-create kasten")
 			err = nil

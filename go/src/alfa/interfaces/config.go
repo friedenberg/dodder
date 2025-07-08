@@ -1,9 +1,5 @@
 package interfaces
 
-type ImmutableConfig interface {
-	GetStoreVersion() StoreVersion
-}
-
 type ConfigDryRunReader interface {
 	IsDryRun() bool
 }
@@ -34,6 +30,5 @@ type MutableConfig interface {
 
 type Config interface {
 	MutableConfig
-	ImmutableConfig
 	GetTypeStringFromExtension(t string) string
 }

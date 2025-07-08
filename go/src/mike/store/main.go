@@ -89,8 +89,8 @@ func (store *Store) Initialize(
 	}
 
 	if store.zettelIdIndex, err = zettel_id_index.MakeIndex(
-		// TODO
-		store.GetConfig(),
+		store.GetConfig().GetImmutableConfigPublic(),
+		store.config.GetCLIConfig(),
 		store.GetEnvRepo(),
 		store.GetEnvRepo(),
 	); err != nil {
@@ -133,7 +133,9 @@ func (store *Store) MakeSupplies(
 	supplies.Clock = store.sunrise
 	supplies.BlobStore = store.typedBlobStore
 	supplies.RepoId = repoId
-	supplies.DirCache = store.GetEnvRepo().DirCacheRepo(repoId.GetRepoIdString())
+	supplies.DirCache = store.GetEnvRepo().DirCacheRepo(
+		repoId.GetRepoIdString(),
+	)
 
 	return
 }

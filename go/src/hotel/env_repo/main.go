@@ -47,25 +47,29 @@ type Env struct {
 
 func Make(
 	envLocal env_local.Env,
-	o Options,
+	options Options,
 ) (env Env, err error) {
 	env.Env = envLocal
-	if o.BasePath == "" {
-		o.BasePath = os.Getenv(env_dir.EnvDir)
+	if options.BasePath == "" {
+		options.BasePath = os.Getenv(env_dir.EnvDir)
 	}
 
-	if o.BasePath == "" {
-		if o.BasePath, err = os.Getwd(); err != nil {
+	if options.BasePath == "" {
+		if options.BasePath, err = os.Getwd(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	env.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
+	env.readOnlyBlobStorePath = options.GetReadOnlyBlobStorePath()
 
-	dp := &directoryV1{}
+	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
+		env.directoryPaths = &directoryV1{}
+	} else {
+		env.directoryPaths = &directoryV2{}
+	}
 
-	if err = dp.init(
+	if err = env.directoryPaths.init(
 		env.GetStoreVersion(),
 		env.GetXDG(),
 	); err != nil {
@@ -73,15 +77,13 @@ func Make(
 		return
 	}
 
-	env.directoryPaths = dp
-
 	// TODO add support for failing on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
 	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
 	// 	return
 	// }
 
-	if !o.PermitNoDodderDirectory {
+	if !options.PermitNoDodderDirectory {
 		if ok := files.Exists(env.DirDodder()); !ok {
 			err = errors.Wrap(ErrNotInDodderDir{Expected: env.DirDodder()})
 			return
@@ -191,7 +193,7 @@ func (env Env) DataFileStoreVersion() string {
 	return filepath.Join(env.GetXDG().Data, "version")
 }
 
-func (env Env) GetStoreVersion() interfaces.StoreVersion {
+func (env Env) GetStoreVersion() store_version.Version {
 	if env.config.Blob == nil {
 		return store_version.VCurrent
 	} else {

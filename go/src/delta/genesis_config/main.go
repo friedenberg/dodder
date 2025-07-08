@@ -26,7 +26,7 @@ type (
 
 type common interface {
 	GetImmutableConfigPublic() Public
-	GetStoreVersion() interfaces.StoreVersion
+	GetStoreVersion() StoreVersion
 	GetPublicKey() repo_signing.PublicKey
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId

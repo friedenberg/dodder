@@ -68,7 +68,7 @@ func (config *v0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfig
 	return config
 }
 
-func (config v0Common) GetStoreVersion() interfaces.StoreVersion {
+func (config v0Common) GetStoreVersion() StoreVersion {
 	return config.StoreVersion
 }
 

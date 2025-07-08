@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
 type encodedIds struct {
@@ -37,13 +38,13 @@ type index struct {
 }
 
 func MakeIndex(
-	config interfaces.Config,
+	configCli repo_config_cli.Config,
 	dir interfaces.Directory,
 	cacheFactory interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
 		path:               dir.FileCacheObjectId(),
-		nonRandomSelection: config.UsePredictableZettelIds(),
+		nonRandomSelection: configCli.UsePredictableZettelIds(),
 		cacheFactory:       cacheFactory,
 		encodedIds: encodedIds{
 			AvailableIds: make(map[int]bool),

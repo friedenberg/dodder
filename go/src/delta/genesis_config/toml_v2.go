@@ -78,7 +78,7 @@ func (config *TomlV2Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreCo
 	return nil
 }
 
-func (config *TomlV2Common) GetStoreVersion() interfaces.StoreVersion {
+func (config *TomlV2Common) GetStoreVersion() StoreVersion {
 	return config.StoreVersion
 }
 
