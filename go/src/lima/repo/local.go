@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 )
@@ -9,7 +9,7 @@ import (
 type LocalRepo interface {
 	Repo
 	GetEnvRepo() env_repo.Env // TODO rename to GetEnvRepo
-	GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob
+	GetImmutableConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob
 	Lock() error
 	Unlock() error
 }

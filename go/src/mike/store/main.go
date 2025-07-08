@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -35,7 +35,7 @@ type Store struct {
 
 	inventoryList          *sku.OpenList
 	persistentObjectFormat object_inventory_format.Format
-	configBlobFormat       interfaces.Format[config_mutable_blobs.Blob]
+	configBlobFormat       interfaces.Format[repo_config_blobs.Blob]
 	envLua                 env_lua.Env
 	tagLock                sync.Mutex
 
@@ -113,10 +113,10 @@ func (store *Store) Initialize(
 	)
 
 	store.configBlobFormat = typed_blob_store.MakeBlobFormat2(
-		typed_blob_store.MakeTextParserIgnoreTomlErrors2[config_mutable_blobs.Blob](
+		typed_blob_store.MakeTextParserIgnoreTomlErrors2[repo_config_blobs.Blob](
 			store.GetEnvRepo(),
 		),
-		typed_blob_store.ParsedBlobTomlFormatter2[config_mutable_blobs.Blob]{},
+		typed_blob_store.ParsedBlobTomlFormatter2[repo_config_blobs.Blob]{},
 		store.GetEnvRepo(),
 	)
 

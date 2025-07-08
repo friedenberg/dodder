@@ -13,11 +13,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -49,7 +49,7 @@ func MakeClient(
 
 type client struct {
 	envUI           env_ui.Env
-	configImmutable config_immutable_io.ConfigPublicTypedBlob
+	configImmutable genesis_config_io.ConfigPublicTypedBlob
 	http            http.Client
 	localRepo       repo.LocalRepo
 	typedBlobStore  typed_blob_store.InventoryList
@@ -86,7 +86,7 @@ func (client *client) Initialize() {
 		}
 	}
 
-	decoder := config_immutable_io.CoderPublic{}
+	decoder := genesis_config_io.CoderPublic{}
 
 	if _, err := decoder.DecodeFrom(
 		&client.configImmutable,
@@ -108,7 +108,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfigPublic() config_immutable.Public {
+func (client *client) GetImmutableConfigPublic() genesis_config.Public {
 	return client.configImmutable.Blob
 }
 

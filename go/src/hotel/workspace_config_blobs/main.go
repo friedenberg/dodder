@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 
 type (
 	Blob interface {
-		GetDefaults() config_mutable_blobs.Defaults
+		GetDefaults() repo_config_blobs.Defaults
 		GetDefaultQueryGroup() string
 	}
 )

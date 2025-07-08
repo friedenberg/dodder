@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -23,7 +23,7 @@ func (local *Repo) GetEnv() env_ui.Env {
 	return local
 }
 
-func (local *Repo) GetImmutableConfigPublic() config_immutable.Public {
+func (local *Repo) GetImmutableConfigPublic() genesis_config.Public {
 	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -31,7 +31,7 @@ func (local *Repo) GetImmutableConfigPublicType() ids.Type {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (local *Repo) GetImmutableConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
+func (local *Repo) GetImmutableConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob {
 	return local.GetEnvRepo().GetConfigPrivate()
 }
 

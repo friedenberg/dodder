@@ -10,10 +10,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -21,7 +21,7 @@ func (c *store) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 
-func (kc *store) GetImmutableConfig() config_immutable.Private {
+func (kc *store) GetImmutableConfig() genesis_config.Private {
 	return kc.immutable_config_private
 }
 
@@ -233,6 +233,6 @@ func (c *compiled) GetImplicitTags(
 	return s
 }
 
-func (kc *store) Cli() config_mutable_cli.Config {
+func (kc *store) Cli() repo_config_cli.Config {
 	return kc.cli
 }

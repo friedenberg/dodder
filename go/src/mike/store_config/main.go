@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
@@ -39,20 +39,20 @@ func init() {
 }
 
 type (
-	immutable_config_private = config_immutable.Private
-	cli                      = config_mutable_cli.Config
+	immutable_config_private = genesis_config.Private
+	cli                      = repo_config_cli.Config
 	ApproximatedType         = typed_blob_store.ApproximatedType
 
 	Store interface {
 		interfaces.Config
-		config_immutable.Private
+		genesis_config.Private
 
-		config_mutable_blobs.Getter
+		repo_config_blobs.Getter
 
 		ids.InlineTypeChecker
 		GetTypeExtension(string) string
-		GetCLIConfig() config_mutable_cli.Config
-		GetImmutableConfig() config_immutable.Private
+		GetCLIConfig() repo_config_cli.Config
+		GetImmutableConfig() genesis_config.Private
 		GetFileExtensions() interfaces.FileExtensions
 		HasChanges() (ok bool)
 		GetChanges() (out []string)
@@ -77,7 +77,7 @@ type (
 
 		Initialize(
 			dirLayout env_repo.Env,
-			kcli config_mutable_cli.Config,
+			kcli repo_config_cli.Config,
 		) (err error)
 
 		Reset() error
@@ -101,12 +101,12 @@ type store struct {
 	immutable_config_private
 }
 
-func (a *store) GetCLIConfig() config_mutable_cli.Config {
+func (a *store) GetCLIConfig() repo_config_cli.Config {
 	return a.cli
 }
 
 func (a *store) Reset() error {
-	a.Blob = config_mutable_blobs.V1{}
+	a.Blob = repo_config_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
 
@@ -123,13 +123,13 @@ func (a *store) Reset() error {
 	return nil
 }
 
-func (a *store) GetMutableConfig() config_mutable_blobs.Blob {
+func (a *store) GetMutableConfig() repo_config_blobs.Blob {
 	return a.mutable_config_blob
 }
 
 func (c *store) Initialize(
 	envRepo env_repo.Env,
-	kcli config_mutable_cli.Config,
+	kcli repo_config_cli.Config,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
@@ -160,11 +160,11 @@ func (c *store) Initialize(
 	return
 }
 
-func (kc *store) SetCli(k config_mutable_cli.Config) {
+func (kc *store) SetCli(k repo_config_cli.Config) {
 	kc.cli = k
 }
 
-func (kc *store) SetCliFromCommander(k config_mutable_cli.Config) {
+func (kc *store) SetCliFromCommander(k repo_config_cli.Config) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath

@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -173,7 +173,7 @@ func writeDefaultMutableConfig(
 	u *Repo,
 	dt ids.Type,
 ) (sh interfaces.Sha, tipe ids.Type, err error) {
-	defaultMutableConfig := config_mutable_blobs.Default(dt)
+	defaultMutableConfig := repo_config_blobs.Default(dt)
 	tipe = defaultMutableConfig.Type
 
 	f := u.GetStore().GetConfigBlobFormat()

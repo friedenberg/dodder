@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
@@ -35,7 +35,7 @@ func Run(ctx errors.Context, args ...string) {
 
 	args = args[2:]
 
-	configCli := config_mutable_cli.Default()
+	configCli := repo_config_cli.Default()
 	configCli.SetFlagSet(flagSet)
 
 	if err := flagSet.Parse(args); err != nil {

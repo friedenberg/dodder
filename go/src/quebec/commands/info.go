@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -42,7 +42,7 @@ func (c Info) Run(req command.Request) {
 		args = []string{"store-version"}
 	}
 
-	defaultConfig := config_immutable.Default()
+	defaultConfig := genesis_config.Default()
 
 	for _, arg := range args {
 		switch strings.ToLower(arg) {

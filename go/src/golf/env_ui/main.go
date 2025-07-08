@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
 // TODO explore storing buffered writer and reader
@@ -27,7 +27,7 @@ type Env interface {
 	GetOutFile() interfaces.WriterAndStringWriter
 	GetErr() fd.Std
 	GetErrFile() interfaces.WriterAndStringWriter
-	GetCLIConfig() config_mutable_cli.Config
+	GetCLIConfig() repo_config_cli.Config
 
 	Confirm(message string) (success bool)
 	Retry(header, retry string, err error) (tryAgain bool)
@@ -53,20 +53,20 @@ type env struct {
 
 	debug *debug.Context
 
-	cliConfig config_mutable_cli.Config
+	cliConfig repo_config_cli.Config
 }
 
 func MakeDefault() *env {
 	return Make(
 		errors.MakeContextDefault(),
-		config_mutable_cli.Config{},
+		repo_config_cli.Config{},
 		Options{},
 	)
 }
 
 func Make(
 	context errors.Context,
-	kCli config_mutable_cli.Config,
+	kCli repo_config_cli.Config,
 	options Options,
 ) *env {
 	e := &env{
@@ -141,6 +141,6 @@ func (u *env) GetErrFile() interfaces.WriterAndStringWriter {
 	return u.err.GetFile()
 }
 
-func (u *env) GetCLIConfig() config_mutable_cli.Config {
+func (u *env) GetCLIConfig() repo_config_cli.Config {
 	return u.cliConfig
 }

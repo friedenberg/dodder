@@ -6,12 +6,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
 type Request struct {
 	errors.Context
-	config_mutable_cli.Config
+	repo_config_cli.Config
 	*flag.FlagSet
 	*Args
 }
@@ -38,7 +38,7 @@ type Args struct {
 
 func MakeRequest(
 	ctx errors.Context,
-	config config_mutable_cli.Config,
+	config repo_config_cli.Config,
 	flagSet *flag.FlagSet,
 ) Request {
 	return Request{

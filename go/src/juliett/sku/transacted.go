@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -252,7 +252,7 @@ func (transacted *Transacted) GetKey() string {
 }
 
 func (transacted *Transacted) Sign(
-	config config_immutable.Private,
+	config genesis_config.Private,
 ) (err error) {
 	transacted.Metadata.RepoPubKey = config.GetPublicKey()
 

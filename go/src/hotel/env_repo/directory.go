@@ -5,22 +5,22 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
 type directoryPaths interface {
 	interfaces.DirectoryPaths
-	init(sv config_immutable.StoreVersion, xdg xdg.XDG) error
+	init(sv genesis_config.StoreVersion, xdg xdg.XDG) error
 }
 
 type directoryV0 struct {
-	sv       config_immutable.StoreVersion
+	sv       genesis_config.StoreVersion
 	basePath string
 }
 
 func (c *directoryV0) init(
-	sv config_immutable.StoreVersion,
+	sv genesis_config.StoreVersion,
 	xdg xdg.XDG,
 ) (err error) {
 	c.sv = sv

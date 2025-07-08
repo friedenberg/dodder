@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -31,7 +31,7 @@ type Import struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteBlobStore
 
-	config_immutable.StoreVersion
+	genesis_config.StoreVersion
 	InventoryList string
 	PrintCopies   bool
 	sku.Proto

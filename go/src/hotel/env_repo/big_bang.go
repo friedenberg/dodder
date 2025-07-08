@@ -3,7 +3,7 @@ package env_repo
 import (
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
@@ -11,7 +11,7 @@ import (
 // Config used to initialize a repo for the first time
 type BigBang struct {
 	ids.Type
-	Config *config_immutable.LatestPrivate
+	Config *genesis_config.LatestPrivate
 
 	Yin                  string
 	Yang                 string
@@ -26,6 +26,6 @@ func (bigBang *BigBang) SetFlagSet(f *flag.FlagSet) {
 	f.StringVar(&bigBang.Yang, "yang", "", "File containing list of zettel id right parts")
 
 	bigBang.Type = builtin_types.GetOrPanic(builtin_types.ImmutableConfigV1).Type
-	bigBang.Config = config_immutable.Default()
+	bigBang.Config = genesis_config.Default()
 	bigBang.Config.SetFlagSet(f)
 }

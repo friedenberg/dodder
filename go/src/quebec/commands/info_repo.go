@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -36,7 +36,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
 		case "config-immutable":
-			if _, err := (config_immutable_io.CoderPublic{}).EncodeTo(
+			if _, err := (genesis_config_io.CoderPublic{}).EncodeTo(
 				&configTypedBlob,
 				repo.GetUIFile(),
 			); err != nil {

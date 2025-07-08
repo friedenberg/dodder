@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
 const (
@@ -47,7 +47,7 @@ type env struct {
 
 func MakeFromXDGDotenvPath(
 	context errors.Context,
-	config config_mutable_cli.Config,
+	config repo_config_cli.Config,
 	xdgDotenvPath string,
 ) env {
 	dotenv := xdg.Dotenv{

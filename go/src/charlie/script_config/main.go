@@ -1,3 +1,4 @@
+// TODO rename this to something clearer
 package script_config
 
 import (

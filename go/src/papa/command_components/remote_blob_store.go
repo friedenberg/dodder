@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_immutable_config"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -13,7 +13,7 @@ import (
 
 type RemoteBlobStore struct {
 	Blobs  string
-	Config blob_store_immutable_config.BlobStoreTomlV1
+	Config blob_store_config.BlobStoreTomlV1
 }
 
 func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {

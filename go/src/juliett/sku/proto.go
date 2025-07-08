@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
-func MakeProto(defaults config_mutable_blobs.Defaults) (proto Proto) {
+func MakeProto(defaults repo_config_blobs.Defaults) (proto Proto) {
 	var tipe ids.Type
 	var tags ids.TagSet
 

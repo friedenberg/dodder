@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -73,7 +73,7 @@ func (cmd Complete) Run(req command.Request) {
 
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
-	(&config_mutable_cli.Config{}).SetFlagSet(flagSet)
+	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
 	subcmd.SetFlagSet(flagSet)
 
 	var containsDoubleHyphen bool

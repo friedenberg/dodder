@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -27,7 +27,7 @@ const (
 type Env struct {
 	env_local.Env
 
-	config config_immutable_io.ConfigPrivateTypedBlob
+	config genesis_config_io.ConfigPrivateTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -99,7 +99,7 @@ func Make(
 	}
 
 	{
-		decoder := config_immutable_io.CoderPrivate{}
+		decoder := genesis_config_io.CoderPrivate{}
 
 		if err = decoder.DecodeFromFile(
 			&env.config,
@@ -133,14 +133,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() config_immutable_io.ConfigPublicTypedBlob {
-	return config_immutable_io.ConfigPublicTypedBlob{
+func (env Env) GetConfigPublic() genesis_config_io.ConfigPublicTypedBlob {
+	return genesis_config_io.ConfigPublicTypedBlob{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() config_immutable_io.ConfigPrivateTypedBlob {
+func (env Env) GetConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob {
 	return env.config
 }
 

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
@@ -28,7 +28,7 @@ type Env interface {
 	AssertNotTemporaryOrOfferToCreate(errors.Context)
 	IsTemporary() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
-	GetDefaults() config_mutable_blobs.Defaults
+	GetDefaults() repo_config_blobs.Defaults
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
 	DeleteWorkspace() (err error)
 	GetStore() *Store
@@ -43,7 +43,7 @@ type Env interface {
 }
 
 type Config interface {
-	config_mutable_blobs.Getter
+	repo_config_blobs.Getter
 	sku.Config
 	interfaces.FileExtensionsGetter
 }
@@ -91,7 +91,7 @@ func Make(
 
 	defaults := out.configMutable.GetDefaults()
 
-	out.defaults = config_mutable_blobs.DefaultsV1{
+	out.defaults = repo_config_blobs.DefaultsV1{
 		Type: defaults.GetType(),
 		Tags: defaults.GetTags(),
 	}
@@ -146,9 +146,9 @@ type env struct {
 	// Later, dir may be set to $PWD/.dodder-workspace by CreateWorkspace
 	dir string
 
-	configMutable config_mutable_blobs.Blob
+	configMutable repo_config_blobs.Blob
 	blob          workspace_config_blobs.Blob
-	defaults      config_mutable_blobs.DefaultsV1
+	defaults      repo_config_blobs.DefaultsV1
 
 	storeFS *store_fs.Store
 	store   Store
@@ -236,7 +236,7 @@ func (env *env) GetWorkspaceConfig() workspace_config_blobs.Blob {
 	return env.blob
 }
 
-func (env *env) GetDefaults() config_mutable_blobs.Defaults {
+func (env *env) GetDefaults() repo_config_blobs.Defaults {
 	return env.defaults
 }
 

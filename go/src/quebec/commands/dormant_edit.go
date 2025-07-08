@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/config_mutable_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -140,7 +140,7 @@ func (c DormantEdit) readTempKonfigFile(
 
 	format := u.GetStore().GetConfigBlobFormat()
 
-	var k config_mutable_blobs.V0
+	var k repo_config_blobs.V0
 
 	var aw interfaces.ShaWriteCloser
 

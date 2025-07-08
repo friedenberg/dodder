@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -25,7 +25,7 @@ type BlobStoreWithEnv struct {
 
 func (c BlobStoreLocal) MakeBlobStoreLocal(
 	context errors.Context,
-	config config_mutable_cli.Config,
+	config repo_config_cli.Config,
 	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {

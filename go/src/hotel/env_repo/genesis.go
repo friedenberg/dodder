@@ -11,10 +11,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-	"code.linenisgreat.com/dodder/go/src/golf/config_immutable_io"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 )
 
 func (env *Env) Genesis(bb BigBang) {
@@ -53,7 +53,7 @@ func (env *Env) Genesis(bb BigBang) {
 			defer env.MustClose(f)
 		}
 
-		encoder := config_immutable_io.CoderPrivate{}
+		encoder := genesis_config_io.CoderPrivate{}
 
 		if _, err := encoder.EncodeTo(&env.config, f); err != nil {
 			env.CancelWithError(err)
@@ -165,7 +165,7 @@ func (env Env) readAndTransferLines(in, out string) (err error) {
 	return
 }
 
-func (env *Env) writeBlobStoreConfig(config config_immutable.Private) {
+func (env *Env) writeBlobStoreConfig(config genesis_config.Private) {
 	// TODO
 }
 
