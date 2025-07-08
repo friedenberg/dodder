@@ -19,7 +19,7 @@ setup() {
 }
 
 teardown() {
-	rm_from_version "$version"
+	chflags_and_rm
 }
 
 function diff_all_same { # @test

@@ -6,8 +6,8 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
+	copy_from_version "$DIR"
+
 	# TODO prevent checkouts if workspace is not initialized
 	run_dodder_init_workspace
 
@@ -38,7 +38,7 @@ setup() {
 }
 
 teardown() {
-	rm_from_version "$version"
+	chflags_and_rm
 }
 
 function checkout_simple_all { # @test

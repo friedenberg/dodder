@@ -68,7 +68,7 @@ export cmd_dodder_def
 
 function copy_from_version {
   DIR="$1"
-  version="${2:-v$(dodder info store-version)}"
+  version="$DODDER_VERSION"
   rm -rf "$BATS_TEST_TMPDIR/.xdg"
   cp -r "$DIR/migration/$version/.xdg" "$BATS_TEST_TMPDIR/.xdg"
 }

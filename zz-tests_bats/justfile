@@ -85,7 +85,7 @@ test-generate_fixtures store_version:
 
 bats_timeout := "5"
 
-# runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
+# runs specific bats test files, or a default of all.
 [group("test")]
 test-targets *targets="*.bats":
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}

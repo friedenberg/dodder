@@ -11,7 +11,7 @@ setup() {
 }
 
 teardown() {
-	rm_from_version "$version"
+	chflags_and_rm
 }
 
 # bats file_tags=user_story:workspace

@@ -3,12 +3,11 @@
 setup() {
 	load "$(dirname "$BATS_TEST_FILE")/common.bash"
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
-
 	# for shellcheck SC2154
 	export output
-	export BATS_TEST_BODY=true
+
+	version="v$(dodder info store-version)"
+	copy_from_version "$DIR" "$version"
 }
 
 teardown() {

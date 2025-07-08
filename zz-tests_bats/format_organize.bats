@@ -5,7 +5,6 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
-	export BATS_TEST_BODY=true
 }
 
 teardown() {

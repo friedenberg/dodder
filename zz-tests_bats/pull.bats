@@ -182,8 +182,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
+	copy_from_version "$DIR"
 
 	run_dodder show one/dos+
 	assert_success

@@ -6,14 +6,13 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
+	copy_from_version "$DIR"
+
 	run_dodder_init_workspace
-	export BATS_TEST_BODY=true
 }
 
 teardown() {
-	rm_from_version "$version"
+	chflags_and_rm
 }
 
 # bats file_tags=user_story:organize

@@ -11,7 +11,7 @@ setup() {
 }
 
 teardown() {
-	rm_from_version "$version"
+	chflags_and_rm
 }
 
 function revert_one_zettel { # @test
