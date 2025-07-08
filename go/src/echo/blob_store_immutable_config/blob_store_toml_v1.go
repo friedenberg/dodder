@@ -1,17 +1,18 @@
-package config_immutable
+package blob_store_immutable_config
 
 import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
 // TODO move this to the new package blob_store_config
 type BlobStoreTomlV1 struct {
-	AgeEncryption     age.Age         `toml:"age-encryption,omitempty"`
-	CompressionType   CompressionType `toml:"compression-type"`
-	LockInternalFiles bool            `toml:"lock-internal-files"`
+	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
+	CompressionType   compression_type.CompressionType `toml:"compression-type"`
+	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }
 
 func (blobStoreConfig *BlobStoreTomlV1) SetFlagSet(flagSet *flag.FlagSet) {

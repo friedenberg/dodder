@@ -5,6 +5,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_immutable_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -56,8 +58,8 @@ func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
 		TomlV1Common: TomlV1Common{
 			StoreVersion: storeVersion,
 			RepoType:     repo_type.TypeWorkingCopy,
-			BlobStore: BlobStoreTomlV1{
-				CompressionType:   CompressionTypeDefault,
+			BlobStore: blob_store_immutable_config.BlobStoreTomlV1{
+				CompressionType:   compression_type.CompressionTypeDefault,
 				LockInternalFiles: true,
 			},
 			InventoryListType: InventoryListTypeV2,

@@ -7,16 +7,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_immutable_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 // must be public for toml coding to function
 type TomlV1Common struct {
-	StoreVersion      StoreVersion    `toml:"store-version"`
-	RepoType          repo_type.Type  `toml:"repo-type"`
-	RepoId            ids.RepoId      `toml:"id"`
-	BlobStore         BlobStoreTomlV1 `toml:"blob-store"`
-	InventoryListType string          `toml:"inventory_list-type"`
+	StoreVersion      StoreVersion                                `toml:"store-version"`
+	RepoType          repo_type.Type                              `toml:"repo-type"`
+	RepoId            ids.RepoId                                  `toml:"id"`
+	BlobStore         blob_store_immutable_config.BlobStoreTomlV1 `toml:"blob-store"`
+	InventoryListType string                                      `toml:"inventory_list-type"`
 }
 
 type TomlV1Private struct {

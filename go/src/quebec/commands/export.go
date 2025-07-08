@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -21,7 +21,7 @@ func init() {
 	command.Register(
 		"export",
 		&Export{
-			CompressionType: config_immutable.CompressionTypeEmpty,
+			CompressionType: compression_type.CompressionTypeEmpty,
 		},
 	)
 }
@@ -30,7 +30,7 @@ type Export struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 
 	AgeIdentity     age.Identity
-	CompressionType config_immutable.CompressionType
+	CompressionType compression_type.CompressionType
 }
 
 func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
@@ -68,7 +68,11 @@ func (cmd Export) Run(dep command.Request) {
 	var ag age.Age
 
 	if err := ag.AddIdentity(cmd.AgeIdentity); err != nil {
-		localWorkingCopy.CancelWithErrorAndFormat(err, "age-identity: %q", &cmd.AgeIdentity)
+		localWorkingCopy.CancelWithErrorAndFormat(
+			err,
+			"age-identity: %q",
+			&cmd.AgeIdentity,
+		)
 	}
 
 	var wc io.WriteCloser

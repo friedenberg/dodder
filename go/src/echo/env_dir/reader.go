@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
@@ -33,7 +33,7 @@ func NewReader(options ReadOptions) (r *reader, err error) {
 			return
 		}
 
-		if r.expander, err = config_immutable.CompressionTypeNone.WrapReader(
+		if r.expander, err = compression_type.CompressionTypeNone.WrapReader(
 			options.File,
 		); err != nil {
 			err = errors.Wrap(err)

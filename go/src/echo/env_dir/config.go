@@ -3,7 +3,7 @@ package env_dir
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
-	"code.linenisgreat.com/dodder/go/src/delta/config_immutable"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
 type Config struct {
@@ -32,7 +32,7 @@ func MakeConfig(
 	}
 
 	if compression == nil {
-		c := config_immutable.CompressionTypeNone
+		c := compression_type.CompressionTypeNone
 		compression = &c
 	}
 

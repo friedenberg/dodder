@@ -1,4 +1,4 @@
-package config_immutable
+package compression_type
 
 import (
 	"compress/gzip"

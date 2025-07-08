@@ -8,13 +8,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type v0Common struct {
 	StoreVersion      StoreVersion
 	Recipients        []string
-	CompressionType   CompressionType
+	CompressionType   compression_type.CompressionType
 	LockInternalFiles bool
 }
 
