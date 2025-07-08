@@ -172,12 +172,14 @@ test-bats $PATH=(dir_build + ":" + env("PATH")):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test
 
-test-bats-version version $PATH=(dir_build + ":" + env("PATH")):
-  just --set {{version}} DODDER_VERSION../zz-tests_bats/test
+test-bats-version dodder version $PATH=(dir_build + ":" + env("PATH")):
+  just \
+    --set DODDER_BIN {{dodder}} \
+    --set DODDER_VERSION v{{version}} \
+    ../zz-tests_bats/test
 
-# test-bats-targets $PATH=(dir_build + ":" + env("PATH")):
-#   just zz-tests_bats/test-generate_fixtures "$(build/der info)"
-#   just zz-tests_bats/test
+# shell("echo", join(dir_build, "der-next")
+test-bats-next: (test-bats-version "der-next" shell("der-next info"))
 
 test: test-go test-bats
 
@@ -222,6 +224,7 @@ deploy-docker: build-docker
 deploy-github: \
     build-go \
     test \
+    test-bats-next \
     (git-add-and-commit \
       "." \
       "../{zz-pandoc,zz-vim,zz-tests_bats}" \

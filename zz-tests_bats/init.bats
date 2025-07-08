@@ -47,7 +47,8 @@ function init_compression { # @test
 	assert_success
 
 	sha="$(get_konfig_sha)"
-	run zstd --decompress .xdg/data/dodder/objects/blobs/"${sha:0:2}"/* --stdout
+  dir_blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
+	run zstd --decompress "$dir_blobs/${sha:0:2}"/* --stdout
 	assert_success
 }
 
@@ -196,20 +197,4 @@ function init_and_init { # @test
 	assert_output - <<-EOM
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
-}
-
-function init_next { # @test
-	run_dodder info store-version-next
-	assert_success
-	assert_output --regexp '[0-9]+'
-
-	# shellcheck disable=SC2034
-	storeVersionNext="$output"
-
-	run_dodder_init -next -override-xdg-with-cwd test-repo-id
-	assert_success
-
-	run_dodder info-repo store-version
-	assert_success
-	assert_output "$storeVersionNext"
 }
