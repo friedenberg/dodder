@@ -8,15 +8,15 @@ import (
 )
 
 type directoryV1 struct {
-	sv interfaces.StoreVersion
+	storeVersion interfaces.StoreVersion
 	xdg.XDG
 }
 
 func (c *directoryV1) init(
-	sv interfaces.StoreVersion,
+	storeVersion interfaces.StoreVersion,
 	xdg xdg.XDG,
 ) (err error) {
-	c.sv = sv
+	c.storeVersion = storeVersion
 	c.XDG = xdg
 	return
 }
@@ -63,7 +63,7 @@ func (s directoryV1) DirCacheRepo(p ...string) string {
 	return s.DirDodder(append([]string{"cache", "repo"}, p...)...)
 }
 
-func (s directoryV1) DirObjects(p ...string) string {
+func (s directoryV1) DirBlobStores(p ...string) string {
 	return s.DirDodder(append([]string{"objects"}, p...)...)
 }
 
@@ -92,13 +92,13 @@ func (s directoryV1) FileCacheObjectId() string {
 }
 
 func (s directoryV1) FileInventoryListLog() string {
-	return s.DirObjects("inventory_lists_log")
+	return s.DirBlobStores("inventory_lists_log")
 }
 
-func (s directoryV1) DirInventoryLists() string {
-	return s.DirObjects("inventory_lists")
+func (s directoryV1) DirFirstBlobStoreInventoryLists() string {
+	return s.DirBlobStores("inventory_lists")
 }
 
-func (s directoryV1) DirBlobs() string {
-	return s.DirObjects("blobs")
+func (s directoryV1) DirFirstBlobStoreBlobs() string {
+	return s.DirBlobStores("blobs")
 }

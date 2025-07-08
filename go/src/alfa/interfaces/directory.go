@@ -2,17 +2,20 @@ package interfaces
 
 type DirectoryPaths interface {
 	Dir(p ...string) string
+	DirDodder(p ...string) string
+
+	DirFirstBlobStoreBlobs() string
+	DirFirstBlobStoreInventoryLists() string
+	DirBlobStores(p ...string) string
+
 	DirCache(p ...string) string
+	DirCacheInventoryListLog() string
 	DirCacheObjectPointers() string
 	DirCacheObjects() string
-	DirCacheInventoryListLog() string
 	DirCacheRepo(p ...string) string
 	DirLostAndFound() string
 	DirObjectId() string
-	DirObjects(p ...string) string
-	DirInventoryLists() string
-	DirBlobs() string
-	DirDodder(p ...string) string
+
 	FileCacheDormant() string
 	FileCacheObjectId() string
 	FileConfigMutable() string

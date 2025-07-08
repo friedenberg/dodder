@@ -55,7 +55,7 @@ func (env Env) ReadAllShas(
 func (env Env) ReadAllShasForBlobs(
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
-	p := env.DirBlobs()
+	p := env.DirFirstBlobStoreBlobs()
 
 	if err = env.ReadAllShas(p, w); err != nil {
 		err = errors.Wrap(err)

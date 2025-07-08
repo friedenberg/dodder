@@ -30,8 +30,8 @@ func (env *Env) Genesis(bb BigBang) {
 		env.DirObjectId(),
 		env.DirCache(),
 		env.DirLostAndFound(),
-		env.DirInventoryLists(),
-		env.DirBlobs(),
+		env.DirFirstBlobStoreInventoryLists(),
+		env.DirFirstBlobStoreBlobs(),
 	); err != nil {
 		env.CancelWithError(err)
 	}

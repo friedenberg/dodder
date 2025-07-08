@@ -11,9 +11,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
+	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
@@ -24,6 +25,11 @@ const (
 	FileWorkspace         = ".dodder-workspace"
 )
 
+type directoryPaths interface {
+	interfaces.DirectoryPaths
+	init(interfaces.StoreVersion, xdg.XDG) error
+}
+
 type Env struct {
 	env_local.Env
 
@@ -32,7 +38,7 @@ type Env struct {
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
 
-	interfaces.DirectoryPaths
+	directoryPaths
 
 	local, remote blob_store.LocalBlobStore
 
@@ -67,7 +73,7 @@ func Make(
 		return
 	}
 
-	env.DirectoryPaths = dp
+	env.directoryPaths = dp
 
 	// TODO add support for failing on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
@@ -200,7 +206,7 @@ func (env Env) Mover() (*env_dir.Mover, error) {
 func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
 	// TODO use default blob store ref from config and initialize a blob store
 	return blob_store.MakeShardedFilesStore(
-		env.DirBlobs(),
+		env.DirFirstBlobStoreBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
 			env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable(),
 		),

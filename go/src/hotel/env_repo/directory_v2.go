@@ -9,98 +9,98 @@ import (
 
 // TODO examine the directories and use XDG more appropriately for them
 type directoryV2 struct {
-	storeVersoin interfaces.StoreVersion
+	storeVersion interfaces.StoreVersion
 	xdg          xdg.XDG
 }
 
-func (c *directoryV2) init(
-	sv interfaces.StoreVersion,
+func (directory *directoryV2) init(
+	storeVersion interfaces.StoreVersion,
 	xdg xdg.XDG,
 ) (err error) {
-	c.storeVersoin = sv
-	c.xdg = xdg
+	directory.storeVersion = storeVersion
+	directory.xdg = xdg
 	return
 }
 
-func (c directoryV2) GetDirectoryPaths() interfaces.DirectoryPaths {
-	return c
+func (directory directoryV2) GetDirectoryPaths() interfaces.DirectoryPaths {
+	return directory
 }
 
-func (c directoryV2) FileCacheDormant() string {
-	return c.DirDodder("dormant")
+func (directory directoryV2) Dir(p ...string) string {
+	return filepath.Join(stringSliceJoin(directory.xdg.Data, p)...)
 }
 
-func (c directoryV2) FileTags() string {
-	return c.DirDodder("tags")
+func (directory directoryV2) DirDodder(p ...string) string {
+	return directory.Dir(p...)
 }
 
-func (c directoryV2) FileLock() string {
-	return filepath.Join(c.xdg.State, "lock")
+func (directory directoryV2) DirBlobStores(p ...string) string {
+	return directory.DirDodder(append([]string{"objects"}, p...)...)
 }
 
-func (c directoryV2) FileConfigPermanent() string {
-	return c.DirDodder("config-permanent")
-}
-
-func (c directoryV2) FileConfigMutable() string {
-	return c.DirDodder("config-mutable")
-}
-
-func (s directoryV2) Dir(p ...string) string {
-	return filepath.Join(stringSliceJoin(s.xdg.Data, p)...)
-}
-
-func (s directoryV2) DirDodder(p ...string) string {
-	return s.Dir(p...)
-}
-
-func (s directoryV2) DirCache(p ...string) string {
-	return s.DirDodder(append([]string{"cache"}, p...)...)
-}
-
-func (s directoryV2) DirCacheRepo(p ...string) string {
-	// TODO switch to XDG cache
-	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
-	return s.DirDodder(append([]string{"cache", "repo"}, p...)...)
-}
-
-func (s directoryV2) DirObjects(p ...string) string {
-	return s.DirDodder(append([]string{"objects"}, p...)...)
-}
-
-func (s directoryV2) DirLostAndFound() string {
-	return s.DirDodder("lost_and_found")
-}
-
-func (s directoryV2) DirCacheObjects() string {
-	return s.DirCache("objects")
-}
-
-func (s directoryV2) DirCacheObjectPointers() string {
-	return s.DirCache("object_pointers")
-}
-
-func (s directoryV2) DirCacheInventoryListLog() string {
-	return s.DirCache("inventory_list_logs")
-}
-
-func (s directoryV2) DirObjectId() string {
-	return s.DirDodder("object_ids")
-}
-
-func (s directoryV2) FileCacheObjectId() string {
-	return s.DirCache("object_id")
-}
-
-func (s directoryV2) FileInventoryListLog() string {
-	return s.DirObjects("inventory_lists_log")
-}
-
-func (s directoryV2) DirInventoryLists() string {
-	return s.DirObjects("inventory_lists")
+func (directory directoryV2) DirFirstBlobStoreInventoryLists() string {
+	return directory.DirBlobStores("1/inventory_lists")
 }
 
 // TODO switch to named blob stores
-func (s directoryV2) DirBlobs() string {
-	return s.DirObjects("blobs")
+func (directory directoryV2) DirFirstBlobStoreBlobs() string {
+	return directory.DirBlobStores("1/blobs")
+}
+
+func (directory directoryV2) FileCacheDormant() string {
+	return directory.DirDodder("dormant")
+}
+
+func (directory directoryV2) FileTags() string {
+	return directory.DirDodder("tags")
+}
+
+func (directory directoryV2) FileLock() string {
+	return filepath.Join(directory.xdg.State, "lock")
+}
+
+func (directory directoryV2) FileConfigPermanent() string {
+	return directory.DirDodder("config-permanent")
+}
+
+func (directory directoryV2) FileConfigMutable() string {
+	return directory.DirDodder("config-mutable")
+}
+
+func (directory directoryV2) DirCache(p ...string) string {
+	return directory.DirDodder(append([]string{"cache"}, p...)...)
+}
+
+func (directory directoryV2) DirCacheRepo(p ...string) string {
+	// TODO switch to XDG cache
+	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
+	return directory.DirDodder(append([]string{"cache", "repo"}, p...)...)
+}
+
+func (directory directoryV2) DirLostAndFound() string {
+	return directory.DirDodder("lost_and_found")
+}
+
+func (directory directoryV2) DirCacheObjects() string {
+	return directory.DirCache("objects")
+}
+
+func (directory directoryV2) DirCacheObjectPointers() string {
+	return directory.DirCache("object_pointers")
+}
+
+func (directory directoryV2) DirCacheInventoryListLog() string {
+	return directory.DirCache("inventory_list_logs")
+}
+
+func (directory directoryV2) DirObjectId() string {
+	return directory.DirDodder("object_ids")
+}
+
+func (directory directoryV2) FileCacheObjectId() string {
+	return directory.DirCache("object_id")
+}
+
+func (directory directoryV2) FileInventoryListLog() string {
+	return directory.DirBlobStores("inventory_lists_log")
 }
