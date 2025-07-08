@@ -36,7 +36,8 @@ function last_after_typ_mutate { # @test
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 
-	run bash -c 'find .xdg/data/dodder/objects/inventory_lists -type f | wc -l | tr -d " "'
+  dir_inventory_list="$("$DODDER_BIN" info-repo dir.blob-stores.1.inventory_lists)"
+	run bash -c "find '$dir_inventory_list' -type f | wc -l | tr -d \" \""
 	assert_success
 	assert_output '2'
 

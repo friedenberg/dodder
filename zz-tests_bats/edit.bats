@@ -88,7 +88,7 @@ function edit_and_format_no_workspace { # @test
 	# shellcheck disable=SC2317
 	function editor() {
 		out="$(mktemp)"
-		dodder format-object "$0" >"$out"
+		"$DODDER_BIN" format-object "$0" >"$out"
 		mv "$out" "$0"
 	}
 

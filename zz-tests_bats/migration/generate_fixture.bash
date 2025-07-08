@@ -4,14 +4,14 @@
 dir_git_root="$(git rev-parse --show-toplevel)"
 dir_base="$(realpath "$(dirname "$0")")"
 
-v="$1"
+v="$DODDER_VERSION"
 
-if [[ -z "$1" ]]; then
-  echo "no store version passed in" >&2
+if [[ -z "$v" ]]; then
+  echo "no \$DODDER_VERSION set" >&2
   exit 1
 fi
 
-d="${2:-$dir_base/v$v}"
+d="${2:-$dir_base/$v}"
 
 if [[ -d $d ]]; then
   "$dir_git_root/bin/chflags.bash" -R nouchg "$d"

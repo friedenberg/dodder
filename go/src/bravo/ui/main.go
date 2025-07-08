@@ -94,6 +94,7 @@ func Debug() DevPrinter {
 	return printerDebug
 }
 
+// TODO replace with a dynamic `DebugOnEnv("BATS_TEST_BODY")`
 func DebugBatsTestBody() DevPrinter {
 	return printerBatsTestBody
 }

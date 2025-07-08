@@ -11,7 +11,7 @@ type BlobStore[
 	A any,
 	APtr interfaces.Ptr[A],
 ] struct {
-	dirLayout env_repo.Env
+	envRepo env_repo.Env
 	Format[A, APtr]
 	resetFunc func(APtr)
 }
@@ -23,9 +23,9 @@ func MakeBlobStore[
 	repoLayout env_repo.Env,
 	format Format[A, APtr],
 	resetFunc func(APtr),
-) (s *BlobStore[A, APtr]) {
-	s = &BlobStore[A, APtr]{
-		dirLayout: repoLayout,
+) (blobStore *BlobStore[A, APtr]) {
+	blobStore = &BlobStore[A, APtr]{
+		envRepo:   repoLayout,
 		Format:    format,
 		resetFunc: resetFunc,
 	}
@@ -33,12 +33,12 @@ func MakeBlobStore[
 	return
 }
 
-func (s *BlobStore[A, APtr]) GetBlob(
+func (blobStore *BlobStore[A, APtr]) GetBlob(
 	sh interfaces.Sha,
 ) (a APtr, err error) {
 	var rc interfaces.ShaReadCloser
 
-	if rc, err = s.dirLayout.BlobReader(sh); err != nil {
+	if rc, err = blobStore.envRepo.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -47,9 +47,9 @@ func (s *BlobStore[A, APtr]) GetBlob(
 
 	var a1 A
 	a = APtr(&a1)
-	s.resetFunc(a)
+	blobStore.resetFunc(a)
 
-	if _, err = s.DecodeFrom(a, rc); err != nil {
+	if _, err = blobStore.DecodeFrom(a, rc); err != nil {
 		err = errors.Wrapf(err, "BlobReader: %q", rc)
 		return
 	}
@@ -64,23 +64,23 @@ func (s *BlobStore[A, APtr]) GetBlob(
 	return
 }
 
-func (s *BlobStore[A, APtr]) PutBlob(a APtr) {
+func (blobStore *BlobStore[A, APtr]) PutBlob(a APtr) {
 	// TODO-P2 implement pool
 }
 
-func (h *BlobStore[A, APtr]) SaveBlobText(
+func (blobStore *BlobStore[A, APtr]) SaveBlobText(
 	o APtr,
 ) (sh interfaces.Sha, n int64, err error) {
 	var w sha.WriteCloser
 
-	if w, err = h.dirLayout.BlobWriter(); err != nil {
+	if w, err = blobStore.envRepo.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, w)
 
-	if n, err = h.EncodeTo(o, w); err != nil {
+	if n, err = blobStore.EncodeTo(o, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

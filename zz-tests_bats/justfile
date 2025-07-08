@@ -1,4 +1,8 @@
 
+export DODDER_BIN := "dodder"
+export DODDER_VERSION := "v" + shell(DODDER_BIN + " info store-version")
+export DODDER_XDG_UTILITY_OVERRIDE := ""
+
 default: test
 
 dir_git_root := shell("git rev-parse --show-toplevel")
@@ -15,7 +19,6 @@ clean-fixtures:
 [group("clean")]
 clean: clean-fixtures
 
-export DODDER_VERSION := "v" + shell("dodder info store-version")
 
 [group("debug")]
 debug-env store_version=DODDER_VERSION:
@@ -79,9 +82,9 @@ check:
 #
 
 [group("test")]
-test-generate_fixtures store_version:
-  which dodder
-  ./migration/generate_fixture.bash {{store_version}}
+test-generate_fixtures:
+  which {{DODDER_BIN}}
+  ./migration/generate_fixture.bash {{DODDER_VERSION}}
 
 bats_timeout := "5"
 

@@ -66,13 +66,24 @@ cmd_dodder_def=(
 
 export cmd_dodder_def
 
+if [[ -z $DODDER_BIN ]]; then
+  export DODDER_BIN
+  DODDER_BIN="$(which dodder)"
+fi
+
+if [[ -z $DODDER_VERSION ]]; then
+  export DODDER_VERSION
+  DODDER_VERSION="v$("$DODDER_BIN" info store-version)"
+fi
+
+
 function copy_from_version {
   DIR="$1"
-  version="$DODDER_VERSION"
   rm -rf "$BATS_TEST_TMPDIR/.xdg"
-  cp -r "$DIR/migration/$version/.xdg" "$BATS_TEST_TMPDIR/.xdg"
+  cp -r "$DIR/migration/$DODDER_VERSION/.xdg" "$BATS_TEST_TMPDIR/.xdg"
 }
 
+# TODO remove
 function rm_from_version {
   chflags_and_rm
 }
@@ -82,30 +93,26 @@ function chflags_and_rm {
 }
 
 function setup_repo {
-  if [[ -z $DODDER_VERSION ]]; then
-    export DODDER_VERSION
-    DODDER_VERSION="v$(dodder info store-version)"
-  fi
-
   copy_from_version "$DIR" "$DODDER_VERSION"
 }
 
 function teardown_repo {
-  rm_from_version "$DODDER_VERSION"
+  chflags_and_rm
 }
 
 function run_dodder {
   cmd="$1"
   shift
   #shellcheck disable=SC2068
-  run timeout --preserve-status "2s" dodder "$cmd" ${cmd_dodder_def[@]} "$@"
+  run timeout --preserve-status "2s" "$DODDER_BIN" "$cmd" ${cmd_dodder_def[@]} "$@"
 }
 
+# TODO make this actually unify stderr
 function run_dodder_stderr_unified {
   cmd="$1"
   shift
   #shellcheck disable=SC2068
-  run dodder "$cmd" ${cmd_dodder_def[@]} "$@"
+  run "$DODDER_BIN" "$cmd" ${cmd_dodder_def[@]} "$@"
 }
 
 function run_dodder_init {

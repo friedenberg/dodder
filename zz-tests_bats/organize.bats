@@ -373,8 +373,9 @@ function organize_hides_hidden_tags_from_organize { # @test
 
 function organize_dry_run { # @test
 	expected_show="$(mktemp)"
-	# shellcheck disable=SC2154
-	dodder show "${cmd_dodder_def[@]}" -format log :z,e,t >"$expected_show"
+
+	run_dodder show "${cmd_dodder_def[@]}" -format log :z,e,t
+  expected_show="$output"
 
 	run_dodder organize -dry-run -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
@@ -391,7 +392,7 @@ function organize_dry_run { # @test
 
 	run_dodder show -format log :z,e,t
 	assert_success
-	assert_output_unsorted "$(cat "$expected_show")"
+	assert_output_unsorted "$expected_show"
 }
 
 function organize_with_type_output { # @test

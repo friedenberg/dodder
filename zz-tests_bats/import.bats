@@ -75,7 +75,7 @@ function import_one_tai_same { # @test
 	echo "$output" | zstd >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .xdg/data/dodder/objects/blobs)"
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -119,7 +119,7 @@ function import_twice_no_dupes_one_zettel { # @test
 	echo "$output" | zstd >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .dodder/Objekten2/Akten)"
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -172,7 +172,7 @@ function import_conflict { # @test
 	echo "$output" | zstd >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .xdg/data/dodder/objects/blobs)"
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -330,7 +330,7 @@ function import_inventory_lists { # @test
 	echo "$output" | zstd >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .xdg/data/dodder/objects/blobs)"
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
