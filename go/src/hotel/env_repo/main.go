@@ -27,7 +27,7 @@ const (
 type Env struct {
 	env_local.Env
 
-	config genesis_config_io.ConfigPrivateTypedBlob
+	config genesis_config_io.PrivateTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -133,14 +133,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() genesis_config_io.ConfigPublicTypedBlob {
-	return genesis_config_io.ConfigPublicTypedBlob{
+func (env Env) GetConfigPublic() genesis_config_io.PublicTypedBlob {
+	return genesis_config_io.PublicTypedBlob{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob {
+func (env Env) GetConfigPrivate() genesis_config_io.PrivateTypedBlob {
 	return env.config
 }
 

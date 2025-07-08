@@ -9,7 +9,7 @@ import (
 type LocalRepo interface {
 	Repo
 	GetEnvRepo() env_repo.Env // TODO rename to GetEnvRepo
-	GetImmutableConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob
+	GetImmutableConfigPrivate() genesis_config_io.PrivateTypedBlob
 	Lock() error
 	Unlock() error
 }

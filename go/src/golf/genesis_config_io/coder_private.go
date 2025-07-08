@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPrivateTypedBlob = triple_hyphen_io2.TypedBlob[genesis_config.Private]
+type PrivateTypedBlob = triple_hyphen_io2.TypedBlob[genesis_config.Private]
 
 var typedCodersPrivate = map[string]interfaces.CoderBufferedReadWriter[*genesis_config.Private]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPrivate{},
@@ -30,7 +30,7 @@ var coderPrivate = triple_hyphen_io2.CoderToTypedBlob[genesis_config.Private]{
 type CoderPrivate struct{}
 
 func (coder CoderPrivate) DecodeFromFile(
-	typedBlob *ConfigPrivateTypedBlob,
+	typedBlob *PrivateTypedBlob,
 	path string,
 ) (err error) {
 	var reader io.Reader
@@ -62,7 +62,7 @@ func (coder CoderPrivate) DecodeFromFile(
 }
 
 func (CoderPrivate) DecodeFrom(
-	typedBlob *ConfigPrivateTypedBlob,
+	typedBlob *PrivateTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPrivate.DecodeFrom(
@@ -77,7 +77,7 @@ func (CoderPrivate) DecodeFrom(
 }
 
 func (CoderPrivate) EncodeTo(
-	typedBlob *ConfigPrivateTypedBlob,
+	typedBlob *PrivateTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPrivate.EncodeTo(

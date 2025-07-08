@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
-type ConfigPublicTypedBlob = triple_hyphen_io2.TypedBlob[genesis_config.Public]
+type PublicTypedBlob = triple_hyphen_io2.TypedBlob[genesis_config.Public]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*genesis_config.Public]{
 	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
@@ -30,7 +30,7 @@ var coderPublic = triple_hyphen_io2.CoderToTypedBlob[genesis_config.Public]{
 type CoderPublic struct{}
 
 func (coder CoderPublic) DecodeFromFile(
-	object *ConfigPublicTypedBlob,
+	object *PublicTypedBlob,
 	p string,
 ) (err error) {
 	var r io.Reader
@@ -62,7 +62,7 @@ func (coder CoderPublic) DecodeFromFile(
 }
 
 func (CoderPublic) DecodeFrom(
-	typedBlob *ConfigPublicTypedBlob,
+	typedBlob *PublicTypedBlob,
 	reader io.Reader,
 ) (n int64, err error) {
 	if n, err = coderPublic.DecodeFrom(
@@ -77,7 +77,7 @@ func (CoderPublic) DecodeFrom(
 }
 
 func (CoderPublic) EncodeTo(
-	typedBlob *ConfigPublicTypedBlob,
+	typedBlob *PublicTypedBlob,
 	writer io.Writer,
 ) (n int64, err error) {
 	if n, err = coderPublic.EncodeTo(

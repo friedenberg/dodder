@@ -31,7 +31,7 @@ func (local *Repo) GetImmutableConfigPublicType() ids.Type {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (local *Repo) GetImmutableConfigPrivate() genesis_config_io.ConfigPrivateTypedBlob {
+func (local *Repo) GetImmutableConfigPrivate() genesis_config_io.PrivateTypedBlob {
 	return local.GetEnvRepo().GetConfigPrivate()
 }
 
