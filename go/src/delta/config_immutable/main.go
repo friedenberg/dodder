@@ -22,8 +22,6 @@ type (
 	private struct{}
 )
 
-// TODO make it impossible for private configs to be returned fy
-// GetImmutableConfigPublic
 type common interface {
 	GetImmutableConfigPublic() Public
 	GetStoreVersion() interfaces.StoreVersion

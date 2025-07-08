@@ -215,6 +215,7 @@ deploy-docker: build-docker
   docker tag dodder:latest idealnesswagon5/dodder:latest
   docker push idealnesswagon5/dodder:latest
 
+# TODO modify this to exclude any changes that were added AFTER the task began
 deploy-github: \
     build-go \
     test \

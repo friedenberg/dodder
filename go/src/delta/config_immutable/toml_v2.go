@@ -10,18 +10,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-type BlobStoreReference struct {
-	Name string        `toml:"name"`
-	Type BlobStoreType `toml:"type"`
-}
-
 // must be public for toml coding to function
 type TomlV2Common struct {
 	StoreVersion      StoreVersion   `toml:"store-version"`
 	RepoType          repo_type.Type `toml:"repo-type"`
 	RepoId            ids.RepoId     `toml:"id"`
-	DefaultBlobStore  string         `toml:"default-blob-store"`
 	InventoryListType string         `toml:"inventory_list-type"`
+	DefaultBlobStore  string         `toml:"default-blob-store"`
 }
 
 type TomlV2Private struct {
@@ -34,9 +29,9 @@ type TomlV2Public struct {
 	TomlV2Common
 }
 
-func (config *TomlV2Common) SetFlagSet(f *flag.FlagSet) {
+func (config *TomlV2Common) SetFlagSet(flagSet *flag.FlagSet) {
 	config.RepoType = repo_type.TypeWorkingCopy
-	f.Var(&config.RepoType, "repo-type", "")
+	flagSet.Var(&config.RepoType, "repo-type", "")
 }
 
 func (config *TomlV2Common) GetInventoryListTypeString() string {
