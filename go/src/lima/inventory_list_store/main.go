@@ -12,13 +12,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
@@ -35,7 +35,7 @@ type Store struct {
 	lockSmith    interfaces.LockSmith
 	storeVersion interfaces.StoreVersion
 	objectBlobStore
-	blobStore blob_store.LocalBlobStore
+	blobStore interfaces.LocalBlobStore
 	clock     ids.Clock
 
 	object_format object_inventory_format.Format
@@ -267,12 +267,12 @@ func (store *Store) Create(
 
 	object.SetTai(tai)
 
-	if err = openList.Close(); err != nil {
+	if err = openList.Mover.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	actual := openList.GetShaLike()
+	actual := openList.Mover.GetShaLike()
 	expected := sha.Make(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)

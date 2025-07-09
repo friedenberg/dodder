@@ -1,6 +1,9 @@
 package interfaces
 
-import "iter"
+import (
+	"io"
+	"iter"
+)
 
 type (
 	BlobCompression interface {
@@ -21,6 +24,11 @@ type (
 		BlobWriter() (ShaWriteCloser, error)
 	}
 
+	Mover interface {
+		io.WriteCloser
+		GetShaLike() Sha
+	}
+
 	BlobStore interface {
 		GetBlobStore() BlobStore
 		HasBlob(sh Sha) (ok bool)
@@ -28,10 +36,12 @@ type (
 		BlobWriter
 	}
 
+	// TODO merge into BlobStore
 	LocalBlobStore interface {
 		BlobStore
 		GetLocalBlobStore() LocalBlobStore
 		AllBlobs() iter.Seq2[Sha, error]
+		Mover() (Mover, error)
 	}
 
 	BlobStoreConfigImmutable interface {

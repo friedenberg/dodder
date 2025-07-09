@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -56,8 +55,8 @@ type ListFormat interface {
 type List = heap.Heap[Transacted, *Transacted]
 
 type OpenList struct {
-	Tipe ids.Type
-	*env_dir.Mover
+	Tipe        ids.Type
+	Mover       interfaces.Mover
 	Description descriptions.Description
 	LastTai     ids.Tai
 	Len         int

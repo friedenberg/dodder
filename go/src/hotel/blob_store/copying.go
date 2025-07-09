@@ -34,56 +34,60 @@ type CopyingBlobStore struct {
 	remote interfaces.BlobStore
 }
 
-func (s CopyingBlobStore) GetBlobStore() interfaces.BlobStore {
-	return s
+func (blobStore CopyingBlobStore) GetBlobStore() interfaces.BlobStore {
+	return blobStore
 }
 
-func (s CopyingBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
-	return s
+func (blobStore CopyingBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
+	return blobStore
 }
 
-func (s CopyingBlobStore) HasBlob(sh interfaces.Sha) bool {
-	if s.local.HasBlob(sh) {
+func (blobStore CopyingBlobStore) HasBlob(sh interfaces.Sha) bool {
+	if blobStore.local.HasBlob(sh) {
 		return true
 	}
 
-	if s.remote != nil && s.remote.HasBlob(sh) {
+	if blobStore.remote != nil && blobStore.remote.HasBlob(sh) {
 		return true
 	}
 
 	return false
 }
 
-func (s CopyingBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
-	return s.local.AllBlobs()
+func (blobStore CopyingBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+	return blobStore.local.AllBlobs()
 }
 
-func (s CopyingBlobStore) BlobWriter() (w sha.WriteCloser, err error) {
-	return s.local.BlobWriter()
+func (blobStore CopyingBlobStore) BlobWriter() (w sha.WriteCloser, err error) {
+	return blobStore.local.BlobWriter()
 }
 
-func (s CopyingBlobStore) BlobReader(
+func (blobStore CopyingBlobStore) BlobReader(
 	sh interfaces.Sha,
 ) (r interfaces.ShaReadCloser, err error) {
-	if s.local.HasBlob(sh) || s.remote == nil {
-		return s.local.BlobReader(sh)
+	if blobStore.local.HasBlob(sh) || blobStore.remote == nil {
+		return blobStore.local.BlobReader(sh)
 	}
 
 	var n int64
 
-	if n, err = CopyBlob(s, s.local, s.remote, sh.GetShaLike(), nil); err != nil {
+	if n, err = CopyBlob(blobStore, blobStore.local, blobStore.remote, sh.GetShaLike(), nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	ui.Err().Printf("copied Blob %s (%d bytes)", sh, n)
 
-	if r, err = s.local.BlobReader(sh); err != nil {
+	if r, err = blobStore.local.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	return
+}
+
+func (blobStore CopyingBlobStore) Mover() (interfaces.Mover, error) {
+	return blobStore.local.Mover()
 }
 
 func CopyBlobIfNecessary(

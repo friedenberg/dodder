@@ -14,11 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-type LocalBlobStore interface {
-	interfaces.LocalBlobStore
-	Mover() (*env_dir.Mover, error)
-}
-
 type storeShardedFiles struct {
 	env_dir.Config
 	basePath string
@@ -103,7 +98,7 @@ func (store storeShardedFiles) BlobWriter() (w interfaces.ShaWriteCloser, err er
 	return
 }
 
-func (store storeShardedFiles) Mover() (mover *env_dir.Mover, err error) {
+func (store storeShardedFiles) Mover() (mover interfaces.Mover, err error) {
 	if mover, err = store.blobWriterTo(store.basePath); err != nil {
 		err = errors.Wrap(err)
 		return

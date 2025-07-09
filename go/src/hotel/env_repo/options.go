@@ -10,6 +10,6 @@ type Options struct {
 	MakeXDGDirectories      bool
 }
 
-func (o Options) GetReadOnlyBlobStorePath() string {
+func (options Options) GetReadOnlyBlobStorePath() string {
 	return os.Getenv("DODDER_READ_ONLY_BLOB_STORE_PATH")
 }

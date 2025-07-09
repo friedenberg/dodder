@@ -1,6 +1,7 @@
 package env_repo
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 
@@ -40,7 +41,7 @@ type Env struct {
 
 	directoryPaths
 
-	local, remote blob_store.LocalBlobStore
+	local, remote interfaces.LocalBlobStore
 
 	blob_store.CopyingBlobStore
 }
@@ -201,13 +202,14 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) Mover() (*env_dir.Mover, error) {
+func (env Env) Mover() (io.WriteCloser, error) {
 	return env.local.Mover()
 }
 
-func (env Env) GetDefaultBlobStore() blob_store.LocalBlobStore {
+func (env Env) GetDefaultBlobStore() interfaces.LocalBlobStore {
 	// TODO use default blob store ref from config and initialize a blob store
-	// TODO depending on store version, read immutable config from blob store path
+	// TODO depending on store version, read immutable config from blob store
+	// path
 	// or from config
 	return blob_store.MakeShardedFilesStore(
 		env.DirFirstBlobStoreBlobs(),
