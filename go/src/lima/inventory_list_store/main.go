@@ -68,7 +68,7 @@ func (store *Store) Initialize(
 		envRepo:      envRepo,
 		lockSmith:    envRepo.GetLockSmith(),
 		storeVersion: envRepo.GetStoreVersion(),
-		blobStore:    envRepo.MakeBlobStore(),
+		blobStore:    envRepo.GetDefaultBlobStore(),
 		clock:        clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,

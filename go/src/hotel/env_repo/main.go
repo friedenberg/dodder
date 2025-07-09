@@ -127,7 +127,7 @@ func Make(
 }
 
 func (env *Env) setupStores() (err error) {
-	env.local = env.MakeBlobStore()
+	env.local = env.GetDefaultBlobStore()
 	env.CopyingBlobStore = blob_store.MakeCopyingBlobStore(
 		env.Env,
 		env.local,
@@ -205,8 +205,10 @@ func (env Env) Mover() (*env_dir.Mover, error) {
 	return env.local.Mover()
 }
 
-func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
+func (env Env) GetDefaultBlobStore() blob_store.LocalBlobStore {
 	// TODO use default blob store ref from config and initialize a blob store
+	// TODO depending on store version, read immutable config from blob store path
+	// or from config
 	return blob_store.MakeShardedFilesStore(
 		env.DirFirstBlobStoreBlobs(),
 		env_dir.MakeConfigFromImmutableBlobConfig(
@@ -214,6 +216,10 @@ func (env Env) MakeBlobStore() blob_store.LocalBlobStore {
 		),
 		env.GetTempLocal(),
 	)
+}
+
+func (env Env) GetBlobStoreById(id string) interfaces.BlobStore {
+	panic(todo.Implement())
 }
 
 // func (env Env) MakeBlobStoreFromConfig(
