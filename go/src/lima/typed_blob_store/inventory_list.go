@@ -178,7 +178,7 @@ func (a InventoryList) WriteObjectToWriter(
 		// Blob field is zero-value sku.Transacted
 	}
 	sku.TransactedResetter.ResetWith(&typedBlob.Blob, object)
-	
+
 	return a.objectCoders.EncodeTo(typedBlob, bufferedWriter)
 }
 

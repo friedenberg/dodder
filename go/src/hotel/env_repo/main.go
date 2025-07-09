@@ -1,14 +1,12 @@
 package env_repo
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
@@ -41,9 +39,9 @@ type Env struct {
 
 	directoryPaths
 
-	local, remote interfaces.LocalBlobStore
-
-	blob_store.CopyingBlobStore
+	blobStoreDefaultIndex     int
+	interfaces.LocalBlobStore // default
+	blobStores                []interfaces.LocalBlobStore
 }
 
 func Make(
@@ -128,12 +126,20 @@ func Make(
 }
 
 func (env *Env) setupStores() (err error) {
-	env.local = env.GetDefaultBlobStore()
-	env.CopyingBlobStore = blob_store.MakeCopyingBlobStore(
-		env.Env,
-		env.local,
-		env.remote,
+	// TODO depending on store version, read immutable config from blob store
+	// path
+	// or from config
+
+	env.blobStores = make([]interfaces.LocalBlobStore, 1)
+	env.blobStores[0] = blob_store.MakeShardedFilesStore(
+		env.DirFirstBlobStoreBlobs(),
+		env_dir.MakeConfigFromImmutableBlobConfig(
+			env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable(),
+		),
+		env.GetTempLocal(),
 	)
+
+	env.LocalBlobStore = env.GetDefaultBlobStore()
 
 	return
 }
@@ -202,40 +208,10 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) Mover() (io.WriteCloser, error) {
-	return env.local.Mover()
-}
-
 func (env Env) GetDefaultBlobStore() interfaces.LocalBlobStore {
-	// TODO use default blob store ref from config and initialize a blob store
-	// TODO depending on store version, read immutable config from blob store
-	// path
-	// or from config
-	return blob_store.MakeShardedFilesStore(
-		env.DirFirstBlobStoreBlobs(),
-		env_dir.MakeConfigFromImmutableBlobConfig(
-			env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable(),
-		),
-		env.GetTempLocal(),
-	)
+	return env.blobStores[env.blobStoreDefaultIndex]
 }
 
-func (env Env) GetBlobStoreById(id string) interfaces.BlobStore {
-	panic(todo.Implement())
-}
-
-// func (env Env) MakeBlobStoreFromConfig(
-// 	blobStoreConfig config_immutable.BlobStoreConfig,
-// ) blob_store.LocalBlobStore {
-// 	return blob_store.MakeShardedFilesStore(
-// 		env.DirBlobs(),
-// 		env_dir.MakeConfigFromImmutableBlobConfig(blobStoreConfig),
-// 		env.GetTempLocal(),
-// 	)
-// }
-
-func (env Env) MakeBlobStoreFromName(
-	name string,
-) (interfaces.BlobStore, error) {
-	return nil, todo.Implement()
+func (env Env) GetBlobStoreById(id int) interfaces.BlobStore {
+	return env.blobStores[id]
 }

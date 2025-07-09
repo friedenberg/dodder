@@ -324,7 +324,8 @@ func (c importer) ImportBlobIfNecessary(
 				if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
 					err = nil
 				} else {
-					// TODO add context that this could not be copied from the remote blob
+					// TODO add context that this could not be copied from the
+					// remote blob
 					// store
 					err = errors.Wrap(err)
 					return
