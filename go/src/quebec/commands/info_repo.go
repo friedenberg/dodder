@@ -3,6 +3,7 @@ package commands
 import (
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -25,6 +26,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 	// TODO should this be the private config flavor?
 	configTypedBlob := repo.GetConfigPublic()
 	configBlob := configTypedBlob.Blob
+	storeVersion := configBlob.GetStoreVersion()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}
@@ -75,9 +77,15 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "dir.blob-stores.1.inventory_lists":
-			repo.GetUI().Print(
-				repo.DirFirstBlobStoreInventoryLists(),
-			)
+			if store_version.LessOrEqual(storeVersion, store_version.V10) {
+				repo.GetUI().Print(
+					repo.DirFirstBlobStoreInventoryLists(),
+				)
+			} else {
+				repo.GetUI().Print(
+					repo.DirFirstBlobStoreBlobs(),
+				)
+			}
 
 		case "xdg":
 			ecksDeeGee := repo.GetXDG()

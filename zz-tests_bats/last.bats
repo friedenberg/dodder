@@ -39,7 +39,8 @@ function last_after_typ_mutate { # @test
   dir_inventory_list="$("$DODDER_BIN" info-repo dir.blob-stores.1.inventory_lists)"
 	run bash -c "find '$dir_inventory_list' -type f | wc -l | tr -d \" \""
 	assert_success
-	assert_output '2'
+  # to support both <v10 separate inventory list blob store, and >=v11 combined inventory list blob store
+  [[ "$output" -ge 2 ]]
 
 	run_dodder last -format inventory-list-sans-tai
 	assert_success

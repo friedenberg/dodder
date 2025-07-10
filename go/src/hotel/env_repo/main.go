@@ -211,7 +211,7 @@ func (env Env) GetDefaultBlobStore() interfaces.LocalBlobStore {
 func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	storeVersion := env.GetStoreVersion()
 
-	if store_version.LessOrEqual(storeVersion, store_version.V10) || true {
+	if store_version.LessOrEqual(storeVersion, store_version.V10) {
 		return blob_store.MakeShardedFilesStore(
 			env.DirFirstBlobStoreInventoryLists(),
 			env_dir.MakeConfigFromImmutableBlobConfig(
