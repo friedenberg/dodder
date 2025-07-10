@@ -40,6 +40,9 @@ type Env struct {
 	directoryPaths
 
 	blobStoreDefaultIndex     int
+
+	// TODO switch to implementing LocalBlobStore directly and writing to all of
+	// the defined blob stores instead of having a default
 	interfaces.LocalBlobStore // default
 	blobStores                []interfaces.LocalBlobStore
 }
@@ -77,7 +80,7 @@ func Make(
 		return
 	}
 
-	// TODO add support for failing on pre-existing temp local
+	// TODO fail on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
 	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
 	// 	return
@@ -138,8 +141,6 @@ func (env *Env) setupStores() {
 	)
 
 	env.LocalBlobStore = env.GetDefaultBlobStore()
-
-	return
 }
 
 func (env Env) GetEnv() env_ui.Env {
