@@ -39,7 +39,7 @@ type Env struct {
 
 	directoryPaths
 
-	blobStoreDefaultIndex     int
+	blobStoreDefaultIndex int
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
@@ -209,6 +209,22 @@ func (env Env) GetStoreVersion() store_version.Version {
 
 func (env Env) GetDefaultBlobStore() interfaces.LocalBlobStore {
 	return env.blobStores[env.blobStoreDefaultIndex]
+}
+
+func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
+	storeVersion := env.GetStoreVersion()
+
+	if store_version.LessOrEqual(storeVersion, store_version.V10) {
+		return blob_store.MakeShardedFilesStore(
+			env.DirFirstBlobStoreInventoryLists(),
+			env_dir.MakeConfigFromImmutableBlobConfig(
+				env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
+			),
+			env.GetTempLocal(),
+		)
+	} else {
+		return env.GetDefaultBlobStore()
+	}
 }
 
 func (env Env) GetBlobStoreById(id int) interfaces.BlobStore {
