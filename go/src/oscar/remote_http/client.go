@@ -128,7 +128,7 @@ func (client *client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
-func (client *client) GetObjectStore() sku.ObjectStore {
+func (client *client) GetObjectStore() sku.RepoStore {
 	return nil
 }
 

@@ -30,7 +30,7 @@ func Make(
 	typedInventoryListBlobStore typed_blob_store.InventoryList,
 	indexObject sku.IndexObject,
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
-	storeObject sku.ObjectStore,
+	storeObject sku.RepoStore,
 ) sku.Importer {
 	if options.BlobGenres.IsEmpty() {
 		options.BlobGenres = ids.MakeGenreAll()
@@ -67,7 +67,7 @@ type importer struct {
 	typedInventoryListBlobStore typed_blob_store.InventoryList
 	indexObject                 sku.IndexObject
 	storeExternal               store_workspace.MergeCheckedOut
-	storeObject                 sku.ObjectStore
+	storeObject                 sku.RepoStore
 	envRepo                     env_repo.Env
 	blobGenres                  ids.Genre
 	excludeObjects              bool

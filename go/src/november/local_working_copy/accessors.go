@@ -71,7 +71,7 @@ func (local *Repo) GetBlobStore() interfaces.BlobStore {
 	return local.GetEnvRepo().GetDefaultBlobStore()
 }
 
-func (local *Repo) GetObjectStore() sku.ObjectStore {
+func (local *Repo) GetObjectStore() sku.RepoStore {
 	return &local.store
 }
 

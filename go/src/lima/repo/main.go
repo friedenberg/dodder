@@ -17,7 +17,7 @@ type Repo interface {
 	GetImmutableConfigPublic() genesis_config.Public
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
-	GetObjectStore() sku.ObjectStore
+	GetObjectStore() sku.RepoStore
 	GetTypedInventoryListBlobStore() typed_blob_store.InventoryList
 	GetInventoryListStore() sku.InventoryListStore
 

@@ -36,8 +36,8 @@ type Store struct {
 	storeVersion interfaces.StoreVersion
 	clock        ids.Clock
 
-	blobStoreWithInventoryListLog
-	blobStore interfaces.LocalBlobStore
+	inventoryListBlobStore
+	blobBlobStore interfaces.LocalBlobStore
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -46,7 +46,7 @@ type Store struct {
 	ui sku.UIStorePrinters
 }
 
-type blobStoreWithInventoryListLog interface {
+type inventoryListBlobStore interface {
 	interfaces.LocalBlobStore
 
 	getType() ids.Type
@@ -68,11 +68,11 @@ func (store *Store) Initialize(
 	op := object_inventory_format.Options{Tai: true}
 
 	*store = Store{
-		envRepo:      envRepo,
-		lockSmith:    envRepo.GetLockSmith(),
-		storeVersion: envRepo.GetStoreVersion(),
-		blobStore:    envRepo.GetDefaultBlobStore(),
-		clock:        clock,
+		envRepo:       envRepo,
+		lockSmith:     envRepo.GetLockSmith(),
+		storeVersion:  envRepo.GetStoreVersion(),
+		blobBlobStore: envRepo.GetDefaultBlobStore(),
+		clock:         clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
 			options_print.V0{}.WithPrintTai(true),
@@ -84,37 +84,23 @@ func (store *Store) Initialize(
 		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
 	)
 
+	inventoryListBlobStore := envRepo.GetInventoryListBlobStore()
+
 	if store_version.LessOrEqual(
 		store.storeVersion,
 		store_version.V8,
 	) {
-		store.blobStoreWithInventoryListLog = &objectBlobStoreV0{
-			blobType: blobType,
-			// TODO use default blob store ref from config and initialize a blob
-			// store
-			LocalBlobStore: blob_store.MakeShardedFilesStore(
-				envRepo.DirFirstBlobStoreInventoryLists(),
-				env_dir.MakeConfigFromImmutableBlobConfig(
-					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
-				),
-				envRepo.GetTempLocal(),
-			),
+		store.inventoryListBlobStore = &objectBlobStoreV0{
+			blobType:       blobType,
+			LocalBlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
-		store.blobStoreWithInventoryListLog = &objectBlobStoreV1{
+		store.inventoryListBlobStore = &objectBlobStoreV1{
 			envRepo:  envRepo,
 			pathLog:  envRepo.FileInventoryListLog(),
 			blobType: blobType,
-			// TODO use default blob store ref from config and initialize a blob
-			LocalBlobStore: blob_store.MakeShardedFilesStore(
-				// TODO use inventory list log instead of custom blob store
-				envRepo.DirFirstBlobStoreInventoryLists(),
-				env_dir.MakeConfigFromImmutableBlobConfig(
-					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
-				),
-				envRepo.GetTempLocal(),
-			),
+			LocalBlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	}
@@ -142,7 +128,7 @@ func (store *Store) GetImmutableConfigPrivate() genesis_config_io.PrivateTypedBl
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 
-func (store *Store) GetObjectStore() sku.ObjectStore {
+func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
@@ -208,7 +194,7 @@ func (store *Store) GetInventoryListStore() sku.InventoryListStore {
 func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
 	openList = &sku.OpenList{}
 
-	if openList.Mover, err = store.blobStore.Mover(); err != nil {
+	if openList.Mover, err = store.blobBlobStore.Mover(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -414,7 +400,7 @@ func (store *Store) ImportInventoryList(
 
 		if _, err = blob_store.CopyBlobIfNecessary(
 			store.GetEnvRepo().GetEnv(),
-			store.blobStore,
+			store.blobBlobStore,
 			remoteBlobStore,
 			sk.GetBlobSha(),
 			nil,
@@ -454,7 +440,7 @@ func (store *Store) IterInventoryList(
 ) iter.Seq2[*sku.Transacted, error] {
 	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),
-		store.blobStore,
+		store.blobBlobStore,
 		blobSha,
 	)
 }

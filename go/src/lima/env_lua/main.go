@@ -21,13 +21,13 @@ type Env interface {
 
 type env struct {
 	envRepo      env_repo.Env
-	objectStore  sku.ObjectStore
+	objectStore  sku.RepoStore
 	luaSkuFormat *box_format.BoxTransacted
 }
 
 func Make(
 	envRepo env_repo.Env,
-	objectStore sku.ObjectStore,
+	objectStore sku.RepoStore,
 	luaSkuFormat *box_format.BoxTransacted,
 ) *env {
 	return &env{

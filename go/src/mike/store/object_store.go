@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) GetObjectStore() sku.ObjectStore {
+func (s *Store) GetObjectStore() sku.RepoStore {
 	return s
 }
 

@@ -31,7 +31,8 @@ type (
 		errors.Flusher
 	}
 
-	ObjectStore interface {
+	// TODO rename to RepoStore
+	RepoStore interface {
 		Commit(ExternalLike, CommitOptions) (err error)
 		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
 		ReadPrimitiveQuery(
@@ -60,6 +61,7 @@ type (
 		) (e ExternalLike, err error)
 	}
 
+	// TODO rename or remove
 	BlobStore[T any] interface {
 		GetTransactedWithBlob(
 			sk TransactedGetter,
