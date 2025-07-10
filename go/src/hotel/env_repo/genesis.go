@@ -18,13 +18,13 @@ import (
 )
 
 func (env *Env) Genesis(bigBang BigBang) {
-	if err := bigBang.Config.GeneratePrivateKey(); err != nil {
+	if err := bigBang.GenesisConfig.GeneratePrivateKey(); err != nil {
 		env.CancelWithError(err)
 		return
 	}
 
 	env.config.Type = bigBang.Type
-	env.config.Blob = bigBang.Config
+	env.config.Blob = bigBang.GenesisConfig
 
 	if err := env.MakeDir(
 		env.DirObjectId(),
@@ -60,7 +60,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		}
 	}
 
-	env.writeBlobStoreConfig(bigBang.Config)
+	env.writeBlobStoreConfig(bigBang.GenesisConfig)
 
 	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := ohio.CopyFileLines(

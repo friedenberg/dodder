@@ -24,9 +24,9 @@ type InitArchive struct {
 	env_repo.BigBang
 }
 
-func (c *InitArchive) SetFlagSet(f *flag.FlagSet) {
-	c.BigBang.SetFlagSet(f)
-	c.Config.RepoType = repo_type.TypeArchive
+func (cmd *InitArchive) SetFlagSet(f *flag.FlagSet) {
+	cmd.BigBang.SetFlagSet(f)
+	cmd.GenesisConfig.RepoType = repo_type.TypeArchive
 }
 
 func (cmd InitArchive) Run(req command.Request) {
@@ -58,7 +58,6 @@ func (cmd InitArchive) Run(req command.Request) {
 		); err != nil {
 			ui.CancelWithError(err)
 		}
-
 	}
 
 	repoLayout.Genesis(cmd.BigBang)

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -42,21 +43,27 @@ func (c Info) Run(req command.Request) {
 		args = []string{"store-version"}
 	}
 
-	defaultConfig := genesis_config.Default()
+	defaultGenesisConfig := genesis_config.Default()
+	defaultBlobStoreConfig := blob_store_config.Default()
 
 	for _, arg := range args {
+		// TODO switch to underscore+hyphen string keys
 		switch strings.ToLower(arg) {
 		case "store-version":
-			ui.GetUI().Print(defaultConfig.GetStoreVersion())
+			ui.GetUI().Print(defaultGenesisConfig.GetStoreVersion())
 
 		case "store-version-next":
 			ui.GetUI().Print(store_version.VNext)
 
 		case "compression-type":
-			ui.GetUI().Print(defaultConfig.GetBlobStoreConfigImmutable().GetBlobCompression())
+			ui.GetUI().Print(
+				defaultBlobStoreConfig.GetBlobCompression(),
+			)
 
 		case "age-encryption":
-			ui.GetUI().Print(defaultConfig.GetBlobStoreConfigImmutable().GetBlobEncryption())
+			ui.GetUI().Print(
+				defaultBlobStoreConfig.GetBlobEncryption(),
+			)
 
 		case "env":
 			envVars := env_vars.Make(dir)

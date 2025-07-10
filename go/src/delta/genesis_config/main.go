@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -17,7 +16,10 @@ const (
 	InventoryListTypeVCurrent = InventoryListTypeV2
 )
 
-type LatestPrivate = TomlV1Private
+type (
+	Current = TomlV1Private
+	Next    = TomlV2Private
+)
 
 type (
 	public  struct{}
@@ -48,20 +50,17 @@ type Private interface {
 	GetPrivateKey() repo_signing.PrivateKey
 }
 
-func Default() *TomlV1Private {
+func Default() *Current {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
 // TODO read callers of this and add blob store config there
-func DefaultWithVersion(storeVersion StoreVersion) *TomlV1Private {
-	return &TomlV1Private{
+func DefaultWithVersion(storeVersion StoreVersion) *Current {
+	return &Current{
 		TomlV1Common: TomlV1Common{
-			StoreVersion: storeVersion,
-			RepoType:     repo_type.TypeWorkingCopy,
-			BlobStore: blob_store_config.BlobStoreTomlV1{
-				CompressionType:   compression_type.CompressionTypeDefault,
-				LockInternalFiles: true,
-			},
+			StoreVersion:      storeVersion,
+			RepoType:          repo_type.TypeWorkingCopy,
+			BlobStore:         blob_store_config.Default(),
 			InventoryListType: InventoryListTypeV2,
 		},
 	}

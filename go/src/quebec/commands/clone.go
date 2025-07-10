@@ -38,7 +38,7 @@ func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.Query.SetFlagSet(f)
 
 	// must happen after genesis set flag set as cmd.Config is nil until then
-	cmd.Config.RepoType = repo_type.TypeWorkingCopy
+	cmd.GenesisConfig.RepoType = repo_type.TypeWorkingCopy
 }
 
 func (cmd Clone) Run(req command.Request) {

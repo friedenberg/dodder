@@ -33,7 +33,7 @@ func (cmd Genesis) OnTheFirstDay(
 		env_ui.Options{},
 	)
 
-	if err := cmd.Config.RepoId.Set(repoId); err != nil {
+	if err := cmd.GenesisConfig.RepoId.Set(repoId); err != nil {
 		ui.CancelWithError(err)
 	}
 
@@ -63,7 +63,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	envRepo.Genesis(cmd.BigBang)
 
-	switch cmd.BigBang.Config.RepoType {
+	switch cmd.BigBang.GenesisConfig.RepoType {
 	case repo_type.TypeWorkingCopy:
 		return local_working_copy.Genesis(
 			cmd.BigBang,
@@ -75,7 +75,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	default:
 		req.CancelWithError(
-			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.Config.RepoType},
+			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.GenesisConfig.RepoType},
 		)
 	}
 
