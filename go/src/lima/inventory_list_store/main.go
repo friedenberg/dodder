@@ -90,13 +90,13 @@ func (store *Store) Initialize(
 		store.storeVersion,
 		store_version.V8,
 	) {
-		store.inventoryListBlobStore = &objectBlobStoreV0{
+		store.inventoryListBlobStore = &blobStoreV0{
 			blobType:       blobType,
 			LocalBlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
-		store.inventoryListBlobStore = &objectBlobStoreV1{
+		store.inventoryListBlobStore = &blobStoreV1{
 			envRepo:  envRepo,
 			pathLog:  envRepo.FileInventoryListLog(),
 			blobType: blobType,
