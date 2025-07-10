@@ -22,6 +22,7 @@ type BigBang struct {
 	OverrideXDGWithCwd   bool
 }
 
+// TODO switch to flagset wrapper that enforces non-empty descriptions
 func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.BoolVar(
 		&bigBang.OverrideXDGWithCwd,

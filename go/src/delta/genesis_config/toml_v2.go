@@ -16,7 +16,6 @@ type TomlV2Common struct {
 	RepoType          repo_type.Type `toml:"repo-type"`
 	RepoId            ids.RepoId     `toml:"id"`
 	InventoryListType string         `toml:"inventory_list-type"`
-	DefaultBlobStore  string         `toml:"default-blob-store"`
 }
 
 type TomlV2Private struct {
@@ -88,8 +87,4 @@ func (config TomlV2Common) GetRepoType() repo_type.Type {
 
 func (config TomlV2Common) GetRepoId() ids.RepoId {
 	return config.RepoId
-}
-
-func (config *TomlV2Common) GetDefaultBlobStore() string {
-	return config.DefaultBlobStore
 }

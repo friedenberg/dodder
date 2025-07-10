@@ -105,6 +105,7 @@ func (store *Store) Initialize(
 			blobType: blobType,
 			// TODO use default blob store ref from config and initialize a blob
 			blobStore: blob_store.MakeShardedFilesStore(
+				// TODO use inventory list log instead of custom blob store
 				envRepo.DirFirstBlobStoreInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(
 					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),

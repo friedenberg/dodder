@@ -64,23 +64,23 @@ func GreaterOrEqual(a, b interfaces.StoreVersion) bool {
 	return a.GetInt() >= b.GetInt()
 }
 
-func (a Version) Less(b interfaces.StoreVersion) bool {
-	return Less(a, b)
+func (version Version) Less(b interfaces.StoreVersion) bool {
+	return Less(version, b)
 }
 
-func (a Version) LessOrEqual(b interfaces.StoreVersion) bool {
-	return LessOrEqual(a, b)
+func (version Version) LessOrEqual(b interfaces.StoreVersion) bool {
+	return LessOrEqual(version, b)
 }
 
-func (a Version) String() string {
-	return values.Int(a).String()
+func (version Version) String() string {
+	return values.Int(version).String()
 }
 
-func (a Version) GetInt() int {
-	return values.Int(a).Int()
+func (version Version) GetInt() int {
+	return values.Int(version).Int()
 }
 
-func (v *Version) Set(p string) (err error) {
+func (version *Version) Set(p string) (err error) {
 	var i uint64
 
 	if i, err = strconv.ParseUint(p, 10, 16); err != nil {
@@ -88,10 +88,10 @@ func (v *Version) Set(p string) (err error) {
 		return
 	}
 
-	*v = Version(i)
+	*version = Version(i)
 
-	if VCurrent.Less(v) {
-		err = errors.Wrap(ErrFutureStoreVersion{StoreVersion: v})
+	if VCurrent.Less(version) {
+		err = errors.Wrap(ErrFutureStoreVersion{StoreVersion: version})
 		return
 	}
 
