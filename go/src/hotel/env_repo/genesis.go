@@ -24,7 +24,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 	}
 
 	env.config.Type = bigBang.Type
-	env.config.Blob = bigBang.GenesisConfig
+	env.config.Blob = &bigBang.GenesisConfig
 
 	if err := env.MakeDir(
 		env.DirObjectId(),
@@ -60,7 +60,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		}
 	}
 
-	env.writeBlobStoreConfig(bigBang.GenesisConfig)
+	env.writeBlobStoreConfig(&bigBang.GenesisConfig)
 
 	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := ohio.CopyFileLines(

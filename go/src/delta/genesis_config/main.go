@@ -50,13 +50,13 @@ type Private interface {
 	GetPrivateKey() repo_signing.PrivateKey
 }
 
-func Default() *Current {
+func Default() Current {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
 // TODO read callers of this and add blob store config there
-func DefaultWithVersion(storeVersion StoreVersion) *Current {
-	return &Current{
+func DefaultWithVersion(storeVersion StoreVersion) Current {
+	return Current{
 		TomlV1Common: TomlV1Common{
 			StoreVersion:      storeVersion,
 			RepoType:          repo_type.TypeWorkingCopy,
