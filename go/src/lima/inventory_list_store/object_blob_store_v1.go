@@ -24,7 +24,8 @@ type objectBlobStoreV1 struct {
 	pathLog        string
 	blobType       ids.Type
 	typedBlobStore typed_blob_store.InventoryList
-	blobStore      interfaces.LocalBlobStore
+
+	interfaces.LocalBlobStore
 }
 
 func (store *objectBlobStoreV1) getType() ids.Type {
@@ -47,7 +48,7 @@ func (store *objectBlobStoreV1) ReadOneSha(
 
 	var readCloser sha.ReadCloser
 
-	if readCloser, err = store.blobStore.BlobReader(&sh); err != nil {
+	if readCloser, err = store.LocalBlobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,7 +74,7 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 ) (err error) {
 	var blobStoreWriteCloser interfaces.ShaWriteCloser
 
-	if blobStoreWriteCloser, err = store.blobStore.BlobWriter(); err != nil {
+	if blobStoreWriteCloser, err = store.LocalBlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,7 +93,9 @@ func (store *objectBlobStoreV1) WriteInventoryListObject(
 	defer errors.DeferredCloser(&err, file)
 	defer errors.Deferred(&err, file.Sync)
 
-	bufferedWriter := ohio.BufferedWriter(io.MultiWriter(blobStoreWriteCloser, file))
+	bufferedWriter := ohio.BufferedWriter(
+		io.MultiWriter(blobStoreWriteCloser, file),
+	)
 	defer pool.GetBufioWriter().Put(bufferedWriter)
 
 	if err = object.CalculateObjectShas(); err != nil {

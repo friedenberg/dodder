@@ -34,9 +34,10 @@ type Store struct {
 	envRepo      env_repo.Env
 	lockSmith    interfaces.LockSmith
 	storeVersion interfaces.StoreVersion
-	objectBlobStore
+	clock        ids.Clock
+
+	blobStoreWithInventoryListLog
 	blobStore interfaces.LocalBlobStore
-	clock     ids.Clock
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -45,7 +46,9 @@ type Store struct {
 	ui sku.UIStorePrinters
 }
 
-type objectBlobStore interface {
+type blobStoreWithInventoryListLog interface {
+	interfaces.LocalBlobStore
+
 	getType() ids.Type
 	getTypedBlobStore() typed_blob_store.InventoryList
 
@@ -85,11 +88,11 @@ func (store *Store) Initialize(
 		store.storeVersion,
 		store_version.V8,
 	) {
-		store.objectBlobStore = &objectBlobStoreV0{
+		store.blobStoreWithInventoryListLog = &objectBlobStoreV0{
 			blobType: blobType,
 			// TODO use default blob store ref from config and initialize a blob
 			// store
-			blobStore: blob_store.MakeShardedFilesStore(
+			LocalBlobStore: blob_store.MakeShardedFilesStore(
 				envRepo.DirFirstBlobStoreInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(
 					envRepo.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
@@ -99,12 +102,12 @@ func (store *Store) Initialize(
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
-		store.objectBlobStore = &objectBlobStoreV1{
+		store.blobStoreWithInventoryListLog = &objectBlobStoreV1{
 			envRepo:  envRepo,
 			pathLog:  envRepo.FileInventoryListLog(),
 			blobType: blobType,
 			// TODO use default blob store ref from config and initialize a blob
-			blobStore: blob_store.MakeShardedFilesStore(
+			LocalBlobStore: blob_store.MakeShardedFilesStore(
 				// TODO use inventory list log instead of custom blob store
 				envRepo.DirFirstBlobStoreInventoryLists(),
 				env_dir.MakeConfigFromImmutableBlobConfig(

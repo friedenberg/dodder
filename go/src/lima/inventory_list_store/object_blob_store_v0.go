@@ -19,7 +19,8 @@ type objectBlobStoreV0 struct {
 	lock           sync.Mutex
 	blobType       ids.Type
 	typedBlobStore typed_blob_store.InventoryList
-	blobStore      interfaces.LocalBlobStore
+
+	interfaces.LocalBlobStore
 }
 
 func (objectBlobStore *objectBlobStoreV0) getType() ids.Type {
@@ -42,7 +43,7 @@ func (objectBlobStore *objectBlobStoreV0) ReadOneSha(
 
 	var readCloser sha.ReadCloser
 
-	if readCloser, err = objectBlobStore.blobStore.BlobReader(&sh); err != nil {
+	if readCloser, err = objectBlobStore.LocalBlobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,7 +72,7 @@ func (objectBlobStore *objectBlobStoreV0) WriteInventoryListObject(
 
 	var blobStoreWriteCloser interfaces.ShaWriteCloser
 
-	if blobStoreWriteCloser, err = objectBlobStore.blobStore.BlobWriter(); err != nil {
+	if blobStoreWriteCloser, err = objectBlobStore.LocalBlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,7 +113,7 @@ func (objectBlobStore *objectBlobStoreV0) WriteInventoryListObject(
 
 func (objectBlobStore *objectBlobStoreV0) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		for sh, err := range objectBlobStore.blobStore.AllBlobs() {
+		for sh, err := range objectBlobStore.LocalBlobStore.AllBlobs() {
 			if err != nil {
 				if !yield(nil, err) {
 					return
