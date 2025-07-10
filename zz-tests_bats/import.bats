@@ -27,7 +27,7 @@ function import { # @test
 	echo "$output" | zstd >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .xdg/data/dodder/objects/blobs)"
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"

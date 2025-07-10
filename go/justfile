@@ -178,8 +178,18 @@ test-bats-version dodder version $PATH=(dir_build + ":" + env("PATH")):
     --set DODDER_VERSION v{{version}} \
     ../zz-tests_bats/test
 
-# shell("echo", join(dir_build, "der-next")
-test-bats-next: (test-bats-version "der-next" shell("der-next info"))
+version_next := shell("der-next info")
+
+test-bats-next:
+  just \
+    --set DODDER_BIN der-next \
+    --set DODDER_VERSION v{{version_next}} \
+    ../zz-tests_bats/test-generate_fixtures
+
+  just \
+    --set DODDER_BIN der-next \
+    --set DODDER_VERSION v{{version_next}} \
+    ../zz-tests_bats/test
 
 test: test-go test-bats
 

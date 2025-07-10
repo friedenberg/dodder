@@ -35,14 +35,15 @@ func (directory directoryV2) DirDodder(p ...string) string {
 }
 
 func (directory directoryV2) DirBlobStores(p ...string) string {
-	return directory.DirDodder(append([]string{"objects"}, p...)...)
+	return directory.DirDodder(append([]string{"blob_stores"}, p...)...)
 }
 
+// TODO deprecate and remove
 func (directory directoryV2) DirFirstBlobStoreInventoryLists() string {
 	return directory.DirBlobStores("1/inventory_lists")
 }
 
-// TODO switch to named blob stores
+// TODO deprecate and remove
 func (directory directoryV2) DirFirstBlobStoreBlobs() string {
 	return directory.DirBlobStores("1/blobs")
 }

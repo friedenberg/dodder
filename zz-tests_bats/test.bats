@@ -16,7 +16,8 @@ function can_initialize_without_age { # @test
 	run_dodder_init_disable_age
 	assert_success
 
-	run test -d .xdg/data/dodder/objects
+	blobs="$("$DODDER_BIN" info-repo dir.blob-stores)"
+	run test -d "$blobs"
 	assert_success
 }
 

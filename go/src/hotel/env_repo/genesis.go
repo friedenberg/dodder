@@ -81,9 +81,7 @@ func (env *Env) Genesis(bb BigBang) {
 		writeFile(env.FileCacheDormant(), "")
 	}
 
-	if err := env.setupStores(); err != nil {
-		env.CancelWithError(err)
-	}
+	env.setupStores()
 }
 
 func (env Env) writeInventoryListLog() {

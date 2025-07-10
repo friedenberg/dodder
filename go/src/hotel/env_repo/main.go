@@ -49,6 +49,7 @@ func Make(
 	options Options,
 ) (env Env, err error) {
 	env.Env = envLocal
+
 	if options.BasePath == "" {
 		options.BasePath = os.Getenv(env_dir.EnvDir)
 	}
@@ -117,15 +118,12 @@ func Make(
 		}
 	}
 
-	if err = env.setupStores(); err != nil {
-		errors.Wrap(err)
-		return
-	}
+	env.setupStores()
 
 	return
 }
 
-func (env *Env) setupStores() (err error) {
+func (env *Env) setupStores() {
 	// TODO depending on store version, read immutable config from blob store
 	// path
 	// or from config

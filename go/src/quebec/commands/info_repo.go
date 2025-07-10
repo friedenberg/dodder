@@ -64,6 +64,11 @@ func (cmd InfoRepo) Run(req command.Request) {
 				repo.GetUI().Print(i)
 			}
 
+		case "dir.blob-stores":
+			repo.GetUI().Print(
+				repo.DirBlobStores(),
+			)
+
 		case "dir.blob-stores.1.blobs":
 			repo.GetUI().Print(
 				repo.DirFirstBlobStoreBlobs(),

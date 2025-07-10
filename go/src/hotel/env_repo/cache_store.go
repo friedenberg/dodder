@@ -5,22 +5,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-func (env Env) ReadCloserCache(p string) (sha.ReadCloser, error) {
-	o := env_dir.FileReadOptions{
+func (env Env) ReadCloserCache(path string) (sha.ReadCloser, error) {
+	options := env_dir.FileReadOptions{
 		// Config: s.Config.Blob,
-		Path: p,
+		Path: path,
 	}
 
-	return env_dir.NewFileReader(o)
+	return env_dir.NewFileReader(options)
 }
 
 func (env Env) WriteCloserCache(
-	p string,
-) (w sha.WriteCloser, err error) {
+	path string,
+) (sha.WriteCloser, error) {
 	return env_dir.NewMover(
 		env_dir.MoveOptions{
 			// Config:      s.Config.Blob,
-			FinalPath:   p,
+			FinalPath:   path,
 			TemporaryFS: env.GetTempLocal(),
 		},
 	)
