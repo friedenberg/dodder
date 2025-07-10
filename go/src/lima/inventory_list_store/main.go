@@ -195,7 +195,7 @@ func (store *Store) GetEnvRepo() env_repo.Env {
 }
 
 func (store *Store) GetBlobStore() interfaces.BlobStore {
-	return &store.envRepo
+	return store.envRepo.GetDefaultBlobStore()
 }
 
 func (store *Store) GetInventoryListStore() sku.InventoryListStore {
@@ -315,7 +315,7 @@ func (store *Store) WriteInventoryListBlob(
 
 	var writeCloser interfaces.ShaWriteCloser
 
-	if writeCloser, err = store.envRepo.BlobWriter(); err != nil {
+	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

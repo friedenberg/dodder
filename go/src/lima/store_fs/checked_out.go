@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) ToSliceFilesZettelen(
+func (store *Store) ToSliceFilesZettelen(
 	cos sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
@@ -15,7 +15,7 @@ func (s *Store) ToSliceFilesZettelen(
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
-			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
+			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -32,7 +32,7 @@ func (s *Store) ToSliceFilesZettelen(
 	)
 }
 
-func (s *Store) ToSliceFilesBlobs(
+func (store *Store) ToSliceFilesBlobs(
 	cos sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
@@ -40,7 +40,7 @@ func (s *Store) ToSliceFilesBlobs(
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
-			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
+			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

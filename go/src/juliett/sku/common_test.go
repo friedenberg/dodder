@@ -198,11 +198,11 @@ func makeTestTextFormat(
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := ui.T{T: t1}
-	af := test_object_metadata_io.Make(&t, nil)
+	envRepo := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af, af),
+		makeTestTextFormat(envRepo, envRepo.GetDefaultBlobStore()),
 		`---
 # the title
 - tag1
@@ -236,11 +236,11 @@ func TestReadWithoutBlob(t1 *testing.T) {
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	af := test_object_metadata_io.Make(&t, nil)
+	envRepo := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af, af),
+		makeTestTextFormat(envRepo, envRepo.GetDefaultBlobStore()),
 		`---
 # the title
 # continues
@@ -275,11 +275,11 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	af := test_object_metadata_io.Make(&t, nil)
+	envRepo := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
-		makeTestTextFormat(af, af),
+		makeTestTextFormat(envRepo, envRepo.GetDefaultBlobStore()),
 		`---
 # the title
 - tag1
@@ -393,7 +393,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_object_metadata_io.Make(
+	envRepo := test_object_metadata_io.Make(
 		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
@@ -402,7 +402,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.Dependencies{
-			BlobStore: af,
+			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
 
@@ -436,7 +436,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_object_metadata_io.Make(
+	envRepo := test_object_metadata_io.Make(
 		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
@@ -445,7 +445,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.Dependencies{
-			BlobStore: af,
+			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
 

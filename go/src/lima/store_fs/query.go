@@ -14,18 +14,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-func (s *Store) QueryCheckedOut(
+func (store *Store) QueryCheckedOut(
 	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(func() (err error) {
-		funcIterFSItems := s.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
-			s.makeFuncIterFilterAndApply(qg, f),
+		funcIterFSItems := store.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
+			store.makeFuncIterFilterAndApply(qg, f),
 		)
 
-		for o := range s.probablyCheckedOut.All() {
+		for o := range store.probablyCheckedOut.All() {
 			if err = funcIterFSItems(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -37,11 +37,11 @@ func (s *Store) QueryCheckedOut(
 
 	if !qg.ExcludeUntracked {
 		wg.Do(func() (err error) {
-			funcIterFSItems := s.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
-				s.makeFuncIterFilterAndApply(qg, f),
+			funcIterFSItems := store.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
+				store.makeFuncIterFilterAndApply(qg, f),
 			)
 
-			if err = s.queryUntracked(qg, funcIterFSItems); err != nil {
+			if err = store.queryUntracked(qg, funcIterFSItems); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -58,7 +58,7 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
+func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(item *sku.FSItem) (err error) {
@@ -80,7 +80,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			return
 		}
 
-		if err = s.storeSupplies.ReadOneInto(
+		if err = store.storeSupplies.ReadOneInto(
 			&oid,
 			co.GetSku(),
 		); err != nil {
@@ -93,7 +93,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			}
 		}
 
-		if err = s.HydrateExternalFromItem(
+		if err = store.HydrateExternalFromItem(
 			sku.CommitOptions{
 				StoreOptions: sku.StoreOptions{
 					UpdateTai: true,
@@ -126,7 +126,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			co.SetState(checked_out_state.CheckedOut)
 		}
 
-		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -140,7 +140,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	}
 }
 
-func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
+func (store *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[any] {
 	return func(itemUnknown any) (err error) {
@@ -148,7 +148,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 
 		switch item := itemUnknown.(type) {
 		case *sku.FSItem:
-			if err = s.hydrateDefinitelyNotCheckedOutUnrecognizedItem(
+			if err = store.hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 				item,
 				co,
 				f,
@@ -158,7 +158,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 			}
 
 		case *fsItemRecognized:
-			if err = s.hydrateDefinitelyNotCheckedOutRecognizedItem(
+			if err = store.hydrateDefinitelyNotCheckedOutRecognizedItem(
 				item,
 				co,
 				f,
@@ -176,7 +176,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 	}
 }
 
-func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
+func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	item *sku.FSItem,
 	co *sku.CheckedOut,
 	f interfaces.FuncIter[sku.SkuType],
@@ -200,7 +200,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return
 	}
 
-	if err = s.readOneExternalBlob(
+	if err = store.readOneExternalBlob(
 		co.GetSkuExternal(),
 		co.GetSku(),
 		item,
@@ -209,7 +209,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -224,7 +224,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	return
 }
 
-func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
+func (store *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 	item *fsItemRecognized,
 	co *sku.CheckedOut,
 	f interfaces.FuncIter[sku.SkuType],
@@ -237,7 +237,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 	for _, item := range item.Matching {
 		if err = item.WriteToSku(
 			co.GetSkuExternal(),
-			s.envRepo,
+			store.envRepo,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -245,7 +245,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 
 		co.GetSkuExternal().ObjectId.SetGenre(genres.Blob)
 
-		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -259,7 +259,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 	return
 }
 
-func (s *Store) makeFuncIterFilterAndApply(
+func (store *Store) makeFuncIterFilterAndApply(
 	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.CheckedOut] {
@@ -286,11 +286,11 @@ type fsItemRecognized struct {
 	Matching   []*sku.FSItem
 }
 
-func (s *Store) queryUntracked(
+func (store *Store) queryUntracked(
 	qg *query.Query, // TODO use this to conditionally perform recognition
 	aco interfaces.FuncIter[any],
 ) (err error) {
-	definitelyNotCheckedOut := s.dirInfo.definitelyNotCheckedOut.Clone()
+	definitelyNotCheckedOut := store.dirInfo.definitelyNotCheckedOut.Clone()
 
 	// TODO move to initial parse?
 	if err = definitelyNotCheckedOut.ConsolidateDuplicateBlobs(); err != nil {
@@ -327,7 +327,7 @@ func (s *Store) queryUntracked(
 		return
 	}
 
-	if err = s.storeSupplies.ReadPrimitiveQuery(
+	if err = store.storeSupplies.ReadPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			var recognizedBlob, recognizedObject *fsItemRecognized
@@ -344,7 +344,7 @@ func (s *Store) queryUntracked(
 			if recognizedObject, err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.SelfMetadataWithoutTai,
-				s.probablyCheckedOut.shas,
+				store.probablyCheckedOut.shas,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

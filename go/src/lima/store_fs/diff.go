@@ -10,7 +10,7 @@ import (
 )
 
 // TODO include blobs
-func (s *Store) runDiff3(
+func (store *Store) runDiff3(
 	local, base, remote *sku.FSItem,
 ) (merged *sku.FSItem, err error) {
 	baseObjectPath := "/dev/null"
@@ -42,7 +42,7 @@ func (s *Store) runDiff3(
 
 	var f *os.File
 
-	if f, err = s.envRepo.GetTempLocal().FileTemp(); err != nil {
+	if f, err = store.envRepo.GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

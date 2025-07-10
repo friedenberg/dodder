@@ -49,7 +49,7 @@ func (cmd Fsck) Run(dep command.Request) {
 
 			blobSha := sk.GetBlobSha()
 
-			if localWorkingCopy.GetEnvRepo().HasBlob(blobSha) {
+			if localWorkingCopy.GetEnvRepo().GetDefaultBlobStore().HasBlob(blobSha) {
 				return
 			}
 

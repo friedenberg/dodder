@@ -54,7 +54,7 @@ func Make(
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
 				EnvDir:    envRepo,
-				BlobStore: envRepo,
+				BlobStore: envRepo.GetDefaultBlobStore(),
 			},
 		),
 	}
@@ -80,25 +80,25 @@ type Store struct {
 	deletedInternal fd.MutableSet
 }
 
-func (fs *Store) GetExternalStoreLike() store_workspace.StoreLike {
-	return fs
+func (store *Store) GetExternalStoreLike() store_workspace.StoreLike {
+	return store
 }
 
 // Deletions of user objects that should be exposed to the user
-func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
+func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	external := co.GetSkuExternal()
 
 	var item *sku.FSItem
 
-	if item, err = s.ReadFSItemFromExternal(external); err != nil {
+	if item, err = store.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.deleteLock.Lock()
-	defer s.deleteLock.Unlock()
+	store.deleteLock.Lock()
+	defer store.deleteLock.Unlock()
 
-	if err = item.MutableSetLike.Each(s.deleted.Add); err != nil {
+	if err = item.MutableSetLike.Each(store.deleted.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,20 +108,20 @@ func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 
 // Deletions of "transient" internal objects that should not be exposed to the
 // user
-func (s *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
+func (store *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 	external := co.GetSkuExternal()
 
 	var i *sku.FSItem
 
-	if i, err = s.ReadFSItemFromExternal(external); err != nil {
+	if i, err = store.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.deleteLock.Lock()
-	defer s.deleteLock.Unlock()
+	store.deleteLock.Lock()
+	defer store.deleteLock.Unlock()
 
-	if err = i.MutableSetLike.Each(s.deletedInternal.Add); err != nil {
+	if err = i.MutableSetLike.Each(store.deletedInternal.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -129,39 +129,39 @@ func (s *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 	return
 }
 
-func (fs *Store) Flush() (err error) {
+func (store *Store) Flush() (err error) {
 	deleteOp := DeleteCheckout{}
 
 	if err = deleteOp.Run(
-		fs.config.IsDryRun(),
-		fs.envRepo,
-		fs.deletedPrinter,
-		fs.deleted,
+		store.config.IsDryRun(),
+		store.envRepo,
+		store.deletedPrinter,
+		store.deleted,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = deleteOp.Run(
-		fs.config.IsDryRun(),
-		fs.envRepo,
+		store.config.IsDryRun(),
+		store.envRepo,
 		nil,
-		fs.deletedInternal,
+		store.deletedInternal,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	fs.deleted.Reset()
-	fs.deletedInternal.Reset()
+	store.deleted.Reset()
+	store.deletedInternal.Reset()
 
 	return
 }
 
-func (fs *Store) String() (out string) {
+func (store *Store) String() (out string) {
 	if quiter.Len(
-		fs.dirInfo.probablyCheckedOut,
-		fs.definitelyNotCheckedOut,
+		store.dirInfo.probablyCheckedOut,
+		store.definitelyNotCheckedOut,
 	) == 0 {
 		return
 	}
@@ -183,13 +183,13 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.dirInfo.probablyCheckedOut.Each(
+	store.dirInfo.probablyCheckedOut.Each(
 		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.definitelyNotCheckedOut.Each(
+	store.definitelyNotCheckedOut.Each(
 		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -201,8 +201,8 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
-	if err = s.dirInfo.processRootDir(); err != nil {
+func (store *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
+	if err = store.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,7 +210,7 @@ func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
 	ks = make([]*sku.FSItem, 0)
 	var l sync.Mutex
 
-	if err = s.All(
+	if err = store.All(
 		func(kfp *sku.FSItem) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -227,7 +227,7 @@ func (s *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
 	return
 }
 
-func (s *Store) GetFSItemsForDir(
+func (store *Store) GetFSItemsForDir(
 	fd *fd.FD,
 ) (items []*sku.FSItem, err error) {
 	if !fd.IsDir() {
@@ -235,7 +235,7 @@ func (s *Store) GetFSItemsForDir(
 		return
 	}
 
-	if items, err = s.dirInfo.processDir(fd.GetPath()); err != nil {
+	if items, err = store.dirInfo.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -244,13 +244,13 @@ func (s *Store) GetFSItemsForDir(
 }
 
 // TODO confirm against actual Object Id
-func (s *Store) GetFSItemsForString(
+func (store *Store) GetFSItemsForString(
 	baseDir string,
 	value string,
 	tryPattern bool,
 ) (items []*sku.FSItem, err error) {
 	if value == "." {
-		if items, err = s.GetExternalObjectIds(); err != nil {
+		if items, err = store.GetExternalObjectIds(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -260,12 +260,16 @@ func (s *Store) GetFSItemsForString(
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPath(baseDir, value, s.envRepo); err != nil {
+	if fdee, err = fd.MakeFromPath(
+		baseDir,
+		value,
+		store.envRepo.GetDefaultBlobStore(),
+	); err != nil {
 		if errors.IsNotExist(err) && tryPattern {
-			if items, err = s.dirInfo.processFDPattern(
+			if items, err = store.dirInfo.processFDPattern(
 				value,
-				filepath.Join(s.dir, fmt.Sprintf("%s*", value)),
-				s.dir,
+				filepath.Join(store.dir, fmt.Sprintf("%s*", value)),
+				store.dir,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -278,12 +282,12 @@ func (s *Store) GetFSItemsForString(
 	}
 
 	if fdee.IsDir() {
-		if items, err = s.GetFSItemsForDir(fdee); err != nil {
+		if items, err = store.GetFSItemsForDir(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if _, items, err = s.dirInfo.processFD(fdee); err != nil {
+		if _, items, err = store.dirInfo.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -323,10 +327,10 @@ func (store *Store) GetObjectIdsForString(
 	return
 }
 
-func (fs *Store) Get(
+func (store *Store) Get(
 	k interfaces.ObjectId,
 ) (t *sku.FSItem, ok bool) {
-	return fs.dirInfo.probablyCheckedOut.Get(k.String())
+	return store.dirInfo.probablyCheckedOut.Get(k.String())
 }
 
 func (store *Store) Initialize(
@@ -337,8 +341,8 @@ func (store *Store) Initialize(
 	return
 }
 
-func (s *Store) ReadAllExternalItems() (err error) {
-	if err = s.dirInfo.processRootDir(); err != nil {
+func (store *Store) ReadAllExternalItems() (err error) {
+	if err = store.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -346,7 +350,7 @@ func (s *Store) ReadAllExternalItems() (err error) {
 	return
 }
 
-func (s *Store) ReadFSItemFromExternal(
+func (store *Store) ReadFSItemFromExternal(
 	tg sku.TransactedGetter,
 ) (item *sku.FSItem, err error) {
 	item = &sku.FSItem{} // TODO use pool or use dir_items?
@@ -373,7 +377,8 @@ func (s *Store) ReadFSItemFromExternal(
 			return
 		}
 
-		// if we've already set one of object, blob, or conflict, don't set it again
+		// if we've already set one of object, blob, or conflict, don't set it
+		// again
 		// and instead add a new FD to the item
 		if !fdee.IsEmpty() {
 			fdee = &fd.FD{}
@@ -411,7 +416,7 @@ func (s *Store) ReadFSItemFromExternal(
 	return
 }
 
-func (s *Store) WriteFSItemToExternal(
+func (store *Store) WriteFSItemToExternal(
 	item *sku.FSItem,
 	tg sku.TransactedGetter,
 ) (err error) {
@@ -435,7 +440,7 @@ func (s *Store) WriteFSItemToExternal(
 	switch mode {
 	case checkout_mode.BlobOnly:
 		before := item.Blob.String()
-		after := s.envRepo.Rel(before)
+		after := store.envRepo.Rel(before)
 
 		if err = external.ExternalObjectId.SetBlob(after); err != nil {
 			err = errors.Wrap(err)
@@ -471,7 +476,7 @@ func (s *Store) WriteFSItemToExternal(
 
 	if err = item.WriteToSku(
 		external,
-		s.envRepo,
+		store.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

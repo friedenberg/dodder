@@ -34,7 +34,7 @@ func (json *Json) FromStringAndMetadata(
 ) (err error) {
 	var readCloser sha.ReadCloser
 
-	if readCloser, err = envRepo.BlobReader(&metadata.Blob); err != nil {
+	if readCloser, err = envRepo.GetDefaultBlobStore().BlobReader(&metadata.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,7 +73,7 @@ func (json *Json) FromTransacted(
 func (json *Json) ToTransacted(object *sku.Transacted, envRepo env_repo.Env) (err error) {
 	var writeCloser sha.WriteCloser
 
-	if writeCloser, err = envRepo.BlobWriter(); err != nil {
+	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

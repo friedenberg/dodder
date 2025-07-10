@@ -27,8 +27,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -47,7 +47,7 @@ type Server struct {
 }
 
 func (server *Server) init() (err error) {
-	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetLocalBlobStore()
+	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetDefaultBlobStore()
 	server.blobCache.ui = server.Repo.GetEnv().GetUI()
 	return
 }

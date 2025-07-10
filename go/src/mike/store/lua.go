@@ -18,16 +18,16 @@ func (s *Store) MakeLuaVMPoolV1WithSku(
 		return
 	}
 
-	var ar sha.ReadCloser
+	var readCloser sha.ReadCloser
 
-	if ar, err = s.GetEnvRepo().BlobReader(sk.GetBlobSha()); err != nil {
+	if readCloser, err = s.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.DeferredCloser(&err, readCloser)
 
-	if lvp, err = s.MakeLuaVMPoolWithReader(sk, ar); err != nil {
+	if lvp, err = s.MakeLuaVMPoolWithReader(sk, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

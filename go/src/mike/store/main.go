@@ -114,10 +114,10 @@ func (store *Store) Initialize(
 
 	store.configBlobFormat = typed_blob_store.MakeBlobFormat2(
 		typed_blob_store.MakeTextParserIgnoreTomlErrors2[repo_config_blobs.Blob](
-			store.GetEnvRepo(),
+			store.GetEnvRepo().GetDefaultBlobStore(),
 		),
 		typed_blob_store.ParsedBlobTomlFormatter2[repo_config_blobs.Blob]{},
-		store.GetEnvRepo(),
+		store.GetEnvRepo().GetDefaultBlobStore(),
 	)
 
 	return

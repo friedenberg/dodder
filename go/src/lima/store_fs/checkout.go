@@ -19,20 +19,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) CheckoutOne(
+func (store *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (col sku.SkuType, err error) {
-	col, _, err = s.checkoutOneIfNecessary(options, sz)
+	col, _, err = store.checkoutOneIfNecessary(options, sz)
 	return
 }
 
-func (s *Store) checkoutOneForReal(
+func (store *Store) checkoutOneForReal(
 	options checkout_options.Options,
 	co *sku.CheckedOut,
 	item *sku.FSItem,
 ) (err error) {
-	if s.config.IsDryRun() {
+	if store.config.IsDryRun() {
 		return
 	}
 
@@ -40,7 +40,7 @@ func (s *Store) checkoutOneForReal(
 
 	// delete the existing checkout if it exists in the cwd
 	if fsOptions.Path == PathOptionDefault {
-		if err = s.RemoveItem(item); err != nil {
+		if err = store.RemoveItem(item); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -48,7 +48,7 @@ func (s *Store) checkoutOneForReal(
 
 	var info checkoutFileNameInfo
 
-	if err = s.hydrateCheckoutFileNameInfoFromCheckedOut(
+	if err = store.hydrateCheckoutFileNameInfoFromCheckedOut(
 		options,
 		co,
 		&info,
@@ -57,12 +57,12 @@ func (s *Store) checkoutOneForReal(
 		return
 	}
 
-	if err = s.setObjectIfNecessary(options, item, info); err != nil {
+	if err = store.setObjectIfNecessary(options, item, info); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.setBlobIfNecessary(
+	if err = store.setBlobIfNecessary(
 		options,
 		item,
 		info,
@@ -74,12 +74,12 @@ func (s *Store) checkoutOneForReal(
 	// This is necessary otherwise External is an empty sku
 	sku.Resetter.ResetWith(co.GetSkuExternal(), co.GetSku())
 
-	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.fileEncoder.Encode(
+	if err = store.fileEncoder.Encode(
 		fsOptions.TextFormatterOptions,
 		co.GetSkuExternal(),
 		item,
@@ -91,7 +91,7 @@ func (s *Store) checkoutOneForReal(
 	return
 }
 
-func (s *Store) setObjectIfNecessary(
+func (store *Store) setObjectIfNecessary(
 	options checkout_options.Options,
 	i *sku.FSItem,
 	info checkoutFileNameInfo,
@@ -112,7 +112,7 @@ func (s *Store) setObjectIfNecessary(
 	return
 }
 
-func (s *Store) setBlobIfNecessary(
+func (store *Store) setBlobIfNecessary(
 	options checkout_options.Options,
 	i *sku.FSItem,
 	info checkoutFileNameInfo,
@@ -126,7 +126,7 @@ func (s *Store) setBlobIfNecessary(
 		return
 	}
 
-	fe := s.config.GetTypeExtension(info.tipe.String())
+	fe := store.config.GetTypeExtension(info.tipe.String())
 
 	if fe == "" {
 		fe = info.tipe.StringSansOp()
@@ -144,7 +144,7 @@ func (s *Store) setBlobIfNecessary(
 	return
 }
 
-func (s *Store) shouldCheckOut(
+func (store *Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
 	allowMutterMatch bool,
@@ -170,7 +170,7 @@ func (s *Store) shouldCheckOut(
 	mutter := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err := s.storeSupplies.ReadOneInto(
+	if err := store.storeSupplies.ReadOneInto(
 		cz.GetSku().GetObjectId(),
 		mutter,
 	); err == nil {
@@ -191,12 +191,12 @@ type checkoutFileNameInfo struct {
 	inlineBlob bool
 }
 
-func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
+func (store *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	options checkout_options.Options,
 	co *sku.CheckedOut,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	if err = s.SetFilenameForTransacted(options, co.GetSku(), info); err != nil {
+	if err = store.SetFilenameForTransacted(options, co.GetSku(), info); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -204,7 +204,7 @@ func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	co.SetState(checked_out_state.JustCheckedOut)
 
 	info.tipe = co.GetSku().GetType()
-	info.inlineBlob = s.config.IsInlineType(info.tipe)
+	info.inlineBlob = store.config.IsInlineType(info.tipe)
 
 	return
 }
@@ -304,11 +304,11 @@ func (store *Store) FileExtensionForObject(
 	return extension
 }
 
-func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
+func (store *Store) RemoveItem(i *sku.FSItem) (err error) {
 	// TODO check conflict state
 	if err = i.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
-			if err = f.Remove(s.envRepo); err != nil {
+			if err = f.Remove(store.envRepo); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -325,7 +325,7 @@ func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
 	return
 }
 
-func (s *Store) UpdateCheckoutFromCheckedOut(
+func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	co sku.SkuType,
 ) (err error) {
@@ -333,7 +333,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		OptionsWithoutMode: options,
 	}
 
-	if o.CheckoutMode, err = s.GetCheckoutMode(
+	if o.CheckoutMode, err = store.GetCheckoutMode(
 		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -351,12 +351,12 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *sku.FSItem
 
-	if oldFDs, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+	if oldFDs, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if replacement, newFDs, err = s.checkoutOneIfNecessary(
+	if replacement, newFDs, err = store.checkoutOneIfNecessary(
 		o,
 		co.GetSkuExternal(),
 	); err != nil {
@@ -368,7 +368,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	if !oldFDs.Object.IsEmpty() &&
 		!newFDs.Object.IsEmpty() &&
-		!s.config.IsDryRun() {
+		!store.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Object.GetPath(),
 			oldFDs.Object.GetPath(),
@@ -380,7 +380,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	if !oldFDs.Blob.IsEmpty() &&
 		!newFDs.Blob.IsEmpty() &&
-		!s.config.IsDryRun() {
+		!store.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Blob.GetPath(),
 			oldFDs.Blob.GetPath(),

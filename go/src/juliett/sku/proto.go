@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 )
 
 func MakeProto(defaults repo_config_blobs.Defaults) (proto Proto) {

@@ -22,27 +22,27 @@ type FileEncoder interface {
 }
 
 type fileEncoder struct {
-	mode      int
-	perm      os.FileMode
-	dirLayout env_repo.Env
-	ic        ids.InlineTypeChecker
+	mode    int
+	perm    os.FileMode
+	envRepo env_repo.Env
+	ic      ids.InlineTypeChecker
 
 	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
-		mode:      os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
-		perm:      0o666,
-		dirLayout: repoLayout,
-		ic:        ic,
+		mode:    os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
+		perm:    0o666,
+		envRepo: envRepo,
+		ic:      ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir:    repoLayout,
-				BlobStore: repoLayout,
+				EnvDir:    envRepo,
+				BlobStore: envRepo.GetDefaultBlobStore(),
 			},
 		),
 	}
@@ -84,7 +84,7 @@ func (e *fileEncoder) EncodeObject(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.dirLayout.BlobReader(z.GetBlobSha()); err != nil {
+	if ar, err = e.envRepo.GetDefaultBlobStore().BlobReader(z.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -102,7 +102,7 @@ func (e *fileEncoder) EncodeObject(
 				if errors.IsExist(err) {
 					var aw sha.WriteCloser
 
-					if aw, err = e.dirLayout.BlobWriter(); err != nil {
+					if aw, err = e.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

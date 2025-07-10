@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) checkoutOneIfNecessary(
+func (store *Store) checkoutOneIfNecessary(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
 ) (co *sku.CheckedOut, item *sku.FSItem, err error) {
@@ -18,13 +18,13 @@ func (s *Store) checkoutOneIfNecessary(
 
 	var alreadyCheckedOut bool
 
-	if item, alreadyCheckedOut, err = s.prepareFSItemForCheckOut(options, co); err != nil {
+	if item, alreadyCheckedOut, err = store.prepareFSItemForCheckOut(options, co); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if alreadyCheckedOut && !s.shouldCheckOut(options, co, true) {
-		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if alreadyCheckedOut && !store.shouldCheckOut(options, co, true) {
+		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -39,7 +39,7 @@ func (s *Store) checkoutOneIfNecessary(
 
 	// ui.DebugBatsTestBody().Print(sku_fmt_debug.String(co.GetSku()))
 
-	if err = s.checkoutOneForReal(
+	if err = store.checkoutOneForReal(
 		options,
 		co,
 		item,
@@ -55,21 +55,21 @@ func (s *Store) checkoutOneIfNecessary(
 	return
 }
 
-func (s *Store) prepareFSItemForCheckOut(
+func (store *Store) prepareFSItemForCheckOut(
 	options checkout_options.Options,
 	co *sku.CheckedOut,
 ) (item *sku.FSItem, alreadyCheckedOut bool, err error) {
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
-	if s.config.IsDryRun() ||
+	if store.config.IsDryRun() ||
 		fsOptions.Path == PathOptionTempLocal {
 		item = &sku.FSItem{}
 		item.Reset()
 		return
 	}
 
-	if item, alreadyCheckedOut = s.Get(co.GetSku().GetObjectId()); alreadyCheckedOut {
-		if err = s.HydrateExternalFromItem(
+	if item, alreadyCheckedOut = store.Get(co.GetSku().GetObjectId()); alreadyCheckedOut {
+		if err = store.HydrateExternalFromItem(
 			sku.CommitOptions{
 				StoreOptions: sku.GetStoreOptionsRealizeSansProto(),
 			},
@@ -85,7 +85,7 @@ func (s *Store) prepareFSItemForCheckOut(
 			}
 		}
 	} else {
-		if item, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+		if item, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

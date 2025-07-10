@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -68,7 +68,7 @@ func (local *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryLi
 }
 
 func (local *Repo) GetBlobStore() interfaces.BlobStore {
-	return local.GetEnvRepo()
+	return local.GetEnvRepo().GetDefaultBlobStore()
 }
 
 func (local *Repo) GetObjectStore() sku.ObjectStore {

@@ -44,12 +44,12 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 		BasePath: config.BasePath,
 	}
 
-	var repoLayout env_repo.Env
+	var envRepo env_repo.Env
 
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
@@ -59,6 +59,6 @@ func (c BlobStoreLocal) MakeBlobStoreLocal(
 
 	return BlobStoreWithEnv{
 		Env:       ui,
-		BlobStore: repoLayout,
+		BlobStore: envRepo.GetDefaultBlobStore(),
 	}
 }

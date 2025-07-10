@@ -12,63 +12,63 @@ import (
 )
 
 type Tag struct {
-	dirLayout env_repo.Env
-	envLua    env_lua.Env
-	toml_v0   TypedStore[tag_blobs.V0, *tag_blobs.V0]
-	toml_v1   TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
-	lua_v1    TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
-	lua_v2    TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
+	envRepo env_repo.Env
+	envLua  env_lua.Env
+	toml_v0 TypedStore[tag_blobs.V0, *tag_blobs.V0]
+	toml_v1 TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
+	lua_v1  TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
+	lua_v2  TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
 }
 
 func MakeTagStore(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 	envLua env_lua.Env,
 ) Tag {
 	return Tag{
-		dirLayout: dirLayout,
-		envLua:    envLua,
+		envRepo: envRepo,
+		envLua:  envLua,
 		toml_v0: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.V0](
-					dirLayout,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[tag_blobs.V0, *tag_blobs.V0]{},
-				dirLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.TomlV1](
-					dirLayout,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
-				dirLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.TomlV1) {
 				a.Reset()
 			},
 		),
 		lua_v1: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat[tag_blobs.LuaV1, *tag_blobs.LuaV1](
 				nil,
 				nil,
-				dirLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.LuaV1) {
 			},
 		),
 		lua_v2: MakeBlobStore(
-			dirLayout,
+			envRepo,
 			MakeBlobFormat[tag_blobs.LuaV2, *tag_blobs.LuaV2](
 				nil,
 				nil,
-				dirLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.LuaV2) {
 			},
@@ -127,7 +127,7 @@ func (a Tag) GetTransactedWithBlob(
 	case builtin_types.TagTypeLuaV1:
 		var rc sha.ReadCloser
 
-		if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -152,7 +152,7 @@ func (a Tag) GetTransactedWithBlob(
 	case builtin_types.TagTypeLuaV2:
 		var rc sha.ReadCloser
 
-		if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

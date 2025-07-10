@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) Open(
+func (store *Store) Open(
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
@@ -18,13 +18,13 @@ func (s *Store) Open(
 
 	if m.IncludesMetadata() {
 		wg.Do(func() error {
-			return s.openZettels(ph, zsc)
+			return store.openZettels(ph, zsc)
 		})
 	}
 
 	if m.IncludesBlob() {
 		wg.Do(func() error {
-			return s.openBlob(ph, zsc)
+			return store.openBlob(ph, zsc)
 		})
 	}
 
@@ -36,13 +36,13 @@ func (s *Store) Open(
 	return
 }
 
-func (s *Store) openZettels(
+func (store *Store) openZettels(
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
 	var filesZettels []string
 
-	if filesZettels, err = s.ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettels, err = store.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,13 +69,13 @@ func (s *Store) openZettels(
 	return
 }
 
-func (s *Store) openBlob(
+func (store *Store) openBlob(
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
 	var filesBlobs []string
 
-	if filesBlobs, err = s.ToSliceFilesBlobs(zsc); err != nil {
+	if filesBlobs, err = store.ToSliceFilesBlobs(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

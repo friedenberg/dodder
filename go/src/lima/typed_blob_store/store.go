@@ -38,7 +38,7 @@ func (blobStore *BlobStore[A, APtr]) GetBlob(
 ) (a APtr, err error) {
 	var rc interfaces.ShaReadCloser
 
-	if rc, err = blobStore.envRepo.BlobReader(sh); err != nil {
+	if rc, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,21 +71,21 @@ func (blobStore *BlobStore[A, APtr]) PutBlob(a APtr) {
 func (blobStore *BlobStore[A, APtr]) SaveBlobText(
 	o APtr,
 ) (sh interfaces.Sha, n int64, err error) {
-	var w sha.WriteCloser
+	var writeCloser sha.WriteCloser
 
-	if w, err = blobStore.envRepo.BlobWriter(); err != nil {
+	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, w)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if n, err = blobStore.EncodeTo(o, w); err != nil {
+	if n, err = blobStore.EncodeTo(o, writeCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = w.GetShaLike()
+	sh = writeCloser.GetShaLike()
 
 	return
 }

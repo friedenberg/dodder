@@ -18,30 +18,30 @@ type Config struct {
 }
 
 func MakeConfigStore(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 ) Config {
 	return Config{
 		toml_v0: MakeBlobStore(
-			repoLayout,
+			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[repo_config_blobs.V0](
-					repoLayout,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[repo_config_blobs.V0, *repo_config_blobs.V0]{},
-				repoLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *repo_config_blobs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
-			repoLayout,
+			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[repo_config_blobs.V1](
-					repoLayout,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[repo_config_blobs.V1, *repo_config_blobs.V1]{},
-				repoLayout,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *repo_config_blobs.V1) {
 				a.Reset()

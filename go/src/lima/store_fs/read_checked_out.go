@@ -10,17 +10,17 @@ import (
 // TODO what does this even do. This caused [cervicis/marshall.zettel !task pom-2 project-2021-zit-bugs project-25q1-zit_workspaces-crit] fix issue with tags other than workspace in `checkin -organize` bei…
 // likely due to this method overriding tags that were set by organize. maybe
 // this bug existed before workspaces?
-func (s *Store) RefreshCheckedOut(
+func (store *Store) RefreshCheckedOut(
 	co *sku.CheckedOut,
 ) (err error) {
 	var item *sku.FSItem
 
-	if item, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+	if item, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.HydrateExternalFromItem(
+	if err = store.HydrateExternalFromItem(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
@@ -48,12 +48,12 @@ func (s *Store) RefreshCheckedOut(
 	return
 }
 
-func (s *Store) ReadCheckedOutFromTransacted(
+func (store *Store) ReadCheckedOutFromTransacted(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
+	if err = store.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -61,7 +61,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	return
 }
 
-func (s *Store) readIntoCheckedOutFromTransacted(
+func (store *Store) readIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
 	co *sku.CheckedOut,
 ) (err error) {
@@ -73,12 +73,12 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 
 	var kfp *sku.FSItem
 
-	if kfp, ok = s.Get(&sk.ObjectId); !ok {
+	if kfp, ok = store.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
 		return
 	}
 
-	if err = s.HydrateExternalFromItem(
+	if err = store.HydrateExternalFromItem(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,

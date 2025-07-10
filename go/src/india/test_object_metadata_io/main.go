@@ -17,7 +17,7 @@ import (
 func Make(
 	t *ui.T,
 	contents map[string]string,
-) (f env_repo.Env) {
+) (envRepo env_repo.Env) {
 	t = t.Skip(1)
 
 	p := t.TempDir()
@@ -31,7 +31,7 @@ func Make(
 
 	var err error
 
-	if f, err = env_repo.Make(
+	if envRepo, err = env_repo.Make(
 		env_local.Make(env_ui.MakeDefault(), dir),
 		env_repo.Options{
 			BasePath:                p,
@@ -48,7 +48,7 @@ func Make(
 	for k, e := range contents {
 		var w sha.WriteCloser
 
-		w, err := f.BlobWriter()
+		w, err := envRepo.GetDefaultBlobStore().BlobWriter()
 		if err != nil {
 			t.Fatalf("failed to make blob writer: %s", err)
 		}

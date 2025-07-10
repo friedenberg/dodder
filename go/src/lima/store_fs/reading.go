@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
-	item, ok := s.Get(&internal.ObjectId)
+func (store *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
+	item, ok := store.Get(&internal.ObjectId)
 
 	if !ok {
 		return
@@ -16,7 +16,7 @@ func (s *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 
 	var external *sku.Transacted
 
-	if external, err = s.ReadExternalFromItem(
+	if external, err = store.ReadExternalFromItem(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
@@ -35,11 +35,11 @@ func (s *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) ReadOneExternalObjectReader(
+func (store *Store) ReadOneExternalObjectReader(
 	r io.Reader,
 	external *sku.Transacted,
 ) (err error) {
-	if _, err = s.metadataTextParser.ParseMetadata(r, external); err != nil {
+	if _, err = store.metadataTextParser.ParseMetadata(r, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

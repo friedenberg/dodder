@@ -8,12 +8,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) GetCheckoutMode(
+func (store *Store) GetCheckoutMode(
 	el sku.ExternalLike,
 ) (m checkout_mode.Mode, err error) {
 	var fds *sku.FSItem
 
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -23,12 +23,12 @@ func (s *Store) GetCheckoutMode(
 	return
 }
 
-func (s *Store) GetCheckoutModeOrError(
+func (store *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,
 ) (m checkout_mode.Mode, err error) {
 	var fds *sku.FSItem
 
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,12 +41,12 @@ func (s *Store) GetCheckoutModeOrError(
 	return
 }
 
-func (s *Store) GetConflictOrError(
+func (store *Store) GetConflictOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
 	var fds *sku.FSItem
 
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -56,12 +56,12 @@ func (s *Store) GetConflictOrError(
 	return
 }
 
-func (s *Store) GetObjectOrError(
+func (store *Store) GetObjectOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
 	var item *sku.FSItem
 
-	if item, err = s.ReadFSItemFromExternal(el); err != nil {
+	if item, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,14 +71,14 @@ func (s *Store) GetObjectOrError(
 	return
 }
 
-func (s *Store) UpdateTransactedFromBlobs(
+func (store *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
 	sk := el.GetSku()
 
 	var item *sku.FSItem
 
-	if item, err = s.ReadFSItemFromExternal(sk); err != nil {
+	if item, err = store.ReadFSItemFromExternal(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -104,7 +104,7 @@ func (s *Store) UpdateTransactedFromBlobs(
 	if !item.Blob.IsEmpty() {
 		blobFD := &item.Blob
 		ext := blobFD.ExtSansDot()
-		typFromExtension := s.config.GetTypeStringFromExtension(ext)
+		typFromExtension := store.config.GetTypeStringFromExtension(ext)
 
 		if typFromExtension == "" {
 			typFromExtension = ext
@@ -118,7 +118,7 @@ func (s *Store) UpdateTransactedFromBlobs(
 		}
 	}
 
-	if err = s.WriteFSItemToExternal(item, sk); err != nil {
+	if err = store.WriteFSItemToExternal(item, sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -104,7 +104,7 @@ func (a InventoryList) GetTransactedWithBlob(
 
 	var readCloser interfaces.ShaReadCloser
 
-	if readCloser, err = a.envRepo.BlobReader(blobSha); err != nil {
+	if readCloser, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -249,7 +249,7 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 		{
 			var err error
 
-			if readCloser, err = a.envRepo.BlobReader(blobSha); err != nil {
+			if readCloser, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 				yield(nil, errors.Wrap(err))
 				return
 			}

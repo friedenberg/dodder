@@ -20,10 +20,10 @@ func MakeTypeStore(
 			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[type_blobs.V0](
-					envRepo,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[type_blobs.V0, *type_blobs.V0]{},
-				envRepo,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *type_blobs.V0) {
 				a.Reset()
@@ -33,10 +33,10 @@ func MakeTypeStore(
 			envRepo,
 			MakeBlobFormat(
 				MakeTomlDecoderIgnoreTomlErrors[type_blobs.TomlV1](
-					envRepo,
+					envRepo.GetDefaultBlobStore(),
 				),
 				TomlBlobEncoder[type_blobs.TomlV1, *type_blobs.TomlV1]{},
-				envRepo,
+				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *type_blobs.TomlV1) {
 				a.Reset()

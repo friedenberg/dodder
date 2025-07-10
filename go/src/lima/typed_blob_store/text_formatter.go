@@ -41,7 +41,7 @@ func MakeTextFormatterWithBlobFormatter(
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
 				EnvDir:        envRepo,
-				BlobStore:     envRepo,
+				BlobStore:     envRepo.GetDefaultBlobStore(),
 				BlobFormatter: formatter,
 			},
 		),

@@ -119,7 +119,7 @@ func (importer importer) importInventoryList(
 ) (checkedOut *sku.CheckedOut, err error) {
 	blobSha := listObject.GetBlobSha()
 
-	if !importer.envRepo.HasBlob(blobSha) {
+	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 		err = env_dir.ErrBlobMissing{
 			ShaGetter: blobSha,
 		}
@@ -283,7 +283,7 @@ func (c importer) ImportBlobIfNecessary(
 
 		n := int64(-1)
 
-		if c.envRepo.HasBlob(blobSha) {
+		if c.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 			n = -2
 		}
 
@@ -316,7 +316,7 @@ func (c importer) ImportBlobIfNecessary(
 
 			if n, err = blob_store.CopyBlobIfNecessary(
 				c.envRepo,
-				c.envRepo,
+				c.envRepo.GetDefaultBlobStore(),
 				c.remoteBlobStore,
 				blobSha,
 				&progressWriter,

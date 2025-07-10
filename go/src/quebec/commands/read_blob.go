@@ -53,12 +53,12 @@ func (c ReadBlob) Run(dep command.Request) {
 }
 
 func (ReadBlob) readOneBlob(
-	repoLayout env_repo.Env,
+	envRepo env_repo.Env,
 	entry readBlobEntry,
 ) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = repoLayout.BlobWriter(); err != nil {
+	if aw, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

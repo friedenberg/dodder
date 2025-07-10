@@ -144,7 +144,7 @@ func (c DormantEdit) readTempKonfigFile(
 
 	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.GetEnvRepo().BlobWriter(); err != nil {
+	if aw, err = u.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

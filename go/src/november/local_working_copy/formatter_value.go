@@ -508,18 +508,18 @@ func (local *Repo) MakeFormatFunc(
 
 	case "blob":
 		output = func(o *sku.Transacted) (err error) {
-			var r sha.ReadCloser
+			var readCloser sha.ReadCloser
 
-			if r, err = local.GetStore().GetEnvRepo().BlobReader(
+			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.DeferredCloser(&err, r)
+			defer errors.DeferredCloser(&err, readCloser)
 
-			if _, err = io.Copy(writer, r); err != nil {
+			if _, err = io.Copy(writer, readCloser); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -539,22 +539,22 @@ func (local *Repo) MakeFormatFunc(
 			}
 
 			if local.GetConfig().IsInlineType(o.GetType()) {
-				var r sha.ReadCloser
+				var readCloser sha.ReadCloser
 
-				if r, err = local.GetStore().GetEnvRepo().BlobReader(
+				if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					o.GetBlobSha(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				defer errors.DeferredCloser(&err, r)
+				defer errors.DeferredCloser(&err, readCloser)
 
 				if _, err = delim_io.CopyWithPrefixOnDelim(
 					'\n',
 					sb.String(),
 					local.GetOut(),
-					r,
+					readCloser,
 					true,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -574,16 +574,16 @@ func (local *Repo) MakeFormatFunc(
 		cliFmt := local.SkuFormatBoxTransactedNoColor()
 
 		output = func(o *sku.Transacted) (err error) {
-			var r sha.ReadCloser
+			var readCloser sha.ReadCloser
 
-			if r, err = local.GetStore().GetEnvRepo().BlobReader(
+			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.DeferredCloser(&err, r)
+			defer errors.DeferredCloser(&err, readCloser)
 
 			sb := &strings.Builder{}
 
@@ -596,7 +596,7 @@ func (local *Repo) MakeFormatFunc(
 				'\n',
 				sb.String(),
 				local.GetOut(),
-				r,
+				readCloser,
 				true,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -723,18 +723,18 @@ func (local *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
-			var r sha.ReadCloser
+			var readCloser sha.ReadCloser
 
-			if r, err = local.GetStore().GetEnvRepo().BlobReader(
+			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.Deferred(&err, r.Close)
+			defer errors.Deferred(&err, readCloser.Close)
 
-			d := toml.NewDecoder(r)
+			d := toml.NewDecoder(readCloser)
 
 			if err = d.Decode(&a); err != nil {
 				ui.Err().Printf("%s: %s", o, err)
@@ -758,18 +758,18 @@ func (local *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
-			var r sha.ReadCloser
+			var readCloser sha.ReadCloser
 
-			if r, err = local.GetStore().GetEnvRepo().BlobReader(
+			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.DeferredCloser(&err, r)
+			defer errors.DeferredCloser(&err, readCloser)
 
-			d := toml.NewDecoder(r)
+			d := toml.NewDecoder(readCloser)
 
 			if err = d.Decode(&a); err != nil {
 				ui.Err().Printf("%s: %s", o, err)

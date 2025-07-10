@@ -156,7 +156,7 @@ func (d *dirInfo) addPathAndDirEntry(
 	if fdee, err = fd.MakeFromPathAndDirEntry(
 		path,
 		dirEntry,
-		d.envRepo,
+		d.envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

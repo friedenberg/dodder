@@ -14,7 +14,7 @@ import (
 
 // Internal may be nil, which means that the external is hydrated without an
 // overlay.
-func (s *Store) HydrateExternalFromItem(
+func (store *Store) HydrateExternalFromItem(
 	o sku.CommitOptions,
 	item *sku.FSItem,
 	internal *sku.Transacted,
@@ -26,7 +26,7 @@ func (s *Store) HydrateExternalFromItem(
 
 	if err = item.WriteToSku(
 		external,
-		s.envRepo,
+		store.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -41,19 +41,19 @@ func (s *Store) HydrateExternalFromItem(
 
 	switch m {
 	case checkout_mode.BlobOnly:
-		if err = s.readOneExternalBlob(external, internal, item); err != nil {
+		if err = store.readOneExternalBlob(external, internal, item); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
 		if item.Object.IsStdin() {
-			if err = s.ReadOneExternalObjectReader(os.Stdin, external); err != nil {
+			if err = store.ReadOneExternalObjectReader(os.Stdin, external); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			if err = s.readOneExternalObject(external, internal, item); err != nil {
+			if err = store.readOneExternalObject(external, internal, item); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -74,7 +74,7 @@ func (s *Store) HydrateExternalFromItem(
 		o.Clock = item
 	}
 
-	if err = s.WriteFSItemToExternal(item, external); err != nil {
+	if err = store.WriteFSItemToExternal(item, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,7 +82,7 @@ func (s *Store) HydrateExternalFromItem(
 	// Don't apply the proto object as that would artificially create deltas
 	o.StoreOptions.ApplyProto = false
 
-	if err = s.storeSupplies.Commit(
+	if err = store.storeSupplies.Commit(
 		external,
 		o,
 	); err != nil {
@@ -94,7 +94,7 @@ func (s *Store) HydrateExternalFromItem(
 }
 
 // Internal can be nil which means that no overlaying is done.
-func (s *Store) readOneExternalObject(
+func (store *Store) readOneExternalObject(
 	external *sku.Transacted,
 	internal *sku.Transacted,
 	item *sku.FSItem,
@@ -115,7 +115,7 @@ func (s *Store) readOneExternalObject(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if err = s.ReadOneExternalObjectReader(f, external); err != nil {
+	if err = store.ReadOneExternalObjectReader(f, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -123,7 +123,7 @@ func (s *Store) readOneExternalObject(
 	return
 }
 
-func (s *Store) readOneExternalBlob(
+func (store *Store) readOneExternalBlob(
 	external *sku.Transacted,
 	internal *sku.Transacted,
 	item *sku.FSItem,
@@ -132,32 +132,32 @@ func (s *Store) readOneExternalBlob(
 
 	// TODO use cache
 	{
-		var aw sha.WriteCloser
+		var writeCloser sha.WriteCloser
 
-		if aw, err = s.envRepo.BlobWriter(); err != nil {
+		if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, aw)
+		defer errors.DeferredCloser(&err, writeCloser)
 
-		var f *os.File
+		var file *os.File
 
-		if f, err = files.OpenExclusiveReadOnly(
+		if file, err = files.OpenExclusiveReadOnly(
 			item.Blob.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, f)
+		defer errors.DeferredCloser(&err, file)
 
-		if _, err = io.Copy(aw, f); err != nil {
+		if _, err = io.Copy(writeCloser, file); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		external.GetMetadata().Blob.SetShaLike(aw)
+		external.GetMetadata().Blob.SetShaLike(writeCloser)
 	}
 
 	return

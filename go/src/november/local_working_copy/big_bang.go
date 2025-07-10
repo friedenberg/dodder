@@ -180,7 +180,7 @@ func writeDefaultMutableConfig(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetEnvRepo().BlobWriter(); err != nil {
+	if aw, err = u.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -22,7 +22,7 @@ import (
 // TODO combine with other method in this file
 // Makes hard assumptions about the availability of the blobs associated with
 // the *sku.CheckedOut.
-func (s *Store) MergeCheckedOut(
+func (store *Store) MergeCheckedOut(
 	co *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
@@ -73,14 +73,14 @@ func (s *Store) MergeCheckedOut(
 	var skuReplacement *sku.Transacted
 
 	// TODO pass mode / conflicts
-	if skuReplacement, err = s.MakeMergedTransacted(
+	if skuReplacement, err = store.MakeMergedTransacted(
 		conflicted,
 	); err != nil {
 		if sku.IsErrMergeConflict(err) {
 			err = nil
 
 			if !allowMergeConflicts {
-				if err = s.GenerateConflictMarker(
+				if err = store.GenerateConflictMarker(
 					conflicted,
 					conflicted.CheckedOut,
 				); err != nil {
@@ -102,10 +102,10 @@ func (s *Store) MergeCheckedOut(
 	return
 }
 
-func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
+func (store *Store) Merge(conflicted sku.Conflicted) (err error) {
 	var original *sku.FSItem
 
-	if original, err = s.ReadFSItemFromExternal(
+	if original, err = store.ReadFSItemFromExternal(
 		conflicted.CheckedOut.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -114,9 +114,9 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 
 	var skuReplacement *sku.Transacted
 
-	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
+	if skuReplacement, err = store.MakeMergedTransacted(conflicted); err != nil {
 		if sku.IsErrMergeConflict(err) {
-			if err = s.GenerateConflictMarker(
+			if err = store.GenerateConflictMarker(
 				conflicted,
 				conflicted.CheckedOut,
 			); err != nil {
@@ -138,7 +138,7 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 
 	var replacement *sku.FSItem
 
-	if replacement, err = s.ReadFSItemFromExternal(skuReplacement); err != nil {
+	if replacement, err = store.ReadFSItemFromExternal(skuReplacement); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -166,21 +166,21 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 	return
 }
 
-func (s *Store) checkoutConflictedForMerge(
+func (store *Store) checkoutConflictedForMerge(
 	tm sku.Conflicted,
 	mode checkout_mode.Mode,
 ) (local, base, remote *sku.FSItem, err error) {
-	if _, local, err = s.checkoutOneForMerge(mode, tm.Local); err != nil {
+	if _, local, err = store.checkoutOneForMerge(mode, tm.Local); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, base, err = s.checkoutOneForMerge(mode, tm.Base); err != nil {
+	if _, base, err = store.checkoutOneForMerge(mode, tm.Base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, remote, err = s.checkoutOneForMerge(mode, tm.Remote); err != nil {
+	if _, remote, err = store.checkoutOneForMerge(mode, tm.Remote); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -188,7 +188,7 @@ func (s *Store) checkoutConflictedForMerge(
 	return
 }
 
-func (s *Store) MakeMergedTransacted(
+func (store *Store) MakeMergedTransacted(
 	conflicted sku.Conflicted,
 ) (merged *sku.Transacted, err error) {
 	if err = conflicted.MergeTags(); err != nil {
@@ -198,7 +198,7 @@ func (s *Store) MakeMergedTransacted(
 
 	var localItem, baseItem, remoteItem *sku.FSItem
 
-	inlineBlob := conflicted.IsAllInlineType(s.config)
+	inlineBlob := conflicted.IsAllInlineType(store.config)
 
 	mode := checkout_mode.MetadataAndBlob
 
@@ -206,7 +206,7 @@ func (s *Store) MakeMergedTransacted(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	if localItem, baseItem, remoteItem, err = s.checkoutConflictedForMerge(
+	if localItem, baseItem, remoteItem, err = store.checkoutConflictedForMerge(
 		conflicted,
 		mode,
 	); err != nil {
@@ -217,7 +217,7 @@ func (s *Store) MakeMergedTransacted(
 	var mergedItem *sku.FSItem
 	var diff3Error error
 
-	mergedItem, diff3Error = s.runDiff3(
+	mergedItem, diff3Error = store.runDiff3(
 		localItem,
 		baseItem,
 		remoteItem,
@@ -234,12 +234,12 @@ func (s *Store) MakeMergedTransacted(
 
 	merged.ObjectId.ResetWith(&conflicted.GetSku().ObjectId)
 
-	if err = s.WriteFSItemToExternal(localItem, merged); err != nil {
+	if err = store.WriteFSItemToExternal(localItem, merged); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.HydrateExternalFromItem(
+	if err = store.HydrateExternalFromItem(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
 				UpdateTai: true,
@@ -256,7 +256,7 @@ func (s *Store) MakeMergedTransacted(
 	return
 }
 
-func (s *Store) checkoutOneForMerge(
+func (store *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, i *sku.FSItem, err error) {
@@ -282,12 +282,12 @@ func (s *Store) checkoutOneForMerge(
 	co = GetCheckedOutPool().Get()
 	sku.Resetter.ResetWith(co.GetSku(), sk)
 
-	if i, err = s.ReadFSItemFromExternal(co.GetSku()); err != nil {
+	if i, err = store.ReadFSItemFromExternal(co.GetSku()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.checkoutOneForReal(
+	if err = store.checkoutOneForReal(
 		options,
 		co,
 		i,
@@ -296,7 +296,7 @@ func (s *Store) checkoutOneForMerge(
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(i, co.GetSkuExternal()); err != nil {
+	if err = store.WriteFSItemToExternal(i, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

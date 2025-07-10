@@ -43,8 +43,7 @@ type Env struct {
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
-	interfaces.LocalBlobStore // default
-	blobStores                []interfaces.LocalBlobStore
+	blobStores []interfaces.LocalBlobStore
 }
 
 func Make(
@@ -139,8 +138,6 @@ func (env *Env) setupStores() {
 		),
 		env.GetTempLocal(),
 	)
-
-	env.LocalBlobStore = env.GetDefaultBlobStore()
 }
 
 func (env Env) GetEnv() env_ui.Env {

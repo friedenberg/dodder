@@ -141,7 +141,7 @@ func (pair *externalBlobPair) SetArgs(
 	if err = pair.BlobFD.SetFromPath(
 		envRepo.GetCwd(),
 		pathOrSha,
-		envRepo,
+		envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			if err = pair.BlobSha.Set(pair.pathOrSha); err != nil {
