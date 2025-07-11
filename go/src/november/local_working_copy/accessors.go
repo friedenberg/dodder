@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -31,7 +30,7 @@ func (local *Repo) GetImmutableConfigPublicType() ids.Type {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (local *Repo) GetImmutableConfigPrivate() genesis_config_io.PrivateTypedBlob {
+func (local *Repo) GetImmutableConfigPrivate() genesis_config.PrivateTypedBlob {
 	return local.GetEnvRepo().GetConfigPrivate()
 }
 

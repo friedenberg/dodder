@@ -10,17 +10,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
-type Decoder[O any] struct {
+type Decoder[BLOB any] struct {
 	RequireMetadata bool
-	Metadata, Blob  interfaces.DecoderFromBufferedReader[O]
+	Metadata, Blob  interfaces.DecoderFromBufferedReader[BLOB]
 }
 
-func (mr *Decoder[O]) DecodeFrom(
-	object O,
+func (mr *Decoder[BLOB]) DecodeFrom(
+	blob BLOB,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.readMetadataFrom(object, bufferedReader)
+	n1, err = mr.readMetadataFrom(blob, bufferedReader)
 	n += n1
 
 	if err != nil {
@@ -28,7 +28,7 @@ func (mr *Decoder[O]) DecodeFrom(
 		return
 	}
 
-	n1, err = mr.Blob.DecodeFrom(object, bufferedReader)
+	n1, err = mr.Blob.DecodeFrom(blob, bufferedReader)
 	n += n1
 
 	if err != nil {
@@ -39,8 +39,8 @@ func (mr *Decoder[O]) DecodeFrom(
 	return
 }
 
-func (decoder *Decoder[O]) readMetadataFrom(
-	object O,
+func (decoder *Decoder[BLOB]) readMetadataFrom(
+	blob BLOB,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	var state readerState
@@ -82,7 +82,7 @@ func (decoder *Decoder[O]) readMetadataFrom(
 
 		default:
 			state = readerStateFirstBoundary
-			metadataPipe = ohio.MakePipedDecoder(object, decoder.Metadata)
+			metadataPipe = ohio.MakePipedDecoder(blob, decoder.Metadata)
 		}
 	}
 

@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
@@ -39,7 +39,7 @@ type BlobStoreWithConfig struct {
 type Env struct {
 	env_local.Env
 
-	config genesis_config_io.PrivateTypedBlob
+	config genesis_config.PrivateTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -115,9 +115,9 @@ func Make(
 		}
 	}
 
-	env.config = triple_hyphen_io2.DecodeFromFile(
+	env.config = triple_hyphen_io.DecodeFromFile(
 		env,
-		genesis_config_io.CoderPrivate,
+		genesis_config.CoderPrivate,
 		env.FileConfigPermanent(),
 		true,
 	)
@@ -151,7 +151,7 @@ func (env *Env) setupStores() {
 		}
 
 		for i, configPath := range configPaths {
-			env.blobStores[i].Config = triple_hyphen_io2.DecodeFromFile(
+			env.blobStores[i].Config = triple_hyphen_io.DecodeFromFile(
 				env,
 				blob_store_config.Coder,
 				configPath,
@@ -173,14 +173,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() genesis_config_io.PublicTypedBlob {
-	return genesis_config_io.PublicTypedBlob{
+func (env Env) GetConfigPublic() genesis_config.PublicTypedBlob {
+	return genesis_config.PublicTypedBlob{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() genesis_config_io.PrivateTypedBlob {
+func (env Env) GetConfigPrivate() genesis_config.PrivateTypedBlob {
 	return env.config
 }
 

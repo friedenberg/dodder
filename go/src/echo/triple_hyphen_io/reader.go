@@ -14,9 +14,9 @@ type Reader struct {
 	Metadata, Blob  io.ReaderFrom
 }
 
-func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
+func (reader *Reader) ReadFrom(ioReader io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.readMetadataFrom(&r)
+	n1, err = reader.readMetadataFrom(&ioReader)
 	n += n1
 
 	if err != nil {
@@ -24,7 +24,7 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = mr.Blob.ReadFrom(bufio.NewReader(r))
+	n1, err = reader.Blob.ReadFrom(bufio.NewReader(ioReader))
 	n += n1
 
 	if err != nil {
@@ -35,16 +35,16 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (mr *Reader) readMetadataFrom(r *io.Reader) (n int64, err error) {
+func (reader *Reader) readMetadataFrom(ioReader *io.Reader) (n int64, err error) {
 	var state readerState
-	br := bufio.NewReader(*r)
+	br := bufio.NewReader(*ioReader)
 
-	if mr.RequireMetadata && mr.Metadata == nil {
+	if reader.RequireMetadata && reader.Metadata == nil {
 		err = errors.ErrorWithStackf("metadata reader is nil")
 		return
 	}
 
-	if mr.Blob == nil {
+	if reader.Blob == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
 		return
 	}
@@ -75,12 +75,12 @@ LINE_READ_LOOP:
 		switch state {
 		case readerStateEmpty:
 			switch {
-			case mr.RequireMetadata && line != Boundary:
+			case reader.RequireMetadata && line != Boundary:
 				err = errors.ErrorWithStackf("expected %q but got %q", Boundary, line)
 				return
 
 			case line != Boundary:
-				*r = io.MultiReader(
+				*ioReader = io.MultiReader(
 					strings.NewReader(rawLine),
 					br,
 				)
@@ -90,7 +90,7 @@ LINE_READ_LOOP:
 
 			state += 1
 
-			object_metadata = ohio.MakePipedReaderFrom(mr.Metadata)
+			object_metadata = ohio.MakePipedReaderFrom(reader.Metadata)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
@@ -109,7 +109,7 @@ LINE_READ_LOOP:
 			}
 
 		case readerStateSecondBoundary:
-			*r = br
+			*ioReader = br
 			break LINE_READ_LOOP
 
 		default:

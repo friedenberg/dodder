@@ -11,21 +11,21 @@ type Writer struct {
 	Metadata, Blob io.WriterTo
 }
 
-func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
-	w := bufio.NewWriter(w2)
-	defer errors.DeferredFlusher(&err, w)
+func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
+	bufferedWriter := bufio.NewWriter(ioWriter)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	var n1 int64
 	var n2 int
 
 	hasMetadataContent := true
 
-	if mwt, ok := w1.Metadata.(MetadataWriterTo); ok {
+	if mwt, ok := writer.Metadata.(MetadataWriterTo); ok {
 		hasMetadataContent = mwt.HasMetadataContent()
 	}
 
-	if w1.Metadata != nil && hasMetadataContent {
-		n2, err = w.WriteString(Boundary + "\n")
+	if writer.Metadata != nil && hasMetadataContent {
+		n2, err = bufferedWriter.WriteString(Boundary + "\n")
 		n += int64(n2)
 
 		if err != nil {
@@ -33,7 +33,7 @@ func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 			return
 		}
 
-		n1, err = w1.Metadata.WriteTo(w)
+		n1, err = writer.Metadata.WriteTo(bufferedWriter)
 		n += n1
 
 		if err != nil {
@@ -41,7 +41,7 @@ func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 			return
 		}
 
-		w.WriteString(Boundary + "\n")
+		bufferedWriter.WriteString(Boundary + "\n")
 		n += n1
 
 		if err != nil {
@@ -49,8 +49,8 @@ func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 			return
 		}
 
-		if w1.Blob != nil {
-			w.WriteString("\n")
+		if writer.Blob != nil {
+			bufferedWriter.WriteString("\n")
 			n += n1
 
 			if err != nil {
@@ -60,8 +60,8 @@ func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 		}
 	}
 
-	if w1.Blob != nil {
-		n1, err = w1.Blob.WriteTo(w)
+	if writer.Blob != nil {
+		n1, err = writer.Blob.WriteTo(bufferedWriter)
 		n += n1
 
 		if err != nil {

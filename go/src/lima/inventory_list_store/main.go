@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
@@ -124,7 +123,7 @@ func (store *Store) GetImmutableConfigPublicType() ids.Type {
 	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (store *Store) GetImmutableConfigPrivate() genesis_config_io.PrivateTypedBlob {
+func (store *Store) GetImmutableConfigPrivate() genesis_config.PrivateTypedBlob {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

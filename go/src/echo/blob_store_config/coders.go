@@ -2,7 +2,7 @@ package blob_store_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
 const (
@@ -10,11 +10,11 @@ const (
 	TypeVCurrent = TypeV0
 )
 
-var Coder = triple_hyphen_io2.CoderToTypedBlob[Config]{
-	Metadata: triple_hyphen_io2.TypedMetadataCoder[Config]{},
-	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[Config](
+var Coder = triple_hyphen_io.CoderToTypedBlob[Config]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[Config]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Config](
 		map[string]interfaces.CoderBufferedReadWriter[*Config]{
-			TypeV0: triple_hyphen_io2.CoderToml[
+			TypeV0: triple_hyphen_io.CoderToml[
 				Config,
 				*Config,
 			]{

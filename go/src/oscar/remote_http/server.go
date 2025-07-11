@@ -23,12 +23,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -803,7 +803,7 @@ func (server *Server) handlePostInventoryList(
 func (server *Server) handleGetConfigImmutable(
 	request Request,
 ) (response Response) {
-	configLoaded := &genesis_config_io.PublicTypedBlob{
+	configLoaded := &genesis_config.PublicTypedBlob{
 		Type: server.Repo.GetImmutableConfigPublicType(),
 		Blob: server.Repo.GetImmutableConfigPublic(),
 	}
@@ -811,7 +811,7 @@ func (server *Server) handleGetConfigImmutable(
 	var buffer bytes.Buffer
 
 	// TODO modify to not have to buffer
-	if _, err := genesis_config_io.CoderPublic.EncodeTo(configLoaded, &buffer); err != nil {
+	if _, err := genesis_config.CoderPublic.EncodeTo(configLoaded, &buffer); err != nil {
 		server.EnvLocal.CancelWithError(err)
 	}
 

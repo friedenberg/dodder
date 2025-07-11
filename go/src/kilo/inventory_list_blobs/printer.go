@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
@@ -19,7 +19,7 @@ func makePrinter(
 		format:            of,
 		options:           op,
 		out:               out,
-		offset:            int64(len(triple_hyphen_io2.Boundary) + 1),
+		offset:            int64(len(triple_hyphen_io.Boundary) + 1),
 		firstBoundaryOnce: &sync.Once{},
 	}
 }
@@ -33,7 +33,7 @@ type printer struct {
 }
 
 func (f *printer) printBoundary() (n int64, err error) {
-	if n, err = ohio.WriteLine(f.out, triple_hyphen_io2.Boundary); err != nil {
+	if n, err = ohio.WriteLine(f.out, triple_hyphen_io.Boundary); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,7 +46,7 @@ func (f *printer) printBoundary() (n int64, err error) {
 func (f *printer) printFirstBoundary() (n int64, err error) {
 	f.firstBoundaryOnce.Do(
 		func() {
-			if n, err = ohio.WriteLine(f.out, triple_hyphen_io2.Boundary); err != nil {
+			if n, err = ohio.WriteLine(f.out, triple_hyphen_io.Boundary); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

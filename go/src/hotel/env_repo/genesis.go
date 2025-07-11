@@ -12,10 +12,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
 func (env *Env) Genesis(bigBang BigBang) {
@@ -90,15 +90,15 @@ func (env Env) writeInventoryListLog() {
 		defer env.MustClose(file)
 	}
 
-	coder := triple_hyphen_io2.Coder[*triple_hyphen_io2.TypedBlobEmpty]{
-		Metadata: triple_hyphen_io2.TypedMetadataCoder[struct{}]{},
+	coder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlobEmpty]{
+		Metadata: triple_hyphen_io.TypedMetadataCoder[struct{}]{},
 	}
 
 	tipe := ids.GetOrPanic(
 		ids.InventoryListTypeVCurrent,
 	).Type
 
-	subject := triple_hyphen_io2.TypedBlobEmpty{
+	subject := triple_hyphen_io.TypedBlobEmpty{
 		Type: tipe,
 	}
 
@@ -108,9 +108,9 @@ func (env Env) writeInventoryListLog() {
 }
 
 func (env *Env) writeConfig(bigBang BigBang) {
-	triple_hyphen_io2.EncodeToFile(
+	triple_hyphen_io.EncodeToFile(
 		env,
-		genesis_config_io.CoderPrivate,
+		genesis_config.CoderPrivate,
 		&env.config,
 		env.FileConfigPermanent(),
 	)
@@ -122,11 +122,11 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 		return
 	}
 
-	triple_hyphen_io2.EncodeToFile(
+	triple_hyphen_io.EncodeToFile(
 		env,
 		blob_store_config.Coder,
 		// TODO enforce type and blob agreement by return a TypedBlob
-		&triple_hyphen_io2.TypedBlob[blob_store_config.Config]{
+		&triple_hyphen_io.TypedBlob[blob_store_config.Config]{
 			Type: ids.MustType(blob_store_config.TypeVCurrent),
 			Blob: bigBang.BlobStoreConfig,
 		},

@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
@@ -48,7 +47,7 @@ func MakeClient(
 
 type client struct {
 	envUI           env_ui.Env
-	configImmutable genesis_config_io.PublicTypedBlob
+	configImmutable genesis_config.PublicTypedBlob
 	http            http.Client
 	localRepo       repo.LocalRepo
 	typedBlobStore  typed_blob_store.InventoryList
@@ -85,7 +84,7 @@ func (client *client) Initialize() {
 		}
 	}
 
-	if _, err := genesis_config_io.CoderPublic.DecodeFrom(
+	if _, err := genesis_config.CoderPublic.DecodeFrom(
 		&client.configImmutable,
 		response.Body,
 	); err != nil {

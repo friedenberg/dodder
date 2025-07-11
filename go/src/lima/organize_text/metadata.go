@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -88,7 +88,7 @@ func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
 	return
 }
 
-func (m Metadata) GetMetadataWriterTo() triple_hyphen_io2.MetadataWriterTo {
+func (m Metadata) GetMetadataWriterTo() triple_hyphen_io.MetadataWriterTo {
 	return m
 }
 
