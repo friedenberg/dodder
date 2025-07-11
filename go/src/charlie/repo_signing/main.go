@@ -11,6 +11,10 @@ type Verifiable interface {
 	GetPubKeyAndSig() (blech32.Value, blech32.Value, error)
 }
 
+type Generator interface {
+	GeneratePrivateKey() (err error)
+}
+
 type VerifiableFunc func() (blech32.Value, blech32.Value, error)
 
 var _ = Verifiable(VerifiableFunc(nil))

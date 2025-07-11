@@ -52,16 +52,20 @@ type Private interface {
 	GetPrivateKey() repo_signing.PrivateKey
 }
 
-type PrivateWithFlags interface {
+type PrivateMutable interface {
 	Private
+	// TODO separate into non-method function that uses properties
 	SetFlagSet(*flag.FlagSet)
+	SetRepoType(repo_type.Type)
+	SetRepoId(ids.RepoId)
+	repo_signing.Generator
 }
 
 func Default() *Current {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
-func DefaultPrivate() Private {
+func DefaultMutable() PrivateMutable {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 

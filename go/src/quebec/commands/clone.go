@@ -32,13 +32,13 @@ type Clone struct {
 	command_components.Query
 }
 
-func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
-	cmd.Genesis.SetFlagSet(f)
-	cmd.RemoteTransfer.SetFlagSet(f)
-	cmd.Query.SetFlagSet(f)
+func (cmd *Clone) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.Genesis.SetFlagSet(flagSet)
+	cmd.RemoteTransfer.SetFlagSet(flagSet)
+	cmd.Query.SetFlagSet(flagSet)
 
 	// must happen after genesis set flag set as cmd.Config is nil until then
-	cmd.GenesisConfig.RepoType = repo_type.TypeWorkingCopy
+	cmd.GenesisConfig.SetRepoType(repo_type.TypeWorkingCopy)
 }
 
 func (cmd Clone) Run(req command.Request) {

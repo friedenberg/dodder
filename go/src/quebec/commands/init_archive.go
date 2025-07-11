@@ -26,7 +26,7 @@ type InitArchive struct {
 
 func (cmd *InitArchive) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.BigBang.SetFlagSet(flagSet)
-	cmd.GenesisConfig.RepoType = repo_type.TypeArchive
+	cmd.GenesisConfig.SetRepoType(repo_type.TypeArchive)
 }
 
 func (cmd InitArchive) Run(req command.Request) {

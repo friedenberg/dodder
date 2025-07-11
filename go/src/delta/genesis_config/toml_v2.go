@@ -33,6 +33,14 @@ func (config *TomlV2Common) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.Var(&config.RepoType, "repo-type", "")
 }
 
+func (config *TomlV2Common) SetRepoType(tipe repo_type.Type) {
+	config.RepoType = tipe
+}
+
+func (config *TomlV2Common) SetRepoId(id ids.RepoId) {
+	config.RepoId = id
+}
+
 func (config *TomlV2Common) GetInventoryListTypeString() string {
 	if config.InventoryListType == "" {
 		return InventoryListTypeV1

@@ -12,7 +12,7 @@ import (
 // Config used to initialize a repo for the first time
 type BigBang struct {
 	ids.Type
-	GenesisConfig   *genesis_config.Current
+	GenesisConfig   genesis_config.PrivateMutable
 	BlobStoreConfig blob_store_config.Current
 
 	Yin                  string
@@ -49,7 +49,7 @@ func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
 		builtin_types.ImmutableConfigV1,
 	).Type
 
-	bigBang.GenesisConfig = genesis_config.Default()
+	bigBang.GenesisConfig = genesis_config.DefaultMutable()
 	bigBang.GenesisConfig.SetFlagSet(flagSet)
 
 	// bigBang.BlobStoreConfig = blob_store_config.Default()

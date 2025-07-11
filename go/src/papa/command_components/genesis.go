@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -25,7 +26,7 @@ func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Genesis) OnTheFirstDay(
 	req command.Request,
-	repoId string,
+	repoIdString string,
 ) repo.LocalRepo {
 	ui := env_ui.Make(
 		req,
@@ -33,9 +34,13 @@ func (cmd Genesis) OnTheFirstDay(
 		env_ui.Options{},
 	)
 
-	if err := cmd.GenesisConfig.RepoId.Set(repoId); err != nil {
+	var repoId ids.RepoId
+
+	if err := repoId.Set(repoIdString); err != nil {
 		ui.CancelWithError(err)
 	}
+
+	cmd.GenesisConfig.SetRepoId(repoId)
 
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
@@ -63,7 +68,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	envRepo.Genesis(cmd.BigBang)
 
-	switch cmd.BigBang.GenesisConfig.RepoType {
+	switch cmd.BigBang.GenesisConfig.GetRepoType() {
 	case repo_type.TypeWorkingCopy:
 		return local_working_copy.Genesis(
 			cmd.BigBang,
@@ -75,7 +80,9 @@ func (cmd Genesis) OnTheFirstDay(
 
 	default:
 		req.CancelWithError(
-			repo_type.ErrUnsupportedRepoType{Actual: cmd.BigBang.GenesisConfig.RepoType},
+			repo_type.ErrUnsupportedRepoType{
+				Actual: cmd.BigBang.GenesisConfig.GetRepoType(),
+			},
 		)
 	}
 
