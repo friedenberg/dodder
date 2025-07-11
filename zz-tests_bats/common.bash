@@ -76,7 +76,6 @@ if [[ -z $DODDER_VERSION ]]; then
   DODDER_VERSION="v$("$DODDER_BIN" info store-version)"
 fi
 
-
 function copy_from_version {
   DIR="$1"
   rm -rf "$BATS_TEST_TMPDIR/.xdg"
@@ -142,7 +141,13 @@ function run_dodder_init_workspace {
 }
 
 function get_konfig_sha() {
-  echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
+  storeVersionCurrent="$(timeout --preserve-status "2s" "$DODDER_BIN" info "${cmd_dodder_def[@]}" store-version)"
+
+  if [[ $storeVersionCurrent -le 10 ]]; then
+    echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
+  else
+    echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
+  fi
 }
 
 function get_type_blob_sha() {

@@ -27,6 +27,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 	configTypedBlob := repo.GetConfigPublic()
 	configBlob := configTypedBlob.Blob
 	storeVersion := configBlob.GetStoreVersion()
+	blobStoreConfigDefault := repo.GetDefaultBlobStore()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}
@@ -58,14 +59,14 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "compression-type":
 			// TODO read default blob store and expose config
 			repo.GetUI().Print(
-				configBlob.GetBlobStoreConfigImmutable().GetBlobCompression(),
+				blobStoreConfigDefault.GetBlobCompression(),
 			)
 
 			// TODO switch to `blob_stores.N.age_encryption`
 			// TODO switch to encryption interface
 		case "age-encryption":
 			// TODO read default blob store and expose config
-			for _, i := range configBlob.GetBlobStoreConfigImmutable().GetBlobEncryption().(*age.Age).Identities {
+			for _, i := range blobStoreConfigDefault.GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 
@@ -81,9 +82,9 @@ func (cmd InfoRepo) Run(req command.Request) {
 				repo.DirFirstBlobStoreBlobs(),
 			)
 
+			// TODO switch to `blob_stores`
 		case "dir.blob-stores.1.inventory_lists":
-			if store_version.LessOrEqual(storeVersion, store_version.V10) ||
-				true {
+			if store_version.LessOrEqual(storeVersion, store_version.V10) {
 				repo.GetUI().Print(
 					repo.DirFirstBlobStoreInventoryLists(),
 				)

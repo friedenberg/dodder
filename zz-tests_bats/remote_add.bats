@@ -19,7 +19,7 @@ teardown() {
 function print_their_xdg() {
 	set_xdg "$(realpath "$1")"
 	pushd "$1" >/dev/null || exit 1
-	dodder info-repo xdg
+	"$DODDER_BIN" info-repo xdg
 }
 
 function remote_add_dotenv_xdg { # @test

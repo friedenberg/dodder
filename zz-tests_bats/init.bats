@@ -22,21 +22,35 @@ function init_compression { # @test
 	run_dodder_init_disable_age
 
 	function output_immutable_config() {
-		cat - <<-EOM
-			---
-			! toml-config-immutable-v1
-			---
+		if [[ "$storeVersionCurrent" -le 10 ]]; then
+			cat - <<-EOM
+				---
+				! toml-config-immutable-v1
+				---
 
-			public-key = 'dodder-repo-public_key-v1.*'
-			store-version = $storeVersionCurrent
-			repo-type = 'working-copy'
-			id = 'test-repo-id'
-			inventory_list-type = '!inventory_list-v2'
+				public-key = 'dodder-repo-public_key-v1.*'
+				store-version = $storeVersionCurrent
+				repo-type = 'working-copy'
+				id = 'test-repo-id'
+				inventory_list-type = '!inventory_list-v2'
 
-			\[blob-store]
-			compression-type = 'zstd'
-			lock-internal-files = false
-		EOM
+				\[blob-store]
+				compression-type = 'zstd'
+				lock-internal-files = false
+			EOM
+		else
+			cat - <<-EOM
+				---
+				! toml-config-immutable-v2
+				---
+
+				public-key = 'dodder-repo-public_key-v1.*'
+				store-version = $storeVersionCurrent
+				repo-type = 'working-copy'
+				id = 'test-repo-id'
+				inventory_list-type = '!inventory_list-v2'
+			EOM
+		fi
 	}
 
 	run_dodder info-repo config-immutable
@@ -47,7 +61,7 @@ function init_compression { # @test
 	assert_success
 
 	sha="$(get_konfig_sha)"
-  dir_blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
+	dir_blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
 	run zstd --decompress "$dir_blobs/${sha:0:2}"/* --stdout
 	assert_success
 }
@@ -120,7 +134,7 @@ function init_and_deinit { # @test
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init
-	age_id="$(dodder info-repo age-encryption)"
+	age_id="$("$DODDER_BIN" info-repo age-encryption)"
 
 	mkdir inner
 	pushd inner || exit 1

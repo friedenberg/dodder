@@ -8,8 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
-const currentVersion = 9
-
 var (
 	VNull = Version(values.Int(0))
 	V1    = Version(values.Int(1))
@@ -29,6 +27,7 @@ var (
 	VNext    = V11
 )
 
+// TODO replace with Int
 type Version values.Int
 
 type Getter interface {
@@ -99,6 +98,5 @@ func (version *Version) Set(p string) (err error) {
 }
 
 func IsCurrentVersionLessOrEqualToV10() bool {
-	return true
 	return LessOrEqual(VCurrent, V10)
 }

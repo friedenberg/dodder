@@ -33,6 +33,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 			ids.ImmutableConfigV2,
 		).Type
 	}
+
 	env.config.Blob = bigBang.GenesisConfig
 
 	if err := env.MakeDir(
@@ -41,6 +42,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		env.DirLostAndFound(),
 		env.DirFirstBlobStoreInventoryLists(),
 		env.DirFirstBlobStoreBlobs(),
+		env.DirBlobStores("1"),
 	); err != nil {
 		env.CancelWithError(err)
 	}

@@ -27,21 +27,35 @@ function init_archive { # @test
 	EOM
 
 	function output_immutable_config() {
-		cat - <<-EOM
-			---
-			! toml-config-immutable-v1
-			---
+		if [[ "$storeVersionCurrent" -le 10 ]]; then
+			cat - <<-EOM
+				---
+				! toml-config-immutable-v1
+				---
 
-			public-key = 'dodder-repo-public_key-v1.*'
-			store-version = $storeVersionCurrent
-			repo-type = 'archive'
-			id = ''
-			inventory_list-type = '!inventory_list-v2'
+				public-key = 'dodder-repo-public_key-v1.*'
+				store-version = $storeVersionCurrent
+				repo-type = 'archive'
+				id = ''
+				inventory_list-type = '!inventory_list-v2'
 
-			\[blob-store]
-			compression-type = 'zstd'
-			lock-internal-files = false
-		EOM
+				\[blob-store]
+				compression-type = 'zstd'
+				lock-internal-files = false
+			EOM
+		else
+			cat - <<-EOM
+				---
+				! toml-config-immutable-v2
+				---
+
+				public-key = 'dodder-repo-public_key-v1.*'
+				store-version = $storeVersionCurrent
+				repo-type = 'archive'
+				id = ''
+				inventory_list-type = '!inventory_list-v2'
+			EOM
+		fi
 	}
 
 	run_dodder info-repo config-immutable
