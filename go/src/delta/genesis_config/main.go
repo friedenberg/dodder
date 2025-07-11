@@ -61,22 +61,27 @@ type PrivateMutable interface {
 	repo_signing.Generator
 }
 
-func Default() *Current {
-	return DefaultWithVersion(store_version.VCurrent)
-}
-
 func DefaultMutable() PrivateMutable {
-	return DefaultWithVersion(store_version.VCurrent)
+	return DefaultMutableWithVersion(store_version.VCurrent)
 }
 
-// TODO read callers of this and add blob store config there
-func DefaultWithVersion(storeVersion StoreVersion) *Current {
-	return &Current{
-		TomlV1Common: TomlV1Common{
-			StoreVersion:      storeVersion,
-			RepoType:          repo_type.TypeWorkingCopy,
-			BlobStore:         blob_store_config.Default(),
-			InventoryListType: InventoryListTypeV2,
-		},
+func DefaultMutableWithVersion(storeVersion StoreVersion) PrivateMutable {
+	if store_version.LessOrEqual(storeVersion, store_version.V10) || true {
+		return &TomlV1Private{
+			TomlV1Common: TomlV1Common{
+				StoreVersion:      storeVersion,
+				RepoType:          repo_type.TypeWorkingCopy,
+				BlobStore:         blob_store_config.Default(),
+				InventoryListType: InventoryListTypeV2,
+			},
+		}
+	} else {
+		return &TomlV2Private{
+			TomlV2Common: TomlV2Common{
+				StoreVersion:      storeVersion,
+				RepoType:          repo_type.TypeWorkingCopy,
+				InventoryListType: InventoryListTypeV2,
+			},
+		}
 	}
 }
