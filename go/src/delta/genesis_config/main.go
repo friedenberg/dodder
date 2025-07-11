@@ -1,6 +1,8 @@
 package genesis_config
 
 import (
+	"flag"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -50,13 +52,22 @@ type Private interface {
 	GetPrivateKey() repo_signing.PrivateKey
 }
 
-func Default() Current {
+type PrivateWithFlags interface {
+	Private
+	SetFlagSet(*flag.FlagSet)
+}
+
+func Default() *Current {
+	return DefaultWithVersion(store_version.VCurrent)
+}
+
+func DefaultPrivate() Private {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
 // TODO read callers of this and add blob store config there
-func DefaultWithVersion(storeVersion StoreVersion) Current {
-	return Current{
+func DefaultWithVersion(storeVersion StoreVersion) *Current {
+	return &Current{
 		TomlV1Common: TomlV1Common{
 			StoreVersion:      storeVersion,
 			RepoType:          repo_type.TypeWorkingCopy,

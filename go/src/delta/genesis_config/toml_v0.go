@@ -27,7 +27,7 @@ type V0Private struct {
 	v0Common
 }
 
-func (config *V0Public) SetFlagSet(f *flag.FlagSet) {
+func (config *v0Common) SetFlagSet(f *flag.FlagSet) {
 	config.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(

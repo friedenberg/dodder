@@ -24,8 +24,8 @@ type InitArchive struct {
 	env_repo.BigBang
 }
 
-func (cmd *InitArchive) SetFlagSet(f *flag.FlagSet) {
-	cmd.BigBang.SetFlagSet(f)
+func (cmd *InitArchive) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.BigBang.SetFlagSet(flagSet)
 	cmd.GenesisConfig.RepoType = repo_type.TypeArchive
 }
 

@@ -12,7 +12,7 @@ import (
 // Config used to initialize a repo for the first time
 type BigBang struct {
 	ids.Type
-	GenesisConfig   genesis_config.Current
+	GenesisConfig   *genesis_config.Current
 	BlobStoreConfig blob_store_config.Current
 
 	Yin                  string
