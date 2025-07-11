@@ -17,9 +17,9 @@ func (blobV1CoderPrivate) DecodeFrom(
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	config := &genesis_config.TomlV1Private{}
-	td := toml.NewDecoder(bufferedReader)
+	tomlDecoder := toml.NewDecoder(bufferedReader)
 
-	if err = td.Decode(config); err != nil {
+	if err = tomlDecoder.Decode(config); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -37,9 +37,9 @@ func (blobV1CoderPrivate) EncodeTo(
 	blob *genesis_config.Private,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	encoder := toml.NewEncoder(bufferedWriter)
+	tomlEncoder := toml.NewEncoder(bufferedWriter)
 
-	if err = encoder.Encode(*blob); err != nil {
+	if err = tomlEncoder.Encode(*blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

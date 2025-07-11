@@ -54,23 +54,28 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "id":
 			repo.GetUI().Print(configBlob.GetRepoId())
 
+			// TODO switch to `blob_stores.N.compression_type`
 		case "compression-type":
 			// TODO read default blob store and expose config
 			repo.GetUI().Print(
 				configBlob.GetBlobStoreConfigImmutable().GetBlobCompression(),
 			)
 
+			// TODO switch to `blob_stores.N.age_encryption`
+			// TODO switch to encryption interface
 		case "age-encryption":
 			// TODO read default blob store and expose config
 			for _, i := range configBlob.GetBlobStoreConfigImmutable().GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 
+			// TODO switch to `blob_stores`
 		case "dir.blob-stores":
 			repo.GetUI().Print(
 				repo.DirBlobStores(),
 			)
 
+			// TODO switch to `blob_stores`
 		case "dir.blob-stores.1.blobs":
 			repo.GetUI().Print(
 				repo.DirFirstBlobStoreBlobs(),

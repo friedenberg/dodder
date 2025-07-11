@@ -10,8 +10,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
@@ -43,7 +45,8 @@ type Env struct {
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
-	blobStores []interfaces.LocalBlobStore
+	blobStoreConfigs []interfaces.BlobStoreConfigImmutable
+	blobStores       []interfaces.LocalBlobStore
 }
 
 func Make(
@@ -108,17 +111,13 @@ func Make(
 		}
 	}
 
-	{
-		decoder := genesis_config_io.CoderPrivate{}
-
-		if err = decoder.DecodeFromFile(
-			&env.config,
-			env.FileConfigPermanent(),
-		); err != nil {
-			errors.Wrap(err)
-			return
-		}
-	}
+	triple_hyphen_io2.DecodeFromFile[genesis_config.Private](
+		env,
+		genesis_config_io.CoderPrivate,
+		&env.config,
+		env.FileConfigPermanent(),
+		true,
+	)
 
 	env.setupStores()
 
@@ -130,14 +129,27 @@ func (env *Env) setupStores() {
 	// path
 	// or from config
 
-	env.blobStores = make([]interfaces.LocalBlobStore, 1)
-	env.blobStores[0] = blob_store.MakeShardedFilesStore(
-		env.DirFirstBlobStoreBlobs(),
-		env_dir.MakeConfigFromImmutableBlobConfig(
-			env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable(),
-		),
-		env.GetTempLocal(),
+	env.blobStoreConfigs = make([]interfaces.BlobStoreConfigImmutable, 1)
+
+	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
+		env.blobStoreConfigs[0] = env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable()
+	} else {
+		// TODO read blob store configs
+		env.blobStoreConfigs[0] = env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable()
+	}
+
+	env.blobStores = make(
+		[]interfaces.LocalBlobStore,
+		len(env.blobStoreConfigs),
 	)
+
+	for i, config := range env.blobStoreConfigs {
+		env.blobStores[i] = blob_store.MakeShardedFilesStore(
+			env.DirFirstBlobStoreBlobs(),
+			env_dir.MakeConfigFromImmutableBlobConfig(config),
+			env.GetTempLocal(),
+		)
+	}
 }
 
 func (env Env) GetEnv() env_ui.Env {

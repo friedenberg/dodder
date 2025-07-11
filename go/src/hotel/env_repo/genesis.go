@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
@@ -37,30 +38,8 @@ func (env *Env) Genesis(bigBang BigBang) {
 	}
 
 	env.writeInventoryListLog()
-
-	{
-		var file *os.File
-
-		{
-			var err error
-
-			if file, err = files.CreateExclusiveWriteOnly(
-				env.FileConfigPermanent(),
-			); err != nil {
-				env.CancelWithError(err)
-			}
-
-			defer env.MustClose(file)
-		}
-
-		encoder := genesis_config_io.CoderPrivate{}
-
-		if _, err := encoder.EncodeTo(&env.config, file); err != nil {
-			env.CancelWithError(err)
-		}
-	}
-
-	env.writeBlobStoreConfig(bigBang.GenesisConfig)
+	env.writeConfig(bigBang)
+	env.writeBlobStoreConfig(bigBang)
 
 	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
 		if err := ohio.CopyFileLines(
@@ -118,8 +97,25 @@ func (env Env) writeInventoryListLog() {
 	}
 }
 
-func (env *Env) writeBlobStoreConfig(config genesis_config.Private) {
-	// TODO
+func (env *Env) writeConfig(bigBang BigBang) {
+	triple_hyphen_io2.EncodeToFile[genesis_config.Private](
+		env,
+		genesis_config_io.CoderPrivate,
+		&env.config,
+		env.FileConfigPermanent(),
+	)
+}
+
+func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
+	if store_version.LessOrEqual(
+		bigBang.GenesisConfig.GetStoreVersion(),
+		store_version.V10,
+	) {
+		// the immutable config contains the only blob stores's config
+		return
+	}
+
+	// TODO write blob store config
 }
 
 // TODO remove gob

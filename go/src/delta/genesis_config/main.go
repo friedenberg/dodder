@@ -19,11 +19,6 @@ const (
 )
 
 type (
-	Current = TomlV1Private
-	Next    = TomlV2Private
-)
-
-type (
 	public  struct{}
 	private struct{}
 )
@@ -40,6 +35,7 @@ type common interface {
 	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
 }
 
+// switch public and private to be "views" on the underlying interface
 type Public interface {
 	config() public
 	common

@@ -1,13 +1,10 @@
 package genesis_config_io
 
 import (
-	"bytes"
 	"io"
-	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
@@ -28,38 +25,6 @@ var coderPublic = triple_hyphen_io2.CoderToTypedBlob[genesis_config.Public]{
 }
 
 type CoderPublic struct{}
-
-func (coder CoderPublic) DecodeFromFile(
-	object *PublicTypedBlob,
-	p string,
-) (err error) {
-	var r io.Reader
-
-	{
-		var f *os.File
-
-		if f, err = files.OpenExclusiveReadOnly(p); err != nil {
-			if errors.IsNotExist(err) {
-				err = nil
-				r = bytes.NewBuffer(nil)
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			defer errors.DeferredCloser(&err, f)
-
-			r = f
-		}
-	}
-
-	if _, err = coder.DecodeFrom(object, r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
 
 func (CoderPublic) DecodeFrom(
 	typedBlob *PublicTypedBlob,
