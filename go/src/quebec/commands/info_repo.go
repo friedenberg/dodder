@@ -38,7 +38,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
 
 		case "config-immutable":
-			if _, err := (genesis_config_io.CoderPublic{}).EncodeTo(
+			if _, err := genesis_config_io.CoderPublic.EncodeTo(
 				&configTypedBlob,
 				repo.GetUIFile(),
 			); err != nil {
@@ -82,7 +82,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "dir.blob-stores.1.inventory_lists":
-			if store_version.LessOrEqual(storeVersion, store_version.V10) {
+			if store_version.LessOrEqual(storeVersion, store_version.V10) ||
+				true {
 				repo.GetUI().Print(
 					repo.DirFirstBlobStoreInventoryLists(),
 				)

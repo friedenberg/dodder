@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -62,12 +63,15 @@ func DefaultMutable() PrivateMutable {
 }
 
 func DefaultMutableWithVersion(storeVersion StoreVersion) PrivateMutable {
-	if store_version.LessOrEqual(storeVersion, store_version.V10) || true {
+	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		return &TomlV1Private{
 			TomlV1Common: TomlV1Common{
-				StoreVersion:      storeVersion,
-				RepoType:          repo_type.TypeWorkingCopy,
-				BlobStore:         blob_store_config.Default(),
+				StoreVersion: storeVersion,
+				RepoType:     repo_type.TypeWorkingCopy,
+				BlobStore: blob_store_config.TomlV0{
+					CompressionType:   compression_type.CompressionTypeDefault,
+					LockInternalFiles: true,
+				},
 				InventoryListType: InventoryListTypeV2,
 			},
 		}

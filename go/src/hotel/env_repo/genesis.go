@@ -12,9 +12,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 )
 
@@ -24,7 +24,15 @@ func (env *Env) Genesis(bigBang BigBang) {
 		return
 	}
 
-	env.config.Type = bigBang.Type
+	if store_version.IsCurrentVersionLessOrEqualToV10() {
+		env.config.Type = ids.GetOrPanic(
+			ids.ImmutableConfigV1,
+		).Type
+	} else {
+		env.config.Type = ids.GetOrPanic(
+			ids.ImmutableConfigV2,
+		).Type
+	}
 	env.config.Blob = bigBang.GenesisConfig
 
 	if err := env.MakeDir(
@@ -84,8 +92,8 @@ func (env Env) writeInventoryListLog() {
 		Metadata: triple_hyphen_io2.TypedMetadataCoder[struct{}]{},
 	}
 
-	tipe := builtin_types.GetOrPanic(
-		builtin_types.InventoryListTypeVCurrent,
+	tipe := ids.GetOrPanic(
+		ids.InventoryListTypeVCurrent,
 	).Type
 
 	subject := triple_hyphen_io2.TypedBlobEmpty{
@@ -98,7 +106,7 @@ func (env Env) writeInventoryListLog() {
 }
 
 func (env *Env) writeConfig(bigBang BigBang) {
-	triple_hyphen_io2.EncodeToFile[genesis_config.Private](
+	triple_hyphen_io2.EncodeToFile(
 		env,
 		genesis_config_io.CoderPrivate,
 		&env.config,
@@ -107,15 +115,21 @@ func (env *Env) writeConfig(bigBang BigBang) {
 }
 
 func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
-	if store_version.LessOrEqual(
-		bigBang.GenesisConfig.GetStoreVersion(),
-		store_version.V10,
-	) {
+	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		// the immutable config contains the only blob stores's config
 		return
 	}
 
-	// TODO write blob store config
+	triple_hyphen_io2.EncodeToFile(
+		env,
+		blob_store_config.Coder,
+		// TODO enforce type and blob agreement by return a TypedBlob
+		&triple_hyphen_io2.TypedBlob[blob_store_config.Config]{
+			Type: ids.MustType(blob_store_config.TypeVCurrent),
+			Blob: bigBang.BlobStoreConfig,
+		},
+		env.DirBlobStores("1/config.toml"),
+	)
 }
 
 // TODO remove gob

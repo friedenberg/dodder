@@ -6,13 +6,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
-)
-
-const (
-	TypeV0 = builtin_types.WorkspaceConfigTypeTomlV0
 )
 
 type (
@@ -25,7 +21,7 @@ type (
 type TypeWithBlob = *triple_hyphen_io2.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[TypeWithBlob]{
-	TypeV0: blobV0Coder{},
+	ids.WorkspaceConfigTypeTomlV0: blobV0Coder{},
 }
 
 var Coder = triple_hyphen_io2.Coder[TypeWithBlob]{

@@ -8,12 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
-)
-
-const (
-	TypeV0 = builtin_types.ConfigTypeTomlV0
-	TypeV1 = builtin_types.ConfigTypeTomlV1
 )
 
 type (
@@ -37,7 +31,7 @@ type (
 
 func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
 	return ids.TypedBlob[Blob]{
-		Type: builtin_types.DefaultOrPanic(genres.Config),
+		Type: ids.DefaultOrPanic(genres.Config),
 		Blob: V1{
 			Defaults: DefaultsV1{
 				Type: defaultTyp,

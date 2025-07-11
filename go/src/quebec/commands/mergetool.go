@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -107,7 +107,7 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 
 	if err := tm.ReadConflictMarker(
 		bs.IterInventoryListBlobSkusFromReader(
-			builtin_types.DefaultOrPanic(genres.InventoryList),
+			ids.DefaultOrPanic(genres.InventoryList),
 			br,
 		),
 	); err != nil {

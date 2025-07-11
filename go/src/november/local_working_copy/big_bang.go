@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
@@ -112,7 +111,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	}
 
 	o.Metadata.Blob.ResetWithShaLike(sh)
-	o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
+	o.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		o,

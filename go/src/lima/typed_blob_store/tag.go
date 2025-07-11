@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/tag_blobs"
@@ -90,7 +90,7 @@ func (a Tag) GetTransactedWithBlob(
 	twb.Transacted = sk.CloneTransacted()
 
 	switch tipe.String() {
-	case "", builtin_types.TagTypeTomlV0:
+	case "", ids.TagTypeTomlV0:
 		store := a.toml_v0
 		var blob *tag_blobs.V0
 
@@ -101,7 +101,7 @@ func (a Tag) GetTransactedWithBlob(
 
 		twb.Blob = blob
 
-	case builtin_types.TagTypeTomlV1:
+	case ids.TagTypeTomlV1:
 		store := a.toml_v1
 		var blob *tag_blobs.TomlV1
 
@@ -110,7 +110,9 @@ func (a Tag) GetTransactedWithBlob(
 			return
 		}
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV1(sk),
+		)
 
 		var vmp *lua.VMPool
 
@@ -124,7 +126,7 @@ func (a Tag) GetTransactedWithBlob(
 		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(vmp, nil)
 		twb.Blob = blob
 
-	case builtin_types.TagTypeLuaV1:
+	case ids.TagTypeLuaV1:
 		var rc sha.ReadCloser
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
@@ -134,7 +136,9 @@ func (a Tag) GetTransactedWithBlob(
 
 		defer errors.DeferredCloser(&err, rc)
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV1(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV1(sk),
+		)
 
 		var vmp *lua.VMPool
 
@@ -149,7 +153,7 @@ func (a Tag) GetTransactedWithBlob(
 			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
 		}
 
-	case builtin_types.TagTypeLuaV2:
+	case ids.TagTypeLuaV2:
 		var rc sha.ReadCloser
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
@@ -159,7 +163,9 @@ func (a Tag) GetTransactedWithBlob(
 
 		defer errors.DeferredCloser(&err, rc)
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(tag_blobs.MakeLuaSelfApplyV2(sk))
+		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV2(sk),
+		)
 
 		var vmp *lua.VMPool
 
@@ -184,17 +190,25 @@ func (a Tag) PutTransactedWithBlob(
 	tipe := twb.GetType()
 
 	switch tipe.String() {
-	case "", builtin_types.TagTypeTomlV0:
+	case "", ids.TagTypeTomlV0:
 		if blob, ok := twb.Blob.(*tag_blobs.V0); !ok {
-			err = errors.ErrorWithStackf("expected %T but got %T", blob, twb.Blob)
+			err = errors.ErrorWithStackf(
+				"expected %T but got %T",
+				blob,
+				twb.Blob,
+			)
 			return
 		} else {
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case builtin_types.TagTypeLuaV1:
+	case ids.TagTypeLuaV1:
 		if blob, ok := twb.Blob.(*tag_blobs.TomlV1); !ok {
-			err = errors.ErrorWithStackf("expected %T but got %T", blob, twb.Blob)
+			err = errors.ErrorWithStackf(
+				"expected %T but got %T",
+				blob,
+				twb.Blob,
+			)
 			return
 		} else {
 			a.toml_v1.PutBlob(blob)

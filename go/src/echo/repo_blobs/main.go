@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
 type Blob interface {
@@ -28,10 +28,10 @@ type BlobMutable interface {
 type TypedBlob = triple_hyphen_io2.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
-	builtin_types.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
-	builtin_types.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
-	builtin_types.RepoTypeUri:         coderToml[TomlUriV0]{},
-	"":                                coderToml[TomlUriV0]{},
+	ids.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
+	ids.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
+	ids.RepoTypeUri:         coderToml[TomlUriV0]{},
+	"":                      coderToml[TomlUriV0]{},
 }
 
 var Coder = interfaces.CoderBufferedReadWriter[*TypedBlob](

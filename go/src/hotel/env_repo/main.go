@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -45,7 +45,7 @@ type Env struct {
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
-	blobStoreConfigs []interfaces.BlobStoreConfigImmutable
+	blobStoreConfigs []blob_store_config.Config
 	blobStores       []interfaces.LocalBlobStore
 }
 
@@ -68,7 +68,7 @@ func Make(
 
 	env.readOnlyBlobStorePath = options.GetReadOnlyBlobStorePath()
 
-	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
+	if env.GetStoreVersion().LessOrEqual(store_version.V10) || true {
 		env.directoryPaths = &directoryV1{}
 	} else {
 		env.directoryPaths = &directoryV2{}
@@ -111,10 +111,9 @@ func Make(
 		}
 	}
 
-	triple_hyphen_io2.DecodeFromFile[genesis_config.Private](
+	env.config = triple_hyphen_io2.DecodeFromFile(
 		env,
 		genesis_config_io.CoderPrivate,
-		&env.config,
 		env.FileConfigPermanent(),
 		true,
 	)
@@ -129,13 +128,33 @@ func (env *Env) setupStores() {
 	// path
 	// or from config
 
-	env.blobStoreConfigs = make([]interfaces.BlobStoreConfigImmutable, 1)
+	env.blobStoreConfigs = make([]blob_store_config.Config, 1)
 
-	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
+	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) ||
+		true {
 		env.blobStoreConfigs[0] = env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable()
 	} else {
-		// TODO read blob store configs
-		env.blobStoreConfigs[0] = env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable()
+		var configPaths []string
+
+		{
+			var err error
+
+			// TODO consider just iterating and using ErrNotExist instead
+			if configPaths, err = filepath.Glob(
+				filepath.Join(env.DirBlobStores(), "*", "config.toml"),
+			); err != nil {
+				env.CancelWithError(err)
+			}
+		}
+
+		for i, configPath := range configPaths {
+			env.blobStoreConfigs[i] = triple_hyphen_io2.DecodeFromFile(
+				env,
+				blob_store_config.Coder,
+				configPath,
+				false,
+			).Blob
+		}
 	}
 
 	env.blobStores = make(
@@ -223,7 +242,7 @@ func (env Env) GetDefaultBlobStore() interfaces.LocalBlobStore {
 func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	storeVersion := env.GetStoreVersion()
 
-	if store_version.LessOrEqual(storeVersion, store_version.V10) {
+	if store_version.LessOrEqual(storeVersion, store_version.V10) || true {
 		return blob_store.MakeShardedFilesStore(
 			env.DirFirstBlobStoreInventoryLists(),
 			env_dir.MakeConfigFromImmutableBlobConfig(

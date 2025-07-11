@@ -1,11 +1,21 @@
 package blob_store_config
 
-import "code.linenisgreat.com/dodder/go/src/delta/compression_type"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+)
 
-type Current = BlobStoreTomlV1
+type Config interface {
+	interfaces.BlobStoreConfigImmutable
+}
 
-func Default() Current {
-	return Current{
+type ConfigMutable interface {
+	Config
+	interfaces.CommandComponent
+}
+
+func Default() ConfigMutable {
+	return &TomlV0{
 		CompressionType:   compression_type.CompressionTypeDefault,
 		LockInternalFiles: true,
 	}

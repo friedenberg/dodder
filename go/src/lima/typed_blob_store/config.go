@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -55,7 +54,7 @@ func (a Config) ParseTypedBlob(
 	blobSha interfaces.Sha,
 ) (common repo_config_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
-	case "", builtin_types.ConfigTypeTomlV0:
+	case "", ids.ConfigTypeTomlV0:
 		store := a.toml_v0
 		var blob *repo_config_blobs.V0
 
@@ -66,7 +65,7 @@ func (a Config) ParseTypedBlob(
 
 		common = blob
 
-	case builtin_types.ConfigTypeTomlV1:
+	case ids.ConfigTypeTomlV1:
 		store := a.toml_v1
 		var blob *repo_config_blobs.V1
 
@@ -92,10 +91,10 @@ func (a Config) FormatTypedBlob(
 
 	var store interfaces.SavedBlobFormatter
 	switch tipe.String() {
-	case "", builtin_types.ConfigTypeTomlV0:
+	case "", ids.ConfigTypeTomlV0:
 		store = a.toml_v0
 
-	case builtin_types.ConfigTypeTomlV1:
+	case ids.ConfigTypeTomlV1:
 		store = a.toml_v1
 	}
 
@@ -112,7 +111,7 @@ func (a Config) PutTypedBlob(
 	common repo_config_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
-	case "", builtin_types.ConfigTypeTomlV0:
+	case "", ids.ConfigTypeTomlV0:
 		if blob, ok := common.(*repo_config_blobs.V0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
@@ -120,7 +119,7 @@ func (a Config) PutTypedBlob(
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case builtin_types.ConfigTypeTomlV1:
+	case ids.ConfigTypeTomlV1:
 		if blob, ok := common.(*repo_config_blobs.V1); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return

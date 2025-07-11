@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -24,7 +23,7 @@ func (v V1) GetListFormat() sku.ListFormat {
 }
 
 func (v V1) GetType() ids.Type {
-	return ids.MustType(builtin_types.InventoryListTypeV1)
+	return ids.MustType(ids.InventoryListTypeV1)
 }
 
 func (format V1) WriteObjectToOpenList(

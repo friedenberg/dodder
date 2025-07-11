@@ -808,16 +808,14 @@ func (server *Server) handleGetConfigImmutable(
 		Blob: server.Repo.GetImmutableConfigPublic(),
 	}
 
-	encoder := genesis_config_io.CoderPublic{}
-
-	var b bytes.Buffer
+	var buffer bytes.Buffer
 
 	// TODO modify to not have to buffer
-	if _, err := encoder.EncodeTo(configLoaded, &b); err != nil {
+	if _, err := genesis_config_io.CoderPublic.EncodeTo(configLoaded, &buffer); err != nil {
 		server.EnvLocal.CancelWithError(err)
 	}
 
-	response.Body = io.NopCloser(&b)
+	response.Body = io.NopCloser(&buffer)
 
 	return
 }

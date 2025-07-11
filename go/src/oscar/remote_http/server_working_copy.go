@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -21,7 +21,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	request Request,
 	listSku *sku.Transacted,
 ) (response Response) {
-	listSkuType := builtin_types.GetOrPanic(
+	listSkuType := ids.GetOrPanic(
 		server.Repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
 	).Type
 

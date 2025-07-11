@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -32,7 +31,7 @@ func (v V0) GetListFormat() sku.ListFormat {
 }
 
 func (v V0) GetType() ids.Type {
-	return ids.MustType(builtin_types.InventoryListTypeV0)
+	return ids.MustType(ids.InventoryListTypeV0)
 }
 
 func (format V0) WriteObjectToOpenList(

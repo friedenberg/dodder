@@ -97,9 +97,9 @@ func (store *Store) Initialize(
 		}
 	} else {
 		store.inventoryListBlobStore = &blobStoreV1{
-			envRepo:  envRepo,
-			pathLog:  envRepo.FileInventoryListLog(),
-			blobType: blobType,
+			envRepo:        envRepo,
+			pathLog:        envRepo.FileInventoryListLog(),
+			blobType:       blobType,
 			LocalBlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}

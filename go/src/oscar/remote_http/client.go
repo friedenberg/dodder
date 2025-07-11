@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/genesis_config_io"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
@@ -86,9 +85,7 @@ func (client *client) Initialize() {
 		}
 	}
 
-	decoder := genesis_config_io.CoderPublic{}
-
-	if _, err := decoder.DecodeFrom(
+	if _, err := genesis_config_io.CoderPublic.DecodeFrom(
 		&client.configImmutable,
 		response.Body,
 	); err != nil {
@@ -322,7 +319,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		var listMissingSkus *sku.List
 
 		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
-			builtin_types.GetOrPanic(
+			ids.GetOrPanic(
 				client.configImmutable.Blob.GetInventoryListTypeString(),
 			).Type,
 			bufferedReader,

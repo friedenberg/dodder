@@ -13,7 +13,7 @@ import (
 
 type RemoteBlobStore struct {
 	Blobs  string
-	Config blob_store_config.BlobStoreTomlV1
+	Config blob_store_config.TomlV0
 }
 
 func (cmd *RemoteBlobStore) SetFlagSet(f *flag.FlagSet) {

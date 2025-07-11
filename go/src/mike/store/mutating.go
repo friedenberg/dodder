@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -40,7 +39,9 @@ func (s *Store) tryPrecommit(
 
 	if genres.Type == external.GetSku().GetGenre() {
 		if external.GetSku().GetType().IsEmpty() {
-			external.GetSku().GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
+			external.GetSku().GetMetadata().Type = ids.DefaultOrPanic(
+				genres.Type,
+			)
 		}
 	}
 
@@ -146,7 +147,8 @@ func (store *Store) Commit(
 		}
 	}
 
-	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList ||
+		options.StreamIndexOptions.AddToStreamIndex {
 		if err = store.addObjectToAbbrStore(child); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -178,7 +180,8 @@ func (store *Store) Commit(
 		return
 	}
 
-	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList ||
+		options.StreamIndexOptions.AddToStreamIndex {
 		if err = store.config.AddTransacted(
 			child,
 			parent,
@@ -208,7 +211,8 @@ func (store *Store) Commit(
 		}
 	}
 
-	if options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex {
+	if options.AddToInventoryList ||
+		options.StreamIndexOptions.AddToStreamIndex {
 		if err = store.GetStreamIndex().Add(
 			child,
 			options,
@@ -219,10 +223,12 @@ func (store *Store) Commit(
 
 		if parent == nil {
 			if child.GetGenre() == genres.Zettel {
-				// TODO if this is a local zettel (i.e., not a different repo and not a
+				// TODO if this is a local zettel (i.e., not a different repo
+				// and not a
 				// different domain)
 
-				// TODO verify that the zettel id consists of our identifiers, otherwise
+				// TODO verify that the zettel id consists of our identifiers,
+				// otherwise
 				// abort
 			}
 
@@ -231,7 +237,8 @@ func (store *Store) Commit(
 				return
 			}
 		} else {
-			// [are/kabuto !task project-2021-zit-features zz-inbox] add delta printing to changed objects
+			// [are/kabuto !task project-2021-zit-features zz-inbox] add delta
+			// printing to changed objects
 			// if err = s.Updated(mutter); err != nil {
 			// 	err = errors.Wrap(err)
 			// 	return
@@ -330,7 +337,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 
 	case genres.Type:
-		t.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
+		t.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 
 	case genres.Tag:
 	}
@@ -407,7 +414,7 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 		return
 	}
 
-	if builtin_types.IsBuiltin(rootTipe) {
+	if ids.IsBuiltin(rootTipe) {
 		return
 	}
 

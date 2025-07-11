@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -27,7 +26,7 @@ func (format V2) GetListFormat() sku.ListFormat {
 }
 
 func (format V2) GetType() ids.Type {
-	return ids.MustType(builtin_types.InventoryListTypeV2)
+	return ids.MustType(ids.InventoryListTypeV2)
 }
 
 func (format V2) WriteObjectToOpenList(

@@ -16,10 +16,9 @@ func DecodeFromFile[
 ](
 	ctx errors.Context,
 	coders CoderToTypedBlob[BLOB],
-	typedBlob *TypedBlob[BLOB],
 	path string,
 	permitNotExist bool,
-) {
+) (typedBlob TypedBlob[BLOB]) {
 	var reader io.Reader
 
 	{
@@ -42,9 +41,11 @@ func DecodeFromFile[
 		}
 	}
 
-	if _, err := coders.DecodeFrom(typedBlob, reader); err != nil {
+	if _, err := coders.DecodeFrom(&typedBlob, reader); err != nil {
 		ctx.CancelWithError(err)
 	}
+
+	return
 }
 
 func EncodeToFile[

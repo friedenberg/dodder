@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -132,7 +131,8 @@ func (store *Store) Merge(conflicted sku.Conflicted) (err error) {
 
 	if original.Len() == 0 {
 		// generate check out item
-		// TODO if original is empty, it means this was not a checked out conflict but
+		// TODO if original is empty, it means this was not a checked out
+		// conflict but
 		// a remote conflict
 	}
 
@@ -332,7 +332,7 @@ func (store *Store) GenerateConflictMarker(
 	}
 
 	if _, err = blobStore.WriteBlobToWriter(
-		builtin_types.DefaultOrPanic(genres.InventoryList),
+		ids.DefaultOrPanic(genres.InventoryList),
 		conflicted,
 		bufferedWriter,
 	); err != nil {

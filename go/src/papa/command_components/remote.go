@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/repo_blobs"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -33,7 +33,11 @@ type Remote struct {
 
 func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	f.Var(&cmd.RemoteConnectionType, "remote-type", fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()))
+	f.Var(
+		&cmd.RemoteConnectionType,
+		"remote-type",
+		fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()),
+	)
 }
 
 func (cmd Remote) CreateRemoteObject(
@@ -49,7 +53,10 @@ func (cmd Remote) CreateRemoteObject(
 
 	switch cmd.RemoteConnectionType {
 	default:
-		req.CancelWithBadRequestf("unsupported remote type: %q", cmd.RemoteConnectionType)
+		req.CancelWithBadRequestf(
+			"unsupported remote type: %q",
+			cmd.RemoteConnectionType,
+		)
 
 	case repo.RemoteConnectionTypeNativeDotenvXDG:
 		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
@@ -60,13 +67,15 @@ func (cmd Remote) CreateRemoteObject(
 			remoteEnvRepo.GetOptions(),
 		)
 
-		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeXDGDotenvV0).Type
+		remoteObject.Metadata.Type = ids.GetOrPanic(
+			ids.RepoTypeXDGDotenvV0,
+		).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
 	case repo.RemoteConnectionTypeUrl:
 		url := req.PopArg("url")
 
-		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeUri).Type
+		remoteObject.Metadata.Type = ids.GetOrPanic(ids.RepoTypeUri).Type
 		var typedBlob repo_blobs.TomlUriV0
 
 		if err := typedBlob.Uri.Set(url); err != nil {
@@ -78,8 +87,10 @@ func (cmd Remote) CreateRemoteObject(
 	case repo.RemoteConnectionTypeStdioLocal:
 		path := req.PopArg("path")
 
-		remoteObject.Metadata.Type = builtin_types.GetOrPanic(builtin_types.RepoTypeLocalPath).Type
-		blob = &repo_blobs.TomlLocalPathV0{Path: remoteEnvRepo.AbsFromCwdOrSame(path)}
+		remoteObject.Metadata.Type = ids.GetOrPanic(ids.RepoTypeLocalPath).Type
+		blob = &repo_blobs.TomlLocalPathV0{
+			Path: remoteEnvRepo.AbsFromCwdOrSame(path),
+		}
 	}
 
 	remote = cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())

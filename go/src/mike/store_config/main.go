@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -271,7 +270,7 @@ func (kc *store) IsInlineType(k ids.Type) (isInline bool) {
 	}
 
 	isInline = kc.InlineTypes.ContainsKey(k.String()) ||
-		builtin_types.IsBuiltin(k)
+		ids.IsBuiltin(k)
 
 	return
 }

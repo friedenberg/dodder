@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -194,7 +193,10 @@ func (env *env) tryLoad(
 		object,
 		path,
 	); err != nil {
-		err = errors.BadRequestPrefix("failed to decode `.dodder-workspace`", err)
+		err = errors.BadRequestPrefix(
+			"failed to decode `.dodder-workspace`",
+			err,
+		)
 		return
 	}
 
@@ -250,7 +252,7 @@ func (env *env) GetStoreFS() *store_fs.Store {
 
 func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
-	tipe := builtin_types.GetOrPanic(builtin_types.WorkspaceConfigTypeTomlV0).Type
+	tipe := ids.GetOrPanic(ids.WorkspaceConfigTypeTomlV0).Type
 
 	object := triple_hyphen_io2.TypedBlob[*workspace_config_blobs.Blob]{
 		Type: tipe,
@@ -274,7 +276,9 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 }
 
 func (env *env) DeleteWorkspace() (err error) {
-	if err = env.Delete(env.GetWorkspaceConfigFilePath()); errors.IsNotExist(err) {
+	if err = env.Delete(env.GetWorkspaceConfigFilePath()); errors.IsNotExist(
+		err,
+	) {
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)

@@ -1,57 +1,42 @@
 package genesis_config_io
 
 import (
-	"io"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io2"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/builtin_types"
 )
 
 type PublicTypedBlob = triple_hyphen_io2.TypedBlob[genesis_config.Public]
 
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*genesis_config.Public]{
-	builtin_types.ImmutableConfigV1: blobV1CoderPublic{},
-	"":                              blobV0CoderPublic{},
-}
-
-var coderPublic = triple_hyphen_io2.CoderToTypedBlob[genesis_config.Public]{
+var CoderPublic = triple_hyphen_io2.CoderToTypedBlob[genesis_config.Public]{
 	Metadata: triple_hyphen_io2.TypedMetadataCoder[genesis_config.Public]{},
 	Blob: triple_hyphen_io2.CoderTypeMapWithoutType[genesis_config.Public](
-		typedCoders,
+		map[string]interfaces.CoderBufferedReadWriter[*genesis_config.Public]{
+			ids.ImmutableConfigV2: triple_hyphen_io2.CoderToml[
+				genesis_config.Public,
+				*genesis_config.Public,
+			]{
+				Progenitor: func() genesis_config.Public {
+					return &genesis_config.TomlV2Public{}
+				},
+			},
+			ids.ImmutableConfigV1: triple_hyphen_io2.CoderToml[
+				genesis_config.Public,
+				*genesis_config.Public,
+			]{
+				Progenitor: func() genesis_config.Public {
+					return &genesis_config.TomlV1Public{}
+				},
+			},
+			"": triple_hyphen_io2.CoderGob[
+				genesis_config.Public,
+				*genesis_config.Public,
+			]{
+				Progenitor: func() genesis_config.Public {
+					return &genesis_config.V0Public{}
+				},
+			},
+		},
 	),
-}
-
-type CoderPublic struct{}
-
-func (CoderPublic) DecodeFrom(
-	typedBlob *PublicTypedBlob,
-	reader io.Reader,
-) (n int64, err error) {
-	if n, err = coderPublic.DecodeFrom(
-		typedBlob,
-		reader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (CoderPublic) EncodeTo(
-	typedBlob *PublicTypedBlob,
-	writer io.Writer,
-) (n int64, err error) {
-	if n, err = coderPublic.EncodeTo(
-		typedBlob,
-		writer,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

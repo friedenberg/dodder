@@ -98,45 +98,7 @@ func (version *Version) Set(p string) (err error) {
 	return
 }
 
-// func (v *StoreVersion) ReadFromFile(
-// 	p string,
-// ) (err error) {
-// 	if err = v.ReadFromFileOrVersion(p, StoreVersionCurrent); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
-// func (v *StoreVersion) ReadFromFileOrVersion(
-// 	p string,
-// 	alternative StoreVersion,
-// ) (err error) {
-// 	var b []byte
-
-// 	var f *os.File
-
-// 	if f, err = files.Open(p); err != nil {
-// 		if errors.IsNotExist(err) {
-// 			*v = alternative
-// 			err = nil
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	if b, err = io.ReadAll(f); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if err = v.Set(string(b)); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
+func IsCurrentVersionLessOrEqualToV10() bool {
+	return true
+	return LessOrEqual(VCurrent, V10)
+}

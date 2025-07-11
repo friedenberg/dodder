@@ -3,6 +3,7 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 )
@@ -54,7 +55,7 @@ func (a Type) ParseTypedBlob(
 	blobSha interfaces.Sha,
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
-	case "", type_blobs.TypeV0:
+	case "", ids.TypeTypeTomlV0:
 		store := a.toml_v0
 		var blob *type_blobs.V0
 
@@ -65,7 +66,7 @@ func (a Type) ParseTypedBlob(
 
 		common = blob
 
-	case type_blobs.TypeV1:
+	case ids.TypeTypeTomlV1:
 		store := a.toml_v1
 		var blob *type_blobs.TomlV1
 
@@ -85,7 +86,7 @@ func (a Type) PutTypedBlob(
 	common type_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
-	case "", type_blobs.TypeV0:
+	case "", ids.TypeTypeTomlV0:
 		if blob, ok := common.(*type_blobs.V0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
@@ -93,7 +94,7 @@ func (a Type) PutTypedBlob(
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case type_blobs.TypeV1:
+	case ids.TypeTypeTomlV1:
 		if blob, ok := common.(*type_blobs.TomlV1); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
