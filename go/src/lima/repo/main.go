@@ -2,7 +2,7 @@ package repo
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -14,7 +14,7 @@ import (
 // store
 type Repo interface {
 	GetEnv() env_ui.Env
-	GetImmutableConfigPublic() genesis_config.Public
+	GetImmutableConfigPublic() genesis_configs.Public
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.RepoStore

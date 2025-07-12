@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -110,7 +110,7 @@ func (env Env) writeInventoryListLog() {
 func (env *Env) writeConfig(bigBang BigBang) {
 	triple_hyphen_io.EncodeToFile(
 		env,
-		genesis_config.CoderPrivate,
+		genesis_configs.CoderPrivate,
 		&env.config,
 		env.FileConfigPermanent(),
 	)
@@ -124,9 +124,9 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 
 	triple_hyphen_io.EncodeToFile(
 		env,
-		blob_store_config.Coder,
+		blob_store_configs.Coder,
 		// TODO enforce type and blob agreement by return a TypedBlob
-		&triple_hyphen_io.TypedBlob[blob_store_config.Config]{
+		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
 			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
 			Blob: bigBang.BlobStoreConfig,
 		},

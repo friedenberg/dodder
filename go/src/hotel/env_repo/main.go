@@ -10,13 +10,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
@@ -32,14 +32,14 @@ type directoryPaths interface {
 }
 
 type BlobStoreWithConfig struct {
-	blob_store_config.Config
+	blob_store_configs.Config
 	interfaces.LocalBlobStore
 }
 
 type Env struct {
 	env_local.Env
 
-	config genesis_config.PrivateTypedBlob
+	config genesis_configs.PrivateTypedBlob
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -117,7 +117,7 @@ func Make(
 
 	env.config = triple_hyphen_io.DecodeFromFile(
 		env,
-		genesis_config.CoderPrivate,
+		genesis_configs.CoderPrivate,
 		env.FileConfigPermanent(),
 		true,
 	)
@@ -150,7 +150,7 @@ func (env *Env) setupStores() {
 		for i, configPath := range configPaths {
 			env.blobStores[i].Config = triple_hyphen_io.DecodeFromFile(
 				env,
-				blob_store_config.Coder,
+				blob_store_configs.Coder,
 				configPath,
 				false,
 			).Blob
@@ -158,7 +158,7 @@ func (env *Env) setupStores() {
 	}
 
 	for i, blobStore := range env.blobStores {
-		env.blobStores[i].LocalBlobStore = blob_store.MakeBlobStore(
+		env.blobStores[i].LocalBlobStore = blob_stores.MakeBlobStore(
 			env,
 			env.DirFirstBlobStoreBlobs(),
 			blobStore.Config,
@@ -171,14 +171,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() genesis_config.PublicTypedBlob {
-	return genesis_config.PublicTypedBlob{
+func (env Env) GetConfigPublic() genesis_configs.PublicTypedBlob {
+	return genesis_configs.PublicTypedBlob{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() genesis_config.PrivateTypedBlob {
+func (env Env) GetConfigPrivate() genesis_configs.PrivateTypedBlob {
 	return env.config
 }
 
@@ -249,7 +249,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	storeVersion := env.GetStoreVersion()
 
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
-		return blob_store.MakeBlobStore(
+		return blob_stores.MakeBlobStore(
 			env,
 			env.DirFirstBlobStoreInventoryLists(),
 			env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),

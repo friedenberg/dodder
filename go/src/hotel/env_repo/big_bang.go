@@ -4,14 +4,14 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 )
 
 // Config used to initialize a repo for the first time
 type BigBang struct {
-	GenesisConfig   genesis_config.PrivateMutable
-	BlobStoreConfig blob_store_config.ConfigMutable
+	GenesisConfig   genesis_configs.PrivateMutable
+	BlobStoreConfig blob_store_configs.ConfigMutable
 
 	Yin                  string
 	Yang                 string
@@ -21,10 +21,10 @@ type BigBang struct {
 }
 
 func (bigBang *BigBang) SetDefaults() {
-	bigBang.GenesisConfig = genesis_config.DefaultMutable()
+	bigBang.GenesisConfig = genesis_configs.DefaultMutable()
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.BlobStoreConfig = blob_store_config.Default()
+		bigBang.BlobStoreConfig = blob_store_configs.Default()
 	}
 }
 

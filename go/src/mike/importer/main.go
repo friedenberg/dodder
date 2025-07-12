@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
@@ -314,7 +314,7 @@ func (c importer) ImportBlobIfNecessary(
 		func(ctx errors.Context) {
 			var n int64
 
-			if n, err = blob_store.CopyBlobIfNecessary(
+			if n, err = blob_stores.CopyBlobIfNecessary(
 				c.envRepo,
 				c.envRepo.GetDefaultBlobStore(),
 				c.remoteBlobStore,

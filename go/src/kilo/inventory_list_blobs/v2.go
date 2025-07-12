@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -197,7 +197,7 @@ func (format V2) StreamInventoryListBlobSkus(
 
 type V2ObjectCoder struct {
 	Box                    *box_format.BoxTransacted
-	ImmutableConfigPrivate genesis_config.Private
+	ImmutableConfigPrivate genesis_configs.Private
 }
 
 func (coder V2ObjectCoder) EncodeTo(

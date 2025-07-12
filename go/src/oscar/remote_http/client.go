@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -47,7 +47,7 @@ func MakeClient(
 
 type client struct {
 	envUI           env_ui.Env
-	configImmutable genesis_config.PublicTypedBlob
+	configImmutable genesis_configs.PublicTypedBlob
 	http            http.Client
 	localRepo       repo.LocalRepo
 	typedBlobStore  typed_blob_store.InventoryList
@@ -84,7 +84,7 @@ func (client *client) Initialize() {
 		}
 	}
 
-	if _, err := genesis_config.CoderPublic.DecodeFrom(
+	if _, err := genesis_configs.CoderPublic.DecodeFrom(
 		&client.configImmutable,
 		response.Body,
 	); err != nil {
@@ -104,7 +104,7 @@ func (client *client) GetEnv() env_ui.Env {
 	return client.envUI
 }
 
-func (client *client) GetImmutableConfigPublic() genesis_config.Public {
+func (client *client) GetImmutableConfigPublic() genesis_configs.Public {
 	return client.configImmutable.Blob
 }
 

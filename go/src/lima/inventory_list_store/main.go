@@ -13,12 +13,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -115,7 +115,7 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() genesis_config.Public {
+func (store *Store) GetImmutableConfigPublic() genesis_configs.Public {
 	return store.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -123,7 +123,7 @@ func (store *Store) GetImmutableConfigPublicType() ids.Type {
 	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (store *Store) GetImmutableConfigPrivate() genesis_config.PrivateTypedBlob {
+func (store *Store) GetImmutableConfigPrivate() genesis_configs.PrivateTypedBlob {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 
@@ -397,7 +397,7 @@ func (store *Store) ImportInventoryList(
 			return
 		}
 
-		if _, err = blob_store.CopyBlobIfNecessary(
+		if _, err = blob_stores.CopyBlobIfNecessary(
 			store.GetEnvRepo().GetEnv(),
 			store.blobBlobStore,
 			remoteBlobStore,

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/todo"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -38,20 +38,20 @@ func init() {
 }
 
 type (
-	immutable_config_private = genesis_config.Private
+	immutable_config_private = genesis_configs.Private
 	cli                      = repo_config_cli.Config
 	ApproximatedType         = typed_blob_store.ApproximatedType
 
 	Store interface {
 		interfaces.Config
-		genesis_config.Private
+		genesis_configs.Private
 
 		repo_config_blobs.Getter
 
 		ids.InlineTypeChecker
 		GetTypeExtension(string) string
 		GetCLIConfig() repo_config_cli.Config
-		GetImmutableConfig() genesis_config.Private
+		GetImmutableConfig() genesis_configs.Private
 		GetFileExtensions() interfaces.FileExtensions
 		HasChanges() (ok bool)
 		GetChanges() (out []string)

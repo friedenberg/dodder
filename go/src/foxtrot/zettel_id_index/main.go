@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	hinweis_index_v0 "code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index/v0"
@@ -21,7 +21,7 @@ type Index interface {
 }
 
 func MakeIndex(
-	config genesis_config.Public,
+	config genesis_configs.Public,
 	configCli repo_config_cli.Config,
 	directory interfaces.Directory,
 	cacheIOFactory interfaces.CacheIOFactory,

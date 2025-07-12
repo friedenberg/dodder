@@ -7,8 +7,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_config"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_config"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -43,10 +43,10 @@ func (c Info) Run(req command.Request) {
 		args = []string{"store-version"}
 	}
 
-	defaultGenesisConfig := genesis_config.DefaultMutableWithVersion(
+	defaultGenesisConfig := genesis_configs.DefaultMutableWithVersion(
 		store_version.VCurrent,
 	)
-	defaultBlobStoreConfig := blob_store_config.Default()
+	defaultBlobStoreConfig := blob_store_configs.Default()
 
 	for _, arg := range args {
 		// TODO switch to underscore+hyphen string keys
