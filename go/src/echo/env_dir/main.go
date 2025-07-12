@@ -123,15 +123,15 @@ func MakeWithHome(
 	home string,
 	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
-) (s env) {
-	s.Context = context
+) (env env) {
+	env.Context = context
 
 	xdg := xdg.XDG{
 		Home: home,
 	}
 
-	if err := s.beforeXDG.initialize(debugOptions); err != nil {
-		s.CancelWithError(err)
+	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+		env.CancelWithError(err)
 	}
 
 	addedPath := XDGUtilityName
@@ -140,25 +140,25 @@ func MakeWithHome(
 		addedPath = addedPathOverride
 	}
 
-	pathCwdXDGOverride := filepath.Join(s.cwd, fmt.Sprintf(".%s", addedPath))
+	pathCwdXDGOverride := filepath.Join(env.cwd, fmt.Sprintf(".%s", addedPath))
 
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
 		if err := xdg.InitializeOverridden(addedPath); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 	} else {
 		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 	}
 
-	if err := s.initializeXDG(xdg); err != nil {
-		s.CancelWithError(err)
+	if err := env.initializeXDG(xdg); err != nil {
+		env.CancelWithError(err)
 	}
 
-	s.AfterWithContext(s.resetTempOnExit)
+	env.AfterWithContext(env.resetTempOnExit)
 
 	return
 }
@@ -166,70 +166,70 @@ func MakeWithHome(
 func MakeWithHomeAndInitialize(
 	context errors.Context,
 	home string,
-	do debug.Options,
+	debugOptions debug.Options,
 	cwdXDGOverride bool,
-) (s env) {
-	s.Context = context
+) (env env) {
+	env.Context = context
 
 	xdg := xdg.XDG{
 		Home: home,
 	}
 
-	if err := s.beforeXDG.initialize(do); err != nil {
-		s.CancelWithError(err)
+	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+		env.CancelWithError(err)
 	}
 
 	addedPath := "dodder"
-	pathCwdXDGOverride := filepath.Join(s.cwd, ".dodder")
+	pathCwdXDGOverride := filepath.Join(env.cwd, ".dodder")
 
 	if cwdXDGOverride {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
 		if err := xdg.InitializeOverridden(addedPath); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 	} else {
 		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
-			s.CancelWithError(err)
+			env.CancelWithError(err)
 		}
 	}
 
-	if err := s.initializeXDG(xdg); err != nil {
-		s.CancelWithError(err)
+	if err := env.initializeXDG(xdg); err != nil {
+		env.CancelWithError(err)
 	}
 
-	s.AfterWithContext(s.resetTempOnExit)
+	env.AfterWithContext(env.resetTempOnExit)
 
 	return
 }
 
 func MakeWithXDG(
 	context errors.Context,
-	do debug.Options,
+	debugOptions debug.Options,
 	xdg xdg.XDG,
-) (s env) {
-	s.Context = context
+) (env env) {
+	env.Context = context
 
-	if err := s.beforeXDG.initialize(do); err != nil {
-		s.CancelWithError(err)
+	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+		env.CancelWithError(err)
 	}
 
-	if err := s.initializeXDG(xdg); err != nil {
-		s.CancelWithError(err)
+	if err := env.initializeXDG(xdg); err != nil {
+		env.CancelWithError(err)
 	}
 
 	return
 }
 
-func (layout *env) initializeXDG(xdg xdg.XDG) (err error) {
-	layout.XDG = xdg
+func (env *env) initializeXDG(xdg xdg.XDG) (err error) {
+	env.XDG = xdg
 
-	layout.TempLocal.BasePath = filepath.Join(
-		layout.Cache,
-		fmt.Sprintf("tmp-%d", layout.GetPid()),
+	env.TempLocal.BasePath = filepath.Join(
+		env.Cache,
+		fmt.Sprintf("tmp-%d", env.GetPid()),
 	)
 
-	if err = layout.MakeDir(layout.GetTempLocal().BasePath); err != nil {
+	if err = env.MakeDir(env.GetTempLocal().BasePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -237,43 +237,43 @@ func (layout *env) initializeXDG(xdg xdg.XDG) (err error) {
 	return
 }
 
-func (h env) GetDebug() debug.Options {
-	return h.debug
+func (env env) GetDebug() debug.Options {
+	return env.debugOptions
 }
 
-func (h env) IsDryRun() bool {
-	return h.dryRun
+func (env env) IsDryRun() bool {
+	return env.dryRun
 }
 
-func (h env) GetPid() int {
-	return h.pid
+func (env env) GetPid() int {
+	return env.pid
 }
 
 func (env env) AddToEnvVars(envVars env_vars.EnvVars) {
 	envVars[EnvBin] = env.GetExecPath()
 }
 
-func (h env) GetExecPath() string {
-	return h.execPath
+func (env env) GetExecPath() string {
+	return env.execPath
 }
 
-func (h env) GetCwd() string {
-	return h.cwd
+func (env env) GetCwd() string {
+	return env.cwd
 }
 
-func (h env) GetXDG() xdg.XDG {
-	return h.XDG
+func (env env) GetXDG() xdg.XDG {
+	return env.XDG
 }
 
-func (h *env) SetXDG(x xdg.XDG) {
-	h.XDG = x
+func (env *env) SetXDG(x xdg.XDG) {
+	env.XDG = x
 }
 
-func (h env) GetTempLocal() TemporaryFS {
-	return h.TempLocal
+func (env env) GetTempLocal() TemporaryFS {
+	return env.TempLocal
 }
 
-func (s env) AbsFromCwdOrSame(p string) (p1 string) {
+func (env env) AbsFromCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Abs(p)
 	if err != nil {
@@ -283,22 +283,22 @@ func (s env) AbsFromCwdOrSame(p string) (p1 string) {
 	return
 }
 
-func (s env) RelToCwdOrSame(p string) (p1 string) {
+func (env env) RelToCwdOrSame(p string) (p1 string) {
 	var err error
 
-	if p1, err = filepath.Rel(s.GetCwd(), p); err != nil {
+	if p1, err = filepath.Rel(env.GetCwd(), p); err != nil {
 		p1 = p
 	}
 
 	return
 }
 
-func (s env) Rel(
+func (env env) Rel(
 	p string,
 ) (out string) {
 	out = p
 
-	p1, _ := filepath.Rel(s.GetCwd(), p)
+	p1, _ := filepath.Rel(env.GetCwd(), p)
 
 	if p1 != "" {
 		out = p1
@@ -307,19 +307,19 @@ func (s env) Rel(
 	return
 }
 
-func (h env) MakeCommonEnv() map[string]string {
+func (env env) MakeCommonEnv() map[string]string {
 	return map[string]string{
-		EnvBin: h.GetExecPath(),
+		EnvBin: env.GetExecPath(),
 		// TODO determine if EnvDir is kept
 		// EnvDir: h.Dir(),
 	}
 }
 
-func (s env) MakeDir(ds ...string) (err error) {
-	return s.MakeDirPerms(0o755, ds...)
+func (env env) MakeDir(ds ...string) (err error) {
+	return env.MakeDirPerms(0o755, ds...)
 }
 
-func (s env) MakeDirPerms(perms os.FileMode, ds ...string) (err error) {
+func (env env) MakeDirPerms(perms os.FileMode, ds ...string) (err error) {
 	for _, d := range ds {
 		if err = os.MkdirAll(d, os.ModeDir|perms); err != nil {
 			err = errors.Wrapf(err, "Dir: %q", d)

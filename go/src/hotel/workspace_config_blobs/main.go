@@ -21,7 +21,7 @@ type (
 type TypeWithBlob = *triple_hyphen_io.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[TypeWithBlob]{
-	ids.WorkspaceConfigTypeTomlV0: blobV0Coder{},
+	ids.TypeTomlWorkspaceConfigV0: blobV0Coder{},
 }
 
 var Coder = triple_hyphen_io.Coder[TypeWithBlob]{

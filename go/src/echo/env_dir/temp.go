@@ -7,13 +7,13 @@ import (
 )
 
 // TODO only call reset temp when actually not resetting temp
-func (s env) resetTempOnExit(ctx errors.Context) (err error) {
+func (env env) resetTempOnExit(ctx errors.Context) (err error) {
 	errIn := ctx.Cause()
 
-	if errIn != nil || s.GetDebug().NoTempDirCleanup {
+	if errIn != nil || env.debugOptions.NoTempDirCleanup {
 		// ui.Err().Printf("temp dir: %q", s.TempLocal.BasePath)
 	} else {
-		if err = os.RemoveAll(s.GetTempLocal().BasePath); err != nil {
+		if err = os.RemoveAll(env.GetTempLocal().BasePath); err != nil {
 			err = errors.Wrapf(err, "failed to remove temp local")
 			return
 		}
@@ -26,14 +26,14 @@ type TemporaryFS struct {
 	BasePath string
 }
 
-func (s TemporaryFS) DirTemp() (d string, err error) {
-	return s.DirTempWithTemplate("")
+func (fs TemporaryFS) DirTemp() (d string, err error) {
+	return fs.DirTempWithTemplate("")
 }
 
-func (s TemporaryFS) DirTempWithTemplate(
+func (fs TemporaryFS) DirTempWithTemplate(
 	template string,
-) (d string, err error) {
-	if d, err = os.MkdirTemp(s.BasePath, template); err != nil {
+) (dir string, err error) {
+	if dir, err = os.MkdirTemp(fs.BasePath, template); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,8 +41,8 @@ func (s TemporaryFS) DirTempWithTemplate(
 	return
 }
 
-func (s TemporaryFS) FileTemp() (f *os.File, err error) {
-	if f, err = s.FileTempWithTemplate(""); err != nil {
+func (fs TemporaryFS) FileTemp() (file *os.File, err error) {
+	if file, err = fs.FileTempWithTemplate(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -50,8 +50,10 @@ func (s TemporaryFS) FileTemp() (f *os.File, err error) {
 	return
 }
 
-func (s TemporaryFS) FileTempWithTemplate(t string) (f *os.File, err error) {
-	if f, err = os.CreateTemp(s.BasePath, t); err != nil {
+func (fs TemporaryFS) FileTempWithTemplate(
+	template string,
+) (file *os.File, err error) {
+	if file, err = os.CreateTemp(fs.BasePath, template); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

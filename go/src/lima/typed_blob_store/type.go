@@ -55,7 +55,7 @@ func (a Type) ParseTypedBlob(
 	blobSha interfaces.Sha,
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
-	case "", ids.TypeTypeTomlV0:
+	case "", ids.TypeTomlTypeV0:
 		store := a.toml_v0
 		var blob *type_blobs.V0
 
@@ -66,7 +66,7 @@ func (a Type) ParseTypedBlob(
 
 		common = blob
 
-	case ids.TypeTypeTomlV1:
+	case ids.TypeTomlTypeV1:
 		store := a.toml_v1
 		var blob *type_blobs.TomlV1
 
@@ -86,7 +86,7 @@ func (a Type) PutTypedBlob(
 	common type_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
-	case "", ids.TypeTypeTomlV0:
+	case "", ids.TypeTomlTypeV0:
 		if blob, ok := common.(*type_blobs.V0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
@@ -94,7 +94,7 @@ func (a Type) PutTypedBlob(
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case ids.TypeTypeTomlV1:
+	case ids.TypeTomlTypeV1:
 		if blob, ok := common.(*type_blobs.TomlV1); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return

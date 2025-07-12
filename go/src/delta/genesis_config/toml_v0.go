@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-type v0Common struct {
+type V0Common struct {
 	StoreVersion      StoreVersion
 	Recipients        []string
 	CompressionType   compression_type.CompressionType
@@ -20,14 +20,14 @@ type v0Common struct {
 }
 
 type V0Public struct {
-	v0Common
+	V0Common
 }
 
 type V0Private struct {
-	v0Common
+	V0Common
 }
 
-func (config *v0Common) SetFlagSet(f *flag.FlagSet) {
+func (config *V0Common) SetFlagSet(f *flag.FlagSet) {
 	config.CompressionType.SetFlagSet(f)
 
 	f.BoolVar(
@@ -56,7 +56,7 @@ func (config *V0Private) GetImmutableConfig() Private {
 
 func (config *V0Private) GetImmutableConfigPublic() Public {
 	return &V0Public{
-		v0Common: config.v0Common,
+		V0Common: config.V0Common,
 	}
 }
 
@@ -64,46 +64,46 @@ func (config *V0Public) GetImmutableConfigPublic() Public {
 	return config
 }
 
-func (config *v0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
+func (config *V0Common) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
 	return config
 }
 
-func (config v0Common) GetStoreVersion() StoreVersion {
+func (config V0Common) GetStoreVersion() StoreVersion {
 	return config.StoreVersion
 }
 
-func (config v0Common) GetRepoType() repo_type.Type {
+func (config V0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (config v0Common) GetPrivateKey() repo_signing.PrivateKey {
+func (config V0Common) GetPrivateKey() repo_signing.PrivateKey {
 	panic(errors.ErrorWithStackf("not supported"))
 }
 
-func (config v0Common) GetPublicKey() repo_signing.PublicKey {
+func (config V0Common) GetPublicKey() repo_signing.PublicKey {
 	panic(errors.ErrorWithStackf("not supported"))
 }
 
-func (config v0Common) GetRepoId() ids.RepoId {
+func (config V0Common) GetRepoId() ids.RepoId {
 	return ids.RepoId{}
 }
 
-func (config *v0Common) GetAgeEncryption() *age.Age {
+func (config *V0Common) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 
-func (config *v0Common) GetBlobCompression() interfaces.BlobCompression {
+func (config *V0Common) GetBlobCompression() interfaces.BlobCompression {
 	return &config.CompressionType
 }
 
-func (config *v0Common) GetBlobEncryption() interfaces.BlobEncryption {
+func (config *V0Common) GetBlobEncryption() interfaces.BlobEncryption {
 	return config.GetAgeEncryption()
 }
 
-func (config v0Common) GetLockInternalFiles() bool {
+func (config V0Common) GetLockInternalFiles() bool {
 	return config.LockInternalFiles
 }
 
-func (config v0Common) GetInventoryListTypeString() string {
+func (config V0Common) GetInventoryListTypeString() string {
 	return InventoryListTypeV0
 }

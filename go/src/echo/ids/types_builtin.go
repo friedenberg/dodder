@@ -9,32 +9,28 @@ import (
 const (
 	// TODO figure out a more ergonomic way of incrementing and labeling as
 	// latest
-	TagTypeTomlV0 = "!toml-tag-v0"
-	TagTypeTomlV1 = "!toml-tag-v1"
-	TagTypeLuaV1  = "!lua-tag-v1"
-	TagTypeLuaV2  = "!lua-tag-v2"
 
-	TypeTypeTomlV0 = "!toml-type-v0"
-	TypeTypeTomlV1 = "!toml-type-v1"
-
-	ConfigTypeTomlV0 = "!toml-config-v0"
-	ConfigTypeTomlV1 = "!toml-config-v1"
-
-	InventoryListTypeV0       = "!inventory_list-v0"
-	InventoryListTypeV1       = "!inventory_list-v1"
-	InventoryListTypeV2       = "!inventory_list-v2"
-	InventoryListTypeVCurrent = InventoryListTypeV2
-
-	RepoTypeXDGDotenvV0 = "!toml-repo-dotenv_xdg-v0"
-	RepoTypeLocalPath   = "!toml-repo-local_path-v0"
-	RepoTypeUri         = "!toml-repo-uri-v0"
-
-	ImmutableConfigV1 = "!toml-config-immutable-v1"
-	ImmutableConfigV2 = "!toml-config-immutable-v2"
-
-	ZettelIdListTypeV0 = "!zettel_id_list-v0"
-
-	WorkspaceConfigTypeTomlV0 = "!toml-workspace_config-v0"
+	// keep sorted
+	TypeInventoryListV0       = "!inventory_list-v0"
+	TypeInventoryListV1       = "!inventory_list-v1"
+	TypeInventoryListV2       = "!inventory_list-v2"
+	TypeInventoryListVCurrent = TypeInventoryListV2
+	TypeLuaTagV1              = "!lua-tag-v1"
+	TypeLuaTagV2              = "!lua-tag-v2"
+	TypeTomlBlobStoreConfigV0 = "!toml-blob_store_config-v0"
+	TypeTomlConfigImmutableV1 = "!toml-config-immutable-v1"
+	TypeTomlConfigImmutableV2 = "!toml-config-immutable-v2"
+	TypeTomlConfigV0          = "!toml-config-v0"
+	TypeTomlConfigV1          = "!toml-config-v1"
+	TypeTomlRepoDotenvXdgV0   = "!toml-repo-dotenv_xdg-v0"
+	TypeTomlRepoLocalPath     = "!toml-repo-local_path-v0"
+	TypeTomlRepoUri           = "!toml-repo-uri-v0"
+	TypeTomlTagV0             = "!toml-tag-v0"
+	TypeTomlTagV1             = "!toml-tag-v1"
+	TypeTomlTypeV0            = "!toml-type-v0"
+	TypeTomlTypeV1            = "!toml-type-v1"
+	TypeTomlWorkspaceConfigV0 = "!toml-workspace_config-v0"
+	TypeZettelIdListV0        = "!zettel_id_list-v0"
 )
 
 type BuiltinType struct {
@@ -53,32 +49,26 @@ func init() {
 	allMap = make(map[Type]BuiltinType)
 	defaults = make(map[genres.Genre]BuiltinType)
 
-	registerBuiltinTypeString(TagTypeTomlV0, genres.Tag, false)
-	registerBuiltinTypeString(TagTypeTomlV1, genres.Tag, true)
-	registerBuiltinTypeString(TagTypeLuaV1, genres.Tag, false)
-	registerBuiltinTypeString(TagTypeLuaV2, genres.Tag, false)
-
-	registerBuiltinTypeString(TypeTypeTomlV0, genres.Type, false)
-	registerBuiltinTypeString(TypeTypeTomlV1, genres.Type, true)
-
-	registerBuiltinTypeString(ConfigTypeTomlV0, genres.Config, false)
-	registerBuiltinTypeString(ConfigTypeTomlV1, genres.Config, true)
-
-	registerBuiltinTypeString(InventoryListTypeV0, genres.InventoryList, false)
-	registerBuiltinTypeString(InventoryListTypeV1, genres.InventoryList, false)
-	// TODO StoreVersionV10
-	registerBuiltinTypeString(InventoryListTypeV2, genres.InventoryList, true)
-
-	registerBuiltinTypeString(RepoTypeUri, genres.Repo, true)
-	registerBuiltinTypeString(RepoTypeXDGDotenvV0, genres.Repo, false)
-	registerBuiltinTypeString(RepoTypeLocalPath, genres.Repo, false)
-
-	registerBuiltinTypeString(ImmutableConfigV1, genres.None, false)
-	registerBuiltinTypeString(ImmutableConfigV2, genres.None, false)
-
-	registerBuiltinTypeString(ZettelIdListTypeV0, genres.None, false)
-
-	registerBuiltinTypeString(WorkspaceConfigTypeTomlV0, genres.None, false)
+	// keep sorted
+	registerBuiltinTypeString(TypeInventoryListV0, genres.InventoryList, false)
+	registerBuiltinTypeString(TypeInventoryListV1, genres.InventoryList, false)
+	registerBuiltinTypeString(TypeInventoryListV2, genres.InventoryList, true)
+	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
+	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
+	registerBuiltinTypeString(TypeTomlConfigImmutableV1, genres.None, false)
+	registerBuiltinTypeString(TypeTomlConfigImmutableV2, genres.None, false)
+	registerBuiltinTypeString(TypeTomlConfigV0, genres.Config, false)
+	registerBuiltinTypeString(TypeTomlConfigV1, genres.Config, true)
+	registerBuiltinTypeString(TypeTomlRepoDotenvXdgV0, genres.Repo, false)
+	registerBuiltinTypeString(TypeTomlRepoLocalPath, genres.Repo, false)
+	registerBuiltinTypeString(TypeTomlRepoUri, genres.Repo, true)
+	registerBuiltinTypeString(TypeTomlTagV0, genres.Tag, false)
+	registerBuiltinTypeString(TypeTomlTagV1, genres.Tag, true)
+	registerBuiltinTypeString(TypeTomlTypeV0, genres.Type, false)
+	registerBuiltinTypeString(TypeTomlTypeV1, genres.Type, true)
+	registerBuiltinTypeString(TypeTomlWorkspaceConfigV0, genres.None, false)
+	registerBuiltinTypeString(TypeZettelIdListV0, genres.None, false)
 }
 
 // TODO switch to isDefault being a StoreVersion

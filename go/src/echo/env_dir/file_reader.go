@@ -25,21 +25,18 @@ func NewFileReader(
 	}
 
 	readOptions := ReadOptions{
-		Config: MakeConfig(
-			options.GetBlobCompression(),
-			options.GetBlobEncryption(),
-			options.GetLockInternalFiles(),
-		),
-		File: objectReader.file,
+		Config: options.Config,
+		File:   objectReader.file,
 	}
 
+	// try the existing options. if they fail, try without encryption
 	if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
 		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		readOptions.encryption = &age.Age{}
+		readOptions.Encryption = &age.Age{}
 
 		if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
 			err = errors.Wrap(err)

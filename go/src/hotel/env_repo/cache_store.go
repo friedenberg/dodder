@@ -7,7 +7,6 @@ import (
 
 func (env Env) ReadCloserCache(path string) (sha.ReadCloser, error) {
 	options := env_dir.FileReadOptions{
-		// Config: s.Config.Blob,
 		Path: path,
 	}
 
@@ -19,7 +18,6 @@ func (env Env) WriteCloserCache(
 ) (sha.WriteCloser, error) {
 	return env_dir.NewMover(
 		env_dir.MoveOptions{
-			// Config:      s.Config.Blob,
 			FinalPath:   path,
 			TemporaryFS: env.GetTempLocal(),
 		},

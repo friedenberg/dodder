@@ -50,7 +50,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	var envRepo env_repo.Env
 
-	layoutOptions := env_repo.Options{
+	options := env_repo.Options{
 		BasePath:                req.Config.BasePath,
 		PermitNoDodderDirectory: true,
 	}
@@ -60,7 +60,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 		if envRepo, err = env_repo.Make(
 			env_local.Make(ui, dir),
-			layoutOptions,
+			options,
 		); err != nil {
 			ui.CancelWithError(err)
 		}

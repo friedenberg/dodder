@@ -26,7 +26,7 @@ func (format V2) GetListFormat() sku.ListFormat {
 }
 
 func (format V2) GetType() ids.Type {
-	return ids.MustType(ids.InventoryListTypeV2)
+	return ids.MustType(ids.TypeInventoryListV2)
 }
 
 func (format V2) WriteObjectToOpenList(

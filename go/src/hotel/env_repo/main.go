@@ -128,13 +128,8 @@ func Make(
 }
 
 func (env *Env) setupStores() {
-	// TODO depending on store version, read immutable config from blob store
-	// path
-	// or from config
-
-	env.blobStores = make([]BlobStoreWithConfig, 1)
-
 	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
+		env.blobStores = make([]BlobStoreWithConfig, 1)
 		env.blobStores[0].Config = env.GetConfigPublic().Blob.GetBlobStoreConfigImmutable()
 	} else {
 		var configPaths []string
@@ -150,6 +145,8 @@ func (env *Env) setupStores() {
 			}
 		}
 
+		env.blobStores = make([]BlobStoreWithConfig, len(configPaths))
+
 		for i, configPath := range configPaths {
 			env.blobStores[i].Config = triple_hyphen_io.DecodeFromFile(
 				env,
@@ -161,9 +158,10 @@ func (env *Env) setupStores() {
 	}
 
 	for i, blobStore := range env.blobStores {
-		env.blobStores[i].LocalBlobStore = blob_store.MakeShardedFilesStore(
+		env.blobStores[i].LocalBlobStore = blob_store.MakeBlobStore(
+			env,
 			env.DirFirstBlobStoreBlobs(),
-			env_dir.MakeConfigFromImmutableBlobConfig(blobStore.Config),
+			blobStore.Config,
 			env.GetTempLocal(),
 		)
 	}
@@ -234,6 +232,10 @@ func (env Env) GetStoreVersion() store_version.Version {
 }
 
 func (env Env) GetDefaultBlobStore() BlobStoreWithConfig {
+	if len(env.blobStores) == 0 {
+		panic("calling GetDefaultBlobStore without any initialized blob stores")
+	}
+
 	return env.blobStores[env.blobStoreDefaultIndex]
 }
 
@@ -247,11 +249,10 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	storeVersion := env.GetStoreVersion()
 
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
-		return blob_store.MakeShardedFilesStore(
+		return blob_store.MakeBlobStore(
+			env,
 			env.DirFirstBlobStoreInventoryLists(),
-			env_dir.MakeConfigFromImmutableBlobConfig(
-				env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
-			),
+			env.GetConfigPrivate().Blob.GetBlobStoreConfigImmutable(),
 			env.GetTempLocal(),
 		)
 	} else {

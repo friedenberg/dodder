@@ -12,7 +12,7 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[Private]{},
 	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Private](
 		map[string]interfaces.CoderBufferedReadWriter[*Private]{
-			ids.ImmutableConfigV2: triple_hyphen_io.CoderToml[
+			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
 				Private,
 				*Private,
 			]{
@@ -20,7 +20,7 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 					return &TomlV2Private{}
 				},
 			},
-			ids.ImmutableConfigV1: triple_hyphen_io.CoderToml[
+			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
 				Private,
 				*Private,
 			]{
@@ -46,7 +46,7 @@ var CoderPublic = triple_hyphen_io.CoderToTypedBlob[Public]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[Public]{},
 	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Public](
 		map[string]interfaces.CoderBufferedReadWriter[*Public]{
-			ids.ImmutableConfigV2: triple_hyphen_io.CoderToml[
+			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
 				Public,
 				*Public,
 			]{
@@ -54,7 +54,7 @@ var CoderPublic = triple_hyphen_io.CoderToTypedBlob[Public]{
 					return &TomlV2Public{}
 				},
 			},
-			ids.ImmutableConfigV1: triple_hyphen_io.CoderToml[
+			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
 				Public,
 				*Public,
 			]{

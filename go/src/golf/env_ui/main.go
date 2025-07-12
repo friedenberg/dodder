@@ -56,9 +56,9 @@ type env struct {
 	cliConfig repo_config_cli.Config
 }
 
-func MakeDefault() *env {
+func MakeDefault(ctx errors.Context) *env {
 	return Make(
-		errors.MakeContextDefault(),
+		ctx,
 		repo_config_cli.Config{},
 		Options{},
 	)

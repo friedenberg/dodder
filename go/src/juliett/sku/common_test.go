@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/india/test_object_metadata_io"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
 type inlineTypChecker struct {
@@ -198,7 +198,7 @@ func makeTestTextFormat(
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := ui.T{T: t1}
-	envRepo := test_object_metadata_io.Make(&t, nil)
+	envRepo := env_repo.MakeTesting(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -236,7 +236,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	envRepo := test_object_metadata_io.Make(&t, nil)
+	envRepo := env_repo.MakeTesting(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -275,7 +275,7 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	envRepo := test_object_metadata_io.Make(&t, nil)
+	envRepo := env_repo.MakeTesting(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -291,7 +291,9 @@ func TestReadWithBlob(t1 *testing.T) {
 the body`,
 	)
 
-	expectedSha := sha.Must("fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e")
+	expectedSha := sha.Must(
+		"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e",
+	)
 
 	expected := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
@@ -324,7 +326,9 @@ type blobReaderFactory struct {
 	blobs map[string]string
 }
 
-func (arf blobReaderFactory) BlobReader(s sha.Sha) (r sha.ReadCloser, err error) {
+func (arf blobReaderFactory) BlobReader(
+	s sha.Sha,
+) (r sha.ReadCloser, err error) {
 	var v string
 	var ok bool
 
@@ -393,7 +397,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := test_object_metadata_io.Make(
+	envRepo := env_repo.MakeTesting(
 		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
@@ -406,7 +410,14 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		},
 	)
 
-	actual := writeFormat(t, z, format, false, "the body", object_metadata.TextFormatterOptions{})
+	actual := writeFormat(
+		t,
+		z,
+		format,
+		false,
+		"the body",
+		object_metadata.TextFormatterOptions{},
+	)
 
 	expected := `---
 # the title
@@ -436,7 +447,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := test_object_metadata_io.Make(
+	envRepo := env_repo.MakeTesting(
 		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",

@@ -20,6 +20,14 @@ type BigBang struct {
 	OverrideXDGWithCwd   bool
 }
 
+func (bigBang *BigBang) SetDefaults() {
+	bigBang.GenesisConfig = genesis_config.DefaultMutable()
+
+	if !store_version.IsCurrentVersionLessOrEqualToV10() {
+		bigBang.BlobStoreConfig = blob_store_config.Default()
+	}
+}
+
 // TODO switch to flagset wrapper that enforces non-empty descriptions
 func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.BoolVar(
@@ -43,11 +51,11 @@ func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
 		"File containing list of zettel id right parts",
 	)
 
-	bigBang.GenesisConfig = genesis_config.DefaultMutable()
+	bigBang.SetDefaults()
+
 	bigBang.GenesisConfig.SetFlagSet(flagSet)
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.BlobStoreConfig = blob_store_config.Default()
 		bigBang.BlobStoreConfig.SetFlagSet(flagSet)
 	}
 }

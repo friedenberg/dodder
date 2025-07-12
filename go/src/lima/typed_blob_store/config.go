@@ -54,7 +54,7 @@ func (a Config) ParseTypedBlob(
 	blobSha interfaces.Sha,
 ) (common repo_config_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
-	case "", ids.ConfigTypeTomlV0:
+	case "", ids.TypeTomlConfigV0:
 		store := a.toml_v0
 		var blob *repo_config_blobs.V0
 
@@ -65,7 +65,7 @@ func (a Config) ParseTypedBlob(
 
 		common = blob
 
-	case ids.ConfigTypeTomlV1:
+	case ids.TypeTomlConfigV1:
 		store := a.toml_v1
 		var blob *repo_config_blobs.V1
 
@@ -91,10 +91,10 @@ func (a Config) FormatTypedBlob(
 
 	var store interfaces.SavedBlobFormatter
 	switch tipe.String() {
-	case "", ids.ConfigTypeTomlV0:
+	case "", ids.TypeTomlConfigV0:
 		store = a.toml_v0
 
-	case ids.ConfigTypeTomlV1:
+	case ids.TypeTomlConfigV1:
 		store = a.toml_v1
 	}
 
@@ -111,7 +111,7 @@ func (a Config) PutTypedBlob(
 	common repo_config_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
-	case "", ids.ConfigTypeTomlV0:
+	case "", ids.TypeTomlConfigV0:
 		if blob, ok := common.(*repo_config_blobs.V0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
@@ -119,7 +119,7 @@ func (a Config) PutTypedBlob(
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case ids.ConfigTypeTomlV1:
+	case ids.TypeTomlConfigV1:
 		if blob, ok := common.(*repo_config_blobs.V1); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return

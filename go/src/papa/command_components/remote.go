@@ -68,14 +68,14 @@ func (cmd Remote) CreateRemoteObject(
 		)
 
 		remoteObject.Metadata.Type = ids.GetOrPanic(
-			ids.RepoTypeXDGDotenvV0,
+			ids.TypeTomlRepoDotenvXdgV0,
 		).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
 	case repo.RemoteConnectionTypeUrl:
 		url := req.PopArg("url")
 
-		remoteObject.Metadata.Type = ids.GetOrPanic(ids.RepoTypeUri).Type
+		remoteObject.Metadata.Type = ids.GetOrPanic(ids.TypeTomlRepoUri).Type
 		var typedBlob repo_blobs.TomlUriV0
 
 		if err := typedBlob.Uri.Set(url); err != nil {
@@ -87,7 +87,7 @@ func (cmd Remote) CreateRemoteObject(
 	case repo.RemoteConnectionTypeStdioLocal:
 		path := req.PopArg("path")
 
-		remoteObject.Metadata.Type = ids.GetOrPanic(ids.RepoTypeLocalPath).Type
+		remoteObject.Metadata.Type = ids.GetOrPanic(ids.TypeTomlRepoLocalPath).Type
 		blob = &repo_blobs.TomlLocalPathV0{
 			Path: remoteEnvRepo.AbsFromCwdOrSame(path),
 		}

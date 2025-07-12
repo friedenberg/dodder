@@ -28,9 +28,9 @@ type BlobMutable interface {
 type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]
 
 var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
-	ids.RepoTypeLocalPath:   coderToml[TomlLocalPathV0]{},
-	ids.RepoTypeXDGDotenvV0: coderToml[TomlXDGV0]{},
-	ids.RepoTypeUri:         coderToml[TomlUriV0]{},
+	ids.TypeTomlRepoLocalPath:   coderToml[TomlLocalPathV0]{},
+	ids.TypeTomlRepoDotenvXdgV0: coderToml[TomlXDGV0]{},
+	ids.TypeTomlRepoUri:         coderToml[TomlUriV0]{},
 	"":                      coderToml[TomlUriV0]{},
 }
 

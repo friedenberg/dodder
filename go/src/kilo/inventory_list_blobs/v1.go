@@ -23,7 +23,7 @@ func (v V1) GetListFormat() sku.ListFormat {
 }
 
 func (v V1) GetType() ids.Type {
-	return ids.MustType(ids.InventoryListTypeV1)
+	return ids.MustType(ids.TypeInventoryListV1)
 }
 
 func (format V1) WriteObjectToOpenList(

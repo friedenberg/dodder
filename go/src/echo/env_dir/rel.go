@@ -11,8 +11,8 @@ type RelativePath interface {
 	Rel(string) string
 }
 
-func (s env) MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[string] {
-	return relativePathStringFormatWriter(s)
+func (env env) MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[string] {
+	return relativePathStringFormatWriter(env)
 }
 
 type relativePathStringFormatWriter env

@@ -18,33 +18,29 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
-func NewMover(o MoveOptions) (m *Mover, err error) {
-	m = &Mover{
-		lockFile:                  o.GetLockInternalFiles(),
-		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,
+func NewMover(moveOptions MoveOptions) (mover *Mover, err error) {
+	mover = &Mover{
+		lockFile:                  moveOptions.LockInternalFiles,
+		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
 
-	if o.GenerateFinalPathFromSha {
-		m.basePath = o.FinalPath
+	if moveOptions.GenerateFinalPathFromSha {
+		mover.basePath = moveOptions.FinalPath
 	} else {
-		m.objectPath = o.FinalPath
+		mover.objectPath = moveOptions.FinalPath
 	}
 
-	if m.file, err = o.FileTemp(); err != nil {
+	if mover.file, err = moveOptions.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	wo := WriteOptions{
-		Config: MakeConfig(
-			o.GetBlobCompression(),
-			o.GetBlobEncryption(),
-			o.GetLockInternalFiles(),
-		),
-		Writer: m.file,
+	writeOptions := WriteOptions{
+		Config: moveOptions.Config,
+		Writer: mover.file,
 	}
 
-	if m.writer, err = NewWriter(wo); err != nil {
+	if mover.writer, err = NewWriter(writeOptions); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -252,7 +252,7 @@ func (env *env) GetStoreFS() *store_fs.Store {
 
 func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	env.blob = blob
-	tipe := ids.GetOrPanic(ids.WorkspaceConfigTypeTomlV0).Type
+	tipe := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
 
 	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
 		Type: tipe,

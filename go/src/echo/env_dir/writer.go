@@ -23,19 +23,19 @@ type writer struct {
 	wBuf            *bufio.Writer
 }
 
-func NewWriter(o WriteOptions) (w *writer, err error) {
+func NewWriter(writeOptions WriteOptions) (w *writer, err error) {
 	w = &writer{}
 
-	w.wBuf = bufio.NewWriter(o.Writer)
+	w.wBuf = bufio.NewWriter(writeOptions.Writer)
 
-	if w.wAge, err = o.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
+	if w.wAge, err = writeOptions.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	w.hash = sha256.New()
 
-	if w.wCompress, err = o.GetBlobCompression().WrapWriter(w.wAge); err != nil {
+	if w.wCompress, err = writeOptions.GetBlobCompression().WrapWriter(w.wAge); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

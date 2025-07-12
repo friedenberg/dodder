@@ -26,11 +26,11 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		env.config.Type = ids.GetOrPanic(
-			ids.ImmutableConfigV1,
+			ids.TypeTomlConfigImmutableV1,
 		).Type
 	} else {
 		env.config.Type = ids.GetOrPanic(
-			ids.ImmutableConfigV2,
+			ids.TypeTomlConfigImmutableV2,
 		).Type
 	}
 
@@ -95,7 +95,7 @@ func (env Env) writeInventoryListLog() {
 	}
 
 	tipe := ids.GetOrPanic(
-		ids.InventoryListTypeVCurrent,
+		ids.TypeInventoryListVCurrent,
 	).Type
 
 	subject := triple_hyphen_io.TypedBlobEmpty{
@@ -127,7 +127,7 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 		blob_store_config.Coder,
 		// TODO enforce type and blob agreement by return a TypedBlob
 		&triple_hyphen_io.TypedBlob[blob_store_config.Config]{
-			Type: ids.MustType(blob_store_config.TypeVCurrent),
+			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
 			Blob: bigBang.BlobStoreConfig,
 		},
 		env.DirBlobStores("1/config.toml"),

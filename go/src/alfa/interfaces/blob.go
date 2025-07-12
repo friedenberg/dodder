@@ -48,8 +48,6 @@ type (
 		GetBlobStoreConfigImmutable() BlobStoreConfigImmutable
 		GetBlobEncryption() BlobEncryption
 		GetBlobCompression() BlobCompression
-		// TODO move to custom config
-		GetLockInternalFiles() bool
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by

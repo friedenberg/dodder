@@ -90,7 +90,7 @@ func (a Tag) GetTransactedWithBlob(
 	twb.Transacted = sk.CloneTransacted()
 
 	switch tipe.String() {
-	case "", ids.TagTypeTomlV0:
+	case "", ids.TypeTomlTagV0:
 		store := a.toml_v0
 		var blob *tag_blobs.V0
 
@@ -101,7 +101,7 @@ func (a Tag) GetTransactedWithBlob(
 
 		twb.Blob = blob
 
-	case ids.TagTypeTomlV1:
+	case ids.TypeTomlTagV1:
 		store := a.toml_v1
 		var blob *tag_blobs.TomlV1
 
@@ -126,7 +126,7 @@ func (a Tag) GetTransactedWithBlob(
 		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(vmp, nil)
 		twb.Blob = blob
 
-	case ids.TagTypeLuaV1:
+	case ids.TypeLuaTagV1:
 		var rc sha.ReadCloser
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
@@ -153,7 +153,7 @@ func (a Tag) GetTransactedWithBlob(
 			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
 		}
 
-	case ids.TagTypeLuaV2:
+	case ids.TypeLuaTagV2:
 		var rc sha.ReadCloser
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
@@ -190,7 +190,7 @@ func (a Tag) PutTransactedWithBlob(
 	tipe := twb.GetType()
 
 	switch tipe.String() {
-	case "", ids.TagTypeTomlV0:
+	case "", ids.TypeTomlTagV0:
 		if blob, ok := twb.Blob.(*tag_blobs.V0); !ok {
 			err = errors.ErrorWithStackf(
 				"expected %T but got %T",
@@ -202,7 +202,7 @@ func (a Tag) PutTransactedWithBlob(
 			a.toml_v0.PutBlob(blob)
 		}
 
-	case ids.TagTypeLuaV1:
+	case ids.TypeLuaTagV1:
 		if blob, ok := twb.Blob.(*tag_blobs.TomlV1); !ok {
 			err = errors.ErrorWithStackf(
 				"expected %T but got %T",

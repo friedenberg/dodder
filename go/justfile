@@ -164,8 +164,8 @@ check: check-go-vuln check-go-vet
 #    |_|\___||___/\__|
 #
 
-test-go-unit:
-  go test -tags test,debug -v ./...
+test-go-unit *flags:
+  go test {{flags}} -tags test,debug -v ./...
 
 test-go: test-go-unit
 

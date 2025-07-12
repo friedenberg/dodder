@@ -63,8 +63,8 @@ func MakeInventoryStore(
 			"": inventory_list_blobs.V0ObjectCoder{
 				V0: s.v0,
 			},
-			ids.InventoryListTypeV1: s.v1.V1ObjectCoder,
-			ids.InventoryListTypeV2: s.v2.V2ObjectCoder,
+			ids.TypeInventoryListV1: s.v1.V1ObjectCoder,
+			ids.TypeInventoryListV2: s.v2.V2ObjectCoder,
 		},
 	)
 
@@ -72,10 +72,10 @@ func MakeInventoryStore(
 		"": inventory_list_blobs.V0IterDecoder{
 			V0: s.v0,
 		},
-		ids.InventoryListTypeV1: inventory_list_blobs.V1IterDecoder{
+		ids.TypeInventoryListV1: inventory_list_blobs.V1IterDecoder{
 			V1: s.v1,
 		},
-		ids.InventoryListTypeV2: inventory_list_blobs.V2IterDecoder{
+		ids.TypeInventoryListV2: inventory_list_blobs.V2IterDecoder{
 			V2: s.v2,
 		},
 	}
@@ -132,7 +132,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 	twb.Blob = sku.MakeList()
 
 	switch tipe.String() {
-	case "", ids.InventoryListTypeV0:
+	case "", ids.TypeInventoryListV0:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
 			a.v0,
 			reader,
@@ -142,7 +142,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 			return
 		}
 
-	case ids.InventoryListTypeV1:
+	case ids.TypeInventoryListV1:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
 			a.v1,
 			reader,
@@ -152,7 +152,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 			return
 		}
 
-	case ids.InventoryListTypeV2:
+	case ids.TypeInventoryListV2:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
 			a.v2,
 			reader,
@@ -187,7 +187,7 @@ func (store InventoryList) WriteBlobToWriter(
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	switch tipe.String() {
-	case "", ids.InventoryListTypeV0:
+	case "", ids.TypeInventoryListV0:
 		if n, err = store.v0.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
@@ -196,7 +196,7 @@ func (store InventoryList) WriteBlobToWriter(
 			return
 		}
 
-	case ids.InventoryListTypeV1:
+	case ids.TypeInventoryListV1:
 		if n, err = store.v1.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
@@ -205,7 +205,7 @@ func (store InventoryList) WriteBlobToWriter(
 			return
 		}
 
-	case ids.InventoryListTypeV2:
+	case ids.TypeInventoryListV2:
 		if n, err = store.v2.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
@@ -224,8 +224,8 @@ func (a InventoryList) PutTransactedWithBlob(
 	tipe := twb.GetType()
 
 	switch tipe.String() {
-	case "", ids.InventoryListTypeV0:
-	case ids.InventoryListTypeV1:
+	case "", ids.TypeInventoryListV0:
+	case ids.TypeInventoryListV1:
 	}
 
 	sku.GetTransactedPool().Put(twb.Transacted)
@@ -371,7 +371,7 @@ func (a InventoryList) ReadInventoryListObject(
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
 	switch tipe.String() {
-	case "", ids.InventoryListTypeV0:
+	case "", ids.TypeInventoryListV0:
 		if _, out, err = a.v0.ReadInventoryListObject(
 			reader,
 		); err != nil {
@@ -379,7 +379,7 @@ func (a InventoryList) ReadInventoryListObject(
 			return
 		}
 
-	case ids.InventoryListTypeV1:
+	case ids.TypeInventoryListV1:
 		if err = a.v1.StreamInventoryListBlobSkus(
 			reader,
 			func(sk *sku.Transacted) (err error) {
@@ -397,7 +397,7 @@ func (a InventoryList) ReadInventoryListObject(
 			return
 		}
 
-	case ids.InventoryListTypeV2:
+	case ids.TypeInventoryListV2:
 		if err = a.v2.StreamInventoryListBlobSkus(
 			reader,
 			func(sk *sku.Transacted) (err error) {
@@ -428,13 +428,13 @@ func (a InventoryList) ReadInventoryListBlob(
 	var listFormat sku.ListFormat
 
 	switch tipe.String() {
-	case "", ids.InventoryListTypeV0:
+	case "", ids.TypeInventoryListV0:
 		listFormat = a.v0
 
-	case ids.InventoryListTypeV1:
+	case ids.TypeInventoryListV1:
 		listFormat = a.v1
 
-	case ids.InventoryListTypeV2:
+	case ids.TypeInventoryListV2:
 		listFormat = a.v2
 	}
 
