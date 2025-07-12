@@ -252,4 +252,16 @@ types where possible - Follow established patterns in similar modules
    - Access SHA values via `GetShaLike()` method, not by dereferencing
    - SHA paths use Git-like bucketing: first 2 chars as directory
 
-5. **Error Wrapping**: Always use `errors.Wrap()` or `errors.Wrapf()` for consistent error handling
+5. **Streaming vs Temporary Files**:
+   - Remote blob stores should use remote temporary files with atomic moves
+   - Create temporary files on remote server, then rename to final location
+   - Use Git-like bucketing: `id.Path()` for final path generation
+   - Implement proper cleanup with defer statements
+
+6. **Compression/Encryption Streaming**:
+   - Use `env_dir.WriteOptions` and custom writers for output streaming
+   - For input, implement custom readers that handle the full pipeline
+   - Chain: file -> decryption -> decompression -> SHA calculation
+   - Avoid `env_dir.ReadOptions` for non-file streams (expects `*os.File`)
+
+7. **Error Wrapping**: Always use `errors.Wrap()` or `errors.Wrapf()` for consistent error handling
