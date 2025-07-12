@@ -226,3 +226,30 @@ types where possible - Follow established patterns in similar modules
 -   `src/juliett/sku/main.go`: Core object model
 -   `src/mike/store/main.go`: Primary storage implementation
 -   `src/november/local_working_copy/main.go`: Working copy management
+
+## Common Development Pitfalls
+
+### When Adding New Blob Stores
+
+1. **Type Registration**: New blob store configs need THREE registrations:
+   - Add type constant to `src/echo/ids/types_builtin.go` (e.g., `TypeTomlBlobStoreConfigSftpV0`)
+   - Register in init() function of the same file
+   - Add to type map in `src/echo/blob_store_configs/io.go`
+
+2. **Interface Implementation Gotchas**:
+   - `TemporaryFS` uses `FileTempWithTemplate()` not `TempFile()`
+   - SHA writers are created with `sha.MakeWriter()` not `sha.NewWriter()`
+   - Implement `ReadFrom()` method when creating custom `interfaces.ShaWriteCloser`
+   - `interfaces.Sha` is already a pointer type - never use `*interfaces.Sha`
+
+3. **Build Commands**:
+   - `just build` may fail if dependencies are missing
+   - Use `go build -o build/dodder ./cmd/dodder/main.go` as fallback
+   - Dependencies are added with `go get` (e.g., `go get github.com/pkg/sftp`)
+
+4. **SHA Type Handling**:
+   - Use `sha.WriteCloser` type alias which maps to `interfaces.ShaWriteCloser`
+   - Access SHA values via `GetShaLike()` method, not by dereferencing
+   - SHA paths use Git-like bucketing: first 2 chars as directory
+
+5. **Error Wrapping**: Always use `errors.Wrap()` or `errors.Wrapf()` for consistent error handling

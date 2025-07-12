@@ -17,8 +17,9 @@ const (
 	TypeInventoryListVCurrent = TypeInventoryListV2
 	TypeLuaTagV1              = "!lua-tag-v1"
 	TypeLuaTagV2              = "!lua-tag-v2"
-	TypeTomlBlobStoreConfigV0 = "!toml-blob_store_config-v0"
-	TypeTomlConfigImmutableV1 = "!toml-config-immutable-v1"
+	TypeTomlBlobStoreConfigV0     = "!toml-blob_store_config-v0"
+	TypeTomlBlobStoreConfigSftpV0 = "!toml-blob_store_config_sftp-v0"
+	TypeTomlConfigImmutableV1     = "!toml-config-immutable-v1"
 	TypeTomlConfigImmutableV2 = "!toml-config-immutable-v2"
 	TypeTomlConfigV0          = "!toml-config-v0"
 	TypeTomlConfigV1          = "!toml-config-v1"
@@ -56,6 +57,7 @@ func init() {
 	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
 	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigSftpV0, genres.None, false)
 	registerBuiltinTypeString(TypeTomlConfigImmutableV1, genres.None, false)
 	registerBuiltinTypeString(TypeTomlConfigImmutableV2, genres.None, false)
 	registerBuiltinTypeString(TypeTomlConfigV0, genres.Config, false)

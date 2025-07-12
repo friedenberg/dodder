@@ -24,6 +24,14 @@ func MakeBlobStore(
 
 	case gitLikeBucketedConfig:
 		return makeGitLikeBucketedStore(basePath, config, tempFS)
+		
+	case sftpConfig:
+		store, err := makeSftpStore(config, tempFS)
+		if err != nil {
+			ctx.CancelWithError(err)
+			return nil
+		}
+		return store
 	}
 }
 
