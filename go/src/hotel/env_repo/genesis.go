@@ -130,7 +130,7 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
 			Blob: bigBang.BlobStoreConfig,
 		},
-		env.DirBlobStores("1/config.toml"),
+		env.DirBlobStores("1", blobStoreConfigFileName),
 	)
 }
 

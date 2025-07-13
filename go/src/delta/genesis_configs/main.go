@@ -1,8 +1,6 @@
 package genesis_configs
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -52,7 +50,7 @@ type Private interface {
 type PrivateMutable interface {
 	Private
 	// TODO separate into non-method function that uses properties
-	SetFlagSet(*flag.FlagSet)
+	interfaces.CommandComponent
 	SetRepoType(repo_type.Type)
 	SetRepoId(ids.RepoId)
 	repo_signing.Generator
