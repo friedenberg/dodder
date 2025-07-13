@@ -2,10 +2,6 @@ package blob_store_configs
 
 import (
 	"flag"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
-	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
 type TomlSftpV0 struct {
@@ -16,17 +12,9 @@ type TomlSftpV0 struct {
 	Password       string `toml:"password,omitempty"`
 	PrivateKeyPath string `toml:"private-key-path,omitempty"`
 	RemotePath     string `toml:"remote-path"`
-
-	// TODO modify blob store config to read this after blob store
-	// initialization
-	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
-	CompressionType   compression_type.CompressionType `toml:"compression-type"`
-	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }
 
 func (blobStoreConfig *TomlSftpV0) SetFlagSet(flagSet *flag.FlagSet) {
-	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
-
 	flagSet.StringVar(
 		&blobStoreConfig.Host,
 		"sftp-host",
@@ -68,31 +56,6 @@ func (blobStoreConfig *TomlSftpV0) SetFlagSet(flagSet *flag.FlagSet) {
 		blobStoreConfig.RemotePath,
 		"Remote path for blob storage",
 	)
-
-	flagSet.BoolVar(
-		&blobStoreConfig.LockInternalFiles,
-		"lock-internal-files",
-		blobStoreConfig.LockInternalFiles,
-		"",
-	)
-
-	flagSet.Var(
-		&blobStoreConfig.AgeEncryption,
-		"age-identity",
-		"add an age identity",
-	)
-}
-
-func (blobStoreConfig *TomlSftpV0) GetBlobCompression() interfaces.BlobCompression {
-	return &blobStoreConfig.CompressionType
-}
-
-func (blobStoreConfig *TomlSftpV0) GetBlobEncryption() interfaces.BlobEncryption {
-	return &blobStoreConfig.AgeEncryption
-}
-
-func (blobStoreConfig *TomlSftpV0) GetLockInternalFiles() bool {
-	return blobStoreConfig.LockInternalFiles
 }
 
 func (blobStoreConfig *TomlSftpV0) GetHost() string {

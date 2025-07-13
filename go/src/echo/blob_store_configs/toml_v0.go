@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
+// TODO add path option
 type TomlV0 struct {
 	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
