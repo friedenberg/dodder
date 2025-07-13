@@ -144,7 +144,7 @@ func (blobStore gitLikeBucketed) BlobReader(
 
 func (blobStore gitLikeBucketed) blobWriterTo(
 	path string,
-) (mover *env_dir.Mover, err error) {
+) (mover interfaces.Mover, err error) {
 	if mover, err = env_dir.NewMover(
 		blobStore.makeEnvDirConfig(),
 		env_dir.MoveOptions{
@@ -171,12 +171,10 @@ func (blobStore gitLikeBucketed) blobReaderFrom(
 
 	path = id.Path(sh.GetShaLike(), path)
 
-	options := env_dir.FileReadOptions{
-		Config: blobStore.makeEnvDirConfig(),
-		Path:   path,
-	}
-
-	if readCloser, err = env_dir.NewFileReader(options); err != nil {
+	if readCloser, err = env_dir.NewFileReader(
+		blobStore.makeEnvDirConfig(),
+		path,
+	); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
 			shCopy.ResetWithShaLike(sh.GetShaLike())

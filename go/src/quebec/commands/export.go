@@ -85,9 +85,7 @@ func (cmd Export) Run(dep command.Request) {
 				&cmd.CompressionType,
 				&ag,
 			),
-			env_dir.WriteOptions{
-				Writer: localWorkingCopy.GetUIFile(),
-			},
+			localWorkingCopy.GetUIFile(),
 		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}

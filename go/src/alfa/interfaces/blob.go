@@ -31,6 +31,7 @@ type (
 
 	Mover interface {
 		io.WriteCloser
+		io.ReaderFrom
 		GetShaLike() Sha
 	}
 

@@ -41,7 +41,12 @@ func (cmd *Import) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.StoreVersion, "store-version", "")
 	f.StringVar(&cmd.InventoryList, "inventory-list", "", "")
 	cmd.RemoteBlobStore.SetFlagSet(f)
-	f.BoolVar(&cmd.PrintCopies, "print-copies", true, "output when blobs are copied")
+	f.BoolVar(
+		&cmd.PrintCopies,
+		"print-copies",
+		true,
+		"output when blobs are copied",
+	)
 
 	cmd.Proto.SetFlagSet(f)
 }
@@ -53,23 +58,24 @@ func (cmd Import) Run(dep command.Request) {
 		dep.CancelWithBadRequestf("empty inventory list")
 	}
 
-	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(cmd.StoreVersion)
+	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
+		cmd.StoreVersion,
+	)
 
 	var readCloser io.ReadCloser
 
 	// setup inventory list reader
 	{
-		o := env_dir.FileReadOptions{
-			Config: env_dir.MakeConfig(
-				cmd.Config.GetBlobCompression(),
-				cmd.Config.GetBlobEncryption(),
-			),
-			Path: cmd.InventoryList,
-		}
 
 		var err error
 
-		if readCloser, err = env_dir.NewFileReader(o); err != nil {
+		if readCloser, err = env_dir.NewFileReader(
+			env_dir.MakeConfig(
+				cmd.Config.GetBlobCompression(),
+				cmd.Config.GetBlobEncryption(),
+			),
+			cmd.InventoryList,
+		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 

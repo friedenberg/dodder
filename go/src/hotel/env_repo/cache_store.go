@@ -6,12 +6,7 @@ import (
 )
 
 func (env Env) ReadCloserCache(path string) (sha.ReadCloser, error) {
-	options := env_dir.FileReadOptions{
-		Config: env_dir.DefaultConfig,
-		Path:   path,
-	}
-
-	return env_dir.NewFileReader(options)
+	return env_dir.NewFileReader(env_dir.DefaultConfig, path)
 }
 
 func (env Env) WriteCloserCache(

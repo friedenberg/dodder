@@ -11,37 +11,33 @@ import (
 )
 
 func NewFileReader(
-	options FileReadOptions,
+	config Config,
+	path string,
 ) (readCloser interfaces.ShaReadCloser, err error) {
 	objectReader := objectReader{}
 
-	if options.Path == "-" {
+	if path == "-" {
 		objectReader.file = os.Stdin
 	} else {
-		if objectReader.file, err = files.Open(options.Path); err != nil {
+		if objectReader.file, err = files.Open(path); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	readOptions := ReadOptions{
-		Config: options.Config,
-		File:   objectReader.file,
-	}
-
 	// try the existing options. if they fail, try without encryption
-	if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
+	if objectReader.ShaReadCloser, err = NewReader(config, objectReader.file); err != nil {
 		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		readOptions.Config = MakeConfig(
-			readOptions.GetBlobCompression(),
+		config = MakeConfig(
+			config.GetBlobCompression(),
 			&age.Age{},
 		)
 
-		if objectReader.ShaReadCloser, err = NewReader(readOptions); err != nil {
+		if objectReader.ShaReadCloser, err = NewReader(config, objectReader.file); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

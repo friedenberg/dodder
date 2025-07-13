@@ -9,7 +9,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
-type Mover struct {
+type MoveOptions struct {
+	TemporaryFS
+	ErrorOnAttemptedOverwrite bool
+	FinalPath                 string
+	GenerateFinalPathFromSha  bool
+}
+
+type localFileMover struct {
 	file *os.File
 	interfaces.ShaWriteCloser
 
@@ -19,14 +26,23 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
-// TODO add back support for locking internal files
-// TODO split mover into sha-based mover and final-path based mover
-// TODO extract writer portion in injected depenency
 func NewMover(
 	config Config,
 	moveOptions MoveOptions,
-) (mover *Mover, err error) {
-	mover = &Mover{
+) (interfaces.Mover, error) {
+	// TODO make MoveOptions an interface and add support for localFileShaMover
+	// and localFinalPathMover
+	return newMover(config, moveOptions)
+}
+
+// TODO add back support for locking internal files
+// TODO split mover into sha-based mover and final-path based mover
+// TODO extract writer portion in injected depenency
+func newMover(
+	config Config,
+	moveOptions MoveOptions,
+) (mover *localFileMover, err error) {
+	mover = &localFileMover{
 		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
 
@@ -41,12 +57,9 @@ func NewMover(
 		return
 	}
 
-	writeOptions := WriteOptions{
-		Writer: mover.file,
-	}
-
 	if mover.ShaWriteCloser, err = NewWriter(
-		config, writeOptions,
+		config,
+		mover.file,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -55,7 +68,7 @@ func NewMover(
 	return
 }
 
-func (mover *Mover) Close() (err error) {
+func (mover *localFileMover) Close() (err error) {
 	if mover.file == nil {
 		err = errors.ErrorWithStackf("nil file")
 		return

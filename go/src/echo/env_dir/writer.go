@@ -25,11 +25,11 @@ type writer struct {
 
 func NewWriter(
 	config Config,
-	writeOptions WriteOptions,
+	ioWriter io.Writer,
 ) (w *writer, err error) {
 	w = &writer{}
 
-	w.wBuf = bufio.NewWriter(writeOptions.Writer)
+	w.wBuf = bufio.NewWriter(ioWriter)
 
 	if w.wAge, err = config.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
 		err = errors.Wrap(err)

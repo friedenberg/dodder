@@ -345,9 +345,7 @@ func (mover *sftpMover) initialize() (err error) {
 
 	if mover.writer, err = newSftpWriter(
 		mover.config,
-		env_dir.WriteOptions{
-			Writer: mover.tempFile,
-		},
+		mover.tempFile,
 	); err != nil {
 		mover.tempFile.Close()
 		mover.store.sftpClient.Remove(mover.tempPath)
@@ -461,11 +459,11 @@ type sftpWriter struct {
 
 func newSftpWriter(
 	config env_dir.Config,
-	writeOptions env_dir.WriteOptions,
+	ioWriter io.Writer,
 ) (writer *sftpWriter, err error) {
 	writer = &sftpWriter{}
 
-	writer.wBuf = bufio.NewWriter(writeOptions.Writer)
+	writer.wBuf = bufio.NewWriter(ioWriter)
 
 	if writer.wAge, err = config.GetBlobEncryption().WrapWriter(writer.wBuf); err != nil {
 		err = errors.Wrap(err)

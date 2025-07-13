@@ -18,23 +18,23 @@ type reader struct {
 	tee       io.Reader
 }
 
-func NewReader(options ReadOptions) (r *reader, err error) {
+func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
 	r = &reader{}
 
-	if r.decrypter, err = options.GetBlobEncryption().WrapReader(options.File); err != nil {
+	if r.decrypter, err = config.GetBlobEncryption().WrapReader(readSeeker); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if r.expander, err = options.GetBlobCompression().WrapReader(r.decrypter); err != nil {
+	if r.expander, err = config.GetBlobCompression().WrapReader(r.decrypter); err != nil {
 		// TODO remove this when compression / encryption issues are resolved
-		if _, err = options.File.Seek(0, io.SeekStart); err != nil {
+		if _, err = readSeeker.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if r.expander, err = compression_type.CompressionTypeNone.WrapReader(
-			options.File,
+			readSeeker,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -116,11 +116,10 @@ func (cmd WriteBlob) doOne(
 ) (sh interfaces.Sha, err error) {
 	var readCloser io.ReadCloser
 
-	options := env_dir.FileReadOptions{
-		Path: path,
-	}
-
-	if readCloser, err = env_dir.NewFileReader(options); err != nil {
+	if readCloser, err = env_dir.NewFileReader(
+		env_dir.DefaultConfig,
+		path,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
