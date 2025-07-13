@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"iter"
 	"net/http"
 	"strings"
 
@@ -216,7 +215,7 @@ func (client client) ReadLast() (max *sku.Transacted, err error) {
 
 func (client client) IterInventoryList(
 	blobSha interfaces.Sha,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return nil
 }
 
@@ -226,7 +225,7 @@ func (client client) ReadAllSkus(
 	return comments.Implement()
 }
 
-func (client client) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted] {
 	var request *http.Request
 
 	{

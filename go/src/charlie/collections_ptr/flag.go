@@ -2,7 +2,6 @@ package collections_ptr
 
 import (
 	"flag"
-	"iter"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -77,7 +76,7 @@ type flagCommas[
 	resetter interfaces.Resetter2[T, TPtr]
 }
 
-func (f flagCommas[T, TPtr]) All() iter.Seq[T] {
+func (f flagCommas[T, TPtr]) All() interfaces.Seq[T] {
 	return f.MutableSetPtrLike.All()
 }
 

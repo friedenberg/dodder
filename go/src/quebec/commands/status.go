@@ -19,10 +19,10 @@ type Status struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-func (c Status) ModifyBuilder(
-	b *pkg_query.Builder,
+func (cmd Status) ModifyBuilder(
+	builder *pkg_query.Builder,
 ) {
-	b.WithHidden(nil)
+	builder.WithHidden(nil)
 }
 
 func (cmd Status) Run(req command.Request) {
@@ -40,7 +40,9 @@ func (cmd Status) Run(req command.Request) {
 		req.PopArgs(),
 	)
 
-	printer := localWorkingCopy.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
+	printer := localWorkingCopy.PrinterCheckedOut(
+		box_format.CheckedOutHeaderState{},
+	)
 
 	if err := localWorkingCopy.GetStore().QuerySkuType(
 		query,

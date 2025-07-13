@@ -179,7 +179,7 @@ test-bats-version dodder version $PATH=(dir_build + ":" + env("PATH")):
     --set DODDER_VERSION v{{version}} \
     ../zz-tests_bats/test
 
-version_next := shell("der-next info")
+version_next := shell("der-next info || echo '\n\ngetting next version failed'")
 
 test-bats-next:
   just \

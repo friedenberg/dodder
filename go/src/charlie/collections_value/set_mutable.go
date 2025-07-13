@@ -1,8 +1,6 @@
 package collections_value
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
@@ -22,7 +20,7 @@ func (s MutableSet[T]) Len() int {
 	return len(s.E)
 }
 
-func (s MutableSet[T]) All() iter.Seq[T] {
+func (s MutableSet[T]) All() interfaces.Seq[T] {
 	return func(yield func(T) bool) {
 		for _, e := range s.E {
 			if !yield(e) {
@@ -32,7 +30,7 @@ func (s MutableSet[T]) All() iter.Seq[T] {
 	}
 }
 
-func (s MutableSet[T]) AllKeys() iter.Seq[string] {
+func (s MutableSet[T]) AllKeys() interfaces.Seq[string] {
 	return func(yield func(string) bool) {
 		for k := range s.E {
 			if !yield(k) {

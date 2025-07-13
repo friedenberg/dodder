@@ -2,7 +2,6 @@ package sku
 
 import (
 	"bufio"
-	"iter"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -20,7 +19,7 @@ type InventoryListStore interface {
 
 	ReadLast() (max *Transacted, err error)
 
-	IterInventoryList(interfaces.Sha) iter.Seq2[*Transacted, error]
+	IterInventoryList(interfaces.Sha) interfaces.SeqError[*Transacted]
 
 	ReadAllSkus(
 		f func(besty, sk *Transacted) error,
@@ -31,7 +30,7 @@ type InventoryListStore interface {
 	// 	f interfaces.FuncIter[*sku.Transacted],
 	// ) (err error)
 
-	IterAllInventoryLists() iter.Seq2[*Transacted, error]
+	IterAllInventoryLists() interfaces.SeqError[*Transacted]
 	MakeImporter(ImporterOptions, StoreOptions) Importer
 	ImportList(*List, Importer) error
 }
@@ -87,7 +86,7 @@ func (resetterList) ResetWith(a, b *List) {
 	a.ResetWith(b)
 }
 
-func CollectList(seq iter.Seq2[*Transacted, error]) (list *List, err error) {
+func CollectList(seq interfaces.SeqError[*Transacted]) (list *List, err error) {
 	list = MakeList()
 
 	for sk, iterErr := range seq {
@@ -129,7 +128,7 @@ func (resetterListCheckedOut) ResetWith(a, b *ListCheckedOut) {
 }
 
 func CollectListCheckedOut(
-	seq iter.Seq2[*CheckedOut, error],
+	seq interfaces.SeqError[*CheckedOut],
 ) (list *ListCheckedOut, err error) {
 	list = MakeListCheckedOut()
 

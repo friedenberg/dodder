@@ -3,7 +3,6 @@ package typed_blob_store
 import (
 	"bufio"
 	"io"
-	"iter"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -237,7 +236,7 @@ type iterSku = func(*sku.Transacted) bool
 
 func (a InventoryList) StreamInventoryListBlobSkus(
 	transactedGetter sku.TransactedGetter,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		sk := transactedGetter.GetSku()
 		tipe := sk.GetType()
@@ -271,7 +270,7 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 
 func (a InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[iterSku]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
@@ -302,7 +301,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
 	blobSha interfaces.Sha,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var readCloser interfaces.ShaReadCloser
 
@@ -342,7 +341,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	reader io.Reader,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
 			a.streamDecoders,

@@ -2,7 +2,6 @@ package heap
 
 import (
 	"container/heap"
-	"iter"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -25,7 +24,7 @@ func (h *Heap[T, TPtr]) Any() TPtr {
 	return e
 }
 
-func (h *Heap[T, TPtr]) All() iter.Seq[TPtr] {
+func (h *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
 	return func(yield func(TPtr) bool) {
 		h.l.Lock()
 		defer h.l.Unlock()

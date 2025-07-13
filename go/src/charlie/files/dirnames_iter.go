@@ -2,13 +2,13 @@ package files
 
 import (
 	"io/fs"
-	"iter"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
@@ -32,7 +32,7 @@ func WalkDirIgnoreFuncHidden(dirEntry WalkDirEntry) bool {
 
 func WalkDir(
 	base string,
-) iter.Seq2[WalkDirEntry, error] {
+) interfaces.SeqError[WalkDirEntry] {
 	return func(yield func(WalkDirEntry, error) bool) {
 		if err := filepath.WalkDir(
 			base,
@@ -70,7 +70,7 @@ func WalkDir(
 	}
 }
 
-func DirNames2(p string) iter.Seq2[os.DirEntry, error] {
+func DirNames2(p string) interfaces.SeqError[os.DirEntry] {
 	return func(yield func(os.DirEntry, error) bool) {
 		var names []os.DirEntry
 
@@ -107,8 +107,8 @@ func DirNames(dirPath string) (slice quiter.Slice[string], err error) {
 }
 
 func DirNameWriterIgnoringHidden(
-	seq iter.Seq2[string, error],
-) iter.Seq2[string, error] {
+	seq interfaces.SeqError[string],
+) interfaces.SeqError[string] {
 	return func(yield func(string, error) bool) {
 		for path, err := range seq {
 			if err != nil {
@@ -131,7 +131,7 @@ func DirNameWriterIgnoringHidden(
 
 func DirNamesLevel2(
 	dirPath string,
-) iter.Seq2[string, error] {
+) interfaces.SeqError[string] {
 	return func(yield func(string, error) bool) {
 		var topLevel quiter.Slice[string]
 

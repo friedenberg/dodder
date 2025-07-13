@@ -1,9 +1,8 @@
 package sku
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -49,7 +48,7 @@ func (c Conflicted) Any() *Transacted {
 	return c.Local
 }
 
-func (c Conflicted) All() iter.Seq[*Transacted] {
+func (c Conflicted) All() interfaces.Seq[*Transacted] {
 	return func(yield func(*Transacted) bool) {
 		if !yield(c.Local) {
 			return
@@ -155,7 +154,7 @@ func (tm *Conflicted) MergeTags() (err error) {
 }
 
 func (c *Conflicted) ReadConflictMarker(
-	iter iter.Seq2[*Transacted, error],
+	iter interfaces.SeqError[*Transacted],
 ) (err error) {
 	i := 0
 

@@ -2,10 +2,10 @@ package organize_text
 
 import (
 	"fmt"
-	"iter"
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -106,7 +106,7 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.SkuType) {
 	return
 }
 
-func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.SkuType] {
+func (smwo *SkuMapWithOrder) AllSkuAndIndex() interfaces.Seq2[int, sku.SkuType] {
 	return func(yield func(int, sku.SkuType) bool) {
 		for i, sk := range smwo.Sorted() {
 			if !yield(i, sk) {

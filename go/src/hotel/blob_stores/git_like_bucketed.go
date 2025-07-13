@@ -2,8 +2,8 @@ package blob_stores
 
 import (
 	"bytes"
+	"fmt"
 	"io"
-	"iter"
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -37,8 +37,8 @@ func makeGitLikeBucketedStore(
 	}
 }
 
-func (blobStore gitLikeBucketed) GetBlobStore() interfaces.BlobStore {
-	return blobStore
+func (blobStore gitLikeBucketed) GetBlobStoreDescription() string {
+	return fmt.Sprintf("TODO: local-git-like")
 }
 
 func (blobStore gitLikeBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
@@ -70,7 +70,7 @@ func (blobStore gitLikeBucketed) HasBlob(
 	return
 }
 
-func (blobStore gitLikeBucketed) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+func (blobStore gitLikeBucketed) AllBlobs() interfaces.SeqError[interfaces.Sha] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		var sh sha.Sha
 

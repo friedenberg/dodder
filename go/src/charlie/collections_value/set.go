@@ -1,8 +1,6 @@
 package collections_value
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
@@ -14,7 +12,7 @@ type Set[
 	E map[string]T
 }
 
-func (s Set[T]) AllKeys() iter.Seq[string] {
+func (s Set[T]) AllKeys() interfaces.Seq[string] {
 	return func(yield func(string) bool) {
 		for k := range s.E {
 			if !yield(k) {
@@ -24,7 +22,7 @@ func (s Set[T]) AllKeys() iter.Seq[string] {
 	}
 }
 
-func (s Set[T]) All() iter.Seq[T] {
+func (s Set[T]) All() interfaces.Seq[T] {
 	return func(yield func(T) bool) {
 		for _, e := range s.E {
 			if !yield(e) {

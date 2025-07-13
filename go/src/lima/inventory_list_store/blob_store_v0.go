@@ -1,7 +1,6 @@
 package inventory_list_store
 
 import (
-	"iter"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -111,7 +110,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 	return
 }
 
-func (blobStore *blobStoreV0) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+func (blobStore *blobStoreV0) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		for sh, err := range blobStore.LocalBlobStore.AllBlobs() {
 			if err != nil {

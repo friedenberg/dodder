@@ -38,7 +38,7 @@ func (cmd Fsck) Run(dep command.Request) {
 		query.BuilderOptionsOld(cmd),
 	)
 
-	p := localWorkingCopy.PrinterTransacted()
+	printer := localWorkingCopy.PrinterTransacted()
 
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,
@@ -53,7 +53,7 @@ func (cmd Fsck) Run(dep command.Request) {
 				return
 			}
 
-			if err = p(sk); err != nil {
+			if err = printer(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

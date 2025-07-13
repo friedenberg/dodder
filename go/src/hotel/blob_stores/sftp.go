@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"iter"
 	"os"
 	"path"
 	"strings"
@@ -165,8 +164,8 @@ func (blobStore *sftpBlobStore) ensureRemotePath() (err error) {
 	return
 }
 
-func (blobStore *sftpBlobStore) GetBlobStore() interfaces.BlobStore {
-	return blobStore
+func (blobStore *sftpBlobStore) GetBlobStoreDescription() string {
+	return fmt.Sprintf("TODO: sftp")
 }
 
 func (blobStore *sftpBlobStore) GetBlobIOWrapper() interfaces.BlobIOWrapper {
@@ -205,7 +204,7 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	return
 }
 
-func (blobStore *sftpBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Sha] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		basePath := blobStore.config.GetRemotePath()
 

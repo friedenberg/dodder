@@ -1,8 +1,6 @@
 package organize_text
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
@@ -44,7 +42,10 @@ func (s PrefixSet) Len() int {
 
 func (s *PrefixSet) AddSku(object sku.SkuType) (err error) {
 	if object.GetState() == checked_out_state.Unknown {
-		err = errors.ErrorWithStackf("unacceptable state: %s", object.GetState())
+		err = errors.ErrorWithStackf(
+			"unacceptable state: %s",
+			object.GetState(),
+		)
 		err = errors.Wrapf(err, "Sku: %s", sku.String(object.GetSku()))
 		return
 	}
@@ -166,7 +167,7 @@ func (a PrefixSet) Each(
 	return
 }
 
-func (a PrefixSet) AllObjectSets() iter.Seq2[string, objSet] {
+func (a PrefixSet) AllObjectSets() interfaces.Seq2[string, objSet] {
 	return func(yield func(string, objSet) bool) {
 		for i, os := range a.innerMap {
 			if !yield(i, os) {
@@ -176,7 +177,7 @@ func (a PrefixSet) AllObjectSets() iter.Seq2[string, objSet] {
 	}
 }
 
-func (a PrefixSet) AllObjects() iter.Seq2[string, *obj] {
+func (a PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
 	return func(yield func(string, *obj) bool) {
 		for i, os := range a.innerMap {
 			for o := range os.All() {
@@ -260,7 +261,9 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.GetSkuExternal().Metadata.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.GetSkuExternal().Metadata.Cache.TagPaths.All.GetMatching(
+					e2,
+				)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string

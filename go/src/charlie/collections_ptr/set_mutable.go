@@ -1,8 +1,6 @@
 package collections_ptr
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
@@ -15,7 +13,7 @@ type MutableSet[
 	E map[string]TPtr
 }
 
-func (s MutableSet[T, TPtr]) AllKeys() iter.Seq[string] {
+func (s MutableSet[T, TPtr]) AllKeys() interfaces.Seq[string] {
 	return func(yield func(string) bool) {
 		for k := range s.E {
 			if !yield(k) {
@@ -25,7 +23,7 @@ func (s MutableSet[T, TPtr]) AllKeys() iter.Seq[string] {
 	}
 }
 
-func (s MutableSet[T, TPtr]) All() iter.Seq[T] {
+func (s MutableSet[T, TPtr]) All() interfaces.Seq[T] {
 	return func(yield func(T) bool) {
 		for _, e := range s.E {
 			if !yield(*e) {
@@ -35,7 +33,7 @@ func (s MutableSet[T, TPtr]) All() iter.Seq[T] {
 	}
 }
 
-func (s MutableSet[T, TPtr]) AllPtr() iter.Seq[TPtr] {
+func (s MutableSet[T, TPtr]) AllPtr() interfaces.Seq[TPtr] {
 	return func(yield func(TPtr) bool) {
 		for _, e := range s.E {
 			if !yield(e) {

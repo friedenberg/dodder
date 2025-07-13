@@ -2,7 +2,6 @@ package inventory_list_store
 
 import (
 	"io"
-	"iter"
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -138,7 +137,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	return
 }
 
-func (blobStore *blobStoreV1) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {
+func (blobStore *blobStoreV1) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var file *os.File
 

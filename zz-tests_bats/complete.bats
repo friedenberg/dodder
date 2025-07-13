@@ -82,6 +82,9 @@ function complete_subcmd { # @test
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		add
+		blob-cat
+		blob-fsck
+		blob-write
 		cat-alfred
 		cat-blob
 		cat-blob-shas

@@ -2,8 +2,8 @@ package errors
 
 import (
 	"fmt"
-	"iter"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"golang.org/x/xerrors"
 )
@@ -167,7 +167,7 @@ func Implement() (err error) {
 }
 
 //go:noinline
-func IterWrapped[T any](err error) iter.Seq2[T, error] {
+func IterWrapped[T any](err error) interfaces.SeqError[T] {
 	return func(yield func(T, error) bool) {
 		var t T
 		yield(t, WrapN(1, err))

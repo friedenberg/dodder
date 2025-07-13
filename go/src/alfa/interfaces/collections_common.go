@@ -1,8 +1,6 @@
 package interfaces
 
-import (
-	"iter"
-)
+import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 
 type (
 	// Yield[T any]           = func(T) bool
@@ -30,10 +28,10 @@ type ContainsKeyer interface {
 
 type Iterable[T any] interface {
 	Any() T
-	All() iter.Seq[T]
+	All() interfaces.Seq[T]
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {
 	EachPtr(FuncIter[TPtr]) error // TODO remove in favor of iter.Seq
-	AllPtr() iter.Seq[TPtr]
+	AllPtr() interfaces.Seq[TPtr]
 }

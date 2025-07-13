@@ -1,8 +1,6 @@
 package quiter
 
 import (
-	"iter"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 )
@@ -26,7 +24,7 @@ func (s Slice[E]) Each(f interfaces.FuncIter[E]) error {
 	return comments.Implement()
 }
 
-func (s Slice[E]) All() iter.Seq[E] {
+func (s Slice[E]) All() interfaces.Seq[E] {
 	return func(yield func(E) bool) {
 		for _, e := range s {
 			if !yield(e) {

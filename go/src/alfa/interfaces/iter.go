@@ -1,12 +1,13 @@
 package interfaces
 
-import "iter"
+import (
+	"iter"
+)
 
-// TODO replace all uses of iter in codebase with these
 type (
 	Seq[T any]          = iter.Seq[T]
 	Seq2[T any, T1 any] = iter.Seq2[T, T1]
-	SeqError[T any]     = Seq2[T, error]
+	SeqError[T any]     = iter.Seq2[T, error]
 )
 
 func MakeSeqErrorWithError[T any](err error) SeqError[T] {

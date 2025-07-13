@@ -42,7 +42,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		env.DirLostAndFound(),
 		env.DirFirstBlobStoreInventoryLists(),
 		env.DirFirstBlobStoreBlobs(),
-		env.DirBlobStores("1"),
+		env.DirBlobStores("0"),
 	); err != nil {
 		env.CancelWithError(err)
 	}
@@ -130,7 +130,7 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
 			Blob: bigBang.BlobStoreConfig,
 		},
-		env.DirBlobStores("1", FileNameBlobStoreConfig),
+		env.DirBlobStores("0", FileNameBlobStoreConfig),
 	)
 }
 

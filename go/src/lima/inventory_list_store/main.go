@@ -1,7 +1,6 @@
 package inventory_list_store
 
 import (
-	"iter"
 	"sort"
 	"sync"
 
@@ -56,7 +55,7 @@ type inventoryListBlobStore interface {
 		object *sku.Transacted,
 	) (err error)
 
-	IterAllInventoryLists() iter.Seq2[*sku.Transacted, error]
+	IterAllInventoryLists() interfaces.SeqError[*sku.Transacted]
 }
 
 func (store *Store) Initialize(
@@ -436,7 +435,7 @@ func (store *Store) ImportInventoryList(
 
 func (store *Store) IterInventoryList(
 	blobSha interfaces.Sha,
-) iter.Seq2[*sku.Transacted, error] {
+) interfaces.SeqError[*sku.Transacted] {
 	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),
 		store.blobBlobStore,
@@ -487,7 +486,7 @@ func (store *Store) ReadAllSorted(
 	return
 }
 
-func (store *Store) IterAllSkus() iter.Seq2[sku.ObjectWithList, error] {
+func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 	return func(yield func(sku.ObjectWithList, error) bool) {
 		var objectWithList sku.ObjectWithList
 

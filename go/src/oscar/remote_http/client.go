@@ -124,6 +124,10 @@ func (client *client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
+func (client *client) GetBlobStoreDescription() string {
+	return fmt.Sprintf("TODO: remote")
+}
+
 func (client *client) GetObjectStore() sku.RepoStore {
 	return nil
 }

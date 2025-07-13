@@ -2,7 +2,6 @@ package interfaces
 
 import (
 	"io"
-	"iter"
 )
 
 type (
@@ -36,7 +35,7 @@ type (
 	}
 
 	BlobStore interface {
-		GetBlobStore() BlobStore
+		GetBlobStoreDescription() string
 		HasBlob(sh Sha) (ok bool)
 		BlobReader
 		BlobWriter
@@ -47,7 +46,7 @@ type (
 		BlobStore
 		GetLocalBlobStore() LocalBlobStore
 		GetBlobIOWrapper() BlobIOWrapper
-		AllBlobs() iter.Seq2[Sha, error]
+		AllBlobs() SeqError[Sha]
 		Mover() (Mover, error)
 	}
 

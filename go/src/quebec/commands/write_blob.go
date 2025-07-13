@@ -19,6 +19,7 @@ import (
 
 func init() {
 	command.Register("write-blob", &WriteBlob{})
+	command.Register("blob-write", &WriteBlob{})
 }
 
 type WriteBlob struct {
