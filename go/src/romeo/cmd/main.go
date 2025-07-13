@@ -44,7 +44,7 @@ func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus in
 
 	if errors.As(err, &signal) {
 		if signal.Signal != syscall.SIGHUP {
-			ui.Err().Print("%s aborting due to signal: %s", name, signal.Signal)
+			ui.Err().Printf("%s aborting due to signal: %s", name, signal.Signal)
 		}
 
 		return
