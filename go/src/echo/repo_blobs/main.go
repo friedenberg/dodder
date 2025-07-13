@@ -31,7 +31,7 @@ var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
 	ids.TypeTomlRepoLocalPath:   coderToml[TomlLocalPathV0]{},
 	ids.TypeTomlRepoDotenvXdgV0: coderToml[TomlXDGV0]{},
 	ids.TypeTomlRepoUri:         coderToml[TomlUriV0]{},
-	"":                      coderToml[TomlUriV0]{},
+	"":                          coderToml[TomlUriV0]{},
 }
 
 var Coder = interfaces.CoderBufferedReadWriter[*TypedBlob](

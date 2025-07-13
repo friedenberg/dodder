@@ -27,7 +27,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 	configTypedBlob := repo.GetConfigPublic()
 	configBlob := configTypedBlob.Blob
 	storeVersion := configBlob.GetStoreVersion()
-	blobStoreConfigDefault := repo.GetDefaultBlobStore()
+	blobStore := repo.GetDefaultBlobStore()
+	blobIOWrapper := blobStore.GetBlobIOWrapper()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}
@@ -59,14 +60,14 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "compression-type":
 			// TODO read default blob store and expose config
 			repo.GetUI().Print(
-				blobStoreConfigDefault.GetBlobCompression(),
+				blobIOWrapper.GetBlobCompression(),
 			)
 
 			// TODO switch to `blob_stores.N.age_encryption`
 			// TODO switch to encryption interface
 		case "age-encryption":
 			// TODO read default blob store and expose config
-			for _, i := range blobStoreConfigDefault.GetBlobEncryption().(*age.Age).Identities {
+			for _, i := range blobIOWrapper.GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 

@@ -26,7 +26,7 @@ func NewFileReader(
 
 	readOptions := ReadOptions{
 		Config: options.Config,
-		File:          objectReader.file,
+		File:   objectReader.file,
 	}
 
 	// try the existing options. if they fail, try without encryption

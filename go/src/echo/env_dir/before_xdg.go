@@ -8,11 +8,11 @@ import (
 )
 
 type beforeXDG struct {
-	cwd      string
-	execPath string
-	pid      int
-	dryRun   bool
-	debugOptions    debug.Options
+	cwd          string
+	execPath     string
+	pid          int
+	dryRun       bool
+	debugOptions debug.Options
 
 	TempLocal, TempOS TemporaryFS
 }

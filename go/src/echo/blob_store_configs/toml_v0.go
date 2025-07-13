@@ -31,10 +31,6 @@ func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flag.FlagSet) {
 	)
 }
 
-func (blobStoreConfig *TomlV0) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return blobStoreConfig
-}
-
 func (blobStoreConfig *TomlV0) GetBlobCompression() interfaces.BlobCompression {
 	return &blobStoreConfig.CompressionType
 }

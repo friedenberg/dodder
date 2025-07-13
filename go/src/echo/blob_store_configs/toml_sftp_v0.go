@@ -83,10 +83,6 @@ func (blobStoreConfig *TomlSftpV0) SetFlagSet(flagSet *flag.FlagSet) {
 	)
 }
 
-func (blobStoreConfig *TomlSftpV0) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return blobStoreConfig
-}
-
 func (blobStoreConfig *TomlSftpV0) GetBlobCompression() interfaces.BlobCompression {
 	return &blobStoreConfig.CompressionType
 }

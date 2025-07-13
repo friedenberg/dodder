@@ -33,7 +33,7 @@ type common interface {
 	GetInventoryListTypeString() string
 
 	// TODO extricate
-	GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable
+	GetBlobStoreConfigImmutable() interfaces.BlobIOWrapper
 }
 
 // switch public and private to be "views" on the underlying interface

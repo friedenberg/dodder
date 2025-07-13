@@ -16,6 +16,11 @@ type (
 		GetBlobEncryption() BlobEncryption
 	}
 
+	BlobIOWrapper interface {
+		GetBlobEncryption() BlobEncryption
+		GetBlobCompression() BlobCompression
+	}
+
 	BlobReader interface {
 		BlobReader(Sha) (ShaReadCloser, error)
 	}
@@ -40,18 +45,9 @@ type (
 	LocalBlobStore interface {
 		BlobStore
 		GetLocalBlobStore() LocalBlobStore
+		GetBlobIOWrapper() BlobIOWrapper
 		AllBlobs() iter.Seq2[Sha, error]
 		Mover() (Mover, error)
-	}
-
-	BlobIOWrapper interface {
-		GetBlobEncryption() BlobEncryption
-		GetBlobCompression() BlobCompression
-	}
-
-	BlobStoreConfigImmutable interface {
-		GetBlobStoreConfigImmutable() BlobStoreConfigImmutable
-		BlobIOWrapper
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by

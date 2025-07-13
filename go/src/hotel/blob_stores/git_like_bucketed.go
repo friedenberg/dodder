@@ -11,12 +11,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
 type gitLikeBucketedConfig interface {
-	blob_store_configs.Config
+	interfaces.BlobIOWrapper
 	GetLockInternalFiles() bool
 }
 
@@ -40,6 +39,10 @@ func makeGitLikeBucketedStore(
 
 func (blobStore gitLikeBucketed) GetBlobStore() interfaces.BlobStore {
 	return blobStore
+}
+
+func (blobStore gitLikeBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+	return blobStore.config
 }
 
 func (blobStore gitLikeBucketed) GetLocalBlobStore() interfaces.LocalBlobStore {

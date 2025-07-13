@@ -20,12 +20,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
 type sftpConfig interface {
-	blob_store_configs.Config
+	// TODO move this out
+	interfaces.BlobIOWrapper
+
 	GetHost() string
 	GetPort() int
 	GetUser() string
@@ -165,6 +166,10 @@ func (blobStore *sftpBlobStore) ensureRemotePath() (err error) {
 
 func (blobStore *sftpBlobStore) GetBlobStore() interfaces.BlobStore {
 	return blobStore
+}
+
+func (blobStore *sftpBlobStore) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+	return blobStore.config
 }
 
 func (blobStore *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
