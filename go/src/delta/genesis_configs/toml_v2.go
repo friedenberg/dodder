@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -79,10 +78,6 @@ func (config *TomlV2Public) GetImmutableConfigPublic() Public {
 
 func (config TomlV2Public) GetPublicKey() repo_signing.PublicKey {
 	return config.PublicKey.Data
-}
-
-func (config *TomlV2Common) GetBlobStoreConfigImmutable() interfaces.BlobIOWrapper {
-	return nil
 }
 
 func (config *TomlV2Common) GetStoreVersion() StoreVersion {

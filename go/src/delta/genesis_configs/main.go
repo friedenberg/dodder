@@ -29,9 +29,10 @@ type common interface {
 	GetRepoType() repo_type.Type
 	GetRepoId() ids.RepoId
 	GetInventoryListTypeString() string
+}
 
-	// TODO extricate
-	GetBlobStoreConfigImmutable() interfaces.BlobIOWrapper
+type BlobIOWrapperGetter interface {
+	GetBlobIOWrapper() interfaces.BlobIOWrapper
 }
 
 // switch public and private to be "views" on the underlying interface

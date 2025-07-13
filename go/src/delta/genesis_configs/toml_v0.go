@@ -64,7 +64,7 @@ func (config *V0Public) GetImmutableConfigPublic() Public {
 	return config
 }
 
-func (config *V0Common) GetBlobStoreConfigImmutable() interfaces.BlobIOWrapper {
+func (config *V0Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return config
 }
 

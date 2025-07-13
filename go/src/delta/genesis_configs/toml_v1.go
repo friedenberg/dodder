@@ -87,7 +87,7 @@ func (config TomlV1Public) GetPublicKey() repo_signing.PublicKey {
 	return config.PublicKey.Data
 }
 
-func (config *TomlV1Common) GetBlobStoreConfigImmutable() interfaces.BlobIOWrapper {
+func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return &config.BlobStore
 }
 
