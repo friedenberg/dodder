@@ -145,14 +145,14 @@ func (blobStore gitLikeBucketed) BlobReader(
 func (blobStore gitLikeBucketed) blobWriterTo(
 	path string,
 ) (mover *env_dir.Mover, err error) {
-	options := env_dir.MoveOptions{
-		Config:                   blobStore.makeEnvDirConfig(),
-		FinalPath:                path,
-		GenerateFinalPathFromSha: true,
-		TemporaryFS:              blobStore.tempFS,
-	}
-
-	if mover, err = env_dir.NewMover(options); err != nil {
+	if mover, err = env_dir.NewMover(
+		blobStore.makeEnvDirConfig(),
+		env_dir.MoveOptions{
+			FinalPath:                path,
+			GenerateFinalPathFromSha: true,
+			TemporaryFS:              blobStore.tempFS,
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

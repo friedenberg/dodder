@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+// TODO decouple Config from all of these
+
 type ReadOptions struct {
 	Config
 	*os.File
@@ -16,12 +18,10 @@ type FileReadOptions struct {
 }
 
 type WriteOptions struct {
-	Config
 	io.Writer
 }
 
 type MoveOptions struct {
-	Config
 	TemporaryFS
 	ErrorOnAttemptedOverwrite bool
 	FinalPath                 string

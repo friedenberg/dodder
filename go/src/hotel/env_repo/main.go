@@ -25,7 +25,7 @@ const (
 	FileWorkspaceTemplate = ".%s-workspace"
 	FileWorkspace         = ".dodder-workspace"
 
-	blobStoreConfigFileName = "dodder-blob_store-config"
+	FileNameBlobStoreConfig = "dodder-blob_store-config"
 )
 
 type directoryPaths interface {
@@ -142,7 +142,7 @@ func (env *Env) setupStores() {
 
 			// TODO consider just iterating and using ErrNotExist instead
 			if configPaths, err = filepath.Glob(
-				filepath.Join(env.DirBlobStores(), "*", blobStoreConfigFileName),
+				filepath.Join(env.DirBlobStores(), "*", FileNameBlobStoreConfig),
 			); err != nil {
 				env.CancelWithError(err)
 			}

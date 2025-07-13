@@ -75,27 +75,27 @@ func (cmd Export) Run(dep command.Request) {
 		)
 	}
 
-	var wc io.WriteCloser
-
-	o := env_dir.WriteOptions{
-		Config: env_dir.MakeConfig(
-			&cmd.CompressionType,
-			&ag,
-		),
-		Writer: localWorkingCopy.GetUIFile(),
-	}
+	var writeCloser io.WriteCloser
 
 	{
 		var err error
 
-		if wc, err = env_dir.NewWriter(o); err != nil {
+		if writeCloser, err = env_dir.NewWriter(
+			env_dir.MakeConfig(
+				&cmd.CompressionType,
+				&ag,
+			),
+			env_dir.WriteOptions{
+				Writer: localWorkingCopy.GetUIFile(),
+			},
+		); err != nil {
 			localWorkingCopy.CancelWithError(err)
 		}
 	}
 
-	defer localWorkingCopy.MustClose(wc)
+	defer localWorkingCopy.MustClose(writeCloser)
 
-	bufferedWriter := ohio.BufferedWriter(wc)
+	bufferedWriter := ohio.BufferedWriter(writeCloser)
 	defer pool.GetBufioWriter().Put(bufferedWriter)
 	defer localWorkingCopy.MustFlush(bufferedWriter)
 

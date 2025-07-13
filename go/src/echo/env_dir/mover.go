@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
 type Mover struct {
 	file *os.File
-	*writer
+	interfaces.ShaWriteCloser
 
 	basePath                  string
 	objectPath                string
@@ -19,7 +20,12 @@ type Mover struct {
 }
 
 // TODO add back support for locking internal files
-func NewMover(moveOptions MoveOptions) (mover *Mover, err error) {
+// TODO split mover into sha-based mover and final-path based mover
+// TODO extract writer portion in injected depenency
+func NewMover(
+	config Config,
+	moveOptions MoveOptions,
+) (mover *Mover, err error) {
 	mover = &Mover{
 		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
@@ -36,11 +42,12 @@ func NewMover(moveOptions MoveOptions) (mover *Mover, err error) {
 	}
 
 	writeOptions := WriteOptions{
-		Config: moveOptions.Config,
 		Writer: mover.file,
 	}
 
-	if mover.writer, err = NewWriter(writeOptions); err != nil {
+	if mover.ShaWriteCloser, err = NewWriter(
+		config, writeOptions,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -48,18 +55,18 @@ func NewMover(moveOptions MoveOptions) (mover *Mover, err error) {
 	return
 }
 
-func (m *Mover) Close() (err error) {
-	if m.file == nil {
+func (mover *Mover) Close() (err error) {
+	if mover.file == nil {
 		err = errors.ErrorWithStackf("nil file")
 		return
 	}
 
-	if m.writer == nil {
+	if mover.ShaWriteCloser == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = m.writer.Close(); err != nil {
+	if err = mover.ShaWriteCloser.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,12 +78,12 @@ func (m *Mover) Close() (err error) {
 	// 	return
 	// }
 
-	if err = files.Close(m.file); err != nil {
+	if err = mover.file.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh := m.GetShaLike()
+	sh := mover.GetShaLike()
 
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",
@@ -85,25 +92,25 @@ func (m *Mover) Close() (err error) {
 	// 	sh,
 	// )
 
-	if m.objectPath == "" {
+	if mover.objectPath == "" {
 		// TODO-P3 move this validation to options
-		if m.basePath == "" {
+		if mover.basePath == "" {
 			err = errors.ErrorWithStackf("basepath is nil")
 			return
 		}
 
-		if m.objectPath, err = id.MakeDirIfNecessary(sh, m.basePath); err != nil {
+		if mover.objectPath, err = id.MakeDirIfNecessary(sh, mover.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	p := m.file.Name()
+	path := mover.file.Name()
 
-	if err = os.Rename(p, m.objectPath); err != nil {
-		if files.Exists(m.objectPath) {
-			if m.errorOnAttemptedOverwrite {
-				err = MakeErrAlreadyExists(sh, m.objectPath)
+	if err = os.Rename(path, mover.objectPath); err != nil {
+		if files.Exists(mover.objectPath) {
+			if mover.errorOnAttemptedOverwrite {
+				err = MakeErrAlreadyExists(sh, mover.objectPath)
 			} else {
 				err = nil
 			}
@@ -117,8 +124,8 @@ func (m *Mover) Close() (err error) {
 
 	// log.Log().Printf("moved %s to %s", p, m.objectPath)
 
-	if m.lockFile {
-		if err = files.SetDisallowUserChanges(m.objectPath); err != nil {
+	if mover.lockFile {
+		if err = files.SetDisallowUserChanges(mover.objectPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

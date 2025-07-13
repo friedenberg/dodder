@@ -18,8 +18,8 @@ func (env Env) WriteCloserCache(
 	path string,
 ) (sha.WriteCloser, error) {
 	return env_dir.NewMover(
+		env_dir.DefaultConfig,
 		env_dir.MoveOptions{
-			Config:      env_dir.DefaultConfig,
 			FinalPath:   path,
 			TemporaryFS: env.GetTempLocal(),
 		},

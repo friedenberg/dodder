@@ -24,9 +24,6 @@ import (
 )
 
 type sftpConfig interface {
-	// TODO move this out
-	interfaces.BlobIOWrapper
-
 	GetHost() string
 	GetPort() int
 	GetUser() string
@@ -37,9 +34,13 @@ type sftpConfig interface {
 }
 
 type sftpBlobStore struct {
-	config     sftpConfig
-	sshClient  *ssh.Client
-	sftpClient *sftp.Client
+	config sftpConfig
+
+	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
+	// `config.GetRemotePath()`
+	blobIOWrapper interfaces.BlobIOWrapper
+	sshClient     *ssh.Client
+	sftpClient    *sftp.Client
 }
 
 func makeSftpStore(
@@ -169,7 +170,7 @@ func (blobStore *sftpBlobStore) GetBlobStore() interfaces.BlobStore {
 }
 
 func (blobStore *sftpBlobStore) GetBlobIOWrapper() interfaces.BlobIOWrapper {
-	return blobStore.config
+	return blobStore.blobIOWrapper
 }
 
 func (blobStore *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
@@ -178,8 +179,8 @@ func (blobStore *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
 
 func (blobStore *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-		blobStore.config.GetBlobCompression(),
-		blobStore.config.GetBlobEncryption(),
+		blobStore.blobIOWrapper.GetBlobCompression(),
+		blobStore.blobIOWrapper.GetBlobEncryption(),
 	)
 }
 
@@ -280,8 +281,8 @@ func (blobStore *sftpBlobStore) BlobReader(
 
 	remotePath := blobStore.remotePathForSha(sh)
 
-	// Open remote file for reading
 	var remoteFile *sftp.File
+
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
@@ -314,6 +315,7 @@ func (blobStore *sftpBlobStore) BlobReader(
 }
 
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
+// TODO explore using env_dir.Mover generically instead of this
 type sftpMover struct {
 	store    *sftpBlobStore
 	config   env_dir.Config
@@ -340,12 +342,13 @@ func (mover *sftpMover) initialize() (err error) {
 	}
 
 	// Create the streaming writer with compression/encryption
-	writeOptions := env_dir.WriteOptions{
-		Config: mover.config,
-		Writer: mover.tempFile,
-	}
 
-	if mover.writer, err = newSftpWriter(writeOptions); err != nil {
+	if mover.writer, err = newSftpWriter(
+		mover.config,
+		env_dir.WriteOptions{
+			Writer: mover.tempFile,
+		},
+	); err != nil {
 		mover.tempFile.Close()
 		mover.store.sftpClient.Remove(mover.tempPath)
 		err = errors.Wrap(err)
@@ -457,20 +460,21 @@ type sftpWriter struct {
 }
 
 func newSftpWriter(
+	config env_dir.Config,
 	writeOptions env_dir.WriteOptions,
 ) (writer *sftpWriter, err error) {
 	writer = &sftpWriter{}
 
 	writer.wBuf = bufio.NewWriter(writeOptions.Writer)
 
-	if writer.wAge, err = writeOptions.GetBlobEncryption().WrapWriter(writer.wBuf); err != nil {
+	if writer.wAge, err = config.GetBlobEncryption().WrapWriter(writer.wBuf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	writer.hash = sha256.New()
 
-	if writer.wCompress, err = writeOptions.GetBlobCompression().WrapWriter(writer.wAge); err != nil {
+	if writer.wCompress, err = config.GetBlobCompression().WrapWriter(writer.wAge); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -523,6 +527,7 @@ func (writer *sftpWriter) GetShaLike() interfaces.Sha {
 }
 
 // sftpStreamingReader handles decompression/decryption while reading from SFTP
+// TODO combine with sftpReader
 type sftpStreamingReader struct {
 	file   *sftp.File
 	config interfaces.BlobIOWrapper
