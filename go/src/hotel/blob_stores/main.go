@@ -21,17 +21,12 @@ func MakeBlobStore(
 	default:
 		ctx.CancelWithErrorf("unsupported blob store config: %T", config)
 		return nil
+	case sftpConfig:
+		return makeSftpStore(ctx, config)
 
 	case gitLikeBucketedConfig:
 		return makeGitLikeBucketedStore(basePath, config, tempFS)
-		
-	case sftpConfig:
-		store, err := makeSftpStore(config, tempFS)
-		if err != nil {
-			ctx.CancelWithError(err)
-			return nil
-		}
-		return store
+
 	}
 }
 

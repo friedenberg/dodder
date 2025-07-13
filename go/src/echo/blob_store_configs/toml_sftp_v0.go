@@ -9,12 +9,16 @@ import (
 )
 
 type TomlSftpV0 struct {
-	Host              string                           `toml:"host"`
-	Port              int                              `toml:"port,omitempty"`
-	User              string                           `toml:"user"`
-	Password          string                           `toml:"password,omitempty"`
-	PrivateKeyPath    string                           `toml:"private-key-path,omitempty"`
-	RemotePath        string                           `toml:"remote-path"`
+	// TODO replace the below with a url scheme
+	Host           string `toml:"host"`
+	Port           int    `toml:"port,omitempty"`
+	User           string `toml:"user"`
+	Password       string `toml:"password,omitempty"`
+	PrivateKeyPath string `toml:"private-key-path,omitempty"`
+	RemotePath     string `toml:"remote-path"`
+
+	// TODO modify blob store config to read this after blob store
+	// initialization
 	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`

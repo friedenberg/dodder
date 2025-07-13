@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
-// TODO move to todo_debug and replace with no-op stubs
+// TODO rename to comment printer
 var todo todoPrinter
 
 func init() {
@@ -36,10 +36,6 @@ const (
 	P4
 	P5
 )
-
-func TodoRecoverable(f string, a ...any) (err error) {
-	return printerErr.printfStack(1, "TODO: Make recoverable: "+f, a...)
-}
 
 func Todo(f string, a ...any) (err error) {
 	return printerErr.printfStack(1, "TODO: "+f, a...)

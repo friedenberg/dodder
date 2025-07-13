@@ -4,7 +4,7 @@ import (
 	"iter"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 )
 
 // TODO move to own package
@@ -23,7 +23,7 @@ func (s Slice[E]) Any() (e E) {
 }
 
 func (s Slice[E]) Each(f interfaces.FuncIter[E]) error {
-	return todo.Implement()
+	return comments.Implement()
 }
 
 func (s Slice[E]) All() iter.Seq[E] {

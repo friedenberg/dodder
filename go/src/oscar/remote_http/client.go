@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -132,14 +132,14 @@ func (client *client) MakeImporter(
 	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
 ) sku.Importer {
-	panic(todo.Implement())
+	panic(comments.Implement())
 }
 
 func (client *client) ImportList(
 	list *sku.List,
 	i sku.Importer,
 ) (err error) {
-	return todo.Implement()
+	return comments.Implement()
 }
 
 func (client *client) MakeExternalQueryGroup(
@@ -147,7 +147,7 @@ func (client *client) MakeExternalQueryGroup(
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
 ) (qg *query.Query, err error) {
-	err = todo.Implement()
+	err = comments.Implement()
 	return
 }
 
@@ -359,6 +359,6 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 func (client *client) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
-	err = todo.Implement()
+	err = comments.Implement()
 	return
 }

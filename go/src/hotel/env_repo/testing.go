@@ -83,10 +83,6 @@ func MakeTesting(
 					t.Fatalf("sha mismatch: %s. %s, %q", err, shaExpected, content)
 				}
 			}
-
-			for sh, err := range envRepo.GetDefaultBlobStore().AllBlobs() {
-				ui.Debug().Print(sh, err)
-			}
 		},
 	); err != nil {
 		t.Errorf("making envRepo failed: %s", err)

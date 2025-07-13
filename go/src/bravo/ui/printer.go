@@ -22,6 +22,7 @@ func MakePrinterOn(f *os.File, on bool) printer {
 }
 
 type printer struct {
+	// TODO rename to file
 	f     *os.File
 	isTty bool
 	on    bool

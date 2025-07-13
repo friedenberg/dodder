@@ -21,6 +21,10 @@ type T struct {
 	skip int
 }
 
+// TODO rename `T` to `TestContext`, and make the embedded `*testing.T` private,
+// and add a constructor, and add an embedded errors.Context and run the context
+// and end it once on `*testing.T.Cleanup`
+
 func (t *T) MakeStackInfo(skip int) (stackFrame stack_frame.Frame) {
 	var pc uintptr
 	ok := false

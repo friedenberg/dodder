@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -150,7 +150,7 @@ func (op Diff) Run(
 		colorString = "never"
 	}
 
-	todo.Change("disambiguate internal and external, and object / blob")
+	comments.Change("disambiguate internal and external, and object / blob")
 	cmd := exec.Command(
 		"diff",
 		fmt.Sprintf("--color=%s", colorString),
@@ -172,7 +172,7 @@ func (op Diff) Run(
 
 			if err = cmd.Run(); err != nil {
 				if cmd.ProcessState.ExitCode() == 1 {
-					todo.Change("return non-zero exit code")
+					comments.Change("return non-zero exit code")
 					err = nil
 				} else {
 					err = errors.Wrap(err)

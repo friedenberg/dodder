@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -29,7 +29,7 @@ func (client client) FormatForVersion(
 }
 
 func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
-	return todo.Implement()
+	return comments.Implement()
 }
 
 // TODO add progress bar
@@ -211,7 +211,7 @@ func (client client) ImportInventoryList(
 }
 
 func (client client) ReadLast() (max *sku.Transacted, err error) {
-	return nil, todo.Implement()
+	return nil, comments.Implement()
 }
 
 func (client client) IterInventoryList(
@@ -223,7 +223,7 @@ func (client client) IterInventoryList(
 func (client client) ReadAllSkus(
 	f func(besty, sk *sku.Transacted) error,
 ) (err error) {
-	return todo.Implement()
+	return comments.Implement()
 }
 
 func (client client) IterAllInventoryLists() iter.Seq2[*sku.Transacted, error] {

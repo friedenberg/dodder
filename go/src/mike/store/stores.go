@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -177,7 +177,7 @@ func (s *Store) RunMergeTool(
 
 	switch conflicted.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
-		err = todo.Implement()
+		err = comments.Implement()
 
 	default:
 		var co sku.SkuType

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -264,7 +264,7 @@ func (k *store) AddTransacted(
 }
 
 func (kc *store) IsInlineType(k ids.Type) (isInline bool) {
-	todo.Change("fix this horrible hack")
+	comments.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true
 	}

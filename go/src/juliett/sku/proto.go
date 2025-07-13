@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -55,8 +55,8 @@ func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 }
 
 func (pz Proto) Make() (z *Transacted) {
-	todo.Change("add type")
-	todo.Change("add description")
+	comments.Change("add type")
+	comments.Change("add description")
 	z = GetTransactedPool().Get()
 
 	pz.Apply(z, genres.Zettel)

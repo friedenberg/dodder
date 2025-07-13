@@ -3,7 +3,7 @@ package inventory_list_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -51,7 +51,7 @@ func (store *Store) ReadOneInto(
 		return
 	}
 
-	err = todo.Implement()
+	err = comments.Implement()
 	// err = errors.BadRequestf("%q", oid)
 
 	return

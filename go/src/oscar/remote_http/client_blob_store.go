@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -46,7 +46,7 @@ func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 }
 
 func (client *client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
-	err = todo.Implement()
+	err = comments.Implement()
 	return
 }
 

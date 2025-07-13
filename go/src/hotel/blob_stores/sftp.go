@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
-	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -43,28 +42,29 @@ type sftpBlobStore struct {
 }
 
 func makeSftpStore(
+	ctx errors.Context,
 	config sftpConfig,
-	tempFS env_dir.TemporaryFS,
-) (store *sftpBlobStore, err error) {
+) (store *sftpBlobStore) {
 	store = &sftpBlobStore{
 		config: config,
 	}
 
-	if err = store.connect(); err != nil {
-		err = errors.Wrap(err)
+	if err := store.connect(); err != nil {
+		ctx.CancelWithError(err)
 		return
 	}
 
-	// Ensure remote base path exists
-	if err = store.ensureRemotePath(); err != nil {
-		err = errors.Wrap(err)
-		store.close()
-		return nil, err
+	ctx.After(store.close)
+
+	if err := store.ensureRemotePath(); err != nil {
+		ctx.CancelWithError(err)
+		return
 	}
 
 	return
 }
 
+// TODO review this
 func (store *sftpBlobStore) connect() (err error) {
 	sshConfig := &ssh.ClientConfig{
 		User:            store.config.GetUser(),
@@ -95,7 +95,7 @@ func (store *sftpBlobStore) connect() (err error) {
 	}
 
 	addr := fmt.Sprintf("%s:%d", store.config.GetHost(), store.config.GetPort())
-	
+
 	if store.sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
 		err = errors.Wrapf(err, "failed to connect to SSH server")
 		return
@@ -110,33 +110,44 @@ func (store *sftpBlobStore) connect() (err error) {
 	return
 }
 
-func (store *sftpBlobStore) close() {
+// TODO determine how these errors should or should not cascade
+func (store *sftpBlobStore) close() (err error) {
 	if store.sftpClient != nil {
-		store.sftpClient.Close()
+		if err = store.sftpClient.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
 	if store.sshClient != nil {
-		store.sshClient.Close()
+		if err = store.sshClient.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	return nil
 }
 
 func (store *sftpBlobStore) ensureRemotePath() (err error) {
 	remotePath := store.config.GetRemotePath()
-	
+	// TODO read remote blob store config
+
 	// Create directory tree if it doesn't exist
 	parts := strings.Split(remotePath, "/")
 	currentPath := ""
-	
+
 	for _, part := range parts {
 		if part == "" {
 			continue
 		}
-		
+
 		if currentPath == "" && !strings.HasPrefix(remotePath, "/") {
 			currentPath = part
 		} else {
 			currentPath = path.Join(currentPath, part)
 		}
-		
+
 		if _, err = store.sftpClient.Stat(currentPath); err != nil {
 			if err = store.sftpClient.Mkdir(currentPath); err != nil {
 				// Directory might exist, continue
@@ -144,7 +155,7 @@ func (store *sftpBlobStore) ensureRemotePath() (err error) {
 			}
 		}
 	}
-	
+
 	return
 }
 
@@ -185,42 +196,43 @@ func (store *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 func (store *sftpBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		basePath := store.config.GetRemotePath()
-		
+
 		// Walk through the two-level directory structure (Git-like bucketing)
 		walker := store.sftpClient.Walk(basePath)
-		
+
 		for walker.Step() {
 			if err := walker.Err(); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
 			}
-			
+
 			info := walker.Stat()
 			if info.IsDir() {
 				continue
 			}
-			
+
+			// TODO replace with id.Path
 			// Extract SHA from path
 			relPath := strings.TrimPrefix(walker.Path(), basePath)
 			relPath = strings.TrimPrefix(relPath, "/")
-			
+
 			// Skip if not in expected format (2 chars / remaining chars)
 			parts := strings.Split(relPath, "/")
 			if len(parts) != 2 || len(parts[0]) != 2 {
 				continue
 			}
-			
+
 			shaStr := parts[0] + parts[1]
 			var sh sha.Sha
-			
+
 			if err := sh.Set(shaStr); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
 				continue
 			}
-			
+
 			if !yield(&sh, nil) {
 				return
 			}
@@ -233,12 +245,12 @@ func (store *sftpBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error
 		store:  store,
 		config: store.makeEnvDirConfig(),
 	}
-	
+
 	if err = mover.initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	w = mover
 	return
 }
@@ -247,21 +259,23 @@ func (store *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
 	return store.BlobWriter()
 }
 
-func (store *sftpBlobStore) BlobReader(sh interfaces.Sha) (r interfaces.ShaReadCloser, err error) {
+func (store *sftpBlobStore) BlobReader(
+	sh interfaces.Sha,
+) (r interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 
 	remotePath := store.remotePathForSha(sh)
-	
+
 	// Open remote file for reading
 	var remoteFile *sftp.File
 	if remoteFile, err = store.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
 			shCopy.ResetWithShaLike(sh.GetShaLike())
-			
+
 			err = env_dir.ErrBlobMissing{
 				ShaGetter: shCopy,
 				Path:      remotePath,
@@ -271,150 +285,156 @@ func (store *sftpBlobStore) BlobReader(sh interfaces.Sha) (r interfaces.ShaReadC
 		}
 		return
 	}
-	
+
 	// Create streaming reader that handles decompression/decryption
 	config := store.makeEnvDirConfig()
 	streamingReader := &sftpStreamingReader{
 		file:   remoteFile,
 		config: config,
 	}
-	
+
 	if r, err = streamingReader.createReader(); err != nil {
 		remoteFile.Close()
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	return
 }
 
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
 type sftpMover struct {
-	store      *sftpBlobStore
-	config     env_dir.Config
-	tempFile   *sftp.File
-	tempPath   string
-	writer     *sftpWriter
-	closed     bool
+	store    *sftpBlobStore
+	config   env_dir.Config
+	tempFile *sftp.File
+	tempPath string
+	writer   *sftpWriter
+	closed   bool
 }
 
-func (m *sftpMover) initialize() (err error) {
+func (mover *sftpMover) initialize() (err error) {
 	// Create a temporary file on the remote server
 	var tempNameBytes [16]byte
 	if _, err = rand.Read(tempNameBytes[:]); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	tempName := fmt.Sprintf("tmp_%x", tempNameBytes)
-	m.tempPath = path.Join(m.store.config.GetRemotePath(), tempName)
-	
-	if m.tempFile, err = m.store.sftpClient.Create(m.tempPath); err != nil {
+	mover.tempPath = path.Join(mover.store.config.GetRemotePath(), tempName)
+
+	if mover.tempFile, err = mover.store.sftpClient.Create(mover.tempPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	// Create the streaming writer with compression/encryption
 	writeOptions := env_dir.WriteOptions{
-		Config: m.config,
-		Writer: m.tempFile,
+		Config: mover.config,
+		Writer: mover.tempFile,
 	}
-	
-	if m.writer, err = newSftpWriter(writeOptions); err != nil {
-		m.tempFile.Close()
-		m.store.sftpClient.Remove(m.tempPath)
+
+	if mover.writer, err = newSftpWriter(writeOptions); err != nil {
+		mover.tempFile.Close()
+		mover.store.sftpClient.Remove(mover.tempPath)
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	return
 }
 
-func (m *sftpMover) Write(p []byte) (n int, err error) {
-	if m.writer == nil {
+func (mover *sftpMover) Write(p []byte) (n int, err error) {
+	if mover.writer == nil {
 		err = errors.ErrorWithStackf("writer not initialized")
 		return
 	}
-	return m.writer.Write(p)
+
+	return mover.writer.Write(p)
 }
 
-func (m *sftpMover) ReadFrom(r io.Reader) (n int64, err error) {
-	if m.writer == nil {
+func (mover *sftpMover) ReadFrom(r io.Reader) (n int64, err error) {
+	if mover.writer == nil {
 		err = errors.ErrorWithStackf("writer not initialized")
 		return
 	}
-	return m.writer.ReadFrom(r)
+
+	return mover.writer.ReadFrom(r)
 }
 
-func (m *sftpMover) Close() (err error) {
-	if m.closed {
+func (mover *sftpMover) Close() (err error) {
+	if mover.closed {
 		return nil
 	}
-	m.closed = true
-	
+
+	mover.closed = true
+
 	// Ensure cleanup happens
+	// TODO capture errors using errors.Deferred*
 	defer func() {
-		if m.tempFile != nil {
-			m.tempFile.Close()
+		if mover.tempFile != nil {
+			mover.tempFile.Close()
 		}
-		if m.tempPath != "" {
-			m.store.sftpClient.Remove(m.tempPath)
+		if mover.tempPath != "" {
+			mover.store.sftpClient.Remove(mover.tempPath)
 		}
 	}()
-	
-	if m.writer == nil {
+
+	if mover.writer == nil {
 		// No data was written
 		return nil
 	}
-	
+
 	// Close the writer to finalize compression/encryption and SHA calculation
-	if err = m.writer.Close(); err != nil {
+	if err = mover.writer.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	// Close the temp file
-	if err = m.tempFile.Close(); err != nil {
+	if err = mover.tempFile.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	// Get the calculated SHA and determine final path
-	sh := m.writer.GetShaLike()
-	finalPath := m.store.remotePathForSha(sh)
-	
+	sh := mover.writer.GetShaLike()
+	finalPath := mover.store.remotePathForSha(sh)
+
 	// Ensure the target directory exists (Git-like bucketing)
 	finalDir := path.Dir(finalPath)
-	if err = m.store.sftpClient.MkdirAll(finalDir); err != nil {
+	if err = mover.store.sftpClient.MkdirAll(finalDir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	
+
 	// Atomically move temp file to final location
-	if err = m.store.sftpClient.Rename(m.tempPath, finalPath); err != nil {
+	if err = mover.store.sftpClient.Rename(mover.tempPath, finalPath); err != nil {
 		// Check if file already exists
-		if _, statErr := m.store.sftpClient.Stat(finalPath); statErr == nil {
+		if _, statErr := mover.store.sftpClient.Stat(finalPath); statErr == nil {
 			// File already exists, this is OK - just remove temp file
-			m.store.sftpClient.Remove(m.tempPath)
+			mover.store.sftpClient.Remove(mover.tempPath)
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 			return
 		}
 	}
-	
+
 	// Clear temp path so cleanup doesn't try to remove it
-	m.tempPath = ""
-	
+	mover.tempPath = ""
+
 	return
 }
 
-func (m *sftpMover) GetShaLike() interfaces.Sha {
-	if m.writer == nil {
+func (mover *sftpMover) GetShaLike() interfaces.Sha {
+	if mover.writer == nil {
 		// Return empty SHA if no data written
+		// TODO use sha.GetPool()
 		return &sha.Sha{}
 	}
-	return m.writer.GetShaLike()
+
+	return mover.writer.GetShaLike()
 }
 
 // sftpWriter implements the streaming writer with compression/encryption
@@ -425,68 +445,70 @@ type sftpWriter struct {
 	wBuf            *bufio.Writer
 }
 
-func newSftpWriter(writeOptions env_dir.WriteOptions) (w *sftpWriter, err error) {
-	w = &sftpWriter{}
+func newSftpWriter(
+	writeOptions env_dir.WriteOptions,
+) (writer *sftpWriter, err error) {
+	writer = &sftpWriter{}
 
-	w.wBuf = bufio.NewWriter(writeOptions.Writer)
+	writer.wBuf = bufio.NewWriter(writeOptions.Writer)
 
-	if w.wAge, err = writeOptions.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
+	if writer.wAge, err = writeOptions.GetBlobEncryption().WrapWriter(writer.wBuf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.hash = sha256.New()
+	writer.hash = sha256.New()
 
-	if w.wCompress, err = writeOptions.GetBlobCompression().WrapWriter(w.wAge); err != nil {
+	if writer.wCompress, err = writeOptions.GetBlobCompression().WrapWriter(writer.wAge); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.tee = io.MultiWriter(w.hash, w.wCompress)
+	writer.tee = io.MultiWriter(writer.hash, writer.wCompress)
 
 	return
 }
 
-func (w *sftpWriter) ReadFrom(r io.Reader) (n int64, err error) {
-	if n, err = io.Copy(w.tee, r); err != nil {
+func (writer *sftpWriter) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = io.Copy(writer.tee, r); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (w *sftpWriter) Write(p []byte) (n int, err error) {
-	return w.tee.Write(p)
-}
-
-func (w *sftpWriter) Close() (err error) {
-	if w.wCompress != nil {
-		if err = w.wCompress.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if w.wAge != nil {
-		if err = w.wAge.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if w.wBuf != nil {
-		if err = w.wBuf.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return
 }
 
-func (w *sftpWriter) GetShaLike() interfaces.Sha {
-	return sha.FromHash(w.hash)
+func (writer *sftpWriter) Write(p []byte) (n int, err error) {
+	return writer.tee.Write(p)
+}
+
+func (writer *sftpWriter) Close() (err error) {
+	if writer.wCompress != nil {
+		if err = writer.wCompress.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if writer.wAge != nil {
+		if err = writer.wAge.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if writer.wBuf != nil {
+		if err = writer.wBuf.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (writer *sftpWriter) GetShaLike() interfaces.Sha {
+	return sha.FromHash(writer.hash)
 }
 
 // sftpStreamingReader handles decompression/decryption while reading from SFTP
@@ -495,11 +517,11 @@ type sftpStreamingReader struct {
 	config env_dir.Config
 }
 
-func (sr *sftpStreamingReader) createReader() (reader interfaces.ShaReadCloser, err error) {
+func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ShaReadCloser, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
-		file:   sr.file,
-		config: sr.config,
+		file:   reader.file,
+		config: reader.config,
 	}
 
 	if err = sftpReader.initialize(); err != nil {
@@ -507,58 +529,55 @@ func (sr *sftpStreamingReader) createReader() (reader interfaces.ShaReadCloser, 
 		return
 	}
 
-	reader = sftpReader
+	readCloser = sftpReader
+
 	return
 }
 
 // sftpReader implements streaming decompression/decryption for SFTP
 type sftpReader struct {
-	file       *sftp.File
-	config     env_dir.Config
-	hash       hash.Hash
-	decrypter  io.Reader
-	expander   io.ReadCloser
-	tee        io.Reader
+	file      *sftp.File
+	config    env_dir.Config
+	hash      hash.Hash
+	decrypter io.Reader
+	expander  io.ReadCloser
+	tee       io.Reader
 }
 
-func (r *sftpReader) initialize() (err error) {
+func (reader *sftpReader) initialize() (err error) {
 	// Set up decryption
-	if r.decrypter, err = r.config.GetBlobEncryption().WrapReader(r.file); err != nil {
+	if reader.decrypter, err = reader.config.GetBlobEncryption().WrapReader(reader.file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// Set up decompression
-	if r.expander, err = r.config.GetBlobCompression().WrapReader(r.decrypter); err != nil {
-		// Try without compression if it fails
-		if _, err = r.file.Seek(0, io.SeekStart); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if r.expander, err = compression_type.CompressionTypeNone.WrapReader(r.file); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if reader.expander, err = reader.config.GetBlobCompression().WrapReader(reader.decrypter); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	// Set up SHA calculation
-	r.hash = sha256.New()
-	r.tee = io.TeeReader(r.expander, r.hash)
+	// TODO sha.GetPool()
+	reader.hash = sha256.New()
+	reader.tee = io.TeeReader(reader.expander, reader.hash)
 
 	return
 }
 
-func (r *sftpReader) Read(p []byte) (n int, err error) {
-	return r.tee.Read(p)
+func (reader *sftpReader) Read(p []byte) (n int, err error) {
+	return reader.tee.Read(p)
 }
 
-func (r *sftpReader) WriteTo(w io.Writer) (n int64, err error) {
-	return io.Copy(w, r.tee)
+func (reader *sftpReader) WriteTo(w io.Writer) (n int64, err error) {
+	return io.Copy(w, reader.tee)
 }
 
-func (r *sftpReader) Seek(offset int64, whence int) (actual int64, err error) {
-	seeker, ok := r.decrypter.(io.Seeker)
+func (reader *sftpReader) Seek(
+	offset int64,
+	whence int,
+) (actual int64, err error) {
+	seeker, ok := reader.decrypter.(io.Seeker)
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
@@ -568,9 +587,10 @@ func (r *sftpReader) Seek(offset int64, whence int) (actual int64, err error) {
 	return seeker.Seek(offset, whence)
 }
 
-func (r *sftpReader) Close() error {
-	err1 := r.expander.Close()
-	err2 := r.file.Close()
+func (reader *sftpReader) Close() error {
+	// TODO capture both errors using errors.Join
+	err1 := reader.expander.Close()
+	err2 := reader.file.Close()
 
 	if err1 != nil {
 		return err1
@@ -578,6 +598,6 @@ func (r *sftpReader) Close() error {
 	return err2
 }
 
-func (r *sftpReader) GetShaLike() interfaces.Sha {
-	return sha.FromHash(r.hash)
+func (reader *sftpReader) GetShaLike() interfaces.Sha {
+	return sha.FromHash(reader.hash)
 }

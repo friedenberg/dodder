@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/todo"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
@@ -137,7 +137,7 @@ func (ocf optionCommentHide) CloneOptionComment() OptionComment {
 }
 
 func (ocf optionCommentHide) Set(v string) (err error) {
-	return todo.Implement()
+	return comments.Implement()
 }
 
 func (ocf optionCommentHide) String() string {
