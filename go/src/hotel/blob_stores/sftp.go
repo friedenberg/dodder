@@ -65,18 +65,18 @@ func makeSftpStore(
 }
 
 // TODO review this
-func (store *sftpBlobStore) connect() (err error) {
+func (blobStore *sftpBlobStore) connect() (err error) {
 	sshConfig := &ssh.ClientConfig{
-		User:            store.config.GetUser(),
+		User:            blobStore.config.GetUser(),
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: make this configurable
 	}
 
 	// Configure authentication
-	if store.config.GetPrivateKeyPath() != "" {
+	if blobStore.config.GetPrivateKeyPath() != "" {
 		var key ssh.Signer
 		var keyBytes []byte
 
-		if keyBytes, err = os.ReadFile(store.config.GetPrivateKeyPath()); err != nil {
+		if keyBytes, err = os.ReadFile(blobStore.config.GetPrivateKeyPath()); err != nil {
 			err = errors.Wrapf(err, "failed to read private key")
 			return
 		}
@@ -87,23 +87,27 @@ func (store *sftpBlobStore) connect() (err error) {
 		}
 
 		sshConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
-	} else if store.config.GetPassword() != "" {
-		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(store.config.GetPassword())}
+	} else if blobStore.config.GetPassword() != "" {
+		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(blobStore.config.GetPassword())}
 	} else {
 		err = errors.Errorf("no authentication method configured")
 		return
 	}
 
-	addr := fmt.Sprintf("%s:%d", store.config.GetHost(), store.config.GetPort())
+	addr := fmt.Sprintf(
+		"%s:%d",
+		blobStore.config.GetHost(),
+		blobStore.config.GetPort(),
+	)
 
-	if store.sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
+	if blobStore.sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
 		err = errors.Wrapf(err, "failed to connect to SSH server")
 		return
 	}
 
-	if store.sftpClient, err = sftp.NewClient(store.sshClient); err != nil {
+	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
 		err = errors.Wrapf(err, "failed to create SFTP client")
-		store.sshClient.Close()
+		blobStore.sshClient.Close()
 		return
 	}
 
@@ -111,16 +115,16 @@ func (store *sftpBlobStore) connect() (err error) {
 }
 
 // TODO determine how these errors should or should not cascade
-func (store *sftpBlobStore) close() (err error) {
-	if store.sftpClient != nil {
-		if err = store.sftpClient.Close(); err != nil {
+func (blobStore *sftpBlobStore) close() (err error) {
+	if blobStore.sftpClient != nil {
+		if err = blobStore.sftpClient.Close(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if store.sshClient != nil {
-		if err = store.sshClient.Close(); err != nil {
+	if blobStore.sshClient != nil {
+		if err = blobStore.sshClient.Close(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -129,8 +133,8 @@ func (store *sftpBlobStore) close() (err error) {
 	return nil
 }
 
-func (store *sftpBlobStore) ensureRemotePath() (err error) {
-	remotePath := store.config.GetRemotePath()
+func (blobStore *sftpBlobStore) ensureRemotePath() (err error) {
+	remotePath := blobStore.config.GetRemotePath()
 	// TODO read remote blob store config
 
 	// Create directory tree if it doesn't exist
@@ -148,8 +152,8 @@ func (store *sftpBlobStore) ensureRemotePath() (err error) {
 			currentPath = path.Join(currentPath, part)
 		}
 
-		if _, err = store.sftpClient.Stat(currentPath); err != nil {
-			if err = store.sftpClient.Mkdir(currentPath); err != nil {
+		if _, err = blobStore.sftpClient.Stat(currentPath); err != nil {
+			if err = blobStore.sftpClient.Mkdir(currentPath); err != nil {
 				// Directory might exist, continue
 				err = nil
 			}
@@ -159,46 +163,48 @@ func (store *sftpBlobStore) ensureRemotePath() (err error) {
 	return
 }
 
-func (store *sftpBlobStore) GetBlobStore() interfaces.BlobStore {
-	return store
+func (blobStore *sftpBlobStore) GetBlobStore() interfaces.BlobStore {
+	return blobStore
 }
 
-func (store *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
-	return store
+func (blobStore *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
+	return blobStore
 }
 
-func (store *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
-	return env_dir.Config{
-		Compression:       store.config.GetBlobCompression(),
-		Encryption:        store.config.GetBlobEncryption(),
-		LockInternalFiles: store.config.GetLockInternalFiles(),
-	}
+func (blobStore *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
+	return env_dir.MakeConfig(
+		blobStore.config.GetBlobCompression(),
+		blobStore.config.GetBlobEncryption(),
+	)
 }
 
-func (store *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
-	return path.Join(store.config.GetRemotePath(), id.Path(sh.GetShaLike(), ""))
+func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
+	return path.Join(
+		blobStore.config.GetRemotePath(),
+		id.Path(sh.GetShaLike(), ""),
+	)
 }
 
-func (store *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
+func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	if sh.GetShaLike().IsNull() {
 		ok = true
 		return
 	}
 
-	remotePath := store.remotePathForSha(sh)
-	if _, err := store.sftpClient.Stat(remotePath); err == nil {
+	remotePath := blobStore.remotePathForSha(sh)
+	if _, err := blobStore.sftpClient.Stat(remotePath); err == nil {
 		ok = true
 	}
 
 	return
 }
 
-func (store *sftpBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
+func (blobStore *sftpBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	return func(yield func(interfaces.Sha, error) bool) {
-		basePath := store.config.GetRemotePath()
+		basePath := blobStore.config.GetRemotePath()
 
 		// Walk through the two-level directory structure (Git-like bucketing)
-		walker := store.sftpClient.Walk(basePath)
+		walker := blobStore.sftpClient.Walk(basePath)
 
 		for walker.Step() {
 			if err := walker.Err(); err != nil {
@@ -240,10 +246,10 @@ func (store *sftpBlobStore) AllBlobs() iter.Seq2[interfaces.Sha, error] {
 	}
 }
 
-func (store *sftpBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (blobStore *sftpBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 	mover := &sftpMover{
-		store:  store,
-		config: store.makeEnvDirConfig(),
+		store:  blobStore,
+		config: blobStore.makeEnvDirConfig(),
 	}
 
 	if err = mover.initialize(); err != nil {
@@ -255,11 +261,11 @@ func (store *sftpBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error
 	return
 }
 
-func (store *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
-	return store.BlobWriter()
+func (blobStore *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
+	return blobStore.BlobWriter()
 }
 
-func (store *sftpBlobStore) BlobReader(
+func (blobStore *sftpBlobStore) BlobReader(
 	sh interfaces.Sha,
 ) (r interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
@@ -267,11 +273,11 @@ func (store *sftpBlobStore) BlobReader(
 		return
 	}
 
-	remotePath := store.remotePathForSha(sh)
+	remotePath := blobStore.remotePathForSha(sh)
 
 	// Open remote file for reading
 	var remoteFile *sftp.File
-	if remoteFile, err = store.sftpClient.Open(remotePath); err != nil {
+	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
 			shCopy.ResetWithShaLike(sh.GetShaLike())
@@ -287,7 +293,7 @@ func (store *sftpBlobStore) BlobReader(
 	}
 
 	// Create streaming reader that handles decompression/decryption
-	config := store.makeEnvDirConfig()
+	config := blobStore.makeEnvDirConfig()
 	streamingReader := &sftpStreamingReader{
 		file:   remoteFile,
 		config: config,
@@ -514,7 +520,7 @@ func (writer *sftpWriter) GetShaLike() interfaces.Sha {
 // sftpStreamingReader handles decompression/decryption while reading from SFTP
 type sftpStreamingReader struct {
 	file   *sftp.File
-	config env_dir.Config
+	config interfaces.BlobIOWrapper
 }
 
 func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ShaReadCloser, err error) {
@@ -537,7 +543,7 @@ func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ShaRead
 // sftpReader implements streaming decompression/decryption for SFTP
 type sftpReader struct {
 	file      *sftp.File
-	config    env_dir.Config
+	config    interfaces.BlobIOWrapper
 	hash      hash.Hash
 	decrypter io.Reader
 	expander  io.ReadCloser

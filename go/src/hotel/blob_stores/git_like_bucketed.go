@@ -47,11 +47,10 @@ func (blobStore gitLikeBucketed) GetLocalBlobStore() interfaces.LocalBlobStore {
 }
 
 func (blobStore gitLikeBucketed) makeEnvDirConfig() env_dir.Config {
-	return env_dir.Config{
-		Compression:       blobStore.config.GetBlobCompression(),
-		Encryption:        blobStore.config.GetBlobEncryption(),
-		LockInternalFiles: blobStore.config.GetLockInternalFiles(),
-	}
+	return env_dir.MakeConfig(
+		blobStore.config.GetBlobCompression(),
+		blobStore.config.GetBlobEncryption(),
+	)
 }
 
 func (blobStore gitLikeBucketed) HasBlob(

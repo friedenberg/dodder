@@ -18,9 +18,9 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
+// TODO add back support for locking internal files
 func NewMover(moveOptions MoveOptions) (mover *Mover, err error) {
 	mover = &Mover{
-		lockFile:                  moveOptions.LockInternalFiles,
 		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
 

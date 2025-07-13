@@ -30,7 +30,12 @@ type WriteBlob struct {
 }
 
 func (cmd *WriteBlob) SetFlagSet(f *flag.FlagSet) {
-	f.BoolVar(&cmd.Check, "check", false, "only check if the object already exists")
+	f.BoolVar(
+		&cmd.Check,
+		"check",
+		false,
+		"only check if the object already exists",
+	)
 
 	f.Var(&cmd.UtilityBefore, "utility-before", "")
 	f.Var(&cmd.UtilityAfter, "utility-after", "")
@@ -80,7 +85,11 @@ func (cmd WriteBlob) Run(
 
 		if hasBlob {
 			if cmd.Check {
-				blobStore.GetUI().Printf("%s %s (already checked in)", a.GetShaLike(), a.Path)
+				blobStore.GetUI().Printf(
+					"%s %s (already checked in)",
+					a.GetShaLike(),
+					a.Path,
+				)
 			} else {
 				blobStore.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
 			}
@@ -101,42 +110,42 @@ func (cmd WriteBlob) Run(
 	}
 }
 
-func (c WriteBlob) doOne(
+func (cmd WriteBlob) doOne(
 	blobStore command_components.BlobStoreWithEnv,
-	p string,
+	path string,
 ) (sh interfaces.Sha, err error) {
-	var rc io.ReadCloser
+	var readCloser io.ReadCloser
 
-	o := env_dir.FileReadOptions{
-		Path: p,
+	options := env_dir.FileReadOptions{
+		Path: path,
 	}
 
-	if rc, err = env_dir.NewFileReader(o); err != nil {
+	if readCloser, err = env_dir.NewFileReader(options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, rc)
+	defer errors.DeferredCloser(&err, readCloser)
 
-	var wc sha.WriteCloser
+	var writeCloser sha.WriteCloser
 
-	if c.Check {
-		wc = sha.MakeWriter(nil)
+	if cmd.Check {
+		writeCloser = sha.MakeWriter(nil)
 	} else {
-		if wc, err = blobStore.BlobWriter(); err != nil {
+		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	defer errors.DeferredCloser(&err, wc)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = io.Copy(wc, rc); err != nil {
+	if _, err = io.Copy(writeCloser, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = wc.GetShaLike()
+	sh = writeCloser.GetShaLike()
 
 	return
 }

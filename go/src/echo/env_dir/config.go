@@ -6,45 +6,46 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
+// TODO move to own package
+
 func MakeConfig(
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
-	lockInternalFiles bool,
 ) Config {
 	return Config{
-		Compression:       compression,
-		Encryption:        encryption,
-		LockInternalFiles: lockInternalFiles,
+		compression: compression,
+		encryption:  encryption,
 	}
 }
 
-type Config struct {
-	Compression       interfaces.BlobCompression
-	Encryption        interfaces.BlobEncryption
-	LockInternalFiles bool
-}
+var (
+	defaultCompressionTypeValue = compression_type.CompressionTypeNone
+	defaultEncryptionType       = age.Age{}
+	DefaultConfig               = Config{
+		compression: &defaultCompressionTypeValue,
+		encryption:  &defaultEncryptionType,
+	}
 
-func (c Config) GetBlobStoreConfigImmutable() interfaces.BlobStoreConfigImmutable {
-	return &c
+	_ interfaces.BlobIOWrapper = Config{}
+)
+
+type Config struct {
+	compression interfaces.BlobCompression
+	encryption  interfaces.BlobEncryption
 }
 
 func (config Config) GetBlobCompression() interfaces.BlobCompression {
-	if config.Compression == nil {
-		c := compression_type.CompressionTypeNone
-		return &c
+	if config.compression == nil {
+		return &defaultCompressionTypeValue
 	} else {
-		return config.Compression
+		return config.compression
 	}
 }
 
 func (config Config) GetBlobEncryption() interfaces.BlobEncryption {
-	if config.Encryption == nil {
-		return &age.Age{}
+	if config.encryption == nil {
+		return &defaultEncryptionType
 	} else {
-		return config.Encryption
+		return config.encryption
 	}
-}
-
-func (c Config) GetLockInternalFiles() bool {
-	return c.LockInternalFiles
 }

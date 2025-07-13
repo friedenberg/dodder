@@ -44,14 +44,14 @@ type (
 		Mover() (Mover, error)
 	}
 
-	BlobStoreIOWrapper interface {
+	BlobIOWrapper interface {
 		GetBlobEncryption() BlobEncryption
 		GetBlobCompression() BlobCompression
 	}
 
 	BlobStoreConfigImmutable interface {
 		GetBlobStoreConfigImmutable() BlobStoreConfigImmutable
-		BlobStoreIOWrapper
+		BlobIOWrapper
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by

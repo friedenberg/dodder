@@ -63,7 +63,6 @@ func (cmd Import) Run(dep command.Request) {
 			Config: env_dir.MakeConfig(
 				cmd.Config.GetBlobCompression(),
 				cmd.Config.GetBlobEncryption(),
-				false,
 			),
 			Path: cmd.InventoryList,
 		}
