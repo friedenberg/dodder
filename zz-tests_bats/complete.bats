@@ -82,9 +82,11 @@ function complete_subcmd { # @test
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		add
-		blob-cat
-		blob-fsck
-		blob-write
+		blob_store-cat
+		blob_store-fsck
+		blob_store-init
+		blob_store-init-sftp
+		blob_store-write
 		cat-alfred
 		cat-blob
 		cat-blob-shas

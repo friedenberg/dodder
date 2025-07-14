@@ -16,7 +16,7 @@ import (
 
 func init() {
 	command.Register(
-		"blob-fsck",
+		"blob_store-fsck",
 		&BlobFsck{},
 	)
 }

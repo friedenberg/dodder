@@ -8,11 +8,10 @@ import (
 type Config = any
 
 type ConfigMutable interface {
-	interfaces.BlobIOWrapper
 	interfaces.CommandComponent
 }
 
-func Default() ConfigMutable {
+func Default() *TomlV0 {
 	return &TomlV0{
 		CompressionType:   compression_type.CompressionTypeDefault,
 		LockInternalFiles: true,

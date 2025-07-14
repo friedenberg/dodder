@@ -20,7 +20,7 @@ import (
 
 func init() {
 	command.Register("cat-blob", &CatBlob{})
-	command.Register("blob-cat", &CatBlob{})
+	command.Register("blob_store-cat", &CatBlob{})
 }
 
 type CatBlob struct {
