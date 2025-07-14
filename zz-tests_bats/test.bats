@@ -1,44 +1,18 @@
 #! /usr/bin/env bats
 
-load "common.bash"
+setup() {
+	load "$(dirname "$BATS_TEST_FILE")/common.bash"
+
+	# for shellcheck SC2154
+	export output
+}
+
+# TODO refactor into other files and remove
 
 function provides_help_with_no_params { # @test
-	run dodder
+	run "$DODDER_BIN"
 	assert_failure
 	assert_output --partial 'No subcommand provided.'
-}
-
-function can_initialize_without_age { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	set_xdg "$wd"
-	run_dodder_init_disable_age
-	assert_success
-
-	blobs="$("$DODDER_BIN" info-repo dir.blob-stores)"
-	run test -d "$blobs"
-	assert_success
-}
-
-function can_initialize_with_age { # @test
-	run_dodder init \
-		-yin <(cat_yin) \
-		-yang <(cat_yang) \
-		-age-identity generate \
-		test-repo-id
-
-	assert_success
-	assert_output - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
-	EOM
-
-	run test -f .xdg/data/dodder/config-permanent
-
-	run_dodder info-repo age-encryption
-	assert_success
-	assert_output
 }
 
 function can_new_zettel_file { # @test

@@ -1,36 +1,43 @@
 package xdg
 
-func (xdg *XDG) getInitElements() []xdgInitElement {
+type xdgInitElement struct {
+	standard   string
+	overridden string
+	envKey     string
+	out        *string
+}
+
+func (exdg *XDG) getInitElements() []xdgInitElement {
 	return []xdgInitElement{
 		{
 			standard:   "$HOME/.local/share",
 			overridden: "$HOME/local/share",
 			envKey:     "XDG_DATA_HOME",
-			out:        &xdg.Data,
+			out:        &exdg.Data,
 		},
 		{
 			standard:   "$HOME/.config",
 			overridden: "$HOME/config",
 			envKey:     "XDG_CONFIG_HOME",
-			out:        &xdg.Config,
+			out:        &exdg.Config,
 		},
 		{
 			standard:   "$HOME/.local/state",
 			overridden: "$HOME/local/state",
 			envKey:     "XDG_STATE_HOME",
-			out:        &xdg.State,
+			out:        &exdg.State,
 		},
 		{
 			standard:   "$HOME/.cache",
 			overridden: "$HOME/cache",
 			envKey:     "XDG_CACHE_HOME",
-			out:        &xdg.Cache,
+			out:        &exdg.Cache,
 		},
 		{
 			standard:   "$HOME/.local/runtime",
 			overridden: "$HOME/local/runtime",
 			envKey:     "XDG_RUNTIME_HOME",
-			out:        &xdg.Runtime,
+			out:        &exdg.Runtime,
 		},
 	}
 }

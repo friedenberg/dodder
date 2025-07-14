@@ -23,9 +23,9 @@ func init() {
 	)
 }
 
-func (c Info) SetFlagSet(f *flag.FlagSet) {}
+func (cmd Info) SetFlagSet(flagSet *flag.FlagSet) {}
 
-func (c Info) Run(req command.Request) {
+func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(
 		req,
 		req.Debug,

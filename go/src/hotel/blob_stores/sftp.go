@@ -45,20 +45,20 @@ type sftpBlobStore struct {
 func makeSftpStore(
 	ctx errors.Context,
 	config sftpConfig,
-) (store *sftpBlobStore) {
+) (store *sftpBlobStore, err error) {
 	store = &sftpBlobStore{
 		config: config,
 	}
 
-	if err := store.connect(); err != nil {
-		ctx.CancelWithError(err)
+	if err = store.connect(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	ctx.After(store.close)
 
-	if err := store.ensureRemotePath(); err != nil {
-		ctx.CancelWithError(err)
+	if err = store.ensureRemotePath(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

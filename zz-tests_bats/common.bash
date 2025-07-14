@@ -1,12 +1,44 @@
 #! /bin/bash -e
 
+if [[ -z $BATS_TEST_TMPDIR ]]; then
+  echo 'common.bash loaded before $BATS_TEST_TMPDIR set. aborting.' >&2
+
+  cat >&2 <<-'EOM'
+    only load this file from `.bats` files like so:
+
+    setup() {
+      load "$(dirname "$BATS_TEST_FILE")/common.bash"
+
+      # for shellcheck SC2154
+      export output
+    }
+
+    as there is a hard assumption on $BATS_TEST_TMPDIR being set
+EOM
+
+  exit 1
+fi
+
+pushd "$BATS_TEST_TMPDIR" || exit 1
+
 load "$BATS_CWD/test_helper/bats-support/load"
 load "$BATS_CWD/test_helper/bats-assert/load"
 load "$BATS_CWD/test_helper/bats-assert-additions/load"
 
 # TODO remove this in favor of `-override-xdg-with-cwd`
 set_xdg() {
+  if [[ -z $1 ]]; then
+    echo "trying to set empty XDG override. aborting." >&2
+    exit 1
+  fi
+
   loc="$(realpath "$1" 2>/dev/null)"
+
+  if [[ -z $loc ]]; then
+    echo "realpath for xdg is empty. aborting." >&2
+    exit 1
+  fi
+
   export XDG_DATA_HOME="$loc/.xdg/data"
   export XDG_CONFIG_HOME="$loc/.xdg/config"
   export XDG_STATE_HOME="$loc/.xdg/state"
@@ -20,15 +52,6 @@ set_xdg "$BATS_TEST_TMPDIR"
 # use $BATS_TEST_FILENAME instead of ${BASH_SOURCE[0]} or $0,
 # as those will point to the bats executable's location or the preprocessed file respectively
 DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
-
-# {
-#   pushd "$BATS_CWD" >/dev/null 2>&1
-#   gmake build/dodder || exit 1
-# }
-
-{
-  pushd "$BATS_TEST_TMPDIR" >/dev/null || exit 1
-}
 
 cat_yin() (
   echo "one"
@@ -73,6 +96,8 @@ fi
 
 if [[ -z $DODDER_VERSION ]]; then
   export DODDER_VERSION
+  echo "hello $XDG_DATA_HOME"
+  "$DODDER_BIN" info xdg
   DODDER_VERSION="v$("$DODDER_BIN" info store-version)"
 fi
 

@@ -34,6 +34,7 @@ func MakeTesting(
 					NoTempDirCleanup: true,
 				},
 				false,
+				true,
 			)
 
 			var err error

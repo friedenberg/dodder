@@ -11,30 +11,30 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-type gitLikeBucketedConfig interface {
-	interfaces.BlobIOWrapper
-	GetLockInternalFiles() bool
-}
-
 type gitLikeBucketed struct {
-	config   gitLikeBucketedConfig
+	config   blob_store_configs.ConfigLocalGitLikeBucketed
 	basePath string
 	tempFS   env_dir.TemporaryFS
 }
 
 func makeGitLikeBucketedStore(
+	ctx errors.Context,
 	basePath string,
-	config gitLikeBucketedConfig,
+	config blob_store_configs.ConfigLocalGitLikeBucketed,
 	tempFS env_dir.TemporaryFS,
-) gitLikeBucketed {
-	return gitLikeBucketed{
+) (gitLikeBucketed, error) {
+	// TODO validate
+	store := gitLikeBucketed{
 		config:   config,
 		basePath: basePath,
 		tempFS:   tempFS,
 	}
+
+	return store, nil
 }
 
 func (blobStore gitLikeBucketed) GetBlobStoreDescription() string {
@@ -64,8 +64,8 @@ func (blobStore gitLikeBucketed) HasBlob(
 		return
 	}
 
-	p := id.Path(sh.GetShaLike(), blobStore.basePath)
-	ok = files.Exists(p)
+	path := id.Path(sh.GetShaLike(), blobStore.basePath)
+	ok = files.Exists(path)
 
 	return
 }

@@ -6,6 +6,7 @@ type DirectoryPaths interface {
 
 	DirFirstBlobStoreBlobs() string
 	DirFirstBlobStoreInventoryLists() string
+	DirBlobStoreConfigs(p ...string) string
 	DirBlobStores(p ...string) string
 
 	DirCache(p ...string) string

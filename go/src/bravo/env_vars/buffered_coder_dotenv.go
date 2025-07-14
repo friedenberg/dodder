@@ -12,7 +12,10 @@ import (
 
 type BufferedCoderDotenv struct{}
 
-func (dotenv *BufferedCoderDotenv) DecodeFrom(envVars EnvVars, bufferedReader *bufio.Reader) (n int64, err error) {
+func (coder *BufferedCoderDotenv) DecodeFrom(
+	envVars EnvVars,
+	bufferedReader *bufio.Reader,
+) (n int64, err error) {
 	clear(envVars)
 
 	eof := false

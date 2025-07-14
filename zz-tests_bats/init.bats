@@ -61,7 +61,7 @@ function init_compression { # @test
 	assert_success
 
 	sha="$(get_konfig_sha)"
-	dir_blobs="$("$DODDER_BIN" info-repo dir.blob-stores.1.blobs)"
+	dir_blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
 	run zstd --decompress "$dir_blobs/${sha:0:2}"/* --stdout
 	assert_success
 }
@@ -134,7 +134,7 @@ function init_and_deinit { # @test
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init
-	age_id="$("$DODDER_BIN" info-repo age-encryption)"
+	age_id="$("$DODDER_BIN" info-repo blob_stores-0-encryption)"
 
 	mkdir inner
 	pushd inner || exit 1
@@ -143,7 +143,7 @@ function init_and_with_another_age { # @test
 	run_dodder init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id" test-repo-id
 	assert_success
 
-	run_dodder info-repo age-encryption
+	run_dodder info-repo blob_stores-0-encryption
 	assert_success
 	assert_output "$age_id"
 }
@@ -212,3 +212,33 @@ function init_and_init { # @test
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 }
+
+function init_without_age { # @test
+	run_dodder_init_disable_age
+	assert_success
+
+	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	run test -d "$blobs"
+	assert_success
+}
+
+function init_with_age { # @test
+	run_dodder init \
+		-yin <(cat_yin) \
+		-yang <(cat_yang) \
+		-age-identity generate \
+		test-repo-id
+
+	assert_success
+	assert_output - <<-EOM
+		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
+	EOM
+
+	run test -f .xdg/data/dodder/config-permanent
+
+	run_dodder info-repo blob_stores-0-encryption
+	assert_success
+	assert_output
+}
+

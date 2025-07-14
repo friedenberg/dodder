@@ -1,5 +1,6 @@
 package env_vars
 
+// TODO add support for comments
 type EnvVars map[string]string
 
 type Adder interface {

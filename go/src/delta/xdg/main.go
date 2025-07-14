@@ -19,32 +19,26 @@ type XDG struct {
 	Runtime string
 }
 
-type xdgInitElement struct {
-	standard   string
-	overridden string
-	envKey     string
-	out        *string
-}
-
-func (x XDG) GetXDGPaths() []string {
+func (exdg XDG) GetXDGPaths() []string {
 	return []string{
-		x.Data,
-		x.Config,
-		x.State,
-		x.Cache,
-		x.Runtime,
+		exdg.Data,
+		exdg.Config,
+		exdg.State,
+		exdg.Cache,
+		exdg.Runtime,
 	}
 }
 
-func (xdg XDG) AddToEnvVars(envVars env_vars.EnvVars) {
-	initElements := xdg.getInitElements()
+func (exdg XDG) AddToEnvVars(envVars env_vars.EnvVars) {
+	initElements := exdg.getInitElements()
 
 	for _, element := range initElements {
 		envVars[element.envKey] = *element.out
 	}
 }
 
-func (x *XDG) setDefaultOrEnv(
+// TODO simplify this and document it
+func (exdg *XDG) setDefaultOrEnv(
 	defaultValue string,
 	envKey string,
 ) (out string, err error) {
@@ -56,7 +50,7 @@ func (x *XDG) setDefaultOrEnv(
 			func(v string) string {
 				switch v {
 				case "HOME":
-					return x.Home
+					return exdg.Home
 
 				default:
 					return os.Getenv(v)
@@ -65,22 +59,23 @@ func (x *XDG) setDefaultOrEnv(
 		)
 	}
 
-	if x.AddedPath != "" {
-		out = filepath.Join(out, x.AddedPath)
+	if exdg.AddedPath != "" {
+		out = filepath.Join(out, exdg.AddedPath)
 	}
 
 	return
 }
 
-func (x *XDG) InitializeOverridden(
+func (exdg *XDG) InitializeOverridden(
 	addedPath string,
 ) (err error) {
-	x.AddedPath = addedPath
+	exdg.AddedPath = addedPath
 
-	toInitialize := x.getInitElements()
+	toInitialize := exdg.getInitElements()
 
 	for _, ie := range toInitialize {
-		if *ie.out, err = x.setDefaultOrEnv(
+		// TODO valid this to prevent root xdg directories
+		if *ie.out, err = exdg.setDefaultOrEnv(
 			ie.overridden,
 			"",
 		); err != nil {
@@ -92,15 +87,16 @@ func (x *XDG) InitializeOverridden(
 	return
 }
 
-func (x *XDG) InitializeStandardFromEnv(
+func (exdg *XDG) InitializeStandardFromEnv(
 	addedPath string,
 ) (err error) {
-	x.AddedPath = addedPath
+	exdg.AddedPath = addedPath
 
-	toInitialize := x.getInitElements()
+	toInitialize := exdg.getInitElements()
 
 	for _, ie := range toInitialize {
-		if *ie.out, err = x.setDefaultOrEnv(
+		// TODO valid this to prevent root xdg directories
+		if *ie.out, err = exdg.setDefaultOrEnv(
 			ie.standard,
 			ie.envKey,
 		); err != nil {

@@ -15,7 +15,7 @@ import (
 
 type BlobStoreLocal struct{}
 
-func (cmd *BlobStoreLocal) SetFlagSet(f *flag.FlagSet) {
+func (cmd *BlobStoreLocal) SetFlagSet(flagSet *flag.FlagSet) {
 }
 
 type BlobStoreWithEnv struct {
@@ -23,7 +23,7 @@ type BlobStoreWithEnv struct {
 	interfaces.BlobStore
 }
 
-func (c BlobStoreLocal) MakeBlobStoreLocal(
+func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 	context errors.Context,
 	config repo_config_cli.Config,
 	envOptions env_ui.Options,

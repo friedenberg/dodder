@@ -173,15 +173,9 @@ test-bats $PATH=(dir_build + ":" + env("PATH")):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test
 
-test-bats-version dodder version $PATH=(dir_build + ":" + env("PATH")):
-  just \
-    --set DODDER_BIN {{dodder}} \
-    --set DODDER_VERSION v{{version}} \
-    ../zz-tests_bats/test
-
 version_next := shell("der-next info || echo '\n\ngetting next version failed'")
 
-test-bats-next:
+test-bats-next *args:
   just \
     --set DODDER_BIN der-next \
     --set DODDER_VERSION v{{version_next}} \
@@ -190,7 +184,7 @@ test-bats-next:
   just \
     --set DODDER_BIN der-next \
     --set DODDER_VERSION v{{version_next}} \
-    ../zz-tests_bats/test
+    ../zz-tests_bats/test {{args}}
 
 test: test-go test-bats
 

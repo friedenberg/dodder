@@ -2,8 +2,8 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 	"path/filepath"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -42,23 +42,23 @@ func (cmd *BlobStoreInit) SetFlagSet(flagSet *flag.FlagSet) {
 }
 
 func (cmd *BlobStoreInit) Run(req command.Request) {
+	// TODO validate no space
+	blobStoreName := req.PopArg("blob store name")
+
 	req.AssertNoMoreArgs()
 
 	env := cmd.MakeEnvRepo(req, false)
 
 	blobStoreCount := len(env.GetBlobStores())
 
-	dir := env.DirBlobStores(
-		strconv.Itoa(blobStoreCount),
-	)
+	dir := env.DirBlobStoreConfigs()
 
 	if err := env.MakeDir(dir); err != nil {
 		env.CancelWithError(err)
 		return
 	}
 
-	triple_hyphen_io.EncodeToFile(
-		env,
+	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
 			Type: cmd.tipe,
@@ -66,7 +66,14 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 		},
 		filepath.Join(
 			dir,
-			env_repo.FileNameBlobStoreConfig,
+			fmt.Sprintf("%d-%s.%s",
+				blobStoreCount,
+				blobStoreName,
+				env_repo.FileNameBlobStoreConfig,
+			),
 		),
-	)
+	); err != nil {
+		env.CancelWithError(err)
+		return
+	}
 }

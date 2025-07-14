@@ -36,7 +36,8 @@ function last_after_typ_mutate { # @test
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 
-  dir_inventory_list="$("$DODDER_BIN" info-repo dir.blob-stores.1.inventory_lists)"
+  # TODO use switch to using the inventory list log
+  dir_inventory_list="$("$DODDER_BIN" info-repo dir-blob_stores-0-inventory_lists)"
 	run bash -c "find '$dir_inventory_list' -type f | wc -l | tr -d \" \""
 	assert_success
   # to support both <v10 separate inventory list blob store, and >=v11 combined inventory list blob store

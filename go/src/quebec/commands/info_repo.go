@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	// TODO rename to repo-info
 	command.Register("info-repo", &InfoRepo{})
 }
 
@@ -65,26 +66,25 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 			// TODO switch to `blob_stores.N.age_encryption`
 			// TODO switch to encryption interface
-		case "age-encryption":
+		case "blob_stores-0-encryption":
 			// TODO read default blob store and expose config
 			for _, i := range blobIOWrapper.GetBlobEncryption().(*age.Age).Identities {
 				repo.GetUI().Print(i)
 			}
 
-			// TODO switch to `blob_stores`
-		case "dir.blob-stores":
+		case "dir-blob_stores":
 			repo.GetUI().Print(
 				repo.DirBlobStores(),
 			)
 
-			// TODO switch to `blob_stores`
-		case "dir.blob-stores.1.blobs":
+			// TODO make dynamic and parse index
+		case "dir-blob_stores-0-blobs":
 			repo.GetUI().Print(
 				repo.DirFirstBlobStoreBlobs(),
 			)
 
-			// TODO switch to `blob_stores`
-		case "dir.blob-stores.1.inventory_lists":
+			// TODO make dynamic and parse index
+		case "dir-blob_stores-0-inventory_lists":
 			if store_version.LessOrEqual(storeVersion, store_version.V10) {
 				repo.GetUI().Print(
 					repo.DirFirstBlobStoreInventoryLists(),

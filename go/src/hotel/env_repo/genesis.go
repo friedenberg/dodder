@@ -2,6 +2,7 @@ package env_repo
 
 import (
 	"encoding/gob"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -40,9 +41,14 @@ func (env *Env) Genesis(bigBang BigBang) {
 		env.DirObjectId(),
 		env.DirCache(),
 		env.DirLostAndFound(),
+
+		// TODO remove
 		env.DirFirstBlobStoreInventoryLists(),
 		env.DirFirstBlobStoreBlobs(),
+
+		// TODO refactor
 		env.DirBlobStores("0"),
+		env.DirBlobStoreConfigs(),
 	); err != nil {
 		env.CancelWithError(err)
 	}
@@ -108,12 +114,14 @@ func (env Env) writeInventoryListLog() {
 }
 
 func (env *Env) writeConfig(bigBang BigBang) {
-	triple_hyphen_io.EncodeToFile(
-		env,
+	if err := triple_hyphen_io.EncodeToFile(
 		genesis_configs.CoderPrivate,
 		&env.config,
 		env.FileConfigPermanent(),
-	)
+	); err != nil {
+		env.CancelWithError(err)
+		return
+	}
 }
 
 func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
@@ -122,16 +130,20 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 		return
 	}
 
-	triple_hyphen_io.EncodeToFile(
-		env,
+	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		// TODO enforce type and blob agreement by return a TypedBlob
 		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
 			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
 			Blob: bigBang.BlobStoreConfig,
 		},
-		env.DirBlobStores("0", FileNameBlobStoreConfig),
-	)
+		env.DirBlobStoreConfigs(
+			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
+		),
+	); err != nil {
+		env.CancelWithError(err)
+		return
+	}
 }
 
 // TODO remove gob

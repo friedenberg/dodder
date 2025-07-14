@@ -109,7 +109,7 @@ test-integration: (test-targets "*.bats")
 test-migration: (test-targets "migration/*.bats")
 
 [group("test")]
-test: (test-targets "*.bats" "migration/*.bats")
+test *flags: (test-targets flags "*.bats" "migration/*.bats")
 
 #   ____  _        _
 #  / ___|| |_ __ _| |_ ___

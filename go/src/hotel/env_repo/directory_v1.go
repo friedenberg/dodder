@@ -67,6 +67,10 @@ func (s directoryV1) DirBlobStores(p ...string) string {
 	return s.DirDodder(append([]string{"objects"}, p...)...)
 }
 
+func (s directoryV1) DirBlobStoreConfigs(p ...string) string {
+	return s.DirBlobStores(p...)
+}
+
 func (s directoryV1) DirLostAndFound() string {
 	return s.DirDodder("lost_and_found")
 }

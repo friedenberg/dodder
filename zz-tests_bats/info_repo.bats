@@ -67,7 +67,7 @@ function info_store_version { # @test
 
 # bats test_tags=user_story:age_encryption
 function info_age_none { # @test
-	run_dodder info-repo age-encryption
+	run_dodder info-repo blob_stores-0-encryption
 	assert_output ''
 }
 
@@ -76,7 +76,7 @@ function info_age_some { # @test
 	age-keygen --output age-key >/dev/null 2>&1
 	key="$(tail -n1 age-key)"
 	run_dodder_init -override-xdg-with-cwd -age-identity age-key test-repo-id
-	run_dodder info-repo age-encryption
+	run_dodder info-repo blob_stores-0-encryption
 	assert_output "$key"
 }
 

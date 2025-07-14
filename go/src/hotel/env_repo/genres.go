@@ -23,6 +23,7 @@ func (env Env) ReadAllLevel2Files(
 	return
 }
 
+// TODO transform into interfaces.SeqError
 func (env Env) ReadAllShas(
 	p string,
 	w interfaces.FuncIter[*sha.Sha],
@@ -52,6 +53,7 @@ func (env Env) ReadAllShas(
 	return
 }
 
+// TODO transform into interfaces.SeqError
 func (env Env) ReadAllShasForBlobs(
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {

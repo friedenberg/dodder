@@ -14,16 +14,14 @@ func DecodeFromFile[
 	BLOB any,
 	BLOB_PTR interfaces.Ptr[BLOB],
 ](
-	ctx errors.Context,
 	coders CoderToTypedBlob[BLOB],
 	path string,
 	permitNotExist bool,
-) (typedBlob TypedBlob[BLOB]) {
+) (typedBlob TypedBlob[BLOB], err error) {
 	var reader io.Reader
 
 	{
 		var file *os.File
-		var err error
 
 		if file, err = files.OpenExclusiveReadOnly(
 			path,
@@ -32,17 +30,18 @@ func DecodeFromFile[
 				err = nil
 				reader = bytes.NewBuffer(nil)
 			} else {
-				ctx.CancelWithError(err)
+				err = errors.Wrap(err)
 				return
 			}
 		} else {
 			reader = file
-			defer ctx.MustClose(file)
+			defer errors.DeferredCloser(&err, file)
 		}
 	}
 
-	if _, err := coders.DecodeFrom(&typedBlob, reader); err != nil {
-		ctx.CancelWithError(err)
+	if _, err = coders.DecodeFrom(&typedBlob, reader); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -52,26 +51,25 @@ func EncodeToFile[
 	BLOB any,
 	BLOB_PTR interfaces.Ptr[BLOB],
 ](
-	ctx errors.Context,
 	coders CoderToTypedBlob[BLOB],
 	typedBlob *TypedBlob[BLOB],
 	path string,
-) {
+) (err error) {
 	var file *os.File
 
-	{
-		var err error
-
-		if file, err = files.CreateExclusiveWriteOnly(
-			path,
-		); err != nil {
-			ctx.CancelWithError(err)
-		}
-
-		defer ctx.MustClose(file)
+	if file, err = files.CreateExclusiveWriteOnly(
+		path,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if _, err := coders.EncodeTo(typedBlob, file); err != nil {
-		ctx.CancelWithError(err)
+	defer errors.DeferredCloser(&err, file)
+
+	if _, err = coders.EncodeTo(typedBlob, file); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	return
 }

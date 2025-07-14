@@ -58,7 +58,7 @@ function bootstrap {
 
 function print_their_xdg() {
 	pushd "$1" >/dev/null || exit 1
-	dodder info xdg
+	"$DODDER_BIN" info xdg
 }
 
 function run_clone_default_with() {

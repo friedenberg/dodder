@@ -16,17 +16,17 @@ func MakeBlobStore(
 	basePath string,
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,
-) interfaces.LocalBlobStore {
+) (store interfaces.LocalBlobStore, err error) {
 	switch config := config.(type) {
 	default:
-		ctx.CancelWithErrorf("unsupported blob store config: %T", config)
-		return nil
+		err = errors.BadRequestf("unsupported blob store config: %T", config)
+		return
+
 	case sftpConfig:
 		return makeSftpStore(ctx, config)
 
-	case gitLikeBucketedConfig:
-		return makeGitLikeBucketedStore(basePath, config, tempFS)
-
+	case blob_store_configs.ConfigLocalGitLikeBucketed:
+		return makeGitLikeBucketedStore(ctx, basePath, config, tempFS)
 	}
 }
 

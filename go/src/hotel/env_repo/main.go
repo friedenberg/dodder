@@ -3,6 +3,7 @@ package env_repo
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -14,6 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -33,7 +35,9 @@ type directoryPaths interface {
 	init(interfaces.StoreVersion, xdg.XDG) error
 }
 
-type BlobStoreWithConfig struct {
+type BlobStore struct {
+	Name     string
+	BasePath string
 	blob_store_configs.Config
 	interfaces.LocalBlobStore
 }
@@ -52,7 +56,7 @@ type Env struct {
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
-	blobStores []BlobStoreWithConfig
+	blobStores []BlobStore
 }
 
 func Make(
@@ -94,6 +98,10 @@ func Make(
 	// 	return
 	// }
 
+	if env.DirDodder() == "" {
+		panic("empty dir dodder")
+	}
+
 	if !options.PermitNoDodderDirectory {
 		if ok := files.Exists(env.DirDodder()); !ok {
 			err = errors.Wrap(ErrNotInDodderDir{Expected: env.DirDodder()})
@@ -117,12 +125,17 @@ func Make(
 		}
 	}
 
-	env.config = triple_hyphen_io.DecodeFromFile(
-		env,
-		genesis_configs.CoderPrivate,
-		env.FileConfigPermanent(),
-		true,
-	)
+	{
+		var err error
+
+		if env.config, err = triple_hyphen_io.DecodeFromFile(
+			genesis_configs.CoderPrivate,
+			env.FileConfigPermanent(),
+			true,
+		); err != nil {
+			env.CancelWithError(err)
+		}
+	}
 
 	env.setupStores()
 
@@ -131,42 +144,55 @@ func Make(
 
 func (env *Env) setupStores() {
 	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
-		env.blobStores = make([]BlobStoreWithConfig, 1)
+		env.blobStores = make([]BlobStore, 1)
 		blob := env.GetConfigPublic().Blob.(genesis_configs.BlobIOWrapperGetter)
 		env.blobStores[0].Config = blob.GetBlobIOWrapper()
+		env.blobStores[0].BasePath = env.DirBlobStores("blobs")
 	} else {
 		var configPaths []string
 
 		{
 			var err error
 
-			// TODO consider just iterating and using ErrNotExist instead
-			if configPaths, err = filepath.Glob(
-				filepath.Join(env.DirBlobStores(), "*", FileNameBlobStoreConfig),
+			if configPaths, err = files.DirNames(
+				filepath.Join(env.DirBlobStoreConfigs()),
 			); err != nil {
 				env.CancelWithError(err)
 			}
 		}
 
-		env.blobStores = make([]BlobStoreWithConfig, len(configPaths))
+		env.blobStores = make([]BlobStore, len(configPaths))
 
 		for i, configPath := range configPaths {
-			env.blobStores[i].Config = triple_hyphen_io.DecodeFromFile(
-				env,
+			env.blobStores[i].Name = fd.FileNameSansExt(configPath)
+			env.blobStores[i].BasePath = env.DirBlobStores(strconv.Itoa(i))
+
+			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
 				configPath,
 				false,
-			).Blob
+			); err != nil {
+				env.CancelWithError(err)
+				return
+			} else {
+				env.blobStores[i].Config = typedConfig.Blob
+			}
 		}
 	}
 
 	for i, blobStore := range env.blobStores {
-		env.blobStores[i].LocalBlobStore = blob_stores.MakeBlobStore(
+		var err error
+
+		// TODO use sha of config to determine blob store base path
+		if env.blobStores[i].LocalBlobStore, err = blob_stores.MakeBlobStore(
 			env,
-			env.DirFirstBlobStoreBlobs(),
+			blobStore.BasePath,
 			blobStore.Config,
 			env.GetTempLocal(),
-		)
+		); err != nil {
+			env.CancelWithError(err)
+			return
+		}
 	}
 }
 
@@ -234,7 +260,7 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) GetDefaultBlobStore() BlobStoreWithConfig {
+func (env Env) GetDefaultBlobStore() BlobStore {
 	if len(env.blobStores) == 0 {
 		panic("calling GetDefaultBlobStore without any initialized blob stores")
 	}
@@ -242,8 +268,8 @@ func (env Env) GetDefaultBlobStore() BlobStoreWithConfig {
 	return env.blobStores[env.blobStoreDefaultIndex]
 }
 
-func (env Env) GetBlobStores() []BlobStoreWithConfig {
-	blobStores := make([]BlobStoreWithConfig, len(env.blobStores))
+func (env Env) GetBlobStores() []BlobStore {
+	blobStores := make([]BlobStore, len(env.blobStores))
 	copy(blobStores, env.blobStores)
 	return blobStores
 }
@@ -254,12 +280,17 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
 		blob := env.GetConfigPublic().Blob.(genesis_configs.BlobIOWrapperGetter)
 
-		return blob_stores.MakeBlobStore(
+		if store, err := blob_stores.MakeBlobStore(
 			env,
 			env.DirFirstBlobStoreInventoryLists(),
 			blob.GetBlobIOWrapper(),
 			env.GetTempLocal(),
-		)
+		); err != nil {
+			env.CancelWithError(err)
+			return nil
+		} else {
+			return store
+		}
 	} else {
 		return env.GetDefaultBlobStore()
 	}
