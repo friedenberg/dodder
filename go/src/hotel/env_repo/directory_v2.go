@@ -40,12 +40,12 @@ func (directory directoryV2) DirBlobStores(p ...string) string {
 
 // TODO deprecate and remove
 func (directory directoryV2) DirFirstBlobStoreInventoryLists() string {
-	return directory.DirBlobStores("1/inventory_lists")
+	return directory.DirBlobStores("0/inventory_lists")
 }
 
 // TODO deprecate and remove
 func (directory directoryV2) DirFirstBlobStoreBlobs() string {
-	return directory.DirBlobStores("1/blobs")
+	return directory.DirBlobStores("0/blobs")
 }
 
 func (directory directoryV2) FileCacheDormant() string {
