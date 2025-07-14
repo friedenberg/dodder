@@ -2,15 +2,14 @@ package commands
 
 import (
 	"flag"
-	"io"
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -69,7 +68,12 @@ func (cmd BlobFsck) Run(req command.Request) {
 						continue
 					}
 
-					if err = cmd.verifyBlob(ctx, blobStore, sh, &progressWriter); err != nil {
+					if err = blob_stores.VerifyBlob(
+						ctx,
+						blobStore,
+						sh,
+						&progressWriter,
+					); err != nil {
 						blobErrors = append(blobErrors, errorBlob{err: err})
 						continue
 					}
@@ -99,37 +103,4 @@ func (cmd BlobFsck) Run(req command.Request) {
 			ui.Out().Printf("%s: %s", errorBlob.sha, errorBlob.err)
 		}
 	}
-}
-
-func (cmd BlobFsck) verifyBlob(
-	ctx errors.Context,
-	blobStore interfaces.LocalBlobStore,
-	sh interfaces.Sha,
-	progressWriter io.Writer,
-) (err error) {
-	var readCloser interfaces.ShaReadCloser
-
-	if readCloser, err = blobStore.BlobReader(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = io.Copy(progressWriter, readCloser); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	expected := sha.Make(sh)
-
-	if err = expected.AssertEqualsShaLike(readCloser.GetShaLike()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = readCloser.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

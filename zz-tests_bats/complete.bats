@@ -89,8 +89,6 @@ function complete_subcmd { # @test
 		blob_store-init-sftp
 		blob_store-write
 		cat-alfred
-		cat-blob
-		cat-blob-shas
 		checkin
 		checkin-blob
 		checkin-json
@@ -136,7 +134,6 @@ function complete_subcmd { # @test
 		show
 		status
 		test
-		write-blob
 	EOM
 }
 

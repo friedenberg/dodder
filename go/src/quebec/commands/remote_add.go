@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
+// TODO switch to using compound command pattern from blob_store_init.go
 func init() {
 	command.Register(
 		"remote-add",

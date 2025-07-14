@@ -11,7 +11,6 @@ import (
 )
 
 func init() {
-	command.Register("cat-blob-shas", &BlobStoreCatShas{})
 	command.Register("blob_store-cat-shas", &BlobStoreCatShas{})
 }
 

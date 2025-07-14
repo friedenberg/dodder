@@ -57,7 +57,7 @@ function init_compression { # @test
 	assert_success
 	output_immutable_config | assert_output --regexp -
 
-	run_dodder cat-blob "$(get_konfig_sha)"
+	run_dodder blob_store-cat "$(get_konfig_sha)"
 	assert_success
 
 	sha="$(get_konfig_sha)"

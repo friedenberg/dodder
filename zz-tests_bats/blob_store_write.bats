@@ -33,11 +33,11 @@ function write_blob_one_file { # @test
 	assert_success
 	assert_output --partial 'f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63 /dev/fd/'
 
-	run_dodder cat-blob "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
+	run_dodder blob_store-cat "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
 	assert_success
 	assert_output "$(printf "%s\n" wow)"
 
-	run_dodder cat-blob-shas
+	run_dodder blob_store-cat-shas
 	assert_success
 	assert_output --partial "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
 }

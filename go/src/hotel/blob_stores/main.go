@@ -112,3 +112,40 @@ func CopyBlob(
 
 	return
 }
+
+func VerifyBlob(
+	ctx errors.Context,
+	blobStore interfaces.LocalBlobStore,
+	sh interfaces.Sha,
+	progressWriter io.Writer,
+) (err error) {
+	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
+	// instead (for expensive blob stores that may implement their own remote
+	// verification, such as ssh, sftp, or something else)
+
+	var readCloser interfaces.ShaReadCloser
+
+	if readCloser, err = blobStore.BlobReader(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = io.Copy(progressWriter, readCloser); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	expected := sha.Make(sh)
+
+	if err = expected.AssertEqualsShaLike(readCloser.GetShaLike()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = readCloser.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

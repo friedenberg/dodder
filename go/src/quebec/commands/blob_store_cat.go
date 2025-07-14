@@ -19,7 +19,6 @@ import (
 )
 
 func init() {
-	command.Register("cat-blob", &BlobStoreCat{})
 	command.Register("blob_store-cat", &BlobStoreCat{})
 }
 

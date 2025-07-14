@@ -203,7 +203,7 @@ function run_dodder_init_disable_age {
 [konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
 
-  run_dodder cat-blob "$(get_konfig_sha)"
+  run_dodder blob_store-cat "$(get_konfig_sha)"
   assert_success
   assert_output
 
