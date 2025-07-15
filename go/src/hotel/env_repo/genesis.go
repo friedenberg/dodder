@@ -20,22 +20,13 @@ import (
 )
 
 func (env *Env) Genesis(bigBang BigBang) {
-	if err := bigBang.GenesisConfig.GeneratePrivateKey(); err != nil {
+	if err := bigBang.GenesisConfig.Blob.GeneratePrivateKey(); err != nil {
 		env.CancelWithError(err)
 		return
 	}
 
-	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		env.config.Type = ids.GetOrPanic(
-			ids.TypeTomlConfigImmutableV1,
-		).Type
-	} else {
-		env.config.Type = ids.GetOrPanic(
-			ids.TypeTomlConfigImmutableV2,
-		).Type
-	}
-
-	env.config.Blob = bigBang.GenesisConfig
+	env.config.Type = bigBang.GenesisConfig.Type
+	env.config.Blob = bigBang.GenesisConfig.Blob
 
 	if err := env.MakeDir(
 		env.DirObjectId(),

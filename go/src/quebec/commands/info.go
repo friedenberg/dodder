@@ -43,9 +43,9 @@ func (cmd Info) Run(req command.Request) {
 		args = []string{"store-version"}
 	}
 
-	defaultGenesisConfig := genesis_configs.DefaultMutableWithVersion(
+	defaultGenesisConfig := genesis_configs.DefaultWithVersion(
 		store_version.VCurrent,
-	)
+	).Blob
 	defaultBlobStoreConfig := blob_store_configs.Default()
 
 	for _, arg := range args {

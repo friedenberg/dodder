@@ -40,7 +40,7 @@ func (cmd Genesis) OnTheFirstDay(
 		ui.CancelWithError(err)
 	}
 
-	cmd.GenesisConfig.SetRepoId(repoId)
+	cmd.GenesisConfig.Blob.SetRepoId(repoId)
 
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
@@ -68,7 +68,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	envRepo.Genesis(cmd.BigBang)
 
-	switch cmd.BigBang.GenesisConfig.GetRepoType() {
+	switch cmd.BigBang.GenesisConfig.Blob.GetRepoType() {
 	case repo_type.TypeWorkingCopy:
 		return local_working_copy.Genesis(
 			cmd.BigBang,
@@ -81,7 +81,7 @@ func (cmd Genesis) OnTheFirstDay(
 	default:
 		req.CancelWithError(
 			repo_type.ErrUnsupportedRepoType{
-				Actual: cmd.BigBang.GenesisConfig.GetRepoType(),
+				Actual: cmd.BigBang.GenesisConfig.Blob.GetRepoType(),
 			},
 		)
 	}

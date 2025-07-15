@@ -42,29 +42,39 @@ type (
 	TypedPrivateMutable = triple_hyphen_io.TypedBlob[PrivateMutable]
 )
 
-func DefaultMutable() PrivateMutable {
-	return DefaultMutableWithVersion(store_version.VCurrent)
+func Default() *TypedPrivateMutable {
+	return DefaultWithVersion(store_version.VCurrent)
 }
 
-func DefaultMutableWithVersion(storeVersion StoreVersion) PrivateMutable {
+func DefaultWithVersion(storeVersion StoreVersion) *TypedPrivateMutable {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		return &TomlV1Private{
-			TomlV1Common: TomlV1Common{
-				StoreVersion: storeVersion,
-				RepoType:     repo_type.TypeWorkingCopy,
-				BlobStore: blob_store_configs.TomlV0{
-					CompressionType:   compression_type.CompressionTypeDefault,
-					LockInternalFiles: true,
+		return &TypedPrivateMutable{
+			Type: ids.GetOrPanic(
+				ids.TypeTomlConfigImmutableV1,
+			).Type,
+			Blob: &TomlV1Private{
+				TomlV1Common: TomlV1Common{
+					StoreVersion: storeVersion,
+					RepoType:     repo_type.TypeWorkingCopy,
+					BlobStore: blob_store_configs.TomlV0{
+						CompressionType:   compression_type.CompressionTypeDefault,
+						LockInternalFiles: true,
+					},
+					InventoryListType: ids.TypeInventoryListV2,
 				},
-				InventoryListType: ids.TypeInventoryListV2,
 			},
 		}
 	} else {
-		return &TomlV2Private{
-			TomlV2Common: TomlV2Common{
-				StoreVersion:      storeVersion,
-				RepoType:          repo_type.TypeWorkingCopy,
-				InventoryListType: ids.TypeInventoryListV2,
+		return &TypedPrivateMutable{
+			Type: ids.GetOrPanic(
+				ids.TypeTomlConfigImmutableV2,
+			).Type,
+			Blob: &TomlV2Private{
+				TomlV2Common: TomlV2Common{
+					StoreVersion:      storeVersion,
+					RepoType:          repo_type.TypeWorkingCopy,
+					InventoryListType: ids.TypeInventoryListV2,
+				},
 			},
 		}
 	}
