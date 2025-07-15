@@ -125,18 +125,27 @@ func Make(
 		}
 	}
 
-	if env.config, err = triple_hyphen_io.DecodeFromFile(
-		genesis_configs.CoderPrivate,
-		env.FileConfigPermanent(),
-		!options.PermitNoDodderDirectory,
-	); err != nil {
-		if options.PermitNoDodderDirectory && errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
+	if options.PermitNoDodderDirectory {
+		if env.config, err = triple_hyphen_io.DecodeFromFile(
+			genesis_configs.CoderPrivate,
+			env.FileConfigPermanent(),
+		); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
 
-		return
+			return
+		}
+	} else {
+		if env.config, err = triple_hyphen_io.DecodeFromFile(
+			genesis_configs.CoderPrivate,
+			env.FileConfigPermanent(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	env.setupStores()
@@ -172,7 +181,6 @@ func (env *Env) setupStores() {
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
 				configPath,
-				false,
 			); err != nil {
 				env.CancelWithError(err)
 				return

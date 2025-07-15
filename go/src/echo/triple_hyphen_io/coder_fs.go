@@ -2,7 +2,6 @@ package triple_hyphen_io
 
 import (
 	"bytes"
-	"io"
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -16,30 +15,43 @@ func DecodeFromFile[
 ](
 	coders CoderToTypedBlob[BLOB],
 	path string,
-	permitNotExist bool,
 ) (typedBlob TypedBlob[BLOB], err error) {
-	var reader io.Reader
+	var file *os.File
 
-	{
-		var file *os.File
-
-		if file, err = files.OpenExclusiveReadOnly(
-			path,
-		); err != nil {
-			if errors.IsNotExist(err) && permitNotExist {
-				err = nil
-				reader = bytes.NewBuffer(nil)
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			reader = file
-			defer errors.DeferredCloser(&err, file)
-		}
+	if file, err = files.OpenExclusiveReadOnly(
+		path,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if _, err = coders.DecodeFrom(&typedBlob, reader); err != nil {
+	defer errors.DeferredCloser(&err, file)
+
+	if _, err = coders.DecodeFrom(&typedBlob, file); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// For decodes where typedBlob.Blob should be populated with an empty struct
+// when the file is missing
+func DecodeFromFileOrEmptyBuffer[
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
+](
+	coders CoderToTypedBlob[BLOB],
+	path string,
+	permitNotExist bool,
+) (typedBlob TypedBlob[BLOB], err error) {
+	typedBlob, err = DecodeFromFile(coders, path)
+
+	if err == nil {
+		return
+	}
+
+	if _, err = coders.DecodeFrom(&typedBlob, bytes.NewBuffer(nil)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

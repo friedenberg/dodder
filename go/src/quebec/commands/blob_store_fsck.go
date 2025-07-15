@@ -62,6 +62,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 
 				for sh, err := range blobStore.AllBlobs() {
 					ctx.ContinueOrPanicOnDone()
+					// TODO keep track of blobs in a tridex and compare subsequent stores
 
 					if err != nil {
 						blobErrors = append(blobErrors, errorBlob{err: err})
