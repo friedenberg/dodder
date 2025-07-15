@@ -123,11 +123,15 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
-		// TODO enforce type and blob agreement by return a TypedBlob
-		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
-			Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
-			Blob: bigBang.BlobStoreConfig,
+		&blob_store_configs.TypedConfig{
+			Type: bigBang.TypedBlobStoreConfig.Type,
+			Blob: bigBang.TypedBlobStoreConfig.Blob,
 		},
+		// TODO figure out why
+		// &triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
+		// 	Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
+		// 	Blob: bigBang.TypedBlobStoreConfig,
+		// },
 		env.DirBlobStoreConfigs(
 			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
 		),

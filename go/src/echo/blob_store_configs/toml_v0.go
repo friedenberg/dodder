@@ -15,6 +15,10 @@ type TomlV0 struct {
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }
 
+func (*TomlV0) GetBlobStoreType() string {
+	return "local"
+}
+
 func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flag.FlagSet) {
 	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 

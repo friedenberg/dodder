@@ -14,6 +14,10 @@ type TomlSftpV0 struct {
 	RemotePath     string `toml:"remote-path"`
 }
 
+func (*TomlSftpV0) GetBlobStoreType() string {
+	return "sftp"
+}
+
 func (blobStoreConfig *TomlSftpV0) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.StringVar(
 		&blobStoreConfig.Host,

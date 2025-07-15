@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -62,7 +63,10 @@ func (config *V0Public) GetImmutableConfigPublic() Public {
 }
 
 func (config *V0Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
-	return config
+	return &blob_store_configs.TomlV0{
+		AgeEncryption:   *config.GetAgeEncryption(),
+		CompressionType: config.CompressionType,
+	}
 }
 
 func (config V0Common) GetStoreVersion() StoreVersion {

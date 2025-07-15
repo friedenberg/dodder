@@ -11,7 +11,7 @@ import (
 // Config used to initialize a repo for the first time
 type BigBang struct {
 	GenesisConfig        *genesis_configs.TypedPrivateMutable
-	BlobStoreConfig blob_store_configs.ConfigMutable
+	TypedBlobStoreConfig *blob_store_configs.TypedMutableConfig
 
 	Yin                  string
 	Yang                 string
@@ -24,7 +24,7 @@ func (bigBang *BigBang) SetDefaults() {
 	bigBang.GenesisConfig = genesis_configs.Default()
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.BlobStoreConfig = blob_store_configs.Default()
+		bigBang.TypedBlobStoreConfig = blob_store_configs.Default()
 	}
 }
 
@@ -56,6 +56,6 @@ func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
 	bigBang.GenesisConfig.Blob.SetFlagSet(flagSet)
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.BlobStoreConfig.SetFlagSet(flagSet)
+		bigBang.TypedBlobStoreConfig.Blob.SetFlagSet(flagSet)
 	}
 }

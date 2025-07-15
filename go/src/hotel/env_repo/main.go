@@ -146,7 +146,7 @@ func (env *Env) setupStores() {
 	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
 		env.blobStores = make([]BlobStore, 1)
 		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
-		env.blobStores[0].Config = blob.GetBlobIOWrapper()
+		env.blobStores[0].Config = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		env.blobStores[0].BasePath = env.DirBlobStores("blobs")
 	} else {
 		var configPaths []string
@@ -283,7 +283,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 		if store, err := blob_stores.MakeBlobStore(
 			env,
 			env.DirFirstBlobStoreInventoryLists(),
-			blob.GetBlobIOWrapper(),
+			blob.GetBlobIOWrapper().(blob_store_configs.Config),
 			env.GetTempLocal(),
 		); err != nil {
 			env.CancelWithError(err)

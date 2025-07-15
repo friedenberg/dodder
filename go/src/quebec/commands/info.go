@@ -5,6 +5,7 @@ import (
 	"flag"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -46,7 +47,8 @@ func (cmd Info) Run(req command.Request) {
 	defaultGenesisConfig := genesis_configs.DefaultWithVersion(
 		store_version.VCurrent,
 	).Blob
-	defaultBlobStoreConfig := blob_store_configs.Default()
+
+	defaultBlobStoreConfig := blob_store_configs.Default().Blob
 
 	for _, arg := range args {
 		// TODO switch to underscore+hyphen string keys
@@ -58,14 +60,22 @@ func (cmd Info) Run(req command.Request) {
 			ui.GetUI().Print(store_version.VNext)
 
 		case "compression-type":
-			ui.GetUI().Print(
-				defaultBlobStoreConfig.GetBlobCompression(),
-			)
+			if ioWrapper, ok := defaultBlobStoreConfig.(interfaces.BlobIOWrapper); ok {
+				ui.GetUI().Print(
+					ioWrapper.GetBlobCompression(),
+				)
+			} else {
+				ui.CancelWithBadRequestf("default blob store does not support compression")
+			}
 
 		case "age-encryption":
-			ui.GetUI().Print(
-				defaultBlobStoreConfig.GetBlobEncryption(),
-			)
+			if ioWrapper, ok := defaultBlobStoreConfig.(interfaces.BlobIOWrapper); ok {
+				ui.GetUI().Print(
+					ioWrapper.GetBlobEncryption(),
+				)
+			} else {
+				ui.CancelWithBadRequestf("default blob store does not support encryption")
+			}
 
 		case "env":
 			envVars := env_vars.Make(dir)
