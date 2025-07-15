@@ -228,6 +228,7 @@ deploy-docker: build-docker
 # TODO modify this to exclude any changes that were added AFTER the task began
 deploy-github: \
     build-go \
+    build-nix-gomod \
     test \
     test-bats-next \
     (git-add-and-commit \
