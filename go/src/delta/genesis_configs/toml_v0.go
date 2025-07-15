@@ -27,17 +27,17 @@ type V0Private struct {
 	V0Common
 }
 
-func (config *V0Common) SetFlagSet(f *flag.FlagSet) {
-	config.CompressionType.SetFlagSet(f)
+func (config *V0Common) SetFlagSet(flagSet *flag.FlagSet) {
+	config.CompressionType.SetFlagSet(flagSet)
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&config.LockInternalFiles,
 		"lock-internal-files",
 		config.LockInternalFiles,
 		"",
 	)
 
-	f.Func(
+	flagSet.Func(
 		"recipient",
 		"age recipients",
 		func(value string) (err error) {
@@ -46,9 +46,6 @@ func (config *V0Common) SetFlagSet(f *flag.FlagSet) {
 		},
 	)
 }
-
-func (config *V0Public) config() public   { return public{} }
-func (config *V0Private) config() private { return private{} }
 
 func (config *V0Private) GetImmutableConfig() Private {
 	return config
@@ -105,5 +102,5 @@ func (config V0Common) GetLockInternalFiles() bool {
 }
 
 func (config V0Common) GetInventoryListTypeString() string {
-	return InventoryListTypeV0
+	return ids.TypeInventoryListV0
 }

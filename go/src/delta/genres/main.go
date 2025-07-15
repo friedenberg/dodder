@@ -81,14 +81,14 @@ func MakeOrUnknown(v string) (g Genre) {
 	return
 }
 
-func (g Genre) GetGenre() interfaces.Genre {
-	return g
+func (genre Genre) GetGenre() interfaces.Genre {
+	return genre
 }
 
-func (g Genre) GetGenreBitInt() byte {
-	switch g {
+func (genre Genre) GetGenreBitInt() byte {
+	switch genre {
 	default:
-		panic(fmt.Sprintf("genre does not define bit int: %s", g))
+		panic(fmt.Sprintf("genre does not define bit int: %s", genre))
 	case InventoryList:
 		return inventory_list
 	case Blob:
@@ -106,20 +106,20 @@ func (g Genre) GetGenreBitInt() byte {
 	}
 }
 
-func (a Genre) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (genre Genre) EqualsAny(b any) bool {
+	return values.Equals(genre, b)
 }
 
-func (a Genre) Equals(b Genre) bool {
-	return a == b
+func (genre Genre) Equals(b Genre) bool {
+	return genre == b
 }
 
-func (a Genre) EqualsGenre(b interfaces.GenreGetter) bool {
-	return a.GetGenreString() == b.GetGenre().GetGenreString()
+func (genre Genre) EqualsGenre(b interfaces.GenreGetter) bool {
+	return genre.GetGenreString() == b.GetGenre().GetGenreString()
 }
 
-func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
-	if a.GetGenreString() != b.GetGenre().GetGenreString() {
+func (genre Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
+	if genre.GetGenreString() != b.GetGenre().GetGenreString() {
 		err = MakeErrUnsupportedGenre(b)
 		return
 	}
@@ -127,28 +127,28 @@ func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 	return
 }
 
-func (g Genre) GetGenreString() string {
-	return g.String()
+func (genre Genre) GetGenreString() string {
+	return genre.String()
 }
 
-func (g Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {
+func (genre Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {
 	if store_version.LessOrEqual(sv, store_version.V6) {
-		return g.stringOld()
+		return genre.stringOld()
 	} else {
-		return g.String()
+		return genre.String()
 	}
 }
 
-func (g Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
+func (genre Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
 	if store_version.LessOrEqual(sv, store_version.V6) {
-		return g.getGenreStringPluralOld()
+		return genre.getGenreStringPluralOld()
 	} else {
-		return g.getGenreStringPluralNew()
+		return genre.getGenreStringPluralNew()
 	}
 }
 
-func (g Genre) getGenreStringPluralNew() string {
-	switch g {
+func (genre Genre) getGenreStringPluralNew() string {
+	switch genre {
 	case Blob:
 		return "blobs"
 
@@ -168,12 +168,12 @@ func (g Genre) getGenreStringPluralNew() string {
 		return "repos"
 
 	default:
-		panic(fmt.Sprintf("undeclared plural for genre: %q", g))
+		panic(fmt.Sprintf("undeclared plural for genre: %q", genre))
 	}
 }
 
-func (g Genre) getGenreStringPluralOld() string {
-	switch g {
+func (genre Genre) getGenreStringPluralOld() string {
+	switch genre {
 	case Blob:
 		return "Akten"
 
@@ -193,12 +193,12 @@ func (g Genre) getGenreStringPluralOld() string {
 		return "Kisten"
 
 	default:
-		return g.String()
+		return genre.String()
 	}
 }
 
-func (g Genre) String() string {
-	switch g {
+func (genre Genre) String() string {
+	switch genre {
 	case Blob:
 		return "Blob"
 
@@ -224,12 +224,12 @@ func (g Genre) String() string {
 		return "none"
 
 	default:
-		return fmt.Sprintf("Unknown(%#v)", g)
+		return fmt.Sprintf("Unknown(%#v)", genre)
 	}
 }
 
-func (g Genre) stringOld() string {
-	switch g {
+func (genre Genre) stringOld() string {
+	switch genre {
 	case Blob:
 		return "Akte"
 
@@ -255,7 +255,7 @@ func (g Genre) stringOld() string {
 		return "none"
 
 	default:
-		return fmt.Sprintf("Unknown(%#v)", g)
+		return fmt.Sprintf("Unknown(%#v)", genre)
 	}
 }
 
@@ -263,35 +263,35 @@ func hasPrefixOrEquals(v, p string) bool {
 	return strings.HasPrefix(v, p) || strings.EqualFold(v, p)
 }
 
-func (g *Genre) Set(v string) (err error) {
+func (genre *Genre) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	switch {
 	case strings.EqualFold(v, "blob"):
 		fallthrough
 	case strings.EqualFold(v, "akte"):
-		*g = Blob
+		*genre = Blob
 
 	case hasPrefixOrEquals("type", v):
 		fallthrough
 	case hasPrefixOrEquals("typ", v):
-		*g = Type
+		*genre = Type
 
 	case strings.EqualFold(v, "aktetyp"):
-		*g = Type
+		*genre = Type
 
 	case hasPrefixOrEquals("tag", v):
 		fallthrough
 	case hasPrefixOrEquals("etikett", v):
-		*g = Tag
+		*genre = Tag
 
 	case hasPrefixOrEquals("zettel", v):
-		*g = Zettel
+		*genre = Zettel
 
 	case strings.EqualFold("config", v):
 		fallthrough
 	case strings.EqualFold("konfig", v):
-		*g = Config
+		*genre = Config
 
 	case hasPrefixOrEquals("inventorylist", v):
 		fallthrough
@@ -300,12 +300,12 @@ func (g *Genre) Set(v string) (err error) {
 	case hasPrefixOrEquals("inventory-list", v):
 		fallthrough
 	case hasPrefixOrEquals("bestandsaufnahme", v):
-		*g = InventoryList
+		*genre = InventoryList
 
 	case hasPrefixOrEquals("repo", v):
 		fallthrough
 	case hasPrefixOrEquals("kasten", v):
-		*g = Repo
+		*genre = Repo
 
 	default:
 		err = errors.Wrap(MakeErrUnrecognizedGenre(v))
@@ -315,12 +315,12 @@ func (g *Genre) Set(v string) (err error) {
 	return
 }
 
-func (g *Genre) Reset() {
-	*g = None
+func (genre *Genre) Reset() {
+	*genre = None
 }
 
-func (g *Genre) ReadFrom(r io.Reader) (n int64, err error) {
-	*g = None
+func (genre *Genre) ReadFrom(r io.Reader) (n int64, err error) {
+	*genre = None
 
 	var b [1]byte
 
@@ -332,13 +332,13 @@ func (g *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*g = Genre(b[0])
+	*genre = Genre(b[0])
 
 	return
 }
 
-func (g *Genre) WriteTo(w io.Writer) (n int64, err error) {
-	b := [1]byte{byte(*g)}
+func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
+	b := [1]byte{byte(*genre)}
 
 	var n1 int
 	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
@@ -351,26 +351,26 @@ func (g *Genre) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (i Genre) MarshalBinary() (b []byte, err error) {
-	b = []byte{i.Byte()}
+func (genre Genre) MarshalBinary() (b []byte, err error) {
+	b = []byte{genre.Byte()}
 	return
 }
 
-func (i *Genre) UnmarshalBinary(b []byte) (err error) {
+func (genre *Genre) UnmarshalBinary(b []byte) (err error) {
 	if len(b) != 1 {
 		err = errors.ErrorWithStackf("expected exactly one byte but got %q", b)
 		return
 	}
 
-	*i = Genre(b[0])
+	*genre = Genre(b[0])
 
 	return
 }
 
-func (i Genre) Byte() byte {
-	return byte(i)
+func (genre Genre) Byte() byte {
+	return byte(genre)
 }
 
-func (i Genre) ReadByte() (byte, error) {
-	return i.Byte(), nil
+func (genre Genre) ReadByte() (byte, error) {
+	return genre.Byte(), nil
 }

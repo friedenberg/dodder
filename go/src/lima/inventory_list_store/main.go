@@ -122,7 +122,7 @@ func (store *Store) GetImmutableConfigPublicType() ids.Type {
 	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (store *Store) GetImmutableConfigPrivate() genesis_configs.PrivateTypedBlob {
+func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedPrivate {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

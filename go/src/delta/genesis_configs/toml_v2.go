@@ -42,14 +42,11 @@ func (config *TomlV2Common) SetRepoId(id ids.RepoId) {
 
 func (config *TomlV2Common) GetInventoryListTypeString() string {
 	if config.InventoryListType == "" {
-		return InventoryListTypeV1
+		return ids.TypeInventoryListV1
 	} else {
 		return config.InventoryListType
 	}
 }
-
-func (config *TomlV2Public) config() public   { return public{} }
-func (config *TomlV2Private) config() private { return private{} }
 
 func (config *TomlV2Private) GetImmutableConfig() Private {
 	return config

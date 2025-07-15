@@ -10,6 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
 
+// TODO remove this once gob is removed entirely
+
 var (
 	registerOnce   sync.Once
 	registryLock   *sync.Mutex

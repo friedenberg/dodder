@@ -8,54 +8,39 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-)
-
-const (
-	InventoryListTypeV0       = "!inventory_list-v0"
-	InventoryListTypeV1       = "!inventory_list-v1"
-	InventoryListTypeV2       = "!inventory_list-v2"
-	InventoryListTypeVCurrent = InventoryListTypeV2
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
 type (
-	public  struct{}
-	private struct{}
+	Public interface {
+		GetImmutableConfigPublic() Public
+		GetStoreVersion() StoreVersion
+		GetPublicKey() repo_signing.PublicKey
+		GetRepoType() repo_type.Type
+		GetRepoId() ids.RepoId
+		GetInventoryListTypeString() string
+	}
+
+	Private interface {
+		Public
+		GetImmutableConfig() Private
+		GetPrivateKey() repo_signing.PrivateKey
+	}
+
+	PrivateMutable interface {
+		Private
+
+		// TODO separate into non-method function that uses properties
+		interfaces.CommandComponent
+		SetRepoType(repo_type.Type)
+		SetRepoId(ids.RepoId)
+		repo_signing.Generator
+	}
+
+	TypedPublic         = triple_hyphen_io.TypedBlob[Public]
+	TypedPrivate        = triple_hyphen_io.TypedBlob[Private]
+	TypedPrivateMutable = triple_hyphen_io.TypedBlob[PrivateMutable]
 )
-
-type common interface {
-	GetImmutableConfigPublic() Public
-	GetStoreVersion() StoreVersion
-	GetPublicKey() repo_signing.PublicKey
-	GetRepoType() repo_type.Type
-	GetRepoId() ids.RepoId
-	GetInventoryListTypeString() string
-}
-
-type BlobIOWrapperGetter interface {
-	GetBlobIOWrapper() interfaces.BlobIOWrapper
-}
-
-// switch public and private to be "views" on the underlying interface
-type Public interface {
-	config() public
-	common
-}
-
-type Private interface {
-	common
-	config() private
-	GetImmutableConfig() Private
-	GetPrivateKey() repo_signing.PrivateKey
-}
-
-type PrivateMutable interface {
-	Private
-	// TODO separate into non-method function that uses properties
-	interfaces.CommandComponent
-	SetRepoType(repo_type.Type)
-	SetRepoId(ids.RepoId)
-	repo_signing.Generator
-}
 
 func DefaultMutable() PrivateMutable {
 	return DefaultMutableWithVersion(store_version.VCurrent)
@@ -71,7 +56,7 @@ func DefaultMutableWithVersion(storeVersion StoreVersion) PrivateMutable {
 					CompressionType:   compression_type.CompressionTypeDefault,
 					LockInternalFiles: true,
 				},
-				InventoryListType: InventoryListTypeV2,
+				InventoryListType: ids.TypeInventoryListV2,
 			},
 		}
 	} else {
@@ -79,7 +64,7 @@ func DefaultMutableWithVersion(storeVersion StoreVersion) PrivateMutable {
 			TomlV2Common: TomlV2Common{
 				StoreVersion:      storeVersion,
 				RepoType:          repo_type.TypeWorkingCopy,
-				InventoryListType: InventoryListTypeV2,
+				InventoryListType: ids.TypeInventoryListV2,
 			},
 		}
 	}

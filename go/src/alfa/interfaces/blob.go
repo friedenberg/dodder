@@ -20,6 +20,10 @@ type (
 		GetBlobCompression() BlobCompression
 	}
 
+	BlobIOWrapperGetter interface {
+		GetBlobIOWrapper() BlobIOWrapper
+	}
+
 	BlobReader interface {
 		BlobReader(Sha) (ShaReadCloser, error)
 	}

@@ -45,7 +45,7 @@ type BlobStore struct {
 type Env struct {
 	env_local.Env
 
-	config genesis_configs.PrivateTypedBlob
+	config genesis_configs.TypedPrivate
 
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -145,7 +145,7 @@ func Make(
 func (env *Env) setupStores() {
 	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
 		env.blobStores = make([]BlobStore, 1)
-		blob := env.GetConfigPublic().Blob.(genesis_configs.BlobIOWrapperGetter)
+		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
 		env.blobStores[0].Config = blob.GetBlobIOWrapper()
 		env.blobStores[0].BasePath = env.DirBlobStores("blobs")
 	} else {
@@ -200,14 +200,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() genesis_configs.PublicTypedBlob {
-	return genesis_configs.PublicTypedBlob{
+func (env Env) GetConfigPublic() genesis_configs.TypedPublic {
+	return genesis_configs.TypedPublic{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() genesis_configs.PrivateTypedBlob {
+func (env Env) GetConfigPrivate() genesis_configs.TypedPrivate {
 	return env.config
 }
 
@@ -278,7 +278,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 	storeVersion := env.GetStoreVersion()
 
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
-		blob := env.GetConfigPublic().Blob.(genesis_configs.BlobIOWrapperGetter)
+		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
 
 		if store, err := blob_stores.MakeBlobStore(
 			env,

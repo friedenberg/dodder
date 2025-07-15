@@ -803,7 +803,7 @@ func (server *Server) handlePostInventoryList(
 func (server *Server) handleGetConfigImmutable(
 	request Request,
 ) (response Response) {
-	configLoaded := &genesis_configs.PublicTypedBlob{
+	configLoaded := &genesis_configs.TypedPublic{
 		Type: server.Repo.GetImmutableConfigPublicType(),
 		Blob: server.Repo.GetImmutableConfigPublic(),
 	}

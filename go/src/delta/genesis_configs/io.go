@@ -6,8 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
-type PrivateTypedBlob = triple_hyphen_io.TypedBlob[Private]
-
 var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[Private]{},
 	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Private](
@@ -39,8 +37,6 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 		},
 	),
 }
-
-type PublicTypedBlob = triple_hyphen_io.TypedBlob[Public]
 
 var CoderPublic = triple_hyphen_io.CoderToTypedBlob[Public]{
 	Metadata: triple_hyphen_io.TypedMetadataCoder[Public]{},

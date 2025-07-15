@@ -47,7 +47,7 @@ func MakeClient(
 
 type client struct {
 	envUI           env_ui.Env
-	configImmutable genesis_configs.PublicTypedBlob
+	configImmutable genesis_configs.TypedPublic
 	http            http.Client
 	localRepo       repo.LocalRepo
 	typedBlobStore  typed_blob_store.InventoryList

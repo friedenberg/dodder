@@ -9,6 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
 
+// TODO MAYBE move Type into its own package
+
 func init() {
 	register(Type{})
 }
@@ -40,67 +42,67 @@ func MustType(v string) (t Type) {
 	return
 }
 
-func (t Type) IsEmpty() bool {
-	return t.Value == ""
+func (tipe Type) IsEmpty() bool {
+	return tipe.Value == ""
 }
 
-func (t *Type) Reset() {
-	t.Value = ""
+func (tipe *Type) Reset() {
+	tipe.Value = ""
 }
 
-func (a *Type) ResetWith(b Type) {
-	a.Value = b.Value
+func (tipe *Type) ResetWith(b Type) {
+	tipe.Value = b.Value
 }
 
-func (a Type) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (tipe Type) EqualsAny(b any) bool {
+	return values.Equals(tipe, b)
 }
 
-func (a Type) Equals(b Type) bool {
-	return a.Value == b.Value
+func (tipe Type) Equals(b Type) bool {
+	return tipe.Value == b.Value
 }
 
-func (t Type) GetType() Type {
-	return t
+func (tipe Type) GetType() Type {
+	return tipe
 }
 
-func (t *Type) GetTypPtr() *Type {
-	return t
+func (tipe *Type) GetTypPtr() *Type {
+	return tipe
 }
 
-func (o Type) GetGenre() interfaces.Genre {
+func (tipe Type) GetGenre() interfaces.Genre {
 	return genres.Type
 }
 
-func (t Type) IsToml() bool {
-	return strings.HasPrefix(t.Value, "toml")
+func (tipe Type) IsToml() bool {
+	return strings.HasPrefix(tipe.Value, "toml")
 }
 
-func (e Type) StringSansOp() string {
-	if e.IsEmpty() {
+func (tipe Type) StringSansOp() string {
+	if tipe.IsEmpty() {
 		return ""
 	} else {
-		return e.Value
+		return tipe.Value
 	}
 }
 
-func (e Type) String() string {
-	if e.IsEmpty() {
+func (tipe Type) String() string {
+	if tipe.IsEmpty() {
 		return ""
 	} else {
-		return "!" + e.Value
+		return "!" + tipe.Value
 	}
 }
 
-func (t Type) Parts() [3]string {
-	return [3]string{"", "!", t.Value}
+func (tipe Type) Parts() [3]string {
+	return [3]string{"", "!", tipe.Value}
 }
 
-func (e *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
-	return e.Set(v.String())
+func (tipe *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
+	return tipe.Set(v.String())
 }
 
-func (e *Type) Set(v string) (err error) {
+func (tipe *Type) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(strings.Trim(v, ".! ")))
 
 	if err = ErrOnConfig(v); err != nil {
@@ -113,18 +115,18 @@ func (e *Type) Set(v string) (err error) {
 		return
 	}
 
-	e.Value = v
+	tipe.Value = v
 
 	return
 }
 
-func (t Type) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func (tipe Type) MarshalText() (text []byte, err error) {
+	text = []byte(tipe.String())
 	return
 }
 
-func (t *Type) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tipe *Type) UnmarshalText(text []byte) (err error) {
+	if err = tipe.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,13 +134,13 @@ func (t *Type) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (t Type) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (tipe Type) MarshalBinary() (text []byte, err error) {
+	text = []byte(tipe.String())
 	return
 }
 
-func (t *Type) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tipe *Type) UnmarshalBinary(text []byte) (err error) {
+	if err = tipe.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -43,7 +43,11 @@ func (cmd *BlobStoreInit) SetFlagSet(flagSet *flag.FlagSet) {
 
 func (cmd *BlobStoreInit) Run(req command.Request) {
 	// TODO validate no space
-	blobStoreName := req.PopArg("blob store name")
+	var blobStoreName ids.Tag
+
+	if err := blobStoreName.Set(req.PopArg("blob store name")); err != nil {
+		req.CancelWithError(err)
+	}
 
 	req.AssertNoMoreArgs()
 
