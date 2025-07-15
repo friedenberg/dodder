@@ -29,23 +29,7 @@ type V0Private struct {
 }
 
 func (config *V0Common) SetFlagSet(flagSet *flag.FlagSet) {
-	config.CompressionType.SetFlagSet(flagSet)
-
-	flagSet.BoolVar(
-		&config.LockInternalFiles,
-		"lock-internal-files",
-		config.LockInternalFiles,
-		"",
-	)
-
-	flagSet.Func(
-		"recipient",
-		"age recipients",
-		func(value string) (err error) {
-			config.Recipients = append(config.Recipients, value)
-			return
-		},
-	)
+	panic(errors.ErrNotSupported)
 }
 
 func (config *V0Private) GetImmutableConfig() Private {
@@ -78,11 +62,11 @@ func (config V0Common) GetRepoType() repo_type.Type {
 }
 
 func (config V0Common) GetPrivateKey() repo_signing.PrivateKey {
-	panic(errors.ErrorWithStackf("not supported"))
+	panic(errors.ErrNotSupported)
 }
 
 func (config V0Common) GetPublicKey() repo_signing.PublicKey {
-	panic(errors.ErrorWithStackf("not supported"))
+	panic(errors.ErrNotSupported)
 }
 
 func (config V0Common) GetRepoId() ids.RepoId {

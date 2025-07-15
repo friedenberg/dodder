@@ -26,7 +26,7 @@ func DecodeFromFile[
 		if file, err = files.OpenExclusiveReadOnly(
 			path,
 		); err != nil {
-			if errors.IsNotExist(err) {
+			if errors.IsNotExist(err) && permitNotExist {
 				err = nil
 				reader = bytes.NewBuffer(nil)
 			} else {

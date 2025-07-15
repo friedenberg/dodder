@@ -125,16 +125,18 @@ func Make(
 		}
 	}
 
-	{
-		var err error
-
-		if env.config, err = triple_hyphen_io.DecodeFromFile(
-			genesis_configs.CoderPrivate,
-			env.FileConfigPermanent(),
-			true,
-		); err != nil {
-			env.CancelWithError(err)
+	if env.config, err = triple_hyphen_io.DecodeFromFile(
+		genesis_configs.CoderPrivate,
+		env.FileConfigPermanent(),
+		!options.PermitNoDodderDirectory,
+	); err != nil {
+		if options.PermitNoDodderDirectory && errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
 		}
+
+		return
 	}
 
 	env.setupStores()

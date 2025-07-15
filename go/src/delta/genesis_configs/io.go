@@ -26,14 +26,6 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 					return &TomlV1Private{}
 				},
 			},
-			"": triple_hyphen_io.CoderGob[
-				Private,
-				*Private,
-			]{
-				Progenitor: func() Private {
-					return &V0Private{}
-				},
-			},
 		},
 	),
 }
@@ -56,14 +48,6 @@ var CoderPublic = triple_hyphen_io.CoderToTypedBlob[Public]{
 			]{
 				Progenitor: func() Public {
 					return &TomlV1Public{}
-				},
-			},
-			"": triple_hyphen_io.CoderGob[
-				Public,
-				*Public,
-			]{
-				Progenitor: func() Public {
-					return &V0Public{}
 				},
 			},
 		},

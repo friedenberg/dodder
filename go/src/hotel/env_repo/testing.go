@@ -52,6 +52,8 @@ func MakeTesting(
 			var bigBang BigBang
 
 			bigBang.SetDefaults()
+
+			ui.Debug().Print(bigBang.GenesisConfig)
 			envRepo.Genesis(bigBang)
 
 			if contents == nil {
