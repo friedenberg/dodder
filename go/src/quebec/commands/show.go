@@ -40,7 +40,6 @@ type Show struct {
 }
 
 func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
-	cmd.EnvRepo.SetFlagSet(flagSet)
 	cmd.LocalArchive.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
 

@@ -23,9 +23,18 @@ func init() {
 		},
 	})
 
-	command.Register("blob_store-init-sftp", &BlobStoreInit{
-		tipe:            ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV0).Type,
-		blobStoreConfig: &blob_store_configs.TomlSftpV0{},
+	command.Register("blob_store-init-sftp-explicit", &BlobStoreInit{
+		tipe: ids.GetOrPanic(
+			ids.TypeTomlBlobStoreConfigSftpExplicitV0,
+		).Type,
+		blobStoreConfig: &blob_store_configs.TomlSFTPV0{},
+	})
+
+	command.Register("blob_store-init-sftp-ssh_config", &BlobStoreInit{
+		tipe: ids.GetOrPanic(
+			ids.TypeTomlBlobStoreConfigSftpViaSSHConfigV0,
+		).Type,
+		blobStoreConfig: &blob_store_configs.TomlSFTPViaSSHConfigV0{},
 	})
 }
 
@@ -38,7 +47,6 @@ type BlobStoreInit struct {
 
 func (cmd *BlobStoreInit) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.blobStoreConfig.SetFlagSet(flagSet)
-	cmd.EnvRepo.SetFlagSet(flagSet)
 }
 
 func (cmd *BlobStoreInit) Run(req command.Request) {
@@ -62,22 +70,26 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 		return
 	}
 
+	pathConfig := filepath.Join(
+		dir,
+		fmt.Sprintf("%d-%s.%s",
+			blobStoreCount,
+			blobStoreName,
+			env_repo.FileNameBlobStoreConfig,
+		),
+	)
+
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
 			Type: cmd.tipe,
 			Blob: cmd.blobStoreConfig,
 		},
-		filepath.Join(
-			dir,
-			fmt.Sprintf("%d-%s.%s",
-				blobStoreCount,
-				blobStoreName,
-				env_repo.FileNameBlobStoreConfig,
-			),
-		),
+		pathConfig,
 	); err != nil {
 		env.CancelWithError(err)
 		return
 	}
+
+	env.GetUI().Printf("Wrote config to %s", pathConfig)
 }

@@ -149,7 +149,8 @@ func (dst *Sha) SetShaLike(src ShaLike) (err error) {
 		copy(dst.data[:], src.GetShaLike().GetShaBytes()),
 	)
 
-	// if dst.String() == "f32cf7f2b1b8b7688c78dec4eb3c3675fcdc3aeaaf4c1305f3bdaf7fc0252e02" {
+	// if dst.String() ==
+	// "f32cf7f2b1b8b7688c78dec4eb3c3675fcdc3aeaaf4c1305f3bdaf7fc0252e02" {
 	// 	panic("found")
 	// }
 
@@ -191,7 +192,10 @@ func (s *Sha) SetFromPath(path string) (err error) {
 	return
 }
 
-func (s *Sha) ReadAtFrom(reader io.ReaderAt, start int64) (bytesRead int64, err error) {
+func (s *Sha) ReadAtFrom(
+	reader io.ReaderAt,
+	start int64,
+) (bytesRead int64, err error) {
 	s.allocDataIfNecessary()
 
 	var bytesCount int

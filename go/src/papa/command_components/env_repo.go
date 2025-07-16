@@ -1,8 +1,6 @@
 package command_components
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -15,8 +13,6 @@ import (
 )
 
 type EnvRepo struct{}
-
-func (cmd *EnvRepo) SetFlagSet(f *flag.FlagSet) {}
 
 func (cmd EnvRepo) MakeEnvRepo(
 	dep command.Request,

@@ -3,8 +3,10 @@ package commands
 import (
 	"flag"
 	"io"
+	"slices"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -74,15 +76,15 @@ func (cmd Complete) Run(req command.Request) {
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
 	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
-	subcmd.SetFlagSet(flagSet)
+
+	if subcmd, ok := subcmd.(interfaces.CommandComponent); ok {
+		subcmd.SetFlagSet(flagSet)
+	}
 
 	var containsDoubleHyphen bool
 
-	for _, arg := range commandLine.FlagsOrArgs {
-		if arg == "--" {
-			containsDoubleHyphen = true
-			break
-		}
+	if slices.Contains(commandLine.FlagsOrArgs, "--") {
+		containsDoubleHyphen = true
 	}
 
 	if !containsDoubleHyphen &&
@@ -117,7 +119,7 @@ func (cmd Complete) completeSubcommand(
 ) {
 	var shortDescription string
 
-	if hasDescription, ok := subcmd.(command.HasDescription); ok {
+	if hasDescription, ok := subcmd.(command.CommandWithDescription); ok {
 		description := hasDescription.GetDescription()
 		shortDescription = description.Short
 	}
@@ -225,5 +227,9 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	req.CancelWithBadRequestf("no completion available for flag: %q, %#v", after, flag)
+	req.CancelWithBadRequestf(
+		"no completion available for flag: %q, %#v",
+		after,
+		flag,
+	)
 }

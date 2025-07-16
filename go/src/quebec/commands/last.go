@@ -42,7 +42,6 @@ type Last struct {
 }
 
 func (cmd *Last) SetFlagSet(flagSet *flag.FlagSet) {
-	cmd.EnvRepo.SetFlagSet(flagSet)
 	cmd.LocalArchive.SetFlagSet(flagSet)
 
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
-// TODO migrate to using index+named blob stores
+// TODO migrate to using `command_components.BlobStore`
 type RemoteBlobStore struct {
 	Blobs  string
 	Config blob_store_configs.TomlV0

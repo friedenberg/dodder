@@ -1,32 +1,69 @@
 package blob_stores
 
 import (
+	"fmt"
 	"io"
+	"net"
+	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
+// TODO describe base path agnostically
 func MakeBlobStore(
 	ctx errors.Context,
 	basePath string,
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,
 ) (store interfaces.LocalBlobStore, err error) {
-	switch config := config.(type) {
+	switch tipe := config.GetBlobStoreType(); tipe {
 	default:
-		err = errors.BadRequestf("unsupported blob store config: %T", config)
+		err = errors.BadRequestf("unsupported blob store type %q", tipe)
 		return
 
-	case sftpConfig:
-		return makeSftpStore(ctx, config)
+	case "sftp":
+		var sshClient *ssh.Client
+		var configSFTP blob_store_configs.ConfigSFTPRemotePath
 
-	case blob_store_configs.ConfigLocalGitLikeBucketed:
-		return makeGitLikeBucketedStore(ctx, basePath, config, tempFS)
+		switch config := config.(type) {
+		default:
+			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
+			return
+
+		case blob_store_configs.ConfigSFTPUri:
+			if sshClient, err = MakeSSHClientFromSSHConfig(ctx, config); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			configSFTP = config
+
+		case blob_store_configs.ConfigSFTPConfigExplicit:
+			if sshClient, err = MakeSSHClientForExplicitConfig(ctx, config); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			configSFTP = config
+		}
+
+		return makeSftpStore(ctx, configSFTP, sshClient)
+
+	case "local":
+		if config, ok := config.(blob_store_configs.ConfigLocalGitLikeBucketed); ok {
+			return makeGitLikeBucketedStore(ctx, basePath, config, tempFS)
+		} else {
+			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
+			return
+		}
 	}
 }
 
@@ -113,6 +150,8 @@ func CopyBlob(
 	return
 }
 
+// TODO offer options like just checking the existence of the blob, getting its
+// size, or full verification
 func VerifyBlob(
 	ctx errors.Context,
 	blobStore interfaces.LocalBlobStore,
@@ -146,6 +185,107 @@ func VerifyBlob(
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+// TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
+func MakeSSHClientForExplicitConfig(
+	ctx errors.Context,
+	config blob_store_configs.ConfigSFTPConfigExplicit,
+) (sshClient *ssh.Client, err error) {
+	sshConfig := &ssh.ClientConfig{
+		User:            config.GetUser(),
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: make this configurable
+	}
+
+	// Configure authentication
+	if config.GetPrivateKeyPath() != "" {
+		var key ssh.Signer
+		var keyBytes []byte
+
+		if keyBytes, err = os.ReadFile(config.GetPrivateKeyPath()); err != nil {
+			err = errors.Wrapf(err, "failed to read private key")
+			return
+		}
+
+		if key, err = ssh.ParsePrivateKey(keyBytes); err != nil {
+			err = errors.Wrapf(err, "failed to parse private key")
+			return
+		}
+
+		sshConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
+	} else if config.GetPassword() != "" {
+		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
+	} else {
+		err = errors.Errorf("no authentication method configured")
+		return
+	}
+
+	addr := fmt.Sprintf(
+		"%s:%d",
+		config.GetHost(),
+		config.GetPort(),
+	)
+
+	if sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
+		err = errors.Wrapf(err, "failed to connect to SSH server")
+		return
+	}
+
+	ctx.After(sshClient.Close)
+
+	return
+}
+
+func MakeSSHClientFromSSHConfig(
+	ctx errors.Context,
+	config blob_store_configs.ConfigSFTPUri,
+) (sshClient *ssh.Client, err error) {
+	socket := os.Getenv("SSH_AUTH_SOCK")
+
+	if socket == "" {
+		err = errors.Errorf("SSH_AUTH_SOCK empty or unset")
+		return
+	}
+
+	var connSshSock net.Conn
+
+	ui.Log().Print("connecting to SSH_AUTH_SOCK: %s", socket)
+	if connSshSock, err = net.Dial("unix", socket); err != nil {
+		err = errors.Wrapf(err, "failed to connect to SSH_AUTH_SOCK")
+		return
+	}
+
+	ctx.After(connSshSock.Close)
+
+	ui.Log().Print("creating ssh-agent client")
+	clientAgent := agent.NewClient(connSshSock)
+
+	uri := config.GetUri()
+	url := uri.GetUrl()
+
+	configClient := &ssh.ClientConfig{
+		User: url.User.Username(),
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeysCallback(clientAgent.Signers),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO make configurable
+	}
+
+	addr := fmt.Sprintf(
+		"%s:%s",
+		url.Hostname(),
+		url.Port(),
+	)
+
+	ui.Log().Printf("connecting via ssh: %q", addr)
+	if sshClient, err = ssh.Dial("tcp", addr, configClient); err != nil {
+		err = errors.Wrapf(err, "failed to connect to SSH server")
+		return
+	}
+
+	ctx.After(sshClient.Close)
 
 	return
 }

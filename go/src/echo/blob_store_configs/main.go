@@ -2,6 +2,7 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
@@ -22,14 +23,36 @@ type (
 		GetLockInternalFiles() bool
 	}
 
+	ConfigSFTPRemotePath interface {
+		GetRemotePath() string
+	}
+
+	ConfigSFTPUri interface {
+		ConfigSFTPRemotePath
+
+		GetUri() values.Uri
+	}
+
+	ConfigSFTPConfigExplicit interface {
+		ConfigSFTPRemotePath
+
+		GetHost() string
+		GetPort() int
+		GetUser() string
+		GetPassword() string
+		GetPrivateKeyPath() string
+	}
+
 	TypedConfig        = triple_hyphen_io.TypedBlob[Config]
 	TypedMutableConfig = triple_hyphen_io.TypedBlob[ConfigMutable]
 )
 
 var (
 	_ ConfigLocalGitLikeBucketed = &TomlV0{}
+	_ ConfigSFTPRemotePath       = &TomlSFTPV0{}
+	_ ConfigSFTPRemotePath       = &TomlSFTPViaSSHConfigV0{}
 	_ ConfigMutable              = &TomlV0{}
-	_ ConfigMutable              = &TomlSftpV0{}
+	_ ConfigMutable              = &TomlSFTPV0{}
 )
 
 func Default() *TypedMutableConfig {

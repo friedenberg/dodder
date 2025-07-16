@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
@@ -31,7 +32,10 @@ func Run(ctx errors.Context, args ...string) {
 	}
 
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
-	cmd.SetFlagSet(flagSet)
+
+	if cmd, ok := cmd.(interfaces.CommandComponent); ok {
+		cmd.SetFlagSet(flagSet)
+	}
 
 	args = args[2:]
 

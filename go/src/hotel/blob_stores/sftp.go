@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -18,40 +19,40 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/id"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-type sftpConfig interface {
-	GetHost() string
-	GetPort() int
-	GetUser() string
-	GetPassword() string
-	GetPrivateKeyPath() string
-	GetRemotePath() string
-	GetLockInternalFiles() bool
-}
-
 type sftpBlobStore struct {
-	config sftpConfig
+	config blob_store_configs.ConfigSFTPRemotePath
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
 	blobIOWrapper interfaces.BlobIOWrapper
 	sshClient     *ssh.Client
 	sftpClient    *sftp.Client
+
+	blobCacheLock sync.RWMutex
+	blobCache     map[sha.Bytes]struct{}
 }
 
 func makeSftpStore(
 	ctx errors.Context,
-	config sftpConfig,
+	config blob_store_configs.ConfigSFTPRemotePath,
+	sshClient *ssh.Client,
 ) (store *sftpBlobStore, err error) {
 	store = &sftpBlobStore{
-		config: config,
+		config:    config,
+		sshClient: sshClient,
+		blobCache: make(map[sha.Bytes]struct{}),
 	}
 
-	if err = store.connect(); err != nil {
-		err = errors.Wrap(err)
+	ui.Log().Print("creating sftp client")
+
+	if store.sftpClient, err = sftp.NewClient(store.sshClient); err != nil {
+		err = errors.Wrapf(err, "failed to create SFTP client")
 		return
 	}
 
@@ -65,67 +66,9 @@ func makeSftpStore(
 	return
 }
 
-// TODO review this
-func (blobStore *sftpBlobStore) connect() (err error) {
-	sshConfig := &ssh.ClientConfig{
-		User:            blobStore.config.GetUser(),
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: make this configurable
-	}
-
-	// Configure authentication
-	if blobStore.config.GetPrivateKeyPath() != "" {
-		var key ssh.Signer
-		var keyBytes []byte
-
-		if keyBytes, err = os.ReadFile(blobStore.config.GetPrivateKeyPath()); err != nil {
-			err = errors.Wrapf(err, "failed to read private key")
-			return
-		}
-
-		if key, err = ssh.ParsePrivateKey(keyBytes); err != nil {
-			err = errors.Wrapf(err, "failed to parse private key")
-			return
-		}
-
-		sshConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
-	} else if blobStore.config.GetPassword() != "" {
-		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(blobStore.config.GetPassword())}
-	} else {
-		err = errors.Errorf("no authentication method configured")
-		return
-	}
-
-	addr := fmt.Sprintf(
-		"%s:%d",
-		blobStore.config.GetHost(),
-		blobStore.config.GetPort(),
-	)
-
-	if blobStore.sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH server")
-		return
-	}
-
-	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
-		err = errors.Wrapf(err, "failed to create SFTP client")
-		blobStore.sshClient.Close()
-		return
-	}
-
-	return
-}
-
-// TODO determine how these errors should or should not cascade
 func (blobStore *sftpBlobStore) close() (err error) {
 	if blobStore.sftpClient != nil {
 		if err = blobStore.sftpClient.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if blobStore.sshClient != nil {
-		if err = blobStore.sshClient.Close(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -177,16 +120,17 @@ func (blobStore *sftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
 }
 
 func (blobStore *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
-	return env_dir.MakeConfig(
-		blobStore.blobIOWrapper.GetBlobCompression(),
-		blobStore.blobIOWrapper.GetBlobEncryption(),
-	)
+	return env_dir.DefaultConfig
+	// return env_dir.MakeConfig(
+	// 	blobStore.blobIOWrapper.GetBlobCompression(),
+	// 	blobStore.blobIOWrapper.GetBlobEncryption(),
+	// )
 }
 
 func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
-	return path.Join(
-		blobStore.config.GetRemotePath(),
-		id.Path(sh.GetShaLike(), ""),
+	return id.Path(
+		sh.GetShaLike(),
+		strings.TrimPrefix(blobStore.config.GetRemotePath(), "/"),
 	)
 }
 
@@ -196,8 +140,23 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		return
 	}
 
+	sh1 := sha.Make(sh)
+
+	blobStore.blobCacheLock.RLock()
+
+	if _, ok = blobStore.blobCache[sh1.GetBytes()]; ok {
+		blobStore.blobCacheLock.RUnlock()
+		return
+	}
+
+	blobStore.blobCacheLock.RUnlock()
+
 	remotePath := blobStore.remotePathForSha(sh)
+
 	if _, err := blobStore.sftpClient.Stat(remotePath); err == nil {
+		blobStore.blobCacheLock.Lock()
+		blobStore.blobCache[sh1.GetBytes()] = struct{}{}
+		blobStore.blobCacheLock.Unlock()
 		ok = true
 	}
 
@@ -206,43 +165,42 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 
 func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Sha] {
 	return func(yield func(interfaces.Sha, error) bool) {
-		basePath := blobStore.config.GetRemotePath()
+		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
 		walker := blobStore.sftpClient.Walk(basePath)
 
 		for walker.Step() {
 			if err := walker.Err(); err != nil {
-				if !yield(nil, errors.Wrap(err)) {
+				if !yield(nil, errors.Wrapf(err, "BasePath: %q", basePath)) {
 					return
 				}
+
+				continue
 			}
 
 			info := walker.Stat()
+
 			if info.IsDir() {
 				continue
 			}
 
-			// TODO replace with id.Path
-			// Extract SHA from path
 			relPath := strings.TrimPrefix(walker.Path(), basePath)
 			relPath = strings.TrimPrefix(relPath, "/")
 
-			// Skip if not in expected format (2 chars / remaining chars)
-			parts := strings.Split(relPath, "/")
-			if len(parts) != 2 || len(parts[0]) != 2 {
-				continue
-			}
-
-			shaStr := parts[0] + parts[1]
 			var sh sha.Sha
 
-			if err := sh.Set(shaStr); err != nil {
+			if err := sh.SetFromPath(relPath); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
+
 				continue
 			}
+
+			blobStore.blobCacheLock.Lock()
+			blobStore.blobCache[sh.GetBytes()] = struct{}{}
+			blobStore.blobCacheLock.Unlock()
 
 			if !yield(&sh, nil) {
 				return
@@ -272,9 +230,9 @@ func (blobStore *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
 
 func (blobStore *sftpBlobStore) BlobReader(
 	sh interfaces.Sha,
-) (r interfaces.ShaReadCloser, err error) {
+) (readCloser interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
-		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 
@@ -297,6 +255,11 @@ func (blobStore *sftpBlobStore) BlobReader(
 		return
 	}
 
+	sh1 := sha.Make(sh)
+	blobStore.blobCacheLock.Lock()
+	blobStore.blobCache[sh1.GetBytes()] = struct{}{}
+	blobStore.blobCacheLock.Unlock()
+
 	// Create streaming reader that handles decompression/decryption
 	config := blobStore.makeEnvDirConfig()
 	streamingReader := &sftpStreamingReader{
@@ -304,7 +267,7 @@ func (blobStore *sftpBlobStore) BlobReader(
 		config: config,
 	}
 
-	if r, err = streamingReader.createReader(); err != nil {
+	if readCloser, err = streamingReader.createReader(); err != nil {
 		remoteFile.Close()
 		err = errors.Wrap(err)
 		return
@@ -431,6 +394,11 @@ func (mover *sftpMover) Close() (err error) {
 			return
 		}
 	}
+
+	sh1 := sha.Make(sh)
+	mover.store.blobCacheLock.Lock()
+	mover.store.blobCache[sh1.GetBytes()] = struct{}{}
+	mover.store.blobCacheLock.Unlock()
 
 	// Clear temp path so cleanup doesn't try to remove it
 	mover.tempPath = ""

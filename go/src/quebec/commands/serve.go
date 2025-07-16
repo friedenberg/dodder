@@ -24,7 +24,6 @@ type Serve struct {
 }
 
 func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
-	cmd.EnvRepo.SetFlagSet(f)
 	cmd.LocalArchive.SetFlagSet(f)
 
 	flag.BoolVar(&cmd.TailscaleTLS, "tailscale-tls", false, "use tailscale for TLS")

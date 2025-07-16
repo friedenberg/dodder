@@ -35,7 +35,7 @@ type directoryPaths interface {
 	init(interfaces.StoreVersion, xdg.XDG) error
 }
 
-type BlobStore struct {
+type BlobStoreInitialized struct {
 	Name     string
 	BasePath string
 	blob_store_configs.Config
@@ -56,7 +56,9 @@ type Env struct {
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
-	blobStores []BlobStore
+	// TODO switch to primary blob store and others, and add support for v10
+	// directory layout
+	blobStores []BlobStoreInitialized
 }
 
 func Make(
@@ -155,8 +157,9 @@ func Make(
 
 func (env *Env) setupStores() {
 	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
-		env.blobStores = make([]BlobStore, 1)
+		env.blobStores = make([]BlobStoreInitialized, 1)
 		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
+		env.blobStores[0].Name = "0-default"
 		env.blobStores[0].Config = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		env.blobStores[0].BasePath = env.DirBlobStores("blobs")
 	} else {
@@ -172,7 +175,7 @@ func (env *Env) setupStores() {
 			}
 		}
 
-		env.blobStores = make([]BlobStore, len(configPaths))
+		env.blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 		for i, configPath := range configPaths {
 			env.blobStores[i].Name = fd.FileNameSansExt(configPath)
@@ -270,7 +273,7 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) GetDefaultBlobStore() BlobStore {
+func (env Env) GetDefaultBlobStore() BlobStoreInitialized {
 	if len(env.blobStores) == 0 {
 		panic("calling GetDefaultBlobStore without any initialized blob stores")
 	}
@@ -278,8 +281,8 @@ func (env Env) GetDefaultBlobStore() BlobStore {
 	return env.blobStores[env.blobStoreDefaultIndex]
 }
 
-func (env Env) GetBlobStores() []BlobStore {
-	blobStores := make([]BlobStore, len(env.blobStores))
+func (env Env) GetBlobStores() []BlobStoreInitialized {
+	blobStores := make([]BlobStoreInitialized, len(env.blobStores))
 	copy(blobStores, env.blobStores)
 	return blobStores
 }

@@ -6,6 +6,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
 
@@ -66,6 +68,21 @@ func (req *Args) PopArgs() []string {
 
 	req.argi += len(args)
 	return args
+}
+
+func (req *Args) PopArgsAsMutableSet() collections_value.MutableSet[string] {
+	args := req.PeekArgs()
+	set := collections_value.MakeMutableSet(
+		quiter.StringKeyer,
+	)
+
+	for _, arg := range args {
+		set.Add(arg)
+		req.consumed = append(req.consumed, consumedArg{value: arg})
+	}
+
+	req.argi += len(args)
+	return set
 }
 
 func (req *Args) RemainingArgCount() int {

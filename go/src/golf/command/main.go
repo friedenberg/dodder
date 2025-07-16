@@ -1,12 +1,7 @@
 package command
 
-import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-)
-
 // TODO add description
 type Command interface {
-	interfaces.CommandComponent
 	Run(Request)
 }
 
@@ -14,7 +9,7 @@ type Description struct {
 	Short, Long string
 }
 
-type HasDescription interface {
+type CommandWithDescription interface {
 	GetDescription() Description
 }
 

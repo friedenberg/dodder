@@ -11,27 +11,28 @@ const (
 	// latest
 
 	// keep sorted
-	TypeInventoryListV0           = "!inventory_list-v0"
-	TypeInventoryListV1           = "!inventory_list-v1"
-	TypeInventoryListV2           = "!inventory_list-v2"
-	TypeInventoryListVCurrent     = TypeInventoryListV2
-	TypeLuaTagV1                  = "!lua-tag-v1"
-	TypeLuaTagV2                  = "!lua-tag-v2"
-	TypeTomlBlobStoreConfigV0     = "!toml-blob_store_config-v0"
-	TypeTomlBlobStoreConfigSftpV0 = "!toml-blob_store_config_sftp-v0"
-	TypeTomlConfigImmutableV1     = "!toml-config-immutable-v1"
-	TypeTomlConfigImmutableV2     = "!toml-config-immutable-v2"
-	TypeTomlConfigV0              = "!toml-config-v0"
-	TypeTomlConfigV1              = "!toml-config-v1"
-	TypeTomlRepoDotenvXdgV0       = "!toml-repo-dotenv_xdg-v0"
-	TypeTomlRepoLocalPath         = "!toml-repo-local_path-v0"
-	TypeTomlRepoUri               = "!toml-repo-uri-v0"
-	TypeTomlTagV0                 = "!toml-tag-v0"
-	TypeTomlTagV1                 = "!toml-tag-v1"
-	TypeTomlTypeV0                = "!toml-type-v0"
-	TypeTomlTypeV1                = "!toml-type-v1"
-	TypeTomlWorkspaceConfigV0     = "!toml-workspace_config-v0"
-	TypeZettelIdListV0            = "!zettel_id_list-v0"
+	TypeInventoryListV0                       = "!inventory_list-v0"
+	TypeInventoryListV1                       = "!inventory_list-v1"
+	TypeInventoryListV2                       = "!inventory_list-v2"
+	TypeInventoryListVCurrent                 = TypeInventoryListV2
+	TypeLuaTagV1                              = "!lua-tag-v1"
+	TypeLuaTagV2                              = "!lua-tag-v2"
+	TypeTomlBlobStoreConfigV0                 = "!toml-blob_store_config-v0"
+	TypeTomlBlobStoreConfigSftpExplicitV0     = "!toml-blob_store_config_sftp-explicit-v0"
+	TypeTomlBlobStoreConfigSftpViaSSHConfigV0 = "!toml-blob_store_config_sftp-ssh_config-v0"
+	TypeTomlConfigImmutableV1                 = "!toml-config-immutable-v1"
+	TypeTomlConfigImmutableV2                 = "!toml-config-immutable-v2"
+	TypeTomlConfigV0                          = "!toml-config-v0"
+	TypeTomlConfigV1                          = "!toml-config-v1"
+	TypeTomlRepoDotenvXdgV0                   = "!toml-repo-dotenv_xdg-v0"
+	TypeTomlRepoLocalPath                     = "!toml-repo-local_path-v0"
+	TypeTomlRepoUri                           = "!toml-repo-uri-v0"
+	TypeTomlTagV0                             = "!toml-tag-v0"
+	TypeTomlTagV1                             = "!toml-tag-v1"
+	TypeTomlTypeV0                            = "!toml-type-v0"
+	TypeTomlTypeV1                            = "!toml-type-v1"
+	TypeTomlWorkspaceConfigV0                 = "!toml-workspace_config-v0"
+	TypeZettelIdListV0                        = "!zettel_id_list-v0"
 )
 
 type BuiltinType struct {
@@ -57,7 +58,16 @@ func init() {
 	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
 	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
-	registerBuiltinTypeString(TypeTomlBlobStoreConfigSftpV0, genres.None, false)
+	registerBuiltinTypeString(
+		TypeTomlBlobStoreConfigSftpExplicitV0,
+		genres.None,
+		false,
+	)
+	registerBuiltinTypeString(
+		TypeTomlBlobStoreConfigSftpViaSSHConfigV0,
+		genres.None,
+		false,
+	)
 	registerBuiltinTypeString(TypeTomlConfigImmutableV1, genres.None, false)
 	registerBuiltinTypeString(TypeTomlConfigImmutableV2, genres.None, false)
 	registerBuiltinTypeString(TypeTomlConfigV0, genres.Config, false)

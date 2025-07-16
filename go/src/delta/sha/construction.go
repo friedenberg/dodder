@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -27,45 +26,29 @@ func Make(getter interfaces.ShaGetter) *Sha {
 	}
 }
 
-func Must(v string) (s *Sha) {
-	s = poolSha.Get()
+func Must(v string) (sh *Sha) {
+	sh = poolSha.Get()
 
-	errors.PanicIfError(s.Set(v))
+	errors.PanicIfError(sh.Set(v))
 
 	return
 }
 
-func MakeSha(v string) (s *Sha, err error) {
-	s = poolSha.Get()
+func MakeSha(v string) (sh *Sha, err error) {
+	sh = poolSha.Get()
 
-	if err = s.Set(v); err != nil {
+	if err = sh.Set(v); err != nil {
 		err = errors.Wrap(err)
 	}
 
 	return
 }
 
-func MakeShaFromPath(p string) (s *Sha, err error) {
-	tail := filepath.Base(p)
-	head := filepath.Base(filepath.Dir(p))
+func MakeShaFromPath(path string) (sh *Sha, err error) {
+	sh = poolSha.Get()
 
-	switch {
-	case tail == string(filepath.Separator) || head == string(filepath.Separator):
-		fallthrough
-
-	case tail == "." || head == ".":
-		err = errors.ErrorWithStackf(
-			"path cannot be turned into a head/tail pair: '%s/%s'",
-			head,
-			tail,
-		)
-
-		return
-	}
-
-	if s, err = MakeSha(fmt.Sprintf("%s%s", head, tail)); err != nil {
-		err = errors.Wrapf(err, "head: %q, tail: %q", head, tail)
-		return
+	if err = sh.SetFromPath(path); err != nil {
+		err = errors.Wrap(err)
 	}
 
 	return

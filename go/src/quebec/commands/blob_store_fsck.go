@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"flag"
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -22,28 +21,42 @@ func init() {
 
 type BlobFsck struct {
 	command_components.EnvRepo
+	command_components.BlobStore
 }
 
-func (cmd *BlobFsck) SetFlagSet(flagSet *flag.FlagSet) {
-}
+// TODO add completion for blob store id's
 
 func (cmd BlobFsck) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
+
+	blobStoreIds := req.PopArgs()
 	blobStores := envRepo.GetBlobStores()
+
+	if len(blobStoreIds) > 0 {
+		blobStores = blobStores[:0]
+		for _, id := range blobStoreIds {
+			blobStores = append(blobStores, cmd.MakeBlobStore(envRepo, id))
+		}
+	}
 
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
 
 	for i, blobStore := range blobStores {
-		ui.Out().Printf("%d: %s", i, blobStore.GetBlobStoreDescription())
+		ui.Out().Printf("%d: %s", i, blobStore.Name)
 	}
 
 	for _, blobStore := range blobStores {
-		var countSuccess int
+		ui.Out().Printf(
+			"Verification for %s in progress...",
+			blobStore.GetBlobStoreDescription(),
+		)
+
+		var count int
 		var bytesVerified int64
 		var progressWriter env_ui.ProgressWriter
 
-		countSuccessPtr := &countSuccess
+		countSuccessPtr := &count
 
 		type errorBlob struct {
 			sha interfaces.Sha
@@ -55,17 +68,25 @@ func (cmd BlobFsck) Run(req command.Request) {
 		if err := errors.RunChildContextWithPrintTicker(
 			envRepo,
 			func(ctx errors.Context) {
-				ui.Out().Printf(
-					"Verification for %s in progress...",
-					blobStore.GetBlobStoreDescription(),
-				)
-
 				for sh, err := range blobStore.AllBlobs() {
 					ctx.ContinueOrPanicOnDone()
-					// TODO keep track of blobs in a tridex and compare subsequent stores
+					// TODO keep track of blobs in a tridex and compare
+					// subsequent stores
 
 					if err != nil {
 						blobErrors = append(blobErrors, errorBlob{err: err})
+						continue
+					}
+
+					count++
+
+					// TODO offer options:
+					// - check existence
+					// - verify can open
+					// - print size
+					// - compare against other blob stores
+					if !blobStore.HasBlob(sh) {
+						blobErrors = append(blobErrors, errorBlob{err: errors.Errorf("blob missing")})
 						continue
 					}
 
@@ -78,8 +99,6 @@ func (cmd BlobFsck) Run(req command.Request) {
 						blobErrors = append(blobErrors, errorBlob{err: err})
 						continue
 					}
-
-					countSuccess++
 				}
 			},
 			func(time time.Time) {
@@ -96,7 +115,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 			return
 		}
 
-		ui.Out().Printf("blobs verified: %d", countSuccess)
+		ui.Out().Printf("blobs verified: %d", count)
 		ui.Out().Printf("blob bytes verified: %d", bytesVerified)
 		ui.Out().Printf("blobs with errors: %d", len(blobErrors))
 

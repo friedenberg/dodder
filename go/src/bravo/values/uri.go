@@ -10,11 +10,15 @@ type Uri struct {
 	url url.URL
 }
 
-func (u *Uri) GetUrl() url.URL {
-	return u.url
+func (uri *Uri) GetUri() url.URL {
+	return uri.url
 }
 
-func (u *Uri) Set(v string) (err error) {
+func (uri *Uri) GetUrl() url.URL {
+	return uri.url
+}
+
+func (uri *Uri) Set(v string) (err error) {
 	var u1 *url.URL
 
 	if u1, err = url.Parse(v); err != nil {
@@ -22,22 +26,22 @@ func (u *Uri) Set(v string) (err error) {
 		return
 	}
 
-	u.url = *u1
+	uri.url = *u1
 
 	return
 }
 
-func (u *Uri) String() string {
-	return u.url.String()
+func (uri *Uri) String() string {
+	return uri.url.String()
 }
 
-func (u Uri) MarshalText() (text []byte, err error) {
-	text = []byte(u.String())
+func (uri Uri) MarshalText() (text []byte, err error) {
+	text = []byte(uri.String())
 	return
 }
 
-func (u *Uri) UnmarshalText(text []byte) (err error) {
-	if err = u.Set(string(text)); err != nil {
+func (uri *Uri) UnmarshalText(text []byte) (err error) {
+	if err = uri.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -45,13 +49,13 @@ func (u *Uri) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (u Uri) MarshalBinary() (text []byte, err error) {
-	text = []byte(u.String())
+func (uri Uri) MarshalBinary() (text []byte, err error) {
+	text = []byte(uri.String())
 	return
 }
 
-func (u *Uri) UnmarshalBinary(text []byte) (err error) {
-	if err = u.Set(string(text)); err != nil {
+func (uri *Uri) UnmarshalBinary(text []byte) (err error) {
+	if err = uri.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -50,6 +50,7 @@ type (
 		BlobStore
 		GetLocalBlobStore() LocalBlobStore
 		GetBlobIOWrapper() BlobIOWrapper
+		// TODO add context
 		AllBlobs() SeqError[Sha]
 		Mover() (Mover, error)
 	}
