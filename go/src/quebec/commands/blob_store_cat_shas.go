@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -36,7 +37,7 @@ func (cmd BlobStoreCatShas) Run(req command.Request) {
 	req.AssertNoMoreArgs()
 
 	for sh, err := range blobStore.AllBlobs() {
-		envRepo.ContinueOrPanicOnDone()
+		errors.ContextContinueOrPanic(envRepo)
 
 		if err != nil {
 			envRepo.GetErr().Print(err)

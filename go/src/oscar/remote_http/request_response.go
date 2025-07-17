@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +18,7 @@ type MethodPath struct {
 }
 
 type Request struct {
-	context errors.Context
+	context interfaces.Context
 	request *http.Request
 	MethodPath
 	Headers http.Header

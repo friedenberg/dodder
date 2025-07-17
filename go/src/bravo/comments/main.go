@@ -27,7 +27,7 @@ func Optimize() {
 
 func Implement() (err error) {
 	ui.TodoP1("start logging this")
-	return errors.WrapSkip(1, errors.ErrNotImplemented)
+	return errors.WrapSkip(1, errors.Err501NotImplemented)
 }
 
 func Remove() {

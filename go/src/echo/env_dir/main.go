@@ -38,7 +38,7 @@ type Env interface {
 }
 
 type env struct {
-	errors.Context
+	interfaces.Context
 	beforeXDG
 	xdg.XDG
 }

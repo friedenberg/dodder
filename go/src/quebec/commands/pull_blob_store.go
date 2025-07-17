@@ -53,7 +53,7 @@ func (cmd *PullBlobStore) Run(
 		if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
 			localWorkingCopy,
 		); err != nil {
-			dep.CancelWithError(err)
+			dep.Cancel(err)
 		}
 	}
 
@@ -79,6 +79,6 @@ func (cmd *PullBlobStore) Run(
 			return
 		},
 	); err != nil {
-		dep.CancelWithError(err)
+		dep.Cancel(err)
 	}
 }

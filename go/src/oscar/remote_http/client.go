@@ -67,7 +67,7 @@ func (client *client) Initialize() {
 			"/config-immutable",
 			nil,
 		); err != nil {
-			client.envUI.CancelWithError(err)
+			client.envUI.Cancel(err)
 		}
 	}
 
@@ -77,7 +77,8 @@ func (client *client) Initialize() {
 		var err error
 
 		if response, err = client.http.Do(request); err != nil {
-			client.envUI.CancelWithErrorAndFormat(
+			errors.ContextCancelWithErrorAndFormat(
+				client.envUI,
 				err,
 				"failed to read response",
 			)
@@ -88,7 +89,8 @@ func (client *client) Initialize() {
 		&client.configImmutable,
 		response.Body,
 	); err != nil {
-		client.envUI.CancelWithErrorAndFormat(
+		errors.ContextCancelWithErrorAndFormat(
+			client.envUI,
 			err,
 			"failed to read remote immutable config",
 		)
@@ -261,7 +263,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	defer pool.GetBufioWriter().Put(bufferedWriter)
 
 	for {
-		client.envUI.ContinueOrPanicOnDone()
+		errors.ContextContinueOrPanic(client.envUI)
 
 		// TODO make a reader version of inventory lists to avoid allocation
 		if _, err = listFormat.WriteInventoryListBlob(
@@ -317,7 +319,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		bufferedReader := bufio.NewReader(response.Body)
 
-		client.GetEnv().ContinueOrPanicOnDone()
+		errors.ContextContinueOrPanic(client.GetEnv())
 
 		var listMissingSkus *sku.List
 
@@ -338,7 +340,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		// if options.IncludeBlobs {
 		for expected := range listMissingSkus.All() {
-			client.envUI.ContinueOrPanicOnDone()
+			errors.ContextContinueOrPanic(client.envUI)
 
 			if err = client.WriteBlobToRemote(
 				remote.GetBlobStore(),

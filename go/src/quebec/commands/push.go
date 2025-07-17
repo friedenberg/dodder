@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -40,7 +41,7 @@ func (cmd Push) Run(req command.Request) {
 		if remoteObject, err = localWorkingCopy.GetObjectFromObjectId(
 			req.PopArg("repo-id"),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -69,7 +70,7 @@ func (cmd Push) Run(req command.Request) {
 			queryGroup,
 			cmd.WithPrintCopies(true),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	case repo_type.TypeArchive:
@@ -77,6 +78,10 @@ func (cmd Push) Run(req command.Request) {
 		cmd.PushAllToArchive(req, localWorkingCopy, remote)
 
 	default:
-		req.CancelWithBadRequestf("unsupported repo type: %q", repoType)
+		errors.ContextCancelWithBadRequestf(
+			req,
+			"unsupported repo type: %q",
+			repoType,
+		)
 	}
 }

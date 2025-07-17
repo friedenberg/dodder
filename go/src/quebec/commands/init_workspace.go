@@ -67,19 +67,19 @@ func (cmd InitWorkspace) Complete(
 		var err error
 
 		if commandLine.InProgress, err = filepath.Abs(commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 
 		if searchDir, err = filepath.Rel(searchDir, commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 	}
 
 	for dirEntry, err := range files.WalkDir(searchDir) {
 		if err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 
@@ -106,12 +106,12 @@ func (cmd InitWorkspace) Run(req command.Request) {
 		dir := req.PopArg("dir")
 
 		if err := envLocal.MakeDir(dir); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 			return
 		}
 
 		if err := os.Chdir(dir); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 			return
 		}
 	}
@@ -131,6 +131,6 @@ func (cmd InitWorkspace) Run(req command.Request) {
 	if err := localWorkingCopy.GetEnvWorkspace().CreateWorkspace(
 		blob,
 	); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 }

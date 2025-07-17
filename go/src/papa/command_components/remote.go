@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -53,7 +54,8 @@ func (cmd Remote) CreateRemoteObject(
 
 	switch cmd.RemoteConnectionType {
 	default:
-		req.CancelWithBadRequestf(
+		errors.ContextCancelWithBadRequestf(
+			req,
 			"unsupported remote type: %q",
 			cmd.RemoteConnectionType,
 		)
@@ -79,7 +81,7 @@ func (cmd Remote) CreateRemoteObject(
 		var typedBlob repo_blobs.TomlUriV0
 
 		if err := typedBlob.Uri.Set(url); err != nil {
-			req.CancelWithBadRequestf("invalid url: %s", err)
+			errors.ContextCancelWithBadRequestf(req, "invalid url: %s", err)
 		}
 
 		blob = &typedBlob
@@ -87,7 +89,9 @@ func (cmd Remote) CreateRemoteObject(
 	case repo.RemoteConnectionTypeStdioLocal:
 		path := req.PopArg("path")
 
-		remoteObject.Metadata.Type = ids.GetOrPanic(ids.TypeTomlRepoLocalPath).Type
+		remoteObject.Metadata.Type = ids.GetOrPanic(
+			ids.TypeTomlRepoLocalPath,
+		).Type
 		blob = &repo_blobs.TomlLocalPathV0{
 			Path: remoteEnvRepo.AbsFromCwdOrSame(path),
 		}
@@ -106,7 +110,7 @@ func (cmd Remote) CreateRemoteObject(
 			remoteObject.Metadata.Type,
 			blob,
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 	}
 
@@ -132,7 +136,7 @@ func (cmd Remote) MakeRemote(
 			sk.Metadata.Type,
 			sk.GetBlobSha(),
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 	}
 
@@ -207,7 +211,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 		)
 
 	default:
-		req.CancelWithErrorf("unsupported repo blob type: %T", blob)
+		errors.ContextCancelWithErrorf(req, "unsupported repo blob type: %T", blob)
 	}
 
 	return
@@ -241,12 +245,12 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		server,
 		pubkey,
 	); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
 	go func() {
 		if err := server.Serve(httpRoundTripper.UnixSocket); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 	}()
 
@@ -274,7 +278,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 		envRepo,
 		arg,
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	remoteHTTP = remote_http.MakeClient(
@@ -300,9 +304,9 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 
 	if err := files.AssertDir(dir); err != nil {
 		if files.IsErrNotDirectory(err) {
-			req.CancelWithBadRequestError(err)
+			errors.ContextCancelWithBadRequestError(req, err)
 		} else {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 	}
 
@@ -312,7 +316,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 		envRepo,
 		pubkey,
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	remoteHTTP = remote_http.MakeClient(

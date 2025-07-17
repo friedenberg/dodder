@@ -72,7 +72,7 @@ func Make(
 			env,
 			layoutOptions,
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	}
 
@@ -93,10 +93,10 @@ func MakeWithLayout(
 	repo.config.Reset()
 
 	if err := repo.initialize(options); err != nil {
-		repo.CancelWithError(err)
+		repo.Cancel(err)
 	}
 
-	repo.After(repo.Flush)
+	repo.After(errors.MakeFuncContextFromFuncErr(repo.Flush))
 
 	return
 }

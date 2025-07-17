@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -91,7 +92,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	importerOptions.BlobCopierDelegate = func(
 		result sku.BlobCopyResult,
 	) (err error) {
-		server.Repo.GetEnv().ContinueOrPanicOnDone()
+		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
 		if result.N != -1 {
 			return

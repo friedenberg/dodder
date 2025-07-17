@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strconv"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -17,8 +18,8 @@ type PeekZettelIds struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd PeekZettelIds) Run(dep command.Request) {
-	args := dep.PopArgs()
+func (cmd PeekZettelIds) Run(req command.Request) {
+	args := req.PopArgs()
 
 	n := 0
 
@@ -27,12 +28,16 @@ func (cmd PeekZettelIds) Run(dep command.Request) {
 			var err error
 
 			if n, err = strconv.Atoi(args[0]); err != nil {
-				dep.CancelWithErrorf("expected int but got %s", args[0])
+				errors.ContextCancelWithErrorf(
+					req,
+					"expected int but got %s",
+					args[0],
+				)
 			}
 		}
 	}
 
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	var hs []*ids.ZettelId
 
@@ -41,7 +46,7 @@ func (cmd PeekZettelIds) Run(dep command.Request) {
 		if hs, err = localWorkingCopy.GetStore().GetZettelIdIndex().PeekZettelIds(
 			n,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 

@@ -171,7 +171,7 @@ func (transacted *Transacted) makeShaCalcFunc(
 	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (*sha.Sha, error),
 	of object_inventory_format.FormatGeneric,
 	sh *sha.Sha,
-) errors.Func {
+) errors.FuncErr {
 	return func() (err error) {
 		var actual *sha.Sha
 

@@ -197,7 +197,7 @@ func (c Diff) makeDo(
 	w io.WriteCloser,
 	mf object_metadata.TextFormatter,
 	m object_metadata.TextFormatterContext,
-) errors.Func {
+) errors.FuncErr {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
@@ -219,7 +219,7 @@ func (c Diff) makeDoBlob(
 	w io.WriteCloser,
 	arf interfaces.BlobReader,
 	sh interfaces.Sha,
-) errors.Func {
+) errors.FuncErr {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
@@ -249,7 +249,7 @@ func (c Diff) makeDoBlob(
 func (c Diff) makeDoFD(
 	w io.WriteCloser,
 	fd *fd.FD,
-) errors.Func {
+) errors.FuncErr {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 

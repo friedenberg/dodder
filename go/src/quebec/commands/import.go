@@ -55,7 +55,7 @@ func (cmd Import) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
 	if cmd.InventoryList == "" {
-		dep.CancelWithBadRequestf("empty inventory list")
+		errors.ContextCancelWithBadRequestf(dep, "empty inventory list")
 	}
 
 	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
@@ -76,10 +76,10 @@ func (cmd Import) Run(dep command.Request) {
 			),
 			cmd.InventoryList,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
-		defer localWorkingCopy.MustClose(readCloser)
+		defer errors.ContextMustClose(localWorkingCopy, readCloser)
 	}
 
 	bufferedReader := ohio.BufferedReader(readCloser)
@@ -93,7 +93,7 @@ func (cmd Import) Run(dep command.Request) {
 		bufferedReader,
 		list,
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	importerOptions := sku.ImporterOptions{
@@ -107,7 +107,7 @@ func (cmd Import) Run(dep command.Request) {
 			if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
 				localWorkingCopy,
 			); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 	}
@@ -126,6 +126,6 @@ func (cmd Import) Run(dep command.Request) {
 			err = errors.Wrap(err)
 		}
 
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

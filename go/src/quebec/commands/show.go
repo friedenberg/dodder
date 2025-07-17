@@ -114,7 +114,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 		if remoteObject, err = localWorkingCopy.GetObjectFromObjectId(
 			cmd.RemoteRepo.StringWithSlashPrefix(),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 		remoteRepo := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
@@ -134,7 +134,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 			cmd.Format,
 			localWorkingCopy.GetUIFile(),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -179,13 +179,13 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 			var err error
 
 			if list, err = remoteWorkingCopy.MakeInventoryList(query); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
 		for sk := range list.All() {
 			if err := output(sk); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 	} else {
@@ -193,7 +193,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 			query,
 			quiter.MakeSyncSerializer(output),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 }
@@ -217,7 +217,7 @@ func (cmd Show) runWithArchive(
 				writer interfaces.WriterAndStringWriter,
 				object *sku.Transacted,
 			) (n int64, err error) {
-				env.ContinueOrPanicOnDone()
+				errors.ContextContinueOrPanic(env)
 				return boxFormat.EncodeStringTo(object, writer)
 			},
 		),
@@ -235,6 +235,6 @@ func (cmd Show) runWithArchive(
 			return
 		},
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 }

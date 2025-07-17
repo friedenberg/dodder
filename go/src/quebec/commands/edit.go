@@ -111,6 +111,6 @@ func (cmd Edit) Run(req command.Request) {
 	}
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

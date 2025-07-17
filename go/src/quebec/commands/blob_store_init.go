@@ -54,7 +54,7 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 	var blobStoreName ids.Tag
 
 	if err := blobStoreName.Set(req.PopArg("blob store name")); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
 	req.AssertNoMoreArgs()
@@ -66,7 +66,7 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 	dir := env.DirBlobStoreConfigs()
 
 	if err := env.MakeDir(dir); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 		},
 		pathConfig,
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 		return
 	}
 

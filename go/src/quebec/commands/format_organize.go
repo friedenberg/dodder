@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -41,13 +42,16 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	cmd.Flags.Config = localWorkingCopy.GetConfig()
 
 	if len(args) != 1 {
-		localWorkingCopy.CancelWithErrorf("expected exactly one input argument")
+		errors.ContextCancelWithErrorf(
+			localWorkingCopy,
+			"expected exactly one input argument",
+		)
 	}
 
 	var fdee fd.FD
 
 	if err := fdee.Set(args[0]); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	var r io.Reader
@@ -61,13 +65,13 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 			var err error
 
 			if f, err = files.Open(args[0]); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
 		r = f
 
-		defer localWorkingCopy.MustClose(f)
+		defer errors.ContextMustClose(localWorkingCopy, f)
 	}
 
 	var ot *organize_text.Text
@@ -84,7 +88,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 			r,
 			organize_text.NewMetadata(repoId),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -97,10 +101,10 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	)
 
 	if err := ot.Refine(); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	if _, err := ot.WriteTo(os.Stdout); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

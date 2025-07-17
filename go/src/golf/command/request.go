@@ -12,7 +12,7 @@ import (
 )
 
 type Request struct {
-	errors.Context
+	interfaces.Context
 	repo_config_cli.Config
 	*flag.FlagSet
 	*Args
@@ -31,7 +31,7 @@ func (arg consumedArg) String() string {
 }
 
 type Args struct {
-	errors.Context
+	interfaces.Context
 	args []string
 	argi int
 
@@ -39,7 +39,7 @@ type Args struct {
 }
 
 func MakeRequest(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	config repo_config_cli.Config,
 	flagSet *flag.FlagSet,
 ) Request {
@@ -98,7 +98,7 @@ func PopRequestArg[
 	var argValue T
 
 	if err := (Ptr(&argValue)).Set(arg); err != nil {
-		req.CancelWithBadRequestError(err)
+		errors.ContextCancelWithBadRequestError(req, err)
 	}
 
 	return &argValue
@@ -106,7 +106,8 @@ func PopRequestArg[
 
 func (req *Args) PopArg(name string) string {
 	if req.RemainingArgCount() == 0 {
-		req.CancelWithBadRequestf(
+		errors.ContextCancelWithBadRequestf(
+			req,
 			"expected positional argument (%d) %s, but only received %q",
 			req.argi+1,
 			name,
@@ -122,7 +123,8 @@ func (req *Args) PopArg(name string) string {
 
 func (req *Args) AssertNoMoreArgs() {
 	if req.RemainingArgCount() > 0 {
-		req.CancelWithBadRequestf(
+		errors.ContextCancelWithBadRequestf(
+			req,
 			"expected no more arguments, but have %q",
 			req.PopArgs(),
 		)

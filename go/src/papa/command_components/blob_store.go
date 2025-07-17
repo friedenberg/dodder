@@ -31,7 +31,7 @@ func (cmd *BlobStore) MakeBlobStore(
 					err = nil
 					goto tryBlobStoreIndex
 				} else {
-					envRepo.CancelWithError(err)
+					envRepo.Cancel(err)
 					return
 				}
 			}
@@ -48,7 +48,7 @@ func (cmd *BlobStore) MakeBlobStore(
 				typedConfig.Blob,
 				envRepo.GetTempLocal(),
 			); err != nil {
-				envRepo.CancelWithError(err)
+				envRepo.Cancel(err)
 				return
 			}
 		}
@@ -64,7 +64,7 @@ tryBlobStoreIndex:
 			var err error
 
 			if blobStoreIndex, err = strconv.Atoi(blobStoreIndexOrConfigPath); err != nil {
-				envRepo.CancelWithError(err)
+				envRepo.Cancel(err)
 				return
 			}
 		}
@@ -72,7 +72,8 @@ tryBlobStoreIndex:
 		blobStores := envRepo.GetBlobStores()
 
 		if len(blobStores)-1 < blobStoreIndex {
-			envRepo.CancelWithBadRequestf(
+			errors.ContextCancelWithBadRequestf(
+				envRepo,
 				"invalid blob store index: %d. Valid indexes: 0-%d",
 				blobStoreIndex,
 				len(blobStores)-1,

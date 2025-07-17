@@ -38,7 +38,7 @@ func (format V0) WriteObjectToOpenList(
 	object *sku.Transacted,
 	list *sku.OpenList,
 ) (n int64, err error) {
-	err = errors.ErrNotSupported
+	err = errors.Err405MethodNotAllowed
 	return
 }
 
@@ -144,7 +144,7 @@ func (s V0) AllInventoryListBlobSkus(
 	reader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return interfaces.MakeSeqErrorWithError[*sku.Transacted](
-		errors.ErrNotSupported,
+		errors.Err405MethodNotAllowed,
 	)
 }
 

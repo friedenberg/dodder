@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -210,7 +211,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	)
 
 	if !found {
-		envLocal.CancelWithBadRequestf(err.Error())
+		errors.ContextCancelWithBadRequestf(envLocal, err.Error())
 		return
 	}
 
@@ -227,7 +228,8 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	req.CancelWithBadRequestf(
+	errors.ContextCancelWithBadRequestf(
+		req,
 		"no completion available for flag: %q, %#v",
 		after,
 		flag,

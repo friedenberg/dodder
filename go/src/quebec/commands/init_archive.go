@@ -56,7 +56,7 @@ func (cmd InitArchive) Run(req command.Request) {
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
-			ui.CancelWithError(err)
+			ui.Cancel(err)
 		}
 	}
 

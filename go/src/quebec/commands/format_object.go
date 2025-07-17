@@ -36,7 +36,12 @@ type FormatObject struct {
 }
 
 func (cmd *FormatObject) SetFlagSet(f *flag.FlagSet) {
-	f.BoolVar(&cmd.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
+	f.BoolVar(
+		&cmd.Stdin,
+		"stdin",
+		false,
+		"Read object from stdin and use a Type directly",
+	)
 
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 
@@ -51,7 +56,7 @@ func (cmd *FormatObject) Run(req command.Request) {
 
 	if cmd.Stdin {
 		if err := cmd.FormatFromStdin(localWorkingCopy, args...); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 		return
@@ -71,7 +76,8 @@ func (cmd *FormatObject) Run(req command.Request) {
 		objectIdString = args[0]
 
 	default:
-		localWorkingCopy.CancelWithErrorf(
+		errors.ContextCancelWithErrorf(
+			localWorkingCopy,
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
@@ -85,7 +91,7 @@ func (cmd *FormatObject) Run(req command.Request) {
 		if object, err = localWorkingCopy.GetZettelFromObjectId(
 			objectIdString,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -99,7 +105,7 @@ func (cmd *FormatObject) Run(req command.Request) {
 			formatId,
 			cmd.UTIGroup,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -114,7 +120,7 @@ func (cmd *FormatObject) Run(req command.Request) {
 	)
 
 	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	if _, err := formatter.WriteStringFormatWithMode(
@@ -125,11 +131,11 @@ func (cmd *FormatObject) Run(req command.Request) {
 		var errBlobFormatterFailed *object_metadata.ErrBlobFormatterFailed
 
 		if errors.As(err, &errBlobFormatterFailed) {
-			localWorkingCopy.CancelWithError(errBlobFormatterFailed)
+			localWorkingCopy.Cancel(errBlobFormatterFailed)
 			// err = nil
 			// ui.Err().Print(errExit)
 		} else {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 }

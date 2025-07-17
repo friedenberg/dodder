@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -109,7 +110,7 @@ func (server *Server) writeInventoryList(
 		count := 0
 
 		for sk, err := range seqInventoryListSkus {
-			server.Repo.GetEnv().ContinueOrPanicOnDone()
+			errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
 			if err != nil {
 				response.Error(err)

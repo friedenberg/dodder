@@ -4,10 +4,11 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 // TODO only call reset temp when actually not resetting temp
-func (env env) resetTempOnExit(ctx errors.Context) (err error) {
+func (env env) resetTempOnExit(ctx interfaces.Context) (err error) {
 	errIn := ctx.Cause()
 
 	if errIn != nil || env.debugOptions.NoTempDirCleanup {

@@ -56,7 +56,7 @@ func (cmd Query) MakeQuery(
 		cmd.ExternalQueryOptions,
 		args...,
 	); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
 	return

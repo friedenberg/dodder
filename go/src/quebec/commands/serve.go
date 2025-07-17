@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/oscar/remote_http"
@@ -31,7 +32,7 @@ func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Serve) Run(req command.Request) {
 	args := req.PopArgs()
-	req.SetCancelOnSIGHUP()
+	errors.ContextSetCancelOnSIGHUP(req)
 
 	envLocal := cmd.MakeEnvWithOptions(
 		req,
@@ -83,14 +84,14 @@ func (cmd Serve) Run(req command.Request) {
 				network,
 				address,
 			); err != nil {
-				envLocal.CancelWithError(err)
+				envLocal.Cancel(err)
 			}
 
-			defer envLocal.MustClose(listener)
+			defer errors.ContextMustClose(envLocal, listener)
 		}
 
 		if err := server.Serve(listener); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 		}
 	}
 }

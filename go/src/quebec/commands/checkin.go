@@ -79,19 +79,19 @@ func (cmd *Checkin) Complete(
 		var err error
 
 		if commandLine.InProgress, err = filepath.Abs(commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 
 		if searchDir, err = filepath.Rel(searchDir, commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 	}
 
 	for dirEntry, err := range files.WalkDir(searchDir) {
 		if err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 
@@ -139,6 +139,6 @@ func (cmd Checkin) Run(dep command.Request) {
 
 	// TODO add auto dot operator
 	if err := op.Run(localWorkingCopy, queryGroup); err != nil {
-		dep.CancelWithError(err)
+		dep.Cancel(err)
 	}
 }

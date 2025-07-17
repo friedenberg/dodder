@@ -42,19 +42,19 @@ func (cmd *Diff) Complete(
 		var err error
 
 		if commandLine.InProgress, err = filepath.Abs(commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 
 		if searchDir, err = filepath.Rel(searchDir, commandLine.InProgress); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 	}
 
 	for dirEntry, err := range files.WalkDir(searchDir) {
 		if err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 			return
 		}
 		if dirEntry.IsDir() {
@@ -109,6 +109,6 @@ func (cmd Diff) Run(dep command.Request) {
 			return
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

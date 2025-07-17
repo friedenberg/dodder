@@ -1,17 +1,22 @@
 package errors
 
-import "code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+)
 
 type Flusher interface {
 	Flush() error
 }
 
 type (
-	Func func() error
+	FuncNil     = func()
+	FuncErr     = func() error
+	FuncContext = interfaces.FuncContext
 )
 
 type FuncWithStackInfo struct {
-	Func
+	FuncErr
 	stack_frame.Frame
 }
 
@@ -21,13 +26,26 @@ type WithStackInfo[T any] struct {
 }
 
 type WaitGroup interface {
-	Do(Func) bool
-	DoAfter(Func)
+	Do(FuncErr) bool
+	DoAfter(FuncErr)
 	GetError() error
 }
 
-func MakeNilFunc(in func()) Func {
+func MakeFuncErrFromFuncNil(in FuncNil) FuncErr {
 	return func() error {
+		in()
+		return nil
+	}
+}
+
+func MakeFuncContextFromFuncErr(in FuncErr) FuncContext {
+	return func(interfaces.Context) error {
+		return in()
+	}
+}
+
+func MakeFuncContextFromFuncNil(in FuncNil) FuncContext {
+	return func(interfaces.Context) error {
 		in()
 		return nil
 	}

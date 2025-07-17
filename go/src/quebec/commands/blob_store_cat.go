@@ -111,7 +111,7 @@ func (cmd BlobStoreCat) Run(
 		var sh sha.Sha
 
 		if err := sh.Set(v); err != nil {
-			blobStore.CancelWithError(err)
+			blobStore.Cancel(err)
 		}
 
 		if err := cmd.blob(blobStore, &sh, blobWriter); err != nil {

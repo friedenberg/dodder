@@ -33,7 +33,12 @@ type FormatBlob struct {
 }
 
 func (cmd *FormatBlob) SetFlagSet(f *flag.FlagSet) {
-	f.BoolVar(&cmd.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
+	f.BoolVar(
+		&cmd.Stdin,
+		"stdin",
+		false,
+		"Read object from stdin and use a Type directly",
+	)
 
 	f.StringVar(
 		&cmd.UTIGroup,
@@ -70,7 +75,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 
 	if cmd.Stdin {
 		if err := cmd.FormatFromStdin(localWorkingCopy, args...); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 		return
@@ -90,7 +95,8 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		objectIdString = args[0]
 
 	default:
-		localWorkingCopy.CancelWithErrorf(
+		errors.ContextCancelWithErrorf(
+			localWorkingCopy,
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
@@ -102,7 +108,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		var err error
 
 		if object, err = localWorkingCopy.GetZettelFromObjectId(objectIdString); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -116,7 +122,8 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 			formatId,
 			cmd.UTIGroup,
 		); err != nil {
-			localWorkingCopy.CancelWithErrorAndFormat(
+			errors.ContextCancelWithErrorAndFormat(
+				localWorkingCopy,
 				err,
 				"objectIdString: %q, Object: %q",
 				objectIdString, sku.String(object),
@@ -135,7 +142,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 	)
 
 	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	if _, err := format.WriteStringFormatWithMode(
@@ -143,7 +150,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		object,
 		checkout_mode.BlobOnly,
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }
 
@@ -183,7 +190,7 @@ func (c *FormatBlob) FormatFromStdin(
 		formatId,
 		c.UTIGroup,
 	); err != nil {
-		u.CancelWithError(err)
+		u.Cancel(err)
 	}
 
 	var wt io.WriterTo

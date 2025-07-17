@@ -68,6 +68,6 @@ func (cmd Checkout) Run(req command.Request) {
 	envWorkspace.AssertNotTemporaryOrOfferToCreate(localWorkingCopy)
 
 	if _, err := opCheckout.RunQuery(queryGroup); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

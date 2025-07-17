@@ -67,9 +67,9 @@ func (cmd BlobFsck) Run(req command.Request) {
 
 		if err := errors.RunChildContextWithPrintTicker(
 			envRepo,
-			func(ctx errors.Context) {
+			func(ctx interfaces.Context) {
 				for sh, err := range blobStore.AllBlobs() {
-					ctx.ContinueOrPanicOnDone()
+					errors.ContextContinueOrPanic(ctx)
 					// TODO keep track of blobs in a tridex and compare
 					// subsequent stores
 
@@ -111,7 +111,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 			},
 			3*time.Second,
 		); err != nil {
-			envRepo.CancelWithError(err)
+			envRepo.Cancel(err)
 			return
 		}
 

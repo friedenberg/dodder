@@ -54,10 +54,10 @@ func (cmd Mergetool) Run(req command.Request) {
 			return
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Lock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
 
 	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1 and use Err
@@ -69,7 +69,7 @@ func (cmd Mergetool) Run(req command.Request) {
 		cmd.doOne(localWorkingCopy, co)
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Unlock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
 }
 
 func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
@@ -85,7 +85,7 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 		if conflict, err = u.GetEnvWorkspace().GetStoreFS().GetConflictOrError(
 			co.GetSkuExternal(),
 		); err != nil {
-			u.CancelWithError(err)
+			u.Cancel(err)
 		}
 	}
 
@@ -95,10 +95,10 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 		var err error
 
 		if f, err = files.Open(conflict.GetPath()); err != nil {
-			u.CancelWithError(err)
+			u.Cancel(err)
 		}
 
-		defer u.MustClose(f)
+		defer errors.ContextMustClose(u, f)
 	}
 
 	br := bufio.NewReader(f)
@@ -111,12 +111,12 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 			br,
 		),
 	); err != nil {
-		u.CancelWithError(err)
+		u.Cancel(err)
 	}
 
 	if err := u.GetStore().RunMergeTool(
 		tm,
 	); err != nil {
-		u.CancelWithError(err)
+		u.Cancel(err)
 	}
 }

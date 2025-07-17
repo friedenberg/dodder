@@ -48,7 +48,8 @@ func (cmd CheckinBlob) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	if len(args)%2 != 0 {
-		req.CancelWithErrorf(
+		errors.ContextCancelWithErrorf(
+			req,
 			"arguments must come in pairs of zettel id and blob path or sha",
 		)
 	}
@@ -66,7 +67,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 			filepathOrSha,
 			localWorkingCopy.GetEnvRepo(),
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 
 		pairs[idx] = pair
@@ -80,14 +81,14 @@ func (cmd CheckinBlob) Run(req command.Request) {
 			if pairs[idx].object, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 				pair.ZettelId,
 			); err != nil {
-				req.CancelWithError(err)
+				req.Cancel(err)
 			}
 		}
 
 		object := pairs[idx].object
 
 		if err := object.SetBlobSha(pair.GetShaLike()); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 
 		if cmd.NewTags.Len() > 0 {
@@ -96,7 +97,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 		}
 	}
 
-	req.Must(localWorkingCopy.Lock)
+	req.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
 
 	for _, pair := range pairs {
 		if err := localWorkingCopy.GetStore().CreateOrUpdateDefaultProto(
@@ -105,11 +106,11 @@ func (cmd CheckinBlob) Run(req command.Request) {
 				MergeCheckedOut: true,
 			},
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 	}
 
-	req.Must(localWorkingCopy.Unlock)
+	req.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
 }
 
 type externalBlobPair struct {

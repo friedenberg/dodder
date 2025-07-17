@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
@@ -22,7 +23,7 @@ type Context struct {
 }
 
 func MakeContext(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	options Options,
 ) (c *Context, err error) {
 	c = &Context{
@@ -32,7 +33,9 @@ func MakeContext(
 	if options.ExitOnMemoryExhaustion {
 		// TODO start memory limit struct instead
 		ticker := time.NewTicker(time.Millisecond)
-		ctx.After(errors.MakeNilFunc(ticker.Stop))
+		ctx.After(
+			errors.MakeFuncContextFromFuncNil(ticker.Stop),
+		)
 
 		var cgroupMemoryLimit uint64
 
@@ -62,7 +65,11 @@ func MakeContext(
 					runtime.ReadMemStats(&memStats)
 					memoryInUse := memStats.Alloc
 
-					percent := float64(memoryInUse) / float64(cgroupMemoryLimit) * 100
+					percent := float64(
+						memoryInUse,
+					) / float64(
+						cgroupMemoryLimit,
+					) * 100
 
 					if percent >= 90 {
 						memOnce.Do(
@@ -79,7 +86,10 @@ func MakeContext(
 										recover()
 									}()
 
-									ctx.CancelWithErrorf("10% memory remaining")
+									errors.ContextCancelWithErrorf(
+										ctx,
+										"10%% memory remaining",
+									)
 								}()
 							},
 						)
@@ -125,7 +135,7 @@ func MakeContext(
 		debug.SetGCPercent(-1)
 	}
 
-	ctx.After(c.Close)
+	ctx.After(errors.MakeFuncContextFromFuncErr(c.Close))
 
 	return
 }
@@ -135,11 +145,13 @@ func (c *Context) Close() error {
 	multiError := errors.MakeMulti()
 
 	if c.fileTrace != nil {
-		waitGroupStopOrWrite.Do(errors.MakeNilFunc(trace.Stop))
+		waitGroupStopOrWrite.Do(errors.MakeFuncErrFromFuncNil(trace.Stop))
 	}
 
 	if c.filePprofCpu != nil {
-		waitGroupStopOrWrite.Do(errors.MakeNilFunc(pprof.StopCPUProfile))
+		waitGroupStopOrWrite.Do(
+			errors.MakeFuncErrFromFuncNil(pprof.StopCPUProfile),
+		)
 	}
 
 	if c.filePprofHeap != nil {

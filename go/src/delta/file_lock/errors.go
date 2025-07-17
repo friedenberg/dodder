@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 )
 
@@ -49,7 +50,10 @@ func (e ErrUnableToAcquireLock) GetRetryableError() errors.Retryable {
 
 func (e ErrUnableToAcquireLock) ErrorCause() []string {
 	return []string{
-		fmt.Sprintf("A previous operation that acquired the %s lock failed.", e.description),
+		fmt.Sprintf(
+			"A previous operation that acquired the %s lock failed.",
+			e.description,
+		),
 		"The lock is intentionally left behind in case recovery is necessary.",
 	}
 }
@@ -61,18 +65,18 @@ func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
 }
 
 func (err ErrUnableToAcquireLock) Recover(
-	ctx errors.RetryableContext,
+	ctx interfaces.RetryableContext,
 	in error,
 ) {
 	errors.PrintHelpful(err.envUI.GetErr(), err)
 
 	if err.envUI.Confirm("delete the existing lock?") {
 		if err := os.Remove(err.Path); err != nil {
-			ctx.CancelWithError(err)
+			ctx.Cancel(err)
 		}
 
 		ctx.Retry()
 	} else {
-		ctx.CancelWithBadRequestf("not deleting the lock. aborting.")
+		errors.ContextCancelWithBadRequestf(ctx, "not deleting the lock. aborting.")
 	}
 }

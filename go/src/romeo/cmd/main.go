@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
@@ -21,7 +22,7 @@ func Run(name string) {
 	)
 
 	if err := ctx.Run(
-		func(ctx errors.Context) {
+		func(ctx interfaces.Context) {
 			commands.Run(ctx, os.Args...)
 		},
 	); err != nil {
@@ -37,14 +38,22 @@ func extendNameIfNecessary(name string) string {
 	}
 }
 
-func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus int) {
+func handleMainErrors(
+	ctx interfaces.Context,
+	name string,
+	err error,
+) (exitStatus int) {
 	exitStatus = 1
 
 	var signal errors.Signal
 
 	if errors.As(err, &signal) {
 		if signal.Signal != syscall.SIGHUP {
-			ui.Err().Printf("%s aborting due to signal: %s", name, signal.Signal)
+			ui.Err().Printf(
+				"%s aborting due to signal: %s",
+				name,
+				signal.Signal,
+			)
 		}
 
 		return
@@ -54,6 +63,10 @@ func handleMainErrors(ctx errors.Context, name string, err error) (exitStatus in
 
 	if errors.As(err, &helpful) {
 		errors.PrintHelpful(ui.Err(), helpful)
+		return
+	}
+
+	if errors.Is499ClientClosedRequest(err) {
 		return
 	}
 

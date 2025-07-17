@@ -74,7 +74,7 @@ func WrapSkip(
 		errWrapped.error = err
 	}
 
-	if debugBuild {
+	if DebugBuild {
 		errWrapped.checkCycle()
 	}
 

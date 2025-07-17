@@ -22,7 +22,7 @@ type gitLikeBucketed struct {
 }
 
 func makeGitLikeBucketedStore(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	basePath string,
 	config blob_store_configs.ConfigLocalGitLikeBucketed,
 	tempFS env_dir.TemporaryFS,

@@ -36,7 +36,7 @@ func (c ReadBlob) Run(dep command.Request) {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				repoLayout.CancelWithError(err)
+				repoLayout.Cancel(err)
 			}
 
 			return
@@ -46,7 +46,7 @@ func (c ReadBlob) Run(dep command.Request) {
 			var err error
 
 			if _, err = c.readOneBlob(repoLayout, entry); err != nil {
-				repoLayout.CancelWithError(err)
+				repoLayout.Cancel(err)
 			}
 		}
 	}

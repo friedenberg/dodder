@@ -23,7 +23,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 		var err error
 
 		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobShaBytesMap(); err != nil {
-			dep.CancelWithError(err)
+			dep.Cancel(err)
 		}
 	}
 
@@ -31,7 +31,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 		var sh sha.Sha
 
 		if err := sh.Set(shSt); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 		oids, ok := lookupStored[sh.GetBytes()]

@@ -227,6 +227,11 @@ func (server *Server) addSignatureIfNecessary(
 	header http.Header,
 ) (err error) {
 	if nonceString == "" {
+		if errors.DebugBuild {
+			ui.Debug().Print("nonce empty or not provided")
+			return
+		}
+
 		err = errors.Errorf("nonce empty or not provided")
 		return
 	}
@@ -255,7 +260,7 @@ func (server *Server) addSignatureIfNecessary(
 	}
 
 	if sig.Data, err = repo_signing.Sign(privateKey, nonce.Data); err != nil {
-		server.EnvLocal.CancelWithError(err)
+		server.EnvLocal.Cancel(err)
 		return
 	}
 
@@ -374,7 +379,7 @@ func (server *Server) ServeStdio() {
 	listener := MakeStdioListener()
 
 	if err := server.Serve(listener); err != nil {
-		server.EnvLocal.CancelWithError(err)
+		server.EnvLocal.Cancel(err)
 		return
 	}
 }
@@ -399,7 +404,7 @@ func (server *Server) makeHandler(
 
 		if err := errors.RunContextWithPrintTicker(
 			request.context,
-			func(ctx errors.Context) {
+			func(ctx interfaces.Context) {
 				response := handler(request)
 
 				// header := responseWriter.Header()
@@ -437,7 +442,7 @@ func (server *Server) makeHandler(
 						ui.Err().Print(errors.Unwrap(err).Error(), req.URL)
 						err = nil
 					} else {
-						ctx.CancelWithError(err)
+						ctx.Cancel(err)
 					}
 				}
 			},
@@ -451,7 +456,7 @@ func (server *Server) makeHandler(
 			},
 			3*time.Second,
 		); err != nil {
-			server.EnvLocal.CancelWithError(err)
+			server.EnvLocal.Cancel(err)
 		}
 	}
 }
@@ -583,9 +588,9 @@ func (server *Server) copyBlob(
 
 	if err = errors.RunChildContextWithPrintTicker(
 		server.EnvLocal,
-		func(ctx errors.Context) {
+		func(ctx interfaces.Context) {
 			if _, err := io.Copy(io.MultiWriter(writeCloser, &progressWriter), reader); err != nil {
-				ctx.CancelWithError(err)
+				ctx.Cancel(err)
 			}
 		},
 		func(time time.Time) {
@@ -680,11 +685,11 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			list,
 			bufferedWriter,
 		); err != nil {
-			server.EnvLocal.CancelWithError(err)
+			server.EnvLocal.Cancel(err)
 		}
 
 		if err := bufferedWriter.Flush(); err != nil {
-			server.EnvLocal.CancelWithError(err)
+			server.EnvLocal.Cancel(err)
 		}
 
 		response.Body = io.NopCloser(buffer)
@@ -730,7 +735,7 @@ func (server *Server) handleGetInventoryList(
 			return
 		}
 
-		server.Repo.GetEnv().ContinueOrPanicOnDone()
+		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
 		if err = printer(sk); err != nil {
 			response.Error(err)
@@ -812,7 +817,7 @@ func (server *Server) handleGetConfigImmutable(
 
 	// TODO modify to not have to buffer
 	if _, err := genesis_configs.CoderPublic.EncodeTo(configLoaded, &buffer); err != nil {
-		server.EnvLocal.CancelWithError(err)
+		server.EnvLocal.Cancel(err)
 	}
 
 	response.Body = io.NopCloser(&buffer)

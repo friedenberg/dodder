@@ -26,7 +26,7 @@ func (cmd Exec) Run(dep command.Request) {
 	args := dep.PopArgs()
 
 	if len(args) == 0 {
-		dep.CancelWithBadRequestf("needs at least Sku and possibly function name")
+		errors.ContextCancelWithBadRequestf(dep, "needs at least Sku and possibly function name")
 	}
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
@@ -39,14 +39,14 @@ func (cmd Exec) Run(dep command.Request) {
 		var err error
 
 		if sk, err = localWorkingCopy.GetEnvLua().GetSkuFromString(k); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
 	switch {
 	case strings.HasPrefix(sk.GetType().String(), "bash"):
 		if err := cmd.runBash(localWorkingCopy, sk, args...); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	case strings.HasPrefix(sk.GetType().String(), "lua"):
@@ -55,7 +55,7 @@ func (cmd Exec) Run(dep command.Request) {
 		}
 
 		if err := execLuaOp.Run(sk, args...); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 }

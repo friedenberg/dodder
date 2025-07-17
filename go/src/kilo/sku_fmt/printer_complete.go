@@ -30,7 +30,7 @@ func MakePrinterComplete(envLocal env_local.Env) *PrinterComplete {
 		),
 	}
 
-	envLocal.AfterWithContext(printer.Close)
+	envLocal.After(printer.Close)
 
 	go func(s *PrinterComplete) {
 		for sk := range s.chObjects {
@@ -86,7 +86,7 @@ func (printer *PrinterComplete) PrintOne(
 	return
 }
 
-func (printer *PrinterComplete) Close(context errors.Context) (err error) {
+func (printer *PrinterComplete) Close(context interfaces.Context) (err error) {
 	close(printer.chObjects)
 	<-printer.chDone
 

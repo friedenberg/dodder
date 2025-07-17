@@ -30,19 +30,19 @@ func Genesis(
 		repo.PrinterHeader(),
 		repo.config.GetCLIConfig().IsDryRun(),
 	); err != nil {
-		repo.CancelWithError(err)
+		repo.Cancel(err)
 	}
 
-	repo.Must(repo.Reset)
-	repo.Must(repo.envRepo.ResetCache)
+	repo.Must(errors.MakeFuncContextFromFuncErr(repo.Reset))
+	repo.Must(errors.MakeFuncContextFromFuncErr(repo.envRepo.ResetCache))
 
 	if err := repo.initDefaultTypeAndConfig(bb); err != nil {
-		repo.CancelWithError(err)
+		repo.Cancel(err)
 	}
 
-	repo.Must(repo.Lock)
-	repo.Must(repo.GetStore().ResetIndexes)
-	repo.Must(repo.Unlock)
+	repo.Must(errors.MakeFuncContextFromFuncErr(repo.Lock))
+	repo.Must(errors.MakeFuncContextFromFuncErr(repo.GetStore().ResetIndexes))
+	repo.Must(errors.MakeFuncContextFromFuncErr(repo.Unlock))
 
 	return
 }

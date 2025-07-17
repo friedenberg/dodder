@@ -57,14 +57,14 @@ func init() {
 	printerLog = devPrinter{
 		printer:       printerErr.withOn(false),
 		includesStack: true,
-		includesTime:  true,
+		// includesTime:  true,
 	}
 
 	// TODO-P2 determine if on thru compilation
 	printerDebug = devPrinter{
 		printer:       printerErr,
 		includesStack: true,
-		includesTime:  true,
+		// includesTime:  true,
 	}
 
 	// TODO-P2 determine thru compilation

@@ -21,7 +21,7 @@ import (
 
 func (env *Env) Genesis(bigBang BigBang) {
 	if err := bigBang.GenesisConfig.Blob.GeneratePrivateKey(); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		env.DirBlobStores("0"),
 		env.DirBlobStoreConfigs(),
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	env.writeInventoryListLog()
@@ -53,14 +53,14 @@ func (env *Env) Genesis(bigBang BigBang) {
 			bigBang.Yin,
 			filepath.Join(env.DirObjectId(), "Yin"),
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 
 		if err := ohio.CopyFileLines(
 			bigBang.Yang,
 			filepath.Join(env.DirObjectId(), "Yang"),
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 
 		env.writeFile(env.FileConfigMutable(), "")
@@ -81,10 +81,10 @@ func (env Env) writeInventoryListLog() {
 		if file, err = files.CreateExclusiveWriteOnly(
 			env.FileInventoryListLog(),
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 
-		defer env.MustClose(file)
+		defer errors.ContextMustClose(env, file)
 	}
 
 	coder := triple_hyphen_io.Coder[*triple_hyphen_io.TypedBlobEmpty]{
@@ -100,7 +100,7 @@ func (env Env) writeInventoryListLog() {
 	}
 
 	if _, err := coder.EncodeTo(&subject, file); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 }
 
@@ -110,7 +110,7 @@ func (env *Env) writeConfig(bigBang BigBang) {
 		&env.config,
 		env.FileConfigPermanent(),
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 		return
 	}
 }
@@ -136,7 +136,7 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
 		),
 	); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 		return
 	}
 }
@@ -153,22 +153,22 @@ func (env *Env) writeFile(path string, contents any) {
 				ui.Err().Printf("%s already exists, not overwriting", path)
 				err = nil
 			} else {
-				env.CancelWithError(err)
+				env.Cancel(err)
 			}
 		}
 	}
 
-	defer env.MustClose(file)
+	defer errors.ContextMustClose(env, file)
 
 	if value, ok := contents.(string); ok {
 		if _, err := io.WriteString(file, value); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	} else {
 		enc := gob.NewEncoder(file)
 
 		if err := enc.Encode(contents); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	}
 }

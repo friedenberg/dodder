@@ -6,15 +6,14 @@ import (
 	"flag"
 	"sort"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
-func PrintUsage(ctx errors.Context, in error) {
+func PrintUsage(ctx interfaces.Context, in error) {
 	if in != nil {
-		defer ctx.CancelWithError(in)
+		defer ctx.Cancel(in)
 	}
 
 	ui.Err().Print("Usage for dodder:")

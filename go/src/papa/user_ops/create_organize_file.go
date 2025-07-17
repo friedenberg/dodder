@@ -41,7 +41,7 @@ func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
 				count,
 			),
 		) {
-			err = errors.BadRequestf("aborting")
+			err = errors.Err499ClientClosedRequest
 			return
 		}
 	}

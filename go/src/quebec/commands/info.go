@@ -5,6 +5,7 @@ import (
 	"flag"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
@@ -65,7 +66,7 @@ func (cmd Info) Run(req command.Request) {
 					ioWrapper.GetBlobCompression(),
 				)
 			} else {
-				ui.CancelWithBadRequestf("default blob store does not support compression")
+				errors.ContextCancelWithBadRequestf(ui, "default blob store does not support compression")
 			}
 
 		case "age-encryption":
@@ -74,7 +75,7 @@ func (cmd Info) Run(req command.Request) {
 					ioWrapper.GetBlobEncryption(),
 				)
 			} else {
-				ui.CancelWithBadRequestf("default blob store does not support encryption")
+				errors.ContextCancelWithBadRequestf(ui, "default blob store does not support encryption")
 			}
 
 		case "env":
@@ -83,11 +84,11 @@ func (cmd Info) Run(req command.Request) {
 			bufferedWriter := bufio.NewWriter(ui.GetOutFile())
 
 			if _, err := coder.EncodeTo(envVars, bufferedWriter); err != nil {
-				ui.CancelWithError(err)
+				ui.Cancel(err)
 			}
 
 			if err := bufferedWriter.Flush(); err != nil {
-				ui.CancelWithError(err)
+				ui.Cancel(err)
 			}
 
 		case "xdg":
@@ -97,11 +98,11 @@ func (cmd Info) Run(req command.Request) {
 			bufferedWriter := bufio.NewWriter(ui.GetOutFile())
 
 			if _, err := coder.EncodeTo(envVars, bufferedWriter); err != nil {
-				ui.CancelWithError(err)
+				ui.Cancel(err)
 			}
 
 			if err := bufferedWriter.Flush(); err != nil {
-				ui.CancelWithError(err)
+				ui.Cancel(err)
 			}
 		}
 	}

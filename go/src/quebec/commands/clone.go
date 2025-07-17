@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -49,7 +50,8 @@ func (cmd Clone) Run(req command.Request) {
 
 	switch local := local.(type) {
 	default:
-		req.CancelWithBadRequestf(
+		errors.ContextCancelWithBadRequestf(
+			req,
 			"unsupported repo type: %q (%T)",
 			local.GetImmutableConfigPublic().GetRepoType(),
 			local,
@@ -74,7 +76,7 @@ func (cmd Clone) Run(req command.Request) {
 			queryGroup,
 			cmd.WithPrintCopies(true),
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 		}
 
 	case repo.Repo:

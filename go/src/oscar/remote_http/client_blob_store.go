@@ -26,7 +26,7 @@ func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
 		); err != nil {
-			client.GetEnv().CancelWithError(err)
+			client.GetEnv().Cancel(err)
 		}
 	}
 
@@ -36,7 +36,7 @@ func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if response, err = client.http.Do(request); err != nil {
-			client.GetEnv().CancelWithError(err)
+			client.GetEnv().Cancel(err)
 		}
 	}
 

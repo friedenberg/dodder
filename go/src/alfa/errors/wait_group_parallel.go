@@ -39,7 +39,7 @@ func (wg *waitGroupParallel) GetError() (err error) {
 
 	for i := len(wg.doAfter) - 1; i >= 0; i-- {
 		doAfter := wg.doAfter[i]
-		err := doAfter.Func()
+		err := doAfter.FuncErr()
 		if err != nil {
 			wg.err.Add(doAfter.Wrap(err))
 		}
@@ -48,7 +48,7 @@ func (wg *waitGroupParallel) GetError() (err error) {
 	return
 }
 
-func (wg *waitGroupParallel) Do(f Func) (d bool) {
+func (wg *waitGroupParallel) Do(f FuncErr) (d bool) {
 	wg.lock.Lock()
 
 	if wg.isDone {
@@ -75,7 +75,7 @@ func (wg *waitGroupParallel) Do(f Func) (d bool) {
 	return true
 }
 
-func (wg *waitGroupParallel) DoAfter(f Func) {
+func (wg *waitGroupParallel) DoAfter(f FuncErr) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -84,8 +84,8 @@ func (wg *waitGroupParallel) DoAfter(f Func) {
 	wg.doAfter = append(
 		wg.doAfter,
 		FuncWithStackInfo{
-			Func:  f,
-			Frame: frame,
+			FuncErr: f,
+			Frame:   frame,
 		},
 	)
 }

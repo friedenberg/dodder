@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
@@ -15,7 +15,7 @@ import (
 // TODO separate read-only from write
 
 func MakeDefault(
-	context errors.Context,
+	context interfaces.Context,
 	debugOptions debug.Options,
 ) env {
 	var home string
@@ -24,7 +24,7 @@ func MakeDefault(
 		var err error
 
 		if home, err = os.UserHomeDir(); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 
@@ -32,7 +32,7 @@ func MakeDefault(
 }
 
 func MakeDefaultNoInit(
-	context errors.Context,
+	context interfaces.Context,
 	debugOptions debug.Options,
 ) env {
 	var home string
@@ -41,7 +41,7 @@ func MakeDefaultNoInit(
 		var err error
 
 		if home, err = os.UserHomeDir(); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 
@@ -49,7 +49,7 @@ func MakeDefaultNoInit(
 }
 
 func MakeFromXDGDotenvPath(
-	context errors.Context,
+	context interfaces.Context,
 	config repo_config_cli.Config,
 	xdgDotenvPath string,
 ) env {
@@ -63,16 +63,16 @@ func MakeFromXDGDotenvPath(
 		var err error
 
 		if file, err = os.Open(xdgDotenvPath); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 
 	if _, err := dotenv.ReadFrom(file); err != nil {
-		context.CancelWithError(err)
+		context.Cancel(err)
 	}
 
 	if err := file.Close(); err != nil {
-		context.CancelWithError(err)
+		context.Cancel(err)
 	}
 
 	return MakeWithXDG(
@@ -83,7 +83,7 @@ func MakeFromXDGDotenvPath(
 }
 
 func MakeDefaultAndInitialize(
-	context errors.Context,
+	context interfaces.Context,
 	do debug.Options,
 	overrideXDG bool,
 ) env {
@@ -92,7 +92,7 @@ func MakeDefaultAndInitialize(
 	{
 		var err error
 		if home, err = os.UserHomeDir(); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 
@@ -105,7 +105,7 @@ func MakeDefaultAndInitialize(
 }
 
 func MakeWithHome(
-	context errors.Context,
+	context interfaces.Context,
 	home string,
 	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
@@ -118,7 +118,7 @@ func MakeWithHome(
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	if !initialize {
@@ -137,25 +137,25 @@ func MakeWithHome(
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
 		if err := xdg.InitializeOverridden(addedPath); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	} else {
 		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	}
 
 	if err := env.initializeXDG(xdg); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
-	env.AfterWithContext(env.resetTempOnExit)
+	env.After(env.resetTempOnExit)
 
 	return
 }
 
 func MakeWithHomeAndInitialize(
-	context errors.Context,
+	context interfaces.Context,
 	home string,
 	debugOptions debug.Options,
 	cwdXDGOverride bool,
@@ -167,7 +167,7 @@ func MakeWithHomeAndInitialize(
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	addedPath := "dodder"
@@ -177,36 +177,36 @@ func MakeWithHomeAndInitialize(
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
 		if err := xdg.InitializeOverridden(addedPath); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	} else {
 		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 		}
 	}
 
 	if err := env.initializeXDG(xdg); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
-	env.AfterWithContext(env.resetTempOnExit)
+	env.After(env.resetTempOnExit)
 
 	return
 }
 
 func MakeWithXDG(
-	context errors.Context,
+	context interfaces.Context,
 	debugOptions debug.Options,
 	xdg xdg.XDG,
 ) (env env) {
 	env.Context = context
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	if err := env.initializeXDG(xdg); err != nil {
-		env.CancelWithError(err)
+		env.Cancel(err)
 	}
 
 	return

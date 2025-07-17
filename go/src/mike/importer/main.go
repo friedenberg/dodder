@@ -92,7 +92,7 @@ func (importer *importer) SetCheckedOutPrinter(
 func (importer importer) Import(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	importer.envRepo.ContinueOrPanicOnDone()
+	errors.ContextContinueOrPanic(importer.envRepo)
 
 	if err = importer.ImportBlobIfNecessary(external); err != nil {
 		err = errors.Wrap(err)
@@ -311,7 +311,7 @@ func (c importer) ImportBlobIfNecessary(
 
 	if err = errors.RunChildContextWithPrintTicker(
 		c.envRepo,
-		func(ctx errors.Context) {
+		func(ctx interfaces.Context) {
 			var n int64
 
 			if n, err = blob_stores.CopyBlobIfNecessary(

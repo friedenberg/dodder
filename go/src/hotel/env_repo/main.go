@@ -171,7 +171,7 @@ func (env *Env) setupStores() {
 			if configPaths, err = files.DirNames(
 				filepath.Join(env.DirBlobStoreConfigs()),
 			); err != nil {
-				env.CancelWithError(err)
+				env.Cancel(err)
 			}
 		}
 
@@ -185,7 +185,7 @@ func (env *Env) setupStores() {
 				blob_store_configs.Coder,
 				configPath,
 			); err != nil {
-				env.CancelWithError(err)
+				env.Cancel(err)
 				return
 			} else {
 				env.blobStores[i].Config = typedConfig.Blob
@@ -203,7 +203,7 @@ func (env *Env) setupStores() {
 			blobStore.Config,
 			env.GetTempLocal(),
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 			return
 		}
 	}
@@ -299,7 +299,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
 			blob.GetBlobIOWrapper().(blob_store_configs.Config),
 			env.GetTempLocal(),
 		); err != nil {
-			env.CancelWithError(err)
+			env.Cancel(err)
 			return nil
 		} else {
 			return store

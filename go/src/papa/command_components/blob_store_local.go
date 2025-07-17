@@ -3,7 +3,6 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -24,7 +23,7 @@ type BlobStoreWithEnv struct {
 }
 
 func (cmd BlobStoreLocal) MakeBlobStoreLocal(
-	context errors.Context,
+	context interfaces.Context,
 	config repo_config_cli.Config,
 	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
@@ -53,7 +52,7 @@ func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 

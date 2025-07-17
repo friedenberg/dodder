@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -39,7 +40,7 @@ func (cmd Pull) Run(req command.Request) {
 		if object, err = localWorkingCopy.GetObjectFromObjectId(
 			req.PopArg("repo-id"),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
@@ -65,11 +66,12 @@ func (cmd Pull) Run(req command.Request) {
 			qg,
 			cmd.WithPrintCopies(true),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	case repo.Repo:
-		localWorkingCopy.CancelWithBadRequestf(
+		errors.ContextCancelWithBadRequestf(
+			localWorkingCopy,
 			"unsupported repo type: %s (%T)",
 			remote.GetImmutableConfigPublic().GetRepoType(),
 			remote,

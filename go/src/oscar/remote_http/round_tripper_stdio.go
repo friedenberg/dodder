@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -27,7 +28,8 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 
-	// TODO design a better way of selecting binaries (factoring in zit / dodder)
+	// TODO design a better way of selecting binaries (factoring in zit /
+	// dodder)
 	roundTripper.Path = envRepo.GetExecPath()
 
 	// TODO set first arg based on roundTripper.Path
@@ -94,6 +96,8 @@ func (roundTripper *RoundTripperStdio) initialize(
 
 	remotePrinterDone := make(chan struct{})
 
+	// TODO refactor this into something in the ui package that closes
+	// automatically at the end of a context
 	go func() (err error) {
 		defer close(remotePrinterDone)
 
@@ -125,19 +129,25 @@ func (roundTripper *RoundTripperStdio) initialize(
 
 	roundTripper.Reader = bufio.NewReader(roundTripper.ReadCloser)
 
+	ui.Log().Printf("starting server: %q", roundTripper.Cmd.String())
+
 	if err = roundTripper.Start(); err != nil {
 		err = errors.Wrapf(err, "%#v", roundTripper.Cmd)
 		return
 	}
 
-	envUI.After(roundTripper.makeCancel(remotePrinterDone))
+	envUI.After(
+		errors.MakeFuncContextFromFuncErr(
+			roundTripper.makeCancel(remotePrinterDone),
+		),
+	)
 
 	return
 }
 
 func (roundTripper *RoundTripperStdio) makeCancel(
 	readsDone <-chan struct{},
-) errors.Func {
+) errors.FuncErr {
 	return func() error {
 		return roundTripper.cancel(readsDone)
 	}

@@ -35,7 +35,7 @@ func (cmd CheckinJson) Run(req command.Request) {
 				err = nil
 				break
 			} else {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 	}

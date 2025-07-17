@@ -37,7 +37,7 @@ func (cmd Genesis) OnTheFirstDay(
 	var repoId ids.RepoId
 
 	if err := repoId.Set(repoIdString); err != nil {
-		ui.CancelWithError(err)
+		ui.Cancel(err)
 	}
 
 	cmd.GenesisConfig.Blob.SetRepoId(repoId)
@@ -62,7 +62,7 @@ func (cmd Genesis) OnTheFirstDay(
 			env_local.Make(ui, dir),
 			options,
 		); err != nil {
-			ui.CancelWithError(err)
+			ui.Cancel(err)
 		}
 	}
 
@@ -79,11 +79,11 @@ func (cmd Genesis) OnTheFirstDay(
 		return cmd.MakeLocalArchive(envRepo)
 
 	default:
-		req.CancelWithError(
+		req.Cancel(
 			repo_type.ErrUnsupportedRepoType{
 				Actual: cmd.BigBang.GenesisConfig.Blob.GetRepoType(),
-			},
-		)
+			})
+
 	}
 
 	return nil

@@ -3,6 +3,7 @@ package command_components
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_store"
@@ -36,7 +37,7 @@ func (c LocalArchive) MakeLocalArchive(
 			nil,
 			inventoryListBlobStore,
 		); err != nil {
-			envRepo.CancelWithError(err)
+			envRepo.Cancel(err)
 		}
 
 		envBox := env_box.Make(
@@ -56,7 +57,11 @@ func (c LocalArchive) MakeLocalArchive(
 		)
 
 	default:
-		envRepo.CancelWithErrorf("unsupported repo type: %q", repoType)
+		errors.ContextCancelWithErrorf(
+			envRepo,
+			"unsupported repo type: %q",
+			repoType,
+		)
 		return nil
 	}
 }

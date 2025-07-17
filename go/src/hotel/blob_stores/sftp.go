@@ -39,7 +39,7 @@ type sftpBlobStore struct {
 }
 
 func makeSftpStore(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
 ) (store *sftpBlobStore, err error) {
@@ -56,7 +56,7 @@ func makeSftpStore(
 		return
 	}
 
-	ctx.After(store.close)
+	ctx.After(errors.MakeFuncContextFromFuncErr(store.close))
 
 	if err = store.ensureRemotePath(); err != nil {
 		err = errors.Wrap(err)

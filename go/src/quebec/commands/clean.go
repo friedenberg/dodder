@@ -83,13 +83,13 @@ func (cmd Clean) Run(req command.Request) {
 
 	if cmd.organize {
 		if err := cmd.runOrganize(localWorkingCopy, queryGroup); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 		return
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Lock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
 
 	if err := localWorkingCopy.GetStore().QuerySkuType(
 		queryGroup,
@@ -106,10 +106,10 @@ func (cmd Clean) Run(req command.Request) {
 			return
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Unlock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
 }
 
 func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err error) {
@@ -148,7 +148,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err err
 		return
 	}
 
-	u.Must(u.Lock)
+	u.Must(errors.MakeFuncContextFromFuncErr(u.Lock))
 
 	for _, el := range changes.Removed.AllSkuAndIndex() {
 		if err = u.GetStore().DeleteCheckedOut(
@@ -159,7 +159,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err err
 		}
 	}
 
-	u.Must(u.Unlock)
+	u.Must(errors.MakeFuncContextFromFuncErr(u.Unlock))
 
 	return
 }

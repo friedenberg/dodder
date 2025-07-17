@@ -40,25 +40,25 @@ func (cmd DormantEdit) Run(dep command.Request) {
 		var err error
 
 		if sh, err = cmd.editInVim(localWorkingCopy); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 			return
 		}
 	}
 
 	if err := localWorkingCopy.Reset(); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 		return
 	}
 
 	if err := localWorkingCopy.Lock(); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 		return
 	}
 
-	defer localWorkingCopy.Must(localWorkingCopy.Unlock)
+	defer localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
 
 	if _, err := localWorkingCopy.GetStore().UpdateKonfig(sh); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 		return
 	}
 }

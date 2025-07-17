@@ -60,7 +60,7 @@ func (log *v0) Flush() (err error) {
 	return nil
 }
 
-func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
+func (log *v0) initialize(ctx interfaces.Context, env env_repo.Env) {
 	gob.Register(tridex.Make())
 
 	log.values = tridex.Make()
@@ -75,7 +75,7 @@ func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
 	)
 
 	if err := log.lockSmith.Lock(); err != nil {
-		ctx.CancelWithError(err)
+		ctx.Cancel(err)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
 			log.path,
 			files.OpenCreate,
 		); err != nil {
-			ctx.CancelWithError(err)
+			ctx.Cancel(err)
 			return
 		}
 	}

@@ -2,6 +2,7 @@ package env_workspace
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 )
 
@@ -27,17 +28,22 @@ func (err ErrNotInWorkspace) GetRetryableError() errors.Retryable {
 	return err
 }
 
-func (err ErrNotInWorkspace) Recover(ctx errors.RetryableContext, in error) {
+func (err ErrNotInWorkspace) Recover(
+	ctx interfaces.RetryableContext,
+	in error,
+) {
 	if err.offerToCreate &&
-		err.Confirm("a workspace is necessary to run this command. create one?") {
+		err.Confirm(
+			"a workspace is necessary to run this command. create one?",
+		) {
 		blob := &workspace_config_blobs.V0{}
 
 		if err := err.CreateWorkspace(blob); err != nil {
-			ctx.CancelWithError(err)
+			ctx.Cancel(err)
 		}
 
 		ctx.Retry()
 	} else {
-		ctx.CancelWithBadRequestf(err.Error())
+		errors.ContextCancelWithBadRequestf(ctx, err.Error())
 	}
 }

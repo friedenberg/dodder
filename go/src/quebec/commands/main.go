@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
-func Run(ctx errors.Context, args ...string) {
+func Run(ctx interfaces.Context, args ...string) {
 	if len(args) <= 1 {
 		PrintUsage(
 			ctx,
@@ -43,7 +43,7 @@ func Run(ctx errors.Context, args ...string) {
 	configCli.SetFlagSet(flagSet)
 
 	if err := flagSet.Parse(args); err != nil {
-		ctx.CancelWithError(errors.BadRequest(err))
+		ctx.Cancel(errors.BadRequest(err))
 	}
 
 	req := command.MakeRequest(

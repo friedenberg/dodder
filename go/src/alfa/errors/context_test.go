@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"syscall"
 	"testing"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 func TestContextCancelled(t *testing.T) {
@@ -13,15 +15,12 @@ func TestContextCancelled(t *testing.T) {
 	var must1, must2, after1 bool
 
 	if err := ctx.Run(
-		func(ctx Context) {
-			didPanic := false
-
+		func(ctx interfaces.Context) {
 			defer func() {
 				t.Log("defer1")
 
 				if r := recover(); r != nil {
 					t.Log("recover")
-					didPanic = true
 
 					if r != errContextCancelled {
 						t.Errorf("expected recover to be %q", errContextCancelled)
@@ -29,31 +28,25 @@ func TestContextCancelled(t *testing.T) {
 				}
 			}()
 
-			defer ctx.Must(func() error {
+			defer ctx.Must(func(interfaces.Context) error {
 				t.Log("must1")
 				must1 = true
 				return nil
 			})
 
-			defer ctx.Must(func() error {
+			defer ctx.Must(func(interfaces.Context) error {
 				t.Log("must2")
 				must2 = true
 				return nil
 			})
 
-			ctx.After(func() error {
+			ctx.After(MakeFuncContextFromFuncErr(func() error {
 				after1 = true
 				return nil
-			})
+			}))
 
-			ctx.Cancel()
-			ctx.ContinueOrPanicOnDone()
-
+			ctx.Cancel(nil)
 			t.Errorf("expected to not get here")
-
-			if !didPanic {
-				t.Errorf("expected to panic")
-			}
 		},
 	); err != nil {
 		t.Errorf("expected no error but got: %s", err)
@@ -74,7 +67,7 @@ func (err errTestRecover) GetRetryableError() Retryable {
 	return err
 }
 
-func (errTestRecover) Recover(ctx RetryableContext, in error) {
+func (errTestRecover) Recover(ctx interfaces.RetryableContext, in error) {
 	ctx.Retry()
 }
 
@@ -84,11 +77,11 @@ func TestContextCancelledRetry(t *testing.T) {
 	tryCount := 0
 
 	if err := ctx.Run(
-		func(ctx Context) {
+		func(ctx interfaces.Context) {
 			fmt.Printf("%d\n", tryCount)
 			if tryCount == 0 {
 				tryCount++
-				ctx.CancelWithError(errTestRecover{})
+				ctx.Cancel(errTestRecover{})
 			}
 
 			tryCount++
@@ -104,17 +97,17 @@ func TestContextCancelledRetry(t *testing.T) {
 
 func TestContextSignal(t *testing.T) {
 	ctx := MakeContext(ConTeXT.Background())
-	ctx.SetCancelOnSIGHUP()
+	ContextSetCancelOnSIGHUP(ctx)
 
 	cont := make(chan struct{})
 
 	go func() {
 		if err := ctx.Run(
-			func(ctx Context) {
+			func(ctx interfaces.Context) {
 				child := MakeContext(ctx)
 
 				if err := child.Run(
-					func(ctx Context) {
+					func(ctx interfaces.Context) {
 						<-ctx.Done()
 						cont <- struct{}{}
 					},

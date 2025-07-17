@@ -7,22 +7,23 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 type memoryLimit struct {
-	ctx errors.Context
+	ctx interfaces.Context
 	*time.Ticker
 	memoryLimit atomic.Uint64
 	memoryInUse atomic.Uint64
 	sync.Once
 }
 
-func (ml *memoryLimit) Start(ctx errors.Context) (err error) {
+func (ml *memoryLimit) Start(ctx interfaces.Context) (err error) {
 	ml.ctx = ctx
 
 	ml.Ticker = time.NewTicker(time.Millisecond)
-	ctx.After(errors.MakeNilFunc(ml.Stop))
+	ctx.After(errors.MakeFuncContextFromFuncNil(ml.Stop))
 
 	var memoryLimit uint64
 
@@ -83,5 +84,5 @@ func (ml *memoryLimit) Terminate() {
 		recover()
 	}()
 
-	ml.ctx.CancelWithErrorf("10% memory remaining")
+	errors.ContextCancelWithErrorf(ml.ctx, "10%% memory remaining")
 }

@@ -25,25 +25,25 @@ type Editor struct {
 }
 
 func getEditorUtility() string {
-	var ed string
+	var editor string
 
-	if ed = os.Getenv("EDITOR"); ed != "" {
-		return ed
+	if editor = os.Getenv("EDITOR"); editor != "" {
+		return editor
 	}
 
-	if ed = os.Getenv("VISUAL"); ed != "" {
-		return ed
+	if editor = os.Getenv("VISUAL"); editor != "" {
+		return editor
 	}
 
 	return "vim"
 }
 
 func MakeEditorWithVimOptions(
-	ph interfaces.FuncIter[string],
+	funcUI interfaces.FuncIter[string],
 	options []string,
 ) (Editor, error) {
 	return MakeEditor(
-		ph,
+		funcUI,
 		map[Type][]string{
 			TypeVim: options,
 		},
@@ -51,11 +51,11 @@ func MakeEditorWithVimOptions(
 }
 
 func MakeEditor(
-	ph interfaces.FuncIter[string],
+	funcUI interfaces.FuncIter[string],
 	options map[Type][]string,
 ) (editor Editor, err error) {
 	editor.utility = getEditorUtility()
-	editor.ui = ph
+	editor.ui = funcUI
 
 	var utility []string
 
@@ -65,7 +65,10 @@ func MakeEditor(
 	}
 
 	if len(utility) < 1 {
-		err = errors.ErrorWithStackf("utility has no valid path: %q", editor.utility)
+		err = errors.ErrorWithStackf(
+			"utility has no valid path: %q",
+			editor.utility,
+		)
 		return
 	}
 
@@ -75,6 +78,7 @@ func MakeEditor(
 	editor.name = filepath.Base(editor.path)
 
 	switch editor.name {
+	// TODO support other mechanisms of inferring vim as the editor
 	case "vim", "nvim":
 		editor.tipe = TypeVim
 		editor.options = append(editor.options, "-f")
@@ -85,20 +89,20 @@ func MakeEditor(
 	return
 }
 
-func (c Editor) Run(
+func (editor Editor) Run(
 	files []string,
 ) (err error) {
-	if err = c.ui(fmt.Sprintf("editor (%s) started", c.name)); err != nil {
+	if err = editor.ui(fmt.Sprintf("editor (%s) started", editor.name)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.openWithArgs(files...); err != nil {
+	if err = editor.openWithArgs(files...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.ui(fmt.Sprintf("editor (%s) closed", c.name)); err != nil {
+	if err = editor.ui(fmt.Sprintf("editor (%s) closed", editor.name)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

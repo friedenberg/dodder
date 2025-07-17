@@ -155,7 +155,8 @@ func (client client) ImportInventoryList(
 
 	// TODO ensure that conflicts were addressed prior to importing
 	// if options.AllowMergeConflicts {
-	// 	request.Header.Add("x-dodder-remote_transfer_options-allow_merge_conflicts", "true")
+	// 	request.Header.Add("x-dodder-remote_transfer_options-allow_merge_conflicts",
+	// "true")
 	// }
 
 	var response *http.Response
@@ -237,7 +238,7 @@ func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted
 			"/inventory_lists",
 			nil,
 		); err != nil {
-			client.envUI.CancelWithError(err)
+			client.envUI.Cancel(err)
 			return nil
 		}
 	}
@@ -248,7 +249,11 @@ func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted
 		var err error
 
 		if response, err = client.http.Do(request); err != nil {
-			client.envUI.CancelWithErrorAndFormat(err, "failed to read response")
+			errors.ContextCancelWithErrorAndFormat(
+				client.envUI,
+				err,
+				"failed to read response",
+			)
 			return nil
 		}
 	}

@@ -125,7 +125,7 @@ func (cmd Complete) CompleteObjectsIncludingWorkspace(
 		query,
 		printerCompletions.PrintOne,
 	); err != nil {
-		local.CancelWithError(err)
+		local.Cancel(err)
 	}
 }
 
@@ -148,6 +148,6 @@ func (cmd Complete) CompleteObjects(
 		query,
 		printerCompletions.PrintOne,
 	); err != nil {
-		local.CancelWithError(err)
+		local.Cancel(err)
 	}
 }

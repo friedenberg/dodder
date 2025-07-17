@@ -3,6 +3,7 @@ package commands
 import (
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -38,14 +39,18 @@ func (cmd InfoRepo) Run(req command.Request) {
 	for _, arg := range args {
 		switch strings.ToLower(arg) {
 		default:
-			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
+			errors.ContextCancelWithBadRequestf(
+				repo,
+				"unsupported info key: %q",
+				arg,
+			)
 
 		case "config-immutable":
 			if _, err := genesis_configs.CoderPublic.EncodeTo(
 				&configTypedBlob,
 				repo.GetUIFile(),
 			); err != nil {
-				repo.CancelWithError(err)
+				repo.Cancel(err)
 			}
 
 		case "store-version":
@@ -103,7 +108,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			}
 
 			if _, err := dotenv.WriteTo(repo.GetUIFile()); err != nil {
-				repo.CancelWithError(err)
+				repo.Cancel(err)
 			}
 		}
 	}

@@ -43,7 +43,7 @@ func (cmd EnvRepo) MakeEnvRepo(
 			env_local.Make(ui, dir),
 			envRepoOptions,
 		); err != nil {
-			ui.CancelWithError(err)
+			ui.Cancel(err)
 		}
 	}
 
@@ -66,7 +66,7 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 			envLocal,
 			layoutOptions,
 		); err != nil {
-			envLocal.CancelWithError(err)
+			envLocal.Cancel(err)
 		}
 	}
 

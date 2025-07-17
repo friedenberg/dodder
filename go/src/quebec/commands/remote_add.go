@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -49,20 +50,20 @@ func (cmd RemoteAdd) Run(req command.Request) {
 	var id ids.RepoId
 
 	if err := id.Set(req.PopArg("repo-id")); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
 	req.AssertNoMoreArgs()
 
 	if err := remoteObject.ObjectId.SetWithIdLike(&id); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
 	// TODO connect to remote and get public key and validate
 
 	cmd.proto.Apply(remoteObject.GetMetadata(), genres.Repo)
 
-	req.Must(local.Lock)
+	req.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	if err := local.GetStore().CreateOrUpdateDefaultProto(
 		remoteObject,
@@ -70,8 +71,8 @@ func (cmd RemoteAdd) Run(req command.Request) {
 			ApplyProto: true,
 		},
 	); err != nil {
-		req.CancelWithError(err)
+		req.Cancel(err)
 	}
 
-	req.Must(local.Unlock)
+	req.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 }

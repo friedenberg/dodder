@@ -126,7 +126,7 @@ func (cmd *Organize) Run(req command.Request) {
 			return skus.Add(co.Clone())
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
 	defaultQuery := queryGroup.GetDefaultQuery()
@@ -179,11 +179,11 @@ func (cmd *Organize) Run(req command.Request) {
 			if f, err = localWorkingCopy.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
 				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
-		defer localWorkingCopy.MustClose(f)
+		defer errors.ContextMustClose(localWorkingCopy, f)
 
 		{
 			var err error
@@ -191,7 +191,7 @@ func (cmd *Organize) Run(req command.Request) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
@@ -207,7 +207,7 @@ func (cmd *Organize) Run(req command.Request) {
 				os.Stdin,
 				organize_text.NewMetadata(queryGroup.RepoId),
 			); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
@@ -219,13 +219,13 @@ func (cmd *Organize) Run(req command.Request) {
 				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	case organize_text_mode.ModeOutputOnly:
 		ui.Log().Print("generate organize file and write to stdout")
 		if _, err := createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	case organize_text_mode.ModeInteractive:
@@ -242,10 +242,10 @@ func (cmd *Organize) Run(req command.Request) {
 			if f, err = localWorkingCopy.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
 				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 
-			defer localWorkingCopy.MustClose(f)
+			defer errors.ContextMustClose(localWorkingCopy, f)
 		}
 
 		{
@@ -254,7 +254,12 @@ func (cmd *Organize) Run(req command.Request) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				localWorkingCopy.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
+				errors.ContextCancelWithErrorAndFormat(
+					localWorkingCopy,
+					err,
+					"Organize File: %q",
+					f.Name(),
+				)
 			}
 		}
 
@@ -269,7 +274,12 @@ func (cmd *Organize) Run(req command.Request) {
 				createOrganizeFileResults,
 				queryGroup,
 			); err != nil {
-				localWorkingCopy.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
+				errors.ContextCancelWithErrorAndFormat(
+					localWorkingCopy,
+					err,
+					"Organize File: %q",
+					f.Name(),
+				)
 			}
 		}
 
@@ -281,11 +291,11 @@ func (cmd *Organize) Run(req command.Request) {
 				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	default:
-		localWorkingCopy.CancelWithErrorf("unknown mode")
+		errors.ContextCancelWithErrorf(localWorkingCopy, "unknown mode")
 	}
 }
 

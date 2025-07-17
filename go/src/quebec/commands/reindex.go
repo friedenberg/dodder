@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -15,15 +16,18 @@ type Reindex struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd Reindex) Run(dep command.Request) {
-	args := dep.PopArgs()
+func (cmd Reindex) Run(req command.Request) {
+	args := req.PopArgs()
 
 	if len(args) > 0 {
-		dep.CancelWithErrorf("reindex does not support arguments")
+		errors.ContextCancelWithErrorf(
+			req,
+			"reindex does not support arguments",
+		)
 	}
 
 	localWorkingCopy := cmd.MakeLocalWorkingCopyWithOptions(
-		dep,
+		req,
 		env_ui.Options{},
 		local_working_copy.OptionsAllowConfigReadError,
 	)

@@ -3,6 +3,7 @@ package commands
 import (
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -28,7 +29,11 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 	for _, arg := range args {
 		switch strings.ToLower(arg) {
 		default:
-			repo.CancelWithBadRequestf("unsupported info key: %q", arg)
+			errors.ContextCancelWithBadRequestf(
+				repo,
+				"unsupported info key: %q",
+				arg,
+			)
 
 		case "":
 			// TODO what should this be?

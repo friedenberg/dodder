@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -24,7 +25,7 @@ func MakeTesting(
 	ctx := errors.MakeContextDefault()
 
 	if err := ctx.Run(
-		func(ctx errors.Context) {
+		func(ctx interfaces.Context) {
 			dirTemp := t.TempDir()
 
 			envDir := env_dir.MakeWithHome(

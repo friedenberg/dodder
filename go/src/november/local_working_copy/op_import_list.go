@@ -10,7 +10,7 @@ func (local *Repo) ImportList(
 	list *sku.List,
 	i sku.Importer,
 ) (err error) {
-	local.Must(local.Lock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	if err = local.GetInventoryListStore().ImportList(
 		list,
@@ -22,7 +22,7 @@ func (local *Repo) ImportList(
 		}
 	}
 
-	local.Must(local.Unlock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
 	return
 }

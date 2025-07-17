@@ -23,8 +23,8 @@ import (
 type Env interface {
 	env_dir.Env
 	GetWorkspaceDir() string
-	AssertNotTemporary(errors.Context)
-	AssertNotTemporaryOrOfferToCreate(errors.Context)
+	AssertNotTemporary(interfaces.Context)
+	AssertNotTemporaryOrOfferToCreate(interfaces.Context)
 	IsTemporary() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetDefaults() repo_config_blobs.Defaults
@@ -213,20 +213,20 @@ func (env *env) GetWorkspaceConfigFilePath() string {
 	return filepath.Join(env.GetWorkspaceDir(), env_repo.FileWorkspace)
 }
 
-func (env *env) AssertNotTemporary(context errors.Context) {
+func (env *env) AssertNotTemporary(context interfaces.Context) {
 	if env.IsTemporary() {
-		context.CancelWithError(ErrNotInWorkspace{env: env})
+		context.Cancel(ErrNotInWorkspace{env: env})
 	}
 }
 
-func (env *env) AssertNotTemporaryOrOfferToCreate(context errors.Context) {
+func (env *env) AssertNotTemporaryOrOfferToCreate(context interfaces.Context) {
 	if env.IsTemporary() {
-		context.CancelWithError(
+		context.Cancel(
 			ErrNotInWorkspace{
 				env:           env,
 				offerToCreate: true,
-			},
-		)
+			})
+
 	}
 }
 

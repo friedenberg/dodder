@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
@@ -16,7 +15,7 @@ import (
 // TODO explore storing buffered writer and reader
 type Env interface {
 	// TODO remove and keep separate
-	errors.Context
+	interfaces.Context
 
 	GetOptions() Options
 	GetIn() fd.Std
@@ -42,7 +41,7 @@ type Env interface {
 }
 
 type env struct {
-	errors.Context
+	interfaces.Context
 
 	options Options
 
@@ -56,7 +55,7 @@ type env struct {
 	cliConfig repo_config_cli.Config
 }
 
-func MakeDefault(ctx errors.Context) *env {
+func MakeDefault(ctx interfaces.Context) *env {
 	return Make(
 		ctx,
 		repo_config_cli.Config{},
@@ -65,7 +64,7 @@ func MakeDefault(ctx errors.Context) *env {
 }
 
 func Make(
-	context errors.Context,
+	context interfaces.Context,
 	kCli repo_config_cli.Config,
 	options Options,
 ) *env {
@@ -88,7 +87,7 @@ func Make(
 		var err error
 
 		if e.debug, err = debug.MakeContext(context, kCli.Debug); err != nil {
-			context.CancelWithError(err)
+			context.Cancel(err)
 		}
 	}
 
@@ -105,42 +104,42 @@ func Make(
 	return e
 }
 
-func (u env) GetOptions() Options {
-	return u.options
+func (env env) GetOptions() Options {
+	return env.options
 }
 
-func (u *env) GetIn() fd.Std {
-	return u.in
+func (env *env) GetIn() fd.Std {
+	return env.in
 }
 
-func (u *env) GetInFile() io.Reader {
-	return u.in.GetFile()
+func (env *env) GetInFile() io.Reader {
+	return env.in.GetFile()
 }
 
-func (u *env) GetUI() fd.Std {
-	return u.ui
+func (env *env) GetUI() fd.Std {
+	return env.ui
 }
 
-func (u *env) GetUIFile() interfaces.WriterAndStringWriter {
-	return u.ui.GetFile()
+func (env *env) GetUIFile() interfaces.WriterAndStringWriter {
+	return env.ui.GetFile()
 }
 
-func (u *env) GetOut() fd.Std {
-	return u.out
+func (env *env) GetOut() fd.Std {
+	return env.out
 }
 
-func (u *env) GetOutFile() interfaces.WriterAndStringWriter {
-	return u.out.GetFile()
+func (env *env) GetOutFile() interfaces.WriterAndStringWriter {
+	return env.out.GetFile()
 }
 
-func (u *env) GetErr() fd.Std {
-	return u.err
+func (env *env) GetErr() fd.Std {
+	return env.err
 }
 
-func (u *env) GetErrFile() interfaces.WriterAndStringWriter {
-	return u.err.GetFile()
+func (env *env) GetErrFile() interfaces.WriterAndStringWriter {
+	return env.err.GetFile()
 }
 
-func (u *env) GetCLIConfig() repo_config_cli.Config {
-	return u.cliConfig
+func (env *env) GetCLIConfig() repo_config_cli.Config {
+	return env.cliConfig
 }

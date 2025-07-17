@@ -91,7 +91,7 @@ func (cmd *New) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 
 	if err := cmd.ValidateFlagsAndArgs(repo, args...); err != nil {
-		repo.CancelWithError(err)
+		repo.Cancel(err)
 	}
 
 	cotfo := checkout_options.TextFormatterOptions{}
@@ -114,7 +114,7 @@ func (cmd *New) Run(req command.Request) {
 			var err error
 
 			if objects, err = emptyOp.RunMany(cmd.Proto, cmd.Count); err != nil {
-				repo.CancelWithError(err)
+				repo.Cancel(err)
 			}
 		}
 	} else if cmd.Shas {
@@ -127,7 +127,7 @@ func (cmd *New) Run(req command.Request) {
 			var err error
 
 			if objects, err = opCreateFromShas.Run(args...); err != nil {
-				repo.CancelWithError(err)
+				repo.Cancel(err)
 			}
 		}
 	} else {
@@ -144,9 +144,9 @@ func (cmd *New) Run(req command.Request) {
 
 			if objects, err = opCreateFromPath.Run(args...); err != nil {
 				if errors.IsNotExist(err) {
-					repo.CancelWithBadRequestf("Expected a valid file path. Did you mean to add `-description`?")
+					errors.ContextCancelWithBadRequestf(repo, "Expected a valid file path. Did you mean to add `-description`?")
 				} else {
-					repo.CancelWithError(err)
+					repo.Cancel(err)
 				}
 			}
 		}
@@ -170,7 +170,7 @@ func (cmd *New) Run(req command.Request) {
 		}
 
 		if _, err := opCheckout.Run(objects); err != nil {
-			repo.CancelWithError(err)
+			repo.Cancel(err)
 		}
 	}
 
@@ -183,7 +183,7 @@ func (cmd *New) Run(req command.Request) {
 			&cmd.Metadata,
 			ids.RepoId{},
 		); err != nil {
-			repo.CancelWithError(err)
+			repo.Cancel(err)
 		}
 
 		var results organize_text.OrganizeResults
@@ -192,14 +192,14 @@ func (cmd *New) Run(req command.Request) {
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, objects); err != nil {
-				repo.CancelWithError(err)
+				repo.Cancel(err)
 			}
 		}
 
 		if _, err := repo.LockAndCommitOrganizeResults(
 			results,
 		); err != nil {
-			repo.CancelWithError(err)
+			repo.Cancel(err)
 		}
 	}
 }

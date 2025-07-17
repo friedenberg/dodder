@@ -106,7 +106,11 @@ func (cmd BlobStoreWrite) Run(
 	fc := failCount.Load()
 
 	if fc > 0 {
-		blobStore.CancelWithBadRequestf("untracked objects: %d", fc)
+		errors.ContextCancelWithBadRequestf(
+			blobStore,
+			"untracked objects: %d",
+			fc,
+		)
 		return
 	}
 }

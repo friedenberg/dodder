@@ -4,7 +4,7 @@ import "sync"
 
 func MakeWaitGroupSerial() WaitGroup {
 	wg := &waitGroupSerial{
-		do:      make([]Func, 0),
+		do:      make([]FuncErr, 0),
 		doAfter: make([]FuncWithStackInfo, 0),
 	}
 
@@ -13,7 +13,7 @@ func MakeWaitGroupSerial() WaitGroup {
 
 type waitGroupSerial struct {
 	lock    sync.Mutex
-	do      []Func
+	do      []FuncErr
 	doAfter []FuncWithStackInfo
 	isDone  bool
 }
@@ -35,7 +35,7 @@ func (wg *waitGroupSerial) GetError() (err error) {
 
 	for i := len(wg.doAfter) - 1; i >= 0; i-- {
 		doAfter := wg.doAfter[i]
-		err := doAfter.Func()
+		err := doAfter.FuncErr()
 		if err != nil {
 			me.Add(doAfter.Wrap(err))
 		}
@@ -46,7 +46,7 @@ func (wg *waitGroupSerial) GetError() (err error) {
 	return
 }
 
-func (wg *waitGroupSerial) Do(f Func) (d bool) {
+func (wg *waitGroupSerial) Do(f FuncErr) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -59,7 +59,7 @@ func (wg *waitGroupSerial) Do(f Func) (d bool) {
 	return true
 }
 
-func (wg *waitGroupSerial) DoAfter(f Func) {
+func (wg *waitGroupSerial) DoAfter(f FuncErr) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 

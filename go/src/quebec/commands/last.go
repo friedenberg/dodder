@@ -72,22 +72,23 @@ func (cmd Last) Run(dep command.Request) {
 	}
 }
 
-func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
+func (c Last) runArchive(envRepo env_repo.Env, archive repo.Repo) {
 	if (c.Edit || c.Organize) && c.Format.WasSet() {
-		repoLayout.CancelWithErrorf(
+		errors.ContextCancelWithErrorf(
+			envRepo,
 			"cannot organize, edit, or specify format for Archive repos",
 		)
 	}
 
 	// TODO replace with sku.ListFormat
 	boxFormat := box_format.MakeBoxTransactedArchive(
-		repoLayout,
+		envRepo,
 		options_print.V0{}.WithPrintTai(true),
 	)
 
 	f := string_format_writer.MakeDelim(
 		"\n",
-		repoLayout.GetUIFile(),
+		envRepo.GetUIFile(),
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return boxFormat.EncodeStringTo(o, w)
@@ -97,8 +98,8 @@ func (c Last) runArchive(repoLayout env_repo.Env, archive repo.Repo) {
 
 	f = quiter.MakeSyncSerializer(f)
 
-	if err := c.runWithInventoryList(repoLayout, archive, f); err != nil {
-		repoLayout.CancelWithError(err)
+	if err := c.runWithInventoryList(envRepo, archive, f); err != nil {
+		envRepo.Cancel(err)
 	}
 }
 
@@ -106,7 +107,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	if (c.Edit || c.Organize) && c.Format.WasSet() {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		localWorkingCopy.GetEnvRepo().CancelWithErrorf("cannot organize and edit at the same time")
+		errors.ContextCancelWithErrorf(localWorkingCopy, "cannot organize and edit at the same time")
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -123,7 +124,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 				c.Format.String(),
 				localWorkingCopy.GetEnvRepo().GetUIFile(),
 			); err != nil {
-				localWorkingCopy.GetEnvRepo().CancelWithError(err)
+				localWorkingCopy.GetEnvRepo().Cancel(err)
 			}
 		}
 	}
@@ -135,7 +136,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 		localWorkingCopy,
 		funcIter,
 	); err != nil {
-		localWorkingCopy.GetEnvRepo().CancelWithError(err)
+		localWorkingCopy.GetEnvRepo().Cancel(err)
 	}
 
 	if c.Organize {
@@ -152,12 +153,12 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 			var err error
 
 			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
-				localWorkingCopy.GetEnvRepo().CancelWithError(err)
+				localWorkingCopy.GetEnvRepo().Cancel(err)
 			}
 		}
 
 		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(results); err != nil {
-			localWorkingCopy.GetEnvRepo().CancelWithError(err)
+			localWorkingCopy.GetEnvRepo().Cancel(err)
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
@@ -169,7 +170,7 @@ func (c Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 		}
 
 		if _, err := opCheckout.Run(skus); err != nil {
-			localWorkingCopy.GetEnvRepo().CancelWithError(err)
+			localWorkingCopy.GetEnvRepo().Cancel(err)
 		}
 	}
 }

@@ -15,7 +15,7 @@ func (local *Repo) Checkin(
 	delete bool,
 	refreshCheckout bool,
 ) (processed sku.TransactedMutableSet, err error) {
-	local.Must(local.Lock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	processed = sku.MakeTransactedMutableSet()
 	sortedResults := quiter.ElementsSorted(
@@ -93,7 +93,7 @@ func (local *Repo) Checkin(
 		}
 	}
 
-	local.Must(local.Unlock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
 	return
 }

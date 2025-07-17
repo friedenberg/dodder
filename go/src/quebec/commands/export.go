@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -61,14 +62,15 @@ func (cmd Export) Run(dep command.Request) {
 		var err error
 
 		if list, err = localWorkingCopy.MakeInventoryList(queryGroup); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
 	var ag age.Age
 
 	if err := ag.AddIdentity(cmd.AgeIdentity); err != nil {
-		localWorkingCopy.CancelWithErrorAndFormat(
+		errors.ContextCancelWithErrorAndFormat(
+			localWorkingCopy,
 			err,
 			"age-identity: %q",
 			&cmd.AgeIdentity,
@@ -87,15 +89,15 @@ func (cmd Export) Run(dep command.Request) {
 			),
 			localWorkingCopy.GetUIFile(),
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
-	defer localWorkingCopy.MustClose(writeCloser)
+	defer errors.ContextMustClose(localWorkingCopy, writeCloser)
 
 	bufferedWriter := ohio.BufferedWriter(writeCloser)
 	defer pool.GetBufioWriter().Put(bufferedWriter)
-	defer localWorkingCopy.MustFlush(bufferedWriter)
+	defer errors.ContextMustFlush(localWorkingCopy, bufferedWriter)
 
 	listFormat := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
 		localWorkingCopy.GetConfig().GetStoreVersion(),
@@ -105,6 +107,6 @@ func (cmd Export) Run(dep command.Request) {
 		list,
 		bufferedWriter,
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

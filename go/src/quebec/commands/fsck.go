@@ -61,6 +61,6 @@ func (cmd Fsck) Run(dep command.Request) {
 			return
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

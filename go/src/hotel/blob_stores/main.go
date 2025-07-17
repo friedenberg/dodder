@@ -19,7 +19,7 @@ import (
 
 // TODO describe base path agnostically
 func MakeBlobStore(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	basePath string,
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,
@@ -111,7 +111,7 @@ func CopyBlob(
 		return
 	}
 
-	defer env.MustClose(rc)
+	defer errors.ContextMustClose(env, rc)
 
 	var wc sha.WriteCloser
 
@@ -122,7 +122,7 @@ func CopyBlob(
 
 	// TODO should this be closed with an error when the shas don't match to
 	// prevent a garbage object in the store?
-	defer env.MustClose(wc)
+	defer errors.ContextMustClose(env, wc)
 
 	outputWriter := io.Writer(wc)
 
@@ -153,7 +153,7 @@ func CopyBlob(
 // TODO offer options like just checking the existence of the blob, getting its
 // size, or full verification
 func VerifyBlob(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	blobStore interfaces.LocalBlobStore,
 	sh interfaces.Sha,
 	progressWriter io.Writer,
@@ -191,7 +191,7 @@ func VerifyBlob(
 
 // TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
 func MakeSSHClientForExplicitConfig(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	config blob_store_configs.ConfigSFTPConfigExplicit,
 ) (sshClient *ssh.Client, err error) {
 	sshConfig := &ssh.ClientConfig{
@@ -233,13 +233,13 @@ func MakeSSHClientForExplicitConfig(
 		return
 	}
 
-	ctx.After(sshClient.Close)
+	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 
 	return
 }
 
 func MakeSSHClientFromSSHConfig(
-	ctx errors.Context,
+	ctx interfaces.Context,
 	config blob_store_configs.ConfigSFTPUri,
 ) (sshClient *ssh.Client, err error) {
 	socket := os.Getenv("SSH_AUTH_SOCK")
@@ -257,7 +257,7 @@ func MakeSSHClientFromSSHConfig(
 		return
 	}
 
-	ctx.After(connSshSock.Close)
+	ctx.After(errors.MakeFuncContextFromFuncErr(connSshSock.Close))
 
 	ui.Log().Print("creating ssh-agent client")
 	clientAgent := agent.NewClient(connSshSock)
@@ -285,7 +285,7 @@ func MakeSSHClientFromSSHConfig(
 		return
 	}
 
-	ctx.After(sshClient.Close)
+	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 
 	return
 }

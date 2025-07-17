@@ -50,7 +50,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 		return
 	}
 
-	local.Must(local.Lock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	count := changeResults.Changed.Len()
 
@@ -62,7 +62,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 			),
 		) {
 			// TODO output organize file used
-			local.CancelWithBadRequestf("aborting")
+			errors.CancelContextWith499ClientClosedRequest(local)
 			return
 		}
 	}
@@ -89,7 +89,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 		}
 	}
 
-	local.Must(local.Unlock)
+	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
 	return
 }

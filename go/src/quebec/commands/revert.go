@@ -53,21 +53,21 @@ func (cmd Revert) Run(dep command.Request) {
 		),
 	)
 
-	localWorkingCopy.Must(localWorkingCopy.Lock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
 
 	switch {
 	case cmd.Last:
 		if err := cmd.runRevertFromLast(localWorkingCopy); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 
 	default:
 		if err := cmd.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Unlock)
+	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
 }
 
 func (c Revert) runRevertFromQuery(

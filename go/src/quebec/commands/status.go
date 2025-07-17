@@ -55,6 +55,6 @@ func (cmd Status) Run(req command.Request) {
 			return
 		},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 }

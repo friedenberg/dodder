@@ -54,7 +54,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 
 	// this command does its own error handling
 	wo := bufio.NewWriter(localWorkingCopy.GetUIFile())
-	defer localWorkingCopy.MustFlush(wo)
+	defer errors.ContextMustFlush(localWorkingCopy, wo)
 
 	var aiw alfred.Writer
 
@@ -66,7 +66,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 			var err error
 
 			if aiw, err = alfred.NewDebouncingWriter(localWorkingCopy.GetUIFile()); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 
@@ -75,7 +75,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 			var err error
 
 			if aiw, err = alfred.NewWriter(localWorkingCopy.GetUIFile(), itemPool); err != nil {
-				localWorkingCopy.CancelWithError(err)
+				localWorkingCopy.Cancel(err)
 			}
 		}
 	}
@@ -92,11 +92,11 @@ func (cmd CatAlfred) Run(dep command.Request) {
 			aiw,
 			itemPool,
 		); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
-	defer localWorkingCopy.MustClose(aw)
+	defer errors.ContextMustClose(localWorkingCopy, aw)
 
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,

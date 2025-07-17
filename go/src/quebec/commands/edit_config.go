@@ -41,21 +41,28 @@ func (cmd EditConfig) Run(
 		var err error
 
 		if sk, err = cmd.editInVim(localWorkingCopy); err != nil {
-			localWorkingCopy.CancelWithError(err)
+			localWorkingCopy.Cancel(err)
 		}
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Reset)
-	localWorkingCopy.Must(localWorkingCopy.Lock)
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Reset),
+	)
+
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock),
+	)
 
 	if err := localWorkingCopy.GetStore().CreateOrUpdateDefaultProto(
 		sk,
 		sku.StoreOptions{},
 	); err != nil {
-		localWorkingCopy.CancelWithError(err)
+		localWorkingCopy.Cancel(err)
 	}
 
-	localWorkingCopy.Must(localWorkingCopy.Unlock)
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
+	)
 }
 
 func (c EditConfig) editInVim(

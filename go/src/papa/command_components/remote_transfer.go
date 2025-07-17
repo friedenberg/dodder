@@ -30,7 +30,7 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 		// TODO continue to next if we pushed this list already
 
 		if err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 			return
 		}
 
@@ -38,7 +38,7 @@ func (cmd *RemoteTransfer) PushAllToArchive(
 			local.GetBlobStore(),
 			list,
 		); err != nil {
-			req.CancelWithError(err)
+			req.Cancel(err)
 			return
 		}
 

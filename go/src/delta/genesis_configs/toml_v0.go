@@ -29,7 +29,7 @@ type V0Private struct {
 }
 
 func (config *V0Common) SetFlagSet(flagSet *flag.FlagSet) {
-	panic(errors.ErrNotSupported)
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (config *V0Private) GetImmutableConfig() Private {
@@ -62,11 +62,11 @@ func (config V0Common) GetRepoType() repo_type.Type {
 }
 
 func (config V0Common) GetPrivateKey() repo_signing.PrivateKey {
-	panic(errors.ErrNotSupported)
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (config V0Common) GetPublicKey() repo_signing.PublicKey {
-	panic(errors.ErrNotSupported)
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (config V0Common) GetRepoId() ids.RepoId {
