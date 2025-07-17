@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -281,7 +282,12 @@ func (coder V2ObjectCoder) DecodeFrom(
 		sh.GetShaBytes(),
 		object.Metadata.RepoSig,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(
+			err,
+			"Sku: %s, Tags %s",
+			sku.String(object),
+			quiter.StringCommaSeparated(object.Metadata.GetTags()),
+		)
 		return
 	}
 

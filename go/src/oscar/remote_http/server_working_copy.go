@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -69,6 +70,8 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
+	ui.Log().Printf("read list: %d objects", list.Len())
+
 	responseBuffer := bytes.NewBuffer(nil)
 
 	// TODO make option to read from headers
@@ -78,7 +81,9 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
-	if request.Headers.Get("x-dodder-remote_transfer_options-allow_merge_conflicts") == "true" {
+	if request.Headers.Get(
+		"x-dodder-remote_transfer_options-allow_merge_conflicts",
+	) == "true" {
 		importerOptions.AllowMergeConflicts = true
 	}
 
@@ -101,6 +106,11 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		if result.Transacted.GetGenre() == genres.InventoryList {
 			requestRetry = true
 		}
+
+		ui.Log().Print(
+			"missing blob for list: %s",
+			sku.String(result.Transacted),
+		)
 
 		listMissingSkus.Add(result.Transacted.CloneTransacted())
 

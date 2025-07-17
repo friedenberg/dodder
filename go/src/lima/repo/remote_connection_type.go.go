@@ -29,28 +29,28 @@ func GetAllRemoteConnectionTypes() []RemoteConnectionType {
 	return types
 }
 
-func (t *RemoteConnectionType) Set(v string) (err error) {
-	switch strings.TrimSpace(strings.ToLower(v)) {
+func (tipe *RemoteConnectionType) Set(value string) (err error) {
+	switch strings.TrimSpace(strings.ToLower(value)) {
 	case "", "none", "unspecified":
-		*t = RemoteConnectionTypeUnspecified
+		*tipe = RemoteConnectionTypeUnspecified
 
 	case "native-dotenv-xdg":
-		*t = RemoteConnectionTypeNativeDotenvXDG
+		*tipe = RemoteConnectionTypeNativeDotenvXDG
 
 	case "socket-unix":
-		*t = RemoteConnectionTypeSocketUnix
+		*tipe = RemoteConnectionTypeSocketUnix
 
 	case "url":
-		*t = RemoteConnectionTypeUrl
+		*tipe = RemoteConnectionTypeUrl
 
 	case "stdio-local":
-		*t = RemoteConnectionTypeStdioLocal
+		*tipe = RemoteConnectionTypeStdioLocal
 
 	case "stdio-ssh":
-		*t = RemoteConnectionTypeStdioSSH
+		*tipe = RemoteConnectionTypeStdioSSH
 
 	default:
-		err = errors.ErrorWithStackf("unsupported remote type: %q", v)
+		err = errors.ErrorWithStackf("unsupported remote type: %q", value)
 		return
 	}
 

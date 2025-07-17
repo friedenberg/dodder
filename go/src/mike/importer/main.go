@@ -272,23 +272,23 @@ func (importer importer) importLeafSku(
 	return
 }
 
-func (c importer) ImportBlobIfNecessary(
+func (importer importer) ImportBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
 	blobSha := sk.GetBlobSha()
 
-	if c.remoteBlobStore == nil {
+	if importer.remoteBlobStore == nil {
 		// when this is a dumb HTTP remote, we expect local to push the missing
 		// objects to us after the import call
 
 		n := int64(-1)
 
-		if c.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
+		if importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 			n = -2
 		}
 
-		if c.blobCopierDelegate != nil {
-			if err = c.blobCopierDelegate(
+		if importer.blobCopierDelegate != nil {
+			if err = importer.blobCopierDelegate(
 				sku.BlobCopyResult{
 					Transacted: sk,
 					Sha:        blobSha,
@@ -303,21 +303,21 @@ func (c importer) ImportBlobIfNecessary(
 		return
 	}
 
-	if !c.blobGenres.Contains(sk.GetGenre()) {
+	if !importer.blobGenres.Contains(sk.GetGenre()) {
 		return
 	}
 
 	var progressWriter env_ui.ProgressWriter
 
 	if err = errors.RunChildContextWithPrintTicker(
-		c.envRepo,
+		importer.envRepo,
 		func(ctx interfaces.Context) {
 			var n int64
 
 			if n, err = blob_stores.CopyBlobIfNecessary(
-				c.envRepo,
-				c.envRepo.GetDefaultBlobStore(),
-				c.remoteBlobStore,
+				importer.envRepo,
+				importer.envRepo.GetDefaultBlobStore(),
+				importer.remoteBlobStore,
 				blobSha,
 				&progressWriter,
 			); err != nil {
@@ -334,8 +334,8 @@ func (c importer) ImportBlobIfNecessary(
 				return
 			}
 
-			if c.blobCopierDelegate != nil {
-				if err = c.blobCopierDelegate(
+			if importer.blobCopierDelegate != nil {
+				if err = importer.blobCopierDelegate(
 					sku.BlobCopyResult{
 						Transacted: sk,
 						Sha:        blobSha,

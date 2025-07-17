@@ -22,9 +22,10 @@ var (
 	// TODO use golang generation for versions
 	V10 = Version(values.Int(10))
 	V11 = Version(values.Int(11))
+	V12 = Version(values.Int(12))
 
-	VCurrent = V10
-	VNext    = V11
+	VCurrent = V11
+	VNext    = V12
 )
 
 // TODO replace with Int

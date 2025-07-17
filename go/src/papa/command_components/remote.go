@@ -32,9 +32,9 @@ type Remote struct {
 	RemoteConnectionType repo.RemoteConnectionType
 }
 
-func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Remote) SetFlagSet(flagSAet *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	f.Var(
+	flagSAet.Var(
 		&cmd.RemoteConnectionType,
 		"remote-type",
 		fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()),

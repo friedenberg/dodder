@@ -338,6 +338,11 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			return
 		}
 
+		ui.Log().Print(
+			"received missing blob list: %d",
+			listMissingSkus.Len(),
+		)
+
 		// if options.IncludeBlobs {
 		for expected := range listMissingSkus.All() {
 			errors.ContextContinueOrPanic(client.envUI)
