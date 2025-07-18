@@ -26,6 +26,8 @@ type InventoryList struct {
 	v2           inventory_list_blobs.V2
 
 	objectCoders   triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
+	// TODO rewrite these as simple bufferedreader decoders and have a utility
+	// function that turns them into a stream
 	streamDecoders map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]
 }
 
@@ -82,19 +84,19 @@ func MakeInventoryStore(
 	return s
 }
 
-func (a InventoryList) GetCommonStore() sku.BlobStore[*sku.List] {
-	return a
+func (typedBlobStore InventoryList) GetCommonStore() sku.BlobStore[*sku.List] {
+	return typedBlobStore
 }
 
-func (a InventoryList) GetObjectFormat() object_inventory_format.Format {
-	return a.objectFormat
+func (typedBlobStore InventoryList) GetObjectFormat() object_inventory_format.Format {
+	return typedBlobStore.objectFormat
 }
 
-func (a InventoryList) GetBoxFormat() *box_format.BoxTransacted {
-	return a.boxFormat
+func (typedBlobStore InventoryList) GetBoxFormat() *box_format.BoxTransacted {
+	return typedBlobStore.boxFormat
 }
 
-func (a InventoryList) GetTransactedWithBlob(
+func (typedBlobStore InventoryList) GetTransactedWithBlob(
 	inventoryList sku.TransactedGetter,
 ) (objectAndBlob sku.TransactedWithBlob[*sku.List], n int64, err error) {
 	objectAndBlob.Transacted = inventoryList.GetSku()
@@ -102,7 +104,7 @@ func (a InventoryList) GetTransactedWithBlob(
 
 	var readCloser interfaces.ShaReadCloser
 
-	if readCloser, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
+	if readCloser, err = typedBlobStore.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,7 +114,7 @@ func (a InventoryList) GetTransactedWithBlob(
 	bufferedReader := ohio.BufferedReader(readCloser)
 	defer pool.GetBufioReader().Put(bufferedReader)
 
-	if n, err = a.GetTransactedWithBlobFromReader(
+	if n, err = typedBlobStore.GetTransactedWithBlobFromReader(
 		&objectAndBlob,
 		bufferedReader,
 	); err != nil {
@@ -123,7 +125,7 @@ func (a InventoryList) GetTransactedWithBlob(
 	return
 }
 
-func (a InventoryList) GetTransactedWithBlobFromReader(
+func (typedBlobStore InventoryList) GetTransactedWithBlobFromReader(
 	twb *sku.TransactedWithBlob[*sku.List],
 	reader *bufio.Reader,
 ) (n int64, err error) {
@@ -133,7 +135,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 	switch tipe.String() {
 	case "", ids.TypeInventoryListV0:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
-			a.v0,
+			typedBlobStore.v0,
 			reader,
 			twb.Blob,
 		); err != nil {
@@ -143,7 +145,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 
 	case ids.TypeInventoryListV1:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
-			a.v1,
+			typedBlobStore.v1,
 			reader,
 			twb.Blob,
 		); err != nil {
@@ -153,7 +155,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 
 	case ids.TypeInventoryListV2:
 		if err = inventory_list_blobs.ReadInventoryListBlob(
-			a.v2,
+			typedBlobStore.v2,
 			reader,
 			twb.Blob,
 		); err != nil {
@@ -165,7 +167,7 @@ func (a InventoryList) GetTransactedWithBlobFromReader(
 	return
 }
 
-func (a InventoryList) WriteObjectToWriter(
+func (typedBlobStore InventoryList) WriteObjectToWriter(
 	tipe ids.Type,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
@@ -177,17 +179,17 @@ func (a InventoryList) WriteObjectToWriter(
 	}
 	sku.TransactedResetter.ResetWith(&typedBlob.Blob, object)
 
-	return a.objectCoders.EncodeTo(typedBlob, bufferedWriter)
+	return typedBlobStore.objectCoders.EncodeTo(typedBlob, bufferedWriter)
 }
 
-func (store InventoryList) WriteBlobToWriter(
+func (typedBlobStore InventoryList) WriteBlobToWriter(
 	tipe ids.Type,
 	list sku.Collection,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeInventoryListV0:
-		if n, err = store.v0.WriteInventoryListBlob(
+		if n, err = typedBlobStore.v0.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
 		); err != nil {
@@ -196,7 +198,7 @@ func (store InventoryList) WriteBlobToWriter(
 		}
 
 	case ids.TypeInventoryListV1:
-		if n, err = store.v1.WriteInventoryListBlob(
+		if n, err = typedBlobStore.v1.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
 		); err != nil {
@@ -205,7 +207,7 @@ func (store InventoryList) WriteBlobToWriter(
 		}
 
 	case ids.TypeInventoryListV2:
-		if n, err = store.v2.WriteInventoryListBlob(
+		if n, err = typedBlobStore.v2.WriteInventoryListBlob(
 			list,
 			bufferedWriter,
 		); err != nil {
@@ -217,7 +219,7 @@ func (store InventoryList) WriteBlobToWriter(
 	return
 }
 
-func (a InventoryList) PutTransactedWithBlob(
+func (typedBlobStore InventoryList) PutTransactedWithBlob(
 	twb sku.TransactedWithBlob[*sku.List],
 ) (err error) {
 	tipe := twb.GetType()
@@ -234,7 +236,10 @@ func (a InventoryList) PutTransactedWithBlob(
 
 type iterSku = func(*sku.Transacted) bool
 
-func (a InventoryList) StreamInventoryListBlobSkus(
+// TODO refactor all the below. Simplify the naming, and move away from the
+// stream coders, instead use a utility function like in triple_hyphen_io
+
+func (typedBlobStore InventoryList) StreamInventoryListBlobSkus(
 	transactedGetter sku.TransactedGetter,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
@@ -247,7 +252,7 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 		{
 			var err error
 
-			if readCloser, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
+			if readCloser, err = typedBlobStore.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 				yield(nil, errors.Wrap(err))
 				return
 			}
@@ -255,7 +260,7 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		iter := a.IterInventoryListBlobSkusFromReader(
+		iter := typedBlobStore.IterInventoryListBlobSkusFromReader(
 			tipe,
 			readCloser,
 		)
@@ -268,14 +273,14 @@ func (a InventoryList) StreamInventoryListBlobSkus(
 	}
 }
 
-func (a InventoryList) AllDecodedObjectsFromStream(
+func (typedBlobStore InventoryList) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[iterSku]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
 			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-				a.streamDecoders,
+				typedBlobStore.streamDecoders,
 			),
 		}
 
@@ -297,7 +302,7 @@ func (a InventoryList) AllDecodedObjectsFromStream(
 	}
 }
 
-func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
+func (typedBlobStore InventoryList) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
 	blobSha interfaces.Sha,
@@ -317,7 +322,7 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
 		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-			a.streamDecoders,
+			typedBlobStore.streamDecoders,
 		)
 
 		bufferedReader := ohio.BufferedReader(readCloser)
@@ -338,13 +343,13 @@ func (a InventoryList) IterInventoryListBlobSkusFromBlobStore(
 	}
 }
 
-func (a InventoryList) IterInventoryListBlobSkusFromReader(
+func (typedBlobStore InventoryList) IterInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-			a.streamDecoders,
+			typedBlobStore.streamDecoders,
 		)
 
 		bufferedReader := ohio.BufferedReader(reader)
@@ -365,13 +370,13 @@ func (a InventoryList) IterInventoryListBlobSkusFromReader(
 	}
 }
 
-func (a InventoryList) ReadInventoryListObject(
+func (typedBlobStore InventoryList) ReadInventoryListObject(
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
 	switch tipe.String() {
 	case "", ids.TypeInventoryListV0:
-		if _, out, err = a.v0.ReadInventoryListObject(
+		if _, out, err = typedBlobStore.v0.ReadInventoryListObject(
 			reader,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -379,7 +384,7 @@ func (a InventoryList) ReadInventoryListObject(
 		}
 
 	case ids.TypeInventoryListV1:
-		if err = a.v1.StreamInventoryListBlobSkus(
+		if err = typedBlobStore.v1.StreamInventoryListBlobSkus(
 			reader,
 			func(sk *sku.Transacted) (err error) {
 				if out == nil {
@@ -397,7 +402,7 @@ func (a InventoryList) ReadInventoryListObject(
 		}
 
 	case ids.TypeInventoryListV2:
-		if err = a.v2.StreamInventoryListBlobSkus(
+		if err = typedBlobStore.v2.StreamInventoryListBlobSkus(
 			reader,
 			func(sk *sku.Transacted) (err error) {
 				if out == nil {
@@ -418,7 +423,7 @@ func (a InventoryList) ReadInventoryListObject(
 	return
 }
 
-func (a InventoryList) ReadInventoryListBlob(
+func (typedBlobStore InventoryList) ReadInventoryListBlob(
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (list *sku.List, err error) {
@@ -428,13 +433,13 @@ func (a InventoryList) ReadInventoryListBlob(
 
 	switch tipe.String() {
 	case "", ids.TypeInventoryListV0:
-		listFormat = a.v0
+		listFormat = typedBlobStore.v0
 
 	case ids.TypeInventoryListV1:
-		listFormat = a.v1
+		listFormat = typedBlobStore.v1
 
 	case ids.TypeInventoryListV2:
-		listFormat = a.v2
+		listFormat = typedBlobStore.v2
 	}
 
 	if err = listFormat.StreamInventoryListBlobSkus(

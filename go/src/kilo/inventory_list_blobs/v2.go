@@ -256,39 +256,43 @@ func (coder V2ObjectCoder) DecodeFrom(
 		}
 	}
 
-	sh := sha.Make(object.GetTai().GetShaLike())
-	defer sha.GetPool().Put(sh)
+	if object.GetType().String() == ids.TypeInventoryListV2 {
+		sh := sha.Make(object.GetTai().GetShaLike())
+		defer sha.GetPool().Put(sh)
 
-	if len(object.Metadata.RepoPubKey) == 0 {
-		err = errors.ErrorWithStackf(
-			"RepoPubkey missing for %s. Fields: %#v",
-			sku.String(object),
-			object.Metadata.Fields,
-		)
-		return
-	}
+		if len(object.Metadata.RepoPubKey) == 0 {
+			err = errors.ErrorWithStackf(
+				"RepoPubkey missing for %s. Fields: %#v",
+				sku.String(object),
+				object.Metadata.Fields,
+			)
+			return
+		}
 
-	if object.Metadata.RepoSig.IsEmpty() {
-		err = errors.ErrorWithStackf(
-			"signature missing for %s. Fields: %#v",
-			sku.String(object),
-			object.Metadata.Fields,
-		)
-		return
-	}
+		if object.Metadata.RepoSig.IsEmpty() {
+			err = errors.ErrorWithStackf(
+				"signature missing for %s. Fields: %#v",
+				sku.String(object),
+				object.Metadata.Fields,
+			)
+			return
+		}
 
-	if err = repo_signing.VerifySignature(
-		object.Metadata.RepoPubKey,
-		sh.GetShaBytes(),
-		object.Metadata.RepoSig,
-	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Sku: %s, Tags %s",
-			sku.String(object),
-			quiter.StringCommaSeparated(object.Metadata.GetTags()),
-		)
-		return
+		if err = repo_signing.VerifySignature(
+			object.Metadata.RepoPubKey,
+			sh.GetShaBytes(),
+			object.Metadata.RepoSig,
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"Sku: %s, Tags %s",
+				sku.String(object),
+				quiter.StringCommaSeparated(object.Metadata.GetTags()),
+			)
+			return
+		}
+	} else {
+		// TODO determine how to handle this
 	}
 
 	if err = object.CalculateObjectShas(); err != nil {
