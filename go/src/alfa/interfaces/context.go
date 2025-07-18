@@ -3,6 +3,8 @@ package interfaces
 import (
 	"context"
 	"os"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
 type (
@@ -38,6 +40,7 @@ type (
 
 	Context interface {
 		ActiveContext
+		CauseWithStackFrames() (error, []stack_frame.Frame)
 		Run(func(Context)) error
 
 		// TODO extricate from *context and turn into generic function

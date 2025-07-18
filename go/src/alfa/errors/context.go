@@ -25,6 +25,10 @@ var (
 
 type context struct {
 	ConTeXT.Context
+
+	stackFramesCancel []stack_frame.Frame
+	lockCancel        sync.Mutex
+
 	funcCancel ConTeXT.CancelCauseFunc
 	funcRun    func(interfaces.Context)
 
@@ -64,6 +68,14 @@ func (ctx *context) Cause() error {
 	}
 
 	return nil
+}
+
+func (ctx *context) CauseWithStackFrames() (error, []stack_frame.Frame) {
+	if err := ctx.Cause(); err != nil {
+		return err, ctx.stackFramesCancel
+	} else {
+		return nil, nil
+	}
 }
 
 func (ctx *context) Continue() bool {

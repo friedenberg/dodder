@@ -70,7 +70,9 @@ func handleMainErrors(
 		return
 	}
 
-	errors.PrintStackTracerIfNecessary(ui.Err(), name, err)
+	_, stackFrames := ctx.CauseWithStackFrames()
+
+	errors.PrintStackTracerIfNecessary(ui.Err(), name, err, stackFrames)
 
 	return
 }
