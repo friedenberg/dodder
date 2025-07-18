@@ -10,6 +10,7 @@ func PrintStackTracerIfNecessary(
 	printer interfaces.Printer,
 	name string,
 	err error,
+	_ ...interface{},
 ) {
 	var normalError StackTracer
 

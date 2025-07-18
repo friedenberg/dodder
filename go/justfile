@@ -124,11 +124,14 @@ build-go-generate:
   go generate ./...
 
 
-build-go-binary:
-  mkdir -p build
-  go build -tags debug -o build ./cmd/*
+build-go-binary tags output:
+  mkdir -p '{{output}}'
+  go build -tags '{{tags}}' -o '{{output}}' ./cmd/*
 
-build-go: build-go-generate build-go-binary
+build-go: \
+    build-go-generate \
+    (build-go-binary "debug" "build") \
+    (build-go-binary "" "build_release") \
 
 build-nix-gomod:
   gomod2nix

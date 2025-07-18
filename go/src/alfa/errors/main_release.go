@@ -2,4 +2,4 @@
 
 package errors
 
-const debugBuild = false
+const DebugBuild = false
