@@ -7,7 +7,11 @@ type ErrNotInDodderDir struct {
 }
 
 func (err ErrNotInDodderDir) Error() string {
-	return fmt.Sprintf("not in a dodder directory. Looking for %s", err.Expected)
+	if err.Expected == "" {
+		return "not in a dodder directory."
+	} else {
+		return fmt.Sprintf("not in a dodder directory. Looking for %s", err.Expected)
+	}
 }
 
 func (err ErrNotInDodderDir) ShouldShowStackTrace() bool {

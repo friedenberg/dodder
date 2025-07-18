@@ -27,9 +27,9 @@ type Env interface {
 	AssertNotTemporaryOrOfferToCreate(interfaces.Context)
 	IsTemporary() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
+	GetWorkspaceConfigFilePath() string
 	GetDefaults() repo_config_blobs.Defaults
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
-	DeleteWorkspace() (err error)
 	GetStore() *Store
 
 	// TODO identify users of this and reduce / isolate them
@@ -226,7 +226,6 @@ func (env *env) AssertNotTemporaryOrOfferToCreate(context interfaces.Context) {
 				env:           env,
 				offerToCreate: true,
 			})
-
 	}
 }
 
@@ -267,19 +266,6 @@ func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
 	); errors.IsExist(err) {
 		err = errors.BadRequestf("workspace already exists")
 		return
-	} else if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (env *env) DeleteWorkspace() (err error) {
-	if err = env.Delete(env.GetWorkspaceConfigFilePath()); errors.IsNotExist(
-		err,
-	) {
-		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
 		return

@@ -20,10 +20,12 @@ type DirectoryLayout interface {
 	FileCacheDormant() string
 	FileCacheObjectId() string
 	FileConfigMutable() string
-	FileConfigPermanent() string
 	FileLock() string
 	FileTags() string
 	FileInventoryListLog() string
+
+	// TODO remove from DirectoryLayout and move to method on EnvRepo
+	FileConfigPermanent() string
 }
 
 type Directory interface {

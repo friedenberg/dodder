@@ -23,13 +23,6 @@ var (
 	errContextRetry     = New("context retry")
 )
 
-// TODO remove if unused
-type ContextWithEnv[T any] struct {
-	interfaces.Context
-	Env T
-}
-
-// TODO modify to implement `interfaces.Context`
 type context struct {
 	ConTeXT.Context
 	funcCancel ConTeXT.CancelCauseFunc
@@ -83,7 +76,7 @@ func (ctx *context) Continue() bool {
 	}
 }
 
-// TODO consider moving to context_util
+// TODO extricate from *context and turn into generic function
 func (ctx *context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(ctx.signals, signals...)
 }
@@ -241,6 +234,13 @@ func ContextContinueOrPanic(ctx interfaces.Context) {
 	}
 }
 
+//   ____  _                   _
+//  / ___|(_) __ _ _ __   __ _| |___
+//  \___ \| |/ _` | '_ \ / _` | / __|
+//   ___) | | (_| | | | | (_| | \__ \
+//  |____/|_|\__, |_| |_|\__,_|_|___/
+//           |___/
+
 func ContextSetCancelOnSIGTERM(ctx interfaces.Context) {
 	ctx.SetCancelOnSignals(syscall.SIGTERM)
 }
@@ -253,11 +253,18 @@ func ContextSetCancelOnSIGHUP(ctx interfaces.Context) {
 	ctx.SetCancelOnSignals(syscall.SIGHUP)
 }
 
-func CancelContextWith499ClientClosedRequest(ctx interfaces.Context) {
+//    ____                     _
+//   / ___|__ _ _ __   ___ ___| |___
+//  | |   / _` | '_ \ / __/ _ \ / __|
+//  | |__| (_| | | | | (_|  __/ \__ \
+//   \____\__,_|_| |_|\___\___|_|___/
+//
+
+func ContextCancelWith499ClientClosedRequest(ctx interfaces.Context) {
 	ctx.Cancel(Err499ClientClosedRequest)
 }
 
-func CancelWithError(ctx interfaces.Context, err error) {
+func ContextCancelWithError(ctx interfaces.Context, err error) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Cancel(WrapN(1, err))
 }
@@ -305,6 +312,13 @@ func CancelWithNotImplemented(ctx interfaces.Context) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Cancel(Err501NotImplemented)
 }
+
+//   ____                    _
+//  |  _ \ _   _ _ __  _ __ (_)_ __   __ _
+//  | |_) | | | | '_ \| '_ \| | '_ \ / _` |
+//  |  _ <| |_| | | | | | | | | | | | (_| |
+//  |_| \_\\__,_|_| |_|_| |_|_|_| |_|\__, |
+//                                   |___/
 
 func RunContextWithPrintTicker(
 	context interfaces.Context,

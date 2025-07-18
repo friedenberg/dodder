@@ -22,8 +22,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
-// TODO move to mutable config
 const (
+	// TODO move to mutable config
 	FileWorkspaceTemplate = ".%s-workspace"
 	FileWorkspace         = ".dodder-workspace"
 

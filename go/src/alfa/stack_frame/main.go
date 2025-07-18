@@ -61,6 +61,7 @@ func MustFrame(skip int) Frame {
 func MakeFrames(skip, count int) (frames []Frame) {
 	programCounters := make([]uintptr, count)
 	writtenCounters := runtime.Callers(skip+1, programCounters) // 0 is self
+
 	if writtenCounters == 0 {
 		return
 	}

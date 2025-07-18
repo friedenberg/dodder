@@ -74,7 +74,7 @@ func (exdg *XDG) InitializeOverridden(
 	toInitialize := exdg.getInitElements()
 
 	for _, ie := range toInitialize {
-		// TODO valid this to prevent root xdg directories
+		// TODO validate this to prevent root xdg directories
 		if *ie.out, err = exdg.setDefaultOrEnv(
 			ie.overridden,
 			"",

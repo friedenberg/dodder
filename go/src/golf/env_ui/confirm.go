@@ -23,6 +23,7 @@ func (env *env) Confirm(message string) (success bool) {
 	var answer rune
 	var n int
 
+	// TODO add support for context cancellation
 	if n, err = fmt.Fscanf(env.GetInFile(), "%c\n", &answer); err != nil {
 		env.GetErr().Printf("failed to read answer: %s", err)
 		return

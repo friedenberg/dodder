@@ -62,7 +62,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 			),
 		) {
 			// TODO output organize file used
-			errors.CancelContextWith499ClientClosedRequest(local)
+			errors.ContextCancelWith499ClientClosedRequest(local)
 			return
 		}
 	}

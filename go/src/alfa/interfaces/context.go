@@ -8,6 +8,9 @@ import (
 type (
 	FuncContext = func(Context) error
 
+	// TODO think about how to separate "consumers" of context, and "managers or
+	// supervisors"
+
 	ActiveContext interface {
 		context.Context
 
@@ -36,6 +39,8 @@ type (
 	Context interface {
 		ActiveContext
 		Run(func(Context)) error
+
+		// TODO extricate from *context and turn into generic function
 		SetCancelOnSignals(signals ...os.Signal)
 	}
 

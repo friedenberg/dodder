@@ -5,6 +5,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
+func Comment(_ ...string) {}
+
 func Change(_ string) {
 	ui.TodoP1("start logging this")
 }
