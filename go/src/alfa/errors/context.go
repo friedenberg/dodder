@@ -242,6 +242,8 @@ func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
 	defer ctx.lockCancel.Unlock()
 
 	defer func() {
+		// if stack_frame.MakeFrames panics, we don't want that to take anything
+		// else down
 		recover()
 	}()
 

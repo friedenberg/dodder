@@ -179,15 +179,21 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 ) (env env) {
 	env.Context = context
 
+	utilityName := XDGUtilityName
+
+	if utilityNameOverride := os.Getenv(EnvXDGUtilityNameOverride); utilityNameOverride != "" {
+		utilityName = utilityNameOverride
+	}
+
+	utilityNameWithDot := fmt.Sprintf(".%s", utilityName)
+
 	xdg := xdg.XDG{
-		Home: filepath.Join(xdgRootOverride, ".dodder"),
+		Home: filepath.Join(xdgRootOverride, utilityNameWithDot),
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
 		env.Cancel(err)
 	}
-
-	xdg.Home = filepath.Join(xdgRootOverride, ".dodder")
 
 	if err := xdg.InitializeOverridden(""); err != nil {
 		env.Cancel(err)
