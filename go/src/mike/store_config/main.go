@@ -100,45 +100,45 @@ type store struct {
 	immutable_config_private
 }
 
-func (a *store) GetCLIConfig() repo_config_cli.Config {
-	return a.cli
+func (store *store) GetCLIConfig() repo_config_cli.Config {
+	return store.cli
 }
 
-func (a *store) Reset() error {
-	a.Blob = repo_config_blobs.V1{}
-	a.ExtensionsToTypes = make(map[string]string)
-	a.TypesToExtensions = make(map[string]string)
+func (store *store) Reset() error {
+	store.Blob = repo_config_blobs.V1{}
+	store.ExtensionsToTypes = make(map[string]string)
+	store.TypesToExtensions = make(map[string]string)
 
-	a.Tags = collections_value.MakeMutableValueSet[*tag](nil)
-	a.InlineTypes = collections_value.MakeMutableValueSet[values.String](
+	store.Tags = collections_value.MakeMutableValueSet[*tag](nil)
+	store.InlineTypes = collections_value.MakeMutableValueSet[values.String](
 		nil,
 	)
-	a.ImplicitTags = make(implicitTagMap)
-	a.Repos = sku.MakeTransactedMutableSet()
-	a.Types = sku.MakeTransactedMutableSet()
+	store.ImplicitTags = make(implicitTagMap)
+	store.Repos = sku.MakeTransactedMutableSet()
+	store.Types = sku.MakeTransactedMutableSet()
 
-	sku.TransactedResetter.Reset(&a.Sku)
+	sku.TransactedResetter.Reset(&store.Sku)
 
 	return nil
 }
 
-func (a *store) GetMutableConfig() repo_config_blobs.Blob {
-	return a.mutable_config_blob
+func (store *store) GetMutableConfig() repo_config_blobs.Blob {
+	return store.mutable_config_blob
 }
 
-func (c *store) Initialize(
+func (store *store) Initialize(
 	envRepo env_repo.Env,
 	kcli repo_config_cli.Config,
 ) (err error) {
-	c.cli = kcli
-	c.Reset()
-	c.immutable_config_private = envRepo.GetConfigPrivate().Blob
+	store.cli = kcli
+	store.Reset()
+	store.immutable_config_private = envRepo.GetConfigPrivate().Blob
 
-	c.typedConfigBlobStore = typed_blob_store.MakeConfigStore(envRepo)
+	store.typedConfigBlobStore = typed_blob_store.MakeConfigStore(envRepo)
 
 	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = c.loadMutableConfig(envRepo); err != nil {
+		if err = store.loadMutableConfig(envRepo); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
@@ -154,38 +154,38 @@ func (c *store) Initialize(
 		return
 	}
 
-	c.cli.ApplyPrintOptionsConfig(c.GetPrintOptions())
+	store.cli.ApplyPrintOptionsConfig(store.GetPrintOptions())
 
 	return
 }
 
-func (kc *store) SetCli(k repo_config_cli.Config) {
-	kc.cli = k
+func (store *store) SetCli(k repo_config_cli.Config) {
+	store.cli = k
 }
 
-func (kc *store) SetCliFromCommander(k repo_config_cli.Config) {
-	oldBasePath := kc.BasePath
-	kc.cli = k
-	kc.BasePath = oldBasePath
+func (store *store) SetCliFromCommander(k repo_config_cli.Config) {
+	oldBasePath := store.BasePath
+	store.cli = k
+	store.BasePath = oldBasePath
 }
 
-func (k *store) IsDryRun() bool {
-	return k.cli.IsDryRun()
+func (store *store) IsDryRun() bool {
+	return store.cli.IsDryRun()
 }
 
-func (k *store) SetDryRun(v bool) {
-	k.cli.SetDryRun(v)
+func (store *store) SetDryRun(v bool) {
+	store.cli.SetDryRun(v)
 }
 
-func (k *store) GetTypeStringFromExtension(t string) string {
-	return k.ExtensionsToTypes[t]
+func (store *store) GetTypeStringFromExtension(t string) string {
+	return store.ExtensionsToTypes[t]
 }
 
-func (k *store) GetTypeExtension(v string) string {
-	return k.TypesToExtensions[v]
+func (store *store) GetTypeExtension(v string) string {
+	return store.TypesToExtensions[v]
 }
 
-func (k *store) AddTransacted(
+func (store *store) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
 ) (err error) {
@@ -195,19 +195,19 @@ func (k *store) AddTransacted(
 
 	switch g {
 	case genres.Type:
-		if didChange, err = k.addType(child); err != nil {
+		if didChange, err = store.addType(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if didChange {
-			k.SetNeedsRecompile(fmt.Sprintf("modified type: %s", child))
+			store.SetNeedsRecompile(fmt.Sprintf("modified type: %s", child))
 		}
 
 		return
 
 	case genres.Tag:
-		if didChange, err = k.addTag(child, parent); err != nil {
+		if didChange, err = store.addTag(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -220,7 +220,7 @@ func (k *store) AddTransacted(
 		}
 
 		if child.Metadata.GetTags().Len() > 0 {
-			k.SetNeedsRecompile(
+			store.SetNeedsRecompile(
 				fmt.Sprintf(
 					"tag with tags added: %q -> %q",
 					tag,
@@ -230,13 +230,13 @@ func (k *store) AddTransacted(
 		}
 
 	case genres.Repo:
-		if didChange, err = k.addRepo(child); err != nil {
+		if didChange, err = store.addRepo(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Config:
-		if didChange, err = k.setTransacted(child); err != nil {
+		if didChange, err = store.setTransacted(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -258,18 +258,18 @@ func (k *store) AddTransacted(
 		return
 	}
 
-	k.SetNeedsRecompile(fmt.Sprintf("modified: %s", child))
+	store.SetNeedsRecompile(fmt.Sprintf("modified: %s", child))
 
 	return
 }
 
-func (kc *store) IsInlineType(k ids.Type) (isInline bool) {
+func (store *store) IsInlineType(k ids.Type) (isInline bool) {
 	comments.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true
 	}
 
-	isInline = kc.InlineTypes.ContainsKey(k.String()) ||
+	isInline = store.InlineTypes.ContainsKey(k.String()) ||
 		ids.IsBuiltin(k)
 
 	return

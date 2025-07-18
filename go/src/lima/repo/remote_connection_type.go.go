@@ -29,6 +29,18 @@ func GetAllRemoteConnectionTypes() []RemoteConnectionType {
 	return types
 }
 
+func (tipe *RemoteConnectionType) GetCLICompletion() map[string]string {
+	return map[string]string{
+		"native-dotenv-xdg": "",
+		"none": "",
+		"socket-unix": "",
+		"stdio-local": "",
+		"stdio-ssh": "",
+		"unspecified": "",
+		"url": "",
+	}
+}
+
 func (tipe *RemoteConnectionType) Set(value string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(value)) {
 	case "", "none", "unspecified":

@@ -2,7 +2,9 @@ package command_components
 
 import (
 	"flag"
-	"fmt"
+	"maps"
+	"slices"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -32,12 +34,17 @@ type Remote struct {
 	RemoteConnectionType repo.RemoteConnectionType
 }
 
-func (cmd *Remote) SetFlagSet(flagSAet *flag.FlagSet) {
+func (cmd *Remote) SetFlagSet(flagSet *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	flagSAet.Var(
+	flagSet.Var(
 		&cmd.RemoteConnectionType,
 		"remote-type",
-		fmt.Sprintf("%q", repo.GetAllRemoteConnectionTypes()),
+		strings.Join(
+			slices.Collect(
+				maps.Keys(cmd.RemoteConnectionType.GetCLICompletion()),
+			),
+			", ",
+		),
 	)
 }
 

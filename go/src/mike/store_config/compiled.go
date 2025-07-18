@@ -36,25 +36,25 @@ func (k *compiled) GetSku() *sku.Transacted {
 	return &k.Sku
 }
 
-func (k *store) setTransacted(
+func (store *store) setTransacted(
 	kt1 *sku.Transacted,
 ) (didChange bool, err error) {
-	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
+	if !sku.TransactedLessor.LessPtr(&store.Sku, kt1) {
 		return
 	}
 
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	store.lock.Lock()
+	defer store.lock.Unlock()
 
 	didChange = true
 
-	sku.Resetter.ResetWith(&k.Sku, kt1)
+	sku.Resetter.ResetWith(&store.Sku, kt1)
 
-	k.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &k.Sku))
+	store.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &store.Sku))
 
-	if err = k.loadMutableConfigBlob(
-		k.Sku.GetType(),
-		k.Sku.GetBlobSha(),
+	if err = store.loadMutableConfigBlob(
+		store.Sku.GetType(),
+		store.Sku.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

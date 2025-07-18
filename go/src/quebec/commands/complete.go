@@ -215,23 +215,46 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	var flagCompleter command.Completer
-
 	var flag *flag.Flag
 
-	if flag = flagSet.Lookup(after); flag != nil {
-		flagCompleter, _ = flag.Value.(command.Completer)
-	}
+	if flag = flagSet.Lookup(after); flag == nil {
+		// exception
+		errors.ContextCancelWithErrorf(
+			envLocal,
+			"expected to find flag %q, but none found. All flags: %#v",
+			after,
+			flagSet,
+		)
 
-	if flagCompleter != nil {
-		flagCompleter.Complete(req, envLocal, commandLine)
 		return
 	}
 
-	errors.ContextCancelWithBadRequestf(
-		req,
-		"no completion available for flag: %q, %#v",
-		after,
-		flag,
-	)
+	flagValue := flag.Value
+
+	switch flagValue := flagValue.(type) {
+	case interface{ GetCLICompletion() map[string]string }:
+		completions := flagValue.GetCLICompletion()
+
+		for name, description := range completions {
+			if name != "" && description != "" {
+				envLocal.GetUI().Printf("%s\t%s", name, description)
+			} else if description == "" {
+				envLocal.GetUI().Printf("%s", name)
+			} else {
+				envLocal.GetErr().Printf("empty flag value for %s (description: %q)", flag.Name, description)
+			}
+		}
+
+	case command.Completer:
+		flagValue.Complete(req, envLocal, commandLine)
+
+	default:
+		errors.ContextCancelWithBadRequestf(
+			req,
+			"no completion available for flag: %q. Flag Value: %T, *flag.Flag %#v",
+			after,
+			flagValue,
+			flag,
+		)
+	}
 }

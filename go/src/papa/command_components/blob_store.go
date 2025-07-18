@@ -16,6 +16,10 @@ func (cmd *BlobStore) MakeBlobStore(
 	envRepo env_repo.Env,
 	blobStoreIndexOrConfigPath string,
 ) (blobStore env_repo.BlobStoreInitialized) {
+	if blobStoreIndexOrConfigPath == "" {
+		goto tryDefaultBlobStore
+	}
+
 	{
 		configPath := blobStoreIndexOrConfigPath
 		var typedConfig blob_store_configs.TypedConfig
@@ -86,4 +90,7 @@ tryBlobStoreIndex:
 
 		return
 	}
+
+tryDefaultBlobStore:
+	return envRepo.GetDefaultBlobStore()
 }

@@ -30,9 +30,9 @@ const (
 	FileNameBlobStoreConfig = "dodder-blob_store-config"
 )
 
-type directoryPaths interface {
-	interfaces.DirectoryPaths
-	init(interfaces.StoreVersion, xdg.XDG) error
+type directoryLayout interface {
+	interfaces.DirectoryLayout
+	initDirectoryLayout(xdg.XDG) error
 }
 
 type BlobStoreInitialized struct {
@@ -47,10 +47,9 @@ type Env struct {
 
 	config genesis_configs.TypedPrivate
 
-	readOnlyBlobStorePath string
-	lockSmith             interfaces.LockSmith
+	lockSmith interfaces.LockSmith
 
-	directoryPaths
+	directoryLayout
 
 	blobStoreDefaultIndex int
 
@@ -78,18 +77,44 @@ func Make(
 		}
 	}
 
-	env.readOnlyBlobStorePath = options.GetReadOnlyBlobStorePath()
+	xdg := env.GetXDG()
+	fileConfigPermanent := filepath.Join(xdg.Data, "config-permanent")
 
-	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
-		env.directoryPaths = &directoryV1{}
+	var configLoaded bool
+
+	if options.PermitNoDodderDirectory {
+		if env.config, err = triple_hyphen_io.DecodeFromFile(
+			genesis_configs.CoderPrivate,
+			fileConfigPermanent,
+		); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			configLoaded = true
+		}
 	} else {
-		env.directoryPaths = &directoryV2{}
+		if env.config, err = triple_hyphen_io.DecodeFromFile(
+			genesis_configs.CoderPrivate,
+			fileConfigPermanent,
+		); err != nil {
+			err = errors.Wrap(ErrNotInDodderDir{})
+			return
+		} else {
+			configLoaded = true
+		}
 	}
 
-	if err = env.directoryPaths.init(
-		env.GetStoreVersion(),
-		env.GetXDG(),
-	); err != nil {
+	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
+		env.directoryLayout = &directoryLayoutV1{}
+	} else {
+		env.directoryLayout = &directoryLayoutV2{}
+	}
+
+	if err = env.initDirectoryLayout(xdg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -102,13 +127,6 @@ func Make(
 
 	if env.DirDodder() == "" {
 		panic("empty dir dodder")
-	}
-
-	if !options.PermitNoDodderDirectory {
-		if ok := files.Exists(env.DirDodder()); !ok {
-			err = errors.Wrap(ErrNotInDodderDir{Expected: env.DirDodder()})
-			return
-		}
 	}
 
 	if err = env.MakeDirPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
@@ -127,30 +145,9 @@ func Make(
 		}
 	}
 
-	if options.PermitNoDodderDirectory {
-		if env.config, err = triple_hyphen_io.DecodeFromFile(
-			genesis_configs.CoderPrivate,
-			env.FileConfigPermanent(),
-		); err != nil {
-			if errors.IsNotExist(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	} else {
-		if env.config, err = triple_hyphen_io.DecodeFromFile(
-			genesis_configs.CoderPrivate,
-			env.FileConfigPermanent(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if configLoaded {
+		env.setupStores()
 	}
-
-	env.setupStores()
 
 	return
 }
@@ -172,6 +169,7 @@ func (env *Env) setupStores() {
 				filepath.Join(env.DirBlobStoreConfigs()),
 			); err != nil {
 				env.Cancel(err)
+				return
 			}
 		}
 

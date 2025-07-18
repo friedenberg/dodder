@@ -1,6 +1,6 @@
 package interfaces
 
-type DirectoryPaths interface {
+type DirectoryLayout interface {
 	Dir(p ...string) string
 	DirDodder(p ...string) string
 
@@ -27,7 +27,7 @@ type DirectoryPaths interface {
 }
 
 type Directory interface {
-	DirectoryPaths
+	DirectoryLayout
 	Delete(...string) error
 }
 

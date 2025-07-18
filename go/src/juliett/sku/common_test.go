@@ -28,7 +28,7 @@ func (t inlineTypChecker) IsInlineTyp(k ids.Type) bool {
 	return t.answer
 }
 
-func makeTagSet(t ui.T, vs ...string) (es ids.TagSet) {
+func makeTagSet(t *ui.TestContext, vs ...string) (es ids.TagSet) {
 	var err error
 
 	if es, err = collections_ptr.MakeValueSetString[ids.Tag, *ids.Tag](nil, vs...); err != nil {
@@ -38,7 +38,7 @@ func makeTagSet(t ui.T, vs ...string) (es ids.TagSet) {
 	return
 }
 
-func makeBlobExt(t ui.T, v string) (es ids.Type) {
+func makeBlobExt(t *ui.TestContext, v string) (es ids.Type) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
@@ -47,7 +47,7 @@ func makeBlobExt(t ui.T, v string) (es ids.Type) {
 }
 
 func readFormat(
-	t1 ui.T,
+	t1 *ui.TestContext,
 	f object_metadata.TextFormat,
 	contents string,
 ) (z *object_metadata.Metadata) {
@@ -73,7 +73,7 @@ func readFormat(
 }
 
 func TestMakeTags(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
 	vs := []string{
 		"tag1",
@@ -136,7 +136,7 @@ func TestMakeTags(t1 *testing.T) {
 }
 
 func TestEqualitySelf(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
 	text := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
@@ -155,7 +155,7 @@ func TestEqualitySelf(t1 *testing.T) {
 }
 
 func TestEqualityNotSelf(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
 	text := object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
@@ -197,8 +197,8 @@ func makeTestTextFormat(
 }
 
 func TestReadWithoutBlob(t1 *testing.T) {
-	t := ui.T{T: t1}
-	envRepo := env_repo.MakeTesting(&t, nil)
+	t := ui.MakeTestContext(t1)
+	envRepo := env_repo.MakeTesting2(t, nil)
 
 	actual := readFormat(
 		t,
@@ -234,9 +234,9 @@ func TestReadWithoutBlob(t1 *testing.T) {
 }
 
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
-	envRepo := env_repo.MakeTesting(&t, nil)
+	envRepo := env_repo.MakeTesting2(t, nil)
 
 	actual := readFormat(
 		t,
@@ -273,9 +273,9 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 }
 
 func TestReadWithBlob(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
-	envRepo := env_repo.MakeTesting(&t, nil)
+	envRepo := env_repo.MakeTesting2(t, nil)
 
 	actual := readFormat(
 		t,
@@ -322,7 +322,7 @@ func (c noopCloser) Close() error {
 }
 
 type blobReaderFactory struct {
-	t     ui.T
+	t     *ui.TestContext
 	blobs map[string]string
 }
 
@@ -342,7 +342,7 @@ func (arf blobReaderFactory) BlobReader(
 }
 
 func writeFormat(
-	t ui.T,
+	t *ui.TestContext,
 	m *object_metadata.Metadata,
 	f object_metadata.TextFormatter,
 	includeBlob bool,
@@ -384,7 +384,7 @@ func writeFormat(
 }
 
 func TestWriteWithoutBlob(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
 	z := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
@@ -397,8 +397,8 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := env_repo.MakeTesting(
-		&t,
+	envRepo := env_repo.MakeTesting2(
+		t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},
@@ -434,7 +434,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 }
 
 func TestWriteWithInlineBlob(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := ui.MakeTestContext(t1)
 
 	z := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
@@ -447,8 +447,8 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := env_repo.MakeTesting(
-		&t,
+	envRepo := env_repo.MakeTesting2(
+		t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},

@@ -23,15 +23,15 @@ func init() {
 	gob.Register(repo_config_blobs.V0{})
 }
 
-func (kc *store) recompile(
+func (store *store) recompile(
 	blobStore typed_blob_store.Stores,
 ) (err error) {
-	if err = kc.recompileTags(); err != nil {
+	if err = store.recompileTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = kc.recompileTypes(blobStore); err != nil {
+	if err = store.recompileTypes(blobStore); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -39,10 +39,10 @@ func (kc *store) recompile(
 	return
 }
 
-func (kc *store) recompileTags() (err error) {
-	kc.ImplicitTags = make(implicitTagMap)
+func (store *store) recompileTags() (err error) {
+	store.ImplicitTags = make(implicitTagMap)
 
-	if err = kc.compiled.Tags.Each(
+	if err = store.compiled.Tags.Each(
 		func(ke *tag) (err error) {
 			var e ids.Tag
 
@@ -51,7 +51,7 @@ func (kc *store) recompileTags() (err error) {
 				return
 			}
 
-			if err = kc.AccumulateImplicitTags(e); err != nil {
+			if err = store.AccumulateImplicitTags(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -66,16 +66,16 @@ func (kc *store) recompileTags() (err error) {
 	return
 }
 
-func (kc *store) recompileTypes(
+func (store *store) recompileTypes(
 	blobStore typed_blob_store.Stores,
 ) (err error) {
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		kc.InlineTypes = inlineTypes.CloneSetLike()
+		store.InlineTypes = inlineTypes.CloneSetLike()
 	}()
 
-	if err = kc.Types.Each(
+	if err = store.Types.Each(
 		func(ct *sku.Transacted) (err error) {
 			tipe := ct.GetSku().GetType()
 			var commonBlob type_blobs.Blob
@@ -102,8 +102,8 @@ func (kc *store) recompileTypes(
 			}
 
 			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypes[fe] = ct.GetObjectId().String()
-			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
+			store.ExtensionsToTypes[fe] = ct.GetObjectId().String()
+			store.TypesToExtensions[ct.GetObjectId().String()] = fe
 
 			isBinary := commonBlob.GetBinary()
 			if !isBinary {
@@ -119,25 +119,25 @@ func (kc *store) recompileTypes(
 	return
 }
 
-func (kc *store) HasChanges() (ok bool) {
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
+func (store *store) HasChanges() (ok bool) {
+	store.lock.Lock()
+	defer store.lock.Unlock()
 
-	ok = len(kc.compiled.changes) > 0
+	ok = len(store.compiled.changes) > 0
 
 	if ok {
-		ui.Log().Print(kc.compiled.changes)
+		ui.Log().Print(store.compiled.changes)
 	}
 
 	return
 }
 
-func (kc *store) GetChanges() (out []string) {
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
+func (store *store) GetChanges() (out []string) {
+	store.lock.Lock()
+	defer store.lock.Unlock()
 
-	out = make([]string, len(kc.changes))
-	copy(out, kc.changes)
+	out = make([]string, len(store.changes))
+	copy(out, store.changes)
 
 	return
 }
@@ -153,23 +153,23 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *store) loadMutableConfig(
-	dirLayout env_repo.Env,
+func (store *store) loadMutableConfig(
+	envRepo env_repo.Env,
 ) (err error) {
-	var f *os.File
+	var file *os.File
 
-	p := dirLayout.FileConfigMutable()
+	p := envRepo.FileConfigMutable()
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	dec := gob.NewDecoder(f)
+	dec := gob.NewDecoder(file)
 
-	if err = dec.Decode(&kc.compiled); err != nil {
+	if err = dec.Decode(&store.compiled); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -179,9 +179,10 @@ func (kc *store) loadMutableConfig(
 		return
 	}
 
-	if err = kc.loadMutableConfigBlob(
-		kc.Sku.GetType(),
-		kc.Sku.GetBlobSha(),
+	// TODO replace with triple_hyphen_io
+	if err = store.loadMutableConfigBlob(
+		store.Sku.GetType(),
+		store.Sku.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -190,18 +191,18 @@ func (kc *store) loadMutableConfig(
 	return
 }
 
-func (kc *store) Flush(
+func (store *store) Flush(
 	dirLayout env_repo.Env,
 	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
-	if !kc.HasChanges() || kc.IsDryRun() {
+	if !store.HasChanges() || store.IsDryRun() {
 		return
 	}
 
 	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = kc.flushMutableConfig(dirLayout, blobStore, printerHeader); err != nil {
+		if err = store.flushMutableConfig(dirLayout, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -214,12 +215,12 @@ func (kc *store) Flush(
 		return
 	}
 
-	kc.changes = kc.changes[:0]
+	store.changes = store.changes[:0]
 
 	return
 }
 
-func (kc *store) flushMutableConfig(
+func (store *store) flushMutableConfig(
 	s env_repo.Env,
 	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
@@ -229,7 +230,7 @@ func (kc *store) flushMutableConfig(
 		return
 	}
 
-	if err = kc.recompile(blobStore); err != nil {
+	if err = store.recompile(blobStore); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -247,7 +248,7 @@ func (kc *store) flushMutableConfig(
 
 	enc := gob.NewEncoder(f)
 
-	if err = enc.Encode(&kc.compiled); err != nil {
+	if err = enc.Encode(&store.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

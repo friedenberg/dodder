@@ -20,6 +20,13 @@ import (
 )
 
 func (env *Env) Genesis(bigBang BigBang) {
+	if env.directoryLayout == nil {
+		errors.ContextCancelWithErrorf(
+			env,
+			"directory layout not initialized",
+		)
+	}
+
 	if err := bigBang.GenesisConfig.Blob.GeneratePrivateKey(); err != nil {
 		env.Cancel(err)
 		return

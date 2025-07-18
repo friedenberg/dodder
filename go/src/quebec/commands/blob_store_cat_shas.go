@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -26,15 +25,17 @@ func (cmd BlobStoreCatShas) CompletionGenres() ids.Genre {
 
 func (cmd BlobStoreCatShas) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
-	var blobStore env_repo.BlobStoreInitialized
+	var blobStoreIndexOrConfigPath string
 
-	if req.RemainingArgCount() == 0 {
-		blobStore = envRepo.GetDefaultBlobStore()
-	} else {
-		blobStore = cmd.MakeBlobStore(envRepo, req.PopArg("blob store id or blob store config path"))
+	if req.RemainingArgCount() == 1 {
+		blobStoreIndexOrConfigPath = req.PopArg(
+			"blob store id or blob store config path",
+		)
 	}
 
 	req.AssertNoMoreArgs()
+
+	blobStore := cmd.MakeBlobStore(envRepo, blobStoreIndexOrConfigPath)
 
 	for sh, err := range blobStore.AllBlobs() {
 		errors.ContextContinueOrPanic(envRepo)

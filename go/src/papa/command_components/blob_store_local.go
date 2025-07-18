@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
+// TODO remove and replace with BlobStore
 type BlobStoreLocal struct{}
 
 func (cmd *BlobStoreLocal) SetFlagSet(flagSet *flag.FlagSet) {

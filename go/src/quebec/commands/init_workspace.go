@@ -33,23 +33,23 @@ type InitWorkspace struct {
 	Proto             sku.Proto
 }
 
-func (cmd *InitWorkspace) SetFlagSet(f *flag.FlagSet) {
-	cmd.LocalWorkingCopy.SetFlagSet(f)
+func (cmd *InitWorkspace) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 	// TODO add command.Completer variants of tags, type, and query flags
 
-	f.Var(
+	flagSet.Var(
 		cmd.complete.GetFlagValueMetadataTags(&cmd.Proto.Metadata),
 		"tags",
 		"tags added for new objects in `checkin`, `new`, `organize`",
 	)
 
-	f.Var(
+	flagSet.Var(
 		cmd.complete.GetFlagValueMetadataType(&cmd.Proto.Metadata),
 		"type",
 		"type used for new objects in `new` and `organize`",
 	)
 
-	f.Var(
+	flagSet.Var(
 		cmd.complete.GetFlagValueStringTags(&cmd.DefaultQueryGroup),
 		"query",
 		"default query for `show`",

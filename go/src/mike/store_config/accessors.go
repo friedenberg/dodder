@@ -17,12 +17,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (c *store) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
+func (store *store) GetZettelFileExtension() string {
+	return fmt.Sprintf(".%s", store.GetFileExtensions().GetFileExtensionZettel())
 }
 
-func (kc *store) GetImmutableConfig() genesis_configs.Private {
-	return kc.immutable_config_private
+func (store *store) GetImmutableConfig() genesis_configs.Private {
+	return store.immutable_config_private
 }
 
 func (kc *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
@@ -233,6 +233,6 @@ func (c *compiled) GetImplicitTags(
 	return s
 }
 
-func (kc *store) Cli() repo_config_cli.Config {
-	return kc.cli
+func (store *store) Cli() repo_config_cli.Config {
+	return store.cli
 }

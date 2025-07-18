@@ -28,34 +28,34 @@ func MakeTesting(
 		func(ctx interfaces.Context) {
 			dirTemp := t.TempDir()
 
-			envDir := env_dir.MakeWithHome(
+			envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
 				ctx,
 				dirTemp,
-				debug.Options{
-					NoTempDirCleanup: true,
-				},
-				false,
-				true,
+				debug.Options{},
 			)
 
-			var err error
+			var envRepo Env
 
-			if envRepo, err = Make(
-				env_local.Make(env_ui.MakeDefault(ctx), envDir),
-				Options{
-					BasePath:                dirTemp,
-					PermitNoDodderDirectory: true,
-				},
-			); err != nil {
-				t.Fatalf("failed to make envRepo: %s", err)
+			{
+				var err error
+
+				if envRepo, err = Make(
+					env_local.Make(env_ui.MakeDefault(ctx), envDir),
+					Options{
+						BasePath:                dirTemp,
+						PermitNoDodderDirectory: true,
+					},
+				); err != nil {
+					errors.ContextCancelWithErrorAndFormat(ctx, err, "EnvRepo: %#v", envRepo)
+				}
 			}
 
 			var bigBang BigBang
 
 			bigBang.SetDefaults()
 
-			ui.Debug().Print(bigBang.GenesisConfig)
 			envRepo.Genesis(bigBang)
+			ui.Debug().Print(envRepo)
 
 			if contents == nil {
 				return
@@ -66,17 +66,28 @@ func MakeTesting(
 
 				writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
 				if err != nil {
-					t.Fatalf("failed to make blob writer: %s", err)
+					errors.ContextCancelWithErrorAndFormat(
+						ctx,
+						err,
+						"failed to make blob writer",
+					)
 				}
 
 				_, err = io.Copy(writeCloser, strings.NewReader(content))
 				if err != nil {
-					t.Fatalf("failed to write string to blob writer: %s", err)
+					errors.ContextCancelWithErrorAndFormat(
+						ctx,
+						err,
+						"failed to write string to blob writer",
+					)
 				}
 
 				err = writeCloser.Close()
 				if err != nil {
-					t.Fatalf("failed to write string to blob writer: %s", err)
+					errors.ContextCancelWithErrorAndFormat(
+						ctx,
+						err, "failed to write string to blob writer",
+					)
 				}
 
 				shActual := writeCloser.GetShaLike()
@@ -84,12 +95,103 @@ func MakeTesting(
 
 				err = expected.AssertEqualsShaLike(shActual)
 				if err != nil {
-					t.Fatalf("sha mismatch: %s. %s, %q", err, shaExpected, content)
+					errors.ContextCancelWithErrorAndFormat(
+						ctx,
+						err, "sha mismatch: %s, %q", shaExpected, content,
+					)
 				}
 			}
 		},
 	); err != nil {
-		t.Errorf("making envRepo failed: %s", err)
+		t.Fatalf("making envRepo failed: %s", err)
+	}
+
+	return
+}
+
+func MakeTesting2(
+	t *ui.TestContext,
+	contents map[string]string,
+) (envRepo Env) {
+	t = t.Skip(1)
+
+	dirTemp := t.TempDir()
+
+	envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
+		t.Context,
+		dirTemp,
+		debug.Options{},
+	)
+
+	{
+		var err error
+
+		if envRepo, err = Make(
+			env_local.Make(env_ui.MakeDefault(t.Context), envDir),
+			Options{
+				BasePath:                dirTemp,
+				PermitNoDodderDirectory: true,
+			},
+		); err != nil {
+			errors.ContextCancelWithErrorAndFormat(
+				t.Context,
+				err,
+				"EnvRepo: %#v",
+				envRepo,
+			)
+		}
+	}
+
+	var bigBang BigBang
+
+	bigBang.SetDefaults()
+
+	envRepo.Genesis(bigBang)
+	ui.Debug().Print(envRepo)
+
+	if contents == nil {
+		return
+	}
+
+	for shaExpected, content := range contents {
+		var writeCloser sha.WriteCloser
+
+		writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
+		if err != nil {
+			errors.ContextCancelWithErrorAndFormat(
+				t.Context,
+				err,
+				"failed to make blob writer",
+			)
+		}
+
+		_, err = io.Copy(writeCloser, strings.NewReader(content))
+		if err != nil {
+			errors.ContextCancelWithErrorAndFormat(
+				t.Context,
+				err,
+				"failed to write string to blob writer",
+			)
+		}
+
+		err = writeCloser.Close()
+		if err != nil {
+			errors.ContextCancelWithErrorAndFormat(
+				t.Context,
+				err, "failed to write string to blob writer",
+			)
+		}
+
+		shActual := writeCloser.GetShaLike()
+		expected := sha.Must(shaExpected)
+
+		err = expected.AssertEqualsShaLike(shActual)
+		if err != nil {
+			errors.ContextCancelWithErrorAndFormat(
+				t.Context,
+				err, "sha mismatch: %s, %q", shaExpected, content,
+			)
+		}
 	}
 
 	return
