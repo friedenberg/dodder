@@ -213,14 +213,39 @@ func (ctx *context) Must(f interfaces.FuncContext) {
 	}
 }
 
+//go:noinline
 func (ctx *context) Cancel(err error) {
 	defer ContextContinueOrPanic(ctx)
 
 	if err == nil {
 		ctx.cancel(errContextCancelled)
-	} else {
-		ctx.cancel(WrapN(1, err))
+		return
 	}
+
+	// TODO figure out why this needs to be 2
+	ctx.captureCancelStackFramesIfNecessary(2, err)
+	ctx.cancel(WrapN(1, err))
+}
+
+//go:noinline
+func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
+	if !DebugBuild {
+		return
+	}
+
+	switch err {
+	case errContextComplete, errContextCancelled:
+		return
+	}
+
+	ctx.lockCancel.Lock()
+	defer ctx.lockCancel.Unlock()
+
+	defer func() {
+		recover()
+	}()
+
+	ctx.stackFramesCancel = stack_frame.MakeFrames(1+skip, 16)
 }
 
 //   __  __           _
