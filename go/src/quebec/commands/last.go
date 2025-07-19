@@ -193,21 +193,24 @@ func (cmd Last) runWithInventoryList(
 		envRepo,
 	)
 
-	var listWithBlob sku.TransactedWithBlob[*sku.List]
-
-	if listWithBlob, _, err = inventoryListBlobStore.GetTransactedWithBlob(
+	seq := inventoryListBlobStore.StreamInventoryListBlobSkus(
 		listObject,
-	); err != nil {
-		err = errors.Wrapf(err, "InventoryList: %q", sku.String(listObject))
-		return
-	}
+	)
 
-	ui.TodoP3("support log line format for skus")
-	for sk := range listWithBlob.Blob.All() {
-		if err = funcIter(sk); err != nil {
-			err = errors.Wrap(err)
-			return
+	for sk, seqError := range seq {
+		if seqError != nil {
+			ui.Err().Print(seqError)
+			continue
 		}
+
+		func() {
+			// defer sku.GetTransactedPool().Put(sk)
+
+			if err = funcIter(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}()
 	}
 
 	return

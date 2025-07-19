@@ -16,18 +16,13 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var (
-	// TODO modify these sentinel errors to all be the same structure with a
-	// state enum, and then modify interfaces.Context to expose that state in a
-	// `GetState()` method that will replace `Continue()`
-	errContextCompleteSuccess = New("context complete success")
-	errContextCompleteUnknown = New("context complete unknown")
-	errContextCompleteAborted = New("context complete aborted")
-	errContextRetry           = New("context retry")
-)
+var errContextRetry = New("context retry")
 
 type context struct {
 	ConTeXT.Context
+
+	stateLock sync.Mutex
+	state     interfaces.ContextState
 
 	stackFramesCancel []stack_frame.Frame
 	lockCancel        sync.Mutex
@@ -62,7 +57,7 @@ func MakeContext(in ConTeXT.Context) *context {
 func (ctx *context) Cause() error {
 	if err := ConTeXT.Cause(ctx.Context); err != nil {
 		switch err {
-		case errContextCompleteSuccess, errContextCompleteAborted:
+		case interfaces.ContextStateSucceeded, interfaces.ContextStateAborted:
 			return nil
 
 		default:
@@ -81,13 +76,14 @@ func (ctx *context) CauseWithStackFrames() (error, []stack_frame.Frame) {
 	}
 }
 
-func (ctx *context) Continue() bool {
+func (ctx *context) GetState() interfaces.ContextState {
 	select {
 	default:
-		return true
+		return interfaces.ContextStateStarted
 
 	case <-ctx.Done():
-		return false
+		// TODO identify the right terminal state
+		return interfaces.ContextStateSucceeded
 	}
 }
 
@@ -149,7 +145,7 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 	}()
 
 	ctx.funcRun(ctx)
-	ctx.cancel(errContextCompleteSuccess)
+	ctx.cancel(interfaces.ContextStateSucceeded)
 
 	return
 }
@@ -220,7 +216,7 @@ func (ctx *context) Cancel(err error) {
 	defer ContextContinueOrPanic(ctx)
 
 	if err == nil {
-		ctx.cancel(errContextCompleteAborted)
+		ctx.cancel(interfaces.ContextStateAborted)
 		return
 	}
 
@@ -238,7 +234,7 @@ func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
 	}
 
 	switch err {
-	case errContextCompleteSuccess, errContextCompleteAborted:
+	case interfaces.ContextStateSucceeded, interfaces.ContextStateAborted:
 		return
 	}
 
@@ -272,8 +268,8 @@ func ContextMustFlush(ctx interfaces.Context, flusher Flusher) {
 }
 
 func ContextContinueOrPanic(ctx interfaces.Context) {
-	if !ctx.Continue() {
-		panic(errContextCompleteAborted)
+	if state := ctx.GetState(); state.IsComplete() {
+		panic(state)
 	}
 }
 

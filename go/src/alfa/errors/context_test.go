@@ -19,11 +19,13 @@ func TestContextCancelled(t *testing.T) {
 			defer func() {
 				t.Log("defer1")
 
-				if r := recover(); r != nil {
+				if actual := recover(); actual != nil {
 					t.Log("recover")
 
-					if r != errContextCompleteAborted {
-						t.Errorf("expected recover to be %q", errContextCompleteAborted)
+					expected := interfaces.ContextStateSucceeded
+
+					if actual != expected {
+						t.Errorf("expected recover to be %q, but was %q", expected, actual)
 					}
 				}
 			}()

@@ -7,6 +7,33 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
+//go:generate stringer -type=ContextState
+type ContextState uint8
+
+const (
+	ContextStateUnknown = ContextState(iota)
+	ContextStateUnstarted
+	// all states that are > than `ContextStateStarted` are considered terminal,
+	// so the order here is important
+	ContextStateStarted
+	ContextStateSucceeded
+	ContextStateFailed
+	ContextStateAborted
+)
+
+func (state ContextState) IsComplete() bool {
+	return state > ContextStateStarted
+}
+
+func (state ContextState) Error() string {
+	return state.String()
+}
+
+func (state ContextState) Is(target error) bool {
+	_, ok := target.(ContextState)
+	return ok
+}
+
 type (
 	FuncContext = func(Context) error
 
@@ -17,9 +44,7 @@ type (
 		context.Context
 
 		Cause() error
-		// returns true if the context is still active, or false if it's been
-		// cancelled for any reason
-		Continue() bool
+		GetState() ContextState
 
 		// TODO disambiguate between errors and exceptions
 		// TODO rename this to Complete
