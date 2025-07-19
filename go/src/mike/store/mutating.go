@@ -89,6 +89,8 @@ func (store *Store) Commit(
 
 	ui.Log().Printf("%s -> %s", options, child)
 
+	// TODO remove this lock check and perform it when actually necessary (when
+	// persisting the changes).
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() &&
 		(options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{

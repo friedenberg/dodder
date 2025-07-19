@@ -99,6 +99,8 @@ func (importer importer) Import(
 		return
 	}
 
+	// TODO handle repo signing
+
 	if external.GetGenre() == genres.InventoryList {
 		if co, err = importer.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
@@ -117,6 +119,11 @@ func (importer importer) Import(
 func (importer importer) importInventoryList(
 	listObject *sku.Transacted,
 ) (checkedOut *sku.CheckedOut, err error) {
+	if err = genres.InventoryList.AssertGenre(listObject.GetGenre()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	blobSha := listObject.GetBlobSha()
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
@@ -124,15 +131,6 @@ func (importer importer) importInventoryList(
 			ShaGetter: blobSha,
 		}
 
-		return
-	}
-	// if importer.remoteBlobStore == nil {
-	// 	err = errors.Errorf("RemoteBlobStore is nil")
-	// 	return
-	// }
-
-	if err = genres.InventoryList.AssertGenre(listObject.GetGenre()); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -168,6 +166,7 @@ func (importer importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
+		// TODO remove this, it's expensive
 		err = errors.ErrorWithStackf("skipping because objects are excluded")
 		return
 	}
