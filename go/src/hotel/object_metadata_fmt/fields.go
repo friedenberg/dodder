@@ -4,9 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -95,10 +93,7 @@ func MetadataFieldRepoPubKey(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value: blech32.Value{
-			HRP:  repo_signing.HRPRepoPubKeyV1,
-			Data: metadata.RepoPubKey,
-		}.String(),
+		Value:      metadata.GetRepoPubkeyValue().String(),
 		NoTruncate: true,
 		ColorType:  string_format_writer.ColorTypeHash,
 	}
@@ -108,10 +103,7 @@ func MetadataFieldRepoSig(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value: blech32.Value{
-			HRP:  repo_signing.HRPRepoSigV1,
-			Data: metadata.RepoSig,
-		}.String(),
+		Value:      metadata.GetRepoSigValue().String(),
 		NoTruncate: true,
 		ColorType:  string_format_writer.ColorTypeHash,
 	}

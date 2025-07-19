@@ -280,7 +280,7 @@ LOOP_AFTER_OID:
 						return
 					}
 
-					object.Metadata.RepoPubKey = pubKey.Data
+					object.Metadata.RepoPubkey = pubKey.Data
 
 				} else if strings.HasPrefix(value, repo_signing.HRPRepoSigV1) {
 					var repoSig blech32.Value

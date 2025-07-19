@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/flag_policy"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/flag"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -20,7 +21,7 @@ type Field = string_format_writer.Field
 
 type Metadata struct {
 	// Domain
-	RepoPubKey repo_signing.PublicKey
+	RepoPubkey repo_signing.PublicKey
 	RepoSig    repo_signing.Data
 	// InventoryListTai
 
@@ -312,4 +313,18 @@ func (metadata *Metadata) GenerateExpandedTags() {
 		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))
+}
+
+func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
+	return blech32.Value{
+		HRP:  repo_signing.HRPRepoPubKeyV1,
+		Data: metadata.RepoPubkey,
+	}
+}
+
+func (metadata *Metadata) GetRepoSigValue() blech32.Value {
+	return blech32.Value{
+		HRP:  repo_signing.HRPRepoSigV1,
+		Data: metadata.RepoSig,
+	}
 }

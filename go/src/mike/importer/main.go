@@ -99,8 +99,6 @@ func (importer importer) Import(
 		return
 	}
 
-	// TODO handle repo signing
-
 	if external.GetGenre() == genres.InventoryList {
 		if co, err = importer.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
@@ -152,6 +150,14 @@ func (importer importer) importInventoryList(
 		}
 	}
 
+	// TODO decide whether we should rewrite the imported inventory list
+	// according to this repo's inventory list type
+	// inventoryListTypeString := importer.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString()
+
+	// if listObject.GetType().String() != inventoryListTypeString {
+	// 	listObject.Metadata.Type = ids.GetOrPanic(inventoryListTypeString).Type
+	// }
+
 	if checkedOut, err = importer.importLeafSku(
 		listObject,
 	); err != nil {
@@ -181,6 +187,16 @@ func (importer importer) importLeafSku(
 	co = sku.GetCheckedOutPool().Get()
 
 	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
+
+	// TODO set this as an importer option
+	if co.GetSkuExternal().Metadata.RepoSig.IsEmpty() {
+		if err = co.GetSkuExternal().Sign(
+			importer.envRepo.GetConfigPrivate().Blob,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	if err = co.GetSkuExternal().CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)

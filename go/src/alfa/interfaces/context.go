@@ -20,7 +20,9 @@ type (
 		// returns true if the context is still active, or false if it's been
 		// cancelled for any reason
 		Continue() bool
+
 		// TODO disambiguate between errors and exceptions
+		// TODO rename this to Complete
 		Cancel(error)
 
 		// `After` runs a function after the context is complete (regardless of

@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"runtime/debug"
 	"sync"
 	"syscall"
 	"time"
@@ -18,9 +17,13 @@ import (
 )
 
 var (
-	errContextComplete  = New("context complete")
-	errContextCancelled = New("context cancelled")
-	errContextRetry     = New("context retry")
+	// TODO modify these sentinel errors to all be the same structure with a
+	// state enum, and then modify interfaces.Context to expose that state in a
+	// `GetState()` method that will replace `Continue()`
+	errContextCompleteSuccess = New("context complete success")
+	errContextCompleteUnknown = New("context complete unknown")
+	errContextCompleteAborted = New("context complete aborted")
+	errContextRetry           = New("context retry")
 )
 
 type context struct {
@@ -59,7 +62,7 @@ func MakeContext(in ConTeXT.Context) *context {
 func (ctx *context) Cause() error {
 	if err := ConTeXT.Cause(ctx.Context); err != nil {
 		switch err {
-		case errContextComplete, errContextCancelled:
+		case errContextCompleteSuccess, errContextCompleteAborted:
 			return nil
 
 		default:
@@ -130,15 +133,14 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 				return
 			}
 
-			// TODO capture panic stack trace and add to custom error objects
 			switch err := r.(type) {
 			default:
-				fmt.Printf("%s", debug.Stack())
-				panic(r)
+				ctx.captureCancelStackFramesIfNecessary(2, nil)
+				ctx.cancel(xerrors.Errorf("context failed: %w", err))
 
 			case runtime.Error:
-				fmt.Printf("%s", debug.Stack())
-				panic(r)
+				ctx.captureCancelStackFramesIfNecessary(2, err)
+				ctx.cancel(err)
 
 			case error:
 				ctx.cancel(err)
@@ -147,7 +149,7 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 	}()
 
 	ctx.funcRun(ctx)
-	ctx.cancel(errContextComplete)
+	ctx.cancel(errContextCompleteSuccess)
 
 	return
 }
@@ -218,7 +220,7 @@ func (ctx *context) Cancel(err error) {
 	defer ContextContinueOrPanic(ctx)
 
 	if err == nil {
-		ctx.cancel(errContextCancelled)
+		ctx.cancel(errContextCompleteAborted)
 		return
 	}
 
@@ -228,6 +230,7 @@ func (ctx *context) Cancel(err error) {
 }
 
 // TODO add interface for adding stack frames to the cancellation error
+//
 //go:noinline
 func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
 	if !DebugBuild {
@@ -235,7 +238,7 @@ func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
 	}
 
 	switch err {
-	case errContextComplete, errContextCancelled:
+	case errContextCompleteSuccess, errContextCompleteAborted:
 		return
 	}
 
@@ -270,7 +273,7 @@ func ContextMustFlush(ctx interfaces.Context, flusher Flusher) {
 
 func ContextContinueOrPanic(ctx interfaces.Context) {
 	if !ctx.Continue() {
-		panic(errContextCancelled)
+		panic(errContextCompleteAborted)
 	}
 }
 

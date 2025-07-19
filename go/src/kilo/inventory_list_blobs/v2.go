@@ -60,7 +60,7 @@ func (format V2) WriteObjectToOpenList(
 		return
 	}
 
-	if len(object.Metadata.RepoPubKey) == 0 {
+	if len(object.Metadata.RepoPubkey) == 0 {
 		err = errors.Errorf("repo pubkey empty")
 		return
 	}
@@ -260,7 +260,7 @@ func (coder V2ObjectCoder) DecodeFrom(
 		sh := sha.Make(object.GetTai().GetShaLike())
 		defer sha.GetPool().Put(sh)
 
-		if len(object.Metadata.RepoPubKey) == 0 {
+		if len(object.Metadata.RepoPubkey) == 0 {
 			err = errors.ErrorWithStackf(
 				"RepoPubkey missing for %s. Fields: %#v",
 				sku.String(object),
@@ -279,7 +279,7 @@ func (coder V2ObjectCoder) DecodeFrom(
 		}
 
 		if err = repo_signing.VerifySignature(
-			object.Metadata.RepoPubKey,
+			object.Metadata.RepoPubkey,
 			sh.GetShaBytes(),
 			object.Metadata.RepoSig,
 		); err != nil {

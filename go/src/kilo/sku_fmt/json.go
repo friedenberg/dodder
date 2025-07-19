@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -15,16 +16,18 @@ import (
 )
 
 type Json struct {
-	BlobSha     string   `json:"blob-sha"`
-	BlobString  string   `json:"blob-string"`
-	Date        string   `json:"date"`
-	Description string   `json:"description"`
-	Dormant     bool     `json:"dormant"`
-	ObjectId    string   `json:"object-id"`
-	Sha         string   `json:"sha"`
-	Tags        []string `json:"tags"`
-	Tai         string   `json:"tai"`
-	Type        string   `json:"type"`
+	BlobSha     string        `json:"blob-sha"`
+	BlobString  string        `json:"blob-string"`
+	Date        string        `json:"date"`
+	Description string        `json:"description"`
+	Dormant     bool          `json:"dormant"`
+	ObjectId    string        `json:"object-id"`
+	RepoPubkey  blech32.Value `json:"repo-pub_key"`
+	RepoSig     blech32.Value `json:"repo-sig"`
+	Sha         string        `json:"sha"`
+	Tags        []string      `json:"tags"`
+	Tai         string        `json:"tai"`
+	Type        string        `json:"type"`
 }
 
 func (json *Json) FromStringAndMetadata(
@@ -54,6 +57,8 @@ func (json *Json) FromStringAndMetadata(
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
+	json.RepoPubkey = metadata.GetRepoPubkeyValue()
+	json.RepoSig = metadata.GetRepoSigValue()
 	json.Sha = metadata.SelfMetadataWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
@@ -67,10 +72,17 @@ func (json *Json) FromTransacted(
 	object *sku.Transacted,
 	envRepo env_repo.Env,
 ) (err error) {
-	return json.FromStringAndMetadata(object.ObjectId.String(), object.GetMetadata(), envRepo)
+	return json.FromStringAndMetadata(
+		object.ObjectId.String(),
+		object.GetMetadata(),
+		envRepo,
+	)
 }
 
-func (json *Json) ToTransacted(object *sku.Transacted, envRepo env_repo.Env) (err error) {
+func (json *Json) ToTransacted(
+	object *sku.Transacted,
+	envRepo env_repo.Env,
+) (err error) {
 	var writeCloser sha.WriteCloser
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
@@ -112,6 +124,9 @@ func (json *Json) ToTransacted(object *sku.Transacted, envRepo env_repo.Env) (er
 
 	object.Metadata.SetTags(es)
 	object.Metadata.GenerateExpandedTags()
+
+	object.Metadata.RepoPubkey = json.RepoPubkey.Data
+	object.Metadata.RepoSig = json.RepoSig.Data
 
 	return
 }

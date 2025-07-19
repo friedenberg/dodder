@@ -163,6 +163,7 @@ func (s *Transacted) CalculateObjectShaDebug() (err error) {
 	return s.calculateObjectSha(true)
 }
 
+// TODO replace this with repo signatures
 func (s *Transacted) CalculateObjectShas() (err error) {
 	return s.calculateObjectSha(false)
 }
@@ -254,7 +255,7 @@ func (transacted *Transacted) GetKey() string {
 func (transacted *Transacted) Sign(
 	config genesis_configs.Private,
 ) (err error) {
-	transacted.Metadata.RepoPubKey = config.GetPublicKey()
+	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
 	sh := sha.Make(transacted.GetTai().GetShaLike())
 	defer sha.GetPool().Put(sh)

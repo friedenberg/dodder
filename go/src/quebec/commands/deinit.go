@@ -80,7 +80,8 @@ func (cmd Deinit) Run(req command.Request) {
 
 	sort.Strings(filesAndDirectories)
 
-	if repo, ok := localWorkingCopy.(repo.LocalWorkingCopy); ok {
+	if repo, ok := localWorkingCopy.(repo.LocalWorkingCopy); ok &&
+		!repo.GetEnvWorkspace().IsTemporary() {
 		workspaceConfigFilePath := repo.GetEnvWorkspace().GetWorkspaceConfigFilePath()
 
 		if workspaceConfigFilePath != "" {
@@ -90,6 +91,8 @@ func (cmd Deinit) Run(req command.Request) {
 			)
 		}
 	}
+	
+	// TODO decide whether the workspace directory should be deleted too
 
 	if !cmd.Force &&
 		!envRepo.Confirm(

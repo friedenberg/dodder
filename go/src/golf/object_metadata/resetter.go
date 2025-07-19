@@ -14,7 +14,7 @@ func (resetter) Reset(metadata *Metadata) {
 	metadata.Description.Reset()
 	metadata.Comments = metadata.Comments[:0]
 	metadata.RepoSig = nil
-	metadata.RepoPubKey = nil
+	metadata.RepoPubkey = nil
 	metadata.ResetTags()
 	ResetterCache.Reset(&metadata.Cache)
 	metadata.Type = ids.Type{}
@@ -33,7 +33,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 
 	dst.RepoSig.ResetWith(src.RepoSig)
-	dst.RepoPubKey.ResetWith(src.RepoPubKey)
+	dst.RepoPubkey.ResetWith(src.RepoPubkey)
 
 	dst.Type = src.Type
 	dst.Tai = src.Tai
