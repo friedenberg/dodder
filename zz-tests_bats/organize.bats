@@ -375,7 +375,7 @@ function organize_dry_run { # @test
 	expected_show="$(mktemp)"
 
 	run_dodder show "${cmd_dodder_def[@]}" -format log :z,e,t
-  expected_show="$output"
+	expected_show="$output"
 
 	run_dodder organize -dry-run -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
@@ -1316,7 +1316,7 @@ function organize_new_objects_default_tags { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+		[konfig @e2d4dd609d2ee1165e66f199930621a493a4440303fd6f55e3bf9bf34b936f09 !toml-config-v1]
 	EOM
 
 	run_dodder organize -mode output-only
@@ -1437,7 +1437,7 @@ function organize_default_tags_workspace { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+		[konfig @e2d4dd609d2ee1165e66f199930621a493a4440303fd6f55e3bf9bf34b936f09 !toml-config-v1]
 	EOM
 
 	cat >.dodder-workspace <<-EOM

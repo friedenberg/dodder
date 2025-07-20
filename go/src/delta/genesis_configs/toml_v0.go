@@ -32,17 +32,17 @@ func (config *V0Common) SetFlagSet(flagSet *flag.FlagSet) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *V0Private) GetImmutableConfig() Private {
+func (config *V0Private) GetImmutableConfig() BlobPrivate {
 	return config
 }
 
-func (config *V0Private) GetImmutableConfigPublic() Public {
+func (config *V0Private) GetImmutableConfigPublic() BlobPublic {
 	return &V0Public{
 		V0Common: config.V0Common,
 	}
 }
 
-func (config *V0Public) GetImmutableConfigPublic() Public {
+func (config *V0Public) GetImmutableConfigPublic() BlobPublic {
 	return config
 }
 

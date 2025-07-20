@@ -8,12 +8,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 )
 
 type (
 	Blob interface {
-		GetDefaults() repo_config_blobs.Defaults
+		GetDefaults() repo_configs.Defaults
 		GetDefaultQueryGroup() string
 	}
 )

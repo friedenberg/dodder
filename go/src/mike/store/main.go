@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -25,7 +25,7 @@ import (
 
 type Store struct {
 	sunrise      ids.Tai
-	config       store_config.StoreMutable
+	storeConfig  store_config.StoreMutable
 	envRepo      env_repo.Env
 	envWorkspace env_workspace.Env
 
@@ -35,7 +35,7 @@ type Store struct {
 
 	inventoryList          *sku.OpenList
 	persistentObjectFormat object_inventory_format.Format
-	configBlobFormat       interfaces.Format[repo_config_blobs.Blob]
+	configBlobCoder        interfaces.CoderReadWriter[*repo_configs.TypedBlob]
 	envLua                 env_lua.Env
 	tagLock                sync.Mutex
 
@@ -62,7 +62,7 @@ func (store *Store) Initialize(
 	dormantIndex *dormant_index.Index,
 	abbrStore sku.AbbrStore,
 ) (err error) {
-	store.config = config
+	store.storeConfig = config
 	store.envRepo = envRepo
 	store.envWorkspace = envWorkspace
 	store.typedBlobStore = typedBlobStore
@@ -89,8 +89,8 @@ func (store *Store) Initialize(
 	}
 
 	if store.zettelIdIndex, err = zettel_id_index.MakeIndex(
-		store.GetConfig().GetImmutableConfigPublic(),
-		store.config.GetCLIConfig(),
+		store.GetConfigStore().GetConfig(),
+		store.storeConfig.GetConfig().CLI,
 		store.GetEnvRepo(),
 		store.GetEnvRepo(),
 	); err != nil {
@@ -112,13 +112,7 @@ func (store *Store) Initialize(
 		store.envWorkspace.GetDefaults(),
 	)
 
-	store.configBlobFormat = typed_blob_store.MakeBlobFormat2(
-		typed_blob_store.MakeTextParserIgnoreTomlErrors2[repo_config_blobs.Blob](
-			store.GetEnvRepo().GetDefaultBlobStore(),
-		),
-		typed_blob_store.ParsedBlobTomlFormatter2[repo_config_blobs.Blob]{},
-		store.GetEnvRepo().GetDefaultBlobStore(),
-	)
+	store.configBlobCoder = repo_configs.Coder
 
 	return
 }
@@ -140,8 +134,8 @@ func (store *Store) MakeSupplies(
 	return
 }
 
-func (s *Store) ResetIndexes() (err error) {
-	if err = s.zettelIdIndex.Reset(); err != nil {
+func (store *Store) ResetIndexes() (err error) {
+	if err = store.zettelIdIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index object id index")
 		return
 	}
@@ -149,7 +143,7 @@ func (s *Store) ResetIndexes() (err error) {
 	return
 }
 
-func (s *Store) SetUIDelegate(ud sku.UIStorePrinters) {
-	s.ui = ud
-	s.inventoryListStore.SetUIDelegate(ud)
+func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {
+	store.ui = ud
+	store.inventoryListStore.SetUIDelegate(ud)
 }

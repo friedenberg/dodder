@@ -13,7 +13,7 @@ import (
 
 type Request struct {
 	interfaces.Context
-	repo_config_cli.Config
+	repo_config_cli.Blob
 	*flag.FlagSet
 	*Args
 }
@@ -40,12 +40,12 @@ type Args struct {
 
 func MakeRequest(
 	ctx interfaces.Context,
-	config repo_config_cli.Config,
+	config repo_config_cli.Blob,
 	flagSet *flag.FlagSet,
 ) Request {
 	return Request{
 		Context: ctx,
-		Config:  config,
+		Blob:    config,
 		FlagSet: flagSet,
 		Args: &Args{
 			Context: ctx,

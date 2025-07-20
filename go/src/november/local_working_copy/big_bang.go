@@ -1,34 +1,27 @@
 package local_working_copy
 
 import (
-	"encoding/gob"
-	"io"
-	"os"
-	"path"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 func Genesis(
-	bb env_repo.BigBang,
-	repoLayout env_repo.Env,
+	bigBang env_repo.BigBang,
+	envRepo env_repo.Env,
 ) (repo *Repo) {
-	repo = MakeWithLayout(OptionsEmpty, repoLayout)
+	repo = MakeWithLayout(OptionsEmpty, envRepo)
 
 	if err := repo.dormantIndex.Flush(
 		repo.GetEnvRepo(),
 		repo.PrinterHeader(),
-		repo.config.GetCLIConfig().IsDryRun(),
+		repo.config.GetConfig().IsDryRun(),
 	); err != nil {
 		repo.Cancel(err)
 	}
@@ -36,7 +29,7 @@ func Genesis(
 	repo.Must(errors.MakeFuncContextFromFuncErr(repo.Reset))
 	repo.Must(errors.MakeFuncContextFromFuncErr(repo.envRepo.ResetCache))
 
-	if err := repo.initDefaultTypeAndConfig(bb); err != nil {
+	if err := repo.initDefaultTypeAndConfig(bigBang); err != nil {
 		repo.Cancel(err)
 	}
 
@@ -47,7 +40,9 @@ func Genesis(
 	return
 }
 
-func (local *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
+func (local *Repo) initDefaultTypeAndConfig(
+	bigBang env_repo.BigBang,
+) (err error) {
 	if err = local.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -58,14 +53,14 @@ func (local *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
 	var defaultTypeObjectId ids.Type
 
 	if defaultTypeObjectId, err = local.initDefaultTypeIfNecessaryAfterLock(
-		bb,
+		bigBang,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = local.initDefaultConfigIfNecessaryAfterLock(
-		bb,
+		bigBang,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -76,18 +71,18 @@ func (local *Repo) initDefaultTypeAndConfig(bb env_repo.BigBang) (err error) {
 }
 
 func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
-	bb env_repo.BigBang,
+	bigBang env_repo.BigBang,
 ) (defaultTypeObjectId ids.Type, err error) {
-	if bb.ExcludeDefaultType {
+	if bigBang.ExcludeDefaultType {
 		return
 	}
 
 	defaultTypeObjectId = ids.MustType("md")
 	defaultTypeBlob := type_blobs.Default()
 
-	var k ids.ObjectId
+	var objectId ids.ObjectId
 
-	if err = k.SetWithIdLike(defaultTypeObjectId); err != nil {
+	if err = objectId.SetWithIdLike(defaultTypeObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -102,19 +97,19 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return
 	}
 
-	o := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(o)
+	object := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(object)
 
-	if err = o.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
+	if err = object.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	o.Metadata.Blob.ResetWithShaLike(sh)
-	o.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
+	object.Metadata.Blob.ResetWithShaLike(sh)
+	object.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
-		o,
+		object,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -125,17 +120,17 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 }
 
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
-	bb env_repo.BigBang,
+	bigBang env_repo.BigBang,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
-	if bb.ExcludeDefaultConfig {
+	if bigBang.ExcludeDefaultConfig {
 		return
 	}
 
 	var sh interfaces.Sha
-	var tipe ids.Type
+	var typedBlob repo_configs.TypedBlob
 
-	if sh, tipe, err = writeDefaultMutableConfig(
+	if sh, typedBlob, err = writeDefaultMutableConfig(
 		local,
 		defaultTypeObjectId,
 	); err != nil {
@@ -155,7 +150,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	newConfig.Metadata.Type.ResetWith(tipe)
+	newConfig.Metadata.Type.ResetWith(typedBlob.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		newConfig,
@@ -169,59 +164,31 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 }
 
 func writeDefaultMutableConfig(
-	u *Repo,
-	dt ids.Type,
-) (sh interfaces.Sha, tipe ids.Type, err error) {
-	defaultMutableConfig := repo_config_blobs.Default(dt)
-	tipe = defaultMutableConfig.Type
+	repo *Repo,
+	defaultType ids.Type,
+) (sh interfaces.Sha, typedBlob repo_configs.TypedBlob, err error) {
+	typedBlob = repo_configs.Default(defaultType)
 
-	f := u.GetStore().GetConfigBlobFormat()
+	coder := repo.GetStore().GetConfigBlobFormat()
 
-	var aw sha.WriteCloser
+	var writeCloser sha.WriteCloser
 
-	if aw, err = u.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = f.EncodeTo(defaultMutableConfig.Blob, aw); err != nil {
+	if _, err = coder.EncodeTo(
+		&typedBlob,
+		writeCloser,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = sha.Make(aw.GetShaLike())
+	sh = sha.Make(writeCloser.GetShaLike())
 
 	return
-}
-
-func mkdirAll(elements ...string) {
-	err := os.MkdirAll(path.Join(elements...), os.ModeDir|0o755)
-	errors.PanicIfError(err)
-}
-
-func writeFile(p string, contents any) {
-	var f *os.File
-	var err error
-
-	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
-		if errors.IsExist(err) {
-			ui.Err().Printf("%s already exists, not overwriting", p)
-			err = nil
-		} else {
-		}
-
-		return
-	}
-
-	defer errors.PanicIfError(err)
-	defer errors.DeferredCloser(&err, f)
-
-	if s, ok := contents.(string); ok {
-		_, err = io.WriteString(f, s)
-	} else {
-		enc := gob.NewEncoder(f)
-		err = enc.Encode(contents)
-	}
 }

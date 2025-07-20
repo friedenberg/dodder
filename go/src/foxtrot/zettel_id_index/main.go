@@ -21,8 +21,8 @@ type Index interface {
 }
 
 func MakeIndex(
-	config genesis_configs.Public,
-	configCli repo_config_cli.Config,
+	config genesis_configs.BlobPublic,
+	configCli repo_config_cli.Blob,
 	directory interfaces.Directory,
 	cacheIOFactory interfaces.CacheIOFactory,
 ) (i Index, err error) {

@@ -5,13 +5,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) GetObjectStore() sku.RepoStore {
-	return s
+func (store *Store) GetObjectStore() sku.RepoStore {
+	return store
 }
 
-func (s *Store) ReadPrimitiveQuery(
+func (store *Store) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.GetStreamIndex().ReadPrimitiveQuery(qg, w)
+	return store.GetStreamIndex().ReadPrimitiveQuery(qg, w)
 }

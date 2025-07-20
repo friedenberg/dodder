@@ -32,12 +32,12 @@ func GetAllRemoteConnectionTypes() []RemoteConnectionType {
 func (tipe *RemoteConnectionType) GetCLICompletion() map[string]string {
 	return map[string]string{
 		"native-dotenv-xdg": "",
-		"none": "",
-		"socket-unix": "",
-		"stdio-local": "",
-		"stdio-ssh": "",
-		"unspecified": "",
-		"url": "",
+		"none":              "",
+		"socket-unix":       "",
+		"stdio-local":       "",
+		"stdio-ssh":         "",
+		"unspecified":       "",
+		"url":               "",
 	}
 }
 

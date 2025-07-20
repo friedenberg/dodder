@@ -49,7 +49,7 @@ func (c ReadOrganizeFile) Run(
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 
 	o := otFlags.GetOptionsWithMetadata(
-		u.GetConfig().GetCLIConfig().PrintOptions,
+		u.GetConfig().PrintOptions,
 		u.SkuFormatBoxCheckedOutNoColor(),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},

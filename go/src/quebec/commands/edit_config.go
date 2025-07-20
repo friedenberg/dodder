@@ -26,10 +26,10 @@ type EditConfig struct {
 }
 
 func (cmd EditConfig) Run(
-	dep command.Request,
+	req command.Request,
 ) {
-	args := dep.PopArgs()
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+	args := req.PopArgs()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
@@ -65,7 +65,7 @@ func (cmd EditConfig) Run(
 	)
 }
 
-func (c EditConfig) editInVim(
+func (cmd EditConfig) editInVim(
 	repo *local_working_copy.Repo,
 ) (sk *sku.Transacted, err error) {
 	var file *os.File
@@ -84,7 +84,7 @@ func (c EditConfig) editInVim(
 		return
 	}
 
-	if err = c.makeTempConfigFile(repo, path); err != nil {
+	if err = cmd.makeTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -100,7 +100,7 @@ func (c EditConfig) editInVim(
 		return
 	}
 
-	if sk, err = c.readTempConfigFile(repo, path); err != nil {
+	if sk, err = cmd.readTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,7 +108,7 @@ func (c EditConfig) editInVim(
 	return
 }
 
-func (c EditConfig) makeTempConfigFile(
+func (cmd EditConfig) makeTempConfigFile(
 	repo *local_working_copy.Repo,
 	path string,
 ) (err error) {
@@ -141,7 +141,7 @@ func (c EditConfig) makeTempConfigFile(
 	return
 }
 
-func (c EditConfig) readTempConfigFile(
+func (cmd EditConfig) readTempConfigFile(
 	localWorkingCopy *local_working_copy.Repo,
 	path string,
 ) (sk *sku.Transacted, err error) {

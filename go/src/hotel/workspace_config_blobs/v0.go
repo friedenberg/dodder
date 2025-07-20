@@ -6,11 +6,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 )
 
 type V0 struct {
-	Defaults repo_config_blobs.DefaultsV1OmitEmpty `toml:"defaults,omitempty"`
+	Defaults repo_configs.DefaultsV1OmitEmpty `toml:"defaults,omitempty"`
 	// FileExtensions file_extensions.V1    `toml:"file-extensions"`
 	// PrintOptions   options_print.V0      `toml:"cli-output"`
 	// Tools          options_tools.Options `toml:"tools"`
@@ -22,7 +22,7 @@ func (blob V0) GetWorkspaceConfig() Blob {
 	return blob
 }
 
-func (blob V0) GetDefaults() repo_config_blobs.Defaults {
+func (blob V0) GetDefaults() repo_configs.Defaults {
 	return blob.Defaults
 }
 

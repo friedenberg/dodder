@@ -83,7 +83,7 @@ func (cmd Last) runArchive(envRepo env_repo.Env, archive repo.Repo) {
 	// TODO replace with sku.ListFormat
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		envRepo,
-		options_print.V0{}.WithPrintTai(true),
+		options_print.Options{}.WithPrintTai(true),
 	)
 
 	f := string_format_writer.MakeDelim(
@@ -204,6 +204,8 @@ func (cmd Last) runWithInventoryList(
 		}
 
 		func() {
+			// TODO investigate the pool folow for StreamInventoryListBlobSkus and
+			// determine why repooling here is breaking things
 			// defer sku.GetTransactedPool().Put(sk)
 
 			if err = funcIter(sk); err != nil {

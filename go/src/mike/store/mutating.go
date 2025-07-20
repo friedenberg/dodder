@@ -16,12 +16,12 @@ import (
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
 // runs the new hook, validates the blob, then calculates the sha for the object
-func (s *Store) tryPrecommit(
+func (store *Store) tryPrecommit(
 	external sku.ExternalLike,
 	parent *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	if err = s.SaveBlob(external); err != nil {
+	if err = store.SaveBlob(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -34,7 +34,7 @@ func (s *Store) tryPrecommit(
 
 	// TODO decide if the type proto should actually be applied every time
 	if options.ApplyProtoType {
-		s.protoZettel.ApplyType(kinder, kinder)
+		store.protoZettel.ApplyType(kinder, kinder)
 	}
 
 	if genres.Type == external.GetSku().GetGenre() {
@@ -46,8 +46,8 @@ func (s *Store) tryPrecommit(
 	}
 
 	// modify pre commit hooks to support import
-	if err = s.tryPreCommitHooks(kinder, parent, options); err != nil {
-		if s.config.GetCLIConfig().IgnoreHookErrors {
+	if err = store.tryPreCommitHooks(kinder, parent, options); err != nil {
+		if store.storeConfig.GetConfig().IgnoreHookErrors {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -57,8 +57,8 @@ func (s *Store) tryPrecommit(
 
 	// TODO just just mutter == nil
 	if parent == nil {
-		if err = s.tryNewHook(kinder, options); err != nil {
-			if s.config.GetCLIConfig().IgnoreHookErrors {
+		if err = store.tryNewHook(kinder, options); err != nil {
+			if store.storeConfig.GetConfig().IgnoreHookErrors {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (s *Store) tryPrecommit(
 		}
 	}
 
-	if err = s.validate(kinder, parent, options); err != nil {
+	if err = store.validate(kinder, parent, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -184,7 +184,7 @@ func (store *Store) Commit(
 
 	if options.AddToInventoryList ||
 		options.StreamIndexOptions.AddToStreamIndex {
-		if err = store.config.AddTransacted(
+		if err = store.storeConfig.AddTransacted(
 			child,
 			parent,
 		); err != nil {
@@ -268,12 +268,12 @@ func (store *Store) Commit(
 	return
 }
 
-func (s *Store) fetchParentIfNecessary(
+func (store *Store) fetchParentIfNecessary(
 	sk *sku.Transacted,
 ) (mutter *sku.Transacted, err error) {
 	mutter = sku.GetTransactedPool().Get()
 	// TODO find a way to make this more performant when operating over sshfs
-	if err = s.GetStreamIndex().ReadOneObjectId(
+	if err = store.GetStreamIndex().ReadOneObjectId(
 		sk.GetObjectId(),
 		mutter,
 	); err != nil {
@@ -314,22 +314,22 @@ func (store *Store) commitTransacted(
 	return
 }
 
-func (s *Store) handleUnchanged(
+func (store *Store) handleUnchanged(
 	t *sku.Transacted,
 ) (err error) {
-	return s.ui.TransactedUnchanged(t)
+	return store.ui.TransactedUnchanged(t)
 }
 
-func (s *Store) UpdateKonfig(
+func (store *Store) UpdateKonfig(
 	sh interfaces.Sha,
 ) (kt *sku.Transacted, err error) {
-	return s.CreateOrUpdateBlobSha(
+	return store.CreateOrUpdateBlobSha(
 		&ids.Config{},
 		sh,
 	)
 }
 
-func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
+func (store *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 	t := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(t)
 
@@ -354,12 +354,12 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 	}
 
-	if err = s.addObjectToAbbrStore(t); err != nil {
+	if err = store.addObjectToAbbrStore(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.Commit(
+	if err = store.Commit(
 		t,
 		sku.CommitOptions{
 			StoreOptions:       sku.GetStoreOptionsUpdate(),
@@ -373,7 +373,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 	return
 }
 
-func (s *Store) addType(
+func (store *Store) addType(
 	t ids.Type,
 ) (err error) {
 	if t.IsEmpty() {
@@ -388,7 +388,7 @@ func (s *Store) addType(
 		return
 	}
 
-	if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
+	if err = store.GetStreamIndex().ObjectExists(&oid); err == nil {
 		return
 	}
 
@@ -401,7 +401,7 @@ func (s *Store) addType(
 		return
 	}
 
-	if err = s.createTagsOrType(&k); err != nil {
+	if err = store.createTagsOrType(&k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -409,7 +409,7 @@ func (s *Store) addType(
 	return
 }
 
-func (s *Store) addTypeAndExpandedIfNecessary(
+func (store *Store) addTypeAndExpandedIfNecessary(
 	rootTipe ids.Type,
 ) (err error) {
 	if rootTipe.IsEmpty() {
@@ -427,7 +427,7 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 	)
 
 	for _, tipe := range typesExpanded {
-		if err = s.addType(tipe); err != nil {
+		if err = store.addType(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -436,11 +436,11 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 	return
 }
 
-func (s *Store) addTags(
+func (store *Store) addTags(
 	tags []ids.Tag,
 ) (err error) {
-	s.tagLock.Lock()
-	defer s.tagLock.Unlock()
+	store.tagLock.Lock()
+	defer store.tagLock.Unlock()
 
 	var oid ids.ObjectId
 
@@ -454,7 +454,7 @@ func (s *Store) addTags(
 			return
 		}
 
-		if err = s.GetStreamIndex().ObjectExists(&oid); err == nil {
+		if err = store.GetStreamIndex().ObjectExists(&oid); err == nil {
 			continue
 		}
 
@@ -467,7 +467,7 @@ func (s *Store) addTags(
 			return
 		}
 
-		if err = s.createTagsOrType(&k); err != nil {
+		if err = store.createTagsOrType(&k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -476,14 +476,14 @@ func (s *Store) addTags(
 	return
 }
 
-func (s *Store) addMissingTypeAndTags(
+func (store *Store) addMissingTypeAndTags(
 	commitOptions sku.CommitOptions,
 	object *sku.Transacted,
 ) (err error) {
 	tipe := object.GetType()
 
 	if !commitOptions.DontAddMissingType {
-		if err = s.addTypeAndExpandedIfNecessary(tipe); err != nil {
+		if err = store.addTypeAndExpandedIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -507,7 +507,7 @@ func (s *Store) addMissingTypeAndTags(
 			tagsExpanded = tagsExpanded[:len(tagsExpanded)-1]
 		}
 
-		if err = s.addTags(tagsExpanded); err != nil {
+		if err = store.addTags(tagsExpanded); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -534,7 +534,7 @@ func (s *Store) addMissingTypeAndTags(
 				tagsExpanded = tagsExpanded[:len(tagsExpanded)-1]
 			}
 
-			if err = s.addTags(tagsExpanded); err != nil {
+			if err = store.addTags(tagsExpanded); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -547,7 +547,7 @@ func (s *Store) addMissingTypeAndTags(
 				expansion.ExpanderRight,
 			)
 
-			if err = s.addTags(tagsExpanded); err != nil {
+			if err = store.addTags(tagsExpanded); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -557,8 +557,8 @@ func (s *Store) addMissingTypeAndTags(
 	return
 }
 
-func (s *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
-	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(m); err != nil {
+func (store *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
+	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -566,17 +566,17 @@ func (s *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) reindexOne(object sku.ObjectWithList) (err error) {
+func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
 	o := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = s.Commit(object.Object, o); err != nil {
+	if err = store.Commit(object.Object, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(
+	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(
 		object.Object,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -103,7 +103,7 @@ func (local *Repo) MakeFormatFunc(
 	case "box-archive":
 		p := local.MakePrinterBoxArchive(
 			writer,
-			local.GetConfig().GetCLIConfig().PrintOptions.PrintTime,
+			local.GetConfig().PrintOptions.PrintTime,
 		)
 
 		output = func(tl *sku.Transacted) (err error) {

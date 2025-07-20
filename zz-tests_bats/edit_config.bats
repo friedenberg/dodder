@@ -16,11 +16,11 @@ teardown() {
 # bats file_tags=user_story:config
 
 function edit_config_and_change { # @test
-	export EDITOR="/bin/bash -c 'echo \"this is the body 2\" > \"\$0\"'"
+	export EDITOR="/bin/bash -c 'echo \"# this is the body 2\" >> \"\$0\"'"
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @85eb98a5c8f7ccc354f35b846bb24adc1764e88cb907f63293f6902aa105af58]
+		[konfig @060fd1c2ef52c48ffad41f32dbab426df59b4aee063155b10e90b1bbd89ccbd0 !toml-config-v1]
 	EOM
 }
 

@@ -1,66 +1,58 @@
 package store_config
 
 import (
-	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type compiled struct {
-	lock sync.Mutex
+type (
+	configMutableBlob        = repo_configs.Blob
+	configGenesisBlobPrivate = genesis_configs.BlobPrivate
+	CLI                      = repo_config_cli.Blob
 
-	changes []string
+	Config struct {
+		*compiled
 
-	Sku sku.Transacted
+		configMutableBlob
+		configGenesisBlobPrivate
+		CLI
+	}
 
-	Tags         interfaces.MutableSetLike[*tag]
-	ImplicitTags implicitTagMap
+	compiled struct {
+		// TODO move to store
+		lock sync.Mutex
 
-	// Typen
-	ExtensionsToTypes map[string]string
-	TypesToExtensions map[string]string
-	Types             sku.TransactedMutableSet
-	InlineTypes       interfaces.SetLike[values.String]
+		// TODO move to store
+		changes []string
 
-	// Kasten
-	Repos sku.TransactedMutableSet
-}
+		// TODO move to store
+		Sku sku.Transacted
+
+		Tags         interfaces.MutableSetLike[*tag]
+		ImplicitTags implicitTagMap
+
+		// Typen
+		ExtensionsToTypes map[string]string
+		TypesToExtensions map[string]string
+		Types             sku.TransactedMutableSet
+		InlineTypes       interfaces.SetLike[values.String]
+
+		// Kasten
+		Repos sku.TransactedMutableSet
+	}
+)
 
 func (k *compiled) GetSku() *sku.Transacted {
 	return &k.Sku
-}
-
-func (store *store) setTransacted(
-	kt1 *sku.Transacted,
-) (didChange bool, err error) {
-	if !sku.TransactedLessor.LessPtr(&store.Sku, kt1) {
-		return
-	}
-
-	store.lock.Lock()
-	defer store.lock.Unlock()
-
-	didChange = true
-
-	sku.Resetter.ResetWith(&store.Sku, kt1)
-
-	store.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &store.Sku))
-
-	if err = store.loadMutableConfigBlob(
-		store.Sku.GetType(),
-		store.Sku.GetBlobSha(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (k *compiled) addRepo(
@@ -108,4 +100,12 @@ func (k *compiled) addType(
 	}
 
 	return
+}
+
+func (config *Config) GetTypeStringFromExtension(t string) string {
+	return config.ExtensionsToTypes[t]
+}
+
+func (config *Config) GetTypeExtension(v string) string {
+	return config.TypesToExtensions[v]
 }

@@ -63,7 +63,7 @@ func makeAssignmentLineReader() reader {
 			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxCheckedOut(
 				string_format_writer.ColorOptions{},
-				options_print.V0{},
+				options_print.Options{},
 				nil,
 				ids.Abbr{},
 				nil,

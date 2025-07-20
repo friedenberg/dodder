@@ -6,13 +6,53 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
-func Default() V0 {
-	return V0{
-		Abbreviations: Abbreviations{
+type (
+	Abbreviations struct {
+		ZettelIds bool
+		Shas      bool
+	}
+
+	Box struct {
+		PrintIncludeDescription bool
+		PrintTime               bool
+		PrintTagsAlways         bool
+		PrintEmptyShas          bool
+		PrintIncludeTypes       bool
+		PrintTai                bool
+		DescriptionInBox        bool
+		ExcludeFields           bool
+	}
+
+	Options struct {
+		Abbreviations Abbreviations
+		Box
+
+		PrintMatchedDormant bool
+		PrintShas           bool
+		PrintFlush          bool
+		PrintUnchanged      bool
+		PrintColors         bool
+		PrintInventoryLists bool
+		Newlines            bool
+	}
+
+	Blob interface {
+		GetPrintOptions() Options
+	}
+)
+
+var (
+	_ Blob = V0{}
+	_ Blob = V1{}
+)
+
+func Default() V1 {
+	return V1{
+		Abbreviations: abbreviationsV1{
 			ZettelIds: true,
 			Shas:      true,
 		},
-		BoxV0: BoxV0{
+		boxV1: boxV1{
 			PrintIncludeTypes:       true,
 			PrintIncludeDescription: true,
 			PrintTime:               true,
@@ -28,142 +68,223 @@ func Default() V0 {
 	}
 }
 
+func (dst Options) WithPrintShas(v bool) Options {
+	dst.PrintShas = v
+	return dst
+}
+
+func (dst Options) WithDescriptionInBox(v bool) Options {
+	dst.DescriptionInBox = v
+	return dst
+}
+
+func (dst Options) WithPrintTai(v bool) Options {
+	dst.PrintTai = v
+	return dst
+}
+
+func (dst Options) WithExcludeFields(v bool) Options {
+	dst.ExcludeFields = v
+	return dst
+}
+
+func (dst Options) WithPrintTime(v bool) Options {
+	dst.PrintTime = v
+	return dst
+}
+
 func boolVarWithMask(
-	f *flag.FlagSet,
+	flagSet *flag.FlagSet,
 	name string,
-	v *bool,
-	m *bool,
+	valuePtr *bool,
+	mask *bool,
 	desc string,
 ) {
-	f.Func(name,
+	flagSet.Func(name,
 		desc,
 		func(value string) (err error) {
 			var bv values.Bool
 
-			*m = true
+			*mask = true
 
 			if err = bv.Set(value); err != nil {
 				return
 			}
 
-			*v = bv.Bool()
+			*valuePtr = bv.Bool()
 
 			return
 		},
 	)
 }
 
-func (c *V0) AddToFlags(f *flag.FlagSet, m *V0) {
+func (dst *Options) Merge(src Options, mask Options) {
+	if mask.Abbreviations.ZettelIds {
+		dst.Abbreviations.ZettelIds = src.Abbreviations.ZettelIds
+	}
+
+	if mask.Abbreviations.Shas {
+		dst.Abbreviations.Shas = src.Abbreviations.Shas
+	}
+
+	if mask.PrintIncludeTypes {
+		dst.PrintIncludeTypes = src.PrintIncludeTypes
+	}
+
+	if mask.PrintIncludeDescription {
+		dst.PrintIncludeDescription = src.PrintIncludeDescription
+	}
+
+	if mask.PrintTime {
+		dst.PrintTime = src.PrintTime
+	}
+
+	if mask.PrintTagsAlways {
+		dst.PrintTagsAlways = src.PrintTagsAlways
+	}
+
+	if mask.PrintEmptyShas {
+		dst.PrintEmptyShas = src.PrintEmptyShas
+	}
+
+	if mask.PrintMatchedDormant {
+		dst.PrintMatchedDormant = src.PrintMatchedDormant
+	}
+
+	if mask.PrintShas {
+		dst.PrintShas = src.PrintShas
+	}
+
+	if mask.PrintFlush {
+		dst.PrintFlush = src.PrintFlush
+	}
+
+	if mask.PrintUnchanged {
+		dst.PrintUnchanged = src.PrintUnchanged
+	}
+
+	if mask.PrintColors {
+		dst.PrintColors = src.PrintColors
+	}
+
+	if mask.PrintInventoryLists {
+		dst.PrintInventoryLists = src.PrintInventoryLists
+	}
+
+	dst.Newlines = src.Newlines
+}
+
+func (dst *Options) AddToFlags(flagSet *flag.FlagSet, mask *Options) {
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-typen",
-		&c.PrintIncludeTypes,
-		&m.PrintIncludeTypes,
+		&dst.PrintIncludeTypes,
+		&mask.PrintIncludeTypes,
 		"",
 	)
 
 	// TODO-P4 combine below three options
 	boolVarWithMask(
-		f,
+		flagSet,
 		"abbreviate-shas",
-		&c.Abbreviations.Shas,
-		&m.Abbreviations.Shas,
+		&dst.Abbreviations.Shas,
+		&mask.Abbreviations.Shas,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"abbreviate-zettel-ids",
-		&c.Abbreviations.ZettelIds,
-		&m.Abbreviations.ZettelIds,
+		&dst.Abbreviations.ZettelIds,
+		&mask.Abbreviations.ZettelIds,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-description",
-		&c.PrintIncludeDescription,
-		&m.PrintIncludeDescription,
+		&dst.PrintIncludeDescription,
+		&mask.PrintIncludeDescription,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-time",
-		&c.PrintTime,
-		&m.PrintTime,
+		&dst.PrintTime,
+		&mask.PrintTime,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-etiketten",
-		&c.PrintTagsAlways,
-		&m.PrintTagsAlways,
+		&dst.PrintTagsAlways,
+		&mask.PrintTagsAlways,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-empty-shas",
-		&c.PrintEmptyShas,
-		&m.PrintEmptyShas,
+		&dst.PrintEmptyShas,
+		&mask.PrintEmptyShas,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-matched-archiviert",
-		&c.PrintMatchedDormant,
-		&m.PrintMatchedDormant,
+		&dst.PrintMatchedDormant,
+		&mask.PrintMatchedDormant,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-shas",
-		&c.PrintShas,
-		&m.PrintShas,
+		&dst.PrintShas,
+		&mask.PrintShas,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-flush",
-		&c.PrintFlush,
-		&m.PrintFlush,
+		&dst.PrintFlush,
+		&mask.PrintFlush,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-unchanged",
-		&c.PrintUnchanged,
-		&m.PrintUnchanged,
+		&dst.PrintUnchanged,
+		&mask.PrintUnchanged,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-colors",
-		&c.PrintColors,
-		&m.PrintColors,
+		&dst.PrintColors,
+		&mask.PrintColors,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"print-inventory_list",
-		&c.PrintInventoryLists,
-		&m.PrintInventoryLists,
+		&dst.PrintInventoryLists,
+		&mask.PrintInventoryLists,
 		"",
 	)
 
 	boolVarWithMask(
-		f,
+		flagSet,
 		"boxed-description",
-		&c.DescriptionInBox,
-		&m.DescriptionInBox,
+		&dst.DescriptionInBox,
+		&mask.DescriptionInBox,
 		"",
 	)
 }

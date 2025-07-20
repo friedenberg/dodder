@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
@@ -28,7 +28,7 @@ type Env interface {
 	IsTemporary() bool
 	GetWorkspaceConfig() workspace_config_blobs.Blob
 	GetWorkspaceConfigFilePath() string
-	GetDefaults() repo_config_blobs.Defaults
+	GetDefaults() repo_configs.Defaults
 	CreateWorkspace(workspace_config_blobs.Blob) (err error)
 	GetStore() *Store
 
@@ -42,7 +42,7 @@ type Env interface {
 }
 
 type Config interface {
-	repo_config_blobs.Getter
+	repo_configs.Blob
 	sku.Config
 	interfaces.FileExtensionsGetter
 }
@@ -56,7 +56,7 @@ func Make(
 	out = &env{
 		envRepo:       envRepo,
 		Env:           envLocal,
-		configMutable: config.GetMutableConfig(),
+		configMutable: config,
 	}
 
 	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
@@ -90,7 +90,7 @@ func Make(
 
 	defaults := out.configMutable.GetDefaults()
 
-	out.defaults = repo_config_blobs.DefaultsV1{
+	out.defaults = repo_configs.DefaultsV1{
 		Type: defaults.GetType(),
 		Tags: defaults.GetTags(),
 	}
@@ -145,9 +145,9 @@ type env struct {
 	// Later, dir may be set to $PWD/.dodder-workspace by CreateWorkspace
 	dir string
 
-	configMutable repo_config_blobs.Blob
+	configMutable repo_configs.Blob
 	blob          workspace_config_blobs.Blob
-	defaults      repo_config_blobs.DefaultsV1
+	defaults      repo_configs.DefaultsV1
 
 	storeFS *store_fs.Store
 	store   Store
@@ -237,7 +237,7 @@ func (env *env) GetWorkspaceConfig() workspace_config_blobs.Blob {
 	return env.blob
 }
 
-func (env *env) GetDefaults() repo_config_blobs.Defaults {
+func (env *env) GetDefaults() repo_configs.Defaults {
 	return env.defaults
 }
 

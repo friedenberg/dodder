@@ -7,11 +7,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -26,9 +28,9 @@ type DormantEdit struct {
 	command_components.LocalWorkingCopy
 }
 
-func (cmd DormantEdit) Run(dep command.Request) {
-	args := dep.PopArgs()
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+func (cmd DormantEdit) Run(req command.Request) {
+	args := req.PopArgs()
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	if len(args) > 0 {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
@@ -55,7 +57,9 @@ func (cmd DormantEdit) Run(dep command.Request) {
 		return
 	}
 
-	defer localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
+	defer localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
+	)
 
 	if _, err := localWorkingCopy.GetStore().UpdateKonfig(sh); err != nil {
 		localWorkingCopy.Cancel(err)
@@ -64,12 +68,12 @@ func (cmd DormantEdit) Run(dep command.Request) {
 }
 
 // TODO refactor into common
-func (c DormantEdit) editInVim(
+func (cmd DormantEdit) editInVim(
 	u *local_working_copy.Repo,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
-	if p, err = c.makeTempKonfigFile(u); err != nil {
+	if p, err = cmd.makeTempKonfigFile(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -84,7 +88,7 @@ func (c DormantEdit) editInVim(
 		return
 	}
 
-	if sh, err = c.readTempKonfigFile(u, p); err != nil {
+	if sh, err = cmd.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,30 +97,43 @@ func (c DormantEdit) editInVim(
 }
 
 // TODO refactor into common
-func (c DormantEdit) makeTempKonfigFile(
-	u *local_working_copy.Repo,
-) (p string, err error) {
-	var k *sku.Transacted
+func (cmd DormantEdit) makeTempKonfigFile(
+	repo *local_working_copy.Repo,
+) (path string, err error) {
+	var object *sku.Transacted
 
-	if k, err = u.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
+	if object, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = u.GetEnvRepo().GetTempLocal().FileTemp(); err != nil {
+	if file, err = repo.GetEnvRepo().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	p = f.Name()
+	var readCloser io.ReadCloser
 
-	format := u.GetStore().GetConfigBlobFormat()
+	if readCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobReader(
+		object.GetBlobSha(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if _, err = format.FormatSavedBlob(f, k.GetBlobSha()); err != nil {
+	path = file.Name()
+
+	bufferedWriter := ohio.BufferedWriter(file)
+	defer pool.FlushBufioWriterAndPut(&err, bufferedWriter)
+
+	bufferedReader := ohio.BufferedReader(readCloser)
+	defer pool.GetBufioReader().Put(bufferedReader)
+
+	if _, err = io.Copy(bufferedWriter, bufferedReader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,39 +142,44 @@ func (c DormantEdit) makeTempKonfigFile(
 }
 
 // TODO refactor into common
-func (c DormantEdit) readTempKonfigFile(
-	u *local_working_copy.Repo,
-	p string,
+func (cmd DormantEdit) readTempKonfigFile(
+	repo *local_working_copy.Repo,
+	path string,
 ) (sh interfaces.Sha, err error) {
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	format := u.GetStore().GetConfigBlobFormat()
+	var writeCloser interfaces.ShaWriteCloser
 
-	var k repo_config_blobs.V0
-
-	var aw interfaces.ShaWriteCloser
-
-	if aw, err = u.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, writeCloser)
+
+	var typedBlob repo_configs.TypedBlob
+
+	coder := repo.GetStore().GetConfigBlobFormat()
 
 	// TODO-P3 offer option to edit again
-	if _, err = format.DecodeFrom(&k, io.TeeReader(f, aw)); err != nil {
+	if _, err = coder.DecodeFrom(
+		&typedBlob,
+		io.TeeReader(file, writeCloser),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = aw.GetShaLike()
+	// TODO persist blob type
+
+	sh = writeCloser.GetShaLike()
 
 	return
 }

@@ -39,7 +39,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	args := dep.PopArgs()
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	cmd.Flags.Config = localWorkingCopy.GetConfig()
+	cmd.Flags.Config = localWorkingCopy.GetConfigPtr()
 
 	if len(args) != 1 {
 		errors.ContextCancelWithErrorf(
@@ -93,7 +93,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	}
 
 	ot.Options = cmd.Flags.GetOptionsWithMetadata(
-		localWorkingCopy.GetConfig().GetCLIConfig().PrintOptions,
+		localWorkingCopy.GetConfig().PrintOptions,
 		localWorkingCopy.SkuFormatBoxCheckedOutNoColor(),
 		localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},

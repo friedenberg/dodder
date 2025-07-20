@@ -35,7 +35,7 @@ func (cmd Info) Run(req command.Request) {
 
 	ui := env_ui.Make(
 		req,
-		req.Config,
+		req.Blob,
 		env_ui.Options{},
 	)
 

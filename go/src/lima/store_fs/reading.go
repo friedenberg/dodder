@@ -36,10 +36,13 @@ func (store *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 }
 
 func (store *Store) ReadOneExternalObjectReader(
-	r io.Reader,
+	reader io.Reader,
 	external *sku.Transacted,
 ) (err error) {
-	if _, err = store.metadataTextParser.ParseMetadata(r, external); err != nil {
+	if _, err = store.metadataTextParser.ParseMetadata(
+		reader,
+		external,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

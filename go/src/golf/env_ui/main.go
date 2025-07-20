@@ -26,7 +26,7 @@ type Env interface {
 	GetOutFile() interfaces.WriterAndStringWriter
 	GetErr() fd.Std
 	GetErrFile() interfaces.WriterAndStringWriter
-	GetCLIConfig() repo_config_cli.Config
+	GetCLIConfig() repo_config_cli.Blob
 
 	Confirm(message string) (success bool)
 	Retry(header, retry string, err error) (tryAgain bool)
@@ -52,20 +52,20 @@ type env struct {
 
 	debug *debug.Context
 
-	cliConfig repo_config_cli.Config
+	cliConfig repo_config_cli.Blob
 }
 
 func MakeDefault(ctx interfaces.Context) *env {
 	return Make(
 		ctx,
-		repo_config_cli.Config{},
+		repo_config_cli.Blob{},
 		Options{},
 	)
 }
 
 func Make(
 	context interfaces.Context,
-	kCli repo_config_cli.Config,
+	kCli repo_config_cli.Blob,
 	options Options,
 ) *env {
 	e := &env{
@@ -140,6 +140,6 @@ func (env *env) GetErrFile() interfaces.WriterAndStringWriter {
 	return env.err.GetFile()
 }
 
-func (env *env) GetCLIConfig() repo_config_cli.Config {
+func (env *env) GetCLIConfig() repo_config_cli.Blob {
 	return env.cliConfig
 }

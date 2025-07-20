@@ -14,13 +14,13 @@ import (
 
 type Env interface {
 	StringFormatWriterSkuBoxTransacted(
-		po options_print.V0,
+		po options_print.Options,
 		co string_format_writer.ColorOptions,
 		truncation string_format_writer.CliFormatTruncation,
 	) *box_format.BoxTransacted
 
 	StringFormatWriterSkuBoxCheckedOut(
-		po options_print.V0,
+		po options_print.Options,
 		co string_format_writer.ColorOptions,
 		truncation string_format_writer.CliFormatTruncation,
 		headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
@@ -51,7 +51,7 @@ func Make(
 
 	env.box = box_format.MakeBoxTransactedArchive(
 		env,
-		options_print.V0{}.WithPrintTai(true),
+		options_print.Options{}.WithPrintTai(true),
 	)
 
 	return env
@@ -76,7 +76,7 @@ func (env *env) GetAbbr() (abbr ids.Abbr) {
 }
 
 func (env *env) StringFormatWriterSkuBoxTransacted(
-	printOptions options_print.V0,
+	printOptions options_print.Options,
 	colorOptions string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *box_format.BoxTransacted {
@@ -98,7 +98,7 @@ func (env *env) StringFormatWriterSkuBoxTransacted(
 }
 
 func (env *env) StringFormatWriterSkuBoxCheckedOut(
-	printOptions options_print.V0,
+	printOptions options_print.Options,
 	colorOptions string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],

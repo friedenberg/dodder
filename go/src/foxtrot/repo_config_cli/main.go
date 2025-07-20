@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 )
 
-type Config struct {
+type Blob struct {
 	BasePath string
 
 	Debug            debug.Options
@@ -24,94 +24,105 @@ type Config struct {
 	CheckoutCacheEnabled bool
 	PredictableZettelIds bool
 
-	PrintOptions, maskPrintOptions options_print.V0
+	PrintOptions, maskPrintOptions options_print.Options
 	ToolOptions                    options_tools.Options
 
 	descriptions.Description
 }
 
 // TODO add support for all flags
-func (c Config) GetCLIFlags() (flags []string) {
-	flags = append(flags, fmt.Sprintf("-print-time=%t", c.PrintOptions.PrintTime))
-	flags = append(flags, fmt.Sprintf("-print-colors=%t", c.PrintOptions.PrintColors))
+func (config Blob) GetCLIFlags() (flags []string) {
+	flags = append(
+		flags,
+		fmt.Sprintf("-print-time=%t", config.PrintOptions.PrintTime),
+	)
+	flags = append(
+		flags,
+		fmt.Sprintf("-print-colors=%t", config.PrintOptions.PrintColors),
+	)
 
-	if c.Verbose {
+	if config.Verbose {
 		flags = append(flags, "-verbose")
 	}
 
 	return
 }
 
-func (c *Config) SetFlagSet(flagSet *flag.FlagSet) {
-	flagSet.StringVar(&c.BasePath, "dir-dodder", "", "")
+func (config *Blob) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
-	flagSet.Var(&c.Debug, "debug", "debugging options")
-	flagSet.BoolVar(&c.Todo, "todo", false, "")
-	flagSet.BoolVar(&c.dryRun, "dry-run", false, "")
-	flagSet.BoolVar(&c.Verbose, "verbose", false, "")
-	flagSet.BoolVar(&c.Quiet, "quiet", false, "")
-
-	flagSet.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
+	flagSet.Var(&config.Debug, "debug", "debugging options")
+	flagSet.BoolVar(&config.Todo, "todo", false, "")
+	flagSet.BoolVar(&config.dryRun, "dry-run", false, "")
+	flagSet.BoolVar(&config.Verbose, "verbose", false, "")
+	flagSet.BoolVar(&config.Quiet, "quiet", false, "")
 
 	flagSet.BoolVar(
-		&c.PredictableZettelIds,
+		&config.CheckoutCacheEnabled,
+		"checkout-cache-enabled",
+		false,
+		"",
+	)
+
+	flagSet.BoolVar(
+		&config.PredictableZettelIds,
 		"predictable-zettel-ids",
 		false,
 		"generate new zettel ids in order",
 	)
 
-	c.PrintOptions.AddToFlags(flagSet, &c.maskPrintOptions)
-	c.ToolOptions.AddToFlags(flagSet)
+	config.PrintOptions.AddToFlags(flagSet, &config.maskPrintOptions)
+	config.ToolOptions.AddToFlags(flagSet)
 
 	flagSet.BoolVar(
-		&c.PrintOptions.Newlines,
+		&config.PrintOptions.Newlines,
 		"zittish-newlines",
 		false,
 		"add extra newlines to zittish to improve readability",
 	)
 
 	flagSet.BoolVar(
-		&c.IgnoreHookErrors,
+		&config.IgnoreHookErrors,
 		"ignore-hook-errors",
 		false,
 		"ignores errors coming out of hooks",
 	)
 
-	flagSet.StringVar(&c.Hooks, "hooks", "", "")
+	flagSet.StringVar(&config.Hooks, "hooks", "", "")
 
-	flagSet.Var(&c.Description, "comment", "Comment for inventory list")
+	flagSet.Var(&config.Description, "comment", "Comment for inventory list")
 }
 
-func Default() (c Config) {
-	c.PrintOptions = options_print.Default()
+func Default() (c Blob) {
+	c.PrintOptions = options_print.Default().GetPrintOptions()
 
 	return
 }
 
-func (c *Config) ApplyPrintOptionsConfig(
-	po options_print.V0,
+func (config *Blob) ApplyPrintOptionsConfig(
+	printOptions options_print.Options,
 ) {
-	cliSet := c.PrintOptions
-	c.PrintOptions = po
-	c.PrintOptions.Merge(cliSet, c.maskPrintOptions)
+	cliSet := config.PrintOptions
+	config.PrintOptions = printOptions
+	config.PrintOptions.Merge(cliSet, config.maskPrintOptions)
 }
 
-func (c Config) UsePredictableZettelIds() bool {
-	return c.PredictableZettelIds
+func (config Blob) UsePredictableZettelIds() bool {
+	return config.PredictableZettelIds
 }
 
-func (c Config) UsePrintTime() bool {
-	return c.PrintOptions.PrintTime
+func (config Blob) UsePrintTime() bool {
+	return config.PrintOptions.PrintTime
 }
 
-func (c Config) UsePrintTags() bool {
-	return c.PrintOptions.PrintTagsAlways
+func (config Blob) UsePrintTags() bool {
+	return config.PrintOptions.PrintTagsAlways
 }
 
-func (c Config) IsDryRun() bool {
-	return c.dryRun
+func (config Blob) IsDryRun() bool {
+	return config.dryRun
 }
 
-func (c *Config) SetDryRun(v bool) {
-	c.dryRun = v
+func (config *Blob) SetDryRun(v bool) {
+	config.dryRun = v
 }

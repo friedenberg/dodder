@@ -11,14 +11,14 @@ import (
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-func (s *Store) QueryPrimitive(
+func (store *Store) QueryPrimitive(
 	qg sku.PrimitiveQueryGroup,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	e := pkg_query.MakeExecutorPrimitive(
 		qg,
-		s.GetStreamIndex().ReadPrimitiveQuery,
-		s.ReadOneInto,
+		store.GetStreamIndex().ReadPrimitiveQuery,
+		store.ReadOneInto,
 	)
 
 	if err = e.ExecuteTransacted(f); err != nil {
@@ -29,13 +29,13 @@ func (s *Store) QueryPrimitive(
 	return
 }
 
-func (s *Store) QueryTransacted(
+func (store *Store) QueryTransacted(
 	qg *pkg_query.Query,
 	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var e pkg_query.Executor
 
-	if e, err = s.makeQueryExecutor(qg); err != nil {
+	if e, err = store.makeQueryExecutor(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,13 +66,13 @@ func (s *Store) QueryTransacted(
 	return
 }
 
-func (s *Store) QueryTransactedAsSkuType(
+func (store *Store) QueryTransactedAsSkuType(
 	qg *pkg_query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var e pkg_query.Executor
 
-	if e, err = s.makeQueryExecutor(qg); err != nil {
+	if e, err = store.makeQueryExecutor(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -140,11 +140,11 @@ func (store *Store) QueryExactlyOne(
 	return
 }
 
-func (s *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, err error) {
+func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, err error) {
 	blobShaBytes = make(map[sha.Bytes][]string)
 	var l sync.Mutex
 
-	if err = s.QueryPrimitive(
+	if err = store.QueryPrimitive(
 		sku.MakePrimitiveQueryGroup(),
 		func(sk *sku.Transacted) (err error) {
 			l.Lock()

@@ -45,6 +45,41 @@ function generate { # @test
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
+	run_dodder show "${cmd_def[@]}" -format text :konfig
+	assert_success
+	assert_output - <<-EOM
+		---
+		! toml-config-v1
+		---
+
+		[defaults]
+		type = '!md'
+		tags = []
+
+		[file-extensions]
+		zettel = 'zettel'
+		organize = 'md'
+		type = 'type'
+		tag = 'tag'
+		repo = 'repo'
+		config = 'konfig'
+
+		[cli-output]
+		print-matched-dormant = false
+		print-shas = false
+		print-flush = false
+		print-unchanged = false
+		print-colors = false
+		print-inventory_lists = false
+
+		[cli-output.abbreviations]
+		zettel-ids = false
+		shas = false
+
+		[tools]
+		merge = ['vimdiff']
+	EOM
+
 	run_dodder new "${cmd_def[@]}" -edit=false - <<EOM
 ---
 # wow ok

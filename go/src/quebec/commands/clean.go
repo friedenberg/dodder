@@ -141,7 +141,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err err
 	var changes organize_text.Changes
 
 	if changes, err = organize_text.ChangesFromResults(
-		u.GetConfig().GetCLIConfig().PrintOptions,
+		u.GetConfig().PrintOptions,
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) ReadTransactedFromObjectId(
+func (store *Store) ReadTransactedFromObjectId(
 	k1 interfaces.ObjectId,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
-	if err = s.ReadOneInto(k1, sk1); err != nil {
+	if err = store.ReadOneInto(k1, sk1); err != nil {
 		if collections.IsErrNotFound(err) {
 			sku.GetTransactedPool().Put(sk1)
 			sk1 = nil
@@ -28,12 +28,12 @@ func (s *Store) ReadTransactedFromObjectId(
 	return
 }
 
-func (s *Store) ReadOneObjectId(
+func (store *Store) ReadOneObjectId(
 	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()
 
-	if err = s.GetStreamIndex().ReadOneObjectId(k, sk); err != nil {
+	if err = store.GetStreamIndex().ReadOneObjectId(k, sk); err != nil {
 		err = errors.WrapExcept(err, collections.ErrNotFound)
 		return
 	}
@@ -43,7 +43,7 @@ func (s *Store) ReadOneObjectId(
 
 // TODO add support for cwd and sigil
 // TODO simplify
-func (s *Store) ReadOneInto(
+func (store *Store) ReadOneInto(
 	objectId interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
@@ -53,7 +53,7 @@ func (s *Store) ReadOneInto(
 	case genres.Zettel:
 		var zettelId *ids.ZettelId
 
-		if zettelId, err = s.GetAbbrStore().ZettelId().ExpandString(
+		if zettelId, err = store.GetAbbrStore().ZettelId().ExpandString(
 			objectId.String(),
 		); err == nil {
 			objectId = zettelId
@@ -61,19 +61,19 @@ func (s *Store) ReadOneInto(
 			err = nil
 		}
 
-		if sk, err = s.ReadOneObjectId(objectId); err != nil {
+		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Type, genres.Tag, genres.Repo, genres.InventoryList:
-		if sk, err = s.ReadOneObjectId(objectId); err != nil {
+		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Config:
-		sk = s.GetConfig().GetSku()
+		sk = store.GetConfigStore().GetConfig().GetSku()
 
 		if sk.GetTai().IsEmpty() {
 			ui.Err().Print("config tai is empty")
@@ -87,7 +87,7 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-		if sk, err = s.ReadOneObjectId(objectId); err != nil {
+		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

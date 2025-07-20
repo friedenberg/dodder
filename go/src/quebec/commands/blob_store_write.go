@@ -53,7 +53,7 @@ func (cmd BlobStoreWrite) Run(
 ) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		dep,
-		dep.Config,
+		dep.Blob,
 		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)

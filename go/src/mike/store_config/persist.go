@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -19,8 +19,8 @@ import (
 )
 
 func init() {
-	gob.Register(repo_config_blobs.V1{})
-	gob.Register(repo_config_blobs.V0{})
+	gob.Register(repo_configs.V1{})
+	gob.Register(repo_configs.V0{})
 }
 
 func (store *store) recompile(
@@ -40,9 +40,9 @@ func (store *store) recompile(
 }
 
 func (store *store) recompileTags() (err error) {
-	store.ImplicitTags = make(implicitTagMap)
+	store.config.ImplicitTags = make(implicitTagMap)
 
-	if err = store.compiled.Tags.Each(
+	if err = store.config.Tags.Each(
 		func(ke *tag) (err error) {
 			var e ids.Tag
 
@@ -51,7 +51,7 @@ func (store *store) recompileTags() (err error) {
 				return
 			}
 
-			if err = store.AccumulateImplicitTags(e); err != nil {
+			if err = store.config.AccumulateImplicitTags(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -72,10 +72,10 @@ func (store *store) recompileTypes(
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		store.InlineTypes = inlineTypes.CloneSetLike()
+		store.config.InlineTypes = inlineTypes.CloneSetLike()
 	}()
 
-	if err = store.Types.Each(
+	if err = store.config.Types.Each(
 		func(ct *sku.Transacted) (err error) {
 			tipe := ct.GetSku().GetType()
 			var commonBlob type_blobs.Blob
@@ -102,8 +102,8 @@ func (store *store) recompileTypes(
 			}
 
 			// TODO-P2 enforce uniqueness
-			store.ExtensionsToTypes[fe] = ct.GetObjectId().String()
-			store.TypesToExtensions[ct.GetObjectId().String()] = fe
+			store.config.ExtensionsToTypes[fe] = ct.GetObjectId().String()
+			store.config.TypesToExtensions[ct.GetObjectId().String()] = fe
 
 			isBinary := commonBlob.GetBinary()
 			if !isBinary {
@@ -120,24 +120,24 @@ func (store *store) recompileTypes(
 }
 
 func (store *store) HasChanges() (ok bool) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
+	store.config.lock.Lock()
+	defer store.config.lock.Unlock()
 
-	ok = len(store.compiled.changes) > 0
+	ok = len(store.config.compiled.changes) > 0
 
 	if ok {
-		ui.Log().Print(store.compiled.changes)
+		ui.Log().Print(store.config.compiled.changes)
 	}
 
 	return
 }
 
 func (store *store) GetChanges() (out []string) {
-	store.lock.Lock()
-	defer store.lock.Unlock()
+	store.config.lock.Lock()
+	defer store.config.lock.Unlock()
 
-	out = make([]string, len(store.changes))
-	copy(out, store.changes)
+	out = make([]string, len(store.config.changes))
+	copy(out, store.config.changes)
 
 	return
 }
@@ -169,7 +169,7 @@ func (store *store) loadMutableConfig(
 
 	dec := gob.NewDecoder(file)
 
-	if err = dec.Decode(&store.compiled); err != nil {
+	if err = dec.Decode(&store.config.compiled); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -179,10 +179,9 @@ func (store *store) loadMutableConfig(
 		return
 	}
 
-	// TODO replace with triple_hyphen_io
 	if err = store.loadMutableConfigBlob(
-		store.Sku.GetType(),
-		store.Sku.GetBlobSha(),
+		store.config.Sku.GetType(),
+		store.config.Sku.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -215,7 +214,7 @@ func (store *store) Flush(
 		return
 	}
 
-	store.changes = store.changes[:0]
+	store.config.changes = store.config.changes[:0]
 
 	return
 }
@@ -248,7 +247,7 @@ func (store *store) flushMutableConfig(
 
 	enc := gob.NewEncoder(f)
 
-	if err = enc.Encode(&store.compiled); err != nil {
+	if err = enc.Encode(&store.config.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

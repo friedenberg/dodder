@@ -7,7 +7,7 @@ import (
 )
 
 func StringPrefixFromOptions(
-	options options_print.V0,
+	options options_print.Options,
 ) string {
 	if options.Newlines {
 		return "\n  " + StringIndent

@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type Config struct {
-	toml_v0 TypedStore[repo_config_blobs.V0, *repo_config_blobs.V0]
-	toml_v1 TypedStore[repo_config_blobs.V1, *repo_config_blobs.V1]
+	toml_v0 TypedStore[repo_configs.V0, *repo_configs.V0]
+	toml_v1 TypedStore[repo_configs.V1, *repo_configs.V1]
 }
 
 func MakeConfigStore(
@@ -23,26 +23,26 @@ func MakeConfigStore(
 		toml_v0: MakeBlobStore(
 			envRepo,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_config_blobs.V0](
+				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V0](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_config_blobs.V0, *repo_config_blobs.V0]{},
+				TomlBlobEncoder[repo_configs.V0, *repo_configs.V0]{},
 				envRepo.GetDefaultBlobStore(),
 			),
-			func(a *repo_config_blobs.V0) {
+			func(a *repo_configs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
 			envRepo,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_config_blobs.V1](
+				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V1](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_config_blobs.V1, *repo_config_blobs.V1]{},
+				TomlBlobEncoder[repo_configs.V1, *repo_configs.V1]{},
 				envRepo.GetDefaultBlobStore(),
 			),
-			func(a *repo_config_blobs.V1) {
+			func(a *repo_configs.V1) {
 				a.Reset()
 			},
 		),
@@ -52,11 +52,11 @@ func MakeConfigStore(
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Sha,
-) (common repo_config_blobs.Blob, n int64, err error) {
+) (common repo_configs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
 		store := a.toml_v0
-		var blob *repo_config_blobs.V0
+		var blob *repo_configs.V0
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (a Config) ParseTypedBlob(
 
 	case ids.TypeTomlConfigV1:
 		store := a.toml_v1
-		var blob *repo_config_blobs.V1
+		var blob *repo_configs.V1
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -108,11 +108,11 @@ func (a Config) FormatTypedBlob(
 
 func (a Config) PutTypedBlob(
 	tipe interfaces.ObjectId,
-	common repo_config_blobs.Blob,
+	common repo_configs.Blob,
 ) (err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
-		if blob, ok := common.(*repo_config_blobs.V0); !ok {
+		if blob, ok := common.(*repo_configs.V0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
@@ -120,7 +120,7 @@ func (a Config) PutTypedBlob(
 		}
 
 	case ids.TypeTomlConfigV1:
-		if blob, ok := common.(*repo_config_blobs.V1); !ok {
+		if blob, ok := common.(*repo_configs.V1); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {

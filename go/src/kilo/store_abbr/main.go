@@ -23,7 +23,7 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	options_print.V0
+	options_print.Options
 
 	lock    sync.Locker
 	once    *sync.Once
@@ -38,11 +38,11 @@ type indexAbbr struct {
 }
 
 func NewIndexAbbr(
-	options options_print.V0,
+	options options_print.Options,
 	envRepo env_repo.Env,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		V0:      options,
+		Options: options,
 		lock:    &sync.Mutex{},
 		once:    &sync.Once{},
 		path:    envRepo.DirCache("Abbr"),
@@ -153,7 +153,9 @@ func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	return
 }
 
-func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) {
+func (i *indexAbbr) AddObjectToAbbreviationStore(
+	o *sku.Transacted,
+) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -177,7 +179,11 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 		i.indexAbbrEncodableTridexes.ZettelId.Heads.Add(h.GetHead())
 		i.indexAbbrEncodableTridexes.ZettelId.Tails.Add(h.GetTail())
 
-	case genres.Type, genres.Tag, genres.Config, genres.InventoryList, genres.Repo:
+	case genres.Type,
+		genres.Tag,
+		genres.Config,
+		genres.InventoryList,
+		genres.Repo:
 		return
 
 	default:

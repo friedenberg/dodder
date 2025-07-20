@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/tag_blobs"
 )
 
-func (s *Store) MakeLuaVMPoolV1WithSku(
+func (store *Store) MakeLuaVMPoolV1WithSku(
 	sk *sku.Transacted,
 ) (lvp sku.LuaVMPoolV1, err error) {
 	if sk.GetType().String() != "lua" {
@@ -20,14 +20,14 @@ func (s *Store) MakeLuaVMPoolV1WithSku(
 
 	var readCloser sha.ReadCloser
 
-	if readCloser, err = s.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
+	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	if lvp, err = s.MakeLuaVMPoolWithReader(sk, readCloser); err != nil {
+	if lvp, err = store.MakeLuaVMPoolWithReader(sk, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

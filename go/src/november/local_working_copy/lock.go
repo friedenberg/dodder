@@ -20,11 +20,17 @@ func (local *Repo) Unlock() (err error) {
 	ptl := local.PrinterTransacted()
 
 	if local.storesInitialized {
-		ui.Log().Printf("konfig has changes: %t", local.GetConfig().HasChanges())
-		ui.Log().Printf("dormant has changes: %t", local.GetDormantIndex().HasChanges())
+		ui.Log().Printf(
+			"konfig has changes: %t",
+			local.GetConfigStore().HasChanges(),
+		)
+		ui.Log().Printf(
+			"dormant has changes: %t",
+			local.GetDormantIndex().HasChanges(),
+		)
 
 		var changes []string
-		changes = append(changes, local.GetConfig().GetChanges()...)
+		changes = append(changes, local.GetConfigStore().GetChanges()...)
 		changes = append(changes, local.GetDormantIndex().GetChanges()...)
 		local.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
@@ -56,7 +62,7 @@ func (local *Repo) Unlock() (err error) {
 		if err = local.dormantIndex.Flush(
 			local.GetEnvRepo(),
 			local.PrinterHeader(),
-			local.config.GetCLIConfig().IsDryRun(),
+			local.config.GetConfig().IsDryRun(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -91,7 +91,7 @@ func (cmd Deinit) Run(req command.Request) {
 			)
 		}
 	}
-	
+
 	// TODO decide whether the workspace directory should be deleted too
 
 	if !cmd.Force &&

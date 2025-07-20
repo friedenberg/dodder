@@ -47,7 +47,7 @@ func (s *Store) initializeUrls() (err error) {
 		req,
 	); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			if !s.config.GetCLIConfig().Quiet {
+			if !s.config.GetConfig().Quiet {
 				ui.Err().Print("chrest offline")
 			}
 

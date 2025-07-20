@@ -402,6 +402,10 @@ function show_konfig { # @test
 
 	run_dodder show -format text :konfig
 	assert_output - <<-EOM
+		---
+		! toml-config-v1
+		---
+
 		[defaults]
 		type = '!md'
 		tags = []
@@ -415,20 +419,15 @@ function show_konfig { # @test
 		config = 'konfig'
 
 		[cli-output]
-		print-include-description = false
-		print-time = false
-		print-etiketten-always = false
-		print-empty-shas = false
-		print-include-typen = false
-		print-matched-archiviert = false
+		print-matched-dormant = false
 		print-shas = false
 		print-flush = false
 		print-unchanged = false
 		print-colors = false
-		print-bestandsaufnahme = false
+		print-inventory_lists = false
 
 		[cli-output.abbreviations]
-		hinweisen = false
+		zettel-ids = false
 		shas = false
 
 		[tools]

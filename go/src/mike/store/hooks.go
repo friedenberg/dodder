@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) tryNewHook(
+func (store *Store) tryNewHook(
 	kinder *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
@@ -18,7 +18,7 @@ func (s *Store) tryNewHook(
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
+	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -30,7 +30,7 @@ func (s *Store) tryNewHook(
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -38,7 +38,7 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	defer s.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 
@@ -46,7 +46,7 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	if err = s.tryHookWithName(
+	if err = store.tryHookWithName(
 		kinder,
 		nil,
 		o,
@@ -61,26 +61,26 @@ func (s *Store) tryNewHook(
 	return
 }
 
-func (s *Store) TryFormatHook(
+func (store *Store) TryFormatHook(
 	kinder *sku.Transacted,
 ) (err error) {
 	var mutter *sku.Transacted
 
-	if mutter, err = s.ReadOneObjectId(kinder.GetObjectId()); err != nil {
+	if mutter, err = store.ReadOneObjectId(kinder.GetObjectId()); err != nil {
 		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
 		return
 	}
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
+	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
 		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
 		return
 	}
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -88,7 +88,7 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	defer s.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 
@@ -96,7 +96,7 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	if err = s.tryHookWithName(
+	if err = store.tryHookWithName(
 		kinder,
 		mutter,
 		sku.CommitOptions{},
@@ -111,7 +111,7 @@ func (s *Store) TryFormatHook(
 	return
 }
 
-func (s *Store) tryPreCommitHooks(
+func (store *Store) tryPreCommitHooks(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	o sku.CommitOptions,
@@ -129,7 +129,7 @@ func (s *Store) tryPreCommitHooks(
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
+	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -141,7 +141,7 @@ func (s *Store) tryPreCommitHooks(
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = s.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobSha(),
 	); err != nil {
@@ -149,19 +149,25 @@ func (s *Store) tryPreCommitHooks(
 		return
 	}
 
-	defer s.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
 
 	script := blob.GetStringLuaHooks()
 
 	hooks = append(hooks, hook{script: script, description: "type"})
-	hooks = append(hooks, hook{script: s.GetConfig().GetCLIConfig().Hooks, description: "config-mutable"})
+	hooks = append(
+		hooks,
+		hook{
+			script:      store.GetConfigStore().GetConfig().Hooks,
+			description: "config-mutable",
+		},
+	)
 
 	for _, h := range hooks {
 		if h.script == "" {
 			continue
 		}
 
-		if err = s.tryHookWithName(
+		if err = store.tryHookWithName(
 			kinder,
 			mutter,
 			o,
@@ -172,7 +178,11 @@ func (s *Store) tryPreCommitHooks(
 			err = errors.Wrapf(err, "Hook: %#v", h)
 			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
 
-			if s.envRepo.Retry("hook failed", "ignore error and continue?", err) {
+			if store.envRepo.Retry(
+				"hook failed",
+				"ignore error and continue?",
+				err,
+			) {
 				// TODO fix this to properly continue past the failure
 				err = nil
 			} else {
@@ -184,7 +194,7 @@ func (s *Store) tryPreCommitHooks(
 	return
 }
 
-func (s *Store) tryPreCommitHook(
+func (store *Store) tryPreCommitHook(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	storeOptions sku.StoreOptions,
@@ -197,7 +207,7 @@ func (s *Store) tryPreCommitHook(
 
 	var vp sku.LuaVMPoolV1
 
-	if vp, err = s.MakeLuaVMPoolV1(selbst, script); err != nil {
+	if vp, err = store.MakeLuaVMPoolV1(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -272,7 +282,7 @@ func (s *Store) tryPreCommitHook(
 }
 
 // TODO add method with hook with reader
-func (s *Store) tryHookWithName(
+func (store *Store) tryHookWithName(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	o sku.CommitOptions,
@@ -282,7 +292,7 @@ func (s *Store) tryHookWithName(
 ) (err error) {
 	var vp sku.LuaVMPoolV1
 
-	if vp, err = s.MakeLuaVMPoolV1(self, script); err != nil {
+	if vp, err = store.MakeLuaVMPoolV1(self, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

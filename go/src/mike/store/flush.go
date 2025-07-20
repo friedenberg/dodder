@@ -15,7 +15,7 @@ import (
 func (store *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if store.GetConfig().GetCLIConfig().IsDryRun() {
+	if store.GetConfigStore().GetConfig().IsDryRun() {
 		return
 	}
 
@@ -27,7 +27,7 @@ func (store *Store) FlushInventoryList(
 
 	var inventoryListSku *sku.Transacted
 
-	store.inventoryList.Description = store.GetConfig().GetCLIConfig().Description
+	store.inventoryList.Description = store.GetConfigStoreMutable().GetConfig().Description
 
 	if inventoryListSku, err = store.GetInventoryListStore().Create(
 		store.inventoryList,
@@ -53,7 +53,7 @@ func (store *Store) FlushInventoryList(
 		}
 		defer sku.GetTransactedPool().Put(inventoryListSku)
 
-		if store.GetConfig().GetCLIConfig().PrintOptions.PrintInventoryLists {
+		if store.GetConfigStore().GetConfig().PrintOptions.PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -80,14 +80,16 @@ func (store *Store) Flush(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	// TODO handle flushes with dry run
-	if store.GetConfig().GetCLIConfig().IsDryRun() {
+	if store.GetConfigStore().GetConfig().IsDryRun() {
 		return
 	}
 
 	wg := errors.MakeWaitGroupParallel()
 
 	if store.GetEnvRepo().GetLockSmith().IsAcquired() {
-		gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
+		gob.Register(
+			quiter.StringerKeyerPtr[ids.Type, *ids.Type]{},
+		) // TODO check if can be removed
 		wg.Do(func() error { return store.streamIndex.Flush(printerHeader) })
 		wg.Do(store.GetAbbrStore().Flush)
 		wg.Do(store.zettelIdIndex.Flush)

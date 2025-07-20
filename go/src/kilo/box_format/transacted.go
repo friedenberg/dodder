@@ -17,7 +17,7 @@ import (
 
 func MakeBoxTransactedArchive(
 	env env_ui.Env,
-	options options_print.V0,
+	options options_print.Options,
 ) *BoxTransacted {
 	po := options.
 		WithPrintShas(true).
@@ -47,7 +47,7 @@ func MakeBoxTransactedArchive(
 
 func MakeBoxTransacted(
 	co string_format_writer.ColorOptions,
-	options options_print.V0,
+	options options_print.Options,
 	boxStringEncoder interfaces.StringEncoderTo[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
@@ -67,7 +67,7 @@ func MakeBoxTransacted(
 
 type BoxTransacted struct {
 	optionsColor string_format_writer.ColorOptions
-	optionsPrint options_print.V0
+	optionsPrint options_print.Options
 
 	boxStringEncoder interfaces.StringEncoderTo[string_format_writer.Box]
 	headerWriter     string_format_writer.HeaderWriter[*sku.Transacted]
@@ -230,7 +230,7 @@ func (f *BoxTransacted) addFieldsObjectIds(
 }
 
 func (format *BoxTransacted) addFieldsMetadata(
-	options options_print.V0,
+	options options_print.Options,
 	object *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,

@@ -10,7 +10,7 @@ import (
 
 type Field struct {
 	ColorType
-	Separator          rune
+	Separator rune
 	// TODO switch to using io.StringWriter instead of key and value
 	Key, Value         string
 	DisableValueQuotes bool

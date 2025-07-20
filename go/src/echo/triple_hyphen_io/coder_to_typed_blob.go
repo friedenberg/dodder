@@ -17,7 +17,7 @@ type CoderToTypedBlob[BLOB any] struct {
 	Blob     CoderTypeMapWithoutType[BLOB]
 }
 
-func (coder *CoderToTypedBlob[O]) DecodeFrom(
+func (coder CoderToTypedBlob[O]) DecodeFrom(
 	typedBlob *TypedBlob[O],
 	reader io.Reader,
 ) (n int64, err error) {
@@ -41,7 +41,7 @@ func (coder *CoderToTypedBlob[O]) DecodeFrom(
 	return
 }
 
-func (coder *CoderToTypedBlob[O]) readMetadataFrom(
+func (coder CoderToTypedBlob[O]) readMetadataFrom(
 	typedBlob *TypedBlob[O],
 	reader *io.Reader,
 ) (n int64, err error) {

@@ -6,23 +6,23 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
-var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[Private]{},
-	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Private](
-		map[string]interfaces.CoderBufferedReadWriter[*Private]{
+var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[BlobPrivate]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[BlobPrivate]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[BlobPrivate](
+		map[string]interfaces.CoderBufferedReadWriter[*BlobPrivate]{
 			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
-				Private,
-				*Private,
+				BlobPrivate,
+				*BlobPrivate,
 			]{
-				Progenitor: func() Private {
+				Progenitor: func() BlobPrivate {
 					return &TomlV2Private{}
 				},
 			},
 			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
-				Private,
-				*Private,
+				BlobPrivate,
+				*BlobPrivate,
 			]{
-				Progenitor: func() Private {
+				Progenitor: func() BlobPrivate {
 					return &TomlV1Private{}
 				},
 			},
@@ -30,23 +30,23 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[Private]{
 	),
 }
 
-var CoderPublic = triple_hyphen_io.CoderToTypedBlob[Public]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[Public]{},
-	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Public](
-		map[string]interfaces.CoderBufferedReadWriter[*Public]{
+var CoderPublic = triple_hyphen_io.CoderToTypedBlob[BlobPublic]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[BlobPublic]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[BlobPublic](
+		map[string]interfaces.CoderBufferedReadWriter[*BlobPublic]{
 			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
-				Public,
-				*Public,
+				BlobPublic,
+				*BlobPublic,
 			]{
-				Progenitor: func() Public {
+				Progenitor: func() BlobPublic {
 					return &TomlV2Public{}
 				},
 			},
 			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
-				Public,
-				*Public,
+				BlobPublic,
+				*BlobPublic,
 			]{
-				Progenitor: func() Public {
+				Progenitor: func() BlobPublic {
 					return &TomlV1Public{}
 				},
 			},

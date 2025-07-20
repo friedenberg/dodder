@@ -32,20 +32,20 @@ func (cmd *InitArchive) SetFlagSet(flagSet *flag.FlagSet) {
 func (cmd InitArchive) Run(req command.Request) {
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
-		req.Config.Debug,
+		req.Blob.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Config,
+		req.Blob,
 		env_ui.Options{},
 	)
 
 	var repoLayout env_repo.Env
 
 	layoutOptions := env_repo.Options{
-		BasePath:                req.Config.BasePath,
+		BasePath:                req.Blob.BasePath,
 		PermitNoDodderDirectory: true,
 	}
 

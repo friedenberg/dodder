@@ -14,7 +14,7 @@ import (
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
-	printOptions := local.config.GetCLIConfig().PrintOptions.
+	printOptions := local.config.GetConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false)
 
@@ -23,7 +23,7 @@ func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOu
 		local.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
-			ConfigDryRunReader: local.GetConfig().GetCLIConfig(),
+			ConfigDryRunReader: local.GetConfig(),
 		},
 	)
 
@@ -44,7 +44,7 @@ func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOu
 // TODO make generic external version
 func (local *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
-		local.GetConfig().GetCLIConfig().IsDryRun(),
+		local.GetConfig().IsDryRun(),
 		id_fmts.MakeFDCliFormat(
 			local.FormatColorOptionsOut(),
 			local.envRepo.MakeRelativePathStringFormatWriter(),
@@ -59,7 +59,7 @@ func (local *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 }
 
 func (local *Repo) PrinterHeader() interfaces.FuncIter[string] {
-	if local.config.GetCLIConfig().PrintOptions.PrintFlush {
+	if local.config.GetConfig().PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim(
 			"\n",
 			local.GetErrFile(),
@@ -100,7 +100,7 @@ func (local *Repo) MakePrinterBoxArchive(
 ) interfaces.FuncIter[*sku.Transacted] {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		local.GetEnv(),
-		local.GetConfig().GetCLIConfig().PrintOptions.WithPrintTai(includeTai),
+		local.GetConfig().PrintOptions.WithPrintTai(includeTai),
 	)
 
 	return string_format_writer.MakeDelim(

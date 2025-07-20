@@ -20,19 +20,19 @@ func (cmd EnvRepo) MakeEnvRepo(
 ) env_repo.Env {
 	dir := env_dir.MakeDefault(
 		dep,
-		dep.Config.Debug,
+		dep.Blob.Debug,
 	)
 
 	ui := env_ui.Make(
 		dep,
-		dep.Config,
+		dep.Blob,
 		env_ui.Options{},
 	)
 
 	var envRepo env_repo.Env
 
 	envRepoOptions := env_repo.Options{
-		BasePath:                dep.Config.BasePath,
+		BasePath:                dep.Blob.BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 
@@ -82,7 +82,7 @@ func (EnvRepo) MakeTypedInventoryListBlobStore(
 
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		envRepo,
-		options_print.V0{}.WithPrintTai(true),
+		options_print.Options{}.WithPrintTai(true),
 	)
 
 	return typed_blob_store.MakeInventoryStore(

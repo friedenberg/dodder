@@ -73,7 +73,7 @@ func (store *Store) Initialize(
 		clock:         clock,
 		box: box_format.MakeBoxTransactedArchive(
 			envRepo,
-			options_print.V0{}.WithPrintTai(true),
+			options_print.Options{}.WithPrintTai(true),
 		),
 		options: op,
 	}
@@ -114,7 +114,7 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() genesis_configs.Public {
+func (store *Store) GetImmutableConfigPublic() genesis_configs.BlobPublic {
 	return store.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -122,7 +122,7 @@ func (store *Store) GetImmutableConfigPublicType() ids.Type {
 	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedPrivate {
+func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedBlobPrivate {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

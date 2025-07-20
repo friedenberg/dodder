@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) ReadExternalAndMergeIfNecessary(
+func (store *Store) ReadExternalAndMergeIfNecessary(
 	left, parent *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
@@ -16,7 +16,7 @@ func (s *Store) ReadExternalAndMergeIfNecessary(
 
 	var co *sku.CheckedOut
 
-	if co, err = s.ReadCheckedOutFromTransacted(
+	if co, err = store.ReadCheckedOutFromTransacted(
 		options.RepoId,
 		parent,
 	); err != nil {
@@ -24,7 +24,7 @@ func (s *Store) ReadExternalAndMergeIfNecessary(
 		return
 	}
 
-	defer s.PutCheckedOutLike(co)
+	defer store.PutCheckedOutLike(co)
 
 	right := co.GetSkuExternal().GetSku()
 
@@ -37,7 +37,7 @@ func (s *Store) ReadExternalAndMergeIfNecessary(
 
 		sku.TransactedResetter.ResetWithExceptFields(right, left)
 
-		if err = s.UpdateCheckoutFromCheckedOut(
+		if err = store.UpdateCheckoutFromCheckedOut(
 			op,
 			co,
 		); err != nil {
@@ -55,7 +55,7 @@ func (s *Store) ReadExternalAndMergeIfNecessary(
 		Remote:     right,
 	}
 
-	if err = s.MergeConflicted(conflicted); err != nil {
+	if err = store.MergeConflicted(conflicted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (s *Store) validate(
+func (store *Store) validate(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
@@ -21,7 +21,7 @@ func (s *Store) validate(
 
 		var commonBlob type_blobs.Blob
 
-		if commonBlob, _, err = s.GetTypedBlobStore().Type.ParseTypedBlob(
+		if commonBlob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 			tipe,
 			el.GetSku().GetBlobSha(),
 		); err != nil {
@@ -29,7 +29,7 @@ func (s *Store) validate(
 			return
 		}
 
-		defer s.GetTypedBlobStore().Type.PutTypedBlob(tipe, commonBlob)
+		defer store.GetTypedBlobStore().Type.PutTypedBlob(tipe, commonBlob)
 	}
 
 	return

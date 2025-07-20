@@ -36,7 +36,7 @@ type index struct {
 }
 
 func MakeIndex(
-	configCli repo_config_cli.Config,
+	configCli repo_config_cli.Blob,
 	directory interfaces.Directory,
 	cacheIOFactory interfaces.CacheIOFactory,
 ) (i *index, err error) {

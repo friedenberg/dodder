@@ -134,11 +134,6 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 			Type: bigBang.TypedBlobStoreConfig.Type,
 			Blob: bigBang.TypedBlobStoreConfig.Blob,
 		},
-		// TODO figure out why
-		// &triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
-		// 	Type: ids.MustType(ids.TypeTomlBlobStoreConfigV0),
-		// 	Blob: bigBang.TypedBlobStoreConfig,
-		// },
 		env.DirBlobStoreConfigs(
 			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
 		),
@@ -148,7 +143,6 @@ func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 	}
 }
 
-// TODO remove gob
 func (env *Env) writeFile(path string, contents any) {
 	var file *os.File
 
@@ -172,6 +166,7 @@ func (env *Env) writeFile(path string, contents any) {
 			env.Cancel(err)
 		}
 	} else {
+		// TODO remove gob
 		enc := gob.NewEncoder(file)
 
 		if err := enc.Encode(contents); err != nil {

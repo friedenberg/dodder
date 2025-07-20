@@ -7,7 +7,7 @@ import (
 )
 
 // TODO remove entirely
-func (s *Store) PutCheckedOutLike(co sku.SkuType) {
+func (store *Store) PutCheckedOutLike(co sku.SkuType) {
 	switch co.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	// TODO make generic?
 	case "browser":

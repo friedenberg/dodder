@@ -45,7 +45,7 @@ type BlobStoreInitialized struct {
 type Env struct {
 	env_local.Env
 
-	config genesis_configs.TypedPrivate
+	config genesis_configs.TypedBlobPrivate
 
 	lockSmith interfaces.LockSmith
 
@@ -211,14 +211,14 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
-func (env Env) GetConfigPublic() genesis_configs.TypedPublic {
-	return genesis_configs.TypedPublic{
+func (env Env) GetConfigPublic() genesis_configs.TypedBlobPublic {
+	return genesis_configs.TypedBlobPublic{
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetImmutableConfigPublic(),
 	}
 }
 
-func (env Env) GetConfigPrivate() genesis_configs.TypedPrivate {
+func (env Env) GetConfigPrivate() genesis_configs.TypedBlobPrivate {
 	return env.config
 }
 

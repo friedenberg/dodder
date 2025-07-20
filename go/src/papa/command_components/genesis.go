@@ -30,7 +30,7 @@ func (cmd Genesis) OnTheFirstDay(
 ) repo.LocalRepo {
 	ui := env_ui.Make(
 		req,
-		req.Config,
+		req.Blob,
 		env_ui.Options{},
 	)
 
@@ -44,14 +44,14 @@ func (cmd Genesis) OnTheFirstDay(
 
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
-		req.Config.Debug,
+		req.Blob.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	var envRepo env_repo.Env
 
 	options := env_repo.Options{
-		BasePath:                req.Config.BasePath,
+		BasePath:                req.Blob.BasePath,
 		PermitNoDodderDirectory: true,
 	}
 

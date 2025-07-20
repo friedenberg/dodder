@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -16,54 +16,58 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
-func (s *Store) GetTypedBlobStore() typed_blob_store.Stores {
-	return s.typedBlobStore
+func (store *Store) GetTypedBlobStore() typed_blob_store.Stores {
+	return store.typedBlobStore
 }
 
-func (s *Store) GetEnnui() object_probe_index.Index {
+func (store *Store) GetEnnui() object_probe_index.Index {
 	return nil
 }
 
-func (s *Store) GetProtoZettel() sku.Proto {
-	return s.protoZettel
+func (store *Store) GetProtoZettel() sku.Proto {
+	return store.protoZettel
 }
 
-func (s *Store) GetPersistentMetadataFormat() object_inventory_format.Format {
-	return s.persistentObjectFormat
+func (store *Store) GetPersistentMetadataFormat() object_inventory_format.Format {
+	return store.persistentObjectFormat
 }
 
-func (s *Store) GetTime() thyme.Time {
+func (store *Store) GetTime() thyme.Time {
 	return thyme.Now()
 }
 
-func (s *Store) GetTai() ids.Tai {
+func (store *Store) GetTai() ids.Tai {
 	return ids.NowTai()
 }
 
-func (s *Store) GetInventoryListStore() *inventory_list_store.Store {
-	return &s.inventoryListStore
+func (store *Store) GetInventoryListStore() *inventory_list_store.Store {
+	return &store.inventoryListStore
 }
 
-func (s *Store) GetAbbrStore() sku.AbbrStore {
-	return s.Abbr
+func (store *Store) GetAbbrStore() sku.AbbrStore {
+	return store.Abbr
 }
 
-func (s *Store) GetZettelIdIndex() zettel_id_index.Index {
-	return s.zettelIdIndex
+func (store *Store) GetZettelIdIndex() zettel_id_index.Index {
+	return store.zettelIdIndex
 }
 
-func (s *Store) GetEnvRepo() env_repo.Env {
-	return s.envRepo
+func (store *Store) GetEnvRepo() env_repo.Env {
+	return store.envRepo
 }
 
-func (s *Store) GetConfig() store_config.Store {
-	return s.config
+func (store *Store) GetConfigStore() store_config.Store {
+	return store.storeConfig
 }
 
-func (s *Store) GetStreamIndex() *stream_index.Index {
-	return s.streamIndex
+func (store *Store) GetConfigStoreMutable() store_config.StoreMutable {
+	return store.storeConfig
 }
 
-func (s *Store) GetConfigBlobFormat() interfaces.Format[repo_config_blobs.Blob] {
-	return s.configBlobFormat
+func (store *Store) GetStreamIndex() *stream_index.Index {
+	return store.streamIndex
+}
+
+func (store *Store) GetConfigBlobFormat() interfaces.CoderReadWriter[*repo_configs.TypedBlob] {
+	return store.configBlobCoder
 }

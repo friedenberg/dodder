@@ -55,11 +55,11 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	}
 }
 
-func (config *TomlV1Private) GetImmutableConfig() Private {
+func (config *TomlV1Private) GetImmutableConfig() BlobPrivate {
 	return config
 }
 
-func (config *TomlV1Private) GetImmutableConfigPublic() Public {
+func (config *TomlV1Private) GetImmutableConfigPublic() BlobPublic {
 	return &TomlV1Public{
 		TomlV1Common:    config.TomlV1Common,
 		TomlPublicKeyV0: config.TomlPrivateKeyV0.GetPublicKey(),
@@ -76,7 +76,7 @@ func (config *TomlV1Private) GetPublicKey() repo_signing.PublicKey {
 	)
 }
 
-func (config *TomlV1Public) GetImmutableConfigPublic() Public {
+func (config *TomlV1Public) GetImmutableConfigPublic() BlobPublic {
 	return config
 }
 

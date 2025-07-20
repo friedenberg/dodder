@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -122,7 +122,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 
 	blob := &workspace_config_blobs.V0{
 		Query: cmd.DefaultQueryGroup.String(),
-		Defaults: repo_config_blobs.DefaultsV1OmitEmpty{
+		Defaults: repo_configs.DefaultsV1OmitEmpty{
 			Type: cmd.Proto.Type,
 			Tags: quiter.Elements(cmd.Proto.Tags),
 		},

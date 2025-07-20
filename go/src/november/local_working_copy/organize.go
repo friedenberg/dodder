@@ -14,7 +14,7 @@ func (local *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
 	metadata organize_text.Metadata,
 ) organize_text.Options {
 	options := organizeFlags.GetOptions(
-		local.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().PrintOptions,
 		nil,
 		local.SkuFormatBoxCheckedOutNoColor(),
 		local.GetStore().GetAbbrStore().GetAbbr(),
@@ -31,7 +31,7 @@ func (local *Repo) MakeOrganizeOptionsWithQueryGroup(
 	qg *query.Query,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
-		local.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().PrintOptions,
 		query.GetTags(qg),
 		local.SkuFormatBoxCheckedOutNoColor(),
 		local.GetStore().GetAbbrStore().GetAbbr(),
@@ -43,7 +43,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 	results organize_text.OrganizeResults,
 ) (changeResults organize_text.Changes, err error) {
 	if changeResults, err = organize_text.ChangesFromResults(
-		local.GetConfig().GetCLIConfig().PrintOptions,
+		local.GetConfig().PrintOptions,
 		results,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -95,17 +95,17 @@ func (local *Repo) LockAndCommitOrganizeResults(
 }
 
 func (local *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
-	oo.Config = local.GetConfig()
+	oo.Config = local.GetConfigPtr()
 	oo.Abbr = local.GetStore().GetAbbrStore().GetAbbr()
 
-	if !local.GetConfig().GetCLIConfig().IsDryRun() {
+	if !local.GetConfig().IsDryRun() {
 		return
 	}
 
 	oo.AddPrototypeAndOption(
 		"dry-run",
 		&organize_text.OptionCommentDryRun{
-			MutableConfigDryRun: local.GetConfig(),
+			MutableConfigDryRun: local.GetConfigPtr(),
 		},
 	)
 }

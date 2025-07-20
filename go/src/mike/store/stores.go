@@ -12,8 +12,8 @@ import (
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
-	es := s.envWorkspace.GetStore()
+func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {
+	es := store.envWorkspace.GetStore()
 
 	if err = es.SaveBlob(el); err != nil {
 		if errors.Is(err, env_workspace.ErrUnsupportedOperation{}) {
@@ -27,8 +27,8 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	return
 }
 
-func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
-	es := s.envWorkspace.GetStore()
+func (store *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
+	es := store.envWorkspace.GetStore()
 
 	if err = es.DeleteCheckedOut(col); err != nil {
 		err = errors.Wrap(err)
@@ -48,7 +48,8 @@ func (store *Store) CheckoutQuery(
 	qf := func(t *sku.Transacted) (err error) {
 		var co sku.SkuType
 
-		// TODO include a "query complete" signal for the external store to batch
+		// TODO include a "query complete" signal for the external store to
+		// batch
 		// the checkout if necessary
 		if co, err = externalStore.CheckoutOne(options, t); err != nil {
 			if errors.Is(err, env_workspace.ErrUnsupportedType{}) {
@@ -83,12 +84,12 @@ func (store *Store) CheckoutQuery(
 	return
 }
 
-func (s *Store) CheckoutOne(
+func (store *Store) CheckoutOne(
 	repoId ids.RepoId,
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.SkuType, err error) {
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if cz, err = es.CheckoutOne(
 		options,
@@ -101,11 +102,11 @@ func (s *Store) CheckoutOne(
 	return
 }
 
-func (s *Store) UpdateCheckoutFromCheckedOut(
+func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if err = es.UpdateCheckoutFromCheckedOut(
 		options,
@@ -118,13 +119,13 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	return
 }
 
-func (s *Store) Open(
+func (store *Store) Open(
 	repoId ids.RepoId,
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if err = es.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
@@ -170,10 +171,10 @@ func (store *Store) MergeConflicted(
 	return
 }
 
-func (s *Store) RunMergeTool(
+func (store *Store) RunMergeTool(
 	conflicted sku.Conflicted,
 ) (err error) {
-	tool := s.GetConfig().GetCLIConfig().ToolOptions.Merge
+	tool := store.storeConfig.GetConfig().ToolOptions.Merge
 
 	switch conflicted.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
@@ -182,7 +183,7 @@ func (s *Store) RunMergeTool(
 	default:
 		var co sku.SkuType
 
-		if co, err = s.envWorkspace.GetStoreFS().RunMergeTool(
+		if co, err = store.envWorkspace.GetStoreFS().RunMergeTool(
 			tool,
 			conflicted,
 		); err != nil {
@@ -190,9 +191,9 @@ func (s *Store) RunMergeTool(
 			return
 		}
 
-		defer s.PutCheckedOutLike(co)
+		defer store.PutCheckedOutLike(co)
 
-		if err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
+		if err = store.CreateOrUpdateCheckedOut(co, false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -201,11 +202,11 @@ func (s *Store) RunMergeTool(
 	return
 }
 
-func (s *Store) UpdateTransactedWithExternal(
+func (store *Store) UpdateTransactedWithExternal(
 	repoId ids.RepoId,
 	z *sku.Transacted,
 ) (err error) {
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if err = es.UpdateTransacted(z); err != nil {
 		err = errors.Wrap(err)
@@ -215,11 +216,11 @@ func (s *Store) UpdateTransactedWithExternal(
 	return
 }
 
-func (s *Store) ReadCheckedOutFromTransacted(
+func (store *Store) ReadCheckedOutFromTransacted(
 	repoId ids.RepoId,
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
 		err = errors.Wrap(err)
@@ -229,12 +230,12 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	return
 }
 
-func (s *Store) UpdateTransactedFromBlobs(
+func (store *Store) UpdateTransactedFromBlobs(
 	co *sku.CheckedOut,
 ) (err error) {
 	external := co.GetSkuExternal()
 
-	es := s.envWorkspace.GetStore()
+	es := store.envWorkspace.GetStore()
 
 	if err = es.UpdateTransactedFromBlobs(external); err != nil {
 		err = errors.Wrap(err)

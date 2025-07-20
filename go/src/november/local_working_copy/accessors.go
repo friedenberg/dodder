@@ -22,7 +22,7 @@ func (local *Repo) GetEnv() env_ui.Env {
 	return local
 }
 
-func (local *Repo) GetImmutableConfigPublic() genesis_configs.Public {
+func (local *Repo) GetImmutableConfigPublic() genesis_configs.BlobPublic {
 	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -30,7 +30,7 @@ func (local *Repo) GetImmutableConfigPublicType() ids.Type {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (local *Repo) GetImmutableConfigPrivate() genesis_configs.TypedPrivate {
+func (local *Repo) GetImmutableConfigPrivate() genesis_configs.TypedBlobPrivate {
 	return local.GetEnvRepo().GetConfigPrivate()
 }
 
@@ -50,8 +50,20 @@ func (local *Repo) GetTime() time.Time {
 	return time.Now()
 }
 
-func (local *Repo) GetConfig() store_config.Store {
+func (local *Repo) GetConfigStore() store_config.Store {
 	return local.config
+}
+
+func (local *Repo) GetConfigStoreMutable() store_config.StoreMutable {
+	return local.config
+}
+
+func (local *Repo) GetConfig() store_config.Config {
+	return local.config.GetConfig()
+}
+
+func (local *Repo) GetConfigPtr() *store_config.Config {
+	return local.config.GetConfigPtr()
 }
 
 func (local *Repo) GetDormantIndex() *dormant_index.Index {

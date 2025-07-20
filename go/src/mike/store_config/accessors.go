@@ -10,19 +10,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 func (store *store) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", store.GetFileExtensions().GetFileExtensionZettel())
-}
-
-func (store *store) GetImmutableConfig() genesis_configs.Private {
-	return store.immutable_config_private
+	return fmt.Sprintf(
+		".%s",
+		store.GetConfig().GetFileExtensions().GetFileExtensionZettel(),
+	)
 }
 
 func (kc *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
@@ -127,7 +124,11 @@ func (kc *compiled) getTag(
 			continue
 		}
 
-		if len(next.Transacted.GetObjectId().String()) > len(cursor.Transacted.GetObjectId().String()) {
+		if len(
+			next.Transacted.GetObjectId().String(),
+		) > len(
+			cursor.Transacted.GetObjectId().String(),
+		) {
 			cursor = next
 		}
 	}
@@ -231,8 +232,4 @@ func (c *compiled) GetImplicitTags(
 	}
 
 	return s
-}
-
-func (store *store) Cli() repo_config_cli.Config {
-	return store.cli
 }

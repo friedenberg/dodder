@@ -103,13 +103,14 @@ func (store *Store) addSuperTags(
 		func() {
 			var ek *sku.Transacted
 
-			if ek, err = store.config.GetTagOrRepoIdOrType(ex); err != nil {
+			if ek, err = store.storeConfig.GetConfig().GetTagOrRepoIdOrType(ex); err != nil {
 				err = errors.Wrapf(err, "Expanded: %q", ex)
 				return
 			}
 
 			if ek == nil {
-				// this is ok because currently, konfig is applied twice. However, this
+				// this is ok because currently, konfig is applied twice.
+				// However, this
 				// is fragile as the order in which this method is called is
 				// non-deterministic and the `GetTag` call may request an Tag we
 				// have not processed yet
@@ -156,7 +157,7 @@ func (store *Store) addImplicitTags(
 		p1.Type = tag_paths.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
-		implicitTags := store.config.GetImplicitTags(e)
+		implicitTags := store.storeConfig.GetConfig().GetImplicitTags(e)
 
 		if implicitTags.Len() == 0 {
 			sk.Metadata.Cache.TagPaths.AddPathWithType(p1)
@@ -174,7 +175,9 @@ func (store *Store) addImplicitTags(
 
 	mp.GetTags().EachPtr(addImplicitTags)
 
-	typKonfig := store.config.GetApproximatedType(mp.GetType()).ApproximatedOrActual()
+	typKonfig := store.storeConfig.GetConfig().GetApproximatedType(
+		mp.GetType(),
+	).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetTags().EachPtr(ie.AddPtr)

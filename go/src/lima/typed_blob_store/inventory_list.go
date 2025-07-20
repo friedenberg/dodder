@@ -25,7 +25,7 @@ type InventoryList struct {
 	v1           inventory_list_blobs.V1
 	v2           inventory_list_blobs.V2
 
-	objectCoders   triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
+	objectCoders triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
 	// TODO rewrite these as simple bufferedreader decoders and have a utility
 	// function that turns them into a stream
 	streamDecoders map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]

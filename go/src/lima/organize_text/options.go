@@ -44,7 +44,7 @@ type Options struct {
 	UseMetadataHeader bool
 	Limit             int
 
-	PrintOptions options_print.V0
+	PrintOptions options_print.Options
 	fmtBox       *box_format.BoxCheckedOut
 }
 
@@ -118,7 +118,7 @@ func (o *Flags) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (o *Flags) GetOptionsWithMetadata(
-	printOptions options_print.V0,
+	printOptions options_print.Options,
 	skuFmt *box_format.BoxCheckedOut,
 	abbr ids.Abbr,
 	objectFactory sku.ObjectFactory,
@@ -143,7 +143,7 @@ func (o *Flags) GetOptionsWithMetadata(
 }
 
 func (o *Flags) GetOptions(
-	printOptions options_print.V0,
+	printOptions options_print.Options,
 	tagSet ids.TagSet,
 	skuBoxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr, // TODO move Abbr as required arg

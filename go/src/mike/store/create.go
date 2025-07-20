@@ -14,8 +14,8 @@ import (
 )
 
 // TODO-P2 add support for quiet reindexing
-func (s *Store) Reindex() (err error) {
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
+func (store *Store) Reindex() (err error) {
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "reindex",
 		}
@@ -23,24 +23,24 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.ResetIndexes(); err != nil {
+	if err = store.ResetIndexes(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetEnvRepo().ResetCache(); err != nil {
+	if err = store.GetEnvRepo().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetStreamIndex().Initialize(); err != nil {
+	if err = store.GetStreamIndex().Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	missingObjects := sku.MakeList()
 
-	for objectWithList, iterErr := range s.GetInventoryListStore().IterAllSkus() {
+	for objectWithList, iterErr := range store.GetInventoryListStore().IterAllSkus() {
 		if iterErr != nil {
 			if env_dir.IsErrBlobMissing(iterErr) {
 				missingObjects.Add(objectWithList.List)
@@ -51,16 +51,16 @@ func (s *Store) Reindex() (err error) {
 			return
 		}
 
-		if err = s.reindexOne(objectWithList); err != nil {
+		if err = store.reindexOne(objectWithList); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	s.envRepo.GetUI().Print("missing list blobs: ")
+	store.envRepo.GetUI().Print("missing list blobs: ")
 
 	for missingList := range missingObjects.All() {
-		s.envRepo.GetUI().Print(sku.String(missingList))
+		store.envRepo.GetUI().Print(sku.String(missingList))
 	}
 
 	return
@@ -98,11 +98,11 @@ func (store *Store) CreateOrUpdate(
 	return
 }
 
-func (s *Store) CreateOrUpdateBlobSha(
+func (store *Store) CreateOrUpdateBlobSha(
 	k interfaces.ObjectId,
 	sh interfaces.Sha,
 ) (t *sku.Transacted, err error) {
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
@@ -120,7 +120,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 		return
 	}
 
-	if err = s.ReadOneInto(k, t); err != nil {
+	if err = store.ReadOneInto(k, t); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -131,7 +131,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 
 	t.SetBlobSha(sh)
 
-	if err = s.Commit(
+	if err = store.Commit(
 		t,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
@@ -147,14 +147,14 @@ type RevertId struct {
 	ids.Tai
 }
 
-func (s *Store) RevertTo(
+func (store *Store) RevertTo(
 	ri RevertId,
 ) (err error) {
 	if ri.Tai.IsEmpty() {
 		return
 	}
 
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "update many metadata",
 		}
@@ -164,7 +164,7 @@ func (s *Store) RevertTo(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.GetStreamIndex().ReadOneObjectIdTai(
+	if mutter, err = store.GetStreamIndex().ReadOneObjectIdTai(
 		ri.ObjectId,
 		ri.Tai,
 	); err != nil {
@@ -174,7 +174,7 @@ func (s *Store) RevertTo(
 
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err = s.Commit(
+	if err = store.Commit(
 		mutter,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
@@ -185,14 +185,14 @@ func (s *Store) RevertTo(
 	return
 }
 
-func (s *Store) CreateOrUpdateCheckedOut(
+func (store *Store) CreateOrUpdateCheckedOut(
 	col sku.SkuType,
 	updateCheckout bool,
 ) (err error) {
 	external := col.GetSkuExternal()
 	internal := external.GetSku()
 
-	if !s.GetEnvRepo().GetLockSmith().IsAcquired() {
+	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", internal.GetObjectId()),
 		}
@@ -200,7 +200,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.Commit(
+	if err = store.Commit(
 		external,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsCreate()},
 	); err != nil {
@@ -212,7 +212,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.UpdateCheckoutFromCheckedOut(
+	if err = store.UpdateCheckoutFromCheckedOut(
 		checkout_options.OptionsWithoutMode{Force: true},
 		col,
 	); err != nil {

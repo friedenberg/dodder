@@ -19,7 +19,7 @@ EOM
   exit 1
 fi
 
-pushd "$BATS_TEST_TMPDIR" || exit 1
+pushd "$BATS_TEST_TMPDIR" >/dev/null || exit 1
 
 load "$BATS_CWD/test_helper/bats-support/load"
 load "$BATS_CWD/test_helper/bats-assert/load"
@@ -96,8 +96,6 @@ fi
 
 if [[ -z $DODDER_VERSION ]]; then
   export DODDER_VERSION
-  echo "hello $XDG_DATA_HOME"
-  "$DODDER_BIN" info xdg
   DODDER_VERSION="v$("$DODDER_BIN" info store-version)"
 fi
 
@@ -171,7 +169,7 @@ function get_konfig_sha() {
   if [[ $storeVersionCurrent -le 10 ]]; then
     echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
   else
-    echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
+    echo -n "d23cb9e6237446e0ff798250c9e82862f29afd997581c9aefdf4916cebd00b90"
   fi
 }
 
