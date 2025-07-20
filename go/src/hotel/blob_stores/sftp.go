@@ -18,7 +18,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -26,6 +25,8 @@ import (
 )
 
 type sftpBlobStore struct {
+	buckets []int
+
 	config blob_store_configs.ConfigSFTPRemotePath
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
@@ -44,6 +45,7 @@ func makeSftpStore(
 	sshClient *ssh.Client,
 ) (store *sftpBlobStore, err error) {
 	store = &sftpBlobStore{
+		buckets:   defaultBuckets,
 		config:    config,
 		sshClient: sshClient,
 		blobCache: make(map[sha.Bytes]struct{}),
@@ -128,8 +130,9 @@ func (blobStore *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
-	return id.Path(
-		sh.GetShaLike(),
+	return env_dir.MakeHashBucketPathFromSha(
+		sh,
+		blobStore.buckets,
 		strings.TrimPrefix(blobStore.config.GetRemotePath(), "/"),
 	)
 }

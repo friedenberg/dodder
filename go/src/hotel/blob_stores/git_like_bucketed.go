@@ -8,27 +8,28 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-type gitLikeBucketed struct {
-	config   blob_store_configs.ConfigLocalGitLikeBucketed
+type localHashBucketed struct {
+	buckets  []int
+	config   blob_store_configs.ConfigLocalHashBucketed
 	basePath string
 	tempFS   env_dir.TemporaryFS
 }
 
-func makeGitLikeBucketedStore(
+func makeLocalHashBucketed(
 	ctx interfaces.Context,
 	basePath string,
-	config blob_store_configs.ConfigLocalGitLikeBucketed,
+	config blob_store_configs.ConfigLocalHashBucketed,
 	tempFS env_dir.TemporaryFS,
-) (gitLikeBucketed, error) {
+) (localHashBucketed, error) {
 	// TODO validate
-	store := gitLikeBucketed{
+	store := localHashBucketed{
+		buckets:  defaultBuckets, // TODO add to config
 		config:   config,
 		basePath: basePath,
 		tempFS:   tempFS,
@@ -37,26 +38,26 @@ func makeGitLikeBucketedStore(
 	return store, nil
 }
 
-func (blobStore gitLikeBucketed) GetBlobStoreDescription() string {
+func (blobStore localHashBucketed) GetBlobStoreDescription() string {
 	return fmt.Sprintf("TODO: local-git-like")
 }
 
-func (blobStore gitLikeBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return blobStore.config
 }
 
-func (blobStore gitLikeBucketed) GetLocalBlobStore() interfaces.LocalBlobStore {
+func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.LocalBlobStore {
 	return blobStore
 }
 
-func (blobStore gitLikeBucketed) makeEnvDirConfig() env_dir.Config {
+func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
 	)
 }
 
-func (blobStore gitLikeBucketed) HasBlob(
+func (blobStore localHashBucketed) HasBlob(
 	sh interfaces.Sha,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
@@ -64,13 +65,17 @@ func (blobStore gitLikeBucketed) HasBlob(
 		return
 	}
 
-	path := id.Path(sh.GetShaLike(), blobStore.basePath)
+	path := env_dir.MakeHashBucketPathFromSha(
+		sh,
+		blobStore.buckets,
+		blobStore.basePath,
+	)
 	ok = files.Exists(path)
 
 	return
 }
 
-func (blobStore gitLikeBucketed) AllBlobs() interfaces.SeqError[interfaces.Sha] {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Sha] {
 	return func(yield func(interfaces.Sha, error) bool) {
 		var sh sha.Sha
 
@@ -105,7 +110,7 @@ func (blobStore gitLikeBucketed) AllBlobs() interfaces.SeqError[interfaces.Sha] 
 	}
 }
 
-func (blobStore gitLikeBucketed) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (blobStore localHashBucketed) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -114,7 +119,7 @@ func (blobStore gitLikeBucketed) BlobWriter() (w interfaces.ShaWriteCloser, err 
 	return
 }
 
-func (blobStore gitLikeBucketed) Mover() (mover interfaces.Mover, err error) {
+func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 	if mover, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -123,15 +128,18 @@ func (blobStore gitLikeBucketed) Mover() (mover interfaces.Mover, err error) {
 	return
 }
 
-func (blobStore gitLikeBucketed) BlobReader(
+func (blobStore localHashBucketed) BlobReader(
 	sh interfaces.Sha,
-) (r interfaces.ShaReadCloser, err error) {
+) (readeCloser interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
-		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+		readeCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 
-	if r, err = blobStore.blobReaderFrom(sh, blobStore.basePath); err != nil {
+	if readeCloser, err = blobStore.blobReaderFrom(
+		sh,
+		blobStore.basePath,
+	); err != nil {
 		if !env_dir.IsErrBlobMissing(err) {
 			err = errors.Wrap(err)
 		}
@@ -142,7 +150,7 @@ func (blobStore gitLikeBucketed) BlobReader(
 	return
 }
 
-func (blobStore gitLikeBucketed) blobWriterTo(
+func (blobStore localHashBucketed) blobWriterTo(
 	path string,
 ) (mover interfaces.Mover, err error) {
 	if mover, err = env_dir.NewMover(
@@ -160,7 +168,7 @@ func (blobStore gitLikeBucketed) blobWriterTo(
 	return
 }
 
-func (blobStore gitLikeBucketed) blobReaderFrom(
+func (blobStore localHashBucketed) blobReaderFrom(
 	sh sha.ShaLike,
 	path string,
 ) (readCloser sha.ReadCloser, err error) {
@@ -169,7 +177,11 @@ func (blobStore gitLikeBucketed) blobReaderFrom(
 		return
 	}
 
-	path = id.Path(sh.GetShaLike(), path)
+	path = env_dir.MakeHashBucketPathFromSha(
+		sh.GetShaLike(),
+		blobStore.buckets,
+		path,
+	)
 
 	if readCloser, err = env_dir.NewFileReader(
 		blobStore.makeEnvDirConfig(),

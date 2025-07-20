@@ -8,11 +8,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
+	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -174,7 +174,10 @@ func (store *Store) shouldCheckOut(
 		cz.GetSku().GetObjectId(),
 		mutter,
 	); err == nil {
-		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.GetSkuExternal().Metadata) {
+		if object_metadata.EqualerSansTai.Equals(
+			&mutter.Metadata,
+			&cz.GetSkuExternal().Metadata,
+		) {
 			return true
 		}
 	}
@@ -247,7 +250,7 @@ func (store *Store) SetFilenameForTransacted(
 			return
 		}
 
-		if info.basename, err = id.MakeDirIfNecessary(h, cwd); err != nil {
+		if info.basename, err = env_dir.MakeDirIfNecessary(h, cwd); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -259,12 +262,18 @@ func (store *Store) SetFilenameForTransacted(
 	}
 
 	if strings.Contains(info.basename, "!") {
-		err = errors.ErrorWithStackf("contains illegal characters: %q", info.basename)
+		err = errors.ErrorWithStackf(
+			"contains illegal characters: %q",
+			info.basename,
+		)
 		return
 	}
 
 	if strings.Contains(info.objectName, "!") {
-		err = errors.ErrorWithStackf("contains illegal characters: %q", info.objectName)
+		err = errors.ErrorWithStackf(
+			"contains illegal characters: %q",
+			info.objectName,
+		)
 		return
 	}
 

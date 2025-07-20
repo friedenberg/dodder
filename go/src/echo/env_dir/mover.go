@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/id"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
@@ -112,7 +111,7 @@ func (mover *localFileMover) Close() (err error) {
 			return
 		}
 
-		if mover.objectPath, err = id.MakeDirIfNecessary(sh, mover.basePath); err != nil {
+		if mover.objectPath, err = MakeDirIfNecessary(sh, mover.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

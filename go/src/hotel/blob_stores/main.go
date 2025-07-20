@@ -17,6 +17,8 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 )
 
+var defaultBuckets = []int{2}
+
 // TODO describe base path agnostically
 func MakeBlobStore(
 	ctx interfaces.Context,
@@ -58,8 +60,8 @@ func MakeBlobStore(
 		return makeSftpStore(ctx, configSFTP, sshClient)
 
 	case "local":
-		if config, ok := config.(blob_store_configs.ConfigLocalGitLikeBucketed); ok {
-			return makeGitLikeBucketedStore(ctx, basePath, config, tempFS)
+		if config, ok := config.(blob_store_configs.ConfigLocalHashBucketed); ok {
+			return makeLocalHashBucketed(ctx, basePath, config, tempFS)
 		} else {
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
 			return

@@ -18,7 +18,7 @@ type (
 		interfaces.CommandComponent
 	}
 
-	ConfigLocalGitLikeBucketed interface {
+	ConfigLocalHashBucketed interface {
 		interfaces.BlobIOWrapper
 		GetLockInternalFiles() bool
 	}
@@ -48,11 +48,11 @@ type (
 )
 
 var (
-	_ ConfigLocalGitLikeBucketed = &TomlV0{}
-	_ ConfigSFTPRemotePath       = &TomlSFTPV0{}
-	_ ConfigSFTPRemotePath       = &TomlSFTPViaSSHConfigV0{}
-	_ ConfigMutable              = &TomlV0{}
-	_ ConfigMutable              = &TomlSFTPV0{}
+	_ ConfigLocalHashBucketed = &TomlV0{}
+	_ ConfigSFTPRemotePath    = &TomlSFTPV0{}
+	_ ConfigSFTPRemotePath    = &TomlSFTPViaSSHConfigV0{}
+	_ ConfigMutable           = &TomlV0{}
+	_ ConfigMutable           = &TomlSFTPV0{}
 )
 
 func Default() *TypedMutableConfig {

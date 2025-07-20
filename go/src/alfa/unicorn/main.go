@@ -1,6 +1,7 @@
 package unicorn
 
 import (
+	"fmt"
 	"unicode"
 	"unicode/utf8"
 )
@@ -26,4 +27,32 @@ func CountRune(b []byte, r rune) (c int) {
 	}
 
 	return
+}
+
+func CutNCharacters(data []byte, n int) ([]byte, []byte) {
+	if n <= 0 {
+		panic(fmt.Sprintf("n must be >= 0, but was %d", n))
+	}
+
+	if n == 0 {
+		return nil, data
+	}
+
+	count := 0
+	for i := 0; i < len(data); {
+		if count == n {
+			return data[:i], data[i:]
+		}
+
+		ch, size := utf8.DecodeRune(data[i:])
+
+		if ch == utf8.RuneError {
+			panic("invalid utf8 sequence")
+		}
+
+		i += size
+		count++
+	}
+
+	return data, nil // Less than n runes in total
 }
