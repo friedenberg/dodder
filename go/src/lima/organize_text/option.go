@@ -171,14 +171,14 @@ func (ocf *OptionCommentDryRun) CloneOptionComment() OptionComment {
 }
 
 func (ocf *OptionCommentDryRun) Set(v string) (err error) {
-	var b values.Bool
+	var boolValue values.Bool
 
-	if err = b.Set(v); err != nil {
+	if err = boolValue.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ocf.SetDryRun(b.Bool())
+	ocf.SetDryRun(boolValue.Bool())
 
 	return
 }

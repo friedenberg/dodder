@@ -15,10 +15,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (store *store) GetZettelFileExtension() string {
+func (config *Config) GetZettelFileExtension() string {
 	return fmt.Sprintf(
 		".%s",
-		store.GetConfig().GetFileExtensions().GetFileExtensionZettel(),
+		config.GetFileExtensions().GetFileExtensionZettel(),
 	)
 }
 

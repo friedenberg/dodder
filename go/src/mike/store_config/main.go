@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -145,18 +144,6 @@ func (store *store) Initialize(
 	return
 }
 
-func (store *store) SetCli(k repo_config_cli.Blob) {
-	store.config.CLI = k
-}
-
-func (store *store) IsDryRun() bool {
-	return store.config.IsDryRun()
-}
-
-func (store *store) SetDryRun(v bool) {
-	store.config.SetDryRun(v)
-}
-
 func (store *store) AddTransacted(
 	child *sku.Transacted,
 	parent *sku.Transacted,
@@ -233,18 +220,6 @@ func (store *store) AddTransacted(
 	}
 
 	store.config.SetNeedsRecompile(fmt.Sprintf("modified: %s", child))
-
-	return
-}
-
-func (config Config) IsInlineType(tipe ids.Type) (isInline bool) {
-	comments.Change("fix this horrible hack")
-	if tipe.IsEmpty() {
-		return true
-	}
-
-	isInline = config.InlineTypes.ContainsKey(tipe.String()) ||
-		ids.IsBuiltin(tipe)
 
 	return
 }

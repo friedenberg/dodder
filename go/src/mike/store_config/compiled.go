@@ -5,10 +5,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -108,4 +110,16 @@ func (config *Config) GetTypeStringFromExtension(t string) string {
 
 func (config *Config) GetTypeExtension(v string) string {
 	return config.TypesToExtensions[v]
+}
+
+func (config Config) IsInlineType(tipe ids.Type) (isInline bool) {
+	comments.Change("fix this horrible hack")
+	if tipe.IsEmpty() {
+		return true
+	}
+
+	isInline = config.InlineTypes.ContainsKey(tipe.String()) ||
+		ids.IsBuiltin(tipe)
+
+	return
 }

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
+// TODO remove
 func TestGob(t1 *testing.T) {
 	t := ui.T{T: t1}
 
