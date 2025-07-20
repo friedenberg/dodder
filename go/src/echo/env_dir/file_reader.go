@@ -33,6 +33,7 @@ func NewFileReader(
 		}
 
 		config = MakeConfig(
+			config.splitFunc,
 			config.GetBlobCompression(),
 			&age.Age{},
 		)

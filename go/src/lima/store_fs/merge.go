@@ -364,6 +364,7 @@ func (store *Store) GenerateConflictMarker(
 
 		if _, err = env_dir.MakeDirIfNecessary(
 			h,
+			env_dir.Path,
 			store.envRepo.GetCwd(),
 		); err != nil {
 			err = errors.Wrap(err)

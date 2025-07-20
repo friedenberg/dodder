@@ -250,7 +250,11 @@ func (store *Store) SetFilenameForTransacted(
 			return
 		}
 
-		if info.basename, err = env_dir.MakeDirIfNecessary(h, cwd); err != nil {
+		if info.basename, err = env_dir.MakeDirIfNecessary(
+			h,
+			env_dir.Path,
+			cwd,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

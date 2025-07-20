@@ -84,6 +84,7 @@ func (cmd Export) Run(dep command.Request) {
 
 		if writeCloser, err = env_dir.NewWriter(
 			env_dir.MakeConfig(
+				env_dir.MakeHashBucketPathSplitFunc([]int{2}),
 				&cmd.CompressionType,
 				&ag,
 			),

@@ -71,6 +71,7 @@ func (cmd Import) Run(dep command.Request) {
 
 		if readCloser, err = env_dir.NewFileReader(
 			env_dir.MakeConfig(
+				env_dir.MakeHashBucketPathSplitFunc(cmd.Config.GetHashBuckets()),
 				cmd.Config.GetBlobCompression(),
 				cmd.Config.GetBlobEncryption(),
 			),

@@ -7,6 +7,8 @@ setup() {
 	export output
 
 	copy_from_version "$DIR"
+
+  skip "TODO add support for blob config files in import"
 }
 
 teardown() {

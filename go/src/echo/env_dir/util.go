@@ -90,12 +90,24 @@ func Path(
 	return path.Join(pathComponents...)
 }
 
+func MakeHashBucketPathSplitFunc(
+	buckets []int,
+) func(interfaces.StringerWithHeadAndTail, ...string) string {
+	return func(stringer interfaces.StringerWithHeadAndTail, pathComponents ...string) string {
+		return MakeHashBucketPath(
+			[]byte(stringer.String()),
+			buckets,
+			pathComponents...)
+	}
+}
+
 // TODO migrate to using Env and accepting path generation function
 func MakeDirIfNecessary(
 	i interfaces.StringerWithHeadAndTail,
+	splitFunc func(interfaces.StringerWithHeadAndTail, ...string) string,
 	pc ...string,
 ) (p string, err error) {
-	p = Path(i, pc...)
+	p = splitFunc(i, pc...)
 	dir := path.Dir(p)
 
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {

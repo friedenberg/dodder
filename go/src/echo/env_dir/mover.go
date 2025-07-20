@@ -16,7 +16,8 @@ type MoveOptions struct {
 }
 
 type localFileMover struct {
-	file *os.File
+	splitFunc func(interfaces.StringerWithHeadAndTail, ...string) string
+	file      *os.File
 	interfaces.ShaWriteCloser
 
 	basePath                  string
@@ -42,6 +43,7 @@ func newMover(
 	moveOptions MoveOptions,
 ) (mover *localFileMover, err error) {
 	mover = &localFileMover{
+		splitFunc:                 config.splitFunc,
 		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
 
@@ -111,7 +113,11 @@ func (mover *localFileMover) Close() (err error) {
 			return
 		}
 
-		if mover.objectPath, err = MakeDirIfNecessary(sh, mover.basePath); err != nil {
+		if mover.objectPath, err = MakeDirIfNecessary(
+			sh,
+			mover.splitFunc,
+			mover.basePath,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

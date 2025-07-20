@@ -20,6 +20,7 @@ type (
 
 	ConfigLocalHashBucketed interface {
 		interfaces.BlobIOWrapper
+		GetHashBuckets() []int
 		GetLockInternalFiles() bool
 	}
 
@@ -59,6 +60,7 @@ func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
 		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV0).Type,
 		Blob: &TomlV0{
+			HashBuckets:       []int{2},
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,
 		},
