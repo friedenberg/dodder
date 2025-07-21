@@ -115,7 +115,7 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() genesis_configs.BlobPublic {
+func (store *Store) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
 	return store.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -123,7 +123,7 @@ func (store *Store) GetImmutableConfigPublicType() ids.Type {
 	return store.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedBlobPrivate {
+func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedConfigPrivate {
 	return store.GetEnvRepo().GetConfigPrivate()
 }
 

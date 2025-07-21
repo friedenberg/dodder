@@ -22,7 +22,7 @@ func (local *Repo) GetEnv() env_ui.Env {
 	return local
 }
 
-func (local *Repo) GetImmutableConfigPublic() genesis_configs.BlobPublic {
+func (local *Repo) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
 	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 
@@ -30,7 +30,7 @@ func (local *Repo) GetImmutableConfigPublicType() ids.Type {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 
-func (local *Repo) GetImmutableConfigPrivate() genesis_configs.TypedBlobPrivate {
+func (local *Repo) GetImmutableConfigPrivate() genesis_configs.TypedConfigPrivate {
 	return local.GetEnvRepo().GetConfigPrivate()
 }
 

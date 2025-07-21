@@ -10,7 +10,7 @@ import (
 
 // Config used to initialize a repo for the first time
 type BigBang struct {
-	GenesisConfig        *genesis_configs.TypedBlobPrivateMutable
+	GenesisConfig        *genesis_configs.TypedConfigPrivateMutable
 	TypedBlobStoreConfig *blob_store_configs.TypedMutableConfig
 
 	Yin                  string

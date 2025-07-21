@@ -12,8 +12,8 @@ import (
 )
 
 type (
-	BlobPublic interface {
-		GetImmutableConfigPublic() BlobPublic
+	ConfigPublic interface {
+		GetImmutableConfigPublic() ConfigPublic
 		GetStoreVersion() StoreVersion
 		GetPublicKey() repo_signing.PublicKey
 		GetRepoType() repo_type.Type
@@ -21,14 +21,14 @@ type (
 		GetInventoryListTypeString() string
 	}
 
-	BlobPrivate interface {
-		BlobPublic
-		GetImmutableConfig() BlobPrivate
+	ConfigPrivate interface {
+		ConfigPublic
+		GetImmutableConfig() ConfigPrivate
 		GetPrivateKey() repo_signing.PrivateKey
 	}
 
-	BlobPrivateMutable interface {
-		BlobPrivate
+	ConfigPrivateMutable interface {
+		ConfigPrivate
 
 		// TODO separate into non-method function that uses properties
 		interfaces.CommandComponent
@@ -37,18 +37,18 @@ type (
 		repo_signing.Generator
 	}
 
-	TypedBlobPublic         = triple_hyphen_io.TypedBlob[BlobPublic]
-	TypedBlobPrivate        = triple_hyphen_io.TypedBlob[BlobPrivate]
-	TypedBlobPrivateMutable = triple_hyphen_io.TypedBlob[BlobPrivateMutable]
+	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]
+	TypedConfigPrivate        = triple_hyphen_io.TypedBlob[ConfigPrivate]
+	TypedConfigPrivateMutable = triple_hyphen_io.TypedBlob[ConfigPrivateMutable]
 )
 
-func Default() *TypedBlobPrivateMutable {
+func Default() *TypedConfigPrivateMutable {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
-func DefaultWithVersion(storeVersion StoreVersion) *TypedBlobPrivateMutable {
+func DefaultWithVersion(storeVersion StoreVersion) *TypedConfigPrivateMutable {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		return &TypedBlobPrivateMutable{
+		return &TypedConfigPrivateMutable{
 			Type: ids.GetOrPanic(
 				ids.TypeTomlConfigImmutableV1,
 			).Type,
@@ -65,7 +65,7 @@ func DefaultWithVersion(storeVersion StoreVersion) *TypedBlobPrivateMutable {
 			},
 		}
 	} else {
-		return &TypedBlobPrivateMutable{
+		return &TypedConfigPrivateMutable{
 			Type: ids.GetOrPanic(
 				ids.TypeTomlConfigImmutableV2,
 			).Type,

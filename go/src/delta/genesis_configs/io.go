@@ -6,23 +6,23 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
-var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[BlobPrivate]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[BlobPrivate]{},
-	Blob: triple_hyphen_io.CoderTypeMapWithoutType[BlobPrivate](
-		map[string]interfaces.CoderBufferedReadWriter[*BlobPrivate]{
+var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[ConfigPrivate]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[ConfigPrivate]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[ConfigPrivate](
+		map[string]interfaces.CoderBufferedReadWriter[*ConfigPrivate]{
 			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
-				BlobPrivate,
-				*BlobPrivate,
+				ConfigPrivate,
+				*ConfigPrivate,
 			]{
-				Progenitor: func() BlobPrivate {
+				Progenitor: func() ConfigPrivate {
 					return &TomlV2Private{}
 				},
 			},
 			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
-				BlobPrivate,
-				*BlobPrivate,
+				ConfigPrivate,
+				*ConfigPrivate,
 			]{
-				Progenitor: func() BlobPrivate {
+				Progenitor: func() ConfigPrivate {
 					return &TomlV1Private{}
 				},
 			},
@@ -30,23 +30,23 @@ var CoderPrivate = triple_hyphen_io.CoderToTypedBlob[BlobPrivate]{
 	),
 }
 
-var CoderPublic = triple_hyphen_io.CoderToTypedBlob[BlobPublic]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[BlobPublic]{},
-	Blob: triple_hyphen_io.CoderTypeMapWithoutType[BlobPublic](
-		map[string]interfaces.CoderBufferedReadWriter[*BlobPublic]{
+var CoderPublic = triple_hyphen_io.CoderToTypedBlob[ConfigPublic]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[ConfigPublic]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[ConfigPublic](
+		map[string]interfaces.CoderBufferedReadWriter[*ConfigPublic]{
 			ids.TypeTomlConfigImmutableV2: triple_hyphen_io.CoderToml[
-				BlobPublic,
-				*BlobPublic,
+				ConfigPublic,
+				*ConfigPublic,
 			]{
-				Progenitor: func() BlobPublic {
+				Progenitor: func() ConfigPublic {
 					return &TomlV2Public{}
 				},
 			},
 			ids.TypeTomlConfigImmutableV1: triple_hyphen_io.CoderToml[
-				BlobPublic,
-				*BlobPublic,
+				ConfigPublic,
+				*ConfigPublic,
 			]{
-				Progenitor: func() BlobPublic {
+				Progenitor: func() ConfigPublic {
 					return &TomlV1Public{}
 				},
 			},

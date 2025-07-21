@@ -253,7 +253,7 @@ func (transacted *Transacted) GetKey() string {
 }
 
 func (transacted *Transacted) Sign(
-	config genesis_configs.BlobPrivate,
+	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 

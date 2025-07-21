@@ -198,7 +198,7 @@ func (format V2) StreamInventoryListBlobSkus(
 
 type V2ObjectCoder struct {
 	Box                    *box_format.BoxTransacted
-	ImmutableConfigPrivate genesis_configs.BlobPrivate
+	ImmutableConfigPrivate genesis_configs.ConfigPrivate
 }
 
 func (coder V2ObjectCoder) EncodeTo(
