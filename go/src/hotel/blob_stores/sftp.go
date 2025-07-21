@@ -212,7 +212,7 @@ func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Digest
 	}
 }
 
-func (blobStore *sftpBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (blobStore *sftpBlobStore) BlobWriter() (w interfaces.WriteCloserDigester, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -233,7 +233,7 @@ func (blobStore *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
 
 func (blobStore *sftpBlobStore) BlobReader(
 	sh interfaces.Digest,
-) (readCloser interfaces.ShaReadCloser, err error) {
+) (readCloser interfaces.ReadCloserDigester, err error) {
 	if sh.GetDigest().IsNull() {
 		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
@@ -501,7 +501,7 @@ type sftpStreamingReader struct {
 	config interfaces.BlobIOWrapper
 }
 
-func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ShaReadCloser, err error) {
+func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ReadCloserDigester, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,

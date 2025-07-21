@@ -45,14 +45,14 @@ func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
 	return
 }
 
-func (client *client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (client *client) BlobWriter() (w interfaces.WriteCloserDigester, err error) {
 	err = comments.Implement()
 	return
 }
 
 func (client *client) BlobReader(
 	sh interfaces.Digest,
-) (reader interfaces.ShaReadCloser, err error) {
+) (reader interfaces.ReadCloserDigester, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
@@ -96,7 +96,7 @@ func (client *client) WriteBlobToRemote(
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.ShaReadCloser
+	var reader interfaces.ReadCloserDigester
 
 	if reader, err = localBlobStore.BlobReader(
 		expected,

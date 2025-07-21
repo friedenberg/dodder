@@ -165,7 +165,7 @@ func VerifyBlob(
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.ShaReadCloser
+	var readCloser interfaces.ReadCloserDigester
 
 	if readCloser, err = blobStore.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)

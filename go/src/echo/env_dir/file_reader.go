@@ -13,7 +13,7 @@ import (
 func NewFileReader(
 	config Config,
 	path string,
-) (readCloser interfaces.ShaReadCloser, err error) {
+) (readCloser interfaces.ReadCloserDigester, err error) {
 	objectReader := objectReader{}
 
 	if path == "-" {
@@ -26,7 +26,7 @@ func NewFileReader(
 	}
 
 	// try the existing options. if they fail, try without encryption
-	if objectReader.ShaReadCloser, err = NewReader(config, objectReader.file); err != nil {
+	if objectReader.ReadCloserDigester, err = NewReader(config, objectReader.file); err != nil {
 		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -38,7 +38,7 @@ func NewFileReader(
 			&age.Age{},
 		)
 
-		if objectReader.ShaReadCloser, err = NewReader(config, objectReader.file); err != nil {
+		if objectReader.ReadCloserDigester, err = NewReader(config, objectReader.file); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -51,7 +51,7 @@ func NewFileReader(
 
 type objectReader struct {
 	file *os.File
-	interfaces.ShaReadCloser
+	interfaces.ReadCloserDigester
 }
 
 func (r objectReader) String() string {
@@ -64,12 +64,12 @@ func (ar objectReader) Close() (err error) {
 		return
 	}
 
-	if ar.ShaReadCloser == nil {
+	if ar.ReadCloserDigester == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = ar.ShaReadCloser.Close(); err != nil {
+	if err = ar.ReadCloserDigester.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

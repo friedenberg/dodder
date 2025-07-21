@@ -20,16 +20,16 @@ type ObjectIOFactory interface {
 }
 
 type ObjectReaderFactory interface {
-	ObjectReader(DigestGetter) (ShaReadCloser, error)
+	ObjectReader(DigestGetter) (ReadCloserDigester, error)
 }
 
 type ObjectWriterFactory interface {
-	ObjectWriter() (ShaWriteCloser, error)
+	ObjectWriter() (WriteCloserDigester, error)
 }
 
 type (
-	FuncObjectReader func(DigestGetter) (ShaReadCloser, error)
-	FuncObjectWriter func() (ShaWriteCloser, error)
+	FuncObjectReader func(DigestGetter) (ReadCloserDigester, error)
+	FuncObjectWriter func() (WriteCloserDigester, error)
 )
 
 type bespokeObjectReadWriterFactory struct {
@@ -61,7 +61,7 @@ func MakeBespokeObjectReadFactory(
 
 func (b bespokeObjectReadFactory) ObjectReader(
 	sh DigestGetter,
-) (ShaReadCloser, error) {
+) (ReadCloserDigester, error) {
 	return b.FuncObjectReader(sh)
 }
 
@@ -77,6 +77,6 @@ func MakeBespokeObjectWriteFactory(
 	}
 }
 
-func (b bespokeObjectWriterFactory) ObjectWriter() (ShaWriteCloser, error) {
+func (b bespokeObjectWriterFactory) ObjectWriter() (WriteCloserDigester, error) {
 	return b.FuncObjectWriter()
 }

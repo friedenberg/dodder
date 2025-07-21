@@ -25,11 +25,11 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(Digest) (ShaReadCloser, error)
+		BlobReader(Digest) (ReadCloserDigester, error)
 	}
 
 	BlobWriter interface {
-		BlobWriter() (ShaWriteCloser, error)
+		BlobWriter() (WriteCloserDigester, error)
 	}
 
 	Mover interface {

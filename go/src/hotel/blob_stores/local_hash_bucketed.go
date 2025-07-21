@@ -112,7 +112,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Dig
 	}
 }
 
-func (blobStore localHashBucketed) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloserDigester, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -132,7 +132,7 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 
 func (blobStore localHashBucketed) BlobReader(
 	sh interfaces.Digest,
-) (readeCloser interfaces.ShaReadCloser, err error) {
+) (readeCloser interfaces.ReadCloserDigester, err error) {
 	if sh.GetDigest().IsNull() {
 		readeCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return

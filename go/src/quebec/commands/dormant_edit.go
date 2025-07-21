@@ -155,7 +155,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writeCloser interfaces.ShaWriteCloser
+	var writeCloser interfaces.WriteCloserDigester
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

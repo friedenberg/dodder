@@ -577,7 +577,7 @@ func (server *Server) copyBlob(
 	expected *sha.Sha,
 ) (result interfaces.Digest, err error) {
 	var progressWriter env_ui.ProgressWriter
-	var writeCloser interfaces.ShaWriteCloser
+	var writeCloser interfaces.WriteCloserDigester
 
 	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
