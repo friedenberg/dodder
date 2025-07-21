@@ -188,7 +188,7 @@ func writeDefaultMutableConfig(
 		return
 	}
 
-	sh = sha.MustWithDigester(writeCloser.GetDigest())
+	sh = sha.MustWithDigester(writeCloser)
 
 	return
 }

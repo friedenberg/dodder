@@ -257,7 +257,7 @@ func (transacted *Transacted) Sign(
 ) (err error) {
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
-	sh := sha.MustWithDigester(transacted.GetTai().GetDigest())
+	sh := sha.MustWithDigester(transacted.GetTai())
 	defer sha.GetPool().Put(sh)
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(

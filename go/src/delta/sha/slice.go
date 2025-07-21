@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+// TODO move to generic digest package
 type Slice []*Sha
 
 func (s *Slice) ReadFrom(r io.Reader) (n int64, err error) {

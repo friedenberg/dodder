@@ -257,7 +257,7 @@ func (coder V2ObjectCoder) DecodeFrom(
 	}
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
-		sh := sha.MustWithDigester(object.GetTai().GetDigest())
+		sh := sha.MustWithDigester(object.GetTai())
 		defer sha.GetPool().Put(sh)
 
 		if len(object.Metadata.RepoPubkey) == 0 {

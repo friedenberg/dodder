@@ -177,7 +177,7 @@ func VerifyBlob(
 		return
 	}
 
-	expected := sha.MustWithDigester(sh)
+	expected := sha.MustWithDigest(sh)
 
 	if err = expected.AssertEqualsShaLike(readCloser.GetDigest()); err != nil {
 		err = errors.Wrap(err)
