@@ -11,7 +11,8 @@ import (
 type TomlV0 struct {
 	// TODO add hasher option
 	// TODO add path option
-	HashBuckets       []int                            `toml:"hash-buckets"`
+	// TODO uncomment when bumping to V1
+	// HashBuckets       []int                            `toml:"hash-buckets"`
 	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
@@ -39,7 +40,7 @@ func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flag.FlagSet) {
 }
 
 func (blobStoreConfig *TomlV0) GetHashBuckets() []int {
-	return blobStoreConfig.HashBuckets
+	return []int{2}
 }
 
 func (blobStoreConfig *TomlV0) GetBlobCompression() interfaces.BlobCompression {

@@ -2,6 +2,5 @@
 ! toml-blob_store_config-v0
 ---
 
-hash-buckets = [2]
 compression-type = 'zstd'
 lock-internal-files = false
