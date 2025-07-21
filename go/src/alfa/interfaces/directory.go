@@ -34,6 +34,6 @@ type Directory interface {
 }
 
 type CacheIOFactory interface {
-	ReadCloserCache(string) (ReadCloserDigester, error)
-	WriteCloserCache(string) (WriteCloserDigester, error)
+	ReadCloserCache(string) (ReadCloseDigester, error)
+	WriteCloserCache(string) (WriteCloseDigester, error)
 }

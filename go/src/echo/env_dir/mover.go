@@ -18,7 +18,7 @@ type MoveOptions struct {
 type localFileMover struct {
 	funcJoin func(string, ...string) string
 	file     *os.File
-	interfaces.WriteCloserDigester
+	interfaces.WriteCloseDigester
 
 	basePath                  string
 	objectPath                string
@@ -58,7 +58,7 @@ func newMover(
 		return
 	}
 
-	if mover.WriteCloserDigester, err = NewWriter(
+	if mover.WriteCloseDigester, err = NewWriter(
 		config,
 		mover.file,
 	); err != nil {
@@ -75,12 +75,12 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	if mover.WriteCloserDigester == nil {
+	if mover.WriteCloseDigester == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = mover.WriteCloserDigester.Close(); err != nil {
+	if err = mover.WriteCloseDigester.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

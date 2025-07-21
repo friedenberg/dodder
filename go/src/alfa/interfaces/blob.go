@@ -25,17 +25,17 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(Digest) (ReadCloserDigester, error)
+		BlobReader(Digest) (ReadCloseDigester, error)
 	}
 
 	BlobWriter interface {
-		BlobWriter() (WriteCloserDigester, error)
+		BlobWriter() (WriteCloseDigester, error)
 	}
 
 	Mover interface {
 		io.WriteCloser
 		io.ReaderFrom
-		DigestGetter
+		Digester
 	}
 
 	BlobStore interface {

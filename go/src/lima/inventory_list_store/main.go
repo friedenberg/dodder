@@ -301,7 +301,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	var writeCloser interfaces.WriteCloserDigester
+	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -368,7 +368,7 @@ func (store *Store) ImportInventoryList(
 	remoteBlobStore interfaces.BlobStore,
 	object *sku.Transacted,
 ) (err error) {
-	var blobReader interfaces.ReadCloserDigester
+	var blobReader interfaces.ReadCloseDigester
 
 	if blobReader, err = remoteBlobStore.BlobReader(
 		object.GetBlobSha(),

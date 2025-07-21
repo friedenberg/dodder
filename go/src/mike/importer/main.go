@@ -126,7 +126,7 @@ func (importer importer) importInventoryList(
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 		err = env_dir.ErrBlobMissing{
-			DigestGetter: blobSha,
+			Digester: blobSha,
 		}
 
 		return

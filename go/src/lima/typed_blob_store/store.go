@@ -36,7 +36,7 @@ func MakeBlobStore[
 func (blobStore *BlobStore[A, APtr]) GetBlob(
 	sh interfaces.Digest,
 ) (a APtr, err error) {
-	var rc interfaces.ReadCloserDigester
+	var rc interfaces.ReadCloseDigester
 
 	if rc, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(sh); err != nil {
 		err = errors.Wrap(err)

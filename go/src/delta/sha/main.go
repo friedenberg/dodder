@@ -35,7 +35,7 @@ type PathComponents interface {
 	PathComponents() []string
 }
 
-type ShaLike = interfaces.DigestGetter
+type ShaLike = interfaces.Digester
 
 // TODO rename to digest
 type Sha struct {

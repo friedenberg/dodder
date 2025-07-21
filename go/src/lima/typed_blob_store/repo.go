@@ -26,7 +26,7 @@ func (store RepoStore) ReadTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Digest,
 ) (common repo_blobs.Blob, n int64, err error) {
-	var reader interfaces.ReadCloserDigester
+	var reader interfaces.ReadCloseDigester
 
 	if reader, err = store.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func (store RepoStore) WriteTypedBlob(
 	tipe ids.Type,
 	blob repo_blobs.Blob,
 ) (sh interfaces.Digest, n int64, err error) {
-	var writer interfaces.WriteCloserDigester
+	var writer interfaces.WriteCloseDigester
 
 	if writer, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

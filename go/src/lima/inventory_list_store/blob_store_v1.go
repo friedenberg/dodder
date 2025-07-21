@@ -71,7 +71,7 @@ func (blobStore *blobStoreV1) ReadOneSha(
 func (blobStore *blobStoreV1) WriteInventoryListObject(
 	object *sku.Transacted,
 ) (err error) {
-	var blobStoreWriteCloser interfaces.WriteCloserDigester
+	var blobStoreWriteCloser interfaces.WriteCloseDigester
 
 	if blobStoreWriteCloser, err = blobStore.LocalBlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

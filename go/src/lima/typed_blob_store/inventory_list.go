@@ -102,7 +102,7 @@ func (typedBlobStore InventoryList) GetTransactedWithBlob(
 	objectAndBlob.Transacted = inventoryList.GetSku()
 	blobSha := objectAndBlob.GetBlobSha()
 
-	var readCloser interfaces.ReadCloserDigester
+	var readCloser interfaces.ReadCloseDigester
 
 	if readCloser, err = typedBlobStore.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -247,7 +247,7 @@ func (typedBlobStore InventoryList) StreamInventoryListBlobSkus(
 		tipe := sk.GetType()
 		blobSha := sk.GetBlobSha()
 
-		var readCloser interfaces.ReadCloserDigester
+		var readCloser interfaces.ReadCloseDigester
 
 		{
 			var err error
@@ -308,7 +308,7 @@ func (typedBlobStore InventoryList) IterInventoryListBlobSkusFromBlobStore(
 	blobSha interfaces.Digest,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var readCloser interfaces.ReadCloserDigester
+		var readCloser interfaces.ReadCloseDigester
 
 		{
 			var err error

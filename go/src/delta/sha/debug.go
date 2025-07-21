@@ -16,7 +16,7 @@ func DebugCompareBlobs(
 ) {
 	var expected strings.Builder
 
-	var blobReader interfaces.ReadCloserDigester
+	var blobReader interfaces.ReadCloseDigester
 
 	{
 		var err error

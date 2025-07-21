@@ -45,14 +45,14 @@ func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
 	return
 }
 
-func (client *client) BlobWriter() (w interfaces.WriteCloserDigester, err error) {
+func (client *client) BlobWriter() (w interfaces.WriteCloseDigester, err error) {
 	err = comments.Implement()
 	return
 }
 
 func (client *client) BlobReader(
 	sh interfaces.Digest,
-) (reader interfaces.ReadCloserDigester, err error) {
+) (reader interfaces.ReadCloseDigester, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
@@ -75,7 +75,7 @@ func (client *client) BlobReader(
 	switch {
 	case response.StatusCode == http.StatusNotFound:
 		err = env_dir.ErrBlobMissing{
-			DigestGetter: sh,
+			Digester: sh,
 		}
 
 	case response.StatusCode >= 300:
@@ -96,7 +96,7 @@ func (client *client) WriteBlobToRemote(
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.ReadCloserDigester
+	var reader interfaces.ReadCloseDigester
 
 	if reader, err = localBlobStore.BlobReader(
 		expected,

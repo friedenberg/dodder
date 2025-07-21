@@ -8,31 +8,39 @@ import (
 
 type (
 	Digest interface {
-		DigestGetter
+		Digester
 		GetBytes() []byte
 		GetType() string
 		IsNull() bool
 	}
 
-	DigestGetter interface {
+	Digester interface {
 		GetDigest() Digest
 	}
 
-	ReadCloserDigester interface {
+	ReadCloseDigester interface {
 		io.WriterTo
 		io.ReadCloser
-		DigestGetter
+		Digester
 	}
 
-	WriteCloserDigester interface {
+	WriteCloseDigester interface {
 		io.ReaderFrom
 		io.WriteCloser
-		DigestGetter
+		Digester
 	}
 )
 
+func DigesterEquals(a, b Digester) bool {
+	return DigestEquals(a.GetDigest(), b.GetDigest())
+}
+
 func DigestEquals(a, b Digest) bool {
 	return bytes.Equal(a.GetBytes(), b.GetBytes())
+}
+
+func FormatDigester(digester Digester) string {
+	return FormatDigest(digester.GetDigest())
 }
 
 // Creates a human-readable string representation of a digest.

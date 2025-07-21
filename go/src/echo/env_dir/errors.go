@@ -36,7 +36,7 @@ func IsErrBlobMissing(err error) bool {
 }
 
 type ErrBlobMissing struct {
-	interfaces.DigestGetter
+	interfaces.Digester
 	Path string
 }
 

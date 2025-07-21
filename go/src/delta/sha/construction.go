@@ -16,7 +16,7 @@ func MakeHashWriter() (h hash.Hash) {
 	return
 }
 
-func Make(getter interfaces.DigestGetter) *Sha {
+func Make(getter interfaces.Digester) *Sha {
 	switch st := getter.GetDigest().(type) {
 	case *Sha:
 		return st

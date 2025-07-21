@@ -13,7 +13,7 @@ import (
 
 type Writer interface {
 	sha.WriteCloser
-	interfaces.DigestGetter
+	interfaces.Digester
 }
 
 type writer struct {

@@ -11,8 +11,8 @@ import (
 
 // TODO-P4 remove
 type (
-	ReadCloser  = interfaces.ReadCloserDigester
-	WriteCloser = interfaces.WriteCloserDigester
+	ReadCloser  = interfaces.ReadCloseDigester
+	WriteCloser = interfaces.WriteCloseDigester
 )
 
 type readCloser struct {

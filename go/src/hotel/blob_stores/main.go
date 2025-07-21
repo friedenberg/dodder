@@ -73,7 +73,7 @@ func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobShaGetter interfaces.DigestGetter,
+	blobShaGetter interfaces.Digester,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
@@ -165,7 +165,7 @@ func VerifyBlob(
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.ReadCloserDigester
+	var readCloser interfaces.ReadCloseDigester
 
 	if readCloser, err = blobStore.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)

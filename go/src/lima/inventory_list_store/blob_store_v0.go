@@ -70,7 +70,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 	blobStore.lock.Lock()
 	defer blobStore.lock.Unlock()
 
-	var blobStoreWriteCloser interfaces.WriteCloserDigester
+	var blobStoreWriteCloser interfaces.WriteCloseDigester
 
 	if blobStoreWriteCloser, err = blobStore.LocalBlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
