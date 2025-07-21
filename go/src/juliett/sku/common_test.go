@@ -48,14 +48,14 @@ func makeBlobExt(t *ui.TestContext, v string) (es ids.Type) {
 
 func readFormat(
 	t1 *ui.TestContext,
-	f object_metadata.TextFormat,
+	format object_metadata.TextFormat,
 	contents string,
-) (z *object_metadata.Metadata) {
+) (metadata *object_metadata.Metadata) {
 	var zt Transacted
 
 	t := t1.Skip(1)
 
-	n, err := f.ParseMetadata(
+	n, err := format.ParseMetadata(
 		strings.NewReader(contents),
 		&zt,
 	)
@@ -67,7 +67,7 @@ func readFormat(
 		t.Fatalf("expected to read %d but only read %d", len(contents), n)
 	}
 
-	z = zt.GetMetadata()
+	metadata = zt.GetMetadata()
 
 	return
 }
@@ -198,7 +198,7 @@ func makeTestTextFormat(
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
-	envRepo := env_repo.MakeTesting2(t, nil)
+	envRepo := env_repo.MakeTesting(t, nil)
 
 	actual := readFormat(
 		t,
@@ -236,7 +236,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	envRepo := env_repo.MakeTesting2(t, nil)
+	envRepo := env_repo.MakeTesting(t, nil)
 
 	actual := readFormat(
 		t,
@@ -275,7 +275,7 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	envRepo := env_repo.MakeTesting2(t, nil)
+	envRepo := env_repo.MakeTesting(t, nil)
 
 	actual := readFormat(
 		t,
@@ -397,7 +397,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := env_repo.MakeTesting2(
+	envRepo := env_repo.MakeTesting(
 		t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
@@ -447,7 +447,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	envRepo := env_repo.MakeTesting2(
+	envRepo := env_repo.MakeTesting(
 		t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",

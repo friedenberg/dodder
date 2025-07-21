@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -71,6 +72,8 @@ func (cmd Import) Run(dep command.Request) {
 
 		if readCloser, err = env_dir.NewFileReader(
 			env_dir.MakeConfig(
+				// TODO ready from config
+				sha.Env{},
 				env_dir.MakeHashBucketPathJoinFunc(cmd.Config.GetHashBuckets()),
 				cmd.Config.GetBlobCompression(),
 				cmd.Config.GetBlobEncryption(),

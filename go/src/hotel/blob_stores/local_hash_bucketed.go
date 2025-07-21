@@ -52,6 +52,8 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.LocalBlobStore
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
+		// TODO move to config
+		sha.Env{},
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
@@ -59,15 +61,15 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	sh interfaces.Digest,
+	digest interfaces.Digest,
 ) (ok bool) {
-	if sh.GetDigest().IsNull() {
+	if digest.GetDigest().IsNull() {
 		ok = true
 		return
 	}
 
 	path := env_dir.MakeHashBucketPathFromSha(
-		sh,
+		digest,
 		blobStore.buckets,
 		blobStore.basePath,
 	)

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -84,6 +85,8 @@ func (cmd Export) Run(dep command.Request) {
 
 		if writeCloser, err = env_dir.NewWriter(
 			env_dir.MakeConfig(
+				// TODO read from config
+				sha.Env{},
 				env_dir.MakeHashBucketPathJoinFunc([]int{2}),
 				&cmd.CompressionType,
 				&ag,

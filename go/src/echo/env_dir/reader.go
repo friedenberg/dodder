@@ -1,18 +1,15 @@
 package env_dir
 
 import (
-	"crypto/sha256"
-	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type reader struct {
-	hash      hash.Hash
+	digester  interfaces.WriteDigester
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
@@ -41,8 +38,8 @@ func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
 		}
 	}
 
-	r.hash = sha256.New()
-	r.tee = io.TeeReader(r.expander, r.hash)
+	r.digester = config.envDigest.MakeWriteDigester()
+	r.tee = io.TeeReader(r.expander, r.digester)
 
 	return
 }
@@ -75,6 +72,6 @@ func (reader *reader) Close() (err error) {
 	return
 }
 
-func (reader *reader) GetDigest() (s interfaces.Digest) {
-	return sha.FromHash(reader.hash)
+func (reader *reader) GetDigest() interfaces.Digest {
+	return reader.digester.GetDigest()
 }

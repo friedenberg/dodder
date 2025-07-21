@@ -2,13 +2,10 @@ package env_dir
 
 import (
 	"bufio"
-	"crypto/sha256"
-	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type Writer interface {
@@ -17,7 +14,7 @@ type Writer interface {
 }
 
 type writer struct {
-	hash            hash.Hash
+	digester        interfaces.WriteDigester
 	tee             io.Writer
 	wCompress, wAge io.WriteCloser
 	wBuf            *bufio.Writer
@@ -36,14 +33,14 @@ func NewWriter(
 		return
 	}
 
-	w.hash = sha256.New()
+	w.digester = config.envDigest.MakeWriteDigester()
 
 	if w.wCompress, err = config.GetBlobCompression().WrapWriter(w.wAge); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.tee = io.MultiWriter(w.hash, w.wCompress)
+	w.tee = io.MultiWriter(w.digester, w.wCompress)
 
 	return
 }
@@ -85,5 +82,5 @@ func (w *writer) Close() (err error) {
 }
 
 func (w *writer) GetDigest() interfaces.Digest {
-	return sha.FromHash(w.hash)
+	return w.digester.GetDigest()
 }

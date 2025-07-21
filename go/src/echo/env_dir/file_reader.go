@@ -26,13 +26,17 @@ func NewFileReader(
 	}
 
 	// try the existing options. if they fail, try without encryption
-	if objectReader.ReadCloseDigester, err = NewReader(config, objectReader.file); err != nil {
+	if objectReader.ReadCloseDigester, err = NewReader(
+		config,
+		objectReader.file,
+	); err != nil {
 		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		config = MakeConfig(
+			config.envDigest,
 			config.funcJoin,
 			config.GetBlobCompression(),
 			&age.Age{},

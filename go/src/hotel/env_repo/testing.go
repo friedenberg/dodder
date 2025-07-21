@@ -17,99 +17,6 @@ import (
 )
 
 func MakeTesting(
-	t *ui.T,
-	contents map[string]string,
-) (envRepo Env) {
-	t = t.Skip(1)
-
-	ctx := errors.MakeContextDefault()
-
-	if err := ctx.Run(
-		func(ctx interfaces.Context) {
-			dirTemp := t.TempDir()
-
-			envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
-				ctx,
-				dirTemp,
-				debug.Options{},
-			)
-
-			var envRepo Env
-
-			{
-				var err error
-
-				if envRepo, err = Make(
-					env_local.Make(env_ui.MakeDefault(ctx), envDir),
-					Options{
-						BasePath:                dirTemp,
-						PermitNoDodderDirectory: true,
-					},
-				); err != nil {
-					errors.ContextCancelWithErrorAndFormat(ctx, err, "EnvRepo: %#v", envRepo)
-				}
-			}
-
-			var bigBang BigBang
-
-			bigBang.SetDefaults()
-
-			envRepo.Genesis(bigBang)
-			ui.Debug().Print(envRepo)
-
-			if contents == nil {
-				return
-			}
-
-			for shaExpected, content := range contents {
-				var writeCloser interfaces.WriteCloseDigester
-
-				writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
-				if err != nil {
-					errors.ContextCancelWithErrorAndFormat(
-						ctx,
-						err,
-						"failed to make blob writer",
-					)
-				}
-
-				_, err = io.Copy(writeCloser, strings.NewReader(content))
-				if err != nil {
-					errors.ContextCancelWithErrorAndFormat(
-						ctx,
-						err,
-						"failed to write string to blob writer",
-					)
-				}
-
-				err = writeCloser.Close()
-				if err != nil {
-					errors.ContextCancelWithErrorAndFormat(
-						ctx,
-						err, "failed to write string to blob writer",
-					)
-				}
-
-				shActual := writeCloser.GetDigest()
-				expected := sha.Must(shaExpected)
-
-				err = expected.AssertEqualsShaLike(shActual)
-				if err != nil {
-					errors.ContextCancelWithErrorAndFormat(
-						ctx,
-						err, "sha mismatch: %s, %q", shaExpected, content,
-					)
-				}
-			}
-		},
-	); err != nil {
-		t.Fatalf("making envRepo failed: %s", err)
-	}
-
-	return
-}
-
-func MakeTesting2(
 	t *ui.TestContext,
 	contents map[string]string,
 ) (envRepo Env) {
@@ -147,7 +54,6 @@ func MakeTesting2(
 	bigBang.SetDefaults()
 
 	envRepo.Genesis(bigBang)
-	ui.Debug().Print(envRepo)
 
 	if contents == nil {
 		return

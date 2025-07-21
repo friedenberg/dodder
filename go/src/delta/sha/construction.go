@@ -48,7 +48,7 @@ func MakeShaFromPath(path string) (sh *Sha, err error) {
 	return
 }
 
-func FromFormatString(f string, vs ...interface{}) *Sha {
+func FromFormatString(f string, vs ...any) *Sha {
 	return FromStringContent(fmt.Sprintf(f, vs...))
 }
 

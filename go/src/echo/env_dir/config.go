@@ -4,16 +4,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 // TODO move to own package
 
 func MakeConfig(
+	envDigest interfaces.EnvDigest,
 	funcJoin func(string, ...string) string,
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
 ) Config {
 	return Config{
+		envDigest:   envDigest,
 		funcJoin:    funcJoin,
 		compression: compression,
 		encryption:  encryption,
@@ -24,6 +27,7 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionType       = age.Age{}
 	DefaultConfig               = Config{
+		envDigest:   sha.Env{},
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionType,
 	}
@@ -32,8 +36,9 @@ var (
 )
 
 type Config struct {
-	funcJoin func(string, ...string) string
-	// TODO add hasher
+	envDigest interfaces.EnvDigest
+	// TODO replace with path generator interface
+	funcJoin    func(string, ...string) string
 	compression interfaces.BlobCompression
 	encryption  interfaces.BlobEncryption
 }

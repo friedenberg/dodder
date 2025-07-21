@@ -97,7 +97,7 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	sh := mover.GetDigest()
+	digest := mover.GetDigest()
 
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",
@@ -114,7 +114,7 @@ func (mover *localFileMover) Close() (err error) {
 		}
 
 		if mover.objectPath, err = MakeDirIfNecessary(
-			interfaces.FormatDigest(sh),
+			interfaces.FormatDigest(digest),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {
@@ -128,7 +128,7 @@ func (mover *localFileMover) Close() (err error) {
 	if err = os.Rename(path, mover.objectPath); err != nil {
 		if files.Exists(mover.objectPath) {
 			if mover.errorOnAttemptedOverwrite {
-				err = MakeErrAlreadyExists(sh, mover.objectPath)
+				err = MakeErrAlreadyExists(digest, mover.objectPath)
 			} else {
 				err = nil
 			}

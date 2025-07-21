@@ -18,6 +18,15 @@ type (
 		GetDigest() Digest
 	}
 
+	EnvDigest interface {
+		MakeWriteDigester() WriteDigester
+		MakeReadDigester() ReadDigester
+
+		// TODO pool
+		// GetDigest() Digest
+		// PutDigest(Digest)
+	}
+
 	WriteDigester interface {
 		io.Writer
 		Digester
