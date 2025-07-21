@@ -2,6 +2,8 @@ package sha
 
 import "encoding/hex"
 
+// TODO move into own package
+
 const (
 	reverseHexTable = "" +
 		"\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff" +

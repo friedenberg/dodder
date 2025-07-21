@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -45,7 +45,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
 
-	var blobWriter sha.WriteCloser
+	var blobWriter interfaces.WriteCloseDigester
 
 	{
 		var err error

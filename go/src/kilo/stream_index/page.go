@@ -8,11 +8,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -20,10 +20,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
-type PageId = sha.PageId
-
 type Page struct {
-	PageId
+	page_id.PageId
 	sunrise ids.Tai
 	*probe_index
 	added, addedLatest *sku.List
@@ -35,7 +33,7 @@ type Page struct {
 }
 
 func (pt *Page) initialize(
-	pid PageId,
+	pid page_id.PageId,
 	i *Index,
 ) {
 	pt.repoLayout = i.directoryLayout

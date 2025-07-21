@@ -3,7 +3,6 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -71,7 +70,7 @@ func (blobStore *BlobStore[A, APtr]) PutBlob(a APtr) {
 func (blobStore *BlobStore[A, APtr]) SaveBlobText(
 	o APtr,
 ) (sh interfaces.Digest, n int64, err error) {
-	var writeCloser sha.WriteCloser
+	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

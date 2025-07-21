@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -82,7 +82,7 @@ func (e *fileEncoder) EncodeObject(
 
 	inline := e.ic.IsInlineType(z.GetType())
 
-	var ar sha.ReadCloser
+	var ar interfaces.ReadCloseDigester
 
 	if ar, err = e.envRepo.GetDefaultBlobStore().BlobReader(z.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
@@ -100,7 +100,7 @@ func (e *fileEncoder) EncodeObject(
 				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
-					var aw sha.WriteCloser
+					var aw interfaces.WriteCloseDigester
 
 					if aw, err = e.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 						err = errors.Wrap(err)

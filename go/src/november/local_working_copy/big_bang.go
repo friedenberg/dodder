@@ -171,7 +171,7 @@ func writeDefaultMutableConfig(
 
 	coder := repo.GetStore().GetConfigBlobFormat()
 
-	var writeCloser sha.WriteCloser
+	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

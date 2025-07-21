@@ -106,7 +106,7 @@ func CopyBlob(
 		return
 	}
 
-	var rc sha.ReadCloser
+	var rc interfaces.ReadCloseDigester
 
 	if rc, err = src.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func CopyBlob(
 
 	defer errors.ContextMustClose(env, rc)
 
-	var wc sha.WriteCloser
+	var wc interfaces.WriteCloseDigester
 
 	if wc, err = dst.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

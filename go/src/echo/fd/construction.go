@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 func MakeFromDirPath(
@@ -121,7 +120,7 @@ func MakeFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer sha.WriteCloser
+	var writer interfaces.WriteCloseDigester
 
 	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

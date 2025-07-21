@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -112,7 +112,7 @@ func (s *env) LuaRequire(ls *lua.LState) int {
 		panic(err)
 	}
 
-	var ar sha.ReadCloser
+	var ar interfaces.ReadCloseDigester
 
 	if ar, err = s.envRepo.GetDefaultBlobStore().BlobReader(
 		sk.GetBlobSha(),

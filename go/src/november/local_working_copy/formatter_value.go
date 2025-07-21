@@ -508,7 +508,7 @@ func (local *Repo) MakeFormatFunc(
 
 	case "blob":
 		output = func(o *sku.Transacted) (err error) {
-			var readCloser sha.ReadCloser
+			var readCloser interfaces.ReadCloseDigester
 
 			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
@@ -539,7 +539,7 @@ func (local *Repo) MakeFormatFunc(
 			}
 
 			if local.GetConfig().IsInlineType(o.GetType()) {
-				var readCloser sha.ReadCloser
+				var readCloser interfaces.ReadCloseDigester
 
 				if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					o.GetBlobSha(),
@@ -574,7 +574,7 @@ func (local *Repo) MakeFormatFunc(
 		cliFmt := local.SkuFormatBoxTransactedNoColor()
 
 		output = func(o *sku.Transacted) (err error) {
-			var readCloser sha.ReadCloser
+			var readCloser interfaces.ReadCloseDigester
 
 			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
@@ -723,7 +723,7 @@ func (local *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
-			var readCloser sha.ReadCloser
+			var readCloser interfaces.ReadCloseDigester
 
 			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),
@@ -758,7 +758,7 @@ func (local *Repo) MakeFormatFunc(
 		output = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 
-			var readCloser sha.ReadCloser
+			var readCloser interfaces.ReadCloseDigester
 
 			if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 				o.GetBlobSha(),

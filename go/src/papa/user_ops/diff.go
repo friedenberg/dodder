@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -223,7 +222,7 @@ func (c Diff) makeDoBlob(
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
-		var ar sha.ReadCloser
+		var ar interfaces.ReadCloseDigester
 
 		if ar, err = arf.BlobReader(sh); err != nil {
 			err = errors.Wrap(err)

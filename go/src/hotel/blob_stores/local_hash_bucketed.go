@@ -173,7 +173,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 func (blobStore localHashBucketed) blobReaderFrom(
 	sh sha.ShaLike,
 	path string,
-) (readCloser sha.ReadCloser, err error) {
+) (readCloser interfaces.ReadCloseDigester, err error) {
 	if sh.GetDigest().IsNull() {
 		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
@@ -195,7 +195,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 
 			err = env_dir.ErrBlobMissing{
 				Digester: shCopy,
-				Path:         path,
+				Path:     path,
 			}
 		} else {
 			err = errors.Wrapf(

@@ -47,7 +47,7 @@ func (f textParser) ParseMetadata(
 		TextParserContext: c,
 	}
 
-	var blobWriter sha.WriteCloser
+	var blobWriter interfaces.WriteCloseDigester
 
 	if blobWriter, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

@@ -41,7 +41,7 @@ func (blobStore *blobStoreV0) ReadOneSha(
 		return
 	}
 
-	var readCloser sha.ReadCloser
+	var readCloser interfaces.ReadCloseDigester
 
 	if readCloser, err = blobStore.LocalBlobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)

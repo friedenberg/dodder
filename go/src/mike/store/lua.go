@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/tag_blobs"
 )
@@ -18,7 +18,7 @@ func (store *Store) MakeLuaVMPoolV1WithSku(
 		return
 	}
 
-	var readCloser sha.ReadCloser
+	var readCloser interfaces.ReadCloseDigester
 
 	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)

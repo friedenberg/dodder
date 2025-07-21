@@ -32,7 +32,8 @@ var (
 )
 
 type Config struct {
-	funcJoin    func(string, ...string) string
+	funcJoin func(string, ...string) string
+	// TODO add hasher
 	compression interfaces.BlobCompression
 	encryption  interfaces.BlobEncryption
 }

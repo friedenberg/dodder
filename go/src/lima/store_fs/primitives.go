@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -132,7 +132,7 @@ func (store *Store) readOneExternalBlob(
 
 	// TODO use cache
 	{
-		var writeCloser sha.WriteCloser
+		var writeCloser interfaces.WriteCloseDigester
 
 		if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 			err = errors.Wrap(err)

@@ -1,7 +1,6 @@
 package sha
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"hash"
 	"io"
@@ -10,11 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
-
-func MakeHashWriter() (h hash.Hash) {
-	h = sha256.New()
-	return
-}
 
 func Make(getter interfaces.Digester) *Sha {
 	switch st := getter.GetDigest().(type) {

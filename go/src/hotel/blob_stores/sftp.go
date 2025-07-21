@@ -81,7 +81,7 @@ func (blobStore *sftpBlobStore) close() (err error) {
 
 func (blobStore *sftpBlobStore) ensureRemotePath() (err error) {
 	remotePath := blobStore.config.GetRemotePath()
-	// TODO read remote blob store config
+	// TODO read remote blob store config (including hash buckets)
 
 	// Create directory tree if it doesn't exist
 	parts := strings.Split(remotePath, "/")
@@ -250,7 +250,7 @@ func (blobStore *sftpBlobStore) BlobReader(
 
 			err = env_dir.ErrBlobMissing{
 				Digester: shCopy,
-				Path:         remotePath,
+				Path:     remotePath,
 			}
 		} else {
 			err = errors.Wrap(err)

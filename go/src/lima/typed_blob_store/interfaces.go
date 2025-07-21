@@ -18,5 +18,6 @@ type TypedStore[
 	// TODO remove and replace with two-step process
 	SaveBlobText(APtr) (interfaces.Digest, int64, error)
 	Format[A, APtr]
+	// TODO remove
 	interfaces.BlobPool[APtr]
 }

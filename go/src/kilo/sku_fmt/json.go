@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -35,7 +35,7 @@ func (json *Json) FromStringAndMetadata(
 	metadata *object_metadata.Metadata,
 	envRepo env_repo.Env,
 ) (err error) {
-	var readCloser sha.ReadCloser
+	var readCloser interfaces.ReadCloseDigester
 
 	if readCloser, err = envRepo.GetDefaultBlobStore().BlobReader(&metadata.Blob); err != nil {
 		err = errors.Wrap(err)
@@ -83,7 +83,7 @@ func (json *Json) ToTransacted(
 	object *sku.Transacted,
 	envRepo env_repo.Env,
 ) (err error) {
-	var writeCloser sha.WriteCloser
+	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

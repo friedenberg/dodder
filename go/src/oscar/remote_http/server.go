@@ -494,7 +494,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			response.StatusCode = http.StatusNotFound
 		}
 	} else {
-		var rc sha.ReadCloser
+		var rc interfaces.ReadCloseDigester
 
 		{
 			var err error

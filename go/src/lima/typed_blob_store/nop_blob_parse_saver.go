@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type nopBlobParseSaver[
@@ -29,7 +28,7 @@ func (f nopBlobParseSaver[O, OPtr]) ParseBlob(
 	r io.Reader,
 	t OPtr,
 ) (n int64, err error) {
-	var aw sha.WriteCloser
+	var aw interfaces.WriteCloseDigester
 
 	if aw, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

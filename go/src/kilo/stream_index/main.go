@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
@@ -91,7 +92,7 @@ func MakeIndex(
 func (i *Index) Initialize() (err error) {
 	for n := range i.pages {
 		i.pages[n].initialize(
-			PageId{
+			page_id.PageId{
 				Prefix: "Page",
 				Dir:    i.path,
 				Index:  uint8(n),
@@ -261,10 +262,10 @@ func PageIndexForObject(
 }
 
 func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
-	if n, err = sha.PageIndexForString(
+	if n, err = page_id.PageIndexForString(
 		width,
 		oid.String(),
-		// oid.GetObjectIdString(),
+		sha.MakeWriter(nil),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -339,24 +340,28 @@ func (s *Index) ReadManySha(
 }
 
 func (s *Index) ObjectExists(
-	id *ids.ObjectId,
+	objectId *ids.ObjectId,
 ) (err error) {
 	var n uint8
 
-	oid := id.String()
+	objectIdString := objectId.String()
 
-	if n, err = sha.PageIndexForString(DigitWidth, oid); err != nil {
+	if n, err = page_id.PageIndexForString(
+		DigitWidth,
+		objectIdString,
+		sha.MakeWriter(nil),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	p := s.GetPage(n)
 
-	if _, ok := p.oids[oid]; ok {
+	if _, ok := p.oids[objectIdString]; ok {
 		return
 	}
 
-	sh := sha.FromStringContent(oid)
+	sh := sha.FromStringContent(objectIdString)
 	defer sha.GetPool().Put(sh)
 
 	if _, err = s.readOneShaLoc(sh); err != nil {

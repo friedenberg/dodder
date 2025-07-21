@@ -2,8 +2,8 @@ package typed_blob_store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -127,7 +127,7 @@ func (a Tag) GetTransactedWithBlob(
 		twb.Blob = blob
 
 	case ids.TypeLuaTagV1:
-		var rc sha.ReadCloser
+		var rc interfaces.ReadCloseDigester
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -154,7 +154,7 @@ func (a Tag) GetTransactedWithBlob(
 		}
 
 	case ids.TypeLuaTagV2:
-		var rc sha.ReadCloser
+		var rc interfaces.ReadCloseDigester
 
 		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
 			err = errors.Wrap(err)

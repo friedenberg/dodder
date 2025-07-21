@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -56,7 +57,7 @@ func (ReadBlob) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
 ) (sh *sha.Sha, err error) {
-	var aw sha.WriteCloser
+	var aw interfaces.WriteCloseDigester
 
 	if aw, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

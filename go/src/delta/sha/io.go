@@ -9,12 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-// TODO-P4 remove
-type (
-	ReadCloser  = interfaces.ReadCloseDigester
-	WriteCloser = interfaces.WriteCloseDigester
-)
-
 type readCloser struct {
 	tee  io.Reader
 	r    io.Reader
@@ -121,7 +115,7 @@ type nopReadCloser struct {
 	io.ReadCloser
 }
 
-func MakeNopReadCloser(rc io.ReadCloser) ReadCloser {
+func MakeNopReadCloser(rc io.ReadCloser) interfaces.ReadCloseDigester {
 	return nopReadCloser{
 		ReadCloser: rc,
 	}

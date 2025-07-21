@@ -18,6 +18,7 @@ type (
 		interfaces.CommandComponent
 	}
 
+	// TODO add config interface for local file stores
 	ConfigLocalHashBucketed interface {
 		interfaces.BlobIOWrapper
 		GetHashBuckets() []int

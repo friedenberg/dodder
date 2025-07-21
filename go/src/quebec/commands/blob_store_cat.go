@@ -155,7 +155,7 @@ func (cmd BlobStoreCat) blob(
 	sh *sha.Sha,
 	blobWriter interfaces.FuncIter[shaWithReadCloser],
 ) (err error) {
-	var r sha.ReadCloser
+	var r interfaces.ReadCloseDigester
 
 	if r, err = blobStore.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)

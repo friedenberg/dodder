@@ -18,6 +18,16 @@ type (
 		GetDigest() Digest
 	}
 
+	WriteDigester interface {
+		io.Writer
+		Digester
+	}
+
+	ReadDigester interface {
+		io.Reader
+		Digester
+	}
+
 	ReadCloseDigester interface {
 		io.WriterTo
 		io.ReadCloser

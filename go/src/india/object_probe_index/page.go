@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
@@ -23,13 +24,13 @@ type page struct {
 	added      *heap.Heap[row, *row]
 	repoLayout env_repo.Env
 	searchFunc func(*sha.Sha) (mid int64, err error)
-	sha.PageId
+	page_id.PageId
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler[*row],
-	s env_repo.Env,
-	pid sha.PageId,
+	envRepo env_repo.Env,
+	pid page_id.PageId,
 ) (err error) {
 	p.added = heap.Make(
 		equaler,
@@ -37,7 +38,7 @@ func (p *page) initialize(
 		rowResetter{},
 	)
 
-	p.repoLayout = s
+	p.repoLayout = envRepo
 	p.PageId = pid
 
 	p.searchFunc = p.seekToFirstBinarySearch

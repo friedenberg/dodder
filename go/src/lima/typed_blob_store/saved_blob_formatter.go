@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type savedBlobFormatter struct {
@@ -24,7 +23,7 @@ func (f savedBlobFormatter) FormatSavedBlob(
 	w io.Writer,
 	sh interfaces.Digest,
 ) (n int64, err error) {
-	var ar sha.ReadCloser
+	var ar interfaces.ReadCloseDigester
 
 	if ar, err = f.arf.BlobReader(sh); err != nil {
 		if errors.IsNotExist(err) {

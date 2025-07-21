@@ -12,7 +12,7 @@ import (
 )
 
 type Writer interface {
-	sha.WriteCloser
+	interfaces.WriteCloseDigester
 	interfaces.Digester
 }
 
