@@ -17,7 +17,7 @@ import (
 )
 
 type (
-	configMutableBlob        = repo_configs.Blob
+	configMutableBlob        = repo_configs.Config
 	configGenesisBlobPrivate = genesis_configs.BlobPrivate
 	CLI                      = repo_config_cli.Blob
 

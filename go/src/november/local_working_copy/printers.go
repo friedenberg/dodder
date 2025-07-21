@@ -23,7 +23,7 @@ func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOu
 		local.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
-			ConfigDryRunReader: local.GetConfig(),
+			ConfigDryRunGetter: local.GetConfig(),
 		},
 	)
 

@@ -15,7 +15,7 @@ type V2 struct {
 	Tools          options_tools.Options `toml:"tools"`
 }
 
-func (config V2) GetBlob() Blob {
+func (config V2) GetBlob() Config {
 	return config
 }
 

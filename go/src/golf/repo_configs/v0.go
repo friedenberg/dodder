@@ -34,7 +34,7 @@ type V0 struct {
 	Filters         map[string]string                     `toml:"filters"`
 }
 
-func (blob V0) GetBlob() Blob {
+func (blob V0) GetBlob() Config {
 	return blob
 }
 

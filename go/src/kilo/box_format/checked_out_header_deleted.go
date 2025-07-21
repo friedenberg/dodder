@@ -7,7 +7,7 @@ import (
 )
 
 type CheckedOutHeaderDeleted struct {
-	interfaces.ConfigDryRunReader
+	interfaces.ConfigDryRunGetter
 }
 
 func (f CheckedOutHeaderDeleted) WriteBoxHeader(

@@ -12,13 +12,8 @@ import (
 )
 
 type (
-	Getter interface {
-		GetMutableConfig() Blob
-	}
-
-	Blob interface {
-		interfaces.MutableStoredConfig
-		GetBlob() Blob
+	Config interface {
+		GetBlob() Config
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.Options
@@ -29,7 +24,7 @@ type (
 		GetTags() quiter.Slice[ids.Tag]
 	}
 
-	TypedBlob = triple_hyphen_io.TypedBlob[Blob]
+	TypedBlob = triple_hyphen_io.TypedBlob[Config]
 )
 
 func Default(defaultTyp ids.Type) TypedBlob {

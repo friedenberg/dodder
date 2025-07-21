@@ -23,10 +23,7 @@ type Flags struct {
 type Options struct {
 	wasMade bool
 
-	Config interface {
-		interfaces.MutableConfigDryRun
-		interfaces.ConfigGetFilters
-	}
+	Config interfaces.MutableConfigDryRun
 
 	Metadata
 

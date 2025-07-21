@@ -42,7 +42,7 @@ type V1 struct {
 	Tools          options_tools.Options `toml:"tools"`
 }
 
-func (blob V1) GetBlob() Blob {
+func (blob V1) GetBlob() Config {
 	return blob
 }
 

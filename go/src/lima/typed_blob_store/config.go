@@ -52,7 +52,7 @@ func MakeConfigStore(
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
 	blobSha interfaces.Digest,
-) (common repo_configs.Blob, n int64, err error) {
+) (common repo_configs.Config, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
 		store := a.toml_v0
@@ -108,7 +108,7 @@ func (a Config) FormatTypedBlob(
 
 func (a Config) PutTypedBlob(
 	tipe interfaces.ObjectId,
-	common repo_configs.Blob,
+	common repo_configs.Config,
 ) (err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
