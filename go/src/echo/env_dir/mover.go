@@ -97,7 +97,7 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	sh := mover.GetShaLike()
+	sh := mover.GetDigest()
 
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",

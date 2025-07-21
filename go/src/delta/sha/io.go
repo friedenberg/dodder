@@ -22,8 +22,8 @@ type readCloser struct {
 	hash hash.Hash
 }
 
-func MakeReadCloser(r io.Reader) (src readCloser) {
-	switch rt := r.(type) {
+func MakeReadCloser(reader io.Reader) (src readCloser) {
+	switch rt := reader.(type) {
 	case *readCloser:
 		src = *rt
 
@@ -32,7 +32,7 @@ func MakeReadCloser(r io.Reader) (src readCloser) {
 
 	default:
 		src.hash = sha256.New()
-		src.r = r
+		src.r = reader
 	}
 
 	src.setupTee()
@@ -61,16 +61,19 @@ func MakeReadCloserTee(r io.Reader, w io.Writer) (src readCloser) {
 	return
 }
 
-func (src *readCloser) setupTee() {
-	if src.w == nil {
-		src.tee = io.TeeReader(src.r, src.hash)
+func (readCloser *readCloser) setupTee() {
+	if readCloser.w == nil {
+		readCloser.tee = io.TeeReader(readCloser.r, readCloser.hash)
 	} else {
-		src.tee = io.TeeReader(src.r, io.MultiWriter(src.hash, src.w))
+		readCloser.tee = io.TeeReader(readCloser.r, io.MultiWriter(readCloser.hash, readCloser.w))
 	}
 }
 
-func (r readCloser) Seek(offset int64, whence int) (actual int64, err error) {
-	seeker, ok := r.r.(io.Seeker)
+func (readCloser readCloser) Seek(
+	offset int64,
+	whence int,
+) (actual int64, err error) {
+	seeker, ok := readCloser.r.(io.Seeker)
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
@@ -80,9 +83,9 @@ func (r readCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	return seeker.Seek(offset, whence)
 }
 
-func (r readCloser) WriteTo(w io.Writer) (n int64, err error) {
+func (readCloser readCloser) WriteTo(w io.Writer) (n int64, err error) {
 	// TODO-P3 determine why something in the copy returns an EOF
-	if n, err = io.Copy(w, r.tee); err != nil {
+	if n, err = io.Copy(w, readCloser.tee); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -94,24 +97,24 @@ func (r readCloser) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (r readCloser) Read(b []byte) (n int, err error) {
-	return r.tee.Read(b)
+func (readCloser readCloser) Read(b []byte) (n int, err error) {
+	return readCloser.tee.Read(b)
 }
 
-func (r readCloser) Close() (err error) {
-	if c, ok := r.r.(io.Closer); ok {
+func (readCloser readCloser) Close() (err error) {
+	if c, ok := readCloser.r.(io.Closer); ok {
 		defer errors.DeferredCloser(&err, c)
 	}
 
-	if c, ok := r.w.(io.Closer); ok {
+	if c, ok := readCloser.w.(io.Closer); ok {
 		defer errors.DeferredCloser(&err, c)
 	}
 
 	return
 }
 
-func (r readCloser) GetShaLike() interfaces.Sha {
-	return FromHash(r.hash)
+func (readCloser readCloser) GetDigest() interfaces.Digest {
+	return FromHash(readCloser.hash)
 }
 
 type nopReadCloser struct {
@@ -129,10 +132,10 @@ func (nopReadCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	return
 }
 
-func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
-	return io.Copy(w, nrc.ReadCloser)
+func (readCloser nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
+	return io.Copy(w, readCloser.ReadCloser)
 }
 
-func (nrc nopReadCloser) GetShaLike() interfaces.Sha {
-	return &Sha{}
+func (readCloser nopReadCloser) GetDigest() interfaces.Digest {
+	return GetPool().Get()
 }

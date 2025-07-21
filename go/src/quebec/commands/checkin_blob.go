@@ -87,7 +87,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 
 		object := pairs[idx].object
 
-		if err := object.SetBlobSha(pair.GetShaLike()); err != nil {
+		if err := object.SetBlobSha(pair.GetDigest()); err != nil {
 			req.Cancel(err)
 		}
 
@@ -158,16 +158,16 @@ func (pair *externalBlobPair) SetArgs(
 	return
 }
 
-func (pair *externalBlobPair) GetShaLike() interfaces.Sha {
+func (pair *externalBlobPair) GetDigest() interfaces.Digest {
 	if !pair.BlobFD.IsEmpty() {
-		return pair.BlobFD.GetShaLike()
+		return pair.BlobFD.GetDigest()
 	} else {
-		return pair.BlobSha.GetShaLike()
+		return pair.BlobSha.GetDigest()
 	}
 }
 
 func (pair *externalBlobPair) PopulateBlobSha() (err error) {
-	if err = pair.object.SetBlobSha(pair.GetShaLike()); err != nil {
+	if err = pair.object.SetBlobSha(pair.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

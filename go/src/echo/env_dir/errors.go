@@ -36,7 +36,7 @@ func IsErrBlobMissing(err error) bool {
 }
 
 type ErrBlobMissing struct {
-	interfaces.ShaGetter
+	interfaces.DigestGetter
 	Path string
 }
 
@@ -44,12 +44,12 @@ func (e ErrBlobMissing) Error() string {
 	if e.Path == "" {
 		return fmt.Sprintf(
 			"Blob with sha %q does not exist locally",
-			e.GetShaLike(),
+			e.GetDigest(),
 		)
 	} else {
 		return fmt.Sprintf(
 			"Blob with sha %q does not exist locally: %q",
-			e.GetShaLike(),
+			e.GetDigest(),
 			e.Path,
 		)
 	}

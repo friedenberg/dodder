@@ -198,7 +198,7 @@ func (t *Tai) Set(v string) (err error) {
 	}
 }
 
-func (t Tai) GetShaLike() interfaces.Sha {
+func (t Tai) GetDigest() interfaces.Digest {
 	return sha.FromStringContent(t.String())
 }
 

@@ -47,8 +47,8 @@ func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
 	return
 }
 
-func (r *reader) Seek(offset int64, whence int) (actual int64, err error) {
-	seeker, ok := r.decrypter.(io.Seeker)
+func (reader *reader) Seek(offset int64, whence int) (actual int64, err error) {
+	seeker, ok := reader.decrypter.(io.Seeker)
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
@@ -58,16 +58,16 @@ func (r *reader) Seek(offset int64, whence int) (actual int64, err error) {
 	return seeker.Seek(offset, whence)
 }
 
-func (r *reader) WriteTo(w io.Writer) (n int64, err error) {
-	return io.Copy(w, r.tee)
+func (reader *reader) WriteTo(w io.Writer) (n int64, err error) {
+	return io.Copy(w, reader.tee)
 }
 
-func (r *reader) Read(p []byte) (n int, err error) {
-	return r.tee.Read(p)
+func (reader *reader) Read(p []byte) (n int, err error) {
+	return reader.tee.Read(p)
 }
 
-func (r *reader) Close() (err error) {
-	if err = r.expander.Close(); err != nil {
+func (reader *reader) Close() (err error) {
+	if err = reader.expander.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -75,8 +75,6 @@ func (r *reader) Close() (err error) {
 	return
 }
 
-func (r *reader) GetShaLike() (s interfaces.Sha) {
-	s = sha.FromHash(r.hash)
-
-	return
+func (reader *reader) GetDigest() (s interfaces.Digest) {
+	return sha.FromHash(reader.hash)
 }

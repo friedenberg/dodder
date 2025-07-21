@@ -61,7 +61,7 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 func (blobStore localHashBucketed) HasBlob(
 	sh interfaces.Sha,
 ) (ok bool) {
-	if sh.GetShaLike().IsNull() {
+	if sh.GetDigest().IsNull() {
 		ok = true
 		return
 	}
@@ -133,7 +133,7 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 func (blobStore localHashBucketed) BlobReader(
 	sh interfaces.Sha,
 ) (readeCloser interfaces.ShaReadCloser, err error) {
-	if sh.GetShaLike().IsNull() {
+	if sh.GetDigest().IsNull() {
 		readeCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
@@ -174,13 +174,13 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	sh sha.ShaLike,
 	path string,
 ) (readCloser sha.ReadCloser, err error) {
-	if sh.GetShaLike().IsNull() {
+	if sh.GetDigest().IsNull() {
 		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 
 	path = env_dir.MakeHashBucketPathFromSha(
-		sh.GetShaLike(),
+		sh.GetDigest(),
 		blobStore.buckets,
 		path,
 	)
@@ -191,11 +191,11 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(sh.GetShaLike())
+			shCopy.ResetWithShaLike(sh.GetDigest())
 
 			err = env_dir.ErrBlobMissing{
-				ShaGetter: shCopy,
-				Path:      path,
+				DigestGetter: shCopy,
+				Path:         path,
 			}
 		} else {
 			err = errors.Wrapf(

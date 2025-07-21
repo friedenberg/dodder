@@ -615,7 +615,7 @@ func (server *Server) copyBlob(
 		return
 	}
 
-	result = writeCloser.GetShaLike()
+	result = writeCloser.GetDigest()
 
 	blobCopierDelegate := sku.MakeBlobCopierDelegate(
 		server.Repo.GetEnv().GetUI(),

@@ -188,7 +188,7 @@ func writeDefaultMutableConfig(
 		return
 	}
 
-	sh = sha.Make(writeCloser.GetShaLike())
+	sh = sha.Make(writeCloser.GetDigest())
 
 	return
 }

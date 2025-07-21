@@ -222,7 +222,7 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	if o.PrintFinalSha {
-		actual := mh.GetShaLike()
+		actual := mh.GetDigest()
 		// TODO-P1 set value
 
 		// if !m.Verzeichnisse.Sha.IsNull() &&

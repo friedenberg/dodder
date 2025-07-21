@@ -87,7 +87,7 @@ func (store RepoStore) WriteTypedBlob(
 		return
 	}
 
-	sh = writer.GetShaLike()
+	sh = writer.GetDigest()
 
 	return
 }

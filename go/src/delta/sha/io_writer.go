@@ -70,9 +70,9 @@ func (w *writer) setShaLikeIfNecessary() {
 	}
 }
 
-func (w *writer) GetShaLike() (s interfaces.Sha) {
+func (w *writer) GetDigest() (digest interfaces.Digest) {
 	w.setShaLikeIfNecessary()
-	s = &w.sh
+	digest = &w.sh
 
 	return
 }

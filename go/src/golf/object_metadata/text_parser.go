@@ -74,9 +74,9 @@ func (f textParser) ParseMetadata(
 
 	n += n1
 
-	inlineBlobSha := sha.Make(blobWriter.GetShaLike())
+	inlineBlobSha := sha.Make(blobWriter.GetDigest())
 
-	if !m.Blob.IsNull() && !mp.Blob.GetShaLike().IsNull() {
+	if !m.Blob.IsNull() && !mp.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
 				&mp.Blob,
@@ -85,7 +85,7 @@ func (f textParser) ParseMetadata(
 		)
 
 		return
-	} else if !mp.Blob.GetShaLike().IsNull() {
+	} else if !mp.Blob.GetDigest().IsNull() {
 		m.Fields = append(
 			m.Fields,
 			Field{
@@ -95,7 +95,7 @@ func (f textParser) ParseMetadata(
 			},
 		)
 
-		m.Blob.SetShaLike(mp.Blob.GetShaLike())
+		m.Blob.SetShaLike(mp.Blob.GetDigest())
 	}
 
 	switch {

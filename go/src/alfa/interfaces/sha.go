@@ -8,11 +8,7 @@ import (
 // out into context object
 type Sha interface {
 	Digest
-	ShaGetter
-}
-
-type ShaGetter interface {
-	GetShaLike() Sha
+	DigestGetter
 }
 
 // TODO reconsider this and force consumption of bufio? Formats expect
@@ -22,13 +18,13 @@ type (
 	ShaReadCloser interface {
 		io.WriterTo
 		io.ReadCloser
-		ShaGetter
+		DigestGetter
 	}
 
 	// TODO rename to BlobWriter
 	ShaWriteCloser interface {
 		io.ReaderFrom
 		io.WriteCloser
-		ShaGetter
+		DigestGetter
 	}
 )

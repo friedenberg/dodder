@@ -54,7 +54,7 @@ func (e *ErrHasInlineBlobAndFilePath) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
 		e.BlobFD.GetPath(),
-		e.BlobFD.GetShaLike(),
+		e.BlobFD.GetDigest(),
 		&e.InlineSha,
 	)
 }

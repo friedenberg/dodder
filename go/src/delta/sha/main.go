@@ -34,7 +34,7 @@ type PathComponents interface {
 	PathComponents() []string
 }
 
-type ShaLike = interfaces.ShaGetter
+type ShaLike = interfaces.DigestGetter
 
 // TODO rename to digest
 type Sha struct {
@@ -77,10 +77,6 @@ func (digest *Sha) GetType() string {
 }
 
 func (digest *Sha) GetDigest() interfaces.Digest {
-	return digest
-}
-
-func (digest *Sha) GetShaLike() interfaces.Sha {
 	return digest
 }
 
@@ -139,7 +135,7 @@ func (digest *Sha) SetShaLike(src ShaLike) (err error) {
 
 	err = makeErrLength(
 		ByteSize,
-		copy(digest.data[:], src.GetShaLike().GetBytes()),
+		copy(digest.data[:], src.GetDigest().GetBytes()),
 	)
 
 	// if dst.String() ==

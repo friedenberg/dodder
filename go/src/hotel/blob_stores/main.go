@@ -73,14 +73,14 @@ func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobShaGetter interfaces.ShaGetter,
+	blobShaGetter interfaces.DigestGetter,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	blobSha := blobShaGetter.GetShaLike()
+	blobSha := blobShaGetter.GetDigest()
 
 	if dst.HasBlob(blobSha) || blobSha.IsNull() {
 		err = env_dir.MakeErrAlreadyExists(
@@ -137,8 +137,8 @@ func CopyBlob(
 		return
 	}
 
-	shaRc := rc.GetShaLike()
-	shaWc := wc.GetShaLike()
+	shaRc := rc.GetDigest()
+	shaWc := wc.GetDigest()
 
 	if !interfaces.DigestEquals(shaRc, blobSha) ||
 		!interfaces.DigestEquals(shaWc, blobSha) {
@@ -179,7 +179,7 @@ func VerifyBlob(
 
 	expected := sha.Make(sh)
 
-	if err = expected.AssertEqualsShaLike(readCloser.GetShaLike()); err != nil {
+	if err = expected.AssertEqualsShaLike(readCloser.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

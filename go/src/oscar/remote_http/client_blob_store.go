@@ -24,7 +24,7 @@ func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 			client.GetEnv(),
 			"HEAD",
 			"/blobs",
-			strings.NewReader(interfaces.FormatDigest(sh.GetShaLike())),
+			strings.NewReader(interfaces.FormatDigest(sh.GetDigest())),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -58,7 +58,7 @@ func (client *client) BlobReader(
 	if request, err = http.NewRequestWithContext(
 		client.GetEnv(),
 		"GET",
-		fmt.Sprintf("/blobs/%s", interfaces.FormatDigest(sh.GetShaLike())),
+		fmt.Sprintf("/blobs/%s", interfaces.FormatDigest(sh.GetDigest())),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -75,7 +75,7 @@ func (client *client) BlobReader(
 	switch {
 	case response.StatusCode == http.StatusNotFound:
 		err = env_dir.ErrBlobMissing{
-			ShaGetter: sh,
+			DigestGetter: sh,
 		}
 
 	case response.StatusCode >= 300:

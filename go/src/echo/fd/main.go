@@ -391,7 +391,7 @@ func (fd *FD) GetSha() *sha.Sha {
 	return &fd.sha
 }
 
-func (fd *FD) GetShaLike() interfaces.Sha {
+func (fd *FD) GetDigest() interfaces.Digest {
 	return &fd.sha
 }
 

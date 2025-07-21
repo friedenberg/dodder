@@ -90,7 +90,7 @@ func MakeTesting(
 					)
 				}
 
-				shActual := writeCloser.GetShaLike()
+				shActual := writeCloser.GetDigest()
 				expected := sha.Must(shaExpected)
 
 				err = expected.AssertEqualsShaLike(shActual)
@@ -182,7 +182,7 @@ func MakeTesting2(
 			)
 		}
 
-		shActual := writeCloser.GetShaLike()
+		shActual := writeCloser.GetDigest()
 		expected := sha.Must(shaExpected)
 
 		err = expected.AssertEqualsShaLike(shActual)

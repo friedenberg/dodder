@@ -35,7 +35,7 @@ type (
 	Mover interface {
 		io.WriteCloser
 		io.ReaderFrom
-		GetShaLike() Sha
+		DigestGetter
 	}
 
 	BlobStore interface {

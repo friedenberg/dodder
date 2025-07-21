@@ -20,7 +20,7 @@ type ObjectIOFactory interface {
 }
 
 type ObjectReaderFactory interface {
-	ObjectReader(ShaGetter) (ShaReadCloser, error)
+	ObjectReader(DigestGetter) (ShaReadCloser, error)
 }
 
 type ObjectWriterFactory interface {
@@ -28,7 +28,7 @@ type ObjectWriterFactory interface {
 }
 
 type (
-	FuncObjectReader func(ShaGetter) (ShaReadCloser, error)
+	FuncObjectReader func(DigestGetter) (ShaReadCloser, error)
 	FuncObjectWriter func() (ShaWriteCloser, error)
 )
 
@@ -60,7 +60,7 @@ func MakeBespokeObjectReadFactory(
 }
 
 func (b bespokeObjectReadFactory) ObjectReader(
-	sh ShaGetter,
+	sh DigestGetter,
 ) (ShaReadCloser, error) {
 	return b.FuncObjectReader(sh)
 }

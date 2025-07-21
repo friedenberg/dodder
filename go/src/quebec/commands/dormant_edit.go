@@ -179,7 +179,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	// TODO persist blob type
 
-	sh = writeCloser.GetShaLike()
+	sh = writeCloser.GetDigest()
 
 	return
 }

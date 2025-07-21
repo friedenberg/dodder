@@ -13,7 +13,7 @@ import (
 
 type Writer interface {
 	sha.WriteCloser
-	interfaces.ShaGetter
+	interfaces.DigestGetter
 }
 
 type writer struct {
@@ -86,10 +86,4 @@ func (w *writer) Close() (err error) {
 
 func (w *writer) GetDigest() interfaces.Digest {
 	return sha.FromHash(w.hash)
-}
-
-func (w *writer) GetShaLike() (s interfaces.Sha) {
-	s = sha.FromHash(w.hash)
-
-	return
 }

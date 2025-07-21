@@ -126,7 +126,7 @@ func (importer importer) importInventoryList(
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 		err = env_dir.ErrBlobMissing{
-			ShaGetter: blobSha,
+			DigestGetter: blobSha,
 		}
 
 		return
@@ -152,7 +152,8 @@ func (importer importer) importInventoryList(
 
 	// TODO decide whether we should rewrite the imported inventory list
 	// according to this repo's inventory list type
-	// inventoryListTypeString := importer.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString()
+	// inventoryListTypeString :=
+	// importer.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString()
 
 	// if listObject.GetType().String() != inventoryListTypeString {
 	// 	listObject.Metadata.Type = ids.GetOrPanic(inventoryListTypeString).Type

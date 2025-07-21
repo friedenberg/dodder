@@ -148,7 +148,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	actual := blobWriter.GetShaLike()
+	actual := blobWriter.GetDigest()
 
 	if err := expected.AssertEqualsShaLike(actual); err != nil {
 		ui.Err().Printf(

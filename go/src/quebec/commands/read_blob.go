@@ -72,7 +72,7 @@ func (ReadBlob) readOneBlob(
 
 	sh = sha.GetPool().Get()
 
-	if err = sh.SetShaLike(aw.GetShaLike()); err != nil {
+	if err = sh.SetShaLike(aw.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

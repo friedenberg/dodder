@@ -138,7 +138,7 @@ func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
 }
 
 func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
-	if sh.GetShaLike().IsNull() {
+	if sh.GetDigest().IsNull() {
 		ok = true
 		return
 	}
@@ -234,7 +234,7 @@ func (blobStore *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
 func (blobStore *sftpBlobStore) BlobReader(
 	sh interfaces.Sha,
 ) (readCloser interfaces.ShaReadCloser, err error) {
-	if sh.GetShaLike().IsNull() {
+	if sh.GetDigest().IsNull() {
 		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
@@ -246,11 +246,11 @@ func (blobStore *sftpBlobStore) BlobReader(
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(sh.GetShaLike())
+			shCopy.ResetWithShaLike(sh.GetDigest())
 
 			err = env_dir.ErrBlobMissing{
-				ShaGetter: shCopy,
-				Path:      remotePath,
+				DigestGetter: shCopy,
+				Path:         remotePath,
 			}
 		} else {
 			err = errors.Wrap(err)
@@ -375,7 +375,7 @@ func (mover *sftpMover) Close() (err error) {
 	}
 
 	// Get the calculated SHA and determine final path
-	sh := mover.writer.GetShaLike()
+	sh := mover.writer.GetDigest()
 	finalPath := mover.store.remotePathForSha(sh)
 
 	// Ensure the target directory exists (Git-like bucketing)
@@ -409,14 +409,14 @@ func (mover *sftpMover) Close() (err error) {
 	return
 }
 
-func (mover *sftpMover) GetShaLike() interfaces.Sha {
+func (mover *sftpMover) GetDigest() interfaces.Digest {
 	if mover.writer == nil {
 		// Return empty SHA if no data written
 		// TODO use sha.GetPool()
 		return &sha.Sha{}
 	}
 
-	return mover.writer.GetShaLike()
+	return mover.writer.GetDigest()
 }
 
 // sftpWriter implements the streaming writer with compression/encryption
@@ -490,7 +490,7 @@ func (writer *sftpWriter) Close() (err error) {
 	return
 }
 
-func (writer *sftpWriter) GetShaLike() interfaces.Sha {
+func (writer *sftpWriter) GetDigest() interfaces.Digest {
 	return sha.FromHash(writer.hash)
 }
 
@@ -582,6 +582,6 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetShaLike() interfaces.Sha {
+func (reader *sftpReader) GetDigest() interfaces.Digest {
 	return sha.FromHash(reader.hash)
 }

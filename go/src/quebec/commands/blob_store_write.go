@@ -88,14 +88,14 @@ func (cmd BlobStoreWrite) Run(
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					a.GetShaLike(),
+					a.GetDigest(),
 					a.Path,
 				)
 			} else {
-				blobStore.GetUI().Printf("%s %s (checked in)", a.GetShaLike(), a.Path)
+				blobStore.GetUI().Printf("%s %s (checked in)", a.GetDigest(), a.Path)
 			}
 		} else {
-			ui.Err().Printf("%s %s (untracked)", a.GetShaLike(), a.Path)
+			ui.Err().Printf("%s %s (untracked)", a.GetDigest(), a.Path)
 
 			if cmd.Check {
 				failCount.Add(1)
@@ -149,7 +149,7 @@ func (cmd BlobStoreWrite) doOne(
 		return
 	}
 
-	sh = writeCloser.GetShaLike()
+	sh = writeCloser.GetDigest()
 
 	return
 }

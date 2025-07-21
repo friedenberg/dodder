@@ -54,7 +54,7 @@ func (blobStore *BlobStore[A, APtr]) GetBlob(
 		return
 	}
 
-	actual := rc.GetShaLike()
+	actual := rc.GetDigest()
 
 	if !interfaces.DigestEquals(actual, sh) {
 		err = errors.ErrorWithStackf("expected sha %s but got %s", sh, actual)
@@ -85,7 +85,7 @@ func (blobStore *BlobStore[A, APtr]) SaveBlobText(
 		return
 	}
 
-	sh = writeCloser.GetShaLike()
+	sh = writeCloser.GetDigest()
 
 	return
 }

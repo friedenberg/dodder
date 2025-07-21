@@ -261,7 +261,7 @@ func (store *Store) Create(
 		return
 	}
 
-	actual := openList.Mover.GetShaLike()
+	actual := openList.Mover.GetDigest()
 	expected := sha.Make(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
@@ -327,7 +327,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	actual := writeCloser.GetShaLike()
+	actual := writeCloser.GetDigest()
 	expected := sha.Make(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
