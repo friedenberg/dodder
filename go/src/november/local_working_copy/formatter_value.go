@@ -253,7 +253,7 @@ func (local *Repo) MakeFormatFunc(
 
 	case "object":
 		fo := object_inventory_format.FormatForVersion(
-			local.GetConfig().GetImmutableConfig().GetStoreVersion(),
+			local.GetConfig().GetGenesisConfigPublic().GetStoreVersion(),
 		)
 
 		o := object_inventory_format.Options{

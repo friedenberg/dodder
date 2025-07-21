@@ -93,7 +93,7 @@ func (store *store) Reset() error {
 		store.config.compiled = &compiled{}
 	}
 
-	store.config.configMutableBlob = repo_configs.V1{}
+	store.config.configRepo = repo_configs.V1{}
 	store.config.ExtensionsToTypes = make(map[string]string)
 	store.config.TypesToExtensions = make(map[string]string)
 
@@ -117,7 +117,7 @@ func (store *store) Initialize(
 	store.envRepo = envRepo
 	store.config.CLI = cli
 	store.Reset()
-	store.config.configGenesisBlobPrivate = envRepo.GetConfigPrivate().Blob
+	store.config.configGenesis = envRepo.GetConfigPrivate().Blob
 
 	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {

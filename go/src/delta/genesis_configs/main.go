@@ -12,8 +12,7 @@ import (
 )
 
 type (
-	ConfigPublic interface {
-		GetImmutableConfigPublic() ConfigPublic
+	Config interface {
 		GetStoreVersion() StoreVersion
 		GetPublicKey() repo_signing.PublicKey
 		GetRepoType() repo_type.Type
@@ -21,9 +20,15 @@ type (
 		GetInventoryListTypeString() string
 	}
 
+	ConfigPublic interface {
+		Config
+		GetGenesisConfig() ConfigPublic
+	}
+
 	ConfigPrivate interface {
-		ConfigPublic
-		GetImmutableConfig() ConfigPrivate
+		Config
+		GetGenesisConfigPublic() ConfigPublic
+		GetGenesisConfig() ConfigPrivate
 		GetPrivateKey() repo_signing.PrivateKey
 	}
 

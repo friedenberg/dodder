@@ -17,15 +17,15 @@ import (
 )
 
 type (
-	configMutableBlob        = repo_configs.Config
-	configGenesisBlobPrivate = genesis_configs.ConfigPrivate
-	CLI                      = repo_config_cli.Blob
+	configRepo    = repo_configs.Config
+	configGenesis = genesis_configs.ConfigPrivate
+	CLI           = repo_config_cli.Blob
 
 	Config struct {
 		*compiled
 
-		configMutableBlob
-		configGenesisBlobPrivate
+		configRepo
+		configGenesis
 		CLI
 	}
 

@@ -288,7 +288,7 @@ func (store *store) loadMutableConfigBlob(
 		return
 	}
 
-	store.config.configMutableBlob = typedBlob.Blob
+	store.config.configRepo = typedBlob.Blob
 
 	return
 }

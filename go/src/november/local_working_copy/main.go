@@ -158,7 +158,7 @@ func (local *Repo) initialize(
 	if local.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
 		err = repo_type.ErrUnsupportedRepoType{
 			Expected: repo_type.TypeWorkingCopy,
-			Actual:   local.GetConfig().GetImmutableConfig().GetRepoType(),
+			Actual:   local.GetConfig().GetGenesisConfigPublic().GetRepoType(),
 		}
 
 		return
@@ -218,7 +218,7 @@ func (local *Repo) initialize(
 
 	ui.Log().Printf(
 		"store version: %s",
-		local.GetConfig().GetImmutableConfig().GetStoreVersion(),
+		local.GetConfig().GetGenesisConfigPublic().GetStoreVersion(),
 	)
 
 	if err = local.envWorkspace.SetWorkspaceTypes(

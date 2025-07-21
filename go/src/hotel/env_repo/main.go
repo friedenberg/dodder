@@ -214,7 +214,7 @@ func (env Env) GetEnv() env_ui.Env {
 func (env Env) GetConfigPublic() genesis_configs.TypedConfigPublic {
 	return genesis_configs.TypedConfigPublic{
 		Type: env.config.Type,
-		Blob: env.config.Blob.GetImmutableConfigPublic(),
+		Blob: env.config.Blob.GetGenesisConfigPublic(),
 	}
 }
 

@@ -89,7 +89,7 @@ func (store *Store) Initialize(
 	}
 
 	if store.zettelIdIndex, err = zettel_id_index.MakeIndex(
-		store.GetConfigStore().GetConfig(),
+		store.GetConfigStore().GetConfig().GetGenesisConfigPublic(),
 		store.storeConfig.GetConfig().CLI,
 		store.GetEnvRepo(),
 		store.GetEnvRepo(),
