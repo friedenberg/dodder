@@ -36,7 +36,7 @@ type sftpBlobStore struct {
 	sftpClient    *sftp.Client
 
 	blobCacheLock sync.RWMutex
-	blobCache     map[sha.Bytes]struct{}
+	blobCache     map[string]struct{}
 }
 
 func makeSftpStore(
@@ -48,7 +48,7 @@ func makeSftpStore(
 		buckets:   defaultBuckets,
 		config:    config,
 		sshClient: sshClient,
-		blobCache: make(map[sha.Bytes]struct{}),
+		blobCache: make(map[string]struct{}),
 	}
 
 	ui.Log().Print("creating sftp client")
@@ -147,7 +147,7 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 
 	blobStore.blobCacheLock.RLock()
 
-	if _, ok = blobStore.blobCache[sh1.GetBytes()]; ok {
+	if _, ok = blobStore.blobCache[string(sh1.GetBytes())]; ok {
 		blobStore.blobCacheLock.RUnlock()
 		return
 	}
@@ -158,7 +158,7 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 
 	if _, err := blobStore.sftpClient.Stat(remotePath); err == nil {
 		blobStore.blobCacheLock.Lock()
-		blobStore.blobCache[sh1.GetBytes()] = struct{}{}
+		blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
 		blobStore.blobCacheLock.Unlock()
 		ok = true
 	}
@@ -202,7 +202,7 @@ func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Sha] {
 			}
 
 			blobStore.blobCacheLock.Lock()
-			blobStore.blobCache[sh.GetBytes()] = struct{}{}
+			blobStore.blobCache[string(sh.GetBytes())] = struct{}{}
 			blobStore.blobCacheLock.Unlock()
 
 			if !yield(&sh, nil) {
@@ -260,7 +260,7 @@ func (blobStore *sftpBlobStore) BlobReader(
 
 	sh1 := sha.Make(sh)
 	blobStore.blobCacheLock.Lock()
-	blobStore.blobCache[sh1.GetBytes()] = struct{}{}
+	blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
 	blobStore.blobCacheLock.Unlock()
 
 	// Create streaming reader that handles decompression/decryption
@@ -400,7 +400,7 @@ func (mover *sftpMover) Close() (err error) {
 
 	sh1 := sha.Make(sh)
 	mover.store.blobCacheLock.Lock()
-	mover.store.blobCache[sh1.GetBytes()] = struct{}{}
+	mover.store.blobCache[string(sh1.GetBytes())] = struct{}{}
 	mover.store.blobCacheLock.Unlock()
 
 	// Clear temp path so cleanup doesn't try to remove it

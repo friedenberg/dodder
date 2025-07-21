@@ -6,19 +6,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type fsItemData struct {
 	interfaces.MutableSetLike[*sku.FSItem]
-	shas map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem]
+	shas map[string]interfaces.MutableSetLike[*sku.FSItem]
 }
 
 func makeFSItemData() fsItemData {
 	return fsItemData{
 		MutableSetLike: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
-		shas:           make(map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem]),
+		shas:           make(map[string]interfaces.MutableSetLike[*sku.FSItem]),
 	}
 }
 

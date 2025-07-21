@@ -30,14 +30,14 @@ func (a UnsureMatchType) MakeMatchMap() UnsureMatchMaps {
 	if a.Contains(UnsureMatchTypeMetadataWithoutTaiHistory) {
 		maps.Lookup[UnsureMatchTypeMetadataWithoutTaiHistory] = UnsureMatchMap{
 			UnsureMatchType: UnsureMatchTypeMetadataWithoutTaiHistory,
-			Lookup:          make(map[sha.Bytes]SkuTypeSetMutable),
+			Lookup:          make(map[string]SkuTypeSetMutable),
 		}
 	}
 
 	if a.Contains(UnsureMatchTypeDescription) {
 		maps.Lookup[UnsureMatchTypeDescription] = UnsureMatchMap{
 			UnsureMatchType: UnsureMatchTypeDescription,
-			Lookup:          make(map[sha.Bytes]SkuTypeSetMutable),
+			Lookup:          make(map[string]SkuTypeSetMutable),
 		}
 	}
 
@@ -62,7 +62,7 @@ type IterMatching func(
 
 type UnsureMatchMap struct {
 	UnsureMatchType
-	Lookup map[sha.Bytes]SkuTypeSetMutable
+	Lookup map[string]SkuTypeSetMutable
 }
 
 type UnsureMatchMaps struct {
@@ -93,20 +93,22 @@ func MakeUnsureMatchMapsCollector(
 		clone := co.Clone()
 
 		for t, v := range umm.Lookup {
-			var k sha.Bytes
+			var digestBytes []byte
 
 			switch t {
 			case UnsureMatchTypeMetadataWithoutTaiHistory:
-				k = e.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
+				digestBytes = e.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeDescription:
-				k = sha.FromStringContent(e.Metadata.Description.String()).GetBytes()
+				digestBytes = sha.FromStringContent(
+					e.Metadata.Description.String(),
+				).GetBytes()
 
 			default:
 				continue
 			}
 
-			existing, ok := v.Lookup[k]
+			existing, ok := v.Lookup[string(digestBytes)]
 
 			if !ok {
 				existing = MakeSkuTypeSetMutable()
@@ -117,7 +119,7 @@ func MakeUnsureMatchMapsCollector(
 				return
 			}
 
-			v.Lookup[k] = existing
+			v.Lookup[string(digestBytes)] = existing
 		}
 
 		return
@@ -130,20 +132,22 @@ func MakeUnsureMatchMapsMatcher(
 ) interfaces.FuncIter[*Transacted] {
 	return func(sk *Transacted) (err error) {
 		for t, v := range umm.Lookup {
-			var k sha.Bytes
+			var digestBytes []byte
 
 			switch t {
 			case UnsureMatchTypeMetadataWithoutTaiHistory:
-				k = sk.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
+				digestBytes = sk.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeDescription:
-				k = sha.FromStringContent(sk.Metadata.Description.String()).GetBytes()
+				digestBytes = sha.FromStringContent(
+					sk.Metadata.Description.String(),
+				).GetBytes()
 
 			default:
 				continue
 			}
 
-			existing, ok := v.Lookup[k]
+			existing, ok := v.Lookup[string(digestBytes)]
 
 			if !ok {
 				continue

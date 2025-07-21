@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 )
@@ -140,8 +139,8 @@ func (store *Store) QueryExactlyOne(
 	return
 }
 
-func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, err error) {
-	blobShaBytes = make(map[sha.Bytes][]string)
+func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[string][]string, err error) {
+	blobShaBytes = make(map[string][]string)
 	var l sync.Mutex
 
 	if err = store.QueryPrimitive(
@@ -150,8 +149,8 @@ func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, 
 			l.Lock()
 			defer l.Unlock()
 
-			k := sk.Metadata.Blob.GetBytes()
-			oids := blobShaBytes[k]
+			digestBytes := sk.Metadata.Blob.GetBytes()
+			oids := blobShaBytes[string(digestBytes)]
 			oid := sk.ObjectId.String()
 			loc, found := slices.BinarySearch(oids, oid)
 
@@ -161,7 +160,7 @@ func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, 
 
 			oids = slices.Insert(oids, loc, oid)
 
-			blobShaBytes[sk.Metadata.Blob.GetBytes()] = oids
+			blobShaBytes[string(sk.Metadata.Blob.GetBytes())] = oids
 
 			return
 		},

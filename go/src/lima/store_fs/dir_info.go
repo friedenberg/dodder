@@ -310,7 +310,12 @@ func (d *dirInfo) processFDPattern(
 		objectIdString,
 		item,
 	); err != nil {
-		err = errors.Wrapf(err, "FD: %q, ObjectIdString: %q", item.Debug(), objectIdString)
+		err = errors.Wrapf(
+			err,
+			"FD: %q, ObjectIdString: %q",
+			item.Debug(),
+			objectIdString,
+		)
 		return
 	}
 
@@ -353,7 +358,12 @@ func (d *dirInfo) processFD(
 		objectIdString,
 		item,
 	); err != nil {
-		err = errors.Wrapf(err, "FD: %q, ObjectIdString: %q", item.Debug(), objectIdString)
+		err = errors.Wrapf(
+			err,
+			"FD: %q, ObjectIdString: %q",
+			item.Debug(),
+			objectIdString,
+		)
 		return
 	}
 
@@ -541,7 +551,7 @@ func (d *dirInfo) addOneUntracked(
 
 	// TODO add sha cache
 	key := sh.GetBytes()
-	existing, ok := d.definitelyNotCheckedOut.shas[key]
+	existing, ok := d.definitelyNotCheckedOut.shas[string(key)]
 
 	if !ok {
 		existing = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
@@ -552,7 +562,7 @@ func (d *dirInfo) addOneUntracked(
 		return
 	}
 
-	d.definitelyNotCheckedOut.shas[key] = existing
+	d.definitelyNotCheckedOut.shas[string(key)] = existing
 
 	return
 }

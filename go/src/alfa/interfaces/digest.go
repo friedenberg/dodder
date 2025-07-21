@@ -6,6 +6,7 @@ type (
 	Digest interface {
 		DigestGetter
 		GetBytes() []byte
+		GetType() string
 		IsNull() bool
 	}
 

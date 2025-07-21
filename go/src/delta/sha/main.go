@@ -44,12 +44,8 @@ func (s *Sha) Size() int {
 	return ByteSize
 }
 
-func (s *Sha) GetBytes() Bytes {
-	if s.IsNull() {
-		return *shaNull.data
-	} else {
-		return *s.data
-	}
+func (s *Sha) GetBytes() []byte {
+	return s.GetShaBytes()
 }
 
 func (s *Sha) GetShaBytes() []byte {

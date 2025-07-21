@@ -64,8 +64,9 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	return func(item *sku.FSItem) (err error) {
 		co := GetCheckedOutPool().Get()
 
-		// at a bare minimum, the internal object ID must always be set as there are
-		// hard assumptions about internal being valid throughout the reading cycle
+		// at a bare minimum, the internal object ID must always be set as there
+		// are hard assumptions about internal being valid throughout the
+		// reading cycle
 		if err = co.GetSku().ObjectId.SetObjectIdLike(&item.ExternalObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -84,7 +85,8 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			&oid,
 			co.GetSku(),
 		); err != nil {
-			if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
+			if collections.IsErrNotFound(err) ||
+				genres.IsErrUnsupportedGenre(err) {
 				hasInternal = false
 				err = nil
 			} else {
@@ -182,7 +184,10 @@ func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if !item.Conflict.IsEmpty() {
-		err = errors.ErrorWithStackf("cannot have a conflict for a definitely not checked out blob: %s", item.Debug())
+		err = errors.ErrorWithStackf(
+			"cannot have a conflict for a definitely not checked out blob: %s",
+			item.Debug(),
+		)
 		return
 	}
 
@@ -303,14 +308,14 @@ func (store *Store) queryUntracked(
 	addRecognizedIfNecessary := func(
 		sk *sku.Transacted,
 		shaBlob *sha.Sha,
-		shaCache map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem],
+		digestCache map[string]interfaces.MutableSetLike[*sku.FSItem],
 	) (item *fsItemRecognized, err error) {
 		if shaBlob.IsNull() {
 			return
 		}
 
 		key := shaBlob.GetBytes()
-		recognized, ok := shaCache[key]
+		recognized, ok := digestCache[string(key)]
 
 		if !ok {
 			return
@@ -422,7 +427,8 @@ func (store *Store) queryUntracked(
 	// 	sort.Slice(
 	// 		objects,
 	// 		func(i, j int) bool {
-	// 			return objects[i].ExternalObjectId.String() < objects[j].ExternalObjectId.String()
+	// 			return objects[i].ExternalObjectId.String() <
+	// objects[j].ExternalObjectId.String()
 	// 		},
 	// 	)
 

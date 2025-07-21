@@ -17,7 +17,7 @@ type FindMissing struct {
 func (cmd FindMissing) Run(dep command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
 
-	var lookupStored map[sha.Bytes][]string
+	var lookupStored map[string][]string
 
 	{
 		var err error
@@ -34,7 +34,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 			localWorkingCopy.Cancel(err)
 		}
 
-		oids, ok := lookupStored[sh.GetBytes()]
+		oids, ok := lookupStored[string(sh.GetBytes())]
 
 		if ok {
 			localWorkingCopy.GetUI().Printf("%s (checked in as %q)", &sh, oids)

@@ -14,17 +14,17 @@ type CreateFromShas struct {
 	sku.Proto
 }
 
-func (c CreateFromShas) Run(
+func (op CreateFromShas) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	var lookupStored map[sha.Bytes][]string
+	var lookupStored map[string][]string
 
-	if lookupStored, err = c.GetStore().MakeBlobShaBytesMap(); err != nil {
+	if lookupStored, err = op.GetStore().MakeBlobShaBytesMap(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	toCreate := make(map[sha.Bytes]*sku.Transacted)
+	toCreate := make(map[string]*sku.Transacted)
 
 	for _, arg := range args {
 		var sh sha.Sha
@@ -34,44 +34,51 @@ func (c CreateFromShas) Run(
 			return
 		}
 
-		k := sh.GetBytes()
+		digestBytes := sh.GetBytes()
 
-		if _, ok := toCreate[k]; ok {
-			ui.Err().Printf("%s appears in arguments more than once. Ignoring", &sh)
+		if _, ok := toCreate[string(digestBytes)]; ok {
+			ui.Err().Printf(
+				"%s appears in arguments more than once. Ignoring",
+				&sh,
+			)
 			continue
 		}
 
-		if oids, ok := lookupStored[k]; ok {
-			ui.Err().Printf("%s appears in object already checked in (%q). Ignoring", &sh, oids)
+		if oids, ok := lookupStored[string(digestBytes)]; ok {
+			ui.Err().Printf(
+				"%s appears in object already checked in (%q). Ignoring",
+				&sh,
+				oids,
+			)
 			continue
 		}
 
-		z := sku.GetTransactedPool().Get()
+		object := sku.GetTransactedPool().Get()
 
-		z.ObjectId.SetGenre(genres.Zettel)
-		z.Metadata.Blob.ResetWith(&sh)
+		object.ObjectId.SetGenre(genres.Zettel)
+		object.Metadata.Blob.ResetWith(&sh)
 
-		c.Proto.Apply(z, genres.Zettel)
+		op.Proto.Apply(object, genres.Zettel)
 
-		toCreate[k] = z
+		toCreate[string(digestBytes)] = object
 	}
 
 	results = sku.MakeTransactedMutableSet()
 
-	if err = c.Lock(); err != nil {
+	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for _, z := range toCreate {
-		if err = c.GetStore().CreateOrUpdateDefaultProto(
+		if err = op.GetStore().CreateOrUpdateDefaultProto(
 			z,
 			sku.StoreOptions{
 				ApplyProto: true,
 			},
 		); err != nil {
 			// TODO-P2 add file for error handling
-			c.handleStoreError(z, "", err)
+			op.handleStoreError(z, "", err)
 			err = nil
 			continue
 		}
@@ -79,7 +86,7 @@ func (c CreateFromShas) Run(
 		results.Add(z)
 	}
 
-	if err = c.Unlock(); err != nil {
+	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

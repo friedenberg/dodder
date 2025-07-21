@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -24,7 +23,7 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	toCreate := make(map[sha.Bytes]*sku.Transacted)
+	toCreate := make(map[string]*sku.Transacted)
 	toDelete := fd.MakeMutableSet()
 
 	o := sku.CommitOptions{
@@ -68,8 +67,8 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		k := sh.GetBytes()
-		existing, ok := toCreate[k]
+		digestBytes := sh.GetBytes()
+		existing, ok := toCreate[string(digestBytes)]
 
 		if ok {
 			if err = existing.Metadata.Description.Set(
@@ -79,7 +78,7 @@ func (c CreateFromPaths) Run(
 				return
 			}
 		} else {
-			toCreate[k] = z
+			toCreate[string(digestBytes)] = z
 		}
 
 		if c.Delete {
