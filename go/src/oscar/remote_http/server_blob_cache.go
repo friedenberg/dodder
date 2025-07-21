@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -29,7 +30,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 				return
 			}
 
-			serverBlobCache.shas.Add(interfaces.FormatDigest(sh))
+			serverBlobCache.shas.Add(digests.FormatDigest(sh))
 			count++
 		}
 
@@ -55,7 +56,7 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 	}
 
 	if serverBlobCache.shas.ContainsExpansion(
-		interfaces.FormatDigest(blobSha),
+		digests.FormatDigest(blobSha),
 	) {
 		ok = true
 		return

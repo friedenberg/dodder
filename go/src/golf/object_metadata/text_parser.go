@@ -95,12 +95,12 @@ func (f textParser) ParseMetadata(
 			},
 		)
 
-		m.Blob.SetShaLike(mp.Blob.GetDigest())
+		m.Blob.SetDigest(mp.Blob.GetDigest())
 	}
 
 	switch {
 	case m.Blob.IsNull() && !inlineBlobSha.IsNull():
-		m.Blob.SetShaLike(inlineBlobSha)
+		m.Blob.SetDigest(inlineBlobSha)
 
 	case !m.Blob.IsNull() && inlineBlobSha.IsNull():
 		// noop

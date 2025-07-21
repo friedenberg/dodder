@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -258,7 +259,7 @@ func (coder V2ObjectCoder) DecodeFrom(
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
 		sh := sha.MustWithDigester(object.GetTai())
-		defer sha.GetPool().Put(sh)
+		defer digests.PutDigest(sh)
 
 		if len(object.Metadata.RepoPubkey) == 0 {
 			err = errors.ErrorWithStackf(

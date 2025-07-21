@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -184,7 +185,7 @@ func (transacted *Transacted) makeShaCalcFunc(
 			return
 		}
 
-		defer sha.GetPool().Put(actual)
+		defer digests.PutDigest(actual)
 
 		sh.ResetWith(actual)
 
@@ -233,7 +234,7 @@ func (transacted *Transacted) SetDormant(v bool) {
 }
 
 func (transacted *Transacted) SetObjectSha(v interfaces.Digest) (err error) {
-	return transacted.GetMetadata().Sha().SetShaLike(v)
+	return transacted.GetMetadata().Sha().SetDigest(v)
 }
 
 func (transacted *Transacted) GetObjectSha() interfaces.Digest {
@@ -245,7 +246,7 @@ func (transacted *Transacted) GetBlobSha() interfaces.Digest {
 }
 
 func (transacted *Transacted) SetBlobSha(sh interfaces.Digest) error {
-	return transacted.Metadata.Blob.SetShaLike(sh)
+	return transacted.Metadata.Blob.SetDigest(sh)
 }
 
 func (transacted *Transacted) GetKey() string {
@@ -258,7 +259,7 @@ func (transacted *Transacted) Sign(
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
 	sh := sha.MustWithDigester(transacted.GetTai())
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
 		config.GetPrivateKey(),

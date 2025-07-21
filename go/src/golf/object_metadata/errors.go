@@ -41,7 +41,7 @@ func MakeErrHasInlineBlobAndFilePath(
 ) (err *ErrHasInlineBlobAndFilePath) {
 	err = &ErrHasInlineBlobAndFilePath{}
 	err.BlobFD.ResetWith(blobFD)
-	err.InlineSha.SetShaLike(sh)
+	err.InlineSha.SetDigest(sh)
 	return
 }
 
@@ -63,8 +63,8 @@ func MakeErrHasInlineBlobAndMetadataSha(
 	inline, object_metadata *sha.Sha,
 ) (err *ErrHasInlineBlobAndMetadataSha) {
 	err = &ErrHasInlineBlobAndMetadataSha{}
-	err.MetadataSha.SetShaLike(object_metadata)
-	err.InlineSha.SetShaLike(inline)
+	err.MetadataSha.SetDigest(object_metadata)
+	err.InlineSha.SetDigest(inline)
 	return
 }
 

@@ -128,7 +128,10 @@ func (store *Store) readOneExternalBlob(
 	internal *sku.Transacted,
 	item *sku.FSItem,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(&external.Metadata, internal.GetMetadata())
+	object_metadata.Resetter.ResetWith(
+		&external.Metadata,
+		internal.GetMetadata(),
+	)
 
 	// TODO use cache
 	{
@@ -157,7 +160,7 @@ func (store *Store) readOneExternalBlob(
 			return
 		}
 
-		external.GetMetadata().Blob.SetShaLike(writeCloser)
+		external.GetMetadata().Blob.SetDigester(writeCloser)
 	}
 
 	return

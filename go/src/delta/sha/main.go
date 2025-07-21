@@ -12,6 +12,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
@@ -37,8 +38,6 @@ func init() {
 type PathComponents interface {
 	PathComponents() []string
 }
-
-type ShaLike = interfaces.Digester
 
 // TODO rename to digest
 type Sha struct {
@@ -105,7 +104,7 @@ func (digest *Sha) GetTail() string {
 }
 
 func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
-	if !interfaces.DigestEquals(digest, b) {
+	if !digests.DigestEquals(digest, b) {
 		return MakeErrNotEqual(digest, b)
 	}
 
@@ -134,7 +133,12 @@ func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
 	return
 }
 
-func (digest *Sha) SetShaLike(src ShaLike) (err error) {
+func (digest *Sha) SetDigester(src interfaces.Digester) (err error) {
+	return digest.SetDigest(src.GetDigest())
+}
+
+// TODO replace
+func (digest *Sha) SetDigest(src interfaces.Digest) (err error) {
 	digest.allocDataIfNecessary()
 
 	err = makeErrLength(
@@ -150,6 +154,7 @@ func (digest *Sha) SetShaLike(src ShaLike) (err error) {
 	return
 }
 
+// TODO remove
 func (digest *Sha) SetParts(head, tail string) (err error) {
 	if err = digest.Set(head + tail); err != nil {
 		err = errors.Wrap(err)
@@ -229,6 +234,7 @@ func (digest *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
 	return
 }
 
+// TODO move to digests package
 func (digest *Sha) SetHexBytes(bytess []byte) (err error) {
 	digest.allocDataIfNecessary()
 

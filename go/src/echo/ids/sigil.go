@@ -95,11 +95,13 @@ func (a Sigil) ContainsOneOf(b Sigil) bool {
 }
 
 func (a Sigil) IsLatestOrUnknown() bool {
-	return a == SigilLatest || a == SigilUnknown || a == SigilLatest|SigilUnknown
+	return a == SigilLatest || a == SigilUnknown ||
+		a == SigilLatest|SigilUnknown
 }
 
 func (a Sigil) IncludesLatest() bool {
-	return a.ContainsOneOf(SigilLatest) || a.ContainsOneOf(SigilHistory) || a == 0
+	return a.ContainsOneOf(SigilLatest) || a.ContainsOneOf(SigilHistory) ||
+		a == 0
 }
 
 func (a Sigil) IncludesHistory() bool {
@@ -161,7 +163,7 @@ func (i *Sigil) Set(v string) (err error) {
 	return
 }
 
-func (i Sigil) GetSha() *sha.Sha {
+func (i Sigil) GetSha() interfaces.Digest {
 	return sha.FromStringContent(i.String())
 }
 

@@ -291,14 +291,14 @@ func (metadata *Metadata) AddComment(f string, vals ...any) {
 func (metadata *Metadata) SetMutter(mg Getter) (err error) {
 	mutter := mg.GetMetadata()
 
-	if err = metadata.Mutter().SetShaLike(
+	if err = metadata.Mutter().SetDigest(
 		mutter.Sha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = metadata.ParentMetadataObjectIdParent.SetShaLike(
+	if err = metadata.ParentMetadataObjectIdParent.SetDigest(
 		&mutter.SelfMetadataObjectIdParent,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -2,7 +2,7 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -29,7 +29,7 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !interfaces.DigestEquals(&a.Blob, &b.Blob) {
+	if !digests.DigestEquals(&a.Blob, &b.Blob) {
 		if debug {
 			ui.Debug().Print(&a.Blob, "->", &b.Blob)
 		}

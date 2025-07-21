@@ -146,7 +146,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 		return
 	}
 
-	fd.sha.SetShaLike(writer)
+	fd.sha.SetDigester(writer)
 	fd.state = StateStored
 
 	return
@@ -201,7 +201,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 	}
 
 	fd.path = path
-	fd.sha.SetShaLike(blobWriter)
+	fd.sha.SetDigester(blobWriter)
 	fd.state = StateStored
 
 	return
@@ -384,7 +384,7 @@ func (fd *FD) IsDir() bool {
 }
 
 func (fd *FD) SetShaLike(v interfaces.Digest) (err error) {
-	return fd.sha.SetShaLike(v)
+	return fd.sha.SetDigest(v)
 }
 
 func (fd *FD) GetSha() *sha.Sha {

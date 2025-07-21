@@ -2,6 +2,8 @@ package stream_index
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -39,7 +41,7 @@ func (s *probe_index) Flush() (err error) {
 }
 
 func (s *probe_index) readOneShaLoc(
-	sh *sha.Sha,
+	sh interfaces.Digest,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = s.Index.ReadOne(sh); err != nil {
 		return
@@ -49,7 +51,7 @@ func (s *probe_index) readOneShaLoc(
 }
 
 func (s *probe_index) readManyShaLoc(
-	sh *sha.Sha,
+	sh interfaces.Digest,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = s.Index.ReadMany(sh, &locs); err != nil {
 		return
@@ -85,10 +87,10 @@ func (s *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
-	sh := sha.FromStringContent(str)
-	defer sha.GetPool().Put(sh)
+	digest := sha.FromStringContent(str)
+	defer digests.PutDigest(digest)
 
-	if err = s.Index.AddSha(sh, loc); err != nil {
+	if err = s.Index.AddSha(digest, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

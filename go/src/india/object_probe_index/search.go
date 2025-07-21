@@ -5,13 +5,19 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
-func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
+func (e *page) seekToFirstBinarySearch(
+	shMet interfaces.Digest,
+) (mid int64, err error) {
 	if e.f == nil {
-		err = collections.MakeErrNotFoundString("fd nil: " + shMet.String())
+		err = collections.MakeErrNotFoundString(
+			"fd nil: " + digests.FormatDigest(shMet),
+		)
 		return
 	}
 
@@ -61,14 +67,20 @@ func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(fmt.Sprintf("%d: %s", loops, shMet.String()))
+	err = collections.MakeErrNotFoundString(
+		fmt.Sprintf("%d: %s", loops, digests.FormatDigest(shMet)),
+	)
 
 	return
 }
 
-func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
+func (e *page) seekToFirstLinearSearch(
+	shMet interfaces.Digest,
+) (loc int64, err error) {
 	if e.f == nil {
-		err = collections.MakeErrNotFoundString("fd nil: " + shMet.String())
+		err = collections.MakeErrNotFoundString(
+			"fd nil: " + digests.FormatDigest(shMet),
+		)
 		return
 	}
 
@@ -103,7 +115,7 @@ func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 		}
 	}
 
-	err = collections.MakeErrNotFound(shMet)
+	err = collections.MakeErrNotFoundString(digests.FormatDigest(shMet))
 
 	return
 }

@@ -57,23 +57,23 @@ func (ReadBlob) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
 ) (sh *sha.Sha, err error) {
-	var aw interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseDigester
 
-	if aw, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = io.Copy(aw, strings.NewReader(entry.Blob)); err != nil {
+	if _, err = io.Copy(writeCloser, strings.NewReader(entry.Blob)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	sh = sha.GetPool().Get()
 
-	if err = sh.SetShaLike(aw.GetDigest()); err != nil {
+	if err = sh.SetDigest(writeCloser.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -362,7 +362,7 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.Blob.SetShaLike(&blobSha); err != nil {
+	if err = m.Blob.SetDigest(&blobSha); err != nil {
 		t.Fatalf("%s", err)
 	}
 

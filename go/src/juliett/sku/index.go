@@ -2,7 +2,6 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -27,11 +26,11 @@ type (
 		) (err error)
 
 		ReadManySha(
-			sh *sha.Sha,
+			sh interfaces.Digest,
 		) (skus []*Transacted, err error)
 
 		ReadOneSha(
-			sh *sha.Sha,
+			sh interfaces.Digest,
 			sk *Transacted,
 		) (err error)
 	}

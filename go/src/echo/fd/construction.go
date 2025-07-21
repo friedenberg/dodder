@@ -134,7 +134,7 @@ func MakeFromFileInfoWithDir(
 		return
 	}
 
-	fd.sha.SetShaLike(writer)
+	fd.sha.SetDigester(writer)
 	fd.state = StateStored
 
 	return

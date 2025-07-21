@@ -24,7 +24,7 @@ func MakeMutableSet(es ...*sha.Sha) (s MutableSet) {
 	return collections_value.MakeMutableValueSet(nil, es...)
 }
 
-func ShaFromSet(s interfaces.SetLike[sha.Sha]) *sha.Sha {
+func ShaFromSet(s interfaces.SetLike[sha.Sha]) interfaces.Digest {
 	hash := sha256.New()
 
 	elements := make([]sha.Sha, 0, s.Len())

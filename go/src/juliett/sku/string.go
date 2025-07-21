@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -61,7 +61,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(interfaces.FormatDigest(object.GetBlobSha()))
+	sb.WriteString(digests.FormatDigest(object.GetBlobSha()))
 
 	m := object.GetMetadata()
 

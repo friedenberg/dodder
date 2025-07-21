@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
@@ -114,7 +115,7 @@ func (mover *localFileMover) Close() (err error) {
 		}
 
 		if mover.objectPath, err = MakeDirIfNecessary(
-			interfaces.FormatDigest(digest),
+			digests.FormatDigest(digest),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {

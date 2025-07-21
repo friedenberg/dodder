@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -239,7 +239,7 @@ func (f v4) FormatPersistentMetadata(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			bufferedWriter,
 			keySha.String(),
-			interfaces.FormatDigest(actual),
+			digests.FormatDigest(actual),
 		)
 
 		n += int64(n1)

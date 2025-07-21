@@ -3,6 +3,7 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -55,7 +56,7 @@ func (blobStore *BlobStore[A, APtr]) GetBlob(
 
 	actual := rc.GetDigest()
 
-	if !interfaces.DigestEquals(actual, sh) {
+	if !digests.DigestEquals(actual, sh) {
 		err = errors.ErrorWithStackf("expected sha %s but got %s", sh, actual)
 		return
 	}

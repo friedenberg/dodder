@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -24,7 +25,7 @@ func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
 			client.GetEnv(),
 			"HEAD",
 			"/blobs",
-			strings.NewReader(interfaces.FormatDigest(sh.GetDigest())),
+			strings.NewReader(digests.FormatDigest(sh.GetDigest())),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -58,7 +59,7 @@ func (client *client) BlobReader(
 	if request, err = http.NewRequestWithContext(
 		client.GetEnv(),
 		"GET",
-		fmt.Sprintf("/blobs/%s", interfaces.FormatDigest(sh.GetDigest())),
+		fmt.Sprintf("/blobs/%s", digests.FormatDigest(sh.GetDigest())),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)

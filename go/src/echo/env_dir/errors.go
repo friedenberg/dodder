@@ -13,7 +13,7 @@ func MakeErrAlreadyExists(
 	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}
-	err.Sha.SetShaLike(sh)
+	err.Sha.SetDigest(sh)
 	return
 }
 

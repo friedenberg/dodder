@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -299,7 +300,7 @@ func (i *Index) Add(
 }
 
 func (s *Index) ReadOneSha(
-	sh *sha.Sha,
+	sh interfaces.Digest,
 	sk *sku.Transacted,
 ) (err error) {
 	var loc object_probe_index.Loc
@@ -316,7 +317,7 @@ func (s *Index) ReadOneSha(
 }
 
 func (s *Index) ReadManySha(
-	sh *sha.Sha,
+	sh interfaces.Digest,
 ) (skus []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
@@ -362,7 +363,7 @@ func (s *Index) ObjectExists(
 	}
 
 	sh := sha.FromStringContent(objectIdString)
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	if _, err = s.readOneShaLoc(sh); err != nil {
 		err = errors.Wrap(err)
@@ -377,7 +378,7 @@ func (s *Index) ReadOneObjectId(
 	sk *sku.Transacted,
 ) (err error) {
 	sh := sha.FromStringContent(oid.String())
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
 		return
@@ -390,7 +391,7 @@ func (s *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	sh := sha.FromStringContent(id.String())
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	if skus, err = s.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
@@ -411,7 +412,7 @@ func (s *Index) ReadOneObjectIdTai(
 	}
 
 	sh := sha.FromStringContent(k.String() + t.String())
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	sk = sku.GetTransactedPool().Get()
 

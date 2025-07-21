@@ -151,7 +151,11 @@ func (g *Genre) ReadFromBoxScanner(
 			return
 
 		default:
-			err = errors.ErrorWithStackf("unsupported sequence: %q:%#v", seq, seq)
+			err = errors.ErrorWithStackf(
+				"unsupported sequence: %q:%#v",
+				seq,
+				seq,
+			)
 			return
 		}
 	}
@@ -164,7 +168,7 @@ func (g *Genre) ReadFromBoxScanner(
 	return
 }
 
-func (i Genre) GetSha() *sha.Sha {
+func (i Genre) GetSha() interfaces.Digest {
 	return sha.FromStringContent(i.String())
 }
 

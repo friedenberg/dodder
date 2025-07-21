@@ -173,7 +173,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
-	sh sha.ShaLike,
+	sh interfaces.Digest,
 	path string,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
 	if sh.GetDigest().IsNull() {

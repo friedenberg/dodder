@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 )
 
 // TODO move to own package
@@ -65,7 +66,7 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	bucketIndexString := interfaces.FormatDigest(digest)[:width]
+	bucketIndexString := digests.FormatDigest(digest)[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)

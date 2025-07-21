@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -23,7 +24,7 @@ type page struct {
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
 	repoLayout env_repo.Env
-	searchFunc func(*sha.Sha) (mid int64, err error)
+	searchFunc func(interfaces.Digest) (mid int64, err error)
 	page_id.PageId
 }
 
@@ -80,7 +81,7 @@ func (e *page) GetObjectProbeIndexPage() pageInterface {
 	return e
 }
 
-func (e *page) AddSha(sh *Sha, loc Loc) (err error) {
+func (e *page) AddSha(sh interfaces.Digest, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -91,7 +92,7 @@ func (e *page) AddSha(sh *Sha, loc Loc) (err error) {
 	return e.addSha(sh, loc)
 }
 
-func (e *page) addSha(sh *Sha, loc Loc) (err error) {
+func (e *page) addSha(sh interfaces.Digest, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -100,7 +101,7 @@ func (e *page) addSha(sh *Sha, loc Loc) (err error) {
 		Loc: loc,
 	}
 
-	if err = r.sha.SetShaLike(sh); err != nil {
+	if err = r.sha.SetDigest(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -123,7 +124,7 @@ func (e *page) GetRowCount() (n int64, err error) {
 	return
 }
 
-func (e *page) ReadOne(sh *Sha) (loc Loc, err error) {
+func (e *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -150,7 +151,7 @@ func (e *page) ReadOne(sh *Sha) (loc Loc, err error) {
 	return
 }
 
-func (e *page) ReadMany(sh *Sha, locs *[]Loc) (err error) {
+func (e *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -191,7 +192,7 @@ func (e *page) ReadMany(sh *Sha, locs *[]Loc) (err error) {
 }
 
 func (e *page) readCurrentLoc(
-	in *sha.Sha,
+	in interfaces.Digest,
 	r io.Reader,
 ) (out Loc, found bool, err error) {
 	if in.IsNull() {
@@ -200,14 +201,14 @@ func (e *page) readCurrentLoc(
 	}
 
 	sh := sha.GetPool().Get()
-	defer sha.GetPool().Put(sh)
+	defer digests.PutDigest(sh)
 
 	if _, err = sh.ReadFrom(r); err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
-	if !in.Equals(sh) {
+	if !digests.DigestEquals(in, sh) {
 		err = io.EOF
 		return
 	}

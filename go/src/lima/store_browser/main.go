@@ -75,8 +75,12 @@ func Make(
 				quiter.StringerKeyer[*ids.ObjectId]{},
 			),
 		},
-		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
-		transactedItemIndex:           make(map[browser_items.ItemId]*sku.Transacted),
+		transactedUrlIndex: make(
+			map[url.URL]sku.TransactedMutableSet,
+		),
+		transactedItemIndex: make(
+			map[browser_items.ItemId]*sku.Transacted,
+		),
 		itemDeletedStringFormatWriter: itemDeletedStringFormatWriter,
 	}
 
@@ -135,7 +139,12 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	dec := toml.NewDecoder(r)
 
 	if err = dec.Decode(&tb); err != nil {
-		err = errors.Wrapf(err, "Sha: %s, Object Id: %s", sk.GetBlobSha(), sk.GetObjectId())
+		err = errors.Wrapf(
+			err,
+			"Sha: %s, Object Id: %s",
+			sk.GetBlobSha(),
+			sk.GetObjectId(),
+		)
 		return
 	}
 
@@ -265,14 +274,14 @@ func (c *Store) QueryCheckedOut(
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
 func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
-	var aw interfaces.WriteCloseDigester
+	var blobWriter interfaces.WriteCloseDigester
 
-	if aw, err = s.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if blobWriter, err = s.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, blobWriter)
 
 	var item Item
 
@@ -286,7 +295,7 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 	}
 
 	func() {
-		bw := bufio.NewWriter(aw)
+		bw := bufio.NewWriter(blobWriter)
 		defer errors.DeferredFlusher(&err, bw)
 
 		enc := toml.NewEncoder(bw)
@@ -297,7 +306,7 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 		}
 	}()
 
-	e.GetSku().Metadata.Blob.SetShaLike(aw)
+	e.GetSku().Metadata.Blob.SetDigester(blobWriter)
 
 	return
 }

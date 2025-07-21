@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -624,8 +625,8 @@ func (local *Repo) MakeFormatFunc(
 			sh2 := sha.FromStringContent(
 				z.GetObjectId().String() + z.GetTai().String(),
 			)
-			defer sha.GetPool().Put(sh1)
-			defer sha.GetPool().Put(sh2)
+			defer digests.PutDigest(sh1)
+			defer digests.PutDigest(sh2)
 			_, err = fmt.Fprintln(writer, z.GetObjectId(), sh1, sh2)
 			return
 		}

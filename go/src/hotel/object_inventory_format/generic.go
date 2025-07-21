@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -97,13 +98,32 @@ var Formats formats
 
 func init() {
 	Formats.metadata.key = KeyFormatV5Metadata
-	Formats.metadata.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai}
+	Formats.metadata.keys = []*catgut.String{
+		keyAkte,
+		keyBezeichnung,
+		keyEtikett,
+		keyTyp,
+		keyTai,
+	}
 
 	Formats.metadataSansTai.key = KeyFormatV5MetadataWithoutTai
-	Formats.metadataSansTai.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp}
+	Formats.metadataSansTai.keys = []*catgut.String{
+		keyAkte,
+		keyBezeichnung,
+		keyEtikett,
+		keyTyp,
+	}
 
 	Formats.metadataObjectIdParent.key = KeyFormatV5MetadataObjectIdParent
-	Formats.metadataObjectIdParent.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadataKennungMutter}
+	Formats.metadataObjectIdParent.keys = []*catgut.String{
+		keyAkte,
+		keyBezeichnung,
+		keyEtikett,
+		keyKennung,
+		keyTyp,
+		keyTai,
+		keyShasMutterMetadataKennungMutter,
+	}
 }
 
 func FormatForKeyError(k string) (fo FormatGeneric, err error) {
@@ -340,7 +360,10 @@ func writeShaKeyIfNotNull(
 	return
 }
 
-func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+func GetShaForContext(
+	f FormatGeneric,
+	c FormatterContext,
+) (sh *Sha, err error) {
 	m := c.GetMetadata()
 
 	switch f.key {
@@ -367,10 +390,14 @@ func GetShaForMetadata(f FormatGeneric, m *Metadata) (sh *Sha, err error) {
 	return GetShaForContext(f, nopFormatterContext{m})
 }
 
-func WriteMetadata(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
-	sw := sha.MakeWriter(w)
+func WriteMetadata(
+	w io.Writer,
+	f FormatGeneric,
+	c FormatterContext,
+) (sh *Sha, err error) {
+	writer := sha.MakeWriter(w)
 
-	_, err = f.WriteMetadataTo(sw, c)
+	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -378,7 +405,7 @@ func WriteMetadata(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, e
 
 	sh = sha.GetPool().Get()
 
-	if err = sh.SetShaLike(sw); err != nil {
+	if err = sh.SetDigester(writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -386,7 +413,10 @@ func WriteMetadata(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, e
 	return
 }
 
-func getShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+func getShaForContext(
+	f FormatGeneric,
+	c FormatterContext,
+) (sh *Sha, err error) {
 	if sh, err = WriteMetadata(nil, f, c); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -400,9 +430,9 @@ func GetShaForContextDebug(
 	c FormatterContext,
 ) (sh *Sha, err error) {
 	var sb strings.Builder
-	sw := sha.MakeWriter(&sb)
+	writer := sha.MakeWriter(&sb)
 
-	_, err = f.WriteMetadataTo(sw, c)
+	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -410,7 +440,7 @@ func GetShaForContextDebug(
 
 	sh = sha.GetPool().Get()
 
-	if err = sh.SetShaLike(sw); err != nil {
+	if err = sh.SetDigester(writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -420,8 +450,10 @@ func GetShaForContextDebug(
 	return
 }
 
-func GetShasForMetadata(m *Metadata) (shas map[string]*sha.Sha, err error) {
-	shas = make(map[string]*sha.Sha, len(FormatKeysV5))
+func GetShasForMetadata(
+	m *Metadata,
+) (digests map[string]interfaces.Digest, err error) {
+	digests = make(map[string]interfaces.Digest, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)
@@ -437,7 +469,7 @@ func GetShasForMetadata(m *Metadata) (shas map[string]*sha.Sha, err error) {
 			continue
 		}
 
-		shas[k] = sh
+		digests[k] = sh
 	}
 
 	return

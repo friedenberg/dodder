@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -530,7 +531,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(interfaces.FormatDigest(result)),
+			strings.NewReader(digests.FormatDigest(result)),
 		)
 
 		return
@@ -566,7 +567,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(interfaces.FormatDigest(result)),
+		strings.NewReader(digests.FormatDigest(result)),
 	)
 
 	return
