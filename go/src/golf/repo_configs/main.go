@@ -13,7 +13,7 @@ import (
 
 type (
 	Config interface {
-		GetBlob() Config
+		GetRepoConfig() Config
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.Options
