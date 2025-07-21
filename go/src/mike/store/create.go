@@ -100,7 +100,7 @@ func (store *Store) CreateOrUpdate(
 
 func (store *Store) CreateOrUpdateBlobSha(
 	k interfaces.ObjectId,
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (t *sku.Transacted, err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{

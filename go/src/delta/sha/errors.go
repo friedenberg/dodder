@@ -32,10 +32,10 @@ func (e errLength) Error() string {
 }
 
 type ErrNotEqual struct {
-	Expected, Actual interfaces.Sha
+	Expected, Actual interfaces.Digest
 }
 
-func MakeErrNotEqual(expected, actual interfaces.Sha) *ErrNotEqual {
+func MakeErrNotEqual(expected, actual interfaces.Digest) *ErrNotEqual {
 	err := &ErrNotEqual{
 		Expected: expected,
 		Actual:   actual,

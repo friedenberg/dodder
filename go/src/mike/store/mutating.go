@@ -321,7 +321,7 @@ func (store *Store) handleUnchanged(
 }
 
 func (store *Store) UpdateKonfig(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (kt *sku.Transacted, err error) {
 	return store.CreateOrUpdateBlobSha(
 		&ids.Config{},

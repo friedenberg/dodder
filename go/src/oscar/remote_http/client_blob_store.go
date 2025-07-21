@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
+func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
 	var request *http.Request
 
 	{
@@ -51,7 +51,7 @@ func (client *client) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 }
 
 func (client *client) BlobReader(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (reader interfaces.ShaReadCloser, err error) {
 	var request *http.Request
 

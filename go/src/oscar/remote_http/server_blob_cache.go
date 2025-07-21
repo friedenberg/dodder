@@ -40,7 +40,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 }
 
 func (serverBlobCache *serverBlobCache) HasBlob(
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) (ok bool, err error) {
 	serverBlobCache.init.Do(
 		func() {

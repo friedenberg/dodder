@@ -34,7 +34,7 @@ func MakeBlobStore[
 }
 
 func (blobStore *BlobStore[A, APtr]) GetBlob(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (a APtr, err error) {
 	var rc interfaces.ShaReadCloser
 
@@ -70,7 +70,7 @@ func (blobStore *BlobStore[A, APtr]) PutBlob(a APtr) {
 
 func (blobStore *BlobStore[A, APtr]) SaveBlobText(
 	o APtr,
-) (sh interfaces.Sha, n int64, err error) {
+) (sh interfaces.Digest, n int64, err error) {
 	var writeCloser sha.WriteCloser
 
 	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {

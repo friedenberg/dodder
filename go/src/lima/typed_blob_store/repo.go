@@ -24,7 +24,7 @@ func MakeRepoStore(
 
 func (store RepoStore) ReadTypedBlob(
 	tipe ids.Type,
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) (common repo_blobs.Blob, n int64, err error) {
 	var reader interfaces.ShaReadCloser
 
@@ -58,7 +58,7 @@ func (store RepoStore) ReadTypedBlob(
 func (store RepoStore) WriteTypedBlob(
 	tipe ids.Type,
 	blob repo_blobs.Blob,
-) (sh interfaces.Sha, n int64, err error) {
+) (sh interfaces.Digest, n int64, err error) {
 	var writer interfaces.ShaWriteCloser
 
 	if writer, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {

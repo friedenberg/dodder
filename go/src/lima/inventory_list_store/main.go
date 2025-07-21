@@ -435,7 +435,7 @@ func (store *Store) ImportInventoryList(
 }
 
 func (store *Store) IterInventoryList(
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) interfaces.SeqError[*sku.Transacted] {
 	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),

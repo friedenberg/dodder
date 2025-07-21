@@ -34,7 +34,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
-		SetBlobSha(interfaces.Sha) error
+		SetBlobSha(interfaces.Digest) error
 	}
 
 	TextFormatOutput struct {

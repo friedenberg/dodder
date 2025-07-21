@@ -36,7 +36,7 @@ func (cmd DormantEdit) Run(req command.Request) {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
 
-	var sh interfaces.Sha
+	var sh interfaces.Digest
 
 	{
 		var err error
@@ -70,7 +70,7 @@ func (cmd DormantEdit) Run(req command.Request) {
 // TODO refactor into common
 func (cmd DormantEdit) editInVim(
 	u *local_working_copy.Repo,
-) (sh interfaces.Sha, err error) {
+) (sh interfaces.Digest, err error) {
 	var p string
 
 	if p, err = cmd.makeTempKonfigFile(u); err != nil {
@@ -145,7 +145,7 @@ func (cmd DormantEdit) makeTempKonfigFile(
 func (cmd DormantEdit) readTempKonfigFile(
 	repo *local_working_copy.Repo,
 	path string,
-) (sh interfaces.Sha, err error) {
+) (sh interfaces.Digest, err error) {
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {

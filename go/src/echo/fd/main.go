@@ -383,7 +383,7 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v interfaces.Sha) (err error) {
+func (fd *FD) SetShaLike(v interfaces.Digest) (err error) {
 	return fd.sha.SetShaLike(v)
 }
 

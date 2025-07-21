@@ -25,7 +25,7 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(Sha) (ShaReadCloser, error)
+		BlobReader(Digest) (ShaReadCloser, error)
 	}
 
 	BlobWriter interface {
@@ -40,7 +40,7 @@ type (
 
 	BlobStore interface {
 		GetBlobStoreDescription() string
-		HasBlob(sh Sha) (ok bool)
+		HasBlob(sh Digest) (ok bool)
 		BlobReader
 		BlobWriter
 	}
@@ -51,14 +51,14 @@ type (
 		GetLocalBlobStore() LocalBlobStore
 		GetBlobIOWrapper() BlobIOWrapper
 		// TODO add context
-		AllBlobs() SeqError[Sha]
+		AllBlobs() SeqError[Digest]
 		Mover() (Mover, error)
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[V any] interface {
-		GetBlob(Sha) (V, error)
+		GetBlob(Digest) (V, error)
 		PutBlob(V)
 	}
 )

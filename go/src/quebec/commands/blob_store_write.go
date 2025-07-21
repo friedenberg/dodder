@@ -44,7 +44,7 @@ func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flag.FlagSet) {
 
 type answer struct {
 	error
-	interfaces.Sha
+	interfaces.Digest
 	Path string
 }
 
@@ -74,7 +74,7 @@ func (cmd BlobStoreWrite) Run(
 
 		a := answer{Path: p}
 
-		a.Sha, a.error = cmd.doOne(blobStore, p)
+		a.Digest, a.error = cmd.doOne(blobStore, p)
 
 		if a.error != nil {
 			blobStore.GetErr().Printf("%s: (error: %q)", a.Path, a.error)
@@ -82,7 +82,7 @@ func (cmd BlobStoreWrite) Run(
 			continue
 		}
 
-		hasBlob := blobStore.HasBlob(a.Sha)
+		hasBlob := blobStore.HasBlob(a.Digest)
 
 		if hasBlob {
 			if cmd.Check {
@@ -118,7 +118,7 @@ func (cmd BlobStoreWrite) Run(
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
-) (sh interfaces.Sha, err error) {
+) (sh interfaces.Digest, err error) {
 	var readCloser io.ReadCloser
 
 	if readCloser, err = env_dir.NewFileReader(

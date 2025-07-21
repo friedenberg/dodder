@@ -108,7 +108,7 @@ func (cmd Remote) CreateRemoteObject(
 	remoteConfig := remote.GetImmutableConfigPublic()
 	blob.SetPublicKey(remoteConfig.GetPublicKey())
 
-	var blobSha interfaces.Sha
+	var blobSha interfaces.Digest
 
 	{
 		var err error

@@ -59,7 +59,7 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (ok bool) {
 	if sh.GetDigest().IsNull() {
 		ok = true
@@ -77,8 +77,8 @@ func (blobStore localHashBucketed) HasBlob(
 }
 
 // TODO add support for other bucket sizes
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Sha] {
-	return func(yield func(interfaces.Sha, error) bool) {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Digest] {
+	return func(yield func(interfaces.Digest, error) bool) {
 		var sh sha.Sha
 
 		for path, err := range files.DirNamesLevel2(blobStore.basePath) {
@@ -131,7 +131,7 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore localHashBucketed) BlobReader(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (readeCloser interfaces.ShaReadCloser, err error) {
 	if sh.GetDigest().IsNull() {
 		readeCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))

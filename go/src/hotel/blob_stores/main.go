@@ -99,7 +99,7 @@ func CopyBlob(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
@@ -158,7 +158,7 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.LocalBlobStore,
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that

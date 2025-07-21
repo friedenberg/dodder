@@ -4,13 +4,6 @@ import (
 	"io"
 )
 
-// TODO-P3 refactor into hash or checksum or content address and split korper
-// out into context object
-type Sha interface {
-	Digest
-	DigestGetter
-}
-
 // TODO reconsider this and force consumption of bufio? Formats expect
 // WriterAndStringWriter, but this forces just Writer
 type (

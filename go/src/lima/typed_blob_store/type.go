@@ -52,7 +52,7 @@ func (a Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
 
 func (a Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlTypeV0:

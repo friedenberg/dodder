@@ -9,7 +9,7 @@ import (
 )
 
 func MakeErrAlreadyExists(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}

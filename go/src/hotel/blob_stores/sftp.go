@@ -129,7 +129,7 @@ func (blobStore *sftpBlobStore) makeEnvDirConfig() env_dir.Config {
 	// )
 }
 
-func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
+func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Digest) string {
 	return env_dir.MakeHashBucketPathFromSha(
 		sh,
 		blobStore.buckets,
@@ -137,7 +137,7 @@ func (blobStore *sftpBlobStore) remotePathForSha(sh interfaces.Sha) string {
 	)
 }
 
-func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
+func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Digest) (ok bool) {
 	if sh.GetDigest().IsNull() {
 		ok = true
 		return
@@ -166,8 +166,8 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	return
 }
 
-func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Sha] {
-	return func(yield func(interfaces.Sha, error) bool) {
+func (blobStore *sftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Digest] {
+	return func(yield func(interfaces.Digest, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -232,7 +232,7 @@ func (blobStore *sftpBlobStore) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore *sftpBlobStore) BlobReader(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 ) (readCloser interfaces.ShaReadCloser, err error) {
 	if sh.GetDigest().IsNull() {
 		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))

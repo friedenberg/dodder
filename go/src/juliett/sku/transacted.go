@@ -232,19 +232,19 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) SetObjectSha(v interfaces.Sha) (err error) {
+func (transacted *Transacted) SetObjectSha(v interfaces.Digest) (err error) {
 	return transacted.GetMetadata().Sha().SetShaLike(v)
 }
 
-func (transacted *Transacted) GetObjectSha() interfaces.Sha {
+func (transacted *Transacted) GetObjectSha() interfaces.Digest {
 	return transacted.GetMetadata().Sha()
 }
 
-func (transacted *Transacted) GetBlobSha() interfaces.Sha {
+func (transacted *Transacted) GetBlobSha() interfaces.Digest {
 	return &transacted.Metadata.Blob
 }
 
-func (transacted *Transacted) SetBlobSha(sh interfaces.Sha) error {
+func (transacted *Transacted) SetBlobSha(sh interfaces.Digest) error {
 	return transacted.Metadata.Blob.SetShaLike(sh)
 }
 

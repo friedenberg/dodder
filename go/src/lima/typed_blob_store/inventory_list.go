@@ -305,7 +305,7 @@ func (typedBlobStore InventoryList) AllDecodedObjectsFromStream(
 func (typedBlobStore InventoryList) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var readCloser interfaces.ShaReadCloser

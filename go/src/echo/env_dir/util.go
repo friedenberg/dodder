@@ -13,7 +13,7 @@ import (
 )
 
 func MakeHashBucketPathFromSha(
-	sh interfaces.Sha,
+	sh interfaces.Digest,
 	buckets []int,
 	pathComponents ...string,
 ) string {

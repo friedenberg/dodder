@@ -263,7 +263,7 @@ func (store *store) flushMutableConfig(
 
 func (store *store) loadMutableConfigBlob(
 	mutableConfigType ids.Type,
-	blobSha interfaces.Sha,
+	blobSha interfaces.Digest,
 ) (err error) {
 	var readCloser io.ReadCloser
 

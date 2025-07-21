@@ -100,7 +100,7 @@ func (digest *Sha) GetTail() string {
 	return digest.String()[2:]
 }
 
-func (digest *Sha) AssertEqualsShaLike(b interfaces.Sha) error {
+func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
 	if !interfaces.DigestEquals(digest, b) {
 		return MakeErrNotEqual(digest, b)
 	}
@@ -288,7 +288,7 @@ func (digest *Sha) ResetWith(other *Sha) {
 	}
 }
 
-func (digest *Sha) ResetWithShaLike(other interfaces.Sha) {
+func (digest *Sha) ResetWithShaLike(other interfaces.Digest) {
 	digest.allocDataIfNecessary()
 	copy(digest.data[:], other.GetBytes())
 }
