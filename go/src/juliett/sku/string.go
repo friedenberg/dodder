@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -48,21 +49,21 @@ func StringMetadataTai(o *Transacted) (str string) {
 	)
 }
 
-func StringMetadataSansTai(o *Transacted) (str string) {
+func StringMetadataSansTai(object *Transacted) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(o.GetGenre().GetGenreString())
+	sb.WriteString(object.GetGenre().GetGenreString())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetObjectId().String())
+	sb.WriteString(object.GetObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetExternalObjectId().String())
+	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetBlobSha().String())
+	sb.WriteString(interfaces.FormatDigest(object.GetBlobSha()))
 
-	m := o.GetMetadata()
+	m := object.GetMetadata()
 
 	t := m.GetType()
 

@@ -50,7 +50,8 @@ type inventoryListBlobStore interface {
 	getType() ids.Type
 	getTypedBlobStore() typed_blob_store.InventoryList
 
-	ReadOneSha(id interfaces.Stringer) (object *sku.Transacted, err error)
+	// TODO rename to ReadOneDigest
+	ReadOneSha(id interfaces.Digest) (object *sku.Transacted, err error)
 	WriteInventoryListObject(
 		object *sku.Transacted,
 	) (err error)

@@ -18,7 +18,9 @@ func MakeHashBucketPathFromSha(
 	pathComponents ...string,
 ) string {
 	return MakeHashBucketPath(
-		[]byte(sh.String()),
+		// TODO must be a way to make this more performant instead of a double
+		// copy
+		[]byte(interfaces.FormatDigest(sh)),
 		buckets,
 		pathComponents...,
 	)
@@ -102,11 +104,11 @@ func MakeHashBucketPathJoinFunc(
 
 // TODO migrate to using Env and accepting path generation function
 func MakeDirIfNecessary(
-	stringer interfaces.Stringer,
+	base string,
 	joinFunc func(string, ...string) string,
 	pathComponents ...string,
 ) (path string, err error) {
-	path = joinFunc(stringer.String(), pathComponents...)
+	path = joinFunc(base, pathComponents...)
 	dir := filepath.Dir(path)
 
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {

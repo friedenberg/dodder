@@ -24,7 +24,7 @@ func (client *client) HasBlob(sh interfaces.Sha) (ok bool) {
 			client.GetEnv(),
 			"HEAD",
 			"/blobs",
-			strings.NewReader(sh.GetShaLike().String()),
+			strings.NewReader(interfaces.FormatDigest(sh.GetShaLike())),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -58,7 +58,7 @@ func (client *client) BlobReader(
 	if request, err = http.NewRequestWithContext(
 		client.GetEnv(),
 		"GET",
-		fmt.Sprintf("/blobs/%s", sh.GetShaLike().String()),
+		fmt.Sprintf("/blobs/%s", interfaces.FormatDigest(sh.GetShaLike())),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -102,7 +102,8 @@ func (client *client) WriteBlobToRemote(
 		expected,
 	); err != nil {
 		if env_dir.IsErrBlobMissing(err) {
-			// TODO make an option to collect this error at the present it, and an
+			// TODO make an option to collect this error at the present it, and
+			// an
 			// option to fetch it from another remote store
 			ui.Err().Printf("Blob missing locally: %q", expected)
 			err = nil

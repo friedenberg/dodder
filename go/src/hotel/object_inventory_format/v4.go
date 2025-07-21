@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -19,16 +20,16 @@ func (f v4) FormatPersistentMetadata(
 	c FormatterContext,
 	o Options,
 ) (n int64, err error) {
-	w := pool.GetBufioWriter().Get()
-	defer pool.GetBufioWriter().Put(w)
+	bufferedWriter := pool.GetBufioWriter().Get()
+	defer pool.GetBufioWriter().Put(bufferedWriter)
 
-	w.Reset(w1)
-	defer errors.DeferredFlusher(&err, w)
+	bufferedWriter.Reset(w1)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	m := c.GetMetadata()
 
 	mh := sha.MakeWriter(nil)
-	mw := io.MultiWriter(w, mh)
+	mw := io.MultiWriter(bufferedWriter, mh)
 	var (
 		n1 int
 		n2 int64
@@ -85,7 +86,7 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
-		w,
+		bufferedWriter,
 		keyGattung.String(),
 		c.GetObjectId().GetGenre().GetGenreString(),
 	)
@@ -97,7 +98,7 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
-		w,
+		bufferedWriter,
 		keyKennung.String(),
 		c.GetObjectId().String(),
 	)
@@ -153,7 +154,7 @@ func (f v4) FormatPersistentMetadata(
 	if o.Verzeichnisse {
 		if m.Cache.Dormant.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
+				bufferedWriter,
 				keyVerzeichnisseArchiviert.String(),
 				m.Cache.Dormant.String(),
 			)
@@ -172,7 +173,7 @@ func (f v4) FormatPersistentMetadata(
 				m.Cache.GetExpandedTags(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
-					w,
+					bufferedWriter,
 					k,
 					e.String(),
 				)
@@ -192,7 +193,7 @@ func (f v4) FormatPersistentMetadata(
 				m.Cache.GetImplicitTags(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
-					w,
+					bufferedWriter,
 					k,
 					e.Bytes(),
 				)
@@ -236,9 +237,9 @@ func (f v4) FormatPersistentMetadata(
 		// }
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			w,
+			bufferedWriter,
 			keySha.String(),
-			actual.String(),
+			interfaces.FormatDigest(actual),
 		)
 
 		n += int64(n1)

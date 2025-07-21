@@ -116,10 +116,6 @@ func (digest *Sha) EqualsAny(b any) bool {
 	return values.Equals(digest, b)
 }
 
-func (digest *Sha) EqualsSha(b interfaces.Sha) bool {
-	return digest.String() == b.String()
-}
-
 func (digest *Sha) Equals(b *Sha) bool {
 	return digest.String() == b.String()
 }

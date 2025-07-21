@@ -30,12 +30,13 @@ func (blobStore *blobStoreV0) getTypedBlobStore() typed_blob_store.InventoryList
 	return blobStore.typedBlobStore
 }
 
+// TODO rename to ReadOneDigest
 func (blobStore *blobStoreV0) ReadOneSha(
-	id interfaces.Stringer,
+	id interfaces.Digest,
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
 
-	if err = sh.Set(id.String()); err != nil {
+	if err = sh.Set(interfaces.FormatDigest(id)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

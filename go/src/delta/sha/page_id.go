@@ -56,9 +56,9 @@ func PageIndexForString(width uint8, s string) (n uint8, err error) {
 	return
 }
 
-func PageIndexForSha(width uint8, s interfaces.Sha) (n uint8, err error) {
+func PageIndexForSha(width uint8, digest interfaces.Sha) (n uint8, err error) {
 	var n1 int64
-	ss := s.String()[:width]
+	ss := interfaces.FormatDigest(digest)[:width]
 
 	if n1, err = strconv.ParseInt(ss, 16, 64); err != nil {
 		err = errors.Wrap(err)

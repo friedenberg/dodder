@@ -114,7 +114,7 @@ func (mover *localFileMover) Close() (err error) {
 		}
 
 		if mover.objectPath, err = MakeDirIfNecessary(
-			sh,
+			interfaces.FormatDigest(sh),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {

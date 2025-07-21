@@ -29,7 +29,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 				return
 			}
 
-			serverBlobCache.shas.Add(sh.String())
+			serverBlobCache.shas.Add(interfaces.FormatDigest(sh))
 			count++
 		}
 
@@ -54,7 +54,9 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 		return
 	}
 
-	if serverBlobCache.shas.ContainsExpansion(blobSha.String()) {
+	if serverBlobCache.shas.ContainsExpansion(
+		interfaces.FormatDigest(blobSha),
+	) {
 		ok = true
 		return
 	}

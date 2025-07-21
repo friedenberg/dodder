@@ -9,7 +9,6 @@ import (
 type (
 	Digest interface {
 		DigestGetter
-		String() string // TODO remove
 		GetBytes() []byte
 		GetType() string
 		IsNull() bool
@@ -36,6 +35,8 @@ func DigestEquals(a, b Digest) bool {
 	return bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 
+// Creates a human-readable string representation of a digest.
+// TODO add type information
 func FormatDigest(digest Digest) string {
 	return fmt.Sprintf("%x", digest.GetBytes())
 }

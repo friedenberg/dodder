@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -126,7 +127,7 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			blobShaString := blobSha.String()
+			blobShaString := interfaces.FormatDigest(blobSha)
 
 			if ok || writtenNeededBlobs.ContainsExpansion(blobShaString) {
 				continue

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
@@ -163,7 +164,9 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(o.GetBlobSha().String())
+	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(
+		interfaces.FormatDigest(o.GetBlobSha()),
+	)
 
 	ks := o.GetObjectId().String()
 
