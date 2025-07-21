@@ -529,7 +529,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		}
 
 		response.StatusCode = http.StatusCreated
-		response.Body = io.NopCloser(strings.NewReader(result.GetShaString()))
+		response.Body = io.NopCloser(strings.NewReader(result.String()))
 
 		return
 	}
@@ -563,7 +563,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	}
 
 	response.StatusCode = http.StatusCreated
-	response.Body = io.NopCloser(strings.NewReader(result.GetShaString()))
+	response.Body = io.NopCloser(strings.NewReader(result.String()))
 
 	return
 }

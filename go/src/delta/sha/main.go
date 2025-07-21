@@ -24,10 +24,10 @@ const (
 
 type Bytes [ByteSize]byte
 
-var shaNull Sha
+var digestNull Sha
 
 func init() {
-	errors.PanicIfError(shaNull.Set(ShaNullString))
+	errors.PanicIfError(digestNull.Set(ShaNullString))
 }
 
 type PathComponents interface {
@@ -36,91 +36,92 @@ type PathComponents interface {
 
 type ShaLike = interfaces.ShaGetter
 
+// TODO rename to digest
 type Sha struct {
 	data *Bytes
 }
 
-func (s *Sha) Size() int {
+func (digest *Sha) Size() int {
 	return ByteSize
 }
 
-func (s *Sha) GetBytes() []byte {
-	return s.GetShaBytes()
-}
-
-func (s *Sha) GetShaBytes() []byte {
-	if s.IsNull() {
-		return shaNull.data[:]
+func (digest *Sha) GetBytes() []byte {
+	if digest.IsNull() {
+		return digestNull.data[:]
 	} else {
-		return s.data[:]
+		return digest.data[:]
 	}
 }
 
-func (s *Sha) GetShaString() string {
-	if s == nil || s.IsNull() {
-		return fmt.Sprintf("%x", shaNull.data[:])
+func (digest *Sha) String() string {
+	if digest == nil || digest.IsNull() {
+		return fmt.Sprintf("%x", digestNull.data[:])
 	} else {
-		return fmt.Sprintf("%x", s.data[:])
+		return fmt.Sprintf("%x", digest.data[:])
 	}
 }
 
-func (s *Sha) String() string {
-	return s.GetShaString()
+func (digest *Sha) Sha() *Sha {
+	return digest
 }
 
-func (s *Sha) Sha() *Sha {
-	return s
-}
-
-func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
+func (digest *Sha) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	n1, err = ohio.WriteAllOrDieTrying(w, src.GetShaBytes())
+	n1, err = ohio.WriteAllOrDieTrying(w, digest.GetBytes())
 	n = int64(n1)
 	return
 }
 
-func (s *Sha) GetShaLike() interfaces.Sha {
-	return s
+func (digest *Sha) GetType() string {
+	return "sha256"
 }
 
-func (s *Sha) IsNull() bool {
-	if s == nil || s.data == nil {
+func (digest *Sha) GetDigest() interfaces.Digest {
+	return digest
+}
+
+func (digest *Sha) GetShaLike() interfaces.Sha {
+	return digest
+}
+
+func (digest *Sha) IsNull() bool {
+	if digest == nil || digest.data == nil {
 		return true
 	}
 
-	if bytes.Equal(s.data[:], shaNull.data[:]) {
+	if bytes.Equal(digest.data[:], digestNull.data[:]) {
 		return true
 	}
 
 	return false
 }
 
-func (s *Sha) GetHead() string {
-	return s.String()[0:2]
+func (digest *Sha) GetHead() string {
+	return digest.String()[0:2]
 }
 
-func (s *Sha) GetTail() string {
-	return s.String()[2:]
+func (digest *Sha) GetTail() string {
+	return digest.String()[2:]
 }
 
-func (sha *Sha) AssertEqualsShaLike(b interfaces.Sha) error {
-	if !sha.EqualsSha(b) {
-		return MakeErrNotEqual(sha, b)
+func (digest *Sha) AssertEqualsShaLike(b interfaces.Sha) error {
+	if !interfaces.DigestEquals(digest, b) {
+		return MakeErrNotEqual(digest, b)
 	}
 
 	return nil
 }
 
-func (sha *Sha) EqualsAny(b any) bool {
-	return values.Equals(sha, b)
+func (digest *Sha) EqualsAny(b any) bool {
+	return values.Equals(digest, b)
 }
 
-func (sha *Sha) EqualsSha(b interfaces.Sha) bool {
-	return sha.GetShaString() == b.GetShaString()
+func (digest *Sha) EqualsSha(b interfaces.Sha) bool {
+	return digest.String() == b.String()
 }
 
-func (sha *Sha) Equals(b *Sha) bool {
-	return sha.GetShaString() == b.GetShaString()
+func (digest *Sha) Equals(b *Sha) bool {
+	return digest.String() == b.String()
 }
 
 //  __        __    _ _   _
@@ -130,19 +131,19 @@ func (sha *Sha) Equals(b *Sha) bool {
 //     \_/\_/ |_|  |_|\__|_|_| |_|\__, |
 //                                |___/
 
-func (dst *Sha) SetFromHash(h hash.Hash) (err error) {
-	dst.allocDataIfNecessary()
-	b := h.Sum(dst.data[:0])
+func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
+	digest.allocDataIfNecessary()
+	b := h.Sum(digest.data[:0])
 	err = makeErrLength(ByteSize, len(b))
 	return
 }
 
-func (dst *Sha) SetShaLike(src ShaLike) (err error) {
-	dst.allocDataIfNecessary()
+func (digest *Sha) SetShaLike(src ShaLike) (err error) {
+	digest.allocDataIfNecessary()
 
 	err = makeErrLength(
 		ByteSize,
-		copy(dst.data[:], src.GetShaLike().GetShaBytes()),
+		copy(digest.data[:], src.GetShaLike().GetBytes()),
 	)
 
 	// if dst.String() ==
@@ -153,8 +154,8 @@ func (dst *Sha) SetShaLike(src ShaLike) (err error) {
 	return
 }
 
-func (s *Sha) SetParts(head, tail string) (err error) {
-	if err = s.Set(head + tail); err != nil {
+func (digest *Sha) SetParts(head, tail string) (err error) {
+	if err = digest.Set(head + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -162,7 +163,7 @@ func (s *Sha) SetParts(head, tail string) (err error) {
 	return
 }
 
-func (s *Sha) SetFromPath(path string) (err error) {
+func (digest *Sha) SetFromPath(path string) (err error) {
 	tail := filepath.Base(path)
 	head := filepath.Base(filepath.Dir(path))
 
@@ -180,7 +181,7 @@ func (s *Sha) SetFromPath(path string) (err error) {
 		return
 	}
 
-	if err = s.SetParts(head, tail); err != nil {
+	if err = digest.SetParts(head, tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -188,14 +189,14 @@ func (s *Sha) SetFromPath(path string) (err error) {
 	return
 }
 
-func (s *Sha) ReadAtFrom(
+func (digest *Sha) ReadAtFrom(
 	reader io.ReaderAt,
 	start int64,
 ) (bytesRead int64, err error) {
-	s.allocDataIfNecessary()
+	digest.allocDataIfNecessary()
 
 	var bytesCount int
-	bytesCount, err = reader.ReadAt(s.data[:], start)
+	bytesCount, err = reader.ReadAt(digest.data[:], start)
 	bytesRead += int64(bytesCount)
 
 	if bytesRead == 0 && err == io.EOF {
@@ -211,11 +212,11 @@ func (s *Sha) ReadAtFrom(
 	return
 }
 
-func (s *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
-	s.allocDataIfNecessary()
+func (digest *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
+	digest.allocDataIfNecessary()
 
 	var bytesCount int
-	bytesCount, err = ohio.ReadAllOrDieTrying(reader, s.data[:])
+	bytesCount, err = ohio.ReadAllOrDieTrying(reader, digest.data[:])
 	bytesRead += int64(bytesCount)
 
 	if bytesRead == 0 && err == io.EOF {
@@ -231,8 +232,8 @@ func (s *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
 	return
 }
 
-func (s *Sha) SetHexBytes(bytess []byte) (err error) {
-	s.allocDataIfNecessary()
+func (digest *Sha) SetHexBytes(bytess []byte) (err error) {
+	digest.allocDataIfNecessary()
 
 	bytess = bytes.TrimSpace(bytess)
 
@@ -242,7 +243,7 @@ func (s *Sha) SetHexBytes(bytess []byte) (err error) {
 
 	var bytesDecoded int
 
-	if _, bytesDecoded, err = hexDecode(s.data[:0], bytess); err != nil {
+	if _, bytesDecoded, err = hexDecode(digest.data[:0], bytess); err != nil {
 		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, bytess)
 		return
 	}
@@ -250,8 +251,8 @@ func (s *Sha) SetHexBytes(bytess []byte) (err error) {
 	return
 }
 
-func (s *Sha) Set(value string) (err error) {
-	s.allocDataIfNecessary()
+func (digest *Sha) Set(value string) (err error) {
+	digest.allocDataIfNecessary()
 
 	value1 := strings.TrimSpace(value)
 	value1 = strings.TrimPrefix(value1, "@")
@@ -263,7 +264,7 @@ func (s *Sha) Set(value string) (err error) {
 		return
 	}
 
-	bytesWritten := copy(s.data[:], decodedBytes)
+	bytesWritten := copy(digest.data[:], decodedBytes)
 
 	if err = makeErrLength(ByteSize, bytesWritten); err != nil {
 		return
@@ -272,63 +273,63 @@ func (s *Sha) Set(value string) (err error) {
 	return
 }
 
-func (s *Sha) allocDataIfNecessary() {
-	if s.data != nil {
+func (digest *Sha) allocDataIfNecessary() {
+	if digest.data != nil {
 		return
 	}
 
-	s.data = &Bytes{}
+	digest.data = &Bytes{}
 }
 
-func (s *Sha) Reset() {
-	s.allocDataIfNecessary()
-	s.ResetWith(&shaNull)
+func (digest *Sha) Reset() {
+	digest.allocDataIfNecessary()
+	digest.ResetWith(&digestNull)
 }
 
-func (sha *Sha) ResetWith(other *Sha) {
-	sha.allocDataIfNecessary()
+func (digest *Sha) ResetWith(other *Sha) {
+	digest.allocDataIfNecessary()
 
 	if other.IsNull() {
-		copy(sha.data[:], shaNull.data[:])
+		copy(digest.data[:], digestNull.data[:])
 	} else {
-		copy(sha.data[:], other.data[:])
+		copy(digest.data[:], other.data[:])
 	}
 }
 
-func (sha *Sha) ResetWithShaLike(other interfaces.Sha) {
-	sha.allocDataIfNecessary()
-	copy(sha.data[:], other.GetShaBytes())
+func (digest *Sha) ResetWithShaLike(other interfaces.Sha) {
+	digest.allocDataIfNecessary()
+	copy(digest.data[:], other.GetBytes())
 }
 
-func (s *Sha) Path(pathComponents ...string) string {
-	pathComponents = append(pathComponents, s.GetHead())
-	pathComponents = append(pathComponents, s.GetTail())
+func (digest *Sha) Path(pathComponents ...string) string {
+	pathComponents = append(pathComponents, digest.GetHead())
+	pathComponents = append(pathComponents, digest.GetTail())
 
 	return path.Join(pathComponents...)
 }
 
-func (s *Sha) MarshalBinary() (text []byte, err error) {
-	text = []byte(s.String())
+func (digest *Sha) MarshalBinary() (text []byte, err error) {
+	text = []byte(digest.String())
 
 	return
 }
 
-func (s *Sha) UnmarshalBinary(text []byte) (err error) {
-	if err = s.Set(string(text)); err != nil {
+func (digest *Sha) UnmarshalBinary(text []byte) (err error) {
+	if err = digest.Set(string(text)); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *Sha) MarshalText() (text []byte, err error) {
-	text = []byte(s.String())
+func (digest *Sha) MarshalText() (text []byte, err error) {
+	text = []byte(digest.String())
 
 	return
 }
 
-func (s *Sha) UnmarshalText(text []byte) (err error) {
-	if err = s.Set(string(text)); err != nil {
+func (digest *Sha) UnmarshalText(text []byte) (err error) {
+	if err = digest.Set(string(text)); err != nil {
 		return
 	}
 

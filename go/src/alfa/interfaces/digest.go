@@ -1,10 +1,15 @@
 package interfaces
 
-import "io"
+import (
+	"bytes"
+	"fmt"
+	"io"
+)
 
 type (
 	Digest interface {
 		DigestGetter
+		String() string // TODO remove
 		GetBytes() []byte
 		GetType() string
 		IsNull() bool
@@ -25,9 +30,12 @@ type (
 		io.WriteCloser
 		DigestGetter
 	}
-
-	WriterStringWriterDigester interface {
-		WriterAndStringWriter
-		DigestGetter
-	}
 )
+
+func DigestEquals(a, b Digest) bool {
+	return bytes.Equal(a.GetBytes(), b.GetBytes())
+}
+
+func FormatDigest(digest Digest) string {
+	return fmt.Sprintf("%x", digest.GetBytes())
+}

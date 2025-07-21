@@ -63,7 +63,7 @@ func (server *Server) writeInventoryList(
 
 		if err := repo_signing.VerifyBase64Signature(
 			logEntry.PublicKey,
-			expected.GetShaBytes(),
+			expected.GetBytes(),
 			sig,
 		); err != nil {
 			response.Error(err)

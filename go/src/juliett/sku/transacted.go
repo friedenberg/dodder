@@ -262,7 +262,7 @@ func (transacted *Transacted) Sign(
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
 		config.GetPrivateKey(),
-		sh.GetShaBytes(),
+		sh.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

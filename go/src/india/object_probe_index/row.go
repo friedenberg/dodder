@@ -24,7 +24,7 @@ func (r *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
 		&r.Loc,
-		r.sha.GetShaString(),
+		r.sha.String(),
 	)
 }
 
@@ -117,7 +117,7 @@ func (rowResetter) ResetWith(a, b *row) {
 type rowLessor struct{}
 
 func (rowLessor) Less(a, b *row) bool {
-	cmp := bytes.Compare(a.sha.GetShaBytes(), b.sha.GetShaBytes())
+	cmp := bytes.Compare(a.sha.GetBytes(), b.sha.GetBytes())
 
 	if cmp != 0 {
 		return cmp == -1

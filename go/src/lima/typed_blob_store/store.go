@@ -56,7 +56,7 @@ func (blobStore *BlobStore[A, APtr]) GetBlob(
 
 	actual := rc.GetShaLike()
 
-	if !actual.EqualsSha(sh) {
+	if !interfaces.DigestEquals(actual, sh) {
 		err = errors.ErrorWithStackf("expected sha %s but got %s", sh, actual)
 		return
 	}

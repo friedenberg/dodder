@@ -124,7 +124,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.GetBlobSha(),
 	)
 
-	key = sh.GetShaString()
+	key = sh.String()
 	sha.GetPool().Put(sh)
 
 	return

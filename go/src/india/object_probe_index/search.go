@@ -39,7 +39,7 @@ func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 			return
 		}
 
-		cmp := bytes.Compare(shMet.GetShaBytes(), shMid.GetShaBytes())
+		cmp := bytes.Compare(shMet.GetBytes(), shMid.GetBytes())
 
 		switch cmp {
 		case -1:
@@ -97,7 +97,7 @@ func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 			return
 		}
 
-		if bytes.Equal(shMet.GetShaBytes(), shMid.GetShaBytes()) {
+		if bytes.Equal(shMet.GetBytes(), shMid.GetBytes()) {
 			// found
 			return
 		}

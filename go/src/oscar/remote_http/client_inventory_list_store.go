@@ -144,7 +144,7 @@ func (client client) ImportInventoryList(
 
 		if sig, err = repo_signing.SignBase64(
 			key,
-			listSku.GetBlobSha().GetShaBytes(),
+			listSku.GetBlobSha().GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

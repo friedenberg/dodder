@@ -1,21 +1,13 @@
 package interfaces
 
 import (
-	"bytes"
 	"io"
 )
 
 // TODO-P3 refactor into hash or checksum or content address and split korper
 // out into context object
 type Sha interface {
-	// TODO-P3
-	// GetHashBytes() []byte
-	// ValueLike
-	StringerWithHeadAndTail // TODO remove
-	GetShaString() string
-	GetShaBytes() []byte
-	EqualsSha(Sha) bool // TODO-P3 rename to EqualsShaLike
-	IsNull() bool
+	Digest
 	ShaGetter
 }
 
@@ -39,13 +31,4 @@ type (
 		io.WriteCloser
 		ShaGetter
 	}
-
-	ShaWriter interface {
-		WriterAndStringWriter
-		ShaGetter
-	}
 )
-
-func ShaEquals(a, b Sha) bool {
-	return bytes.Equal(a.GetShaBytes(), b.GetShaBytes())
-}

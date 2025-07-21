@@ -84,6 +84,10 @@ func (w *writer) Close() (err error) {
 	return
 }
 
+func (w *writer) GetDigest() interfaces.Digest {
+	return sha.FromHash(w.hash)
+}
+
 func (w *writer) GetShaLike() (s interfaces.Sha) {
 	s = sha.FromHash(w.hash)
 

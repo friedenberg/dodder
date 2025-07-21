@@ -65,7 +65,7 @@ var Lessor lessor
 type lessor struct{}
 
 func (lessor) Less(a, b *Sha) bool {
-	return bytes.Compare(a.GetShaBytes(), b.GetShaBytes()) == -1
+	return bytes.Compare(a.GetBytes(), b.GetBytes()) == -1
 }
 
 var Equaler equaler
@@ -73,5 +73,5 @@ var Equaler equaler
 type equaler struct{}
 
 func (equaler) Equals(a, b *Sha) bool {
-	return bytes.Equal(a.GetShaBytes(), b.GetShaBytes())
+	return bytes.Equal(a.GetBytes(), b.GetBytes())
 }

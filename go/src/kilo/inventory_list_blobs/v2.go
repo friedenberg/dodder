@@ -280,7 +280,7 @@ func (coder V2ObjectCoder) DecodeFrom(
 
 		if err = repo_signing.VerifySignature(
 			object.Metadata.RepoPubkey,
-			sh.GetShaBytes(),
+			sh.GetBytes(),
 			object.Metadata.RepoSig,
 		); err != nil {
 			err = errors.Wrapf(

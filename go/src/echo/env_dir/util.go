@@ -18,7 +18,7 @@ func MakeHashBucketPathFromSha(
 	pathComponents ...string,
 ) string {
 	return MakeHashBucketPath(
-		[]byte(sh.GetShaString()),
+		[]byte(sh.String()),
 		buckets,
 		pathComponents...,
 	)
