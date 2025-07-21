@@ -52,7 +52,7 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.LocalBlobStore
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-		env_dir.MakeHashBucketPathSplitFunc(blobStore.buckets),
+		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
 	)

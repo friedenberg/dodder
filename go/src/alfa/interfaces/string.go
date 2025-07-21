@@ -1,10 +1,8 @@
 package interfaces
 
 type (
-	FuncSetString        func(string) error
-	FuncString[T any]    func(T) string
-	FuncAbbreviateValue  func(ValueLike) (string, error)
-	FuncAbbreviateKorper func(StringerWithHeadAndTail) (string, error)
+	FuncSetString     func(string) error
+	FuncString[T any] func(T) string
 )
 
 type Stringer interface {

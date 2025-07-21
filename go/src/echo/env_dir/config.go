@@ -9,12 +9,12 @@ import (
 // TODO move to own package
 
 func MakeConfig(
-	splitFunc func(interfaces.StringerWithHeadAndTail, ...string) string,
+	funcJoin func(string, ...string) string,
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
 ) Config {
 	return Config{
-		splitFunc:   splitFunc,
+		funcJoin:    funcJoin,
 		compression: compression,
 		encryption:  encryption,
 	}
@@ -32,7 +32,7 @@ var (
 )
 
 type Config struct {
-	splitFunc   func(interfaces.StringerWithHeadAndTail, ...string) string
+	funcJoin    func(string, ...string) string
 	compression interfaces.BlobCompression
 	encryption  interfaces.BlobEncryption
 }

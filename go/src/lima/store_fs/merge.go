@@ -355,16 +355,15 @@ func (store *Store) GenerateConflictMarker(
 	}
 
 	if checkedOut.GetSkuExternal().GetGenre() == genres.Zettel {
-		var h ids.ZettelId
+		var zettelId ids.ZettelId
 
-		if err = h.Set(checkedOut.GetSkuExternal().GetObjectId().String()); err != nil {
+		if err = zettelId.Set(checkedOut.GetSkuExternal().GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if _, err = env_dir.MakeDirIfNecessary(
-			h,
-			env_dir.Path,
+		if _, err = env_dir.MakeDirIfNecessaryForStringerWithHeadAndTail(
+			zettelId,
 			store.envRepo.GetCwd(),
 		); err != nil {
 			err = errors.Wrap(err)

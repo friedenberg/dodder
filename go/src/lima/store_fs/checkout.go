@@ -243,16 +243,15 @@ func (store *Store) SetFilenameForTransacted(
 	}
 
 	if sk.GetGenre() == genres.Zettel {
-		var h ids.ZettelId
+		var zettelId ids.ZettelId
 
-		if err = h.Set(sk.GetObjectId().String()); err != nil {
+		if err = zettelId.Set(sk.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if info.basename, err = env_dir.MakeDirIfNecessary(
-			h,
-			env_dir.Path,
+		if info.basename, err = env_dir.MakeDirIfNecessaryForStringerWithHeadAndTail(
+			zettelId,
 			cwd,
 		); err != nil {
 			err = errors.Wrap(err)

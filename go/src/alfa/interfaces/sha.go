@@ -1,6 +1,9 @@
 package interfaces
 
-import "io"
+import (
+	"bytes"
+	"io"
+)
 
 // TODO-P3 refactor into hash or checksum or content address and split korper
 // out into context object
@@ -8,7 +11,7 @@ type Sha interface {
 	// TODO-P3
 	// GetHashBytes() []byte
 	// ValueLike
-	StringerWithHeadAndTail
+	StringerWithHeadAndTail // TODO remove
 	GetShaString() string
 	GetShaBytes() []byte
 	EqualsSha(Sha) bool // TODO-P3 rename to EqualsShaLike
@@ -27,14 +30,14 @@ type (
 	ShaReadCloser interface {
 		io.WriterTo
 		io.ReadCloser
-		GetShaLike() Sha
+		ShaGetter
 	}
 
 	// TODO rename to BlobWriter
 	ShaWriteCloser interface {
 		io.ReaderFrom
 		io.WriteCloser
-		GetShaLike() Sha
+		ShaGetter
 	}
 
 	ShaWriter interface {
@@ -43,7 +46,6 @@ type (
 	}
 )
 
-type (
-	FuncShaReadCloser  func(Sha) (ShaReadCloser, error)
-	FuncShaWriteCloser func(Sha) (ShaWriteCloser, error)
-)
+func ShaEquals(a, b Sha) bool {
+	return bytes.Equal(a.GetShaBytes(), b.GetShaBytes())
+}

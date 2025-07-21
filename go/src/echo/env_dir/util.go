@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -77,7 +76,7 @@ func MakeHashBucketPath(
 	return buffer.String()
 }
 
-func Path(
+func PathFromHeadAndTail(
 	stringer interfaces.StringerWithHeadAndTail,
 	pathComponents ...string,
 ) string {
@@ -87,15 +86,15 @@ func Path(
 		stringer.GetTail(),
 	)
 
-	return path.Join(pathComponents...)
+	return filepath.Join(pathComponents...)
 }
 
-func MakeHashBucketPathSplitFunc(
+func MakeHashBucketPathJoinFunc(
 	buckets []int,
-) func(interfaces.StringerWithHeadAndTail, ...string) string {
-	return func(stringer interfaces.StringerWithHeadAndTail, pathComponents ...string) string {
+) func(string, ...string) string {
+	return func(initial string, pathComponents ...string) string {
 		return MakeHashBucketPath(
-			[]byte(stringer.String()),
+			[]byte(initial),
 			buckets,
 			pathComponents...)
 	}
@@ -103,12 +102,28 @@ func MakeHashBucketPathSplitFunc(
 
 // TODO migrate to using Env and accepting path generation function
 func MakeDirIfNecessary(
-	i interfaces.StringerWithHeadAndTail,
-	splitFunc func(interfaces.StringerWithHeadAndTail, ...string) string,
-	pc ...string,
-) (p string, err error) {
-	p = splitFunc(i, pc...)
-	dir := path.Dir(p)
+	stringer interfaces.Stringer,
+	joinFunc func(string, ...string) string,
+	pathComponents ...string,
+) (path string, err error) {
+	path = joinFunc(stringer.String(), pathComponents...)
+	dir := filepath.Dir(path)
+
+	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO migrate to using Env and accepting path generation function
+func MakeDirIfNecessaryForStringerWithHeadAndTail(
+	stringer interfaces.StringerWithHeadAndTail,
+	pathComponents ...string,
+) (path string, err error) {
+	path = PathFromHeadAndTail(stringer, pathComponents...)
+	dir := filepath.Dir(path)
 
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 		err = errors.Wrap(err)
