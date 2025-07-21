@@ -21,7 +21,7 @@ func MetadataShaString(
 	if abbr != nil {
 		var v1 string
 
-		sh := sha.Make(s)
+		sh := sha.MustWithDigester(s)
 
 		if v1, err = abbr(sh); err != nil {
 			err = errors.Wrap(err)

@@ -291,7 +291,7 @@ func TestReadWithBlob(t1 *testing.T) {
 the body`,
 	)
 
-	expectedSha := sha.Must(
+	expectedSha := sha.MustWithString(
 		"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e",
 	)
 

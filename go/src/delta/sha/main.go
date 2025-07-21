@@ -159,6 +159,7 @@ func (digest *Sha) SetParts(head, tail string) (err error) {
 	return
 }
 
+// TODO remove
 func (digest *Sha) SetFromPath(path string) (err error) {
 	tail := filepath.Base(path)
 	head := filepath.Base(filepath.Dir(path))

@@ -41,7 +41,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	expected := sha.Make(listSku.GetBlobSha())
+	expected := sha.MustWithDigester(listSku.GetBlobSha())
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 

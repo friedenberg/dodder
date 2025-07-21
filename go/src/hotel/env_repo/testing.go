@@ -89,7 +89,7 @@ func MakeTesting(
 		}
 
 		shActual := writeCloser.GetDigest()
-		expected := sha.Must(shaExpected)
+		expected := sha.MustWithString(shaExpected)
 
 		err = expected.AssertEqualsShaLike(shActual)
 		if err != nil {

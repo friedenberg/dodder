@@ -74,7 +74,7 @@ func (f textParser) ParseMetadata(
 
 	n += n1
 
-	inlineBlobSha := sha.Make(blobWriter.GetDigest())
+	inlineBlobSha := sha.MustWithDigester(blobWriter.GetDigest())
 
 	if !m.Blob.IsNull() && !mp.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(

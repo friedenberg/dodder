@@ -349,7 +349,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 			if err = client.WriteBlobToRemote(
 				remote.GetBlobStore(),
-				sha.Make(expected.GetBlobSha()),
+				sha.MustWithDigester(expected.GetBlobSha()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

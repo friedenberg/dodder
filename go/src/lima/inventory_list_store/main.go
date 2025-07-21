@@ -262,7 +262,7 @@ func (store *Store) Create(
 	}
 
 	actual := openList.Mover.GetDigest()
-	expected := sha.Make(object.GetBlobSha())
+	expected := sha.MustWithDigester(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
@@ -328,7 +328,7 @@ func (store *Store) WriteInventoryListBlob(
 	}
 
 	actual := writeCloser.GetDigest()
-	expected := sha.Make(object.GetBlobSha())
+	expected := sha.MustWithDigester(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 

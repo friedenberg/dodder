@@ -479,7 +479,7 @@ func (server *Server) handleBlobsHeadOrGet(
 	{
 		var err error
 
-		if sh, err = sha.MakeSha(shString); err != nil {
+		if sh, err = sha.MakeWithString(shString); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}

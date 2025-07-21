@@ -143,7 +143,7 @@ func (blobStore *sftpBlobStore) HasBlob(sh interfaces.Digest) (ok bool) {
 		return
 	}
 
-	sh1 := sha.Make(sh)
+	sh1 := sha.MustWithDigester(sh)
 
 	blobStore.blobCacheLock.RLock()
 
@@ -258,7 +258,7 @@ func (blobStore *sftpBlobStore) BlobReader(
 		return
 	}
 
-	sh1 := sha.Make(sh)
+	sh1 := sha.MustWithDigester(sh)
 	blobStore.blobCacheLock.Lock()
 	blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
 	blobStore.blobCacheLock.Unlock()
@@ -398,7 +398,7 @@ func (mover *sftpMover) Close() (err error) {
 		}
 	}
 
-	sh1 := sha.Make(sh)
+	sh1 := sha.MustWithDigester(sh)
 	mover.store.blobCacheLock.Lock()
 	mover.store.blobCache[string(sh1.GetBytes())] = struct{}{}
 	mover.store.blobCacheLock.Unlock()
