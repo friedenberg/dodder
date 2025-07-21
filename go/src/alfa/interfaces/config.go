@@ -15,13 +15,15 @@ type (
 	}
 
 	Config interface {
-		MutableConfig
+		UsePrintTime() bool
+		UsePredictableZettelIds() bool
 		GetTypeStringFromExtension(t string) string
+		GetTypeExtension(string) string
+		ConfigDryRunGetter
 	}
 
 	MutableConfig interface {
-		UsePrintTime() bool
-		UsePredictableZettelIds() bool
+		Config
 		MutableConfigDryRun
 	}
 )

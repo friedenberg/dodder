@@ -20,6 +20,7 @@ type (
 		Value string
 	}
 
+	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
 		IsInlineType(Type) bool
 	}

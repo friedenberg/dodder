@@ -16,7 +16,6 @@ type (
 	Config interface {
 		interfaces.Config
 		ids.InlineTypeChecker // TODO move out of konfig entirely
-		GetTypeExtension(string) string
 	}
 
 	ObjectProbeIndex interface {
