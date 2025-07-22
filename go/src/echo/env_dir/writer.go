@@ -14,10 +14,10 @@ type Writer interface {
 }
 
 type writer struct {
-	digester        interfaces.WriteDigester
-	tee             io.Writer
-	wCompress, wAge io.WriteCloser
-	wBuf            *bufio.Writer
+	digester              interfaces.WriteDigester
+	tee                   io.Writer
+	compressor, encrypter io.WriteCloser
+	buffer                *bufio.Writer
 }
 
 func NewWriter(
@@ -26,21 +26,22 @@ func NewWriter(
 ) (w *writer, err error) {
 	w = &writer{}
 
-	w.wBuf = bufio.NewWriter(ioWriter)
+	// TODO use pool
+	w.buffer = bufio.NewWriter(ioWriter)
 
-	if w.wAge, err = config.GetBlobEncryption().WrapWriter(w.wBuf); err != nil {
+	if w.encrypter, err = config.GetBlobEncryption().WrapWriter(w.buffer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	w.digester = config.envDigest.MakeWriteDigester()
 
-	if w.wCompress, err = config.GetBlobCompression().WrapWriter(w.wAge); err != nil {
+	if w.compressor, err = config.GetBlobCompression().WrapWriter(w.encrypter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.tee = io.MultiWriter(w.digester, w.wCompress)
+	w.tee = io.MultiWriter(w.digester, w.compressor)
 
 	return
 }
@@ -63,17 +64,17 @@ func (w *writer) WriteString(s string) (n int, err error) {
 }
 
 func (w *writer) Close() (err error) {
-	if err = w.wCompress.Close(); err != nil {
+	if err = w.compressor.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = w.wAge.Close(); err != nil {
+	if err = w.encrypter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = w.wBuf.Flush(); err != nil {
+	if err = w.buffer.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

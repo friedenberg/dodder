@@ -266,7 +266,7 @@ func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
 	if n, err = page_id.PageIndexForString(
 		width,
 		oid.String(),
-		sha.MakeWriter(nil),
+		sha.MakeWriter(sha.Env{}, nil),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -350,7 +350,7 @@ func (s *Index) ObjectExists(
 	if n, err = page_id.PageIndexForString(
 		DigitWidth,
 		objectIdString,
-		sha.MakeWriter(nil),
+		sha.MakeWriter(sha.Env{}, nil),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

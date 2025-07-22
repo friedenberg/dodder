@@ -24,8 +24,13 @@ type (
 	}
 
 	EnvDigest interface {
+		GetHash() hash.Hash
+		PutHash(hash.Hash)
+
+		GetDigest() Digest
+		PutDigest(Digest)
+
 		MakeWriteDigester() WriteDigester
-		MakeReadDigester() ReadDigester
 		MakeDigestFromHash(hash.Hash) (Digest, error)
 
 		// TODO pool

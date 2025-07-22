@@ -28,7 +28,7 @@ func (f v4) FormatPersistentMetadata(
 
 	m := c.GetMetadata()
 
-	mh := sha.MakeWriter(nil)
+	mh := sha.MakeWriter(sha.Env{}, nil)
 	mw := io.MultiWriter(bufferedWriter, mh)
 	var (
 		n1 int

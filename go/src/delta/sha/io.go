@@ -1,7 +1,6 @@
 package sha
 
 import (
-	"crypto/sha256"
 	"hash"
 	"io"
 
@@ -10,13 +9,19 @@ import (
 )
 
 type readCloser struct {
-	tee  io.Reader
-	r    io.Reader
-	w    io.Writer
-	hash hash.Hash
+	envDigest interfaces.EnvDigest
+	tee       io.Reader
+	reader    io.Reader
+	writer    io.Writer
+	hash      hash.Hash
 }
 
-func MakeReadCloser(reader io.Reader) (src readCloser) {
+func MakeReadCloser(
+	envDigest interfaces.EnvDigest,
+	reader io.Reader,
+) (src readCloser) {
+	src.envDigest = envDigest
+
 	switch rt := reader.(type) {
 	case *readCloser:
 		src = *rt
@@ -25,8 +30,8 @@ func MakeReadCloser(reader io.Reader) (src readCloser) {
 		src = rt
 
 	default:
-		src.hash = sha256.New()
-		src.r = reader
+		src.hash = src.envDigest.GetHash()
+		src.reader = reader
 	}
 
 	src.setupTee()
@@ -34,20 +39,26 @@ func MakeReadCloser(reader io.Reader) (src readCloser) {
 	return
 }
 
-func MakeReadCloserTee(r io.Reader, w io.Writer) (src readCloser) {
-	switch rt := r.(type) {
+func MakeReadCloserTee(
+	envDigest interfaces.EnvDigest,
+	reader io.Reader,
+	writer io.Writer,
+) (src readCloser) {
+	src.envDigest = envDigest
+
+	switch rt := reader.(type) {
 	case *readCloser:
 		src = *rt
-		src.w = w
+		src.writer = writer
 
 	case readCloser:
 		src = rt
-		src.w = w
+		src.writer = writer
 
 	default:
-		src.hash = sha256.New()
-		src.r = r
-		src.w = w
+		src.hash = src.envDigest.GetHash()
+		src.reader = reader
+		src.writer = writer
 	}
 
 	src.setupTee()
@@ -56,10 +67,16 @@ func MakeReadCloserTee(r io.Reader, w io.Writer) (src readCloser) {
 }
 
 func (readCloser *readCloser) setupTee() {
-	if readCloser.w == nil {
-		readCloser.tee = io.TeeReader(readCloser.r, readCloser.hash)
+	if readCloser.writer == nil {
+		readCloser.tee = io.TeeReader(
+			readCloser.reader,
+			readCloser.hash,
+		)
 	} else {
-		readCloser.tee = io.TeeReader(readCloser.r, io.MultiWriter(readCloser.hash, readCloser.w))
+		readCloser.tee = io.TeeReader(
+			readCloser.reader,
+			io.MultiWriter(readCloser.hash, readCloser.writer),
+		)
 	}
 }
 
@@ -67,7 +84,7 @@ func (readCloser readCloser) Seek(
 	offset int64,
 	whence int,
 ) (actual int64, err error) {
-	seeker, ok := readCloser.r.(io.Seeker)
+	seeker, ok := readCloser.reader.(io.Seeker)
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
@@ -96,11 +113,11 @@ func (readCloser readCloser) Read(b []byte) (n int, err error) {
 }
 
 func (readCloser readCloser) Close() (err error) {
-	if c, ok := readCloser.r.(io.Closer); ok {
+	if c, ok := readCloser.reader.(io.Closer); ok {
 		defer errors.DeferredCloser(&err, c)
 	}
 
-	if c, ok := readCloser.w.(io.Closer); ok {
+	if c, ok := readCloser.writer.(io.Closer); ok {
 		defer errors.DeferredCloser(&err, c)
 	}
 
@@ -108,16 +125,20 @@ func (readCloser readCloser) Close() (err error) {
 }
 
 func (readCloser readCloser) GetDigest() interfaces.Digest {
-	return FromHash(readCloser.hash)
+	digest, err := readCloser.envDigest.MakeDigestFromHash(readCloser.hash)
+	errors.PanicIfError(err)
+	return digest
 }
 
 type nopReadCloser struct {
 	io.ReadCloser
 }
 
-func MakeNopReadCloser(rc io.ReadCloser) interfaces.ReadCloseDigester {
+func MakeNopReadCloser(
+	readCloser io.ReadCloser,
+) interfaces.ReadCloseDigester {
 	return nopReadCloser{
-		ReadCloser: rc,
+		ReadCloser: readCloser,
 	}
 }
 
@@ -126,8 +147,8 @@ func (nopReadCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	return
 }
 
-func (readCloser nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
-	return io.Copy(w, readCloser.ReadCloser)
+func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
+	return io.Copy(writer, readCloser.ReadCloser)
 }
 
 func (readCloser nopReadCloser) GetDigest() interfaces.Digest {

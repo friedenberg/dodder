@@ -35,7 +35,7 @@ func init() {
 	poolWriter = pool.MakePool(
 		nil,
 		func(writer *writer) {
-			writer.Reset(nil)
+			writer.Reset(Env{}, nil)
 		},
 	)
 }

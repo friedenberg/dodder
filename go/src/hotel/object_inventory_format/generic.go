@@ -395,7 +395,7 @@ func WriteMetadata(
 	f FormatGeneric,
 	c FormatterContext,
 ) (sh *Sha, err error) {
-	writer := sha.MakeWriter(w)
+	writer := sha.MakeWriter(sha.Env{}, w)
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {
@@ -430,7 +430,7 @@ func GetShaForContextDebug(
 	c FormatterContext,
 ) (sh *Sha, err error) {
 	var sb strings.Builder
-	writer := sha.MakeWriter(&sb)
+	writer := sha.MakeWriter(sha.Env{}, &sb)
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {

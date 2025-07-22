@@ -83,7 +83,7 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		reader = sha.MakeReadCloser(response.Body)
+		reader = sha.MakeReadCloser(sha.Env{}, response.Body)
 	}
 
 	return

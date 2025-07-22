@@ -13,6 +13,22 @@ import (
 
 type Env struct{}
 
+func (env Env) GetHash() hash.Hash {
+	return poolHash256.Get()
+}
+
+func (env Env) PutHash(hash hash.Hash) {
+	poolHash256.Put(hash)
+}
+
+func (env Env) GetDigest() interfaces.Digest {
+	return poolSha.Get()
+}
+
+func (env Env) PutDigest(digest interfaces.Digest) {
+	poolSha.Put(digest.(*Sha))
+}
+
 func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 	digest := poolSha.Get()
 	digest.Reset()
@@ -28,11 +44,7 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 }
 
 func (env Env) MakeWriteDigester() interfaces.WriteDigester {
-	return MakeWriter(nil)
-}
-
-func (env Env) MakeReadDigester() interfaces.ReadDigester {
-	return MakeReadCloser(nil)
+	return MakeWriter(env, nil)
 }
 
 // TODO switch to being functions on Env that return interfaces.Digest

@@ -9,75 +9,24 @@ import (
 )
 
 type writer struct {
-	closed bool
-	in     io.Writer
-	c      io.Closer
-	w      io.Writer
-	h      hash.Hash
-	sh     Sha
+	envDigest interfaces.EnvDigest
+	closed    bool
+	in        io.Writer
+	closer    io.Closer
+	writer    io.Writer
+	hash      hash.Hash
 }
 
-func MakeWriter(in io.Writer) (writer *writer) {
+func MakeWriter(envDigest interfaces.EnvDigest, in io.Writer) (writer *writer) {
 	writer = GetPoolWriter().Get()
-	writer.Reset(in)
+	writer.Reset(envDigest, in)
 
 	return
 }
 
-func (w *writer) ReadFrom(r io.Reader) (n int64, err error) {
-	if n, err = io.Copy(w.w, r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+func (writer *writer) Reset(envDigest interfaces.EnvDigest, in io.Writer) {
+	writer.envDigest = envDigest
 
-	return
-}
-
-func (w *writer) Write(p []byte) (n int, err error) {
-	return w.w.Write(p)
-}
-
-func (w *writer) WriteString(v string) (n int, err error) {
-	if stringWriter, ok := w.w.(io.StringWriter); ok {
-		return stringWriter.WriteString(v)
-	} else {
-		return io.WriteString(w.w, v)
-	}
-}
-
-func (w *writer) Close() (err error) {
-	w.closed = true
-	w.setShaLikeIfNecessary()
-
-	if w.c == nil {
-		return
-	}
-
-	if err = w.c.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (w *writer) setShaLikeIfNecessary() {
-	if w.h != nil {
-		errors.PanicIfError(w.sh.SetFromHash(w.h))
-
-		poolHash256.Put(w.h)
-		w.h = nil
-	}
-}
-
-func (w *writer) GetDigest() (digest interfaces.Digest) {
-	w.setShaLikeIfNecessary()
-	digest = &w.sh
-
-	return
-}
-
-func (writer *writer) Reset(in io.Writer) {
 	if in == nil {
 		in = io.Discard
 	}
@@ -85,14 +34,57 @@ func (writer *writer) Reset(in io.Writer) {
 	writer.in = in
 
 	if c, ok := in.(io.Closer); ok {
-		writer.c = c
+		writer.closer = c
 	}
 
-	if writer.h == nil {
-		writer.h = poolHash256.Get()
+	if writer.hash == nil {
+		writer.hash = writer.envDigest.GetHash()
 	} else {
-		writer.h.Reset()
+		writer.hash.Reset()
 	}
 
-	writer.w = io.MultiWriter(writer.h, writer.in)
+	writer.writer = io.MultiWriter(writer.hash, writer.in)
+}
+
+func (writer *writer) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = io.Copy(writer.writer, r); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (writer *writer) Write(p []byte) (n int, err error) {
+	return writer.writer.Write(p)
+}
+
+func (writer *writer) WriteString(v string) (n int, err error) {
+	if stringWriter, ok := writer.writer.(io.StringWriter); ok {
+		return stringWriter.WriteString(v)
+	} else {
+		return io.WriteString(writer.writer, v)
+	}
+}
+
+func (writer *writer) Close() (err error) {
+	writer.closed = true
+
+	if writer.closer == nil {
+		return
+	}
+
+	if err = writer.closer.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (writer *writer) GetDigest() interfaces.Digest {
+	digest, err := writer.envDigest.MakeDigestFromHash(writer.hash)
+	errors.PanicIfError(err)
+
+	return digest
 }

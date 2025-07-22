@@ -134,7 +134,7 @@ func (cmd BlobStoreWrite) doOne(
 	var writeCloser interfaces.WriteCloseDigester
 
 	if cmd.Check {
-		writeCloser = sha.MakeWriter(nil)
+		writeCloser = sha.MakeWriter(sha.Env{}, nil)
 	} else {
 		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
