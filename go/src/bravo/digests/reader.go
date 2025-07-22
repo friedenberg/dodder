@@ -30,7 +30,7 @@ func MakeReadCloser(
 		src = rt
 
 	default:
-		src.hash = src.envDigest.GetHash()
+		src.hash, _ = src.envDigest.GetHash()
 		src.reader = reader
 	}
 
@@ -56,7 +56,7 @@ func MakeReadCloserTee(
 		src.writer = writer
 
 	default:
-		src.hash = src.envDigest.GetHash()
+		src.hash, _ = src.envDigest.GetHash()
 		src.reader = reader
 		src.writer = writer
 	}

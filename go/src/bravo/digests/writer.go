@@ -60,7 +60,7 @@ func (writer *writer) Reset(envDigest interfaces.EnvDigest, in io.Writer) {
 	}
 
 	if writer.hash == nil {
-		writer.hash = writer.envDigest.GetHash()
+		writer.hash, _ = writer.envDigest.GetHash()
 	} else {
 		writer.hash.Reset()
 	}

@@ -9,24 +9,24 @@ import (
 )
 
 func WriteKeySpaceValueNewlineString(
-	w io.Writer,
+	writer io.Writer,
 	key, value string,
 ) (n int, err error) {
-	return WriteStrings(w, key, " ", value, "\n")
+	return WriteStrings(writer, key, " ", value, "\n")
 }
 
 func WriteKeySpaceValueNewline(
-	w io.Writer,
+	writer io.Writer,
 	key string, value []byte,
 ) (n int64, err error) {
 	var (
-		n1 int64
-		sr *strings.Reader
-		br *bytes.Reader
+		n1           int64
+		stringReader *strings.Reader
+		byteReader   *bytes.Reader
 	)
 
-	sr = strings.NewReader(key)
-	n1, err = sr.WriteTo(w)
+	stringReader = strings.NewReader(key)
+	n1, err = stringReader.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -34,9 +34,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	sr = strings.NewReader(" ")
+	stringReader = strings.NewReader(" ")
 
-	n1, err = sr.WriteTo(w)
+	n1, err = stringReader.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -44,9 +44,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	br = bytes.NewReader(value)
+	byteReader = bytes.NewReader(value)
 
-	n1, err = br.WriteTo(w)
+	n1, err = byteReader.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -54,9 +54,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	sr = strings.NewReader("\n")
+	stringReader = strings.NewReader("\n")
 
-	n1, err = sr.WriteTo(w)
+	n1, err = stringReader.WriteTo(writer)
 	n += n1
 
 	if err != nil {

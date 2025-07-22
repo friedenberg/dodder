@@ -11,6 +11,7 @@ import (
 	"strings"
 	"unicode"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -46,13 +47,16 @@ func main() {
 			line = line[:len(line)-1]
 		}
 
-		sc := bufio.NewScanner(strings.NewReader(line))
-		sc.Split(bufio.ScanWords)
+		stringReader, repool := pool.GetStringReader(line)
+		defer repool()
+
+		scanner := bufio.NewScanner(stringReader)
+		scanner.Split(bufio.ScanWords)
 
 		theseTokens := make([]string, 0)
 
-		for sc.Scan() {
-			t := sc.Text()
+		for scanner.Scan() {
+			t := scanner.Text()
 
 			if len(t) <= 3 {
 				continue

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
 var _ = digests.RegisterEnv(Env{})
@@ -19,12 +20,8 @@ func (env Env) GetType() string {
 	return Type
 }
 
-func (env Env) GetHash() hash.Hash {
-	return poolHash256.Get()
-}
-
-func (env Env) PutHash(hash hash.Hash) {
-	poolHash256.Put(hash)
+func (env Env) GetHash() (hash.Hash, func()) {
+	return pool.GetSha256Hash()
 }
 
 func (env Env) GetDigest() interfaces.Digest {
@@ -64,8 +61,8 @@ func FromFormatString(f string, vs ...any) interfaces.Digest {
 }
 
 func FromStringContent(s string) interfaces.Digest {
-	hash := poolHash256.Get()
-	defer poolHash256.Put(hash)
+	hash, repool := pool.GetSha256Hash()
+	defer repool()
 
 	stringReader := strings.NewReader(s)
 

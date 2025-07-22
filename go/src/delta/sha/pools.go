@@ -2,28 +2,14 @@ package sha
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"hash"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var (
-	poolHash256 interfaces.PoolValue[hash.Hash]
-	poolSha     interfaces.Pool[Sha, *Sha]
-)
+var poolSha interfaces.Pool[Sha, *Sha]
 
 func init() {
-	poolHash256 = pool.MakeValue(
-		func() hash.Hash {
-			return sha256.New()
-		},
-		func(h hash.Hash) {
-			h.Reset()
-		},
-	)
-
 	poolSha = pool.MakePool(
 		nil,
 		func(sh *Sha) {

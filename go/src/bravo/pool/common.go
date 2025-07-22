@@ -2,6 +2,9 @@ package pool
 
 import (
 	"bufio"
+	"bytes"
+	"crypto/sha256"
+	"hash"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -11,7 +14,16 @@ import (
 var (
 	bufioReader   = MakePool[bufio.Reader](nil, nil)
 	bufioWriter   = MakePool[bufio.Writer](nil, nil)
+	byteReaders   = MakePool[bytes.Reader](nil, nil)
 	stringReaders = MakePool[strings.Reader](nil, nil)
+	sha256Hash    = MakeValue(
+		func() hash.Hash {
+			return sha256.New()
+		},
+		func(hash hash.Hash) {
+			hash.Reset()
+		},
+	)
 )
 
 func GetBufioReader() interfaces.Pool[bufio.Reader, *bufio.Reader] {
@@ -35,6 +47,29 @@ func GetStringReader(
 
 	repool = func() {
 		stringReaders.Put(stringReader)
+	}
+
+	return
+}
+
+func GetByteReader(
+	value []byte,
+) (byteReader *bytes.Reader, repool func()) {
+	byteReader = byteReaders.Get()
+	byteReader.Reset(value)
+
+	repool = func() {
+		byteReaders.Put(byteReader)
+	}
+
+	return
+}
+
+func GetSha256Hash() (hash hash.Hash, repool func()) {
+	hash = sha256Hash.Get()
+
+	repool = func() {
+		sha256Hash.Put(hash)
 	}
 
 	return

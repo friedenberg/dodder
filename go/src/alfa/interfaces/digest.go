@@ -27,8 +27,7 @@ type (
 		GetType() string
 
 		// TODO rename to "MakeHash"
-		GetHash() hash.Hash
-		PutHash(hash.Hash)
+		GetHash() (hash.Hash, func())
 
 		// TODO rename to "MakeDigest"
 		GetDigest() Digest
@@ -37,10 +36,6 @@ type (
 		MakeWriteDigesterWithRepool() (WriteDigester, func())
 		MakeWriteDigester() WriteDigester
 		MakeDigestFromHash(hash.Hash) (Digest, error)
-
-		// TODO pool
-		// GetDigest() Digest
-		// PutDigest(Digest)
 	}
 
 	WriteDigester interface {
