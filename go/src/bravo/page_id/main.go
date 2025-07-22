@@ -6,14 +6,13 @@ import (
 	"math"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-// TODO move to own package
 type PageId struct {
 	Index  uint8
 	Dir    string
@@ -42,7 +41,8 @@ func PageIndexForString(
 	value string,
 	envDigest interfaces.EnvDigest,
 ) (n uint8, err error) {
-	stringReader := strings.NewReader(value)
+	stringReader, repool := pool.GetStringReader(value)
+	defer repool()
 
 	writer, repool := envDigest.MakeWriteDigesterWithRepool()
 	defer repool()
@@ -52,8 +52,8 @@ func PageIndexForString(
 		return
 	}
 
-	// TODO figure out how to repool these
 	digest := envDigest.GetDigest()
+	defer envDigest.PutDigest(digest)
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
 		err = errors.Wrap(err)
