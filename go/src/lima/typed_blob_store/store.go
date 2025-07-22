@@ -56,7 +56,7 @@ func (blobStore *BlobStore[A, APtr]) GetBlob(
 
 	actual := rc.GetDigest()
 
-	if !digests.DigestEquals(actual, sh) {
+	if !digests.Equals(actual, sh) {
 		err = errors.ErrorWithStackf("expected sha %s but got %s", sh, actual)
 		return
 	}

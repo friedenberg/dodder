@@ -17,17 +17,17 @@ import (
 )
 
 const (
-	ByteSize      = 32
-	ShaNullString = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-	Null          = ShaNullString
+	ByteSize   = 32
+	NullString = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	Null       = NullString
 )
 
-type Bytes [ByteSize]byte
+type byteArray [ByteSize]byte
 
 var digestNull Sha
 
 func init() {
-	errors.PanicIfError(digestNull.Set(ShaNullString))
+	errors.PanicIfError(digestNull.Set(NullString))
 
 	if !digestNull.IsNull() {
 		panic("null digest is not null")
@@ -40,7 +40,7 @@ type PathComponents interface {
 
 // TODO rename to digest
 type Sha struct {
-	data *Bytes
+	data *byteArray
 }
 
 func (digest *Sha) Size() int {
@@ -103,8 +103,8 @@ func (digest *Sha) GetTail() string {
 }
 
 func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
-	if !digests.DigestEquals(digest, b) {
-		return MakeErrNotEqual(digest, b)
+	if !digests.Equals(digest, b) {
+		return digests.MakeErrNotEqual(digest, b)
 	}
 
 	return nil
@@ -128,7 +128,7 @@ func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
 func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
 	digest.allocDataIfNecessary()
 	b := h.Sum(digest.data[:0])
-	err = makeErrLength(ByteSize, len(b))
+	err = digests.MakeErrLength(ByteSize, len(b))
 	return
 }
 
@@ -140,7 +140,7 @@ func (digest *Sha) SetDigester(src interfaces.Digester) (err error) {
 func (digest *Sha) SetDigest(src interfaces.Digest) (err error) {
 	digest.allocDataIfNecessary()
 
-	err = makeErrLength(
+	err = digests.MakeErrLength(
 		ByteSize,
 		copy(digest.data[:], src.GetDigest().GetBytes()),
 	)
@@ -263,7 +263,7 @@ func (digest *Sha) Set(value string) (err error) {
 
 	bytesWritten := copy(digest.data[:], decodedBytes)
 
-	if err = makeErrLength(ByteSize, bytesWritten); err != nil {
+	if err = digests.MakeErrLength(ByteSize, bytesWritten); err != nil {
 		return
 	}
 
@@ -275,7 +275,7 @@ func (digest *Sha) allocDataIfNecessary() {
 		return
 	}
 
-	digest.data = &Bytes{}
+	digest.data = &byteArray{}
 }
 
 func (digest *Sha) Reset() {

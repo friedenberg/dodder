@@ -16,7 +16,7 @@ func (e *page) seekToFirstBinarySearch(
 ) (mid int64, err error) {
 	if e.f == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + digests.FormatDigest(shMet),
+			"fd nil: " + digests.Format(shMet),
 		)
 		return
 	}
@@ -68,7 +68,7 @@ func (e *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, digests.FormatDigest(shMet)),
+		fmt.Sprintf("%d: %s", loops, digests.Format(shMet)),
 	)
 
 	return
@@ -79,7 +79,7 @@ func (e *page) seekToFirstLinearSearch(
 ) (loc int64, err error) {
 	if e.f == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + digests.FormatDigest(shMet),
+			"fd nil: " + digests.Format(shMet),
 		)
 		return
 	}
@@ -115,7 +115,7 @@ func (e *page) seekToFirstLinearSearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(digests.FormatDigest(shMet))
+	err = collections.MakeErrNotFoundString(digests.Format(shMet))
 
 	return
 }

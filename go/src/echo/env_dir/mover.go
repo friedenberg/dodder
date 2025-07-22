@@ -115,7 +115,7 @@ func (mover *localFileMover) Close() (err error) {
 		}
 
 		if mover.objectPath, err = MakeDirIfNecessary(
-			digests.FormatDigest(digest),
+			digests.Format(digest),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {

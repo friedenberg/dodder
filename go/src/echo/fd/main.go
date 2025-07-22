@@ -60,7 +60,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !digests.DigestEquals(&a.sha, &b.sha) {
+	if !digests.Equals(&a.sha, &b.sha) {
 		return false
 	}
 

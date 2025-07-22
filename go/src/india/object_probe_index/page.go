@@ -208,7 +208,7 @@ func (e *page) readCurrentLoc(
 		return
 	}
 
-	if !digests.DigestEquals(in, sh) {
+	if !digests.Equals(in, sh) {
 		err = io.EOF
 		return
 	}

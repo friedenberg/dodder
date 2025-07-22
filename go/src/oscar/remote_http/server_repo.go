@@ -128,7 +128,7 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			blobShaString := digests.FormatDigest(blobSha)
+			blobShaString := digests.Format(blobSha)
 
 			if ok || writtenNeededBlobs.ContainsExpansion(blobShaString) {
 				continue

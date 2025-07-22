@@ -21,7 +21,7 @@ func MakeHashBucketPathFromSha(
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(digests.FormatDigest(sh)),
+		[]byte(digests.Format(sh)),
 		buckets,
 		pathComponents...,
 	)

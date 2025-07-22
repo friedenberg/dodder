@@ -66,7 +66,7 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	bucketIndexString := digests.FormatDigest(digest)[:width]
+	bucketIndexString := digests.Format(digest)[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)

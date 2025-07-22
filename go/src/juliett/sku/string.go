@@ -61,7 +61,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(digests.FormatDigest(object.GetBlobSha()))
+	sb.WriteString(digests.Format(object.GetBlobSha()))
 
 	m := object.GetMetadata()
 

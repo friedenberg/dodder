@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -56,7 +55,7 @@ func (c ReadBlob) Run(dep command.Request) {
 func (ReadBlob) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
-) (sh *sha.Sha, err error) {
+) (digest interfaces.Digest, err error) {
 	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
@@ -71,12 +70,7 @@ func (ReadBlob) readOneBlob(
 		return
 	}
 
-	sh = sha.GetPool().Get()
-
-	if err = sh.SetDigest(writeCloser.GetDigest()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	digest = writeCloser.GetDigest()
 
 	return
 }

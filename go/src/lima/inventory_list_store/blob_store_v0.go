@@ -37,7 +37,7 @@ func (blobStore *blobStoreV0) ReadOneSha(
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
 
-	if err = sh.Set(digests.FormatDigest(id)); err != nil {
+	if err = sh.Set(digests.Format(id)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

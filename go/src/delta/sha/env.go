@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 )
 
 type Env struct{}
@@ -16,7 +17,7 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
-	if err := makeErrLength(ByteSize, hash.Size()); err != nil {
+	if err := digests.MakeErrLength(ByteSize, hash.Size()); err != nil {
 		return nil, err
 	}
 

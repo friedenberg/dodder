@@ -95,7 +95,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return digests.DigestEquals(&a.sha, &b.sha) &&
+	return digests.Equals(&a.sha, &b.sha) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
@@ -104,7 +104,7 @@ func (rowEqualerComplete) Equals(a, b *row) bool {
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return digests.DigestEquals(&a.sha, &b.sha)
+	return digests.Equals(&a.sha, &b.sha)
 }
 
 type rowResetter struct{}

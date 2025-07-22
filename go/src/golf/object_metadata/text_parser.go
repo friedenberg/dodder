@@ -107,7 +107,7 @@ func (f textParser) ParseMetadata(
 		// noop
 
 	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
-		!digests.DigestEquals(&m.Blob, inlineBlobSha):
+		!digests.Equals(&m.Blob, inlineBlobSha):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataSha(
 				inlineBlobSha,

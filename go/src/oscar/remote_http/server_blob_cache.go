@@ -30,7 +30,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 				return
 			}
 
-			serverBlobCache.shas.Add(digests.FormatDigest(sh))
+			serverBlobCache.shas.Add(digests.Format(sh))
 			count++
 		}
 
@@ -56,7 +56,7 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 	}
 
 	if serverBlobCache.shas.ContainsExpansion(
-		digests.FormatDigest(blobSha),
+		digests.Format(blobSha),
 	) {
 		ok = true
 		return

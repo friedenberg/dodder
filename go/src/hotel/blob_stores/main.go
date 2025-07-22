@@ -141,8 +141,8 @@ func CopyBlob(
 	shaRc := rc.GetDigest()
 	shaWc := wc.GetDigest()
 
-	if !digests.DigestEquals(shaRc, blobSha) ||
-		!digests.DigestEquals(shaWc, blobSha) {
+	if !digests.Equals(shaRc, blobSha) ||
+		!digests.Equals(shaWc, blobSha) {
 		err = errors.ErrorWithStackf(
 			"lookup sha was %s, read sha was %s, but written sha was %s",
 			blobSha,

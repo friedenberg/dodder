@@ -22,24 +22,28 @@ func (cmd FindMissing) Run(dep command.Request) {
 	{
 		var err error
 
-		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobShaBytesMap(); err != nil {
+		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobDigestBytesMap(); err != nil {
 			dep.Cancel(err)
 		}
 	}
 
-	for _, shSt := range dep.PopArgs() {
-		var sh sha.Sha
+	for _, digestString := range dep.PopArgs() {
+		var digest sha.Sha
 
-		if err := sh.Set(shSt); err != nil {
+		if err := digest.Set(digestString); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 
-		oids, ok := lookupStored[string(sh.GetBytes())]
+		objectIds, ok := lookupStored[string(digest.GetBytes())]
 
 		if ok {
-			localWorkingCopy.GetUI().Printf("%s (checked in as %q)", &sh, oids)
+			localWorkingCopy.GetUI().Printf(
+				"%s (checked in as %q)",
+				&digest,
+				objectIds,
+			)
 		} else {
-			localWorkingCopy.GetUI().Printf("%s (missing)", &sh)
+			localWorkingCopy.GetUI().Printf("%s (missing)", &digest)
 		}
 	}
 }

@@ -19,7 +19,7 @@ func (op CreateFromShas) Run(
 ) (results sku.TransactedMutableSet, err error) {
 	var lookupStored map[string][]string
 
-	if lookupStored, err = op.GetStore().MakeBlobShaBytesMap(); err != nil {
+	if lookupStored, err = op.GetStore().MakeBlobDigestBytesMap(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

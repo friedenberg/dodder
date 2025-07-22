@@ -139,7 +139,7 @@ func (store *Store) QueryExactlyOne(
 	return
 }
 
-func (store *Store) MakeBlobShaBytesMap() (blobShaBytes map[string][]string, err error) {
+func (store *Store) MakeBlobDigestBytesMap() (blobShaBytes map[string][]string, err error) {
 	blobShaBytes = make(map[string][]string)
 	var l sync.Mutex
 

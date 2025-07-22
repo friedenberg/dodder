@@ -125,7 +125,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.GetBlobSha(),
 	)
 
-	key = digests.FormatDigest(digest)
+	key = digests.Format(digest)
 	digests.PutDigest(digest)
 
 	return

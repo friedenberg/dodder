@@ -36,7 +36,7 @@ func (store *Store) MergeCheckedOut(
 	var conflicts checkout_mode.Mode
 
 	// TODO add checkout_mode.BlobOnly
-	if digests.DigestEquals(
+	if digests.Equals(
 		co.GetSku().Metadata.Sha(),
 		co.GetSkuExternal().Metadata.Sha(),
 	) {
@@ -48,7 +48,7 @@ func (store *Store) MergeCheckedOut(
 		}
 
 		return
-	} else if digests.DigestEquals(&co.GetSku().Metadata.Blob, &co.GetSkuExternal().Metadata.Blob) {
+	} else if digests.Equals(&co.GetSku().Metadata.Blob, &co.GetSkuExternal().Metadata.Blob) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

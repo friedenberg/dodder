@@ -18,7 +18,7 @@ func StringMetadataSansTai(object *sku.Transacted) (str string) {
 	sb.WriteString(object.GetObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(digests.FormatDigest(object.GetBlobSha()))
+	sb.WriteString(digests.Format(object.GetBlobSha()))
 
 	m := object.GetMetadata()
 

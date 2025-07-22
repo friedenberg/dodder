@@ -239,7 +239,7 @@ func (f v4) FormatPersistentMetadata(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			bufferedWriter,
 			keySha.String(),
-			digests.FormatDigest(actual),
+			digests.Format(actual),
 		)
 
 		n += int64(n1)

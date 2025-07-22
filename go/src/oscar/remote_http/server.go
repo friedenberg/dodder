@@ -531,7 +531,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(digests.FormatDigest(result)),
+			strings.NewReader(digests.Format(result)),
 		)
 
 		return
@@ -567,7 +567,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(digests.FormatDigest(result)),
+		strings.NewReader(digests.Format(result)),
 	)
 
 	return

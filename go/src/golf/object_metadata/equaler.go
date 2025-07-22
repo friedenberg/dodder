@@ -29,7 +29,7 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !digests.DigestEquals(&a.Blob, &b.Blob) {
+	if !digests.Equals(&a.Blob, &b.Blob) {
 		if debug {
 			ui.Debug().Print(&a.Blob, "->", &b.Blob)
 		}
