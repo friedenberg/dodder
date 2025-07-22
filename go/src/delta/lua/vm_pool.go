@@ -11,7 +11,7 @@ import (
 )
 
 type VMPool struct {
-	interfaces.Pool2[VM, *VM]
+	interfaces.PoolWithErrorsPtr[VM, *VM]
 	Require  LGFunction
 	Searcher LGFunction
 	compiled *lua.FunctionProto
@@ -132,7 +132,7 @@ func (sp *VMPool) SetCompiled(
 ) (err error) {
 	sp.compiled = compiled
 
-	sp.Pool2 = pool2.MakePool(
+	sp.PoolWithErrorsPtr = pool2.MakePool(
 		func() (vm *VM, err error) {
 			vm = &VM{
 				LState: lua.NewState(),

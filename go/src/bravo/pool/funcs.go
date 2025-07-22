@@ -5,20 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MakeWriterDoNotRepool[T any]() interfaces.FuncIter[*T] {
-	return func(e *T) (err error) {
-		err = ErrDoNotRepool
-		return
-	}
-}
-
-func MakePooledChain[T interfaces.Poolable[T], TPtr interfaces.PoolablePtr[T]](
-	p interfaces.Pool[T, TPtr],
-	wfs ...interfaces.FuncIter[TPtr],
+// TODO rewrite with iterator?
+func MakePooledChain[T any, TPtr interfaces.Ptr[T]](
+	pool interfaces.Pool[T, TPtr],
+	funcIters ...interfaces.FuncIter[TPtr],
 ) interfaces.FuncIter[TPtr] {
-	return func(e TPtr) (err error) {
-		for _, w := range wfs {
-			err = w(e)
+	return func(element TPtr) (err error) {
+		for _, w := range funcIters {
+			err = w(element)
 
 			switch {
 			case err == nil:
@@ -30,17 +24,17 @@ func MakePooledChain[T interfaces.Poolable[T], TPtr interfaces.PoolablePtr[T]](
 
 			case errors.IsStopIteration(err):
 				err = nil
-				p.Put(e)
+				pool.Put(element)
 				return
 
 			default:
-				p.Put(e)
+				pool.Put(element)
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		p.Put(e)
+		pool.Put(element)
 
 		return
 	}

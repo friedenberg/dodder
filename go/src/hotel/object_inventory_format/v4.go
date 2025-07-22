@@ -26,20 +26,23 @@ func (f v4) FormatPersistentMetadata(
 	bufferedWriter.Reset(w1)
 	defer errors.DeferredFlusher(&err, bufferedWriter)
 
-	m := c.GetMetadata()
+	metadata := c.GetMetadata()
 
-	mh := digests.MakeWriter(sha.Env{}, nil)
-	mw := io.MultiWriter(bufferedWriter, mh)
+	digester, repool := digests.MakeWriterWithRepool(sha.Env{}, nil)
+	defer repool()
+
+	multiWriter := io.MultiWriter(bufferedWriter, digester)
+
 	var (
 		n1 int
 		n2 int64
 	)
 
-	if !m.Blob.IsNull() {
+	if !metadata.Blob.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyAkte.String(),
-			m.Blob.String(),
+			metadata.Blob.String(),
 		)
 		n += int64(n1)
 
@@ -49,7 +52,7 @@ func (f v4) FormatPersistentMetadata(
 		}
 	}
 
-	lines := strings.Split(m.Description.String(), "\n")
+	lines := strings.Split(metadata.Description.String(), "\n")
 
 	for _, line := range lines {
 		if line == "" {
@@ -57,7 +60,7 @@ func (f v4) FormatPersistentMetadata(
 		}
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyBezeichnung.String(),
 			line,
 		)
@@ -69,11 +72,11 @@ func (f v4) FormatPersistentMetadata(
 		}
 	}
 
-	es := m.GetTags()
+	es := metadata.GetTags()
 
 	for _, e := range quiter.SortedValues(es) {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyEtikett.String(),
 			e.String(),
 		)
@@ -109,9 +112,9 @@ func (f v4) FormatPersistentMetadata(
 		return
 	}
 
-	for _, k := range m.Comments {
+	for _, k := range metadata.Comments {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyKomment.String(),
 			k,
 		)
@@ -125,9 +128,9 @@ func (f v4) FormatPersistentMetadata(
 
 	if o.Tai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyTai.String(),
-			m.Tai.String(),
+			metadata.Tai.String(),
 		)
 		n += int64(n1)
 
@@ -137,11 +140,11 @@ func (f v4) FormatPersistentMetadata(
 		}
 	}
 
-	if !m.Type.IsEmpty() {
+	if !metadata.Type.IsEmpty() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyTyp.String(),
-			m.GetType().String(),
+			metadata.GetType().String(),
 		)
 		n += int64(n1)
 
@@ -152,11 +155,11 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	if o.Verzeichnisse {
-		if m.Cache.Dormant.Bool() {
+		if metadata.Cache.Dormant.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				bufferedWriter,
 				keyVerzeichnisseArchiviert.String(),
-				m.Cache.Dormant.String(),
+				metadata.Cache.Dormant.String(),
 			)
 			n += int64(n1)
 
@@ -166,11 +169,11 @@ func (f v4) FormatPersistentMetadata(
 			}
 		}
 
-		if m.Cache.GetExpandedTags().Len() > 0 {
+		if metadata.Cache.GetExpandedTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
 			for _, e := range quiter.SortedValues[ids.Tag](
-				m.Cache.GetExpandedTags(),
+				metadata.Cache.GetExpandedTags(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					bufferedWriter,
@@ -186,11 +189,11 @@ func (f v4) FormatPersistentMetadata(
 			}
 		}
 
-		if m.Cache.GetImplicitTags().Len() > 0 {
+		if metadata.Cache.GetImplicitTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range quiter.SortedValues[ids.Tag](
-				m.Cache.GetImplicitTags(),
+				metadata.Cache.GetImplicitTags(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					bufferedWriter,
@@ -207,11 +210,11 @@ func (f v4) FormatPersistentMetadata(
 		}
 	}
 
-	if !m.Mutter().IsNull() && !o.ExcludeMutter {
+	if !metadata.Mutter().IsNull() && !o.ExcludeMutter {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			mw,
+			multiWriter,
 			keyShasMutterMetadataKennungMutter.String(),
-			m.Mutter().String(),
+			metadata.Mutter().String(),
 		)
 		n += int64(n1)
 
@@ -222,7 +225,7 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	if o.PrintFinalSha {
-		actual := mh.GetDigest()
+		actual := digester.GetDigest()
 		// TODO-P1 set value
 
 		// if !m.Verzeichnisse.Sha.IsNull() &&

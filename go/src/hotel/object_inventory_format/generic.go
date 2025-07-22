@@ -396,7 +396,8 @@ func WriteMetadata(
 	f FormatGeneric,
 	c FormatterContext,
 ) (sh *Sha, err error) {
-	writer := digests.MakeWriter(sha.Env{}, w)
+	writer, repool := digests.MakeWriterWithRepool(sha.Env{}, w)
+	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {
@@ -431,7 +432,8 @@ func GetShaForContextDebug(
 	c FormatterContext,
 ) (sh *Sha, err error) {
 	var sb strings.Builder
-	writer := digests.MakeWriter(sha.Env{}, &sb)
+	writer, repool := digests.MakeWriterWithRepool(sha.Env{}, &sb)
+	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {

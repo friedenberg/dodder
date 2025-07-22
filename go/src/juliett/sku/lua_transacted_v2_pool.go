@@ -41,7 +41,7 @@ func PushTopFuncV2(
 }
 
 type (
-	LuaVMPoolV2    interfaces.Pool2[LuaVMV2, *LuaVMV2]
+	LuaVMPoolV2    interfaces.PoolWithErrorsPtr[LuaVMV2, *LuaVMV2]
 	LuaTablePoolV2 = interfaces.Pool[LuaTableV2, *LuaTableV2]
 )
 
@@ -50,7 +50,7 @@ func MakeLuaVMPoolV2(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV2 {
 		func() (out *LuaVMV2, err error) {
 			var vm *lua.VM
 
-			if vm, err = lvp.Pool2.Get(); err != nil {
+			if vm, err = lvp.PoolWithErrorsPtr.Get(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

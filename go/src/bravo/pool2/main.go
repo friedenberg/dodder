@@ -37,7 +37,7 @@ func MakePool[T any, TPtr interfaces.Ptr[T]](
 	}
 }
 
-func (ip pool[T, TPtr]) GetPool() interfaces.Pool2[T, TPtr] {
+func (ip pool[T, TPtr]) GetPool() interfaces.PoolWithErrorsPtr[T, TPtr] {
 	return ip
 }
 

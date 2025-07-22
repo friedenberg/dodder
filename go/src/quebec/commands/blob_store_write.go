@@ -135,7 +135,11 @@ func (cmd BlobStoreWrite) doOne(
 	var writeCloser interfaces.WriteCloseDigester
 
 	if cmd.Check {
-		writeCloser = digests.MakeWriter(sha.Env{}, nil)
+		{
+			var repool func()
+			writeCloser, repool = digests.MakeWriterWithRepool(sha.Env{}, nil)
+			defer repool()
+		}
 	} else {
 		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)

@@ -34,6 +34,7 @@ type (
 		GetDigest() Digest
 		PutDigest(Digest)
 
+		MakeWriteDigesterWithRepool() (WriteDigester, func())
 		MakeWriteDigester() WriteDigester
 		MakeDigestFromHash(hash.Hash) (Digest, error)
 

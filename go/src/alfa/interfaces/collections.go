@@ -64,33 +64,6 @@ type MutableTridex interface {
 	Remove(string)
 }
 
-type Poolable[T any] interface{}
-
-type PoolablePtr[T any] interface {
-	Ptr[T]
-	// Resetable[T]
-}
-
-type PoolValue[T any] interface {
-	Get() T
-	Put(i T) (err error)
-}
-
-type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {
-	PoolValue[TPtr]
-	PutMany(...TPtr) error
-}
-
-type PoolValue2[T any] interface {
-	Get() (T, error)
-	Put(i T) (err error)
-}
-
-type Pool2[T Poolable[T], TPtr PoolablePtr[T]] interface {
-	PoolValue2[TPtr]
-	PutMany(...TPtr) error
-}
-
 type Adder[E any] interface {
 	Add(E) error
 }

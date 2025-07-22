@@ -11,10 +11,25 @@ import (
 
 var poolWriter = pool.MakePool[writer](nil, nil)
 
-func MakeWriter(envDigest interfaces.EnvDigest, in io.Writer) (writer *writer) {
+func MakeWriterWithRepool(
+	envDigest interfaces.EnvDigest,
+	in io.Writer,
+) (writer *writer, repool func()) {
 	writer = poolWriter.Get()
 	writer.Reset(envDigest, in)
 
+	repool = func() {
+		PutWriter(writer)
+	}
+
+	return
+}
+
+func MakeWriter(
+	envDigest interfaces.EnvDigest,
+	in io.Writer,
+) (writer *writer) {
+	writer, _ = MakeWriterWithRepool(envDigest, in)
 	return
 }
 

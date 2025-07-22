@@ -266,7 +266,7 @@ func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
 	if n, err = page_id.PageIndexForString(
 		width,
 		oid.String(),
-		digests.MakeWriter(sha.Env{}, nil),
+		sha.Env{},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -350,7 +350,7 @@ func (s *Index) ObjectExists(
 	if n, err = page_id.PageIndexForString(
 		DigitWidth,
 		objectIdString,
-		digests.MakeWriter(sha.Env{}, nil),
+		sha.Env{},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -440,12 +440,12 @@ func (s *Index) readOneLoc(
 // TODO add support for *errors.Context closure
 func (i *Index) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[*sku.Transacted],
+	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	ui.Log().Printf("starting query: %q", qg)
-	wg := &sync.WaitGroup{}
+	waitGroup := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
-	me := errors.MakeMulti()
+	multiError := errors.MakeMulti()
 	chDone := make(chan struct{})
 
 	isDone := func() bool {
@@ -458,17 +458,17 @@ func (i *Index) ReadPrimitiveQuery(
 		}
 	}
 
-	w = pool.MakePooledChain(
+	funcIter = pool.MakePooledChain(
 		sku.GetTransactedPool(),
-		w,
+		funcIter,
 	)
 
 	for n := range i.pages {
-		wg.Add(1)
+		waitGroup.Add(1)
 
 		go func(p *Page, openFileCh chan struct{}) {
 			ui.Log().Printf("starting query on page %d: %q", p.PageId.Index, qg)
-			defer wg.Done()
+			defer waitGroup.Done()
 			defer func() {
 				openFileCh <- struct{}{}
 			}()
@@ -478,7 +478,7 @@ func (i *Index) ReadPrimitiveQuery(
 
 				if err1 = p.copyHistoryAndMaybeLatest(
 					qg,
-					w,
+					funcIter,
 					false,
 					false,
 				); err1 != nil {
@@ -494,7 +494,7 @@ func (i *Index) ReadPrimitiveQuery(
 					case errors.IsStopIteration(err1):
 
 					default:
-						me.Add(err1)
+						multiError.Add(err1)
 					}
 				}
 
@@ -503,10 +503,10 @@ func (i *Index) ReadPrimitiveQuery(
 		}(&i.pages[n], ch)
 	}
 
-	wg.Wait()
+	waitGroup.Wait()
 
-	if me.Len() > 0 {
-		err = me
+	if multiError.Len() > 0 {
+		err = multiError
 	}
 
 	return

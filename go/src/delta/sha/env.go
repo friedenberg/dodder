@@ -49,6 +49,10 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 	return digest, nil
 }
 
+func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteDigester, func()) {
+	return digests.MakeWriterWithRepool(env, nil)
+}
+
 func (env Env) MakeWriteDigester() interfaces.WriteDigester {
 	return digests.MakeWriter(env, nil)
 }

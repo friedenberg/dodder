@@ -40,17 +40,20 @@ func (pid *PageId) Path() string {
 func PageIndexForString(
 	width uint8,
 	value string,
-	digester interfaces.WriteDigester,
+	envDigest interfaces.EnvDigest,
 ) (n uint8, err error) {
 	stringReader := strings.NewReader(value)
 
-	if _, err = io.Copy(digester, stringReader); err != nil {
+	writer, repool := envDigest.MakeWriteDigesterWithRepool()
+	defer repool()
+
+	if _, err = io.Copy(writer, stringReader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO figure out how to repool these
-	digest := digester.GetDigest()
+	digest := envDigest.GetDigest()
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
 		err = errors.Wrap(err)
