@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
@@ -111,13 +110,13 @@ func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
 	return nil
 }
 
-func (digest *Sha) EqualsAny(b any) bool {
-	return values.Equals(digest, b)
-}
+// func (digest *Sha) EqualsAny(b any) bool {
+// 	return values.Equals(digest, b)
+// }
 
-func (digest *Sha) Equals(b *Sha) bool {
-	return digest.String() == b.String()
-}
+// func (digest *Sha) Equals(b *Sha) bool {
+// 	return digest.String() == b.String()
+// }
 
 //  __        __    _ _   _
 //  \ \      / / __(_) |_(_)_ __   __ _
@@ -145,11 +144,6 @@ func (digest *Sha) SetDigest(src interfaces.Digest) (err error) {
 		ByteSize,
 		copy(digest.data[:], src.GetDigest().GetBytes()),
 	)
-
-	// if dst.String() ==
-	// "f32cf7f2b1b8b7688c78dec4eb3c3675fcdc3aeaaf4c1305f3bdaf7fc0252e02" {
-	// 	panic("found")
-	// }
 
 	return
 }

@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -106,7 +107,7 @@ func (f textParser) ParseMetadata(
 		// noop
 
 	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
-		!m.Blob.Equals(inlineBlobSha):
+		!digests.DigestEquals(&m.Blob, inlineBlobSha):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataSha(
 				inlineBlobSha,

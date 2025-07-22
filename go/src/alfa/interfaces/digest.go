@@ -13,6 +13,12 @@ type (
 		IsNull() bool
 	}
 
+	MutableDigest interface {
+		Digester
+		SetBytes([]byte) error
+		Reset()
+	}
+
 	Digester interface {
 		GetDigest() Digest
 	}

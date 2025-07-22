@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
@@ -48,7 +49,11 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	if n != RowSize {
-		err = errors.ErrorWithStackf("expected to read %d but read %d", RowSize, n)
+		err = errors.ErrorWithStackf(
+			"expected to read %d but read %d",
+			RowSize,
+			n,
+		)
 		return
 	}
 
@@ -76,7 +81,11 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	if n != RowSize {
-		err = errors.ErrorWithStackf("expected to write %d but wrote %d", RowSize, n)
+		err = errors.ErrorWithStackf(
+			"expected to write %d but wrote %d",
+			RowSize,
+			n,
+		)
 		return
 	}
 
@@ -86,7 +95,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return a.sha.Equals(&b.sha) &&
+	return digests.DigestEquals(&a.sha, &b.sha) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
@@ -95,7 +104,7 @@ func (rowEqualerComplete) Equals(a, b *row) bool {
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return a.sha.Equals(&b.sha)
+	return digests.DigestEquals(&a.sha, &b.sha)
 }
 
 type rowResetter struct{}

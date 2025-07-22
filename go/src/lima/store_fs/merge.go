@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -35,7 +36,10 @@ func (store *Store) MergeCheckedOut(
 	var conflicts checkout_mode.Mode
 
 	// TODO add checkout_mode.BlobOnly
-	if co.GetSku().Metadata.Sha().Equals(co.GetSkuExternal().Metadata.Sha()) {
+	if digests.DigestEquals(
+		co.GetSku().Metadata.Sha(),
+		co.GetSkuExternal().Metadata.Sha(),
+	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return
 	} else if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().Metadata) {
@@ -44,7 +48,7 @@ func (store *Store) MergeCheckedOut(
 		}
 
 		return
-	} else if co.GetSku().Metadata.Blob.Equals(&co.GetSkuExternal().Metadata.Blob) {
+	} else if digests.DigestEquals(&co.GetSku().Metadata.Blob, &co.GetSkuExternal().Metadata.Blob) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

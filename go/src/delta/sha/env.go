@@ -16,13 +16,8 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
-	if hash.Size() != ByteSize {
-		return nil, errors.Errorf(
-			"expected hash size to be %d but was %d. Hash: %T",
-			ByteSize,
-			hash.Size(),
-			hash,
-		)
+	if err := makeErrLength(ByteSize, hash.Size()); err != nil {
+		return nil, err
 	}
 
 	// the return value isn't used because s.data is already the right size

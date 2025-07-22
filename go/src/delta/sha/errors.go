@@ -19,6 +19,7 @@ func MakeErrIsNull(s *Sha) error {
 
 type errLength [2]int
 
+// TODO add another "wrong hasher" error type
 func makeErrLength(expected, actual int) error {
 	if expected != actual {
 		return errLength{expected, actual}
