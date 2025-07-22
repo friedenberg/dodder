@@ -26,7 +26,6 @@ type (
 	EnvDigest interface {
 		GetType() string
 
-		// TODO rename to "MakeHash"
 		GetHash() (hash.Hash, func())
 
 		// TODO rename to "MakeDigest"

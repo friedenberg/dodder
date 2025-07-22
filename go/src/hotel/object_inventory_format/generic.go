@@ -430,7 +430,7 @@ func getShaForContext(
 func GetShaForContextDebug(
 	f FormatGeneric,
 	c FormatterContext,
-) (sh *Sha, err error) {
+) (digest *Sha, err error) {
 	var sb strings.Builder
 	writer, repool := digests.MakeWriterWithRepool(sha.Env{}, &sb)
 	defer repool()
@@ -441,14 +441,14 @@ func GetShaForContextDebug(
 		return
 	}
 
-	sh = sha.GetPool().Get()
+	digest = sha.GetPool().Get()
 
-	if err = sh.SetDigester(writer); err != nil {
+	if err = digest.SetDigester(writer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ui.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
+	ui.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, digest, &sb)
 
 	return
 }

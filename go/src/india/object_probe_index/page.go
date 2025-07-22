@@ -193,28 +193,28 @@ func (e *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
 
 func (e *page) readCurrentLoc(
 	in interfaces.Digest,
-	r io.Reader,
+	reader io.Reader,
 ) (out Loc, found bool, err error) {
 	if in.IsNull() {
 		err = errors.ErrorWithStackf("empty sha")
 		return
 	}
 
-	sh := sha.GetPool().Get()
-	defer digests.PutDigest(sh)
+	digest := sha.GetPool().Get()
+	defer digests.PutDigest(digest)
 
-	if _, err = sh.ReadFrom(r); err != nil {
+	if _, err = digest.ReadFrom(reader); err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
-	if !digests.Equals(in, sh) {
+	if !digests.Equals(in, digest) {
 		err = io.EOF
 		return
 	}
 
 	var n int64
-	n, err = out.ReadFrom(r)
+	n, err = out.ReadFrom(reader)
 
 	if n > 0 {
 		found = true

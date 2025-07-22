@@ -29,6 +29,7 @@ func (store *Store) MergeCheckedOut(
 ) (commitOptions sku.CommitOptions, err error) {
 	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
 
+	// TODO determine why the internal can ever be null
 	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
 		return
 	}
