@@ -289,7 +289,7 @@ func (store *Store) fetchParentIfNecessary(
 		return
 	}
 
-	sk.Metadata.Mutter().ResetWith(mutter.Metadata.Sha())
+	sk.Metadata.GetMotherDigest().ResetWith(mutter.Metadata.GetSha())
 
 	return
 }

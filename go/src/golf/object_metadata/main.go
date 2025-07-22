@@ -42,11 +42,11 @@ func (metadata *Metadata) GetMetadata() *Metadata {
 	return metadata
 }
 
-func (metadata *Metadata) Sha() *sha.Sha {
+func (metadata *Metadata) GetSha() *sha.Sha {
 	return &metadata.SelfMetadataObjectIdParent
 }
 
-func (metadata *Metadata) Mutter() *sha.Sha {
+func (metadata *Metadata) GetMotherDigest() *sha.Sha {
 	return &metadata.ParentMetadataObjectIdParent
 }
 
@@ -291,8 +291,8 @@ func (metadata *Metadata) AddComment(f string, vals ...any) {
 func (metadata *Metadata) SetMutter(mg Getter) (err error) {
 	mutter := mg.GetMetadata()
 
-	if err = metadata.Mutter().SetDigest(
-		mutter.Sha(),
+	if err = metadata.GetMotherDigest().SetDigest(
+		mutter.GetSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

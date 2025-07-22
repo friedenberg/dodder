@@ -190,7 +190,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaParentMetadataParentObjectId:
-		if n, err = bf.writeSha(sk.Metadata.Mutter(), true); err != nil {
+		if n, err = bf.writeSha(sk.Metadata.GetMotherDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -202,7 +202,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaMetadataParentObjectId:
-		if n, err = bf.writeSha(sk.Metadata.Sha(), false); err != nil {
+		if n, err = bf.writeSha(sk.Metadata.GetSha(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -71,7 +71,7 @@ func (s V0) WriteInventoryListBlob(
 	)
 
 	for sk := range o.All() {
-		if sk.Metadata.Sha().IsNull() {
+		if sk.Metadata.GetSha().IsNull() {
 			err = errors.ErrorWithStackf("empty sha: %s", sk)
 			return
 		}

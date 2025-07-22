@@ -157,7 +157,7 @@ func (s *Transacted) GetGenre() interfaces.Genre {
 }
 
 func (s *Transacted) IsNew() bool {
-	return s.Metadata.Mutter().IsNull()
+	return s.Metadata.GetMotherDigest().IsNull()
 }
 
 func (s *Transacted) CalculateObjectShaDebug() (err error) {
@@ -206,7 +206,7 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 		transacted.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadataObjectIdParent(),
-			transacted.Metadata.Sha(),
+			transacted.Metadata.GetSha(),
 		),
 	)
 
@@ -234,11 +234,11 @@ func (transacted *Transacted) SetDormant(v bool) {
 }
 
 func (transacted *Transacted) SetObjectSha(v interfaces.Digest) (err error) {
-	return transacted.GetMetadata().Sha().SetDigest(v)
+	return transacted.GetMetadata().GetSha().SetDigest(v)
 }
 
 func (transacted *Transacted) GetObjectSha() interfaces.Digest {
-	return transacted.GetMetadata().Sha()
+	return transacted.GetMetadata().GetSha()
 }
 
 func (transacted *Transacted) GetBlobSha() interfaces.Digest {

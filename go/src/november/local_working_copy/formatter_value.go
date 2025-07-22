@@ -118,7 +118,7 @@ func (local *Repo) MakeFormatFunc(
 
 	case "sha":
 		output = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(writer, tl.Metadata.Sha())
+			_, err = fmt.Fprintln(writer, tl.Metadata.GetSha())
 			return
 		}
 
@@ -127,8 +127,8 @@ func (local *Repo) MakeFormatFunc(
 			_, err = fmt.Fprintf(
 				writer,
 				"%s -> %s\n",
-				tl.Metadata.Sha(),
-				tl.Metadata.Mutter(),
+				tl.Metadata.GetSha(),
+				tl.Metadata.GetMotherDigest(),
 			)
 			return
 		}
@@ -615,7 +615,7 @@ func (local *Repo) MakeFormatFunc(
 
 	case "mutter-sha":
 		output = func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(writer, z.Metadata.Mutter())
+			_, err = fmt.Fprintln(writer, z.Metadata.GetMotherDigest())
 			return
 		}
 
@@ -635,7 +635,7 @@ func (local *Repo) MakeFormatFunc(
 		p := local.PrinterTransacted()
 
 		output = func(z *sku.Transacted) (err error) {
-			if z.Metadata.Mutter().IsNull() {
+			if z.Metadata.GetMotherDigest().IsNull() {
 				return
 			}
 

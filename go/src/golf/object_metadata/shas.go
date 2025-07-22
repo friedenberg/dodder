@@ -23,7 +23,7 @@ type Sha struct {
 	string
 }
 
-// TODO make this a map
+// TODO consider moving all non-essential digests to a separate key-value store
 type Shas struct {
 	Blob                         sha.Sha
 	SelfMetadata                 sha.Sha
@@ -32,54 +32,61 @@ type Shas struct {
 	ParentMetadataObjectIdParent sha.Sha
 }
 
-func (s *Shas) Reset() {
-	s.Blob.Reset()
-	s.SelfMetadata.Reset()
-	s.SelfMetadataWithoutTai.Reset()
-	s.SelfMetadataObjectIdParent.Reset()
-	s.ParentMetadataObjectIdParent.Reset()
+func (shas *Shas) Reset() {
+	shas.Blob.Reset()
+	shas.SelfMetadata.Reset()
+	shas.SelfMetadataWithoutTai.Reset()
+	shas.SelfMetadataObjectIdParent.Reset()
+	shas.ParentMetadataObjectIdParent.Reset()
 }
 
-func (dst *Shas) ResetWith(src *Shas) {
-	dst.Blob.ResetWith(&src.Blob)
-	dst.SelfMetadata.ResetWith(&src.SelfMetadata)
-	dst.SelfMetadataWithoutTai.ResetWith(&src.SelfMetadataWithoutTai)
-	dst.SelfMetadataObjectIdParent.ResetWith(&src.SelfMetadataObjectIdParent)
-	dst.ParentMetadataObjectIdParent.ResetWith(&src.ParentMetadataObjectIdParent)
+func (shas *Shas) ResetWith(src *Shas) {
+	shas.Blob.ResetWith(&src.Blob)
+	shas.SelfMetadata.ResetWith(&src.SelfMetadata)
+	shas.SelfMetadataWithoutTai.ResetWith(&src.SelfMetadataWithoutTai)
+	shas.SelfMetadataObjectIdParent.ResetWith(&src.SelfMetadataObjectIdParent)
+	shas.ParentMetadataObjectIdParent.ResetWith(
+		&src.ParentMetadataObjectIdParent,
+	)
 }
 
-func (s *Shas) String() string {
+func (shas *Shas) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &s.Blob)
-	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadata, &s.SelfMetadata)
-	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadataWithouTai, &s.SelfMetadataWithoutTai)
+	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &shas.Blob)
+	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadata, &shas.SelfMetadata)
+	fmt.Fprintf(
+		&sb,
+		"%s: %s\n",
+		ShaKeySelfMetadataWithouTai,
+		&shas.SelfMetadataWithoutTai,
+	)
 
 	return sb.String()
 }
 
-func (s *Shas) Add(k, v string) (err error) {
+func (shas *Shas) Add(k, v string) (err error) {
 	switch k {
 	case ShaKeySelfMetadata:
-		if err = s.SelfMetadata.Set(v); err != nil {
+		if err = shas.SelfMetadata.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case ShaKeySelfMetadataWithouTai:
-		if err = s.SelfMetadataWithoutTai.Set(v); err != nil {
+		if err = shas.SelfMetadataWithoutTai.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case ShaKeySelfMetadataObjectIdParent:
-		if err = s.SelfMetadataObjectIdParent.Set(v); err != nil {
+		if err = shas.SelfMetadataObjectIdParent.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case ShaKeyParentMetadataObjectIdParent:
-		if err = s.ParentMetadataObjectIdParent.Set(v); err != nil {
+		if err = shas.ParentMetadataObjectIdParent.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

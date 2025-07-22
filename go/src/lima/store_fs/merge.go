@@ -30,7 +30,7 @@ func (store *Store) MergeCheckedOut(
 	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
 
 	// TODO determine why the internal can ever be null
-	if co.GetSku().Metadata.Sha().IsNull() || allowMergeConflicts {
+	if co.GetSku().Metadata.GetSha().IsNull() || allowMergeConflicts {
 		return
 	}
 
@@ -38,8 +38,8 @@ func (store *Store) MergeCheckedOut(
 
 	// TODO add checkout_mode.BlobOnly
 	if digests.Equals(
-		co.GetSku().Metadata.Sha(),
-		co.GetSkuExternal().Metadata.Sha(),
+		co.GetSku().Metadata.GetSha(),
+		co.GetSkuExternal().Metadata.GetSha(),
 	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return

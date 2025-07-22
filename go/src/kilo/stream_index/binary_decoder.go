@@ -315,13 +315,13 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.ShaParentMetadataParentObjectId:
-		if _, err = sk.Metadata.Mutter().ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadata.GetMotherDigest().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ShaMetadataParentObjectId:
-		if _, err = sk.Metadata.Sha().ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadata.GetSha().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

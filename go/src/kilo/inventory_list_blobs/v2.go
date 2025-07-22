@@ -206,7 +206,7 @@ func (coder V2ObjectCoder) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.Sha().IsNull() {
+	if object.Metadata.GetSha().IsNull() {
 		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
 		return
 	}

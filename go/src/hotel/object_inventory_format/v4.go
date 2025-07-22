@@ -210,11 +210,11 @@ func (f v4) FormatPersistentMetadata(
 		}
 	}
 
-	if !metadata.Mutter().IsNull() && !o.ExcludeMutter {
+	if !metadata.GetMotherDigest().IsNull() && !o.ExcludeMutter {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			multiWriter,
 			keyShasMutterMetadataKennungMutter.String(),
-			metadata.Mutter().String(),
+			metadata.GetMotherDigest().String(),
 		)
 		n += int64(n1)
 
