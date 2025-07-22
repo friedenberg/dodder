@@ -1,9 +1,9 @@
 package box
 
 import (
-	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -128,9 +128,12 @@ func getScannerTestCases() []scannerTestCase {
 				),
 				makeTestSeq(TokenTypeOperator, " "),
 				makeTestSeq(
-					TokenTypeIdentifier, "url",
-					TokenTypeOperator, "=",
-					TokenTypeLiteral, `https://support."mozilla.org/products/firefox`,
+					TokenTypeIdentifier,
+					"url",
+					TokenTypeOperator,
+					"=",
+					TokenTypeLiteral,
+					`https://support."mozilla.org/products/firefox`,
 				),
 			},
 		},
@@ -143,7 +146,9 @@ func TestTokenScanner(t1 *testing.T) {
 	var scanner Scanner
 
 	for _, tc := range getScannerTestCases() {
-		scanner.Reset(strings.NewReader(tc.input))
+		reader, repool := pool.GetStringReader(tc.input)
+		defer repool()
+		scanner.Reset(reader)
 
 		actual := make([]testSeq, 0)
 

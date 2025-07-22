@@ -8,13 +8,16 @@ import (
 	"unicode"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 func TestRingBufferReader(t1 *testing.T) {
 	t := ui.T{T: t1}
 	expected := "all that content"
-	sut := MakeRingBuffer(strings.NewReader(expected), 0)
+	reader, repool := pool.GetStringReader(expected)
+	defer repool()
+	sut := MakeRingBuffer(reader, 0)
 
 	var sb strings.Builder
 
@@ -365,8 +368,9 @@ func TestRingBufferDefaultReadFrom(t1 *testing.T) {
 
 func TestRingBufferPeekUpto2(t1 *testing.T) {
 	t := ui.T{T: t1}
-	input := strings.NewReader("test with words")
-	sut := MakeRingBuffer(input, 0)
+	reader, repool := pool.GetStringReader("test with words")
+	defer repool()
+	sut := MakeRingBuffer(reader, 0)
 
 	{
 		readable, err := sut.PeekUptoAndIncluding(' ')
@@ -394,8 +398,9 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 
 func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
 	t := ui.T{T: t1}
-	input := strings.NewReader(" test with words")
-	rb := MakeRingBuffer(input, 0)
+	reader, repool := pool.GetStringReader(" test with words")
+	defer repool()
+	rb := MakeRingBuffer(reader, 0)
 	sut := MakeRingBufferScanner(rb)
 
 	{
@@ -446,8 +451,9 @@ func TestRingBufferAdvanceToFirstMatchLong(t1 *testing.T) {
 		sb.WriteString(" x")
 	}
 
-	input := strings.NewReader(sb.String())
-	rb := MakeRingBuffer(input, 0)
+	reader, repool := pool.GetStringReader(sb.String())
+	defer repool()
+	rb := MakeRingBuffer(reader, 0)
 	sut := MakeRingBufferScanner(rb)
 
 	rb.Fill()

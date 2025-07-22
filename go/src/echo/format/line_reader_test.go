@@ -2,9 +2,9 @@ package format
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -15,7 +15,8 @@ func TestLineReaderOneReaderHappy(t1 *testing.T) {
 
 	input := "test string\n"
 	test_value := values.MakeString("test string")
-	r := strings.NewReader(input)
+	r, repool := pool.GetStringReader(input)
+	defer repool()
 	sut := MakeLineReaderConsumeEmpty(
 		test_value.Match,
 	)
@@ -36,7 +37,8 @@ func TestLineReaderOneReaderSad(t1 *testing.T) {
 
 	input := "test string sad\n"
 	test_value := values.MakeString("test string")
-	r := strings.NewReader(input)
+	r, repool := pool.GetStringReader(input)
+	defer repool()
 	sut := MakeLineReaderConsumeEmpty(
 		test_value.Match,
 	)
@@ -60,7 +62,8 @@ func TestLineReaderTwoReaders(t1 *testing.T) {
 
 	input := fmt.Sprintf("%s\n%s\n", test_value_one, test_value_two)
 
-	r := strings.NewReader(input)
+	r, repool := pool.GetStringReader(input)
+	defer repool()
 	sut := MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterateStrict(
 			test_value_one.Match,
@@ -87,7 +90,8 @@ func TestLineReaderTwoReadersSad(t1 *testing.T) {
 
 	input := fmt.Sprintf("%s\n%s sad\n", test_value_one, test_value_two)
 
-	r := strings.NewReader(input)
+	r, repool := pool.GetStringReader(input)
+	defer repool()
 	sut := MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterateStrict(
 			test_value_one.Match,

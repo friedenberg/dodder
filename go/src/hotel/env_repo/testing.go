@@ -4,10 +4,10 @@ package env_repo
 
 import (
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -71,7 +71,9 @@ func MakeTesting(
 			)
 		}
 
-		_, err = io.Copy(writeCloser, strings.NewReader(content))
+		reader, repool := pool.GetStringReader(content)
+		defer repool()
+		_, err = io.Copy(writeCloser, reader)
 		if err != nil {
 			errors.ContextCancelWithErrorAndFormat(
 				t.Context,

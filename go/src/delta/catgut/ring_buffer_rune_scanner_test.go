@@ -1,9 +1,9 @@
 package catgut
 
 import (
-	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"github.com/google/go-cmp/cmp"
 )
@@ -12,7 +12,9 @@ func TestRingBufferRuneScanner(t1 *testing.T) {
 	t := ui.T{T: t1}
 	input := `- [six/wow] seis`
 
-	rb := MakeRingBuffer(strings.NewReader(input), 0)
+	reader, repool := pool.GetStringReader(input)
+	defer repool()
+	rb := MakeRingBuffer(reader, 0)
 	sut1 := MakeRingBufferRuneScanner(rb)
 	sut2 := MakeRingBufferRuneScanner(rb)
 

@@ -9,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
@@ -78,7 +79,9 @@ func (f Dependencies) writeCommonMetadataFormat(
 	m := c.GetMetadata()
 
 	if m.Description.String() != "" || !c.DoNotWriteEmptyDescription {
-		sr := bufio.NewReader(strings.NewReader(m.Description.String()))
+		reader, repool := pool.GetStringReader(m.Description.String())
+		defer repool()
+		sr := bufio.NewReader(reader)
 
 		for {
 			var line string

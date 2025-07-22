@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
@@ -56,8 +57,10 @@ func readFormat(
 
 	t := t1.Skip(1)
 
+	reader, repool := pool.GetStringReader(contents)
+	defer repool()
 	n, err := format.ParseMetadata(
-		strings.NewReader(contents),
+		reader,
 		&zt,
 	)
 	if err != nil {
@@ -354,7 +357,9 @@ func writeFormat(
 	options object_metadata.TextFormatterOptions,
 ) (out string) {
 	hash := sha256.New()
-	_, err := io.Copy(hash, strings.NewReader(blobBody))
+	reader, repool := pool.GetStringReader(blobBody)
+	defer repool()
+	_, err := io.Copy(hash, reader)
 	if err != nil {
 		t.Fatalf("%s", err)
 	}

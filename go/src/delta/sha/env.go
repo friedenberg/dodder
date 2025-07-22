@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -64,7 +63,8 @@ func FromStringContent(s string) interfaces.Digest {
 	hash, repool := pool.GetSha256Hash()
 	defer repool()
 
-	stringReader := strings.NewReader(s)
+	stringReader, repool2 := pool.GetStringReader(s)
+	defer repool2()
 
 	if _, err := io.Copy(hash, stringReader); err != nil {
 		errors.PanicIfError(err)

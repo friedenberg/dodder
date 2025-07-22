@@ -2,9 +2,9 @@ package object_metadata
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -35,7 +35,9 @@ body
 	var n int64
 	var err error
 
-	n, err = r.ReadFrom(strings.NewReader(in))
+	reader, repool := pool.GetStringReader(in)
+	defer repool()
+	n, err = r.ReadFrom(reader)
 
 	if n != nExpected {
 		t.Errorf("expected to read %d but read %d", nExpected, n)
@@ -82,7 +84,9 @@ metadatei
 	var n int64
 	var err error
 
-	n, err = r.ReadFrom(strings.NewReader(in))
+	reader, repool := pool.GetStringReader(in)
+	defer repool()
+	n, err = r.ReadFrom(reader)
 
 	if n != nExpected {
 		t.Errorf("expected to read %d but read %d", nExpected, n)

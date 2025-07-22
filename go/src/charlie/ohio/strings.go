@@ -3,9 +3,9 @@ package ohio
 import (
 	"bytes"
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
 func WriteKeySpaceValueNewlineString(
@@ -20,12 +20,12 @@ func WriteKeySpaceValueNewline(
 	key string, value []byte,
 ) (n int64, err error) {
 	var (
-		n1           int64
-		stringReader *strings.Reader
-		byteReader   *bytes.Reader
+		n1         int64
+		byteReader *bytes.Reader
 	)
 
-	stringReader = strings.NewReader(key)
+	stringReader, repool1 := pool.GetStringReader(key)
+	defer repool1()
 	n1, err = stringReader.WriteTo(writer)
 	n += n1
 
@@ -34,9 +34,10 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	stringReader = strings.NewReader(" ")
+	stringReader2, repool2 := pool.GetStringReader(" ")
+	defer repool2()
 
-	n1, err = stringReader.WriteTo(writer)
+	n1, err = stringReader2.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -54,9 +55,10 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	stringReader = strings.NewReader("\n")
+	stringReader3, repool3 := pool.GetStringReader("\n")
+	defer repool3()
 
-	n1, err = stringReader.WriteTo(writer)
+	n1, err = stringReader3.WriteTo(writer)
 	n += n1
 
 	if err != nil {

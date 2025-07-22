@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"io"
 	"sort"
-	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -99,7 +99,9 @@ func TestBigMac(t1 *testing.T) {
 
 	comp := zstd.NewWriter(dataComp)
 
-	io.Copy(comp, strings.NewReader(dataRaw))
+	reader, repool := pool.GetStringReader(dataRaw)
+	defer repool()
+	io.Copy(comp, reader)
 
 	comp.Flush()
 
@@ -141,8 +143,10 @@ func TestOffsets(t1 *testing.T) {
 	f := object_inventory_format.Default()
 	op := object_inventory_format.Options{Tai: true}
 
+	reader, repool := pool.GetStringReader(dataRaw)
+	defer repool()
 	scanner := makeScanner(
-		strings.NewReader(dataRaw),
+		reader,
 		f,
 		op,
 	)
@@ -195,7 +199,8 @@ func TestOffsets(t1 *testing.T) {
 
 		sk = &sku.Transacted{}
 		_, err = f.ParsePersistentMetadata(rb, sk, op)
-		// t.AssertErrorEquals(objekte_format.ErrV4ExpectedSpaceSeparatedKey, err)
+		// t.AssertErrorEquals(objekte_format.ErrV4ExpectedSpaceSeparatedKey,
+		// err)
 
 		if !s.Equals(sk) {
 			// t.Logf("\n%s", re)

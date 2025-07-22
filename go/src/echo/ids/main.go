@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/box"
 )
 
@@ -35,7 +36,9 @@ type Index struct{}
 
 func MakeObjectId(v string) (objectId *ObjectId, err error) {
 	var boxScanner box.Scanner
-	boxScanner.Reset(strings.NewReader(v))
+	reader, repool := pool.GetStringReader(v)
+	defer repool()
+	boxScanner.Reset(reader)
 
 	objectId = &ObjectId{}
 

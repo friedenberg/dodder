@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -92,7 +93,9 @@ func (json *Json) ToTransacted(
 
 	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = io.Copy(writeCloser, strings.NewReader(json.BlobString)); err != nil {
+	reader, repool := pool.GetStringReader(json.BlobString)
+	defer repool()
+	if _, err = io.Copy(writeCloser, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

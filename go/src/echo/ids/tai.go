@@ -11,6 +11,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -137,7 +138,9 @@ func (t *Tai) SetFromRFC3339(v string) (err error) {
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
 
-	delimiterReader := delim_io.Make('.', strings.NewReader(v))
+	reader, repool := pool.GetStringReader(v)
+	defer repool()
+	delimiterReader := delim_io.Make('.', reader)
 	defer delim_io.PutReader(delimiterReader)
 
 	idx := 0
