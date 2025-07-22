@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
@@ -327,16 +328,19 @@ type blobReaderFactory struct {
 }
 
 func (arf blobReaderFactory) BlobReader(
-	s sha.Sha,
-) (r interfaces.ReadCloseDigester, err error) {
+	digest sha.Sha,
+) (readCloser interfaces.ReadCloseDigester, err error) {
 	var v string
 	var ok bool
 
-	if v, ok = arf.blobs[s.String()]; !ok {
-		arf.t.Fatalf("request for non-existent blob: %s", s)
+	if v, ok = arf.blobs[digest.String()]; !ok {
+		arf.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
-	r = sha.MakeNopReadCloser(io.NopCloser(strings.NewReader(v)))
+	readCloser = digests.MakeNopReadCloser(
+		sha.Env{},
+		io.NopCloser(strings.NewReader(v)),
+	)
 
 	return
 }

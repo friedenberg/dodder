@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -395,7 +396,7 @@ func WriteMetadata(
 	f FormatGeneric,
 	c FormatterContext,
 ) (sh *Sha, err error) {
-	writer := sha.MakeWriter(sha.Env{}, w)
+	writer := digests.MakeWriter(sha.Env{}, w)
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {
@@ -430,7 +431,7 @@ func GetShaForContextDebug(
 	c FormatterContext,
 ) (sh *Sha, err error) {
 	var sb strings.Builder
-	writer := sha.MakeWriter(sha.Env{}, &sb)
+	writer := digests.MakeWriter(sha.Env{}, &sb)
 
 	_, err = f.WriteMetadataTo(writer, c)
 	if err != nil {

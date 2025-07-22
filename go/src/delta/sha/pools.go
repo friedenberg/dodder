@@ -12,7 +12,6 @@ import (
 var (
 	poolHash256 interfaces.PoolValue[hash.Hash]
 	poolSha     interfaces.Pool[Sha, *Sha]
-	poolWriter  interfaces.Pool[writer, *writer]
 )
 
 func init() {
@@ -31,21 +30,11 @@ func init() {
 			sh.Reset()
 		},
 	)
-
-	poolWriter = pool.MakePool(
-		nil,
-		func(writer *writer) {
-			writer.Reset(Env{}, nil)
-		},
-	)
 }
 
+// TODO replace with digests.GetDigest
 func GetPool() interfaces.Pool[Sha, *Sha] {
 	return poolSha
-}
-
-func GetPoolWriter() interfaces.Pool[writer, *writer] {
-	return poolWriter
 }
 
 var Resetter resetter

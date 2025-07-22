@@ -18,6 +18,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -28,6 +29,9 @@ type remoteSftpBlobStore struct {
 	buckets []int
 
 	config blob_store_configs.ConfigSFTPRemotePath
+
+	// TODO move to config
+	envDigest sha.Env
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -234,21 +238,24 @@ func (blobStore *remoteSftpBlobStore) Mover() (mover interfaces.Mover, err error
 }
 
 func (blobStore *remoteSftpBlobStore) BlobReader(
-	sh interfaces.Digest,
+	digest interfaces.Digest,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
-	if sh.GetDigest().IsNull() {
-		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+	if digest.GetDigest().IsNull() {
+		readCloser = digests.MakeNopReadCloser(
+			blobStore.envDigest,
+			io.NopCloser(bytes.NewReader(nil)),
+		)
 		return
 	}
 
-	remotePath := blobStore.remotePathForSha(sh)
+	remotePath := blobStore.remotePathForSha(digest)
 
 	var remoteFile *sftp.File
 
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(sh.GetDigest())
+			shCopy.ResetWithShaLike(digest.GetDigest())
 
 			err = env_dir.ErrBlobMissing{
 				Digester: shCopy,
@@ -260,7 +267,7 @@ func (blobStore *remoteSftpBlobStore) BlobReader(
 		return
 	}
 
-	sh1 := sha.MustWithDigest(sh)
+	sh1 := sha.MustWithDigest(digest)
 	blobStore.blobCacheLock.Lock()
 	blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
 	blobStore.blobCacheLock.Unlock()

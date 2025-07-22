@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -15,10 +16,12 @@ import (
 )
 
 type localHashBucketed struct {
-	buckets  []int
-	config   blob_store_configs.ConfigLocalHashBucketed
-	basePath string
-	tempFS   env_dir.TemporaryFS
+	// TODO move to config
+	envDigest sha.Env
+	buckets   []int
+	config    blob_store_configs.ConfigLocalHashBucketed
+	basePath  string
+	tempFS    env_dir.TemporaryFS
 }
 
 func makeLocalHashBucketed(
@@ -78,7 +81,7 @@ func (blobStore localHashBucketed) HasBlob(
 	return
 }
 
-// TODO add support for other bucket sizes
+// TODO add support for other bucket sizes and digest types
 func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Digest] {
 	return func(yield func(interfaces.Digest, error) bool) {
 		var sh sha.Sha
@@ -133,15 +136,18 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore localHashBucketed) BlobReader(
-	sh interfaces.Digest,
-) (readeCloser interfaces.ReadCloseDigester, err error) {
-	if sh.GetDigest().IsNull() {
-		readeCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+	digest interfaces.Digest,
+) (readCloser interfaces.ReadCloseDigester, err error) {
+	if digest.GetDigest().IsNull() {
+		readCloser = digests.MakeNopReadCloser(
+			blobStore.envDigest,
+			io.NopCloser(bytes.NewReader(nil)),
+		)
 		return
 	}
 
-	if readeCloser, err = blobStore.blobReaderFrom(
-		sh,
+	if readCloser, err = blobStore.blobReaderFrom(
+		digest,
 		blobStore.basePath,
 	); err != nil {
 		if !env_dir.IsErrBlobMissing(err) {
@@ -173,16 +179,19 @@ func (blobStore localHashBucketed) blobWriterTo(
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
-	sh interfaces.Digest,
+	digest interfaces.Digest,
 	path string,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
-	if sh.GetDigest().IsNull() {
-		readCloser = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+	if digest.IsNull() {
+		readCloser = digests.MakeNopReadCloser(
+			blobStore.envDigest,
+			io.NopCloser(bytes.NewReader(nil)),
+		)
 		return
 	}
 
 	path = env_dir.MakeHashBucketPathFromSha(
-		sh.GetDigest(),
+		digest.GetDigest(),
 		blobStore.buckets,
 		path,
 	)
@@ -193,7 +202,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(sh.GetDigest())
+			shCopy.ResetWithShaLike(digest.GetDigest())
 
 			err = env_dir.ErrBlobMissing{
 				Digester: shCopy,

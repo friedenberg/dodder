@@ -11,7 +11,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 )
 
+var _ = digests.RegisterEnv(Env{})
+
 type Env struct{}
+
+func (env Env) GetType() string {
+	return Type
+}
 
 func (env Env) GetHash() hash.Hash {
 	return poolHash256.Get()
@@ -44,7 +50,7 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 }
 
 func (env Env) MakeWriteDigester() interfaces.WriteDigester {
-	return MakeWriter(env, nil)
+	return digests.MakeWriter(env, nil)
 }
 
 // TODO switch to being functions on Env that return interfaces.Digest

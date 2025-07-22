@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	Type       = "sha256"
 	ByteSize   = 32
 	NullString = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 	Null       = NullString
@@ -75,7 +76,7 @@ func (digest *Sha) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (digest *Sha) GetType() string {
-	return "sha256"
+	return Type
 }
 
 func (digest *Sha) GetDigest() interfaces.Digest {

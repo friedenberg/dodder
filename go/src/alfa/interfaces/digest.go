@@ -24,9 +24,13 @@ type (
 	}
 
 	EnvDigest interface {
+		GetType() string
+
+		// TODO rename to "MakeHash"
 		GetHash() hash.Hash
 		PutHash(hash.Hash)
 
+		// TODO rename to "MakeDigest"
 		GetDigest() Digest
 		PutDigest(Digest)
 

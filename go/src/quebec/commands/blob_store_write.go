@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -134,7 +135,7 @@ func (cmd BlobStoreWrite) doOne(
 	var writeCloser interfaces.WriteCloseDigester
 
 	if cmd.Check {
-		writeCloser = sha.MakeWriter(sha.Env{}, nil)
+		writeCloser = digests.MakeWriter(sha.Env{}, nil)
 	} else {
 		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
