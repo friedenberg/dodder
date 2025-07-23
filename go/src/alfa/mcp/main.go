@@ -31,6 +31,16 @@ type ResourcesListResult struct {
 	Resources []Resource `json:"resources"`
 }
 
+type ResourcesReadParams struct {
+	URI string `json:"uri"`
+}
+
+type ResourceContent struct {
+	URI      string `json:"uri"`
+	MimeType string `json:"mimeType,omitempty"`
+	Text     string `json:"text,omitempty"`
+}
+
 type ResourcesReadResult struct {
-	Resources []Resource `json:"resources"`
+	Contents []ResourceContent `json:"contents"`
 }

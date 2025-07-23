@@ -34,7 +34,16 @@ func (r Request) Vars() map[string]string {
 
 type Response struct {
 	StatusCode int
+	headers    http.Header
 	Body       io.ReadCloser
+}
+
+func (response *Response) Headers() http.Header {
+	if response.headers == nil {
+		response.headers = make(http.Header)
+	}
+
+	return response.headers
 }
 
 func (response *Response) ErrorWithStatus(status int, err error) {

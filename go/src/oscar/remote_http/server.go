@@ -410,13 +410,13 @@ func (server *Server) makeHandler(
 			func(ctx interfaces.Context) {
 				response := handler(request)
 
-				// header := responseWriter.Header()
+				header := responseWriter.Header()
 
-				// for key, values := range response.Headers {
-				// 	for _, value := range values {
-				// 		header.Add(key, value)
-				// 	}
-				// }
+				for key, values := range response.Headers() {
+					for _, value := range values {
+						header.Add(key, value)
+					}
+				}
 
 				if response.StatusCode == 0 {
 					response.StatusCode = http.StatusOK

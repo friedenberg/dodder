@@ -20,7 +20,8 @@
       "Bash(nix build:*)",
       "Bash(nix log:*)",
       "Bash(./build/der:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }
