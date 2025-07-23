@@ -186,6 +186,9 @@ func (server *Server) makeRouter(
 	router.HandleFunc("/query/{query}", makeHandler(server.handleGetQuery)).
 		Methods("GET")
 
+	router.HandleFunc("/mcp", makeHandler(server.handleMCP)).
+		Methods("POST")
+
 	{
 		router.HandleFunc(
 			"/inventory_lists",
@@ -775,7 +778,9 @@ func (server *Server) handlePostInventoryList(
 		{
 			var err error
 
-			bufferedReader, repoolBufferedReader := pool.GetBufferedReader(strings.NewReader(boxString))
+			bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
+				strings.NewReader(boxString),
+			)
 			defer repoolBufferedReader()
 
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(

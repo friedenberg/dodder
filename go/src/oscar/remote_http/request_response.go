@@ -1,6 +1,8 @@
 package remote_http
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +11,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"github.com/gorilla/mux"
 )
 
@@ -41,6 +44,29 @@ func (response *Response) ErrorWithStatus(status int, err error) {
 
 func (response *Response) Error(err error) {
 	response.ErrorWithStatus(http.StatusInternalServerError, err)
+}
+
+func (response *Response) MCPError(
+	status int,
+	id any,
+	code int,
+	message string,
+	data any,
+) {
+	response.StatusCode = status
+
+	mcpResponse := mcp.Response{
+		JSONRPC: "2.0",
+		ID:      id,
+		Error: &mcp.Error{
+			Code:    code,
+			Message: message,
+			Data:    data,
+		},
+	}
+
+	responseBytes, _ := json.Marshal(mcpResponse)
+	response.Body = io.NopCloser(bytes.NewReader(responseBytes))
 }
 
 func ReadErrorFromBody(response *http.Response) (err error) {
