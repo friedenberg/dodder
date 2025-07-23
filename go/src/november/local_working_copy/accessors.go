@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 	"code.linenisgreat.com/dodder/go/src/mike/store"
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
@@ -74,7 +74,7 @@ func (local *Repo) GetEnvRepo() env_repo.Env {
 	return local.envRepo
 }
 
-func (local *Repo) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+func (local *Repo) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
 	return local.typedBlobStore.InventoryList
 }
 

@@ -7,9 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 )
 
 type EnvRepo struct{}
@@ -75,19 +74,14 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 
 func (EnvRepo) MakeTypedInventoryListBlobStore(
 	envRepo env_repo.Env,
-) typed_blob_store.InventoryList {
-	objectFormat := object_inventory_format.FormatForVersion(
-		envRepo.GetStoreVersion(),
-	)
-
+) inventory_list_blobs.TypedStore {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		envRepo,
 		options_print.Options{}.WithPrintTai(true),
 	)
 
-	return typed_blob_store.MakeInventoryStore(
+	return inventory_list_blobs.MakeInventoryStore(
 		envRepo,
-		objectFormat,
 		boxFormat,
 	)
 }

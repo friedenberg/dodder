@@ -22,14 +22,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
 func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
 	localRepo repo.LocalRepo,
-	typedBlobStore typed_blob_store.InventoryList,
+	typedBlobStore inventory_list_blobs.TypedStore,
 ) *client {
 	client := &client{
 		envUI: envUI,
@@ -50,7 +49,7 @@ type client struct {
 	configImmutable genesis_configs.TypedConfigPublic
 	http            http.Client
 	localRepo       repo.LocalRepo
-	typedBlobStore  typed_blob_store.InventoryList
+	typedBlobStore  inventory_list_blobs.TypedStore
 
 	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
@@ -118,7 +117,7 @@ func (client *client) GetInventoryListStore() sku.InventoryListStore {
 	return client
 }
 
-func (client *client) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+func (client *client) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
 	return client.typedBlobStore
 }
 

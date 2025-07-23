@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
@@ -27,7 +27,7 @@ func Make(
 	options ImporterOptions,
 	storeOptions sku.StoreOptions,
 	envRepo env_repo.Env,
-	typedInventoryListBlobStore typed_blob_store.InventoryList,
+	typedInventoryListBlobStore inventory_list_blobs.TypedStore,
 	indexObject sku.IndexObject,
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.RepoStore,
@@ -64,7 +64,7 @@ func Make(
 }
 
 type importer struct {
-	typedInventoryListBlobStore typed_blob_store.InventoryList
+	typedInventoryListBlobStore inventory_list_blobs.TypedStore
 	indexObject                 sku.IndexObject
 	storeExternal               store_workspace.MergeCheckedOut
 	storeObject                 sku.RepoStore

@@ -42,7 +42,7 @@ func (cmd InitArchive) Run(req command.Request) {
 		env_ui.Options{},
 	)
 
-	var repoLayout env_repo.Env
+	var envRepo env_repo.Env
 
 	layoutOptions := env_repo.Options{
 		BasePath:                req.Blob.BasePath,
@@ -52,7 +52,7 @@ func (cmd InitArchive) Run(req command.Request) {
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
@@ -60,5 +60,5 @@ func (cmd InitArchive) Run(req command.Request) {
 		}
 	}
 
-	repoLayout.Genesis(cmd.BigBang)
+	envRepo.Genesis(cmd.BigBang)
 }

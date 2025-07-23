@@ -23,7 +23,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
 type Store struct {
@@ -48,7 +47,7 @@ type inventoryListBlobStore interface {
 	interfaces.LocalBlobStore
 
 	getType() ids.Type
-	getTypedBlobStore() typed_blob_store.InventoryList
+	getTypedBlobStore() inventory_list_blobs.TypedStore
 
 	// TODO rename to ReadOneDigest
 	ReadOneSha(id interfaces.Digest) (object *sku.Transacted, err error)
@@ -62,7 +61,7 @@ type inventoryListBlobStore interface {
 func (store *Store) Initialize(
 	envRepo env_repo.Env,
 	clock ids.Clock,
-	typedBlobStore typed_blob_store.InventoryList,
+	typedBlobStore inventory_list_blobs.TypedStore,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
@@ -131,7 +130,7 @@ func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
-func (store *Store) GetTypedInventoryListBlobStore() typed_blob_store.InventoryList {
+func (store *Store) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
 	return store.getTypedBlobStore()
 }
 

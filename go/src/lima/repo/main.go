@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
 // TODO explore permissions for who can read / write from the inventory list
@@ -18,7 +18,7 @@ type Repo interface {
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.RepoStore
-	GetTypedInventoryListBlobStore() typed_blob_store.InventoryList
+	GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(
