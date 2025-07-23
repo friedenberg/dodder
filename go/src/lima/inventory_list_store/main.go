@@ -140,18 +140,10 @@ func (store *Store) Flush() (err error) {
 }
 
 func (store *Store) FormatForVersion(
-	sv interfaces.StoreVersion,
+	storeVersion interfaces.StoreVersion,
 ) sku.ListFormat {
 	if store_version.LessOrEqual(
-		sv,
-		store_version.V6,
-	) {
-		return inventory_list_blobs.MakeV0(
-			store.object_format,
-			store.options,
-		)
-	} else if store_version.LessOrEqual(
-		sv,
+		storeVersion,
 		store_version.V9,
 	) {
 		return inventory_list_blobs.V1{
