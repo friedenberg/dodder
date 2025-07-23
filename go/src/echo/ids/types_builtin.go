@@ -11,15 +11,16 @@ const (
 	// latest
 
 	// keep sorted
+	TypeInventoryListJsonV0                   = "!inventory_list-json-v0"
 	TypeInventoryListV0                       = "!inventory_list-v0"
 	TypeInventoryListV1                       = "!inventory_list-v1"
 	TypeInventoryListV2                       = "!inventory_list-v2"
 	TypeInventoryListVCurrent                 = TypeInventoryListV2
 	TypeLuaTagV1                              = "!lua-tag-v1"
 	TypeLuaTagV2                              = "!lua-tag-v2"
-	TypeTomlBlobStoreConfigV0                 = "!toml-blob_store_config-v0"
 	TypeTomlBlobStoreConfigSftpExplicitV0     = "!toml-blob_store_config_sftp-explicit-v0"
 	TypeTomlBlobStoreConfigSftpViaSSHConfigV0 = "!toml-blob_store_config_sftp-ssh_config-v0"
+	TypeTomlBlobStoreConfigV0                 = "!toml-blob_store_config-v0"
 	TypeTomlConfigImmutableV1                 = "!toml-config-immutable-v1"
 	TypeTomlConfigImmutableV2                 = "!toml-config-immutable-v2"
 	TypeTomlConfigV0                          = "!toml-config-v0"

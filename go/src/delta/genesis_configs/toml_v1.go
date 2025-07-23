@@ -55,6 +55,10 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	}
 }
 
+func (config *TomlV1Common) SetInventoryListTypeString(value string) {
+	config.InventoryListType = value
+}
+
 func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
 	return config
 }

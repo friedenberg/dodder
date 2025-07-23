@@ -18,12 +18,13 @@ import (
 )
 
 type InventoryList struct {
-	envRepo      env_repo.Env
-	objectFormat object_inventory_format.Format
-	boxFormat    *box_format.BoxTransacted
-	v0           inventory_list_blobs.V0
-	v1           inventory_list_blobs.V1
-	v2           inventory_list_blobs.V2
+	envRepo   env_repo.Env
+	boxFormat *box_format.BoxTransacted
+
+	// TODO remove V0
+	v0 inventory_list_blobs.V0
+	v1 inventory_list_blobs.V1
+	v2 inventory_list_blobs.V2
 
 	objectCoders triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
 	// TODO rewrite these as simple bufferedreader decoders and have a utility
@@ -38,10 +39,9 @@ func MakeInventoryStore(
 ) InventoryList {
 	objectOptions := object_inventory_format.Options{Tai: true}
 
-	s := InventoryList{
-		envRepo:      dirLayout,
-		objectFormat: objectFormat,
-		boxFormat:    boxFormat,
+	store := InventoryList{
+		envRepo:   dirLayout,
+		boxFormat: boxFormat,
 		v0: inventory_list_blobs.MakeV0(
 			objectFormat,
 			objectOptions,
@@ -59,70 +59,33 @@ func MakeInventoryStore(
 		},
 	}
 
-	s.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted](
+	store.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted](
 		map[string]interfaces.CoderBufferedReadWriter[*sku.Transacted]{
 			"": inventory_list_blobs.V0ObjectCoder{
-				V0: s.v0,
+				V0: store.v0,
 			},
-			ids.TypeInventoryListV1: s.v1.V1ObjectCoder,
-			ids.TypeInventoryListV2: s.v2.V2ObjectCoder,
+			ids.TypeInventoryListV1: store.v1.V1ObjectCoder,
+			ids.TypeInventoryListV2: store.v2.V2ObjectCoder,
 		},
 	)
 
-	s.streamDecoders = map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]{
+	store.streamDecoders = map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]{
 		"": inventory_list_blobs.V0IterDecoder{
-			V0: s.v0,
+			V0: store.v0,
 		},
 		ids.TypeInventoryListV1: inventory_list_blobs.V1IterDecoder{
-			V1: s.v1,
+			V1: store.v1,
 		},
 		ids.TypeInventoryListV2: inventory_list_blobs.V2IterDecoder{
-			V2: s.v2,
+			V2: store.v2,
 		},
 	}
 
-	return s
-}
-
-func (typedBlobStore InventoryList) GetCommonStore() sku.BlobStore[*sku.List] {
-	return typedBlobStore
-}
-
-func (typedBlobStore InventoryList) GetObjectFormat() object_inventory_format.Format {
-	return typedBlobStore.objectFormat
+	return store
 }
 
 func (typedBlobStore InventoryList) GetBoxFormat() *box_format.BoxTransacted {
 	return typedBlobStore.boxFormat
-}
-
-func (typedBlobStore InventoryList) GetTransactedWithBlob(
-	inventoryList sku.TransactedGetter,
-) (objectAndBlob sku.TransactedWithBlob[*sku.List], n int64, err error) {
-	objectAndBlob.Transacted = inventoryList.GetSku()
-	blobSha := objectAndBlob.GetBlobSha()
-
-	var readCloser interfaces.ReadCloseDigester
-
-	if readCloser, err = typedBlobStore.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, readCloser)
-
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
-
-	if n, err = typedBlobStore.GetTransactedWithBlobFromReader(
-		&objectAndBlob,
-		bufferedReader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (typedBlobStore InventoryList) GetTransactedWithBlobFromReader(

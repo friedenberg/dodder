@@ -237,14 +237,17 @@ func (transacted *Transacted) SetObjectSha(v interfaces.Digest) (err error) {
 	return transacted.GetMetadata().GetSha().SetDigest(v)
 }
 
+// TODO remove
 func (transacted *Transacted) GetObjectSha() interfaces.Digest {
 	return transacted.GetMetadata().GetSha()
 }
 
+// TODO rename to GetBlobDigest
 func (transacted *Transacted) GetBlobSha() interfaces.Digest {
 	return &transacted.Metadata.Blob
 }
 
+// TODO rename to SetBlobDigest
 func (transacted *Transacted) SetBlobSha(sh interfaces.Digest) error {
 	return transacted.Metadata.Blob.SetDigest(sh)
 }

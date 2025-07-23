@@ -93,3 +93,7 @@ func (config V0Common) GetLockInternalFiles() bool {
 func (config V0Common) GetInventoryListTypeString() string {
 	return ids.TypeInventoryListV0
 }
+
+func (config V0Common) SetInventoryListTypeString(string) {
+	panic(errors.Err405MethodNotAllowed)
+}

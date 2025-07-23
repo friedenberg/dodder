@@ -98,6 +98,7 @@ func (version *Version) Set(p string) (err error) {
 	return
 }
 
+// TODO remove callers and self
 func IsCurrentVersionLessOrEqualToV10() bool {
 	return LessOrEqual(VCurrent, V10)
 }

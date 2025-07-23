@@ -5,6 +5,8 @@ type Borrowed interface {
 	Return()
 }
 
+type FuncRepool func()
+
 type Poolable[T any] any
 
 type PoolablePtr[T any] interface {

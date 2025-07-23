@@ -35,6 +35,7 @@ type (
 	ConfigPrivateMutable interface {
 		ConfigPrivate
 
+		SetInventoryListTypeString(string)
 		// TODO separate into non-method function that uses properties
 		interfaces.CommandComponent
 		SetRepoType(repo_type.Type)

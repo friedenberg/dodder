@@ -6,12 +6,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 // Config used to initialize a repo for the first time
 type BigBang struct {
 	GenesisConfig        *genesis_configs.TypedConfigPrivateMutable
 	TypedBlobStoreConfig *blob_store_configs.TypedMutableConfig
+
+	InventoryListType ids.Type
 
 	Yin                  string
 	Yang                 string
@@ -30,6 +33,12 @@ func (bigBang *BigBang) SetDefaults() {
 
 // TODO switch to flagset wrapper that enforces non-empty descriptions
 func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.Var(
+		&bigBang.InventoryListType,
+		"inventory_list-type",
+		"the type that will be used when creating inventory lists for this repo",
+	)
+
 	flagSet.BoolVar(
 		&bigBang.OverrideXDGWithCwd,
 		"override-xdg-with-cwd",

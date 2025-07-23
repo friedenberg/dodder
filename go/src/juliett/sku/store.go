@@ -61,17 +61,6 @@ type (
 		) (e ExternalLike, err error)
 	}
 
-	// TODO rename or remove
-	BlobStore[T any] interface {
-		GetTransactedWithBlob(
-			sk TransactedGetter,
-		) (common TransactedWithBlob[T], n int64, err error)
-
-		PutTransactedWithBlob(
-			TransactedWithBlob[T],
-		) error
-	}
-
 	BlobCopyResult struct {
 		*Transacted       // may be nil
 		interfaces.Digest // may not be nil

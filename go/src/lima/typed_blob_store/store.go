@@ -8,23 +8,23 @@ import (
 )
 
 type BlobStore[
-	A any,
-	APtr interfaces.Ptr[A],
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
 ] struct {
 	envRepo env_repo.Env
-	Format[A, APtr]
-	resetFunc func(APtr)
+	Format[BLOB, BLOB_PTR]
+	resetFunc func(BLOB_PTR)
 }
 
 func MakeBlobStore[
-	A any,
-	APtr interfaces.Ptr[A],
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
 ](
 	repoLayout env_repo.Env,
-	format Format[A, APtr],
-	resetFunc func(APtr),
-) (blobStore *BlobStore[A, APtr]) {
-	blobStore = &BlobStore[A, APtr]{
+	format Format[BLOB, BLOB_PTR],
+	resetFunc func(BLOB_PTR),
+) (blobStore *BlobStore[BLOB, BLOB_PTR]) {
+	blobStore = &BlobStore[BLOB, BLOB_PTR]{
 		envRepo:   repoLayout,
 		Format:    format,
 		resetFunc: resetFunc,
@@ -33,43 +33,62 @@ func MakeBlobStore[
 	return
 }
 
-func (blobStore *BlobStore[A, APtr]) GetBlob(
-	sh interfaces.Digest,
-) (a APtr, err error) {
-	var rc interfaces.ReadCloseDigester
+func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
+	digest interfaces.Digest,
+) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
+	var readCloser interfaces.ReadCloseDigester
 
-	if rc, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(sh); err != nil {
+	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(
+		digest,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, rc)
+	defer errors.DeferredCloser(&err, readCloser)
 
-	var a1 A
-	a = APtr(&a1)
-	blobStore.resetFunc(a)
+	var blob BLOB
+	blobPtr = BLOB_PTR(&blob)
+	blobStore.resetFunc(blobPtr)
 
-	if _, err = blobStore.DecodeFrom(a, rc); err != nil {
-		err = errors.Wrapf(err, "BlobReader: %q", rc)
+	if _, err = blobStore.DecodeFrom(blobPtr, readCloser); err != nil {
+		err = errors.Wrapf(err, "BlobReader: %q", readCloser)
 		return
 	}
 
-	actual := rc.GetDigest()
+	actual := readCloser.GetDigest()
 
-	if !digests.Equals(actual, sh) {
-		err = errors.ErrorWithStackf("expected sha %s but got %s", sh, actual)
+	if !digests.Equals(actual, digest) {
+		err = errors.ErrorWithStackf(
+			"expected sha %s but got %s",
+			digest,
+			actual,
+		)
+
 		return
+	}
+
+	repool = func() {
+		blobStore.PutBlob(blobPtr)
 	}
 
 	return
 }
 
-func (blobStore *BlobStore[A, APtr]) PutBlob(a APtr) {
+func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
+	digest interfaces.Digest,
+) (a BLOB_PTR, err error) {
+	a, _, err = blobStore.GetBlob2(digest)
+	return
+}
+
+func (blobStore *BlobStore[BLOB, BLOB_PTR]) PutBlob(a BLOB_PTR) {
 	// TODO-P2 implement pool
 }
 
-func (blobStore *BlobStore[A, APtr]) SaveBlobText(
-	o APtr,
+// TODO re-evaluate this strategy
+func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
+	o BLOB_PTR,
 ) (sh interfaces.Digest, n int64, err error) {
 	var writeCloser interfaces.WriteCloseDigester
 

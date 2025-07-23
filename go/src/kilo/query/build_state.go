@@ -2,6 +2,7 @@ package query
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/box"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
@@ -304,9 +305,11 @@ LOOP:
 				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
-			// TODO if this fails, permit a workspace store to try to read this as an
+			// TODO if this fails, permit a workspace store to try to read this
+			// as an
 			// external object ID. And if that fails, try to remove the last two
-			// elements as per the above and read that and force the genre and sigils
+			// elements as per the above and read that and force the genre and
+			// sigils
 			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
 				err = errors.BadRequestf("not a valid object id: %q", seq)
 				return
@@ -471,12 +474,12 @@ func (b *buildState) makeTagOrLuaTag(
 		return
 	}
 
-	sk := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(sk)
+	object := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(object)
 
 	if err = b.builder.objectProbeIndex.ReadOneObjectId(
 		k,
-		sk,
+		object,
 	); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
@@ -487,13 +490,19 @@ func (b *buildState) makeTagOrLuaTag(
 		return
 	}
 
-	var twb sku.TransactedWithBlob[tag_blobs.Blob]
+	var tagBlob tag_blobs.Blob
 
-	if twb, _, err = b.builder.typedBlobStore.Tag.GetTransactedWithBlob(
-		sk,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var repool interfaces.FuncRepool
+
+		if tagBlob, repool, err = b.builder.typedBlobStore.Tag.GetBlob(
+			object,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer repool()
 	}
 
 	var matcherBlob sku.Queryable
@@ -501,7 +510,7 @@ func (b *buildState) makeTagOrLuaTag(
 	{
 		var ok bool
 
-		if matcherBlob, ok = twb.Blob.(sku.Queryable); !ok {
+		if matcherBlob, ok = tagBlob.(sku.Queryable); !ok {
 			return
 		}
 	}

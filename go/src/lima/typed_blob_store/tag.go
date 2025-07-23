@@ -76,146 +76,105 @@ func MakeTagStore(
 	}
 }
 
-func (a Tag) GetCommonStore() sku.BlobStore[tag_blobs.Blob] {
-	return a
-}
-
-func (a Tag) GetTransactedWithBlob(
-	tg sku.TransactedGetter,
-) (twb sku.TransactedWithBlob[tag_blobs.Blob], n int64, err error) {
-	sk := tg.GetSku()
-	tipe := sk.GetType()
-	blobSha := sk.GetBlobSha()
-
-	twb.Transacted = sk.CloneTransacted()
+func (store Tag) GetBlob(
+	object *sku.Transacted,
+) (blobGeneric tag_blobs.Blob, repool interfaces.FuncRepool, err error) {
+	tipe := object.GetType()
+	blobDigest := object.GetBlobSha()
 
 	switch tipe.String() {
 	case "", ids.TypeTomlTagV0:
-		store := a.toml_v0
-		var blob *tag_blobs.V0
-
-		if blob, err = store.GetBlob(blobSha); err != nil {
+		if blobGeneric, repool, err = store.toml_v0.GetBlob2(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		twb.Blob = blob
+		repool = func() { store.toml_v0.PutBlob(blobGeneric.(*tag_blobs.V0)) }
 
 	case ids.TypeTomlTagV1:
-		store := a.toml_v1
 		var blob *tag_blobs.TomlV1
 
-		if blob, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.toml_v1.GetBlob2(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
-			tag_blobs.MakeLuaSelfApplyV1(sk),
+		luaVMPoolBuilder := store.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV1(object),
 		)
 
-		var vmp *lua.VMPool
+		var luaVMPool *lua.VMPool
 
-		lb.WithScript(blob.Filter)
+		luaVMPoolBuilder.WithScript(blob.Filter)
 
-		if vmp, err = lb.Build(); err != nil {
+		if luaVMPool, err = luaVMPoolBuilder.Build(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(vmp, nil)
-		twb.Blob = blob
+		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(luaVMPool, nil)
+		blobGeneric = blob
 
 	case ids.TypeLuaTagV1:
-		var rc interfaces.ReadCloseDigester
+		// TODO try to repool things here
 
-		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
+		var readCloser interfaces.ReadCloseDigester
+
+		if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(
+			blobDigest,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, rc)
+		defer errors.DeferredCloser(&err, readCloser)
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
-			tag_blobs.MakeLuaSelfApplyV1(sk),
+		luaVMPoolBuilder := store.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV1(object),
 		)
 
-		var vmp *lua.VMPool
+		var luaVMPool *lua.VMPool
 
-		lb.WithReader(rc)
+		luaVMPoolBuilder.WithReader(readCloser)
 
-		if vmp, err = lb.Build(); err != nil {
+		if luaVMPool, err = luaVMPoolBuilder.Build(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		twb.Blob = &tag_blobs.LuaV1{
-			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
+		blobGeneric = &tag_blobs.LuaV1{
+			LuaVMPoolV1: sku.MakeLuaVMPoolV1(luaVMPool, nil),
 		}
 
 	case ids.TypeLuaTagV2:
-		var rc interfaces.ReadCloseDigester
+		// TODO try to repool things here
 
-		if rc, err = a.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
+		var readCloser interfaces.ReadCloseDigester
+
+		if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, rc)
+		defer errors.DeferredCloser(&err, readCloser)
 
-		lb := a.envLua.MakeLuaVMPoolBuilder().WithApply(
-			tag_blobs.MakeLuaSelfApplyV2(sk),
+		luaVMPoolBUilder := store.envLua.MakeLuaVMPoolBuilder().WithApply(
+			tag_blobs.MakeLuaSelfApplyV2(object),
 		)
 
-		var vmp *lua.VMPool
+		var luaVMPool *lua.VMPool
 
-		lb.WithReader(rc)
+		luaVMPoolBUilder.WithReader(readCloser)
 
-		if vmp, err = lb.Build(); err != nil {
+		if luaVMPool, err = luaVMPoolBUilder.Build(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		twb.Blob = &tag_blobs.LuaV2{
-			LuaVMPoolV2: sku.MakeLuaVMPoolV2(vmp, nil),
+		blobGeneric = &tag_blobs.LuaV2{
+			LuaVMPoolV2: sku.MakeLuaVMPoolV2(luaVMPool, nil),
 		}
 	}
-
-	return
-}
-
-func (a Tag) PutTransactedWithBlob(
-	twb sku.TransactedWithBlob[tag_blobs.Blob],
-) (err error) {
-	tipe := twb.GetType()
-
-	switch tipe.String() {
-	case "", ids.TypeTomlTagV0:
-		if blob, ok := twb.Blob.(*tag_blobs.V0); !ok {
-			err = errors.ErrorWithStackf(
-				"expected %T but got %T",
-				blob,
-				twb.Blob,
-			)
-			return
-		} else {
-			a.toml_v0.PutBlob(blob)
-		}
-
-	case ids.TypeLuaTagV1:
-		if blob, ok := twb.Blob.(*tag_blobs.TomlV1); !ok {
-			err = errors.ErrorWithStackf(
-				"expected %T but got %T",
-				blob,
-				twb.Blob,
-			)
-			return
-		} else {
-			a.toml_v1.PutBlob(blob)
-		}
-	}
-
-	sku.GetTransactedPool().Put(twb.Transacted)
 
 	return
 }
