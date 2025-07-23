@@ -14,7 +14,7 @@ import (
 
 // must be public for toml coding to function
 type TomlV1Common struct {
-	StoreVersion      StoreVersion              `toml:"store-version"`
+	StoreVersion      store_version.Version     `toml:"store-version"`
 	RepoType          repo_type.Type            `toml:"repo-type"`
 	RepoId            ids.RepoId                `toml:"id"`
 	BlobStore         blob_store_configs.TomlV0 `toml:"blob-store"`
@@ -88,7 +88,7 @@ func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return &config.BlobStore
 }
 
-func (config *TomlV1Common) GetStoreVersion() StoreVersion {
+func (config *TomlV1Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
 }
 

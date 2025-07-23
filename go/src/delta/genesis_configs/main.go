@@ -13,7 +13,7 @@ import (
 
 type (
 	Config interface {
-		GetStoreVersion() StoreVersion
+		GetStoreVersion() store_version.Version
 		GetPublicKey() repo_signing.PublicKey
 		GetRepoType() repo_type.Type
 		GetRepoId() ids.RepoId
@@ -51,7 +51,9 @@ func Default() *TypedConfigPrivateMutable {
 	return DefaultWithVersion(store_version.VCurrent)
 }
 
-func DefaultWithVersion(storeVersion StoreVersion) *TypedConfigPrivateMutable {
+func DefaultWithVersion(
+	storeVersion store_version.Version,
+) *TypedConfigPrivateMutable {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		return &TypedConfigPrivateMutable{
 			Type: ids.GetOrPanic(

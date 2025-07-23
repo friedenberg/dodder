@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -14,7 +15,7 @@ import (
 )
 
 type V0Common struct {
-	StoreVersion      StoreVersion
+	StoreVersion      store_version.Version
 	Recipients        []string
 	CompressionType   compression_type.CompressionType
 	LockInternalFiles bool
@@ -53,7 +54,7 @@ func (config *V0Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	}
 }
 
-func (config V0Common) GetStoreVersion() StoreVersion {
+func (config V0Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
 }
 

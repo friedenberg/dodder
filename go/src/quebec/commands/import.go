@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -22,7 +21,7 @@ func init() {
 	command.Register(
 		"import",
 		&Import{
-			StoreVersion: store_version.VCurrent,
+			Version: store_version.VCurrent,
 		},
 	)
 }
@@ -32,14 +31,14 @@ type Import struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteBlobStore
 
-	genesis_configs.StoreVersion
+	store_version.Version
 	InventoryList string
 	PrintCopies   bool
 	sku.Proto
 }
 
 func (cmd *Import) SetFlagSet(f *flag.FlagSet) {
-	f.Var(&cmd.StoreVersion, "store-version", "")
+	f.Var(&cmd.Version, "store-version", "")
 	f.StringVar(&cmd.InventoryList, "inventory-list", "", "")
 	cmd.RemoteBlobStore.SetFlagSet(f)
 	f.BoolVar(
@@ -60,7 +59,7 @@ func (cmd Import) Run(dep command.Request) {
 	}
 
 	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
-		cmd.StoreVersion,
+		cmd.Version,
 	)
 
 	var readCloser io.ReadCloser

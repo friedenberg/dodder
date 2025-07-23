@@ -6,15 +6,16 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 // must be public for toml coding to function
 type TomlV2Common struct {
-	StoreVersion      StoreVersion   `toml:"store-version"`
-	RepoType          repo_type.Type `toml:"repo-type"`
-	RepoId            ids.RepoId     `toml:"id"`
-	InventoryListType string         `toml:"inventory_list-type"`
+	StoreVersion      store_version.Version `toml:"store-version"`
+	RepoType          repo_type.Type        `toml:"repo-type"`
+	RepoId            ids.RepoId            `toml:"id"`
+	InventoryListType string                `toml:"inventory_list-type"`
 }
 
 type TomlV2Private struct {
@@ -77,7 +78,7 @@ func (config TomlV2Public) GetPublicKey() repo_signing.PublicKey {
 	return config.PublicKey.Data
 }
 
-func (config *TomlV2Common) GetStoreVersion() StoreVersion {
+func (config *TomlV2Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
 }
 

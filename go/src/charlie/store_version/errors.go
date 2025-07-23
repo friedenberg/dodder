@@ -11,7 +11,7 @@ type ErrFutureStoreVersion struct {
 	interfaces.StoreVersion
 }
 
-func (e ErrFutureStoreVersion) Error() string {
+func (err ErrFutureStoreVersion) Error() string {
 	return fmt.Sprintf(
 		strings.Join(
 			[]string{
@@ -20,11 +20,11 @@ func (e ErrFutureStoreVersion) Error() string {
 			},
 			". ",
 		),
-		e.StoreVersion,
+		err.StoreVersion,
 	)
 }
 
-func (e ErrFutureStoreVersion) Is(target error) bool {
+func (err ErrFutureStoreVersion) Is(target error) bool {
 	_, ok := target.(ErrFutureStoreVersion)
 	return ok
 }
