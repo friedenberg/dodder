@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -99,8 +98,8 @@ func (cmd Export) Run(dep command.Request) {
 
 	defer errors.ContextMustClose(localWorkingCopy, writeCloser)
 
-	bufferedWriter := ohio.BufferedWriter(writeCloser)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(writeCloser)
+	defer repoolBufferedWriter()
 	defer errors.ContextMustFlush(localWorkingCopy, bufferedWriter)
 
 	listFormat := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(

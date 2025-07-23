@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -40,8 +39,8 @@ func (format V1) WriteObjectToOpenList(
 		return
 	}
 
-	bufferedWriter := ohio.BufferedWriter(list.Mover)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
+	defer repoolBufferedWriter()
 
 	if n, err = format.EncodeTo(
 		object,

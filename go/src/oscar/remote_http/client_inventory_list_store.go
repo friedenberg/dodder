@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
@@ -77,8 +76,8 @@ func (client client) ImportInventoryList(
 	ui.Log().Printf("collected list (%d): %s", list.Len(), sku.String(listSku))
 
 	{
-		bufferedWriter := ohio.BufferedWriter(buffer)
-		defer pool.GetBufioWriter().Put(bufferedWriter)
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
+		defer repoolBufferedWriter()
 
 		// TODO make a reader version of inventory lists to avoid allocation
 		if _, err = listFormat.WriteInventoryListBlob(
@@ -98,8 +97,8 @@ func (client client) ImportInventoryList(
 	var sbListSkuBox strings.Builder
 
 	{
-		bufferedWriter := ohio.BufferedWriter(&sbListSkuBox)
-		defer pool.GetBufioWriter().Put(bufferedWriter)
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(&sbListSkuBox)
+		defer repoolBufferedWriter()
 
 		if _, err = client.typedBlobStore.WriteObjectToWriter(
 			listSku.GetType(),

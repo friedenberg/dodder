@@ -22,7 +22,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -683,8 +682,8 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			repo.GetConfig().GetStoreVersion(),
 		)
 
-		bufferedWriter := ohio.BufferedWriter(buffer)
-		defer pool.GetBufioWriter().Put(bufferedWriter)
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
+		defer repoolBufferedWriter()
 
 		if _, err := listFormat.WriteInventoryListBlob(
 			list,
@@ -776,8 +775,8 @@ func (server *Server) handlePostInventoryList(
 		{
 			var err error
 
-			bufferedReader := ohio.BufferedReader(strings.NewReader(boxString))
-			defer pool.GetBufioReader().Put(bufferedReader)
+			bufferedReader, repoolBufferedReader := pool.GetBufferedReader(strings.NewReader(boxString))
+			defer repoolBufferedReader()
 
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(
 				ids.MustType(

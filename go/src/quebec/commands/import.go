@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -85,8 +84,8 @@ func (cmd Import) Run(dep command.Request) {
 		defer errors.ContextMustClose(localWorkingCopy, readCloser)
 	}
 
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+	defer repoolBufferedReader()
 
 	list := sku.MakeList()
 

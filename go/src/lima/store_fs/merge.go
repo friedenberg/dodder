@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -322,8 +321,11 @@ func (store *Store) GenerateConflictMarker(
 
 	defer errors.DeferredCloser(&err, file)
 
-	bufferedWriter := ohio.BufferedWriter(file)
-	defer pool.FlushBufioWriterAndPut(&err, bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(file)
+	defer func() {
+		pool.FlushBufioWriterAndPut(&err, bufferedWriter)
+		repoolBufferedWriter()
+	}()
 
 	blobStore := store.storeSupplies.BlobStore.InventoryList
 

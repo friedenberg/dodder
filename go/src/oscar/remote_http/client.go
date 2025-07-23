@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -258,8 +257,8 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	buffer := bytes.NewBuffer(nil)
 
-	bufferedWriter := ohio.BufferedWriter(buffer)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
+	defer repoolBufferedWriter()
 
 	for {
 		errors.ContextContinueOrPanic(client.envUI)

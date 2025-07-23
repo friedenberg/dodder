@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
@@ -301,8 +300,8 @@ func (store *Store) WriteInventoryListBlob(
 
 	defer errors.DeferredCloser(&err, writeCloser)
 
-	bufferedWriter := ohio.BufferedWriter(writeCloser)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(writeCloser)
+	defer repoolBufferedWriter()
 
 	if _, err = store.getTypedBlobStore().WriteBlobToWriter(
 		object.GetType(),
@@ -368,8 +367,8 @@ func (store *Store) ImportInventoryList(
 		return
 	}
 
-	bufferedReader := ohio.BufferedReader(blobReader)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(blobReader)
+	defer repoolBufferedReader()
 
 	list := sku.MakeList()
 

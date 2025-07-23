@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -51,8 +50,8 @@ func (blobStore *blobStoreV0) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+	defer repoolBufferedReader()
 
 	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
 		blobStore.blobType,
@@ -82,8 +81,8 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 	object.Metadata.Type = blobStore.blobType
 
-	bufferedWriter := ohio.BufferedWriter(blobStoreWriteCloser)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(blobStoreWriteCloser)
+	defer repoolBufferedWriter()
 
 	if err = object.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)

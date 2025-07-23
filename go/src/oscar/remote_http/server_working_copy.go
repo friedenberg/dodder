@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -134,8 +133,8 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
-	bufferedWriter := ohio.BufferedWriter(responseBuffer)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(responseBuffer)
+	defer repoolBufferedWriter()
 
 	if _, err := listFormat.WriteInventoryListBlob(
 		listMissingSkus,

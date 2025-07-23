@@ -76,8 +76,8 @@ func MakePipedDecoder[O any](
 	go func() {
 		var msg readFromDone
 
-		bufferedReader := BufferedReader(pr)
-		defer pool.GetBufioReader().Put(bufferedReader)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(pr)
+		defer repoolBufferedReader()
 
 		if msg.n, msg.err = decoder.DecodeFrom(
 			object,

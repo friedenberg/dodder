@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/repo_blobs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -39,8 +38,8 @@ func (store RepoStore) ReadTypedBlob(
 		Type: tipe,
 	}
 
-	bufferedReader := ohio.BufferedReader(reader)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(reader)
+	defer repoolBufferedReader()
 
 	if n, err = repo_blobs.Coder.DecodeFrom(
 		&typedBlob,
@@ -68,8 +67,8 @@ func (store RepoStore) WriteTypedBlob(
 
 	defer errors.DeferredCloser(&err, writer)
 
-	bufferedWriter := ohio.BufferedWriter(writer)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(writer)
+	defer repoolBufferedWriter()
 
 	if n, err = repo_blobs.Coder.EncodeTo(
 		&repo_blobs.TypedBlob{

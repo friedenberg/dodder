@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -45,8 +44,8 @@ func (format V2) WriteObjectToOpenList(
 		return
 	}
 
-	bufferedWriter := ohio.BufferedWriter(list.Mover)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
+	defer repoolBufferedWriter()
 
 	if n, err = format.EncodeTo(
 		object,

@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -55,8 +54,8 @@ func (blobStore *blobStoreV1) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+	defer repoolBufferedReader()
 
 	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
 		blobStore.blobType,
@@ -93,10 +92,10 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	defer errors.DeferredCloser(&err, file)
 	defer errors.Deferred(&err, file.Sync)
 
-	bufferedWriter := ohio.BufferedWriter(
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
 		io.MultiWriter(blobStoreWriteCloser, file),
 	)
-	defer pool.GetBufioWriter().Put(bufferedWriter)
+	defer repoolBufferedWriter()
 
 	if err = object.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)

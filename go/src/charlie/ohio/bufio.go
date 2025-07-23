@@ -1,20 +1,5 @@
 package ohio
 
-import (
-	"bufio"
-	"io"
-
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-)
-
-func BufferedWriter(writer io.Writer) *bufio.Writer {
-	bufferedWriter := pool.GetBufioWriter().Get()
-	bufferedWriter.Reset(writer)
-	return bufferedWriter
-}
-
-func BufferedReader(reader io.Reader) *bufio.Reader {
-	bufferedReader := pool.GetBufioReader().Get()
-	bufferedReader.Reset(reader)
-	return bufferedReader
-}
+// This file previously contained BufferedWriter and BufferedReader functions
+// that have been moved to src/bravo/pool/common.go as GetBufferedWriter and 
+// GetBufferedReader with a new calling pattern that returns a repool function.

@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -170,8 +169,8 @@ func (store TypedStore) AllDecodedObjectsFromStream(
 			),
 		}
 
-		bufferedReader := ohio.BufferedReader(reader)
-		defer pool.GetBufioReader().Put(bufferedReader)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(reader)
+		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[iterSku]{
@@ -211,8 +210,8 @@ func (store TypedStore) IterInventoryListBlobSkusFromBlobStore(
 			store.streamDecoders,
 		)
 
-		bufferedReader := ohio.BufferedReader(readCloser)
-		defer pool.GetBufioReader().Put(bufferedReader)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[iterSku]{
@@ -238,8 +237,8 @@ func (store TypedStore) IterInventoryListBlobSkusFromReader(
 			store.streamDecoders,
 		)
 
-		bufferedReader := ohio.BufferedReader(reader)
-		defer pool.GetBufioReader().Put(bufferedReader)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(reader)
+		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[iterSku]{

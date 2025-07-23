@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
@@ -127,11 +126,14 @@ func (cmd DormantEdit) makeTempKonfigFile(
 
 	path = file.Name()
 
-	bufferedWriter := ohio.BufferedWriter(file)
-	defer pool.FlushBufioWriterAndPut(&err, bufferedWriter)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(file)
+	defer func() {
+		pool.FlushBufioWriterAndPut(&err, bufferedWriter)
+		repoolBufferedWriter()
+	}()
 
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+	defer repoolBufferedReader()
 
 	if _, err = io.Copy(bufferedWriter, bufferedReader); err != nil {
 		err = errors.Wrap(err)

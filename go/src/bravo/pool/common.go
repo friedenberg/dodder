@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"hash"
+	"io"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -70,6 +71,32 @@ func GetSha256Hash() (hash hash.Hash, repool func()) {
 
 	repool = func() {
 		sha256Hash.Put(hash)
+	}
+
+	return
+}
+
+func GetBufferedWriter(
+	writer io.Writer,
+) (bufferedWriter *bufio.Writer, repool func()) {
+	bufferedWriter = bufioWriter.Get()
+	bufferedWriter.Reset(writer)
+
+	repool = func() {
+		bufioWriter.Put(bufferedWriter)
+	}
+
+	return
+}
+
+func GetBufferedReader(
+	reader io.Reader,
+) (bufferedReader *bufio.Reader, repool func()) {
+	bufferedReader = bufioReader.Get()
+	bufferedReader.Reset(reader)
+
+	repool = func() {
+		bufioReader.Put(bufferedReader)
 	}
 
 	return
