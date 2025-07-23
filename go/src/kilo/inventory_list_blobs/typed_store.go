@@ -71,67 +71,6 @@ func (store TypedStore) GetBoxFormat() *box_format.BoxTransacted {
 	return store.boxFormat
 }
 
-func (store TypedStore) GetTransactedWithBlob(
-	inventoryList sku.TransactedGetter,
-) (objectAndBlob sku.TransactedWithBlob[*sku.List], n int64, err error) {
-	objectAndBlob.Transacted = inventoryList.GetSku()
-	blobSha := objectAndBlob.GetBlobSha()
-
-	var readCloser interfaces.ReadCloseDigester
-
-	if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, readCloser)
-
-	bufferedReader := ohio.BufferedReader(readCloser)
-	defer pool.GetBufioReader().Put(bufferedReader)
-
-	if n, err = store.GetTransactedWithBlobFromReader(
-		&objectAndBlob,
-		bufferedReader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (store TypedStore) GetTransactedWithBlobFromReader(
-	twb *sku.TransactedWithBlob[*sku.List],
-	reader *bufio.Reader,
-) (n int64, err error) {
-	tipe := twb.GetType()
-	twb.Blob = sku.MakeList()
-
-	switch tipe.String() {
-	case ids.TypeInventoryListV1:
-		if err = ReadInventoryListBlob(
-			store.v1,
-			reader,
-			twb.Blob,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case ids.TypeInventoryListV2:
-		if err = ReadInventoryListBlob(
-			store.v2,
-			reader,
-			twb.Blob,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (store TypedStore) WriteObjectToWriter(
 	tipe ids.Type,
 	object *sku.Transacted,
@@ -171,21 +110,6 @@ func (store TypedStore) WriteBlobToWriter(
 			return
 		}
 	}
-
-	return
-}
-
-func (store TypedStore) PutTransactedWithBlob(
-	twb sku.TransactedWithBlob[*sku.List],
-) (err error) {
-	tipe := twb.GetType()
-
-	switch tipe.String() {
-	case "", ids.TypeInventoryListV0:
-	case ids.TypeInventoryListV1:
-	}
-
-	sku.GetTransactedPool().Put(twb.Transacted)
 
 	return
 }

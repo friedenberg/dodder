@@ -19,7 +19,8 @@
       "Bash(just build-nix:*)",
       "Bash(nix build:*)",
       "Bash(nix log:*)",
-      "Bash(./build/der:*)"
+      "Bash(./build/der:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

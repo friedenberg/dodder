@@ -120,37 +120,6 @@ func (format V1) ReadInventoryListObject(
 	return
 }
 
-type V1StreamCoder struct {
-	V1
-}
-
-func (coder V1StreamCoder) DecodeFrom(
-	output interfaces.FuncIter[*sku.Transacted],
-	bufferedReader *bufio.Reader,
-) (n int64, err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(object)
-
-		if _, err = coder.V1ObjectCoder.DecodeFrom(object, bufferedReader); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if err = output(object); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku.String(object))
-			return
-		}
-	}
-
-	return
-}
-
 func (format V1) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
 	output interfaces.FuncIter[*sku.Transacted],
@@ -243,37 +212,6 @@ func (coder V1ObjectCoder) DecodeFrom(
 
 	if isEOF {
 		err = io.EOF
-	}
-
-	return
-}
-
-type V1IterDecoder struct {
-	V1
-}
-
-func (coder V1IterDecoder) DecodeFrom(
-	yield func(*sku.Transacted) bool,
-	bufferedReader *bufio.Reader,
-) (n int64, err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		// TODO Fix upstream issues with repooling
-		// defer sku.GetTransactedPool().Put(object)
-
-		if _, err = coder.V1ObjectCoder.DecodeFrom(object, bufferedReader); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if !yield(object) {
-			return
-		}
 	}
 
 	return

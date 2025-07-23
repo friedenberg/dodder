@@ -35,6 +35,7 @@ type InventoryListStore interface {
 	ImportList(*List, Importer) error
 }
 
+// TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
 type ListFormat interface {
 	GetType() ids.Type
 	GetListFormat() ListFormat
