@@ -2,14 +2,24 @@ package remote_http
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 func (server *Server) handleMCP(request Request) (response Response) {
@@ -122,39 +132,243 @@ func (server *Server) handleMCP(request Request) (response Response) {
 }
 
 func (server *Server) getMCPResources() []mcp.Resource {
-	// For now, return a simple list of example resources
-	// TODO: Implement proper querying when we understand the query system
-	// better
 	resources := []mcp.Resource{
 		{
-			URI:         "dodder://example/test-zettel",
-			Name:        "Test Zettel",
-			Description: "A sample Zettel for testing MCP implementation",
-			MimeType:    "text/markdown",
+			URI:         "dodder:///objects",
+			Name:        "Objects",
+			Description: "list of all available objects (just their descriptions)",
+			MimeType:    "application/json",
 		},
 	}
-
-	// Log that we're returning example resources
-	ui.Log().Print("getMCPResources: returning example resources")
 
 	return resources
 }
 
 func (server *Server) readMCPResource(
-	uri string,
+	uriString string,
 ) ([]mcp.ResourceContent, error) {
-	// For now, return example content for testing
-	// TODO: Implement proper object reading when we understand the store system
-	// better
-
-	if uri == "dodder://example/test-zettel" {
-		content := mcp.ResourceContent{
-			URI:      uri,
-			MimeType: "text/markdown",
-			Text:     "# Test Zettel\n\nThis is example content for the test Zettel.\n\n- Item 1\n- Item 2\n- Item 3\n",
-		}
-		return []mcp.ResourceContent{content}, nil
+	uri, err := url.ParseRequestURI(uriString)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.Errorf("resource not found: %s", uri)
+	if uri.Scheme != "dodder" {
+		err = errors.BadRequestf(
+			"expected scheme %q but got %q",
+			"dodder",
+			uri.Scheme,
+		)
+		return nil, err
+	}
+
+	if uri.Host != "" {
+		err = errors.BadRequestf(
+			"expected empty host but got %q",
+			uri.Host,
+		)
+		return nil, err
+	}
+
+	if strings.HasPrefix(uri.Path, "/objects") {
+		return server.readMCPResourceObjects(uri)
+	} else if strings.HasPrefix(uri.Path, "/blobs") {
+		return server.readMCPResourceBlobs(uri)
+	} else {
+		return nil, errors.BadRequestf("resource not found: %q", uriString)
+	}
+}
+
+func (server *Server) readMCPResourceObjects(
+	uri *url.URL,
+) ([]mcp.ResourceContent, error) {
+	repo := server.Repo.(*local_working_copy.Repo)
+
+	objectIdString := strings.TrimPrefix(
+		strings.TrimPrefix(uri.Path, "/"),
+		"objects",
+	)
+
+	if len(objectIdString) > 1 {
+		var objectId ids.ObjectId
+
+		if err := objectId.Set(objectIdString); err != nil {
+			return nil, err
+		}
+
+		var object *sku.Transacted
+
+		{
+			var err error
+
+			if object, err = repo.GetStore().ReadOneObjectId(
+				&objectId,
+			); err != nil {
+				return nil, err
+			}
+		}
+
+		defer sku.GetTransactedPool().Put(object)
+
+		return server.readMCPResourceObject(object)
+	}
+
+	var queryGroup *query.Query
+
+	{
+		var err error
+
+		if queryGroup, err = repo.MakeExternalQueryGroup(
+			query.BuilderOptions(
+				query.BuilderOptionWorkspace{Env: repo.GetEnvWorkspace()},
+			),
+			sku.ExternalQueryOptions{},
+			"",
+		); err != nil {
+			return nil, err
+		}
+	}
+
+	var list *sku.List
+
+	{
+		var err error
+
+		if list, err = repo.MakeInventoryList(queryGroup); err != nil {
+			return nil, err
+		}
+	}
+
+	results := make([]mcp.ResourceContent, 0, list.Len())
+
+	for object := range list.All() {
+		objectResources, err := server.readMCPResourceObject(object)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, objectResources...)
+	}
+
+	return results, nil
+}
+
+func (server *Server) readMCPResourceObject(
+	object *sku.Transacted,
+) ([]mcp.ResourceContent, error) {
+	repo := server.Repo.(*local_working_copy.Repo)
+
+	var jsonRep sku_fmt.Json
+
+	if err := jsonRep.FromTransacted(
+		object,
+		repo.GetEnvRepo().GetDefaultBlobStore(),
+	); err != nil {
+		return nil, err
+	}
+
+	tipe := object.GetType()
+	var typeObject *sku.Transacted
+
+	{
+		var err error
+
+		if typeObject, err = repo.GetStore().ReadOneObjectId(
+			tipe,
+		); err != nil {
+			return nil, err
+		}
+
+		defer sku.GetTransactedPool().Put(typeObject)
+	}
+
+	var typeBlob type_blobs.Blob
+
+	{
+		var err error
+
+		if typeBlob, _, err = repo.GetTypedBlobStore().Type.ParseTypedBlob(
+			typeObject.GetType(),
+			typeObject.GetBlobSha(),
+		); err != nil {
+			return nil, err
+		}
+
+		defer repo.GetTypedBlobStore().Type.PutTypedBlob(tipe, typeBlob)
+	}
+
+	var mimeType string
+
+	if typeBlob != nil {
+		mimeType = mime.TypeByExtension(typeBlob.GetFileExtension())
+	}
+
+	if mimeType == "" {
+		jsonRep.RelatedURIs = append(
+			jsonRep.RelatedURIs,
+			fmt.Sprintf("dodder:///blobs/%s", jsonRep.BlobDigest),
+		)
+	} else {
+		jsonRep.RelatedURIs = append(
+			jsonRep.RelatedURIs,
+			fmt.Sprintf("dodder:///blobs/%s/%s", jsonRep.BlobDigest, mimeType),
+		)
+	}
+
+	var sb strings.Builder
+
+	encoder := json.NewEncoder(&sb)
+
+	if err := encoder.Encode(jsonRep); err != nil {
+		return nil, err
+	}
+
+	return []mcp.ResourceContent{{
+		URI:      jsonRep.URI,
+		MimeType: "application/json",
+		Text:     sb.String(),
+	}}, nil
+}
+
+func (server *Server) readMCPResourceBlobs(
+	uri *url.URL,
+) ([]mcp.ResourceContent, error) {
+	pathComponents := strings.Split(strings.TrimPrefix(uri.Path, "/blobs"), "/")
+
+	if len(pathComponents) == 0 {
+		return nil, errors.BadRequestf("blob digest not provided")
+	}
+
+	blobDigest := pathComponents[0]
+
+	digest, repool, err := sha.Env{}.MakeDigestFromString(blobDigest)
+	if err != nil {
+		return nil, err
+	}
+
+	defer repool()
+
+	readCloser, err := server.Repo.GetEnvRepo().GetDefaultBlobStore().BlobReader(
+		digest,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var buffer bytes.Buffer
+
+	if _, err := io.Copy(&buffer, readCloser); err != nil {
+		return nil, err
+	}
+
+	var mimeType string
+
+	if len(pathComponents) > 1 {
+		mimeType = pathComponents[1]
+	}
+
+	return []mcp.ResourceContent{{
+		URI:      uri.String(),
+		MimeType: mimeType,
+		Blob:     base64.StdEncoding.EncodeToString(buffer.Bytes()),
+	}}, nil
 }
