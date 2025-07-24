@@ -8,10 +8,10 @@ import (
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
-// TODO rename
+// TODO add to repo.Repo interface
 func (local *Repo) GetZettelFromObjectId(
 	objectIdString string,
-) (sk *sku.Transacted, err error) {
+) (object *sku.Transacted, err error) {
 	builder := local.MakeQueryBuilder(ids.MakeGenre(genres.Zettel), nil)
 
 	var query *pkg_query.Query
@@ -24,7 +24,7 @@ func (local *Repo) GetZettelFromObjectId(
 		return
 	}
 
-	if sk, err = local.GetStore().QueryExactlyOneExternal(query); err != nil {
+	if object, err = local.GetStore().QueryExactlyOneExternal(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -32,9 +32,10 @@ func (local *Repo) GetZettelFromObjectId(
 	return
 }
 
+// TODO add to repo.Repo interface
 func (local *Repo) GetObjectFromObjectId(
 	objectIdString string,
-) (sk *sku.Transacted, err error) {
+) (object *sku.Transacted, err error) {
 	builder := local.MakeQueryBuilder(ids.MakeGenre(genres.All()...), nil)
 
 	var queryGroup *pkg_query.Query
@@ -47,8 +48,10 @@ func (local *Repo) GetObjectFromObjectId(
 		return
 	}
 
-	if sk, err = local.GetStore().QueryExactlyOneExternal(queryGroup); err != nil {
-		err = errors.Wrap(err)
+	if object, err = local.GetStore().QueryExactlyOneExternal(
+		queryGroup,
+	); err != nil {
+		err = errors.Wrapf(err, "ObjectIdString: %q", objectIdString)
 		return
 	}
 

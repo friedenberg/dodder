@@ -15,10 +15,10 @@ type LocalWorkingCopy struct {
 func (cmd *LocalWorkingCopy) SetFlagSet(f *flag.FlagSet) {
 }
 
-func (c LocalWorkingCopy) MakeLocalWorkingCopy(
+func (cmd LocalWorkingCopy) MakeLocalWorkingCopy(
 	req command.Request,
 ) *local_working_copy.Repo {
-	return c.MakeLocalWorkingCopyWithOptions(
+	return cmd.MakeLocalWorkingCopyWithOptions(
 		req,
 		env_ui.Options{},
 		local_working_copy.OptionsEmpty,

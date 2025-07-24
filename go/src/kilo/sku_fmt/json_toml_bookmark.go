@@ -15,21 +15,21 @@ type JsonWithUrl struct {
 }
 
 func MakeJsonTomlBookmark(
-	sk *sku.Transacted,
-	s env_repo.Env,
-	tabs []interface{},
-) (j JsonWithUrl, err error) {
-	if err = j.FromTransacted(sk, s); err != nil {
+	object *sku.Transacted,
+	envRepo env_repo.Env,
+	tabs []any,
+) (json JsonWithUrl, err error) {
+	if err = json.FromTransacted(object, envRepo.GetDefaultBlobStore()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = toml.Unmarshal([]byte(j.BlobString), &j.TomlBookmark); err != nil {
-		err = errors.Wrapf(err, "%q", j.BlobString)
+	if err = toml.Unmarshal([]byte(json.BlobString), &json.TomlBookmark); err != nil {
+		err = errors.Wrapf(err, "%q", json.BlobString)
 		return
 	}
 
-	if _, err = url.Parse(j.Url); err != nil {
+	if _, err = url.Parse(json.Url); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

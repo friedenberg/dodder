@@ -47,16 +47,19 @@ func (server *Server) handleMCP(request Request) (response Response) {
 
 	switch mcpRequest.Method {
 	case "initialize":
-		// mcpResponse.Result = mcp.InitializeResponse{
-		// 	ProtocolVersion: "2024-11-05",
-		// 	Capabilities: ServerCapabilities{
-		// 		Tools: ToolsCapability{ListChanged: true},
-		// 	},
-		// 	ServerInfo: ServerInfo{
-		// 		Name:    "dodder",
-		// 		Version: "1.0.0",
-		// 	},
-		// }
+		mcpResponse.Result = mcp.InitializeResponse{
+			ProtocolVersion: "2024-11-05",
+			Capabilities: mcp.ServerCapabilities{
+				Resources: &mcp.ResourcesCapability{
+					Subscribe:   false,
+					ListChanged: true,
+				},
+			},
+			ServerInfo: mcp.ServerInfo{
+				Name:    "dodder",
+				Version: "1.0.0",
+			},
+		}
 
 	case "resources/list":
 		resources := server.getMCPResources()

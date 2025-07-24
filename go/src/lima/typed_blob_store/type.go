@@ -9,7 +9,7 @@ import (
 )
 
 type Type struct {
-	toml_v0 TypedStore[type_blobs.V0, *type_blobs.V0]
+	toml_v0 TypedStore[type_blobs.TomlV0, *type_blobs.TomlV0]
 	toml_v1 TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1]
 }
 
@@ -20,13 +20,13 @@ func MakeTypeStore(
 		toml_v0: MakeBlobStore(
 			envRepo,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[type_blobs.V0](
+				MakeTomlDecoderIgnoreTomlErrors[type_blobs.TomlV0](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[type_blobs.V0, *type_blobs.V0]{},
+				TomlBlobEncoder[type_blobs.TomlV0, *type_blobs.TomlV0]{},
 				envRepo.GetDefaultBlobStore(),
 			),
-			func(a *type_blobs.V0) {
+			func(a *type_blobs.TomlV0) {
 				a.Reset()
 			},
 		),
@@ -46,18 +46,23 @@ func MakeTypeStore(
 	}
 }
 
-func (a Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
-	return a
+func (store Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
+	return store
 }
 
-func (a Type) ParseTypedBlob(
+// TODO return repool function
+func (store Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
 	blobSha interfaces.Digest,
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
+	default:
+		err = errors.Errorf("unsupported type: %q", tipe)
+		return
+
 	case "", ids.TypeTomlTypeV0:
-		store := a.toml_v0
-		var blob *type_blobs.V0
+		store := store.toml_v0
+		var blob *type_blobs.TomlV0
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
@@ -67,7 +72,7 @@ func (a Type) ParseTypedBlob(
 		common = blob
 
 	case ids.TypeTomlTypeV1:
-		store := a.toml_v1
+		store := store.toml_v1
 		var blob *type_blobs.TomlV1
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
@@ -81,17 +86,17 @@ func (a Type) ParseTypedBlob(
 	return
 }
 
-func (a Type) PutTypedBlob(
+func (store Type) PutTypedBlob(
 	tipe interfaces.ObjectId,
 	common type_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlTypeV0:
-		if blob, ok := common.(*type_blobs.V0); !ok {
+		if blob, ok := common.(*type_blobs.TomlV0); !ok {
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.toml_v0.PutBlob(blob)
+			store.toml_v0.PutBlob(blob)
 		}
 
 	case ids.TypeTomlTypeV1:
@@ -99,7 +104,7 @@ func (a Type) PutTypedBlob(
 			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.toml_v1.PutBlob(blob)
+			store.toml_v1.PutBlob(blob)
 		}
 	}
 

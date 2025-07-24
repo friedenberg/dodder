@@ -713,7 +713,7 @@ func (server *Server) handleGetInventoryList(
 	inventoryListStore := server.Repo.GetInventoryListStore()
 
 	// TODO make this more performant by returning a proper reader
-	b := bytes.NewBuffer(nil)
+	buffer := bytes.NewBuffer(nil)
 
 	// TODO replace with sku.ListFormat
 	boxFormat := box_format.MakeBoxTransactedArchive(
@@ -723,7 +723,7 @@ func (server *Server) handleGetInventoryList(
 
 	printer := string_format_writer.MakeDelim(
 		"\n",
-		b,
+		buffer,
 		string_format_writer.MakeFunc(
 			func(
 				writer interfaces.WriterAndStringWriter,
@@ -750,7 +750,7 @@ func (server *Server) handleGetInventoryList(
 		}
 	}
 
-	response.Body = io.NopCloser(b)
+	response.Body = io.NopCloser(buffer)
 
 	return
 }

@@ -17,17 +17,23 @@ func Default() (t TomlV1) {
 type Blob interface {
 	GetFileExtension() string
 	GetBinary() bool
+	GetMimeType() string
 	GetVimSyntaxType() string
 	WithFormatters
-	WithFormatterUTIGropus
+	WithFormatterUTIGroups
 	WithStringLuaHooks
 }
+
+var (
+	_ Blob = &TomlV0{}
+	_ Blob = &TomlV1{}
+)
 
 type WithFormatters interface {
 	GetFormatters() map[string]script_config.WithOutputFormat
 }
 
-type WithFormatterUTIGropus interface {
+type WithFormatterUTIGroups interface {
 	GetFormatterUTIGroups() map[string]UTIGroup
 }
 

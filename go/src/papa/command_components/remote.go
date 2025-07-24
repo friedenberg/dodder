@@ -2,9 +2,6 @@ package command_components
 
 import (
 	"flag"
-	"maps"
-	"slices"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -28,7 +25,6 @@ import (
 type Remote struct {
 	Env
 	EnvRepo
-	LocalWorkingCopy
 	LocalArchive
 
 	RemoteConnectionType repo.RemoteConnectionType
@@ -36,15 +32,10 @@ type Remote struct {
 
 func (cmd *Remote) SetFlagSet(flagSet *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	flagSet.Var(
+	command.FlagSetVarWithCompletion(
+		flagSet,
 		&cmd.RemoteConnectionType,
 		"remote-type",
-		strings.Join(
-			slices.Collect(
-				maps.Keys(cmd.RemoteConnectionType.GetCLICompletion()),
-			),
-			", ",
-		),
 	)
 }
 

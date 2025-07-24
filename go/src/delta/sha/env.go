@@ -31,6 +31,20 @@ func (env Env) PutDigest(digest interfaces.Digest) {
 	poolSha.Put(digest.(*Sha))
 }
 
+func (env Env) MakeDigestFromString(
+	value string,
+) (interfaces.Digest, interfaces.FuncRepool, error) {
+	digest := poolSha.Get()
+	digest.Reset()
+
+	if err := digest.Set(value); err != nil {
+		poolSha.Put(digest)
+		return nil, nil, err
+	}
+
+	return digest, func() { poolSha.Put(digest) }, nil
+}
+
 func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
 	digest := poolSha.Get()
 	digest.Reset()

@@ -8,46 +8,53 @@ import (
 type TomlV1 struct {
 	Binary        bool                                      `toml:"binary,omitempty"`
 	FileExtension string                                    `toml:"file-extension,omitempty"`
+	MimeType      string                                    `toml:"mime-type,omitempty"`
 	ExecCommand   *script_config.ScriptConfig               `toml:"exec-command,omitempty"`
 	VimSyntaxType string                                    `toml:"vim-syntax-type"`
 	UTIGroups     map[string]UTIGroup                       `toml:"uti-groups"`
 	Formatters    map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
+
 	// TODO migrate to properly-typed hooks
-	Hooks interface{} `toml:"hooks"`
+	Hooks any `toml:"hooks"`
 }
 
-func (a *TomlV1) Reset() {
-	a.Binary = false
-	a.FileExtension = ""
-	a.ExecCommand = nil
-	a.VimSyntaxType = ""
+func (blob *TomlV1) Reset() {
+	blob.Binary = false
+	blob.FileExtension = ""
+	blob.MimeType = ""
+	blob.ExecCommand = nil
+	blob.VimSyntaxType = ""
 
-	a.UTIGroups = reset.Map(a.UTIGroups)
-	a.Formatters = reset.Map(a.Formatters)
-	a.Hooks = nil
+	blob.UTIGroups = reset.Map(blob.UTIGroups)
+	blob.Formatters = reset.Map(blob.Formatters)
+	blob.Hooks = nil
 }
 
-func (a *TomlV1) GetBinary() bool {
-	return a.Binary
+func (blob *TomlV1) GetBinary() bool {
+	return blob.Binary
 }
 
-func (a *TomlV1) GetFileExtension() string {
-	return a.FileExtension
+func (blob *TomlV1) GetFileExtension() string {
+	return blob.FileExtension
 }
 
-func (a *TomlV1) GetVimSyntaxType() string {
-	return a.VimSyntaxType
+func (blob *TomlV1) GetMimeType() string {
+	return blob.MimeType
 }
 
-func (a *TomlV1) GetFormatters() map[string]script_config.WithOutputFormat {
-	return a.Formatters
+func (blob *TomlV1) GetVimSyntaxType() string {
+	return blob.VimSyntaxType
 }
 
-func (a *TomlV1) GetFormatterUTIGroups() map[string]UTIGroup {
-	return a.UTIGroups
+func (blob *TomlV1) GetFormatters() map[string]script_config.WithOutputFormat {
+	return blob.Formatters
 }
 
-func (a *TomlV1) GetStringLuaHooks() string {
-	hooks, _ := a.Hooks.(string)
+func (blob *TomlV1) GetFormatterUTIGroups() map[string]UTIGroup {
+	return blob.UTIGroups
+}
+
+func (blob *TomlV1) GetStringLuaHooks() string {
+	hooks, _ := blob.Hooks.(string)
 	return hooks
 }

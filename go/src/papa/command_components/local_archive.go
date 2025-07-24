@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
+// TODO remove and remove archive repos too
 type LocalArchive struct {
 	EnvRepo
 }
@@ -19,14 +20,14 @@ type LocalArchive struct {
 func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 }
 
-func (c LocalArchive) MakeLocalArchive(
+func (cmd LocalArchive) MakeLocalArchive(
 	envRepo env_repo.Env,
 ) repo.LocalRepo {
 	repoType := envRepo.GetConfigPrivate().Blob.GetRepoType()
 
 	switch repoType {
 	case repo_type.TypeArchive:
-		inventoryListBlobStore := c.MakeTypedInventoryListBlobStore(
+		inventoryListBlobStore := cmd.MakeTypedInventoryListBlobStore(
 			envRepo,
 		)
 

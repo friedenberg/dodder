@@ -1,6 +1,7 @@
 package sku_fmt
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -16,9 +17,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
+type JsonMCP struct {
+	URI         string   `json:"uri,omitempty"`
+	RelatedURIs []string `json:"related_uris,omitempty"`
+}
+
 type Json struct {
-	BlobSha     string        `json:"blob-sha"`
-	BlobString  string        `json:"blob-string"`
+	// TODO rename to blob-digest
+	BlobDigest  string        `json:"blob-sha"`
+	BlobString  string        `json:"blob-string,omitempty"`
 	Date        string        `json:"date"`
 	Description string        `json:"description"`
 	Dormant     bool          `json:"dormant"`
@@ -29,31 +36,36 @@ type Json struct {
 	Tags        []string      `json:"tags"`
 	Tai         string        `json:"tai"`
 	Type        string        `json:"type"`
+
+	JsonMCP
 }
 
 func (json *Json) FromStringAndMetadata(
 	objectId string,
 	metadata *object_metadata.Metadata,
-	envRepo env_repo.Env,
+	blobStore interfaces.LocalBlobStore,
 ) (err error) {
-	var readCloser interfaces.ReadCloseDigester
+	if blobStore != nil {
+		var readCloser interfaces.ReadCloseDigester
 
-	if readCloser, err = envRepo.GetDefaultBlobStore().BlobReader(&metadata.Blob); err != nil {
-		err = errors.Wrap(err)
-		return
+		if readCloser, err = blobStore.BlobReader(&metadata.Blob); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, readCloser)
+
+		var blobStringBuilder strings.Builder
+
+		if _, err = io.Copy(&blobStringBuilder, readCloser); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		json.BlobString = blobStringBuilder.String()
 	}
 
-	defer errors.DeferredCloser(&err, readCloser)
-
-	var blobStringBuilder strings.Builder
-
-	if _, err = io.Copy(&blobStringBuilder, readCloser); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	json.BlobSha = metadata.Blob.String()
-	json.BlobString = blobStringBuilder.String()
+	json.BlobDigest = metadata.Blob.String()
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
@@ -64,19 +76,47 @@ func (json *Json) FromStringAndMetadata(
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
 	json.Type = metadata.Type.String()
+
+	json.URI = fmt.Sprintf("dodder:///objects/%s", objectId)
+
+	json.RelatedURIs = make([]string, 0, 2+len(json.Tags))
+
+	var mimeType string
+
+	json.RelatedURIs = append(
+		json.RelatedURIs,
+		fmt.Sprintf("dodder:///blobs/%s/%s", json.BlobDigest, mimeType),
+		fmt.Sprintf("dodder:///objects/%s", metadata.GetType()),
+	)
+
+	for _, tag := range json.Tags {
+		json.RelatedURIs = append(
+			json.RelatedURIs,
+			fmt.Sprintf("dodder:///objects/%s", tag),
+		)
+	}
+
+	// json.MCPURI = fmt.Sprintf(
+	// 	"dodder://objects/%s@%s:%s",
+	// 	objectId,
+	// 	json.RepoPubkey,
+	// 	json.RepoSig,
+	// )
+
 	// TODO add support for "preview"
 
 	return
 }
 
+// TODO accept blob store instead of env
 func (json *Json) FromTransacted(
 	object *sku.Transacted,
-	envRepo env_repo.Env,
+	blobStore interfaces.LocalBlobStore,
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
 		object.GetMetadata(),
-		envRepo,
+		blobStore,
 	)
 }
 

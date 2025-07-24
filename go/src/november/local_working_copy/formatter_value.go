@@ -409,7 +409,10 @@ func (local *Repo) MakeFormatFunc(
 		output = func(object *sku.Transacted) (err error) {
 			var jsonRepresentation sku_fmt.Json
 
-			if err = jsonRepresentation.FromTransacted(object, local.GetStore().GetEnvRepo()); err != nil {
+			if err = jsonRepresentation.FromTransacted(
+				object,
+				local.GetStore().GetEnvRepo().GetDefaultBlobStore(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -427,21 +430,24 @@ func (local *Repo) MakeFormatFunc(
 
 		type tomlJson struct {
 			sku_fmt.Json
-			Blob map[string]interface{} `json:"blob"`
+			Blob map[string]any `json:"blob"`
 		}
 
-		output = func(o *sku.Transacted) (err error) {
-			var j tomlJson
+		output = func(object *sku.Transacted) (err error) {
+			var jsonRep tomlJson
 
-			if err = j.FromTransacted(o, local.GetStore().GetEnvRepo()); err != nil {
+			if err = jsonRep.FromTransacted(
+				object,
+				local.GetStore().GetEnvRepo().GetDefaultBlobStore(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = toml.Unmarshal([]byte(j.Json.BlobString), &j.Blob); err != nil {
+			if err = toml.Unmarshal([]byte(jsonRep.Json.BlobString), &jsonRep.Blob); err != nil {
 				err = nil
 
-				if err = enc.Encode(j.Json); err != nil {
+				if err = enc.Encode(jsonRep.Json); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -451,7 +457,7 @@ func (local *Repo) MakeFormatFunc(
 				// return
 			}
 
-			if err = enc.Encode(j); err != nil {
+			if err = enc.Encode(jsonRep); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
