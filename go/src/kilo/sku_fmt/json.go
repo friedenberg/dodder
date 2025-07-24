@@ -81,11 +81,8 @@ func (json *Json) FromStringAndMetadata(
 
 	json.RelatedURIs = make([]string, 0, 2+len(json.Tags))
 
-	var mimeType string
-
 	json.RelatedURIs = append(
 		json.RelatedURIs,
-		fmt.Sprintf("dodder:///blobs/%s/%s", json.BlobDigest, mimeType),
 		fmt.Sprintf("dodder:///objects/%s", metadata.GetType()),
 	)
 

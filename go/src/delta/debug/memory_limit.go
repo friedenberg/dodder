@@ -22,7 +22,7 @@ type memoryLimit struct {
 func (ml *memoryLimit) Start(ctx interfaces.Context) (err error) {
 	ml.ctx = ctx
 
-	ml.Ticker = time.NewTicker(time.Millisecond)
+	ml.Ticker = time.NewTicker(time.Microsecond)
 	ctx.After(errors.MakeFuncContextFromFuncNil(ml.Stop))
 
 	var memoryLimit uint64

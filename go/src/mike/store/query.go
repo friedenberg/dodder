@@ -10,6 +10,7 @@ import (
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
+// TODO make iterator
 func (store *Store) QueryPrimitive(
 	qg sku.PrimitiveQueryGroup,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -28,6 +29,7 @@ func (store *Store) QueryPrimitive(
 	return
 }
 
+// TODO make iterator
 func (store *Store) QueryTransacted(
 	qg *pkg_query.Query,
 	output interfaces.FuncIter[*sku.Transacted],
@@ -65,6 +67,7 @@ func (store *Store) QueryTransacted(
 	return
 }
 
+// TODO make iterator
 func (store *Store) QueryTransactedAsSkuType(
 	qg *pkg_query.Query,
 	f interfaces.FuncIter[sku.SkuType],
@@ -84,6 +87,7 @@ func (store *Store) QueryTransactedAsSkuType(
 	return
 }
 
+// TODO make iterator
 func (store *Store) QuerySkuType(
 	query *pkg_query.Query,
 	output interfaces.FuncIter[sku.SkuType],
