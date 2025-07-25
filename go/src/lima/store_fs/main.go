@@ -383,7 +383,7 @@ func (store *Store) ReadFSItemFromExternal(
 			return
 		}
 
-		if err = item.Add(fdee); err != nil {
+		if err = item.MutableSetLike.Add(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

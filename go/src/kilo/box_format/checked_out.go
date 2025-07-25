@@ -283,7 +283,8 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		object_metadata_fmt.MetadataFieldTags(m)...,
 	)
 
-	if !options.ExcludeFields && (item == nil || item.Len() == 0) {
+	if !options.ExcludeFields &&
+		(item == nil || item.MutableSetLike.Len() == 0) {
 		box.Contents = append(box.Contents, m.Fields...)
 	}
 
@@ -385,7 +386,7 @@ func (f *BoxTransacted) addFieldsFSBlobExcept(
 		return
 	}
 
-	for fd := range fds.All() {
+	for fd := range fds.MutableSetLike.All() {
 		if except != nil && fd.Equals(except) {
 			continue
 		}

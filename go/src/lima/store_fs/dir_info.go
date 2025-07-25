@@ -240,7 +240,7 @@ func (d *dirInfo) addFD(
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
-		fds.Add(fileDescriptor)
+		fds.MutableSetLike.Add(fileDescriptor)
 	} else {
 		fds = cache[key]
 
@@ -250,7 +250,7 @@ func (d *dirInfo) addFD(
 			}
 		}
 
-		fds.Add(fileDescriptor)
+		fds.MutableSetLike.Add(fileDescriptor)
 		cache[key] = fds
 	}
 
@@ -388,7 +388,7 @@ func (d *dirInfo) processRootDir() (err error) {
 func (d *dirInfo) processFDsOnItem(
 	fds *sku.FSItem,
 ) (blobCount, objectCount int, err error) {
-	if err = fds.Each(
+	if err = fds.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
 			ext := f.ExtSansDot()
 
@@ -574,7 +574,7 @@ func (d *dirInfo) addOneOrMoreBlobs(
 		var fdsOne *sku.FSItem
 
 		if fdsOne, err = d.addOneUntracked(
-			fds.Any(),
+			fds.MutableSetLike.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -590,7 +590,7 @@ func (d *dirInfo) addOneOrMoreBlobs(
 		var fdsOne *sku.FSItem
 
 		if fdsOne, err = d.addOneUntracked(
-			fds.Any(),
+			fds.MutableSetLike.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

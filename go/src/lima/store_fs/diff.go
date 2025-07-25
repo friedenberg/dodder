@@ -15,7 +15,7 @@ func (store *Store) runDiff3(
 ) (merged *sku.FSItem, err error) {
 	baseObjectPath := "/dev/null"
 
-	if base.Len() > 0 {
+	if base.MutableSetLike.Len() > 0 {
 		baseObjectPath = base.Object.GetPath()
 	}
 

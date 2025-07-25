@@ -106,7 +106,7 @@ func (store *Store) setObjectIfNecessary(
 		return
 	}
 
-	i.Add(&i.Object)
+	i.MutableSetLike.Add(&i.Object)
 
 	return
 }
@@ -138,7 +138,7 @@ func (store *Store) setBlobIfNecessary(
 		return
 	}
 
-	i.Add(&i.Blob)
+	i.MutableSetLike.Add(&i.Blob)
 
 	return
 }

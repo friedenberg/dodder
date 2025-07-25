@@ -24,7 +24,7 @@ type FSItem struct {
 	Blob     fd.FD // TODO make set
 	Conflict fd.FD
 
-	interfaces.MutableSetLike[*fd.FD]
+	MutableSetLike interfaces.MutableSetLike[*fd.FD]
 }
 
 func (ef *FSItem) WriteToSku(
@@ -62,7 +62,8 @@ func (ef *FSItem) WriteToExternalObjectId(
 		anchorFD = &ef.Conflict
 
 	default:
-		// [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer during organize in workspace
+		// [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer
+		// during organize in workspace
 		ui.Err().Printf("item has no anchor FDs. %q", ef.Debug())
 		return
 	}
@@ -156,15 +157,15 @@ func (dst *FSItem) ResetWith(src *FSItem) {
 
 	// TODO consider if this approach actually works
 	if !dst.Object.IsEmpty() {
-		dst.Add(&dst.Object)
+		dst.MutableSetLike.Add(&dst.Object)
 	}
 
 	if !dst.Blob.IsEmpty() {
-		dst.Add(&dst.Blob)
+		dst.MutableSetLike.Add(&dst.Blob)
 	}
 
 	if !dst.Conflict.IsEmpty() {
-		dst.Add(&dst.Conflict)
+		dst.MutableSetLike.Add(&dst.Conflict)
 	}
 }
 
@@ -190,7 +191,9 @@ func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 
 func (e *FSItem) GenerateConflictFD() (err error) {
 	if e.ExternalObjectId.IsEmpty() {
-		err = errors.ErrorWithStackf("cannot generate conflict FD for empty external object id")
+		err = errors.ErrorWithStackf(
+			"cannot generate conflict FD for empty external object id",
+		)
 		return
 	}
 
