@@ -142,6 +142,12 @@ func (server *Server) getMCPResources() []mcp.Resource {
 			Description: "list of all available object types",
 			MimeType:    "application/json",
 		},
+		{
+			URI:         "dodder:///word-index",
+			Name:        "Objects that contain words",
+			Description: "A list of indexes corresponding to words, where the objects in the index contain the word somewhere in their blob or metadata",
+			MimeType:    "application/json",
+		},
 		// {
 		// 	URI:         "dodder:///tags",
 		// 	Name:        "Objects",

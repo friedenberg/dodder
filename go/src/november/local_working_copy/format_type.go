@@ -162,13 +162,13 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			typeBlobStore typed_blob_store.Type,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(
+			format := sku_fmt.MakeFormatterTypFormatterUTIGroups(
 				repo.GetStore(),
 				typeBlobStore,
 			)
 
-			return func(o *sku.Transacted) (err error) {
-				if _, err = fo.Format(writer, o); err != nil {
+			return func(object *sku.Transacted) (err error) {
+				if _, err = format.Format(writer, object); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -183,18 +183,18 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			typeBlobStore typed_blob_store.Type,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			return func(o *sku.Transacted) (err error) {
+			return func(object *sku.Transacted) (err error) {
 				var blob type_blobs.Blob
 
 				if blob, _, err = typeBlobStore.ParseTypedBlob(
-					o.GetType(),
-					o.GetBlobSha(),
+					object.GetType(),
+					object.GetBlobSha(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				defer typeBlobStore.PutTypedBlob(o.GetType(), blob)
+				defer typeBlobStore.PutTypedBlob(object.GetType(), blob)
 
 				script := blob.GetStringLuaHooks()
 
@@ -205,7 +205,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 				// TODO switch to typed variant
 				var vp sku.LuaVMPoolV1
 
-				if vp, err = repo.GetStore().MakeLuaVMPoolV1(o, script); err != nil {
+				if vp, err = repo.GetStore().MakeLuaVMPoolV1(object, script); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

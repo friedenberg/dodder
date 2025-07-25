@@ -8,17 +8,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var poolMatchBuilder interfaces.Pool[MatchBuilder, *MatchBuilder]
+var poolMatchBuilder = pool.MakePool(
+	NewMatchBuilder,
+	func(matchBuilder *MatchBuilder) {
+		matchBuilder.Buffer.Reset()
+	},
+)
 
-func init() {
-	poolMatchBuilder = pool.MakePool[MatchBuilder, *MatchBuilder](
-		NewMatchBuilder,
-		func(mb *MatchBuilder) {
-			mb.Buffer.Reset()
-		},
-	)
-}
-
+// TODO switch to returning repool function
 func GetPoolMatchBuilder() interfaces.Pool[MatchBuilder, *MatchBuilder] {
 	return poolMatchBuilder
 }
@@ -33,30 +30,30 @@ func NewMatchBuilder() *MatchBuilder {
 
 var sliceBytesUnderscore = []byte("_")
 
-func (mb *MatchBuilder) AddMatchBytes(s []byte) {
-	s1 := bytes.Split(s, sliceBytesUnderscore)
+func (matchBuilder *MatchBuilder) AddMatchBytes(s []byte) {
+	s1 := bytes.SplitSeq(s, sliceBytesUnderscore)
 
-	for _, s2 := range s1 {
-		mb.Write(s2)
-		mb.WriteRune(' ')
+	for s2 := range s1 {
+		matchBuilder.Write(s2)
+		matchBuilder.WriteRune(' ')
 	}
 }
 
-func (mb *MatchBuilder) AddMatch(s string) {
-	s1 := strings.Split(s, "_")
+func (matchBuilder *MatchBuilder) AddMatch(s string) {
+	s1 := strings.SplitSeq(s, "_")
 
-	for _, s2 := range s1 {
-		mb.WriteString(s2)
-		mb.WriteString(" ")
+	for s2 := range s1 {
+		matchBuilder.WriteString(s2)
+		matchBuilder.WriteString(" ")
 	}
 }
 
-func (mb *MatchBuilder) AddMatches(s ...string) {
+func (matchBuilder *MatchBuilder) AddMatches(s ...string) {
 	for _, v := range s {
-		mb.AddMatch(v)
+		matchBuilder.AddMatch(v)
 	}
 }
 
-func (mb *MatchBuilder) Bytes() []byte {
-	return mb.Buffer.Bytes()
+func (matchBuilder *MatchBuilder) Bytes() []byte {
+	return matchBuilder.Buffer.Bytes()
 }

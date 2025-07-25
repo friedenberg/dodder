@@ -3,9 +3,12 @@ package alfred_sku
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/alfred"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -36,46 +39,46 @@ func New(
 	return
 }
 
-func (w *Writer) SetWriter(alfredWriter alfred.Writer) {
-	w.alfredWriter = alfredWriter
+func (writer *Writer) SetWriter(alfredWriter alfred.Writer) {
+	writer.alfredWriter = alfredWriter
 }
 
-func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
+func (writer *Writer) PrintOne(object *sku.Transacted) (err error) {
 	var item *alfred.Item
-	g := z.GetGenre()
+	g := object.GetGenre()
 
 	switch g {
 	case genres.Zettel:
-		item = w.zettelToItem(z)
+		item = writer.zettelToItem(object)
 
 	case genres.Tag:
-		var e ids.Tag
+		var tag ids.Tag
 
-		if err = e.Set(z.ObjectId.String()); err != nil {
+		if err = tag.Set(object.ObjectId.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		item = w.etikettToItem(z, &e)
+		item = writer.emitTag(object, &tag)
 
 	default:
-		item = w.Get()
+		item = writer.Get()
 		item.Title = fmt.Sprintf("not implemented for genre: %q", g)
-		item.Subtitle = sku.StringTaiGenreObjectIdShaBlob(z)
+		item.Subtitle = sku.StringTaiGenreObjectIdShaBlob(object)
 	}
 
-	w.alfredWriter.WriteItem(item)
+	writer.alfredWriter.WriteItem(item)
 
 	return
 }
 
-func (w *Writer) WriteZettelId(e ids.ZettelId) (n int64, err error) {
-	item := w.zettelIdToItem(e)
-	w.alfredWriter.WriteItem(item)
+func (writer *Writer) WriteZettelId(e ids.ZettelId) (n int64, err error) {
+	item := writer.zettelIdToItem(e)
+	writer.alfredWriter.WriteItem(item)
 	return
 }
 
-func (w *Writer) WriteError(in error) (n int64, out error) {
+func (writer *Writer) WriteError(in error) (n int64, out error) {
 	if in == nil {
 		return 0, nil
 	}
@@ -84,17 +87,163 @@ func (w *Writer) WriteError(in error) (n int64, out error) {
 
 	if errors.As(in, &em) {
 		for _, err := range em.Errors() {
-			item := w.errorToItem(err)
-			w.alfredWriter.WriteItem(item)
+			item := writer.errorToItem(err)
+			writer.alfredWriter.WriteItem(item)
 		}
 	} else {
-		item := w.errorToItem(in)
-		w.alfredWriter.WriteItem(item)
+		item := writer.errorToItem(in)
+		writer.alfredWriter.WriteItem(item)
 	}
 
 	return
 }
 
-func (w Writer) Close() (err error) {
-	return w.alfredWriter.Close()
+func (writer Writer) Close() (err error) {
+	return writer.alfredWriter.Close()
+}
+
+func (writer *Writer) addCommonMatches(
+	object *sku.Transacted,
+	item *alfred.Item,
+) {
+	k := &object.ObjectId
+	ks := k.String()
+
+	matchBuilder := alfred.GetPoolMatchBuilder().Get()
+	defer alfred.GetPoolMatchBuilder().Put(matchBuilder)
+
+	parts := k.PartsStrings()
+
+	matchBuilder.AddMatches(ks)
+	matchBuilder.AddMatchBytes(parts.Left.Bytes())
+	matchBuilder.AddMatchBytes(parts.Right.Bytes())
+
+	errors.PanicIfError(writer.abbr.AbbreviateZettelIdOnly(k))
+	matchBuilder.AddMatches(k.String())
+	parts = k.PartsStrings()
+	matchBuilder.AddMatchBytes(parts.Left.Bytes())
+	matchBuilder.AddMatchBytes(parts.Right.Bytes())
+
+	matchBuilder.AddMatches(object.GetMetadata().Description.String())
+	matchBuilder.AddMatches(object.GetType().String())
+	object.Metadata.GetTags().Each(
+		func(e ids.Tag) (err error) {
+			expansion.ExpanderAll.Expand(
+				func(v string) (err error) {
+					matchBuilder.AddMatches(v)
+					return
+				},
+				e.String(),
+			)
+
+			return
+		},
+	)
+
+	t := object.GetType()
+
+	expansion.ExpanderAll.Expand(
+		func(v string) (err error) {
+			matchBuilder.AddMatches(v)
+			return
+		},
+		t.String(),
+	)
+
+	item.Match.Write(matchBuilder.Bytes())
+	// a.Match.ReadFromBuffer(&mb.Buffer)
+}
+
+func (writer *Writer) zettelToItem(
+	object *sku.Transacted,
+) (item *alfred.Item) {
+	item = writer.Get()
+
+	item.Title = object.Metadata.Description.String()
+
+	es := quiter.StringCommaSeparated(
+		object.Metadata.GetTags(),
+	)
+
+	k := &object.ObjectId
+	ks := k.String()
+
+	if item.Title == "" {
+		item.Title = ks
+		item.Subtitle = es
+	} else {
+		item.Subtitle = fmt.Sprintf("%s: %s %s", object.Metadata.Type, ks, es)
+	}
+
+	item.Arg = ks
+
+	writer.addCommonMatches(object, item)
+
+	item.Text.Copy = ks
+	item.Uid = "dodder://" + ks
+
+	{
+		var sb strings.Builder
+
+		if _, err := writer.organizeFmt.EncodeStringTo(object, &sb); err != nil {
+			item = writer.errorToItem(err)
+			return
+		}
+
+		item.Mods["alt"] = alfred.Mod{
+			Valid:    true,
+			Arg:      sb.String(),
+			Subtitle: sb.String(),
+		}
+	}
+
+	return
+}
+
+func (writer *Writer) emitTag(
+	object *sku.Transacted,
+	tag *ids.Tag,
+) (item *alfred.Item) {
+	item = writer.Get()
+
+	item.Title = "@" + tag.String()
+
+	item.Arg = tag.String()
+
+	writer.addCommonMatches(object, item)
+
+	item.Text.Copy = tag.String()
+	item.Uid = "dodder://" + tag.String()
+
+	return
+}
+
+func (writer *Writer) errorToItem(err error) (a *alfred.Item) {
+	a = writer.Get()
+
+	a.Title = errors.Unwrap(err).Error()
+
+	return
+}
+
+func (writer *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
+	a = writer.Get()
+
+	a.Title = e.String()
+
+	a.Arg = e.String()
+
+	mb := alfred.GetPoolMatchBuilder().Get()
+	defer alfred.GetPoolMatchBuilder().Put(mb)
+
+	mb.AddMatch(e.String())
+	mb.AddMatch(e.GetHead())
+	mb.AddMatch(e.GetTail())
+
+	a.Match.ReadFromBuffer(&mb.Buffer)
+
+	a.Text.Copy = e.String()
+	a.Uid = "dodder://" + e.String()
+
+	return
 }

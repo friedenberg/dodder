@@ -18,17 +18,17 @@ type Item struct {
 	// Valid        bool     `json:"valid,omitempty"`
 }
 
-func (i *Item) Reset() {
-	i.Title = ""
-	i.Arg = ""
-	i.Subtitle = ""
-	i.Match.Reset()
-	i.Icon.Type = ""
-	i.Icon.Path = ""
-	i.Uid = ""
-	i.QuicklookUrl = ""
-	i.Text.Copy = ""
-	clear(i.Mods)
+func (item *Item) Reset() {
+	item.Title = ""
+	item.Arg = ""
+	item.Subtitle = ""
+	item.Match.Reset()
+	item.Icon.Type = ""
+	item.Icon.Path = ""
+	item.Uid = ""
+	item.QuicklookUrl = ""
+	item.Text.Copy = ""
+	clear(item.Mods)
 }
 
 type ItemText struct {
