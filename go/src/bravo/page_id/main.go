@@ -13,14 +13,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
+// TODO rename to Id
 type PageId struct {
 	Index  uint8
 	Dir    string
 	Prefix string
 }
 
-func PageIdFromPath(n uint8, p string) PageId {
-	dir, file := filepath.Split(p)
+func PageIdFromPath(n uint8, path string) PageId {
+	dir, file := filepath.Split(path)
 	return PageId{
 		Dir:    dir,
 		Prefix: file,
@@ -28,12 +29,12 @@ func PageIdFromPath(n uint8, p string) PageId {
 	}
 }
 
-func (pid PageId) String() string {
-	return fmt.Sprintf("%d", pid.Index)
+func (id PageId) String() string {
+	return fmt.Sprintf("%d", id.Index)
 }
 
-func (pid *PageId) Path() string {
-	return filepath.Join(pid.Dir, fmt.Sprintf("%s-%x", pid.Prefix, pid.Index))
+func (id *PageId) Path() string {
+	return filepath.Join(id.Dir, fmt.Sprintf("%s-%x", id.Prefix, id.Index))
 }
 
 func PageIndexForString(

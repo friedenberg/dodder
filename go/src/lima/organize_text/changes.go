@@ -211,21 +211,14 @@ func applyToText(
 		return
 	}
 
-	if err = t.Options.Skus.Each(
-		func(el sku.SkuType) (err error) {
-			sk := el.GetSkuExternal()
+	for el := range t.Options.Skus.All() {
+		sk := el.GetSkuExternal()
 
-			if sk.Metadata.Description.IsEmpty() {
-				return
-			}
+		if sk.Metadata.Description.IsEmpty() {
+			continue
+		}
 
-			sk.Metadata.ResetTags()
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		sk.Metadata.ResetTags()
 	}
 
 	return

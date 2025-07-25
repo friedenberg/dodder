@@ -219,8 +219,12 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 		a.addChild(c)
 	}
 
-	b.Objects.Each(a.AddObject)
-	b.Objects.Each(b.Objects.Del)
+	for _, obj := range b.Objects.All() {
+		a.AddObject(obj)
+	}
+	for _, obj := range b.Objects.All() {
+		b.Objects.Del(obj)
+	}
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)
@@ -242,9 +246,11 @@ func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 		return
 	}
 
-	if err = es.EachPtr(mes.AddPtr); err != nil {
-		err = errors.Wrap(err)
-		return
+	for e := range es.AllPtr() {
+		if err = mes.AddPtr(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = a.Parent.AllTags(mes); err != nil {
@@ -305,26 +311,20 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 }
 
 func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	if err = a.Transacted.Metadata.Tags.EachPtr(
-		func(e *ids.Tag) (err error) {
-			if err = es.EachPtr(
-				func(e1 *ids.Tag) (err error) {
-					if !ids.ContainsExactly(e1, e) {
-						return
-					}
-
-					return es.DelPtr(e1)
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+	for e := range a.Transacted.Metadata.Tags.AllPtr() {
+		for e1 := range es.AllPtr() {
+			if ids.ContainsExactly(e1, e) {
+				if err = es.DelPtr(e1); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
+		}
 
-			return es.DelPtr(e)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = es.DelPtr(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if a.Parent == nil {

@@ -14,6 +14,8 @@ func ResetMutableSetWithPool[E any, EPtr interfaces.Ptr[E]](
 	s interfaces.MutableSetPtrLike[E, EPtr],
 	p interfaces.Pool[E, EPtr],
 ) {
-	s.EachPtr(p.Put)
+	for e := range s.AllPtr() {
+		p.Put(e)
+	}
 	s.Reset()
 }

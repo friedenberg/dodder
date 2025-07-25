@@ -11,10 +11,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
-func (e *page) seekToFirstBinarySearch(
+func (page *page) seekToFirstBinarySearch(
 	shMet interfaces.Digest,
 ) (mid int64, err error) {
-	if e.f == nil {
+	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
 			"fd nil: " + digests.Format(shMet),
 		)
@@ -26,7 +26,7 @@ func (e *page) seekToFirstBinarySearch(
 
 	var rowCount int64
 
-	if rowCount, err = e.GetRowCount(); err != nil {
+	if rowCount, err = page.GetRowCount(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -40,7 +40,7 @@ func (e *page) seekToFirstBinarySearch(
 
 		// var loc int64
 
-		if _, err = shMid.ReadAtFrom(e.f, mid*RowSize); err != nil {
+		if _, err = shMid.ReadAtFrom(page.file, mid*RowSize); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -74,10 +74,10 @@ func (e *page) seekToFirstBinarySearch(
 	return
 }
 
-func (e *page) seekToFirstLinearSearch(
+func (page *page) seekToFirstLinearSearch(
 	shMet interfaces.Digest,
 ) (loc int64, err error) {
-	if e.f == nil {
+	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
 			"fd nil: " + digests.Format(shMet),
 		)
@@ -87,19 +87,19 @@ func (e *page) seekToFirstLinearSearch(
 	var rowCount int64
 	shMid := &sha.Sha{}
 
-	if rowCount, err = e.GetRowCount(); err != nil {
+	if rowCount, err = page.GetRowCount(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.br.Reset(e.f)
+	page.bufferedReader.Reset(page.file)
 	buf := bytes.NewBuffer(make([]byte, RowSize))
 	buf.Reset()
 
 	for loc = int64(0); loc <= rowCount; loc++ {
 		// var loc int64
 
-		if _, err = buf.ReadFrom(&e.br); err != nil {
+		if _, err = buf.ReadFrom(&page.bufferedReader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

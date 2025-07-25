@@ -25,20 +25,16 @@ func MakeSetDelta[T interfaces.ValueLike](
 		Removed: from.CloneMutableSetLike(),
 	}
 
-	to.Each(
-		func(e T) (err error) {
-			if from.Contains(e) {
-				// had previously
-			} else {
-				// did not have previously
-				d.Added.Add(e)
-			}
+	for e := range to.All() {
+		if from.Contains(e) {
+			// had previously
+		} else {
+			// did not have previously
+			d.Added.Add(e)
+		}
 
-			d.Removed.Del(e)
-
-			return
-		},
-	)
+		d.Removed.Del(e)
+	}
 
 	return d
 }

@@ -9,11 +9,13 @@ type DirectoryLayout interface {
 	DirBlobStoreConfigs(p ...string) string
 	DirBlobStores(p ...string) string
 
+	// TODO rename Cache to Index
 	DirCache(p ...string) string
 	DirCacheInventoryListLog() string
 	DirCacheObjectPointers() string
 	DirCacheObjects() string
 	DirCacheRepo(p ...string) string
+
 	DirLostAndFound() string
 	DirObjectId() string
 

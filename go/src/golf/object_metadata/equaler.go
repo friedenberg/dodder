@@ -1,10 +1,8 @@
 package object_metadata
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 var (
@@ -46,24 +44,21 @@ func (e equaler) Equals(a, b *Metadata) bool {
 	aes := a.GetTags()
 	bes := b.GetTags()
 
-	if err := aes.EachPtr(
-		func(ea *ids.Tag) (err error) {
-			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
-				return
+	found := false
+	for ea := range aes.AllPtr() {
+		if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
+			continue
+		}
+
+		if !bes.ContainsKey(bes.KeyPtr(ea)) {
+			if debug {
+				ui.Debug().Print(ea, "-> X")
 			}
-
-			if !bes.ContainsKey(bes.KeyPtr(ea)) {
-				if debug {
-					ui.Debug().Print(ea, "-> X")
-				}
-
-				err = errors.New("false")
-				return
-			}
-
-			return
-		},
-	); err != nil {
+			found = true
+			break
+		}
+	}
+	if found {
 		if debug {
 			ui.Debug().Print(aes, "->", bes)
 		}
@@ -71,20 +66,18 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if err := bes.EachPtr(
-		func(eb *ids.Tag) (err error) {
-			if !e.includeVirtual && eb.IsVirtual() {
-				return
-			}
+	found2 := false
+	for eb := range bes.AllPtr() {
+		if !e.includeVirtual && eb.IsVirtual() {
+			continue
+		}
 
-			if !aes.ContainsKey(aes.KeyPtr(eb)) {
-				err = errors.New("false")
-				return
-			}
-
-			return
-		},
-	); err != nil {
+		if !aes.ContainsKey(aes.KeyPtr(eb)) {
+			found2 = true
+			break
+		}
+	}
+	if found2 {
 		if debug {
 			ui.Debug().Print(aes, "->", bes)
 		}

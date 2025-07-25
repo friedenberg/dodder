@@ -21,7 +21,9 @@
       "Bash(nix log:*)",
       "Bash(./build/der:*)",
       "Bash(rm:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(sed:*)",
+      "Bash(go clean:*)"
     ],
     "deny": []
   }

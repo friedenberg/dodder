@@ -19,32 +19,32 @@ import (
 )
 
 type page struct {
-	sync.Mutex // for the buffered reader
-	f          *os.File
-	br         bufio.Reader
-	added      *heap.Heap[row, *row]
-	repoLayout env_repo.Env
-	searchFunc func(interfaces.Digest) (mid int64, err error)
-	page_id.PageId
+	sync.Mutex     // for the buffered reader
+	file           *os.File
+	bufferedReader bufio.Reader
+	added          *heap.Heap[row, *row]
+	envRepo        env_repo.Env
+	searchFunc     func(interfaces.Digest) (mid int64, err error)
+	id             page_id.PageId
 }
 
-func (p *page) initialize(
+func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	pid page_id.PageId,
 ) (err error) {
-	p.added = heap.Make(
+	page.added = heap.Make(
 		equaler,
 		rowLessor{},
 		rowResetter{},
 	)
 
-	p.repoLayout = envRepo
-	p.PageId = pid
+	page.envRepo = envRepo
+	page.id = pid
 
-	p.searchFunc = p.seekToFirstBinarySearch
+	page.searchFunc = page.seekToFirstBinarySearch
 
-	if err = p.open(); err != nil {
+	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -52,16 +52,16 @@ func (p *page) initialize(
 	return
 }
 
-func (e *page) open() (err error) {
-	if e.f != nil {
-		if err = e.f.Close(); err != nil {
+func (page *page) open() (err error) {
+	if page.file != nil {
+		if err = page.file.Close(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if e.f, err = files.OpenFile(
-		e.Path(),
+	if page.file, err = files.OpenFile(
+		page.id.Path(),
 		os.O_RDONLY,
 		0o666,
 	); err != nil {
@@ -77,22 +77,22 @@ func (e *page) open() (err error) {
 	return
 }
 
-func (e *page) GetObjectProbeIndexPage() pageInterface {
-	return e
+func (page *page) GetObjectProbeIndexPage() pageInterface {
+	return page
 }
 
-func (e *page) AddSha(sh interfaces.Digest, loc Loc) (err error) {
+func (page *page) AddSha(sh interfaces.Digest, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
 
-	e.Lock()
-	defer e.Unlock()
+	page.Lock()
+	defer page.Unlock()
 
-	return e.addSha(sh, loc)
+	return page.addSha(sh, loc)
 }
 
-func (e *page) addSha(sh interfaces.Digest, loc Loc) (err error) {
+func (page *page) addSha(sh interfaces.Digest, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -106,15 +106,15 @@ func (e *page) addSha(sh interfaces.Digest, loc Loc) (err error) {
 		return
 	}
 
-	e.added.Push(r)
+	page.added.Push(r)
 
 	return
 }
 
-func (e *page) GetRowCount() (n int64, err error) {
+func (page *page) GetRowCount() (n int64, err error) {
 	var fi os.FileInfo
 
-	if fi, err = e.f.Stat(); err != nil {
+	if fi, err = page.file.Stat(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,13 +124,13 @@ func (e *page) GetRowCount() (n int64, err error) {
 	return
 }
 
-func (e *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
-	e.Lock()
-	defer e.Unlock()
+func (page *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
+	page.Lock()
+	defer page.Unlock()
 
 	var start int64
 
-	if start, err = e.searchFunc(sh); err != nil {
+	if start, err = page.searchFunc(sh); err != nil {
 		if !collections.IsErrNotFound(err) {
 			err = errors.Wrap(err)
 		}
@@ -138,12 +138,12 @@ func (e *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
 		return
 	}
 
-	if err = e.seekAndResetTo(start); err != nil {
+	if err = page.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if loc, _, err = e.readCurrentLoc(sh, &e.br); err != nil {
+	if loc, _, err = page.readCurrentLoc(sh, &page.bufferedReader); err != nil {
 		err = errors.Wrapf(err, "Start: %d", start)
 		return
 	}
@@ -151,18 +151,18 @@ func (e *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
 	return
 }
 
-func (e *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
-	e.Lock()
-	defer e.Unlock()
+func (page *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
+	page.Lock()
+	defer page.Unlock()
 
 	var start int64
 
-	if start, err = e.searchFunc(sh); err != nil {
+	if start, err = page.searchFunc(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.seekAndResetTo(start); err != nil {
+	if err = page.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,7 +173,7 @@ func (e *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
 		var loc Loc
 		var found bool
 
-		loc, found, err = e.readCurrentLoc(sh, &e.br)
+		loc, found, err = page.readCurrentLoc(sh, &page.bufferedReader)
 
 		if err == io.EOF {
 			err = nil
@@ -191,7 +191,7 @@ func (e *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
 	return
 }
 
-func (e *page) readCurrentLoc(
+func (page *page) readCurrentLoc(
 	in interfaces.Digest,
 	reader io.Reader,
 ) (out Loc, found bool, err error) {
@@ -228,26 +228,26 @@ func (e *page) readCurrentLoc(
 	return
 }
 
-func (e *page) seekAndResetTo(loc int64) (err error) {
-	if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
+func (page *page) seekAndResetTo(loc int64) (err error) {
+	if _, err = page.file.Seek(loc*RowSize, io.SeekStart); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.br.Reset(e.f)
+	page.bufferedReader.Reset(page.file)
 
 	return
 }
 
-func (e *page) PrintAll(env env_ui.Env) (err error) {
-	e.Lock()
-	defer e.Unlock()
+func (page *page) PrintAll(env env_ui.Env) (err error) {
+	page.Lock()
+	defer page.Unlock()
 
-	if e.f == nil {
+	if page.file == nil {
 		return
 	}
 
-	if err = e.seekAndResetTo(0); err != nil {
+	if err = page.seekAndResetTo(0); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -255,7 +255,7 @@ func (e *page) PrintAll(env env_ui.Env) (err error) {
 	for {
 		var current row
 
-		if _, err = current.ReadFrom(&e.br); err != nil {
+		if _, err = current.ReadFrom(&page.bufferedReader); err != nil {
 			err = errors.WrapExceptAsNil(err, io.EOF)
 			return
 		}
@@ -264,16 +264,16 @@ func (e *page) PrintAll(env env_ui.Env) (err error) {
 	}
 }
 
-func (e *page) Flush() (err error) {
-	e.Lock()
-	defer e.Unlock()
+func (page *page) Flush() (err error) {
+	page.Lock()
+	defer page.Unlock()
 
-	if e.added.Len() == 0 {
+	if page.added.Len() == 0 {
 		return
 	}
 
-	if e.f != nil {
-		if err = e.seekAndResetTo(0); err != nil {
+	if page.file != nil {
+		if err = page.seekAndResetTo(0); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -281,7 +281,7 @@ func (e *page) Flush() (err error) {
 
 	var ft *os.File
 
-	if ft, err = e.repoLayout.GetTempLocal().FileTemp(); err != nil {
+	if ft, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -295,13 +295,13 @@ func (e *page) Flush() (err error) {
 	var current row
 
 	getOne := func() (r *row, err error) {
-		if e.f == nil {
+		if page.file == nil {
 			err = io.EOF
 			return
 		}
 
 		var n int64
-		n, err = current.ReadFrom(&e.br)
+		n, err = current.ReadFrom(&page.bufferedReader)
 		if err != nil {
 			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
@@ -317,7 +317,7 @@ func (e *page) Flush() (err error) {
 	}
 
 	if err = heap.MergeStream(
-		e.added,
+		page.added,
 		func() (tz *row, err error) {
 			tz, err = getOne()
 
@@ -338,15 +338,15 @@ func (e *page) Flush() (err error) {
 
 	if err = os.Rename(
 		ft.Name(),
-		e.Path(),
+		page.id.Path(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.added.Reset()
+	page.added.Reset()
 
-	if err = e.open(); err != nil {
+	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

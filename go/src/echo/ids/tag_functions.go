@@ -89,7 +89,9 @@ func AddNormalizedTag(es TagMutableSet, e *Tag) {
 
 	c := es.CloneSetPtrLike()
 	es.Reset()
-	WithRemovedCommonPrefixes(c).Each(es.Add)
+	for tag := range WithRemovedCommonPrefixes(c).All() {
+		es.Add(tag)
+	}
 }
 
 func RemovePrefixes(es TagMutableSet, needle Tag) {

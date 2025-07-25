@@ -20,6 +20,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
+// TODO consider moving this or refactoring it as it's currently not really used
 type v0 struct {
 	once      sync.Once
 	path      string

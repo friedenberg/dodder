@@ -88,13 +88,9 @@ func ExpandMany[T idExpandable[T], TPtr idExpandablePtr[T]](
 ) (out interfaces.SetPtrLike[T, TPtr]) {
 	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
-	ks.EachPtr(
-		func(k TPtr) (err error) {
-			expandOne[T, TPtr](k, ex, s1)
-
-			return
-		},
-	)
+	for k := range ks.AllPtr() {
+		expandOne[T, TPtr](k, ex, s1)
+	}
 
 	out = s1.CloneSetPtrLike()
 

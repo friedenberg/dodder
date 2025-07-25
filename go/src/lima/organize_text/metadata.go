@@ -72,9 +72,11 @@ func (m *Metadata) SetFromObjectMetadata(
 func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
 	mes := sk.GetSkuExternal().Metadata.GetTags().CloneMutableSetPtrLike()
 
-	if err = m.Each(mes.Del); err != nil {
-		err = errors.Wrap(err)
-		return
+	for element := range m.All() {
+		if err = mes.Del(element); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	sk.GetSkuExternal().Metadata.SetTags(mes)

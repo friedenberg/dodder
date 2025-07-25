@@ -46,7 +46,9 @@ func (v *Cache) SetExpandedTags(e ids.TagSet) {
 		return
 	}
 
-	errors.PanicIfError(e.Each(es.Add))
+	for tag := range e.All() {
+		errors.PanicIfError(es.Add(tag))
+	}
 }
 
 func (v *Cache) GetImplicitTags() ids.TagSet {
@@ -78,5 +80,7 @@ func (v *Cache) SetImplicitTags(e ids.TagSet) {
 		return
 	}
 
-	errors.PanicIfError(e.Each(es.Add))
+	for tag := range e.All() {
+		errors.PanicIfError(es.Add(tag))
+	}
 }

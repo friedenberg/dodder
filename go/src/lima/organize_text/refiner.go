@@ -246,26 +246,22 @@ func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 	for _, c := range node.Children {
 		expanded := ids.Expanded(c.Transacted.Metadata.Tags, expansion.ExpanderRight)
 
-		expanded.Each(
-			func(e ids.Tag) (err error) {
-				if e.String() == "" {
-					return
-				}
+		for e := range expanded.All() {
+			if e.String() == "" {
+				continue
+			}
 
-				var n []*Assignment
-				ok := false
+			var n []*Assignment
+			ok := false
 
-				if n, ok = m[e.String()]; !ok {
-					n = make([]*Assignment, 0)
-				}
+			if n, ok = m[e.String()]; !ok {
+				n = make([]*Assignment, 0)
+			}
 
-				n = append(n, c)
+			n = append(n, c)
 
-				m[e.String()] = n
-
-				return
-			},
-		)
+			m[e.String()] = n
+		}
 	}
 
 	for e, n := range m {

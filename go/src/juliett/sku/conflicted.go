@@ -119,29 +119,32 @@ func (tm *Conflicted) MergeTags() (err error) {
 		return
 	}
 
-	if err = middle.EachPtr(
-		func(e *ids.Tag) (err error) {
-			if left.ContainsKey(left.KeyPtr(e)) && right.ContainsKey(right.KeyPtr(e)) {
-				return removeFromAllButAddTo(e, same)
-			} else if left.ContainsKey(left.KeyPtr(e)) || right.ContainsKey(right.KeyPtr(e)) {
-				return removeFromAllButAddTo(e, deleted)
+	for e := range middle.AllPtr() {
+		if left.ContainsKey(left.KeyPtr(e)) && right.ContainsKey(right.KeyPtr(e)) {
+			if err = removeFromAllButAddTo(e, same); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
+		} else if left.ContainsKey(left.KeyPtr(e)) || right.ContainsKey(right.KeyPtr(e)) {
+			if err = removeFromAllButAddTo(e, deleted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
 
+	for e := range left.AllPtr() {
+		if err = same.AddPtr(e); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
-	if err = left.EachPtr(same.AddPtr); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = right.EachPtr(same.AddPtr); err != nil {
-		err = errors.Wrap(err)
-		return
+	for e := range right.AllPtr() {
+		if err = same.AddPtr(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	ets := same.CloneSetPtrLike()

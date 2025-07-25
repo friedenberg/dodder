@@ -127,17 +127,14 @@ func MetadataFieldTags(
 
 	tags := make([]string_format_writer.Field, 0, metadata.Tags.Len())
 
-	metadata.Tags.EachPtr(
-		func(t *ids.Tag) (err error) {
-			tags = append(
-				tags,
-				string_format_writer.Field{
-					Value: t.String(),
-				},
-			)
-			return
-		},
-	)
+	for t := range metadata.Tags.AllPtr() {
+		tags = append(
+			tags,
+			string_format_writer.Field{
+				Value: t.String(),
+			},
+		)
+	}
 
 	sort.Slice(tags, func(i, j int) bool {
 		return tags[i].Value < tags[j].Value

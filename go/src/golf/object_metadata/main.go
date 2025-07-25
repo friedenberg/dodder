@@ -238,7 +238,9 @@ func (metadata *Metadata) SetTags(tags ids.TagSet) {
 		panic("empty tag set")
 	}
 
-	errors.PanicIfError(tags.EachPtr(metadata.AddTagPtr))
+	for tag := range tags.AllPtr() {
+		errors.PanicIfError(metadata.AddTagPtr(tag))
+	}
 }
 
 func (metadata *Metadata) GetType() ids.Type {

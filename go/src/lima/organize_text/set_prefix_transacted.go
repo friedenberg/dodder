@@ -32,7 +32,9 @@ func MakePrefixSetFrom(
 	ts objSet,
 ) (s PrefixSet) {
 	s = MakePrefixSet(ts.Len())
-	ts.Each(s.Add)
+	for element := range ts.All() {
+		s.Add(element)
+	}
 	return
 }
 
@@ -69,11 +71,11 @@ func (s *PrefixSet) Add(z *obj) (err error) {
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.GetSkuExternal().GetMetadata().Cache.GetExpandedTags().EachPtr(
-		es.AddPtr,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for e := range z.GetSkuExternal().GetMetadata().Cache.GetExpandedTags().AllPtr() {
+		if err = es.AddPtr(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if es.Len() == 0 {
@@ -81,14 +83,8 @@ func (s *PrefixSet) Add(z *obj) (err error) {
 		return
 	}
 
-	if err = es.Each(
-		func(e ids.Tag) (err error) {
-			s.addPair(e.String(), z)
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for e := range es.All() {
+		s.addPair(e.String(), z)
 	}
 
 	return
@@ -100,17 +96,11 @@ func (a PrefixSet) Subtract(
 	c = MakePrefixSet(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
-		aSet.Each(
-			func(z *obj) (err error) {
-				if b.Contains(z) {
-					return
-				}
-
+		for z := range aSet.All() {
+			if !b.Contains(z) {
 				c.addPair(e, z)
-
-				return
-			},
-		)
+			}
+		}
 	}
 
 	return
@@ -194,12 +184,11 @@ func (a PrefixSet) EachObject(
 ) error {
 	return a.Each(
 		func(_ ids.Tag, st objSet) (err error) {
-			err = st.Each(
-				func(z *obj) (err error) {
-					err = f(z)
+			for z := range st.All() {
+				if err = f(z); err != nil {
 					return
-				},
-			)
+				}
+			}
 
 			return
 		},
@@ -217,29 +206,25 @@ func (a PrefixSet) Match(
 			continue
 		}
 
-		zSet.Each(
-			func(z *obj) (err error) {
-				es := z.GetSkuExternal().GetTags()
+		for z := range zSet.All() {
+			es := z.GetSkuExternal().GetTags()
 
-				intersection := ids.IntersectPrefixes(
-					es,
-					e,
-				)
+			intersection := ids.IntersectPrefixes(
+				es,
+				e,
+			)
 
-				exactMatch := intersection.Len() == 1 &&
-					intersection.Any().Equals(e)
+			exactMatch := intersection.Len() == 1 &&
+				intersection.Any().Equals(e)
 
-				if intersection.Len() == 0 && !exactMatch {
-					return
-				}
+			if intersection.Len() == 0 && !exactMatch {
+				continue
+			}
 
-				for _, e2 := range quiter.Elements(intersection) {
-					out.Grouped.addPair(e2.String(), z)
-				}
-
-				return
-			},
-		)
+			for _, e2 := range quiter.Elements(intersection) {
+				out.Grouped.addPair(e2.String(), z)
+			}
+		}
 	}
 
 	return
@@ -258,50 +243,46 @@ func (a PrefixSet) Subset(
 			continue
 		}
 
-		zSet.Each(
-			func(z *obj) (err error) {
-				ui.Log().Print(e2, z)
-				intersection := z.GetSkuExternal().Metadata.Cache.TagPaths.All.GetMatching(
-					e2,
-				)
-				hasDirect := false || len(intersection) == 0
-				type match struct {
-					string
-					tag_paths.Type
-				}
-				toAddGrouped := make([]match, 0)
+		for z := range zSet.All() {
+			ui.Log().Print(e2, z)
+			intersection := z.GetSkuExternal().Metadata.Cache.TagPaths.All.GetMatching(
+				e2,
+			)
+			hasDirect := false || len(intersection) == 0
+			type match struct {
+				string
+				tag_paths.Type
+			}
+			toAddGrouped := make([]match, 0)
 
-			OUTER:
-				for _, e2Match := range intersection {
-					e2s := e2Match.Tag.String()
-					ui.Log().Print(e2Match.Tag)
-					for _, e3 := range e2Match.Parents {
-						toAddGrouped = append(toAddGrouped, match{
-							string: e2s,
-							Type:   e3.Type,
-						})
+		OUTER:
+			for _, e2Match := range intersection {
+				e2s := e2Match.Tag.String()
+				ui.Log().Print(e2Match.Tag)
+				for _, e3 := range e2Match.Parents {
+					toAddGrouped = append(toAddGrouped, match{
+						string: e2s,
+						Type:   e3.Type,
+					})
 
-						ui.Log().Print(e3)
-						if e3.Type == tag_paths.TypeDirect &&
-							e2Match.Tag.Len() == e2.Len() {
-							hasDirect = true
-							break OUTER
-						}
+					ui.Log().Print(e3)
+					if e3.Type == tag_paths.TypeDirect &&
+						e2Match.Tag.Len() == e2.Len() {
+						hasDirect = true
+						break OUTER
 					}
 				}
+			}
 
-				if hasDirect {
-					out.Ungrouped.Add(z)
-				} else {
-					for _, e3 := range toAddGrouped {
-						c := z.cloneWithType(e3.Type)
-						out.Grouped.addPair(e3.string, c)
-					}
+			if hasDirect {
+				out.Ungrouped.Add(z)
+			} else {
+				for _, e3 := range toAddGrouped {
+					c := z.cloneWithType(e3.Type)
+					out.Grouped.addPair(e3.string, c)
 				}
-
-				return
-			},
-		)
+			}
+		}
 	}
 
 	return

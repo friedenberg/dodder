@@ -57,37 +57,30 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	anchored := ids.MakeMutableTagSet()
 	extras := ids.MakeMutableTagSet()
 
-	if err = c.TagSet.Each(
-		func(re ids.Tag) (err error) {
-			var explicitCount, implicitCount int
+	for re := range c.TagSet.All() {
+		var explicitCount, implicitCount int
 
-			if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
-				c.Options.Skus,
-				re,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
-
-			// TODO [radi/du !task project-2021-zit-etiketten_and_organize zz-inbox] fix issue with `zit organize project-2021-zit` causing an extra tag…
-			if err = anchored.Add(re); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-			// if explicitCount == c.Options.Skus.Len() {
-			// 	if err = extras.Add(re); err != nil {
-			// 		err = errors.Wrap(err)
-			// 		return
-			// 	}
-			// }
-
+		if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
+			c.Options.Skus,
+			re,
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
+
+		// TODO [radi/du !task project-2021-zit-etiketten_and_organize zz-inbox] fix issue with `zit organize project-2021-zit` causing an extra tag…
+		if err = anchored.Add(re); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+		// if explicitCount == c.Options.Skus.Len() {
+		// 	if err = extras.Add(re); err != nil {
+		// 		err = errors.Wrap(err)
+		// 		return
+		// 	}
+		// }
 	}
 
 	c.TagSet = anchored
@@ -116,7 +109,14 @@ func (c *constructor) populate() (err error) {
 
 		if err = c.makeChildrenWithoutGroups(
 			ee,
-			segments.Ungrouped.Each,
+			func(f interfaces.FuncIter[*obj]) error {
+				for element := range segments.Ungrouped.All() {
+					if err := f(element); err != nil {
+						return err
+					}
+				}
+				return nil
+			},
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -185,7 +185,14 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 
 	segments := prefixSet.Subset(groupingTags[0])
 
-	if err = c.makeAndAddUngrouped(parent, segments.Ungrouped.Each); err != nil {
+	if err = c.makeAndAddUngrouped(parent, func(f interfaces.FuncIter[*obj]) error {
+		for element := range segments.Ungrouped.All() {
+			if err := f(element); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -211,42 +218,52 @@ func (c *constructor) addGroupedChildren(
 	groupingTags ids.TagSlice,
 	used objSet,
 ) (err error) {
-	if err = grouped.Each(
-		func(e ids.Tag, zs objSet) (err error) {
-			if e.IsEmpty() || c.TagSet.Contains(e) {
-				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
-					err = errors.Wrap(err)
-					return
+	for eStr, zs := range grouped.AllObjectSets() {
+		var e ids.Tag
+		if eStr != "" {
+			e = ids.MustTag(eStr)
+		}
+
+		if e.IsEmpty() || c.TagSet.Contains(e) {
+			if err = c.makeAndAddUngrouped(parent, func(f interfaces.FuncIter[*obj]) error {
+				for element := range zs.All() {
+					if err := f(element); err != nil {
+						return err
+					}
 				}
-
-				zs.Each(used.Add)
-
-				return
-			}
-
-			child := newAssignment(parent.GetDepth() + 1)
-			child.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
-			groupingTags.DropFirst()
-
-			psv := MakePrefixSetFrom(zs)
-
-			if err = c.makeChildrenWithPossibleGroups(
-				child,
-				psv,
-				groupingTags,
-				used,
-			); err != nil {
+				return nil
+			}); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			parent.addChild(child)
+			for element := range zs.All() {
+				if err = used.Add(element); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 
+			continue
+		}
+
+		child := newAssignment(parent.GetDepth() + 1)
+		child.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
+		groupingTags.DropFirst()
+
+		psv := MakePrefixSetFrom(zs)
+
+		if err = c.makeChildrenWithPossibleGroups(
+			child,
+			psv,
+			groupingTags,
+			used,
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		parent.addChild(child)
 	}
 
 	return

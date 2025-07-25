@@ -11,18 +11,18 @@ import (
 )
 
 type probe_index struct {
-	directoryLayout env_repo.Env
+	envRepo env_repo.Env
 	object_probe_index.Index
 }
 
-func (s *probe_index) Initialize(
-	directoryLayout env_repo.Env,
+func (index *probe_index) Initialize(
+	envRepo env_repo.Env,
 ) (err error) {
-	s.directoryLayout = directoryLayout
+	index.envRepo = envRepo
 
-	if s.Index, err = object_probe_index.MakeNoDuplicates(
-		s.directoryLayout,
-		s.directoryLayout.DirCacheObjectPointers(),
+	if index.Index, err = object_probe_index.MakeNoDuplicates(
+		index.envRepo,
+		index.envRepo.DirCacheObjectPointers(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -31,8 +31,8 @@ func (s *probe_index) Initialize(
 	return
 }
 
-func (s *probe_index) Flush() (err error) {
-	if err = s.Index.Flush(); err != nil {
+func (index *probe_index) Flush() (err error) {
+	if err = index.Index.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -40,31 +40,31 @@ func (s *probe_index) Flush() (err error) {
 	return
 }
 
-func (s *probe_index) readOneShaLoc(
+func (index *probe_index) readOneShaLoc(
 	sh interfaces.Digest,
 ) (loc object_probe_index.Loc, err error) {
-	if loc, err = s.Index.ReadOne(sh); err != nil {
+	if loc, err = index.Index.ReadOne(sh); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *probe_index) readManyShaLoc(
+func (index *probe_index) readManyShaLoc(
 	sh interfaces.Digest,
 ) (locs []object_probe_index.Loc, err error) {
-	if err = s.Index.ReadMany(sh, &locs); err != nil {
+	if err = index.Index.ReadMany(sh, &locs); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *probe_index) saveOneLoc(
+func (index *probe_index) saveOneLoc(
 	o *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
-	if err = s.saveOneLocString(
+	if err = index.saveOneLocString(
 		o.GetObjectId().String(),
 		loc,
 	); err != nil {
@@ -72,7 +72,7 @@ func (s *probe_index) saveOneLoc(
 		return
 	}
 
-	if err = s.saveOneLocString(
+	if err = index.saveOneLocString(
 		o.GetObjectId().String()+o.GetTai().String(),
 		loc,
 	); err != nil {
@@ -83,14 +83,14 @@ func (s *probe_index) saveOneLoc(
 	return
 }
 
-func (s *probe_index) saveOneLocString(
+func (index *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
 	digest := sha.FromStringContent(str)
 	defer digests.PutDigest(digest)
 
-	if err = s.Index.AddSha(digest, loc); err != nil {
+	if err = index.Index.AddSha(digest, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

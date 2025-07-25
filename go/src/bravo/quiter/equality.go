@@ -1,7 +1,6 @@
 package quiter
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
@@ -25,18 +24,10 @@ func SetEquals[T any](
 		return false
 	}
 
-	err := a.Each(
-		func(e T) (err error) {
-			if ok := b.Contains(e); !ok {
-				err = errors.ErrFalse
-				return
-			}
-
-			return
-		},
-	)
-	if err != nil {
-		return false
+	for e := range a.All() {
+		if ok := b.Contains(e); !ok {
+			return false
+		}
 	}
 
 	return true
@@ -57,20 +48,12 @@ func SetEqualsPtr[T any, TPtr interfaces.Ptr[T]](
 		return false
 	}
 
-	err := a.EachPtr(
-		func(e TPtr) (err error) {
-			k := b.KeyPtr(e)
+	for e := range a.AllPtr() {
+		k := b.KeyPtr(e)
 
-			if ok := b.ContainsKey(k); !ok {
-				err = errors.ErrFalse
-				return
-			}
-
-			return
-		},
-	)
-	if err != nil {
-		return false
+		if ok := b.ContainsKey(k); !ok {
+			return false
+		}
 	}
 
 	return true

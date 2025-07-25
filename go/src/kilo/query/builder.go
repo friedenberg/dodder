@@ -203,21 +203,17 @@ func (b *Builder) WithTransacted(
 	zts sku.TransactedSet,
 	sigil ids.Sigil,
 ) *Builder {
-	errors.PanicIfError(zts.Each(
-		func(t *sku.Transacted) (err error) {
-			b.pinnedObjectIds = append(
-				b.pinnedObjectIds,
-				pinnedObjectId{
-					Sigil: sigil,
-					ObjectId: ObjectId{
-						ObjectId: t.ObjectId.Clone(),
-					},
+	for t := range zts.All() {
+		b.pinnedObjectIds = append(
+			b.pinnedObjectIds,
+			pinnedObjectId{
+				Sigil: sigil,
+				ObjectId: ObjectId{
+					ObjectId: t.ObjectId.Clone(),
 				},
-			)
-
-			return
-		},
-	))
+			},
+		)
+	}
 
 	return b
 }

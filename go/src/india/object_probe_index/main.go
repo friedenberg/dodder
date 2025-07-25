@@ -16,6 +16,7 @@ type (
 	Sha = sha.Sha
 
 	commonInterface interface {
+		// TODO rename to AddDigest and enforce digest type
 		AddSha(interfaces.Digest, Loc) error
 		ReadOne(sh interfaces.Digest) (loc Loc, err error)
 		ReadMany(sh interfaces.Digest, locs *[]Loc) (err error)
@@ -48,41 +49,45 @@ type object_probe_index struct {
 }
 
 func MakePermitDuplicates(
-	s env_repo.Env,
+	envRepo env_repo.Env,
 	path string,
-) (e *object_probe_index, err error) {
-	e = &object_probe_index{}
-	err = e.initialize(rowEqualerComplete{}, s, path)
+) (index *object_probe_index, err error) {
+	index = &object_probe_index{}
+	err = index.initialize(rowEqualerComplete{}, envRepo, path)
 	return
 }
 
 func MakeNoDuplicates(
-	s env_repo.Env,
-	path string,
-) (e *object_probe_index, err error) {
-	e = &object_probe_index{}
-	err = e.initialize(rowEqualerShaOnly{}, s, path)
+	envRepo env_repo.Env,
+	dir string,
+) (index *object_probe_index, err error) {
+	index = &object_probe_index{}
+	err = index.initialize(rowEqualerShaOnly{}, envRepo, dir)
 	return
 }
 
-func (e *object_probe_index) initialize(
+func (index *object_probe_index) initialize(
 	equaler interfaces.Equaler[*row],
-	s env_repo.Env,
-	path string,
+	envRepo env_repo.Env,
+	dir string,
 ) (err error) {
-	for i := range e.pages {
-		p := &e.pages[i]
-		p.initialize(equaler, s, page_id.PageIdFromPath(uint8(i), path))
+	for i := range index.pages {
+		page := &index.pages[i]
+		page.initialize(
+			equaler,
+			envRepo,
+			page_id.PageIdFromPath(uint8(i), dir),
+		)
 	}
 
 	return
 }
 
-func (e *object_probe_index) GetObjectProbeIndex() Index {
-	return e
+func (index *object_probe_index) GetObjectProbeIndex() Index {
+	return index
 }
 
-func (e *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
+func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	var shas map[string]interfaces.Digest
 
 	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
@@ -91,7 +96,7 @@ func (e *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	}
 
 	for _, s := range shas {
-		if err = e.addSha(s, loc); err != nil {
+		if err = index.addSha(s, loc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -100,11 +105,17 @@ func (e *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	return
 }
 
-func (e *object_probe_index) AddSha(sh interfaces.Digest, loc Loc) (err error) {
-	return e.addSha(sh, loc)
+func (index *object_probe_index) AddSha(
+	sh interfaces.Digest,
+	loc Loc,
+) (err error) {
+	return index.addSha(sh, loc)
 }
 
-func (e *object_probe_index) addSha(sh interfaces.Digest, loc Loc) (err error) {
+func (index *object_probe_index) addSha(
+	sh interfaces.Digest,
+	loc Loc,
+) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -116,10 +127,12 @@ func (e *object_probe_index) addSha(sh interfaces.Digest, loc Loc) (err error) {
 		return
 	}
 
-	return e.pages[i].AddSha(sh, loc)
+	return index.pages[i].AddSha(sh, loc)
 }
 
-func (e *object_probe_index) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
+func (index *object_probe_index) ReadOne(
+	sh interfaces.Digest,
+) (loc Loc, err error) {
 	var i uint8
 
 	if i, err = page_id.PageIndexForDigest(DigitWidth, sh); err != nil {
@@ -127,10 +140,13 @@ func (e *object_probe_index) ReadOne(sh interfaces.Digest) (loc Loc, err error) 
 		return
 	}
 
-	return e.pages[i].ReadOne(sh)
+	return index.pages[i].ReadOne(sh)
 }
 
-func (e *object_probe_index) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
+func (index *object_probe_index) ReadMany(
+	sh interfaces.Digest,
+	locs *[]Loc,
+) (err error) {
 	var i uint8
 
 	if i, err = page_id.PageIndexForDigest(DigitWidth, sh); err != nil {
@@ -138,10 +154,10 @@ func (e *object_probe_index) ReadMany(sh interfaces.Digest, locs *[]Loc) (err er
 		return
 	}
 
-	return e.pages[i].ReadMany(sh, locs)
+	return index.pages[i].ReadMany(sh, locs)
 }
 
-func (e *object_probe_index) ReadOneKey(
+func (index *object_probe_index) ReadOneKey(
 	kf string,
 	m *object_metadata.Metadata,
 ) (loc Loc, err error) {
@@ -161,7 +177,7 @@ func (e *object_probe_index) ReadOneKey(
 
 	defer digests.PutDigest(sh)
 
-	if loc, err = e.ReadOne(sh); err != nil {
+	if loc, err = index.ReadOne(sh); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
 		return
 	}
@@ -169,7 +185,7 @@ func (e *object_probe_index) ReadOneKey(
 	return
 }
 
-func (e *object_probe_index) ReadManyKeys(
+func (index *object_probe_index) ReadManyKeys(
 	kf string,
 	m *object_metadata.Metadata,
 	h *[]Loc,
@@ -188,10 +204,10 @@ func (e *object_probe_index) ReadManyKeys(
 		return
 	}
 
-	return e.ReadMany(sh, h)
+	return index.ReadMany(sh, h)
 }
 
-func (e *object_probe_index) ReadAll(
+func (index *object_probe_index) ReadAll(
 	m *object_metadata.Metadata,
 	h *[]Loc,
 ) (err error) {
@@ -210,7 +226,7 @@ func (e *object_probe_index) ReadAll(
 			func() (err error) {
 				var loc Loc
 
-				if loc, err = e.ReadOne(s); err != nil {
+				if loc, err = index.ReadOne(s); err != nil {
 					err = errors.Wrapf(err, "Key: %s", k)
 					return
 				}
@@ -225,9 +241,9 @@ func (e *object_probe_index) ReadAll(
 	return wg.GetError()
 }
 
-func (e *object_probe_index) PrintAll(env env_ui.Env) (err error) {
-	for i := range e.pages {
-		p := &e.pages[i]
+func (index *object_probe_index) PrintAll(env env_ui.Env) (err error) {
+	for i := range index.pages {
+		p := &index.pages[i]
 
 		if err = p.PrintAll(env); err != nil {
 			err = errors.Wrap(err)
@@ -238,11 +254,11 @@ func (e *object_probe_index) PrintAll(env env_ui.Env) (err error) {
 	return
 }
 
-func (e *object_probe_index) Flush() (err error) {
+func (index *object_probe_index) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	for i := range e.pages {
-		p := &e.pages[i]
+	for i := range index.pages {
+		p := &index.pages[i]
 		wg.Do(p.Flush)
 	}
 
