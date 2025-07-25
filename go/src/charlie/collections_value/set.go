@@ -93,21 +93,6 @@ func (s Set[T]) Add(v T) (err error) {
 	return
 }
 
-func (s Set[T]) Each(wf interfaces.FuncIter[T]) (err error) {
-	for _, v := range s.E {
-		if err = wf(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
 
 func (a Set[T]) CloneSetLike() interfaces.SetLike[T] {
 	return a

@@ -105,23 +105,6 @@ func (s MutableSet[T]) EachKey(
 	return
 }
 
-func (s MutableSet[T]) Each(
-	wf interfaces.FuncIter[T],
-) (err error) {
-	for _, v := range s.E {
-		if err = wf(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
 
 func (a MutableSet[T]) Reset() {
 	for k := range a.E {

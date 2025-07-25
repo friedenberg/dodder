@@ -19,7 +19,7 @@ type Collection[T any] interface {
 }
 
 type SetLike[T any] interface {
-	CollectionOld[T]
+	Collection[T]
 	ContainsKeyer
 
 	Key(T) string

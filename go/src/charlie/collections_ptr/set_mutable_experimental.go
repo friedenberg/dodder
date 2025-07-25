@@ -322,55 +322,8 @@ func (s *mutableSetExperimental[T, TPtr]) EachKey(
 	return
 }
 
-func (s *mutableSetExperimental[T, TPtr]) Each(
-	wf interfaces.FuncIter[T],
-) (err error) {
-	defer s.TryProcessMutationsDuringReads()
-	s.l.RLock()
-	defer s.l.RUnlock()
 
-	for _, v := range s.E {
-		if err = wf(*v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
 
-			return
-		}
-	}
-
-	return
-}
-
-func (s *mutableSetExperimental[T, TPtr]) EachPtr(
-	wf interfaces.FuncIter[TPtr],
-) (err error) {
-	defer s.TryProcessMutationsDuringReads()
-	s.l.RLock()
-	defer s.l.RUnlock()
-
-	return s.eachPtr(wf)
-}
-
-func (s *mutableSetExperimental[T, TPtr]) eachPtr(
-	wf interfaces.FuncIter[TPtr],
-) (err error) {
-	for _, v := range s.E {
-		if err = wf(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
 
 func (a *mutableSetExperimental[T, TPtr]) Reset() {
 	if !a.l.TryLock() {

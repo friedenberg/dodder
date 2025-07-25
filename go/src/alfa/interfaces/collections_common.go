@@ -32,6 +32,5 @@ type Iterable[T any] interface {
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {
-	EachPtr(FuncIter[TPtr]) error // TODO remove in favor of iter.Seq
 	AllPtr() interfaces.Seq[TPtr]
 }

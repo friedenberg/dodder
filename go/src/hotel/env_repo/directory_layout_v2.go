@@ -70,13 +70,13 @@ func (layout directoryLayoutV2) FileConfigMutable() string {
 }
 
 func (layout directoryLayoutV2) DirCache(p ...string) string {
-	return layout.DirDodder(append([]string{"cache"}, p...)...)
+	return layout.DirDodder(append([]string{"index"}, p...)...)
 }
 
 func (layout directoryLayoutV2) DirCacheRepo(p ...string) string {
 	// TODO switch to XDG cache
 	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
-	return layout.DirDodder(append([]string{"cache", "repo"}, p...)...)
+	return layout.DirDodder(append([]string{"index", "repo"}, p...)...)
 }
 
 func (layout directoryLayoutV2) DirLostAndFound() string {
@@ -88,7 +88,7 @@ func (layout directoryLayoutV2) DirCacheObjects() string {
 }
 
 func (layout directoryLayoutV2) DirCacheObjectPointers() string {
-	return layout.DirCache("object_pointers")
+	return layout.DirCache("object_pointers/Page")
 }
 
 func (layout directoryLayoutV2) DirCacheInventoryListLog() string {

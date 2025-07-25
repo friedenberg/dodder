@@ -123,39 +123,7 @@ func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 	return
 }
 
-func (s Set[T, TPtr]) Each(wf interfaces.FuncIter[T]) (err error) {
-	for _, v := range s.E {
-		if err = wf(*v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
 
-			return
-		}
-	}
-
-	return
-}
-
-func (s Set[T, TPtr]) EachPtr(
-	wf interfaces.FuncIter[TPtr],
-) (err error) {
-	for _, v := range s.E {
-		if err = wf(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
 
 func (a Set[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {
 	return a

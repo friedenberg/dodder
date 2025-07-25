@@ -139,41 +139,7 @@ func (s MutableSet[T, TPtr]) EachKey(
 	return
 }
 
-func (s MutableSet[T, TPtr]) Each(
-	wf interfaces.FuncIter[T],
-) (err error) {
-	for _, v := range s.E {
-		if err = wf(*v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
 
-			return
-		}
-	}
-
-	return
-}
-
-func (s MutableSet[T, TPtr]) EachPtr(
-	wf interfaces.FuncIter[TPtr],
-) (err error) {
-	for _, v := range s.E {
-		if err = wf(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
 
 func (a MutableSet[T, TPtr]) Reset() {
 	for k := range a.E {
