@@ -115,6 +115,8 @@ func (a Set[T]) CloneSetLike() interfaces.SetLike[T] {
 
 func (a Set[T]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
 	c := MakeMutableSet[T](a.K)
-	a.Each(c.Add)
+	for e := range a.All() {
+		c.Add(e)
+	}
 	return c
 }

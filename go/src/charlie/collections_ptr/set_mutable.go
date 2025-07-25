@@ -193,7 +193,9 @@ func (a MutableSet[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {
 
 func (a MutableSet[T, TPtr]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
 	c := MakeMutableSet[T, TPtr](a.K)
-	a.Each(c.Add)
+	for e := range a.All() {
+		c.Add(e)
+	}
 	return c
 }
 
@@ -209,6 +211,8 @@ func (a MutableSet[T, TPtr]) CloneSetPtrLike() interfaces.SetPtrLike[T, TPtr] {
 
 func (a MutableSet[T, TPtr]) CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr] {
 	c := MakeMutableSet[T, TPtr](a.K)
-	a.Each(c.Add)
+	for e := range a.All() {
+		c.Add(e)
+	}
 	return c
 }
