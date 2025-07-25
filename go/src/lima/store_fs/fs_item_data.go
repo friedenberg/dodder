@@ -45,7 +45,9 @@ func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
 		top := sorted[0]
 
 		for _, other := range sorted[1:] {
-			other.MutableSetLike.Each(top.MutableSetLike.Add)
+			for item := range other.MutableSetLike.All() {
+				top.MutableSetLike.Add(item)
+			}
 		}
 
 		replacement.Add(top)

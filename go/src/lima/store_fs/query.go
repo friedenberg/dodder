@@ -381,14 +381,8 @@ func (store *Store) queryUntracked(
 	{
 		blobs := make([]*sku.FSItem, 0, definitelyNotCheckedOut.Len())
 
-		if err = definitelyNotCheckedOut.Each(
-			func(fds *sku.FSItem) (err error) {
-				blobs = append(blobs, fds)
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		for fds := range definitelyNotCheckedOut.All() {
+			blobs = append(blobs, fds)
 		}
 
 		sort.Slice(

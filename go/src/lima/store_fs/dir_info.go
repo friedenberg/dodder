@@ -586,24 +586,17 @@ func (d *dirInfo) addOneOrMoreBlobs(
 		return
 	}
 
-	if err = fds.MutableSetLike.Each(
-		func(fd *fd.FD) (err error) {
-			var fdsOne *sku.FSItem
+	for range fds.MutableSetLike.All() {
+		var fdsOne *sku.FSItem
 
-			if fdsOne, err = d.addOneUntracked(
-				fds.Any(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			results = append(results, fdsOne)
-
+		if fdsOne, err = d.addOneUntracked(
+			fds.Any(),
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		results = append(results, fdsOne)
 	}
 
 	return

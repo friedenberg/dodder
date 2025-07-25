@@ -91,7 +91,8 @@ export cmd_dodder_def
 
 if [[ -z $DODDER_BIN ]]; then
   export DODDER_BIN
-  DODDER_BIN="$(which dodder || echo "$DIR/../go/build/dodder")"
+  echo "No \$DODDER_BIN set. This is usually set by .envrc or .env" >&2
+  exit 1
 fi
 
 if [[ -z $DODDER_VERSION ]]; then

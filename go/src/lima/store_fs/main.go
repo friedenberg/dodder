@@ -98,9 +98,8 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	store.deleteLock.Lock()
 	defer store.deleteLock.Unlock()
 
-	if err = item.MutableSetLike.Each(store.deleted.Add); err != nil {
-		err = errors.Wrap(err)
-		return
+	for fd := range item.MutableSetLike.All() {
+		store.deleted.Add(fd)
 	}
 
 	return
@@ -121,9 +120,8 @@ func (store *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 	store.deleteLock.Lock()
 	defer store.deleteLock.Unlock()
 
-	if err = i.MutableSetLike.Each(store.deletedInternal.Add); err != nil {
-		err = errors.Wrap(err)
-		return
+	for fd := range i.MutableSetLike.All() {
+		store.deletedInternal.Add(fd)
 	}
 
 	return
@@ -183,17 +181,13 @@ func (store *Store) String() (out string) {
 		return
 	}
 
-	store.dirInfo.probablyCheckedOut.Each(
-		func(z *sku.FSItem) (err error) {
-			return writeOneIfNecessary(z)
-		},
-	)
+	for z := range store.dirInfo.probablyCheckedOut.All() {
+		writeOneIfNecessary(z)
+	}
 
-	store.definitelyNotCheckedOut.Each(
-		func(z *sku.FSItem) (err error) {
-			return writeOneIfNecessary(z)
-		},
-	)
+	for z := range store.definitelyNotCheckedOut.All() {
+		writeOneIfNecessary(z)
+	}
 
 	sb.WriteRune(box.OpGroupClose)
 
