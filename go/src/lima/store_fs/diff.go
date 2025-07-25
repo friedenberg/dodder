@@ -15,7 +15,7 @@ func (store *Store) runDiff3(
 ) (merged *sku.FSItem, err error) {
 	baseObjectPath := "/dev/null"
 
-	if base.MutableSetLike.Len() > 0 {
+	if base.FDs.Len() > 0 {
 		baseObjectPath = base.Object.GetPath()
 	}
 
@@ -63,7 +63,7 @@ func (store *Store) runDiff3(
 	merged.ResetWith(local)
 	merged.Object.Reset()
 	merged.Blob.Reset()
-	merged.MutableSetLike.Reset()
+	merged.FDs.Reset()
 
 	hasConflict := false
 

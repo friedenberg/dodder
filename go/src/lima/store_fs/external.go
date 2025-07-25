@@ -85,7 +85,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 
 	if sk.Metadata.Description.IsEmpty() {
 		sorted := quiter.ElementsSorted(
-			item.MutableSetLike,
+			item.FDs,
 			func(a, b *fd.FD) bool {
 				return a.GetPath() < b.GetPath()
 			},

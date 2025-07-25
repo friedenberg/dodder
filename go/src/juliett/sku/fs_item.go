@@ -24,14 +24,14 @@ type FSItem struct {
 	Blob     fd.FD // TODO make set
 	Conflict fd.FD
 
-	MutableSetLike interfaces.MutableSetLike[*fd.FD]
+	FDs interfaces.MutableSetLike[*fd.FD]
 }
 
-func (ef *FSItem) WriteToSku(
+func (item *FSItem) WriteToSku(
 	external *Transacted,
 	dirLayout env_dir.Env,
 ) (err error) {
-	if err = ef.WriteToExternalObjectId(
+	if err = item.WriteToExternalObjectId(
 		&external.ExternalObjectId,
 		dirLayout,
 	); err != nil {
@@ -42,29 +42,29 @@ func (ef *FSItem) WriteToSku(
 	return
 }
 
-func (ef *FSItem) WriteToExternalObjectId(
+func (item *FSItem) WriteToExternalObjectId(
 	eoid *ids.ExternalObjectId,
 	dirLayout env_dir.Env,
 ) (err error) {
-	eoid.SetGenre(ef.ExternalObjectId.GetGenre())
+	eoid.SetGenre(item.ExternalObjectId.GetGenre())
 
 	var relPath string
 	var anchorFD *fd.FD
 
 	switch {
-	case !ef.Object.IsEmpty():
-		anchorFD = &ef.Object
+	case !item.Object.IsEmpty():
+		anchorFD = &item.Object
 
-	case !ef.Blob.IsEmpty():
-		anchorFD = &ef.Blob
+	case !item.Blob.IsEmpty():
+		anchorFD = &item.Blob
 
-	case !ef.Conflict.IsEmpty():
-		anchorFD = &ef.Conflict
+	case !item.Conflict.IsEmpty():
+		anchorFD = &item.Conflict
 
 	default:
 		// [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer
 		// during organize in workspace
-		ui.Err().Printf("item has no anchor FDs. %q", ef.Debug())
+		ui.Err().Printf("item has no anchor FDs. %q", item.Debug())
 		return
 	}
 
@@ -82,36 +82,36 @@ func (ef *FSItem) WriteToExternalObjectId(
 	return
 }
 
-func (ef *FSItem) String() string {
-	return ef.ExternalObjectId.String()
+func (item *FSItem) String() string {
+	return item.ExternalObjectId.String()
 }
 
-func (ef *FSItem) GetExternalObjectId() *ids.ExternalObjectId {
-	return &ef.ExternalObjectId
+func (item *FSItem) GetExternalObjectId() *ids.ExternalObjectId {
+	return &item.ExternalObjectId
 }
 
-func (i *FSItem) Debug() string {
+func (item *FSItem) Debug() string {
 	return fmt.Sprintf(
 		"Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
-		i.ExternalObjectId.GetGenre(),
-		&i.ExternalObjectId,
-		&i.Object,
-		&i.Blob,
-		&i.Conflict,
-		i.MutableSetLike,
+		item.ExternalObjectId.GetGenre(),
+		&item.ExternalObjectId,
+		&item.Object,
+		&item.Blob,
+		&item.Conflict,
+		item.FDs,
 	)
 }
 
-func (i *FSItem) GetTai() ids.Tai {
-	return ids.TaiFromTime(i.LatestModTime())
+func (item *FSItem) GetTai() ids.Tai {
+	return ids.TaiFromTime(item.LatestModTime())
 }
 
-func (i *FSItem) GetTime() thyme.Time {
-	return i.LatestModTime()
+func (item *FSItem) GetTime() thyme.Time {
+	return item.LatestModTime()
 }
 
-func (i *FSItem) LatestModTime() thyme.Time {
-	o, b := i.Object.ModTime(), i.Blob.ModTime()
+func (item *FSItem) LatestModTime() thyme.Time {
+	o, b := item.Object.ModTime(), item.Blob.ModTime()
 
 	if o.Less(b) {
 		return b
@@ -120,16 +120,16 @@ func (i *FSItem) LatestModTime() thyme.Time {
 	}
 }
 
-func (dst *FSItem) Reset() {
-	dst.ExternalObjectId.Reset()
-	dst.Object.Reset()
-	dst.Blob.Reset()
-	dst.Conflict.Reset()
+func (item *FSItem) Reset() {
+	item.ExternalObjectId.Reset()
+	item.Object.Reset()
+	item.Blob.Reset()
+	item.Conflict.Reset()
 
-	if dst.MutableSetLike == nil {
-		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
+	if item.FDs == nil {
+		item.FDs = collections_value.MakeMutableValueSet[*fd.FD](nil)
 	} else {
-		dst.MutableSetLike.Reset()
+		item.FDs.Reset()
 	}
 }
 
@@ -143,61 +143,61 @@ func (dst *FSItem) ResetWith(src *FSItem) {
 	dst.Blob.ResetWith(&src.Blob)
 	dst.Conflict.ResetWith(&src.Conflict)
 
-	if dst.MutableSetLike == nil {
-		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
+	if dst.FDs == nil {
+		dst.FDs = collections_value.MakeMutableValueSet[*fd.FD](nil)
 	}
 
-	dst.MutableSetLike.Reset()
+	dst.FDs.Reset()
 
-	if src.MutableSetLike != nil {
-		for item := range src.MutableSetLike.All() {
-			dst.MutableSetLike.Add(item)
+	if src.FDs != nil {
+		for item := range src.FDs.All() {
+			dst.FDs.Add(item)
 		}
 	}
 
 	// TODO consider if this approach actually works
 	if !dst.Object.IsEmpty() {
-		dst.MutableSetLike.Add(&dst.Object)
+		dst.FDs.Add(&dst.Object)
 	}
 
 	if !dst.Blob.IsEmpty() {
-		dst.MutableSetLike.Add(&dst.Blob)
+		dst.FDs.Add(&dst.Blob)
 	}
 
 	if !dst.Conflict.IsEmpty() {
-		dst.MutableSetLike.Add(&dst.Conflict)
+		dst.FDs.Add(&dst.Conflict)
 	}
 }
 
-func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
-	if ok, why = a.Object.Equals2(&b.Object); !ok {
+func (item *FSItem) Equals(b *FSItem) (ok bool, why string) {
+	if ok, why = item.Object.Equals2(&b.Object); !ok {
 		return false, fmt.Sprintf("Object.%s", why)
 	}
 
-	if ok, why = a.Blob.Equals2(&b.Blob); !ok {
+	if ok, why = item.Blob.Equals2(&b.Blob); !ok {
 		return false, fmt.Sprintf("Blob.%s", why)
 	}
 
-	if ok, why = a.Conflict.Equals2(&b.Conflict); !ok {
+	if ok, why = item.Conflict.Equals2(&b.Conflict); !ok {
 		return false, fmt.Sprintf("Conflict.%s", why)
 	}
 
-	if !quiter.SetEquals(a.MutableSetLike, b.MutableSetLike) {
+	if !quiter.SetEquals(item.FDs, b.FDs) {
 		return false, "set"
 	}
 
 	return
 }
 
-func (e *FSItem) GenerateConflictFD() (err error) {
-	if e.ExternalObjectId.IsEmpty() {
+func (item *FSItem) GenerateConflictFD() (err error) {
+	if item.ExternalObjectId.IsEmpty() {
 		err = errors.ErrorWithStackf(
 			"cannot generate conflict FD for empty external object id",
 		)
 		return
 	}
 
-	if err = e.Conflict.SetPath(e.ExternalObjectId.String() + ".conflict"); err != nil {
+	if err = item.Conflict.SetPath(item.ExternalObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -205,38 +205,38 @@ func (e *FSItem) GenerateConflictFD() (err error) {
 	return
 }
 
-func (e *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
+func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
-	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
+	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
 
-	case !e.Blob.IsEmpty():
+	case !item.Blob.IsEmpty():
 		m = checkout_mode.BlobOnly
 
-	case !e.Object.IsEmpty():
+	case !item.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
 
-	case !e.Conflict.IsEmpty():
-		err = MakeErrMergeConflict(e)
+	case !item.Conflict.IsEmpty():
+		err = MakeErrMergeConflict(item)
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.ErrorWithStackf("all FD's are empty: %s", e.Debug()),
+			errors.ErrorWithStackf("all FD's are empty: %s", item.Debug()),
 		)
 	}
 
 	return
 }
 
-func (e *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
+func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
 	switch {
-	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
+	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
 
-	case !e.Blob.IsEmpty():
+	case !item.Blob.IsEmpty():
 		m = checkout_mode.BlobOnly
 
-	case !e.Object.IsEmpty():
+	case !item.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
 	}
 

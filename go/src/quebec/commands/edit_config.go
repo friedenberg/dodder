@@ -127,7 +127,7 @@ func (cmd EditConfig) makeTempConfigFile(
 		return
 	}
 
-	i.MutableSetLike.Add(&i.Object)
+	i.FDs.Add(&i.Object)
 
 	if err = repo.GetEnvWorkspace().GetStoreFS().GetFileEncoder().Encode(
 		checkout_options.TextFormatterOptions{},

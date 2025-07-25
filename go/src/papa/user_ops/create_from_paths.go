@@ -43,7 +43,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if err = i.MutableSetLike.Add(&i.Object); err != nil {
+		if err = i.FDs.Add(&i.Object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

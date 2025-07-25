@@ -98,7 +98,7 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	store.deleteLock.Lock()
 	defer store.deleteLock.Unlock()
 
-	for fd := range item.MutableSetLike.All() {
+	for fd := range item.FDs.All() {
 		store.deleted.Add(fd)
 	}
 
@@ -120,7 +120,7 @@ func (store *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 	store.deleteLock.Lock()
 	defer store.deleteLock.Unlock()
 
-	for fd := range i.MutableSetLike.All() {
+	for fd := range i.FDs.All() {
 		store.deletedInternal.Add(fd)
 	}
 
@@ -383,7 +383,7 @@ func (store *Store) ReadFSItemFromExternal(
 			return
 		}
 
-		if err = item.MutableSetLike.Add(fdee); err != nil {
+		if err = item.FDs.Add(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -476,7 +476,7 @@ func (store *Store) WriteFSItemToExternal(
 		return
 	}
 
-	fdees := quiter.SortedValues(item.MutableSetLike)
+	fdees := quiter.SortedValues(item.FDs)
 
 	for _, f := range fdees {
 		field := object_metadata.Field{

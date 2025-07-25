@@ -96,7 +96,7 @@ func (store *Store) setObjectIfNecessary(
 	info checkoutFileNameInfo,
 ) (err error) {
 	if !options.CheckoutMode.IncludesMetadata() {
-		i.MutableSetLike.Del(&i.Object)
+		i.FDs.Del(&i.Object)
 		i.Object.Reset()
 		return
 	}
@@ -106,7 +106,7 @@ func (store *Store) setObjectIfNecessary(
 		return
 	}
 
-	i.MutableSetLike.Add(&i.Object)
+	i.FDs.Add(&i.Object)
 
 	return
 }
@@ -120,7 +120,7 @@ func (store *Store) setBlobIfNecessary(
 
 	if fsOptions.ForceInlineBlob ||
 		!options.CheckoutMode.IncludesBlob() {
-		i.MutableSetLike.Del(&i.Blob)
+		i.FDs.Del(&i.Blob)
 		i.Blob.Reset()
 		return
 	}
@@ -138,7 +138,7 @@ func (store *Store) setBlobIfNecessary(
 		return
 	}
 
-	i.MutableSetLike.Add(&i.Blob)
+	i.FDs.Add(&i.Blob)
 
 	return
 }
@@ -317,7 +317,7 @@ func (store *Store) FileExtensionForObject(
 
 func (store *Store) RemoveItem(i *sku.FSItem) (err error) {
 	// TODO check conflict state
-	for fdItem := range i.MutableSetLike.All() {
+	for fdItem := range i.FDs.All() {
 		if err = fdItem.Remove(store.envRepo); err != nil {
 			err = errors.Wrap(err)
 			return

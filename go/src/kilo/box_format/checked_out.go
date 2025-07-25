@@ -284,7 +284,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	)
 
 	if !options.ExcludeFields &&
-		(item == nil || item.MutableSetLike.Len() == 0) {
+		(item == nil || item.FDs.Len() == 0) {
 		box.Contents = append(box.Contents, m.Fields...)
 	}
 
@@ -381,12 +381,12 @@ func (f *BoxTransacted) addFieldsFSBlobExcept(
 	except *fd.FD,
 	box *string_format_writer.Box,
 ) (err error) {
-	if fds.MutableSetLike == nil {
+	if fds.FDs == nil {
 		err = errors.ErrorWithStackf("FDSet.MutableSetLike was nil")
 		return
 	}
 
-	for fd := range fds.MutableSetLike.All() {
+	for fd := range fds.FDs.All() {
 		if except != nil && fd.Equals(except) {
 			continue
 		}

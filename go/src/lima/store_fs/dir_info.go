@@ -61,7 +61,7 @@ func makeObjectsWithDir(
 //     \_/\_/ \__,_|_|_|\_\_|_| |_|\__, |
 //                                 |___/
 
-func (d *dirInfo) walkDir(
+func (dirInfo *dirInfo) walkDir(
 	cache map[string]*sku.FSItem,
 	dir string,
 	pattern string,
@@ -74,7 +74,7 @@ func (d *dirInfo) walkDir(
 				return
 			}
 
-			if path == d.root {
+			if path == dirInfo.root {
 				return
 			}
 
@@ -127,7 +127,7 @@ func (d *dirInfo) walkDir(
 				return
 			}
 
-			if _, _, err = d.addPathAndDirEntry(cache, path, dirEntry); err != nil {
+			if _, _, err = dirInfo.addPathAndDirEntry(cache, path, dirEntry); err != nil {
 				err = errors.Wrapf(err, "DirEntry: %s", dirEntry)
 				return
 			}
@@ -142,7 +142,7 @@ func (d *dirInfo) walkDir(
 	return
 }
 
-func (d *dirInfo) addPathAndDirEntry(
+func (dirInfo *dirInfo) addPathAndDirEntry(
 	cache map[string]*sku.FSItem,
 	path string,
 	dirEntry fs.DirEntry,
@@ -156,13 +156,13 @@ func (d *dirInfo) addPathAndDirEntry(
 	if fdee, err = fd.MakeFromPathAndDirEntry(
 		path,
 		dirEntry,
-		d.envRepo.GetDefaultBlobStore(),
+		dirInfo.envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if key, fds, err = d.addFD(cache, fdee); err != nil {
+	if key, fds, err = dirInfo.addFD(cache, fdee); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -170,8 +170,8 @@ func (d *dirInfo) addPathAndDirEntry(
 	return
 }
 
-func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
-	if fdee.ExtSansDot() == d.GetFileExtensionConfig() {
+func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
+	if fdee.ExtSansDot() == dirInfo.GetFileExtensionConfig() {
 		key = "konfig"
 		return
 	}
@@ -185,7 +185,7 @@ func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 
 	var rel string
 
-	if rel, err = filepath.Rel(d.root, path); err != nil {
+	if rel, err = filepath.Rel(dirInfo.root, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -195,7 +195,7 @@ func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 		return
 	}
 
-	key = d.keyForObjectIdString(rel)
+	key = dirInfo.keyForObjectIdString(rel)
 
 	if key == "" {
 		err = errors.ErrorWithStackf("empty key for rel path: %q", rel)
@@ -205,7 +205,7 @@ func (d *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 	return
 }
 
-func (d *dirInfo) keyForObjectIdString(
+func (dirInfo *dirInfo) keyForObjectIdString(
 	oidString string,
 ) (key string) {
 	var ok bool
@@ -222,7 +222,7 @@ func (d *dirInfo) keyForObjectIdString(
 	return
 }
 
-func (d *dirInfo) addFD(
+func (dirInfo *dirInfo) addFD(
 	cache map[string]*sku.FSItem,
 	fileDescriptor *fd.FD,
 ) (key string, fds *sku.FSItem, err error) {
@@ -230,27 +230,27 @@ func (d *dirInfo) addFD(
 		return
 	}
 
-	if key, err = d.keyForFD(fileDescriptor); err != nil {
+	if key, err = dirInfo.keyForFD(fileDescriptor); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if cache == nil {
 		fds = &sku.FSItem{
-			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+			FDs: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
-		fds.MutableSetLike.Add(fileDescriptor)
+		fds.FDs.Add(fileDescriptor)
 	} else {
 		fds = cache[key]
 
 		if fds == nil {
 			fds = &sku.FSItem{
-				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+				FDs: collections_value.MakeMutableValueSet[*fd.FD](nil),
 			}
 		}
 
-		fds.MutableSetLike.Add(fileDescriptor)
+		fds.FDs.Add(fileDescriptor)
 		cache[key] = fds
 	}
 
@@ -264,12 +264,14 @@ func (d *dirInfo) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
-func (d *dirInfo) processDir(path string) (results []*sku.FSItem, err error) {
+func (dirInfo *dirInfo) processDir(
+	path string,
+) (results []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
 
 	results = make([]*sku.FSItem, 0)
 
-	if err = d.walkDir(cache, path, ""); err != nil {
+	if err = dirInfo.walkDir(cache, path, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -277,7 +279,7 @@ func (d *dirInfo) processDir(path string) (results []*sku.FSItem, err error) {
 	for objectIdString, fds := range cache {
 		var someResult []*sku.FSItem
 
-		if someResult, err = d.processFDSet(objectIdString, fds); err != nil {
+		if someResult, err = dirInfo.processFDSet(objectIdString, fds); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -288,14 +290,14 @@ func (d *dirInfo) processDir(path string) (results []*sku.FSItem, err error) {
 	return
 }
 
-func (d *dirInfo) processFDPattern(
+func (dirInfo *dirInfo) processFDPattern(
 	objectIdString string,
 	pattern string,
 	dir string,
 ) (fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
 
-	if err = d.walkDir(cache, dir, pattern); err != nil {
+	if err = dirInfo.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -306,7 +308,7 @@ func (d *dirInfo) processFDPattern(
 		return
 	}
 
-	if fds, err = d.processFDSet(
+	if fds, err = dirInfo.processFDSet(
 		objectIdString,
 		item,
 	); err != nil {
@@ -322,12 +324,12 @@ func (d *dirInfo) processFDPattern(
 	return
 }
 
-func (d *dirInfo) processFD(
+func (dirInfo *dirInfo) processFD(
 	fdee *fd.FD,
 ) (objectIdString string, fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
 
-	if objectIdString, err = d.keyForFD(fdee); err != nil {
+	if objectIdString, err = dirInfo.keyForFD(fdee); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -335,7 +337,7 @@ func (d *dirInfo) processFD(
 	dir := filepath.Dir(fdee.GetPath())
 	pattern := filepath.Join(dir, fmt.Sprintf("%s*", fdee.FileNameSansExt()))
 
-	if err = d.walkDir(cache, dir, pattern); err != nil {
+	if err = dirInfo.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -354,7 +356,7 @@ func (d *dirInfo) processFD(
 		return
 	}
 
-	if fds, err = d.processFDSet(
+	if fds, err = dirInfo.processFDSet(
 		objectIdString,
 		item,
 	); err != nil {
@@ -370,67 +372,60 @@ func (d *dirInfo) processFD(
 	return
 }
 
-func (d *dirInfo) processRootDir() (err error) {
-	if d.rootProcessed {
+func (dirInfo *dirInfo) processRootDir() (err error) {
+	if dirInfo.rootProcessed {
 		return
 	}
 
-	if _, err = d.processDir(d.root); err != nil {
+	if _, err = dirInfo.processDir(dirInfo.root); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	d.rootProcessed = true
+	dirInfo.rootProcessed = true
 
 	return
 }
 
-func (d *dirInfo) processFDsOnItem(
-	fds *sku.FSItem,
+func (dirInfo *dirInfo) processFDsOnItem(
+	item *sku.FSItem,
 ) (blobCount, objectCount int, err error) {
-	if err = fds.MutableSetLike.Each(
-		func(f *fd.FD) (err error) {
-			ext := f.ExtSansDot()
+	for f := range item.FDs.All() {
+		ext := f.ExtSansDot()
 
-			switch ext {
-			case d.GetFileExtensionZettel():
-				fds.ExternalObjectId.SetGenre(genres.Zettel)
+		switch ext {
+		case dirInfo.GetFileExtensionZettel():
+			item.ExternalObjectId.SetGenre(genres.Zettel)
 
-			case d.GetFileExtensionType():
-				fds.ExternalObjectId.SetGenre(genres.Type)
+		case dirInfo.GetFileExtensionType():
+			item.ExternalObjectId.SetGenre(genres.Type)
 
-			case d.GetFileExtensionTag():
-				fds.ExternalObjectId.SetGenre(genres.Tag)
+		case dirInfo.GetFileExtensionTag():
+			item.ExternalObjectId.SetGenre(genres.Tag)
 
-			case d.GetFileExtensionRepo():
-				fds.ExternalObjectId.SetGenre(genres.Repo)
+		case dirInfo.GetFileExtensionRepo():
+			item.ExternalObjectId.SetGenre(genres.Repo)
 
-			case "conflict":
-				fds.Conflict.ResetWith(f)
-				return
+		case "conflict":
+			item.Conflict.ResetWith(f)
+			continue
 
-			default: // blobs
-				fds.Blob.ResetWith(f)
-				blobCount++
-				return
-			}
+		default: // blobs
+			item.Blob.ResetWith(f)
+			blobCount++
+			continue
+		}
 
-			fds.Object.ResetWith(f)
-			objectCount++
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		item.Object.ResetWith(f)
+		objectCount++
 	}
 
 	return
 }
 
-func (d *dirInfo) processFDSet(
+func (dirInfo *dirInfo) processFDSet(
 	objectIdString string,
-	fds *sku.FSItem,
+	item *sku.FSItem,
 ) (results []*sku.FSItem, err error) {
 	var recognizedGenre genres.Genre
 
@@ -445,7 +440,7 @@ func (d *dirInfo) processFDSet(
 			return
 		}
 
-		if err = d.storeSupplies.ReadOneInto(
+		if err = dirInfo.storeSupplies.ReadOneInto(
 			&oid,
 			recognized,
 		); err != nil {
@@ -462,81 +457,81 @@ func (d *dirInfo) processFDSet(
 
 	var blobCount, objectCount int
 
-	if blobCount, objectCount, err = d.processFDsOnItem(fds); err != nil {
+	if blobCount, objectCount, err = dirInfo.processFDsOnItem(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if fds.ExternalObjectId.GetGenre() != genres.None {
+	if item.ExternalObjectId.GetGenre() != genres.None {
 		if blobCount > 1 {
 			err = errors.ErrorWithStackf(
 				"several blobs matching object id %q: %q",
 				objectIdString,
-				fds.MutableSetLike,
+				item.FDs,
 			)
 		} else if objectCount > 1 {
 			err = errors.ErrorWithStackf(
 				"found more than one object: %q",
-				fds.MutableSetLike,
+				item.FDs,
 			)
 		}
 
 		if err != nil {
-			if err = d.errors.Add(fdSetWithError{FSItem: fds, error: err}); err != nil {
+			if err = dirInfo.errors.Add(fdSetWithError{FSItem: item, error: err}); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	if fds.ExternalObjectId.GetGenre() == genres.None {
-		fds.ExternalObjectId.SetGenre(recognizedGenre)
+	if item.ExternalObjectId.GetGenre() == genres.None {
+		item.ExternalObjectId.SetGenre(recognizedGenre)
 	}
 
-	if fds.ExternalObjectId.GetGenre() == genres.None {
-		if results, err = d.addOneOrMoreBlobs(
-			fds,
+	if item.ExternalObjectId.GetGenre() == genres.None {
+		if results, err = dirInfo.addOneOrMoreBlobs(
+			item,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = d.addOneObject(
+		if err = dirInfo.addOneObject(
 			objectIdString,
-			fds,
+			item,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		results = []*sku.FSItem{fds}
+		results = []*sku.FSItem{item}
 	}
 
 	return
 }
 
-func (d *dirInfo) addOneUntracked(
+func (dirInfo *dirInfo) addOneUntracked(
 	f *fd.FD,
 ) (result *sku.FSItem, err error) {
 	result = &sku.FSItem{
-		MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+		FDs: collections_value.MakeMutableValueSet[*fd.FD](nil),
 	}
 
 	result.Blob.ResetWith(f)
 
-	if err = result.MutableSetLike.Add(&result.Blob); err != nil {
+	if err = result.FDs.Add(&result.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = result.ExternalObjectId.SetBlob(
-		d.envRepo.Rel(f.GetPath()),
+		dirInfo.envRepo.Rel(f.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = d.definitelyNotCheckedOut.Add(result); err != nil {
+	if err = dirInfo.definitelyNotCheckedOut.Add(result); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -551,7 +546,7 @@ func (d *dirInfo) addOneUntracked(
 
 	// TODO add sha cache
 	key := sh.GetBytes()
-	existing, ok := d.definitelyNotCheckedOut.shas[string(key)]
+	existing, ok := dirInfo.definitelyNotCheckedOut.shas[string(key)]
 
 	if !ok {
 		existing = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
@@ -562,19 +557,19 @@ func (d *dirInfo) addOneUntracked(
 		return
 	}
 
-	d.definitelyNotCheckedOut.shas[string(key)] = existing
+	dirInfo.definitelyNotCheckedOut.shas[string(key)] = existing
 
 	return
 }
 
-func (d *dirInfo) addOneOrMoreBlobs(
+func (dirInfo *dirInfo) addOneOrMoreBlobs(
 	fds *sku.FSItem,
 ) (results []*sku.FSItem, err error) {
-	if fds.MutableSetLike.Len() == 1 {
+	if fds.FDs.Len() == 1 {
 		var fdsOne *sku.FSItem
 
-		if fdsOne, err = d.addOneUntracked(
-			fds.MutableSetLike.Any(),
+		if fdsOne, err = dirInfo.addOneUntracked(
+			fds.FDs.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -586,11 +581,11 @@ func (d *dirInfo) addOneOrMoreBlobs(
 		return
 	}
 
-	for range fds.MutableSetLike.All() {
+	for range fds.FDs.All() {
 		var fdsOne *sku.FSItem
 
-		if fdsOne, err = d.addOneUntracked(
-			fds.MutableSetLike.Any(),
+		if fdsOne, err = dirInfo.addOneUntracked(
+			fds.FDs.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -602,7 +597,7 @@ func (d *dirInfo) addOneOrMoreBlobs(
 	return
 }
 
-func (d *dirInfo) addOneObject(
+func (dirInfo *dirInfo) addOneObject(
 	objectIdString string,
 	item *sku.FSItem,
 ) (err error) {
@@ -611,7 +606,7 @@ func (d *dirInfo) addOneObject(
 		return
 	}
 
-	if err = d.probablyCheckedOut.Add(item); err != nil {
+	if err = dirInfo.probablyCheckedOut.Add(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -627,13 +622,13 @@ func (d *dirInfo) addOneObject(
 //
 
 // TODO switch to seq.Iter2
-func (d *dirInfo) All(
+func (dirInfo *dirInfo) All(
 	f interfaces.FuncIter[*sku.FSItem],
 ) (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	quiter.ErrorWaitGroupApply(wg, d.probablyCheckedOut, f)
-	quiter.ErrorWaitGroupApply(wg, d.definitelyNotCheckedOut, f)
+	quiter.ErrorWaitGroupApply(wg, dirInfo.probablyCheckedOut, f)
+	quiter.ErrorWaitGroupApply(wg, dirInfo.definitelyNotCheckedOut, f)
 
 	return wg.GetError()
 }

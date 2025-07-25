@@ -133,7 +133,7 @@ func (store *Store) Merge(conflicted sku.Conflicted) (err error) {
 		return
 	}
 
-	if original.MutableSetLike.Len() == 0 {
+	if original.FDs.Len() == 0 {
 		// generate check out item
 		// TODO if original is empty, it means this was not a checked out
 		// conflict but
