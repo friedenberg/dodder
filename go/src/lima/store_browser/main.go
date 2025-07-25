@@ -248,22 +248,15 @@ func (c *Store) QueryCheckedOut(
 					return
 				}
 			} else if exactIndexURLMatch {
-				if err = matchingUrls.Each(
-					func(matching *sku.Transacted) (err error) {
-						if err = ex.tryToEmitOneRecognized(
-							matching,
-							item,
-						); err != nil {
-							err = errors.Wrapf(err, "Item: %#v", item)
-							return
-						}
-
-						return
-					},
+				for matching := range matchingUrls.All() {
+				if err = ex.tryToEmitOneRecognized(
+					matching,
+					item,
 				); err != nil {
-					err = errors.Wrap(err)
+					err = errors.Wrapf(err, "Item: %#v", item)
 					return
 				}
+			}
 			}
 		}
 	}

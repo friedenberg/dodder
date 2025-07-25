@@ -43,25 +43,18 @@ func (store *store) recompile(
 func (store *store) recompileTags() (err error) {
 	store.config.ImplicitTags = make(implicitTagMap)
 
-	if err = store.config.Tags.Each(
-		func(ke *tag) (err error) {
-			var e ids.Tag
+	for ke := range store.config.Tags.All() {
+		var e ids.Tag
 
-			if err = e.Set(ke.String()); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
-				return
-			}
-
-			if err = store.config.AccumulateImplicitTags(e); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if err = e.Set(ke.String()); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = store.config.AccumulateImplicitTags(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -76,30 +69,29 @@ func (store *store) recompileTypes(
 		store.config.InlineTypes = inlineTypes.CloneSetLike()
 	}()
 
-	if err = store.config.Types.Each(
-		func(ct *sku.Transacted) (err error) {
-			tipe := ct.GetSku().GetType()
-			var commonBlob type_blobs.Blob
+	for ct := range store.config.Types.All() {
+		tipe := ct.GetSku().GetType()
+		var commonBlob type_blobs.Blob
 
-			if commonBlob, _, err = blobStore.Type.ParseTypedBlob(
-				tipe,
-				ct.GetBlobSha(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if commonBlob, _, err = blobStore.Type.ParseTypedBlob(
+			tipe,
+			ct.GetBlobSha(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-			defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
+		defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
 
-			if commonBlob == nil {
-				err = errors.ErrorWithStackf("nil type blob for type: %q. Sku: %s", tipe, ct)
-				return
-			}
+		if commonBlob == nil {
+			err = errors.ErrorWithStackf("nil type blob for type: %q. Sku: %s", tipe, ct)
+			return
+		}
 
-			fe := commonBlob.GetFileExtension()
+		fe := commonBlob.GetFileExtension()
 
-			if fe == "" {
-				fe = ct.GetObjectId().StringSansOp()
+		if fe == "" {
+			fe = ct.GetObjectId().StringSansOp()
 			}
 
 			// TODO-P2 enforce uniqueness
@@ -111,11 +103,6 @@ func (store *store) recompileTypes(
 				inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
 			}
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 	return
 }

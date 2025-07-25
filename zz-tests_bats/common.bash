@@ -91,7 +91,7 @@ export cmd_dodder_def
 
 if [[ -z $DODDER_BIN ]]; then
   export DODDER_BIN
-  DODDER_BIN="$(which dodder)"
+  DODDER_BIN="$(which dodder || echo "$DIR/../go/build/dodder")"
 fi
 
 if [[ -z $DODDER_VERSION ]]; then

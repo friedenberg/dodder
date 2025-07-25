@@ -152,22 +152,15 @@ func (c *compiled) getSortedTypesExpanded(
 	expansion.ExpanderRight.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
-	expandedMaybe.Each(
-		func(v values.String) (err error) {
-			c.lock.Lock()
-			defer c.lock.Unlock()
+	for v := range expandedMaybe.All() {
+		c.lock.Lock()
+		ct, ok := c.Types.Get(v.String())
+		c.lock.Unlock()
 
-			ct, ok := c.Types.Get(v.String())
-
-			if !ok {
-				return
-			}
-
+		if ok {
 			expandedActual = append(expandedActual, ct)
-
-			return
-		},
-	)
+		}
+	}
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(
@@ -193,23 +186,19 @@ func (c *compiled) getSortedTagsExpanded(
 	expansion.ExpanderRight.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
-	expandedMaybe.Each(
-		func(v values.String) (err error) {
-			ct, ok := c.Tags.Get(v.String())
+	for v := range expandedMaybe.All() {
+		ct, ok := c.Tags.Get(v.String())
 
-			if !ok {
-				return
-			}
+		if !ok {
+			continue
+		}
 
-			ct1 := sku.GetTransactedPool().Get()
+		ct1 := sku.GetTransactedPool().Get()
 
-			sku.Resetter.ResetWith(ct1, &ct.Transacted)
+		sku.Resetter.ResetWith(ct1, &ct.Transacted)
 
-			expandedActual = append(expandedActual, ct1)
-
-			return
-		},
-	)
+		expandedActual = append(expandedActual, ct1)
+	}
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(

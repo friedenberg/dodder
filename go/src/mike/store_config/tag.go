@@ -100,31 +100,22 @@ func (k *compiled) AccumulateImplicitTags(
 		ees,
 	)
 
-	if err = ees.Each(
-		func(e1 ids.Tag) (err error) {
-			if e1.Equals(e) {
-				return
-			}
+	for e1 := range ees.All() {
+		if e1.Equals(e) {
+			continue
+		}
 
-			if err = k.AccumulateImplicitTags(e1); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = k.GetImplicitTags(&e1).Each(
-				func(e2 ids.Tag) (err error) {
-					return k.ImplicitTags.Set(e, e2)
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if err = k.AccumulateImplicitTags(e1); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		for e2 := range k.GetImplicitTags(&e1).All() {
+			if err = k.ImplicitTags.Set(e, e2); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
 	for e1 := range ek.Transacted.Metadata.GetTags().All() {
