@@ -36,7 +36,9 @@ func (store *Store) applyDormantAndRealizeTags(
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
 	mp.Cache.TagPaths.Reset()
-	mp.GetTags().Each(mp.Cache.TagPaths.AddTagOld)
+	for tag := range mp.GetTags().All() {
+		mp.Cache.TagPaths.AddTagOld(tag)
+	}
 
 	if isTag {
 		ks := object.ObjectId.String()
@@ -173,15 +175,30 @@ func (store *Store) addImplicitTags(
 		return
 	}
 
-	mp.GetTags().EachPtr(addImplicitTags)
+	for e := range mp.GetTags().AllPtr() {
+		if err = addImplicitTags(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	typKonfig := store.storeConfig.GetConfig().GetApproximatedType(
 		mp.GetType(),
 	).ApproximatedOrActual()
 
 	if typKonfig != nil {
-		typKonfig.GetTags().EachPtr(ie.AddPtr)
-		typKonfig.GetTags().EachPtr(addImplicitTags)
+		for e := range typKonfig.GetTags().AllPtr() {
+			if err = ie.AddPtr(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+		for e := range typKonfig.GetTags().AllPtr() {
+			if err = addImplicitTags(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
 	mp.Cache.SetImplicitTags(ie)

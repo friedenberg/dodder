@@ -103,17 +103,17 @@ func (cmd CatAlfred) Run(dep command.Request) {
 		func(object *sku.Transacted) (err error) {
 			switch cmd.Genre {
 			case genres.Tag:
-				for t := range object.Metadata.GetTags().All() {
+				for tag := range object.Metadata.GetTags().All() {
 					var tagObject *sku.Transacted
 
 					if tagObject, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
-						t,
+						tag,
 					); err != nil {
 						if collections.IsErrNotFound(err) {
 							err = nil
 							tagObject = sku.GetTransactedPool().Get()
 							defer sku.GetTransactedPool().Put(tagObject)
-							tagObject.ObjectId.ResetWithIdLike(t)
+							tagObject.ObjectId.ResetWithIdLike(tag)
 						} else {
 							err = errors.Wrap(err)
 							return

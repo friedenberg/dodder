@@ -22,21 +22,15 @@ func ToLuaTableV1(tg TransactedGetter, l *lua.LState, t *LuaTableV1) {
 
 	tags := t.Tags
 
-	o.Metadata.GetTags().EachPtr(
-		func(e *ids.Tag) (err error) {
-			l.SetField(tags, e.String(), lua.LBool(true))
-			return
-		},
-	)
+	for e := range o.Metadata.GetTags().AllPtr() {
+		l.SetField(tags, e.String(), lua.LBool(true))
+	}
 
 	tags = t.TagsImplicit
 
-	o.Metadata.Cache.GetImplicitTags().EachPtr(
-		func(e *ids.Tag) (err error) {
-			l.SetField(tags, e.String(), lua.LBool(true))
-			return
-		},
-	)
+	for e := range o.Metadata.Cache.GetImplicitTags().AllPtr() {
+		l.SetField(tags, e.String(), lua.LBool(true))
+	}
 }
 
 func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {

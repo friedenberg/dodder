@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
@@ -368,12 +367,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				if err = object.Metadata.GetTags().EachPtr(func(e *ids.Tag) (err error) {
-					_, err = fmt.Fprintln(writer, e)
-					return
-				}); err != nil {
-					err = errors.Wrap(err)
-					return
+				for e := range object.Metadata.GetTags().AllPtr() {
+					if _, err = fmt.Fprintln(writer, e); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 				return

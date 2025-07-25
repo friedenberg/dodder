@@ -126,19 +126,15 @@ func (writer *Writer) addCommonMatches(
 
 	matchBuilder.AddMatches(object.GetMetadata().Description.String())
 	matchBuilder.AddMatches(object.GetType().String())
-	object.Metadata.GetTags().Each(
-		func(e ids.Tag) (err error) {
-			expansion.ExpanderAll.Expand(
-				func(v string) (err error) {
-					matchBuilder.AddMatches(v)
-					return
-				},
-				e.String(),
-			)
-
-			return
-		},
-	)
+	for e := range object.Metadata.GetTags().All() {
+		expansion.ExpanderAll.Expand(
+			func(v string) (err error) {
+				matchBuilder.AddMatches(v)
+				return
+			},
+			e.String(),
+		)
+	}
 
 	t := object.GetType()
 
