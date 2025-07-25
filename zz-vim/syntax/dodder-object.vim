@@ -4,34 +4,36 @@ if exists("b:current_syntax")
 endif
 
 if $BIN_DODDER == ""
-  let $BIN_DODDER = "dodder"
+  let $BIN_DODDER = "der"
 endif
 
-let zettel = expand("%")
+let object = expand("%")
 
 let g:markdown_syntax_conceal = 0
 
-if zettel != ""
-  let cmdFormat = "$BIN_DODDER show -quiet -format type.vim-syntax-type " . zettel
-  let zettelTypSyntax = trim(system(cmdFormat))
+if object != ""
+  let cmdFormat = "$BIN_DODDER show -quiet -format type.vim-syntax-type ".object
+  let objectTypeSyntax = trim(system(cmdFormat))
 
   if v:shell_error
-    echom "Error getting vim syntax type: " . zettelTypSyntax
-    let zettelTypSyntax = "markdown"
-  elseif zettelTypSyntax == ""
-    echom "Zettel Type has no vim syntax set"
-    let zettelTypSyntax = "markdown"
+    echom "Error getting vim syntax type: ".objectTypeSyntax
+    echom "Error: ".objectTypeSyntax
+    " TODO use default objectTypeSyntax
+    let objectTypeSyntax = "pandoc"
+  elseif objectTypeSyntax == ""
+    echom "Object Type has no vim syntax set"
+    let objectTypeSyntax = "markdown"
   endif
 
-  let dodder_syntax_path = $HOME."/.local/share/dodder/vim/syntax/".zettelTypSyntax.".vim"
-  let vim_syntax_path = $VIMRUNTIME."/syntax/" . zettelTypSyntax . ".vim"
+  let dodder_syntax_path = $HOME."/.local/share/dodder/vim/syntax/".objectTypeSyntax.".vim"
+  let vim_syntax_path = $VIMRUNTIME."/syntax/" . objectTypeSyntax . ".vim"
 
   if filereadable(dodder_syntax_path)
     execute "syntax include @akte" dodder_syntax_path
   elseif filereadable(vim_syntax_path)
     execute "syntax include @akte" vim_syntax_path
   else
-    echom "could not find syntax file for ".zettelTypSyntax
+    echom "could not find syntax file for ".objectTypeSyntax
   endif
 endif
 

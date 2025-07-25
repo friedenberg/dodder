@@ -4,7 +4,7 @@ if exists("b:current_syntax")
 endif
 
 if $BIN_DODDER == ""
-  let $BIN_DODDER = "dodder"
+  let $BIN_DODDER = "der"
 endif
 
 let zettel = expand("%")

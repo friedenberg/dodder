@@ -537,19 +537,19 @@ func (local *Repo) MakeFormatFunc(
 	case "text-sku-prefix":
 		cliFmt := local.SkuFormatBoxTransactedNoColor()
 
-		output = func(o *sku.Transacted) (err error) {
+		output = func(object *sku.Transacted) (err error) {
 			sb := &strings.Builder{}
 
-			if _, err = cliFmt.EncodeStringTo(o, sb); err != nil {
+			if _, err = cliFmt.EncodeStringTo(object, sb); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if local.GetConfig().IsInlineType(o.GetType()) {
+			if local.GetConfig().IsInlineType(object.GetType()) {
 				var readCloser interfaces.ReadCloseDigester
 
 				if readCloser, err = local.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-					o.GetBlobSha(),
+					object.GetBlobSha(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return

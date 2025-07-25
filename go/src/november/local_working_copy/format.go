@@ -11,79 +11,106 @@ import (
 )
 
 type (
-	FormatFunc func(*Repo, interfaces.WriterAndStringWriter) (interfaces.FuncIter[*sku.Transacted], error)
+	FormatFuncConstructorEntry struct {
+		description string
+		FormatFuncConstructor
+	}
 
-	Format struct {
+	FormatFuncConstructor func(
+		*Repo,
+		interfaces.WriterAndStringWriter,
+	) interfaces.FuncIter[*sku.Transacted]
+
+	FormatFlag struct {
 		*Repo
-		value  string
-		format interfaces.FuncIter[*sku.Transacted]
+
+		value       string
+		description string
+		constructor FormatFuncConstructor
 	}
 )
 
-func (f *Format) Set(v string) (err error) {
-	var ok bool
-	var rawFormatter FormatFunc
-
-	if rawFormatter, ok = formatters[v]; !ok {
-		err = errors.BadRequestf(
-			"unsupported format: %q. Available formats: %q",
-			v,
-			slices.Collect(maps.Keys(formatters)),
-		)
-
-		return
-	}
-
-	f.value = v
-
-	if f.format, err = rawFormatter(f.Repo, f.Repo.GetOutFile()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (f *Format) String() string {
-	if f == nil || f.format == nil {
+func (formatFlag *FormatFlag) String() string {
+	if formatFlag == nil || formatFlag.constructor == nil {
 		return fmt.Sprintf(
 			"%q",
 			slices.Collect(maps.Keys(formatters)),
 		)
+	} else if formatFlag.description != "" {
+		return fmt.Sprintf("%s: %s", formatFlag.value, formatFlag.description)
 	} else {
-		return f.value
+		return formatFlag.value
 	}
 }
 
-func (u *Format) Format(
-	sk *sku.Transacted,
-) (err error) {
-	if u.format == nil {
+var formatterCompletions = func() map[string]string {
+	completion := make(map[string]string, len(formatters))
+
+	for name, entry := range formatters {
+		if entry.description != "" {
+			completion[name] = name
+		} else {
+			completion[name] = entry.description
+		}
 	}
 
-	if err = u.format(sk); err != nil {
-		err = errors.Wrap(err)
+	return completion
+}()
+
+func (formatFlag *FormatFlag) GetCLICompletion() map[string]string {
+	return formatterCompletions
+}
+
+func (formatFlag *FormatFlag) Set(value string) (err error) {
+	var ok bool
+	var entry FormatFuncConstructorEntry
+
+	if entry, ok = formatters[value]; !ok {
+		err = errors.BadRequestf(
+			"unsupported format: %q. Available formats: %q",
+			value,
+			slices.Collect(maps.Keys(formatters)),
+		)
+
 		return
 	}
+
+	formatFlag.value = value
+	formatFlag.description = entry.description
+	formatFlag.constructor = entry.FormatFuncConstructor
 
 	return
 }
 
-var formatters = map[string]FormatFunc{
-	"tags-path": func(u *Repo, out interfaces.WriterAndStringWriter) (f interfaces.FuncIter[*sku.Transacted], err error) {
-		f = func(tl *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(
-				out,
-				tl.GetObjectId(),
-				&tl.Metadata.Cache.TagPaths,
-			); err != nil {
-				err = errors.Wrap(err)
+func (formatFlag *FormatFlag) MakeFormatFunc(
+	repo *Repo,
+	writer interfaces.WriterAndStringWriter,
+) interfaces.FuncIter[*sku.Transacted] {
+	return formatFlag.constructor(repo, writer)
+}
+
+var formatters = map[string]FormatFuncConstructorEntry{
+	"tags-path": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				if _, err = fmt.Fprintln(
+					writer,
+					object.GetObjectId(),
+					&object.Metadata.Cache.TagPaths,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
-
-			return
-		}
-
-		return
+		},
 	},
+	// TODO convert rest of the formatters from
+	// src/november/local_working_copy/formatter_value.go in MakeFormatFunc to
+	// this strategy. In the cases where the formatter construct should return an
+	// error, instead call repo.Cancel(err) and then return
 }
