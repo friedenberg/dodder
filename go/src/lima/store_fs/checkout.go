@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -318,18 +317,11 @@ func (store *Store) FileExtensionForObject(
 
 func (store *Store) RemoveItem(i *sku.FSItem) (err error) {
 	// TODO check conflict state
-	if err = i.MutableSetLike.Each(
-		func(f *fd.FD) (err error) {
-			if err = f.Remove(store.envRepo); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for fdItem := range i.MutableSetLike.All() {
+		if err = fdItem.Remove(store.envRepo); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	i.Reset()

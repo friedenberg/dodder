@@ -149,7 +149,9 @@ func (dst *FSItem) ResetWith(src *FSItem) {
 	dst.MutableSetLike.Reset()
 
 	if src.MutableSetLike != nil {
-		src.MutableSetLike.Each(dst.MutableSetLike.Add)
+		for item := range src.MutableSetLike.All() {
+			dst.MutableSetLike.Add(item)
+		}
 	}
 
 	// TODO consider if this approach actually works
