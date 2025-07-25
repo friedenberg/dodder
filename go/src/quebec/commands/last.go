@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -27,7 +26,11 @@ import (
 
 func init() {
 	command.Register("last", &Last{
-		Format: values.MakeStringDefault("log"),
+		Format: local_working_copy.FormatFlag{
+			DefaultFormatter: local_working_copy.GetFormatFuncConstructorEntry(
+				"log",
+			),
+		},
 	})
 }
 
@@ -38,7 +41,7 @@ type Last struct {
 	RepoId   ids.RepoId
 	Edit     bool
 	Organize bool
-	Format   values.String
+	Format   local_working_copy.FormatFlag
 }
 
 func (cmd *Last) SetFlagSet(flagSet *flag.FlagSet) {
@@ -117,16 +120,10 @@ func (cmd Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	if cmd.Organize || cmd.Edit {
 		funcIter = skus.Add
 	} else {
-		{
-			var err error
-
-			if funcIter, err = localWorkingCopy.MakeFormatFunc(
-				cmd.Format.String(),
-				localWorkingCopy.GetEnvRepo().GetUIFile(),
-			); err != nil {
-				localWorkingCopy.GetEnvRepo().Cancel(err)
-			}
-		}
+		funcIter = cmd.Format.MakeFormatFunc(
+			localWorkingCopy,
+			localWorkingCopy.GetUIFile(),
+		)
 	}
 
 	funcIter = quiter.MakeSyncSerializer(funcIter)
@@ -204,7 +201,8 @@ func (cmd Last) runWithInventoryList(
 		}
 
 		func() {
-			// TODO investigate the pool folow for StreamInventoryListBlobSkus and
+			// TODO investigate the pool folow for StreamInventoryListBlobSkus
+			// and
 			// determine why repooling here is breaking things
 			// defer sku.GetTransactedPool().Put(sk)
 

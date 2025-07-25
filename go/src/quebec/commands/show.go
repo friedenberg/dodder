@@ -22,7 +22,13 @@ import (
 )
 
 func init() {
-	command.Register("show", &Show{})
+	command.Register("show", &Show{
+		Format: local_working_copy.FormatFlag{
+			DefaultFormatter: local_working_copy.GetFormatFuncConstructorEntry(
+				"log",
+			),
+		},
+	})
 }
 
 type Show struct {
@@ -35,7 +41,7 @@ type Show struct {
 
 	After      ids.Tai
 	Before     ids.Tai
-	Format     string
+	Format     local_working_copy.FormatFlag
 	RemoteRepo ids.RepoId
 }
 
@@ -43,7 +49,11 @@ func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.LocalArchive.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
 
-	flagSet.StringVar(&cmd.Format, "format", "log", "format")
+	flagSet.Var(
+		&cmd.Format,
+		"format",
+		"format used when outputting objects to stdout",
+	)
 	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.Before), "before", "")
 	flagSet.Var((*ids.TaiRFC3339Value)(&cmd.After), "after", "")
 	flagSet.Var(&cmd.RemoteRepo, "repo", "the remote repo to query")
@@ -83,7 +93,9 @@ func (cmd Show) Run(req command.Request) {
 		query := cmd.MakeQueryIncludingWorkspace(
 			req,
 			pkg_query.BuilderOptions(
-				pkg_query.BuilderOptionWorkspace{Env: localWorkingCopy.GetEnvWorkspace()},
+				pkg_query.BuilderOptionWorkspace{
+					Env: localWorkingCopy.GetEnvWorkspace(),
+				},
 				pkg_query.BuilderOptionDefaultGenres(genres.Zettel),
 			),
 			localWorkingCopy,
@@ -121,22 +133,17 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 		remoteWorkingCopy, _ = remoteRepo.(repo.WorkingCopy)
 	}
 
-	var output interfaces.FuncIter[*sku.Transacted]
-
-	if cmd.Format == "" && pkg_query.IsExactlyOneObjectId(query) {
-		cmd.Format = "text"
+	if cmd.Format.GetName() == "" && pkg_query.IsExactlyOneObjectId(query) {
+		// if err := cmd.Format.Set("text"); err != nil {
+		// 	localWorkingCopy.Cancel(err)
+		// 	return
+		// }
 	}
 
-	{
-		var err error
-
-		if output, err = localWorkingCopy.MakeFormatFunc(
-			cmd.Format,
-			localWorkingCopy.GetUIFile(),
-		); err != nil {
-			localWorkingCopy.Cancel(err)
-		}
-	}
+	output := cmd.Format.MakeFormatFunc(
+		localWorkingCopy,
+		localWorkingCopy.GetUIFile(),
+	)
 
 	if !cmd.Before.IsEmpty() {
 		old := output

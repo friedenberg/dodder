@@ -12,6 +12,8 @@ let object = expand("%")
 let g:markdown_syntax_conceal = 0
 
 if object != ""
+  " TODO update show to emit an error when requesting a workspace object but
+  " lacking a workspace
   let cmdFormat = "$BIN_DODDER show -quiet -format type.vim-syntax-type ".object
   let objectTypeSyntax = trim(system(cmdFormat))
 
