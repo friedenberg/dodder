@@ -147,3 +147,34 @@ func WriteInventoryListObject(
 
 	return
 }
+
+type IterCoder struct {
+	sku.ListFormat
+}
+
+func (coder IterCoder) DecodeFrom(
+	yield func(*sku.Transacted) bool,
+	bufferedReader *bufio.Reader,
+) (n int64, err error) {
+	for {
+		object := sku.GetTransactedPool().Get()
+		// TODO Fix upstream issues with repooling
+		// defer sku.GetTransactedPool().Put(object)
+
+		if _, err = coder.ListFormat.DecodeFrom(object, bufferedReader); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if !yield(object) {
+			return
+		}
+	}
+
+	return
+}

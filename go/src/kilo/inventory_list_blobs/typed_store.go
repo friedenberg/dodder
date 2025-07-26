@@ -56,11 +56,11 @@ func MakeInventoryStore(
 	)
 
 	store.streamDecoders = map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]{
-		ids.TypeInventoryListV1: V1IterDecoder{
-			V1: store.v1,
+		ids.TypeInventoryListV1: IterCoder{
+			ListFormat: store.v1,
 		},
-		ids.TypeInventoryListV2: V2IterDecoder{
-			V2: store.v2,
+		ids.TypeInventoryListV2: IterCoder{
+			ListFormat: store.v2,
 		},
 	}
 
