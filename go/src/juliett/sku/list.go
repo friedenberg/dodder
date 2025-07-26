@@ -38,22 +38,23 @@ type InventoryListStore interface {
 // TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
 type ListFormat interface {
 	GetType() ids.Type
-	GetListFormat() ListFormat
-	WriteObjectToOpenList(*Transacted, *OpenList) (int64, error)
+
+	interfaces.CoderBufferedReadWriter[*Transacted]
+
+	// TODO turn into utility functions
 	WriteInventoryListBlob(Collection, *bufio.Writer) (int64, error)
-	// TODO add context and ContinueOrPanicOnDone
-	WriteInventoryListObject(*Transacted, *bufio.Writer) (int64, error)
-	ReadInventoryListObject(*bufio.Reader) (int64, *Transacted, error)
-	// TODO add context and ContinueOrPanicOnDone
-	// TODO refactor to iterator
 	StreamInventoryListBlobSkus(
 		*bufio.Reader,
 	) interfaces.SeqError[*Transacted]
+
+	WriteInventoryListObject(*Transacted, *bufio.Writer) (int64, error)
+	ReadInventoryListObject(*bufio.Reader) (int64, *Transacted, error)
 }
 
 // TODO rename to ListTransacted
 type List = heap.Heap[Transacted, *Transacted]
 
+// TODO add buffered writer
 type OpenList struct {
 	Tipe        ids.Type
 	Mover       interfaces.Mover

@@ -17,10 +17,6 @@ type V1 struct {
 	V1ObjectCoder
 }
 
-func (format V1) GetListFormat() sku.ListFormat {
-	return format
-}
-
 func (format V1) GetType() ids.Type {
 	return ids.MustType(ids.TypeInventoryListV1)
 }

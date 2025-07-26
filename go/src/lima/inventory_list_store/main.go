@@ -89,7 +89,7 @@ func (store *Store) Initialize(
 	) {
 		store.inventoryListBlobStore = &blobStoreV0{
 			blobType:       blobType,
-			BlobStore: inventoryListBlobStore,
+			BlobStore:      inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
@@ -97,7 +97,7 @@ func (store *Store) Initialize(
 			envRepo:        envRepo,
 			pathLog:        envRepo.FileInventoryListLog(),
 			blobType:       blobType,
-			BlobStore: inventoryListBlobStore,
+			BlobStore:      inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	}
@@ -204,7 +204,11 @@ func (store *Store) AddObjectToOpenList(
 
 	format := store.FormatForVersion(store.storeVersion)
 
-	if _, err = format.WriteObjectToOpenList(object, openList); err != nil {
+	if _, err = inventory_list_blobs.WriteObjectToOpenList(
+		format,
+		object,
+		openList,
+	); err != nil {
 		err = errors.Wrapf(
 			err,
 			"%#v, format: %#v",

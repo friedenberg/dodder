@@ -22,10 +22,6 @@ type V2 struct {
 	V2ObjectCoder
 }
 
-func (format V2) GetListFormat() sku.ListFormat {
-	return format
-}
-
 func (format V2) GetType() ids.Type {
 	return ids.MustType(ids.TypeInventoryListV2)
 }
