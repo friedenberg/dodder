@@ -59,11 +59,11 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	return digest, nil
 }
 
-func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteDigester, func()) {
+func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, func()) {
 	return digests.MakeWriterWithRepool(env, nil)
 }
 
-func (env Env) MakeWriteDigester() interfaces.WriteDigester {
+func (env Env) MakeWriteDigester() interfaces.WriteBlobIdGetter {
 	return digests.MakeWriter(env, nil)
 }
 

@@ -46,7 +46,7 @@ func (cmd *BlobStore) MakeBlobStore(
 		{
 			var err error
 
-			if blobStore.LocalBlobStore, err = blob_stores.MakeBlobStore(
+			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
 				envRepo,
 				"", // TODO get base path
 				typedConfig.Blob,

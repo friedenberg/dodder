@@ -20,16 +20,16 @@ type ObjectIOFactory interface {
 }
 
 type ObjectReaderFactory interface {
-	ObjectReader(BlobIdGetter) (ReadCloseDigester, error)
+	ObjectReader(BlobIdGetter) (ReadCloseBlobIdGetter, error)
 }
 
 type ObjectWriterFactory interface {
-	ObjectWriter() (WriteCloseDigester, error)
+	ObjectWriter() (WriteCloseBlobIdGetter, error)
 }
 
 type (
-	FuncObjectReader func(BlobIdGetter) (ReadCloseDigester, error)
-	FuncObjectWriter func() (WriteCloseDigester, error)
+	FuncObjectReader func(BlobIdGetter) (ReadCloseBlobIdGetter, error)
+	FuncObjectWriter func() (WriteCloseBlobIdGetter, error)
 )
 
 type bespokeObjectReadWriterFactory struct {
@@ -61,7 +61,7 @@ func MakeBespokeObjectReadFactory(
 
 func (b bespokeObjectReadFactory) ObjectReader(
 	sh BlobIdGetter,
-) (ReadCloseDigester, error) {
+) (ReadCloseBlobIdGetter, error) {
 	return b.FuncObjectReader(sh)
 }
 
@@ -77,6 +77,6 @@ func MakeBespokeObjectWriteFactory(
 	}
 }
 
-func (b bespokeObjectWriterFactory) ObjectWriter() (WriteCloseDigester, error) {
+func (b bespokeObjectWriterFactory) ObjectWriter() (WriteCloseBlobIdGetter, error) {
 	return b.FuncObjectWriter()
 }

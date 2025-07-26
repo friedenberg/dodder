@@ -39,7 +39,7 @@ type BlobStoreInitialized struct {
 	Name     string
 	BasePath string
 	blob_store_configs.Config
-	interfaces.LocalBlobStore
+	interfaces.BlobStore
 }
 
 type Env struct {
@@ -195,7 +195,7 @@ func (env *Env) setupStores() {
 		var err error
 
 		// TODO use sha of config to determine blob store base path
-		if env.blobStores[i].LocalBlobStore, err = blob_stores.MakeBlobStore(
+		if env.blobStores[i].BlobStore, err = blob_stores.MakeBlobStore(
 			env,
 			blobStore.BasePath,
 			blobStore.Config,
@@ -285,7 +285,7 @@ func (env Env) GetBlobStores() []BlobStoreInitialized {
 	return blobStores
 }
 
-func (env Env) GetInventoryListBlobStore() interfaces.LocalBlobStore {
+func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 	storeVersion := env.GetStoreVersion()
 
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {

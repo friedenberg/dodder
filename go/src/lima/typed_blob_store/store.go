@@ -36,7 +36,7 @@ func MakeBlobStore[
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 	digest interfaces.BlobId,
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
-	var readCloser interfaces.ReadCloseDigester
+	var readCloser interfaces.ReadCloseBlobIdGetter
 
 	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(
 		digest,
@@ -90,7 +90,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) PutBlob(a BLOB_PTR) {
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 	o BLOB_PTR,
 ) (sh interfaces.BlobId, n int64, err error) {
-	var writeCloser interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseBlobIdGetter
 
 	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

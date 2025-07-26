@@ -8,12 +8,15 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
+
+func (client *client) GetBlobStore() interfaces.BlobStore {
+	return client
+}
 
 func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 	var request *http.Request
@@ -46,14 +49,9 @@ func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 	return
 }
 
-func (client *client) BlobWriter() (w interfaces.WriteCloseDigester, err error) {
-	err = comments.Implement()
-	return
-}
-
 func (client *client) BlobReader(
 	sh interfaces.BlobId,
-) (reader interfaces.ReadCloseDigester, err error) {
+) (reader interfaces.ReadCloseBlobIdGetter, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
@@ -97,7 +95,7 @@ func (client *client) WriteBlobToRemote(
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.ReadCloseDigester
+	var reader interfaces.ReadCloseBlobIdGetter
 
 	if reader, err = localBlobStore.BlobReader(
 		expected,
@@ -164,4 +162,37 @@ func (client *client) WriteBlobToRemote(
 	}
 
 	return
+}
+
+//   _   _       _
+//  | \ | | ___ | |_
+//  |  \| |/ _ \| __|
+//  | |\  | (_) | |_
+//  |_| \_|\___/ \__|
+//
+//   ___                 _                           _           _
+//  |_ _|_ __ ___  _ __ | | ___ _ __ ___   ___ _ __ | |_ ___  __| |
+//   | || '_ ` _ \| '_ \| |/ _ \ '_ ` _ \ / _ \ '_ \| __/ _ \/ _` |
+//   | || | | | | | |_) | |  __/ | | | | |  __/ | | | ||  __/ (_| |
+//  |___|_| |_| |_| .__/|_|\___|_| |_| |_|\___|_| |_|\__\___|\__,_|
+//                |_|
+
+func (client *client) GetBlobStoreDescription() string {
+	panic(errors.Err501NotImplemented)
+}
+
+func (client *client) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+	panic(errors.Err501NotImplemented)
+}
+
+func (client *client) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+	panic(errors.Err501NotImplemented)
+}
+
+func (client *client) Mover() (interfaces.Mover, error) {
+	panic(errors.Err501NotImplemented)
+}
+
+func (client *client) BlobWriter() (interfaces.WriteCloseBlobIdGetter, error) {
+	panic(errors.Err501NotImplemented)
 }

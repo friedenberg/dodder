@@ -26,7 +26,7 @@ func MakeBlobStore(
 	basePath string,
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,
-) (store interfaces.LocalBlobStore, err error) {
+) (store interfaces.BlobStore, err error) {
 	switch tipe := config.GetBlobStoreType(); tipe {
 	default:
 		err = errors.BadRequestf("unsupported blob store type %q", tipe)
@@ -107,7 +107,7 @@ func CopyBlob(
 		return
 	}
 
-	var rc interfaces.ReadCloseDigester
+	var rc interfaces.ReadCloseBlobIdGetter
 
 	if rc, err = src.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -116,7 +116,7 @@ func CopyBlob(
 
 	defer errors.ContextMustClose(env, rc)
 
-	var wc interfaces.WriteCloseDigester
+	var wc interfaces.WriteCloseBlobIdGetter
 
 	if wc, err = dst.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -158,7 +158,7 @@ func CopyBlob(
 // size, or full verification
 func VerifyBlob(
 	ctx interfaces.Context,
-	blobStore interfaces.LocalBlobStore,
+	blobStore interfaces.BlobStore,
 	sh interfaces.BlobId,
 	progressWriter io.Writer,
 ) (err error) {
@@ -166,7 +166,7 @@ func VerifyBlob(
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.ReadCloseDigester
+	var readCloser interfaces.ReadCloseBlobIdGetter
 
 	if readCloser, err = blobStore.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)

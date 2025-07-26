@@ -8,7 +8,6 @@ import (
 	"net/url"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -120,14 +119,6 @@ func (client *client) GetTypedInventoryListBlobStore() inventory_list_blobs.Type
 	return client.typedBlobStore
 }
 
-func (client *client) GetBlobStore() interfaces.BlobStore {
-	return client
-}
-
-func (client *client) GetBlobStoreDescription() string {
-	return fmt.Sprintf("TODO: remote")
-}
-
 func (client *client) GetObjectStore() sku.RepoStore {
 	return nil
 }
@@ -155,13 +146,13 @@ func (client *client) MakeExternalQueryGroup(
 	return
 }
 
-func (remote *client) MakeInventoryList(
+func (client *client) MakeInventoryList(
 	queryGroup *query.Query,
 ) (list *sku.List, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
-		remote.GetEnv(),
+		client.GetEnv(),
 		"GET",
 		// fmt.Sprintf("/query/%s", queryGroup.String()),
 		fmt.Sprintf("/query/%s", url.QueryEscape(queryGroup.String())),
@@ -173,7 +164,7 @@ func (remote *client) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = remote.http.Do(request); err != nil {
+	if response, err = client.http.Do(request); err != nil {
 		err = errors.ErrorWithStackf("failed to read response: %w", err)
 		return
 	}
@@ -183,8 +174,8 @@ func (remote *client) MakeInventoryList(
 		return
 	}
 
-	listFormat := remote.GetInventoryListStore().FormatForVersion(
-		remote.GetImmutableConfigPublic().GetStoreVersion(),
+	listFormat := client.GetInventoryListStore().FormatForVersion(
+		client.GetImmutableConfigPublic().GetStoreVersion(),
 	)
 
 	list = sku.MakeList()

@@ -138,7 +138,7 @@ type nopReadCloser struct {
 func MakeNopReadCloser(
 	envDigest interfaces.EnvBlobId,
 	readCloser io.ReadCloser,
-) interfaces.ReadCloseDigester {
+) interfaces.ReadCloseBlobIdGetter {
 	return nopReadCloser{
 		envDigest:  envDigest,
 		ReadCloser: readCloser,

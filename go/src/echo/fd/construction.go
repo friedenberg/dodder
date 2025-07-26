@@ -120,7 +120,7 @@ func MakeFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.WriteCloseDigester
+	var writer interfaces.WriteCloseBlobIdGetter
 
 	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

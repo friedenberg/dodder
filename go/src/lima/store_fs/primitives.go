@@ -135,7 +135,7 @@ func (store *Store) readOneExternalBlob(
 
 	// TODO use cache
 	{
-		var writeCloser interfaces.WriteCloseDigester
+		var writeCloser interfaces.WriteCloseBlobIdGetter
 
 		if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 			err = errors.Wrap(err)

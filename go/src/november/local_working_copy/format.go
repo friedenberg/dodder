@@ -793,7 +793,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				var readCloser interfaces.ReadCloseDigester
+				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					object.GetBlobSha(),
@@ -829,7 +829,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				}
 
 				if repo.GetConfig().IsInlineType(object.GetType()) {
-					var readCloser interfaces.ReadCloseDigester
+					var readCloser interfaces.ReadCloseBlobIdGetter
 
 					if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 						object.GetBlobSha(),
@@ -869,7 +869,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			cliFmt := repo.SkuFormatBoxTransactedNoColor()
 
 			return func(object *sku.Transacted) (err error) {
-				var readCloser interfaces.ReadCloseDigester
+				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					object.GetBlobSha(),
@@ -1068,7 +1068,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				var a map[string]interface{}
 
-				var readCloser interfaces.ReadCloseDigester
+				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					object.GetBlobSha(),
@@ -1108,7 +1108,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				ui.TodoP3("limit to only zettels supporting toml")
 				var a map[string]interface{}
 
-				var readCloser interfaces.ReadCloseDigester
+				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
 					object.GetBlobSha(),

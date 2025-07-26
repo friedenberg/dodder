@@ -20,7 +20,7 @@ func TomlBookmarkUrl(
 	sk *sku.Transacted,
 	s env_repo.Env,
 ) (ur *url.URL, err error) {
-	var r interfaces.ReadCloseDigester
+	var r interfaces.ReadCloseBlobIdGetter
 
 	if r, err = s.GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)

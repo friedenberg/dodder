@@ -13,7 +13,7 @@ import (
 func NewFileReader(
 	config Config,
 	path string,
-) (readCloser interfaces.ReadCloseDigester, err error) {
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	objectReader := objectReader{}
 
 	if path == "-" {
@@ -26,7 +26,7 @@ func NewFileReader(
 	}
 
 	// try the existing options. if they fail, try without encryption
-	if objectReader.ReadCloseDigester, err = NewReader(
+	if objectReader.ReadCloseBlobIdGetter, err = NewReader(
 		config,
 		objectReader.file,
 	); err != nil {
@@ -42,7 +42,7 @@ func NewFileReader(
 			&age.Age{},
 		)
 
-		if objectReader.ReadCloseDigester, err = NewReader(config, objectReader.file); err != nil {
+		if objectReader.ReadCloseBlobIdGetter, err = NewReader(config, objectReader.file); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -55,7 +55,7 @@ func NewFileReader(
 
 type objectReader struct {
 	file *os.File
-	interfaces.ReadCloseDigester
+	interfaces.ReadCloseBlobIdGetter
 }
 
 func (r objectReader) String() string {
@@ -68,12 +68,12 @@ func (ar objectReader) Close() (err error) {
 		return
 	}
 
-	if ar.ReadCloseDigester == nil {
+	if ar.ReadCloseBlobIdGetter == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = ar.ReadCloseDigester.Close(); err != nil {
+	if err = ar.ReadCloseBlobIdGetter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

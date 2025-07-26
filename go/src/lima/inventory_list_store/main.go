@@ -33,7 +33,7 @@ type Store struct {
 	clock        ids.Clock
 
 	inventoryListBlobStore
-	blobBlobStore interfaces.LocalBlobStore
+	blobBlobStore interfaces.BlobStore
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -43,7 +43,7 @@ type Store struct {
 }
 
 type inventoryListBlobStore interface {
-	interfaces.LocalBlobStore
+	interfaces.BlobStore
 
 	getType() ids.Type
 	getTypedBlobStore() inventory_list_blobs.TypedStore
@@ -89,7 +89,7 @@ func (store *Store) Initialize(
 	) {
 		store.inventoryListBlobStore = &blobStoreV0{
 			blobType:       blobType,
-			LocalBlobStore: inventoryListBlobStore,
+			BlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	} else {
@@ -97,7 +97,7 @@ func (store *Store) Initialize(
 			envRepo:        envRepo,
 			pathLog:        envRepo.FileInventoryListLog(),
 			blobType:       blobType,
-			LocalBlobStore: inventoryListBlobStore,
+			BlobStore: inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
 		}
 	}
@@ -291,7 +291,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	var writeCloser interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseBlobIdGetter
 
 	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -358,7 +358,7 @@ func (store *Store) ImportInventoryList(
 	remoteBlobStore interfaces.BlobStore,
 	object *sku.Transacted,
 ) (err error) {
-	var blobReader interfaces.ReadCloseDigester
+	var blobReader interfaces.ReadCloseBlobIdGetter
 
 	if blobReader, err = remoteBlobStore.BlobReader(
 		object.GetBlobSha(),

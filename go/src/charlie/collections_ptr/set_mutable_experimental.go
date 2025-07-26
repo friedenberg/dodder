@@ -322,9 +322,6 @@ func (s *mutableSetExperimental[T, TPtr]) EachKey(
 	return
 }
 
-
-
-
 func (a *mutableSetExperimental[T, TPtr]) Reset() {
 	if !a.l.TryLock() {
 		panic("attempting to reset mutable set during read")

@@ -4,6 +4,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
+// TODO replace with coders
+
 type (
 	Format[T any, TPtr interfaces.Ptr[T]] interface {
 		interfaces.SavedBlobFormatter
@@ -12,12 +14,12 @@ type (
 )
 
 type TypedStore[
-	A any,
-	APtr interfaces.Ptr[A],
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
 ] interface {
 	// TODO remove and replace with two-step process
-	SaveBlobText(APtr) (interfaces.BlobId, int64, error)
-	Format[A, APtr]
+	SaveBlobText(BLOB_PTR) (interfaces.BlobId, int64, error)
+	Format[BLOB, BLOB_PTR]
 	// TODO remove
-	interfaces.BlobPool[APtr]
+	interfaces.BlobPool[BLOB_PTR]
 }

@@ -133,7 +133,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.WriteCloseDigester
+	var writer interfaces.WriteCloseBlobIdGetter
 
 	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -175,7 +175,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	defer errors.DeferredCloser(&err, f)
 
-	var blobWriter interfaces.WriteCloseDigester
+	var blobWriter interfaces.WriteCloseBlobIdGetter
 
 	if blobWriter, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

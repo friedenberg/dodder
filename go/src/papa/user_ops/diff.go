@@ -222,7 +222,7 @@ func (c Diff) makeDoBlob(
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
-		var ar interfaces.ReadCloseDigester
+		var ar interfaces.ReadCloseBlobIdGetter
 
 		if ar, err = arf.BlobReader(sh); err != nil {
 			err = errors.Wrap(err)

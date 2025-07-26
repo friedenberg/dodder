@@ -49,7 +49,7 @@ func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return blobStore.config
 }
 
-func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.LocalBlobStore {
+func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.BlobStore {
 	return blobStore
 }
 
@@ -117,7 +117,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 	}
 }
 
-func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloseDigester, err error) {
+func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -137,7 +137,7 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 
 func (blobStore localHashBucketed) BlobReader(
 	digest interfaces.BlobId,
-) (readCloser interfaces.ReadCloseDigester, err error) {
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.GetBlobId().IsNull() {
 		readCloser = digests.MakeNopReadCloser(
 			blobStore.envDigest,
@@ -181,7 +181,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 func (blobStore localHashBucketed) blobReaderFrom(
 	digest interfaces.BlobId,
 	path string,
-) (readCloser interfaces.ReadCloseDigester, err error) {
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = digests.MakeNopReadCloser(
 			blobStore.envDigest,
@@ -206,7 +206,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 
 			err = env_dir.ErrBlobMissing{
 				BlobIdGetter: shCopy,
-				Path:     path,
+				Path:         path,
 			}
 		} else {
 			err = errors.Wrapf(

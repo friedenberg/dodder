@@ -105,7 +105,6 @@ func (s MutableSet[T]) EachKey(
 	return
 }
 
-
 func (a MutableSet[T]) Reset() {
 	for k := range a.E {
 		delete(a.E, k)

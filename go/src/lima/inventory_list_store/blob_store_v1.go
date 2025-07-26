@@ -24,7 +24,7 @@ type blobStoreV1 struct {
 	blobType       ids.Type
 	typedBlobStore inventory_list_blobs.TypedStore
 
-	interfaces.LocalBlobStore
+	interfaces.BlobStore
 }
 
 func (blobStore *blobStoreV1) getType() ids.Type {
@@ -45,9 +45,9 @@ func (blobStore *blobStoreV1) ReadOneSha(
 		return
 	}
 
-	var readCloser interfaces.ReadCloseDigester
+	var readCloser interfaces.ReadCloseBlobIdGetter
 
-	if readCloser, err = blobStore.LocalBlobStore.BlobReader(&sh); err != nil {
+	if readCloser, err = blobStore.BlobStore.BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,9 +71,9 @@ func (blobStore *blobStoreV1) ReadOneSha(
 func (blobStore *blobStoreV1) WriteInventoryListObject(
 	object *sku.Transacted,
 ) (err error) {
-	var blobStoreWriteCloser interfaces.WriteCloseDigester
+	var blobStoreWriteCloser interfaces.WriteCloseBlobIdGetter
 
-	if blobStoreWriteCloser, err = blobStore.LocalBlobStore.BlobWriter(); err != nil {
+	if blobStoreWriteCloser, err = blobStore.BlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -60,7 +60,7 @@ func MakeTesting(
 	}
 
 	for shaExpected, content := range contents {
-		var writeCloser interfaces.WriteCloseDigester
+		var writeCloser interfaces.WriteCloseBlobIdGetter
 
 		writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
 		if err != nil {

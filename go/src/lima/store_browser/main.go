@@ -125,7 +125,7 @@ func (s *Store) Flush() (err error) {
 
 // TODO limit this to being used only by *Item.ReadFromExternal
 func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
-	var r interfaces.ReadCloseDigester
+	var r interfaces.ReadCloseBlobIdGetter
 
 	if r, err = c.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
@@ -249,14 +249,14 @@ func (c *Store) QueryCheckedOut(
 				}
 			} else if exactIndexURLMatch {
 				for matching := range matchingUrls.All() {
-				if err = ex.tryToEmitOneRecognized(
-					matching,
-					item,
-				); err != nil {
-					err = errors.Wrapf(err, "Item: %#v", item)
-					return
+					if err = ex.tryToEmitOneRecognized(
+						matching,
+						item,
+					); err != nil {
+						err = errors.Wrapf(err, "Item: %#v", item)
+						return
+					}
 				}
-			}
 			}
 		}
 	}
@@ -267,7 +267,7 @@ func (c *Store) QueryCheckedOut(
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
 func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
-	var blobWriter interfaces.WriteCloseDigester
+	var blobWriter interfaces.WriteCloseBlobIdGetter
 
 	if blobWriter, err = s.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

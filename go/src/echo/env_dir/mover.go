@@ -19,7 +19,7 @@ type MoveOptions struct {
 type localFileMover struct {
 	funcJoin func(string, ...string) string
 	file     *os.File
-	interfaces.WriteCloseDigester
+	interfaces.WriteCloseBlobIdGetter
 
 	basePath                  string
 	objectPath                string
@@ -59,7 +59,7 @@ func newMover(
 		return
 	}
 
-	if mover.WriteCloseDigester, err = NewWriter(
+	if mover.WriteCloseBlobIdGetter, err = NewWriter(
 		config,
 		mover.file,
 	); err != nil {
@@ -76,12 +76,12 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	if mover.WriteCloseDigester == nil {
+	if mover.WriteCloseBlobIdGetter == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = mover.WriteCloseDigester.Close(); err != nil {
+	if err = mover.WriteCloseBlobIdGetter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

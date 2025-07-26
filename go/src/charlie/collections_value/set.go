@@ -93,7 +93,6 @@ func (s Set[T]) Add(v T) (err error) {
 	return
 }
 
-
 func (a Set[T]) CloneSetLike() interfaces.SetLike[T] {
 	return a
 }

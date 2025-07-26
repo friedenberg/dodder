@@ -89,7 +89,7 @@ func (server *Server) writeInventoryList(
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
 
-	var blobWriter interfaces.WriteCloseDigester
+	var blobWriter interfaces.WriteCloseBlobIdGetter
 
 	{
 		var err error

@@ -28,7 +28,7 @@ func (f nopBlobParseSaver[O, OPtr]) ParseBlob(
 	r io.Reader,
 	t OPtr,
 ) (n int64, err error) {
-	var aw interfaces.WriteCloseDigester
+	var aw interfaces.WriteCloseBlobIdGetter
 
 	if aw, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

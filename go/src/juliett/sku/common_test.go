@@ -332,7 +332,7 @@ type blobReaderFactory struct {
 
 func (arf blobReaderFactory) BlobReader(
 	digest sha.Sha,
-) (readCloser interfaces.ReadCloseDigester, err error) {
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	var v string
 	var ok bool
 

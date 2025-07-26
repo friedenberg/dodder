@@ -25,11 +25,11 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(BlobId) (ReadCloseDigester, error)
+		BlobReader(BlobId) (ReadCloseBlobIdGetter, error)
 	}
 
 	BlobWriter interface {
-		BlobWriter() (WriteCloseDigester, error)
+		BlobWriter() (WriteCloseBlobIdGetter, error)
 	}
 
 	Mover interface {
@@ -43,15 +43,8 @@ type (
 		HasBlob(sh BlobId) (ok bool)
 		BlobReader
 		BlobWriter
-	}
-
-	// TODO merge into BlobStore
-	LocalBlobStore interface {
-		BlobStore
-		GetLocalBlobStore() LocalBlobStore
-		GetBlobIOWrapper() BlobIOWrapper
-		// TODO add context
 		AllBlobs() SeqError[BlobId]
+		GetBlobIOWrapper() BlobIOWrapper
 		Mover() (Mover, error)
 	}
 

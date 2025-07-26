@@ -126,7 +126,7 @@ func (store TypedStore) StreamInventoryListBlobSkus(
 		tipe := object.GetType()
 		blobDigest := object.GetBlobSha()
 
-		var readCloser interfaces.ReadCloseDigester
+		var readCloser interfaces.ReadCloseBlobIdGetter
 
 		if blobDigest.IsNull() {
 			return
@@ -193,7 +193,7 @@ func (store TypedStore) IterInventoryListBlobSkusFromBlobStore(
 	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var readCloser interfaces.ReadCloseDigester
+		var readCloser interfaces.ReadCloseBlobIdGetter
 
 		{
 			var err error

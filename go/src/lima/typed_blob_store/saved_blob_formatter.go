@@ -23,7 +23,7 @@ func (f savedBlobFormatter) FormatSavedBlob(
 	w io.Writer,
 	sh interfaces.BlobId,
 ) (n int64, err error) {
-	var ar interfaces.ReadCloseDigester
+	var ar interfaces.ReadCloseBlobIdGetter
 
 	if ar, err = f.arf.BlobReader(sh); err != nil {
 		if errors.IsNotExist(err) {

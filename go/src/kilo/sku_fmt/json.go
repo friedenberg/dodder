@@ -43,10 +43,10 @@ type Json struct {
 func (json *Json) FromStringAndMetadata(
 	objectId string,
 	metadata *object_metadata.Metadata,
-	blobStore interfaces.LocalBlobStore,
+	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var readCloser interfaces.ReadCloseDigester
+		var readCloser interfaces.ReadCloseBlobIdGetter
 
 		if readCloser, err = blobStore.BlobReader(&metadata.Blob); err != nil {
 			err = errors.Wrap(err)
@@ -108,7 +108,7 @@ func (json *Json) FromStringAndMetadata(
 // TODO accept blob store instead of env
 func (json *Json) FromTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.LocalBlobStore,
+	blobStore interfaces.BlobStore,
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
@@ -121,7 +121,7 @@ func (json *Json) ToTransacted(
 	object *sku.Transacted,
 	envRepo env_repo.Env,
 ) (err error) {
-	var writeCloser interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseBlobIdGetter
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

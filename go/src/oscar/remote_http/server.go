@@ -497,7 +497,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			response.StatusCode = http.StatusNotFound
 		}
 	} else {
-		var rc interfaces.ReadCloseDigester
+		var rc interfaces.ReadCloseBlobIdGetter
 
 		{
 			var err error
@@ -580,7 +580,7 @@ func (server *Server) copyBlob(
 	expected *sha.Sha,
 ) (result interfaces.BlobId, err error) {
 	var progressWriter env_ui.ProgressWriter
-	var writeCloser interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseBlobIdGetter
 
 	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

@@ -56,7 +56,7 @@ func (ReadBlob) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
 ) (digest interfaces.BlobId, err error) {
-	var writeCloser interfaces.WriteCloseDigester
+	var writeCloser interfaces.WriteCloseBlobIdGetter
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)

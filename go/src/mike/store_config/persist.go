@@ -92,16 +92,16 @@ func (store *store) recompileTypes(
 
 		if fe == "" {
 			fe = ct.GetObjectId().StringSansOp()
-			}
+		}
 
-			// TODO-P2 enforce uniqueness
-			store.config.ExtensionsToTypes[fe] = ct.GetObjectId().String()
-			store.config.TypesToExtensions[ct.GetObjectId().String()] = fe
+		// TODO-P2 enforce uniqueness
+		store.config.ExtensionsToTypes[fe] = ct.GetObjectId().String()
+		store.config.TypesToExtensions[ct.GetObjectId().String()] = fe
 
-			isBinary := commonBlob.GetBinary()
-			if !isBinary {
-				inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
-			}
+		isBinary := commonBlob.GetBinary()
+		if !isBinary {
+			inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
+		}
 
 	}
 	return

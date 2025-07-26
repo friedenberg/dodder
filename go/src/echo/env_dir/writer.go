@@ -9,12 +9,12 @@ import (
 )
 
 type Writer interface {
-	interfaces.WriteCloseDigester
+	interfaces.WriteCloseBlobIdGetter
 	interfaces.BlobIdGetter
 }
 
 type writer struct {
-	digester              interfaces.WriteDigester
+	digester              interfaces.WriteBlobIdGetter
 	tee                   io.Writer
 	compressor, encrypter io.WriteCloser
 	buffer                *bufio.Writer

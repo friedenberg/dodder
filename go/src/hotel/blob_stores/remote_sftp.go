@@ -121,7 +121,7 @@ func (blobStore *remoteSftpBlobStore) GetBlobIOWrapper() interfaces.BlobIOWrappe
 	return blobStore.blobIOWrapper
 }
 
-func (blobStore *remoteSftpBlobStore) GetLocalBlobStore() interfaces.LocalBlobStore {
+func (blobStore *remoteSftpBlobStore) GetLocalBlobStore() interfaces.BlobStore {
 	return blobStore
 }
 
@@ -218,7 +218,7 @@ func (blobStore *remoteSftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.
 	}
 }
 
-func (blobStore *remoteSftpBlobStore) BlobWriter() (w interfaces.WriteCloseDigester, err error) {
+func (blobStore *remoteSftpBlobStore) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -239,7 +239,7 @@ func (blobStore *remoteSftpBlobStore) Mover() (mover interfaces.Mover, err error
 
 func (blobStore *remoteSftpBlobStore) BlobReader(
 	digest interfaces.BlobId,
-) (readCloser interfaces.ReadCloseDigester, err error) {
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.GetBlobId().IsNull() {
 		readCloser = digests.MakeNopReadCloser(
 			blobStore.envDigest,
@@ -259,7 +259,7 @@ func (blobStore *remoteSftpBlobStore) BlobReader(
 
 			err = env_dir.ErrBlobMissing{
 				BlobIdGetter: shCopy,
-				Path:     remotePath,
+				Path:         remotePath,
 			}
 		} else {
 			err = errors.Wrap(err)
@@ -510,7 +510,7 @@ type sftpStreamingReader struct {
 	config interfaces.BlobIOWrapper
 }
 
-func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ReadCloseDigester, err error) {
+func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,

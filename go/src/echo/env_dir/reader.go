@@ -9,7 +9,7 @@ import (
 )
 
 type reader struct {
-	digester  interfaces.WriteDigester
+	digester  interfaces.WriteBlobIdGetter
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader

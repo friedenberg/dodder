@@ -13,7 +13,7 @@ import (
 
 type serverBlobCache struct {
 	ui             fd.Std
-	localBlobStore interfaces.LocalBlobStore
+	localBlobStore interfaces.BlobStore
 	shas           interfaces.MutableTridex
 	init           sync.Once
 }
