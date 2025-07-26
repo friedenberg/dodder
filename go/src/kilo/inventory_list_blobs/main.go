@@ -51,7 +51,7 @@ func WriteObjectToOpenList(
 	return
 }
 
-func WriteInventoryListBlob(
+func WriteInventoryList(
 	format sku.ListFormat,
 	skus interfaces.SeqError[*sku.Transacted],
 	bufferedWriter *bufio.Writer,
@@ -84,16 +84,11 @@ func CollectSkuList(
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	iter := StreamInventoryListBlobSkus(listFormat, reader)
+	iter := StreamInventoryListSkus(listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
-		}
-
-		if err = sk.CalculateObjectShas(); err != nil {
-			err = errors.Wrap(err)
 			return
 		}
 
@@ -106,7 +101,7 @@ func CollectSkuList(
 	return
 }
 
-func StreamInventoryListBlobSkus(
+func StreamInventoryListSkus(
 	format sku.ListFormat,
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {

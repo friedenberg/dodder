@@ -72,25 +72,6 @@ func (format V2) WriteObjectToOpenList(
 	return
 }
 
-func (format V2) WriteInventoryListBlob(
-	skus sku.Collection,
-	bufferedWriter *bufio.Writer,
-) (n int64, err error) {
-	var n1 int64
-
-	for sk := range skus.All() {
-		n1, err = format.EncodeTo(sk, bufferedWriter)
-		n += n1
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (format V2) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {

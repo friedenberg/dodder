@@ -140,7 +140,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	)
 	defer repoolBufferedWriter()
 
-	if _, err := inventory_list_blobs.WriteInventoryListBlob(
+	if _, err := inventory_list_blobs.WriteInventoryList(
 		listFormat,
 		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,

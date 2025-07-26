@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -85,29 +86,33 @@ func (store TypedStore) WriteObjectToWriter(
 	return store.objectCoders.EncodeTo(typedBlob, bufferedWriter)
 }
 
+// TODO consume interfaces.SeqError and expose as a coder instead
 func (store TypedStore) WriteBlobToWriter(
 	tipe ids.Type,
 	list sku.Collection,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
+	var format sku.ListFormat
+
 	switch tipe.String() {
 	case ids.TypeInventoryListV1:
-		if n, err = store.v1.WriteInventoryListBlob(
-			list,
-			bufferedWriter,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		format = store.v1
 
 	case ids.TypeInventoryListV2:
-		if n, err = store.v2.WriteInventoryListBlob(
-			list,
-			bufferedWriter,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		format = store.v2
+
+	default:
+		err = errors.Errorf("unsupported inventory list type: %q", tipe)
+		return
+	}
+
+	if n, err = WriteInventoryList(
+		format,
+		quiter.MakeSeqErrorFromSeq(list.All()),
+		bufferedWriter,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -314,7 +319,7 @@ func (store TypedStore) ReadInventoryListBlob(
 		listFormat = store.v2
 	}
 
-	iter := StreamInventoryListBlobSkus(listFormat, reader)
+	iter := StreamInventoryListSkus(listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {

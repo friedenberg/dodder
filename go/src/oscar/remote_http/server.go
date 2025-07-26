@@ -690,7 +690,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 		defer repoolBufferedWriter()
 
-		if _, err := inventory_list_blobs.WriteInventoryListBlob(
+		if _, err := inventory_list_blobs.WriteInventoryList(
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,

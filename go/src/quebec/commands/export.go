@@ -108,7 +108,7 @@ func (cmd Export) Run(dep command.Request) {
 		localWorkingCopy.GetConfig().GetStoreVersion(),
 	)
 
-	if _, err := inventory_list_blobs.WriteInventoryListBlob(
+	if _, err := inventory_list_blobs.WriteInventoryList(
 		listFormat,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
