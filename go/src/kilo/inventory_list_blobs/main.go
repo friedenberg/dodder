@@ -12,24 +12,23 @@ func ReadInventoryListBlob(
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	if err = listFormat.StreamInventoryListBlobSkus(
-		reader,
-		func(sk *sku.Transacted) (err error) {
-			if err = sk.CalculateObjectShas(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = list.Add(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	iter := listFormat.StreamInventoryListBlobSkus(reader)
+	
+	for sk, iterErr := range iter {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = sk.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = list.Add(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

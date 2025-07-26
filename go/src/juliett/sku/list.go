@@ -45,10 +45,10 @@ type ListFormat interface {
 	WriteInventoryListObject(*Transacted, *bufio.Writer) (int64, error)
 	ReadInventoryListObject(*bufio.Reader) (int64, *Transacted, error)
 	// TODO add context and ContinueOrPanicOnDone
+	// TODO refactor to iterator
 	StreamInventoryListBlobSkus(
-		rf *bufio.Reader,
-		f interfaces.FuncIter[*Transacted],
-	) error
+		*bufio.Reader,
+	) interfaces.SeqError[*Transacted]
 }
 
 // TODO rename to ListTransacted

@@ -261,39 +261,35 @@ func (store TypedStore) ReadInventoryListObject(
 ) (out *sku.Transacted, err error) {
 	switch tipe.String() {
 	case ids.TypeInventoryListV1:
-		if err = store.v1.StreamInventoryListBlobSkus(
-			reader,
-			func(sk *sku.Transacted) (err error) {
-				if out == nil {
-					out = sk.CloneTransacted()
-				} else {
-					err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
-					return
-				}
-
+		iter := store.v1.StreamInventoryListBlobSkus(reader)
+		for sk, iterErr := range iter {
+			if iterErr != nil {
+				err = errors.Wrap(iterErr)
 				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+			}
+			
+			if out == nil {
+				out = sk.CloneTransacted()
+			} else {
+				err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
+				return
+			}
 		}
 
 	case ids.TypeInventoryListV2:
-		if err = store.v2.StreamInventoryListBlobSkus(
-			reader,
-			func(sk *sku.Transacted) (err error) {
-				if out == nil {
-					out = sk.CloneTransacted()
-				} else {
-					err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
-					return
-				}
-
+		iter := store.v2.StreamInventoryListBlobSkus(reader)
+		for sk, iterErr := range iter {
+			if iterErr != nil {
+				err = errors.Wrap(iterErr)
 				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+			}
+			
+			if out == nil {
+				out = sk.CloneTransacted()
+			} else {
+				err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
+				return
+			}
 		}
 	}
 
@@ -316,24 +312,23 @@ func (store TypedStore) ReadInventoryListBlob(
 		listFormat = store.v2
 	}
 
-	if err = listFormat.StreamInventoryListBlobSkus(
-		reader,
-		func(sk *sku.Transacted) (err error) {
-			if err = sk.CalculateObjectShas(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = list.Add(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	iter := listFormat.StreamInventoryListBlobSkus(reader)
+	
+	for sk, iterErr := range iter {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = sk.CalculateObjectShas(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = list.Add(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

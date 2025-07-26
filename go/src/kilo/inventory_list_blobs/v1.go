@@ -121,33 +121,32 @@ func (format V1) ReadInventoryListObject(
 
 func (format V1) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		// TODO Fix upstream issues with repooling
-		// defer sku.GetTransactedPool().Put(object)
+) interfaces.SeqError[*sku.Transacted] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for {
+			object := sku.GetTransactedPool().Get()
+			// TODO Fix upstream issues with repooling
+			// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = format.V1ObjectCoder.DecodeFrom(
-			object,
-			bufferedReader,
-		); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
+			if _, err := format.V1ObjectCoder.DecodeFrom(
+				object,
+				bufferedReader,
+			); err != nil {
+				if errors.IsEOF(err) {
+					err = nil
+					break
+				} else {
+					if !yield(nil, err) {
+						break
+					}
+				}
+			}
+
+			if !yield(object, nil) {
 				break
-			} else {
-				err = errors.Wrap(err)
-				return
 			}
 		}
-
-		if err = output(object); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku.String(object))
-			return
-		}
 	}
-
-	return
 }
 
 type V1ObjectCoder struct {

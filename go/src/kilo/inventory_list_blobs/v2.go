@@ -167,33 +167,32 @@ func (coder V2StreamCoder) DecodeFrom(
 
 func (format V2) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		// TODO Fix upstream issues with repooling
-		// defer sku.GetTransactedPool().Put(object)
+) interfaces.SeqError[*sku.Transacted] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for {
+			object := sku.GetTransactedPool().Get()
+			// TODO Fix upstream issues with repooling
+			// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = format.V2ObjectCoder.DecodeFrom(
-			object,
-			bufferedReader,
-		); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
+			if _, err := format.V2ObjectCoder.DecodeFrom(
+				object,
+				bufferedReader,
+			); err != nil {
+				if errors.IsEOF(err) {
+					err = nil
+					break
+				} else {
+					if !yield(nil, err) {
+						break
+					}
+				}
+			}
+
+			if !yield(object, nil) {
 				break
-			} else {
-				err = errors.Wrap(err)
-				return
 			}
 		}
-
-		if err = output(object); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku.String(object))
-			return
-		}
 	}
-
-	return
 }
 
 type V2ObjectCoder struct {
@@ -302,37 +301,6 @@ func (coder V2ObjectCoder) DecodeFrom(
 
 	if isEOF {
 		err = io.EOF
-	}
-
-	return
-}
-
-type V2IterDecoder struct {
-	V2
-}
-
-func (coder V2IterDecoder) DecodeFrom(
-	yield func(*sku.Transacted) bool,
-	bufferedReader *bufio.Reader,
-) (n int64, err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		// TODO Fix upstream issues with repooling
-		// defer sku.GetTransactedPool().Put(object)
-
-		if _, err = coder.V2ObjectCoder.DecodeFrom(object, bufferedReader); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if !yield(object) {
-			return
-		}
 	}
 
 	return
