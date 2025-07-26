@@ -46,6 +46,10 @@ func (coder V2ObjectCoder) EncodeTo(
 	var n1 int64
 	var n2 int
 
+	if coder.Box == nil {
+		panic("empty box")
+	}
+
 	n1, err = coder.Box.EncodeStringTo(object, bufferedWriter)
 	n += n1
 

@@ -27,7 +27,7 @@ func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
 	localRepo repo.LocalRepo,
-	typedBlobStore inventory_list_blobs.TypedStore,
+	typedBlobStore inventory_list_blobs.Closet,
 ) *client {
 	client := &client{
 		envUI: envUI,
@@ -48,7 +48,7 @@ type client struct {
 	configImmutable genesis_configs.TypedConfigPublic
 	http            http.Client
 	localRepo       repo.LocalRepo
-	typedBlobStore  inventory_list_blobs.TypedStore
+	typedBlobStore  inventory_list_blobs.Closet
 
 	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
@@ -116,7 +116,7 @@ func (client *client) GetInventoryListStore() sku.InventoryListStore {
 	return client
 }
 
-func (client *client) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
+func (client *client) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
 	return client.typedBlobStore
 }
 

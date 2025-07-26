@@ -17,7 +17,7 @@ import (
 type blobStoreV0 struct {
 	lock           sync.Mutex
 	blobType       ids.Type
-	typedBlobStore inventory_list_blobs.TypedStore
+	typedBlobStore inventory_list_blobs.Closet
 
 	interfaces.BlobStore
 }
@@ -26,7 +26,7 @@ func (blobStore *blobStoreV0) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_blobs.TypedStore {
+func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_blobs.Closet {
 	return blobStore.typedBlobStore
 }
 

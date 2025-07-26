@@ -46,7 +46,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
 	getType() ids.Type
-	getTypedBlobStore() inventory_list_blobs.TypedStore
+	getTypedBlobStore() inventory_list_blobs.Closet
 
 	// TODO rename to ReadOneDigest
 	ReadOneSha(id interfaces.BlobId) (object *sku.Transacted, err error)
@@ -60,7 +60,7 @@ type inventoryListBlobStore interface {
 func (store *Store) Initialize(
 	envRepo env_repo.Env,
 	clock ids.Clock,
-	typedBlobStore inventory_list_blobs.TypedStore,
+	typedBlobStore inventory_list_blobs.Closet,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
@@ -129,7 +129,7 @@ func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
-func (store *Store) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
+func (store *Store) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
 	return store.getTypedBlobStore()
 }
 

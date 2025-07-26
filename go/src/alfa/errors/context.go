@@ -134,6 +134,13 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 				ctx.captureCancelStackFramesIfNecessary(2, nil)
 				ctx.cancel(xerrors.Errorf("context failed: %w", err))
 
+			case string:
+				{
+					err := xerrors.Errorf("%s", err)
+					ctx.captureCancelStackFramesIfNecessary(2, err)
+					ctx.cancel(err)
+				}
+
 			case runtime.Error:
 				ctx.captureCancelStackFramesIfNecessary(2, err)
 				ctx.cancel(err)

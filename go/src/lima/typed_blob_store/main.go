@@ -10,7 +10,7 @@ import (
 )
 
 type Stores struct {
-	InventoryList inventory_list_blobs.TypedStore
+	InventoryList inventory_list_blobs.Closet
 	Repo          RepoStore
 	Type          Type
 	Tag           Tag
@@ -23,7 +23,7 @@ func MakeStores(
 	boxFormat *box_format.BoxTransacted,
 ) Stores {
 	return Stores{
-		InventoryList: inventory_list_blobs.MakeInventoryStore(
+		InventoryList: inventory_list_blobs.MakeCloset(
 			envRepo,
 			boxFormat,
 		),

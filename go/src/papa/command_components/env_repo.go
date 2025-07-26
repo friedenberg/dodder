@@ -74,13 +74,13 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 
 func (EnvRepo) MakeTypedInventoryListBlobStore(
 	envRepo env_repo.Env,
-) inventory_list_blobs.TypedStore {
+) inventory_list_blobs.Closet {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		envRepo,
 		options_print.Options{}.WithPrintTai(true),
 	)
 
-	return inventory_list_blobs.MakeInventoryStore(
+	return inventory_list_blobs.MakeCloset(
 		envRepo,
 		boxFormat,
 	)

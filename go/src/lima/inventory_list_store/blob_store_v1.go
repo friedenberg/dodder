@@ -22,7 +22,7 @@ type blobStoreV1 struct {
 	envRepo        env_repo.Env
 	pathLog        string
 	blobType       ids.Type
-	typedBlobStore inventory_list_blobs.TypedStore
+	typedBlobStore inventory_list_blobs.Closet
 
 	interfaces.BlobStore
 }
@@ -31,7 +31,7 @@ func (blobStore *blobStoreV1) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_blobs.TypedStore {
+func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_blobs.Closet {
 	return blobStore.typedBlobStore
 }
 

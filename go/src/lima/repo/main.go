@@ -18,7 +18,7 @@ type Repo interface {
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.RepoStore
-	GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore
+	GetTypedInventoryListBlobStore() inventory_list_blobs.Closet
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(

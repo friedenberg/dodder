@@ -27,7 +27,7 @@ func Make(
 	options ImporterOptions,
 	storeOptions sku.StoreOptions,
 	envRepo env_repo.Env,
-	typedInventoryListBlobStore inventory_list_blobs.TypedStore,
+	typedInventoryListBlobStore inventory_list_blobs.Closet,
 	indexObject sku.IndexObject,
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.RepoStore,
@@ -64,7 +64,7 @@ func Make(
 }
 
 type importer struct {
-	typedInventoryListBlobStore inventory_list_blobs.TypedStore
+	typedInventoryListBlobStore inventory_list_blobs.Closet
 	indexObject                 sku.IndexObject
 	storeExternal               store_workspace.MergeCheckedOut
 	storeObject                 sku.RepoStore

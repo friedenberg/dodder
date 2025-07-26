@@ -79,7 +79,7 @@ func (local *Repo) GetTypedBlobStore() typed_blob_store.Stores {
 	return local.typedBlobStore
 }
 
-func (local *Repo) GetTypedInventoryListBlobStore() inventory_list_blobs.TypedStore {
+func (local *Repo) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
 	return local.typedBlobStore.InventoryList
 }
 
