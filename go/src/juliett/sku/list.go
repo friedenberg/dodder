@@ -1,8 +1,6 @@
 package sku
 
 import (
-	"bufio"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
@@ -38,8 +36,6 @@ type InventoryListStore interface {
 // TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
 type ListFormat interface {
 	GetType() ids.Type
-	WriteEntrySuffix(*bufio.Writer) (int64, error)
-
 	interfaces.CoderBufferedReadWriter[*Transacted]
 }
 

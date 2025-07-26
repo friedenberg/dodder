@@ -76,34 +76,6 @@ func (format V1) WriteInventoryListBlob(
 	return
 }
 
-func (format V1) WriteEntrySuffix(
-	bufferedWriter *bufio.Writer,
-) (n int64, err error) {
-	var n1 int
-	n1, err = fmt.Fprintf(bufferedWriter, "\n")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (format V1) ReadInventoryListObject(
-	reader *bufio.Reader,
-) (n int64, object *sku.Transacted, err error) {
-	object = sku.GetTransactedPool().Get()
-
-	if n, err = format.DecodeFrom(object, reader); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (format V1) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {

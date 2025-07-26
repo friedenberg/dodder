@@ -91,65 +91,6 @@ func (format V2) WriteInventoryListBlob(
 	return
 }
 
-func (format V2) WriteEntrySuffix(
-	bufferedWriter *bufio.Writer,
-) (n int64, err error) {
-	var n1 int
-	n1, err = fmt.Fprintf(bufferedWriter, "\n")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (format V2) ReadInventoryListObject(
-	reader *bufio.Reader,
-) (n int64, object *sku.Transacted, err error) {
-	object = sku.GetTransactedPool().Get()
-
-	if n, err = format.DecodeFrom(object, reader); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-type V2StreamCoder struct {
-	V2
-}
-
-func (coder V2StreamCoder) DecodeFrom(
-	output interfaces.FuncIter[*sku.Transacted],
-	bufferedReader *bufio.Reader,
-) (n int64, err error) {
-	for {
-		object := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(object)
-
-		if _, err = coder.V2ObjectCoder.DecodeFrom(object, bufferedReader); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if err = output(object); err != nil {
-			err = errors.Wrapf(err, "Object: %s", sku.String(object))
-			return
-		}
-	}
-
-	return
-}
-
 func (format V2) StreamInventoryListBlobSkus(
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
