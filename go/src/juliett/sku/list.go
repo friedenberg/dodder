@@ -38,12 +38,9 @@ type InventoryListStore interface {
 // TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
 type ListFormat interface {
 	GetType() ids.Type
+	WriteEntrySuffix(*bufio.Writer) (int64, error)
 
 	interfaces.CoderBufferedReadWriter[*Transacted]
-
-	// TODO turn into utility functions
-	WriteInventoryListObject(*Transacted, *bufio.Writer) (int64, error)
-	ReadInventoryListObject(*bufio.Reader) (int64, *Transacted, error)
 }
 
 // TODO rename to ListTransacted

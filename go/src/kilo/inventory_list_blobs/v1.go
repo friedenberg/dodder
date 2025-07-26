@@ -76,23 +76,12 @@ func (format V1) WriteInventoryListBlob(
 	return
 }
 
-func (format V1) WriteInventoryListObject(
-	object *sku.Transacted,
+func (format V1) WriteEntrySuffix(
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	var n1 int64
-	var n2 int
-
-	n1, err = format.Box.EncodeStringTo(object, bufferedWriter)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = fmt.Fprintf(bufferedWriter, "\n")
-	n += int64(n2)
+	var n1 int
+	n1, err = fmt.Fprintf(bufferedWriter, "\n")
+	n += int64(n1)
 
 	if err != nil {
 		err = errors.Wrap(err)

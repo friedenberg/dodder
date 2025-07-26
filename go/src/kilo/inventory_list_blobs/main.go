@@ -136,3 +136,19 @@ func StreamInventoryListBlobSkus(
 		}
 	}
 }
+
+func WriteInventoryListObject(
+	format sku.ListFormat,
+	object *sku.Transacted,
+	bufferedWriter *bufio.Writer,
+) (n int64, err error) {
+	if n, err = format.EncodeTo(
+		object,
+		bufferedWriter,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
