@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -32,6 +33,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -688,8 +690,9 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 		defer repoolBufferedWriter()
 
-		if _, err := listFormat.WriteInventoryListBlob(
-			list,
+		if _, err := inventory_list_blobs.WriteInventoryListBlob(
+			listFormat,
+			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
 		); err != nil {
 			server.EnvLocal.Cancel(err)

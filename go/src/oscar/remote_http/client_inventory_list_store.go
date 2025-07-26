@@ -12,12 +12,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 )
 
 func (client client) FormatForVersion(
@@ -80,8 +82,9 @@ func (client client) ImportInventoryList(
 		defer repoolBufferedWriter()
 
 		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = listFormat.WriteInventoryListBlob(
-			list,
+		if _, err = inventory_list_blobs.WriteInventoryListBlob(
+			listFormat,
+			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -97,7 +100,9 @@ func (client client) ImportInventoryList(
 	var sbListSkuBox strings.Builder
 
 	{
-		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(&sbListSkuBox)
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+			&sbListSkuBox,
+		)
 		defer repoolBufferedWriter()
 
 		if _, err = client.typedBlobStore.WriteObjectToWriter(

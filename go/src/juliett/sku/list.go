@@ -42,7 +42,6 @@ type ListFormat interface {
 	interfaces.CoderBufferedReadWriter[*Transacted]
 
 	// TODO turn into utility functions
-	WriteInventoryListBlob(Collection, *bufio.Writer) (int64, error)
 	StreamInventoryListBlobSkus(
 		*bufio.Reader,
 	) interfaces.SeqError[*Transacted]

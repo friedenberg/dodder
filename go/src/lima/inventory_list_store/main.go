@@ -138,6 +138,7 @@ func (store *Store) Flush() (err error) {
 	return wg.GetError()
 }
 
+// TODO pass errors.Context
 func (store *Store) FormatForVersion(
 	storeVersion interfaces.StoreVersion,
 ) sku.ListFormat {

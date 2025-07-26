@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -255,8 +256,9 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		errors.ContextContinueOrPanic(client.envUI)
 
 		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = listFormat.WriteInventoryListBlob(
-			list,
+		if _, err = inventory_list_blobs.WriteInventoryListBlob(
+			listFormat,
+			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
 		); err != nil {
 			err = errors.Wrap(err)

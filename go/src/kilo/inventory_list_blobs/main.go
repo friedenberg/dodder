@@ -4,6 +4,7 @@ import (
 	"bufio"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -46,6 +47,33 @@ func WriteObjectToOpenList(
 
 	list.LastTai = object.GetTai()
 	list.Len += 1
+
+	return
+}
+
+func WriteInventoryListBlob(
+	format sku.ListFormat,
+	skus interfaces.SeqError[*sku.Transacted],
+	bufferedWriter *bufio.Writer,
+) (n int64, err error) {
+	var n1 int64
+
+	var object *sku.Transacted
+
+	for object, err = range skus {
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = format.EncodeTo(object, bufferedWriter)
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }

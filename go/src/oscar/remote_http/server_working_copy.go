@@ -9,11 +9,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -133,11 +135,14 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(responseBuffer)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+		responseBuffer,
+	)
 	defer repoolBufferedWriter()
 
-	if _, err := listFormat.WriteInventoryListBlob(
-		listMissingSkus,
+	if _, err := inventory_list_blobs.WriteInventoryListBlob(
+		listFormat,
+		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,
 	); err != nil {
 		response.Error(err)

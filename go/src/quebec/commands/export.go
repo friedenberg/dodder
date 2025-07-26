@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -14,6 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -106,8 +108,9 @@ func (cmd Export) Run(dep command.Request) {
 		localWorkingCopy.GetConfig().GetStoreVersion(),
 	)
 
-	if _, err := listFormat.WriteInventoryListBlob(
-		list,
+	if _, err := inventory_list_blobs.WriteInventoryListBlob(
+		listFormat,
+		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
 	); err != nil {
 		localWorkingCopy.Cancel(err)
