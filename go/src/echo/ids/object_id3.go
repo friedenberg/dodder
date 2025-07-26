@@ -2,7 +2,7 @@ package ids
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
 
@@ -14,7 +14,7 @@ import (
 // /browser/!md
 // /browser/!md
 func (oid *objectId2) ReadFromSeq(
-	seq box.Seq,
+	seq doddish.Seq,
 ) (err error) {
 	switch {
 	case seq.Len() == 0:
@@ -22,7 +22,7 @@ func (oid *objectId2) ReadFromSeq(
 		return
 
 		// tag
-	case seq.MatchAll(box.TokenTypeIdentifier):
+	case seq.MatchAll(doddish.TokenTypeIdentifier):
 		oid.g = genres.Tag
 		oid.right.WriteLower(seq.At(0).Contents)
 
@@ -33,28 +33,28 @@ func (oid *objectId2) ReadFromSeq(
 		return
 
 		// !type
-	case seq.MatchAll(box.TokenMatcherOp(box.OpType), box.TokenTypeIdentifier):
+	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpType), doddish.TokenTypeIdentifier):
 		oid.g = genres.Type
-		oid.middle = box.OpType
+		oid.middle = doddish.OpType
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// %tag
-	case seq.MatchAll(box.TokenMatcherOp(box.OpVirtual), box.TokenTypeIdentifier):
+	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpVirtual), doddish.TokenTypeIdentifier):
 		oid.g = genres.Tag
-		oid.middle = box.OpVirtual
+		oid.middle = doddish.OpVirtual
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// /repo
-	case seq.MatchAll(box.TokenMatcherOp(box.OpPathSeparator), box.TokenTypeIdentifier):
+	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpPathSeparator), doddish.TokenTypeIdentifier):
 		oid.g = genres.Repo
-		oid.middle = box.OpPathSeparator
+		oid.middle = doddish.OpPathSeparator
 		oid.right.Write(seq.At(1).Contents)
 		return
 
 		// @sha
-	case seq.MatchAll(box.TokenMatcherOp('@'), box.TokenTypeIdentifier):
+	case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
 		oid.g = genres.Blob
 		oid.middle = '@'
 		oid.right.Write(seq.At(1).Contents)
@@ -62,21 +62,21 @@ func (oid *objectId2) ReadFromSeq(
 
 		// zettel/id
 	case seq.MatchAll(
-		box.TokenTypeIdentifier,
-		box.TokenMatcherOp(box.OpPathSeparator),
-		box.TokenTypeIdentifier,
+		doddish.TokenTypeIdentifier,
+		doddish.TokenMatcherOp(doddish.OpPathSeparator),
+		doddish.TokenTypeIdentifier,
 	):
 		oid.g = genres.Zettel
 		oid.left.Write(seq.At(0).Contents)
-		oid.middle = box.OpPathSeparator
+		oid.middle = doddish.OpPathSeparator
 		oid.right.Write(seq.At(2).Contents)
 		return
 
 		// sec.asec
 	case seq.MatchAll(
-		box.TokenTypeIdentifier,
-		box.TokenMatcherOp(box.OpSigilExternal),
-		box.TokenTypeIdentifier,
+		doddish.TokenTypeIdentifier,
+		doddish.TokenMatcherOp(doddish.OpSigilExternal),
+		doddish.TokenTypeIdentifier,
 	):
 		var t Tai
 
@@ -87,7 +87,7 @@ func (oid *objectId2) ReadFromSeq(
 
 		oid.g = genres.InventoryList
 		oid.left.Write(seq.At(0).Contents)
-		oid.middle = box.OpSigilExternal
+		oid.middle = doddish.OpSigilExternal
 		oid.right.Write(seq.At(2).Contents)
 		return
 

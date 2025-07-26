@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 func (client client) FormatForVersion(
@@ -82,7 +82,7 @@ func (client client) ImportInventoryList(
 		defer repoolBufferedWriter()
 
 		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = inventory_list_blobs.WriteInventoryList(
+		if _, err = inventory_list_coders.WriteInventoryList(
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,

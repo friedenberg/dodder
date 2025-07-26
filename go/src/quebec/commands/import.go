@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/mike/importer"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -90,7 +90,7 @@ func (cmd Import) Run(dep command.Request) {
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
-	if err := inventory_list_blobs.CollectSkuList(
+	if err := inventory_list_coders.CollectSkuList(
 		bf,
 		bufferedReader,
 		list,

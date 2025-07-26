@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -346,7 +346,7 @@ func (k2 *objectId2) String() string {
 		sb.Write(k2.right.Bytes())
 
 	case genres.Type:
-		sb.WriteByte(box.OpType)
+		sb.WriteByte(doddish.OpType)
 		sb.Write(k2.right.Bytes())
 
 	default:

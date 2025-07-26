@@ -6,7 +6,7 @@ import (
 	"unicode/utf8"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 )
 
@@ -49,7 +49,7 @@ func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
 }
 
 func (b *Description) readFromRuneScannerAfterNewline(
-	rs *box.Scanner,
+	rs *doddish.Scanner,
 	sb *strings.Builder,
 ) (err error) {
 	if !rs.ConsumeSpacesOrErrorOnFalse() {
@@ -91,7 +91,7 @@ func (b *Description) readFromRuneScannerAfterNewline(
 }
 
 func (b *Description) readFromRuneScannerOrdinary(
-	rs *box.Scanner,
+	rs *doddish.Scanner,
 	sb *strings.Builder,
 ) (err error) {
 	for {
@@ -129,7 +129,7 @@ func (b *Description) readFromRuneScannerOrdinary(
 	return
 }
 
-func (b *Description) ReadFromBoxScanner(rs *box.Scanner) (err error) {
+func (b *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
 	var sb strings.Builder
 
 	if err = b.readFromRuneScannerOrdinary(rs, &sb); err != nil {

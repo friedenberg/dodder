@@ -11,13 +11,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 type blobStoreV0 struct {
 	lock           sync.Mutex
 	blobType       ids.Type
-	typedBlobStore inventory_list_blobs.Closet
+	typedBlobStore inventory_list_coders.Closet
 
 	interfaces.BlobStore
 }
@@ -26,7 +26,7 @@ func (blobStore *blobStoreV0) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_blobs.Closet {
+func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_coders.Closet {
 	return blobStore.typedBlobStore
 }
 

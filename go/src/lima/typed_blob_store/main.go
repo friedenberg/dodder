@@ -5,12 +5,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 )
 
 type Stores struct {
-	InventoryList inventory_list_blobs.Closet
+	InventoryList inventory_list_coders.Closet
 	Repo          RepoStore
 	Type          Type
 	Tag           Tag
@@ -23,7 +23,7 @@ func MakeStores(
 	boxFormat *box_format.BoxTransacted,
 ) Stores {
 	return Stores{
-		InventoryList: inventory_list_blobs.MakeCloset(
+		InventoryList: inventory_list_coders.MakeCloset(
 			envRepo,
 			boxFormat,
 		),

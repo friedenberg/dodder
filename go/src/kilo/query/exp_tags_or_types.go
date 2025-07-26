@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -131,9 +131,9 @@ func (tagsOrTypes *expTagsOrTypes) Add(m sku.Query) (err error) {
 
 func (tagsOrTypes *expTagsOrTypes) Operator() rune {
 	if tagsOrTypes.Or {
-		return box.OpOr
+		return doddish.OpOr
 	} else {
-		return box.OpAnd
+		return doddish.OpAnd
 	}
 }
 
@@ -146,7 +146,7 @@ func (tagsOrTypes *expTagsOrTypes) StringDebug() string {
 		sb.WriteRune('^')
 	}
 
-	sb.WriteRune(box.OpGroupOpen)
+	sb.WriteRune(doddish.OpGroupOpen)
 	fmt.Fprintf(&sb, "(%d)", len(tagsOrTypes.Children))
 
 	for i, m := range tagsOrTypes.Children {
@@ -157,7 +157,7 @@ func (tagsOrTypes *expTagsOrTypes) StringDebug() string {
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteRune(box.OpGroupClose)
+	sb.WriteRune(doddish.OpGroupClose)
 
 	return sb.String()
 }
@@ -186,7 +186,7 @@ func (tagsOrTypes *expTagsOrTypes) String() string {
 		sb.WriteString(tagsOrTypes.Children[0].String())
 
 	default:
-		sb.WriteRune(box.OpGroupOpen)
+		sb.WriteRune(doddish.OpGroupOpen)
 
 		for i, m := range tagsOrTypes.Children {
 			if i > 0 {
@@ -196,7 +196,7 @@ func (tagsOrTypes *expTagsOrTypes) String() string {
 			sb.WriteString(m.String())
 		}
 
-		sb.WriteRune(box.OpGroupClose)
+		sb.WriteRune(doddish.OpGroupClose)
 	}
 
 	return sb.String()

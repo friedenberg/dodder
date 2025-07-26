@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 )
 
 type ErrBoxParse struct {
@@ -28,7 +28,7 @@ var ErrNotABox = errors.New("not a box")
 
 type ErrBoxReadSeq struct {
 	expected string
-	actual   box.Seq
+	actual   doddish.Seq
 }
 
 func (err ErrBoxReadSeq) Is(target error) bool {

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -20,7 +20,7 @@ func (format *BoxTransacted) ReadStringFormat(
 	object *sku.Transacted,
 	runeScanner io.RuneScanner,
 ) (n int64, err error) {
-	scanner := box.MakeScanner(runeScanner)
+	scanner := doddish.MakeScanner(runeScanner)
 
 	if err = format.readStringFormatBox(scanner, object); err != nil {
 		if err == ErrNotABox {
@@ -55,7 +55,7 @@ func (format *BoxTransacted) ReadStringFormat(
 }
 
 func (format *BoxTransacted) openBox(
-	scanner *box.Scanner,
+	scanner *doddish.Scanner,
 ) (err error) {
 	if !scanner.ScanSkipSpace() {
 		if scanner.Error() != nil {
@@ -69,7 +69,7 @@ func (format *BoxTransacted) openBox(
 
 	seq := scanner.GetSeq()
 
-	if !seq.MatchAll(box.TokenMatcherOp(box.OpGroupOpen)) {
+	if !seq.MatchAll(doddish.TokenMatcherOp(doddish.OpGroupOpen)) {
 		err = ErrNotABox
 		scanner.Unscan()
 
@@ -91,7 +91,7 @@ func (format *BoxTransacted) openBox(
 
 // TODO switch to returning ErrBoxParse
 func (format *BoxTransacted) readStringFormatBox(
-	scanner *box.Scanner,
+	scanner *doddish.Scanner,
 	object *sku.Transacted,
 ) (err error) {
 	if err = format.openBox(scanner); err != nil {
@@ -116,21 +116,21 @@ func (format *BoxTransacted) readStringFormatBox(
 			err = nil
 			object.ObjectId.Reset()
 
-			if seq.MatchAll(box.TokenTypeLiteral) {
+			if seq.MatchAll(doddish.TokenTypeLiteral) {
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			} else if ok, left, _, _ := seq.PartitionFavoringLeft(
-				box.TokenMatcherOp(box.OpPathSeparator),
+				doddish.TokenMatcherOp(doddish.OpPathSeparator),
 			); ok && left.Len() == 0 {
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			} else if ok, left, right := seq.MatchEnd(
-				box.TokenMatcherOp(box.OpSigilExternal),
-				box.TokenTypeIdentifier,
+				doddish.TokenMatcherOp(doddish.OpSigilExternal),
+				doddish.TokenTypeIdentifier,
 			); ok {
 				var g genres.Genre
 
@@ -172,7 +172,7 @@ LOOP_AFTER_OID:
 
 		switch {
 		// ] ' '
-		case seq.MatchAll(box.TokenTypeOperator):
+		case seq.MatchAll(doddish.TokenTypeOperator):
 			r := rune(seq.At(0).Contents[0])
 
 			switch {
@@ -184,7 +184,7 @@ LOOP_AFTER_OID:
 			}
 
 			// "value"
-		case seq.MatchAll(box.TokenTypeLiteral):
+		case seq.MatchAll(doddish.TokenTypeLiteral):
 			if err = object.Metadata.Description.Set(
 				seq.String(),
 			); err != nil {
@@ -195,7 +195,7 @@ LOOP_AFTER_OID:
 			continue
 
 			// @abcd
-		case seq.MatchAll(box.TokenMatcherOp('@'), box.TokenTypeIdentifier):
+		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
 			if err = object.Metadata.Blob.Set(
 				string(seq.At(1).Contents),
 			); err != nil {
@@ -207,7 +207,7 @@ LOOP_AFTER_OID:
 
 			// "value"
 		case seq.MatchAll(
-			box.TokenTypeLiteral,
+			doddish.TokenTypeLiteral,
 		):
 			if err = object.Metadata.Description.Set(seq.String()); err != nil {
 				err = errors.Wrap(err)
@@ -218,12 +218,12 @@ LOOP_AFTER_OID:
 
 			// key=value key="value"
 		case seq.MatchStart(
-			box.TokenTypeIdentifier,
-			box.TokenMatcherOp(box.OpExact),
+			doddish.TokenTypeIdentifier,
+			doddish.TokenMatcherOp(doddish.OpExact),
 		) || seq.MatchStart(
-			box.TokenTypeIdentifier,
-			box.TokenMatcherOp(box.OpExact),
-			box.TokenTypeLiteral,
+			doddish.TokenTypeIdentifier,
+			doddish.TokenMatcherOp(doddish.OpExact),
+			doddish.TokenTypeLiteral,
 		):
 
 			value := seq[2:]

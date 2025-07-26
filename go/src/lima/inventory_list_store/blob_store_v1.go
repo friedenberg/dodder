@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 // TODO add triple_hyphen_io2 coder
@@ -22,7 +22,7 @@ type blobStoreV1 struct {
 	envRepo        env_repo.Env
 	pathLog        string
 	blobType       ids.Type
-	typedBlobStore inventory_list_blobs.Closet
+	typedBlobStore inventory_list_coders.Closet
 
 	interfaces.BlobStore
 }
@@ -31,7 +31,7 @@ func (blobStore *blobStoreV1) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_blobs.Closet {
+func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_coders.Closet {
 	return blobStore.typedBlobStore
 }
 

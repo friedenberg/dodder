@@ -3,7 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -34,7 +34,7 @@ type buildState struct {
 
 	workspaceStoreAcceptedQueryComponent bool
 
-	scanner box.Scanner
+	scanner doddish.Scanner
 }
 
 func (src *buildState) copy() (dst *buildState) {
@@ -222,7 +222,7 @@ LOOP:
 	for state.scanner.Scan() {
 		seq := state.scanner.GetSeq()
 
-		if seq.MatchAll(box.TokenTypeOperator) {
+		if seq.MatchAll(doddish.TokenTypeOperator) {
 			op := seq.At(0).Contents[0]
 
 			switch op {
@@ -274,12 +274,12 @@ LOOP:
 			}
 		} else {
 			if ok, left, right, partition := seq.PartitionFavoringRight(
-				box.TokenMatcherOp(box.OpSigilExternal),
+				doddish.TokenMatcherOp(doddish.OpSigilExternal),
 			); ok {
 				switch {
 
 				// left: one/uno, partition: ., right: zettel
-				case right.MatchAll(box.TokenTypeIdentifier):
+				case right.MatchAll(doddish.TokenTypeIdentifier):
 					if err = q.AddString(string(right.At(0).Contents)); err != nil {
 						err = nil
 					} else {
@@ -421,7 +421,7 @@ func (b *buildState) parseSigilsAndGenres(
 	for b.scanner.Scan() {
 		seq := b.scanner.GetSeq()
 
-		if seq.MatchAll(box.TokenTypeOperator) {
+		if seq.MatchAll(doddish.TokenTypeOperator) {
 			op := seq.At(0).Contents[0]
 
 			switch op {
@@ -442,7 +442,7 @@ func (b *buildState) parseSigilsAndGenres(
 					return
 				}
 			}
-		} else if seq.MatchAll(box.TokenTypeIdentifier) {
+		} else if seq.MatchAll(doddish.TokenTypeIdentifier) {
 			b.scanner.Unscan()
 			break
 		} else {

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 	"code.linenisgreat.com/dodder/go/src/mike/store"
@@ -79,7 +79,7 @@ func (local *Repo) GetTypedBlobStore() typed_blob_store.Stores {
 	return local.typedBlobStore
 }
 
-func (local *Repo) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
+func (local *Repo) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
 	return local.typedBlobStore.InventoryList
 }
 

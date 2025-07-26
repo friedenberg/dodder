@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 )
@@ -27,7 +27,7 @@ func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
 	localRepo repo.LocalRepo,
-	typedBlobStore inventory_list_blobs.Closet,
+	typedBlobStore inventory_list_coders.Closet,
 ) *client {
 	client := &client{
 		envUI: envUI,
@@ -48,7 +48,7 @@ type client struct {
 	configImmutable genesis_configs.TypedConfigPublic
 	http            http.Client
 	localRepo       repo.LocalRepo
-	typedBlobStore  inventory_list_blobs.Closet
+	typedBlobStore  inventory_list_coders.Closet
 
 	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
@@ -116,7 +116,7 @@ func (client *client) GetInventoryListStore() sku.InventoryListStore {
 	return client
 }
 
-func (client *client) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
+func (client *client) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
 	return client.typedBlobStore
 }
 
@@ -181,7 +181,7 @@ func (client *client) MakeInventoryList(
 
 	list = sku.MakeList()
 
-	if err = inventory_list_blobs.CollectSkuList(
+	if err = inventory_list_coders.CollectSkuList(
 		listFormat,
 		bufio.NewReader(response.Body),
 		list,
@@ -256,7 +256,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		errors.ContextContinueOrPanic(client.envUI)
 
 		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = inventory_list_blobs.WriteInventoryList(
+		if _, err = inventory_list_coders.WriteInventoryList(
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,

@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 type Store struct {
@@ -46,7 +46,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
 	getType() ids.Type
-	getTypedBlobStore() inventory_list_blobs.Closet
+	getTypedBlobStore() inventory_list_coders.Closet
 
 	// TODO rename to ReadOneDigest
 	ReadOneSha(id interfaces.BlobId) (object *sku.Transacted, err error)
@@ -60,7 +60,7 @@ type inventoryListBlobStore interface {
 func (store *Store) Initialize(
 	envRepo env_repo.Env,
 	clock ids.Clock,
-	typedBlobStore inventory_list_blobs.Closet,
+	typedBlobStore inventory_list_coders.Closet,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
@@ -129,7 +129,7 @@ func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
-func (store *Store) GetTypedInventoryListBlobStore() inventory_list_blobs.Closet {
+func (store *Store) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
 	return store.getTypedBlobStore()
 }
 
@@ -146,17 +146,13 @@ func (store *Store) FormatForVersion(
 		storeVersion,
 		store_version.V9,
 	) {
-		return inventory_list_blobs.V1{
-			V1ObjectCoder: inventory_list_blobs.V1ObjectCoder{
-				Box: store.box,
-			},
+		return inventory_list_coders.DoddishV1{
+			Box: store.box,
 		}
 	} else {
-		return inventory_list_blobs.V2{
-			V2ObjectCoder: inventory_list_blobs.V2ObjectCoder{
-				Box:                    store.box,
-				ImmutableConfigPrivate: store.envRepo.GetConfigPrivate().Blob,
-			},
+		return inventory_list_coders.DoddishV2{
+			Box:                    store.box,
+			ImmutableConfigPrivate: store.envRepo.GetConfigPrivate().Blob,
 		}
 	}
 }
@@ -205,7 +201,7 @@ func (store *Store) AddObjectToOpenList(
 
 	format := store.FormatForVersion(store.storeVersion)
 
-	if _, err = inventory_list_blobs.WriteObjectToOpenList(
+	if _, err = inventory_list_coders.WriteObjectToOpenList(
 		format,
 		object,
 		openList,
@@ -377,7 +373,7 @@ func (store *Store) ImportInventoryList(
 
 	list := sku.MakeList()
 
-	if err = inventory_list_blobs.CollectSkuList(
+	if err = inventory_list_coders.CollectSkuList(
 		store.FormatForVersion(store.storeVersion),
 		bufferedReader,
 		list,

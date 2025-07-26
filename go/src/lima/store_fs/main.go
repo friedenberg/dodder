@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -165,13 +165,13 @@ func (store *Store) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteRune(box.OpGroupOpen)
+	sb.WriteRune(doddish.OpGroupOpen)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
 		if hasOne {
-			sb.WriteRune(box.OpOr)
+			sb.WriteRune(doddish.OpOr)
 		}
 
 		sb.WriteString(v.String())
@@ -189,7 +189,7 @@ func (store *Store) String() (out string) {
 		writeOneIfNecessary(z)
 	}
 
-	sb.WriteRune(box.OpGroupClose)
+	sb.WriteRune(doddish.OpGroupClose)
 
 	out = sb.String()
 	return

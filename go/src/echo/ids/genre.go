@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/box"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -128,24 +128,24 @@ func (gs *Genre) Set(v string) (err error) {
 }
 
 func (g *Genre) ReadFromBoxScanner(
-	scanner *box.Scanner,
+	scanner *doddish.Scanner,
 ) (err error) {
 	for scanner.Scan() {
 		seq := scanner.GetSeq()
 
 		switch {
-		case seq.MatchAll(box.TokenTypeIdentifier):
+		case seq.MatchAll(doddish.TokenTypeIdentifier):
 			// etikett type zettel kasten konfig
 			if err = g.AddString(string(seq.At(0).Contents)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case seq.MatchAll(box.TokenMatcherOp(box.OpOr)):
+		case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpOr)):
 			// ,
 			continue
 
-		case seq.MatchAll(box.TokenMatcherOp(box.OpAnd)):
+		case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpAnd)):
 			// " "
 			scanner.Unscan()
 			return

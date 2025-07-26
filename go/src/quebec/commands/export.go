@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -108,7 +108,7 @@ func (cmd Export) Run(dep command.Request) {
 		localWorkingCopy.GetConfig().GetStoreVersion(),
 	)
 
-	if _, err := inventory_list_blobs.WriteInventoryList(
+	if _, err := inventory_list_coders.WriteInventoryList(
 		listFormat,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,

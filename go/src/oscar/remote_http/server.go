@@ -33,7 +33,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -690,7 +690,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 		defer repoolBufferedWriter()
 
-		if _, err := inventory_list_blobs.WriteInventoryList(
+		if _, err := inventory_list_coders.WriteInventoryList(
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,

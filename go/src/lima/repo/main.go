@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 )
 
@@ -18,7 +18,7 @@ type Repo interface {
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.RepoStore
-	GetTypedInventoryListBlobStore() inventory_list_blobs.Closet
+	GetTypedInventoryListBlobStore() inventory_list_coders.Closet
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(
