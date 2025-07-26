@@ -79,12 +79,12 @@ func WriteInventoryListBlob(
 }
 
 // TODO also return a repool func
-func ReadInventoryListBlob(
+func CollectSkuList(
 	listFormat sku.ListFormat,
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	iter := listFormat.StreamInventoryListBlobSkus(reader)
+	iter := StreamInventoryListBlobSkus(listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
@@ -104,4 +104,35 @@ func ReadInventoryListBlob(
 	}
 
 	return
+}
+
+func StreamInventoryListBlobSkus(
+	format sku.ListFormat,
+	bufferedReader *bufio.Reader,
+) interfaces.SeqError[*sku.Transacted] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		for {
+			object := sku.GetTransactedPool().Get()
+			// TODO Fix upstream issues with repooling
+			// defer sku.GetTransactedPool().Put(object)
+
+			if _, err := format.DecodeFrom(
+				object,
+				bufferedReader,
+			); err != nil {
+				if errors.IsEOF(err) {
+					err = nil
+					break
+				} else {
+					if !yield(nil, err) {
+						break
+					}
+				}
+			}
+
+			if !yield(object, nil) {
+				break
+			}
+		}
+	}
 }

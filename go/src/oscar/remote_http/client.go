@@ -181,7 +181,7 @@ func (client *client) MakeInventoryList(
 
 	list = sku.MakeList()
 
-	if err = inventory_list_blobs.ReadInventoryListBlob(
+	if err = inventory_list_blobs.CollectSkuList(
 		listFormat,
 		bufio.NewReader(response.Body),
 		list,

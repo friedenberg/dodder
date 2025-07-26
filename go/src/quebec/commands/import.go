@@ -90,7 +90,7 @@ func (cmd Import) Run(dep command.Request) {
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
-	if err := inventory_list_blobs.ReadInventoryListBlob(
+	if err := inventory_list_blobs.CollectSkuList(
 		bf,
 		bufferedReader,
 		list,

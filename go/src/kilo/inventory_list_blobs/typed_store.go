@@ -210,7 +210,9 @@ func (store TypedStore) IterInventoryListBlobSkusFromBlobStore(
 			store.streamDecoders,
 		)
 
-		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
+			readCloser,
+		)
 		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
@@ -267,7 +269,7 @@ func (store TypedStore) ReadInventoryListObject(
 				err = errors.Wrap(iterErr)
 				return
 			}
-			
+
 			if out == nil {
 				out = sk.CloneTransacted()
 			} else {
@@ -283,7 +285,7 @@ func (store TypedStore) ReadInventoryListObject(
 				err = errors.Wrap(iterErr)
 				return
 			}
-			
+
 			if out == nil {
 				out = sk.CloneTransacted()
 			} else {
@@ -312,8 +314,8 @@ func (store TypedStore) ReadInventoryListBlob(
 		listFormat = store.v2
 	}
 
-	iter := listFormat.StreamInventoryListBlobSkus(reader)
-	
+	iter := StreamInventoryListBlobSkus(listFormat, reader)
+
 	for sk, iterErr := range iter {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)

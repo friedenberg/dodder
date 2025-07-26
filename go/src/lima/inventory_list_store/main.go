@@ -377,7 +377,7 @@ func (store *Store) ImportInventoryList(
 
 	list := sku.MakeList()
 
-	if err = inventory_list_blobs.ReadInventoryListBlob(
+	if err = inventory_list_blobs.CollectSkuList(
 		store.FormatForVersion(store.storeVersion),
 		bufferedReader,
 		list,
