@@ -521,7 +521,7 @@ func (server *Server) handleBlobsHeadOrGet(
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
 	shString := request.Vars()["sha"]
-	var result interfaces.Digest
+	var result interfaces.BlobId
 
 	if shString == "" {
 		var err error
@@ -578,7 +578,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
 	expected *sha.Sha,
-) (result interfaces.Digest, err error) {
+) (result interfaces.BlobId, err error) {
 	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.WriteCloseDigester
 
@@ -618,7 +618,7 @@ func (server *Server) copyBlob(
 		return
 	}
 
-	result = writeCloser.GetDigest()
+	result = writeCloser.GetBlobId()
 
 	blobCopierDelegate := sku.MakeBlobCopierDelegate(
 		server.Repo.GetEnv().GetUI(),
@@ -626,7 +626,7 @@ func (server *Server) copyBlob(
 
 	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
-			Digest: result,
+			BlobId: result,
 			N:      progressWriter.GetWritten(),
 		},
 	); err != nil {

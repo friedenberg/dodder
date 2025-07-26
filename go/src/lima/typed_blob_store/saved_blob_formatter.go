@@ -21,7 +21,7 @@ func MakeSavedBlobFormatter(
 
 func (f savedBlobFormatter) FormatSavedBlob(
 	w io.Writer,
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (n int64, err error) {
 	var ar interfaces.ReadCloseDigester
 

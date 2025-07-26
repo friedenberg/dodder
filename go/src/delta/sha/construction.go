@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MustWithDigest(digest interfaces.Digest) *Sha {
+func MustWithDigest(digest interfaces.BlobId) *Sha {
 	// TODO instead of checking type, check `GetType()` and use GetBytes
 	switch st := digest.(type) {
 	case *Sha:
@@ -18,8 +18,8 @@ func MustWithDigest(digest interfaces.Digest) *Sha {
 	}
 }
 
-func MustWithDigester(digester interfaces.Digester) *Sha {
-	return MustWithDigest(digester.GetDigest())
+func MustWithDigester(digester interfaces.BlobIdGetter) *Sha {
+	return MustWithDigest(digester.GetBlobId())
 }
 
 func MustWithString(v string) (sh *Sha) {

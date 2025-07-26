@@ -12,7 +12,7 @@ import (
 )
 
 func (page *page) seekToFirstBinarySearch(
-	shMet interfaces.Digest,
+	shMet interfaces.BlobId,
 ) (mid int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
@@ -75,7 +75,7 @@ func (page *page) seekToFirstBinarySearch(
 }
 
 func (page *page) seekToFirstLinearSearch(
-	shMet interfaces.Digest,
+	shMet interfaces.BlobId,
 ) (loc int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(

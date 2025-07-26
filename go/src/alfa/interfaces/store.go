@@ -4,7 +4,7 @@ import "io"
 
 type (
 	SavedBlobFormatter interface {
-		FormatSavedBlob(io.Writer, Digest) (int64, error)
+		FormatSavedBlob(io.Writer, BlobId) (int64, error)
 	}
 
 	Format[T any] interface {
@@ -15,7 +15,7 @@ type (
 	TypedBlobStore[T any] interface {
 		ParseTypedBlob(
 			tipe ObjectId,
-			blobSha Digest) (common T, n int64, err error)
+			blobSha BlobId) (common T, n int64, err error)
 
 		PutTypedBlob(
 			ObjectId,

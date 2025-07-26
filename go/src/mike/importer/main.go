@@ -126,7 +126,7 @@ func (importer importer) importInventoryList(
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 		err = env_dir.ErrBlobMissing{
-			Digester: blobSha,
+			BlobIdGetter: blobSha,
 		}
 
 		return
@@ -307,7 +307,7 @@ func (importer importer) ImportBlobIfNecessary(
 			if err = importer.blobCopierDelegate(
 				sku.BlobCopyResult{
 					Transacted: sk,
-					Digest:     blobSha,
+					BlobId:     blobSha,
 					N:          n,
 				},
 			); err != nil {
@@ -354,7 +354,7 @@ func (importer importer) ImportBlobIfNecessary(
 				if err = importer.blobCopierDelegate(
 					sku.BlobCopyResult{
 						Transacted: sk,
-						Digest:     blobSha,
+						BlobId:     blobSha,
 						N:          n,
 					},
 				); err != nil {

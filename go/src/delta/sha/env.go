@@ -23,17 +23,17 @@ func (env Env) GetHash() (hash.Hash, func()) {
 	return pool.GetSha256Hash()
 }
 
-func (env Env) GetDigest() interfaces.Digest {
+func (env Env) GetBlobId() interfaces.BlobId {
 	return poolSha.Get()
 }
 
-func (env Env) PutDigest(digest interfaces.Digest) {
+func (env Env) PutBlobId(digest interfaces.BlobId) {
 	poolSha.Put(digest.(*Sha))
 }
 
 func (env Env) MakeDigestFromString(
 	value string,
-) (interfaces.Digest, interfaces.FuncRepool, error) {
+) (interfaces.BlobId, interfaces.FuncRepool, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
@@ -45,7 +45,7 @@ func (env Env) MakeDigestFromString(
 	return digest, func() { poolSha.Put(digest) }, nil
 }
 
-func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.Digest, error) {
+func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
@@ -69,11 +69,11 @@ func (env Env) MakeWriteDigester() interfaces.WriteDigester {
 
 // TODO switch to being functions on Env that return interfaces.Digest
 
-func FromFormatString(f string, vs ...any) interfaces.Digest {
+func FromFormatString(f string, vs ...any) interfaces.BlobId {
 	return FromStringContent(fmt.Sprintf(f, vs...))
 }
 
-func FromStringContent(s string) interfaces.Digest {
+func FromStringContent(s string) interfaces.BlobId {
 	hash, repool := pool.GetSha256Hash()
 	defer repool()
 
@@ -87,11 +87,11 @@ func FromStringContent(s string) interfaces.Digest {
 	return FromHash(hash)
 }
 
-func FromStringer(v interfaces.Stringer) interfaces.Digest {
+func FromStringer(v interfaces.Stringer) interfaces.BlobId {
 	return FromStringContent(v.String())
 }
 
-func FromHash(hash hash.Hash) interfaces.Digest {
+func FromHash(hash hash.Hash) interfaces.BlobId {
 	digest, err := Env{}.MakeDigestFromHash(hash)
 	if err != nil {
 		panic(err)

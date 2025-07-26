@@ -158,11 +158,11 @@ func (pair *externalBlobPair) SetArgs(
 	return
 }
 
-func (pair *externalBlobPair) GetDigest() interfaces.Digest {
+func (pair *externalBlobPair) GetDigest() interfaces.BlobId {
 	if !pair.BlobFD.IsEmpty() {
 		return pair.BlobFD.GetDigest()
 	} else {
-		return pair.BlobSha.GetDigest()
+		return pair.BlobSha.GetBlobId()
 	}
 }
 

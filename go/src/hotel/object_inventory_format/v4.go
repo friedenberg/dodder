@@ -225,7 +225,7 @@ func (f v4) FormatPersistentMetadata(
 	}
 
 	if o.PrintFinalSha {
-		actual := digester.GetDigest()
+		actual := digester.GetBlobId()
 		// TODO-P1 set value
 
 		// if !m.Verzeichnisse.Sha.IsNull() &&

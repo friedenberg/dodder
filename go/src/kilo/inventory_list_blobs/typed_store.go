@@ -190,7 +190,7 @@ func (store TypedStore) AllDecodedObjectsFromStream(
 func (store TypedStore) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
-	blobSha interfaces.Digest,
+	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var readCloser interfaces.ReadCloseDigester

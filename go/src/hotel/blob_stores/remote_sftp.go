@@ -134,7 +134,7 @@ func (blobStore *remoteSftpBlobStore) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore *remoteSftpBlobStore) remotePathForSha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) string {
 	return env_dir.MakeHashBucketPathFromSha(
 		sh,
@@ -143,8 +143,8 @@ func (blobStore *remoteSftpBlobStore) remotePathForSha(
 	)
 }
 
-func (blobStore *remoteSftpBlobStore) HasBlob(sh interfaces.Digest) (ok bool) {
-	if sh.GetDigest().IsNull() {
+func (blobStore *remoteSftpBlobStore) HasBlob(sh interfaces.BlobId) (ok bool) {
+	if sh.GetBlobId().IsNull() {
 		ok = true
 		return
 	}
@@ -172,8 +172,8 @@ func (blobStore *remoteSftpBlobStore) HasBlob(sh interfaces.Digest) (ok bool) {
 	return
 }
 
-func (blobStore *remoteSftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.Digest] {
-	return func(yield func(interfaces.Digest, error) bool) {
+func (blobStore *remoteSftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+	return func(yield func(interfaces.BlobId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -238,9 +238,9 @@ func (blobStore *remoteSftpBlobStore) Mover() (mover interfaces.Mover, err error
 }
 
 func (blobStore *remoteSftpBlobStore) BlobReader(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
-	if digest.GetDigest().IsNull() {
+	if digest.GetBlobId().IsNull() {
 		readCloser = digests.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
@@ -255,10 +255,10 @@ func (blobStore *remoteSftpBlobStore) BlobReader(
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(digest.GetDigest())
+			shCopy.ResetWithShaLike(digest.GetBlobId())
 
 			err = env_dir.ErrBlobMissing{
-				Digester: shCopy,
+				BlobIdGetter: shCopy,
 				Path:     remotePath,
 			}
 		} else {
@@ -418,7 +418,7 @@ func (mover *sftpMover) Close() (err error) {
 	return
 }
 
-func (mover *sftpMover) GetDigest() interfaces.Digest {
+func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 	if mover.writer == nil {
 		// Return empty SHA if no data written
 		// TODO use sha.GetPool()
@@ -499,7 +499,7 @@ func (writer *sftpWriter) Close() (err error) {
 	return
 }
 
-func (writer *sftpWriter) GetDigest() interfaces.Digest {
+func (writer *sftpWriter) GetDigest() interfaces.BlobId {
 	return sha.FromHash(writer.hash)
 }
 
@@ -591,6 +591,6 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetDigest() interfaces.Digest {
+func (reader *sftpReader) GetBlobId() interfaces.BlobId {
 	return sha.FromHash(reader.hash)
 }

@@ -79,7 +79,7 @@ func (digest *Sha) GetType() string {
 	return Type
 }
 
-func (digest *Sha) GetDigest() interfaces.Digest {
+func (digest *Sha) GetBlobId() interfaces.BlobId {
 	return digest
 }
 
@@ -103,7 +103,7 @@ func (digest *Sha) GetTail() string {
 	return digest.String()[2:]
 }
 
-func (digest *Sha) AssertEqualsShaLike(b interfaces.Digest) error {
+func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
 	if !digests.Equals(digest, b) {
 		return digests.MakeErrNotEqual(digest, b)
 	}
@@ -133,17 +133,17 @@ func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
 	return
 }
 
-func (digest *Sha) SetDigester(src interfaces.Digester) (err error) {
-	return digest.SetDigest(src.GetDigest())
+func (digest *Sha) SetDigester(src interfaces.BlobIdGetter) (err error) {
+	return digest.SetDigest(src.GetBlobId())
 }
 
 // TODO replace
-func (digest *Sha) SetDigest(src interfaces.Digest) (err error) {
+func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
 	digest.allocDataIfNecessary()
 
 	err = digests.MakeErrLength(
 		ByteSize,
-		copy(digest.data[:], src.GetDigest().GetBytes()),
+		copy(digest.data[:], src.GetBlobId().GetBytes()),
 	)
 
 	return
@@ -294,7 +294,7 @@ func (digest *Sha) ResetWith(other *Sha) {
 	}
 }
 
-func (digest *Sha) ResetWithShaLike(other interfaces.Digest) {
+func (digest *Sha) ResetWithShaLike(other interfaces.BlobId) {
 	digest.allocDataIfNecessary()
 	copy(digest.data[:], other.GetBytes())
 }

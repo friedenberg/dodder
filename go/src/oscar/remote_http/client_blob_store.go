@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
+func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -25,7 +25,7 @@ func (client *client) HasBlob(sh interfaces.Digest) (ok bool) {
 			client.GetEnv(),
 			"HEAD",
 			"/blobs",
-			strings.NewReader(digests.Format(sh.GetDigest())),
+			strings.NewReader(digests.Format(sh.GetBlobId())),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -52,14 +52,14 @@ func (client *client) BlobWriter() (w interfaces.WriteCloseDigester, err error) 
 }
 
 func (client *client) BlobReader(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (reader interfaces.ReadCloseDigester, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(
 		client.GetEnv(),
 		"GET",
-		fmt.Sprintf("/blobs/%s", digests.Format(sh.GetDigest())),
+		fmt.Sprintf("/blobs/%s", digests.Format(sh.GetBlobId())),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -76,7 +76,7 @@ func (client *client) BlobReader(
 	switch {
 	case response.StatusCode == http.StatusNotFound:
 		err = env_dir.ErrBlobMissing{
-			Digester: sh,
+			BlobIdGetter: sh,
 		}
 
 	case response.StatusCode >= 300:

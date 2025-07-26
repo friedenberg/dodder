@@ -5,20 +5,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func GetDigest(tipe string) (interfaces.Digest, func()) {
+func GetBlobId(tipe string) (interfaces.BlobId, func()) {
 	if env, ok := envs[tipe]; ok {
-		digest := env.GetDigest()
-		return digest, func() { env.PutDigest(digest) }
+		digest := env.GetBlobId()
+		return digest, func() { env.PutBlobId(digest) }
 	} else {
 		panic(errors.Errorf("no env registered for digest type: %s", tipe))
 	}
 }
 
-func PutDigest(digest interfaces.Digest) {
+func PutBlobId(digest interfaces.BlobId) {
 	tipe := digest.GetType()
 
 	if env, ok := envs[tipe]; ok {
-		env.PutDigest(digest)
+		env.PutBlobId(digest)
 	} else {
 		panic(errors.Errorf("no env registered for digest type: %s", tipe))
 	}

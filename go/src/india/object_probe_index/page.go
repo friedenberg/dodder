@@ -24,7 +24,7 @@ type page struct {
 	bufferedReader bufio.Reader
 	added          *heap.Heap[row, *row]
 	envRepo        env_repo.Env
-	searchFunc     func(interfaces.Digest) (mid int64, err error)
+	searchFunc     func(interfaces.BlobId) (mid int64, err error)
 	id             page_id.PageId
 }
 
@@ -81,7 +81,7 @@ func (page *page) GetObjectProbeIndexPage() pageInterface {
 	return page
 }
 
-func (page *page) AddSha(sh interfaces.Digest, loc Loc) (err error) {
+func (page *page) AddSha(sh interfaces.BlobId, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -92,7 +92,7 @@ func (page *page) AddSha(sh interfaces.Digest, loc Loc) (err error) {
 	return page.addSha(sh, loc)
 }
 
-func (page *page) addSha(sh interfaces.Digest, loc Loc) (err error) {
+func (page *page) addSha(sh interfaces.BlobId, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -124,7 +124,7 @@ func (page *page) GetRowCount() (n int64, err error) {
 	return
 }
 
-func (page *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
+func (page *page) ReadOne(sh interfaces.BlobId) (loc Loc, err error) {
 	page.Lock()
 	defer page.Unlock()
 
@@ -151,7 +151,7 @@ func (page *page) ReadOne(sh interfaces.Digest) (loc Loc, err error) {
 	return
 }
 
-func (page *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
+func (page *page) ReadMany(sh interfaces.BlobId, locs *[]Loc) (err error) {
 	page.Lock()
 	defer page.Unlock()
 
@@ -192,7 +192,7 @@ func (page *page) ReadMany(sh interfaces.Digest, locs *[]Loc) (err error) {
 }
 
 func (page *page) readCurrentLoc(
-	in interfaces.Digest,
+	in interfaces.BlobId,
 	reader io.Reader,
 ) (out Loc, found bool, err error) {
 	if in.IsNull() {
@@ -201,7 +201,7 @@ func (page *page) readCurrentLoc(
 	}
 
 	digest := sha.GetPool().Get()
-	defer digests.PutDigest(digest)
+	defer digests.PutBlobId(digest)
 
 	if _, err = digest.ReadFrom(reader); err != nil {
 		err = errors.WrapExcept(err, io.EOF)

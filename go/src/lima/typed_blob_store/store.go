@@ -34,7 +34,7 @@ func MakeBlobStore[
 }
 
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
 	var readCloser interfaces.ReadCloseDigester
 
@@ -56,7 +56,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 		return
 	}
 
-	actual := readCloser.GetDigest()
+	actual := readCloser.GetBlobId()
 
 	if !digests.Equals(actual, digest) {
 		err = errors.ErrorWithStackf(
@@ -76,7 +76,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 }
 
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (a BLOB_PTR, err error) {
 	a, _, err = blobStore.GetBlob2(digest)
 	return
@@ -89,7 +89,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) PutBlob(a BLOB_PTR) {
 // TODO re-evaluate this strategy
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 	o BLOB_PTR,
-) (sh interfaces.Digest, n int64, err error) {
+) (sh interfaces.BlobId, n int64, err error) {
 	var writeCloser interfaces.WriteCloseDigester
 
 	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
@@ -104,7 +104,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 		return
 	}
 
-	sh = writeCloser.GetDigest()
+	sh = writeCloser.GetBlobId()
 
 	return
 }

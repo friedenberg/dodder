@@ -41,7 +41,7 @@ func (index *probe_index) Flush() (err error) {
 }
 
 func (index *probe_index) readOneShaLoc(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.Index.ReadOne(sh); err != nil {
 		return
@@ -51,7 +51,7 @@ func (index *probe_index) readOneShaLoc(
 }
 
 func (index *probe_index) readManyShaLoc(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.Index.ReadMany(sh, &locs); err != nil {
 		return
@@ -88,7 +88,7 @@ func (index *probe_index) saveOneLocString(
 	loc object_probe_index.Loc,
 ) (err error) {
 	digest := sha.FromStringContent(str)
-	defer digests.PutDigest(digest)
+	defer digests.PutBlobId(digest)
 
 	if err = index.Index.AddSha(digest, loc); err != nil {
 		err = errors.Wrap(err)

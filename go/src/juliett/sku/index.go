@@ -26,11 +26,11 @@ type (
 		) (err error)
 
 		ReadManySha(
-			sh interfaces.Digest,
+			sh interfaces.BlobId,
 		) (skus []*Transacted, err error)
 
 		ReadOneSha(
-			sh interfaces.Digest,
+			sh interfaces.BlobId,
 			sk *Transacted,
 		) (err error)
 	}

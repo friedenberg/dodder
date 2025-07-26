@@ -36,7 +36,7 @@ func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_blobs.TypedStor
 }
 
 func (blobStore *blobStoreV1) ReadOneSha(
-	id interfaces.Digest,
+	id interfaces.BlobId,
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
 

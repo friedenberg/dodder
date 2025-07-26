@@ -10,7 +10,7 @@ import (
 
 type Writer interface {
 	interfaces.WriteCloseDigester
-	interfaces.Digester
+	interfaces.BlobIdGetter
 }
 
 type writer struct {
@@ -82,6 +82,6 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) GetDigest() interfaces.Digest {
-	return w.digester.GetDigest()
+func (w *writer) GetBlobId() interfaces.BlobId {
+	return w.digester.GetBlobId()
 }

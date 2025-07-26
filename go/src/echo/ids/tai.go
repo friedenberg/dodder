@@ -201,7 +201,7 @@ func (t *Tai) Set(v string) (err error) {
 	}
 }
 
-func (t Tai) GetDigest() interfaces.Digest {
+func (t Tai) GetBlobId() interfaces.BlobId {
 	return sha.FromStringContent(t.String())
 }
 

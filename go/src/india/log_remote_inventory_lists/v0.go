@@ -127,7 +127,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 	)
 
 	key = digests.Format(digest)
-	digests.PutDigest(digest)
+	digests.PutBlobId(digest)
 
 	return
 }

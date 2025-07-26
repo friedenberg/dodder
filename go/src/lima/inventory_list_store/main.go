@@ -49,7 +49,7 @@ type inventoryListBlobStore interface {
 	getTypedBlobStore() inventory_list_blobs.TypedStore
 
 	// TODO rename to ReadOneDigest
-	ReadOneSha(id interfaces.Digest) (object *sku.Transacted, err error)
+	ReadOneSha(id interfaces.BlobId) (object *sku.Transacted, err error)
 	WriteInventoryListObject(
 		object *sku.Transacted,
 	) (err error)
@@ -251,7 +251,7 @@ func (store *Store) Create(
 		return
 	}
 
-	actual := openList.Mover.GetDigest()
+	actual := openList.Mover.GetBlobId()
 	expected := sha.MustWithDigester(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
@@ -317,7 +317,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	actual := writeCloser.GetDigest()
+	actual := writeCloser.GetBlobId()
 	expected := sha.MustWithDigester(object.GetBlobSha())
 
 	ui.Log().Print("expected", expected, "actual", actual)
@@ -425,7 +425,7 @@ func (store *Store) ImportInventoryList(
 }
 
 func (store *Store) IterInventoryList(
-	blobSha interfaces.Digest,
+	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),

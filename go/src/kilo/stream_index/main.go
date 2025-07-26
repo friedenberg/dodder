@@ -300,7 +300,7 @@ func (i *Index) Add(
 }
 
 func (s *Index) ReadOneSha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	sk *sku.Transacted,
 ) (err error) {
 	var loc object_probe_index.Loc
@@ -317,7 +317,7 @@ func (s *Index) ReadOneSha(
 }
 
 func (s *Index) ReadManySha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (skus []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
@@ -363,7 +363,7 @@ func (s *Index) ObjectExists(
 	}
 
 	sh := sha.FromStringContent(objectIdString)
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	if _, err = s.readOneShaLoc(sh); err != nil {
 		err = errors.Wrap(err)
@@ -378,7 +378,7 @@ func (s *Index) ReadOneObjectId(
 	sk *sku.Transacted,
 ) (err error) {
 	sh := sha.FromStringContent(oid.String())
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
 		return
@@ -391,7 +391,7 @@ func (s *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	sh := sha.FromStringContent(id.String())
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	if skus, err = s.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
@@ -412,7 +412,7 @@ func (s *Index) ReadOneObjectIdTai(
 	}
 
 	sh := sha.FromStringContent(k.String() + t.String())
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	sk = sku.GetTransactedPool().Get()
 

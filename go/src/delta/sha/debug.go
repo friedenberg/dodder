@@ -13,7 +13,7 @@ import (
 func DebugCompareBlobs(
 	ctx interfaces.Context,
 	blobStore interfaces.BlobStore,
-	expectedSha interfaces.Digest,
+	expectedSha interfaces.BlobId,
 	actual *strings.Builder,
 ) {
 	var expected strings.Builder

@@ -63,7 +63,7 @@ type (
 
 	BlobCopyResult struct {
 		*Transacted       // may be nil
-		interfaces.Digest // may not be nil
+		interfaces.BlobId // may not be nil
 
 		// -1: no remote blob store and the blob doesn't exist locally
 		// -2: no remote blob store and the blob exists locally
@@ -102,7 +102,7 @@ func MakeBlobCopierDelegate(ui fd.Std) func(BlobCopyResult) error {
 	return func(result BlobCopyResult) error {
 		return ui.Printf(
 			"copied Blob %s (%d bytes)",
-			result.Digest,
+			result.BlobId,
 			result.N,
 		)
 	}

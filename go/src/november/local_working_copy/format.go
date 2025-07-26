@@ -934,8 +934,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				sh2 := sha.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
-				defer digests.PutDigest(sh1)
-				defer digests.PutDigest(sh2)
+				defer digests.PutBlobId(sh1)
+				defer digests.PutBlobId(sh2)
 				_, err = fmt.Fprintln(writer, object.GetObjectId(), sh1, sh2)
 				return
 			}

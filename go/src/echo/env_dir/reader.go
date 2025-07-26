@@ -72,6 +72,6 @@ func (reader *reader) Close() (err error) {
 	return
 }
 
-func (reader *reader) GetDigest() interfaces.Digest {
-	return reader.digester.GetDigest()
+func (reader *reader) GetBlobId() interfaces.BlobId {
+	return reader.digester.GetBlobId()
 }

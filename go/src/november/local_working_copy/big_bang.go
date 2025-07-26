@@ -87,7 +87,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return
 	}
 
-	var sh interfaces.Digest
+	var sh interfaces.BlobId
 
 	// TODO remove and replace with two-step process
 	if sh, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
@@ -127,7 +127,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	var sh interfaces.Digest
+	var sh interfaces.BlobId
 	var typedBlob repo_configs.TypedBlob
 
 	if sh, typedBlob, err = writeDefaultMutableConfig(
@@ -166,7 +166,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 func writeDefaultMutableConfig(
 	repo *Repo,
 	defaultType ids.Type,
-) (sh interfaces.Digest, typedBlob repo_configs.TypedBlob, err error) {
+) (sh interfaces.BlobId, typedBlob repo_configs.TypedBlob, err error) {
 	typedBlob = repo_configs.Default(defaultType)
 
 	coder := repo.GetStore().GetConfigBlobFormat()

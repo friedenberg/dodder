@@ -9,7 +9,7 @@ import (
 )
 
 type readCloser struct {
-	envDigest interfaces.EnvDigest
+	envDigest interfaces.EnvBlobId
 	tee       io.Reader
 	reader    io.Reader
 	writer    io.Writer
@@ -17,7 +17,7 @@ type readCloser struct {
 }
 
 func MakeReadCloser(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	reader io.Reader,
 ) (src readCloser) {
 	src.envDigest = envDigest
@@ -40,7 +40,7 @@ func MakeReadCloser(
 }
 
 func MakeReadCloserTee(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	reader io.Reader,
 	writer io.Writer,
 ) (src readCloser) {
@@ -124,19 +124,19 @@ func (readCloser readCloser) Close() (err error) {
 	return
 }
 
-func (readCloser readCloser) GetDigest() interfaces.Digest {
+func (readCloser readCloser) GetBlobId() interfaces.BlobId {
 	digest, err := readCloser.envDigest.MakeDigestFromHash(readCloser.hash)
 	errors.PanicIfError(err)
 	return digest
 }
 
 type nopReadCloser struct {
-	envDigest interfaces.EnvDigest
+	envDigest interfaces.EnvBlobId
 	io.ReadCloser
 }
 
 func MakeNopReadCloser(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	readCloser io.ReadCloser,
 ) interfaces.ReadCloseDigester {
 	return nopReadCloser{
@@ -154,6 +154,6 @@ func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
 	return io.Copy(writer, readCloser.ReadCloser)
 }
 
-func (readCloser nopReadCloser) GetDigest() interfaces.Digest {
-	return readCloser.envDigest.GetDigest()
+func (readCloser nopReadCloser) GetBlobId() interfaces.BlobId {
+	return readCloser.envDigest.GetBlobId()
 }

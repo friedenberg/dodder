@@ -138,7 +138,7 @@ func (json *Json) ToTransacted(
 	}
 
 	// TODO-P1 support states of blob vs blob sha
-	object.SetBlobSha(writeCloser.GetDigest())
+	object.SetBlobSha(writeCloser.GetBlobId())
 
 	if err = object.ObjectId.Set(json.ObjectId); err != nil {
 		err = errors.Wrap(err)

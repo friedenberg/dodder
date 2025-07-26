@@ -98,7 +98,7 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	digest := mover.GetDigest()
+	digest := mover.GetBlobId()
 
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",

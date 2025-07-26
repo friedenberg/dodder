@@ -32,7 +32,7 @@ func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_blobs.TypedStor
 
 // TODO rename to ReadOneDigest
 func (blobStore *blobStoreV0) ReadOneSha(
-	id interfaces.Digest,
+	id interfaces.BlobId,
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
 

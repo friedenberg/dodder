@@ -45,7 +45,7 @@ func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flag.FlagSet) {
 
 type answer struct {
 	error
-	interfaces.Digest
+	interfaces.BlobId
 	Path string
 }
 
@@ -75,7 +75,7 @@ func (cmd BlobStoreWrite) Run(
 
 		a := answer{Path: p}
 
-		a.Digest, a.error = cmd.doOne(blobStore, p)
+		a.BlobId, a.error = cmd.doOne(blobStore, p)
 
 		if a.error != nil {
 			blobStore.GetErr().Printf("%s: (error: %q)", a.Path, a.error)
@@ -83,20 +83,20 @@ func (cmd BlobStoreWrite) Run(
 			continue
 		}
 
-		hasBlob := blobStore.HasBlob(a.Digest)
+		hasBlob := blobStore.HasBlob(a.BlobId)
 
 		if hasBlob {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					a.GetDigest(),
+					a.GetBlobId(),
 					a.Path,
 				)
 			} else {
-				blobStore.GetUI().Printf("%s %s (checked in)", a.GetDigest(), a.Path)
+				blobStore.GetUI().Printf("%s %s (checked in)", a.GetBlobId(), a.Path)
 			}
 		} else {
-			ui.Err().Printf("%s %s (untracked)", a.GetDigest(), a.Path)
+			ui.Err().Printf("%s %s (untracked)", a.GetBlobId(), a.Path)
 
 			if cmd.Check {
 				failCount.Add(1)
@@ -119,7 +119,7 @@ func (cmd BlobStoreWrite) Run(
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
-) (sh interfaces.Digest, err error) {
+) (sh interfaces.BlobId, err error) {
 	var readCloser io.ReadCloser
 
 	if readCloser, err = env_dir.NewFileReader(
@@ -154,7 +154,7 @@ func (cmd BlobStoreWrite) doOne(
 		return
 	}
 
-	sh = writeCloser.GetDigest()
+	sh = writeCloser.GetBlobId()
 
 	return
 }

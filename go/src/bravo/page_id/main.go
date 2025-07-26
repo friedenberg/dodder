@@ -40,7 +40,7 @@ func (id *PageId) Path() string {
 func PageIndexForString(
 	width uint8,
 	value string,
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 ) (n uint8, err error) {
 	stringReader, repool := pool.GetStringReader(value)
 	defer repool()
@@ -53,8 +53,8 @@ func PageIndexForString(
 		return
 	}
 
-	digest := envDigest.GetDigest()
-	defer envDigest.PutDigest(digest)
+	digest := envDigest.GetBlobId()
+	defer envDigest.PutBlobId(digest)
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
 		err = errors.Wrap(err)
@@ -66,7 +66,7 @@ func PageIndexForString(
 
 func PageIndexForDigest(
 	width uint8,
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (n uint8, err error) {
 	var n1 int64
 

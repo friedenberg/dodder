@@ -17,9 +17,9 @@ type (
 
 	commonInterface interface {
 		// TODO rename to AddDigest and enforce digest type
-		AddSha(interfaces.Digest, Loc) error
-		ReadOne(sh interfaces.Digest) (loc Loc, err error)
-		ReadMany(sh interfaces.Digest, locs *[]Loc) (err error)
+		AddSha(interfaces.BlobId, Loc) error
+		ReadOne(sh interfaces.BlobId) (loc Loc, err error)
+		ReadMany(sh interfaces.BlobId, locs *[]Loc) (err error)
 	}
 
 	pageInterface interface {
@@ -88,7 +88,7 @@ func (index *object_probe_index) GetObjectProbeIndex() Index {
 }
 
 func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
-	var shas map[string]interfaces.Digest
+	var shas map[string]interfaces.BlobId
 
 	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
 		err = errors.Wrap(err)
@@ -106,14 +106,14 @@ func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 }
 
 func (index *object_probe_index) AddSha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	loc Loc,
 ) (err error) {
 	return index.addSha(sh, loc)
 }
 
 func (index *object_probe_index) addSha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	loc Loc,
 ) (err error) {
 	if sh.IsNull() {
@@ -131,7 +131,7 @@ func (index *object_probe_index) addSha(
 }
 
 func (index *object_probe_index) ReadOne(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 ) (loc Loc, err error) {
 	var i uint8
 
@@ -144,7 +144,7 @@ func (index *object_probe_index) ReadOne(
 }
 
 func (index *object_probe_index) ReadMany(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	locs *[]Loc,
 ) (err error) {
 	var i uint8
@@ -168,14 +168,14 @@ func (index *object_probe_index) ReadOneKey(
 		return
 	}
 
-	var sh interfaces.Digest
+	var sh interfaces.BlobId
 
 	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	if loc, err = index.ReadOne(sh); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
@@ -197,7 +197,7 @@ func (index *object_probe_index) ReadManyKeys(
 		return
 	}
 
-	var sh interfaces.Digest
+	var sh interfaces.BlobId
 
 	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
@@ -211,7 +211,7 @@ func (index *object_probe_index) ReadAll(
 	m *object_metadata.Metadata,
 	h *[]Loc,
 ) (err error) {
-	var shas map[string]interfaces.Digest
+	var shas map[string]interfaces.BlobId
 
 	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
 		err = errors.Wrap(err)

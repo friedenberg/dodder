@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
-type fdSetWithError struct {
+type itemWithError struct {
 	error
 	*sku.FSItem
 }
@@ -38,7 +38,7 @@ type dirInfo struct {
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData
 
-	errors interfaces.MutableSetLike[fdSetWithError]
+	errors interfaces.MutableSetLike[itemWithError]
 }
 
 func makeObjectsWithDir(
@@ -49,7 +49,7 @@ func makeObjectsWithDir(
 	info.envRepo = envRepo
 	info.probablyCheckedOut = makeFSItemData()
 	info.definitelyNotCheckedOut = makeFSItemData()
-	info.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
+	info.errors = collections_value.MakeMutableValueSet[itemWithError](nil)
 
 	return
 }
@@ -477,7 +477,7 @@ func (dirInfo *dirInfo) processFDSet(
 		}
 
 		if err != nil {
-			if err = dirInfo.errors.Add(fdSetWithError{FSItem: item, error: err}); err != nil {
+			if err = dirInfo.errors.Add(itemWithError{FSItem: item, error: err}); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

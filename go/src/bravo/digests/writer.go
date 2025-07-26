@@ -12,7 +12,7 @@ import (
 var poolWriter = pool.MakePool[writer](nil, nil)
 
 func MakeWriterWithRepool(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	in io.Writer,
 ) (writer *writer, repool func()) {
 	writer = poolWriter.Get()
@@ -26,7 +26,7 @@ func MakeWriterWithRepool(
 }
 
 func MakeWriter(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	in io.Writer,
 ) (writer *writer) {
 	writer, _ = MakeWriterWithRepool(envDigest, in)
@@ -38,7 +38,7 @@ func PutWriter(writer *writer) {
 }
 
 type writer struct {
-	envDigest interfaces.EnvDigest
+	envDigest interfaces.EnvBlobId
 	closed    bool
 	in        io.Writer
 	closer    io.Closer
@@ -46,7 +46,7 @@ type writer struct {
 	hash      hash.Hash
 }
 
-func (writer *writer) Reset(envDigest interfaces.EnvDigest, in io.Writer) {
+func (writer *writer) Reset(envDigest interfaces.EnvBlobId, in io.Writer) {
 	writer.envDigest = envDigest
 
 	if in == nil {
@@ -104,7 +104,7 @@ func (writer *writer) Close() (err error) {
 	return
 }
 
-func (writer *writer) GetDigest() interfaces.Digest {
+func (writer *writer) GetBlobId() interfaces.BlobId {
 	digest, err := writer.envDigest.MakeDigestFromHash(writer.hash)
 	errors.PanicIfError(err)
 

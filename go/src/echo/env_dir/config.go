@@ -10,7 +10,7 @@ import (
 // TODO move to own package
 
 func MakeConfig(
-	envDigest interfaces.EnvDigest,
+	envDigest interfaces.EnvBlobId,
 	funcJoin func(string, ...string) string,
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
@@ -36,7 +36,7 @@ var (
 )
 
 type Config struct {
-	envDigest interfaces.EnvDigest
+	envDigest interfaces.EnvBlobId
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.BlobCompression

@@ -185,7 +185,7 @@ func (transacted *Transacted) makeShaCalcFunc(
 			return
 		}
 
-		defer digests.PutDigest(actual)
+		defer digests.PutBlobId(actual)
 
 		sh.ResetWith(actual)
 
@@ -233,22 +233,22 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) SetObjectSha(v interfaces.Digest) (err error) {
+func (transacted *Transacted) SetObjectSha(v interfaces.BlobId) (err error) {
 	return transacted.GetMetadata().GetSha().SetDigest(v)
 }
 
 // TODO remove
-func (transacted *Transacted) GetObjectSha() interfaces.Digest {
+func (transacted *Transacted) GetObjectSha() interfaces.BlobId {
 	return transacted.GetMetadata().GetSha()
 }
 
 // TODO rename to GetBlobDigest
-func (transacted *Transacted) GetBlobSha() interfaces.Digest {
+func (transacted *Transacted) GetBlobSha() interfaces.BlobId {
 	return &transacted.Metadata.Blob
 }
 
 // TODO rename to SetBlobDigest
-func (transacted *Transacted) SetBlobSha(sh interfaces.Digest) error {
+func (transacted *Transacted) SetBlobSha(sh interfaces.BlobId) error {
 	return transacted.Metadata.Blob.SetDigest(sh)
 }
 
@@ -262,7 +262,7 @@ func (transacted *Transacted) Sign(
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
 	sh := sha.MustWithDigester(transacted.GetTai())
-	defer digests.PutDigest(sh)
+	defer digests.PutBlobId(sh)
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
 		config.GetPrivateKey(),

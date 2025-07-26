@@ -133,7 +133,7 @@ func (cmd BlobStoreCat) copy(
 	if cmd.PrefixSha {
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			digests.Format(readCloser.Sha.GetDigest()),
+			digests.Format(readCloser.Sha.GetBlobId()),
 			envRepo.GetUI(),
 			readCloser.ReadCloser,
 			true,

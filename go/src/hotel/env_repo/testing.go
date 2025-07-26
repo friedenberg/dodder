@@ -90,7 +90,7 @@ func MakeTesting(
 			)
 		}
 
-		shActual := writeCloser.GetDigest()
+		shActual := writeCloser.GetBlobId()
 		expected := sha.MustWithString(shaExpected)
 
 		err = expected.AssertEqualsShaLike(shActual)

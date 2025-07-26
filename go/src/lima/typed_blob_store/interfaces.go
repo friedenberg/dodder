@@ -16,7 +16,7 @@ type TypedStore[
 	APtr interfaces.Ptr[A],
 ] interface {
 	// TODO remove and replace with two-step process
-	SaveBlobText(APtr) (interfaces.Digest, int64, error)
+	SaveBlobText(APtr) (interfaces.BlobId, int64, error)
 	Format[A, APtr]
 	// TODO remove
 	interfaces.BlobPool[APtr]

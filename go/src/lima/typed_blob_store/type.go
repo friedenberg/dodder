@@ -53,7 +53,7 @@ func (store Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
 // TODO return repool function
 func (store Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
-	blobSha interfaces.Digest,
+	blobSha interfaces.BlobId,
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	default:

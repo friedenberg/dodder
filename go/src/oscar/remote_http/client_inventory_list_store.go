@@ -214,7 +214,7 @@ func (client client) ReadLast() (max *sku.Transacted, err error) {
 }
 
 func (client client) IterInventoryList(
-	blobSha interfaces.Digest,
+	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return nil
 }

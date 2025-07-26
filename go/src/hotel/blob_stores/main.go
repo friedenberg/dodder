@@ -74,14 +74,14 @@ func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobShaGetter interfaces.Digester,
+	blobShaGetter interfaces.BlobIdGetter,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	blobSha := blobShaGetter.GetDigest()
+	blobSha := blobShaGetter.GetBlobId()
 
 	if dst.HasBlob(blobSha) || blobSha.IsNull() {
 		err = env_dir.MakeErrAlreadyExists(
@@ -100,7 +100,7 @@ func CopyBlob(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobSha interfaces.Digest,
+	blobSha interfaces.BlobId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
@@ -138,8 +138,8 @@ func CopyBlob(
 		return
 	}
 
-	shaRc := rc.GetDigest()
-	shaWc := wc.GetDigest()
+	shaRc := rc.GetBlobId()
+	shaWc := wc.GetBlobId()
 
 	if !digests.Equals(shaRc, blobSha) ||
 		!digests.Equals(shaWc, blobSha) {
@@ -159,7 +159,7 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.LocalBlobStore,
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
@@ -180,7 +180,7 @@ func VerifyBlob(
 
 	expected := sha.MustWithDigest(sh)
 
-	if err = expected.AssertEqualsShaLike(readCloser.GetDigest()); err != nil {
+	if err = expected.AssertEqualsShaLike(readCloser.GetBlobId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

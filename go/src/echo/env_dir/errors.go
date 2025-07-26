@@ -9,7 +9,7 @@ import (
 )
 
 func MakeErrAlreadyExists(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}
@@ -36,7 +36,7 @@ func IsErrBlobMissing(err error) bool {
 }
 
 type ErrBlobMissing struct {
-	interfaces.Digester
+	interfaces.BlobIdGetter
 	Path string
 }
 
@@ -44,12 +44,12 @@ func (e ErrBlobMissing) Error() string {
 	if e.Path == "" {
 		return fmt.Sprintf(
 			"Blob with sha %q does not exist locally",
-			e.GetDigest(),
+			e.GetBlobId(),
 		)
 	} else {
 		return fmt.Sprintf(
 			"Blob with sha %q does not exist locally: %q",
-			e.GetDigest(),
+			e.GetBlobId(),
 			e.Path,
 		)
 	}

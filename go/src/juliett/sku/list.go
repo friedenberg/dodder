@@ -19,7 +19,7 @@ type InventoryListStore interface {
 
 	ReadLast() (max *Transacted, err error)
 
-	IterInventoryList(interfaces.Digest) interfaces.SeqError[*Transacted]
+	IterInventoryList(interfaces.BlobId) interfaces.SeqError[*Transacted]
 
 	ReadAllSkus(
 		f func(besty, sk *Transacted) error,

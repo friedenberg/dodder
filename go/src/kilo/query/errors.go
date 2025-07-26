@@ -17,7 +17,7 @@ func (e ErrBlobMissing) Error() string {
 	return fmt.Sprintf(
 		"Blob for %q with sha %q does not exist locally.",
 		e.ObjectId,
-		e.GetDigest(),
+		e.GetBlobId(),
 	)
 }
 

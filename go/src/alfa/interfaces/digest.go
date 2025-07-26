@@ -6,56 +6,56 @@ import (
 )
 
 type (
-	Digest interface {
-		Digester
+	BlobId interface {
+		BlobIdGetter
 		GetBytes() []byte
 		GetType() string
 		IsNull() bool
 	}
 
-	MutableDigest interface {
-		Digester
+	MutableBlobId interface {
+		BlobIdGetter
 		SetBytes([]byte) error
 		Reset()
 	}
 
-	Digester interface {
-		GetDigest() Digest
+	BlobIdGetter interface {
+		GetBlobId() BlobId
 	}
 
-	EnvDigest interface {
+	EnvBlobId interface {
 		GetType() string
 
 		GetHash() (hash.Hash, func())
 
 		// TODO rename to "MakeDigest"
-		GetDigest() Digest
-		PutDigest(Digest)
+		GetBlobId() BlobId
+		PutBlobId(BlobId)
 
 		MakeWriteDigesterWithRepool() (WriteDigester, func())
 		MakeWriteDigester() WriteDigester
-		MakeDigestFromHash(hash.Hash) (Digest, error)
+		MakeDigestFromHash(hash.Hash) (BlobId, error)
 	}
 
 	WriteDigester interface {
 		io.Writer
-		Digester
+		BlobIdGetter
 	}
 
 	ReadDigester interface {
 		io.Reader
-		Digester
+		BlobIdGetter
 	}
 
 	ReadCloseDigester interface {
 		io.WriterTo
 		io.ReadCloser
-		Digester
+		BlobIdGetter
 	}
 
 	WriteCloseDigester interface {
 		io.ReaderFrom
 		io.WriteCloser
-		Digester
+		BlobIdGetter
 	}
 )

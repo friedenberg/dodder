@@ -9,11 +9,11 @@ import (
 
 var (
 	envsLock sync.Mutex
-	envs     = make(map[string]interfaces.EnvDigest)
+	envs     = make(map[string]interfaces.EnvBlobId)
 )
 
 func RegisterEnv(
-	env interfaces.EnvDigest,
+	env interfaces.EnvBlobId,
 ) struct{} {
 	envsLock.Lock()
 	defer envsLock.Unlock()
@@ -29,7 +29,7 @@ func RegisterEnv(
 	return struct{}{}
 }
 
-func GetEnv(tipe string) interfaces.EnvDigest {
+func GetEnv(tipe string) interfaces.EnvBlobId {
 	if env, ok := envs[tipe]; ok {
 		return env
 	} else {

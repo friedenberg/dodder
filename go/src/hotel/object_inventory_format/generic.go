@@ -455,8 +455,8 @@ func GetShaForContextDebug(
 
 func GetShasForMetadata(
 	m *Metadata,
-) (digests map[string]interfaces.Digest, err error) {
-	digests = make(map[string]interfaces.Digest, len(FormatKeysV5))
+) (digests map[string]interfaces.BlobId, err error) {
+	digests = make(map[string]interfaces.BlobId, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)

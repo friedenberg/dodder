@@ -14,7 +14,7 @@ import (
 )
 
 func MakeHashBucketPathFromSha(
-	sh interfaces.Digest,
+	sh interfaces.BlobId,
 	buckets []int,
 	pathComponents ...string,
 ) string {

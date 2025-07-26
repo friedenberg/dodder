@@ -9,7 +9,7 @@ import (
 
 var ErrIsNull = errors.New("digest is null")
 
-func MakeErrIsNull(digest interfaces.Digest) error {
+func MakeErrIsNull(digest interfaces.BlobId) error {
 	if digest.IsNull() {
 		return errors.WrapSkip(1, ErrIsNull)
 	}
@@ -18,10 +18,10 @@ func MakeErrIsNull(digest interfaces.Digest) error {
 }
 
 type ErrNotEqual struct {
-	Expected, Actual interfaces.Digest
+	Expected, Actual interfaces.BlobId
 }
 
-func MakeErrNotEqual(expected, actual interfaces.Digest) *ErrNotEqual {
+func MakeErrNotEqual(expected, actual interfaces.BlobId) *ErrNotEqual {
 	err := &ErrNotEqual{
 		Expected: expected,
 		Actual:   actual,

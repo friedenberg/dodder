@@ -384,7 +384,7 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v interfaces.Digest) (err error) {
+func (fd *FD) SetShaLike(v interfaces.BlobId) (err error) {
 	return fd.sha.SetDigest(v)
 }
 
@@ -392,7 +392,7 @@ func (fd *FD) GetSha() *sha.Sha {
 	return &fd.sha
 }
 
-func (fd *FD) GetDigest() interfaces.Digest {
+func (fd *FD) GetDigest() interfaces.BlobId {
 	return &fd.sha
 }
 

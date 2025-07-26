@@ -64,9 +64,9 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (ok bool) {
-	if digest.GetDigest().IsNull() {
+	if digest.GetBlobId().IsNull() {
 		ok = true
 		return
 	}
@@ -82,8 +82,8 @@ func (blobStore localHashBucketed) HasBlob(
 }
 
 // TODO add support for other bucket sizes and digest types
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Digest] {
-	return func(yield func(interfaces.Digest, error) bool) {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+	return func(yield func(interfaces.BlobId, error) bool) {
 		var sh sha.Sha
 
 		for path, err := range files.DirNamesLevel2(blobStore.basePath) {
@@ -136,9 +136,9 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore localHashBucketed) BlobReader(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
-	if digest.GetDigest().IsNull() {
+	if digest.GetBlobId().IsNull() {
 		readCloser = digests.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
@@ -179,7 +179,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
-	digest interfaces.Digest,
+	digest interfaces.BlobId,
 	path string,
 ) (readCloser interfaces.ReadCloseDigester, err error) {
 	if digest.IsNull() {
@@ -191,7 +191,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	}
 
 	path = env_dir.MakeHashBucketPathFromSha(
-		digest.GetDigest(),
+		digest.GetBlobId(),
 		blobStore.buckets,
 		path,
 	)
@@ -202,10 +202,10 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(digest.GetDigest())
+			shCopy.ResetWithShaLike(digest.GetBlobId())
 
 			err = env_dir.ErrBlobMissing{
-				Digester: shCopy,
+				BlobIdGetter: shCopy,
 				Path:     path,
 			}
 		} else {
