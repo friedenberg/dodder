@@ -264,17 +264,17 @@ func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
 //  |_|  |_|\__,_|___/\__|
 //
 
-func ContextMustClose(ctx interfaces.Context, closer io.Closer) {
+func ContextMustClose(ctx interfaces.ActiveContext, closer io.Closer) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Must(MakeFuncContextFromFuncErr(closer.Close))
 }
 
-func ContextMustFlush(ctx interfaces.Context, flusher Flusher) {
+func ContextMustFlush(ctx interfaces.ActiveContext, flusher Flusher) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Must(MakeFuncContextFromFuncErr(flusher.Flush))
 }
 
-func ContextContinueOrPanic(ctx interfaces.Context) {
+func ContextContinueOrPanic(ctx interfaces.ActiveContext) {
 	if state := ctx.GetState(); state.IsComplete() {
 		panic(state)
 	}
@@ -306,17 +306,17 @@ func ContextSetCancelOnSIGHUP(ctx interfaces.Context) {
 //   \____\__,_|_| |_|\___\___|_|___/
 //
 
-func ContextCancelWith499ClientClosedRequest(ctx interfaces.Context) {
+func ContextCancelWith499ClientClosedRequest(ctx interfaces.ActiveContext) {
 	ctx.Cancel(Err499ClientClosedRequest)
 }
 
-func ContextCancelWithError(ctx interfaces.Context, err error) {
+func ContextCancelWithError(ctx interfaces.ActiveContext, err error) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Cancel(WrapN(1, err))
 }
 
 func ContextCancelWithErrorAndFormat(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	err error,
 	format string,
 	values ...any,
@@ -332,7 +332,7 @@ func ContextCancelWithErrorAndFormat(
 }
 
 func ContextCancelWithErrorf(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	format string,
 	values ...any,
 ) {
@@ -354,7 +354,7 @@ func ContextCancelWithBadRequestf(
 	ctx.Cancel(&errBadRequestWrap{xerrors.Errorf(format, values...)})
 }
 
-func CancelWithNotImplemented(ctx interfaces.Context) {
+func CancelWithNotImplemented(ctx interfaces.ActiveContext) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Cancel(Err501NotImplemented)
 }

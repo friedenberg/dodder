@@ -63,6 +63,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		var err error
 
 		if list, err = typedInventoryListStore.ReadInventoryListBlob(
+			repo,
 			listSkuType,
 			bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 		); err != nil {
@@ -141,6 +142,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	defer repoolBufferedWriter()
 
 	if _, err := inventory_list_coders.WriteInventoryList(
+		repo,
 		listFormat,
 		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,

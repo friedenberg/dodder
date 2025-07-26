@@ -376,12 +376,12 @@ SKIP_TYPE_BLOB:
 	if mimeType == "" {
 		jsonRep.RelatedURIs = append(
 			jsonRep.RelatedURIs,
-			fmt.Sprintf("dodder:///blobs/%s", jsonRep.BlobDigest),
+			fmt.Sprintf("dodder:///blobs/%s", jsonRep.BlobId),
 		)
 	} else {
 		jsonRep.RelatedURIs = append(
 			jsonRep.RelatedURIs,
-			fmt.Sprintf("dodder:///blobs/%s/%s", jsonRep.BlobDigest, mimeType),
+			fmt.Sprintf("dodder:///blobs/%s/%s", jsonRep.BlobId, mimeType),
 		)
 	}
 

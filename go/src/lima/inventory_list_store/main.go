@@ -88,6 +88,7 @@ func (store *Store) Initialize(
 		store_version.V8,
 	) {
 		store.inventoryListBlobStore = &blobStoreV0{
+			envRepo:        envRepo,
 			blobType:       blobType,
 			BlobStore:      inventoryListBlobStore,
 			typedBlobStore: typedBlobStore,
@@ -258,7 +259,7 @@ func (store *Store) Create(
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
-		object.SetBlobSha(actual)
+		object.SetBlobId(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
 			err = errors.Wrap(err)
@@ -305,6 +306,7 @@ func (store *Store) WriteInventoryListBlob(
 	defer repoolBufferedWriter()
 
 	if _, err = store.getTypedBlobStore().WriteBlobToWriter(
+		store.envRepo,
 		object.GetType(),
 		list,
 		bufferedWriter,
@@ -324,7 +326,7 @@ func (store *Store) WriteInventoryListBlob(
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
-		object.SetBlobSha(actual)
+		object.SetBlobId(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
 			err = errors.Wrap(err)
@@ -374,6 +376,7 @@ func (store *Store) ImportInventoryList(
 	list := sku.MakeList()
 
 	if err = inventory_list_coders.CollectSkuList(
+		store.envRepo,
 		store.FormatForVersion(store.storeVersion),
 		bufferedReader,
 		list,

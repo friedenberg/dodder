@@ -64,6 +64,7 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = IterCoder{
+				ctx:        envRepo,
 				ListFormat: coder,
 			}
 		}
@@ -95,6 +96,7 @@ func (store Closet) WriteObjectToWriter(
 
 // TODO consume interfaces.SeqError and expose as a coder instead
 func (store Closet) WriteBlobToWriter(
+	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	list sku.Collection,
 	bufferedWriter *bufio.Writer,
@@ -107,6 +109,7 @@ func (store Closet) WriteBlobToWriter(
 	}
 
 	if n, err = WriteInventoryList(
+		ctx,
 		format,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
@@ -263,6 +266,7 @@ func (store Closet) IterInventoryListBlobSkusFromReader(
 }
 
 func (store Closet) ReadInventoryListObject(
+	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
@@ -273,7 +277,7 @@ func (store Closet) ReadInventoryListObject(
 		return
 	}
 
-	iter := StreamInventoryList(format, reader)
+	iter := StreamInventoryList(ctx, format, reader)
 
 	for object, iterErr := range iter {
 		if iterErr != nil {
@@ -293,6 +297,7 @@ func (store Closet) ReadInventoryListObject(
 }
 
 func (store Closet) ReadInventoryListBlob(
+	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (list *sku.List, err error) {
@@ -305,7 +310,7 @@ func (store Closet) ReadInventoryListBlob(
 		return
 	}
 
-	iter := StreamInventoryList(format, reader)
+	iter := StreamInventoryList(ctx, format, reader)
 
 	for object, iterErr := range iter {
 		if iterErr != nil {

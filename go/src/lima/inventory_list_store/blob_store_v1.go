@@ -58,6 +58,7 @@ func (blobStore *blobStoreV1) ReadOneSha(
 	defer repoolBufferedReader()
 
 	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
+		blobStore.envRepo,
 		blobStore.blobType,
 		bufferedReader,
 	); err != nil {

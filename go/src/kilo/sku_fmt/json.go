@@ -22,8 +22,8 @@ type JSONMCP struct {
 }
 
 type JSON struct {
-	// TODO rename to blob-digest
-	BlobDigest  string        `json:"blob-sha"`
+	// TODO rename to blob-id
+	BlobId      string        `json:"blob-sha"`
 	BlobString  string        `json:"blob-string,omitempty"`
 	Date        string        `json:"date"`
 	Description string        `json:"description"`
@@ -64,7 +64,7 @@ func (json *JSON) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobDigest = metadata.Blob.String()
+	json.BlobId = metadata.Blob.String()
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
@@ -140,7 +140,7 @@ func (json *JSON) ToTransacted(
 
 		// TODO just compare blob digests
 		// TODO-P1 support states of blob vs blob sha
-		object.SetBlobSha(writeCloser.GetBlobId())
+		object.SetBlobId(writeCloser.GetBlobId())
 	}
 
 	if err = object.ObjectId.Set(json.ObjectId); err != nil {
@@ -170,6 +170,8 @@ func (json *JSON) ToTransacted(
 
 	object.Metadata.RepoPubkey = json.RepoPubkey.Data
 	object.Metadata.RepoSig = json.RepoSig.Data
+
+	// TODO populate remaining fields
 
 	return
 }

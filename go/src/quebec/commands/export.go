@@ -43,9 +43,9 @@ func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
 	cmd.CompressionType.SetFlagSet(f)
 }
 
-func (cmd Export) Run(dep command.Request) {
+func (cmd Export) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.BuilderOptionsOld(
 			cmd,
 			query.BuilderOptionDefaultSigil(
@@ -109,6 +109,7 @@ func (cmd Export) Run(dep command.Request) {
 	)
 
 	if _, err := inventory_list_coders.WriteInventoryList(
+		req,
 		listFormat,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,

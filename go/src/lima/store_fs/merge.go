@@ -339,6 +339,7 @@ func (store *Store) GenerateConflictMarker(
 	}
 
 	if _, err = blobStore.WriteBlobToWriter(
+		store.envRepo,
 		ids.DefaultOrPanic(genres.InventoryList),
 		conflicted,
 		bufferedWriter,

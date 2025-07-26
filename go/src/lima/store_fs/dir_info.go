@@ -536,17 +536,17 @@ func (dirInfo *dirInfo) addOneUntracked(
 		return
 	}
 
-	sh := f.GetSha()
+	digest := f.GetDigest()
 
-	if sh.IsNull() {
+	if digest.IsNull() {
 		return
 	}
 
 	// TODO try reading as object
 
 	// TODO add sha cache
-	key := sh.GetBytes()
-	existing, ok := dirInfo.definitelyNotCheckedOut.shas[string(key)]
+	key := digest.GetBytes()
+	existing, ok := dirInfo.definitelyNotCheckedOut.digests[string(key)]
 
 	if !ok {
 		existing = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
@@ -557,7 +557,7 @@ func (dirInfo *dirInfo) addOneUntracked(
 		return
 	}
 
-	dirInfo.definitelyNotCheckedOut.shas[string(key)] = existing
+	dirInfo.definitelyNotCheckedOut.digests[string(key)] = existing
 
 	return
 }

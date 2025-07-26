@@ -25,8 +25,7 @@ cmd_bats=(
   migration/generate_fixture.bats
 )
 
-export BATS_TEST_TIMEOUT=3
-if ! bats_run="$("${cmd_bats[@]}" 2>&1)"; then
+if ! bats_run="$(BATS_TEST_TIMEOUT=3 "${cmd_bats[@]}" 2>&1)"; then
   echo "$bats_run" >&2
   exit 1
 else

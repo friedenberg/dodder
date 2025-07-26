@@ -388,10 +388,6 @@ func (fd *FD) SetShaLike(v interfaces.BlobId) (err error) {
 	return fd.sha.SetDigest(v)
 }
 
-func (fd *FD) GetSha() *sha.Sha {
-	return &fd.sha
-}
-
 func (fd *FD) GetDigest() interfaces.BlobId {
 	return &fd.sha
 }

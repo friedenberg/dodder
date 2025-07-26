@@ -50,11 +50,11 @@ func (cmd *Import) SetFlagSet(f *flag.FlagSet) {
 	cmd.Proto.SetFlagSet(f)
 }
 
-func (cmd Import) Run(dep command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(dep)
+func (cmd Import) Run(req command.Request) {
+	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	if cmd.InventoryList == "" {
-		errors.ContextCancelWithBadRequestf(dep, "empty inventory list")
+		errors.ContextCancelWithBadRequestf(req, "empty inventory list")
 	}
 
 	bf := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
@@ -91,6 +91,7 @@ func (cmd Import) Run(dep command.Request) {
 
 	// TODO determine why this is not erroring for invalid input
 	if err := inventory_list_coders.CollectSkuList(
+		req,
 		bf,
 		bufferedReader,
 		list,

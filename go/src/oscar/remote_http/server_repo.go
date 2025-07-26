@@ -26,7 +26,7 @@ func (server *Server) writeInventoryList(
 	listSku *sku.Transacted,
 ) (response Response) {
 	logRemoteInventoryLists := log_remote_inventory_lists.Make(
-		request.context,
+		request.ctx,
 		server.Repo.GetEnvRepo(),
 	)
 

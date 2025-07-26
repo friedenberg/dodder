@@ -87,7 +87,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 
 		object := pairs[idx].object
 
-		if err := object.SetBlobSha(pair.GetDigest()); err != nil {
+		if err := object.SetBlobId(pair.GetDigest()); err != nil {
 			req.Cancel(err)
 		}
 
@@ -167,7 +167,7 @@ func (pair *externalBlobPair) GetDigest() interfaces.BlobId {
 }
 
 func (pair *externalBlobPair) PopulateBlobSha() (err error) {
-	if err = pair.object.SetBlobSha(pair.GetDigest()); err != nil {
+	if err = pair.object.SetBlobId(pair.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

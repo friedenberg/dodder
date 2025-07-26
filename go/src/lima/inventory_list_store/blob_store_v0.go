@@ -10,11 +10,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 type blobStoreV0 struct {
+	envRepo        env_repo.Env
 	lock           sync.Mutex
 	blobType       ids.Type
 	typedBlobStore inventory_list_coders.Closet
@@ -54,6 +56,7 @@ func (blobStore *blobStoreV0) ReadOneSha(
 	defer repoolBufferedReader()
 
 	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
+		blobStore.envRepo,
 		blobStore.blobType,
 		bufferedReader,
 	); err != nil {
@@ -81,7 +84,9 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 	object.Metadata.Type = blobStore.blobType
 
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(blobStoreWriteCloser)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+		blobStoreWriteCloser,
+	)
 	defer repoolBufferedWriter()
 
 	if err = object.CalculateObjectDigests(); err != nil {

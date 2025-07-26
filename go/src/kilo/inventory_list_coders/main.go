@@ -35,11 +35,20 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
 		}
 	},
+	ids.TypeInventoryListJsonV0: func(
+		envRepo env_repo.Env,
+		box *box_format.BoxTransacted,
+	) sku.ListFormat {
+		return JSONV0{
+			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
+		}
+	},
 }
 
 var (
 	_ sku.ListFormat = DoddishV1{}
 	_ sku.ListFormat = DoddishV2{}
+	_ sku.ListFormat = JSONV0{}
 )
 
 func WriteObjectToOpenList(
@@ -80,6 +89,7 @@ func WriteObjectToOpenList(
 }
 
 func WriteInventoryList(
+	ctx interfaces.ActiveContext,
 	format sku.ListFormat,
 	skus interfaces.SeqError[*sku.Transacted],
 	bufferedWriter *bufio.Writer,
@@ -89,6 +99,8 @@ func WriteInventoryList(
 	var object *sku.Transacted
 
 	for object, err = range skus {
+		errors.ContextContinueOrPanic(ctx)
+
 		if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -108,11 +120,12 @@ func WriteInventoryList(
 
 // TODO also return a repool func
 func CollectSkuList(
+	ctx interfaces.ActiveContext,
 	listFormat sku.ListFormat,
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	iter := StreamInventoryList(listFormat, reader)
+	iter := StreamInventoryList(ctx, listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
@@ -130,11 +143,14 @@ func CollectSkuList(
 }
 
 func StreamInventoryList(
+	ctx interfaces.ActiveContext,
 	format sku.ListFormat,
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		for {
+			errors.ContextContinueOrPanic(ctx)
+
 			object := sku.GetTransactedPool().Get()
 			// TODO Fix upstream issues with repooling
 			// defer sku.GetTransactedPool().Put(object)
@@ -177,6 +193,7 @@ func WriteInventoryListObject(
 }
 
 type IterCoder struct {
+	ctx interfaces.ActiveContext
 	sku.ListFormat
 }
 
@@ -185,6 +202,8 @@ func (coder IterCoder) DecodeFrom(
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	for {
+		errors.ContextContinueOrPanic(coder.ctx)
+
 		object := sku.GetTransactedPool().Get()
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)

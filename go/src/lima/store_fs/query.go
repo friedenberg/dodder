@@ -340,7 +340,7 @@ func (store *Store) queryUntracked(
 			if recognizedBlob, err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.Blob,
-				definitelyNotCheckedOut.shas,
+				definitelyNotCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -349,7 +349,7 @@ func (store *Store) queryUntracked(
 			if recognizedObject, err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.SelfMetadataWithoutTai,
-				store.probablyCheckedOut.shas,
+				store.probablyCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

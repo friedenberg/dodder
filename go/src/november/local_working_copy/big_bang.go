@@ -145,7 +145,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	if err = newConfig.SetBlobSha(sh); err != nil {
+	if err = newConfig.SetBlobId(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

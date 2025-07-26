@@ -168,7 +168,7 @@ func (g *Genre) ReadFromBoxScanner(
 	return
 }
 
-func (i Genre) GetSha() interfaces.BlobId {
+func (i Genre) GetDigest() interfaces.BlobId {
 	return sha.FromStringContent(i.String())
 }
 

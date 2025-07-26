@@ -182,6 +182,7 @@ func (client *client) MakeInventoryList(
 	list = sku.MakeList()
 
 	if err = inventory_list_coders.CollectSkuList(
+		client.envUI,
 		listFormat,
 		bufio.NewReader(response.Body),
 		list,
@@ -257,6 +258,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		// TODO make a reader version of inventory lists to avoid allocation
 		if _, err = inventory_list_coders.WriteInventoryList(
+			client.envUI,
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
@@ -310,11 +312,10 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		bufferedReader := bufio.NewReader(response.Body)
 
-		errors.ContextContinueOrPanic(client.GetEnv())
-
 		var listMissingSkus *sku.List
 
 		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
+			client.GetEnv(),
 			ids.GetOrPanic(
 				client.configImmutable.Blob.GetInventoryListTypeString(),
 			).Type,

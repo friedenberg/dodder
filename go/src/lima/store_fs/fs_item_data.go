@@ -11,26 +11,26 @@ import (
 
 type fsItemData struct {
 	interfaces.MutableSetLike[*sku.FSItem]
-	shas map[string]interfaces.MutableSetLike[*sku.FSItem]
+	digests map[string]interfaces.MutableSetLike[*sku.FSItem]
 }
 
 func makeFSItemData() fsItemData {
 	return fsItemData{
 		MutableSetLike: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
-		shas:           make(map[string]interfaces.MutableSetLike[*sku.FSItem]),
+		digests:        make(map[string]interfaces.MutableSetLike[*sku.FSItem]),
 	}
 }
 
 func (src *fsItemData) Clone() (dst fsItemData) {
 	dst.MutableSetLike = src.MutableSetLike.CloneMutableSetLike()
-	dst.shas = maps.Clone(src.shas)
+	dst.digests = maps.Clone(src.digests)
 	return
 }
 
 func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
 	replacement := collections_value.MakeMutableValueSet[*sku.FSItem](nil)
 
-	for _, fds := range data.shas {
+	for _, fds := range data.digests {
 		if fds.Len() == 1 {
 			replacement.Add(fds.Any())
 		}

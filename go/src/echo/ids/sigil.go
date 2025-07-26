@@ -163,7 +163,7 @@ func (i *Sigil) Set(v string) (err error) {
 	return
 }
 
-func (i Sigil) GetSha() interfaces.BlobId {
+func (i Sigil) GetDigest() interfaces.BlobId {
 	return sha.FromStringContent(i.String())
 }
 

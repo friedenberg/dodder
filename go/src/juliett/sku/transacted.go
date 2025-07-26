@@ -247,8 +247,8 @@ func (transacted *Transacted) GetBlobSha() interfaces.BlobId {
 	return &transacted.Metadata.Blob
 }
 
-// TODO rename to SetBlobDigest
-func (transacted *Transacted) SetBlobSha(sh interfaces.BlobId) error {
+// TODO rename to SetBlobId
+func (transacted *Transacted) SetBlobId(sh interfaces.BlobId) error {
 	return transacted.Metadata.Blob.SetDigest(sh)
 }
 

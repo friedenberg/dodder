@@ -21,15 +21,15 @@ type MethodPath struct {
 }
 
 type Request struct {
-	context interfaces.Context
+	ctx     interfaces.Context
 	request *http.Request
 	MethodPath
 	Headers http.Header
 	Body    io.ReadCloser
 }
 
-func (r Request) Vars() map[string]string {
-	return mux.Vars(r.request)
+func (request Request) Vars() map[string]string {
+	return mux.Vars(request.request)
 }
 
 type Response struct {

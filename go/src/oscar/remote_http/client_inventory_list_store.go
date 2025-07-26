@@ -83,6 +83,7 @@ func (client client) ImportInventoryList(
 
 		// TODO make a reader version of inventory lists to avoid allocation
 		if _, err = inventory_list_coders.WriteInventoryList(
+			client.envUI,
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,

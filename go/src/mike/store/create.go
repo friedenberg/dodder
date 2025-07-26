@@ -129,7 +129,7 @@ func (store *Store) CreateOrUpdateBlobSha(
 		}
 	}
 
-	t.SetBlobSha(sh)
+	t.SetBlobId(sh)
 
 	if err = store.Commit(
 		t,

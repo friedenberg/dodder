@@ -398,7 +398,7 @@ func (server *Server) makeHandler(
 ) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
-			context:    errors.MakeContext(server.EnvLocal),
+			ctx:    errors.MakeContext(server.EnvLocal),
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
@@ -408,7 +408,7 @@ func (server *Server) makeHandler(
 		var progressWriter env_ui.ProgressWriter
 
 		if err := errors.RunContextWithPrintTicker(
-			request.context,
+			request.ctx,
 			func(ctx interfaces.Context) {
 				response := handler(request)
 
@@ -691,6 +691,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		defer repoolBufferedWriter()
 
 		if _, err := inventory_list_coders.WriteInventoryList(
+			repo,
 			listFormat,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
@@ -787,6 +788,7 @@ func (server *Server) handlePostInventoryList(
 			defer repoolBufferedReader()
 
 			if sk, err = typedInventoryListStore.ReadInventoryListObject(
+				request.ctx,
 				ids.MustType(
 					server.Repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
 				),
