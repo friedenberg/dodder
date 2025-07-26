@@ -199,7 +199,7 @@ func (importer importer) importLeafSku(
 		}
 	}
 
-	if err = co.GetSkuExternal().CalculateObjectShas(); err != nil {
+	if err = co.GetSkuExternal().CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -256,7 +256,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, object.Metadata.GetSha())
+				_, err = fmt.Fprintln(writer, object.Metadata.GetDigest())
 				return
 			}
 		},
@@ -270,7 +270,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				_, err = fmt.Fprintf(
 					writer,
 					"%s -> %s\n",
-					object.Metadata.GetSha(),
+					object.Metadata.GetDigest(),
 					object.Metadata.GetMotherDigest(),
 				)
 				return
@@ -665,7 +665,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			enc := json.NewEncoder(writer)
 
 			return func(object *sku.Transacted) (err error) {
-				var jsonRepresentation sku_fmt.Json
+				var jsonRepresentation sku_fmt.JSON
 
 				if err = jsonRepresentation.FromTransacted(
 					object,
@@ -692,7 +692,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			enc := json.NewEncoder(writer)
 
 			type tomlJson struct {
-				sku_fmt.Json
+				sku_fmt.JSON
 				Blob map[string]any `json:"blob"`
 			}
 
@@ -707,10 +707,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return
 				}
 
-				if err = toml.Unmarshal([]byte(jsonRep.Json.BlobString), &jsonRep.Blob); err != nil {
+				if err = toml.Unmarshal([]byte(jsonRep.JSON.BlobString), &jsonRep.Blob); err != nil {
 					err = nil
 
-					if err = enc.Encode(jsonRep.Json); err != nil {
+					if err = enc.Encode(jsonRep.JSON); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

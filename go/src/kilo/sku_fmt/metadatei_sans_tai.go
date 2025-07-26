@@ -34,7 +34,7 @@ func StringMetadataSansTai(object *sku.Transacted) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			quiter.StringDelimiterSeparated[ids.Tag](
+			quiter.StringDelimiterSeparated(
 				" ",
 				m.GetTags(),
 			),

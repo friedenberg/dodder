@@ -320,7 +320,7 @@ func (server *Server) readMCPResourceObject(
 ) ([]mcp.ResourceContent, error) {
 	repo := server.Repo.(*local_working_copy.Repo)
 
-	var jsonRep sku_fmt.Json
+	var jsonRep sku_fmt.JSON
 
 	if err := jsonRep.FromTransacted(
 		object,

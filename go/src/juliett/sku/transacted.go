@@ -165,7 +165,7 @@ func (s *Transacted) CalculateObjectShaDebug() (err error) {
 }
 
 // TODO replace this with repo signatures
-func (s *Transacted) CalculateObjectShas() (err error) {
+func (s *Transacted) CalculateObjectDigests() (err error) {
 	return s.calculateObjectSha(false)
 }
 
@@ -206,7 +206,7 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 		transacted.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadataObjectIdParent(),
-			transacted.Metadata.GetSha(),
+			transacted.Metadata.GetDigest(),
 		),
 	)
 
@@ -234,12 +234,12 @@ func (transacted *Transacted) SetDormant(v bool) {
 }
 
 func (transacted *Transacted) SetObjectSha(v interfaces.BlobId) (err error) {
-	return transacted.GetMetadata().GetSha().SetDigest(v)
+	return transacted.GetMetadata().GetDigest().SetDigest(v)
 }
 
 // TODO remove
 func (transacted *Transacted) GetObjectSha() interfaces.BlobId {
-	return transacted.GetMetadata().GetSha()
+	return transacted.GetMetadata().GetDigest()
 }
 
 // TODO rename to GetBlobDigest

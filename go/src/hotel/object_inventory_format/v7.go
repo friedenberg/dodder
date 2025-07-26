@@ -155,7 +155,7 @@ func (f v7) FormatPersistentMetadata(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keys.KeySha.String(),
-		m.GetSha().String(),
+		m.GetDigest().String(),
 	)
 
 	n += int64(n1)
@@ -279,7 +279,7 @@ func (f v7) ParsePersistentMetadata(
 			}
 
 		case key.Equal(keys.KeySha.Bytes()):
-			if err = m.GetSha().SetHexBytes(val.Bytes()); err != nil {
+			if err = m.GetDigest().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

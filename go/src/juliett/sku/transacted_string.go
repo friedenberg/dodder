@@ -40,7 +40,7 @@ func (transacted *Transacted) StringObjectIdSha() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&transacted.ObjectId,
-		transacted.GetMetadata().GetSha(),
+		transacted.GetMetadata().GetDigest(),
 	)
 }
 

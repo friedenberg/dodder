@@ -5,40 +5,53 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
+
+type TypeBlobStore interface {
+	ParseTypedBlob(
+		tipe interfaces.ObjectId,
+		blobSha interfaces.BlobId,
+	) (common type_blobs.Blob, n int64, err error)
+
+	PutTypedBlob(
+		tipe interfaces.ObjectId,
+		common type_blobs.Blob,
+	) (err error)
+}
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	typed_blob_store.Type
+	store TypeBlobStore
 }
 
 func MakeFormatterTypFormatterUTIGroups(
-	sr sku.OneReader,
-	typeBlobStore typed_blob_store.Type,
+	oneReader sku.OneReader,
+	typeBlobStore TypeBlobStore,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
-		OneReader: sr,
-		Type:      typeBlobStore,
+		OneReader: oneReader,
+		store:     typeBlobStore,
 	}
 }
 
-func (e formatterTypFormatterUTIGroups) Format(
-	w io.Writer,
-	z *sku.Transacted,
+// TODO rewrite as coder
+func (format formatterTypFormatterUTIGroups) Format(
+	writer io.Writer,
+	object *sku.Transacted,
 ) (n int64, err error) {
 	var skuTyp *sku.Transacted
 
-	if skuTyp, err = e.ReadTransactedFromObjectId(z.Metadata.GetType()); err != nil {
+	if skuTyp, err = format.ReadTransactedFromObjectId(object.Metadata.GetType()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var blob type_blobs.Blob
 
-	if blob, _, err = e.ParseTypedBlob(
+	if blob, _, err = format.store.ParseTypedBlob(
 		skuTyp.GetType(),
 		skuTyp.GetBlobSha(),
 	); err != nil {
@@ -46,7 +59,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	defer e.PutTypedBlob(skuTyp.GetType(), blob)
+	defer format.store.PutTypedBlob(skuTyp.GetType(), blob)
 
 	for groupName, group := range blob.GetFormatterUTIGroups() {
 		sb := bytes.NewBuffer(nil)
@@ -62,7 +75,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 		sb.WriteString("\n")
 
-		if n, err = io.Copy(w, sb); err != nil {
+		if n, err = io.Copy(writer, sb); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

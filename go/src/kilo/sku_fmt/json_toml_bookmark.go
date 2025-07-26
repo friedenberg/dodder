@@ -10,7 +10,7 @@ import (
 )
 
 type JsonWithUrl struct {
-	Json
+	JSON
 	TomlBookmark
 }
 
@@ -35,7 +35,7 @@ func MakeJsonTomlBookmark(
 	}
 
 	for _, tabRaw := range tabs {
-		tab := tabRaw.(map[string]interface{})
+		tab := tabRaw.(map[string]any)
 
 		if _, err = url.Parse(tab["url"].(string)); err != nil {
 			err = errors.Wrap(err)

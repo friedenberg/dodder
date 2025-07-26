@@ -180,7 +180,7 @@ func (f v4) ParsePersistentMetadata(
 			}
 
 		case key.Equal(keySha.Bytes()):
-			if err = m.GetSha().SetHexBytes(val.Bytes()); err != nil {
+			if err = m.GetDigest().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

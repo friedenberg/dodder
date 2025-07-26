@@ -202,7 +202,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaMetadataParentObjectId:
-		if n, err = bf.writeSha(sk.Metadata.GetSha(), false); err != nil {
+		if n, err = bf.writeSha(sk.Metadata.GetDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

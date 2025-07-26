@@ -84,7 +84,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(blobStoreWriteCloser)
 	defer repoolBufferedWriter()
 
-	if err = object.CalculateObjectShas(); err != nil {
+	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

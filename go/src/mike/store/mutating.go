@@ -72,7 +72,7 @@ func (store *Store) tryPrecommit(
 		return
 	}
 
-	if err = kinder.CalculateObjectShas(); err != nil {
+	if err = kinder.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -289,7 +289,7 @@ func (store *Store) fetchParentIfNecessary(
 		return
 	}
 
-	sk.Metadata.GetMotherDigest().ResetWith(mutter.Metadata.GetSha())
+	sk.Metadata.GetMotherDigest().ResetWith(mutter.Metadata.GetDigest())
 
 	return
 }

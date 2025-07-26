@@ -33,6 +33,6 @@ func MakeStores(
 	}
 }
 
-func (a Stores) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
-	return a.Type.toml_v1
+func (stores Stores) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
+	return stores.Type.toml_v1
 }

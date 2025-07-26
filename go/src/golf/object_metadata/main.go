@@ -42,7 +42,7 @@ func (metadata *Metadata) GetMetadata() *Metadata {
 	return metadata
 }
 
-func (metadata *Metadata) GetSha() *sha.Sha {
+func (metadata *Metadata) GetDigest() *sha.Sha {
 	return &metadata.SelfMetadataObjectIdParent
 }
 
@@ -294,7 +294,7 @@ func (metadata *Metadata) SetMutter(mg Getter) (err error) {
 	mutter := mg.GetMetadata()
 
 	if err = metadata.GetMotherDigest().SetDigest(
-		mutter.GetSha(),
+		mutter.GetDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

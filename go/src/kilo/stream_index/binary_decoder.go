@@ -321,7 +321,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.ShaMetadataParentObjectId:
-		if _, err = sk.Metadata.GetSha().ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadata.GetDigest().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

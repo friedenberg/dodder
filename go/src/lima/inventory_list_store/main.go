@@ -383,7 +383,7 @@ func (store *Store) ImportInventoryList(
 	}
 
 	for sk := range list.All() {
-		if err = sk.CalculateObjectShas(); err != nil {
+		if err = sk.CalculateObjectDigests(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

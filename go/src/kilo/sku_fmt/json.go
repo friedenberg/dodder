@@ -13,16 +13,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type JsonMCP struct {
+type JSONMCP struct {
 	URI         string   `json:"uri,omitempty"`
 	RelatedURIs []string `json:"related_uris,omitempty"`
 }
 
-type Json struct {
+type JSON struct {
 	// TODO rename to blob-digest
 	BlobDigest  string        `json:"blob-sha"`
 	BlobString  string        `json:"blob-string,omitempty"`
@@ -37,10 +36,10 @@ type Json struct {
 	Tai         string        `json:"tai"`
 	Type        string        `json:"type"`
 
-	JsonMCP
+	JSONMCP
 }
 
-func (json *Json) FromStringAndMetadata(
+func (json *JSON) FromStringAndMetadata(
 	objectId string,
 	metadata *object_metadata.Metadata,
 	blobStore interfaces.BlobStore,
@@ -106,7 +105,7 @@ func (json *Json) FromStringAndMetadata(
 }
 
 // TODO accept blob store instead of env
-func (json *Json) FromTransacted(
+func (json *JSON) FromTransacted(
 	object *sku.Transacted,
 	blobStore interfaces.BlobStore,
 ) (err error) {
@@ -117,28 +116,32 @@ func (json *Json) FromTransacted(
 	)
 }
 
-func (json *Json) ToTransacted(
+func (json *JSON) ToTransacted(
 	object *sku.Transacted,
-	envRepo env_repo.Env,
+	blobStore interfaces.BlobStore,
 ) (err error) {
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+	if blobStore != nil {
+		var writeCloser interfaces.WriteCloseBlobIdGetter
 
-	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if writeCloser, err = blobStore.BlobWriter(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, writeCloser)
+
+		reader, repool := pool.GetStringReader(json.BlobString)
+		defer repool()
+
+		if _, err = io.Copy(writeCloser, reader); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		// TODO just compare blob digests
+		// TODO-P1 support states of blob vs blob sha
+		object.SetBlobSha(writeCloser.GetBlobId())
 	}
-
-	defer errors.DeferredCloser(&err, writeCloser)
-
-	reader, repool := pool.GetStringReader(json.BlobString)
-	defer repool()
-	if _, err = io.Copy(writeCloser, reader); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO-P1 support states of blob vs blob sha
-	object.SetBlobSha(writeCloser.GetBlobId())
 
 	if err = object.ObjectId.Set(json.ObjectId); err != nil {
 		err = errors.Wrap(err)
@@ -155,14 +158,14 @@ func (json *Json) ToTransacted(
 		return
 	}
 
-	var es ids.TagSet
+	var tagSet ids.TagSet
 
-	if es, err = ids.MakeTagSetStrings(json.Tags...); err != nil {
+	if tagSet, err = ids.MakeTagSetStrings(json.Tags...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	object.Metadata.SetTags(es)
+	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
 	object.Metadata.RepoPubkey = json.RepoPubkey.Data

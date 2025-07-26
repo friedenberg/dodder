@@ -97,7 +97,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	)
 	defer repoolBufferedWriter()
 
-	if err = object.CalculateObjectShas(); err != nil {
+	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,7 +124,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	}
 
 	// TODO why do we CalculateObjectShas twice?
-	if err = object.CalculateObjectShas(); err != nil {
+	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
