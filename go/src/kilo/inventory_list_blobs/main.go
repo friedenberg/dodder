@@ -84,7 +84,7 @@ func CollectSkuList(
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	iter := StreamInventoryListSkus(listFormat, reader)
+	iter := StreamInventoryList(listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
@@ -101,7 +101,7 @@ func CollectSkuList(
 	return
 }
 
-func StreamInventoryListSkus(
+func StreamInventoryList(
 	format sku.ListFormat,
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {

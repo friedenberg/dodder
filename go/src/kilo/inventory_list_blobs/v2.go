@@ -6,9 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -24,82 +22,6 @@ type V2 struct {
 
 func (format V2) GetType() ids.Type {
 	return ids.MustType(ids.TypeInventoryListV2)
-}
-
-func (format V2) WriteObjectToOpenList(
-	object *sku.Transacted,
-	list *sku.OpenList,
-) (n int64, err error) {
-	if !list.LastTai.Less(object.GetTai()) {
-		err = errors.Errorf(
-			"object order incorrect. Last: %s, current: %s",
-			list.LastTai,
-			object.GetTai(),
-		)
-
-		return
-	}
-
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
-	defer repoolBufferedWriter()
-
-	if n, err = format.EncodeTo(
-		object,
-		bufferedWriter,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if object.Metadata.RepoSig.IsEmpty() {
-		err = errors.Errorf("repo sig empty")
-		return
-	}
-
-	if len(object.Metadata.RepoPubkey) == 0 {
-		err = errors.Errorf("repo pubkey empty")
-		return
-	}
-
-	if err = bufferedWriter.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	list.LastTai = object.GetTai()
-	list.Len += 1
-
-	return
-}
-
-func (format V2) StreamInventoryListBlobSkus(
-	bufferedReader *bufio.Reader,
-) interfaces.SeqError[*sku.Transacted] {
-	return func(yield func(*sku.Transacted, error) bool) {
-		for {
-			object := sku.GetTransactedPool().Get()
-			// TODO Fix upstream issues with repooling
-			// defer sku.GetTransactedPool().Put(object)
-
-			if _, err := format.V2ObjectCoder.DecodeFrom(
-				object,
-				bufferedReader,
-			); err != nil {
-				if errors.IsEOF(err) {
-					err = nil
-					break
-				} else {
-					if !yield(nil, err) {
-						break
-					}
-				}
-			}
-
-			if !yield(object, nil) {
-				break
-			}
-		}
-	}
 }
 
 type V2ObjectCoder struct {

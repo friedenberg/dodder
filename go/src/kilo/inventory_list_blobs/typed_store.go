@@ -266,37 +266,33 @@ func (store TypedStore) ReadInventoryListObject(
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
+	var format sku.ListFormat
+
 	switch tipe.String() {
 	case ids.TypeInventoryListV1:
-		iter := store.v1.StreamInventoryListBlobSkus(reader)
-		for sk, iterErr := range iter {
-			if iterErr != nil {
-				err = errors.Wrap(iterErr)
-				return
-			}
-
-			if out == nil {
-				out = sk.CloneTransacted()
-			} else {
-				err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
-				return
-			}
-		}
+		format = store.v1
 
 	case ids.TypeInventoryListV2:
-		iter := store.v2.StreamInventoryListBlobSkus(reader)
-		for sk, iterErr := range iter {
-			if iterErr != nil {
-				err = errors.Wrap(iterErr)
-				return
-			}
+		format = store.v2
 
-			if out == nil {
-				out = sk.CloneTransacted()
-			} else {
-				err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
-				return
-			}
+	default:
+		err = errors.Errorf("unsupported inventory list type: %q", tipe)
+		return
+	}
+
+	iter := StreamInventoryList(format, reader)
+
+	for object, iterErr := range iter {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		if out == nil {
+			out = object.CloneTransacted()
+		} else {
+			err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
+			return
 		}
 	}
 
@@ -319,7 +315,7 @@ func (store TypedStore) ReadInventoryListBlob(
 		listFormat = store.v2
 	}
 
-	iter := StreamInventoryListSkus(listFormat, reader)
+	iter := StreamInventoryList(listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
