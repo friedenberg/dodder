@@ -52,7 +52,7 @@ func (cmd LocalArchive) MakeLocalArchive(
 		return &inventoryListStore
 
 	case repo_type.TypeWorkingCopy:
-		return local_working_copy.MakeWithLayout(
+		return local_working_copy.MakeWithEnvRepo(
 			local_working_copy.OptionsEmpty,
 			envRepo,
 		)

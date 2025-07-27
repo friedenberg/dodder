@@ -4,11 +4,19 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
 func init() {
-	command.Register("init", &Init{})
+	bigBang := env_repo.BigBang{}
+	bigBang.SetDefaults()
+
+	command.Register("init", &Init{
+		Genesis: command_components.Genesis{
+			BigBang: bigBang,
+		},
+	})
 }
 
 type Init struct {

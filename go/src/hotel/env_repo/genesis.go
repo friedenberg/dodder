@@ -32,6 +32,10 @@ func (env *Env) Genesis(bigBang BigBang) {
 		return
 	}
 
+	bigBang.GenesisConfig.Blob.SetInventoryListTypeString(
+		bigBang.InventoryListType.String(),
+	)
+
 	env.config.Type = bigBang.GenesisConfig.Type
 	env.config.Blob = bigBang.GenesisConfig.Blob
 
@@ -77,8 +81,6 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.setupStores()
 }
 
-// TODO determine if this is necessary, it appears to be writing an empty
-// inventory list
 func (env Env) writeInventoryListLog() {
 	var file *os.File
 
@@ -99,7 +101,7 @@ func (env Env) writeInventoryListLog() {
 	}
 
 	tipe := ids.GetOrPanic(
-		ids.TypeInventoryListVCurrent,
+		env.config.Blob.GetInventoryListTypeString(),
 	).Type
 
 	subject := triple_hyphen_io.TypedBlobEmpty{

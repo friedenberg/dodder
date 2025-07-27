@@ -56,6 +56,11 @@ func init() {
 	registerBuiltinTypeString(TypeInventoryListV0, genres.InventoryList, false)
 	registerBuiltinTypeString(TypeInventoryListV1, genres.InventoryList, false)
 	registerBuiltinTypeString(TypeInventoryListV2, genres.InventoryList, true)
+	registerBuiltinTypeString(
+		TypeInventoryListJsonV0,
+		genres.InventoryList,
+		false,
+	)
 	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
 	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)

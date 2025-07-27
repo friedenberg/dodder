@@ -130,6 +130,7 @@ func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
+// TODO rename
 func (store *Store) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
 	return store.getTypedBlobStore()
 }
@@ -143,19 +144,11 @@ func (store *Store) Flush() (err error) {
 func (store *Store) FormatForVersion(
 	storeVersion interfaces.StoreVersion,
 ) sku.ListFormat {
-	if store_version.LessOrEqual(
-		storeVersion,
-		store_version.V9,
-	) {
-		return inventory_list_coders.DoddishV1{
-			Box: store.box,
-		}
-	} else {
-		return inventory_list_coders.DoddishV2{
-			Box:                    store.box,
-			ImmutableConfigPrivate: store.envRepo.GetConfigPrivate().Blob,
-		}
-	}
+	tipe := ids.GetOrPanic(
+		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
+	).Type
+
+	return store.getTypedBlobStore().GetCoderForType(tipe)
 }
 
 func (store *Store) GetTai() ids.Tai {

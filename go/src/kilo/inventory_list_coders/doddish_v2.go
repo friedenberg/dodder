@@ -16,16 +16,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
-type DoddishV2 struct {
+type doddishV2 struct {
 	Box                    *box_format.BoxTransacted
 	ImmutableConfigPrivate genesis_configs.ConfigPrivate
 }
 
-func (coder DoddishV2) GetType() ids.Type {
-	return ids.MustType(ids.TypeInventoryListV2)
-}
-
-func (coder DoddishV2) EncodeTo(
+func (coder doddishV2) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -61,7 +57,7 @@ func (coder DoddishV2) EncodeTo(
 	return
 }
 
-func (coder DoddishV2) DecodeFrom(
+func (coder doddishV2) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {

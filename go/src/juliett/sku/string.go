@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-func String(o *Transacted) (str string) {
-	return StringMetadataTai(o)
+func String(object *Transacted) (str string) {
+	return StringMetadataTai(object)
 }
 
 func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
@@ -37,15 +37,15 @@ func StringObjectIdBlobMetadataSansTai(o *Transacted) (str string) {
 	return
 }
 
-func StringMetadataTai(o *Transacted) (str string) {
-	t := o.GetTai()
-	t1 := ids.MakeTaiRFC3339Value(t)
+func StringMetadataTai(object *Transacted) (str string) {
+	tai := object.GetTai()
+	taiFormatted := ids.MakeTaiRFC3339Value(tai)
 
 	return fmt.Sprintf(
 		"%s (%s) %s",
-		t,
-		t1,
-		StringMetadataSansTai(o),
+		tai,
+		taiFormatted,
+		StringMetadataSansTai(object),
 	)
 }
 

@@ -34,10 +34,7 @@ type InventoryListStore interface {
 }
 
 // TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
-type ListFormat interface {
-	GetType() ids.Type
-	interfaces.CoderBufferedReadWriter[*Transacted]
-}
+type ListFormat = interfaces.CoderBufferedReadWriter[*Transacted]
 
 // TODO rename to ListTransacted
 type List = heap.Heap[Transacted, *Transacted]

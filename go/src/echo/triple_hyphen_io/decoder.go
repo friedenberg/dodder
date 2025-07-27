@@ -15,12 +15,12 @@ type Decoder[BLOB any] struct {
 	Metadata, Blob  interfaces.DecoderFromBufferedReader[BLOB]
 }
 
-func (mr *Decoder[BLOB]) DecodeFrom(
+func (decoder *Decoder[BLOB]) DecodeFrom(
 	blob BLOB,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.readMetadataFrom(blob, bufferedReader)
+	n1, err = decoder.readMetadataFrom(blob, bufferedReader)
 	n += n1
 
 	if err != nil {
@@ -28,7 +28,7 @@ func (mr *Decoder[BLOB]) DecodeFrom(
 		return
 	}
 
-	n1, err = mr.Blob.DecodeFrom(blob, bufferedReader)
+	n1, err = decoder.Blob.DecodeFrom(blob, bufferedReader)
 	n += n1
 
 	if err != nil {

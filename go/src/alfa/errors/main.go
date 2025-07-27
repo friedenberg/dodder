@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
@@ -53,6 +54,10 @@ func WrapSkip(
 	skip int,
 	err error,
 ) (errWrapped *stackWrapError) {
+	if err == io.EOF {
+		panic("trying to wrap io.EOF")
+	}
+
 	if err == nil {
 		return
 	}
@@ -103,18 +108,26 @@ func WrapN(n int, in error) (err error) {
 
 //go:noinline
 func Wrap(in error) error {
+	if in == io.EOF {
+		return in
+	}
+
 	return WrapSkip(thisSkip, in)
 }
 
 //go:noinline
-func Wrapf(in error, f string, values ...any) error {
+func Wrapf(in error, format string, values ...any) error {
+	if in == io.EOF {
+		panic("trying to wrap io.EOF")
+	}
+
 	if in == nil {
 		return nil
 	}
 
 	return &stackWrapError{
 		Frame: stack_frame.MustFrame(thisSkip),
-		error: fmt.Errorf(f, values...),
+		error: fmt.Errorf(format, values...),
 		next:  WrapSkip(thisSkip, in),
 	}
 }

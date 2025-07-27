@@ -76,10 +76,10 @@ func Make(
 		}
 	}
 
-	return MakeWithLayout(options, repoLayout)
+	return MakeWithEnvRepo(options, repoLayout)
 }
 
-func MakeWithLayout(
+func MakeWithEnvRepo(
 	options Options,
 	envRepo env_repo.Env,
 ) (repo *Repo) {

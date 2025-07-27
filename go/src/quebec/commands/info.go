@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 )
@@ -47,6 +48,7 @@ func (cmd Info) Run(req command.Request) {
 
 	defaultGenesisConfig := genesis_configs.DefaultWithVersion(
 		store_version.VCurrent,
+		ids.TypeInventoryListVCurrent,
 	).Blob
 
 	defaultBlobStoreConfig := blob_store_configs.Default().Blob

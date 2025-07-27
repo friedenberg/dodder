@@ -242,3 +242,25 @@ function init_with_age { # @test
 	assert_output
 }
 
+function init_with_json_inventory_list_type { # @test
+	run_dodder init \
+		-yin <(cat_yin) \
+		-yang <(cat_yang) \
+		-age-identity generate \
+		-inventory_list-type inventory_list-json-v0 \
+		test-repo-id
+
+	# TODO add assertion about json type
+
+	assert_success
+	assert_output - <<-EOM
+		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
+	EOM
+
+	run test -f .xdg/data/dodder/config-permanent
+
+	run_dodder info-repo blob_stores-0-encryption
+	assert_success
+	assert_output
+}

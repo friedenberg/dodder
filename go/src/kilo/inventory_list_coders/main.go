@@ -2,6 +2,7 @@ package inventory_list_coders
 
 import (
 	"bufio"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -22,7 +23,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListFormat {
-		return DoddishV1{
+		return doddishV1{
 			Box: box,
 		}
 	},
@@ -30,7 +31,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListFormat {
-		return DoddishV2{
+		return doddishV2{
 			Box:                    box,
 			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
 		}
@@ -39,16 +40,16 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListFormat {
-		return JSONV0{
+		return jsonV0{
 			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
 		}
 	},
 }
 
 var (
-	_ sku.ListFormat = DoddishV1{}
-	_ sku.ListFormat = DoddishV2{}
-	_ sku.ListFormat = JSONV0{}
+	_ sku.ListFormat = doddishV1{}
+	_ sku.ListFormat = doddishV2{}
+	_ sku.ListFormat = jsonV0{}
 )
 
 func WriteObjectToOpenList(
@@ -192,12 +193,12 @@ func WriteInventoryListObject(
 	return
 }
 
-type IterCoder struct {
+type SeqCoder struct {
 	ctx interfaces.ActiveContext
 	sku.ListFormat
 }
 
-func (coder IterCoder) DecodeFrom(
+func (coder SeqCoder) DecodeFrom(
 	yield func(*sku.Transacted) bool,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
@@ -209,7 +210,7 @@ func (coder IterCoder) DecodeFrom(
 		// defer sku.GetTransactedPool().Put(object)
 
 		if _, err = coder.ListFormat.DecodeFrom(object, bufferedReader); err != nil {
-			if errors.IsEOF(err) {
+			if err == io.EOF {
 				err = nil
 				break
 			} else {
@@ -219,6 +220,43 @@ func (coder IterCoder) DecodeFrom(
 		}
 
 		if !yield(object) {
+			return
+		}
+	}
+
+	return
+}
+
+type SeqErrorCoder struct {
+	ctx interfaces.ActiveContext
+	sku.ListFormat
+}
+
+func (coder SeqErrorCoder) DecodeFrom(
+	yield func(*sku.Transacted, error) bool,
+	bufferedReader *bufio.Reader,
+) (n int64, err error) {
+	for {
+		errors.ContextContinueOrPanic(coder.ctx)
+
+		object := sku.GetTransactedPool().Get()
+		// TODO Fix upstream issues with repooling
+		// defer sku.GetTransactedPool().Put(object)
+
+		if _, err = coder.ListFormat.DecodeFrom(object, bufferedReader); err != nil {
+			if err == io.EOF {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+
+				if !yield(nil, err) {
+					return
+				}
+			}
+		}
+
+		if !yield(object, nil) {
 			return
 		}
 	}

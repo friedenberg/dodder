@@ -151,25 +151,22 @@ func (blobStore *blobStoreV1) IterAllInventoryLists() interfaces.SeqError[*sku.T
 			}
 		}
 
+		defer errors.ContextMustClose(blobStore.envRepo, file)
+
 		seq := blobStore.typedBlobStore.AllDecodedObjectsFromStream(
 			file,
 		)
 
-		for sk, err := range seq {
+		for object, err := range seq {
 			if err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
 			}
 
-			if !yield(sk, nil) {
+			if !yield(object, nil) {
 				return
 			}
-		}
-
-		if err := file.Close(); err != nil {
-			yield(nil, errors.Wrap(err))
-			return
 		}
 	}
 }

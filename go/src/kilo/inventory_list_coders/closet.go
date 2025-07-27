@@ -3,6 +3,7 @@ package inventory_list_coders
 import (
 	"bufio"
 	"io"
+	"maps"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -15,6 +16,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
+type (
+	funcIterSeq      = func(*sku.Transacted) bool
+	funcIterSeqError = func(*sku.Transacted, error) bool
+)
+
 type Closet struct {
 	envRepo   env_repo.Env
 	boxFormat *box_format.BoxTransacted
@@ -23,7 +29,8 @@ type Closet struct {
 
 	objectCoders triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
 
-	streamDecoders map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool]
+	seqDecoders      map[string]interfaces.DecoderFromBufferedReader[funcIterSeq]
+	seqErrorDecoders map[string]interfaces.DecoderFromBufferedReader[funcIterSeqError]
 }
 
 func MakeCloset(
@@ -47,9 +54,7 @@ func MakeCloset(
 			len(store.coders),
 		)
 
-		for tipe, coder := range store.coders {
-			coders[tipe] = coder
-		}
+		maps.Copy(coders, store.coders)
 
 		store.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted](
 			coders,
@@ -58,18 +63,34 @@ func MakeCloset(
 
 	{
 		coders := make(
-			map[string]interfaces.DecoderFromBufferedReader[func(*sku.Transacted) bool],
+			map[string]interfaces.DecoderFromBufferedReader[funcIterSeq],
 			len(store.coders),
 		)
 
 		for tipe, coder := range store.coders {
-			coders[tipe] = IterCoder{
+			coders[tipe] = SeqCoder{
 				ctx:        envRepo,
 				ListFormat: coder,
 			}
 		}
 
-		store.streamDecoders = coders
+		store.seqDecoders = coders
+	}
+
+	{
+		coders := make(
+			map[string]interfaces.DecoderFromBufferedReader[funcIterSeqError],
+			len(store.coders),
+		)
+
+		for tipe, coder := range store.coders {
+			coders[tipe] = SeqErrorCoder{
+				ctx:        envRepo,
+				ListFormat: coder,
+			}
+		}
+
+		store.seqErrorDecoders = coders
 	}
 
 	return store
@@ -77,6 +98,16 @@ func MakeCloset(
 
 func (store Closet) GetBoxFormat() *box_format.BoxTransacted {
 	return store.boxFormat
+}
+
+func (store Closet) GetCoderForType(tipe ids.Type) sku.ListFormat {
+	format, ok := store.coders[tipe.String()]
+
+	if !ok {
+		panic(errors.Errorf("unsupported inventory list type: %q", tipe))
+	}
+
+	return format
 }
 
 func (store Closet) WriteObjectToWriter(
@@ -120,8 +151,6 @@ func (store Closet) WriteBlobToWriter(
 
 	return
 }
-
-type iterSku = func(*sku.Transacted) bool
 
 // TODO refactor all the below. Simplify the naming, and move away from the
 // stream coders, instead use a utility function like in triple_hyphen_io
@@ -170,10 +199,10 @@ func (store Closet) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[iterSku]]{
-			Metadata: triple_hyphen_io.TypedMetadataCoder[iterSku]{},
-			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-				store.streamDecoders,
+		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[funcIterSeq]]{
+			Metadata: triple_hyphen_io.TypedMetadataCoder[funcIterSeq]{},
+			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
+				store.seqDecoders,
 			),
 		}
 
@@ -181,15 +210,15 @@ func (store Closet) AllDecodedObjectsFromStream(
 		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
+			&triple_hyphen_io.TypedBlob[funcIterSeq]{
 				Type: ids.Type{},
-				Blob: func(sk *sku.Transacted) bool {
-					return yield(sk, nil)
+				Blob: func(object *sku.Transacted) bool {
+					return yield(object, nil)
 				},
 			},
 			bufferedReader,
 		); err != nil {
-			yield(nil, err)
+			yield(nil, errors.Wrap(err))
 			return
 		}
 	}
@@ -198,7 +227,7 @@ func (store Closet) AllDecodedObjectsFromStream(
 func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
-	blobSha interfaces.BlobId,
+	blobId interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var readCloser interfaces.ReadCloseBlobIdGetter
@@ -206,7 +235,7 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 		{
 			var err error
 
-			if readCloser, err = blobStore.BlobReader(blobSha); err != nil {
+			if readCloser, err = blobStore.BlobReader(blobId); err != nil {
 				yield(nil, errors.Wrap(err))
 				return
 			}
@@ -214,8 +243,8 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-			store.streamDecoders,
+		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
+			store.seqDecoders,
 		)
 
 		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
@@ -224,7 +253,7 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
+			&triple_hyphen_io.TypedBlob[funcIterSeq]{
 				Type: tipe,
 				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)
@@ -243,15 +272,15 @@ func (store Closet) IterInventoryListBlobSkusFromReader(
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[iterSku](
-			store.streamDecoders,
+		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
+			store.seqDecoders,
 		)
 
 		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(reader)
 		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[iterSku]{
+			&triple_hyphen_io.TypedBlob[funcIterSeq]{
 				Type: tipe,
 				Blob: func(sk *sku.Transacted) bool {
 					return yield(sk, nil)

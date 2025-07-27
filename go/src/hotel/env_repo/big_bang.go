@@ -25,6 +25,9 @@ type BigBang struct {
 
 func (bigBang *BigBang) SetDefaults() {
 	bigBang.GenesisConfig = genesis_configs.Default()
+	bigBang.InventoryListType = ids.GetOrPanic(
+		ids.TypeInventoryListVCurrent,
+	).Type
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
 		bigBang.TypedBlobStoreConfig = blob_store_configs.Default()

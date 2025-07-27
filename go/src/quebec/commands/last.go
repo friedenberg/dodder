@@ -47,6 +47,7 @@ type Last struct {
 func (cmd *Last) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.LocalArchive.SetFlagSet(flagSet)
 
+	// TODO remove
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 	flagSet.Var(&cmd.Format, "format", "format")
 	flagSet.BoolVar(&cmd.Organize, "organize", false, "")
@@ -59,19 +60,19 @@ func (cmd Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Last) Run(dep command.Request) {
-	repoLayout := cmd.MakeEnvRepo(dep, false)
+func (cmd Last) Run(req command.Request) {
+	envRepo := cmd.MakeEnvRepo(req, false)
 
-	archive := cmd.MakeLocalArchive(repoLayout)
+	archive := cmd.MakeLocalArchive(envRepo)
 
-	if len(dep.PopArgs()) != 0 {
+	if len(req.PopArgs()) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
 	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
 		cmd.runLocalWorkingCopy(localWorkingCopy)
 	} else {
-		cmd.runArchive(repoLayout, archive)
+		cmd.runArchive(envRepo, archive)
 	}
 }
 

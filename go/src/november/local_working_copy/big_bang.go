@@ -16,7 +16,7 @@ func Genesis(
 	bigBang env_repo.BigBang,
 	envRepo env_repo.Env,
 ) (repo *Repo) {
-	repo = MakeWithLayout(OptionsEmpty, envRepo)
+	repo = MakeWithEnvRepo(OptionsEmpty, envRepo)
 
 	if err := repo.dormantIndex.Flush(
 		repo.GetEnvRepo(),

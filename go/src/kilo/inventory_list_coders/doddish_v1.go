@@ -6,20 +6,15 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
-type DoddishV1 struct {
+type doddishV1 struct {
 	Box *box_format.BoxTransacted
 }
 
-func (coder DoddishV1) GetType() ids.Type {
-	return ids.MustType(ids.TypeInventoryListV1)
-}
-
-func (coder DoddishV1) EncodeTo(
+func (coder doddishV1) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -50,7 +45,7 @@ func (coder DoddishV1) EncodeTo(
 	return
 }
 
-func (coder DoddishV1) DecodeFrom(
+func (coder doddishV1) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {

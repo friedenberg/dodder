@@ -103,6 +103,8 @@ func IsNotNilAndNotEOF(err error) bool {
 	return true
 }
 
+// TODO remove and fix calling sites / wrapping. There is an infinite recursion
+// here.
 func IsEOF(err error) bool {
 	if err == nil {
 		return false

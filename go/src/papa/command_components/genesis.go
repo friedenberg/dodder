@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -20,15 +21,15 @@ type Genesis struct {
 	LocalArchive
 }
 
-func (cmd *Genesis) SetFlagSet(f *flag.FlagSet) {
-	cmd.BigBang.SetFlagSet(f)
+func (cmd *Genesis) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.BigBang.SetFlagSet(flagSet)
 }
 
 func (cmd Genesis) OnTheFirstDay(
 	req command.Request,
 	repoIdString string,
 ) repo.LocalRepo {
-	ui := env_ui.Make(
+	envUI := env_ui.Make(
 		req,
 		req.Blob,
 		env_ui.Options{},
@@ -37,7 +38,7 @@ func (cmd Genesis) OnTheFirstDay(
 	var repoId ids.RepoId
 
 	if err := repoId.Set(repoIdString); err != nil {
-		ui.Cancel(err)
+		envUI.Cancel(err)
 	}
 
 	cmd.GenesisConfig.Blob.SetRepoId(repoId)
@@ -59,14 +60,15 @@ func (cmd Genesis) OnTheFirstDay(
 		var err error
 
 		if envRepo, err = env_repo.Make(
-			env_local.Make(ui, dir),
+			env_local.Make(envUI, dir),
 			options,
 		); err != nil {
-			ui.Cancel(err)
+			envUI.Cancel(err)
 		}
 	}
 
 	envRepo.Genesis(cmd.BigBang)
+	defer ui.Log().Print("genesis done")
 
 	switch cmd.BigBang.GenesisConfig.Blob.GetRepoType() {
 	case repo_type.TypeWorkingCopy:

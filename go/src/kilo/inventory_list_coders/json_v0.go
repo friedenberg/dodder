@@ -15,15 +15,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 )
 
-type JSONV0 struct {
+type jsonV0 struct {
 	ImmutableConfigPrivate genesis_configs.ConfigPrivate
 }
 
-func (coder JSONV0) GetType() ids.Type {
-	return ids.MustType(ids.TypeInventoryListV2)
-}
-
-func (coder JSONV0) EncodeTo(
+func (coder jsonV0) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -54,7 +50,7 @@ func (coder JSONV0) EncodeTo(
 	return
 }
 
-func (coder JSONV0) DecodeFrom(
+func (coder jsonV0) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
@@ -73,8 +69,8 @@ func (coder JSONV0) DecodeFrom(
 	}
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
-		sh := sha.MustWithDigester(object.GetTai())
-		defer digests.PutBlobId(sh)
+		digest := sha.MustWithDigester(object.GetTai())
+		defer digests.PutBlobId(digest)
 
 		if len(object.Metadata.RepoPubkey) == 0 {
 			err = errors.ErrorWithStackf(
@@ -96,7 +92,7 @@ func (coder JSONV0) DecodeFrom(
 
 		if err = repo_signing.VerifySignature(
 			object.Metadata.RepoPubkey,
-			sh.GetBytes(),
+			digest.GetBytes(),
 			object.Metadata.RepoSig,
 		); err != nil {
 			err = errors.Wrapf(

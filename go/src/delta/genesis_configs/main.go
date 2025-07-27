@@ -49,11 +49,15 @@ type (
 )
 
 func Default() *TypedConfigPrivateMutable {
-	return DefaultWithVersion(store_version.VCurrent)
+	return DefaultWithVersion(
+		store_version.VCurrent,
+		ids.TypeInventoryListV2,
+	)
 }
 
 func DefaultWithVersion(
 	storeVersion store_version.Version,
+	inventoryListTypeString string,
 ) *TypedConfigPrivateMutable {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		return &TypedConfigPrivateMutable{
@@ -68,7 +72,7 @@ func DefaultWithVersion(
 						CompressionType:   compression_type.CompressionTypeDefault,
 						LockInternalFiles: true,
 					},
-					InventoryListType: ids.TypeInventoryListV2,
+					InventoryListType: inventoryListTypeString,
 				},
 			},
 		}
@@ -81,7 +85,7 @@ func DefaultWithVersion(
 				TomlV2Common: TomlV2Common{
 					StoreVersion:      storeVersion,
 					RepoType:          repo_type.TypeWorkingCopy,
-					InventoryListType: ids.TypeInventoryListV2,
+					InventoryListType: inventoryListTypeString,
 				},
 			},
 		}
