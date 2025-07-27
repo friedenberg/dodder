@@ -64,45 +64,45 @@ func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
 	return
 }
 
-func (t Tai) AsTime() (t1 thyme.Time) {
-	t1 = thyme.Tyme(t.tai.AsTime().Local())
+func (tai Tai) AsTime() (t1 thyme.Time) {
+	t1 = thyme.Tyme(tai.tai.AsTime().Local())
 	return
 }
 
-func (a Tai) Before(b Tai) bool {
-	return a.tai.Before(b.tai)
+func (tai Tai) Before(b Tai) bool {
+	return tai.tai.Before(b.tai)
 }
 
-func (a Tai) After(b Tai) bool {
-	return a.tai.After(b.tai)
+func (tai Tai) After(b Tai) bool {
+	return tai.tai.After(b.tai)
 }
 
-func (t Tai) GetGenre() interfaces.Genre {
+func (tai Tai) GetGenre() interfaces.Genre {
 	return genres.InventoryList
 }
 
-func (t Tai) Parts() [3]string {
-	a := strings.TrimRight(fmt.Sprintf("%018d", t.Asec), "0")
+func (tai Tai) Parts() [3]string {
+	a := strings.TrimRight(fmt.Sprintf("%018d", tai.Asec), "0")
 
 	if a == "" {
 		a = "0"
 	}
 
-	return [3]string{strconv.FormatInt(t.Sec, 10), ".", a}
+	return [3]string{strconv.FormatInt(tai.Sec, 10), ".", a}
 }
 
-func (i Tai) GetObjectIdString() string {
-	return i.String()
+func (tai Tai) GetObjectIdString() string {
+	return tai.String()
 }
 
-func (t Tai) String() (v string) {
-	a := strings.TrimRight(fmt.Sprintf("%018d", t.Asec), "0")
+func (tai Tai) String() (v string) {
+	a := strings.TrimRight(fmt.Sprintf("%018d", tai.Asec), "0")
 
 	if a == "" {
 		a = "0"
 	}
 
-	v = fmt.Sprintf("%s.%s", strconv.FormatInt(t.Sec, 10), a)
+	v = fmt.Sprintf("%s.%s", strconv.FormatInt(tai.Sec, 10), a)
 
 	// if v == "0.0" {
 	// 	panic("empty tai")
@@ -111,17 +111,17 @@ func (t Tai) String() (v string) {
 	return
 }
 
-func (t Tai) StringDefaultFormat() string {
+func (tai Tai) StringDefaultFormat() string {
 	f := string_format_writer.StringFormatDateTime + ".000000000"
-	return t.Format(f)
+	return tai.Format(f)
 }
 
-func (t Tai) Format(v string) string {
-	return t.AsTime().Format(v)
+func (tai Tai) Format(v string) string {
+	return tai.AsTime().Format(v)
 }
 
-func (t *Tai) SetFromRFC3339(v string) (err error) {
-	t.wasSet = true
+func (tai *Tai) SetFromRFC3339(v string) (err error) {
+	tai.wasSet = true
 
 	var t1 time.Time
 
@@ -130,47 +130,50 @@ func (t *Tai) SetFromRFC3339(v string) (err error) {
 		return
 	}
 
-	*t = TaiFromTime1(t1)
+	*tai = TaiFromTime1(t1)
 
 	return
 }
 
-func (t *Tai) Set(v string) (err error) {
-	t.wasSet = true
+func (tai *Tai) Set(value string) (err error) {
+	tai.wasSet = true
 
-	reader, repool := pool.GetStringReader(v)
+	reader, repool := pool.GetStringReader(value)
 	defer repool()
+
 	delimiterReader := delim_io.Make('.', reader)
 	defer delim_io.PutReader(delimiterReader)
 
 	idx := 0
 	var val string
 
-	for {
+	var isEOF bool
+
+	for !isEOF {
 		val, err = delimiterReader.ReadOneString()
+
+		if err == io.EOF {
+			isEOF = true
+			err = nil
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		switch idx {
 		case 0:
-			if err = errors.WrapExcept(err, io.EOF); err != nil {
-				return
-			}
-
 			val = strings.TrimSpace(val)
 
 			if len(val) == 0 {
 				break
 			}
 
-			if t.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
-				err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
+			if tai.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
+				err = errors.Wrapf(err, "failed to parse Sec time: %s", value)
 				return
 			}
 
 		case 1:
-			if err = errors.WrapExceptAsNil(err, io.EOF); err != nil {
-				return
-			}
-
 			val = strings.TrimSpace(val)
 			val = strings.TrimRight(val, "0")
 
@@ -185,63 +188,63 @@ func (t *Tai) Set(v string) (err error) {
 				return
 			}
 
-			t.Asec = pre * int64(math.Pow10(18-len(val)))
+			tai.Asec = pre * int64(math.Pow10(18-len(val)))
 
 		default:
-			if err == io.EOF {
-				err = nil
-			} else {
-				err = errors.ErrorWithStackf("expected no more elements but got %s", val)
-			}
-
+			err = errors.ErrorWithStackf(
+				"expected no more elements but got %s",
+				val,
+			)
 			return
 		}
 
 		idx++
 	}
-}
 
-func (t Tai) GetBlobId() interfaces.BlobId {
-	return sha.FromStringContent(t.String())
-}
-
-func (t Tai) IsZero() (ok bool) {
-	ok = (t.Sec == 0 && t.Asec == 0) || !t.wasSet
 	return
 }
 
-func (t Tai) IsEmpty() (ok bool) {
-	ok = t.IsZero()
+func (tai Tai) GetBlobId() interfaces.BlobId {
+	return sha.FromStringContent(tai.String())
+}
+
+func (tai Tai) IsZero() (ok bool) {
+	ok = (tai.Sec == 0 && tai.Asec == 0) || !tai.wasSet
 	return
 }
 
-func (t Tai) GetTai() Tai {
-	return t
+func (tai Tai) IsEmpty() (ok bool) {
+	ok = tai.IsZero()
+	return
 }
 
-func (t *Tai) Reset() {
-	t.Sec = 0
-	t.Asec = 0
-	t.wasSet = false
+func (tai Tai) GetTai() Tai {
+	return tai
 }
 
-func (t *Tai) ResetWith(b Tai) {
-	t.Sec = b.Sec
-	t.Asec = b.Asec
-	t.wasSet = b.wasSet
+func (tai *Tai) Reset() {
+	tai.Sec = 0
+	tai.Asec = 0
+	tai.wasSet = false
 }
 
-func (t Tai) WriteTo(w io.Writer) (n int64, err error) {
+func (tai *Tai) ResetWith(b Tai) {
+	tai.Sec = b.Sec
+	tai.Asec = b.Asec
+	tai.wasSet = b.wasSet
+}
+
+func (tai Tai) WriteTo(w io.Writer) (n int64, err error) {
 	b := make([]byte, binary.MaxVarintLen64*2)
-	binary.PutVarint(b[:binary.MaxVarintLen64], t.Sec)
-	binary.PutVarint(b[binary.MaxVarintLen64:], t.Asec)
+	binary.PutVarint(b[:binary.MaxVarintLen64], tai.Sec)
+	binary.PutVarint(b[binary.MaxVarintLen64:], tai.Asec)
 	var n1 int
 	n1, err = ohio.WriteAllOrDieTrying(w, b)
 	n += int64(n1)
 	return
 }
 
-func (t *Tai) ReadFrom(r io.Reader) (n int64, err error) {
+func (tai *Tai) ReadFrom(r io.Reader) (n int64, err error) {
 	b := make([]byte, binary.MaxVarintLen64*2)
 
 	var n1 int
@@ -253,62 +256,62 @@ func (t *Tai) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	t.wasSet = true
-	t.Sec, _ = binary.Varint(b[:binary.MaxVarintLen64])
-	t.Asec, _ = binary.Varint(b[binary.MaxVarintLen64:])
+	tai.wasSet = true
+	tai.Sec, _ = binary.Varint(b[:binary.MaxVarintLen64])
+	tai.Asec, _ = binary.Varint(b[binary.MaxVarintLen64:])
 
 	return
 }
 
-func (t Tai) MarshalText() (text []byte, err error) {
-	ui.Err().Printf(t.String())
-	text = []byte(t.String())
+func (tai Tai) MarshalText() (text []byte, err error) {
+	ui.Err().Printf(tai.String())
+	text = []byte(tai.String())
 
 	return
 }
 
-func (t *Tai) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tai *Tai) UnmarshalText(text []byte) (err error) {
+	if err = tai.Set(string(text)); err != nil {
 		return
 	}
 
 	return
 }
 
-func (t Tai) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (tai Tai) MarshalBinary() (text []byte, err error) {
+	text = []byte(tai.String())
 
 	return
 }
 
-func (t *Tai) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tai *Tai) UnmarshalBinary(text []byte) (err error) {
+	if err = tai.Set(string(text)); err != nil {
 		return
 	}
 
 	return
 }
 
-func (a Tai) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (tai Tai) EqualsAny(b any) bool {
+	return values.Equals(tai, b)
 }
 
-func (t Tai) Equals(t1 Tai) bool {
-	if !t.Eq(t1.tai) {
+func (tai Tai) Equals(t1 Tai) bool {
+	if !tai.Eq(t1.tai) {
 		return false
 	}
 
 	return true
 }
 
-func (t Tai) Less(t1 Tai) bool {
-	return t.Before(t1)
+func (tai Tai) Less(t1 Tai) bool {
+	return tai.Before(t1)
 }
 
-func (t Tai) SortCompare(t1 Tai) quiter.SortCompare {
-	if t.Equals(t1) {
+func (tai Tai) SortCompare(t1 Tai) quiter.SortCompare {
+	if tai.Equals(t1) {
 		return quiter.SortCompareEqual
-	} else if t.Before(t1) {
+	} else if tai.Before(t1) {
 		return quiter.SortCompareLess
 	} else {
 		return quiter.SortCompareGreater

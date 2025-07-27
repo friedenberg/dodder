@@ -280,7 +280,7 @@ func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 		if read == toRead && err == io.EOF {
 			err = nil
 		} else {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 	}

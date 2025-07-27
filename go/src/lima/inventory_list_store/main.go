@@ -431,13 +431,12 @@ func (store *Store) IterInventoryList(
 	)
 }
 
-func (store *Store) ReadLast() (max *sku.Transacted, err error) {
-	max = sku.GetTransactedPool().Get()
+func (store *Store) ReadLast() (*sku.Transacted, error) {
+	max := sku.GetTransactedPool().Get()
 
-	for list, iterErr := range store.IterAllInventoryLists() {
-		if iterErr != nil {
-			err = errors.Wrap(iterErr)
-			return
+	for list, err := range store.IterAllInventoryLists() {
+		if err != nil {
+			return nil, errors.Wrap(err)
 		}
 
 		if sku.TransactedLessor.LessPtr(max, list) {
@@ -445,7 +444,7 @@ func (store *Store) ReadLast() (max *sku.Transacted, err error) {
 		}
 	}
 
-	return
+	return max, nil
 }
 
 func (store *Store) ReadAllSorted(

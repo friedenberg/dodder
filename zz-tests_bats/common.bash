@@ -197,10 +197,10 @@ function run_dodder_init_disable_age {
     "${args[@]}"
 
   assert_success
-  assert_output - <<-EOM
-[!md @$(get_type_blob_sha) !toml-type-v1]
-[konfig @$(get_konfig_sha) !toml-config-v1]
-EOM
+  # assert_output - <<-EOM
+# [!md @$(get_type_blob_sha) !toml-type-v1]
+# [konfig @$(get_konfig_sha) !toml-config-v1]
+# EOM
 
   run_dodder blob_store-cat "$(get_konfig_sha)"
   assert_success

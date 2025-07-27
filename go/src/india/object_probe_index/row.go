@@ -36,7 +36,7 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	n += n1
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

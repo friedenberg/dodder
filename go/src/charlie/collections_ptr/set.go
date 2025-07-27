@@ -100,7 +100,7 @@ func (s Set[T, TPtr]) Contains(e T) (ok bool) {
 func (s Set[T, TPtr]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if errors.Is(err, errors.MakeErrStopIteration()) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -34,7 +34,7 @@ func (store *Store) ReadOneObjectId(
 	sk = sku.GetTransactedPool().Get()
 
 	if err = store.GetStreamIndex().ReadOneObjectId(k, sk); err != nil {
-		err = errors.WrapExcept(err, collections.ErrNotFound)
+		err = errors.WrapExceptSentinel(err, collections.ErrNotFound)
 		return
 	}
 

@@ -78,7 +78,7 @@ func (bf *binaryEncoder) writeFormat(
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -319,7 +319,7 @@ func (bf *binaryEncoder) writeFieldBinaryMarshaler(
 	}
 
 	if err != nil {
-		err = errors.WrapExceptAsNil(err, io.EOF)
+		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return
 	}
 

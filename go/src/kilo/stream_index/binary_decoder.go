@@ -142,11 +142,14 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 		n += int64(n1)
 
 		if err != nil {
-			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
+			if errors.IsEOF(err) {
+				// no-op
+				// TODO why might this ever be the case
+			} else if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
 			}
 
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 
 			return
 		}
@@ -160,7 +163,11 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 		n += n2
 
 		if err != nil {
-			err = errors.Wrapf(err, "ExpectedContentLenght: %d", contentLength64)
+			err = errors.Wrapf(
+				err,
+				"ExpectedContentLenght: %d",
+				contentLength64,
+			)
 			return
 		}
 
@@ -370,7 +377,7 @@ func (bf *binaryDecoder) readFieldKey(
 		var e tag_paths.PathWithType
 
 		if _, err = e.ReadFrom(&bf.Content); err != nil {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 

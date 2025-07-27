@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"syscall"
-	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -24,11 +23,6 @@ func Run(name string) {
 
 	if err := ctx.Run(
 		func(ctx interfaces.Context) {
-			go func() {
-				<-time.After(3 * time.Second)
-				os.Exit(1)
-			}()
-
 			commands.Run(ctx, os.Args...)
 		},
 	); err != nil {

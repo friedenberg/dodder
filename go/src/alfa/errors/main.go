@@ -3,6 +3,7 @@ package errors
 import (
 	"fmt"
 	"io"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
@@ -132,19 +133,18 @@ func Wrapf(in error, format string, values ...any) error {
 	}
 }
 
-// wrap the error with stack info unless it's one of the provided `except`
-// errors, in which case return nil.
+// Wrap the error with stack info unless it's one of the provided `except`
+// errors, in which case return nil. Direct value comparison is
+// performed (`in == except`) rather than errors.Is.
 //
 //go:noinline
-func WrapExceptAsNil(in error, except ...error) (err error) {
+func WrapExceptSentinelAsNil(in error, except ...error) (err error) {
 	if in == nil {
 		return
 	}
 
-	for _, anExcept := range except {
-		if Is(in, anExcept) {
-			return nil
-		}
+	if slices.Contains(except, in) {
+		return in
 	}
 
 	err = WrapSkip(thisSkip, in)
@@ -152,31 +152,23 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 	return
 }
 
-// wrap the error with stack info unless it's one of the provided `except`
-// errors, in which case return that bare error
+// Wrap the error with stack info unless it's one of the provided `except`
+// errors, in which case return that bare error. Direct value comparison is
+// performed (`in == except`) rather than errors.Is.
 //
 //go:noinline
-func WrapExcept(in error, except ...error) (err error) {
+func WrapExceptSentinel(in error, except ...error) (err error) {
 	if in == nil {
 		return
 	}
 
-	for _, e := range except {
-		if Is(in, e) {
-			return in
-		}
+	if slices.Contains(except, in) {
+		return in
 	}
 
 	err = WrapSkip(thisSkip, in)
 
 	return
-}
-
-var errImplement = New("not implemented")
-
-//go:noinline
-func Implement() (err error) {
-	return WrapSkip(1, errImplement)
 }
 
 //go:noinline
@@ -184,5 +176,29 @@ func IterWrapped[T any](err error) interfaces.SeqError[T] {
 	return func(yield func(T, error) bool) {
 		var t T
 		yield(t, WrapN(1, err))
+	}
+}
+
+type funcGetNext func() (error, funcGetNext)
+
+func checkCycle(err error, next funcGetNext) {
+	return
+	getSlow := next
+	getFast := next
+
+	slow := err
+	fast := err
+
+	for fast != nil {
+		if slow == fast && slow != err {
+			panic("cycle detected!")
+		}
+
+		slow, getSlow = getSlow()
+		fast, getFast = getFast()
+
+		if fast != nil {
+			fast, getFast = getFast()
+		}
 	}
 }

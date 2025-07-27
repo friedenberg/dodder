@@ -4,6 +4,9 @@ var (
 	Err501NotImplemented      = New("not implemented")
 	Err405MethodNotAllowed    = New("method not allowed")
 	Err499ClientClosedRequest = New("client closed request")
+
+	// TODO remove
+	errStopIteration = New("stop iteration")
 )
 
 func Is499ClientClosedRequest(err error) bool {
@@ -12,16 +15,10 @@ func Is499ClientClosedRequest(err error) bool {
 
 // TODO remove all below
 
-var (
-	ErrFalse         = New("false")
-	ErrTrue          = New("true")
-	ErrStopIteration = New("stop iteration")
-)
-
 func MakeErrStopIteration() error {
-	return ErrStopIteration
+	return errStopIteration
 }
 
 func IsStopIteration(err error) bool {
-	return Is(err, ErrStopIteration)
+	return Is(err, errStopIteration)
 }

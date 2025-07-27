@@ -5,31 +5,45 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
-type Flusher interface {
-	Flush() error
-}
-
 type (
+	Flusher interface {
+		Flush() error
+	}
+
 	FuncNil     = func()
 	FuncErr     = func() error
 	FuncContext = interfaces.FuncContext
+
+	FuncWithStackInfo struct {
+		FuncErr
+		stack_frame.Frame
+	}
+
+	WithStackInfo[T any] struct {
+		Contents T
+		stack_frame.Frame
+	}
+
+	WaitGroup interface {
+		Do(FuncErr) bool
+		DoAfter(FuncErr)
+		GetError() error
+	}
+
+	FuncIs func(error) bool
+
+	UnwrapOne interface {
+		Unwrap() error
+	}
+
+	UnwrapMany interface {
+		Unwrap() []error
+	}
+
+	ErrorsIs interface {
+		Is(error) bool
+	}
 )
-
-type FuncWithStackInfo struct {
-	FuncErr
-	stack_frame.Frame
-}
-
-type WithStackInfo[T any] struct {
-	Contents T
-	stack_frame.Frame
-}
-
-type WaitGroup interface {
-	Do(FuncErr) bool
-	DoAfter(FuncErr)
-	GetError() error
-}
 
 func MakeFuncErrFromFuncNil(in FuncNil) FuncErr {
 	return func() error {

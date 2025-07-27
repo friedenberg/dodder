@@ -204,7 +204,7 @@ func (page *page) readCurrentLoc(
 	defer digests.PutBlobId(digest)
 
 	if _, err = digest.ReadFrom(reader); err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -221,7 +221,7 @@ func (page *page) readCurrentLoc(
 	}
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -256,7 +256,7 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 		var current row
 
 		if _, err = current.ReadFrom(&page.bufferedReader); err != nil {
-			err = errors.WrapExceptAsNil(err, io.EOF)
+			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 			return
 		}
 
@@ -294,6 +294,7 @@ func (page *page) Flush() (err error) {
 
 	var current row
 
+	// TODO make iterator
 	getOne := func() (r *row, err error) {
 		if page.file == nil {
 			err = io.EOF
@@ -303,11 +304,14 @@ func (page *page) Flush() (err error) {
 		var n int64
 		n, err = current.ReadFrom(&page.bufferedReader)
 		if err != nil {
-			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
+			if errors.IsEOF(err) {
+				// no-op
+			// TODO why might this ever be the case
+			} else if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
 			}
 
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 

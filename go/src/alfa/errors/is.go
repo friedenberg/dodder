@@ -2,11 +2,13 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"os"
 	"slices"
 	"syscall"
+	"time"
 )
 
 var (
@@ -14,11 +16,9 @@ var (
 	Unwrap = errors.Unwrap
 )
 
-type FuncIs func(error) bool
-
-func IsAny(err error, ises ...FuncIs) bool {
-	for _, is := range ises {
-		if is(err) {
+func IsAny(err error, funcTargets ...FuncIs) bool {
+	for _, funcTarget := range funcTargets {
+		if funcTarget(err) {
 			return true
 		}
 	}
@@ -26,36 +26,37 @@ func IsAny(err error, ises ...FuncIs) bool {
 	return false
 }
 
+func IsSentinel(err, target error) bool {
+	return err == target
+}
+
 func Is(err, target error) bool {
-	if err == target {
-		return true
+	if err == io.EOF || target == io.EOF {
+		panic("checking for EOF via errors.Is")
 	}
 
-	if errors.Is(err, target) {
-		return true
+	if DebugBuild {
+		return IsWithTimeout(err, target, time.Second)
 	}
 
-	switch u := err.(type) {
-	case interface{ Unwrap() error }:
-		if Is(u.Unwrap(), target) {
-			return true
-		}
+	return errors.Is(err, target)
+}
 
-	case interface{ Unwrap() []error }:
+func IsWithTimeout(err, target error, timeout time.Duration) bool {
+	chBool := make(chan bool)
+	defer close(chBool)
 
-		for _, e := range u.Unwrap() {
-			if Is(e, target) {
-				return true
-			}
-		}
+	go func() {
+		chBool <- errors.Is(err, target)
+	}()
 
-	default:
-		if errors.Is(u, target) {
-			return true
-		}
+	select {
+	case result := <-chBool:
+		return result
+
+	case <-time.After(timeout):
+		panic(fmt.Sprintf("calling errors.Is() timed out for %T", err))
 	}
-
-	return false
 }
 
 func IsNetTimeout(err error) (ok bool) {
@@ -103,37 +104,14 @@ func IsNotNilAndNotEOF(err error) bool {
 	return true
 }
 
-// TODO remove and fix calling sites / wrapping. There is an infinite recursion
-// here.
 func IsEOF(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	return Is(err, io.EOF)
+	return err == io.EOF
 }
 
 func IsExist(err error) bool {
-	e := errors.Unwrap(err)
-	return os.IsExist(e)
+	return os.IsExist(errors.Unwrap(err))
 }
 
 func IsNotExist(err error) bool {
-	e := errors.Unwrap(err)
-	return os.IsNotExist(e)
-}
-
-func IsAsNilOrWrapf(
-	err error,
-	target error,
-	format string,
-	values ...any,
-) (out error) {
-	if Is(err, target) {
-		out = nil
-	} else {
-		out = Wrapf(err, format, values...)
-	}
-
-	return
+	return os.IsNotExist(errors.Unwrap(err))
 }

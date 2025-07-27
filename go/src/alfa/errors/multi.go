@@ -42,38 +42,38 @@ func MakeMulti(errs ...error) (em *multi) {
 	return
 }
 
-func (e *multi) ChanOnErr() <-chan struct{} {
-	return e.chOnErr
+func (err *multi) ChanOnErr() <-chan struct{} {
+	return err.chOnErr
 }
 
-func (e *multi) GetError() error {
-	e.lock.Lock()
-	defer e.lock.Unlock()
+func (err *multi) GetError() error {
+	err.lock.Lock()
+	defer err.lock.Unlock()
 
-	if len(e.slice) > 0 {
-		return e
+	if len(err.slice) > 0 {
+		return err
 	}
 
 	return nil
 }
 
-func (e *multi) GetMultiError() Multi {
-	return e
+func (err *multi) GetMultiError() Multi {
+	return err
 }
 
-func (e *multi) Reset() {
-	e.slice = e.slice[:0]
+func (err *multi) Reset() {
+	err.slice = err.slice[:0]
 }
 
-func (e *multi) Len() int {
-	e.lock.Lock()
-	defer e.lock.Unlock()
+func (err *multi) Len() int {
+	err.lock.Lock()
+	defer err.lock.Unlock()
 
-	return len(e.slice)
+	return len(err.slice)
 }
 
-func (e *multi) Empty() (ok bool) {
-	ok = e.Len() == 0
+func (err *multi) Empty() (ok bool) {
+	ok = err.Len() == 0
 	return
 }
 
@@ -119,61 +119,44 @@ func (e *multi) Add(err error) {
 	}
 }
 
-func (e *multi) Is(target error) (ok bool) {
-	e.lock.Lock()
-	defer e.lock.Unlock()
+func (err *multi) Unwrap() []error {
+	err.lock.Lock()
+	defer err.lock.Unlock()
 
-	if len(e.slice) == 1 {
-		return Is(e.slice[0], target)
-	}
-
-	for _, err := range e.Errors() {
-		if ok = Is(err, target); ok {
-			return
-		}
-	}
-
-	return
-}
-
-func (e *multi) Unwrap() []error {
-	e.lock.Lock()
-	defer e.lock.Unlock()
-
-	out := make([]error, len(e.slice))
-	copy(out, e.slice)
+	out := make([]error, len(err.slice))
+	copy(out, err.slice)
 
 	return out
 }
 
-func (e *multi) Errors() (out []error) {
-	e.lock.Lock()
-	defer e.lock.Unlock()
+func (err *multi) Errors() (out []error) {
+	err.lock.Lock()
+	defer err.lock.Unlock()
 
-	out = make([]error, len(e.slice))
-	copy(out, e.slice)
+	out = make([]error, len(err.slice))
+	copy(out, err.slice)
 
 	return
 }
 
-func (e *multi) Error() string {
-	e.lock.Lock()
-	defer e.lock.Unlock()
+func (err *multi) Error() string {
+	err.lock.Lock()
+	defer err.lock.Unlock()
 
-	switch len(e.slice) {
+	switch len(err.slice) {
 	case 0:
 		return "no errors!"
 
 	case 1:
-		return e.slice[0].Error()
+		return err.slice[0].Error()
 
 	default:
 		sb := &strings.Builder{}
 
-		fmt.Fprintf(sb, "# %d Errors", len(e.slice))
+		fmt.Fprintf(sb, "# %d Errors", len(err.slice))
 		sb.WriteString("\n")
 
-		for i, err := range e.slice {
+		for i, err := range err.slice {
 			fmt.Fprintf(sb, "Error %d:\n", i+1)
 			sb.WriteString(err.Error())
 			sb.WriteString("\n")

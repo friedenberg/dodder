@@ -15,22 +15,21 @@ type stackWrapError struct {
 	next *stackWrapError
 }
 
-func (err *stackWrapError) checkCycle() {
-	slow := err
-	fast := err
+func (err *stackWrapError) getNext() (error, funcGetNext) {
+	var next funcGetNext
 
-	for fast != nil {
-		if slow == fast && slow != err {
-			panic("cycle detected!")
-		}
-
-		slow = slow.next
-		fast = fast.next
-
-		if fast != nil {
-			fast = fast.next
-		}
+	if err.next != nil {
+		next = err.next.getNext
 	}
+
+	return err, next
+}
+
+func (err *stackWrapError) checkCycle() {
+	checkCycle(
+		err,
+		err.getNext,
+	)
 }
 
 func (se *stackWrapError) Unwrap() error {
@@ -71,8 +70,12 @@ func (se *stackWrapError) writeError(sb *strings.Builder) {
 	}
 
 	if se.next == nil && se.error == nil {
-		sb.WriteString("dodder/alfa/errors/stackWrapError: both next and error are nil.")
-		sb.WriteString("dodder/alfa/errors/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
+		sb.WriteString(
+			"dodder/alfa/errors/stackWrapError: both next and error are nil.",
+		)
+		sb.WriteString(
+			"dodder/alfa/errors/stackWrapError: this usually means that some nil error was wrapped in the error stack.",
+		)
 	}
 }
 
@@ -90,8 +93,12 @@ func (se *stackWrapError) writeErrorNoStack(sb *strings.Builder) {
 	}
 
 	if se.next == nil && se.error == nil {
-		sb.WriteString("dodder/alfa/errors/stackWrapError: both next and error are nil.")
-		sb.WriteString("dodder/alfa/errors/stackWrapError: this usually means that some nil error was wrapped in the error stack.")
+		sb.WriteString(
+			"dodder/alfa/errors/stackWrapError: both next and error are nil.",
+		)
+		sb.WriteString(
+			"dodder/alfa/errors/stackWrapError: this usually means that some nil error was wrapped in the error stack.",
+		)
 	}
 }
 

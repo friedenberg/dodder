@@ -42,14 +42,14 @@ func ReadUint8(r io.Reader) (n uint8, read int, err error) {
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
 	clInt, clIntErr := binary.Uvarint(cl[:])
 
 	if clIntErr <= 0 {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -63,7 +63,7 @@ func ReadFixedUint8(r io.Reader) (n uint8, read int, err error) {
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -77,14 +77,14 @@ func ReadInt8(r io.Reader) (n int8, read int, err error) {
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
 	clInt, clIntErr := binary.Uvarint(cl[:])
 
 	if clIntErr <= 0 {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -112,14 +112,14 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
 	n, clIntErr := binary.Varint(cl[:])
 
 	if clIntErr <= 0 {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -131,7 +131,7 @@ func ReadFixedUInt16(r io.Reader) (n int, val uint16, err error) {
 
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -145,7 +145,7 @@ func ReadFixedInt32(r io.Reader) (n int, val int32, err error) {
 
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -159,7 +159,7 @@ func ReadFixedInt64(r io.Reader) (n int, val int64, err error) {
 
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

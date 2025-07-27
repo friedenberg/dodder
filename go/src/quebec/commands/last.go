@@ -104,6 +104,7 @@ func (cmd Last) runArchive(envRepo env_repo.Env, archive repo.Repo) {
 
 	if err := cmd.runWithInventoryList(envRepo, archive, f); err != nil {
 		envRepo.Cancel(err)
+		return
 	}
 }
 
@@ -135,6 +136,7 @@ func (cmd Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 		funcIter,
 	); err != nil {
 		localWorkingCopy.GetEnvRepo().Cancel(err)
+		return
 	}
 
 	if cmd.Organize {

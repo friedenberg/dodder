@@ -130,9 +130,7 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 			}
 
 			switch err := r.(type) {
-			default:
-				ctx.captureCancelStackFramesIfNecessary(2, nil)
-				ctx.cancel(xerrors.Errorf("context failed: %w", err))
+			case interfaces.ContextState:
 
 			case string:
 				{
@@ -147,12 +145,17 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 
 			case error:
 				ctx.cancel(err)
+
+			default:
+				ctx.captureCancelStackFramesIfNecessary(2, nil)
+				ctx.cancel(xerrors.Errorf("context failed: %w", err))
 			}
+		} else {
+			ctx.cancel(interfaces.ContextStateSucceeded)
 		}
 	}()
 
 	ctx.funcRun(ctx)
-	ctx.cancel(interfaces.ContextStateSucceeded)
 
 	return
 }
@@ -229,14 +232,14 @@ func (ctx *context) Cancel(err error) {
 
 	// TODO figure out why this needs to be 2
 	ctx.captureCancelStackFramesIfNecessary(2, err)
-	ctx.cancel(WrapN(1, err))
+	ctx.cancel(err)
 }
 
 // TODO add interface for adding stack frames to the cancellation error
 //
 //go:noinline
 func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
-	if !DebugBuild {
+	if !DebugBuild || true {
 		return
 	}
 

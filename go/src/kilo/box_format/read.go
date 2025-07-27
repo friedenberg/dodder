@@ -26,7 +26,7 @@ func (format *BoxTransacted) ReadStringFormat(
 		if err == ErrNotABox {
 			err = nil
 		} else {
-			err = errors.WrapExcept(err, io.EOF, ErrBoxReadSeq{})
+			err = errors.WrapExceptSentinel(err, io.EOF, ErrBoxReadSeq{})
 			return
 		}
 	}
@@ -95,7 +95,7 @@ func (format *BoxTransacted) readStringFormatBox(
 	object *sku.Transacted,
 ) (err error) {
 	if err = format.openBox(scanner); err != nil {
-		err = errors.WrapExcept(err, io.EOF, ErrNotABox)
+		err = errors.WrapExceptSentinel(err, io.EOF, ErrNotABox)
 		return
 	}
 

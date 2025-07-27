@@ -236,7 +236,7 @@ func (importer importer) importLeafSku(
 					DontAddMissingType: true,
 				},
 			); err != nil {
-				err = errors.WrapExcept(err, collections.ErrExists)
+				err = errors.WrapExceptSentinel(err, collections.ErrExists)
 			}
 		} else {
 			err = errors.Wrapf(err, "ObjectId: %s", external.GetObjectId())

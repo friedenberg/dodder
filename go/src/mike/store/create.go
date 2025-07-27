@@ -91,7 +91,7 @@ func (store *Store) CreateOrUpdate(
 		external,
 		options,
 	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, collections.ErrExists)
 		return
 	}
 
@@ -135,7 +135,7 @@ func (store *Store) CreateOrUpdateBlobSha(
 		t,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, collections.ErrExists)
 		return
 	}
 
@@ -178,7 +178,7 @@ func (store *Store) RevertTo(
 		mutter,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, collections.ErrExists)
 		return
 	}
 

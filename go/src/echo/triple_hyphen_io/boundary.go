@@ -26,7 +26,7 @@ type Peeker interface {
 
 func ReadBoundaryFromPeeker(peeker Peeker) (err error) {
 	if err = PeekBoundaryFromPeeker(peeker); err != nil {
-		err = errors.WrapExcept(err, io.EOF, errBoundaryInvalid)
+		err = errors.WrapExceptSentinel(err, io.EOF, errBoundaryInvalid)
 		return
 	}
 
@@ -35,7 +35,7 @@ func ReadBoundaryFromPeeker(peeker Peeker) (err error) {
 		peeker,
 		int64(BoundaryStringValue.Len()+1),
 	); err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -46,7 +46,7 @@ func PeekBoundaryFromPeeker(peeker Peeker) (err error) {
 	var peeked []byte
 
 	if peeked, err = peeker.Peek(BoundaryStringValue.Len() + 1); err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

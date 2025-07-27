@@ -39,7 +39,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n2)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	n += n2
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n2)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -110,7 +110,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	n += n2
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

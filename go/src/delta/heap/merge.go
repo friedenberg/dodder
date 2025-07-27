@@ -5,18 +5,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MergeStream[T Element, TPtr ElementPtr[T]](
-	a *Heap[T, TPtr],
-	read func() (TPtr, error),
-	write interfaces.FuncIter[TPtr],
+func MergeStream[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
+	heap *Heap[ELEMENT, ELEMENT_PTR],
+	read func() (ELEMENT_PTR, error),
+	write interfaces.FuncIter[ELEMENT_PTR],
 ) (err error) {
 	if err = MergeStreamPreferringHeap(
-		a,
+		heap,
 		read,
 		write,
-		a.h.equaler,
-		a.h.Lessor,
-		a.h.Resetter,
+		heap.h.equaler,
+		heap.h.Lessor,
+		heap.h.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -26,28 +26,28 @@ func MergeStream[T Element, TPtr ElementPtr[T]](
 }
 
 func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
-	h *Heap[T, TPtr],
-	r func() (TPtr, error),
-	w interfaces.FuncIter[TPtr],
+	heap *Heap[T, TPtr],
+	read func() (TPtr, error),
+	write interfaces.FuncIter[TPtr],
 	equaler interfaces.Equaler[TPtr],
-	l interfaces.Lessor3[TPtr],
-	re interfaces.Resetter2[T, TPtr],
+	lessor interfaces.Lessor3[TPtr],
+	resetter interfaces.Resetter2[T, TPtr],
 ) (err error) {
 	defer func() {
-		h.restore()
+		heap.restore()
 	}()
 
-	oldWrite := w
+	oldWrite := write
 
 	var last TPtr
 
-	w = func(e TPtr) (err error) {
+	write = func(e TPtr) (err error) {
 		if last == nil {
 			var t T
 			last = &t
 		} else if equaler.Equals(e, last) {
 			return
-		} else if l.Less(e, last) {
+		} else if lessor.Less(e, last) {
 			err = errors.ErrorWithStackf(
 				"last is greater than current! last:\n%v\ncurrent: %v",
 				last,
@@ -57,7 +57,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			return
 		}
 
-		re.ResetWith(last, e)
+		resetter.ResetWith(last, e)
 
 		return oldWrite(e)
 	}
@@ -65,7 +65,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	for {
 		var element TPtr
 
-		if element, err = r(); err != nil {
+		if element, err = read(); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 				break
@@ -77,7 +77,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 
 	LOOP:
 		for {
-			peeked, ok := h.Peek()
+			peeked, ok := heap.Peek()
 
 			switch {
 			case !ok:
@@ -85,16 +85,16 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 
 			case equaler.Equals(peeked, element):
 				element = peeked
-				h.Pop()
+				heap.Pop()
 				continue LOOP
 
-			case l.Less(element, peeked):
+			case lessor.Less(element, peeked):
 				break LOOP
 
 			default:
 			}
 
-			popped, _ := h.popAndSave()
+			popped, _ := heap.popAndSave()
 
 			if !equaler.Equals(peeked, popped) {
 				err = errors.ErrorWithStackf(
@@ -110,7 +110,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 				break
 			}
 
-			if err = w(popped); err != nil {
+			if err = write(popped); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -121,7 +121,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			}
 		}
 
-		if err = w(element); err != nil {
+		if err = write(element); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -133,13 +133,13 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	}
 
 	for {
-		popped, ok := h.popAndSave()
+		popped, ok := heap.popAndSave()
 
 		if !ok {
 			break
 		}
 
-		if err = w(popped); err != nil {
+		if err = write(popped); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 			} else {

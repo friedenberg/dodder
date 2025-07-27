@@ -197,7 +197,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 
 	var n1 int
 	if count, n1, err = ohio.ReadUint8(r); err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -213,7 +213,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 		var cl uint8
 
 		if cl, n1, err = ohio.ReadUint8(r); err != nil {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 
@@ -225,7 +225,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 
 		_, err = (*p)[i].ReadNFrom(r, int(cl))
 		if err != nil {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 	}
@@ -240,7 +240,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
@@ -253,7 +253,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 		n += int64(n1)
 
 		if err != nil {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 
@@ -262,7 +262,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 		n += n2
 
 		if err != nil {
-			err = errors.WrapExcept(err, io.EOF)
+			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 	}

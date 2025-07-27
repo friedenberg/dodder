@@ -135,6 +135,7 @@ func (h *Heap[T, TPtr]) restore() {
 	quiter.ReverseSortable(&h.h)
 }
 
+// TODO remove
 func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
 	ok := false
 	sk, ok = h.Pop()

@@ -72,10 +72,11 @@ func (s Set[T]) Contains(e T) (ok bool) {
 	return s.ContainsKey(s.Key(e))
 }
 
+// TODO remove in favor of iterators
 func (s Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if errors.Is(err, errors.MakeErrStopIteration()) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

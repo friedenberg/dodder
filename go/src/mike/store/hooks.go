@@ -62,33 +62,44 @@ func (store *Store) tryNewHook(
 }
 
 func (store *Store) TryFormatHook(
-	kinder *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	var mutter *sku.Transacted
+	var objectMother *sku.Transacted
 
-	if mutter, err = store.ReadOneObjectId(kinder.GetObjectId()); err != nil {
-		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
-		return
+	if objectMother, err = store.ReadOneObjectId(object.GetObjectId()); err != nil {
+		if errors.Is(err, collections.ErrNotFound) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	var t *sku.Transacted
+	var objectType *sku.Transacted
 
-	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
-		err = errors.WrapExceptAsNil(err, collections.ErrNotFound)
-		return
+	if objectType, err = store.ReadOneObjectId(object.GetType()); err != nil {
+		if errors.Is(err, collections.ErrNotFound) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	var blob type_blobs.Blob
 
 	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
-		t.GetType(),
-		t.GetBlobSha(),
+		objectType.GetType(),
+		objectType.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer store.GetTypedBlobStore().Type.PutTypedBlob(
+		objectType.GetType(),
+		blob,
+	)
 
 	script := blob.GetStringLuaHooks()
 
@@ -97,10 +108,10 @@ func (store *Store) TryFormatHook(
 	}
 
 	if err = store.tryHookWithName(
-		kinder,
-		mutter,
+		object,
+		objectMother,
 		sku.CommitOptions{},
-		t,
+		objectType,
 		script,
 		"on_format",
 	); err != nil {

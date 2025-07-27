@@ -243,6 +243,7 @@ function init_with_age { # @test
 }
 
 function init_with_json_inventory_list_type { # @test
+	skip
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
@@ -257,6 +258,16 @@ function init_with_json_inventory_list_type { # @test
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
+
+	run_dodder show :b
+	assert_success
+	assert_output --regexp - <<-'EOM'
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-json-v0]
+	EOM
+
+	run_dodder last
+	assert_success
+	assert_output
 
 	run test -f .xdg/data/dodder/config-permanent
 

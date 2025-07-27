@@ -143,6 +143,14 @@ func (json *JSON) ToTransacted(
 		object.SetBlobId(writeCloser.GetBlobId())
 	}
 
+	// Set BlobId from JSON even if not writing to blob store
+	if json.BlobId != "" && blobStore == nil {
+		if err = object.Metadata.Blob.Set(json.BlobId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = object.ObjectId.Set(json.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -171,7 +179,29 @@ func (json *JSON) ToTransacted(
 	object.Metadata.RepoPubkey = json.RepoPubkey.Data
 	object.Metadata.RepoSig = json.RepoSig.Data
 
-	// TODO populate remaining fields
+	// Set Tai from either Date or Tai field
+	if json.Tai != "" {
+		if err = object.Metadata.Tai.Set(json.Tai); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if json.Date != "" {
+		if err = object.Metadata.Tai.SetFromRFC3339(json.Date); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	// Set SelfMetadataWithoutTai SHA
+	if json.Sha != "" {
+		if err = object.Metadata.SelfMetadataWithoutTai.Set(json.Sha); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	// Set Dormant state
+	object.Metadata.Cache.Dormant.SetBool(json.Dormant)
 
 	return
 }
