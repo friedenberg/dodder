@@ -15,18 +15,18 @@ import (
 )
 
 func (store *Store) QueryCheckedOut(
-	qg *query.Query,
+	queryGroup *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(func() (err error) {
 		funcIterFSItems := store.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
-			store.makeFuncIterFilterAndApply(qg, f),
+			store.makeFuncIterFilterAndApply(queryGroup, f),
 		)
 
-		for o := range store.probablyCheckedOut.All() {
-			if err = funcIterFSItems(o); err != nil {
+		for item := range store.probablyCheckedOut.All() {
+			if err = funcIterFSItems(item); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -35,13 +35,13 @@ func (store *Store) QueryCheckedOut(
 		return
 	})
 
-	if !qg.ExcludeUntracked {
+	if !queryGroup.ExcludeUntracked {
 		wg.Do(func() (err error) {
 			funcIterFSItems := store.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
-				store.makeFuncIterFilterAndApply(qg, f),
+				store.makeFuncIterFilterAndApply(queryGroup, f),
 			)
 
-			if err = store.queryUntracked(qg, funcIterFSItems); err != nil {
+			if err = store.queryUntracked(queryGroup, funcIterFSItems); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -62,28 +62,30 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(item *sku.FSItem) (err error) {
-		co := GetCheckedOutPool().Get()
+		checkedOut := GetCheckedOutPool().Get()
 
 		// at a bare minimum, the internal object ID must always be set as there
 		// are hard assumptions about internal being valid throughout the
 		// reading cycle
-		if err = co.GetSku().ObjectId.SetObjectIdLike(&item.ExternalObjectId); err != nil {
+		if err = checkedOut.GetSku().ObjectId.SetObjectIdLike(
+			&item.ExternalObjectId,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		hasInternal := true
 
-		var oid ids.ObjectId
+		var objectId ids.ObjectId
 
-		if err = oid.SetObjectIdLike(item.GetExternalObjectId()); err != nil {
+		if err = objectId.SetObjectIdLike(item.GetExternalObjectId()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = store.storeSupplies.ReadOneInto(
-			&oid,
-			co.GetSku(),
+			&objectId,
+			checkedOut.GetSku(),
 		); err != nil {
 			if collections.IsErrNotFound(err) ||
 				genres.IsErrUnsupportedGenre(err) {
@@ -102,14 +104,14 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 				},
 			},
 			item,
-			co.GetSku(),
-			co.GetSkuExternal(),
+			checkedOut.GetSku(),
+			checkedOut.GetSkuExternal(),
 		); err != nil {
 			if sku.IsErrMergeConflict(err) {
-				co.SetState(checked_out_state.Conflicted)
+				checkedOut.SetState(checked_out_state.Conflicted)
 
-				if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
-					&co.GetSku().ObjectId,
+				if err = checkedOut.GetSkuExternal().ObjectId.SetWithIdLike(
+					&checkedOut.GetSku().ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -121,19 +123,19 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		}
 
 		if !item.Conflict.IsEmpty() {
-			co.SetState(checked_out_state.Conflicted)
+			checkedOut.SetState(checked_out_state.Conflicted)
 		} else if !hasInternal {
-			co.SetState(checked_out_state.Untracked)
+			checkedOut.SetState(checked_out_state.Untracked)
 		} else {
-			co.SetState(checked_out_state.CheckedOut)
+			checkedOut.SetState(checked_out_state.CheckedOut)
 		}
 
-		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+		if err = store.WriteFSItemToExternal(item, checkedOut.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = out(co); err != nil {
+		if err = out(checkedOut); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

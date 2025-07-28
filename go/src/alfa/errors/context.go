@@ -105,6 +105,7 @@ func (ctx *context) Run(funcRun func(interfaces.Context)) error {
 
 	ctx.funcRun = funcRun
 
+	// TODO extricate from *context and turn into generic function
 	go func() {
 		defer signal.Stop(ctx.signals)
 
@@ -239,7 +240,7 @@ func (ctx *context) Cancel(err error) {
 //
 //go:noinline
 func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
-	if !DebugBuild || true {
+	if !DebugBuild {
 		return
 	}
 

@@ -7,14 +7,15 @@ import (
 )
 
 func MakeWaitGroupParallel() WaitGroup {
-	wg := &waitGroupParallel{
-		lock:    &sync.Mutex{},
-		inner:   &sync.WaitGroup{},
-		err:     MakeMulti(),
-		doAfter: make([]FuncWithStackInfo, 0),
+	waitGroup := &waitGroupParallel{
+		lock:         &sync.Mutex{},
+		inner:        &sync.WaitGroup{},
+		err:          MakeMulti(),
+		doAfter:      make([]FuncWithStackInfo, 0),
+		addStackInfo: DebugBuild,
 	}
 
-	return wg
+	return waitGroup
 }
 
 type waitGroupParallel struct {
@@ -28,61 +29,61 @@ type waitGroupParallel struct {
 	isDone bool
 }
 
-func (wg *waitGroupParallel) GetError() (err error) {
-	wg.wait()
+func (waitGroup *waitGroupParallel) GetError() (err error) {
+	waitGroup.wait()
 
 	defer func() {
-		if !wg.err.Empty() {
-			err = wg.err
+		if !waitGroup.err.Empty() {
+			err = waitGroup.err
 		}
 	}()
 
-	for i := len(wg.doAfter) - 1; i >= 0; i-- {
-		doAfter := wg.doAfter[i]
+	for i := len(waitGroup.doAfter) - 1; i >= 0; i-- {
+		doAfter := waitGroup.doAfter[i]
 		err := doAfter.FuncErr()
 		if err != nil {
-			wg.err.Add(doAfter.Wrap(err))
+			waitGroup.err.Add(doAfter.Wrap(err))
 		}
 	}
 
 	return
 }
 
-func (wg *waitGroupParallel) Do(f FuncErr) (d bool) {
-	wg.lock.Lock()
+func (waitGroup *waitGroupParallel) Do(f FuncErr) (d bool) {
+	waitGroup.lock.Lock()
 
-	if wg.isDone {
-		wg.lock.Unlock()
+	if waitGroup.isDone {
+		waitGroup.lock.Unlock()
 		return false
 	}
 
-	wg.lock.Unlock()
+	waitGroup.lock.Unlock()
 
-	wg.inner.Add(1)
+	waitGroup.inner.Add(1)
 
 	var si stack_frame.Frame
 
-	if wg.addStackInfo {
+	if waitGroup.addStackInfo {
 		si, _ = stack_frame.MakeFrame(1)
 	}
 
 	go func() {
 		err := f()
 
-		wg.doneWith(&si, err)
+		waitGroup.doneWith(&si, err)
 	}()
 
 	return true
 }
 
-func (wg *waitGroupParallel) DoAfter(f FuncErr) {
-	wg.lock.Lock()
-	defer wg.lock.Unlock()
+func (waitGroup *waitGroupParallel) DoAfter(f FuncErr) {
+	waitGroup.lock.Lock()
+	defer waitGroup.lock.Unlock()
 
 	frame, _ := stack_frame.MakeFrame(1)
 
-	wg.doAfter = append(
-		wg.doAfter,
+	waitGroup.doAfter = append(
+		waitGroup.doAfter,
 		FuncWithStackInfo{
 			FuncErr: f,
 			Frame:   frame,
@@ -90,19 +91,22 @@ func (wg *waitGroupParallel) DoAfter(f FuncErr) {
 	)
 }
 
-func (wg *waitGroupParallel) doneWith(frame *stack_frame.Frame, err error) {
-	wg.inner.Done()
+func (waitGroup *waitGroupParallel) doneWith(
+	frame *stack_frame.Frame,
+	err error,
+) {
+	waitGroup.inner.Done()
 
 	if err != nil {
-		wg.err.Add(frame.Wrap(err))
+		waitGroup.err.Add(frame.Wrap(err))
 	}
 }
 
-func (wg *waitGroupParallel) wait() {
-	wg.inner.Wait()
+func (waitGroup *waitGroupParallel) wait() {
+	waitGroup.inner.Wait()
 
-	wg.lock.Lock()
-	defer wg.lock.Unlock()
+	waitGroup.lock.Lock()
+	defer waitGroup.lock.Unlock()
 
-	wg.isDone = true
+	waitGroup.isDone = true
 }
