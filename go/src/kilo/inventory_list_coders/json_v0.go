@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 )
 
 type jsonV0 struct {
@@ -33,7 +33,7 @@ func (coder jsonV0) EncodeTo(
 		return
 	}
 
-	var objectJson sku_fmt.JSON
+	var objectJson sku_json_fmt.Transacted
 
 	if err = objectJson.FromTransacted(object, nil); err != nil {
 		err = errors.Wrap(err)
@@ -54,7 +54,7 @@ func (coder jsonV0) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
-	var objectJson sku_fmt.JSON
+	var objectJson sku_json_fmt.Transacted
 
 	decoder := json.NewDecoder(bufferedReader)
 

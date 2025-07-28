@@ -19,17 +19,17 @@ type cache struct {
 	Rows       map[string]browser_items.ItemId // map[browserItem.ExternalId]browserItemId
 }
 
-func (c *Store) getCachePath() string {
-	return path.Join(c.externalStoreInfo.DirCache, "tab_cache")
+func (store *Store) getCachePath() string {
+	return path.Join(store.externalStoreInfo.DirCache, "tab_cache")
 }
 
-func (c *Store) initializeCache() (err error) {
-	c.tabCache.Rows = make(map[string]browser_items.ItemId)
+func (store *Store) initializeCache() (err error) {
+	store.tabCache.Rows = make(map[string]browser_items.ItemId)
 
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(
-		c.getCachePath(),
+		store.getCachePath(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
@@ -45,7 +45,7 @@ func (c *Store) initializeCache() (err error) {
 	br := bufio.NewReader(f)
 	dec := gob.NewDecoder(br)
 
-	if err = dec.Decode(&c.tabCache); err != nil {
+	if err = dec.Decode(&store.tabCache); err != nil {
 		ui.Err().Printf("browser tab cache parse failed: %s", err)
 		err = nil
 		return
@@ -54,7 +54,7 @@ func (c *Store) initializeCache() (err error) {
 	return
 }
 
-func (c *Store) resetCacheIfNecessary(
+func (store *Store) resetCacheIfNecessary(
 	resp *http.Response,
 ) (err error) {
 	if resp == nil {
@@ -70,25 +70,25 @@ func (c *Store) resetCacheIfNecessary(
 		return
 	}
 
-	if newLaunchTime.Equals(c.tabCache.LaunchTime) {
+	if newLaunchTime.Equals(store.tabCache.LaunchTime) {
 		return
 	}
 
-	c.tabCache.LaunchTime = newLaunchTime
-	clear(c.tabCache.Rows)
+	store.tabCache.LaunchTime = newLaunchTime
+	clear(store.tabCache.Rows)
 
 	return
 }
 
-func (c *Store) flushCache() (err error) {
+func (store *Store) flushCache() (err error) {
 	var file *os.File
 
 	if file, err = files.OpenExclusiveWriteOnly(
-		c.getCachePath(),
+		store.getCachePath(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			if file, err = files.TryOrMakeDirIfNecessary(
-				c.getCachePath(),
+				store.getCachePath(),
 				files.CreateExclusiveWriteOnly,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -107,7 +107,7 @@ func (c *Store) flushCache() (err error) {
 
 	dec := gob.NewEncoder(bw)
 
-	if err = dec.Encode(&c.tabCache); err != nil {
+	if err = dec.Encode(&store.tabCache); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

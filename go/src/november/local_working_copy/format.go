@@ -22,6 +22,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
@@ -665,9 +666,9 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			enc := json.NewEncoder(writer)
 
 			return func(object *sku.Transacted) (err error) {
-				var jsonRepresentation sku_fmt.JSON
+				var jsonRep sku_json_fmt.Transacted
 
-				if err = jsonRepresentation.FromTransacted(
+				if err = jsonRep.FromTransacted(
 					object,
 					repo.GetStore().GetEnvRepo().GetDefaultBlobStore(),
 				); err != nil {
@@ -675,7 +676,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return
 				}
 
-				if err = enc.Encode(jsonRepresentation); err != nil {
+				if err = enc.Encode(jsonRep); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -692,7 +693,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			enc := json.NewEncoder(writer)
 
 			type tomlJson struct {
-				sku_fmt.JSON
+				sku_json_fmt.Transacted
 				Blob map[string]any `json:"blob"`
 			}
 
@@ -707,10 +708,13 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return
 				}
 
-				if err = toml.Unmarshal([]byte(jsonRep.JSON.BlobString), &jsonRep.Blob); err != nil {
+				if err = toml.Unmarshal([]byte(
+					jsonRep.Transacted.BlobString),
+					&jsonRep.Blob,
+				); err != nil {
 					err = nil
 
-					if err = enc.Encode(jsonRep.JSON); err != nil {
+					if err = enc.Encode(jsonRep.Transacted); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -756,9 +760,9 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			tabs := resp.ParsedJSONBody.([]interface{})
 
 			return func(object *sku.Transacted) (err error) {
-				var j sku_fmt.JsonWithUrl
+				var objectJSON sku_json_fmt.JsonWithUrl
 
-				if j, err = sku_fmt.MakeJsonTomlBookmark(
+				if objectJSON, err = sku_json_fmt.MakeJsonTomlBookmark(
 					object,
 					repo.GetStore().GetEnvRepo(),
 					tabs,
@@ -767,7 +771,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return
 				}
 
-				if err = enc.Encode(j); err != nil {
+				if err = enc.Encode(objectJSON); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -243,7 +243,6 @@ function init_with_age { # @test
 }
 
 function init_with_json_inventory_list_type { # @test
-	skip
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \

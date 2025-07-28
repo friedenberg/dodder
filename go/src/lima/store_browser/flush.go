@@ -10,37 +10,37 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-func (s *Store) flushUrls() (err error) {
-	if len(s.deleted) == 0 && len(s.added) == 0 {
+func (store *Store) flushUrls() (err error) {
+	if len(store.deleted) == 0 && len(store.added) == 0 {
 		return
 	}
 
 	var resp browser_items.HTTPResponseWithRequestPayloadPut
 
-	deleted := make(map[string]checkedOutWithItem, len(s.deleted))
+	deleted := make(map[string]checkedOutWithItem, len(store.deleted))
 
 	var req browser_items.BrowserRequestPut
-	req.Deleted = make([]browser_items.Item, 0, len(s.deleted))
+	req.Deleted = make([]browser_items.Item, 0, len(store.deleted))
 
-	for _, is := range s.deleted {
+	for _, is := range store.deleted {
 		for _, i := range is {
 			req.Deleted = append(req.Deleted, i.Item.Item)
 			deleted[i.Item.Item.ExternalId] = i
 		}
 	}
 
-	for _, is := range s.added {
+	for _, is := range store.added {
 		for _, i := range is {
 			req.Added = append(req.Added, i.Item.Item)
 		}
 	}
 
-	if !s.config.GetConfig().IsDryRun() {
+	if !store.config.GetConfig().IsDryRun() {
 		ctx := context.Background()
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
 		defer cancel()
 
-		if resp, err = s.browser.PutAll(
+		if resp, err = store.browser.PutAll(
 			ctxWithTimeout,
 			req,
 		); err != nil {
@@ -53,18 +53,18 @@ func (s *Store) flushUrls() (err error) {
 			}
 		}
 
-		if err = s.resetCacheIfNecessary(resp.Response); err != nil {
+		if err = store.resetCacheIfNecessary(resp.Response); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		for _, is := range s.deleted {
+		for _, is := range store.deleted {
 			for _, i := range is {
 				resp.Deleted = append(resp.Deleted, i.Item.Item)
 			}
 		}
 
-		for _, is := range s.added {
+		for _, is := range store.added {
 			for _, i := range is {
 				resp.Added = append(resp.Added, i.Item.Item)
 			}
@@ -73,11 +73,11 @@ func (s *Store) flushUrls() (err error) {
 
 	for _, i := range resp.RequestPayloadPut.Added {
 		// TODO emit changes
-		s.tabCache.Rows[i.ExternalId] = i.Id
+		store.tabCache.Rows[i.ExternalId] = i.Id
 	}
 
 	for _, item := range resp.RequestPayloadPut.Deleted {
-		delete(s.tabCache.Rows, item.ExternalId)
+		delete(store.tabCache.Rows, item.ExternalId)
 
 		originalItem, ok := deleted[item.ExternalId]
 
@@ -91,7 +91,7 @@ func (s *Store) flushUrls() (err error) {
 			return
 		}
 
-		if err = s.itemDeletedStringFormatWriter(
+		if err = store.itemDeletedStringFormatWriter(
 			originalItem.CheckedOut,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -99,10 +99,10 @@ func (s *Store) flushUrls() (err error) {
 		}
 	}
 
-	clear(s.added)
-	clear(s.deleted)
+	clear(store.added)
+	clear(store.deleted)
 
-	if err = s.flushCache(); err != nil {
+	if err = store.flushCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

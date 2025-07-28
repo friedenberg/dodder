@@ -96,6 +96,7 @@ func IsTooManyOpenFiles(err error) bool {
 	return e.Error() == "too many open files"
 }
 
+// TODO remove
 func IsNotNilAndNotEOF(err error) bool {
 	if err == nil || err == io.EOF {
 		return false

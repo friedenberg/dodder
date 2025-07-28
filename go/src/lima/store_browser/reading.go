@@ -8,19 +8,19 @@ import (
 )
 
 // TODO decide how this should behave
-func (s *Store) UpdateTransacted(sk *sku.Transacted) (err error) {
-	if !sk.GetType().Equals(s.typ) {
+func (store *Store) UpdateTransacted(sk *sku.Transacted) (err error) {
+	if !sk.GetType().Equals(store.typ) {
 		return
 	}
 
 	var uSku *url.URL
 
-	if uSku, err = s.getUrl(sk); err != nil {
+	if uSku, err = store.getUrl(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	_, ok := s.urls[*uSku]
+	_, ok := store.urls[*uSku]
 
 	if !ok {
 		return

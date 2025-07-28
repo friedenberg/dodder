@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
@@ -87,18 +87,18 @@ func Make(
 	return c
 }
 
-func (fs *Store) GetExternalStoreLike() store_workspace.StoreLike {
-	return fs
+func (store *Store) GetExternalStoreLike() store_workspace.StoreLike {
+	return store
 }
 
-func (s *Store) ReadAllExternalItems() error {
+func (store *Store) ReadAllExternalItems() error {
 	return nil
 }
 
-func (s *Store) GetObjectIdsForString(
+func (store *Store) GetObjectIdsForString(
 	v string,
 ) (k []sku.ExternalObjectId, err error) {
-	item, ok := s.itemsById[v]
+	item, ok := store.itemsById[v]
 
 	if !ok {
 		err = errors.ErrorWithStackf("not a browser item id")
@@ -110,10 +110,10 @@ func (s *Store) GetObjectIdsForString(
 	return
 }
 
-func (s *Store) Flush() (err error) {
+func (store *Store) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	wg.Do(s.flushUrls)
+	wg.Do(store.flushUrls)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -124,21 +124,21 @@ func (s *Store) Flush() (err error) {
 }
 
 // TODO limit this to being used only by *Item.ReadFromExternal
-func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
+func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r interfaces.ReadCloseBlobIdGetter
 
-	if r, err = c.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
+	if r, err = store.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, r)
 
-	var tb sku_fmt.TomlBookmark
+	var tomlBookmark sku_json_fmt.TomlBookmark
 
 	dec := toml.NewDecoder(r)
 
-	if err = dec.Decode(&tb); err != nil {
+	if err = dec.Decode(&tomlBookmark); err != nil {
 		err = errors.Wrapf(
 			err,
 			"Sha: %s, Object Id: %s",
@@ -148,7 +148,7 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 		return
 	}
 
-	if u, err = url.Parse(tb.Url); err != nil {
+	if u, err = url.Parse(tomlBookmark.Url); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -156,20 +156,20 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Store) CheckoutOne(
+func (store *Store) CheckoutOne(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
 ) (cz sku.SkuType, err error) {
 	sz := tg.GetSku()
 
-	if !sz.Metadata.Type.Equals(c.typ) {
+	if !sz.Metadata.Type.Equals(store.typ) {
 		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.Metadata.Type))
 		return
 	}
 
 	var u *url.URL
 
-	if u, err = c.getUrl(sz); err != nil {
+	if u, err = store.getUrl(sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -196,13 +196,13 @@ func (c *Store) CheckoutOne(
 		return
 	}
 
-	co.GetSkuExternal().RepoId = c.externalStoreInfo.RepoId
+	co.GetSkuExternal().RepoId = store.externalStoreInfo.RepoId
 
-	c.l.Lock()
-	defer c.l.Unlock()
+	store.l.Lock()
+	defer store.l.Unlock()
 
-	existing := c.added[*u]
-	c.added[*u] = append(existing, checkedOutWithItem{
+	existing := store.added[*u]
+	store.added[*u] = append(existing, checkedOutWithItem{
 		CheckedOut: co.Clone(),
 		Item:       item,
 	})
@@ -210,7 +210,7 @@ func (c *Store) CheckoutOne(
 	return
 }
 
-func (c *Store) QueryCheckedOut(
+func (store *Store) QueryCheckedOut(
 	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
@@ -219,20 +219,20 @@ func (c *Store) QueryCheckedOut(
 	// }
 
 	ex := executor{
-		store: c,
+		store: store,
 		qg:    qg,
 		out:   f,
 	}
 
-	for u, items := range c.urls {
-		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
+	for u, items := range store.urls {
+		matchingUrls, exactIndexURLMatch := store.transactedUrlIndex[u]
 
 		for _, item := range items {
 			var matchingTabId *sku.Transacted
 			var trackedFromBefore bool
 
 			tabId := item.Id
-			matchingTabId, trackedFromBefore = c.transactedItemIndex[tabId]
+			matchingTabId, trackedFromBefore = store.transactedItemIndex[tabId]
 
 			if trackedFromBefore {
 				if err = ex.tryToEmitOneExplicitlyCheckedOut(
@@ -266,10 +266,10 @@ func (c *Store) QueryCheckedOut(
 
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
-func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
+func (store *Store) SaveBlob(e sku.ExternalLike) (err error) {
 	var blobWriter interfaces.WriteCloseBlobIdGetter
 
-	if blobWriter, err = s.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -283,7 +283,7 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 		return
 	}
 
-	tb := sku_fmt.TomlBookmark{
+	tomlBookmark := sku_json_fmt.TomlBookmark{
 		Url: item.Url.String(),
 	}
 
@@ -293,7 +293,7 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 
 		enc := toml.NewEncoder(bw)
 
-		if err = enc.Encode(tb); err != nil {
+		if err = enc.Encode(tomlBookmark); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -304,11 +304,11 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 	return
 }
 
-func (s *Store) asBlobSaver() sku.BlobSaver {
-	return s
+func (store *Store) asBlobSaver() sku.BlobSaver {
+	return store
 }
 
-func (s *Store) UpdateCheckoutFromCheckedOut(
+func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {

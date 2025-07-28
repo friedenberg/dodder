@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -320,7 +320,7 @@ func (server *Server) readMCPResourceObject(
 ) ([]mcp.ResourceContent, error) {
 	repo := server.Repo.(*local_working_copy.Repo)
 
-	var jsonRep sku_fmt.JSON
+	var jsonRep sku_json_fmt.MCP
 
 	if err := jsonRep.FromTransacted(
 		object,

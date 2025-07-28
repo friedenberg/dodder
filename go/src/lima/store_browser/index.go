@@ -9,24 +9,24 @@ import (
 )
 
 // TODO abstract and regenerate on commit / reindex
-func (c *Store) initializeIndex() (err error) {
-	if err = c.initializeCache(); err != nil {
+func (store *Store) initializeIndex() (err error) {
+	if err = store.initializeCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var l sync.Mutex
 
-	if err = c.externalStoreInfo.ReadPrimitiveQuery(
+	if err = store.externalStoreInfo.ReadPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
-			if !sk.GetType().Equals(c.typ) {
+			if !sk.GetType().Equals(store.typ) {
 				return
 			}
 
 			var u *url.URL
 
-			if u, err = c.getUrl(sk); err != nil {
+			if u, err = store.getUrl(sk); err != nil {
 				err = nil
 				return
 			}
@@ -38,11 +38,11 @@ func (c *Store) initializeIndex() (err error) {
 			defer l.Unlock()
 
 			{
-				existing, ok := c.transactedUrlIndex[*u]
+				existing, ok := store.transactedUrlIndex[*u]
 
 				if !ok {
 					existing = sku.MakeTransactedMutableSet()
-					c.transactedUrlIndex[*u] = existing
+					store.transactedUrlIndex[*u] = existing
 				}
 
 				if err = existing.Add(cl); err != nil {
@@ -52,10 +52,10 @@ func (c *Store) initializeIndex() (err error) {
 			}
 
 			{
-				existing, ok := c.tabCache.Rows[sk.ObjectId.String()]
+				existing, ok := store.tabCache.Rows[sk.ObjectId.String()]
 
 				if ok {
-					c.transactedItemIndex[existing] = cl
+					store.transactedItemIndex[existing] = cl
 				}
 			}
 

@@ -133,6 +133,40 @@ func Wrapf(in error, format string, values ...any) error {
 	}
 }
 
+//go:noinline
+func IterWrapped[T any](err error) interfaces.SeqError[T] {
+	return func(yield func(T, error) bool) {
+		var t T
+		yield(t, WrapN(1, err))
+	}
+}
+
+type funcGetNext func() (error, funcGetNext)
+
+func checkCycle(err error, next funcGetNext) {
+	return
+	getSlow := next
+	getFast := next
+
+	slow := err
+	fast := err
+
+	for fast != nil {
+		if slow == fast && slow != err {
+			panic("cycle detected!")
+		}
+
+		slow, getSlow = getSlow()
+		fast, getFast = getFast()
+
+		if fast != nil {
+			fast, getFast = getFast()
+		}
+	}
+}
+
+// TODO remove / rewrite the below
+
 // Wrap the error with stack info unless it's one of the provided `except`
 // errors, in which case return nil. Direct value comparison is
 // performed (`in == except`) rather than errors.Is.
@@ -169,36 +203,4 @@ func WrapExceptSentinel(in error, except ...error) (err error) {
 	err = WrapSkip(thisSkip, in)
 
 	return
-}
-
-//go:noinline
-func IterWrapped[T any](err error) interfaces.SeqError[T] {
-	return func(yield func(T, error) bool) {
-		var t T
-		yield(t, WrapN(1, err))
-	}
-}
-
-type funcGetNext func() (error, funcGetNext)
-
-func checkCycle(err error, next funcGetNext) {
-	return
-	getSlow := next
-	getFast := next
-
-	slow := err
-	fast := err
-
-	for fast != nil {
-		if slow == fast && slow != err {
-			panic("cycle detected!")
-		}
-
-		slow, getSlow = getSlow()
-		fast, getFast = getFast()
-
-		if fast != nil {
-			fast, getFast = getFast()
-		}
-	}
 }

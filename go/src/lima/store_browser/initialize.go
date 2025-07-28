@@ -11,18 +11,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
-func (s *Store) Initialize(esi store_workspace.Supplies) (err error) {
-	s.externalStoreInfo = esi
+func (store *Store) Initialize(esi store_workspace.Supplies) (err error) {
+	store.externalStoreInfo = esi
 
-	if err = s.browser.Read(); err != nil {
+	if err = store.browser.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	wg := errors.MakeWaitGroupParallel()
 
-	wg.Do(s.initializeUrls)
-	wg.Do(s.initializeIndex)
+	wg.Do(store.initializeUrls)
+	wg.Do(store.initializeIndex)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (s *Store) Initialize(esi store_workspace.Supplies) (err error) {
 	return
 }
 
-func (s *Store) initializeUrls() (err error) {
+func (store *Store) initializeUrls() (err error) {
 	var req browser_items.BrowserRequestGet
 	var resp browser_items.HTTPResponseWithRequestPayloadGet
 
@@ -42,12 +42,12 @@ func (s *Store) initializeUrls() (err error) {
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
 	defer cancel()
 
-	if resp, err = s.browser.GetAll(
+	if resp, err = store.browser.GetAll(
 		ctxWithTimeout,
 		req,
 	); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			if !s.config.GetConfig().Quiet {
+			if !store.config.GetConfig().Quiet {
 				ui.Err().Print("chrest offline")
 			}
 
@@ -60,9 +60,9 @@ func (s *Store) initializeUrls() (err error) {
 
 	ui.Log().Print("got all")
 
-	s.urls = make(map[url.URL][]Item, len(resp.RequestPayloadGet))
+	store.urls = make(map[url.URL][]Item, len(resp.RequestPayloadGet))
 
-	if err = s.resetCacheIfNecessary(resp.Response); err != nil {
+	if err = store.resetCacheIfNecessary(resp.Response); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -72,8 +72,8 @@ func (s *Store) initializeUrls() (err error) {
 
 		u := i.Url.Url()
 
-		s.urls[u] = append(s.urls[u], i)
-		s.itemsById[i.GetObjectId().String()] = i
+		store.urls[u] = append(store.urls[u], i)
+		store.itemsById[i.GetObjectId().String()] = i
 	}
 
 	return
