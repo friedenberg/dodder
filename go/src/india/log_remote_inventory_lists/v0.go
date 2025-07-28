@@ -123,7 +123,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.EntryType,
 		base64.URLEncoding.EncodeToString(entry.PublicKey),
 		entry.GetObjectId(),
-		entry.GetBlobSha(),
+		entry.GetBlobId(),
 	)
 
 	key = digests.Format(digest)

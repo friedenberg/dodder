@@ -68,7 +68,7 @@ func (cmd *PullBlobStore) Run(
 			if err = importer.ImportBlobIfNecessary(sk); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					err = nil
-					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobSha())
+					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobId())
 				} else {
 					err = errors.Wrap(err)
 				}

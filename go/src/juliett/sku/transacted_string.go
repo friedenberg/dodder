@@ -7,7 +7,7 @@ func (transacted *Transacted) String() string {
 		"%s %s %s",
 		&transacted.ObjectId,
 		transacted.GetObjectSha(),
-		transacted.GetBlobSha(),
+		transacted.GetBlobId(),
 	)
 }
 
@@ -32,7 +32,7 @@ func (transacted *Transacted) StringObjectIdTaiBlob() string {
 		"%s@%s@%s",
 		&transacted.ObjectId,
 		transacted.GetTai().StringDefaultFormat(),
-		transacted.GetBlobSha(),
+		transacted.GetBlobId(),
 	)
 }
 

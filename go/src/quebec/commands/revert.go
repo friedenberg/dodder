@@ -109,7 +109,7 @@ func (c Revert) runRevertFromLast(
 		return
 	}
 
-	for z, errIter := range s.GetInventoryListStore().IterInventoryList(b.GetBlobSha()) {
+	for z, errIter := range s.GetInventoryListStore().IterInventoryList(b.GetBlobId()) {
 		var cachedSku *sku.Transacted
 
 		if cachedSku, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(

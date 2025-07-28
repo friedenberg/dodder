@@ -23,7 +23,7 @@ func (store *Store) validate(
 
 		if commonBlob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 			tipe,
-			el.GetSku().GetBlobSha(),
+			el.GetSku().GetBlobId(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

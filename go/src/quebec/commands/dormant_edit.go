@@ -118,7 +118,7 @@ func (cmd DormantEdit) makeTempKonfigFile(
 	var readCloser io.ReadCloser
 
 	if readCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobReader(
-		object.GetBlobSha(),
+		object.GetBlobId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

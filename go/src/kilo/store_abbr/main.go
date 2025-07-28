@@ -165,7 +165,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(
-		digests.Format(o.GetBlobSha()),
+		digests.Format(o.GetBlobId()),
 	)
 
 	ks := o.GetObjectId().String()

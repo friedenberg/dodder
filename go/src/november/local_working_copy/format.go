@@ -505,7 +505,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				ui.TodoP3("convert into an option")
 
-				sh := object.GetBlobSha()
+				sh := object.GetBlobId()
 
 				if sh.IsNull() {
 					return
@@ -800,7 +800,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-					object.GetBlobSha(),
+					object.GetBlobId(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -836,7 +836,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					var readCloser interfaces.ReadCloseBlobIdGetter
 
 					if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-						object.GetBlobSha(),
+						object.GetBlobId(),
 					); err != nil {
 						err = errors.Wrap(err)
 						return
@@ -876,7 +876,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-					object.GetBlobSha(),
+					object.GetBlobId(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -1010,7 +1010,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				if _, err = fmt.Fprintln(writer, object.GetBlobSha()); err != nil {
+				if _, err = fmt.Fprintln(writer, object.GetBlobId()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -1075,7 +1075,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-					object.GetBlobSha(),
+					object.GetBlobId(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -1115,7 +1115,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				var readCloser interfaces.ReadCloseBlobIdGetter
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().BlobReader(
-					object.GetBlobSha(),
+					object.GetBlobId(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return

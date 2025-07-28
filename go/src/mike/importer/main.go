@@ -122,7 +122,7 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	blobSha := listObject.GetBlobSha()
+	blobSha := listObject.GetBlobId()
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
 		err = env_dir.ErrBlobMissing{
@@ -291,7 +291,7 @@ func (importer importer) importLeafSku(
 func (importer importer) ImportBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
-	blobSha := sk.GetBlobSha()
+	blobSha := sk.GetBlobId()
 
 	if importer.remoteBlobStore == nil {
 		// when this is a dumb HTTP remote, we expect local to push the missing

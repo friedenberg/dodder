@@ -53,7 +53,7 @@ func (format formatterTypFormatterUTIGroups) Format(
 
 	if blob, _, err = format.store.ParseTypedBlob(
 		skuTyp.GetType(),
-		skuTyp.GetBlobSha(),
+		skuTyp.GetBlobId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

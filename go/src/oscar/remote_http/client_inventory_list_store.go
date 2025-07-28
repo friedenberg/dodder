@@ -68,7 +68,7 @@ func (client client) ImportInventoryList(
 		client.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
 			listSku.GetType(),
 			blobStore,
-			listSku.GetBlobSha(),
+			listSku.GetBlobId(),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -149,7 +149,7 @@ func (client client) ImportInventoryList(
 
 		if sig, err = repo_signing.SignBase64(
 			key,
-			listSku.GetBlobSha().GetBytes(),
+			listSku.GetBlobId().GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

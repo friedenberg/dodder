@@ -22,7 +22,7 @@ func TomlBookmarkUrl(
 ) (ur *url.URL, err error) {
 	var reader interfaces.ReadCloseBlobIdGetter
 
-	if reader, err = envRepo.GetDefaultBlobStore().BlobReader(object.GetBlobSha()); err != nil {
+	if reader, err = envRepo.GetDefaultBlobStore().BlobReader(object.GetBlobId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

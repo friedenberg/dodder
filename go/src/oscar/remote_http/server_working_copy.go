@@ -36,7 +36,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			return
 		}
 
-		if blobStore.HasBlob(listSku.GetBlobSha()) {
+		if blobStore.HasBlob(listSku.GetBlobId()) {
 			response.StatusCode = http.StatusFound
 			return
 		}

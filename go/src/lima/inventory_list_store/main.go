@@ -247,7 +247,7 @@ func (store *Store) Create(
 	}
 
 	actual := openList.Mover.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobSha())
+	expected := sha.MustWithDigester(object.GetBlobId())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
@@ -274,7 +274,7 @@ func (store *Store) WriteInventoryListBlob(
 	list *sku.List,
 ) (err error) {
 	if list.Len() == 0 {
-		if !object.GetBlobSha().IsNull() {
+		if !object.GetBlobId().IsNull() {
 			err = errors.ErrorWithStackf(
 				"inventory list has non-empty blob but passed in list is empty. %q",
 				sku.String(object),
@@ -314,7 +314,7 @@ func (store *Store) WriteInventoryListBlob(
 	}
 
 	actual := writeCloser.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobSha())
+	expected := sha.MustWithDigester(object.GetBlobId())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
@@ -357,7 +357,7 @@ func (store *Store) ImportInventoryList(
 	var blobReader interfaces.ReadCloseBlobIdGetter
 
 	if blobReader, err = remoteBlobStore.BlobReader(
-		object.GetBlobSha(),
+		object.GetBlobId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -388,7 +388,7 @@ func (store *Store) ImportInventoryList(
 			store.GetEnvRepo().GetEnv(),
 			store.blobBlobStore,
 			remoteBlobStore,
-			sk.GetBlobSha(),
+			sk.GetBlobId(),
 			nil,
 		); err != nil {
 			if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
@@ -492,7 +492,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 			}
 
 			iter := store.IterInventoryList(
-				listObject.GetBlobSha(),
+				listObject.GetBlobId(),
 			)
 
 			for object, iterErr := range iter {
@@ -526,7 +526,7 @@ func (store *Store) ReadAllSkus(
 		}
 
 		iter := store.IterInventoryList(
-			listObject.GetBlobSha(),
+			listObject.GetBlobId(),
 		)
 
 		for object, iterErr := range iter {

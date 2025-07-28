@@ -29,20 +29,20 @@ type Transacted struct {
 	ExternalObjectId ids.ExternalObjectId
 }
 
-func (t *Transacted) GetSkuExternal() *Transacted {
-	return t
+func (transacted *Transacted) GetSkuExternal() *Transacted {
+	return transacted
 }
 
-func (t *Transacted) GetRepoId() ids.RepoId {
-	return t.RepoId
+func (transacted *Transacted) GetRepoId() ids.RepoId {
+	return transacted.RepoId
 }
 
-func (t *Transacted) GetExternalObjectId() ids.ExternalObjectIdLike {
-	return &t.ExternalObjectId
+func (transacted *Transacted) GetExternalObjectId() ids.ExternalObjectIdLike {
+	return &transacted.ExternalObjectId
 }
 
-func (t *Transacted) GetExternalState() external_state.State {
-	return t.State
+func (transacted *Transacted) GetExternalState() external_state.State {
+	return transacted.State
 }
 
 func (transacted *Transacted) CloneTransacted() (cloned *Transacted) {
@@ -51,8 +51,8 @@ func (transacted *Transacted) CloneTransacted() (cloned *Transacted) {
 	return
 }
 
-func (t *Transacted) GetSku() *Transacted {
-	return t
+func (transacted *Transacted) GetSku() *Transacted {
+	return transacted
 }
 
 func (transacted *Transacted) SetFromTransacted(other *Transacted) (err error) {
@@ -152,21 +152,21 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	return true
 }
 
-func (s *Transacted) GetGenre() interfaces.Genre {
-	return s.ObjectId.GetGenre()
+func (transacted *Transacted) GetGenre() interfaces.Genre {
+	return transacted.ObjectId.GetGenre()
 }
 
-func (s *Transacted) IsNew() bool {
-	return s.Metadata.GetMotherDigest().IsNull()
+func (transacted *Transacted) IsNew() bool {
+	return transacted.Metadata.GetMotherDigest().IsNull()
 }
 
-func (s *Transacted) CalculateObjectShaDebug() (err error) {
-	return s.calculateObjectSha(true)
+func (transacted *Transacted) CalculateObjectShaDebug() (err error) {
+	return transacted.calculateObjectSha(true)
 }
 
 // TODO replace this with repo signatures
-func (s *Transacted) CalculateObjectDigests() (err error) {
-	return s.calculateObjectSha(false)
+func (transacted *Transacted) CalculateObjectDigests() (err error) {
+	return transacted.calculateObjectSha(false)
 }
 
 func (transacted *Transacted) makeShaCalcFunc(
@@ -242,8 +242,7 @@ func (transacted *Transacted) GetObjectSha() interfaces.BlobId {
 	return transacted.GetMetadata().GetDigest()
 }
 
-// TODO rename to GetBlobDigest
-func (transacted *Transacted) GetBlobSha() interfaces.BlobId {
+func (transacted *Transacted) GetBlobId() interfaces.BlobId {
 	return &transacted.Metadata.Blob
 }
 

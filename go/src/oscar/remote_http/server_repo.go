@@ -37,12 +37,12 @@ func (server *Server) writeInventoryList(
 
 	blobStore := server.Repo.GetBlobStore()
 
-	if blobStore.HasBlob(listSku.GetBlobSha()) {
+	if blobStore.HasBlob(listSku.GetBlobId()) {
 		response.StatusCode = http.StatusFound
 		return
 	}
 
-	expected := sha.MustWithDigester(listSku.GetBlobSha())
+	expected := sha.MustWithDigester(listSku.GetBlobId())
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 
@@ -119,7 +119,7 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			blobSha := sk.GetBlobSha()
+			blobSha := sk.GetBlobId()
 
 			var ok bool
 			ok, err = server.blobCache.HasBlob(blobSha)

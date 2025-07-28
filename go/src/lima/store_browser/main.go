@@ -127,7 +127,7 @@ func (store *Store) Flush() (err error) {
 func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r interfaces.ReadCloseBlobIdGetter
 
-	if r, err = store.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobSha()); err != nil {
+	if r, err = store.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -142,7 +142,7 @@ func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 		err = errors.Wrapf(
 			err,
 			"Sha: %s, Object Id: %s",
-			sk.GetBlobSha(),
+			sk.GetBlobId(),
 			sk.GetObjectId(),
 		)
 		return
