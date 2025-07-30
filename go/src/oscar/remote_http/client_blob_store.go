@@ -24,8 +24,7 @@ func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 	{
 		var err error
 
-		if request, err = http.NewRequestWithContext(
-			client.GetEnv(),
+		if request, err = client.newRequest(
 			"HEAD",
 			"/blobs",
 			strings.NewReader(digests.Format(sh.GetBlobId())),
@@ -54,8 +53,7 @@ func (client *client) BlobReader(
 ) (reader interfaces.ReadCloseBlobIdGetter, err error) {
 	var request *http.Request
 
-	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
+	if request, err = client.newRequest(
 		"GET",
 		fmt.Sprintf("/blobs/%s", digests.Format(sh.GetBlobId())),
 		nil,
@@ -115,8 +113,7 @@ func (client *client) WriteBlobToRemote(
 
 	var request *http.Request
 
-	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
+	if request, err = client.newRequest(
 		"POST",
 		"/blobs",
 		reader,

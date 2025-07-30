@@ -13,7 +13,7 @@ var todo todoPrinter
 func init() {
 	todo = todoPrinter{
 		printer: printer{
-			f: os.Stderr,
+			file: os.Stderr,
 		},
 		includesStack: true,
 	}
@@ -90,7 +90,7 @@ func (p todoPrinter) printf(
 	}
 
 	_, err = fmt.Fprintln(
-		p.f,
+		p.file,
 		fmt.Sprintf(f, a...),
 	)
 

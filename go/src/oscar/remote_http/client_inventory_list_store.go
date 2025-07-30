@@ -2,9 +2,9 @@ package remote_http
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -12,14 +12,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 func (client client) FormatForVersion(
@@ -55,48 +53,6 @@ func (client client) ImportInventoryList(
 	}
 
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
-	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().GetStoreVersion(),
-	)
-
-	buffer := bytes.NewBuffer(nil)
-
-	var list *sku.List
-
-	// TODO add support for "broken" inventory lists that have unstable sorts
-	if list, err = sku.CollectList(
-		client.typedBlobStore.IterInventoryListBlobSkusFromBlobStore(
-			listSku.GetType(),
-			blobStore,
-			listSku.GetBlobId(),
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ui.Log().Printf("collected list (%d): %s", list.Len(), sku.String(listSku))
-
-	{
-		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
-		defer repoolBufferedWriter()
-
-		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = inventory_list_coders.WriteInventoryList(
-			client.envUI,
-			listFormat,
-			quiter.MakeSeqErrorFromSeq(list.All()),
-			bufferedWriter,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = bufferedWriter.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	var sbListSkuBox strings.Builder
 
@@ -121,13 +77,23 @@ func (client client) ImportInventoryList(
 		}
 	}
 
+	var listBlobReader io.ReadCloser
+
+	if listBlobReader, err = blobStore.BlobReader(listSku.GetBlobId()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var request *http.Request
 
-	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
+	if request, err = client.newRequest(
 		"POST",
-		fmt.Sprintf("/inventory_lists/%s", strings.TrimSpace(sbListSkuBox.String())),
-		buffer,
+		fmt.Sprintf(
+			"/inventory_lists/%s/%s",
+			listSku.GetType(),
+			strings.TrimSpace(sbListSkuBox.String()),
+		),
+		listBlobReader,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -171,8 +137,6 @@ func (client client) ImportInventoryList(
 		return
 	}
 
-	ui.Log().Printf("sent list (%d): %s", list.Len(), sku.String(listSku))
-
 	if err = ReadErrorFromBodyOnNot(
 		response,
 		http.StatusCreated,
@@ -182,19 +146,19 @@ func (client client) ImportInventoryList(
 		return
 	}
 
-	var shas sha.Slice
+	var digests sha.Slice
 
-	if _, err = shas.ReadFrom(bufio.NewReader(response.Body)); err != nil {
+	if _, err = digests.ReadFrom(bufio.NewReader(response.Body)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if len(shas) > 0 {
-		ui.Err().Printf("sending blobs: %d", len(shas))
+	if len(digests) > 0 {
+		ui.Err().Printf("sending blobs: %d", len(digests))
 	}
 
-	for _, sh := range shas {
-		if err = client.WriteBlobToRemote(blobStore, sh); err != nil {
+	for _, digest := range digests {
+		if err = client.WriteBlobToRemote(blobStore, digest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -237,8 +201,7 @@ func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted
 	{
 		var err error
 
-		if request, err = http.NewRequestWithContext(
-			client.GetEnv(),
+		if request, err = client.newRequest(
 			"GET",
 			"/inventory_lists",
 			nil,

@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
@@ -70,9 +71,12 @@ func handleMainErrors(
 		return
 	}
 
-	_, stackFrames := ctx.CauseWithStackFrames()
+	if errors.DebugBuild {
+		_, stackFrames := ctx.CauseWithStackFrames()
+		err = stack_frame.Error{Err: err, Frames: stackFrames}
+	}
 
-	errors.PrintStackTracerIfNecessary(ui.Err(), name, err, stackFrames)
+	ui.Err().Printf("%s failed with error: %s", name, err)
 
 	return
 }

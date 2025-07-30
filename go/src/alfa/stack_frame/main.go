@@ -124,17 +124,17 @@ func getPackageAndFunctionName(v string) (p string, f string) {
 	return
 }
 
-func (si Frame) FileNameLine() string {
-	filename := si.Filename
+func (frame Frame) FileNameLine() string {
+	filename := frame.Filename
 
-	if si.RelFilename != "" {
-		filename = si.RelFilename
+	if frame.RelFilename != "" {
+		filename = frame.RelFilename
 	}
 
 	return fmt.Sprintf(
 		"%s:%d",
 		filename,
-		si.Line,
+		frame.Line,
 	)
 }
 
@@ -172,17 +172,17 @@ func (frame Frame) StringLogLine() string {
 	)
 }
 
-func (si Frame) StringNoFunctionName() string {
-	filename := si.Filename
+func (frame Frame) StringNoFunctionName() string {
+	filename := frame.Filename
 
-	if si.RelFilename != "" {
-		filename = si.RelFilename
+	if frame.RelFilename != "" {
+		filename = frame.RelFilename
 	}
 
 	return fmt.Sprintf(
 		"%s|%d|",
 		filename,
-		si.Line,
+		frame.Line,
 	)
 }
 
@@ -199,20 +199,20 @@ func (frame Frame) Wrap(in error) (err error) {
 	}
 }
 
-func (si Frame) Wrapf(in error, f string, values ...any) (err error) {
+func (frame Frame) Wrapf(in error, f string, values ...any) (err error) {
 	return &stackWrapError{
-		Frame:     si,
+		Frame:     frame,
 		ExtraData: fmt.Sprintf(f, values...),
 		next: &stackWrapError{
-			Frame: si,
+			Frame: frame,
 			error: in,
 		},
 	}
 }
 
-func (si Frame) Errorf(f string, values ...any) (err error) {
+func (frame Frame) Errorf(f string, values ...any) (err error) {
 	return &stackWrapError{
-		Frame: si,
+		Frame: frame,
 		error: fmt.Errorf(f, values...),
 	}
 }

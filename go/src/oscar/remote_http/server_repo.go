@@ -23,26 +23,30 @@ import (
 
 func (server *Server) writeInventoryList(
 	request Request,
-	listSku *sku.Transacted,
+	listObject *sku.Transacted,
 ) (response Response) {
 	logRemoteInventoryLists := log_remote_inventory_lists.Make(
 		request.ctx,
 		server.Repo.GetEnvRepo(),
 	)
 
-	if listSku.GetGenre() != genres.InventoryList {
-		response.Error(genres.MakeErrUnsupportedGenre(listSku.GetGenre()))
+	if listObject == nil {
+		panic("nil list object")
+	}
+
+	if listObject.GetGenre() != genres.InventoryList {
+		response.Error(genres.MakeErrUnsupportedGenre(listObject.GetGenre()))
 		return
 	}
 
 	blobStore := server.Repo.GetBlobStore()
 
-	if blobStore.HasBlob(listSku.GetBlobId()) {
+	if blobStore.HasBlob(listObject.GetBlobId()) {
 		response.StatusCode = http.StatusFound
 		return
 	}
 
-	expected := sha.MustWithDigester(listSku.GetBlobId())
+	expected := sha.MustWithDigester(listObject.GetBlobId())
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 
@@ -59,7 +63,7 @@ func (server *Server) writeInventoryList(
 		}
 
 		logEntry.EntryType = log_remote_inventory_lists.EntryTypeReceived
-		logEntry.Transacted = listSku
+		logEntry.Transacted = listObject
 
 		sig := request.request.Header.Get(headerSha256Sig)
 
@@ -101,7 +105,7 @@ func (server *Server) writeInventoryList(
 	}
 
 	seqInventoryListSkus := typedInventoryListStore.IterInventoryListBlobSkusFromReader(
-		listSku.GetType(),
+		listObject.GetType(),
 		bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 	)
 
@@ -170,7 +174,7 @@ func (server *Server) writeInventoryList(
 	response.Body = io.NopCloser(b)
 
 	if err := server.Repo.GetObjectStore().Commit(
-		listSku,
+		listObject,
 		sku.CommitOptions{},
 	); err != nil {
 		response.Error(err)

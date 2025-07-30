@@ -59,8 +59,7 @@ func (client *client) Initialize() {
 	{
 		var err error
 
-		if request, err = http.NewRequestWithContext(
-			client.GetEnv(),
+		if request, err = client.newRequest(
 			"GET",
 			"/config-immutable",
 			nil,
@@ -151,12 +150,14 @@ func (client *client) MakeInventoryList(
 	queryGroup *query.Query,
 ) (list *sku.List, err error) {
 	var request *http.Request
+	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeString()
 
-	if request, err = http.NewRequestWithContext(
-		client.GetEnv(),
+	if request, err = client.newRequest(
 		"GET",
-		// fmt.Sprintf("/query/%s", queryGroup.String()),
-		fmt.Sprintf("/query/%s", url.QueryEscape(queryGroup.String())),
+		fmt.Sprintf("/query/%s/%s",
+			url.QueryEscape(listTypeString),
+			url.QueryEscape(queryGroup.String()),
+		),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -175,17 +176,12 @@ func (client *client) MakeInventoryList(
 		return
 	}
 
-	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.GetImmutableConfigPublic().GetStoreVersion(),
-	)
+	inventoryListCoderCloset := client.localRepo.GetTypedInventoryListBlobStore()
 
-	list = sku.MakeList()
-
-	if err = inventory_list_coders.CollectSkuList(
-		client.envUI,
-		listFormat,
+	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
+		client.localRepo.GetEnvRepo(),
+		ids.GetOrPanic(listTypeString).Type,
 		bufio.NewReader(response.Body),
-		list,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -277,8 +273,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		{
 			var request *http.Request
 
-			if request, err = http.NewRequestWithContext(
-				client.GetEnv(),
+			if request, err = client.newRequest(
 				"POST",
 				"/inventory_lists",
 				buffer,

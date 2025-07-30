@@ -9,104 +9,108 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
-func MakePrinter(f *os.File) printer {
-	return MakePrinterOn(f, true)
+func MakePrinter(file *os.File) printer {
+	return MakePrinterOn(file, true)
 }
 
-func MakePrinterOn(f *os.File, on bool) printer {
+func MakePrinterOn(file *os.File, on bool) printer {
 	return printer{
-		f:     f,
-		isTty: primordial.IsTty(f),
+		file:  file,
+		isTty: primordial.IsTty(file),
 		on:    on,
 	}
 }
 
 type printer struct {
-	// TODO rename to file
-	f     *os.File
+	file  *os.File
 	isTty bool
 	on    bool
 }
 
 // Returns a copy of this printer with a modified `on` setting
-func (p printer) withOn(on bool) printer {
-	p.on = on
-	return p
+func (printer printer) withOn(on bool) printer {
+	printer.on = on
+	return printer
 }
 
-func (p printer) GetPrinter() Printer {
-	return p
+func (printer printer) GetPrinter() Printer {
+	return printer
 }
 
-func (p printer) Write(b []byte) (n int, err error) {
-	if !p.on {
+func (printer printer) Write(b []byte) (n int, err error) {
+	if !printer.on {
 		n = len(b)
 		return
 	}
 
-	return p.f.Write(b)
+	return printer.file.Write(b)
 }
 
-func (p printer) GetFile() *os.File {
-	return p.f
+func (printer printer) GetFile() *os.File {
+	return printer.file
 }
 
-func (p printer) IsTty() bool {
-	return p.isTty
+func (printer printer) IsTty() bool {
+	return printer.isTty
 }
 
-func (p printer) PrintDebug(a ...any) (err error) {
-	if !p.on {
+func (printer printer) PrintDebug(args ...any) (err error) {
+	if !printer.on {
 		return
 	}
 
 	_, err = fmt.Fprintf(
-		p.f,
-		strings.Repeat("%#v ", len(a))+"\n",
-		a...,
+		printer.file,
+		strings.Repeat("%#v ", len(args))+"\n",
+		args...,
 	)
 
 	return
 }
 
-func (p printer) Print(a ...any) (err error) {
-	if !p.on {
+func (printer printer) Print(args ...any) (err error) {
+	if !printer.on {
 		return
 	}
 
 	_, err = fmt.Fprintln(
-		p.f,
-		a...,
+		printer.file,
+		args...,
 	)
 
 	return
 }
 
-func (p printer) printfStack(depth int, f string, a ...any) (err error) {
-	if !p.on {
+//go:noinline
+func (printer printer) printfStack(
+	depth int,
+	format string,
+	args ...any,
+) (err error) {
+	if !printer.on {
 		return
 	}
 
-	si, _ := stack_frame.MakeFrame(1 + depth)
-	f = "%s" + f
-	a = append([]interface{}{si}, a...)
+	stackFrame, _ := stack_frame.MakeFrame(1 + depth)
+	format = "%s" + format
+	args = append([]any{stackFrame}, args...)
 
 	_, err = fmt.Fprintln(
-		p.f,
-		fmt.Sprintf(f, a...),
+		printer.file,
+		fmt.Sprintf(format, args...),
 	)
 
 	return
 }
 
-func (p printer) Printf(f string, a ...any) (err error) {
-	if !p.on {
+func (printer printer) Printf(format string, args ...any) (err error) {
+	if !printer.on {
 		return
 	}
 
 	_, err = fmt.Fprintln(
-		p.f,
-		fmt.Sprintf(f, a...),
+		printer.file,
+		fmt.Sprintf(format, args...),
 	)
 
 	return

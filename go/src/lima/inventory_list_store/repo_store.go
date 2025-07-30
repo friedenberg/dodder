@@ -20,21 +20,21 @@ func (store *Store) Commit(
 	externalLike sku.ExternalLike,
 	_ sku.CommitOptions,
 ) (err error) {
-	sk := externalLike.GetSku()
+	object := externalLike.GetSku()
 
-	if sk.GetGenre() != genres.InventoryList {
-		err = genres.MakeErrUnsupportedGenre(sk.GetGenre())
+	if object.GetGenre() != genres.InventoryList {
+		err = genres.MakeErrUnsupportedGenre(object.GetGenre())
 		return
 	}
 
 	// TODO transform this inventory list into a local inventory list and update
 	// its tai
-	if err = store.WriteInventoryListObject(sk); err != nil {
+	if err = store.WriteInventoryListObject(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = store.ui.TransactedNew(sk); err != nil {
+	if err = store.ui.TransactedNew(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

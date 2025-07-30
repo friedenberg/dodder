@@ -103,12 +103,9 @@ func (digest *Sha) GetTail() string {
 	return digest.String()[2:]
 }
 
+// TODO remove
 func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
-	if !digests.Equals(digest, b) {
-		return digests.MakeErrNotEqual(digest, b)
-	}
-
-	return nil
+	return digests.MakeErrNotEqual(digest, b)
 }
 
 // func (digest *Sha) EqualsAny(b any) bool {

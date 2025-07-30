@@ -121,9 +121,12 @@ func (json *Transacted) ToTransacted(
 		return
 	}
 
-	if err = object.Metadata.Type.Set(json.Type); err != nil {
-		err = errors.Wrap(err)
-		return
+	// TODO enforce non-empty types
+	if json.Type != "" {
+		if err = object.Metadata.Type.Set(json.Type); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = object.Metadata.Description.Set(json.Description); err != nil {

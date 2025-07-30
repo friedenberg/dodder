@@ -153,9 +153,7 @@ func (blobStore *blobStoreV1) IterAllInventoryLists() interfaces.SeqError[*sku.T
 
 		defer errors.ContextMustClose(blobStore.envRepo, file)
 
-		seq := blobStore.typedBlobStore.AllDecodedObjectsFromStream(
-			file,
-		)
+		seq := blobStore.typedBlobStore.AllDecodedObjectsFromStream(file)
 
 		for object, err := range seq {
 			if err != nil {

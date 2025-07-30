@@ -56,15 +56,18 @@ func (coder jsonV0) DecodeFrom(
 ) (n int64, err error) {
 	var objectJson sku_json_fmt.Transacted
 
-	decoder := json.NewDecoder(bufferedReader)
+	bytess, err := bufferedReader.ReadBytes('\n')
+	if err != nil {
+		return
+	}
 
-	if err = decoder.Decode(&objectJson); err != nil {
-		err = errors.Wrap(err)
+	if err = json.Unmarshal(bytess, &objectJson); err != nil {
+		err = errors.Wrapf(err, "Line: %q", bytess)
 		return
 	}
 
 	if err = objectJson.ToTransacted(object, nil); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Line: %q", bytess)
 		return
 	}
 

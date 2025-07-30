@@ -396,7 +396,6 @@ func RunContextWithPrintTicker(
 			runFunc(ctx)
 		},
 	); err != nil {
-		err = Wrap(err)
 		return
 	}
 

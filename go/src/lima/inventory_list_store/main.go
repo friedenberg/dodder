@@ -352,12 +352,12 @@ func (store *Store) WriteInventoryListBlob(
 // skus AND the list, while private writes just the list
 func (store *Store) ImportInventoryList(
 	remoteBlobStore interfaces.BlobStore,
-	object *sku.Transacted,
+	listObject *sku.Transacted,
 ) (err error) {
 	var blobReader interfaces.ReadCloseBlobIdGetter
 
 	if blobReader, err = remoteBlobStore.BlobReader(
-		object.GetBlobId(),
+		listObject.GetBlobId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -366,20 +366,21 @@ func (store *Store) ImportInventoryList(
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(blobReader)
 	defer repoolBufferedReader()
 
-	list := sku.MakeList()
+	var list *sku.List
 
-	if err = inventory_list_coders.CollectSkuList(
-		store.envRepo,
-		store.FormatForVersion(store.storeVersion),
+	inventoryListCoderCloset := store.getTypedBlobStore()
+
+	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
+		store.GetEnvRepo(),
+		listObject.GetType(),
 		bufferedReader,
-		list,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for sk := range list.All() {
-		if err = sk.CalculateObjectDigests(); err != nil {
+	for childObject := range list.All() {
+		if err = childObject.CalculateObjectDigests(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -388,7 +389,7 @@ func (store *Store) ImportInventoryList(
 			store.GetEnvRepo().GetEnv(),
 			store.blobBlobStore,
 			remoteBlobStore,
-			sk.GetBlobId(),
+			childObject.GetBlobId(),
 			nil,
 		); err != nil {
 			if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
@@ -402,9 +403,11 @@ func (store *Store) ImportInventoryList(
 		}
 	}
 
+	// TODO transform listObject into local type if necessary
+
 	if err = store.WriteInventoryListBlob(
 		remoteBlobStore,
-		object,
+		listObject,
 		list,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -412,7 +415,7 @@ func (store *Store) ImportInventoryList(
 	}
 
 	if err = store.WriteInventoryListObject(
-		object,
+		listObject,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

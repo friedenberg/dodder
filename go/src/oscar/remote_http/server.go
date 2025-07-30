@@ -18,10 +18,10 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -33,12 +33,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"github.com/gorilla/mux"
 )
+
+// TODO use context cancellation for http errors
 
 type Server struct {
 	EnvLocal  env_local.Env
@@ -185,8 +186,13 @@ func (server *Server) makeRouter(
 			Methods("POST")
 	}
 
-	router.HandleFunc("/query/{query}", makeHandler(server.handleGetQuery)).
-		Methods("GET")
+	router.HandleFunc(
+		"/query/{list_type}/{query}",
+		makeHandler(server.handleGetQuery),
+	).
+		Methods(
+			"GET",
+		)
 
 	router.HandleFunc("/mcp", makeHandler(server.handleMCP)).
 		Methods("POST")
@@ -209,7 +215,7 @@ func (server *Server) makeRouter(
 			)
 
 		router.HandleFunc(
-			"/inventory_lists/{box}",
+			"/inventory_lists/{list_type}/{list_object}",
 			makeHandler(server.handlePostInventoryList),
 		).
 			Methods(
@@ -308,6 +314,7 @@ func (server *Server) loggerMiddleware(next http.Handler) http.Handler {
 	)
 }
 
+// TODO consider removing in place of context
 func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, request *http.Request) {
@@ -398,7 +405,7 @@ func (server *Server) makeHandler(
 ) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		request := Request{
-			ctx:    errors.MakeContext(server.EnvLocal),
+			ctx:        errors.MakeContext(server.EnvLocal),
 			request:    req,
 			MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
 			Headers:    req.Header,
@@ -406,12 +413,31 @@ func (server *Server) makeHandler(
 		}
 
 		var progressWriter env_ui.ProgressWriter
+		var response Response
 
 		if err := errors.RunContextWithPrintTicker(
 			request.ctx,
 			func(ctx interfaces.Context) {
-				response := handler(request)
+				response = handler(request)
+			},
+			func(time time.Time) {
+				ui.Log().Printf(
+					"Still serving request (%s): %q",
+					time,
+					req.URL,
+					progressWriter.GetWrittenHumanString(),
+				)
+			},
+			3*time.Second,
+		); err != nil {
+			_, stackFrames := request.ctx.CauseWithStackFrames()
+			err = stack_frame.Error{Err: err, Frames: stackFrames}
+			response.Error(err)
+		}
 
+		if err := errors.RunContextWithPrintTicker(
+			request.ctx,
+			func(ctx interfaces.Context) {
 				header := responseWriter.Header()
 
 				for key, values := range response.Headers() {
@@ -461,7 +487,14 @@ func (server *Server) makeHandler(
 			},
 			3*time.Second,
 		); err != nil {
-			server.EnvLocal.Cancel(err)
+			_, stackFrames := request.ctx.CauseWithStackFrames()
+			err = stack_frame.Error{Err: err, Frames: stackFrames}
+
+			http.Error(
+				responseWriter,
+				err.Error(),
+				http.StatusInternalServerError,
+			)
 		}
 	}
 }
@@ -640,6 +673,19 @@ func (server *Server) copyBlob(
 }
 
 func (server *Server) handleGetQuery(request Request) (response Response) {
+	var listTypeString string
+
+	{
+		var err error
+
+		if listTypeString, err = url.QueryUnescape(
+			request.Vars()["list_type"],
+		); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
 	var queryGroupString string
 
 	{
@@ -683,17 +729,15 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		// TODO make this more performant by returning a proper reader
 		buffer := bytes.NewBuffer(nil)
 
-		listFormat := repo.GetStore().GetInventoryListStore().FormatForVersion(
-			repo.GetConfig().GetStoreVersion(),
-		)
-
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 		defer repoolBufferedWriter()
 
-		if _, err := inventory_list_coders.WriteInventoryList(
+		inventoryListCoderCloset := server.Repo.GetTypedInventoryListBlobStore()
+
+		if _, err := inventoryListCoderCloset.WriteBlobToWriter(
 			repo,
-			listFormat,
-			quiter.MakeSeqErrorFromSeq(list.All()),
+			ids.GetOrPanic(listTypeString).Type,
+			list,
 			bufferedWriter,
 		); err != nil {
 			server.EnvLocal.Cancel(err)
@@ -762,60 +806,93 @@ func (server *Server) handleGetInventoryList(
 func (server *Server) handlePostInventoryList(
 	request Request,
 ) (response Response) {
-	boxString := request.Vars()["box"]
+	listTypeString := request.Vars()["list_type"]
+	listObjectString := request.Vars()["list_object"]
 
-	var sk *sku.Transacted
+	if listTypeString == "" || listObjectString == "" {
+		if listTypeString != "" {
+			response.ErrorWithStatus(
+				http.StatusBadRequest,
+				errors.BadRequestf("no list type provided"),
+			)
+			return
+		} else if listObjectString != "" {
+			response.ErrorWithStatus(
+				http.StatusBadRequest,
+				errors.BadRequestf("no list object provided"),
+			)
+			return
+		} else {
+			return server.handlePostInventoryListNew(request)
+		}
+	}
 
 	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
 
-	if boxString != "" {
+	{
+		var err error
 
-		{
-			var err error
-
-			if boxString, err = url.QueryUnescape(request.Vars()["box"]); err != nil {
-				response.Error(err)
-				return
-			}
+		if listTypeString, err = url.QueryUnescape(listTypeString); err != nil {
+			response.Error(err)
+			return
 		}
+	}
 
-		{
-			var err error
+	{
+		var err error
 
-			bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
-				strings.NewReader(boxString),
-			)
-			defer repoolBufferedReader()
+		if listObjectString, err = url.QueryUnescape(listObjectString); err != nil {
+			response.Error(err)
+			return
+		}
+	}
 
-			if sk, err = typedInventoryListStore.ReadInventoryListObject(
-				request.ctx,
-				ids.MustType(
-					server.Repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
+	var object *sku.Transacted
+
+	{
+		var err error
+
+		bufferedReader, repool := pool.GetBufferedReader(
+			strings.NewReader(listObjectString),
+		)
+		defer repool()
+
+		if object, err = typedInventoryListStore.ReadInventoryListObject(
+			request.ctx,
+			ids.MustType(listTypeString),
+			bufferedReader,
+		); err != nil {
+			response.Error(
+				errors.ErrorWithStackf(
+					"failed to parse inventory list sku (%q): %w",
+					listObjectString,
+					err,
 				),
-				bufferedReader,
-			); err != nil {
-				response.Error(
-					errors.ErrorWithStackf(
-						"failed to parse inventory list sku (%q): %w",
-						boxString,
-						err,
-					),
-				)
+			)
 
-				return
-			}
+			return
 		}
 
-		defer sku.GetTransactedPool().Put(sk)
+		defer sku.GetTransactedPool().Put(object)
 	}
 
-	// TODO parse box into sk
 	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		response = server.writeInventoryListLocalWorkingCopy(repo, request, sk)
+		response = server.writeInventoryListLocalWorkingCopy(
+			repo,
+			request,
+			object,
+		)
 	} else {
-		response = server.writeInventoryList(request, sk)
+		response.ErrorWithStatus(http.StatusNotImplemented, nil)
 	}
 
+	return
+}
+
+func (server *Server) handlePostInventoryListNew(
+	request Request,
+) (response Response) {
+	response.ErrorWithStatus(http.StatusNotImplemented, nil)
 	return
 }
 

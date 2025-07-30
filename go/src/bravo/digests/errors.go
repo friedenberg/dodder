@@ -21,21 +21,33 @@ type ErrNotEqual struct {
 	Expected, Actual interfaces.BlobId
 }
 
-func MakeErrNotEqual(expected, actual interfaces.BlobId) *ErrNotEqual {
-	err := &ErrNotEqual{
+func IsErrNotEqual(err error) bool {
+	return errors.Is(err, ErrNotEqual{})
+}
+
+func MakeErrNotEqual(expected, actual interfaces.BlobId) (err error) {
+	if Equals(expected, actual) {
+		return
+	}
+
+	err = ErrNotEqual{
 		Expected: expected,
 		Actual:   actual,
 	}
 
-	return err
+	return
 }
 
-func (e *ErrNotEqual) Error() string {
-	return fmt.Sprintf("expected digest %s but got %s", e.Expected, e.Actual)
+func (err ErrNotEqual) Error() string {
+	return fmt.Sprintf(
+		"expected digest %s but got %s",
+		err.Expected,
+		err.Actual,
+	)
 }
 
-func (e *ErrNotEqual) Is(target error) bool {
-	_, ok := target.(*ErrNotEqual)
+func (err ErrNotEqual) Is(target error) bool {
+	_, ok := target.(ErrNotEqual)
 	return ok
 }
 

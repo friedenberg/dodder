@@ -48,7 +48,10 @@ func (response *Response) Headers() http.Header {
 
 func (response *Response) ErrorWithStatus(status int, err error) {
 	response.StatusCode = status
-	response.Body = io.NopCloser(strings.NewReader(err.Error()))
+
+	if err != nil {
+		response.Body = io.NopCloser(strings.NewReader(err.Error()))
+	}
 }
 
 func (response *Response) Error(err error) {
@@ -91,12 +94,33 @@ func ReadErrorFromBody(response *http.Response) (err error) {
 		return
 	}
 
-	err = errors.BadRequestf(
-		"remote responded to request (%q) with error (%d):\n\n%s",
-		fmt.Sprintf("%s %s", response.Request.Method, response.Request.URL),
-		response.StatusCode,
-		&sb,
+	body := sb.String()
+
+	endpointText := fmt.Sprintf(
+		"%s %s",
+		response.Request.Method,
+		response.Request.URL,
 	)
+
+	statusText := fmt.Sprintf(
+		"%d %s", response.StatusCode,
+		http.StatusText(response.StatusCode),
+	)
+
+	if body == "" {
+		err = errors.BadRequestf(
+			"remote responded to request (%q) with error status: %s (error body not provided)",
+			endpointText,
+			statusText,
+		)
+	} else {
+		err = errors.BadRequestf(
+			"remote responded to request (%q) with error (%s):\n\n%s",
+			endpointText,
+			statusText,
+			body,
+		)
+	}
 
 	return
 }
