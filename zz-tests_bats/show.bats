@@ -224,7 +224,7 @@ function show_history_one_zettel { # @test
 	EOM
 }
 
-function show_zettel_etikett { # @test
+function show_zettel_tag { # @test
 	run_dodder show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -259,7 +259,7 @@ function show_zettels_with_tag_no_workspace_folder { # @test
 	EOM
 }
 
-function show_zettel_etikett_complex { # @test
+function show_zettel_tag_complex { # @test
 	run_dodder init-workspace
 	assert_success
 
@@ -308,7 +308,7 @@ function show_zettel_etikett_complex { # @test
 	EOM
 }
 
-function show_complex_zettel_etikett_negation { # @test
+function show_complex_zettel_tag_negation { # @test
 	run_dodder show ^-etikett-two:z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -358,21 +358,21 @@ function show_simple_type_one_history { # @test
 	EOM
 }
 
-function show_simple_typ_schwanzen { # @test
+function show_simple_type_tail { # @test
 	run_dodder show :t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
-function show_simple_typ_history { # @test
+function show_simple_type_history { # @test
 	run_dodder show +t
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
-function show_simple_etikett_schwanzen { # @test
+function show_simple_tag_tail { # @test
 	run_dodder show :e
 	assert_output_unsorted - <<-EOM
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -383,7 +383,7 @@ function show_simple_etikett_schwanzen { # @test
 	EOM
 }
 
-function show_simple_etikett_history { # @test
+function show_simple_tag_history { # @test
 	run_dodder show +e
 	assert_output_unsorted - <<-EOM
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -452,7 +452,7 @@ function show_history_all { # @test
 }
 
 # bats test_tags=user_story:workspace
-function show_etikett_toml { # @test
+function show_tag_toml { # @test
 	skip
 	cat >true.tag <<-EOM
 		---
@@ -485,7 +485,7 @@ function show_etikett_toml { # @test
 
 # TODO fix race condition between stderr and stdout
 # bats test_tags=user_story:workspace, user_story:lua_tags
-function show_etikett_lua_v1 { # @test
+function show_tag_lua_v1 { # @test
 	skip
 	cat >true.tag <<-EOM
 		---
@@ -519,7 +519,7 @@ function show_etikett_lua_v1 { # @test
 
 # TODO fix race condition between stderr and stdout
 # bats test_tags=user_story:workspace, user_story:lua_tags
-function show_etikett_lua_v2 { # @test
+function show_tag_lua_v2 { # @test
 	skip
 	cat >true.tag <<-EOM
 		---

@@ -92,7 +92,7 @@ function try_add_new_after_pull {
 	EOM
 }
 
-function pull_history_zettel_typ_etikett_no_conflicts { # @test
+function pull_history_zettel_type_tag_no_conflicts { # @test
 	them="them"
 	bootstrap_xdg "$them"
 	assert_success
@@ -170,7 +170,7 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 	try_add_new_after_pull
 }
 
-function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
+function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	them="them"
 	bootstrap_xdg "$them"
 	assert_success
@@ -285,7 +285,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 	try_add_new_after_pull
 }
 
-function pull_history_zettel_typ_etikett_yes_conflicts_allowed_remote_first { # @test
+function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init_disable_age
 
@@ -365,7 +365,7 @@ function pull_history_zettel_typ_etikett_yes_conflicts_allowed_remote_first { # 
 	EOM
 }
 
-function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
+function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init_disable_age
 

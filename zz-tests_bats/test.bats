@@ -113,7 +113,7 @@ function can_checkout_and_checkin { # @test
 	EOM
 }
 
-function can_checkout_via_etiketten { # @test
+function can_checkout_via_tags { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 

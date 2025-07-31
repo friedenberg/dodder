@@ -89,7 +89,7 @@ function try_add_new_after_clone {
 	EOM
 }
 
-function clone_history_zettel_typ_etikett { # @test
+function clone_history_zettel_type_tag { # @test
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -119,7 +119,7 @@ function clone_history_zettel_typ_etikett { # @test
 	try_add_new_after_clone
 }
 
-function clone_history_zettel_typ_etikett_stdio_local { # @test
+function clone_history_zettel_type_tag_stdio_local { # @test
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -170,7 +170,7 @@ function clone_history_one_zettel_stdio_local { # @test
 	EOM
 }
 
-function clone_history_zettel_typ_etikett_stdio_ssh { # @test
+function clone_history_zettel_type_tag_stdio_ssh { # @test
 	skip
 	them="them"
 	bootstrap "$them"

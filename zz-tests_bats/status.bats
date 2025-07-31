@@ -102,7 +102,7 @@ function dirty_da_new_typ() {
 	EOM
 }
 
-function dirty_zz_archive_etikett() {
+function dirty_zz_archive_tag() {
 	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
@@ -125,7 +125,7 @@ function status_simple_one_zettel { # @test
 	EOM
 }
 
-function status_simple_one_zettel_akte_separate { # @test
+function status_simple_one_zettel_blob_separate { # @test
 	checkout_everything
 	run_dodder status one/uno.zettel
 	assert_success
@@ -147,7 +147,7 @@ function status_simple_one_zettel_akte_separate { # @test
 	EOM
 }
 
-function status_simple_one_zettel_akte_only { # @test
+function status_simple_one_zettel_blob_only { # @test
 	checkout_everything
 	run_dodder clean one/uno.zettel
 	assert_success
@@ -186,7 +186,7 @@ function status_simple_one_zettel_akte_only { # @test
 	EOM
 }
 
-function status_zettel_akte_checkout { # @test
+function status_zettel_blob_checkout { # @test
 	checkout_everything
 	run_dodder clean .
 	assert_success
@@ -259,7 +259,7 @@ function status_zettelen_typ { # @test
 	EOM
 }
 
-function status_complex_zettel_etikett_negation { # @test
+function status_complex_zettel_tag_negation { # @test
 	checkout_everything
 	run_dodder status ^-etikett-two.z
 	assert_success
@@ -296,7 +296,7 @@ function status_simple_all { # @test
 	dirty_one_uno
 	dirty_one_dos
 	dirty_md_typ
-	dirty_zz_archive_etikett
+	dirty_zz_archive_tag
 	dirty_da_new_typ
 
 	run_dodder status .
@@ -334,7 +334,7 @@ function status_simple_typ { # @test
 	EOM
 }
 
-function status_simple_etikett { # @test
+function status_simple_tag { # @test
 	checkout_everything
 	run_dodder status .e
 	assert_success
@@ -346,7 +346,7 @@ function status_simple_etikett { # @test
 		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	dirty_zz_archive_etikett
+	dirty_zz_archive_tag
 
 	run_dodder status .e
 	assert_success
