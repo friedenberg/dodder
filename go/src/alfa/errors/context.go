@@ -218,7 +218,7 @@ func (ctx *context) Must(f interfaces.FuncContext) {
 	defer ContextContinueOrPanic(ctx)
 
 	if err := f(ctx); err != nil {
-		ctx.cancel(WrapN(1, err))
+		ctx.cancel(WrapSkip(1, err))
 	}
 }
 
@@ -316,7 +316,7 @@ func ContextCancelWith499ClientClosedRequest(ctx interfaces.ActiveContext) {
 
 func ContextCancelWithError(ctx interfaces.ActiveContext, err error) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(WrapN(1, err))
+	ctx.Cancel(WrapSkip(1, err))
 }
 
 func ContextCancelWithErrorAndFormat(
@@ -326,13 +326,7 @@ func ContextCancelWithErrorAndFormat(
 	values ...any,
 ) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(
-		&stackWrapError{
-			Frame: stack_frame.MustFrame(1),
-			error: fmt.Errorf(format, values...),
-			next:  WrapSkip(1, err),
-		},
-	)
+	ctx.Cancel(WrapSkip(1, fmt.Errorf(format, values...)))
 }
 
 func ContextCancelWithErrorf(

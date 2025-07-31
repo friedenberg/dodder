@@ -126,7 +126,7 @@ func CollectSkuList(
 	reader *bufio.Reader,
 	list *sku.List,
 ) (err error) {
-	iter := StreamInventoryList(ctx, listFormat, reader)
+	iter := streamInventoryList(ctx, listFormat, reader)
 
 	for sk, iterErr := range iter {
 		if iterErr != nil {
@@ -143,7 +143,7 @@ func CollectSkuList(
 	return
 }
 
-func StreamInventoryList(
+func streamInventoryList(
 	ctx interfaces.ActiveContext,
 	format sku.ListFormat,
 	bufferedReader *bufio.Reader,
@@ -177,7 +177,7 @@ func StreamInventoryList(
 	}
 }
 
-func WriteInventoryListObject(
+func writeInventoryListObject(
 	format sku.ListFormat,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
@@ -227,12 +227,12 @@ func (coder SeqCoder) DecodeFrom(
 	return
 }
 
-type SeqErrorCoder struct {
+type SeqErrorDecoder struct {
 	ctx interfaces.ActiveContext
 	sku.ListFormat
 }
 
-func (coder SeqErrorCoder) DecodeFrom(
+func (coder SeqErrorDecoder) DecodeFrom(
 	yield func(*sku.Transacted, error) bool,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
@@ -258,6 +258,37 @@ func (coder SeqErrorCoder) DecodeFrom(
 
 		if !yield(object, nil) {
 			return
+		}
+	}
+
+	return
+}
+
+type SeqErrorEncoder struct {
+	ctx interfaces.ActiveContext
+	sku.ListFormat
+}
+
+func (coder SeqErrorDecoder) EncodeTo(
+	seq sku.Seq,
+	bufferedWriter *bufio.Writer,
+) (n int64, err error) {
+	for object, iterErr := range seq {
+		errors.ContextContinueOrPanic(coder.ctx)
+
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		if _, err = coder.ListFormat.EncodeTo(object, bufferedWriter); err != nil {
+			if err == io.EOF {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

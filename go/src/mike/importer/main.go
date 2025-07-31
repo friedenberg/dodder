@@ -289,9 +289,9 @@ func (importer importer) importLeafSku(
 }
 
 func (importer importer) ImportBlobIfNecessary(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	blobSha := sk.GetBlobId()
+	blobId := object.GetBlobId()
 
 	if importer.remoteBlobStore == nil {
 		// when this is a dumb HTTP remote, we expect local to push the missing
@@ -299,15 +299,15 @@ func (importer importer) ImportBlobIfNecessary(
 
 		n := int64(-1)
 
-		if importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
+		if importer.envRepo.GetDefaultBlobStore().HasBlob(blobId) {
 			n = -2
 		}
 
 		if importer.blobCopierDelegate != nil {
 			if err = importer.blobCopierDelegate(
 				sku.BlobCopyResult{
-					Transacted: sk,
-					BlobId:     blobSha,
+					Transacted: object,
+					BlobId:     blobId,
 					N:          n,
 				},
 			); err != nil {
@@ -319,7 +319,7 @@ func (importer importer) ImportBlobIfNecessary(
 		return
 	}
 
-	if !importer.blobGenres.Contains(sk.GetGenre()) {
+	if !importer.blobGenres.Contains(object.GetGenre()) {
 		return
 	}
 
@@ -334,7 +334,7 @@ func (importer importer) ImportBlobIfNecessary(
 				importer.envRepo,
 				importer.envRepo.GetDefaultBlobStore(),
 				importer.remoteBlobStore,
-				blobSha,
+				blobId,
 				&progressWriter,
 			); err != nil {
 				if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
@@ -353,8 +353,8 @@ func (importer importer) ImportBlobIfNecessary(
 			if importer.blobCopierDelegate != nil {
 				if err = importer.blobCopierDelegate(
 					sku.BlobCopyResult{
-						Transacted: sk,
-						BlobId:     blobSha,
+						Transacted: object,
+						BlobId:     blobId,
 						N:          n,
 					},
 				); err != nil {
@@ -366,7 +366,7 @@ func (importer importer) ImportBlobIfNecessary(
 		func(time time.Time) {
 			ui.Err().Printf(
 				"Copying %s... (%s written)",
-				blobSha,
+				blobId,
 				progressWriter.GetWrittenHumanString(),
 			)
 		},

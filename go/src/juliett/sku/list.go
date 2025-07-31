@@ -30,8 +30,10 @@ type InventoryListStore interface {
 
 	IterAllInventoryLists() interfaces.SeqError[*Transacted]
 	MakeImporter(ImporterOptions, StoreOptions) Importer
-	ImportList(*List, Importer) error
+	ImportSeq(Seq, Importer) error
 }
+
+type Seq = interfaces.SeqError[*Transacted]
 
 // TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
 type ListFormat = interfaces.CoderBufferedReadWriter[*Transacted]

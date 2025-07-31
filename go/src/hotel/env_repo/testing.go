@@ -40,12 +40,8 @@ func MakeTesting(
 				PermitNoDodderDirectory: true,
 			},
 		); err != nil {
-			errors.ContextCancelWithErrorAndFormat(
-				t.Context,
-				err,
-				"EnvRepo: %#v",
-				envRepo,
-			)
+			t.Errorf("failed to make repo: %s", err)
+			return
 		}
 	}
 

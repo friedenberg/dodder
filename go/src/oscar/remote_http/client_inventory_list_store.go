@@ -62,7 +62,7 @@ func (client client) ImportInventoryList(
 		)
 		defer repoolBufferedWriter()
 
-		if _, err = client.typedBlobStore.WriteObjectToWriter(
+		if _, err = client.inventoryListCoderCloset.WriteObjectToWriter(
 			listSku.GetType(),
 			listSku,
 			bufferedWriter,
@@ -226,5 +226,5 @@ func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted
 		}
 	}
 
-	return client.typedBlobStore.AllDecodedObjectsFromStream(response.Body)
+	return client.inventoryListCoderCloset.AllDecodedObjectsFromStream(response.Body)
 }

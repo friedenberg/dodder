@@ -19,6 +19,111 @@ import (
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
+func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
+	repo *local_working_copy.Repo,
+	request Request,
+) (response Response) {
+	listCoderCloset := server.Repo.GetInventoryListCoderCloset()
+
+	seq := listCoderCloset.AllDecodedObjectsFromStream(
+		bufio.NewReader(request.Body),
+	)
+
+	responseBuffer := bytes.NewBuffer(nil)
+
+	// TODO make option to read from headers
+	// TODO add remote blob store
+	importerOptions := sku.ImporterOptions{
+		// TODO
+		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+	}
+
+	if request.Headers.Get(
+		"x-dodder-remote_transfer_options-allow_merge_conflicts",
+	) == "true" {
+		importerOptions.AllowMergeConflicts = true
+	}
+
+	listMissingSkus := sku.MakeList()
+	var requestRetry bool
+
+	importerOptions.BlobCopierDelegate = func(
+		result sku.BlobCopyResult,
+	) (err error) {
+		errors.ContextContinueOrPanic(server.Repo.GetEnv())
+
+		if result.N != -1 {
+			return
+		}
+
+		if result.Transacted.GetGenre() == genres.InventoryList {
+			requestRetry = true
+		}
+
+		ui.Log().Print(
+			"missing blob for list: %s",
+			sku.String(result.Transacted),
+		)
+
+		listMissingSkus.Add(result.Transacted.CloneTransacted())
+
+		return
+	}
+
+	importer := server.Repo.MakeImporter(
+		importerOptions,
+		sku.GetStoreOptionsRemoteTransfer(),
+	)
+
+	if err := server.Repo.ImportSeq(
+		seq,
+		importer,
+	); err != nil {
+		if env_dir.IsErrBlobMissing(err) {
+			requestRetry = true
+		} else {
+			response.Error(err)
+			return
+		}
+	}
+
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+		responseBuffer,
+	)
+	defer repoolBufferedWriter()
+
+	listType := ids.GetOrPanic(
+		repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
+	).Type
+
+	inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
+
+	if _, err := inventoryListCoderCloset.WriteBlobToWriter(
+		repo,
+		listType,
+		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
+		bufferedWriter,
+	); err != nil {
+		response.Error(err)
+		return
+	}
+
+	if err := bufferedWriter.Flush(); err != nil {
+		response.Error(err)
+		return
+	}
+
+	if requestRetry {
+		response.StatusCode = http.StatusExpectationFailed
+	} else {
+		response.StatusCode = http.StatusCreated
+	}
+
+	response.Body = io.NopCloser(responseBuffer)
+
+	return
+}
+
 func (server *Server) writeInventoryListLocalWorkingCopy(
 	repo *local_working_copy.Repo,
 	request Request,
@@ -44,7 +149,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		listSkuType = listSku.GetType()
 	}
 
-	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+	listCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
 	var blobWriter interfaces.WriteCloseBlobIdGetter
 
@@ -62,7 +167,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	{
 		var err error
 
-		if list, err = typedInventoryListStore.ReadInventoryListBlob(
+		if list, err = listCoderCloset.ReadInventoryListBlob(
 			repo,
 			listSkuType,
 			bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
@@ -124,8 +229,8 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		sku.GetStoreOptionsRemoteTransfer(),
 	)
 
-	if err := server.Repo.ImportList(
-		list,
+	if err := server.Repo.ImportSeq(
+		quiter.MakeSeqErrorFromSeq(list.All()),
 		importer,
 	); err != nil {
 		if env_dir.IsErrBlobMissing(err) {

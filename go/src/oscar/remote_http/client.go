@@ -34,8 +34,8 @@ func MakeClient(
 		http: http.Client{
 			Transport: transport,
 		},
-		localRepo:      localRepo,
-		typedBlobStore: typedBlobStore,
+		localRepo:                localRepo,
+		inventoryListCoderCloset: typedBlobStore,
 	}
 
 	client.Initialize()
@@ -44,11 +44,11 @@ func MakeClient(
 }
 
 type client struct {
-	envUI           env_ui.Env
-	configImmutable genesis_configs.TypedConfigPublic
-	http            http.Client
-	localRepo       repo.LocalRepo
-	typedBlobStore  inventory_list_coders.Closet
+	envUI                    env_ui.Env
+	configImmutable          genesis_configs.TypedConfigPublic
+	http                     http.Client
+	localRepo                repo.LocalRepo
+	inventoryListCoderCloset inventory_list_coders.Closet
 
 	logRemoteInventoryLists log_remote_inventory_lists.Log
 }
@@ -115,8 +115,8 @@ func (client *client) GetInventoryListStore() sku.InventoryListStore {
 	return client
 }
 
-func (client *client) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
-	return client.typedBlobStore
+func (client *client) GetInventoryListCoderCloset() inventory_list_coders.Closet {
+	return client.inventoryListCoderCloset
 }
 
 func (client *client) GetObjectStore() sku.RepoStore {
@@ -130,9 +130,9 @@ func (client *client) MakeImporter(
 	panic(comments.Implement())
 }
 
-func (client *client) ImportList(
-	list *sku.List,
-	i sku.Importer,
+func (client *client) ImportSeq(
+	seq sku.Seq,
+	importer sku.Importer,
 ) (err error) {
 	return comments.Implement()
 }
@@ -176,7 +176,7 @@ func (client *client) MakeInventoryList(
 		return
 	}
 
-	inventoryListCoderCloset := client.localRepo.GetTypedInventoryListBlobStore()
+	inventoryListCoderCloset := client.localRepo.GetInventoryListCoderCloset()
 
 	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
 		client.localRepo.GetEnvRepo(),
@@ -240,22 +240,24 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	// TODO local / remote version negotiation
 
-	listFormat := client.GetInventoryListStore().FormatForVersion(
-		client.localRepo.GetImmutableConfigPublic().GetStoreVersion(),
-	)
+	listType := ids.GetOrPanic(
+		client.localRepo.GetImmutableConfigPublic().GetInventoryListTypeString(),
+	).Type
 
 	buffer := bytes.NewBuffer(nil)
 
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 	defer repoolBufferedWriter()
 
+	inventoryListCoderCloset := client.localRepo.GetInventoryListCoderCloset()
+
 	for {
 		errors.ContextContinueOrPanic(client.envUI)
 
 		// TODO make a reader version of inventory lists to avoid allocation
-		if _, err = inventory_list_coders.WriteInventoryList(
+		if _, err = inventoryListCoderCloset.WriteTypedBlobToWriter(
 			client.envUI,
-			listFormat,
+			listType,
 			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
 		); err != nil {
@@ -309,7 +311,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		var listMissingSkus *sku.List
 
-		if listMissingSkus, err = client.typedBlobStore.ReadInventoryListBlob(
+		if listMissingSkus, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
 			client.GetEnv(),
 			ids.GetOrPanic(
 				client.configImmutable.Blob.GetInventoryListTypeString(),

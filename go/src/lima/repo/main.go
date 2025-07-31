@@ -18,7 +18,7 @@ type Repo interface {
 	GetImmutableConfigPublicType() ids.Type
 	GetBlobStore() interfaces.BlobStore
 	GetObjectStore() sku.RepoStore
-	GetTypedInventoryListBlobStore() inventory_list_coders.Closet
+	GetInventoryListCoderCloset() inventory_list_coders.Closet
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(
@@ -26,11 +26,10 @@ type Repo interface {
 		storeOptions sku.StoreOptions,
 	) sku.Importer
 
-	// TODO switch to seq
-	ImportList(
-		list *sku.List,
-		i sku.Importer,
-	) (err error)
+	ImportSeq(
+		interfaces.SeqError[*sku.Transacted],
+		sku.Importer,
+	) error
 }
 
 type WorkingCopy interface {

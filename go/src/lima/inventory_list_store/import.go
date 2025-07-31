@@ -19,7 +19,7 @@ func (store *Store) MakeImporter(
 		options,
 		storeOptions,
 		store.envRepo,
-		store.getTypedBlobStore(),
+		store.GetInventoryListCoderCloset(),
 		nil,
 		nil,
 		store,
@@ -28,8 +28,8 @@ func (store *Store) MakeImporter(
 	return importer
 }
 
-func (store *Store) ImportList(
-	list *sku.List,
+func (store *Store) ImportSeq(
+	seq sku.Seq,
 	importer sku.Importer,
 ) (err error) {
 	var hasConflicts bool
@@ -49,8 +49,13 @@ func (store *Store) ImportList(
 	importErrors := errors.MakeMulti()
 	missingBlobs := sku.MakeListCheckedOut()
 
-	for sk := range list.All() {
-		checkedOut, importError := importer.Import(sk)
+	for object, iterErr := range seq {
+		if iterErr != nil {
+			err = errors.Wrap(iterErr)
+			return
+		}
+
+		checkedOut, importError := importer.Import(object)
 
 		func() {
 			defer sku.GetCheckedOutPool().Put(checkedOut)
@@ -73,7 +78,10 @@ func (store *Store) ImportList(
 
 			if env_dir.IsErrBlobMissing(importError) {
 				checkedOut := sku.GetCheckedOutPool().Get()
-				sku.TransactedResetter.ResetWith(checkedOut.GetSkuExternal(), sk)
+				sku.TransactedResetter.ResetWith(
+					checkedOut.GetSkuExternal(),
+					object,
+				)
 				checkedOut.SetState(checked_out_state.Untracked)
 
 				missingBlobs.Add(checkedOut)
@@ -81,7 +89,7 @@ func (store *Store) ImportList(
 				return
 			}
 
-			importErrors.Add(errors.Wrapf(err, "Sku: %s", sku.String(sk)))
+			importErrors.Add(errors.Wrapf(err, "Sku: %s", sku.String(object)))
 		}()
 	}
 

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -90,6 +91,7 @@ func (cmd Import) Run(req command.Request) {
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
+	// TODO switch to inventoryListCoderCloset.AllDecodedObjectsFromStream
 	if err := inventory_list_coders.CollectSkuList(
 		req,
 		bf,
@@ -116,14 +118,14 @@ func (cmd Import) Run(req command.Request) {
 	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies
-	i := localWorkingCopy.MakeImporter(
+	importerr := localWorkingCopy.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
-	if err := localWorkingCopy.ImportList(
-		list,
-		i,
+	if err := localWorkingCopy.ImportSeq(
+		quiter.MakeSeqErrorFromSeq(list.All()),
+		importerr,
 	); err != nil {
 		if !errors.Is(err, importer.ErrNeedsMerge) {
 			err = errors.Wrap(err)

@@ -91,7 +91,7 @@ func (server *Server) writeInventoryList(
 		}
 	}
 
-	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+	typedInventoryListStore := server.Repo.GetInventoryListCoderCloset()
 
 	var blobWriter interfaces.WriteCloseBlobIdGetter
 

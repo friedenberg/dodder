@@ -42,25 +42,21 @@ type errBadRequestPreamble struct {
 
 func (err errBadRequestPreamble) IsBadRequest() {}
 
-func (e errBadRequestPreamble) ShouldShowStackTrace() bool {
+func (err errBadRequestPreamble) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e errBadRequestPreamble) Is(target error) bool {
+func (err errBadRequestPreamble) Is(target error) bool {
 	_, ok := target.(ErrBadRequest)
 	return ok
 }
 
 func (err errBadRequestPreamble) Error() string {
 	var sb strings.Builder
+
 	sb.WriteString(err.preamble)
 	sb.WriteString(": \n\n")
-
-	if stackWrapError, ok := err.error.(*stackWrapError); ok {
-		stackWrapError.writeErrorNoStack(&sb)
-	} else {
-		sb.WriteString(err.error.Error())
-	}
+	sb.WriteString(err.error.Error())
 
 	return sb.String()
 }

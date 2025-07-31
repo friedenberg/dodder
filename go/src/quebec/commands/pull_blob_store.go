@@ -64,11 +64,11 @@ func (cmd *PullBlobStore) Run(
 
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,
-		func(sk *sku.Transacted) (err error) {
-			if err = importer.ImportBlobIfNecessary(sk); err != nil {
+		func(object *sku.Transacted) (err error) {
+			if err = importer.ImportBlobIfNecessary(object); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					err = nil
-					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", sk.GetBlobId())
+					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", object.GetBlobId())
 				} else {
 					err = errors.Wrap(err)
 				}

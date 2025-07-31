@@ -22,6 +22,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -430,8 +431,10 @@ func (server *Server) makeHandler(
 			},
 			3*time.Second,
 		); err != nil {
-			_, stackFrames := request.ctx.CauseWithStackFrames()
-			err = stack_frame.Error{Err: err, Frames: stackFrames}
+			_, frames := request.ctx.CauseWithStackFrames()
+
+			err = stack_frame.MakeErrorTree(err, frames...)
+
 			response.Error(err)
 		}
 
@@ -487,8 +490,9 @@ func (server *Server) makeHandler(
 			},
 			3*time.Second,
 		); err != nil {
-			_, stackFrames := request.ctx.CauseWithStackFrames()
-			err = stack_frame.Error{Err: err, Frames: stackFrames}
+			_, frames := request.ctx.CauseWithStackFrames()
+
+			err = stack_frame.MakeErrorTree(err, frames...)
 
 			http.Error(
 				responseWriter,
@@ -732,12 +736,12 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 		defer repoolBufferedWriter()
 
-		inventoryListCoderCloset := server.Repo.GetTypedInventoryListBlobStore()
+		inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
 		if _, err := inventoryListCoderCloset.WriteBlobToWriter(
 			repo,
 			ids.GetOrPanic(listTypeString).Type,
-			list,
+			quiter.MakeSeqErrorFromSeq(list.All()),
 			bufferedWriter,
 		); err != nil {
 			server.EnvLocal.Cancel(err)
@@ -827,7 +831,7 @@ func (server *Server) handlePostInventoryList(
 		}
 	}
 
-	typedInventoryListStore := server.Repo.GetTypedInventoryListBlobStore()
+	inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
 	{
 		var err error
@@ -857,7 +861,7 @@ func (server *Server) handlePostInventoryList(
 		)
 		defer repool()
 
-		if object, err = typedInventoryListStore.ReadInventoryListObject(
+		if object, err = inventoryListCoderCloset.ReadInventoryListObject(
 			request.ctx,
 			ids.MustType(listTypeString),
 			bufferedReader,
@@ -892,7 +896,15 @@ func (server *Server) handlePostInventoryList(
 func (server *Server) handlePostInventoryListNew(
 	request Request,
 ) (response Response) {
-	response.ErrorWithStatus(http.StatusNotImplemented, nil)
+	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
+		response = server.writeInventoryListTypedBlobLocalWorkingCopy(
+			repo,
+			request,
+		)
+	} else {
+		response.ErrorWithStatus(http.StatusNotImplemented, nil)
+	}
+
 	return
 }
 

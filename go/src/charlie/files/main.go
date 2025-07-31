@@ -191,7 +191,7 @@ func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
 
 func OpenReadOnly(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDONLY, 0o666); err != nil {
-		err = errors.Wrapf(err, "Path: %q", s)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -200,7 +200,7 @@ func OpenReadOnly(s string) (f *os.File, err error) {
 
 func OpenExclusive(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDWR|os.O_EXCL, 0o666); err != nil {
-		err = errors.Wrapf(err, "Path: %q", s)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -209,7 +209,7 @@ func OpenExclusive(s string) (f *os.File, err error) {
 
 func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0o666); err != nil {
-		err = errors.Wrapf(err, "Path: %q", s)
+		err = errors.Wrap(err)
 		return
 	}
 

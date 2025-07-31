@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/digests"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -341,7 +342,7 @@ func (store *Store) GenerateConflictMarker(
 	if _, err = blobStore.WriteBlobToWriter(
 		store.envRepo,
 		ids.DefaultOrPanic(genres.InventoryList),
-		conflicted,
+		quiter.MakeSeqErrorFromSeq(conflicted.All()),
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -2,6 +2,7 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -53,8 +54,8 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		sku.GetStoreOptionsImport(),
 	)
 
-	if err = local.ImportList(
-		list,
+	if err = local.ImportSeq(
+		quiter.MakeSeqErrorFromSeq(list.All()),
 		importer,
 	); err != nil {
 		err = errors.Wrap(err)

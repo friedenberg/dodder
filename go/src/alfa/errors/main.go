@@ -54,37 +54,23 @@ func PanicIfError(err any) {
 func WrapSkip(
 	skip int,
 	err error,
-) (errWrapped *stackWrapError) {
+) error {
 	if err == io.EOF {
 		panic("trying to wrap io.EOF")
 	}
 
 	if err == nil {
-		return
+		return nil
 	}
 
-	var si stack_frame.Frame
+	var stackFrame stack_frame.Frame
 	var ok bool
 
-	if si, ok = stack_frame.MakeFrame(skip + 1); !ok {
+	if stackFrame, ok = stack_frame.MakeFrame(skip + 1); !ok {
 		panic("failed to get stack info")
 	}
 
-	errWrapped = &stackWrapError{
-		Frame: si,
-	}
-
-	if next, ok := err.(*stackWrapError); ok {
-		errWrapped.next = next
-	} else {
-		errWrapped.error = err
-	}
-
-	if DebugBuild {
-		errWrapped.checkCycle()
-	}
-
-	return
+	return stackFrame.Wrap(err)
 }
 
 const thisSkip = 1
@@ -96,74 +82,66 @@ func Errorf(f string, values ...any) (err error) {
 }
 
 //go:noinline
-func ErrorWithStackf(f string, values ...any) (err error) {
-	err = WrapSkip(thisSkip, fmt.Errorf(f, values...))
-	return
-}
+func ErrorWithStackf(format string, args ...any) error {
+	var stackFrame stack_frame.Frame
+	var ok bool
 
-//go:noinline
-func WrapN(n int, in error) (err error) {
-	err = WrapSkip(n+thisSkip, in)
-	return
-}
-
-//go:noinline
-func Wrap(in error) error {
-	if in == io.EOF {
-		return in
+	if stackFrame, ok = stack_frame.MakeFrame(thisSkip); !ok {
+		panic("failed to get stack info")
 	}
 
-	return WrapSkip(thisSkip, in)
+	return stackFrame.Errorf(format, args...)
 }
 
 //go:noinline
-func Wrapf(in error, format string, values ...any) error {
-	if in == io.EOF {
+func Wrap(err error) error {
+	if err == io.EOF {
 		panic("trying to wrap io.EOF")
 	}
 
-	if in == nil {
+	if err == nil {
 		return nil
 	}
 
-	return &stackWrapError{
-		Frame: stack_frame.MustFrame(thisSkip),
-		error: fmt.Errorf(format, values...),
-		next:  WrapSkip(thisSkip, in),
+	var stackFrame stack_frame.Frame
+	var ok bool
+
+	if stackFrame, ok = stack_frame.MakeFrame(thisSkip); !ok {
+		panic("failed to get stack info")
 	}
+
+	return stackFrame.Wrap(err)
+}
+
+//go:noinline
+func Wrapf(err error, format string, values ...any) error {
+	if err == io.EOF {
+		panic("trying to wrap io.EOF")
+	}
+
+	if err == nil {
+		return nil
+	}
+
+	var stackFrame stack_frame.Frame
+	var ok bool
+
+	if stackFrame, ok = stack_frame.MakeFrame(thisSkip); !ok {
+		panic("failed to get stack info")
+	}
+
+	return stackFrame.Wrapf(err, format, values...)
 }
 
 //go:noinline
 func IterWrapped[T any](err error) interfaces.SeqError[T] {
 	return func(yield func(T, error) bool) {
 		var t T
-		yield(t, WrapN(1, err))
+		yield(t, WrapSkip(1, err))
 	}
 }
 
 type funcGetNext func() (error, funcGetNext)
-
-func checkCycle(err error, next funcGetNext) {
-	return
-	getSlow := next
-	getFast := next
-
-	slow := err
-	fast := err
-
-	for fast != nil {
-		if slow == fast && slow != err {
-			panic("cycle detected!")
-		}
-
-		slow, getSlow = getSlow()
-		fast, getFast = getFast()
-
-		if fast != nil {
-			fast, getFast = getFast()
-		}
-	}
-}
 
 // TODO remove / rewrite the below
 

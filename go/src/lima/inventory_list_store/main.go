@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
@@ -46,7 +47,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
 	getType() ids.Type
-	getTypedBlobStore() inventory_list_coders.Closet
+	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
 	// TODO rename to ReadOneDigest
 	ReadOneSha(id interfaces.BlobId) (object *sku.Transacted, err error)
@@ -60,7 +61,7 @@ type inventoryListBlobStore interface {
 func (store *Store) Initialize(
 	envRepo env_repo.Env,
 	clock ids.Clock,
-	typedBlobStore inventory_list_coders.Closet,
+	inventoryListCoderCloset inventory_list_coders.Closet,
 ) (err error) {
 	op := object_inventory_format.Options{Tai: true}
 
@@ -91,15 +92,15 @@ func (store *Store) Initialize(
 			envRepo:        envRepo,
 			blobType:       blobType,
 			BlobStore:      inventoryListBlobStore,
-			typedBlobStore: typedBlobStore,
+			typedBlobStore: inventoryListCoderCloset,
 		}
 	} else {
 		store.inventoryListBlobStore = &blobStoreV1{
-			envRepo:        envRepo,
-			pathLog:        envRepo.FileInventoryListLog(),
-			blobType:       blobType,
-			BlobStore:      inventoryListBlobStore,
-			typedBlobStore: typedBlobStore,
+			envRepo:                  envRepo,
+			pathLog:                  envRepo.FileInventoryListLog(),
+			blobType:                 blobType,
+			BlobStore:                inventoryListBlobStore,
+			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	}
 
@@ -130,11 +131,6 @@ func (store *Store) GetObjectStore() sku.RepoStore {
 	return store
 }
 
-// TODO rename
-func (store *Store) GetTypedInventoryListBlobStore() inventory_list_coders.Closet {
-	return store.getTypedBlobStore()
-}
-
 func (store *Store) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 	return wg.GetError()
@@ -148,7 +144,7 @@ func (store *Store) FormatForVersion(
 		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
 	).Type
 
-	return store.getTypedBlobStore().GetCoderForType(tipe)
+	return store.GetInventoryListCoderCloset().GetCoderForType(tipe)
 }
 
 func (store *Store) GetTai() ids.Tai {
@@ -298,10 +294,10 @@ func (store *Store) WriteInventoryListBlob(
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(writeCloser)
 	defer repoolBufferedWriter()
 
-	if _, err = store.getTypedBlobStore().WriteBlobToWriter(
+	if _, err = store.GetInventoryListCoderCloset().WriteBlobToWriter(
 		store.envRepo,
 		object.GetType(),
-		list,
+		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -368,7 +364,7 @@ func (store *Store) ImportInventoryList(
 
 	var list *sku.List
 
-	inventoryListCoderCloset := store.getTypedBlobStore()
+	inventoryListCoderCloset := store.GetInventoryListCoderCloset()
 
 	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
 		store.GetEnvRepo(),
@@ -427,7 +423,7 @@ func (store *Store) ImportInventoryList(
 func (store *Store) IterInventoryList(
 	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
-	return store.getTypedBlobStore().IterInventoryListBlobSkusFromBlobStore(
+	return store.GetInventoryListCoderCloset().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),
 		store.blobBlobStore,
 		blobSha,

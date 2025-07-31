@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -31,6 +30,7 @@ type Closet struct {
 
 	seqDecoders      map[string]interfaces.DecoderFromBufferedReader[funcIterSeq]
 	seqErrorDecoders map[string]interfaces.DecoderFromBufferedReader[funcIterSeqError]
+	seqEncoders      map[string]interfaces.EncoderToBufferedWriter[sku.Seq]
 }
 
 func MakeCloset(
@@ -84,13 +84,29 @@ func MakeCloset(
 		)
 
 		for tipe, coder := range store.coders {
-			coders[tipe] = SeqErrorCoder{
+			coders[tipe] = SeqErrorDecoder{
 				ctx:        envRepo,
 				ListFormat: coder,
 			}
 		}
 
 		store.seqErrorDecoders = coders
+	}
+
+	{
+		coders := make(
+			map[string]interfaces.EncoderToBufferedWriter[sku.Seq],
+			len(store.coders),
+		)
+
+		for tipe, coder := range store.coders {
+			coders[tipe] = SeqErrorDecoder{
+				ctx:        envRepo,
+				ListFormat: coder,
+			}
+		}
+
+		store.seqEncoders = coders
 	}
 
 	return store
@@ -129,7 +145,7 @@ func (store Closet) WriteObjectToWriter(
 func (store Closet) WriteBlobToWriter(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
-	list sku.Collection,
+	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
 	format, ok := store.coders[tipe.String()]
@@ -142,7 +158,34 @@ func (store Closet) WriteBlobToWriter(
 	if n, err = WriteInventoryList(
 		ctx,
 		format,
-		quiter.MakeSeqErrorFromSeq(list.All()),
+		seq,
+		bufferedWriter,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (store Closet) WriteTypedBlobToWriter(
+	ctx interfaces.ActiveContext,
+	tipe ids.Type,
+	seq sku.Seq,
+	bufferedWriter *bufio.Writer,
+) (n int64, err error) {
+	decoder := triple_hyphen_io.Encoder[*triple_hyphen_io.TypedBlob[sku.Seq]]{
+		Metadata: triple_hyphen_io.TypedMetadataCoder[sku.Seq]{},
+		Blob: triple_hyphen_io.EncoderTypeMapWithoutType[sku.Seq](
+			store.seqEncoders,
+		),
+	}
+
+	if _, err = decoder.EncodeTo(
+		&triple_hyphen_io.TypedBlob[sku.Seq]{
+			Type: tipe,
+			Blob: seq,
+		},
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -306,7 +349,7 @@ func (store Closet) ReadInventoryListObject(
 		return
 	}
 
-	iter := StreamInventoryList(ctx, format, reader)
+	iter := streamInventoryList(ctx, format, reader)
 
 	for object, iterErr := range iter {
 		if iterErr != nil {
@@ -339,7 +382,7 @@ func (store Closet) ReadInventoryListBlob(
 		return
 	}
 
-	iter := StreamInventoryList(ctx, format, reader)
+	iter := streamInventoryList(ctx, format, reader)
 
 	for object, iterErr := range iter {
 		if iterErr != nil {

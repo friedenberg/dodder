@@ -315,9 +315,7 @@ function push_history_default_only_blobs { # @test
 	EOM
 }
 
-# TODO reimplement support for bare pushes
 function push_default_stdio_local_once { # @test
-	skip
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
@@ -345,9 +343,7 @@ function push_default_stdio_local_once { # @test
 	popd || exit 1
 }
 
-# TODO reimplement support for bare pushes
 function push_history_default_stdio_local_twice { # @test
-	skip
 	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 

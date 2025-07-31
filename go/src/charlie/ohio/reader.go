@@ -97,7 +97,7 @@ func ReadUint16(r io.ByteReader) (v uint16, n int64, err error) {
 	var clInt uint64
 
 	if clInt, err = binary.ReadUvarint(r); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

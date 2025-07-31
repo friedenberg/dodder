@@ -28,7 +28,7 @@ func (blobStore *blobStoreV0) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV0) getTypedBlobStore() inventory_list_coders.Closet {
+func (blobStore *blobStoreV0) GetInventoryListCoderCloset() inventory_list_coders.Closet {
 	return blobStore.typedBlobStore
 }
 

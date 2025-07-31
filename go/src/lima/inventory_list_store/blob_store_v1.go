@@ -19,10 +19,10 @@ import (
 
 // TODO add triple_hyphen_io2 coder
 type blobStoreV1 struct {
-	envRepo        env_repo.Env
-	pathLog        string
-	blobType       ids.Type
-	typedBlobStore inventory_list_coders.Closet
+	envRepo                  env_repo.Env
+	pathLog                  string
+	blobType                 ids.Type
+	inventoryListCoderCloset inventory_list_coders.Closet
 
 	interfaces.BlobStore
 }
@@ -31,8 +31,8 @@ func (blobStore *blobStoreV1) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV1) getTypedBlobStore() inventory_list_coders.Closet {
-	return blobStore.typedBlobStore
+func (blobStore *blobStoreV1) GetInventoryListCoderCloset() inventory_list_coders.Closet {
+	return blobStore.inventoryListCoderCloset
 }
 
 func (blobStore *blobStoreV1) ReadOneSha(
@@ -57,7 +57,7 @@ func (blobStore *blobStoreV1) ReadOneSha(
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
 	defer repoolBufferedReader()
 
-	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
+	if object, err = blobStore.inventoryListCoderCloset.ReadInventoryListObject(
 		blobStore.envRepo,
 		blobStore.blobType,
 		bufferedReader,
@@ -110,7 +110,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 		return
 	}
 
-	if _, err = blobStore.typedBlobStore.WriteObjectToWriter(
+	if _, err = blobStore.inventoryListCoderCloset.WriteObjectToWriter(
 		blobStore.blobType,
 		object,
 		bufferedWriter,
@@ -153,7 +153,9 @@ func (blobStore *blobStoreV1) IterAllInventoryLists() interfaces.SeqError[*sku.T
 
 		defer errors.ContextMustClose(blobStore.envRepo, file)
 
-		seq := blobStore.typedBlobStore.AllDecodedObjectsFromStream(file)
+		seq := blobStore.inventoryListCoderCloset.AllDecodedObjectsFromStream(
+			file,
+		)
 
 		for object, err := range seq {
 			if err != nil {

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
-	"os"
 	"slices"
 	"syscall"
 	"time"
@@ -110,9 +110,9 @@ func IsEOF(err error) bool {
 }
 
 func IsExist(err error) bool {
-	return os.IsExist(errors.Unwrap(err))
+	return Is(err, fs.ErrExist)
 }
 
 func IsNotExist(err error) bool {
-	return os.IsNotExist(errors.Unwrap(err))
+	return Is(err, fs.ErrNotExist)
 }

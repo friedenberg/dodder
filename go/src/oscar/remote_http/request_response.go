@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
+	"code.linenisgreat.com/dodder/go/src/error_string_encoder"
 	"github.com/gorilla/mux"
 )
 
@@ -50,7 +51,10 @@ func (response *Response) ErrorWithStatus(status int, err error) {
 	response.StatusCode = status
 
 	if err != nil {
-		response.Body = io.NopCloser(strings.NewReader(err.Error()))
+		var buffer bytes.Buffer
+
+		error_string_encoder.Encoder.EncodeTo(err, &buffer)
+		response.Body = io.NopCloser(&buffer)
 	}
 }
 
