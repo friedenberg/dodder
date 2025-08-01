@@ -92,7 +92,7 @@ function bootstrap_archive {
 	popd || exit 1
 }
 
-function push_history_zettel_typ_etikett_no_conflicts { # @test
+function push_history_zettel_type_tag_no_conflicts { # @test
 	them="them"
 	set_xdg "$them"
 	run_dodder_init
@@ -146,7 +146,7 @@ function push_history_zettel_typ_etikett_no_conflicts { # @test
 	EOM
 }
 
-function push_history_zettel_typ_etikett_yes_conflicts { # @test
+function push_history_zettel_type_tag_yes_conflicts { # @test
 	skip
 	them="them"
 	bootstrap_with_content "$them"

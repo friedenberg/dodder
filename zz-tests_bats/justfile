@@ -121,7 +121,7 @@ test *flags: (test-targets flags "*.bats" "migration/*.bats")
 [group("stats")]
 @stats-skipped:
   echo -n "skipped bats tests: "
-  ag '^\s+skip'  -c | cut -d: -f2 | paste -s -d + - | bc
+  ag '^\s+skip' -c | cut -d: -f2 | grep -v '^$' | paste -s -d + - | bc
 
 [group("stats")]
 @stats-todos:
