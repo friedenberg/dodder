@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -65,51 +64,41 @@ func (cmd Show) Complete(
 	commandLine command.CommandLine,
 ) {
 	envRepo := cmd.MakeEnvRepo(req, false)
-	archive := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalArchive(envRepo)
 
-	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		args := commandLine.FlagsOrArgs[1:]
+	args := commandLine.FlagsOrArgs[1:]
 
-		if commandLine.InProgress != "" {
-			args = args[:len(args)-1]
-		}
-
-		cmd.complete.CompleteObjects(
-			req,
-			localWorkingCopy,
-			pkg_query.BuilderOptionDefaultGenres(genres.Tag),
-			args...,
-		)
+	if commandLine.InProgress != "" {
+		args = args[:len(args)-1]
 	}
+
+	cmd.complete.CompleteObjects(
+		req,
+		repo,
+		pkg_query.BuilderOptionDefaultGenres(genres.Tag),
+		args...,
+	)
 }
 
 func (cmd Show) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
-	archive := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalArchive(envRepo)
 
 	args := req.PopArgs()
 
-	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		query := cmd.MakeQueryIncludingWorkspace(
-			req,
-			pkg_query.BuilderOptions(
-				pkg_query.BuilderOptionWorkspace{
-					Env: localWorkingCopy.GetEnvWorkspace(),
-				},
-				pkg_query.BuilderOptionDefaultGenres(genres.Zettel),
-			),
-			localWorkingCopy,
-			args,
-		)
+	query := cmd.MakeQueryIncludingWorkspace(
+		req,
+		pkg_query.BuilderOptions(
+			pkg_query.BuilderOptionWorkspace{
+				Env: repo.GetEnvWorkspace(),
+			},
+			pkg_query.BuilderOptionDefaultGenres(genres.Zettel),
+		),
+		repo,
+		args,
+	)
 
-		cmd.runWithLocalWorkingCopyAndQuery(req, localWorkingCopy, query)
-	} else {
-		if len(args) != 0 {
-			ui.Err().Print("ignoring arguments for archive repo")
-		}
-
-		cmd.runWithArchive(envRepo, archive)
-	}
+	cmd.runWithLocalWorkingCopyAndQuery(req, repo, query)
 }
 
 func (cmd Show) runWithLocalWorkingCopyAndQuery(

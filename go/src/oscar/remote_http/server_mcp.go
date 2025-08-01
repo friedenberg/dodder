@@ -21,7 +21,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
-	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 func (server *Server) handleMCP(request Request) (response Response) {
@@ -198,7 +197,7 @@ func (server *Server) readMCPResource(
 func (server *Server) readMCPResourceTypes(
 	uri *url.URL,
 ) ([]mcp.ResourceContent, error) {
-	repo := server.Repo.(*local_working_copy.Repo)
+	repo := server.Repo
 
 	var queryGroup *query.Query
 
@@ -244,7 +243,7 @@ func (server *Server) readMCPResourceTypes(
 func (server *Server) readMCPResourceObjects(
 	uri *url.URL,
 ) ([]mcp.ResourceContent, error) {
-	repo := server.Repo.(*local_working_copy.Repo)
+	repo := server.Repo
 
 	objectIdString := strings.TrimPrefix(
 		strings.TrimPrefix(uri.Path, "/"),
@@ -318,7 +317,7 @@ func (server *Server) readMCPResourceObjects(
 func (server *Server) readMCPResourceObject(
 	object *sku.Transacted,
 ) ([]mcp.ResourceContent, error) {
-	repo := server.Repo.(*local_working_copy.Repo)
+	repo := server.Repo
 
 	var jsonRep sku_json_fmt.MCP
 

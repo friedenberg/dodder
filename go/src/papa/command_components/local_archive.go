@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -18,7 +17,7 @@ func (cmd *LocalArchive) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd LocalArchive) MakeLocalArchive(
 	envRepo env_repo.Env,
-) repo.LocalRepo {
+) *local_working_copy.Repo {
 	return local_working_copy.MakeWithEnvRepo(
 		local_working_copy.OptionsEmpty,
 		envRepo,

@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -38,7 +37,7 @@ func (cmd *Deinit) SetFlagSet(f *flag.FlagSet) {
 
 func (cmd Deinit) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
-	localWorkingCopy := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalArchive(envRepo)
 
 	var home string
 
@@ -73,15 +72,14 @@ func (cmd Deinit) Run(req command.Request) {
 	var filesAndDirectories []string
 
 	if xdgHome == home {
-		filesAndDirectories = localWorkingCopy.GetEnvRepo().GetXDG().GetXDGPaths()
+		filesAndDirectories = repo.GetEnvRepo().GetXDG().GetXDGPaths()
 	} else {
 		filesAndDirectories = []string{xdgHome}
 	}
 
 	sort.Strings(filesAndDirectories)
 
-	if repo, ok := localWorkingCopy.(repo.LocalWorkingCopy); ok &&
-		!repo.GetEnvWorkspace().IsTemporary() {
+	if !repo.GetEnvWorkspace().IsTemporary() {
 		workspaceConfigFilePath := repo.GetEnvWorkspace().GetWorkspaceConfigFilePath()
 
 		if workspaceConfigFilePath != "" {
@@ -106,7 +104,7 @@ The following directories and files would be deleted:
 		return
 	}
 
-	base := path.Join(localWorkingCopy.GetEnvRepo().Dir())
+	base := path.Join(repo.GetEnvRepo().Dir())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
 		envRepo.Cancel(err)

@@ -9,14 +9,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -63,49 +60,13 @@ func (cmd Last) CompletionGenres() ids.Genre {
 func (cmd Last) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
-	archive := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalArchive(envRepo)
 
 	if len(req.PopArgs()) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
 
-	if localWorkingCopy, ok := archive.(*local_working_copy.Repo); ok {
-		cmd.runLocalWorkingCopy(localWorkingCopy)
-	} else {
-		cmd.runArchive(envRepo, archive)
-	}
-}
-
-func (cmd Last) runArchive(envRepo env_repo.Env, archive repo.Repo) {
-	if (cmd.Edit || cmd.Organize) && cmd.Format.WasSet() {
-		errors.ContextCancelWithErrorf(
-			envRepo,
-			"cannot organize, edit, or specify format for Archive repos",
-		)
-	}
-
-	// TODO replace with sku.ListFormat
-	boxFormat := box_format.MakeBoxTransactedArchive(
-		envRepo,
-		options_print.Options{}.WithPrintTai(true),
-	)
-
-	f := string_format_writer.MakeDelim(
-		"\n",
-		envRepo.GetUIFile(),
-		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.EncodeStringTo(o, w)
-			},
-		),
-	)
-
-	f = quiter.MakeSyncSerializer(f)
-
-	if err := cmd.runWithInventoryList(envRepo, archive, f); err != nil {
-		envRepo.Cancel(err)
-		return
-	}
+	cmd.runLocalWorkingCopy(repo)
 }
 
 func (cmd Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {

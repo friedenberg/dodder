@@ -44,7 +44,7 @@ import (
 
 type Server struct {
 	EnvLocal  env_local.Env
-	Repo      repo.LocalRepo
+	Repo      *local_working_copy.Repo
 	blobCache serverBlobCache
 
 	GetCertificate func(*tls.ClientHelloInfo) (*tls.Certificate, error)
@@ -703,58 +703,54 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		}
 	}
 
-	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		var queryGroup *query.Query
+	var queryGroup *query.Query
 
-		{
-			var err error
+	{
+		var err error
 
-			if queryGroup, err = repo.MakeExternalQueryGroup(
-				nil,
-				sku.ExternalQueryOptions{},
-				queryGroupString,
-			); err != nil {
-				response.Error(err)
-				return
-			}
-		}
-
-		var list *sku.ListTransacted
-
-		{
-			var err error
-
-			if list, err = repo.MakeInventoryList(queryGroup); err != nil {
-				response.Error(err)
-				return
-			}
-		}
-
-		// TODO make this more performant by returning a proper reader
-		buffer := bytes.NewBuffer(nil)
-
-		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
-		defer repoolBufferedWriter()
-
-		inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
-
-		if _, err := inventoryListCoderCloset.WriteBlobToWriter(
-			repo,
-			ids.GetOrPanic(listTypeString).Type,
-			quiter.MakeSeqErrorFromSeq(list.All()),
-			bufferedWriter,
+		if queryGroup, err = server.Repo.MakeExternalQueryGroup(
+			nil,
+			sku.ExternalQueryOptions{},
+			queryGroupString,
 		); err != nil {
-			server.EnvLocal.Cancel(err)
+			response.Error(err)
+			return
 		}
-
-		if err := bufferedWriter.Flush(); err != nil {
-			server.EnvLocal.Cancel(err)
-		}
-
-		response.Body = io.NopCloser(buffer)
-	} else {
-		response.StatusCode = http.StatusNotImplemented
 	}
+
+	var list *sku.ListTransacted
+
+	{
+		var err error
+
+		if list, err = server.Repo.MakeInventoryList(queryGroup); err != nil {
+			response.Error(err)
+			return
+		}
+	}
+
+	// TODO make this more performant by returning a proper reader
+	buffer := bytes.NewBuffer(nil)
+
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
+	defer repoolBufferedWriter()
+
+	inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
+
+	if _, err := inventoryListCoderCloset.WriteBlobToWriter(
+		server.Repo,
+		ids.GetOrPanic(listTypeString).Type,
+		quiter.MakeSeqErrorFromSeq(list.All()),
+		bufferedWriter,
+	); err != nil {
+		server.EnvLocal.Cancel(err)
+	}
+
+	if err := bufferedWriter.Flush(); err != nil {
+		server.EnvLocal.Cancel(err)
+	}
+
+	response.Body = io.NopCloser(buffer)
 
 	return
 }
@@ -880,15 +876,11 @@ func (server *Server) handlePostInventoryList(
 		defer sku.GetTransactedPool().Put(object)
 	}
 
-	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		response = server.writeInventoryListLocalWorkingCopy(
-			repo,
-			request,
-			object,
-		)
-	} else {
-		response.ErrorWithStatus(http.StatusNotImplemented, nil)
-	}
+	response = server.writeInventoryListLocalWorkingCopy(
+		server.Repo,
+		request,
+		object,
+	)
 
 	return
 }
@@ -896,14 +888,10 @@ func (server *Server) handlePostInventoryList(
 func (server *Server) handlePostInventoryListNew(
 	request Request,
 ) (response Response) {
-	if repo, ok := server.Repo.(*local_working_copy.Repo); ok {
-		response = server.writeInventoryListTypedBlobLocalWorkingCopy(
-			repo,
-			request,
-		)
-	} else {
-		response.ErrorWithStatus(http.StatusNotImplemented, nil)
-	}
+	response = server.writeInventoryListTypedBlobLocalWorkingCopy(
+		server.Repo,
+		request,
+	)
 
 	return
 }
