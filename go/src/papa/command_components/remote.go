@@ -25,7 +25,7 @@ import (
 type Remote struct {
 	Env
 	EnvRepo
-	LocalArchive
+	LocalWorkingCopy
 
 	RemoteConnectionType repo.RemoteConnectionType
 }
@@ -228,9 +228,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		options,
 	)
 
-	envRepo := cmd.MakeEnvRepoFromEnvLocal(envLocal)
-
-	remote := cmd.MakeLocalArchive(envRepo)
+	remote := cmd.MakeLocalWorkingCopyFromEnvLocal(envLocal)
 
 	server := &remote_http.Server{
 		EnvLocal: envLocal,
@@ -256,7 +254,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		envLocal,
 		&httpRoundTripper,
 		repo,
-		cmd.MakeTypedInventoryListBlobStore(envRepo),
+		cmd.MakeTypedInventoryListBlobStore(repo.GetEnvRepo()),
 	)
 
 	return

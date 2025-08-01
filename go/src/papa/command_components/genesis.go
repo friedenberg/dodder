@@ -16,7 +16,6 @@ import (
 type Genesis struct {
 	env_repo.BigBang
 	LocalWorkingCopy
-	LocalArchive
 }
 
 func (cmd *Genesis) SetFlagSet(flagSet *flag.FlagSet) {

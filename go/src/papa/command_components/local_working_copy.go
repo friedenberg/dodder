@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -26,11 +27,11 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopy(
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopyWithOptions(
-	dep command.Request,
+	req command.Request,
 	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
 ) *local_working_copy.Repo {
-	env := cmd.MakeEnvWithOptions(dep, envOptions)
+	env := cmd.MakeEnvWithOptions(req, envOptions)
 
 	return local_working_copy.Make(env, repoOptions)
 }
@@ -47,6 +48,17 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 		options,
 	)
 
+	local = local_working_copy.Make(
+		envLocal,
+		local_working_copy.OptionsEmpty,
+	)
+
+	return
+}
+
+func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromEnvLocal(
+	envLocal env_local.Env,
+) (local *local_working_copy.Repo) {
 	local = local_working_copy.Make(
 		envLocal,
 		local_working_copy.OptionsEmpty,

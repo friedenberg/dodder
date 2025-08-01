@@ -19,13 +19,13 @@ func init() {
 type Serve struct {
 	command_components.Env
 	command_components.EnvRepo
-	command_components.LocalArchive
+	command_components.LocalWorkingCopy
 
 	TailscaleTLS bool
 }
 
-func (cmd *Serve) SetFlagSet(f *flag.FlagSet) {
-	cmd.LocalArchive.SetFlagSet(f)
+func (cmd *Serve) SetFlagSet(flagSet *flag.FlagSet) {
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 
 	flag.BoolVar(
 		&cmd.TailscaleTLS,
@@ -47,9 +47,7 @@ func (cmd Serve) Run(req command.Request) {
 		},
 	)
 
-	envRepo := cmd.MakeEnvRepoFromEnvLocal(envLocal)
-
-	repo := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalWorkingCopyFromEnvLocal(envLocal)
 
 	server := remote_http.Server{
 		EnvLocal: envLocal,
