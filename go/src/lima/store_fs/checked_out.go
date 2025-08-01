@@ -3,7 +3,6 @@ package store_fs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -23,7 +22,7 @@ func (store *Store) ToSliceFilesZettelen(
 			e = fds.Object.GetPath()
 
 			if e == "" {
-				err = collections.MakeErrStopIteration()
+				err = errors.MakeErrStopIteration()
 				return
 			}
 
@@ -48,7 +47,7 @@ func (store *Store) ToSliceFilesBlobs(
 			e = fds.Blob.GetPath()
 
 			if e == "" {
-				err = collections.MakeErrStopIteration()
+				err = errors.MakeErrStopIteration()
 				return
 			}
 

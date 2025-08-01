@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -78,7 +77,7 @@ func (printer *PrinterComplete) PrintOne(
 
 	select {
 	case <-printer.chDone:
-		err = collections.MakeErrStopIteration()
+		err = errors.MakeErrStopIteration()
 
 	case printer.chObjects <- dst:
 	}

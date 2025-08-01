@@ -38,11 +38,11 @@ func MakePrefixSetFrom(
 	return
 }
 
-func (s PrefixSet) Len() int {
-	return s.count
+func (prefixSet PrefixSet) Len() int {
+	return prefixSet.count
 }
 
-func (s *PrefixSet) AddSku(object sku.SkuType) (err error) {
+func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 	if object.GetState() == checked_out_state.Unknown {
 		err = errors.ErrorWithStackf(
 			"unacceptable state: %s",
@@ -56,7 +56,7 @@ func (s *PrefixSet) AddSku(object sku.SkuType) (err error) {
 		sku: sku.CloneSkuType(object),
 	}
 
-	if err = s.Add(&o); err != nil {
+	if err = prefixSet.Add(&o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,7 +65,7 @@ func (s *PrefixSet) AddSku(object sku.SkuType) (err error) {
 }
 
 // this splits on right-expanded
-func (s *PrefixSet) Add(z *obj) (err error) {
+func (prefixSet *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
 		z.GetSkuExternal().GetMetadata().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
@@ -79,23 +79,23 @@ func (s *PrefixSet) Add(z *obj) (err error) {
 	}
 
 	if es.Len() == 0 {
-		s.addPair("", z)
+		prefixSet.addPair("", z)
 		return
 	}
 
 	for e := range es.All() {
-		s.addPair(e.String(), z)
+		prefixSet.addPair(e.String(), z)
 	}
 
 	return
 }
 
-func (a PrefixSet) Subtract(
+func (prefixSet PrefixSet) Subtract(
 	b objSet,
 ) (c PrefixSet) {
-	c = MakePrefixSet(len(a.innerMap))
+	c = MakePrefixSet(len(prefixSet.innerMap))
 
-	for e, aSet := range a.innerMap {
+	for e, aSet := range prefixSet.innerMap {
 		for z := range aSet.All() {
 			if !b.Contains(z) {
 				c.addPair(e, z)
@@ -106,7 +106,7 @@ func (a PrefixSet) Subtract(
 	return
 }
 
-func (s *PrefixSet) addPair(
+func (prefixSet *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
@@ -114,11 +114,11 @@ func (s *PrefixSet) addPair(
 		e = ""
 	}
 
-	existingSet, ok := s.innerMap[e]
+	existingSet, ok := prefixSet.innerMap[e]
 
 	if !ok {
 		existingSet = makeObjSet()
-		s.innerMap[e] = existingSet
+		prefixSet.innerMap[e] = existingSet
 	}
 
 	var existingObj *obj
@@ -127,51 +127,27 @@ func (s *PrefixSet) addPair(
 	if ok && existingObj.tipe.IsDirectOrSelf() {
 		z.tipe.SetDirect()
 	} else if !ok {
-		s.count += 1
+		prefixSet.count += 1
 	}
 
 	existingSet.Add(z)
 }
 
-func (a PrefixSet) Each(
-	f func(ids.Tag, objSet) error,
-) (err error) {
-	for e, ssz := range a.innerMap {
-		var e1 ids.Tag
-
-		if e != "" {
-			e1 = ids.MustTag(e)
-		}
-
-		if err = f(e1, ssz); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
-
-func (a PrefixSet) AllObjectSets() interfaces.Seq2[string, objSet] {
+func (prefixSet PrefixSet) AllObjectSets() interfaces.Seq2[string, objSet] {
 	return func(yield func(string, objSet) bool) {
-		for i, os := range a.innerMap {
-			if !yield(i, os) {
+		for tagString, objects := range prefixSet.innerMap {
+			if !yield(tagString, objects) {
 				break
 			}
 		}
 	}
 }
 
-func (a PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
+func (prefixSet PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
 	return func(yield func(string, *obj) bool) {
-		for i, os := range a.innerMap {
-			for o := range os.All() {
-				if !yield(i, o) {
+		for tagString, objects := range prefixSet.innerMap {
+			for object := range objects.All() {
+				if !yield(tagString, object) {
 					break
 				}
 			}
@@ -179,29 +155,13 @@ func (a PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
 	}
 }
 
-func (a PrefixSet) EachObject(
-	f interfaces.FuncIter[*obj],
-) error {
-	return a.Each(
-		func(_ ids.Tag, st objSet) (err error) {
-			for z := range st.All() {
-				if err = f(z); err != nil {
-					return
-				}
-			}
-
-			return
-		},
-	)
-}
-
-func (a PrefixSet) Match(
+func (prefixSet PrefixSet) Match(
 	e ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
-	out.Grouped = MakePrefixSet(len(a.innerMap))
+	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 
-	for e1, zSet := range a.innerMap {
+	for e1, zSet := range prefixSet.innerMap {
 		if e1 == "" {
 			continue
 		}
@@ -230,15 +190,15 @@ func (a PrefixSet) Match(
 	return
 }
 
-func (a PrefixSet) Subset(
+func (prefixSet PrefixSet) Subset(
 	e ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
-	out.Grouped = MakePrefixSet(len(a.innerMap))
+	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 
 	e2 := catgut.MakeFromString(e.String())
 
-	for e1, zSet := range a.innerMap {
+	for e1, zSet := range prefixSet.innerMap {
 		if e1 == "" {
 			continue
 		}

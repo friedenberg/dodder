@@ -12,10 +12,14 @@ func PrintStackTracerIfNecessary(
 	err error,
 	_ ...interface{},
 ) {
-	var normalError StackTracer
+	var normalError interfaces.StackTracer
 
 	if As(err, &normalError) && !normalError.ShouldShowStackTrace() {
-		printer.Printf("\n\n%s failed with error:\n%s", name, normalError.Error())
+		printer.Printf(
+			"\n\n%s failed with error:\n%s",
+			name,
+			normalError.Error(),
+		)
 	} else {
 		printer.Printf("\n\n%s failed with error:\n%s", name, err)
 	}

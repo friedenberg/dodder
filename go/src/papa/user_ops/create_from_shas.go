@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -94,19 +95,19 @@ func (op CreateFromShas) Run(
 	return
 }
 
-func (c CreateFromShas) handleStoreError(
-	z *sku.Transacted,
-	f string,
+func (op CreateFromShas) handleStoreError(
+	object *sku.Transacted,
+	path string,
 	in error,
 ) {
 	var err error
 
-	var normalError errors.StackTracer
+	var normalError interfaces.StackTracer
 
 	if errors.As(in, &normalError) {
 		ui.Err().Printf("%s", normalError.Error())
 	} else {
-		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", f, in)
+		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", path, in)
 		ui.Err().Print(err)
 	}
 }

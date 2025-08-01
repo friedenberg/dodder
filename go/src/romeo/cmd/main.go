@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/error_string_encoder"
+	"code.linenisgreat.com/dodder/go/src/charlie/error_coders"
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
 
@@ -77,7 +77,7 @@ func handleMainErrors(
 		err = stack_frame.MakeErrorTree(err, frames...)
 	}
 
-	error_string_encoder.Encoder.EncodeTo(err, ui.Err())
+	error_coders.Encoder.EncodeTo(err, ui.Err())
 
 	return
 }

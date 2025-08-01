@@ -306,7 +306,7 @@ func (page *page) Flush() (err error) {
 		if err != nil {
 			if errors.IsEOF(err) {
 				// no-op
-			// TODO why might this ever be the case
+				// TODO why might this ever be the case
 			} else if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
 			}
@@ -326,7 +326,7 @@ func (page *page) Flush() (err error) {
 			tz, err = getOne()
 
 			if errors.IsEOF(err) || tz == nil {
-				err = collections.MakeErrStopIteration()
+				err = errors.MakeErrStopIteration()
 			}
 
 			return

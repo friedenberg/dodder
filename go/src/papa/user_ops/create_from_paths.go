@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
@@ -20,7 +21,7 @@ type CreateFromPaths struct {
 	// ReadHinweisFromPath bool
 }
 
-func (c CreateFromPaths) Run(
+func (op CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
 	toCreate := make(map[string]*sku.Transacted)
@@ -48,7 +49,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetEnvWorkspace().GetStoreFS().ReadExternalFromItem(
+		if z, err = op.GetEnvWorkspace().GetStoreFS().ReadExternalFromItem(
 			o,
 			&i,
 			nil,
@@ -81,11 +82,11 @@ func (c CreateFromPaths) Run(
 			toCreate[string(digestBytes)] = z
 		}
 
-		if c.Delete {
+		if op.Delete {
 			{
 				var object *fd.FD
 
-				if object, err = c.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
+				if object, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -98,7 +99,7 @@ func (c CreateFromPaths) Run(
 			{
 				var blob *fd.FD
 
-				if blob, err = c.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
+				if blob, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -112,7 +113,7 @@ func (c CreateFromPaths) Run(
 
 	results = sku.MakeTransactedMutableSet()
 
-	if err = c.Lock(); err != nil {
+	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,16 +123,16 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		c.Proto.Apply(z, genres.Zettel)
+		op.Proto.Apply(z, genres.Zettel)
 
-		if err = c.GetStore().CreateOrUpdateDefaultProto(
+		if err = op.GetStore().CreateOrUpdateDefaultProto(
 			z,
 			sku.StoreOptions{
 				ApplyProto: true,
 			},
 		); err != nil {
 			// TODO-P2 add file for error handling
-			c.handleStoreError(z, "", err)
+			op.handleStoreError(z, "", err)
 			err = nil
 			continue
 		}
@@ -141,18 +142,18 @@ func (c CreateFromPaths) Run(
 
 	for f := range toDelete.All() {
 		// TODO-P2 move to checkout store
-		if err = c.GetEnvRepo().Delete(f.GetPath()); err != nil {
+		if err = op.GetEnvRepo().Delete(f.GetPath()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		pathRel := c.GetEnvRepo().RelToCwdOrSame(f.GetPath())
+		pathRel := op.GetEnvRepo().RelToCwdOrSame(f.GetPath())
 
 		// TODO-P2 move to printer
-		c.GetUI().Printf("[%s] (deleted)", pathRel)
+		op.GetUI().Printf("[%s] (deleted)", pathRel)
 	}
 
-	if err = c.Unlock(); err != nil {
+	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -160,19 +161,19 @@ func (c CreateFromPaths) Run(
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(
-	z *sku.Transacted,
-	f string,
+func (op CreateFromPaths) handleStoreError(
+	object *sku.Transacted,
+	path string,
 	in error,
 ) {
 	var err error
 
-	var normalError errors.StackTracer
+	var normalError interfaces.StackTracer
 
 	if errors.As(in, &normalError) {
 		ui.Err().Printf("%s", normalError.Error())
 	} else {
-		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", f, in)
+		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", path, in)
 		ui.Err().Print(err)
 	}
 }

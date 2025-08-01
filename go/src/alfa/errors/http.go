@@ -2,19 +2,71 @@ package errors
 
 import (
 	"fmt"
-	"net/http"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/http_statuses"
 )
 
+func NewHTTPError(statusCode http_statuses.Code) HTTP {
+	return HTTP{StatusCode: statusCode}
+}
+
+var (
+	Err405MethodNotAllowed = NewHTTPError(
+		http_statuses.Code405MethodNotAllowed,
+	)
+	Err409Conflict            = NewHTTPError(http_statuses.Code409Conflict)
+	Err499ClientClosedRequest = NewHTTPError(
+		http_statuses.Code499ClientClosedRequest,
+	)
+	Err501NotImplemented = NewHTTPError(
+		http_statuses.Code501NotImplemented,
+	)
+)
+
+func Is499ClientClosedRequest(err error) bool {
+	return IsHTTPError(err, http_statuses.Code499ClientClosedRequest)
+}
+
+func IsHTTPError(target error, statusCode http_statuses.Code) bool {
+	var errHTTP HTTP
+
+	if !As(target, &errHTTP) {
+		return false
+	}
+
+	return errHTTP.StatusCode == statusCode
+}
+
 type HTTP struct {
-	StatusCode int
+	StatusCode http_statuses.Code
+
+	underlying error
 }
 
 func (err HTTP) Error() string {
-	text := http.StatusText(err.StatusCode)
-	return fmt.Sprintf("%d %s", err.StatusCode, text)
+	if err.underlying != nil {
+		return err.underlying.Error()
+	} else {
+		return err.StatusCode.String()
+	}
 }
 
 func (err HTTP) Is(target error) bool {
 	_, ok := target.(HTTP)
 	return ok
+}
+
+func (err HTTP) Unwrap() error {
+	return err.underlying
+}
+
+func (err HTTP) Wrap(underlying error) error {
+	return HTTP{
+		StatusCode: err.StatusCode,
+		underlying: underlying,
+	}
+}
+
+func (err HTTP) Errorf(format string, args ...any) error {
+	return err.Wrap(fmt.Errorf(format, args...))
 }

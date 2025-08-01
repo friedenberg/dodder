@@ -3,7 +3,6 @@ package organize_text
 import (
 	"sort"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -19,7 +18,9 @@ type (
 var objKeyer interfaces.StringKeyer[*obj]
 
 func makeObjSet() objSet {
-	return collections_value.MakeMutableValueSet(sku.GetExternalLikeKeyer[*obj]())
+	return collections_value.MakeMutableValueSet(
+		sku.GetExternalLikeKeyer[*obj](),
+	)
 }
 
 type obj struct {
@@ -96,23 +97,6 @@ func (os *Objects) All() interfaces.Seq2[int, *obj] {
 			}
 		}
 	}
-}
-
-// TODO remove
-func (os *Objects) Each(f interfaces.FuncIter[*obj]) (err error) {
-	for _, v := range *os {
-		if err = f(v); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
 }
 
 func (os Objects) Any() *obj {

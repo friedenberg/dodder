@@ -8,10 +8,8 @@ import (
 )
 
 var (
-	ErrNilPointer        = errors.New("nil pointer")
-	ErrExists            = errors.New("exists")
-	MakeErrStopIteration = errors.MakeErrStopIteration
-	ErrNotFound          = errNotFound("not found")
+	ErrExists   = errors.New("exists")
+	ErrNotFound = errNotFound("not found")
 )
 
 func MakeErrNotFound(value interfaces.Stringer) error {

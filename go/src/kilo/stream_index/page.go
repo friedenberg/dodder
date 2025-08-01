@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -201,7 +200,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 			_, err = dec.readFormatAndMatchSigil(br, &sk)
 			if err != nil {
 				if errors.IsEOF(err) {
-					err = collections.MakeErrStopIteration()
+					err = errors.MakeErrStopIteration()
 				} else {
 					err = errors.Wrap(err)
 				}
@@ -226,7 +225,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 	if err = heap.MergeStream(
 		&addedLatest,
 		func() (tz *sku.Transacted, err error) {
-			err = collections.MakeErrStopIteration()
+			err = errors.MakeErrStopIteration()
 			return
 		},
 		w,

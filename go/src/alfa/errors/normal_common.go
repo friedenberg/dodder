@@ -3,18 +3,11 @@ package errors
 import (
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"golang.org/x/xerrors"
 )
 
 // TODO combine all of the below errors into a more useful grouping
-type StackTracer interface {
-	error
-	ShouldShowStackTrace() bool
-}
-
-type ErrBadRequest interface {
-	IsBadRequest()
-}
 
 func BadRequest(err error) *errBadRequestWrap {
 	return &errBadRequestWrap{err}
@@ -47,7 +40,7 @@ func (err errBadRequestPreamble) ShouldShowStackTrace() bool {
 }
 
 func (err errBadRequestPreamble) Is(target error) bool {
-	_, ok := target.(ErrBadRequest)
+	_, ok := target.(interfaces.ErrBadRequest)
 	return ok
 }
 
@@ -67,17 +60,17 @@ type errBadRequestWrap struct {
 
 func (err errBadRequestWrap) IsBadRequest() {}
 
-func (e errBadRequestWrap) ShouldShowStackTrace() bool {
+func (err errBadRequestWrap) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e errBadRequestWrap) Is(target error) bool {
-	_, ok := target.(ErrBadRequest)
+func (err errBadRequestWrap) Is(target error) bool {
+	_, ok := target.(interfaces.ErrBadRequest)
 	return ok
 }
 
-func (e errBadRequestWrap) Error() string {
-	return e.error.Error()
+func (err errBadRequestWrap) Error() string {
+	return err.error.Error()
 }
 
 // TODO refactor NewNormal into something that combines helpful and stack trace

@@ -252,7 +252,7 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 				m = n
 
 				if j == ri {
-					err = collections.MakeErrStopIteration()
+					err = errors.MakeErrStopIteration()
 					return
 				}
 			}
@@ -320,7 +320,7 @@ func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 			j++
 
 			if j == m {
-				err = collections.MakeErrStopIteration()
+				err = errors.MakeErrStopIteration()
 				return
 			}
 

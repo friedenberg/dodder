@@ -20,6 +20,7 @@ type Multi interface {
 	interfaces.Lenner
 }
 
+// split into error group builder and error group
 type multi struct {
 	lock    sync.Locker
 	chOnErr chan struct{}
