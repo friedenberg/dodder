@@ -48,13 +48,10 @@ type inventoryListBlobStore interface {
 	getType() ids.Type
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
-	// TODO rename to ReadOneDigest
-	ReadOneSha(id interfaces.BlobId) (object *sku.Transacted, err error)
-	WriteInventoryListObject(
-		object *sku.Transacted,
-	) (err error)
+	ReadOneBlobId(interfaces.BlobId) (*sku.Transacted, error)
+	WriteInventoryListObject(*sku.Transacted) error
 
-	IterAllInventoryLists() interfaces.SeqError[*sku.Transacted]
+	AllInventoryListObjects() interfaces.SeqError[*sku.Transacted]
 }
 
 func (store *Store) Initialize(
@@ -88,10 +85,10 @@ func (store *Store) Initialize(
 		store_version.V8,
 	) {
 		store.inventoryListBlobStore = &blobStoreV0{
-			envRepo:        envRepo,
-			blobType:       blobType,
-			BlobStore:      inventoryListBlobStore,
-			typedBlobStore: inventoryListCoderCloset,
+			envRepo:                  envRepo,
+			blobType:                 blobType,
+			BlobStore:                inventoryListBlobStore,
+			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	} else {
 		store.inventoryListBlobStore = &blobStoreV1{
@@ -333,7 +330,7 @@ func (store *Store) IterInventoryList(
 func (store *Store) ReadLast() (*sku.Transacted, error) {
 	max := sku.GetTransactedPool().Get()
 
-	for list, err := range store.IterAllInventoryLists() {
+	for list, err := range store.AllInventoryListObjects() {
 		if err != nil {
 			return nil, errors.Wrap(err)
 		}
@@ -351,7 +348,7 @@ func (store *Store) ReadAllSorted(
 ) (err error) {
 	var skus []*sku.Transacted
 
-	for list, iterErr := range store.IterAllInventoryLists() {
+	for list, iterErr := range store.AllInventoryListObjects() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
@@ -376,7 +373,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 	return func(yield func(sku.ObjectWithList, error) bool) {
 		var objectWithList sku.ObjectWithList
 
-		for listObject, iterErr := range store.IterAllInventoryLists() {
+		for listObject, iterErr := range store.AllInventoryListObjects() {
 			objectWithList.List = listObject
 			objectWithList.Object = listObject
 
@@ -409,7 +406,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 func (store *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {
-	for listObject, iterErr := range store.IterAllInventoryLists() {
+	for listObject, iterErr := range store.AllInventoryListObjects() {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return

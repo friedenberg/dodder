@@ -27,7 +27,7 @@ type InventoryListStore interface {
 	// 	f interfaces.FuncIter[*sku.Transacted],
 	// ) (err error)
 
-	IterAllInventoryLists() interfaces.SeqError[*Transacted]
+	AllInventoryListObjects() interfaces.SeqError[*Transacted]
 }
 
 type Seq = interfaces.SeqError[*Transacted]

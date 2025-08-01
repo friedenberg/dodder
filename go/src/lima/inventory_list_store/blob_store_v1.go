@@ -6,11 +6,9 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -35,19 +33,12 @@ func (blobStore *blobStoreV1) GetInventoryListCoderCloset() inventory_list_coder
 	return blobStore.inventoryListCoderCloset
 }
 
-func (blobStore *blobStoreV1) ReadOneSha(
-	id interfaces.BlobId,
+func (blobStore *blobStoreV1) ReadOneBlobId(
+	blobId interfaces.BlobId,
 ) (object *sku.Transacted, err error) {
-	var sh sha.Sha
-
-	if err = sh.Set(blob_ids.Format(id)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var readCloser interfaces.ReadCloseBlobIdGetter
 
-	if readCloser, err = blobStore.BlobStore.BlobReader(&sh); err != nil {
+	if readCloser, err = blobStore.BlobStore.BlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -138,7 +129,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	return
 }
 
-func (blobStore *blobStoreV1) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted] {
+func (blobStore *blobStoreV1) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var file *os.File
 

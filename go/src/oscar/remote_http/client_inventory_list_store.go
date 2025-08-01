@@ -195,7 +195,7 @@ func (client client) ReadAllSkus(
 	return comments.Implement()
 }
 
-func (client client) IterAllInventoryLists() interfaces.SeqError[*sku.Transacted] {
+func (client client) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
 	var request *http.Request
 
 	{
