@@ -41,12 +41,12 @@ func MetadataShaString(
 func MetadataFieldError(
 	err error,
 ) []string_format_writer.Field {
-	var errorGroupBuilder errors.GroupBuilder
+	var errorGroup errors.Group
 
-	if errors.As(err, &errorGroupBuilder) {
-		out := make([]string_format_writer.Field, 0, errorGroupBuilder.Len())
+	if errors.As(err, &errorGroup) {
+		out := make([]string_format_writer.Field, 0, errorGroup.Len())
 
-		for _, e := range errorGroupBuilder.Errors() {
+		for _, e := range errorGroup {
 			out = append(
 				out,
 				string_format_writer.Field{

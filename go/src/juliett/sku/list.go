@@ -11,7 +11,6 @@ import (
 type InventoryListStore interface {
 	FormatForVersion(sv interfaces.StoreVersion) ListFormat
 	WriteInventoryListObject(t *Transacted) (err error)
-	ImportInventoryList(bs interfaces.BlobStore, t *Transacted) (err error)
 	// WriteInventoryListStream(list *Transacted, ) (err error)
 	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
 
@@ -29,8 +28,6 @@ type InventoryListStore interface {
 	// ) (err error)
 
 	IterAllInventoryLists() interfaces.SeqError[*Transacted]
-	MakeImporter(ImporterOptions, StoreOptions) Importer
-	ImportSeq(Seq, Importer) error
 }
 
 type Seq = interfaces.SeqError[*Transacted]

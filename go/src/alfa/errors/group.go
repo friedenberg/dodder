@@ -2,9 +2,9 @@ package errors
 
 import "fmt"
 
-type group []error
+type Group []error
 
-func (group group) Error() string {
+func (group Group) Error() string {
 	count := group.Len()
 
 	switch count {
@@ -19,10 +19,10 @@ func (group group) Error() string {
 	}
 }
 
-func (group group) Unwrap() []error {
+func (group Group) Unwrap() []error {
 	return group
 }
 
-func (group group) Len() int {
+func (group Group) Len() int {
 	return len(group)
 }

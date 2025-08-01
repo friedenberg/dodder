@@ -83,10 +83,10 @@ func (writer *Writer) WriteError(in error) (n int64, out error) {
 		return 0, nil
 	}
 
-	var errorGroupBuilder errors.GroupBuilder
+	var errorGroup errors.Group
 
-	if errors.As(in, &errorGroupBuilder) {
-		for _, err := range errorGroupBuilder.Errors() {
+	if errors.As(in, &errorGroup) {
+		for _, err := range errorGroup {
 			item := writer.errorToItem(err)
 			writer.alfredWriter.WriteItem(item)
 		}
