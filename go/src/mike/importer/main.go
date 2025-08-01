@@ -337,7 +337,7 @@ func (importer importer) ImportBlobIfNecessary(
 				blobId,
 				&progressWriter,
 			); err != nil {
-				if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
+				if errors.Is(err, &env_dir.ErrBlobAlreadyExists{}) {
 					err = nil
 				} else {
 					// TODO add context that this could not be copied from the

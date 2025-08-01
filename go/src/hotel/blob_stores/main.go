@@ -84,7 +84,7 @@ func CopyBlobIfNecessary(
 	blobSha := blobShaGetter.GetBlobId()
 
 	if dst.HasBlob(blobSha) || blobSha.IsNull() {
-		err = env_dir.MakeErrAlreadyExists(
+		err = env_dir.MakeErrBlobAlreadyExists(
 			blobSha,
 			"",
 		)

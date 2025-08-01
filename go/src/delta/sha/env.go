@@ -19,7 +19,7 @@ func (env Env) GetType() string {
 	return Type
 }
 
-func (env Env) GetHash() (hash.Hash, func()) {
+func (env Env) GetHash() (hash.Hash, interfaces.FuncRepool) {
 	return pool.GetSha256Hash()
 }
 
@@ -59,7 +59,7 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	return digest, nil
 }
 
-func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, func()) {
+func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, interfaces.FuncRepool) {
 	return blob_ids.MakeWriterWithRepool(env, nil)
 }
 

@@ -27,14 +27,12 @@ type (
 	EnvBlobId interface {
 		GetType() string
 
-		// TODO replace with FuncRepool
-		GetHash() (hash.Hash, func())
+		GetHash() (hash.Hash, FuncRepool)
 
 		GetBlobId() MutableBlobId
 		PutBlobId(BlobId)
 
-		// TODO replace with FuncRepool
-		MakeWriteDigesterWithRepool() (WriteBlobIdGetter, func())
+		MakeWriteDigesterWithRepool() (WriteBlobIdGetter, FuncRepool)
 		MakeWriteDigester() WriteBlobIdGetter
 		MakeDigestFromHash(hash.Hash) (BlobId, error)
 	}

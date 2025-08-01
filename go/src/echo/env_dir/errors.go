@@ -8,21 +8,26 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 )
 
-func MakeErrAlreadyExists(
-	blobId interfaces.BlobId,
-	path string,
-) (err *ErrAlreadyExists) {
-	err = &ErrAlreadyExists{Path: path}
-	err.BlobId = blob_ids.Clone(blobId)
-	return
+func IsErrBlobAlreadyExists(err error) bool {
+	return errors.Is(err, ErrBlobAlreadyExists{})
 }
 
-type ErrAlreadyExists struct {
+func MakeErrBlobAlreadyExists(
+	blobId interfaces.BlobId,
+	path string,
+) ErrBlobAlreadyExists {
+	return ErrBlobAlreadyExists{
+		Path:   path,
+		BlobId: blob_ids.Clone(blobId),
+	}
+}
+
+type ErrBlobAlreadyExists struct {
 	BlobId interfaces.BlobId
 	Path   string
 }
 
-func (err *ErrAlreadyExists) Error() string {
+func (err ErrBlobAlreadyExists) Error() string {
 	return fmt.Sprintf(
 		"File with blob_id %s already exists: %s",
 		blob_ids.Format(err.BlobId),
@@ -30,8 +35,8 @@ func (err *ErrAlreadyExists) Error() string {
 	)
 }
 
-func (err *ErrAlreadyExists) Is(target error) bool {
-	_, ok := target.(*ErrAlreadyExists)
+func (err ErrBlobAlreadyExists) Is(target error) bool {
+	_, ok := target.(ErrBlobAlreadyExists)
 	return ok
 }
 

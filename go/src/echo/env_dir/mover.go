@@ -129,7 +129,7 @@ func (mover *localFileMover) Close() (err error) {
 	if err = os.Rename(path, mover.objectPath); err != nil {
 		if files.Exists(mover.objectPath) {
 			if mover.errorOnAttemptedOverwrite {
-				err = MakeErrAlreadyExists(digest, mover.objectPath)
+				err = MakeErrBlobAlreadyExists(digest, mover.objectPath)
 			} else {
 				err = nil
 			}

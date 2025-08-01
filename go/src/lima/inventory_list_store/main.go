@@ -14,10 +14,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -344,82 +342,6 @@ func (store *Store) WriteInventoryListBlob(
 	return
 }
 
-// TODO split into public and private parts, where public includes writing the
-// skus AND the list, while private writes just the list
-func (store *Store) ImportInventoryList(
-	remoteBlobStore interfaces.BlobStore,
-	listObject *sku.Transacted,
-) (err error) {
-	var blobReader interfaces.ReadCloseBlobIdGetter
-
-	if blobReader, err = remoteBlobStore.BlobReader(
-		listObject.GetBlobId(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(blobReader)
-	defer repoolBufferedReader()
-
-	var list *sku.List
-
-	inventoryListCoderCloset := store.GetInventoryListCoderCloset()
-
-	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
-		store.GetEnvRepo(),
-		listObject.GetType(),
-		bufferedReader,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for childObject := range list.All() {
-		if err = childObject.CalculateObjectDigests(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = blob_stores.CopyBlobIfNecessary(
-			store.GetEnvRepo().GetEnv(),
-			store.blobBlobStore,
-			remoteBlobStore,
-			childObject.GetBlobId(),
-			nil,
-		); err != nil {
-			if errors.Is(err, &env_dir.ErrAlreadyExists{}) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-
-			continue
-		}
-	}
-
-	// TODO transform listObject into local type if necessary
-
-	if err = store.WriteInventoryListBlob(
-		remoteBlobStore,
-		listObject,
-		list,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = store.WriteInventoryListObject(
-		listObject,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (store *Store) IterInventoryList(
 	blobSha interfaces.BlobId,
 ) interfaces.SeqError[*sku.Transacted] {
@@ -505,6 +427,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 	}
 }
 
+// TODO rewrite as iterator
 func (store *Store) ReadAllSkus(
 	f func(listSku, sk *sku.Transacted) error,
 ) (err error) {

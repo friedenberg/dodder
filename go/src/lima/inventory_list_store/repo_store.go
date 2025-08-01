@@ -43,16 +43,15 @@ func (store *Store) Commit(
 }
 
 func (store *Store) ReadOneInto(
-	oid interfaces.ObjectId,
+	objectId interfaces.ObjectId,
 	_ *sku.Transacted,
 ) (err error) {
-	if oid.GetGenre() != genres.InventoryList {
-		err = genres.MakeErrUnsupportedGenre(oid.GetGenre())
+	if objectId.GetGenre() != genres.InventoryList {
+		err = genres.MakeErrUnsupportedGenre(objectId.GetGenre())
 		return
 	}
 
 	err = comments.Implement()
-	// err = errors.BadRequestf("%q", oid)
 
 	return
 }
