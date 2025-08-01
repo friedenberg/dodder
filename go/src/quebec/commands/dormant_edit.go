@@ -127,10 +127,8 @@ func (cmd DormantEdit) makeTempKonfigFile(
 	path = file.Name()
 
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(file)
-	defer func() {
-		pool.FlushBufioWriterAndPut(&err, bufferedWriter)
-		repoolBufferedWriter()
-	}()
+	defer repoolBufferedWriter()
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
 	defer repoolBufferedReader()

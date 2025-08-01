@@ -8,7 +8,6 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 )
@@ -34,11 +33,6 @@ func GetBufioReader() interfaces.Pool[bufio.Reader, *bufio.Reader] {
 
 func GetBufioWriter() interfaces.Pool[bufio.Writer, *bufio.Writer] {
 	return bufioWriter
-}
-
-func FlushBufioWriterAndPut(err *error, writer *bufio.Writer) {
-	errors.DeferredFlusher(err, writer)
-	GetBufioWriter().Put(writer)
 }
 
 func GetStringReader(

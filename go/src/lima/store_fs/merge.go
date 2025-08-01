@@ -323,10 +323,8 @@ func (store *Store) GenerateConflictMarker(
 	defer errors.DeferredCloser(&err, file)
 
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(file)
-	defer func() {
-		pool.FlushBufioWriterAndPut(&err, bufferedWriter)
-		repoolBufferedWriter()
-	}()
+	defer repoolBufferedWriter()
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	blobStore := store.storeSupplies.BlobStore.InventoryList
 
