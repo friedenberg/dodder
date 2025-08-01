@@ -33,7 +33,7 @@ func init() {
 
 type Last struct {
 	command_components.EnvRepo
-	command_components.LocalArchive
+	command_components.LocalWorkingCopy
 
 	RepoId   ids.RepoId
 	Edit     bool
@@ -42,7 +42,7 @@ type Last struct {
 }
 
 func (cmd *Last) SetFlagSet(flagSet *flag.FlagSet) {
-	cmd.LocalArchive.SetFlagSet(flagSet)
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 
 	// TODO remove
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
@@ -58,9 +58,7 @@ func (cmd Last) CompletionGenres() ids.Genre {
 }
 
 func (cmd Last) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-
-	repo := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	if len(req.PopArgs()) != 0 {
 		ui.Err().Print("ignoring arguments")

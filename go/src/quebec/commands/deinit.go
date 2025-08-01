@@ -21,7 +21,7 @@ func init() {
 }
 
 type Deinit struct {
-	command_components.LocalArchive
+	command_components.LocalWorkingCopy
 
 	Force bool
 }
@@ -36,8 +36,7 @@ func (cmd *Deinit) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (cmd Deinit) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-	repo := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	var home string
 
@@ -53,7 +52,7 @@ func (cmd Deinit) Run(req command.Request) {
 		}
 	}
 
-	exdg := envRepo.GetXDG()
+	exdg := repo.GetEnvRepo().GetXDG()
 
 	comments.Comment(
 		"determine if this is a native XDG repo, or an overridden XDG repo",
@@ -93,7 +92,7 @@ func (cmd Deinit) Run(req command.Request) {
 	// TODO decide whether the workspace directory should be deleted too
 
 	if !cmd.Force &&
-		!envRepo.Confirm(
+		!repo.Confirm(
 			fmt.Sprintf(
 				`are you sure you want to deinit?
 The following directories and files would be deleted:
@@ -107,12 +106,12 @@ The following directories and files would be deleted:
 	base := path.Join(repo.GetEnvRepo().Dir())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
-		envRepo.Cancel(err)
+		repo.Cancel(err)
 	}
 
-	if err := envRepo.Delete(
+	if err := repo.Delete(
 		filesAndDirectories...,
 	); err != nil {
-		envRepo.Cancel(err)
+		repo.Cancel(err)
 	}
 }

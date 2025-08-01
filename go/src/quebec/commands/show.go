@@ -32,7 +32,7 @@ func init() {
 
 type Show struct {
 	command_components.EnvRepo
-	command_components.LocalArchive
+	command_components.LocalWorkingCopy
 	command_components.Query
 	command_components.RemoteTransfer
 
@@ -45,7 +45,7 @@ type Show struct {
 }
 
 func (cmd *Show) SetFlagSet(flagSet *flag.FlagSet) {
-	cmd.LocalArchive.SetFlagSet(flagSet)
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
 
 	flagSet.Var(
@@ -63,8 +63,7 @@ func (cmd Show) Complete(
 	envLocal env_local.Env,
 	commandLine command.CommandLine,
 ) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-	repo := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	args := commandLine.FlagsOrArgs[1:]
 
@@ -81,8 +80,7 @@ func (cmd Show) Complete(
 }
 
 func (cmd Show) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-	repo := cmd.MakeLocalArchive(envRepo)
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	args := req.PopArgs()
 

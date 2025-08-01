@@ -69,7 +69,7 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqCoder{
-				ctx:        envRepo,
+				ctx:       envRepo,
 				ListCoder: coder,
 			}
 		}
@@ -85,7 +85,7 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
-				ctx:        envRepo,
+				ctx:       envRepo,
 				ListCoder: coder,
 			}
 		}
@@ -101,7 +101,7 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
-				ctx:        envRepo,
+				ctx:       envRepo,
 				ListCoder: coder,
 			}
 		}
