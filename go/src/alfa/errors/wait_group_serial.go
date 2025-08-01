@@ -24,7 +24,7 @@ func (wg *waitGroupSerial) GetError() (err error) {
 
 	wg.isDone = true
 
-	me := MakeMulti()
+	me := MakeGroupBuilder()
 
 	for _, f := range wg.do {
 		if err = f(); err != nil {

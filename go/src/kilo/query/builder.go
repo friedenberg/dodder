@@ -56,7 +56,7 @@ func (builder *Builder) makeState() *buildState {
 	state := &buildState{
 		options:      builder.options,
 		builder:      builder,
-		latentErrors: errors.MakeMulti(),
+		latentErrors: errors.MakeGroupBuilder(),
 	}
 
 	if builder.luaVMPoolBuilder != nil {
@@ -78,99 +78,99 @@ func (builder *Builder) makeState() *buildState {
 	return state
 }
 
-func (b *Builder) WithOptions(options BuilderOption) *Builder {
+func (builder *Builder) WithOptions(options BuilderOption) *Builder {
 	if options == nil {
-		return b
+		return builder
 	}
 
-	applied := options.Apply(b)
+	applied := options.Apply(builder)
 
 	if applied != nil {
 		return applied
 	}
 
-	return b
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
-	b.options.permittedSigil.Add(s)
-	return b
+func (builder *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
+	builder.options.permittedSigil.Add(s)
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (b *Builder) WithDoNotMatchEmpty() *Builder {
-	b.doNotMatchEmpty = true
-	return b
+func (builder *Builder) WithDoNotMatchEmpty() *Builder {
+	builder.doNotMatchEmpty = true
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (b *Builder) WithRequireNonEmptyQuery() *Builder {
-	b.requireNonEmptyQuery = true
-	return b
+func (builder *Builder) WithRequireNonEmptyQuery() *Builder {
+	builder.requireNonEmptyQuery = true
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithDebug() *Builder {
-	mb.debug = true
-	return mb
+func (builder *Builder) WithDebug() *Builder {
+	builder.debug = true
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithRepoId(
+func (builder *Builder) WithRepoId(
 	repoId ids.RepoId,
 ) *Builder {
-	mb.repoId = repoId
-	return mb
+	builder.repoId = repoId
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithFileExtensions(
+func (builder *Builder) WithFileExtensions(
 	feg interfaces.FileExtensions,
 ) *Builder {
-	mb.fileExtensions = feg
-	return mb
+	builder.fileExtensions = feg
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithExpanders(
+func (builder *Builder) WithExpanders(
 	expanders ids.Abbr,
 ) *Builder {
-	mb.expanders = expanders
-	return mb
+	builder.expanders = expanders
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithDefaultGenres(
+func (builder *Builder) WithDefaultGenres(
 	defaultGenres ids.Genre,
 ) *Builder {
-	mb.options.defaultGenres = defaultGenres
-	return mb
+	builder.options.defaultGenres = defaultGenres
+	return builder
 }
 
 // TODO refactor into BuilderOption
-func (mb *Builder) WithDefaultSigil(
+func (builder *Builder) WithDefaultSigil(
 	defaultSigil ids.Sigil,
 ) *Builder {
-	mb.options.defaultSigil = defaultSigil
-	return mb
+	builder.options.defaultSigil = defaultSigil
+	return builder
 }
 
-func (mb *Builder) WithHidden(
+func (builder *Builder) WithHidden(
 	hidden sku.Query,
 ) *Builder {
-	mb.hidden = hidden
-	return mb
+	builder.hidden = hidden
+	return builder
 }
 
 // TODO
-func (b *Builder) WithExternalLike(
+func (builder *Builder) WithExternalLike(
 	zts sku.SkuTypeSet,
 ) *Builder {
 	for t := range zts.All() {
 		if t.GetExternalObjectId().IsEmpty() {
-			b.pinnedObjectIds = append(
-				b.pinnedObjectIds,
+			builder.pinnedObjectIds = append(
+				builder.pinnedObjectIds,
 				pinnedObjectId{
 					Sigil: ids.SigilExternal,
 					ObjectId: ObjectId{
@@ -189,23 +189,23 @@ func (b *Builder) WithExternalLike(
 				)
 			}
 
-			b.pinnedExternalObjectIds = append(
-				b.pinnedExternalObjectIds,
+			builder.pinnedExternalObjectIds = append(
+				builder.pinnedExternalObjectIds,
 				t.GetExternalObjectId(),
 			)
 		}
 	}
 
-	return b
+	return builder
 }
 
-func (b *Builder) WithTransacted(
+func (builder *Builder) WithTransacted(
 	zts sku.TransactedSet,
 	sigil ids.Sigil,
 ) *Builder {
 	for t := range zts.All() {
-		b.pinnedObjectIds = append(
-			b.pinnedObjectIds,
+		builder.pinnedObjectIds = append(
+			builder.pinnedObjectIds,
 			pinnedObjectId{
 				Sigil: sigil,
 				ObjectId: ObjectId{
@@ -215,19 +215,19 @@ func (b *Builder) WithTransacted(
 		)
 	}
 
-	return b
+	return builder
 }
 
-func (b *Builder) BuildQueryGroupWithRepoId(
+func (builder *Builder) BuildQueryGroupWithRepoId(
 	externalQueryOptions sku.ExternalQueryOptions,
 	values ...string,
 ) (query *Query, err error) {
-	state := b.makeState()
+	state := builder.makeState()
 
-	if b.workspaceEnabled {
+	if builder.workspaceEnabled {
 		ok := false
 
-		state.workspaceStore, ok = b.workspaceStoreGetter.GetWorkspaceStoreForQuery(
+		state.workspaceStore, ok = builder.workspaceStoreGetter.GetWorkspaceStoreForQuery(
 			externalQueryOptions.RepoId,
 		)
 
@@ -235,12 +235,15 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 		state.group.ExternalQueryOptions = externalQueryOptions
 
 		if !ok {
-			err = errors.ErrorWithStackf("kasten not found: %q", externalQueryOptions.RepoId)
+			err = errors.ErrorWithStackf(
+				"kasten not found: %q",
+				externalQueryOptions.RepoId,
+			)
 			return
 		}
 	}
 
-	if err = b.build(state, values...); err != nil {
+	if err = builder.build(state, values...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -250,10 +253,12 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 	return
 }
 
-func (b *Builder) BuildQueryGroup(vs ...string) (group *Query, err error) {
-	state := b.makeState()
+func (builder *Builder) BuildQueryGroup(
+	args ...string,
+) (group *Query, err error) {
+	state := builder.makeState()
 
-	if err = b.build(state, vs...); err != nil {
+	if err = builder.build(state, args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -263,13 +268,13 @@ func (b *Builder) BuildQueryGroup(vs ...string) (group *Query, err error) {
 	return
 }
 
-func (b *Builder) build(state *buildState, values ...string) (err error) {
-	var latent errors.Multi
+func (builder *Builder) build(state *buildState, values ...string) (err error) {
+	var latent errors.GroupBuilder
 
 	if err, latent = state.build(values...); err != nil {
 		if !errors.IsBadRequest(err) {
 			latent.Add(errors.Wrapf(err, "Query String: %q", values))
-			err = latent
+			err = latent.GetError()
 		}
 
 		errors.Wrap(err)
@@ -278,7 +283,7 @@ func (b *Builder) build(state *buildState, values ...string) (err error) {
 	}
 
 	if len(state.missingBlobs) > 0 {
-		me := errors.MakeMulti()
+		me := errors.MakeGroupBuilder()
 
 		for _, e := range state.missingBlobs {
 			me.Add(e)
@@ -289,14 +294,15 @@ func (b *Builder) build(state *buildState, values ...string) (err error) {
 		return
 	}
 
-	if b.defaultQuery == "" {
+	if builder.defaultQuery == "" {
 		return
 	}
 
 	defaultQueryGroupState := state.copy()
-	defaultQueryGroupState.options.defaultGenres = ids.MakeGenre(genres.All()...)
+	defaultQueryGroupState.options.defaultGenres = ids.MakeGenre(
+		genres.All()...)
 
-	if err, _ = defaultQueryGroupState.build(b.defaultQuery); err != nil {
+	if err, _ = defaultQueryGroupState.build(builder.defaultQuery); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

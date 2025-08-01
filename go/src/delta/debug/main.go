@@ -142,7 +142,7 @@ func MakeContext(
 
 func (c *Context) Close() error {
 	waitGroupStopOrWrite := errors.MakeWaitGroupParallel()
-	multiError := errors.MakeMulti()
+	multiError := errors.MakeGroupBuilder()
 
 	if c.fileTrace != nil {
 		waitGroupStopOrWrite.Do(errors.MakeFuncErrFromFuncNil(trace.Stop))

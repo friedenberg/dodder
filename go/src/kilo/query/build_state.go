@@ -23,7 +23,7 @@ type buildState struct {
 
 	builder      *Builder
 	group        *Query
-	latentErrors errors.Multi
+	latentErrors errors.GroupBuilder
 	missingBlobs []ErrBlobMissing
 
 	luaVMPoolBuilder        *lua.VMPoolBuilder
@@ -40,7 +40,7 @@ func (src *buildState) copy() (dst *buildState) {
 	dst = &buildState{
 		options:      src.options,
 		builder:      src.builder,
-		latentErrors: errors.MakeMulti(),
+		latentErrors: errors.MakeGroupBuilder(),
 	}
 
 	if src.luaVMPoolBuilder != nil {
@@ -73,8 +73,8 @@ func (buildState *buildState) makeGroup() *Query {
 
 func (buildState *buildState) build(
 	values ...string,
-) (err error, latent errors.Multi) {
-	em := errors.MakeMulti()
+) (err error, latent errors.GroupBuilder) {
+	em := errors.MakeGroupBuilder()
 	latent = em
 
 	var remaining []string

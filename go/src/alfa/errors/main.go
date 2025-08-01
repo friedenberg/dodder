@@ -26,7 +26,7 @@ func Join(es ...error) error {
 		return es[0]
 
 	default:
-		err := MakeMulti(es...)
+		err := MakeGroupBuilder(es...)
 
 		if err.Empty() {
 			return nil

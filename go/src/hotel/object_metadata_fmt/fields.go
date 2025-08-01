@@ -41,7 +41,7 @@ func MetadataShaString(
 func MetadataFieldError(
 	err error,
 ) []string_format_writer.Field {
-	var me errors.Multi
+	var me errors.GroupBuilder
 
 	if errors.As(err, &me) {
 		out := make([]string_format_writer.Field, 0, me.Len())

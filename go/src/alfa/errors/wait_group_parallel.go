@@ -8,21 +8,21 @@ import (
 
 func MakeWaitGroupParallel() WaitGroup {
 	waitGroup := &waitGroupParallel{
-		lock:         &sync.Mutex{},
-		inner:        &sync.WaitGroup{},
-		err:          MakeMulti(),
-		doAfter:      make([]FuncWithStackInfo, 0),
-		addStackInfo: DebugBuild,
+		lock:              &sync.Mutex{},
+		inner:             &sync.WaitGroup{},
+		errorGroupBuilder: MakeGroupBuilder(),
+		doAfter:           make([]FuncWithStackInfo, 0),
+		addStackInfo:      DebugBuild,
 	}
 
 	return waitGroup
 }
 
 type waitGroupParallel struct {
-	lock    *sync.Mutex
-	inner   *sync.WaitGroup
-	err     Multi
-	doAfter []FuncWithStackInfo
+	lock              *sync.Mutex
+	inner             *sync.WaitGroup
+	errorGroupBuilder GroupBuilder
+	doAfter           []FuncWithStackInfo
 
 	addStackInfo bool
 
@@ -33,8 +33,8 @@ func (waitGroup *waitGroupParallel) GetError() (err error) {
 	waitGroup.wait()
 
 	defer func() {
-		if !waitGroup.err.Empty() {
-			err = waitGroup.err
+		if !waitGroup.errorGroupBuilder.Empty() {
+			err = waitGroup.errorGroupBuilder.GetError()
 		}
 	}()
 
@@ -42,7 +42,7 @@ func (waitGroup *waitGroupParallel) GetError() (err error) {
 		doAfter := waitGroup.doAfter[i]
 		err := doAfter.FuncErr()
 		if err != nil {
-			waitGroup.err.Add(doAfter.Wrap(err))
+			waitGroup.errorGroupBuilder.Add(doAfter.Wrap(err))
 		}
 	}
 
@@ -98,7 +98,7 @@ func (waitGroup *waitGroupParallel) doneWith(
 	waitGroup.inner.Done()
 
 	if err != nil {
-		waitGroup.err.Add(frame.Wrap(err))
+		waitGroup.errorGroupBuilder.Add(frame.Wrap(err))
 	}
 }
 

@@ -83,7 +83,7 @@ func (writer *Writer) WriteError(in error) (n int64, out error) {
 		return 0, nil
 	}
 
-	var em errors.Multi
+	var em errors.GroupBuilder
 
 	if errors.As(in, &em) {
 		for _, err := range em.Errors() {

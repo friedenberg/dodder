@@ -160,7 +160,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	v = strings.TrimSuffix(v, ".zettel")
 
-	me := errors.MakeMulti()
+	me := errors.MakeGroupBuilder()
 
 	if strings.ContainsFunc(
 		v,

@@ -46,7 +46,7 @@ func (store *Store) ImportSeq(
 		},
 	)
 
-	importErrors := errors.MakeMulti()
+	importErrors := errors.MakeGroupBuilder()
 	missingBlobs := sku.MakeListCheckedOut()
 
 	for object, iterErr := range seq {

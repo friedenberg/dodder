@@ -101,7 +101,7 @@ func Multiplex[T any](
 
 	for e := range ch {
 		if e != nil {
-			err = errors.MakeMulti(err, e)
+			err = errors.MakeGroupBuilder(err, e)
 		}
 	}
 
