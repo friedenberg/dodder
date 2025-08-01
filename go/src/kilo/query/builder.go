@@ -54,9 +54,8 @@ type Builder struct {
 
 func (builder *Builder) makeState() *buildState {
 	state := &buildState{
-		options:      builder.options,
-		builder:      builder,
-		latentErrors: errors.MakeGroupBuilder(),
+		options: builder.options,
+		builder: builder,
 	}
 
 	if builder.luaVMPoolBuilder != nil {
@@ -269,7 +268,7 @@ func (builder *Builder) BuildQueryGroup(
 }
 
 func (builder *Builder) build(state *buildState, values ...string) (err error) {
-	var latent errors.GroupBuilder
+	var latent *errors.GroupBuilder
 
 	if err, latent = state.build(values...); err != nil {
 		if !errors.IsBadRequest(err) {

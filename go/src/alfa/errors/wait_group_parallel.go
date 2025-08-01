@@ -8,11 +8,10 @@ import (
 
 func MakeWaitGroupParallel() WaitGroup {
 	waitGroup := &waitGroupParallel{
-		lock:              &sync.Mutex{},
-		inner:             &sync.WaitGroup{},
-		errorGroupBuilder: MakeGroupBuilder(),
-		doAfter:           make([]FuncWithStackInfo, 0),
-		addStackInfo:      DebugBuild,
+		lock:         &sync.Mutex{},
+		inner:        &sync.WaitGroup{},
+		doAfter:      make([]FuncWithStackInfo, 0),
+		addStackInfo: DebugBuild,
 	}
 
 	return waitGroup

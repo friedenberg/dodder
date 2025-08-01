@@ -38,9 +38,8 @@ type buildState struct {
 
 func (src *buildState) copy() (dst *buildState) {
 	dst = &buildState{
-		options:      src.options,
-		builder:      src.builder,
-		latentErrors: errors.MakeGroupBuilder(),
+		options: src.options,
+		builder: src.builder,
 	}
 
 	if src.luaVMPoolBuilder != nil {
@@ -73,9 +72,8 @@ func (buildState *buildState) makeGroup() *Query {
 
 func (buildState *buildState) build(
 	values ...string,
-) (err error, latent errors.GroupBuilder) {
-	em := errors.MakeGroupBuilder()
-	latent = em
+) (err error, latent *errors.GroupBuilder) {
+	latent = errors.MakeGroupBuilder()
 
 	var remaining []string
 
@@ -97,7 +95,7 @@ func (buildState *buildState) build(
 					remaining = append(remaining, value)
 				}
 
-				em.Add(err)
+				latent.Add(err)
 				err = nil
 
 				continue
