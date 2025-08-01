@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/german_keys"
@@ -364,7 +363,7 @@ func writeShaKeyIfNotNull(
 func GetShaForContext(
 	f FormatGeneric,
 	c FormatterContext,
-) (sh *Sha, err error) {
+) (sh interfaces.BlobId, err error) {
 	m := c.GetMetadata()
 
 	switch f.key {
@@ -387,7 +386,10 @@ func GetShaForContext(
 	return getShaForContext(f, c)
 }
 
-func GetShaForMetadata(f FormatGeneric, m *Metadata) (sh *Sha, err error) {
+func GetShaForMetadata(
+	f FormatGeneric,
+	m *Metadata,
+) (sh interfaces.BlobId, err error) {
 	return GetShaForContext(f, nopFormatterContext{m})
 }
 
@@ -395,7 +397,7 @@ func WriteMetadata(
 	w io.Writer,
 	f FormatGeneric,
 	c FormatterContext,
-) (sh *Sha, err error) {
+) (blobId interfaces.BlobId, err error) {
 	writer, repool := blob_ids.MakeWriterWithRepool(sha.Env{}, w)
 	defer repool()
 
@@ -405,12 +407,7 @@ func WriteMetadata(
 		return
 	}
 
-	sh = sha.GetPool().Get()
-
-	if err = sh.SetDigester(writer); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	blobId = writer.GetBlobId()
 
 	return
 }
@@ -418,7 +415,7 @@ func WriteMetadata(
 func getShaForContext(
 	f FormatGeneric,
 	c FormatterContext,
-) (sh *Sha, err error) {
+) (sh interfaces.BlobId, err error) {
 	if sh, err = WriteMetadata(nil, f, c); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -430,7 +427,7 @@ func getShaForContext(
 func GetShaForContextDebug(
 	f FormatGeneric,
 	c FormatterContext,
-) (digest *Sha, err error) {
+) (blobId interfaces.BlobId, err error) {
 	var sb strings.Builder
 	writer, repool := blob_ids.MakeWriterWithRepool(sha.Env{}, &sb)
 	defer repool()
@@ -441,27 +438,20 @@ func GetShaForContextDebug(
 		return
 	}
 
-	digest = sha.GetPool().Get()
-
-	if err = digest.SetDigester(writer); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ui.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, digest, &sb)
+	blobId = writer.GetBlobId()
 
 	return
 }
 
 func GetShasForMetadata(
 	m *Metadata,
-) (digests map[string]interfaces.BlobId, err error) {
-	digests = make(map[string]interfaces.BlobId, len(FormatKeysV5))
+) (blobIds map[string]interfaces.BlobId, err error) {
+	blobIds = make(map[string]interfaces.BlobId, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)
 
-		var sh *Sha
+		var sh interfaces.BlobId
 
 		if sh, err = GetShaForMetadata(f, m); err != nil {
 			err = errors.Wrap(err)
@@ -472,7 +462,7 @@ func GetShasForMetadata(
 			continue
 		}
 
-		digests[k] = sh
+		blobIds[k] = sh
 	}
 
 	return

@@ -170,15 +170,15 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 }
 
 func (transacted *Transacted) makeShaCalcFunc(
-	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (*sha.Sha, error),
-	of object_inventory_format.FormatGeneric,
+	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	objectFormat object_inventory_format.FormatGeneric,
 	sh *sha.Sha,
 ) errors.FuncErr {
 	return func() (err error) {
-		var actual *sha.Sha
+		var actual interfaces.BlobId
 
 		if actual, err = f(
-			of,
+			objectFormat,
 			transacted,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -187,7 +187,10 @@ func (transacted *Transacted) makeShaCalcFunc(
 
 		defer blob_ids.PutBlobId(actual)
 
-		sh.ResetWith(actual)
+		if err = sh.SetDigest(actual); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}
