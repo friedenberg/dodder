@@ -15,13 +15,13 @@ const (
 	TypeArchive
 )
 
-func (t *Type) Set(v string) (err error) {
+func (tipe *Type) Set(v string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(v)) {
 	case "archive":
-		*t = TypeArchive
+		*tipe = TypeArchive
 
 	case "", "working-copy":
-		*t = TypeWorkingCopy
+		*tipe = TypeWorkingCopy
 
 	default:
 		err = errors.Wrapf(ErrUnsupportedRepoType{}, "Value: %q", v)
@@ -31,8 +31,8 @@ func (t *Type) Set(v string) (err error) {
 	return
 }
 
-func (t Type) String() string {
-	switch t {
+func (tipe Type) String() string {
+	switch tipe {
 	case TypeWorkingCopy:
 		return "working-copy"
 
@@ -40,17 +40,17 @@ func (t Type) String() string {
 		return "archive"
 
 	default:
-		return fmt.Sprintf("unknown-%d", t)
+		return fmt.Sprintf("unknown-%d", tipe)
 	}
 }
 
-func (t Type) MarshalText() (b []byte, err error) {
-	b = []byte(t.String())
+func (tipe Type) MarshalText() (b []byte, err error) {
+	b = []byte(tipe.String())
 	return
 }
 
-func (t *Type) UnmarshalText(b []byte) (err error) {
-	if err = t.Set(string(b)); err != nil {
+func (tipe *Type) UnmarshalText(b []byte) (err error) {
+	if err = tipe.Set(string(b)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

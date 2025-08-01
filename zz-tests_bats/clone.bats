@@ -245,21 +245,37 @@ function clone_archive_history_default_allow_conflicts { # @test
 		<(print_their_xdg them)
 
 	assert_success
-	assert_output ''
+	assert_output_unsorted --regexp - <<-'EOM'
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[konfig @[0-9a-f]+ !toml-config-v1]
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
 
-	run_dodder show
+	run_dodder show :z,b,t,e,konfig
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[konfig @d23cb9e6237446e0ff798250c9e82862f29afd997581c9aefdf4916cebd00b90 .* !toml-config-v1]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 .* !toml-type-v1]
-		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b .* !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 .* !md "wow" tag]
-		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[konfig @[0-9a-f]+ !toml-config-v1]
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 

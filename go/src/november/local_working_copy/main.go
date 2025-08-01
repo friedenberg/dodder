@@ -2,7 +2,6 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -152,15 +151,6 @@ func (local *Repo) initialize(
 		local.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if local.GetConfig().GetRepoType() != repo_type.TypeWorkingCopy {
-		err = repo_type.ErrUnsupportedRepoType{
-			Expected: repo_type.TypeWorkingCopy,
-			Actual:   local.GetConfig().GetGenesisConfigPublic().GetRepoType(),
-		}
-
 		return
 	}
 

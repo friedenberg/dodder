@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -113,22 +112,6 @@ func (store *Store) GetEnv() env_ui.Env {
 	return store.GetEnvRepo()
 }
 
-func (store *Store) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
-	return store.GetEnvRepo().GetConfigPublic().Blob
-}
-
-func (store *Store) GetImmutableConfigPublicType() ids.Type {
-	return store.GetEnvRepo().GetConfigPublic().Type
-}
-
-func (store *Store) GetImmutableConfigPrivate() genesis_configs.TypedConfigPrivate {
-	return store.GetEnvRepo().GetConfigPrivate()
-}
-
-func (store *Store) GetObjectStore() sku.RepoStore {
-	return store
-}
-
 func (store *Store) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 	return wg.GetError()
@@ -155,14 +138,6 @@ func (store *Store) GetTai() ids.Tai {
 
 func (store *Store) GetEnvRepo() env_repo.Env {
 	return store.envRepo
-}
-
-func (store *Store) GetBlobStore() interfaces.BlobStore {
-	return store.envRepo.GetDefaultBlobStore()
-}
-
-func (store *Store) GetInventoryListStore() sku.InventoryListStore {
-	return store
 }
 
 func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {

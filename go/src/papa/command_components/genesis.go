@@ -3,7 +3,6 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -70,23 +69,5 @@ func (cmd Genesis) OnTheFirstDay(
 	envRepo.Genesis(cmd.BigBang)
 	defer ui.Log().Print("genesis done")
 
-	switch cmd.BigBang.GenesisConfig.Blob.GetRepoType() {
-	case repo_type.TypeWorkingCopy:
-		return local_working_copy.Genesis(
-			cmd.BigBang,
-			envRepo,
-		)
-
-	case repo_type.TypeArchive:
-		return cmd.MakeLocalArchive(envRepo)
-
-	default:
-		req.Cancel(
-			repo_type.ErrUnsupportedRepoType{
-				Actual: cmd.BigBang.GenesisConfig.Blob.GetRepoType(),
-			})
-
-	}
-
-	return nil
+	return local_working_copy.Genesis(cmd.BigBang, envRepo)
 }

@@ -15,3 +15,12 @@ func MakeSeqErrorFromSeq[ELEMENT any](
 		}
 	}
 }
+
+func MakeSeqErrorWithError[ELEMENT any](
+	err error,
+) interfaces.SeqError[ELEMENT] {
+	return func(yield func(ELEMENT, error) bool) {
+		var t ELEMENT
+		yield(t, err)
+	}
+}
