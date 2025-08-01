@@ -71,12 +71,17 @@ func (cmd Mergetool) Run(req command.Request) {
 		cmd.doOne(localWorkingCopy, co)
 	}
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
+	)
 }
 
-func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
-	tm := sku.Conflicted{
-		CheckedOut: co.Clone(),
+func (cmd Mergetool) doOne(
+	repo *local_working_copy.Repo,
+	checkedOut *sku.CheckedOut,
+) {
+	conflicted := sku.Conflicted{
+		CheckedOut: checkedOut.Clone(),
 	}
 
 	var conflict *fd.FD
@@ -84,41 +89,43 @@ func (c Mergetool) doOne(u *local_working_copy.Repo, co *sku.CheckedOut) {
 	{
 		var err error
 
-		if conflict, err = u.GetEnvWorkspace().GetStoreFS().GetConflictOrError(
-			co.GetSkuExternal(),
+		if conflict, err = repo.GetEnvWorkspace().GetStoreFS().GetConflictOrError(
+			checkedOut.GetSkuExternal(),
 		); err != nil {
-			u.Cancel(err)
+			repo.Cancel(err)
 		}
 	}
 
-	var f *os.File
+	var file *os.File
 
 	{
 		var err error
 
-		if f, err = files.Open(conflict.GetPath()); err != nil {
-			u.Cancel(err)
+		if file, err = files.Open(conflict.GetPath()); err != nil {
+			repo.Cancel(err)
+			return
 		}
 
-		defer errors.ContextMustClose(u, f)
+		defer errors.ContextMustClose(repo, file)
 	}
 
-	br := bufio.NewReader(f)
+	// TODO pool
+	bufferedReader := bufio.NewReader(file)
 
-	bs := u.GetStore().GetTypedBlobStore().InventoryList
+	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
 
-	if err := tm.ReadConflictMarker(
-		bs.IterInventoryListBlobSkusFromReader(
+	if err := conflicted.ReadConflictMarker(
+		inventoryListCoderCloset.IterInventoryListBlobSkusFromReader(
 			ids.DefaultOrPanic(genres.InventoryList),
-			br,
+			bufferedReader,
 		),
 	); err != nil {
-		u.Cancel(err)
+		repo.Cancel(err)
 	}
 
-	if err := u.GetStore().RunMergeTool(
-		tm,
+	if err := repo.GetStore().RunMergeTool(
+		conflicted,
 	); err != nil {
-		u.Cancel(err)
+		repo.Cancel(err)
 	}
 }

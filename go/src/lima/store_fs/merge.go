@@ -396,13 +396,13 @@ func (store *Store) GenerateConflictMarker(
 func (store *Store) RunMergeTool(
 	tool []string,
 	conflicted sku.Conflicted,
-) (co *sku.CheckedOut, err error) {
+) (checkedOut *sku.CheckedOut, err error) {
 	if len(tool) == 0 {
 		err = errors.ErrorWithStackf("no utility provided")
 		return
 	}
 
-	co = conflicted.CheckedOut
+	checkedOut = conflicted.CheckedOut
 
 	inlineBlob := conflicted.IsAllInlineType(store.config)
 
@@ -467,7 +467,7 @@ func (store *Store) RunMergeTool(
 	external := GetExternalPool().Get()
 	defer GetExternalPool().Put(external)
 
-	external.ObjectId.ResetWith(&co.GetSkuExternal().ObjectId)
+	external.ObjectId.ResetWith(&checkedOut.GetSkuExternal().ObjectId)
 
 	if err = store.WriteFSItemToExternal(localItem, external); err != nil {
 		err = errors.Wrap(err)
@@ -497,9 +497,9 @@ func (store *Store) RunMergeTool(
 		return
 	}
 
-	co = GetCheckedOutPool().Get()
+	checkedOut = GetCheckedOutPool().Get()
 
-	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), external)
+	sku.TransactedResetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
 	return
 }

@@ -181,9 +181,9 @@ func (store *Store) RunMergeTool(
 		err = comments.Implement()
 
 	default:
-		var co sku.SkuType
+		var checkedOut sku.SkuType
 
-		if co, err = store.envWorkspace.GetStoreFS().RunMergeTool(
+		if checkedOut, err = store.envWorkspace.GetStoreFS().RunMergeTool(
 			tool,
 			conflicted,
 		); err != nil {
@@ -191,9 +191,9 @@ func (store *Store) RunMergeTool(
 			return
 		}
 
-		defer store.PutCheckedOutLike(co)
+		defer store.PutCheckedOutLike(checkedOut)
 
-		if err = store.CreateOrUpdateCheckedOut(co, false); err != nil {
+		if err = store.CreateOrUpdateCheckedOut(checkedOut, false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
