@@ -20,26 +20,7 @@ func (store *Store) Commit(
 	externalLike sku.ExternalLike,
 	_ sku.CommitOptions,
 ) (err error) {
-	object := externalLike.GetSku()
-
-	if object.GetGenre() != genres.InventoryList {
-		err = genres.MakeErrUnsupportedGenre(object.GetGenre())
-		return
-	}
-
-	// TODO transform this inventory list into a local inventory list and update
-	// its tai
-	if err = store.WriteInventoryListObject(object); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = store.ui.TransactedNew(object); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return errors.Err405MethodNotAllowed
 }
 
 func (store *Store) ReadOneInto(

@@ -171,7 +171,7 @@ func (importer importer) importInventoryList(
 
 func (importer importer) importLeafSku(
 	external *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
+) (checkedOut *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
 		// TODO remove this, it's expensive
 		err = errors.ErrorWithStackf("skipping because objects are excluded")
@@ -185,13 +185,13 @@ func (importer importer) importLeafSku(
 		return
 	}
 
-	co = sku.GetCheckedOutPool().Get()
+	checkedOut = sku.GetCheckedOutPool().Get()
 
-	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
+	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
 	// TODO set this as an importer option
-	if co.GetSkuExternal().Metadata.RepoSig.IsEmpty() {
-		if err = co.GetSkuExternal().Sign(
+	if checkedOut.GetSkuExternal().Metadata.RepoSig.IsEmpty() {
+		if err = checkedOut.GetSkuExternal().Sign(
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -199,15 +199,15 @@ func (importer importer) importLeafSku(
 		}
 	}
 
-	if err = co.GetSkuExternal().CalculateObjectDigests(); err != nil {
+	if err = checkedOut.GetSkuExternal().CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if importer.indexObject != nil {
 		_, err = importer.indexObject.ReadOneObjectIdTai(
-			co.GetSkuExternal().GetObjectId(),
-			co.GetSkuExternal().GetTai(),
+			checkedOut.GetSkuExternal().GetObjectId(),
+			checkedOut.GetSkuExternal().GetTai(),
 		)
 
 		if err == nil {
@@ -223,14 +223,14 @@ func (importer importer) importLeafSku(
 
 	ui.TodoP4("cleanup")
 	if err = importer.storeObject.ReadOneInto(
-		co.GetSkuExternal().GetObjectId(),
-		co.GetSku(),
+		checkedOut.GetSkuExternal().GetObjectId(),
+		checkedOut.GetSku(),
 	); err != nil {
 		if collections.IsErrNotFound(err) {
 			if err = importer.storeObject.Commit(
-				co.GetSkuExternal(),
+				checkedOut.GetSkuExternal(),
 				sku.CommitOptions{
-					Clock:              co.GetSkuExternal(),
+					Clock:              checkedOut.GetSkuExternal(),
 					StoreOptions:       importer.storeOptions,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
@@ -250,7 +250,7 @@ func (importer importer) importLeafSku(
 	// TODO extra commit option setting into its own function
 	if importer.storeExternal != nil {
 		if commitOptions, err = importer.storeExternal.MergeCheckedOut(
-			co,
+			checkedOut,
 			importer.parentNegotiator,
 			importer.allowMergeConflicts,
 		); err != nil {
@@ -258,9 +258,9 @@ func (importer importer) importLeafSku(
 			return
 		}
 
-		if co.GetState() == checked_out_state.Conflicted {
+		if checkedOut.GetState() == checked_out_state.Conflicted {
 			if !importer.allowMergeConflicts {
-				if err = importer.checkedOutPrinter(co); err != nil {
+				if err = importer.checkedOutPrinter(checkedOut); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -273,14 +273,14 @@ func (importer importer) importLeafSku(
 	commitOptions.Validate = false
 
 	if err = importer.storeObject.Commit(
-		co.GetSkuExternal(),
+		checkedOut.GetSkuExternal(),
 		commitOptions,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = importer.checkedOutPrinter(co); err != nil {
+	if err = importer.checkedOutPrinter(checkedOut); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
