@@ -9,7 +9,6 @@ import (
 )
 
 type InventoryListStore interface {
-	FormatForVersion(sv interfaces.StoreVersion) ListFormat
 	WriteInventoryListObject(t *Transacted) (err error)
 	// WriteInventoryListStream(list *Transacted, ) (err error)
 	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)

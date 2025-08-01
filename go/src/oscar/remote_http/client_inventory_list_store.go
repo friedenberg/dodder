@@ -20,12 +20,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-func (client client) FormatForVersion(
-	sv interfaces.StoreVersion,
-) sku.ListFormat {
-	return client.localRepo.GetInventoryListStore().FormatForVersion(sv)
-}
-
 func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 	return comments.Implement()
 }
@@ -226,5 +220,7 @@ func (client client) AllInventoryListObjects() interfaces.SeqError[*sku.Transact
 		}
 	}
 
-	return client.inventoryListCoderCloset.AllDecodedObjectsFromStream(response.Body)
+	return client.inventoryListCoderCloset.AllDecodedObjectsFromStream(
+		response.Body,
+	)
 }

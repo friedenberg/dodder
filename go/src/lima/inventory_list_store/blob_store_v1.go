@@ -20,6 +20,7 @@ type blobStoreV1 struct {
 	envRepo                  env_repo.Env
 	pathLog                  string
 	blobType                 ids.Type
+	listFormat               sku.ListFormat
 	inventoryListCoderCloset inventory_list_coders.Closet
 
 	interfaces.BlobStore
@@ -27,6 +28,10 @@ type blobStoreV1 struct {
 
 func (blobStore *blobStoreV1) getType() ids.Type {
 	return blobStore.blobType
+}
+
+func (blobStore *blobStoreV1) getFormat() sku.ListFormat {
+	return blobStore.listFormat
 }
 
 func (blobStore *blobStoreV1) GetInventoryListCoderCloset() inventory_list_coders.Closet {

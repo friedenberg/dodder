@@ -17,6 +17,7 @@ type blobStoreV0 struct {
 	envRepo                  env_repo.Env
 	lock                     sync.Mutex
 	blobType                 ids.Type
+	listFormat               sku.ListFormat
 	inventoryListCoderCloset inventory_list_coders.Closet
 
 	interfaces.BlobStore
@@ -24,6 +25,10 @@ type blobStoreV0 struct {
 
 func (blobStore *blobStoreV0) getType() ids.Type {
 	return blobStore.blobType
+}
+
+func (blobStore *blobStoreV0) getFormat() sku.ListFormat {
+	return blobStore.listFormat
 }
 
 func (blobStore *blobStoreV0) GetInventoryListCoderCloset() inventory_list_coders.Closet {

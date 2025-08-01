@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -194,10 +193,6 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		importerOptions.AllowMergeConflicts = true
 	}
 
-	listFormat := server.Repo.GetInventoryListStore().FormatForVersion(
-		repo.GetImmutableConfigPublic().GetStoreVersion(),
-	)
-
 	listMissingSkus := sku.MakeList()
 	var requestRetry bool
 
@@ -246,9 +241,11 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	)
 	defer repoolBufferedWriter()
 
-	if _, err := inventory_list_coders.WriteInventoryList(
+	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
+
+	if _, err := inventoryListCoderCloset.WriteTypedBlobToWriter(
 		repo,
-		listFormat,
+		ids.GetOrPanic(repo.GetImmutableConfigPublic().GetInventoryListTypeString()).Type,
 		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,
 	); err != nil {

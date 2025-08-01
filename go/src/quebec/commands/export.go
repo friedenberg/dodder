@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -104,13 +103,11 @@ func (cmd Export) Run(req command.Request) {
 	defer repoolBufferedWriter()
 	defer errors.ContextMustFlush(localWorkingCopy, bufferedWriter)
 
-	listFormat := localWorkingCopy.GetStore().GetInventoryListStore().FormatForVersion(
-		localWorkingCopy.GetConfig().GetStoreVersion(),
-	)
+	inventoryListCoderCloset := localWorkingCopy.GetInventoryListCoderCloset()
 
-	if _, err := inventory_list_coders.WriteInventoryList(
+	if _, err := inventoryListCoderCloset.WriteTypedBlobToWriter(
 		req,
-		listFormat,
+		ids.GetOrPanic(localWorkingCopy.GetImmutableConfigPublic().GetInventoryListTypeString()).Type,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
 	); err != nil {

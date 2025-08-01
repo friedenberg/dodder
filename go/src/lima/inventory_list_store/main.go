@@ -35,9 +35,9 @@ type Store struct {
 	inventoryListBlobStore
 	blobBlobStore interfaces.BlobStore
 
-	object_format object_inventory_format.Format
-	options       object_inventory_format.Options
-	box           *box_format.BoxTransacted
+	objectFormat object_inventory_format.Format
+	options      object_inventory_format.Options
+	box          *box_format.BoxTransacted
 
 	ui sku.UIStorePrinters
 }
@@ -46,6 +46,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
 	getType() ids.Type
+	getFormat() sku.ListFormat
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
 	ReadOneBlobId(interfaces.BlobId) (*sku.Transacted, error)
@@ -79,6 +80,7 @@ func (store *Store) Initialize(
 	)
 
 	inventoryListBlobStore := envRepo.GetInventoryListBlobStore()
+	listFormat := inventoryListCoderCloset.GetCoderForType(blobType)
 
 	if store_version.LessOrEqual(
 		store.storeVersion,
@@ -88,6 +90,7 @@ func (store *Store) Initialize(
 			envRepo:                  envRepo,
 			blobType:                 blobType,
 			BlobStore:                inventoryListBlobStore,
+			listFormat:               listFormat,
 			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	} else {
@@ -96,6 +99,7 @@ func (store *Store) Initialize(
 			pathLog:                  envRepo.FileInventoryListLog(),
 			blobType:                 blobType,
 			BlobStore:                inventoryListBlobStore,
+			listFormat:               listFormat,
 			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	}
@@ -161,19 +165,18 @@ func (store *Store) AddObjectToOpenList(
 		return
 	}
 
-	format := store.FormatForVersion(store.storeVersion)
-
 	if _, err = inventory_list_coders.WriteObjectToOpenList(
-		format,
+		store.getFormat(),
 		object,
 		openList,
 	); err != nil {
 		err = errors.Wrapf(
 			err,
-			"%#v, format: %#v",
+			"%#v, format type: %q",
 			object.Metadata.Fields,
-			format,
+			store.getType(),
 		)
+
 		return
 	}
 
