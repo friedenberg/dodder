@@ -242,7 +242,7 @@ func (ctx *context) Cancel(err error) {
 //
 //go:noinline
 func (ctx *context) captureCancelStackFramesIfNecessary(skip int, err error) {
-	if !DebugBuild {
+	if !debugBuild {
 		return
 	}
 

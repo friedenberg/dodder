@@ -6,18 +6,18 @@ import (
 )
 
 type GroupBuilder struct {
-	lock sync.Mutex
-	Group
+	lock  sync.Mutex
+	group Group
 }
 
-func MakeGroupBuilder(errs ...error) (em *GroupBuilder) {
-	em = &GroupBuilder{
-		Group: make([]error, 0, len(errs)),
+func MakeGroupBuilder(errs ...error) (groupBuilder *GroupBuilder) {
+	groupBuilder = &GroupBuilder{
+		group: make([]error, 0, len(errs)),
 	}
 
 	for _, err := range errs {
 		if err != nil {
-			em.Add(err)
+			groupBuilder.Add(err)
 		}
 	}
 
@@ -28,7 +28,7 @@ func (groupBuilder *GroupBuilder) GetError() error {
 	groupBuilder.lock.Lock()
 	defer groupBuilder.lock.Unlock()
 
-	if len(groupBuilder.Group) > 0 {
+	if len(groupBuilder.group) > 0 {
 		return groupBuilder
 	}
 
@@ -36,14 +36,14 @@ func (groupBuilder *GroupBuilder) GetError() error {
 }
 
 func (groupBuilder *GroupBuilder) Reset() {
-	groupBuilder.Group = groupBuilder.Group[:0]
+	groupBuilder.group = groupBuilder.group[:0]
 }
 
 func (groupBuilder *GroupBuilder) Len() int {
 	groupBuilder.lock.Lock()
 	defer groupBuilder.lock.Unlock()
 
-	return len(groupBuilder.Group)
+	return len(groupBuilder.group)
 }
 
 func (groupBuilder *GroupBuilder) Empty() (ok bool) {
@@ -55,7 +55,7 @@ func (groupBuilder *GroupBuilder) merge(err *GroupBuilder) {
 	groupBuilder.lock.Lock()
 	defer groupBuilder.lock.Unlock()
 
-	groupBuilder.Group = append(groupBuilder.Group, err.Group...)
+	groupBuilder.group = append(groupBuilder.group, err.group...)
 }
 
 func (groupBuilder *GroupBuilder) Add(err error) {
@@ -73,7 +73,7 @@ func (groupBuilder *GroupBuilder) Add(err error) {
 
 	default:
 		groupBuilder.lock.Lock()
-		groupBuilder.Group = append(groupBuilder.Group, err)
+		groupBuilder.group = append(groupBuilder.group, err)
 		groupBuilder.lock.Unlock()
 	}
 }

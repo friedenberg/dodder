@@ -11,7 +11,7 @@ func MakeWaitGroupParallel() WaitGroup {
 		lock:         &sync.Mutex{},
 		inner:        &sync.WaitGroup{},
 		doAfter:      make([]FuncWithStackInfo, 0),
-		addStackInfo: DebugBuild,
+		addStackInfo: debugBuild,
 	}
 
 	return waitGroup

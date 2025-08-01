@@ -12,7 +12,7 @@ func PrintWithStackFramesIfNecessary(
 	message string,
 	stackFrames []stack_frame.Frame,
 ) {
-	if len(stackFrames) > 0 && DebugBuild {
+	if len(stackFrames) > 0 && debugBuild {
 		printer.Printf("\n\n%s\n", stackFrames, message)
 	} else {
 		printer.Printf("\n\n%s", message)

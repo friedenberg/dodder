@@ -239,11 +239,6 @@ func (server *Server) addSignatureIfNecessary(
 	header http.Header,
 ) (err error) {
 	if nonceString == "" {
-		if errors.DebugBuild {
-			ui.Debug().Print("nonce empty or not provided")
-			return
-		}
-
 		err = errors.Errorf("nonce empty or not provided")
 		return
 	}

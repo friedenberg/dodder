@@ -35,7 +35,7 @@ func Is(err, target error) bool {
 		panic("checking for EOF via errors.Is")
 	}
 
-	if DebugBuild {
+	if debugBuild {
 		return IsWithTimeout(err, target, time.Second)
 	}
 

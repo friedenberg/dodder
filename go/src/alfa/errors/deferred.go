@@ -6,7 +6,7 @@ import (
 )
 
 func DeferredRecover(err *error) {
-	if !DebugBuild {
+	if !debugBuild {
 		return
 	}
 

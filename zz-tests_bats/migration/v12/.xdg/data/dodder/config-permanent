@@ -2,7 +2,7 @@
 ! toml-config-immutable-v2
 ---
 
-private-key = 'dodder-repo-private_key-v1-wlh4448hrggqs0qcwpl4xrxd3xwn5fzlqqc03rxvt93qjqxly04qv9k57t'
+private-key = 'dodder-repo-private_key-v1-4sg4gwjgd70xnu28depanwzrw0k2w6y9kscumkerxfsvyyvma8hqndcq0k'
 store-version = 12
 repo-type = 'working-copy'
 id = 'test-repo-id'
