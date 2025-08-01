@@ -1,12 +1,24 @@
 package interfaces
 
 type (
-	StackTracer interface {
+	ErrorStackTracer interface {
 		error
 		ShouldShowStackTrace() bool
 	}
 
-	ErrBadRequest interface {
+	ErrorBadRequest interface {
 		IsBadRequest()
+	}
+
+	ErrorHelpful interface {
+		error
+		GetHelpfulError() ErrorHelpful
+		ErrorCause() []string
+		ErrorRecovery() []string
+	}
+
+	ErrorRetryable interface {
+		GetRetryableError() ErrorRetryable
+		Recover(RetryableContext, error)
 	}
 )

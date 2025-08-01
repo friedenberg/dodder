@@ -3,33 +3,33 @@ package object_id_provider
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type ErrDoesNotExist struct {
 	Value string
 }
 
-func (e ErrDoesNotExist) Error() string {
-	return fmt.Sprintf("object id does not exist: %s", e.Value)
+func (err ErrDoesNotExist) Error() string {
+	return fmt.Sprintf("object id does not exist: %s", err.Value)
 }
 
-func (e ErrDoesNotExist) Is(target error) bool {
+func (err ErrDoesNotExist) Is(target error) bool {
 	_, ok := target.(ErrDoesNotExist)
 	return ok
 }
 
 type ErrZettelIdsExhausted struct{}
 
-func (e ErrZettelIdsExhausted) GetHelpfulError() errors.Helpful {
-	return e
+func (err ErrZettelIdsExhausted) GetHelpfulError() interfaces.ErrorHelpful {
+	return err
 }
 
-func (e ErrZettelIdsExhausted) Error() string {
+func (err ErrZettelIdsExhausted) Error() string {
 	return "zettel ids exhausted"
 }
 
-func (e ErrZettelIdsExhausted) ErrorCause() []string {
+func (err ErrZettelIdsExhausted) ErrorCause() []string {
 	return []string{
 		"There are no more unused zettel ids left.",
 		"This may be because the last id was used.",
@@ -37,13 +37,13 @@ func (e ErrZettelIdsExhausted) ErrorCause() []string {
 	}
 }
 
-func (e ErrZettelIdsExhausted) ErrorRecovery() []string {
+func (err ErrZettelIdsExhausted) ErrorRecovery() []string {
 	return []string{
 		"zettel id's must be added via the TODO command",
 	}
 }
 
-func (e ErrZettelIdsExhausted) Is(target error) bool {
+func (err ErrZettelIdsExhausted) Is(target error) bool {
 	_, ok := target.(ErrZettelIdsExhausted)
 	return ok
 }

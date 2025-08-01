@@ -61,7 +61,7 @@ func handleMainErrors(
 		return
 	}
 
-	var helpful errors.Helpful
+	var helpful interfaces.ErrorHelpful
 
 	if errors.As(err, &helpful) {
 		errors.PrintHelpful(ui.Err(), helpful)

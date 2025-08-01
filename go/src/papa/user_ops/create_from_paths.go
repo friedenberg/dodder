@@ -168,7 +168,7 @@ func (op CreateFromPaths) handleStoreError(
 ) {
 	var err error
 
-	var normalError interfaces.StackTracer
+	var normalError interfaces.ErrorStackTracer
 
 	if errors.As(in, &normalError) {
 		ui.Err().Printf("%s", normalError.Error())

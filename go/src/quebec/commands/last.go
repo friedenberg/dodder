@@ -148,7 +148,7 @@ func (cmd Last) runWithInventoryList(
 		return
 	}
 
-	inventoryListBlobStore := cmd.MakeTypedInventoryListBlobStore(
+	inventoryListBlobStore := cmd.MakeInventoryListCoderCloset(
 		envRepo,
 	)
 

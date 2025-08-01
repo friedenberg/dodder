@@ -181,7 +181,7 @@ func (ctx *context) Retry() {
 }
 
 func (ctx *context) cancel(err error) {
-	var retryable Retryable
+	var retryable interfaces.ErrorRetryable
 
 	if !ctx.retriesDisabled && As(err, &retryable) {
 		retryable.Recover(ctx, err)

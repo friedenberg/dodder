@@ -40,7 +40,7 @@ func (err errBadRequestPreamble) ShouldShowStackTrace() bool {
 }
 
 func (err errBadRequestPreamble) Is(target error) bool {
-	_, ok := target.(interfaces.ErrBadRequest)
+	_, ok := target.(interfaces.ErrorBadRequest)
 	return ok
 }
 
@@ -65,7 +65,7 @@ func (err errBadRequestWrap) ShouldShowStackTrace() bool {
 }
 
 func (err errBadRequestWrap) Is(target error) bool {
-	_, ok := target.(interfaces.ErrBadRequest)
+	_, ok := target.(interfaces.ErrorBadRequest)
 	return ok
 }
 

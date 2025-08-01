@@ -14,24 +14,24 @@ import (
 type EnvRepo struct{}
 
 func (cmd EnvRepo) MakeEnvRepo(
-	dep command.Request,
+	req command.Request,
 	permitNoDodderDirectory bool,
 ) env_repo.Env {
 	dir := env_dir.MakeDefault(
-		dep,
-		dep.Blob.Debug,
+		req,
+		req.Blob.Debug,
 	)
 
 	ui := env_ui.Make(
-		dep,
-		dep.Blob,
+		req,
+		req.Blob,
 		env_ui.Options{},
 	)
 
 	var envRepo env_repo.Env
 
 	envRepoOptions := env_repo.Options{
-		BasePath:                dep.Blob.BasePath,
+		BasePath:                req.Blob.BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 
@@ -52,7 +52,7 @@ func (cmd EnvRepo) MakeEnvRepo(
 func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	envLocal env_local.Env,
 ) env_repo.Env {
-	var repoLayout env_repo.Env
+	var envRepo env_repo.Env
 
 	layoutOptions := env_repo.Options{
 		BasePath: envLocal.GetCLIConfig().BasePath,
@@ -61,7 +61,7 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			envLocal,
 			layoutOptions,
 		); err != nil {
@@ -69,10 +69,10 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 		}
 	}
 
-	return repoLayout
+	return envRepo
 }
 
-func (EnvRepo) MakeTypedInventoryListBlobStore(
+func (EnvRepo) MakeInventoryListCoderCloset(
 	envRepo env_repo.Env,
 ) inventory_list_coders.Closet {
 	boxFormat := box_format.MakeBoxTransactedArchive(

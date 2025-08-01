@@ -12,7 +12,7 @@ func PrintStackTracerIfNecessary(
 	err error,
 	_ ...interface{},
 ) {
-	var normalError interfaces.StackTracer
+	var normalError interfaces.ErrorStackTracer
 
 	if As(err, &normalError) && !normalError.ShouldShowStackTrace() {
 		printer.Printf(

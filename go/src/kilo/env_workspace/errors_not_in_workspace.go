@@ -24,7 +24,7 @@ func (err ErrNotInWorkspace) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (err ErrNotInWorkspace) GetRetryableError() errors.Retryable {
+func (err ErrNotInWorkspace) GetRetryableError() interfaces.ErrorRetryable {
 	return err
 }
 

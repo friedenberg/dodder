@@ -40,11 +40,11 @@ func (e ErrUnableToAcquireLock) Is(target error) bool {
 	return ok
 }
 
-func (e ErrUnableToAcquireLock) GetHelpfulError() errors.Helpful {
+func (e ErrUnableToAcquireLock) GetHelpfulError() interfaces.ErrorHelpful {
 	return e
 }
 
-func (e ErrUnableToAcquireLock) GetRetryableError() errors.Retryable {
+func (e ErrUnableToAcquireLock) GetRetryableError() interfaces.ErrorRetryable {
 	return e
 }
 

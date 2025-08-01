@@ -55,8 +55,8 @@ func (cmd Serve) Run(req command.Request) {
 	}
 
 	if cmd.TailscaleTLS {
-		var lc local.Client
-		server.GetCertificate = lc.GetCertificate
+		var localClient local.Client
+		server.GetCertificate = localClient.GetCertificate
 	}
 
 	// TODO switch network to be RemoteServeType

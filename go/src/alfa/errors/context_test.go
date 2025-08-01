@@ -65,7 +65,7 @@ func (errTestRecover) Error() string {
 	return "test recover error"
 }
 
-func (err errTestRecover) GetRetryableError() Retryable {
+func (err errTestRecover) GetRetryableError() interfaces.ErrorRetryable {
 	return err
 }
 
