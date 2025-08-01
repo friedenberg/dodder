@@ -8,7 +8,7 @@ import (
 	"math"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
@@ -208,7 +208,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaMetadata:
-		if err = digests.MakeErrIsNull(&sk.Metadata.SelfMetadata); err != nil {
+		if err = blob_ids.MakeErrIsNull(&sk.Metadata.SelfMetadata); err != nil {
 			return
 		}
 
@@ -272,7 +272,7 @@ func (bf *binaryEncoder) writeSha(
 ) (n int64, err error) {
 	if sh.IsNull() {
 		if !allowNull {
-			err = digests.MakeErrIsNull(sh)
+			err = blob_ids.MakeErrIsNull(sh)
 		}
 
 		return

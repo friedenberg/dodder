@@ -12,7 +12,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
@@ -64,10 +64,6 @@ func (digest *Sha) String() string {
 	}
 }
 
-func (digest *Sha) Sha() *Sha {
-	return digest
-}
-
 func (digest *Sha) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 	n1, err = ohio.WriteAllOrDieTrying(w, digest.GetBytes())
@@ -105,7 +101,7 @@ func (digest *Sha) GetTail() string {
 
 // TODO remove
 func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
-	return digests.MakeErrNotEqual(digest, b)
+	return blob_ids.MakeErrNotEqual(digest, b)
 }
 
 // func (digest *Sha) EqualsAny(b any) bool {
@@ -126,7 +122,7 @@ func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
 func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
 	digest.allocDataIfNecessary()
 	b := h.Sum(digest.data[:0])
-	err = digests.MakeErrLength(ByteSize, len(b))
+	err = blob_ids.MakeErrLength(ByteSize, len(b))
 	return
 }
 
@@ -136,11 +132,27 @@ func (digest *Sha) SetDigester(src interfaces.BlobIdGetter) (err error) {
 
 // TODO replace
 func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
+	if src.GetType() != digest.GetType() {
+		err = errors.Errorf(
+			"cannot set digest from type %q, need %q",
+			src.GetType(),
+			digest.GetType(),
+		)
+
+		return
+	}
+
+	digest.SetBytes(src.GetBytes())
+
+	return
+}
+
+func (digest *Sha) SetBytes(bytess []byte) (err error) {
 	digest.allocDataIfNecessary()
 
-	err = digests.MakeErrLength(
+	err = blob_ids.MakeErrLength(
 		ByteSize,
-		copy(digest.data[:], src.GetBlobId().GetBytes()),
+		copy(digest.data[:], bytess),
 	)
 
 	return
@@ -261,7 +273,7 @@ func (digest *Sha) Set(value string) (err error) {
 
 	bytesWritten := copy(digest.data[:], decodedBytes)
 
-	if err = digests.MakeErrLength(ByteSize, bytesWritten); err != nil {
+	if err = blob_ids.MakeErrLength(ByteSize, bytesWritten); err != nil {
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -185,7 +185,7 @@ func (transacted *Transacted) makeShaCalcFunc(
 			return
 		}
 
-		defer digests.PutBlobId(actual)
+		defer blob_ids.PutBlobId(actual)
 
 		sh.ResetWith(actual)
 
@@ -261,7 +261,7 @@ func (transacted *Transacted) Sign(
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
 	sh := sha.MustWithDigester(transacted.GetTai())
-	defer digests.PutBlobId(sh)
+	defer blob_ids.PutBlobId(sh)
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
 		config.GetPrivateKey(),

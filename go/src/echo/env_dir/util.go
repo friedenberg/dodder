@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 )
 
 func MakeHashBucketPathFromSha(
@@ -21,7 +21,7 @@ func MakeHashBucketPathFromSha(
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(digests.Format(sh)),
+		[]byte(blob_ids.Format(sh)),
 		buckets,
 		pathComponents...,
 	)

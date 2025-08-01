@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
@@ -70,7 +70,7 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	bucketIndexString := digests.Format(digest)[:width]
+	bucketIndexString := blob_ids.Format(digest)[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)

@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -60,7 +60,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !digests.Equals(&a.sha, &b.sha) {
+	if !blob_ids.Equals(&a.sha, &b.sha) {
 		return false
 	}
 

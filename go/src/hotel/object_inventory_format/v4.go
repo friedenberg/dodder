@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -28,7 +28,7 @@ func (f v4) FormatPersistentMetadata(
 
 	metadata := c.GetMetadata()
 
-	digester, repool := digests.MakeWriterWithRepool(sha.Env{}, nil)
+	digester, repool := blob_ids.MakeWriterWithRepool(sha.Env{}, nil)
 	defer repool()
 
 	multiWriter := io.MultiWriter(bufferedWriter, digester)
@@ -242,7 +242,7 @@ func (f v4) FormatPersistentMetadata(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			bufferedWriter,
 			keySha.String(),
-			digests.Format(actual),
+			blob_ids.Format(actual),
 		)
 
 		n += int64(n1)

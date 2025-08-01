@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -78,7 +78,7 @@ func (coder doddishV2) DecodeFrom(
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
 		sh := sha.MustWithDigester(object.GetTai())
-		defer digests.PutBlobId(sh)
+		defer blob_ids.PutBlobId(sh)
 
 		if len(object.Metadata.RepoPubkey) == 0 {
 			err = errors.ErrorWithStackf(

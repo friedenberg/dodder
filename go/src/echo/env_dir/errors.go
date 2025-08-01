@@ -5,28 +5,32 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 )
 
 func MakeErrAlreadyExists(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}
-	err.Sha.SetDigest(sh)
+	err.BlobId = blob_ids.Clone(blobId)
 	return
 }
 
 type ErrAlreadyExists struct {
-	sha.Sha
-	Path string
+	BlobId interfaces.BlobId
+	Path   string
 }
 
-func (e *ErrAlreadyExists) Error() string {
-	return fmt.Sprintf("File with sha %s already exists: %s", &e.Sha, e.Path)
+func (err *ErrAlreadyExists) Error() string {
+	return fmt.Sprintf(
+		"File with blob_id %s already exists: %s",
+		blob_ids.Format(err.BlobId),
+		err.Path,
+	)
 }
 
-func (e *ErrAlreadyExists) Is(target error) bool {
+func (err *ErrAlreadyExists) Is(target error) bool {
 	_, ok := target.(*ErrAlreadyExists)
 	return ok
 }

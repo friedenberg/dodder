@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
@@ -16,7 +16,7 @@ func (page *page) seekToFirstBinarySearch(
 ) (mid int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + digests.Format(shMet),
+			"fd nil: " + blob_ids.Format(shMet),
 		)
 		return
 	}
@@ -68,7 +68,7 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, digests.Format(shMet)),
+		fmt.Sprintf("%d: %s", loops, blob_ids.Format(shMet)),
 	)
 
 	return
@@ -79,7 +79,7 @@ func (page *page) seekToFirstLinearSearch(
 ) (loc int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + digests.Format(shMet),
+			"fd nil: " + blob_ids.Format(shMet),
 		)
 		return
 	}
@@ -115,7 +115,7 @@ func (page *page) seekToFirstLinearSearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(digests.Format(shMet))
+	err = collections.MakeErrNotFoundString(blob_ids.Format(shMet))
 
 	return
 }

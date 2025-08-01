@@ -18,6 +18,8 @@ import (
 
 var errContextRetry = New("context retry")
 
+// TODO maybe consider adding a target error that is used to determine whether a
+// stack trace is printed?
 type context struct {
 	ConTeXT.Context
 

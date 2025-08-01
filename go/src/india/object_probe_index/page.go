@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -201,14 +201,14 @@ func (page *page) readCurrentLoc(
 	}
 
 	digest := sha.GetPool().Get()
-	defer digests.PutBlobId(digest)
+	defer blob_ids.PutBlobId(digest)
 
 	if _, err = digest.ReadFrom(reader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 
-	if !digests.Equals(in, digest) {
+	if !blob_ids.Equals(in, digest) {
 		err = io.EOF
 		return
 	}

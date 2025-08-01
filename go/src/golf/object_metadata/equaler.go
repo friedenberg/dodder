@@ -1,7 +1,7 @@
 package object_metadata
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -27,7 +27,7 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !digests.Equals(&a.Blob, &b.Blob) {
+	if !blob_ids.Equals(&a.Blob, &b.Blob) {
 		if debug {
 			ui.Debug().Print(&a.Blob, "->", &b.Blob)
 		}

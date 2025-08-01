@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -141,8 +141,8 @@ func CopyBlob(
 	shaRc := rc.GetBlobId()
 	shaWc := wc.GetBlobId()
 
-	if !digests.Equals(shaRc, blobSha) ||
-		!digests.Equals(shaWc, blobSha) {
+	if !blob_ids.Equals(shaRc, blobSha) ||
+		!blob_ids.Equals(shaWc, blobSha) {
 		err = errors.ErrorWithStackf(
 			"lookup sha was %s, read sha was %s, but written sha was %s",
 			blobSha,

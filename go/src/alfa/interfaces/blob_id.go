@@ -14,8 +14,9 @@ type (
 	}
 
 	MutableBlobId interface {
-		BlobIdGetter
-		SetBytes([]byte) error
+		BlobId
+		SetDigest(BlobId) error
+		// SetBytes([]byte) error
 		Reset()
 	}
 
@@ -26,11 +27,13 @@ type (
 	EnvBlobId interface {
 		GetType() string
 
+		// TODO replace with FuncRepool
 		GetHash() (hash.Hash, func())
 
-		GetBlobId() BlobId
+		GetBlobId() MutableBlobId
 		PutBlobId(BlobId)
 
+		// TODO replace with FuncRepool
 		MakeWriteDigesterWithRepool() (WriteBlobIdGetter, func())
 		MakeWriteDigester() WriteBlobIdGetter
 		MakeDigestFromHash(hash.Hash) (BlobId, error)

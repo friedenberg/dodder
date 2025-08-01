@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -38,7 +38,7 @@ func (blobStore *blobStoreV0) ReadOneSha(
 ) (object *sku.Transacted, err error) {
 	var sh sha.Sha
 
-	if err = sh.Set(digests.Format(id)); err != nil {
+	if err = sh.Set(blob_ids.Format(id)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

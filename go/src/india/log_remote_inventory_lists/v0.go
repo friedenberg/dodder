@@ -11,7 +11,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
@@ -126,8 +126,8 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.GetBlobId(),
 	)
 
-	key = digests.Format(digest)
-	digests.PutBlobId(digest)
+	key = blob_ids.Format(digest)
+	blob_ids.PutBlobId(digest)
 
 	return
 }

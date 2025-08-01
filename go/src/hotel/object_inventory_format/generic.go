@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/digests"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -396,7 +396,7 @@ func WriteMetadata(
 	f FormatGeneric,
 	c FormatterContext,
 ) (sh *Sha, err error) {
-	writer, repool := digests.MakeWriterWithRepool(sha.Env{}, w)
+	writer, repool := blob_ids.MakeWriterWithRepool(sha.Env{}, w)
 	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
@@ -432,7 +432,7 @@ func GetShaForContextDebug(
 	c FormatterContext,
 ) (digest *Sha, err error) {
 	var sb strings.Builder
-	writer, repool := digests.MakeWriterWithRepool(sha.Env{}, &sb)
+	writer, repool := blob_ids.MakeWriterWithRepool(sha.Env{}, &sb)
 	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
