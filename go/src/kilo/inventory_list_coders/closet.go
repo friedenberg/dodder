@@ -24,7 +24,7 @@ type Closet struct {
 	envRepo   env_repo.Env
 	boxFormat *box_format.BoxTransacted
 
-	coders map[string]sku.ListFormat
+	coders map[string]sku.ListCoder
 
 	objectCoders triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
 
@@ -42,7 +42,7 @@ func MakeCloset(
 		boxFormat: box,
 	}
 
-	store.coders = make(map[string]sku.ListFormat, len(coderConstructors))
+	store.coders = make(map[string]sku.ListCoder, len(coderConstructors))
 
 	for tipe, coderConstructor := range coderConstructors {
 		store.coders[tipe] = coderConstructor(envRepo, box)
@@ -70,7 +70,7 @@ func MakeCloset(
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqCoder{
 				ctx:        envRepo,
-				ListFormat: coder,
+				ListCoder: coder,
 			}
 		}
 
@@ -86,7 +86,7 @@ func MakeCloset(
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
 				ctx:        envRepo,
-				ListFormat: coder,
+				ListCoder: coder,
 			}
 		}
 
@@ -102,7 +102,7 @@ func MakeCloset(
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
 				ctx:        envRepo,
-				ListFormat: coder,
+				ListCoder: coder,
 			}
 		}
 
@@ -116,7 +116,7 @@ func (store Closet) GetBoxFormat() *box_format.BoxTransacted {
 	return store.boxFormat
 }
 
-func (store Closet) GetCoderForType(tipe ids.Type) sku.ListFormat {
+func (store Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
 	format, ok := store.coders[tipe.String()]
 
 	if !ok {
@@ -372,8 +372,8 @@ func (store Closet) ReadInventoryListBlob(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
-) (list *sku.List, err error) {
-	list = sku.MakeList()
+) (list *sku.ListTransacted, err error) {
+	list = sku.MakeListTransacted()
 
 	format, ok := store.coders[tipe.String()]
 

@@ -46,7 +46,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
 	getType() ids.Type
-	getFormat() sku.ListFormat
+	getFormat() sku.ListCoder
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
 	ReadOneBlobId(interfaces.BlobId) (*sku.Transacted, error)
@@ -80,7 +80,7 @@ func (store *Store) Initialize(
 	)
 
 	inventoryListBlobStore := envRepo.GetInventoryListBlobStore()
-	listFormat := inventoryListCoderCloset.GetCoderForType(blobType)
+	coder := inventoryListCoderCloset.GetCoderForType(blobType)
 
 	if store_version.LessOrEqual(
 		store.storeVersion,
@@ -90,7 +90,7 @@ func (store *Store) Initialize(
 			envRepo:                  envRepo,
 			blobType:                 blobType,
 			BlobStore:                inventoryListBlobStore,
-			listFormat:               listFormat,
+			listFormat:               coder,
 			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	} else {
@@ -99,7 +99,7 @@ func (store *Store) Initialize(
 			pathLog:                  envRepo.FileInventoryListLog(),
 			blobType:                 blobType,
 			BlobStore:                inventoryListBlobStore,
-			listFormat:               listFormat,
+			listFormat:               coder,
 			inventoryListCoderCloset: inventoryListCoderCloset,
 		}
 	}
@@ -123,7 +123,7 @@ func (store *Store) Flush() (err error) {
 // TODO pass errors.Context
 func (store *Store) FormatForVersion(
 	storeVersion interfaces.StoreVersion,
-) sku.ListFormat {
+) sku.ListCoder {
 	tipe := ids.GetOrPanic(
 		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
 	).Type
@@ -243,7 +243,7 @@ func (store *Store) Create(
 func (store *Store) WriteInventoryListBlob(
 	remoteBlobStore interfaces.BlobStore,
 	object *sku.Transacted,
-	list *sku.List,
+	list *sku.ListTransacted,
 ) (err error) {
 	if list.Len() == 0 {
 		if !object.GetBlobId().IsNull() {

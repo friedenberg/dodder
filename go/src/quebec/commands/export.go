@@ -57,7 +57,7 @@ func (cmd Export) Run(req command.Request) {
 		),
 	)
 
-	var list *sku.List
+	var list *sku.ListTransacted
 
 	{
 		var err error

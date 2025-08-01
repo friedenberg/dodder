@@ -43,7 +43,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 		importerOptions.AllowMergeConflicts = true
 	}
 
-	listMissingSkus := sku.MakeList()
+	listMissingSkus := sku.MakeListTransacted()
 	var requestRetry bool
 
 	importerOptions.BlobCopierDelegate = func(
@@ -161,7 +161,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
-	var list *sku.List
+	var list *sku.ListTransacted
 
 	{
 		var err error
@@ -193,7 +193,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		importerOptions.AllowMergeConflicts = true
 	}
 
-	listMissingSkus := sku.MakeList()
+	listMissingSkus := sku.MakeListTransacted()
 	var requestRetry bool
 
 	importerOptions.BlobCopierDelegate = func(

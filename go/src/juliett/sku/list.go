@@ -31,11 +31,9 @@ type InventoryListStore interface {
 
 type Seq = interfaces.SeqError[*Transacted]
 
-// TODO refactor into being just a CoderBufferedReadWriter[*sku.Transacted]
-type ListFormat = interfaces.CoderBufferedReadWriter[*Transacted]
+type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
 
-// TODO rename to ListTransacted
-type List = heap.Heap[Transacted, *Transacted]
+type ListTransacted = heap.Heap[Transacted, *Transacted]
 
 // TODO add buffered writer
 type OpenList struct {
@@ -46,8 +44,7 @@ type OpenList struct {
 	Len         int
 }
 
-// TODO rename to MakeListTransacted
-func MakeList() *List {
+func MakeListTransacted() *ListTransacted {
 	h := heap.Make(
 		transactedEqualer{},
 		transactedLessorStable{},
@@ -63,16 +60,18 @@ var ResetterList resetterList
 
 type resetterList struct{}
 
-func (resetterList) Reset(a *List) {
+func (resetterList) Reset(a *ListTransacted) {
 	a.Reset()
 }
 
-func (resetterList) ResetWith(a, b *List) {
+func (resetterList) ResetWith(a, b *ListTransacted) {
 	a.ResetWith(b)
 }
 
-func CollectList(seq interfaces.SeqError[*Transacted]) (list *List, err error) {
-	list = MakeList()
+func CollectList(
+	seq interfaces.SeqError[*Transacted],
+) (list *ListTransacted, err error) {
+	list = MakeListTransacted()
 
 	for sk, iterErr := range seq {
 		if iterErr != nil {

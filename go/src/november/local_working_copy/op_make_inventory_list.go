@@ -10,8 +10,8 @@ import (
 
 func (local *Repo) MakeInventoryList(
 	queryGroup *query.Query,
-) (list *sku.List, err error) {
-	list = sku.MakeList()
+) (list *sku.ListTransacted, err error) {
+	list = sku.MakeListTransacted()
 
 	var l sync.Mutex
 

@@ -38,7 +38,7 @@ func (store *Store) Reindex() (err error) {
 		return
 	}
 
-	missingObjects := sku.MakeList()
+	missingObjects := sku.MakeListTransacted()
 
 	for objectWithList, iterErr := range store.GetInventoryListStore().IterAllSkus() {
 		if iterErr != nil {

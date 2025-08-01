@@ -16,13 +16,13 @@ import (
 type funcListFormatConstructor func(
 	env_repo.Env,
 	*box_format.BoxTransacted,
-) sku.ListFormat
+) sku.ListCoder
 
 var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListV1: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListFormat {
+	) sku.ListCoder {
 		return doddishV1{
 			Box: box,
 		}
@@ -30,7 +30,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListV2: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListFormat {
+	) sku.ListCoder {
 		return doddishV2{
 			Box:                    box,
 			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
@@ -39,7 +39,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListJsonV0: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListFormat {
+	) sku.ListCoder {
 		return jsonV0{
 			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
 		}
@@ -47,13 +47,13 @@ var coderConstructors = map[string]funcListFormatConstructor{
 }
 
 var (
-	_ sku.ListFormat = doddishV1{}
-	_ sku.ListFormat = doddishV2{}
-	_ sku.ListFormat = jsonV0{}
+	_ sku.ListCoder = doddishV1{}
+	_ sku.ListCoder = doddishV2{}
+	_ sku.ListCoder = jsonV0{}
 )
 
 func WriteObjectToOpenList(
-	format sku.ListFormat,
+	format sku.ListCoder,
 	object *sku.Transacted,
 	list *sku.OpenList,
 ) (n int64, err error) {
@@ -91,7 +91,7 @@ func WriteObjectToOpenList(
 
 func WriteInventoryList(
 	ctx interfaces.ActiveContext,
-	format sku.ListFormat,
+	format sku.ListCoder,
 	skus interfaces.SeqError[*sku.Transacted],
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -122,9 +122,9 @@ func WriteInventoryList(
 // TODO also return a repool func
 func CollectSkuList(
 	ctx interfaces.ActiveContext,
-	listFormat sku.ListFormat,
+	listFormat sku.ListCoder,
 	reader *bufio.Reader,
-	list *sku.List,
+	list *sku.ListTransacted,
 ) (err error) {
 	iter := streamInventoryList(ctx, listFormat, reader)
 
@@ -145,7 +145,7 @@ func CollectSkuList(
 
 func streamInventoryList(
 	ctx interfaces.ActiveContext,
-	format sku.ListFormat,
+	format sku.ListCoder,
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
@@ -178,7 +178,7 @@ func streamInventoryList(
 }
 
 func writeInventoryListObject(
-	format sku.ListFormat,
+	format sku.ListCoder,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -195,7 +195,7 @@ func writeInventoryListObject(
 
 type SeqCoder struct {
 	ctx interfaces.ActiveContext
-	sku.ListFormat
+	sku.ListCoder
 }
 
 func (coder SeqCoder) DecodeFrom(
@@ -209,7 +209,7 @@ func (coder SeqCoder) DecodeFrom(
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = coder.ListFormat.DecodeFrom(object, bufferedReader); err != nil {
+		if _, err = coder.ListCoder.DecodeFrom(object, bufferedReader); err != nil {
 			if err == io.EOF {
 				err = nil
 				break
@@ -229,7 +229,7 @@ func (coder SeqCoder) DecodeFrom(
 
 type SeqErrorDecoder struct {
 	ctx interfaces.ActiveContext
-	sku.ListFormat
+	sku.ListCoder
 }
 
 func (coder SeqErrorDecoder) DecodeFrom(
@@ -243,7 +243,7 @@ func (coder SeqErrorDecoder) DecodeFrom(
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = coder.ListFormat.DecodeFrom(object, bufferedReader); err != nil {
+		if _, err = coder.ListCoder.DecodeFrom(object, bufferedReader); err != nil {
 			if err == io.EOF {
 				err = nil
 				break
@@ -266,7 +266,7 @@ func (coder SeqErrorDecoder) DecodeFrom(
 
 type SeqErrorEncoder struct {
 	ctx interfaces.ActiveContext
-	sku.ListFormat
+	sku.ListCoder
 }
 
 func (coder SeqErrorDecoder) EncodeTo(
@@ -281,7 +281,7 @@ func (coder SeqErrorDecoder) EncodeTo(
 			return
 		}
 
-		if _, err = coder.ListFormat.EncodeTo(object, bufferedWriter); err != nil {
+		if _, err = coder.ListCoder.EncodeTo(object, bufferedWriter); err != nil {
 			if err == io.EOF {
 				err = nil
 				break

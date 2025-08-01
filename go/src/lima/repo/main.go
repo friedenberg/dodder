@@ -48,7 +48,7 @@ type WorkingCopy interface {
 
 	MakeInventoryList(
 		qg *query.Query,
-	) (list *sku.List, err error)
+	) (list *sku.ListTransacted, err error)
 
 	PullQueryGroupFromRemote(
 		remote Repo,

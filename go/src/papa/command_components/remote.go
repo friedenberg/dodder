@@ -41,7 +41,7 @@ func (cmd *Remote) SetFlagSet(flagSet *flag.FlagSet) {
 
 func (cmd Remote) CreateRemoteObject(
 	req command.Request,
-	local repo.LocalRepo,
+	local *local_working_copy.Repo,
 ) (remote repo.Repo, remoteObject *sku.Transacted) {
 	remoteEnvRepo := cmd.MakeEnvRepo(req, false)
 	remoteTypedRepoBlobStore := typed_blob_store.MakeRepoStore(remoteEnvRepo)
@@ -119,8 +119,8 @@ func (cmd Remote) CreateRemoteObject(
 
 func (cmd Remote) MakeRemote(
 	req command.Request,
-	local repo.LocalRepo,
-	sk *sku.Transacted,
+	repo *local_working_copy.Repo,
+	object *sku.Transacted,
 ) (remote repo.Repo) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
@@ -131,21 +131,21 @@ func (cmd Remote) MakeRemote(
 		var err error
 
 		if blob, _, err = typedRepoBlobStore.ReadTypedBlob(
-			sk.Metadata.Type,
-			sk.GetBlobId(),
+			object.Metadata.Type,
+			object.GetBlobId(),
 		); err != nil {
 			req.Cancel(err)
 		}
 	}
 
-	remote = cmd.MakeRemoteFromBlob(req, local, blob)
+	remote = cmd.MakeRemoteFromBlob(req, repo, blob)
 
 	return
 }
 
 func (cmd Remote) MakeRemoteFromBlob(
 	req command.Request,
-	local repo.LocalRepo,
+	repo *local_working_copy.Repo,
 	blob repo_blobs.Blob,
 ) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
@@ -180,7 +180,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 			req,
 			env,
 			blob.Path,
-			local,
+			repo,
 			blob.GetPublicKey(),
 		)
 
@@ -205,7 +205,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 			req,
 			env,
 			blob.Uri,
-			local,
+			repo,
 		)
 
 	default:
@@ -219,7 +219,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	req command.Request,
 	xdgDotenvPath string,
 	options env_ui.Options,
-	localRepo repo.LocalRepo,
+	repo *local_working_copy.Repo,
 	pubkey repo_signing.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
@@ -255,7 +255,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	remoteHTTP = remote_http.MakeClient(
 		envLocal,
 		&httpRoundTripper,
-		localRepo,
+		repo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
@@ -266,7 +266,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	req command.Request,
 	env env_local.Env,
 	arg string,
-	local repo.LocalRepo,
+	repo *local_working_copy.Repo,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
@@ -282,7 +282,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 	remoteHTTP = remote_http.MakeClient(
 		envRepo,
 		&httpRoundTripper,
-		local,
+		repo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
@@ -293,7 +293,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	req command.Request,
 	env env_local.Env,
 	dir string,
-	localRepo repo.LocalRepo,
+	repo *local_working_copy.Repo,
 	pubkey repo_signing.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
@@ -320,7 +320,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	remoteHTTP = remote_http.MakeClient(
 		env,
 		&httpRoundTripper,
-		localRepo,
+		repo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 
@@ -331,7 +331,7 @@ func (cmd *Remote) MakeRemoteUrl(
 	req command.Request,
 	env env_local.Env,
 	uri values.Uri,
-	local repo.LocalRepo,
+	repo *local_working_copy.Repo,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
@@ -341,7 +341,7 @@ func (cmd *Remote) MakeRemoteUrl(
 			UrlData:      remote_http.MakeUrlDataFromUri(uri),
 			RoundTripper: remote_http.DefaultRoundTripper,
 		},
-		local,
+		repo,
 		cmd.MakeTypedInventoryListBlobStore(envRepo),
 	)
 

@@ -719,7 +719,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			}
 		}
 
-		var list *sku.List
+		var list *sku.ListTransacted
 
 		{
 			var err error

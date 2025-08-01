@@ -21,12 +21,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
+	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 func MakeClient(
 	envUI env_ui.Env,
 	transport http.RoundTripper,
-	localRepo repo.LocalRepo,
+	repo *local_working_copy.Repo,
 	typedBlobStore inventory_list_coders.Closet,
 ) *client {
 	client := &client{
@@ -34,7 +35,7 @@ func MakeClient(
 		http: http.Client{
 			Transport: transport,
 		},
-		localRepo:                localRepo,
+		repo:                     repo,
 		inventoryListCoderCloset: typedBlobStore,
 	}
 
@@ -47,7 +48,7 @@ type client struct {
 	envUI                    env_ui.Env
 	configImmutable          genesis_configs.TypedConfigPublic
 	http                     http.Client
-	localRepo                repo.LocalRepo
+	repo                     *local_working_copy.Repo
 	inventoryListCoderCloset inventory_list_coders.Closet
 
 	logRemoteInventoryLists log_remote_inventory_lists.Log
@@ -94,8 +95,8 @@ func (client *client) Initialize() {
 	}
 
 	client.logRemoteInventoryLists = log_remote_inventory_lists.Make(
-		client.localRepo.GetEnvRepo(),
-		client.localRepo.GetEnvRepo(),
+		client.repo.GetEnvRepo(),
+		client.repo.GetEnvRepo(),
 	)
 }
 
@@ -148,7 +149,7 @@ func (client *client) MakeExternalQueryGroup(
 
 func (client *client) MakeInventoryList(
 	queryGroup *query.Query,
-) (list *sku.List, err error) {
+) (list *sku.ListTransacted, err error) {
 	var request *http.Request
 	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeString()
 
@@ -176,10 +177,10 @@ func (client *client) MakeInventoryList(
 		return
 	}
 
-	inventoryListCoderCloset := client.localRepo.GetInventoryListCoderCloset()
+	inventoryListCoderCloset := client.repo.GetInventoryListCoderCloset()
 
 	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
-		client.localRepo.GetEnvRepo(),
+		client.repo.GetEnvRepo(),
 		ids.GetOrPanic(listTypeString).Type,
 		bufio.NewReader(response.Body),
 	); err != nil {
@@ -231,7 +232,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
-	var list *sku.List
+	var list *sku.ListTransacted
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
@@ -241,7 +242,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	listType := ids.GetOrPanic(
-		client.localRepo.GetImmutableConfigPublic().GetInventoryListTypeString(),
+		client.repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
 	).Type
 
 	buffer := bytes.NewBuffer(nil)
@@ -249,7 +250,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
 	defer repoolBufferedWriter()
 
-	inventoryListCoderCloset := client.localRepo.GetInventoryListCoderCloset()
+	inventoryListCoderCloset := client.repo.GetInventoryListCoderCloset()
 
 	for {
 		errors.ContextContinueOrPanic(client.envUI)
@@ -309,7 +310,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		bufferedReader := bufio.NewReader(response.Body)
 
-		var listMissingSkus *sku.List
+		var listMissingSkus *sku.ListTransacted
 
 		if listMissingSkus, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
 			client.GetEnv(),

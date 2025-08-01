@@ -291,7 +291,7 @@ func (server *Server) readMCPResourceObjects(
 		}
 	}
 
-	var list *sku.List
+	var list *sku.ListTransacted
 
 	{
 		var err error

@@ -3,14 +3,12 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -48,38 +46,24 @@ func (cmd Clone) Run(req command.Request) {
 	// TODO offer option to persist remote object, if supported
 	remote, _ := cmd.CreateRemoteObject(req, local)
 
-	switch local := local.(type) {
-	default:
-		errors.ContextCancelWithBadRequestf(
-			req,
-			"unsupported repo type: %q (%T)",
-			local.GetImmutableConfigPublic().GetRepoType(),
-			local,
-		)
-
-	case repo.WorkingCopy:
-		queryGroup := cmd.MakeQueryIncludingWorkspace(
-			req,
-			query.BuilderOptions(
-				query.BuilderOptionDefaultSigil(
-					ids.SigilHistory,
-					ids.SigilHidden,
-				),
-				query.BuilderOptionDefaultGenres(genres.InventoryList),
+	queryGroup := cmd.MakeQueryIncludingWorkspace(
+		req,
+		query.BuilderOptions(
+			query.BuilderOptionDefaultSigil(
+				ids.SigilHistory,
+				ids.SigilHidden,
 			),
-			local,
-			req.PopArgs(),
-		)
+			query.BuilderOptionDefaultGenres(genres.InventoryList),
+		),
+		local,
+		req.PopArgs(),
+	)
 
-		if err := local.PullQueryGroupFromRemote(
-			remote,
-			queryGroup,
-			cmd.WithPrintCopies(true),
-		); err != nil {
-			req.Cancel(err)
-		}
-
-	case repo.Repo:
-		cmd.PushAllToArchive(req, remote, local)
+	if err := local.PullQueryGroupFromRemote(
+		remote,
+		queryGroup,
+		cmd.WithPrintCopies(true),
+	); err != nil {
+		req.Cancel(err)
 	}
 }

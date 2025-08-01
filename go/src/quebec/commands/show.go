@@ -180,7 +180,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	}
 
 	if remoteWorkingCopy != nil {
-		var list *sku.List
+		var list *sku.ListTransacted
 
 		{
 			var err error

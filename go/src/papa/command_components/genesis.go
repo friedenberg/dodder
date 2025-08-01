@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -27,7 +26,7 @@ func (cmd *Genesis) SetFlagSet(flagSet *flag.FlagSet) {
 func (cmd Genesis) OnTheFirstDay(
 	req command.Request,
 	repoIdString string,
-) repo.LocalRepo {
+) *local_working_copy.Repo {
 	envUI := env_ui.Make(
 		req,
 		req.Blob,

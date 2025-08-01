@@ -23,7 +23,7 @@ type Page struct {
 	page_id.PageId
 	sunrise ids.Tai
 	*probe_index
-	added, addedLatest *sku.List
+	added, addedLatest *sku.ListTransacted
 	hasChanges         bool
 	repoLayout         env_repo.Env
 	preWrite           interfaces.FuncIter[*sku.Transacted]
@@ -38,8 +38,8 @@ func (pt *Page) initialize(
 	pt.repoLayout = i.directoryLayout
 	pt.sunrise = i.sunrise
 	pt.PageId = pid
-	pt.added = sku.MakeList()
-	pt.addedLatest = sku.MakeList()
+	pt.added = sku.MakeListTransacted()
+	pt.addedLatest = sku.MakeListTransacted()
 	pt.preWrite = i.preWrite
 	pt.probe_index = &i.probe_index
 	pt.oids = make(map[string]struct{})

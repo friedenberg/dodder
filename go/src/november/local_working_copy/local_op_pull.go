@@ -25,7 +25,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
-	var list *sku.List
+	var list *sku.ListTransacted
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)

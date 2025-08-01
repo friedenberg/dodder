@@ -17,7 +17,7 @@ type blobStoreV0 struct {
 	envRepo                  env_repo.Env
 	lock                     sync.Mutex
 	blobType                 ids.Type
-	listFormat               sku.ListFormat
+	listFormat               sku.ListCoder
 	inventoryListCoderCloset inventory_list_coders.Closet
 
 	interfaces.BlobStore
@@ -27,7 +27,7 @@ func (blobStore *blobStoreV0) getType() ids.Type {
 	return blobStore.blobType
 }
 
-func (blobStore *blobStoreV0) getFormat() sku.ListFormat {
+func (blobStore *blobStoreV0) getFormat() sku.ListCoder {
 	return blobStore.listFormat
 }
 
@@ -35,7 +35,6 @@ func (blobStore *blobStoreV0) GetInventoryListCoderCloset() inventory_list_coder
 	return blobStore.inventoryListCoderCloset
 }
 
-// TODO rename to ReadOneDigest
 func (blobStore *blobStoreV0) ReadOneBlobId(
 	blobId interfaces.BlobId,
 ) (object *sku.Transacted, err error) {
