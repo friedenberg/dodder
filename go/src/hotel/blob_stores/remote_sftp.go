@@ -254,11 +254,8 @@ func (blobStore *remoteSftpBlobStore) BlobReader(
 
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
-			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(digest.GetBlobId())
-
 			err = env_dir.ErrBlobMissing{
-				BlobIdGetter: shCopy,
+				BlobIdGetter: blob_ids.Clone(digest),
 				Path:         remotePath,
 			}
 		} else {

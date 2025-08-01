@@ -160,13 +160,17 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	v = strings.TrimSuffix(v, ".zettel")
 
-	me := errors.MakeGroupBuilder()
+	groupBuilder := errors.MakeGroupBuilder()
 
 	if strings.ContainsFunc(
 		v,
 		func(r rune) bool {
 			switch {
-			case unicode.IsDigit(r), unicode.IsLetter(r), r == '_', r == '/', r == '%':
+			case unicode.IsDigit(r),
+				unicode.IsLetter(r),
+				r == '_',
+				r == '/',
+				r == '%':
 				return false
 
 			default:
@@ -174,12 +178,14 @@ func (h *ZettelId) Set(v string) (err error) {
 			}
 		},
 	) {
-		me.Add(errors.ErrorWithStackf("contains invalid characters: %q", v))
+		groupBuilder.Add(
+			errors.ErrorWithStackf("contains invalid characters: %q", v),
+		)
 	}
 
 	if v == "/" {
-		if me.Len() > 0 {
-			err = me
+		if groupBuilder.Len() > 0 {
+			err = groupBuilder.GetError()
 		}
 
 		return
@@ -190,7 +196,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	switch count {
 	default:
-		me.Add(errors.ErrorWithStackf(
+		groupBuilder.Add(errors.ErrorWithStackf(
 			"zettel id needs exactly 2 components, but got %d: %q",
 			count,
 			v,
@@ -201,8 +207,8 @@ func (h *ZettelId) Set(v string) (err error) {
 		h.right = parts[1]
 	}
 
-	if me.Len() > 0 {
-		err = me
+	if groupBuilder.Len() > 0 {
+		err = groupBuilder.GetError()
 	}
 
 	if (len(h.left) == 0 && len(h.right) > 0) ||

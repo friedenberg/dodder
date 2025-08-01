@@ -1,12 +1,62 @@
 package blob_ids
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
+
+func ReadFrom(
+	tipe string,
+	bufferedReader *bufio.Reader,
+) (blobId interfaces.MutableBlobId, repool interfaces.FuncRepool, err error) {
+	env := GetEnv(tipe)
+	blobId = env.GetBlobId()
+	repool = func() { env.PutBlobId(blobId) }
+
+	var bytes []byte
+	bytesRead := blobId.GetSize()
+
+	if bytes, err = bufferedReader.Peek(bytesRead); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	if err = blobId.SetBytes(bytes); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	bufferedReader.Discard(bytesRead)
+
+	return
+}
+
+func EqualsReader(
+	expectedBlobId interfaces.BlobId,
+	bufferedReader *bufio.Reader,
+) (ok bool, err error) {
+	var actualBytes []byte
+	bytesRead := expectedBlobId.GetSize()
+
+	if actualBytes, err = bufferedReader.Peek(bytesRead); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	ok = bytes.Equal(expectedBlobId.GetBytes(), actualBytes)
+
+	if _, err = bufferedReader.Discard(bytesRead); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	return
+}
 
 func Equals(a, b interfaces.BlobId) bool {
 	return bytes.Equal(a.GetBytes(), b.GetBytes())

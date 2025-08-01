@@ -11,18 +11,19 @@ import (
 // TODO move to generic digest package
 type Slice []*Sha
 
-func (s *Slice) ReadFrom(r io.Reader) (n int64, err error) {
-	br := bufio.NewReader(r)
+func (slice *Slice) ReadFrom(reader io.Reader) (n int64, err error) {
+	// TODO use pool
+	bufferedReader := bufio.NewReader(reader)
 
-	var eof bool
+	var isEOF bool
 
-	for !eof {
+	for !isEOF {
 		var line string
-		line, err = br.ReadString('\n')
+		line, err = bufferedReader.ReadString('\n')
 
 		if err == io.EOF {
 			err = nil
-			eof = true
+			isEOF = true
 		} else if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -32,14 +33,14 @@ func (s *Slice) ReadFrom(r io.Reader) (n int64, err error) {
 			continue
 		}
 
-		sh := GetPool().Get()
+		sh := poolSha.Get()
 
 		if err = sh.Set(strings.TrimSpace(line)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		*s = append(*s, sh)
+		*slice = append(*slice, sh)
 	}
 
 	return

@@ -100,7 +100,7 @@ func (local *Repo) ImportSeq(
 	}
 
 	if importErrors.Len() > 0 {
-		err = importErrors
+		err = importErrors.GetError()
 	}
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))

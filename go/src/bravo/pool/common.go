@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 )
 
 var (
@@ -17,7 +18,7 @@ var (
 	bufioWriter   = MakePool[bufio.Writer](nil, nil)
 	byteReaders   = MakePool[bytes.Reader](nil, nil)
 	stringReaders = MakePool[strings.Reader](nil, nil)
-	sha256Hash    = MakeValue(
+	sha256Hash    = pool_value.Make(
 		func() hash.Hash {
 			return sha256.New()
 		},

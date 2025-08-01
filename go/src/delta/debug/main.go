@@ -142,7 +142,7 @@ func MakeContext(
 
 func (c *Context) Close() error {
 	waitGroupStopOrWrite := errors.MakeWaitGroupParallel()
-	multiError := errors.MakeGroupBuilder()
+	groupBuilder := errors.MakeGroupBuilder()
 
 	if c.fileTrace != nil {
 		waitGroupStopOrWrite.Do(errors.MakeFuncErrFromFuncNil(trace.Stop))
@@ -161,7 +161,7 @@ func (c *Context) Close() error {
 	}
 
 	if err := waitGroupStopOrWrite.GetError(); err != nil {
-		multiError.Add(errors.Wrap(err))
+		groupBuilder.Add(errors.Wrap(err))
 	}
 
 	if c.fileTrace != nil {
@@ -186,12 +186,8 @@ func (c *Context) Close() error {
 	}
 
 	if err := waitGroupClose.GetError(); err != nil {
-		multiError.Add(errors.Wrap(err))
+		groupBuilder.Add(errors.Wrap(err))
 	}
 
-	if multiError.Len() > 0 {
-		return multiError
-	}
-
-	return nil
+	return groupBuilder.GetError()
 }

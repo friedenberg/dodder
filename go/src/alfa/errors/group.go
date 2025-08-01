@@ -1,6 +1,10 @@
 package errors
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
+)
 
 type Group []error
 
@@ -26,3 +30,5 @@ func (group Group) Unwrap() []error {
 func (group Group) Len() int {
 	return len(group)
 }
+
+var groupPool = pool_value.MakeSlice[error, Group]()

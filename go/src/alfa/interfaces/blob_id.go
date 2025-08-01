@@ -8,6 +8,7 @@ import (
 type (
 	BlobId interface {
 		BlobIdGetter
+		GetSize() int
 		GetBytes() []byte
 		GetType() string
 		IsNull() bool
@@ -16,7 +17,7 @@ type (
 	MutableBlobId interface {
 		BlobId
 		SetDigest(BlobId) error
-		// SetBytes([]byte) error
+		SetBytes([]byte) error
 		Reset()
 	}
 

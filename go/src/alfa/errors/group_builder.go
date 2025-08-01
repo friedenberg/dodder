@@ -10,7 +10,10 @@ type GroupBuilder struct {
 	group Group
 }
 
-func MakeGroupBuilder(errs ...error) (groupBuilder *GroupBuilder) {
+// TODO consider making a pool and return a repool func on construction
+func MakeGroupBuilder(
+	errs ...error,
+) (groupBuilder *GroupBuilder) {
 	groupBuilder = &GroupBuilder{
 		group: make([]error, 0, len(errs)),
 	}
@@ -29,7 +32,9 @@ func (groupBuilder *GroupBuilder) GetError() error {
 	defer groupBuilder.lock.Unlock()
 
 	if len(groupBuilder.group) > 0 {
-		return groupBuilder
+		group := make(Group, len(groupBuilder.group))
+		copy(group, groupBuilder.group)
+		return group
 	}
 
 	return nil
@@ -51,11 +56,11 @@ func (groupBuilder *GroupBuilder) Empty() (ok bool) {
 	return
 }
 
-func (groupBuilder *GroupBuilder) merge(err *GroupBuilder) {
+func (groupBuilder *GroupBuilder) merge(group Group) {
 	groupBuilder.lock.Lock()
 	defer groupBuilder.lock.Unlock()
 
-	groupBuilder.group = append(groupBuilder.group, err.group...)
+	groupBuilder.group = append(groupBuilder.group, group...)
 }
 
 func (groupBuilder *GroupBuilder) Add(err error) {
@@ -68,7 +73,7 @@ func (groupBuilder *GroupBuilder) Add(err error) {
 	}
 
 	switch e1 := errors.Unwrap(err).(type) {
-	case *GroupBuilder:
+	case Group:
 		groupBuilder.merge(e1)
 
 	default:

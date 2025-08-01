@@ -26,13 +26,8 @@ func Join(es ...error) error {
 		return es[0]
 
 	default:
-		err := MakeGroupBuilder(es...)
-
-		if err.Empty() {
-			return nil
-		} else {
-			return err
-		}
+		groupBuilder := MakeGroupBuilder(es...)
+		return groupBuilder.GetError()
 	}
 }
 

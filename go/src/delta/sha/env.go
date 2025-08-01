@@ -1,17 +1,37 @@
 package sha
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var _ = blob_ids.RegisterEnv(Env{})
+var (
+	_ = blob_ids.RegisterEnv(Env{})
+
+	sha256Hash = pool_value.Make(
+		func() hash.Hash {
+			return sha256.New()
+		},
+		func(hash hash.Hash) {
+			hash.Reset()
+		},
+	)
+
+	poolSha = pool.MakePool(
+		nil,
+		func(sh *Sha) {
+			sh.Reset()
+		},
+	)
+)
 
 type Env struct{}
 

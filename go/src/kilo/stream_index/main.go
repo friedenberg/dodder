@@ -445,7 +445,7 @@ func (i *Index) ReadPrimitiveQuery(
 	ui.Log().Printf("starting query: %q", qg)
 	waitGroup := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
-	multiError := errors.MakeGroupBuilder()
+	groupBuilder := errors.MakeGroupBuilder()
 	chDone := make(chan struct{})
 
 	isDone := func() bool {
@@ -494,7 +494,7 @@ func (i *Index) ReadPrimitiveQuery(
 					case errors.IsStopIteration(err1):
 
 					default:
-						multiError.Add(err1)
+						groupBuilder.Add(err1)
 					}
 				}
 
@@ -505,8 +505,8 @@ func (i *Index) ReadPrimitiveQuery(
 
 	waitGroup.Wait()
 
-	if multiError.Len() > 0 {
-		err = multiError
+	if groupBuilder.Len() > 0 {
+		err = groupBuilder.GetError()
 	}
 
 	return

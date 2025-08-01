@@ -282,13 +282,13 @@ func (builder *Builder) build(state *buildState, values ...string) (err error) {
 	}
 
 	if len(state.missingBlobs) > 0 {
-		me := errors.MakeGroupBuilder()
+		groupBuilder := errors.MakeGroupBuilder()
 
 		for _, e := range state.missingBlobs {
-			me.Add(e)
+			groupBuilder.Add(e)
 		}
 
-		err = me
+		err = groupBuilder.GetError()
 
 		return
 	}

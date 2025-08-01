@@ -57,7 +57,9 @@ func (cmd Mergetool) Run(req command.Request) {
 		localWorkingCopy.Cancel(err)
 	}
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock),
+	)
 
 	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1 and use Err

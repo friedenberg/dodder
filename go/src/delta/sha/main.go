@@ -44,7 +44,7 @@ type Sha struct {
 	data *byteArray
 }
 
-func (digest *Sha) Size() int {
+func (digest *Sha) GetSize() int {
 	return ByteSize
 }
 

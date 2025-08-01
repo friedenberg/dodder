@@ -17,14 +17,14 @@ type Conflicted struct {
 	Local, Base, Remote *Transacted
 }
 
-func (c *Conflicted) FindBestCommonAncestor(
+func (conflicted *Conflicted) FindBestCommonAncestor(
 	negotiator ParentNegotiator,
 ) (err error) {
 	if negotiator == nil {
 		return
 	}
 
-	if c.Base, err = negotiator.FindBestCommonAncestor(*c); err != nil {
+	if conflicted.Base, err = negotiator.FindBestCommonAncestor(*conflicted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -32,62 +32,73 @@ func (c *Conflicted) FindBestCommonAncestor(
 	return
 }
 
-func (c Conflicted) GetCollection() Collection {
-	return c
+func (conflicted Conflicted) GetCollection() Collection {
+	return conflicted
 }
 
-func (c Conflicted) Len() int {
-	if c.Base == nil {
+func (conflicted Conflicted) Len() int {
+	if conflicted.Base == nil {
 		return 2
 	} else {
 		return 3
 	}
 }
 
-func (c Conflicted) Any() *Transacted {
-	return c.Local
+func (conflicted Conflicted) Any() *Transacted {
+	return conflicted.Local
 }
 
-func (c Conflicted) All() interfaces.Seq[*Transacted] {
+func (conflicted Conflicted) All() interfaces.Seq[*Transacted] {
 	return func(yield func(*Transacted) bool) {
-		if !yield(c.Local) {
+		if !yield(conflicted.Local) {
 			return
 		}
 
-		if c.Base != nil && !yield(c.Base) {
+		if conflicted.Base != nil && !yield(conflicted.Base) {
 			return
 		}
 
-		if !yield(c.Remote) {
+		if !yield(conflicted.Remote) {
 			return
 		}
 	}
 }
 
-func (c Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
-	if !itc.IsInlineType(c.Local.GetType()) {
+func (conflicted Conflicted) IsAllInlineType(
+	typeChecker ids.InlineTypeChecker,
+) bool {
+	if typeChecker == nil {
+		panic("nil type checker")
+	}
+
+	if conflicted.Local == nil {
+		panic("nil local")
+	}
+
+	if !typeChecker.IsInlineType(conflicted.Local.GetType()) {
 		return false
 	}
 
-	if c.Base != nil && !itc.IsInlineType(c.Base.GetType()) {
+	if conflicted.Base != nil &&
+		!typeChecker.IsInlineType(conflicted.Base.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineType(c.Remote.GetType()) {
+	if !typeChecker.IsInlineType(conflicted.Remote.GetType()) {
 		return false
 	}
 
 	return true
 }
 
-func (tm *Conflicted) MergeTags() (err error) {
-	if tm.Base == nil {
+func (conflicted *Conflicted) MergeTags() (err error) {
+	if conflicted.Base == nil {
 		return
 	}
 
-	left := tm.Local.GetTags().CloneMutableSetPtrLike()
-	middle := tm.Base.GetTags().CloneMutableSetPtrLike()
-	right := tm.Remote.GetTags().CloneMutableSetPtrLike()
+	left := conflicted.Local.GetTags().CloneMutableSetPtrLike()
+	middle := conflicted.Base.GetTags().CloneMutableSetPtrLike()
+	right := conflicted.Remote.GetTags().CloneMutableSetPtrLike()
 
 	same := ids.MakeTagMutableSet()
 	deleted := ids.MakeTagMutableSet()
@@ -120,7 +131,8 @@ func (tm *Conflicted) MergeTags() (err error) {
 	}
 
 	for e := range middle.AllPtr() {
-		if left.ContainsKey(left.KeyPtr(e)) && right.ContainsKey(right.KeyPtr(e)) {
+		if left.ContainsKey(left.KeyPtr(e)) &&
+			right.ContainsKey(right.KeyPtr(e)) {
 			if err = removeFromAllButAddTo(e, same); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -149,46 +161,51 @@ func (tm *Conflicted) MergeTags() (err error) {
 
 	ets := same.CloneSetPtrLike()
 
-	tm.Local.GetMetadata().SetTags(ets)
-	tm.Base.GetMetadata().SetTags(ets)
-	tm.Remote.GetMetadata().SetTags(ets)
+	conflicted.Local.GetMetadata().SetTags(ets)
+	conflicted.Base.GetMetadata().SetTags(ets)
+	conflicted.Remote.GetMetadata().SetTags(ets)
 
 	return
 }
 
-func (c *Conflicted) ReadConflictMarker(
-	iter interfaces.SeqError[*Transacted],
+func (conflicted *Conflicted) ReadConflictMarker(
+	seq interfaces.SeqError[*Transacted],
 ) (err error) {
-	i := 0
+	idx := 0
 
-	for sk, iterErr := range iter {
+	for object, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return
 		}
 
-		switch i {
+		switch idx {
 		case 0:
-			c.Local = sk
+			conflicted.Local = object
 
 		case 1:
-			c.Base = sk
+			conflicted.Base = object
 
 		case 2:
-			c.Remote = sk
+			conflicted.Remote = object
 
 		default:
-			err = errors.ErrorWithStackf("too many skus in conflict file")
+			err = errors.ErrorWithStackf("too many objects in conflict file")
 			return
 		}
 
-		i++
+		idx++
+	}
+
+	if idx == 0 {
+		err = errors.ErrorWithStackf("no objects in conflict file")
+		return
 	}
 
 	// Conflicts can exist between objects without a base
-	if i == 2 {
-		c.Remote = c.Base
-		c.Base = nil
+	if idx == 2 {
+		conflicted.Remote = conflicted.Base
+		conflicted.Base = nil
 	}
 
 	return

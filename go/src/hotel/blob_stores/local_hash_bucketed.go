@@ -201,11 +201,8 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		path,
 	); err != nil {
 		if errors.IsNotExist(err) {
-			shCopy := sha.GetPool().Get()
-			shCopy.ResetWithShaLike(digest.GetBlobId())
-
 			err = env_dir.ErrBlobMissing{
-				BlobIdGetter: shCopy,
+				BlobIdGetter: blob_ids.Clone(digest),
 				Path:         path,
 			}
 		} else {

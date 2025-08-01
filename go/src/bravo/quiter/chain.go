@@ -31,7 +31,9 @@ func Chain[T any](e T, wfs ...interfaces.FuncIter[T]) (err error) {
 	return
 }
 
-func MakeChainDebug[T any](wfs ...interfaces.FuncIter[T]) interfaces.FuncIter[T] {
+func MakeChainDebug[T any](
+	wfs ...interfaces.FuncIter[T],
+) interfaces.FuncIter[T] {
 	for i := range wfs {
 		old := wfs[i]
 		wfs[i] = func(e T) (err error) {
@@ -99,11 +101,15 @@ func Multiplex[T any](
 	wg.Wait()
 	close(ch)
 
+	groupBuilder := errors.MakeGroupBuilder()
+
 	for e := range ch {
 		if e != nil {
-			err = errors.MakeGroupBuilder(err, e)
+			groupBuilder.Add(e)
 		}
 	}
+
+	err = groupBuilder.GetError()
 
 	return
 }
