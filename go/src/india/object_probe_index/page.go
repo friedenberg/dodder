@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
@@ -192,29 +191,24 @@ func (page *page) ReadMany(sh interfaces.BlobId, locs *[]Loc) (err error) {
 }
 
 func (page *page) readCurrentLoc(
-	in interfaces.BlobId,
-	reader io.Reader,
+	expectedBlobId interfaces.BlobId,
+	bufferedReader *bufio.Reader,
 ) (out Loc, found bool, err error) {
-	if in.IsNull() {
+	if expectedBlobId.IsNull() {
 		err = errors.ErrorWithStackf("empty sha")
 		return
 	}
 
-	digest := sha.GetPool().Get()
-	defer blob_ids.PutBlobId(digest)
-
-	if _, err = digest.ReadFrom(reader); err != nil {
+	if found, err = blob_ids.EqualsReader(expectedBlobId, bufferedReader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
-	}
-
-	if !blob_ids.Equals(in, digest) {
+	} else if !found {
 		err = io.EOF
 		return
 	}
 
 	var n int64
-	n, err = out.ReadFrom(reader)
+	n, err = out.ReadFrom(bufferedReader)
 
 	if n > 0 {
 		found = true
