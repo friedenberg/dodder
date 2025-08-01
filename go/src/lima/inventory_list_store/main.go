@@ -22,6 +22,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
+var ErrEmptyInventoryList = errors.New("empty inventory list")
+
 type Store struct {
 	lock sync.Mutex
 
@@ -185,6 +187,7 @@ func (store *Store) Create(
 	openList *sku.OpenList,
 ) (object *sku.Transacted, err error) {
 	if openList.Len == 0 {
+		err = errors.Wrap(ErrEmptyInventoryList)
 		return
 	}
 

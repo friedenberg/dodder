@@ -16,10 +16,10 @@ import (
 )
 
 type blobStoreV0 struct {
-	envRepo        env_repo.Env
-	lock           sync.Mutex
-	blobType       ids.Type
-	typedBlobStore inventory_list_coders.Closet
+	envRepo                  env_repo.Env
+	lock                     sync.Mutex
+	blobType                 ids.Type
+	inventoryListCoderCloset inventory_list_coders.Closet
 
 	interfaces.BlobStore
 }
@@ -29,7 +29,7 @@ func (blobStore *blobStoreV0) getType() ids.Type {
 }
 
 func (blobStore *blobStoreV0) GetInventoryListCoderCloset() inventory_list_coders.Closet {
-	return blobStore.typedBlobStore
+	return blobStore.inventoryListCoderCloset
 }
 
 // TODO rename to ReadOneDigest
@@ -55,7 +55,7 @@ func (blobStore *blobStoreV0) ReadOneSha(
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
 	defer repoolBufferedReader()
 
-	if object, err = blobStore.typedBlobStore.ReadInventoryListObject(
+	if object, err = blobStore.inventoryListCoderCloset.ReadInventoryListObject(
 		blobStore.envRepo,
 		blobStore.blobType,
 		bufferedReader,
@@ -94,7 +94,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 		return
 	}
 
-	if _, err = blobStore.typedBlobStore.WriteObjectToWriter(
+	if _, err = blobStore.inventoryListCoderCloset.WriteObjectToWriter(
 		blobStore.blobType,
 		object,
 		bufferedWriter,

@@ -32,13 +32,15 @@ func (store *Store) FlushInventoryList(
 	if inventoryListSku, err = store.GetInventoryListStore().Create(
 		store.inventoryList,
 	); err != nil {
-		if errors.Is(err, inventory_list_store.ErrEmpty) {
+		if errors.Is(err, inventory_list_store.ErrEmptyInventoryList) {
 			ui.Log().Printf("inventory list was empty")
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 			return
 		}
+	} else {
+		defer sku.GetTransactedPool().Put(inventoryListSku)
 	}
 
 	if inventoryListSku != nil {
@@ -51,7 +53,6 @@ func (store *Store) FlushInventoryList(
 			err = errors.Wrap(err)
 			return
 		}
-		defer sku.GetTransactedPool().Put(inventoryListSku)
 
 		if store.GetConfigStore().GetConfig().PrintOptions.PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
