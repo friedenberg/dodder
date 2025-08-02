@@ -14,16 +14,25 @@ type t = T
 type TestContext struct {
 	t
 
-	interfaces.Context
-	done <-chan struct{}
+	Context interfaces.Context
+	done    <-chan struct{}
 }
 
 func MakeTestContext(t *testing.T) *TestContext {
+	return makeTestContext(t, errors.MakeContextDefault())
+}
+
+func makeTestContext(
+	t *testing.T,
+	ctx interfaces.Context,
+) *TestContext {
 	done := make(chan struct{})
 
 	testContext := &TestContext{
-		t:       T{T: t},
-		Context: errors.MakeContextDefault(),
+		t: T{
+			T: t,
+		},
+		Context: ctx,
 		done:    done,
 	}
 
@@ -43,16 +52,33 @@ func MakeTestContext(t *testing.T) *TestContext {
 			recover()
 		}()
 
-		testContext.Cancel(nil)
+		testContext.Context.Cancel(nil)
 	},
 	)
 
 	return testContext
 }
 
-func (t *TestContext) Skip(skip int) *TestContext {
+func (testContext *TestContext) Skip(skip int) *TestContext {
 	return &TestContext{
-		t:       *t.t.Skip(skip),
-		Context: t.Context,
+		t:       *testContext.t.Skip(skip),
+		Context: testContext.Context,
 	}
+}
+
+func (testContext *TestContext) Run(
+	testCaseInfo TestCaseInfo,
+	funk func(*TestContext),
+) {
+	description := getTestCaseDescription(testCaseInfo)
+
+	testContext.T.Run(
+		description,
+		func(t1 *testing.T) {
+			printTestCaseInfo(testCaseInfo, description)
+			childContext := errors.MakeContext(testContext.Context)
+			childTestContext := makeTestContext(t1, childContext)
+			funk(childTestContext)
+		},
+	)
 }

@@ -1,10 +1,8 @@
 package query
 
 import (
-	"strings"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -12,7 +10,7 @@ import (
 
 func TestQuery(t1 *testing.T) {
 	type testCase struct {
-		stackInfo                                stack_frame.Frame
+		ui.TestCaseInfo
 		description, expected, expectedOptimized string
 		defaultGenre                             ids.Genre
 		inputs                                   []string
@@ -22,72 +20,72 @@ func TestQuery(t1 *testing.T) {
 
 	testCases := []testCase{
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[[test,house] home]",
-			inputs:    []string{"[test, house] home"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[[test,house] home]",
+			inputs:       []string{"[test, house] home"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[[test,house] home wow]",
-			inputs:    []string{"[test, house] home", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[[test,house] home wow]",
+			inputs:       []string{"[test, house] home", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[^[test,house] home wow]",
-			inputs:    []string{"^[test, house] home", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[^[test,house] home wow]",
+			inputs:       []string{"^[test, house] home", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[[test,house] ^home wow]",
-			inputs:    []string{"[test, house] ^home", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[[test,house] ^home wow]",
+			inputs:       []string{"[test, house] ^home", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[[test,^house] home wow]",
-			inputs:    []string{"[test, ^house] home", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[[test,^house] home wow]",
+			inputs:       []string{"[test, ^house] home", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[[test,house] home ^wow]",
-			inputs:    []string{"[test, house] home", "^wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[[test,house] home ^wow]",
+			inputs:       []string{"[test, house] home", "^wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[^[[test,house] home] wow]",
-			inputs:    []string{"^[[test, house] home]", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[^[[test,house] home] wow]",
+			inputs:       []string{"^[[test, house] home]", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "^[[test,house] home]:Zettel wow",
-			inputs:    []string{"^[[test, house] home]:z", "wow"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "^[[test,house] home]:Zettel wow",
+			inputs:       []string{"^[[test, house] home]:z", "wow"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "[!md,home]:Zettel",
-			inputs:    []string{"[!md,home]:z"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "[!md,home]:Zettel",
+			inputs:       []string{"[!md,home]:z"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "!md?Zettel",
-			inputs:    []string{"!md?z"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "!md?Zettel",
+			inputs:       []string{"!md?z"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "ducks:Tag [!md house]+?Zettel",
-			inputs:    []string{"!md?z", "house+z", "ducks:e"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "ducks:Tag [!md house]+?Zettel",
+			inputs:       []string{"!md?z", "house+z", "ducks:e"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "ducks:Tag [!md house]?Zettel",
-			inputs:    []string{"ducks:Tag [!md house]?Zettel"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "ducks:Tag [!md house]?Zettel",
+			inputs:       []string{"ducks:Tag [!md house]?Zettel"},
 		},
 		{
-			stackInfo: t.MakeStackInfo(0),
-			expected:  "ducks:Tag [=!md house]?Zettel",
-			inputs:    []string{"ducks:Tag [=!md house]?Zettel"},
+			TestCaseInfo: ui.MakeTestCaseInfo(""),
+			expected:     "ducks:Tag [=!md house]?Zettel",
+			inputs:       []string{"ducks:Tag [=!md house]?Zettel"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "ducks:Tag [=!md house wow]:?Zettel",
 			expected:          "ducks:Tag [=!md house wow]:?Zettel",
 			inputs: []string{
@@ -95,104 +93,104 @@ func TestQuery(t1 *testing.T) {
 			},
 		},
 		{ // TODO try to make this expect `one/uno.zettel`
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "one/uno:.Zettel",
 			expected:          "one/uno:.Zettel",
 			inputs:            []string{"one/uno.zettel"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
 			defaultGenre:      ids.MakeGenre(genres.Zettel),
 			inputs:            []string{"one/uno"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
 			inputs:            []string{"one/uno:z"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: ":Config",
 			expected:          ":Config",
 			inputs:            []string{":konfig"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: ":Zettel",
 			expected:          ":Zettel",
 			inputs:            []string{":z"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: ":Repo",
 			expected:          ":Repo",
 			inputs:            []string{":k"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "one/uno:+Zettel",
 			expected:          "one/uno:+Zettel",
 			inputs:            []string{"one/uno+"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: "[one/dos, one/uno]:Zettel",
 			expected:          "[one/dos, one/uno]:Zettel",
 			inputs:            []string{"one/uno", "one/dos"},
 		},
 		{
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			expectedOptimized: ":Type :Tag :Zettel",
 			expected:          ":Type,Tag,Zettel",
 			inputs:            []string{":z,t,e"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: ":Blob :Type :Tag :Zettel :Config :InventoryList :Repo",
 			expected:          ":Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: ":Blob :Type :Tag :Zettel :Config :InventoryList :Repo",
 			expected:          ":Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{":"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: "2109504781.792086:InventoryList",
 			expected:          "2109504781.792086:InventoryList",
 			inputs:            []string{"[2109504781.792086]:b"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: "^etikett-two.Zettel",
 			expected:          "^etikett-two.Zettel",
 			inputs:            []string{"^etikett-two.z"},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: "!md.Blob !md.Type !md.Tag !md.Zettel !md.Config !md.InventoryList !md.Repo",
 			expected:          "!md.Blob,Type,Tag,Zettel,Config,InventoryList,Repo",
 			inputs:            []string{"!md."},
 		},
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: "-etikett-two.Zettel",
 			expected:          "-etikett-two.Zettel",
 			inputs:            []string{"-etikett-two.z"},
 		},
-
 		{
-			stackInfo:         t.MakeStackInfo(0),
+			TestCaseInfo:      ui.MakeTestCaseInfo(""),
 			defaultGenre:      ids.MakeGenre(genres.All()...),
 			expectedOptimized: "/repo:Repo",
 			expected:          "/repo:Repo",
@@ -200,39 +198,34 @@ func TestQuery(t1 *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t1.Run(
-			strings.Join(tc.inputs, " "),
-			func(t1 *testing.T) {
-				t := ui.TC{
-					T:     ui.T{T: t1},
-					Frame: tc.stackInfo,
-				}
-
+	for _, testCase := range testCases {
+		t.Run(
+			testCase,
+			func(t *ui.T) {
 				sut := (&Builder{}).WithDefaultGenres(
-					tc.defaultGenre,
+					testCase.defaultGenre,
 				)
 
-				m, err := sut.BuildQueryGroup(tc.inputs...)
+				m, err := sut.BuildQueryGroup(testCase.inputs...)
 
 				t.AssertNoError(err)
 				actual := m.String()
 
-				if tc.expected != actual {
+				if testCase.expected != actual {
 					t.Log("expected")
-					t.AssertEqual(tc.expected, actual)
+					t.AssertEqual(testCase.expected, actual)
 				}
 
-				if tc.expectedOptimized == "" {
+				if testCase.expectedOptimized == "" {
 					return
 				}
 
 				actualOptimized := m.StringOptimized()
 
-				if tc.expectedOptimized != actualOptimized {
+				if testCase.expectedOptimized != actualOptimized {
 					t.Log(m.StringDebug())
 					t.Log("expectedOptimized")
-					t.AssertEqual(tc.expectedOptimized, actualOptimized)
+					t.AssertEqual(testCase.expectedOptimized, actualOptimized)
 				}
 			},
 		)

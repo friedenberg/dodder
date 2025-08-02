@@ -428,7 +428,7 @@ func (server *Server) makeHandler(
 		); err != nil {
 			_, frames := request.ctx.CauseWithStackFrames()
 
-			err = stack_frame.MakeErrorTree(err, frames...)
+			err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 
 			response.Error(err)
 		}
@@ -487,7 +487,7 @@ func (server *Server) makeHandler(
 		); err != nil {
 			_, frames := request.ctx.CauseWithStackFrames()
 
-			err = stack_frame.MakeErrorTree(err, frames...)
+			err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 
 			http.Error(
 				responseWriter,

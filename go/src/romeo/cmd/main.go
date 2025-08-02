@@ -73,7 +73,7 @@ func handleMainErrors(
 	}
 
 	_, frames := ctx.CauseWithStackFrames()
-	err = stack_frame.MakeErrorTree(err, frames...)
+	err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 
 	error_coders.Encoder.EncodeTo(err, ui.Err())
 

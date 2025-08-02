@@ -39,16 +39,11 @@ func IsHTTPError(target error, statusCode http_statuses.Code) bool {
 
 type HTTP struct {
 	StatusCode http_statuses.Code
-
 	underlying error
 }
 
 func (err HTTP) Error() string {
-	if err.underlying != nil {
-		return err.underlying.Error()
-	} else {
-		return err.StatusCode.String()
-	}
+	return err.StatusCode.String()
 }
 
 func (err HTTP) Is(target error) bool {
@@ -60,13 +55,13 @@ func (err HTTP) Unwrap() error {
 	return err.underlying
 }
 
-func (err HTTP) Wrap(underlying error) error {
+func (err HTTP) Wrap(underlying error) HTTP {
 	return HTTP{
 		StatusCode: err.StatusCode,
 		underlying: underlying,
 	}
 }
 
-func (err HTTP) Errorf(format string, args ...any) error {
+func (err HTTP) Errorf(format string, args ...any) HTTP {
 	return err.Wrap(fmt.Errorf(format, args...))
 }

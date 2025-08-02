@@ -17,8 +17,10 @@ import (
 const (
 	pipeTopRight    = "└"
 	pipeBottomRight = "┌"
+	pipeLeftBottom  = "┐"
 	pipeLeftRight   = "─"
 	pipeTeeRight    = "├"
+	pipeTeeBottom   = "┬"
 	pipeTopBottom   = "│"
 )
 
@@ -29,25 +31,13 @@ var Encoder interfaces.EncoderToWriter[error] = encoder{}
 func (encoder encoder) EncodeTo(
 	input error,
 	writer io.Writer,
-) (n int64, err error) {
+) (bytesWritten int64, err error) {
 	bufferedWriter, repool := pool.GetBufferedWriter(writer)
 	defer repool()
 
-	if err = encoder.encodeToBufferedWriter(
-		input,
-		bufferedWriter,
-		0,
-		false,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-	// TODO calculate N
-
-	if err = bufferedWriter.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	state := &cliTreeState{bufferedWriter: bufferedWriter}
+	err = state.encode(input)
+	bytesWritten = int64(state.bytesWritten)
 
 	return
 }
@@ -187,6 +177,10 @@ func (encoder encoder) encodeToBufferedWriter(
 ) (err error) {
 	switch input := input.(type) {
 	case stack_frame.ErrorsAndFramesGetter:
+		if stackTracer, ok := input.(stack_frame.ErrorStackTracer); ok && !stackTracer.ShouldShowStackTrace() {
+			break
+		}
+
 		children := input.GetErrorsAndFrames()
 
 		lastChildIdx := len(children) - 1

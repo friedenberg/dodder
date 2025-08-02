@@ -2,10 +2,12 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
+	"code.linenisgreat.com/dodder/go/src/mike/importer"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
@@ -49,16 +51,21 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	}
 
 	importerOptions.PrintCopies = options.PrintCopies
-	importer := local.MakeImporter(
+	importerr := local.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
 	if err = local.ImportSeq(
 		quiter.MakeSeqErrorFromSeq(list.All()),
-		importer,
+		importerr,
 	); err != nil {
-		err = errors.Wrap(err)
+		if errors.Is(err, importer.ErrNeedsMerge) {
+			err = stack_frame.ErrorWithoutStack(err)
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/vim_cli_options_builder"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
@@ -126,14 +126,7 @@ func (cmd DormantEdit) makeTempKonfigFile(
 
 	path = file.Name()
 
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(file)
-	defer repoolBufferedWriter()
-	defer errors.DeferredFlusher(&err, bufferedWriter)
-
-	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
-	defer repoolBufferedReader()
-
-	if _, err = io.Copy(bufferedWriter, bufferedReader); err != nil {
+	if _, err = ohio.CopyBuffered(file, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

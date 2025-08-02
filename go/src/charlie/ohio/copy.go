@@ -6,8 +6,25 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
+
+func CopyBuffered(dst io.Writer, src io.Reader) (written int64, err error) {
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(src)
+	defer repoolBufferedReader()
+
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(dst)
+	defer repoolBufferedWriter()
+	defer errors.DeferredFlusher(&err, bufferedWriter)
+
+	if written, err = io.Copy(bufferedWriter, bufferedReader); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
 
 func CopyFileLines(
 	src, dst string,

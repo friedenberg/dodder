@@ -26,10 +26,12 @@ import (
 func TestBlech32(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	tests := []struct {
+	type testCase struct {
 		str   string
 		valid bool
-	}{
+	}
+
+	tests := []testCase{
 		{"A-2UEL5L", true}, // empty
 		{"a-2uel5l", true},
 		{
@@ -82,48 +84,55 @@ func TestBlech32(t1 *testing.T) {
 		{"-qzzfhee", false},
 	}
 
-	for _, test := range tests {
-		t.Run(test, func(t *ui.T) {
-			expected := test.str
-			hrp, decoded, err := Decode(expected)
-			if !test.valid {
-				// Invalid string decoding should result in error.
-				if err == nil {
+	type testCaseInfo struct {
+		ui.TestCaseInfo
+		testCase testCase
+	}
+
+	for _, tc := range tests {
+		t.Run(
+			testCaseInfo{ui.MakeTestCaseInfo(""), tc},
+			func(t *ui.T) {
+				expected := tc.str
+				hrp, decoded, err := Decode(expected)
+				if !tc.valid {
+					// Invalid string decoding should result in error.
+					if err == nil {
+						t.Errorf(
+							"expected decoding to fail for invalid string %v",
+							tc.str,
+						)
+					}
+					return
+				}
+
+				// Valid string decoding should result in no error.
+				if err != nil {
+					t.Errorf("expected string to be valid blech32: %v", err)
+				}
+
+				// Check that it encodes to the same string.
+				actual, err := Encode(hrp, decoded)
+				if err != nil {
+					t.Errorf("encoding failed: %v", err)
+				}
+				if string(actual) != expected {
 					t.Errorf(
-						"expected decoding to fail for invalid string %v",
-						test.str,
+						"expected data to encode to %v, but got %v",
+						expected,
+						string(actual),
 					)
 				}
-				return
-			}
 
-			// Valid string decoding should result in no error.
-			if err != nil {
-				t.Errorf("expected string to be valid blech32: %v", err)
-			}
-
-			// Check that it encodes to the same string.
-			actual, err := Encode(hrp, decoded)
-			if err != nil {
-				t.Errorf("encoding failed: %v", err)
-			}
-			if string(actual) != expected {
-				t.Errorf(
-					"expected data to encode to %v, but got %v",
-					expected,
-					string(actual),
-				)
-			}
-
-			// Flip a bit in the string an make sure it is caught.
-			pos := strings.LastIndexAny(expected, "1")
-			flipped := expected[:pos+1] + string(
-				(expected[pos+1] ^ 1),
-			) + expected[pos+2:]
-			if _, _, err = Decode(flipped); err == nil {
-				t.Error("expected decoding to fail")
-			}
-		},
+				// Flip a bit in the string an make sure it is caught.
+				pos := strings.LastIndexAny(expected, "1")
+				flipped := expected[:pos+1] + string(
+					(expected[pos+1] ^ 1),
+				) + expected[pos+2:]
+				if _, _, err = Decode(flipped); err == nil {
+					t.Error("expected decoding to fail")
+				}
+			},
 		)
 	}
 }

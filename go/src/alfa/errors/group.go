@@ -9,6 +9,7 @@ import (
 type Group []error
 
 func (group Group) Error() string {
+	return fmt.Sprintf("%d errors", group.Len())
 	count := group.Len()
 
 	switch count {

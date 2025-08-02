@@ -106,6 +106,10 @@ func MakeFrame(skip int) (frame Frame, ok bool) {
 	return
 }
 
+func (frame Frame) IsEmpty() bool {
+	return !frame.nonZero
+}
+
 func getPackageAndFunctionName(v string) (p string, f string) {
 	p, f = filepath.Split(v)
 
@@ -173,6 +177,10 @@ func (frame Frame) StringLogLine() string {
 }
 
 func (frame Frame) StringNoFunctionName() string {
+	if frame.IsEmpty() {
+		return "|0| # empty stack frame"
+	}
+
 	filename := frame.Filename
 
 	if frame.RelFilename != "" {

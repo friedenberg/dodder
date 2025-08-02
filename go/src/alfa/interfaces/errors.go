@@ -1,10 +1,9 @@
 package interfaces
 
+import "code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+
 type (
-	ErrorStackTracer interface {
-		error
-		ShouldShowStackTrace() bool
-	}
+	ErrorStackTracer = stack_frame.ErrorStackTracer
 
 	ErrorBadRequest interface {
 		IsBadRequest()
