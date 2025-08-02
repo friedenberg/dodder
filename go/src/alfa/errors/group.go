@@ -10,18 +10,6 @@ type Group []error
 
 func (group Group) Error() string {
 	return fmt.Sprintf("%d errors", group.Len())
-	count := group.Len()
-
-	switch count {
-	case 0:
-		panic("empty error group")
-
-	case 1:
-		return group[0].Error()
-
-	default:
-		return fmt.Sprintf("%d errors in group", group.Len())
-	}
 }
 
 func (group Group) Unwrap() []error {

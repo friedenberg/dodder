@@ -39,6 +39,7 @@ func IsHTTPError(target error, statusCode http_statuses.Code) bool {
 
 type HTTP struct {
 	StatusCode http_statuses.Code
+	hideUnwrap bool
 	underlying error
 }
 
@@ -64,4 +65,14 @@ func (err HTTP) Wrap(underlying error) HTTP {
 
 func (err HTTP) Errorf(format string, args ...any) HTTP {
 	return err.Wrap(fmt.Errorf(format, args...))
+}
+
+func (err HTTP) ErrorUnwrappedf(format string, args ...any) HTTP {
+	err = err.Wrap(fmt.Errorf(format, args...))
+	err.hideUnwrap = true
+	return err
+}
+
+func (err HTTP) ShouldHideUnwrap() bool {
+	return err.hideUnwrap
 }

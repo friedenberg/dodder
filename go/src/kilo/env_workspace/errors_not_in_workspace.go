@@ -24,10 +24,6 @@ func (err ErrNotInWorkspace) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (err ErrNotInWorkspace) GetRetryableError() interfaces.ErrorRetryable {
-	return err
-}
-
 func (err ErrNotInWorkspace) Recover(
 	ctx interfaces.RetryableContext,
 	in error,

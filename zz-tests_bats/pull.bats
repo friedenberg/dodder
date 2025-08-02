@@ -222,7 +222,7 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	EOM
 
 	assert_output --partial - <<-EOM
-		needs merge
+		import failed with conflicts, merging required
 	EOM
 
 	run_dodder status
@@ -419,7 +419,7 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 	EOM
 
 	assert_output --partial - <<-EOM
-		needs merge
+		import failed with conflicts, merging required
 	EOM
 
 	run_dodder status

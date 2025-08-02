@@ -2,7 +2,6 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -61,7 +60,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		importerr,
 	); err != nil {
 		if errors.Is(err, importer.ErrNeedsMerge) {
-			err = stack_frame.ErrorWithoutStack(err)
+			err = errors.WithoutStack(err)
 		} else {
 			err = errors.Wrap(err)
 		}

@@ -32,13 +32,8 @@ type (
 
 	FuncIs func(error) bool
 
-	UnwrapOne interface {
-		Unwrap() error
-	}
-
-	UnwrapMany interface {
-		Unwrap() []error
-	}
+	UnwrapOne  = interfaces.ErrorOneUnwrapper
+	UnwrapMany = interfaces.ErrorManyUnwrapper
 
 	ErrorsIs interface {
 		Is(error) bool

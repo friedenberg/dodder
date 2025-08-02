@@ -13,15 +13,15 @@ type ErrLockRequired struct {
 	Operation string
 }
 
-func (e ErrLockRequired) Is(target error) bool {
+func (err ErrLockRequired) Is(target error) bool {
 	_, ok := target.(ErrLockRequired)
 	return ok
 }
 
-func (e ErrLockRequired) Error() string {
+func (err ErrLockRequired) Error() string {
 	return fmt.Sprintf(
 		"lock required for operation: %q",
-		e.Operation,
+		err.Operation,
 	)
 }
 
@@ -31,36 +31,28 @@ type ErrUnableToAcquireLock struct {
 	description string
 }
 
-func (e ErrUnableToAcquireLock) Error() string {
-	return fmt.Sprintf("%s is currently locked", e.description)
+func (err ErrUnableToAcquireLock) Error() string {
+	return fmt.Sprintf("%s is currently locked", err.description)
 }
 
-func (e ErrUnableToAcquireLock) Is(target error) bool {
+func (err ErrUnableToAcquireLock) Is(target error) bool {
 	_, ok := target.(ErrUnableToAcquireLock)
 	return ok
 }
 
-func (e ErrUnableToAcquireLock) GetHelpfulError() interfaces.ErrorHelpful {
-	return e
-}
-
-func (e ErrUnableToAcquireLock) GetRetryableError() interfaces.ErrorRetryable {
-	return e
-}
-
-func (e ErrUnableToAcquireLock) ErrorCause() []string {
+func (err ErrUnableToAcquireLock) ErrorCause() []string {
 	return []string{
 		fmt.Sprintf(
 			"A previous operation that acquired the %s lock failed.",
-			e.description,
+			err.description,
 		),
 		"The lock is intentionally left behind in case recovery is necessary.",
 	}
 }
 
-func (e ErrUnableToAcquireLock) ErrorRecovery() []string {
+func (err ErrUnableToAcquireLock) ErrorRecovery() []string {
 	return []string{
-		fmt.Sprintf("The lockfile needs to removed (`rm %q`).", e.Path),
+		fmt.Sprintf("The lockfile needs to removed (`rm %q`).", err.Path),
 	}
 }
 

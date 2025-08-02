@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
@@ -36,10 +37,7 @@ func (state *cliTreeState) encode(
 }
 
 // TODO write instead of return string
-func (state *cliTreeState) prefixForDepthChild(
-	err error,
-	continuation bool,
-) string {
+func (state *cliTreeState) prefixForDepthChild() string {
 	depth := state.stack.getDepth()
 
 	if depth == 0 {
@@ -76,16 +74,7 @@ func (state *cliTreeState) writeOneErrorMessage(
 	err error,
 	message string,
 ) {
-	prefixWithoutContinuation := state.prefixForDepthChild(
-		err,
-		false,
-	)
-
-	prefixWithContinuation := state.prefixForDepthChild(
-		err,
-		true,
-	)
-
+	prefixWithoutContinuation := state.prefixForDepthChild()
 	messageReader := bytes.NewBufferString(message)
 
 	var isEOF bool
@@ -100,21 +89,12 @@ func (state *cliTreeState) writeOneErrorMessage(
 		isEOF = err == io.EOF
 
 		if len(line) > 0 {
-			if lineIndex == 0 {
-				bytesWritten, _ = fmt.Fprintf(
-					state.bufferedWriter,
-					"%s%s\n",
-					prefixWithoutContinuation,
-					line,
-				)
-			} else {
-				bytesWritten, _ = fmt.Fprintf(
-					state.bufferedWriter,
-					"%s%s\n",
-					prefixWithContinuation,
-					line,
-				)
-			}
+			bytesWritten, _ = fmt.Fprintf(
+				state.bufferedWriter,
+				"%s%s\n",
+				prefixWithoutContinuation,
+				line,
+			)
 
 			state.bytesWritten += bytesWritten
 			bytesWritten = 0
@@ -142,6 +122,18 @@ func (state *cliTreeState) encodeStack() {
 	input := stackItem.child
 
 	switch inputTyped := input.(type) {
+	case interfaces.ErrorHiddenWrapper:
+		if inputTyped.ShouldHideUnwrap() {
+			child := inputTyped.Unwrap()
+
+			if child != nil {
+				stackItem.child = child
+				state.encodeStack()
+			}
+		} else {
+			state.printErrorOneUnwrapper(inputTyped)
+		}
+
 	case stack_frame.ErrorsAndFramesGetter:
 		state.writeOneErrorMessage(input, input.Error())
 
@@ -163,25 +155,16 @@ func (state *cliTreeState) encodeStack() {
 		}
 
 	case errors.UnwrapOne:
-		child := inputTyped.Unwrap()
-
-		if child == nil {
-			state.writeOneErrorMessage(input, input.Error())
-			return
-		}
-
-		state.writeOneErrorMessage(
-			input,
-			fmt.Sprintf("%T: %s", input, input.Error()),
-		)
-
-		childStackItem := state.stack.push(input, child)
-		childStackItem.childCount = 1
-		state.encodeStack()
-		state.stack.pop()
+		state.printErrorOneUnwrapper(inputTyped)
 
 	case errors.UnwrapMany:
 		children := inputTyped.Unwrap()
+
+		if len(children) == 1 {
+			stackItem.child = children[0]
+			state.encodeStack()
+			return
+		}
 
 		state.writeOneErrorMessage(
 			input,
@@ -209,4 +192,25 @@ func (state *cliTreeState) encodeStack() {
 			input.Error(),
 		)
 	}
+}
+
+func (state cliTreeState) printErrorOneUnwrapper(
+	err interfaces.ErrorOneUnwrapper,
+) {
+	child := err.Unwrap()
+
+	if child == nil {
+		state.writeOneErrorMessage(err, err.Error())
+		return
+	}
+
+	state.writeOneErrorMessage(
+		err,
+		fmt.Sprintf("%T: %s", err, err.Error()),
+	)
+
+	childStackItem := state.stack.push(err, child)
+	childStackItem.childCount = 1
+	state.encodeStack()
+	state.stack.pop()
 }

@@ -48,8 +48,7 @@ func TestCLITreeForwards(t *testing.T) {
 			expected: `errors.Group: 3 errors
 ├── one
 ├── two
-└── errors.Group: 1 errors
-    └── three
+└── three
 `,
 		},
 		{
@@ -66,11 +65,36 @@ func TestCLITreeForwards(t *testing.T) {
 			expected: `errors.Group: 3 errors
 ├── one
 ├── two
-└── errors.Group: 1 errors
-    └── errors.HTTP: 501 Not Implemented
-        └── inner
+└── errors.HTTP: 501 Not Implemented
+    └── inner
 `,
 		},
+		{
+			TestCaseInfo: ui.MakeTestCaseInfo(
+				"error group with one child",
+			),
+			input: errors.Group{
+				errors.New("one"),
+			},
+			expected: "one\n",
+		},
+		{
+			TestCaseInfo: ui.MakeTestCaseInfo(
+				"error no stack",
+			),
+			input: errors.WithoutStack(
+				errors.Wrap(errors.New("one")),
+			),
+			expected: "one\n",
+		},
+		// TODO add test case for errors with stack
+		// {
+		// 	TestCaseInfo: ui.MakeTestCaseInfo(
+		// 		"error with stack",
+		// 	),
+		// 	input:    errors.Wrap(errors.New("one")),
+		// 	expected: "one\n",
+		// },
 	}
 
 	for _, testCase := range testCases {
