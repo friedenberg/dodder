@@ -211,7 +211,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	)
 
 	if !found {
-		errors.ContextCancelWithBadRequestf(envLocal, err.Error())
+		errors.ContextCancelWithBadRequestError(envLocal, err)
 		return
 	}
 

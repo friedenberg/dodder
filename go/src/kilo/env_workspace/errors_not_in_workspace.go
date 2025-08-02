@@ -40,6 +40,6 @@ func (err ErrNotInWorkspace) Recover(
 
 		ctx.Retry()
 	} else {
-		errors.ContextCancelWithBadRequestf(ctx, err.Error())
+		errors.ContextCancelWithBadRequestError(ctx, err)
 	}
 }

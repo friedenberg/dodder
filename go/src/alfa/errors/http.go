@@ -11,6 +11,7 @@ func NewHTTPError(statusCode http_statuses.Code) HTTP {
 }
 
 var (
+	Err400BadRequest       = NewHTTPError(http_statuses.Code400BadRequest)
 	Err405MethodNotAllowed = NewHTTPError(
 		http_statuses.Code405MethodNotAllowed,
 	)

@@ -82,7 +82,7 @@ func (local *Repo) GetBlobFormatter(
 		err = errors.BadRequestf(
 			"no uti group: %q. Available groups: %s",
 			utiGroup,
-			maps.Keys(typeBlob.GetFormatterUTIGroups()),
+			slices.Collect(maps.Keys(typeBlob.GetFormatterUTIGroups())),
 		)
 		return
 	}

@@ -100,7 +100,7 @@ func (formatFlag *FormatFlag) Set(value string) (err error) {
 
 	if entry, ok = formatters[value]; !ok {
 		err = errors.BadRequestf(
-			"unsupported format. Available formats: %q",
+			"unsupported format %q. Available formats: %s",
 			value,
 			slices.Collect(maps.Keys(formatters)),
 		)
