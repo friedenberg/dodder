@@ -1,17 +1,17 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
-	"golang.org/x/xerrors"
 )
 
 func New(text string) error {
-	return xerrors.New(text)
+	return errors.New(text)
 }
 
 func Join(es ...error) error {
@@ -50,12 +50,8 @@ func WrapSkip(
 	skip int,
 	err error,
 ) error {
-	if err == io.EOF {
-		panic("trying to wrap io.EOF")
-	}
-
-	if err == nil {
-		return nil
+	if shouldNotWrap(err) {
+		return err
 	}
 
 	var stackFrame stack_frame.Frame
@@ -88,14 +84,28 @@ func ErrorWithStackf(format string, args ...any) error {
 	return stackFrame.Errorf(format, args...)
 }
 
-//go:noinline
-func Wrap(err error) error {
-	if err == io.EOF {
+func shouldNotWrap(err error) bool {
+	switch err {
+	case nil:
+		return true
+
+	case io.EOF:
 		panic("trying to wrap io.EOF")
 	}
 
-	if err == nil {
-		return nil
+	var errStackTracer interfaces.ErrorStackTracer
+
+	if As(err, &errStackTracer) && !errStackTracer.ShouldShowStackTrace() {
+		return true
+	} else {
+		return false
+	}
+}
+
+//go:noinline
+func Wrap(err error) error {
+	if shouldNotWrap(err) {
+		return err
 	}
 
 	var stackFrame stack_frame.Frame
@@ -110,12 +120,8 @@ func Wrap(err error) error {
 
 //go:noinline
 func Wrapf(err error, format string, values ...any) error {
-	if err == io.EOF {
-		panic("trying to wrap io.EOF")
-	}
-
-	if err == nil {
-		return nil
+	if shouldNotWrap(err) {
+		return err
 	}
 
 	var stackFrame stack_frame.Frame
