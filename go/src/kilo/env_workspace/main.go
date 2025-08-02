@@ -185,26 +185,6 @@ func (env *env) findWorkspaceFile(
 	}
 }
 
-func (env *env) tryLoad(
-	path string,
-	object *triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob],
-) (err error) {
-	if err = workspace_config_blobs.DecodeFromFile(
-		object,
-		path,
-	); err != nil {
-		err = errors.BadRequestPrefix(
-			"failed to decode `.dodder-workspace`",
-			err,
-		)
-		return
-	}
-
-	env.blob = *object.Blob
-
-	return
-}
-
 func (env *env) GetWorkspaceDir() string {
 	return env.dir
 }

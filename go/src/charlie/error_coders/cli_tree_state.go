@@ -16,15 +16,20 @@ type cliTreeState struct {
 	bufferedWriter *bufio.Writer
 	bytesWritten   int
 
+	hideStack bool
+
 	stack cliTreeStateStack
-	// depth      int
-	// childIdx   int
-	// childCount int
 }
 
 func (state *cliTreeState) encode(
 	input error,
 ) (err error) {
+	var stackTracer stack_frame.ErrorStackTracer
+
+	if errors.As(input, &stackTracer) {
+		state.hideStack = !stackTracer.ShouldShowStackTrace()
+	}
+
 	state.stack.push(nil, input)
 	state.encodeStack()
 
@@ -135,12 +140,14 @@ func (state *cliTreeState) encodeStack() {
 		}
 
 	case stack_frame.ErrorsAndFramesGetter:
-		state.writeOneErrorMessage(input, input.Error())
-
-		if stackTracer, ok := inputTyped.(stack_frame.ErrorStackTracer); ok &&
-			!stackTracer.ShouldShowStackTrace() {
-			break
+		if state.hideStack {
+			child := errors.Unwrap(input)
+			stackItem.child = child
+			state.encodeStack()
+			return
 		}
+
+		state.writeOneErrorMessage(input, input.Error())
 
 		children := inputTyped.GetErrorsAndFrames()
 

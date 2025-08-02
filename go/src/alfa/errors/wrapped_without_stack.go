@@ -1,14 +1,8 @@
 package errors
 
-func WithoutStack(err error) errorWithoutStack {
+func WithoutStack(err error) error {
 	if err == nil {
 		panic("wrapping empty error")
-	}
-
-	unwrapped := Unwrap(err)
-
-	if unwrapped != nil {
-		err = unwrapped
 	}
 
 	return errorWithoutStack{underlying: err}
