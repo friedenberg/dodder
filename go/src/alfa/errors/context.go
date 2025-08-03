@@ -184,7 +184,12 @@ func (ctx *context) cancel(err error) {
 	var retryable interfaces.ErrorRetryable
 
 	if !ctx.retriesDisabled && As(err, &retryable) {
-		retryable.Recover(ctx, err)
+		retryable.Recover(
+			ctx,
+			ctx.Retry,
+			func(format string, args ...any) {
+				ContextCancelWithBadRequestf(ctx, "aborting, "+format, args...)
+			})
 	} else {
 		ctx.funcCancel(err)
 	}
@@ -342,7 +347,7 @@ func ContextCancelWithErrorf(
 
 func ContextCancelWithBadRequestError(ctx interfaces.Context, err error) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(&errBadRequestWrap{err})
+	ctx.Cancel(Err400BadRequest.Wrap(err))
 }
 
 func ContextCancelWithBadRequestf(
@@ -351,7 +356,7 @@ func ContextCancelWithBadRequestf(
 	values ...any,
 ) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(&errBadRequestWrap{xerrors.Errorf(format, values...)})
+	ctx.Cancel(Err400BadRequest.Errorf(format, values...))
 }
 
 func CancelWithNotImplemented(ctx interfaces.ActiveContext) {

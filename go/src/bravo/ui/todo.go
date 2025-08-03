@@ -65,33 +65,33 @@ func TodoP5(f string, a ...any) (err error) {
 	return todo.printf(1, P5, f, a...)
 }
 
-func (p todoPrinter) Printf(
-	pr Priority,
-	f string,
-	a ...any,
+func (printer todoPrinter) Printf(
+	priority Priority,
+	format string,
+	aargs ...any,
 ) (err error) {
-	return p.printf(1, pr, f, a...)
+	return printer.printf(1, priority, format, aargs...)
 }
 
-func (p todoPrinter) printf(
+func (printer todoPrinter) printf(
 	skip int,
-	pr Priority,
-	f string,
-	a ...any,
+	priority Priority,
+	format string,
+	args ...any,
 ) (err error) {
-	if !p.on {
+	if !printer.on {
 		return
 	}
 
-	if p.includesStack {
+	if printer.includesStack {
 		si, _ := stack_frame.MakeFrame(1 + skip)
-		f = "%s %s" + f
-		a = append([]any{pr, si}, a...)
+		format = "%s %s" + format
+		args = append([]any{priority, si}, args...)
 	}
 
 	_, err = fmt.Fprintln(
-		p.file,
-		fmt.Sprintf(f, a...),
+		printer.file,
+		fmt.Sprintf(format, args...),
 	)
 
 	return

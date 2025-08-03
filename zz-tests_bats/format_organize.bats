@@ -121,7 +121,7 @@ cat_organize() (
 	EOM
 )
 
-function outputs_organize_one_etikett { # @test
+function outputs_organize_one_tag { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_dodder_init_disable_age
 

@@ -2,7 +2,6 @@ package errors
 
 import (
 	ConTeXT "context"
-	"fmt"
 	"syscall"
 	"testing"
 
@@ -59,14 +58,24 @@ func TestContextCancelled(t *testing.T) {
 	}
 }
 
-type errTestRecover struct{}
+type errTestRecover struct {
+	shouldFail bool
+}
 
 func (errTestRecover) Error() string {
 	return "test recover error"
 }
 
-func (errTestRecover) Recover(ctx interfaces.RetryableContext, in error) {
-	ctx.Retry()
+func (err errTestRecover) Recover(
+	ctx interfaces.ActiveContext,
+	retry interfaces.FuncRetry,
+	abort interfaces.FuncRetryAborted,
+) {
+	if err.shouldFail {
+		abort("")
+	} else {
+		retry()
+	}
 }
 
 func TestContextCancelledRetry(t *testing.T) {
@@ -76,7 +85,8 @@ func TestContextCancelledRetry(t *testing.T) {
 
 	if err := ctx.Run(
 		func(ctx interfaces.Context) {
-			fmt.Printf("%d\n", tryCount)
+			t.Logf("try count: %d", tryCount)
+
 			if tryCount == 0 {
 				tryCount++
 				ctx.Cancel(errTestRecover{})
@@ -89,6 +99,33 @@ func TestContextCancelledRetry(t *testing.T) {
 	}
 
 	if tryCount != 2 {
+		t.Errorf("expected try count 2 but got: %d", tryCount)
+	}
+}
+
+func TestContextCancelledRetryFailed(t *testing.T) {
+	ctx := MakeContext(ConTeXT.Background())
+
+	tryCount := 0
+
+	if err := ctx.Run(
+		func(ctx interfaces.Context) {
+			t.Logf("try count: %d", tryCount)
+
+			if tryCount == 0 {
+				tryCount++
+				ctx.Cancel(errTestRecover{shouldFail: true})
+			}
+
+			tryCount++
+		},
+	); err == nil {
+		t.Errorf("expected an error")
+	} else if !Is400BadRequest(err) {
+		t.Errorf("expected bad request but got : %s", err)
+	}
+
+	if tryCount != 1 {
 		t.Errorf("expected try count 2 but got: %d", tryCount)
 	}
 }

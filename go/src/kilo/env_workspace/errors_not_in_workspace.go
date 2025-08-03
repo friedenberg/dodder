@@ -1,7 +1,6 @@
 package env_workspace
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 )
@@ -25,8 +24,9 @@ func (err ErrNotInWorkspace) ShouldShowStackTrace() bool {
 }
 
 func (err ErrNotInWorkspace) Recover(
-	ctx interfaces.RetryableContext,
-	in error,
+	ctx interfaces.Context,
+	retry interfaces.FuncRetry,
+	abort interfaces.FuncRetryAborted,
 ) {
 	if err.offerToCreate &&
 		err.Confirm(
@@ -38,8 +38,8 @@ func (err ErrNotInWorkspace) Recover(
 			ctx.Cancel(err)
 		}
 
-		ctx.Retry()
+		retry()
 	} else {
-		errors.ContextCancelWithBadRequestError(ctx, err)
+		abort("not creating a workspace")
 	}
 }

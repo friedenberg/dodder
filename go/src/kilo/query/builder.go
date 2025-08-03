@@ -271,7 +271,7 @@ func (builder *Builder) build(state *buildState, values ...string) (err error) {
 	var latent *errors.GroupBuilder
 
 	if err, latent = state.build(values...); err != nil {
-		if !errors.IsBadRequest(err) {
+		if !errors.Is400BadRequest(err) {
 			latent.Add(errors.Wrapf(err, "Query String: %q", values))
 			err = latent.GetError()
 		}

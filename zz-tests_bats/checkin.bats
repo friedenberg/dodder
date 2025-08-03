@@ -109,7 +109,7 @@ function checkin_two_zettel_hidden { # @test
 	EOM
 }
 
-function checkin_simple_one_zettel_virtual_etikett { # @test
+function checkin_simple_one_zettel_virtual_tag { # @test
 	dirty_one_virtual
 	run_dodder checkin one/uno.zettel
 	assert_success
@@ -126,7 +126,7 @@ function checkin_simple_one_zettel_virtual_etikett { # @test
 	EOM
 }
 
-function checkin_complex_zettel_etikett_negation { # @test
+function checkin_complex_zettel_tag_negation { # @test
 	run_dodder checkin ^etikett-two.z
 	assert_success
 	assert_output - <<-EOM
@@ -232,7 +232,7 @@ function checkin_simple_typ { # @test
 	assert_output 'test'
 }
 
-function checkin_simple_etikett { # @test
+function checkin_simple_tag { # @test
 	run_dodder checkin zz-archive.tag
 	# run_dodder checkin zz-archive.e
 	assert_success

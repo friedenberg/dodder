@@ -3,11 +3,12 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -170,7 +171,7 @@ func (test *T) AssertNoError(err error) {
 func (test *T) AssertEOF(err error) {
 	test.Helper()
 
-	if !errors.IsEOF(err) {
+	if err != io.EOF {
 		test.fatalf(1, "expected EOF but got %q", err)
 	}
 }

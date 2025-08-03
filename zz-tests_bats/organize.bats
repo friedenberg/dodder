@@ -459,7 +459,7 @@ function add_named { # @test
 	EOM
 }
 
-function organize_v5_outputs_organize_one_etikett { # @test
+function organize_v5_outputs_organize_one_tag { # @test
 	to_add="$(mktemp)"
 	{
 		echo "---"

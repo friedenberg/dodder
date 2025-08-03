@@ -169,7 +169,7 @@ check: check-go-vuln check-go-vet
 #
 
 test-go-unit *flags:
-  go test {{flags}} -tags test,debug -v ./...
+  go test {{flags}} -count=1 -tags test,debug ./...
 
 test-go: test-go-unit
 

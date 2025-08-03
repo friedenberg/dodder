@@ -30,9 +30,4 @@ type (
 		ErrorCause() []string
 		ErrorRecovery() []string
 	}
-
-	ErrorRetryable interface {
-		error
-		Recover(RetryableContext, error)
-	}
 )

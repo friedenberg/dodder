@@ -57,8 +57,9 @@ func (err ErrUnableToAcquireLock) ErrorRecovery() []string {
 }
 
 func (err ErrUnableToAcquireLock) Recover(
-	ctx interfaces.RetryableContext,
-	in error,
+	ctx interfaces.Context,
+	retry interfaces.FuncRetry,
+	abort interfaces.FuncRetryAborted,
 ) {
 	errors.PrintHelpful(err.envUI.GetErr(), err)
 
@@ -67,8 +68,8 @@ func (err ErrUnableToAcquireLock) Recover(
 			ctx.Cancel(err)
 		}
 
-		ctx.Retry()
+		retry()
 	} else {
-		errors.ContextCancelWithBadRequestf(ctx, "not deleting the lock. aborting.")
+		abort("not deleting the lock")
 	}
 }

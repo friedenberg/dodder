@@ -74,8 +74,11 @@ type (
 		SetCancelOnSignals(signals ...os.Signal)
 	}
 
-	RetryableContext interface {
-		Context
-		Retry()
+	FuncRetry        func()
+	FuncRetryAborted func(format string, args ...any)
+
+	ErrorRetryable interface {
+		error
+		Recover(ActiveContext, FuncRetry, FuncRetryAborted)
 	}
 )

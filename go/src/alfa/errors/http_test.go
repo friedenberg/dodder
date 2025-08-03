@@ -3,19 +3,19 @@ package errors
 import "testing"
 
 func TestBadRequestf(t *testing.T) {
-	var badRequest error = BadRequestf("testing")
+	badRequest := BadRequestf("testing")
 	badRequest = Wrap(badRequest)
 
-	if !IsBadRequest(badRequest) {
+	if !Is400BadRequest(badRequest) {
 		t.Errorf("expected bad request")
 	}
 }
 
 func TestBadRequest(t *testing.T) {
-	var badRequest error = BadRequest(New("testing"))
+	badRequest := BadRequest(New("testing"))
 	badRequest = Wrap(badRequest)
 
-	if !IsBadRequest(badRequest) {
+	if !Is400BadRequest(badRequest) {
 		t.Errorf("expected bad request")
 	}
 }

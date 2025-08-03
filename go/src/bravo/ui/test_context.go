@@ -43,17 +43,18 @@ func makeTestContext(
 			},
 		); err != nil {
 			// TODO replay this `t.Fatalf` on the main go routine
-			testContext.Fatalf("test contest failed: %s", err)
+			testContext.Fatalf("test context failed: %s", err)
 		}
 	}()
 
-	t.Cleanup(func() {
-		defer func() {
-			recover()
-		}()
+	t.Cleanup(
+		func() {
+			defer func() {
+				recover()
+			}()
 
-		testContext.Context.Cancel(nil)
-	},
+			testContext.Context.Cancel(nil)
+		},
 	)
 
 	return testContext

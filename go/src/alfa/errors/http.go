@@ -10,6 +10,14 @@ func NewHTTPError(statusCode http_statuses.Code) HTTP {
 	return HTTP{StatusCode: statusCode}
 }
 
+func BadRequest(err error) error {
+	return WithoutStack(Err400BadRequest.Wrap(err))
+}
+
+func BadRequestf(format string, args ...any) error {
+	return WithoutStack(Err400BadRequest.Errorf(format, args...))
+}
+
 var (
 	Err400BadRequest       = NewHTTPError(http_statuses.Code400BadRequest)
 	Err405MethodNotAllowed = NewHTTPError(
@@ -23,6 +31,10 @@ var (
 		http_statuses.Code501NotImplemented,
 	)
 )
+
+func Is400BadRequest(err error) bool {
+	return IsHTTPError(err, http_statuses.Code400BadRequest)
+}
 
 func Is499ClientClosedRequest(err error) bool {
 	return IsHTTPError(err, http_statuses.Code499ClientClosedRequest)
