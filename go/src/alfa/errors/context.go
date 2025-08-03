@@ -16,8 +16,6 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var errContextRetry = New("context retry")
-
 // TODO maybe consider adding a target error that is used to determine whether a
 // stack trace is printed?
 type context struct {
@@ -176,7 +174,7 @@ func (ctx *context) runAfter() {
 	}
 }
 
-func (ctx *context) Retry() {
+func (ctx *context) retry() {
 	panic(errContextRetry)
 }
 
@@ -186,9 +184,9 @@ func (ctx *context) cancel(err error) {
 	if !ctx.retriesDisabled && As(err, &retryable) {
 		retryable.Recover(
 			ctx,
-			ctx.Retry,
-			func(format string, args ...any) {
-				ContextCancelWithBadRequestf(ctx, "aborting, "+format, args...)
+			ctx.retry,
+			func(err error) {
+				ctx.Cancel(errContextRetryAborted{underlying: err})
 			})
 	} else {
 		ctx.funcCancel(err)

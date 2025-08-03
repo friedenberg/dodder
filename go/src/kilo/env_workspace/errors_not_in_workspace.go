@@ -1,6 +1,7 @@
 package env_workspace
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 )
@@ -40,6 +41,6 @@ func (err ErrNotInWorkspace) Recover(
 
 		retry()
 	} else {
-		abort("not creating a workspace")
+		abort(errors.Errorf("not creating a workspace"))
 	}
 }

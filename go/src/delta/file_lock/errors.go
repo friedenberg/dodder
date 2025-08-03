@@ -70,6 +70,6 @@ func (err ErrUnableToAcquireLock) Recover(
 
 		retry()
 	} else {
-		abort("not deleting the lock")
+		abort(errors.Errorf("not deleting the lock"))
 	}
 }

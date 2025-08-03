@@ -75,7 +75,7 @@ type (
 	}
 
 	FuncRetry        func()
-	FuncRetryAborted func(format string, args ...any)
+	FuncRetryAborted func(err error)
 
 	ErrorRetryable interface {
 		error

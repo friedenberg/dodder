@@ -72,7 +72,7 @@ func (err errTestRecover) Recover(
 	abort interfaces.FuncRetryAborted,
 ) {
 	if err.shouldFail {
-		abort("")
+		abort(BadRequestf("bad request"))
 	} else {
 		retry()
 	}
@@ -108,6 +108,8 @@ func TestContextCancelledRetryFailed(t *testing.T) {
 
 	tryCount := 0
 
+	expected := errContextRetryAborted{}
+
 	if err := ctx.Run(
 		func(ctx interfaces.Context) {
 			t.Logf("try count: %d", tryCount)
@@ -121,8 +123,8 @@ func TestContextCancelledRetryFailed(t *testing.T) {
 		},
 	); err == nil {
 		t.Errorf("expected an error")
-	} else if !Is400BadRequest(err) {
-		t.Errorf("expected bad request but got : %s", err)
+	} else if !Is(err, expected) {
+		t.Errorf("expected %T but got %q", expected, err)
 	}
 
 	if tryCount != 1 {

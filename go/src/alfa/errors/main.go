@@ -67,8 +67,8 @@ func WrapSkip(
 const thisSkip = 1
 
 //go:noinline
-func Errorf(f string, values ...any) (err error) {
-	err = fmt.Errorf(f, values...)
+func Errorf(format string, args ...any) (err error) {
+	err = fmt.Errorf(format, args...)
 	return
 }
 
