@@ -373,9 +373,8 @@ function push_history_default_stdio_local_twice { # @test
 	EOM
 }
 
-function push_history_default_stdio_local_archive_twice { # @test
-	skip
-	bootstrap_archive
+function push_history_default_stdio_twice { # @test
+	bootstrap_without_content
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
@@ -403,23 +402,24 @@ function push_history_default_stdio_local_archive_twice { # @test
 	EOM
 
 	pushd them || exit 1
-	run_dodder show
+	run_dodder show +z,e,t,b
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ .* !inventory_list-v2]
-		\[konfig @d23cb9e6237446e0ff798250c9e82862f29afd997581c9aefdf4916cebd00b90 .* !toml-config-v1]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 .* !toml-type-v1]
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 .* !md "wow ok again" tag-3 tag-4]
-		\[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 .* !md "wow the first" tag-3 tag-4]
-		\[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 .* !md "wow ok" tag-1 tag-2]
-		\[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
-		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 .*]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		\[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		\[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		\[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 	popd || exit 1
 
