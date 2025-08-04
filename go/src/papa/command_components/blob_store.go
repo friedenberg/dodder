@@ -15,7 +15,7 @@ type BlobStore struct{}
 func (cmd *BlobStore) MakeBlobStore(
 	envRepo env_repo.Env,
 	blobStoreIndexOrConfigPath string,
-) (blobStore env_repo.BlobStoreInitialized) {
+) (blobStore blob_stores.BlobStoreInitialized) {
 	if blobStoreIndexOrConfigPath == "" {
 		goto tryDefaultBlobStore
 	}

@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -45,7 +46,7 @@ type shaWithReadCloser struct {
 
 func (cmd BlobStoreCat) makeBlobWriter(
 	envRepo env_repo.Env,
-	blobStore env_repo.BlobStoreInitialized,
+	blobStore blob_stores.BlobStoreInitialized,
 ) interfaces.FuncIter[shaWithReadCloser] {
 	if cmd.Utility.IsEmpty() {
 		return quiter.MakeSyncSerializer(
@@ -125,7 +126,7 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 
 func (cmd BlobStoreCat) copy(
 	envRepo env_repo.Env,
-	blobStore env_repo.BlobStoreInitialized,
+	blobStore blob_stores.BlobStoreInitialized,
 	readCloser shaWithReadCloser,
 ) (err error) {
 	defer errors.DeferredCloser(&err, readCloser.ReadCloser)
@@ -152,7 +153,7 @@ func (cmd BlobStoreCat) copy(
 }
 
 func (cmd BlobStoreCat) blob(
-	blobStore env_repo.BlobStoreInitialized,
+	blobStore blob_stores.BlobStoreInitialized,
 	sh *sha.Sha,
 	blobWriter interfaces.FuncIter[shaWithReadCloser],
 ) (err error) {

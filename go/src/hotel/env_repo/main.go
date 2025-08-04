@@ -3,7 +3,6 @@ package env_repo
 import (
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -15,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -34,8 +32,6 @@ type directoryLayout interface {
 	interfaces.DirectoryLayout
 	initDirectoryLayout(xdg.XDG) error
 }
-
-type BlobStoreInitialized = blob_stores.BlobStoreInitialized
 
 type Env struct {
 	env_local.Env
@@ -148,58 +144,12 @@ func Make(
 }
 
 func (env *Env) setupStores() {
-	if store_version.LessOrEqual(env.GetStoreVersion(), store_version.V10) {
-		env.blobStores = make([]BlobStoreInitialized, 1)
-		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
-		env.blobStores[0].Name = "0-default"
-		env.blobStores[0].Config = blob.GetBlobIOWrapper().(blob_store_configs.Config)
-		env.blobStores[0].BasePath = env.DirBlobStores("blobs")
-	} else {
-		var configPaths []string
-
-		{
-			var err error
-
-			if configPaths, err = files.DirNames(
-				filepath.Join(env.DirBlobStoreConfigs()),
-			); err != nil {
-				env.Cancel(err)
-				return
-			}
-		}
-
-		env.blobStores = make([]BlobStoreInitialized, len(configPaths))
-
-		for i, configPath := range configPaths {
-			env.blobStores[i].Name = fd.FileNameSansExt(configPath)
-			env.blobStores[i].BasePath = env.DirBlobStores(strconv.Itoa(i))
-
-			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
-				blob_store_configs.Coder,
-				configPath,
-			); err != nil {
-				env.Cancel(err)
-				return
-			} else {
-				env.blobStores[i].Config = typedConfig.Blob
-			}
-		}
-	}
-
-	for i, blobStore := range env.blobStores {
-		var err error
-
-		// TODO use sha of config to determine blob store base path
-		if env.blobStores[i].BlobStore, err = blob_stores.MakeBlobStore(
-			env,
-			blobStore.BasePath,
-			blobStore.Config,
-			env.GetTempLocal(),
-		); err != nil {
-			env.Cancel(err)
-			return
-		}
-	}
+	env.blobStores = blob_stores.MakeBlobStores(
+		env,
+		env,
+		env.GetConfigPrivate().Blob,
+		env.directoryLayout,
+	)
 }
 
 func (env Env) GetEnv() env_ui.Env {
