@@ -1,0 +1,103 @@
+package commands
+
+import (
+	"flag"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/mike/importer"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+)
+
+func init() {
+	command.Register(
+		"blob_store-sync",
+		&BlobStoreSync{},
+	)
+}
+
+type BlobStoreSync struct {
+	command_components.EnvRepo
+	command_components.BlobStore
+
+	limit int
+}
+
+func (cmd BlobStoreSync) SetFlagSet(flagSet *flag.FlagSet) {
+	flagSet.IntVar(
+		&cmd.limit,
+		"limit",
+		0,
+		"number of blobs to sync before stopping. 0 means don't stop",
+	)
+}
+
+// TODO add completion for blob store id's
+
+func (cmd BlobStoreSync) Run(req command.Request) {
+	// blobStoreIds := req.PopArgs()
+	cmd.runAllStores(req)
+}
+
+func (cmd BlobStoreSync) runAllStores(req command.Request) {
+	req.AssertNoMoreArgs()
+	envRepo := cmd.MakeEnvRepo(req, false)
+	blobStores := envRepo.GetBlobStores()
+
+	// TODO output TAP
+	ui.Out().Print("Blob Stores:")
+
+	for i, blobStore := range blobStores {
+		ui.Out().Printf("%d: %s", i, blobStore.Name)
+	}
+
+	if len(blobStores) == 1 {
+		errors.ContextCancelWithBadRequestf(
+			req,
+			"only one blob store, nothing to sync",
+		)
+		return
+	}
+
+	primary := blobStores[0]
+	blobStores = blobStores[1:]
+
+	blobImporter := importer.MakeBlobImporter(
+		envRepo,
+		primary,
+		blobStores...,
+	)
+
+	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
+		envRepo.GetUI(),
+	)
+
+	defer req.Must(
+		func(_ interfaces.Context) error {
+			ui.Err().Printf(
+				"Successes: %d, Failures: %d, Skips: %d",
+				blobImporter.CountSuccess,
+				blobImporter.CountFailure,
+				blobImporter.CountIgnored,
+			)
+
+			return nil
+		},
+	)
+
+	for blobId := range primary.AllBlobs() {
+		if err := blobImporter.ImportBlobIfNecessary(blobId); err != nil {
+			req.Cancel(err)
+			return
+		}
+
+		if cmd.limit > 0 &&
+			(blobImporter.CountSuccess+blobImporter.CountFailure) > cmd.limit {
+			ui.Err().Print("limit hit, stopping")
+			break
+		}
+	}
+}

@@ -49,12 +49,11 @@ type answer struct {
 	Path string
 }
 
-func (cmd BlobStoreWrite) Run(
-	dep command.Request,
-) {
+// TODO add support for blob store ids
+func (cmd BlobStoreWrite) Run(req command.Request) {
 	blobStore := cmd.MakeBlobStoreLocal(
-		dep,
-		dep.Blob,
+		req,
+		req.Blob,
 		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)
@@ -63,7 +62,7 @@ func (cmd BlobStoreWrite) Run(
 
 	sawStdin := false
 
-	for _, p := range dep.PopArgs() {
+	for _, p := range req.PopArgs() {
 		switch {
 		case sawStdin:
 			ui.Err().Print("'-' passed in more than once. Ignoring")
@@ -73,30 +72,34 @@ func (cmd BlobStoreWrite) Run(
 			sawStdin = true
 		}
 
-		a := answer{Path: p}
+		answer := answer{Path: p}
 
-		a.BlobId, a.error = cmd.doOne(blobStore, p)
+		answer.BlobId, answer.error = cmd.doOne(blobStore, p)
 
-		if a.error != nil {
-			blobStore.GetErr().Printf("%s: (error: %q)", a.Path, a.error)
+		if answer.error != nil {
+			blobStore.GetErr().Printf(
+				"%s: (error: %q)",
+				answer.Path,
+				answer.error,
+			)
 			failCount.Add(1)
 			continue
 		}
 
-		hasBlob := blobStore.HasBlob(a.BlobId)
+		hasBlob := blobStore.HasBlob(answer.BlobId)
 
 		if hasBlob {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					a.GetBlobId(),
-					a.Path,
+					answer.GetBlobId(),
+					answer.Path,
 				)
 			} else {
-				blobStore.GetUI().Printf("%s %s (checked in)", a.GetBlobId(), a.Path)
+				blobStore.GetUI().Printf("%s %s (checked in)", answer.GetBlobId(), answer.Path)
 			}
 		} else {
-			ui.Err().Printf("%s %s (untracked)", a.GetBlobId(), a.Path)
+			ui.Err().Printf("%s %s (untracked)", answer.GetBlobId(), answer.Path)
 
 			if cmd.Check {
 				failCount.Add(1)

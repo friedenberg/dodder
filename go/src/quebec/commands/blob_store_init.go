@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -54,7 +55,7 @@ func (cmd *BlobStoreInit) Run(req command.Request) {
 	var blobStoreName ids.Tag
 
 	if err := blobStoreName.Set(req.PopArg("blob store name")); err != nil {
-		req.Cancel(err)
+		errors.ContextCancelWithBadRequestError(req, err)
 	}
 
 	req.AssertNoMoreArgs()

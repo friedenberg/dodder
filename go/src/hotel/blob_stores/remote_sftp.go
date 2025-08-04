@@ -143,28 +143,28 @@ func (blobStore *remoteSftpBlobStore) remotePathForSha(
 	)
 }
 
-func (blobStore *remoteSftpBlobStore) HasBlob(sh interfaces.BlobId) (ok bool) {
-	if sh.GetBlobId().IsNull() {
+func (blobStore *remoteSftpBlobStore) HasBlob(
+	blobId interfaces.BlobId,
+) (ok bool) {
+	if blobId.GetBlobId().IsNull() {
 		ok = true
 		return
 	}
 
-	sh1 := sha.MustWithDigest(sh)
-
 	blobStore.blobCacheLock.RLock()
 
-	if _, ok = blobStore.blobCache[string(sh1.GetBytes())]; ok {
+	if _, ok = blobStore.blobCache[string(blobId.GetBytes())]; ok {
 		blobStore.blobCacheLock.RUnlock()
 		return
 	}
 
 	blobStore.blobCacheLock.RUnlock()
 
-	remotePath := blobStore.remotePathForSha(sh)
+	remotePath := blobStore.remotePathForSha(blobId)
 
 	if _, err := blobStore.sftpClient.Stat(remotePath); err == nil {
 		blobStore.blobCacheLock.Lock()
-		blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
+		blobStore.blobCache[string(blobId.GetBytes())] = struct{}{}
 		blobStore.blobCacheLock.Unlock()
 		ok = true
 	}

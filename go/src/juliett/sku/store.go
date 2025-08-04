@@ -3,6 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -67,6 +68,7 @@ type (
 
 		// -1: no remote blob store and the blob doesn't exist locally
 		// -2: no remote blob store and the blob exists locally
+		// -3: blob exists locally and remotely
 		N int64
 	}
 
@@ -98,12 +100,21 @@ type (
 	}
 )
 
-func MakeBlobCopierDelegate(ui fd.Std) func(BlobCopyResult) error {
+func MakeBlobCopierDelegate(fd fd.Std) func(BlobCopyResult) error {
 	return func(result BlobCopyResult) error {
-		return ui.Printf(
-			"copied Blob %s (%d bytes)",
-			result.BlobId,
-			result.N,
-		)
+		switch result.N {
+		case -3:
+			return fd.Printf(
+				"Blob %s already exists",
+				result.BlobId,
+			)
+
+		default:
+			return fd.Printf(
+				"copied Blob %s (%s)",
+				result.BlobId,
+				ui.GetHumanBytesString(uint64(result.N)),
+			)
+		}
 	}
 }

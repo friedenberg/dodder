@@ -125,9 +125,9 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
-		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 bytes)
-		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
+		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
+		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
+		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
 	EOM
 
 	set_xdg "$them"
@@ -170,9 +170,9 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 		       conflicted [one/dos]
 		       conflicted [one/uno]
 		       conflicted [one/uno]
-		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
-		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 bytes)
-		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
+		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
+		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
+		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
 		import failed with conflicts, merging required
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -277,13 +277,13 @@ function push_history_default_only_blobs { # @test
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
-		copied Blob .* \(.* bytes)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
+		copied Blob .* \(.*)
 	EOM
 
 	run_dodder show +?z,e,t
@@ -353,8 +353,8 @@ function push_history_default_stdio_local_twice { # @test
 	assert_output_unsorted --partial - <<-EOM
 		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
 		remote: [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
-		remote: copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
-		remote: copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 bytes)
+		remote: copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
+		remote: copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
 	EOM
 
 	pushd them || exit 1
@@ -391,14 +391,14 @@ function push_history_default_stdio_twice { # @test
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ bytes)
-		remote: copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
+		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ bytes)
+		remote: copied Blob [0-9a-f]+ \(.*)
 	EOM
 
 	pushd them || exit 1

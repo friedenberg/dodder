@@ -1,21 +1,16 @@
 package blob_stores
 
 import (
-	"fmt"
 	"io"
-	"net"
-	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/agent"
 )
 
 var defaultBuckets = []int{2}
@@ -189,107 +184,6 @@ func VerifyBlob(
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-// TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
-func MakeSSHClientForExplicitConfig(
-	ctx interfaces.Context,
-	config blob_store_configs.ConfigSFTPConfigExplicit,
-) (sshClient *ssh.Client, err error) {
-	sshConfig := &ssh.ClientConfig{
-		User:            config.GetUser(),
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: make this configurable
-	}
-
-	// Configure authentication
-	if config.GetPrivateKeyPath() != "" {
-		var key ssh.Signer
-		var keyBytes []byte
-
-		if keyBytes, err = os.ReadFile(config.GetPrivateKeyPath()); err != nil {
-			err = errors.Wrapf(err, "failed to read private key")
-			return
-		}
-
-		if key, err = ssh.ParsePrivateKey(keyBytes); err != nil {
-			err = errors.Wrapf(err, "failed to parse private key")
-			return
-		}
-
-		sshConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
-	} else if config.GetPassword() != "" {
-		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
-	} else {
-		err = errors.Errorf("no authentication method configured")
-		return
-	}
-
-	addr := fmt.Sprintf(
-		"%s:%d",
-		config.GetHost(),
-		config.GetPort(),
-	)
-
-	if sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH server")
-		return
-	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
-
-	return
-}
-
-func MakeSSHClientFromSSHConfig(
-	ctx interfaces.Context,
-	config blob_store_configs.ConfigSFTPUri,
-) (sshClient *ssh.Client, err error) {
-	socket := os.Getenv("SSH_AUTH_SOCK")
-
-	if socket == "" {
-		err = errors.Errorf("SSH_AUTH_SOCK empty or unset")
-		return
-	}
-
-	var connSshSock net.Conn
-
-	ui.Log().Print("connecting to SSH_AUTH_SOCK: %s", socket)
-	if connSshSock, err = net.Dial("unix", socket); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH_AUTH_SOCK")
-		return
-	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(connSshSock.Close))
-
-	ui.Log().Print("creating ssh-agent client")
-	clientAgent := agent.NewClient(connSshSock)
-
-	uri := config.GetUri()
-	url := uri.GetUrl()
-
-	configClient := &ssh.ClientConfig{
-		User: url.User.Username(),
-		Auth: []ssh.AuthMethod{
-			ssh.PublicKeysCallback(clientAgent.Signers),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO make configurable
-	}
-
-	addr := fmt.Sprintf(
-		"%s:%s",
-		url.Hostname(),
-		url.Port(),
-	)
-
-	ui.Log().Printf("connecting via ssh: %q", addr)
-	if sshClient, err = ssh.Dial("tcp", addr, configClient); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH server")
-		return
-	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 
 	return
 }

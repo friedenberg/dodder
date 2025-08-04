@@ -89,6 +89,7 @@ function complete_subcmd { # @test
 		blob_store-init-sftp-explicit
 		blob_store-init-sftp-ssh_config
 		blob_store-list
+		blob_store-sync
 		blob_store-write
 		cat-alfred
 		checkin
