@@ -12,14 +12,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 )
 
-func (client *client) GetBlobStore() interfaces.BlobStore {
-	return client
+func (client *client) GetBlobStore() blob_stores.BlobStoreInitialized {
+	return blob_stores.BlobStoreInitialized{
+		Name: "remote",
+		// TODO populate these
+		// BasePath:
+		// Config:
+		BlobStore: client,
+	}
 }
 
 func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
-	return nil
+	panic(errors.Err501NotImplemented)
 }
 
 func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {

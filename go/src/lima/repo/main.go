@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -16,7 +17,7 @@ type Repo interface {
 	GetEnv() env_ui.Env
 	GetImmutableConfigPublic() genesis_configs.ConfigPublic
 	GetImmutableConfigPublicType() ids.Type
-	GetBlobStore() interfaces.BlobStore
+	GetBlobStore() blob_stores.BlobStoreInitialized
 	GetObjectStore() sku.RepoStore
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 	GetInventoryListStore() sku.InventoryListStore

@@ -3,10 +3,10 @@ package local_working_copy
 import (
 	"time"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -83,7 +83,7 @@ func (local *Repo) GetInventoryListCoderCloset() inventory_list_coders.Closet {
 	return local.typedBlobStore.InventoryList
 }
 
-func (local *Repo) GetBlobStore() interfaces.BlobStore {
+func (local *Repo) GetBlobStore() blob_stores.BlobStoreInitialized {
 	return local.GetEnvRepo().GetDefaultBlobStore()
 }
 
