@@ -15,9 +15,16 @@ import (
 
 var defaultBuckets = []int{2}
 
+type BlobStoreInitialized struct {
+	Name     string
+	BasePath string
+	blob_store_configs.Config
+	interfaces.BlobStore
+}
+
 // TODO describe base path agnostically
 func MakeBlobStore(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	basePath string,
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,

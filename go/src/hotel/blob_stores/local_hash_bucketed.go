@@ -25,7 +25,7 @@ type localHashBucketed struct {
 }
 
 func makeLocalHashBucketed(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	basePath string,
 	config blob_store_configs.ConfigLocalHashBucketed,
 	tempFS env_dir.TemporaryFS,

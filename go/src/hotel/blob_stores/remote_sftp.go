@@ -44,7 +44,7 @@ type remoteSftpBlobStore struct {
 }
 
 func makeSftpStore(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
 ) (store *remoteSftpBlobStore, err error) {

@@ -15,7 +15,7 @@ import (
 
 // TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
 func MakeSSHClientForExplicitConfig(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	config blob_store_configs.ConfigSFTPConfigExplicit,
 ) (sshClient *ssh.Client, err error) {
 	sshConfig := &ssh.ClientConfig{
@@ -63,7 +63,7 @@ func MakeSSHClientForExplicitConfig(
 }
 
 func MakeSSHClientFromSSHConfig(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	config blob_store_configs.ConfigSFTPUri,
 ) (sshClient *ssh.Client, err error) {
 	socket := os.Getenv("SSH_AUTH_SOCK")

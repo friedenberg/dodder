@@ -15,8 +15,8 @@ import (
 
 func MakeBlobImporter(
 	envRepo env_repo.Env,
-	src env_repo.BlobStoreInitialized,
-	dsts ...env_repo.BlobStoreInitialized,
+	src blob_stores.BlobStoreInitialized,
+	dsts ...blob_stores.BlobStoreInitialized,
 ) BlobImporter {
 	return BlobImporter{
 		EnvRepo: envRepo,
@@ -28,22 +28,61 @@ func MakeBlobImporter(
 type BlobImporter struct {
 	EnvRepo        env_repo.Env
 	CopierDelegate interfaces.FuncIter[sku.BlobCopyResult]
-	Src            env_repo.BlobStoreInitialized
-	Dsts           []env_repo.BlobStoreInitialized
-	CountSuccess   int
-	CountIgnored   int
-	CountFailure   int
+	Src            blob_stores.BlobStoreInitialized
+	Dsts           []blob_stores.BlobStoreInitialized
+
+	Counts Counts
+}
+
+type Counts struct {
+	Succeeded int
+	Ignored   int
+	Failed    int
+	Total     int
 }
 
 func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 	blobId interfaces.BlobId,
+	object *sku.Transacted,
 ) (err error) {
-	for _, blobStore := range blobImporter.Dsts {
-		ui.Log().Print("copying", blobStore.GetBlobStoreDescription(), blobId)
+	if len(blobImporter.Dsts) == 0 {
+		return blobImporter.emitMissingBlob(blobId, object)
+	}
 
+	for _, blobStore := range blobImporter.Dsts {
 		if err = blobImporter.importBlobIfNecessary(
 			blobStore,
 			blobId,
+			object,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (blobImporter *BlobImporter) emitMissingBlob(
+	blobId interfaces.BlobId,
+	object *sku.Transacted,
+) (err error) {
+	// when this is a dumb HTTP remote, we expect local to push the missing
+	// objects to us after the import call
+
+	n := int64(-1)
+
+	if blobImporter.Src.HasBlob(blobId) {
+		n = -2
+	}
+
+	if blobImporter.CopierDelegate != nil {
+		if err = blobImporter.CopierDelegate(
+			sku.BlobCopyResult{
+				Transacted: object,
+				BlobId:     blobId,
+				N:          n,
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -56,6 +95,7 @@ func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 func (blobImporter *BlobImporter) importBlobIfNecessary(
 	dst interfaces.BlobStore,
 	blobId interfaces.BlobId,
+	object *sku.Transacted,
 ) (err error) {
 	var progressWriter env_ui.ProgressWriter
 
@@ -63,6 +103,8 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 		blobImporter.EnvRepo,
 		func(ctx interfaces.Context) {
 			var n int64
+
+			blobImporter.Counts.Total++
 
 			if n, err = blob_stores.CopyBlobIfNecessary(
 				blobImporter.EnvRepo,
@@ -73,11 +115,11 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 			); err != nil {
 				ui.Log().Print("copy failed", err, dst.GetBlobStoreDescription(), blobId)
 				if errors.Is(err, env_dir.ErrBlobAlreadyExists{}) {
-					blobImporter.CountIgnored++
+					blobImporter.Counts.Ignored++
 					n = -3
 					err = nil
 				} else {
-					blobImporter.CountFailure++
+					blobImporter.Counts.Failed++
 					// TODO add context that this could not be copied from the
 					// remote blob
 					// store
@@ -85,14 +127,15 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 					return
 				}
 			} else {
-				blobImporter.CountSuccess++
+				blobImporter.Counts.Succeeded++
 			}
 
 			if blobImporter.CopierDelegate != nil {
 				if err = blobImporter.CopierDelegate(
 					sku.BlobCopyResult{
-						BlobId: blobId,
-						N:      n,
+						Transacted: object,
+						BlobId:     blobId,
+						N:          n,
 					},
 				); err != nil {
 					err = errors.Wrap(err)

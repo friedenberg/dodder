@@ -35,12 +35,7 @@ type directoryLayout interface {
 	initDirectoryLayout(xdg.XDG) error
 }
 
-type BlobStoreInitialized struct {
-	Name     string
-	BasePath string
-	blob_store_configs.Config
-	interfaces.BlobStore
-}
+type BlobStoreInitialized = blob_stores.BlobStoreInitialized
 
 type Env struct {
 	env_local.Env

@@ -15,7 +15,7 @@ teardown() {
 
 # bats file_tags=user_story:blob_store
 
-function show_simple_one_zettel { # @test
+function blob_store_sync_twice { # @test
 	run_dodder blob_store-init test
 	assert_success
 	assert_output --regexp - <<-EOM
@@ -25,12 +25,12 @@ function show_simple_one_zettel { # @test
 	run_dodder blob_store-sync
 	assert_success
 	assert_output --regexp - <<-EOM
-		Successes: 14, Failures: 0, Skips: 0
+		Successes: 14, Failures: 0, Ignored: 0, Total: 14
 	EOM
 
 	run_dodder blob_store-sync
 	assert_success
 	assert_output --regexp - <<-EOM
-		Successes: 0, Failures: 0, Skips: 14
+		Successes: 0, Failures: 0, Ignored: 14, Total: 14
 	EOM
 }

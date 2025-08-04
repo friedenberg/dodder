@@ -78,10 +78,11 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 	defer req.Must(
 		func(_ interfaces.Context) error {
 			ui.Err().Printf(
-				"Successes: %d, Failures: %d, Skips: %d",
-				blobImporter.CountSuccess,
-				blobImporter.CountFailure,
-				blobImporter.CountIgnored,
+				"Successes: %d, Failures: %d, Ignored: %d, Total: %d",
+				blobImporter.Counts.Succeeded,
+				blobImporter.Counts.Failed,
+				blobImporter.Counts.Ignored,
+				blobImporter.Counts.Total,
 			)
 
 			return nil
@@ -89,13 +90,13 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 	)
 
 	for blobId := range primary.AllBlobs() {
-		if err := blobImporter.ImportBlobIfNecessary(blobId); err != nil {
+		if err := blobImporter.ImportBlobIfNecessary(blobId, nil); err != nil {
 			req.Cancel(err)
 			return
 		}
 
 		if cmd.limit > 0 &&
-			(blobImporter.CountSuccess+blobImporter.CountFailure) > cmd.limit {
+			(blobImporter.Counts.Succeeded+blobImporter.Counts.Failed) > cmd.limit {
 			ui.Err().Print("limit hit, stopping")
 			break
 		}
