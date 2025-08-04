@@ -25,7 +25,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-type remoteSftpBlobStore struct {
+type remoteSftp struct {
 	buckets []int
 
 	config blob_store_configs.ConfigSFTPRemotePath
@@ -47,8 +47,8 @@ func makeSftpStore(
 	ctx interfaces.ActiveContext,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
-) (store *remoteSftpBlobStore, err error) {
-	store = &remoteSftpBlobStore{
+) (store *remoteSftp, err error) {
+	store = &remoteSftp{
 		buckets:   defaultBuckets,
 		config:    config,
 		sshClient: sshClient,
@@ -72,7 +72,11 @@ func makeSftpStore(
 	return
 }
 
-func (blobStore *remoteSftpBlobStore) close() (err error) {
+func (blobStore *remoteSftp) GetBlobStoreConfig() interfaces.BlobStoreConfig {
+	return blobStore.config
+}
+
+func (blobStore *remoteSftp) close() (err error) {
 	if blobStore.sftpClient != nil {
 		if err = blobStore.sftpClient.Close(); err != nil {
 			err = errors.Wrap(err)
@@ -83,7 +87,7 @@ func (blobStore *remoteSftpBlobStore) close() (err error) {
 	return nil
 }
 
-func (blobStore *remoteSftpBlobStore) ensureRemotePath() (err error) {
+func (blobStore *remoteSftp) ensureRemotePath() (err error) {
 	remotePath := blobStore.config.GetRemotePath()
 	// TODO read remote blob store config (including hash buckets)
 
@@ -113,19 +117,19 @@ func (blobStore *remoteSftpBlobStore) ensureRemotePath() (err error) {
 	return
 }
 
-func (blobStore *remoteSftpBlobStore) GetBlobStoreDescription() string {
+func (blobStore *remoteSftp) GetBlobStoreDescription() string {
 	return fmt.Sprintf("TODO: sftp")
 }
 
-func (blobStore *remoteSftpBlobStore) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (blobStore *remoteSftp) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return blobStore.blobIOWrapper
 }
 
-func (blobStore *remoteSftpBlobStore) GetLocalBlobStore() interfaces.BlobStore {
+func (blobStore *remoteSftp) GetLocalBlobStore() interfaces.BlobStore {
 	return blobStore
 }
 
-func (blobStore *remoteSftpBlobStore) makeEnvDirConfig() env_dir.Config {
+func (blobStore *remoteSftp) makeEnvDirConfig() env_dir.Config {
 	return env_dir.DefaultConfig
 	// return env_dir.MakeConfig(
 	// 	blobStore.blobIOWrapper.GetBlobCompression(),
@@ -133,7 +137,7 @@ func (blobStore *remoteSftpBlobStore) makeEnvDirConfig() env_dir.Config {
 	// )
 }
 
-func (blobStore *remoteSftpBlobStore) remotePathForSha(
+func (blobStore *remoteSftp) remotePathForSha(
 	sh interfaces.BlobId,
 ) string {
 	return env_dir.MakeHashBucketPathFromSha(
@@ -143,7 +147,7 @@ func (blobStore *remoteSftpBlobStore) remotePathForSha(
 	)
 }
 
-func (blobStore *remoteSftpBlobStore) HasBlob(
+func (blobStore *remoteSftp) HasBlob(
 	blobId interfaces.BlobId,
 ) (ok bool) {
 	if blobId.GetBlobId().IsNull() {
@@ -172,7 +176,7 @@ func (blobStore *remoteSftpBlobStore) HasBlob(
 	return
 }
 
-func (blobStore *remoteSftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 	return func(yield func(interfaces.BlobId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
@@ -218,7 +222,7 @@ func (blobStore *remoteSftpBlobStore) AllBlobs() interfaces.SeqError[interfaces.
 	}
 }
 
-func (blobStore *remoteSftpBlobStore) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
+func (blobStore *remoteSftp) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -233,11 +237,11 @@ func (blobStore *remoteSftpBlobStore) BlobWriter() (w interfaces.WriteCloseBlobI
 	return
 }
 
-func (blobStore *remoteSftpBlobStore) Mover() (mover interfaces.Mover, err error) {
+func (blobStore *remoteSftp) Mover() (mover interfaces.Mover, err error) {
 	return blobStore.BlobWriter()
 }
 
-func (blobStore *remoteSftpBlobStore) BlobReader(
+func (blobStore *remoteSftp) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.GetBlobId().IsNull() {
@@ -288,7 +292,7 @@ func (blobStore *remoteSftpBlobStore) BlobReader(
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
 // TODO explore using env_dir.Mover generically instead of this
 type sftpMover struct {
-	store    *remoteSftpBlobStore
+	store    *remoteSftp
 	config   env_dir.Config
 	tempFile *sftp.File
 	tempPath string

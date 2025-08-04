@@ -15,6 +15,11 @@ import (
 
 var defaultBuckets = []int{2}
 
+var (
+	_ interfaces.BlobStore = localHashBucketed{}
+	_ interfaces.BlobStore = &remoteSftp{}
+)
+
 type BlobStoreInitialized struct {
 	Name     string
 	BasePath string
@@ -29,6 +34,7 @@ func MakeBlobStore(
 	config blob_store_configs.Config,
 	tempFS env_dir.TemporaryFS,
 ) (store interfaces.BlobStore, err error) {
+	// TODO don't use tipe, use interfaces on the config
 	switch tipe := config.GetBlobStoreType(); tipe {
 	default:
 		err = errors.BadRequestf("unsupported blob store type %q", tipe)

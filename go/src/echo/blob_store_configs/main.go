@@ -9,23 +9,19 @@ import (
 )
 
 type (
-	Config interface {
-		GetBlobStoreType() string
-	}
-
-	ConfigMutable interface {
-		Config
-		interfaces.CommandComponent
-	}
+	Config        = interfaces.BlobStoreConfig
+	ConfigMutable = interfaces.BlobStoreConfigMutable
 
 	// TODO add config interface for local file stores
 	ConfigLocalHashBucketed interface {
+		Config
 		interfaces.BlobIOWrapper
 		GetHashBuckets() []int
 		GetLockInternalFiles() bool
 	}
 
 	ConfigSFTPRemotePath interface {
+		Config
 		GetRemotePath() string
 	}
 

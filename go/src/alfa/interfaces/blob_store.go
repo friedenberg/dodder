@@ -38,7 +38,17 @@ type (
 		BlobIdGetter
 	}
 
+	BlobStoreConfig interface {
+		GetBlobStoreType() string
+	}
+
+	BlobStoreConfigMutable interface {
+		BlobStoreConfig
+		CommandComponent
+	}
+
 	BlobStore interface {
+		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string
 		HasBlob(sh BlobId) (ok bool)
 		BlobReader

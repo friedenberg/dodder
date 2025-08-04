@@ -18,6 +18,10 @@ func (client *client) GetBlobStore() interfaces.BlobStore {
 	return client
 }
 
+func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
+	return nil
+}
+
 func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 	var request *http.Request
 

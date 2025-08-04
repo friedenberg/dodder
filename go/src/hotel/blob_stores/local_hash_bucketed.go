@@ -41,6 +41,10 @@ func makeLocalHashBucketed(
 	return store, nil
 }
 
+func (blobStore localHashBucketed) GetBlobStoreConfig() interfaces.BlobStoreConfig {
+	return blobStore.config
+}
+
 func (blobStore localHashBucketed) GetBlobStoreDescription() string {
 	return fmt.Sprintf("TODO: local-git-like")
 }
