@@ -3,8 +3,6 @@ package command_components
 import (
 	"flag"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -25,16 +23,13 @@ func (cmd *RemoteBlobStore) SetFlagSet(flagSet *flag.FlagSet) {
 
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 	envLocal env_local.Env,
-) (blobStore interfaces.BlobStore, err error) {
-	if blobStore, err = blob_stores.MakeBlobStore(
+) (blobStore blob_stores.BlobStoreInitialized, err error) {
+	blobStore = blob_stores.MakeRemoteBlobStore(
 		envLocal,
 		cmd.Blobs,
 		&cmd.Config,
 		envLocal.GetTempLocal(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	return
 }
