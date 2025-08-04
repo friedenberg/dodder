@@ -2,13 +2,20 @@ package blob_stores
 
 import (
 	"io"
+	"path/filepath"
+	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
+	"code.linenisgreat.com/dodder/go/src/echo/fd"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"golang.org/x/crypto/ssh"
 )
@@ -25,6 +32,96 @@ type BlobStoreInitialized struct {
 	BasePath string
 	blob_store_configs.Config
 	interfaces.BlobStore
+}
+
+func MakeBlobStores(
+	ctx interfaces.ActiveContext,
+	envDir env_dir.Env,
+	config genesis_configs.ConfigPrivate,
+	directoryLayout interfaces.DirectoryLayout,
+) (blobStores []BlobStoreInitialized) {
+	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
+		blobStores = make([]BlobStoreInitialized, 1)
+		blob := config.(interfaces.BlobIOWrapperGetter)
+		blobStores[0].Name = "0-default"
+		blobStores[0].Config = blob.GetBlobIOWrapper().(blob_store_configs.Config)
+		blobStores[0].BasePath = directoryLayout.DirBlobStores("blobs")
+	} else {
+		var configPaths []string
+
+		{
+			var err error
+
+			if configPaths, err = files.DirNames(
+				filepath.Join(directoryLayout.DirBlobStoreConfigs()),
+			); err != nil {
+				ctx.Cancel(err)
+				return
+			}
+		}
+
+		blobStores = make([]BlobStoreInitialized, len(configPaths))
+
+		for i, configPath := range configPaths {
+			blobStores[i].Name = fd.FileNameSansExt(configPath)
+			blobStores[i].BasePath = directoryLayout.DirBlobStores(strconv.Itoa(i))
+
+			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
+				blob_store_configs.Coder,
+				configPath,
+			); err != nil {
+				ctx.Cancel(err)
+				return
+			} else {
+				blobStores[i].Config = typedConfig.Blob
+			}
+		}
+	}
+
+	for i, blobStore := range blobStores {
+		var err error
+
+		// TODO use sha of config to determine blob store base path
+		if blobStores[i].BlobStore, err = MakeBlobStore(
+			ctx,
+			blobStore.BasePath,
+			blobStore.Config,
+			envDir.GetTempLocal(),
+		); err != nil {
+			ctx.Cancel(err)
+			return
+		}
+	}
+
+	return
+}
+
+func MakeRemoteBlobStore(
+	ctx interfaces.ActiveContext,
+	basePath string,
+	config blob_store_configs.Config,
+	tempFS env_dir.TemporaryFS,
+) (blobStore BlobStoreInitialized) {
+	blobStore.Name = "remote blob store"
+	blobStore.BasePath = basePath
+	blobStore.Config = config
+
+	{
+		var err error
+
+		// TODO use sha of config to determine blob store base path
+		if blobStore.BlobStore, err = MakeBlobStore(
+			ctx,
+			blobStore.BasePath,
+			blobStore.Config,
+			tempFS,
+		); err != nil {
+			ctx.Cancel(err)
+			return
+		}
+	}
+
+	return
 }
 
 // TODO describe base path agnostically

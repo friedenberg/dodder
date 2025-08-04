@@ -52,7 +52,7 @@ type Env struct {
 	// the defined blob stores instead of having a default
 	// TODO switch to primary blob store and others, and add support for v10
 	// directory layout
-	blobStores []BlobStoreInitialized
+	blobStores []blob_stores.BlobStoreInitialized
 }
 
 func Make(
@@ -266,7 +266,7 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) GetDefaultBlobStore() BlobStoreInitialized {
+func (env Env) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
 	if len(env.blobStores) == 0 {
 		panic("calling GetDefaultBlobStore without any initialized blob stores")
 	}
@@ -274,8 +274,8 @@ func (env Env) GetDefaultBlobStore() BlobStoreInitialized {
 	return env.blobStores[env.blobStoreDefaultIndex]
 }
 
-func (env Env) GetBlobStores() []BlobStoreInitialized {
-	blobStores := make([]BlobStoreInitialized, len(env.blobStores))
+func (env Env) GetBlobStores() []blob_stores.BlobStoreInitialized {
+	blobStores := make([]blob_stores.BlobStoreInitialized, len(env.blobStores))
 	copy(blobStores, env.blobStores)
 	return blobStores
 }
