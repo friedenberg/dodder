@@ -80,6 +80,11 @@ func (err HTTP) Errorf(format string, args ...any) HTTP {
 	return err.Wrap(fmt.Errorf(format, args...))
 }
 
+// Creates a new error from `format` and `args` a returns a new HTTP error that
+// wraps it, but does not expose the HTTP error's message.
+//
+// The returned error will satisfy the appropriate `IsHTTPError(err, status)`
+// call, but when using `error_coders` to print it, it won't show the HTTP error
 func (err HTTP) ErrorUnwrappedf(format string, args ...any) HTTP {
 	err = err.Wrap(fmt.Errorf(format, args...))
 	err.hideUnwrap = true

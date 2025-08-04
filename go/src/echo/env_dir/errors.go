@@ -71,32 +71,34 @@ func (e ErrBlobMissing) Is(target error) bool {
 
 func MakeErrTempAlreadyExists(
 	path string,
-) (err *ErrTempAlreadyExists) {
-	err = &ErrTempAlreadyExists{Path: path}
+) (err ErrTempAlreadyExists) {
+	err = ErrTempAlreadyExists{Path: path}
 	return
 }
+
+var _ interfaces.ErrorHelpful = ErrTempAlreadyExists{}
 
 type ErrTempAlreadyExists struct {
 	Path string
 }
 
-func (e *ErrTempAlreadyExists) Error() string {
-	return fmt.Sprintf("Local temporary directory already exists: %q", e.Path)
+func (err ErrTempAlreadyExists) Error() string {
+	return fmt.Sprintf("Local temporary directory already exists: %q", err.Path)
 }
 
-func (e *ErrTempAlreadyExists) ErrorCause() string {
-	return "Another dodder previous process with the same PID likely terminated unexpectedly"
+func (err ErrTempAlreadyExists) GetErrorCause() []string {
+	return []string{
+		"Another dodder previous process with the same PID likely terminated unexpectedly",
+	}
 }
 
-func (e *ErrTempAlreadyExists) ErrorRecovery() string {
-	return "Check if there are any relevant files in the directory, or possible delete it"
+func (err ErrTempAlreadyExists) GetErrorRecovery() []string {
+	return []string{
+		"Check if there are any relevant files in the directory, or possible delete it",
+	}
 }
 
-func (e *ErrTempAlreadyExists) ErrorRecoveryAutomatic() string {
-	return "TODO"
-}
-
-func (e *ErrTempAlreadyExists) Is(target error) bool {
-	_, ok := target.(*ErrTempAlreadyExists)
+func (err ErrTempAlreadyExists) Is(target error) bool {
+	_, ok := target.(ErrTempAlreadyExists)
 	return ok
 }

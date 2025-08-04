@@ -15,19 +15,18 @@ type (
 		Unwrap() []error
 	}
 
+	// When printing error trees, `error_coders` uses the presence of
+	// `ShouldHideUnwrap()` and its return value to determine if the parent
+	// error
+	// should be printed.
 	ErrorHiddenWrapper interface {
 		ErrorOneUnwrapper
 		ShouldHideUnwrap() bool
 	}
 
-	ErrorBadRequest interface {
-		IsBadRequest()
-	}
-
 	ErrorHelpful interface {
 		error
-		// TODO prefix with Get
-		ErrorCause() []string
-		ErrorRecovery() []string
+		GetErrorCause() []string
+		GetErrorRecovery() []string
 	}
 )

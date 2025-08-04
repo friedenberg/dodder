@@ -28,11 +28,11 @@ func (err helpful) Unwrap() error {
 	return err.underlying
 }
 
-func (err helpful) ErrorCause() []string {
+func (err helpful) GetErrorCause() []string {
 	return err.cause
 }
 
-func (err helpful) ErrorRecovery() []string {
+func (err helpful) GetErrorRecovery() []string {
 	return err.recovery
 }
 

@@ -40,7 +40,7 @@ func (err ErrUnableToAcquireLock) Is(target error) bool {
 	return ok
 }
 
-func (err ErrUnableToAcquireLock) ErrorCause() []string {
+func (err ErrUnableToAcquireLock) GetErrorCause() []string {
 	return []string{
 		fmt.Sprintf(
 			"A previous operation that acquired the %s lock failed.",
@@ -50,7 +50,7 @@ func (err ErrUnableToAcquireLock) ErrorCause() []string {
 	}
 }
 
-func (err ErrUnableToAcquireLock) ErrorRecovery() []string {
+func (err ErrUnableToAcquireLock) GetErrorRecovery() []string {
 	return []string{
 		fmt.Sprintf("The lockfile needs to removed (`rm %q`).", err.Path),
 	}

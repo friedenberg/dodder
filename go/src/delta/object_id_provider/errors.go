@@ -19,17 +19,15 @@ func (err ErrDoesNotExist) Is(target error) bool {
 	return ok
 }
 
-type ErrZettelIdsExhausted struct{}
+var _ interfaces.ErrorHelpful = ErrZettelIdsExhausted{}
 
-func (err ErrZettelIdsExhausted) GetHelpfulError() interfaces.ErrorHelpful {
-	return err
-}
+type ErrZettelIdsExhausted struct{}
 
 func (err ErrZettelIdsExhausted) Error() string {
 	return "zettel ids exhausted"
 }
 
-func (err ErrZettelIdsExhausted) ErrorCause() []string {
+func (err ErrZettelIdsExhausted) GetErrorCause() []string {
 	return []string{
 		"There are no more unused zettel ids left.",
 		"This may be because the last id was used.",
@@ -37,7 +35,7 @@ func (err ErrZettelIdsExhausted) ErrorCause() []string {
 	}
 }
 
-func (err ErrZettelIdsExhausted) ErrorRecovery() []string {
+func (err ErrZettelIdsExhausted) GetErrorRecovery() []string {
 	return []string{
 		"zettel id's must be added via the TODO command",
 	}
