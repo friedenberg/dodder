@@ -31,14 +31,14 @@ function deinit_force() { # @test
 	assert_success
 	# assert_output - <<-EOM
 	# 	[!md @$(get_type_blob_sha) !toml-type-v1]
-	# 	[konfig @$(get_konfig_sha) !toml-config-v1]
+	# 	[konfig @$(get_konfig_sha) !toml-config-v2]
 	# EOM
 
 	run_dodder last
 	assert_success
 	assert_output - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 }
 

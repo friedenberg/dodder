@@ -105,7 +105,7 @@ function clone_history_zettel_type_tag { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @6063d0d9eb30a540621df61a049ed21f1753727699e12a71ba4cf22bd87e3677 !toml-config-v1]
+		[konfig @09918a3aa850bd731ab8d4d28d71caed65c0296be5b15a27b83247bf7b12e467 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -135,7 +135,7 @@ function clone_history_zettel_type_tag_stdio_local { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @6063d0d9eb30a540621df61a049ed21f1753727699e12a71ba4cf22bd87e3677 !toml-config-v1]
+		[konfig @09918a3aa850bd731ab8d4d28d71caed65c0296be5b15a27b83247bf7b12e467 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -165,7 +165,7 @@ function clone_history_one_zettel_stdio_local { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 B)
-		[konfig @6063d0d9eb30a540621df61a049ed21f1753727699e12a71ba4cf22bd87e3677 !toml-config-v1]
+		[konfig @09918a3aa850bd731ab8d4d28d71caed65c0296be5b15a27b83247bf7b12e467 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 }
@@ -186,7 +186,7 @@ function clone_history_zettel_type_tag_stdio_ssh { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @6063d0d9eb30a540621df61a049ed21f1753727699e12a71ba4cf22bd87e3677 !toml-config-v1]
+		[konfig @09918a3aa850bd731ab8d4d28d71caed65c0296be5b15a27b83247bf7b12e467 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -254,7 +254,7 @@ function clone_archive_history_default_allow_conflicts { # @test
 		copied Blob [0-9a-f]+ \([0-9]+ B)
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[konfig @[0-9a-f]+ !toml-config-v1]
+		\[konfig @[0-9a-f]+ !toml-config-v2]
 		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
@@ -268,7 +268,7 @@ function clone_archive_history_default_allow_conflicts { # @test
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[konfig @[0-9a-f]+ !toml-config-v1]
+		\[konfig @[0-9a-f]+ !toml-config-v2]
 		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
@@ -304,7 +304,7 @@ function clone_history_zettel_type_tag_port { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @b2c9398d2585afe1be26ed36a13703c051311256dc9dab03cf826b377ba237a6 !toml-config-v1]
+		[konfig @b2c9398d2585afe1be26ed36a13703c051311256dc9dab03cf826b377ba237a6 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

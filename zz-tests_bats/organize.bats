@@ -1316,7 +1316,7 @@ function organize_new_objects_default_tags { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @e2d4dd609d2ee1165e66f199930621a493a4440303fd6f55e3bf9bf34b936f09 !toml-config-v1]
+		[konfig @d87979c06c24e330e785eb7d985f2f38be6310f25ddbc037b58b1c5651b24d43 !toml-config-v2]
 	EOM
 
 	run_dodder organize -mode output-only
@@ -1437,7 +1437,7 @@ function organize_default_tags_workspace { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @e2d4dd609d2ee1165e66f199930621a493a4440303fd6f55e3bf9bf34b936f09 !toml-config-v1]
+		[konfig @d87979c06c24e330e785eb7d985f2f38be6310f25ddbc037b58b1c5651b24d43 !toml-config-v2]
 	EOM
 
 	cat >.dodder-workspace <<-EOM
@@ -1500,7 +1500,7 @@ function organize_dot_operator_workspace_delete_files { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v1]
+		[konfig @920a6a8fe55112968d75a2c77961a311343cfd62cdcc2305aff913afee7fa638 !toml-config-v2]
 	EOM
 
 	cat >.dodder-workspace <<-EOM

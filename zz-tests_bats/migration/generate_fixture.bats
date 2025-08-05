@@ -42,14 +42,14 @@ function generate { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder show "${cmd_def[@]}" -format text :konfig
 	assert_success
 	assert_output - <<-EOM
 		---
-		! toml-config-v1
+		! toml-config-v2
 		---
 
 		[defaults]
@@ -65,16 +65,25 @@ function generate { # @test
 		config = 'konfig'
 
 		[cli-output]
-		print-matched-dormant = false
-		print-shas = false
-		print-flush = false
-		print-unchanged = false
-		print-colors = false
-		print-inventory_lists = false
+		PrintIncludeDescription = false
+		PrintTime = false
+		PrintTagsAlways = false
+		PrintEmptyShas = false
+		PrintIncludeTypes = false
+		PrintTai = false
+		DescriptionInBox = false
+		ExcludeFields = false
+		PrintMatchedDormant = false
+		PrintShas = false
+		PrintFlush = false
+		PrintUnchanged = false
+		PrintColors = false
+		PrintInventoryLists = false
+		Newlines = false
 
-		[cli-output.abbreviations]
-		zettel-ids = false
-		shas = false
+		[cli-output.Abbreviations]
+		ZettelIds = false
+		Shas = false
 
 		[tools]
 		merge = ['vimdiff']

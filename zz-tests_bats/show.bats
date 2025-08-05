@@ -397,13 +397,13 @@ function show_simple_tag_history { # @test
 function show_konfig { # @test
 	run_dodder show +konfig
 	assert_output_unsorted - <<-EOM
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder show -format text :konfig
 	assert_output - <<-EOM
 		---
-		! toml-config-v1
+		! toml-config-v2
 		---
 
 		[defaults]
@@ -419,16 +419,25 @@ function show_konfig { # @test
 		config = 'konfig'
 
 		[cli-output]
-		print-matched-dormant = false
-		print-shas = false
-		print-flush = false
-		print-unchanged = false
-		print-colors = false
-		print-inventory_lists = false
+		PrintIncludeDescription = false
+		PrintTime = false
+		PrintTagsAlways = false
+		PrintEmptyShas = false
+		PrintIncludeTypes = false
+		PrintTai = false
+		DescriptionInBox = false
+		ExcludeFields = false
+		PrintMatchedDormant = false
+		PrintShas = false
+		PrintFlush = false
+		PrintUnchanged = false
+		PrintColors = false
+		PrintInventoryLists = false
+		Newlines = false
 
-		[cli-output.abbreviations]
-		zettel-ids = false
-		shas = false
+		[cli-output.Abbreviations]
+		ZettelIds = false
+		Shas = false
 
 		[tools]
 		merge = ['vimdiff']
@@ -443,7 +452,7 @@ function show_history_all { # @test
 		Tag tag-2 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Tag tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Tag tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		Config konfig $(get_konfig_sha) !toml-config-v1
+		Config konfig $(get_konfig_sha) !toml-config-v2
 		Type !md $(get_type_blob_sha) !toml-type-v1
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"

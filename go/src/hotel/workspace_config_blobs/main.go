@@ -13,6 +13,10 @@ type (
 		GetDefaults() repo_configs.Defaults
 	}
 
+	ConfigWithRepo interface {
+		GetRepoConfig() repo_configs.Config
+	}
+
 	ConfigTemporary interface {
 		Config
 		temporaryWorkspace()

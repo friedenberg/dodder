@@ -2,14 +2,14 @@
 
 package repo_configs
 
-type TestDryRunOnly struct {
+type DryRunOnly struct {
 	DryRun bool
 }
 
-func (config *TestDryRunOnly) IsDryRun() bool {
+func (config *DryRunOnly) IsDryRun() bool {
 	return config.DryRun
 }
 
-func (config *TestDryRunOnly) SetDryRun(v bool) {
+func (config *DryRunOnly) SetDryRun(v bool) {
 	config.DryRun = v
 }

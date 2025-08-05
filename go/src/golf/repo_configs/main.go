@@ -35,7 +35,7 @@ var (
 func Default(defaultType ids.Type) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),
-		Blob: V1{
+		Blob: V2{
 			Defaults: DefaultsV1{
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),

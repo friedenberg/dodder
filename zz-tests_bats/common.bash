@@ -154,7 +154,7 @@ function run_dodder_init {
   assert_success
   assert_output - <<-EOM
 [!md @$(get_type_blob_sha) !toml-type-v1]
-[konfig @$(get_konfig_sha) !toml-config-v1]
+[konfig @$(get_konfig_sha) !toml-config-v2]
 EOM
 
   run_dodder_init_workspace
@@ -170,7 +170,7 @@ function get_konfig_sha() {
   if [[ $storeVersionCurrent -le 10 ]]; then
     echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
   else
-    echo -n "d23cb9e6237446e0ff798250c9e82862f29afd997581c9aefdf4916cebd00b90"
+    echo -n "9e0223d9e8089f9aecd2f699c899edde27afe8b7753add593d3f6e3129673d43"
   fi
 }
 

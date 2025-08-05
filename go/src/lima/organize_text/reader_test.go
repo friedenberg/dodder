@@ -66,7 +66,7 @@ func makeAssignmentLineReader() reader {
 	return reader{
 		options: Options{
 			wasMade:       true,
-			Config:        &repo_configs.TestDryRunOnly{},
+			Config:        &repo_configs.DryRunOnly{},
 			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxCheckedOut(
 				string_format_writer.ColorOptions{},

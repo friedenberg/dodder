@@ -177,6 +177,14 @@ test-bats $PATH=(dir_build + ":" + env("PATH")):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test
 
+# Runs all bats tests but filters output to only show failed test files
+test-bats-failed_files $PATH=(dir_build + ":" + env("PATH")):
+  just ../zz-tests_bats/test-generate_fixtures
+  just ../zz-tests_bats/test | \
+    grep "#  in test file " | \
+    grep -o '[^[:space:]]*\.bats' | \
+    sort -u
+
 version_next := shell("der-next info || echo '\n\ngetting next version failed'")
 
 test-bats-next *args:

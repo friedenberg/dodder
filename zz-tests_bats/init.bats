@@ -80,7 +80,7 @@ function init_and_reindex { # @test
 	run_dodder show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder reindex
@@ -89,7 +89,7 @@ function init_and_reindex { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder reindex
@@ -98,7 +98,7 @@ function init_and_reindex { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 }
 
@@ -118,7 +118,7 @@ function init_and_deinit { # @test
 	run_dodder show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	# run_dodder deinit
@@ -157,7 +157,7 @@ function init_with_non_xdg { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 }
 
@@ -232,7 +232,7 @@ function init_with_age { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run test -f .xdg/data/dodder/config-permanent
@@ -255,7 +255,7 @@ function init_with_json_inventory_list_type { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder show :b
