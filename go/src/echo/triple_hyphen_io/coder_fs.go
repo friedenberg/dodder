@@ -9,13 +9,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
-func DecodeFromFile[
+func DecodeFromFileInto[
 	BLOB any,
 	BLOB_PTR interfaces.Ptr[BLOB],
 ](
+	typedBlob *TypedBlob[BLOB],
 	coders CoderToTypedBlob[BLOB],
 	path string,
-) (typedBlob TypedBlob[BLOB], err error) {
+) (err error) {
 	var file *os.File
 
 	if file, err = files.OpenExclusiveReadOnly(
@@ -27,7 +28,22 @@ func DecodeFromFile[
 
 	defer errors.DeferredCloser(&err, file)
 
-	if _, err = coders.DecodeFrom(&typedBlob, file); err != nil {
+	if _, err = coders.DecodeFrom(typedBlob, file); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func DecodeFromFile[
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
+](
+	coders CoderToTypedBlob[BLOB],
+	path string,
+) (typedBlob TypedBlob[BLOB], err error) {
+	if err = DecodeFromFileInto(&typedBlob, coders, path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

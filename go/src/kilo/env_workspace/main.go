@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -77,8 +78,9 @@ func Make(
 		outputEnv.isTemporary = true
 		outputEnv.blob = workspace_config_blobs.Temporary{}
 	} else {
-		if err = workspace_config_blobs.DecodeFromFile(
+		if err = triple_hyphen_io.DecodeFromFileInto(
 			&object,
+			workspace_config_blobs.Coder,
 			workspaceFile,
 		); err != nil {
 			err = errors.BadRequestf("failed to decode `%s`: %w", workspaceFile, err)
@@ -246,7 +248,8 @@ func (env *env) CreateWorkspace(
 
 	env.dir = env.GetCwd()
 
-	if err = workspace_config_blobs.EncodeToFile(
+	if err = triple_hyphen_io.EncodeToFile[workspace_config_blobs.Config](
+		workspace_config_blobs.Coder,
 		&object,
 		env.GetWorkspaceConfigFilePath(),
 	); errors.IsExist(err) {
