@@ -31,13 +31,13 @@ type Checkout struct {
 	Organize        bool
 }
 
-func (c *Checkout) SetFlagSet(f *flag.FlagSet) {
-	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
-	f.BoolVar(&c.Organize, "organize", false, "")
-	c.CheckoutOptions.SetFlagSet(f)
+func (cmd *Checkout) SetFlagSet(f *flag.FlagSet) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	f.BoolVar(&cmd.Organize, "organize", false, "")
+	cmd.CheckoutOptions.SetFlagSet(f)
 }
 
-func (c Checkout) ModifyBuilder(b *query.Builder) {
+func (cmd Checkout) ModifyBuilder(b *query.Builder) {
 	b.
 		WithPermittedSigil(ids.SigilLatest).
 		WithPermittedSigil(ids.SigilHidden).

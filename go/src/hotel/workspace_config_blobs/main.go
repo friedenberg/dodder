@@ -12,25 +12,39 @@ import (
 )
 
 type (
-	Blob interface {
+	Config interface {
 		GetDefaults() repo_configs.Defaults
-		GetDefaultQueryGroup() string
+	}
+
+	ConfigTemporary interface {
+		Config
+		temporaryWorkspace()
+	}
+
+	ConfigWithDefaultQueryString interface {
+		Config
+		GetDefaultQueryString() string
 	}
 )
 
-type TypeWithBlob = *triple_hyphen_io.TypedBlob[*Blob]
+var (
+	_ ConfigWithDefaultQueryString = V0{}
+	_ ConfigTemporary              = Temporary{}
+)
 
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[TypeWithBlob]{
+type TypedConfig = *triple_hyphen_io.TypedBlob[*Config]
+
+var coders = map[string]interfaces.CoderBufferedReadWriter[TypedConfig]{
 	ids.TypeTomlWorkspaceConfigV0: blobV0Coder{},
 }
 
-var Coder = triple_hyphen_io.Coder[TypeWithBlob]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*Blob]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
+var Coder = triple_hyphen_io.Coder[TypedConfig]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[*Config]{},
+	Blob:     triple_hyphen_io.CoderTypeMap[*Config](coders),
 }
 
 func DecodeFromFile(
-	object TypeWithBlob,
+	object TypedConfig,
 	path string,
 ) (err error) {
 	var file *os.File
@@ -54,7 +68,7 @@ func DecodeFromFile(
 }
 
 func EncodeToFile(
-	object TypeWithBlob,
+	object TypedConfig,
 	path string,
 ) (err error) {
 	var file *os.File

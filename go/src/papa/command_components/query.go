@@ -13,11 +13,11 @@ type Query struct {
 	sku.ExternalQueryOptions
 }
 
-func (cmd *Query) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Query) SetFlagSet(flagSet *flag.FlagSet) {
 	// TODO switch to repo
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
-	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
-	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
+	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
+	flagSet.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
+	flagSet.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
 }
 
 func (cmd Query) MakeQueryIncludingWorkspace(

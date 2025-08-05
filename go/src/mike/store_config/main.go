@@ -58,7 +58,7 @@ type (
 
 		Initialize(
 			dirLayout env_repo.Env,
-			kcli repo_config_cli.Blob,
+			kcli repo_config_cli.Config,
 		) (err error)
 
 		Reset() error
@@ -112,7 +112,7 @@ func (store *store) Reset() error {
 
 func (store *store) Initialize(
 	envRepo env_repo.Env,
-	cli repo_config_cli.Blob,
+	cli repo_config_cli.Config,
 ) (err error) {
 	store.envRepo = envRepo
 	store.config.CLI = cli

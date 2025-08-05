@@ -19,19 +19,19 @@ func (cmd EnvRepo) MakeEnvRepo(
 ) env_repo.Env {
 	dir := env_dir.MakeDefault(
 		req,
-		req.Blob.Debug,
+		req.Config.Debug,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Blob,
+		req.Config,
 		env_ui.Options{},
 	)
 
 	var envRepo env_repo.Env
 
 	envRepoOptions := env_repo.Options{
-		BasePath:                req.Blob.BasePath,
+		BasePath:                req.Config.BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 

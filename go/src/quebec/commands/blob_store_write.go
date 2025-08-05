@@ -53,7 +53,7 @@ type answer struct {
 func (cmd BlobStoreWrite) Run(req command.Request) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		req,
-		req.Blob,
+		req.Config,
 		env_ui.Options{},
 		local_working_copy.OptionsEmpty,
 	)

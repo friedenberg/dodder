@@ -28,8 +28,6 @@ type Edit struct {
 
 	complete command_components.Complete
 
-	// TODO-P3 add force
-	IgnoreWorkspace bool
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
@@ -40,16 +38,9 @@ func (cmd *Edit) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.Checkout.SetFlagSet(flagSet)
 
 	flagSet.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
-
-	flagSet.BoolVar(
-		&cmd.IgnoreWorkspace,
-		"ignore-workspace",
-		false,
-		"ignore any workspaces that may be present and checkout the object in a temporary workspace",
-	)
 }
 
-func (c Edit) CompletionGenres() ids.Genre {
+func (cmd Edit) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Tag,
 		genres.Zettel,

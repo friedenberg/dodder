@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 )
 
-type Blob struct {
+type Config struct {
 	BasePath string
 
 	Debug            debug.Options
@@ -20,6 +20,7 @@ type Blob struct {
 	dryRun           bool
 	IgnoreHookErrors bool
 	Hooks            string
+	IgnoreWorkspace  bool
 
 	CheckoutCacheEnabled bool
 	PredictableZettelIds bool
@@ -31,7 +32,7 @@ type Blob struct {
 }
 
 // TODO add support for all flags
-func (config Blob) GetCLIFlags() (flags []string) {
+func (config Config) GetCLIFlags() (flags []string) {
 	flags = append(
 		flags,
 		fmt.Sprintf("-print-time=%t", config.PrintOptions.PrintTime),
@@ -48,7 +49,7 @@ func (config Blob) GetCLIFlags() (flags []string) {
 	return
 }
 
-func (config *Blob) SetFlagSet(flagSet *flag.FlagSet) {
+func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
 	flagSet.Var(&config.Debug, "debug", "debugging options")
@@ -56,6 +57,13 @@ func (config *Blob) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.BoolVar(&config.dryRun, "dry-run", false, "")
 	flagSet.BoolVar(&config.Verbose, "verbose", false, "")
 	flagSet.BoolVar(&config.Quiet, "quiet", false, "")
+
+	flagSet.BoolVar(
+		&config.IgnoreWorkspace,
+		"ignore-workspace",
+		false,
+		"ignore any workspaces that may be present and checkout the object in a temporary workspace",
+	)
 
 	flagSet.BoolVar(
 		&config.CheckoutCacheEnabled,
@@ -93,13 +101,13 @@ func (config *Blob) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.Var(&config.Description, "comment", "Comment for inventory list")
 }
 
-func Default() (c Blob) {
+func Default() (c Config) {
 	c.PrintOptions = options_print.Default().GetPrintOptions()
 
 	return
 }
 
-func (config *Blob) ApplyPrintOptionsConfig(
+func (config *Config) ApplyPrintOptionsConfig(
 	printOptions options_print.Options,
 ) {
 	cliSet := config.PrintOptions
@@ -107,22 +115,22 @@ func (config *Blob) ApplyPrintOptionsConfig(
 	config.PrintOptions.Merge(cliSet, config.maskPrintOptions)
 }
 
-func (config Blob) UsePredictableZettelIds() bool {
+func (config Config) UsePredictableZettelIds() bool {
 	return config.PredictableZettelIds
 }
 
-func (config Blob) UsePrintTime() bool {
+func (config Config) UsePrintTime() bool {
 	return config.PrintOptions.PrintTime
 }
 
-func (config Blob) UsePrintTags() bool {
+func (config Config) UsePrintTags() bool {
 	return config.PrintOptions.PrintTagsAlways
 }
 
-func (config Blob) IsDryRun() bool {
+func (config Config) IsDryRun() bool {
 	return config.dryRun
 }
 
-func (config *Blob) SetDryRun(v bool) {
+func (config *Config) SetDryRun(v bool) {
 	config.dryRun = v
 }

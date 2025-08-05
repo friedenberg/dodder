@@ -209,8 +209,8 @@ func (buildState *buildState) addDefaultsIfNecessary() {
 }
 
 func (buildState *buildState) parseTokens() (err error) {
-	q := buildState.makeQuery()
-	stack := []stackEl{q}
+	query := buildState.makeQuery()
+	stack := []stackEl{query}
 
 	isNegated := false
 	isExact := false
@@ -262,7 +262,7 @@ LOOP:
 
 				buildState.scanner.Unscan()
 
-				if err = buildState.parseSigilsAndGenres(q); err != nil {
+				if err = buildState.parseSigilsAndGenres(query); err != nil {
 					err = errors.Wrapf(err, "Seq: %q", seq)
 					return
 				}
@@ -277,10 +277,10 @@ LOOP:
 
 				// left: one/uno, partition: ., right: zettel
 				case right.MatchAll(doddish.TokenTypeIdentifier):
-					if err = q.AddString(string(right.At(0).Contents)); err != nil {
+					if err = query.AddString(string(right.At(0).Contents)); err != nil {
 						err = nil
 					} else {
-						if err = buildState.addSigilFromOp(q, partition.Contents[0]); err != nil {
+						if err = buildState.addSigilFromOp(query, partition.Contents[0]); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -290,7 +290,7 @@ LOOP:
 
 					// left: !md, partition: ., right: ''
 				case right.Len() == 0:
-					if err = buildState.addSigilFromOp(q, partition.Contents[0]); err != nil {
+					if err = buildState.addSigilFromOp(query, partition.Contents[0]); err != nil {
 						err = nil
 					} else {
 						seq = left
@@ -308,7 +308,12 @@ LOOP:
 			// elements as per the above and read that and force the genre and
 			// sigils
 			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
-				err = errors.BadRequestf("not a valid object id: %q", seq)
+				if errors.Is(err, doddish.ErrUnsupportedSeq{}) {
+					err = errors.BadRequest(err)
+				} else {
+					err = errors.Wrap(err)
+				}
+
 				return
 			}
 
@@ -329,7 +334,7 @@ LOOP:
 					pid,
 				)
 
-				if err = q.addPinnedObjectId(buildState, pid); err != nil {
+				if err = query.addPinnedObjectId(buildState, pid); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -374,19 +379,19 @@ LOOP:
 		return
 	}
 
-	if q.IsEmpty() {
+	if query.IsEmpty() {
 		return
 	}
 
-	if q.Genre.IsEmpty() && !buildState.builder.requireNonEmptyQuery {
-		q.Genre = buildState.defaultGenres
+	if query.Genre.IsEmpty() && !buildState.builder.requireNonEmptyQuery {
+		query.Genre = buildState.defaultGenres
 	}
 
-	if q.Sigil.IsEmpty() {
-		q.Sigil = buildState.defaultSigil
+	if query.Sigil.IsEmpty() {
+		query.Sigil = buildState.defaultSigil
 	}
 
-	if err = buildState.group.add(q); err != nil {
+	if err = buildState.group.add(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

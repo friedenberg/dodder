@@ -50,7 +50,7 @@ func MakeDefaultNoInit(
 
 func MakeFromXDGDotenvPath(
 	context interfaces.Context,
-	config repo_config_cli.Blob,
+	config repo_config_cli.Config,
 	xdgDotenvPath string,
 ) env {
 	dotenv := xdg.Dotenv{

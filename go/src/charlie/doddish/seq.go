@@ -24,7 +24,7 @@ func (seq Seq) At(idx int) Token {
 	return seq[idx]
 }
 
-func (a Seq) EqualsSeq(b Seq) bool {
+func (seq Seq) EqualsSeq(b Seq) bool {
 	return false
 }
 
@@ -58,11 +58,11 @@ func (seq Seq) String() string {
 	return sb.String()
 }
 
-func (src Seq) Clone() (dst Seq) {
-	dst = make(Seq, len(src))
+func (seq Seq) Clone() (dst Seq) {
+	dst = make(Seq, len(seq))
 
-	for i := range src {
-		dst[i] = src[i].Clone()
+	for i := range seq {
+		dst[i] = seq[i].Clone()
 	}
 
 	return

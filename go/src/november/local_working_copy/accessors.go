@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
@@ -41,6 +42,10 @@ func (local *Repo) GetEnvLocal() env_local.Env {
 
 func (local *Repo) GetEnvWorkspace() env_workspace.Env {
 	return local.envWorkspace
+}
+
+func (local *Repo) GetWorkspaceConfig() workspace_config_blobs.Config {
+	return local.GetEnvWorkspace().GetWorkspaceConfig()
 }
 
 func (local *Repo) GetEnvLua() env_lua.Env {

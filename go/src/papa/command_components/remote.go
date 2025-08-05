@@ -154,7 +154,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 	case repo_blobs.TomlXDGV0:
 		envDir := env_dir.MakeWithXDG(
 			req,
-			req.Blob.Debug,
+			req.Config.Debug,
 			xdg.XDG{
 				Data:    blob.Data,
 				Config:  blob.Config,
@@ -166,7 +166,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 
 		envUI := env_ui.Make(
 			req,
-			req.Blob,
+			req.Config,
 			env.GetOptions(),
 		)
 

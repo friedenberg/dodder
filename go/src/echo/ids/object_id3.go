@@ -18,7 +18,7 @@ func (oid *objectId2) ReadFromSeq(
 ) (err error) {
 	switch {
 	case seq.Len() == 0:
-		err = errors.ErrorWithStackf("empty seq")
+		err = errors.Wrap(doddish.ErrEmptySeq)
 		return
 
 		// tag
@@ -78,10 +78,10 @@ func (oid *objectId2) ReadFromSeq(
 		doddish.TokenMatcherOp(doddish.OpSigilExternal),
 		doddish.TokenTypeIdentifier,
 	):
-		var t Tai
+		var tai Tai
 
-		if err = t.Set(seq.String()); err != nil {
-			err = errors.ErrorWithStackf("unsupported seq: %q, %#v", seq, seq)
+		if err = tai.Set(seq.String()); err != nil {
+			err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
 			return
 		}
 
@@ -92,7 +92,7 @@ func (oid *objectId2) ReadFromSeq(
 		return
 
 	default:
-		err = errors.ErrorWithStackf("unsupported seq: %q, %#v", seq, seq)
+		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
 		return
 	}
 }

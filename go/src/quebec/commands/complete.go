@@ -76,7 +76,7 @@ func (cmd Complete) Run(req command.Request) {
 
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
-	(&repo_config_cli.Blob{}).SetFlagSet(flagSet)
+	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
 
 	if subcmd, ok := subcmd.(interfaces.CommandComponent); ok {
 		subcmd.SetFlagSet(flagSet)

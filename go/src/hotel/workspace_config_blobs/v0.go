@@ -18,30 +18,26 @@ type V0 struct {
 	Query string `toml:"query,omitempty"`
 }
 
-func (blob V0) GetWorkspaceConfig() Blob {
-	return blob
-}
-
 func (blob V0) GetDefaults() repo_configs.Defaults {
 	return blob.Defaults
 }
 
-func (blob V0) GetDefaultQueryGroup() string {
+func (blob V0) GetDefaultQueryString() string {
 	return blob.Query
 }
 
 type blobV0Coder struct{}
 
 func (blobV0Coder) DecodeFrom(
-	subject TypeWithBlob,
+	typedBlob TypedConfig,
 	reader *bufio.Reader,
-) (n int64, err error) {
-	blob := Blob(&V0{})
-	subject.Blob = &blob
+) (bytesRead int64, err error) {
+	blob := Config(&V0{})
+	typedBlob.Blob = &blob
 
 	dec := toml.NewDecoder(reader)
 
-	if err = dec.Decode(*subject.Blob); err != nil {
+	if err = dec.Decode(*typedBlob.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {
@@ -54,12 +50,12 @@ func (blobV0Coder) DecodeFrom(
 }
 
 func (blobV0Coder) EncodeTo(
-	subject TypeWithBlob,
+	typedBlob TypedConfig,
 	writer *bufio.Writer,
-) (n int64, err error) {
+) (bytesWritten int64, err error) {
 	dec := toml.NewEncoder(writer)
 
-	if err = dec.Encode(*subject.Blob); err != nil {
+	if err = dec.Encode(*typedBlob.Blob); err != nil {
 		if err == io.EOF {
 			err = nil
 		} else {

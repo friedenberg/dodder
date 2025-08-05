@@ -26,10 +26,10 @@ type Env interface {
 	AssertNotTemporary(interfaces.Context)
 	AssertNotTemporaryOrOfferToCreate(interfaces.Context)
 	IsTemporary() bool
-	GetWorkspaceConfig() workspace_config_blobs.Blob
+	GetWorkspaceConfig() workspace_config_blobs.Config
 	GetWorkspaceConfigFilePath() string
 	GetDefaults() repo_configs.Defaults
-	CreateWorkspace(workspace_config_blobs.Blob) (err error)
+	CreateWorkspace(workspace_config_blobs.Config) (err error)
 	GetStore() *Store
 
 	// TODO identify users of this and reduce / isolate them
@@ -59,7 +59,7 @@ func Make(
 		configMutable: config,
 	}
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Config]{
 		Type: ids.Type{},
 	}
 
@@ -146,7 +146,7 @@ type env struct {
 	dir string
 
 	configMutable repo_configs.Config
-	blob          workspace_config_blobs.Blob
+	blob          workspace_config_blobs.Config
 	defaults      repo_configs.DefaultsV1
 
 	storeFS *store_fs.Store
@@ -213,7 +213,7 @@ func (env *env) IsTemporary() bool {
 	return env.isTemporary
 }
 
-func (env *env) GetWorkspaceConfig() workspace_config_blobs.Blob {
+func (env *env) GetWorkspaceConfig() workspace_config_blobs.Config {
 	return env.blob
 }
 
@@ -229,11 +229,13 @@ func (env *env) GetStoreFS() *store_fs.Store {
 	return env.storeFS
 }
 
-func (env *env) CreateWorkspace(blob workspace_config_blobs.Blob) (err error) {
+func (env *env) CreateWorkspace(
+	blob workspace_config_blobs.Config,
+) (err error) {
 	env.blob = blob
 	tipe := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Blob]{
+	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Config]{
 		Type: tipe,
 		Blob: &env.blob,
 	}

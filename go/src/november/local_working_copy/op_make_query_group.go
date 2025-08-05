@@ -66,11 +66,11 @@ func (local *Repo) MakeQueryBuilderExcludingHidden(
 }
 
 func (local *Repo) MakeQueryBuilder(
-	dg ids.Genre,
+	genress ids.Genre,
 	options query.BuilderOption,
 ) *query.Builder {
-	if dg.IsEmpty() {
-		dg = ids.MakeGenre(genres.Zettel)
+	if genress.IsEmpty() {
+		genress = ids.MakeGenre(genres.Zettel)
 	}
 
 	envWorkspace := local.GetEnvWorkspace()
@@ -81,7 +81,7 @@ func (local *Repo) MakeQueryBuilder(
 	)
 
 	return local.makeQueryBuilder().
-		WithDefaultGenres(dg).
+		WithDefaultGenres(genress).
 		WithRepoId(ids.RepoId{}).
 		WithFileExtensions(local.GetConfig().GetFileExtensions()).
 		WithExpanders(local.GetStore().GetAbbrStore().GetAbbr()).

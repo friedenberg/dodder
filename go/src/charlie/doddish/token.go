@@ -23,9 +23,9 @@ func (token Token) String() string {
 	return string(token.Contents)
 }
 
-func (src Token) Clone() (dst Token) {
-	dst = src
-	dst.Contents = make([]byte, len(src.Contents))
-	copy(dst.Contents, src.Contents)
+func (token Token) Clone() (dst Token) {
+	dst = token
+	dst.Contents = make([]byte, len(token.Contents))
+	copy(dst.Contents, token.Contents)
 	return
 }

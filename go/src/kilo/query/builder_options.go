@@ -41,7 +41,7 @@ func (options builderOptions) Apply(builder *Builder) *Builder {
 }
 
 type BuilderOptionWorkspaceConfigGetter interface {
-	GetWorkspaceConfig() workspace_config_blobs.Blob
+	GetWorkspaceConfig() workspace_config_blobs.Config
 }
 
 type BuilderOptionWorkspace struct {
@@ -61,15 +61,11 @@ func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
 		return builder
 	}
 
-	defaultQueryGroup := workspaceConfig.GetDefaultQueryGroup()
+	type WithQueryGroup = workspace_config_blobs.ConfigWithDefaultQueryString
 
-	if defaultQueryGroup == "" {
-		return builder
+	if withQueryGroup, ok := workspaceConfig.(WithQueryGroup); ok {
+		builder.defaultQuery = withQueryGroup.GetDefaultQueryString()
 	}
-
-	// TODO add after parsing as an independent query group, rather than as a
-	// literal
-	builder.defaultQuery = defaultQueryGroup
 
 	return builder
 }
@@ -78,6 +74,7 @@ type builderOptionsOld struct {
 	QueryBuilderModifier
 }
 
+// TODO remove this
 func BuilderOptionsOld(o any, remainder ...BuilderOption) builderOptions {
 	var options builderOptionsOld
 

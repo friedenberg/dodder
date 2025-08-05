@@ -28,7 +28,7 @@ func (cmd Genesis) OnTheFirstDay(
 ) *local_working_copy.Repo {
 	envUI := env_ui.Make(
 		req,
-		req.Blob,
+		req.Config,
 		env_ui.Options{},
 	)
 
@@ -42,14 +42,14 @@ func (cmd Genesis) OnTheFirstDay(
 
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
-		req.Blob.Debug,
+		req.Config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	var envRepo env_repo.Env
 
 	options := env_repo.Options{
-		BasePath:                req.Blob.BasePath,
+		BasePath:                req.Config.BasePath,
 		PermitNoDodderDirectory: true,
 	}
 

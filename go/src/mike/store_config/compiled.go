@@ -19,7 +19,7 @@ import (
 type (
 	configRepo    = repo_configs.Config
 	configGenesis = genesis_configs.ConfigPrivate
-	CLI           = repo_config_cli.Blob
+	CLI           = repo_config_cli.Config
 
 	Config struct {
 		*compiled

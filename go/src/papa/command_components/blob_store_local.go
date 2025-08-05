@@ -25,7 +25,7 @@ type BlobStoreWithEnv struct {
 
 func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 	context interfaces.Context,
-	config repo_config_cli.Blob,
+	config repo_config_cli.Config,
 	envOptions env_ui.Options,
 	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {
