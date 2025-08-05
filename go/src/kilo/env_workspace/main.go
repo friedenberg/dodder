@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -59,7 +58,7 @@ func Make(
 		configMutable: config,
 	}
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Config]{
+	object := workspace_config_blobs.TypedConfig{
 		Type: ids.Type{},
 	}
 
@@ -86,7 +85,7 @@ func Make(
 			return
 		}
 
-		outputEnv.blob = *object.Blob
+		outputEnv.blob = object.Blob
 	}
 
 	defaults := outputEnv.configMutable.GetDefaults()
@@ -240,9 +239,9 @@ func (env *env) CreateWorkspace(
 	env.blob = blob
 	tipe := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
 
-	object := triple_hyphen_io.TypedBlob[*workspace_config_blobs.Config]{
+	object := workspace_config_blobs.TypedConfig{
 		Type: tipe,
-		Blob: &env.blob,
+		Blob: env.blob,
 	}
 
 	env.dir = env.GetCwd()

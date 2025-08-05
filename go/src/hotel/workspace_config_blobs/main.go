@@ -25,6 +25,11 @@ type (
 		Config
 		GetDefaultQueryString() string
 	}
+
+	ConfigWithDryRun interface {
+		Config
+		interfaces.ConfigDryRunGetter
+	}
 )
 
 var (
@@ -32,19 +37,26 @@ var (
 	_ ConfigTemporary              = Temporary{}
 )
 
-type TypedConfig = *triple_hyphen_io.TypedBlob[*Config]
+type TypedConfig = triple_hyphen_io.TypedBlob[Config]
 
-var coders = map[string]interfaces.CoderBufferedReadWriter[TypedConfig]{
-	ids.TypeTomlWorkspaceConfigV0: blobV0Coder{},
-}
-
-var Coder = triple_hyphen_io.Coder[TypedConfig]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[*Config]{},
-	Blob:     triple_hyphen_io.CoderTypeMap[*Config](coders),
+var Coder = triple_hyphen_io.CoderToTypedBlob[Config]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[Config]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Config](
+		map[string]interfaces.CoderBufferedReadWriter[*Config]{
+			ids.TypeTomlWorkspaceConfigV0: triple_hyphen_io.CoderToml[
+				Config,
+				*Config,
+			]{
+				Progenitor: func() Config {
+					return &V0{}
+				},
+			},
+		},
+	),
 }
 
 func DecodeFromFile(
-	object TypedConfig,
+	object *TypedConfig,
 	path string,
 ) (err error) {
 	var file *os.File
@@ -68,7 +80,7 @@ func DecodeFromFile(
 }
 
 func EncodeToFile(
-	object TypedConfig,
+	object *TypedConfig,
 	path string,
 ) (err error) {
 	var file *os.File

@@ -16,10 +16,7 @@ type BuilderOption interface {
 	Apply(*Builder) *Builder
 }
 
-type (
-	BuilderOptionsMulti []BuilderOption
-	builderOptions      []BuilderOption
-)
+type builderOptions []BuilderOption
 
 // nil options are permitted, they are just skipped during application
 func BuilderOptions(options ...BuilderOption) builderOptions {
