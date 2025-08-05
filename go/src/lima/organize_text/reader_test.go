@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/juliett/test_config"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
@@ -32,7 +32,7 @@ func makeZettelId(t *testing.T, v string) (k *ids.ObjectId) {
 	return ids.MustObjectId(h)
 }
 
-func makeBez(t *testing.T, v string) (b descriptions.Description) {
+func makeDescription(t *testing.T, v string) (b descriptions.Description) {
 	var err error
 
 	if err = b.Set(v); err != nil {
@@ -42,15 +42,22 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 	return
 }
 
-func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
-	sk := sku.MakeSkuType()
-	sk.GetSkuExternal().Metadata.Description = makeBez(t, bez)
+func makeObjWithZettelIdAndDescription(
+	t *testing.T,
+	zettelId string,
+	description string,
+) (o *obj) {
+	object := sku.MakeSkuType()
+	object.GetSkuExternal().Metadata.Description = makeDescription(
+		t,
+		description,
+	)
 
 	o = &obj{
-		sku: sk,
+		sku: object,
 	}
 
-	o.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, zettelId))
 
 	return
 }
@@ -59,7 +66,7 @@ func makeAssignmentLineReader() reader {
 	return reader{
 		options: Options{
 			wasMade:       true,
-			Config:        &test_config.Config{},
+			Config:        &repo_configs.TestDryRunOnly{},
 			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxCheckedOut(
 				string_format_writer.ColorOptions{},
@@ -85,7 +92,8 @@ func assertEqualObjects(t *ui.T, expected, actual Objects) {
 	}
 
 	for i := range actual {
-		// actualObj, expectedObj := actual[i].External.GetSkuExternal(), expected[i].External.GetSkuExternal()
+		// actualObj, expectedObj := actual[i].External.GetSkuExternal(),
+		// expected[i].External.GetSkuExternal()
 		actualObj := sku.StringMetadataSansTai(actual[i].GetSkuExternal())
 		expectedObj := sku.StringMetadataSansTai(expected[i].GetSkuExternal())
 
@@ -164,8 +172,8 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.Children[0].Objects
 
@@ -246,8 +254,10 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t.T, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t.T, "dos/wow", "two/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t.T, "one/wow", "uno"))
+		expected.Add(
+			makeObjWithZettelIdAndDescription(t.T, "dos/wow", "two/wow"),
+		)
 
 		actual := sub.root.Children[0].Children[0].Objects
 
@@ -331,8 +341,8 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.Children[0].Objects
 
@@ -341,8 +351,8 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.Children[1].Objects
 
@@ -408,8 +418,8 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
-		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "four/wow", "quatro"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "three/wow", "tres"))
 
 		actual := sub.root.Children[0].Objects
 
@@ -418,8 +428,8 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.Children[1].Objects
 
@@ -470,8 +480,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [two/wow] dos/wow
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
-		expected.Add(makeObjWithHinAndBez(t, "two/wow", "dos/wow"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "two/wow", "dos/wow"))
 
 		actual := sub.root.Children[0].Objects
 
@@ -508,7 +518,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [three/wow] tres
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "three/wow", "tres"))
 
 		actual := sub.root.Children[0].Children[0].Children[0].Objects
 
@@ -519,7 +529,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [four/wow] quatro
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "four/wow", "quatro"))
 
 		actual := sub.root.Children[0].Children[0].Objects
 
@@ -532,8 +542,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// `
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithHinAndBez(t, "five/wow", "cinco"))
-		expected.Add(makeObjWithHinAndBez(t, "six/wow", "seis"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "five/wow", "cinco"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "six/wow", "seis"))
 
 		actual := sub.root.Children[0].Children[1].Objects
 

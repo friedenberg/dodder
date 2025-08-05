@@ -15,10 +15,6 @@ type V2 struct {
 	Tools          options_tools.Options `toml:"tools"`
 }
 
-func (config V2) GetRepoConfig() Config {
-	return config
-}
-
 func (config *V2) Reset() {
 	config.FileExtensions.Reset()
 	config.Defaults.Type = ids.Type{}
@@ -35,10 +31,6 @@ func (config *V2) ResetWith(b *V2) {
 	copy(config.Defaults.Tags, b.Defaults.Tags)
 
 	config.PrintOptions = b.PrintOptions
-}
-
-func (config V2) GetFilters() map[string]string {
-	return make(map[string]string)
 }
 
 func (config V2) GetDefaults() Defaults {

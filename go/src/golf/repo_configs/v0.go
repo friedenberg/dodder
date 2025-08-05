@@ -15,12 +15,12 @@ type DefaultsV0 struct {
 	Etiketten []ids.Tag `toml:"etiketten"`
 }
 
-func (d DefaultsV0) GetType() ids.Type {
-	return d.Typ
+func (defaults DefaultsV0) GetType() ids.Type {
+	return defaults.Typ
 }
 
-func (d DefaultsV0) GetTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](d.Etiketten)
+func (defaults DefaultsV0) GetTags() quiter.Slice[ids.Tag] {
+	return quiter.Slice[ids.Tag](defaults.Etiketten)
 }
 
 type V0 struct {
@@ -64,10 +64,6 @@ func (blob *V0) ResetWith(b *V0) {
 	blob.Actions = b.Actions
 	blob.PrintOptions = b.PrintOptions
 	blob.Filters = b.Filters
-}
-
-func (blob V0) GetFilters() map[string]string {
-	return blob.Filters
 }
 
 func (blob V0) GetDefaults() Defaults {

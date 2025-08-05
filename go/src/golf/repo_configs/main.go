@@ -12,8 +12,9 @@ import (
 )
 
 type (
+	TypedBlob = triple_hyphen_io.TypedBlob[Config]
+
 	Config interface {
-		GetRepoConfig() Config
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.Options
@@ -23,16 +24,20 @@ type (
 		GetType() ids.Type
 		GetTags() quiter.Slice[ids.Tag]
 	}
-
-	TypedBlob = triple_hyphen_io.TypedBlob[Config]
 )
 
-func Default(defaultTyp ids.Type) TypedBlob {
+var (
+	_ Config = V0{}
+	_ Config = V1{}
+	_ Config = V2{}
+)
+
+func Default(defaultType ids.Type) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),
 		Blob: V1{
 			Defaults: DefaultsV1{
-				Type: defaultTyp,
+				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
 			},
 			FileExtensions: file_extensions.V1{

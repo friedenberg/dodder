@@ -14,12 +14,12 @@ type DefaultsV1 struct {
 	Tags []ids.Tag `toml:"tags"`
 }
 
-func (d DefaultsV1) GetType() ids.Type {
-	return d.Type
+func (defaults DefaultsV1) GetType() ids.Type {
+	return defaults.Type
 }
 
-func (d DefaultsV1) GetTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](d.Tags)
+func (defaults DefaultsV1) GetTags() quiter.Slice[ids.Tag] {
+	return quiter.Slice[ids.Tag](defaults.Tags)
 }
 
 type DefaultsV1OmitEmpty struct {
@@ -27,12 +27,12 @@ type DefaultsV1OmitEmpty struct {
 	Tags []ids.Tag `toml:"tags,omitempty"`
 }
 
-func (d DefaultsV1OmitEmpty) GetType() ids.Type {
-	return d.Type
+func (defaults DefaultsV1OmitEmpty) GetType() ids.Type {
+	return defaults.Type
 }
 
-func (d DefaultsV1OmitEmpty) GetTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](d.Tags)
+func (defaults DefaultsV1OmitEmpty) GetTags() quiter.Slice[ids.Tag] {
+	return quiter.Slice[ids.Tag](defaults.Tags)
 }
 
 type V1 struct {
@@ -62,10 +62,6 @@ func (blob *V1) ResetWith(b *V1) {
 	copy(blob.Defaults.Tags, b.Defaults.Tags)
 
 	blob.PrintOptions = b.PrintOptions
-}
-
-func (blob V1) GetFilters() map[string]string {
-	return make(map[string]string)
 }
 
 func (blob V1) GetDefaults() Defaults {

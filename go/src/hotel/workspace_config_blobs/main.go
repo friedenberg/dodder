@@ -7,6 +7,8 @@ import (
 )
 
 type (
+	TypedConfig = triple_hyphen_io.TypedBlob[Config]
+
 	Config interface {
 		GetDefaults() repo_configs.Defaults
 	}
@@ -31,5 +33,3 @@ var (
 	_ ConfigWithDefaultQueryString = V0{}
 	_ ConfigTemporary              = Temporary{}
 )
-
-type TypedConfig = triple_hyphen_io.TypedBlob[Config]
