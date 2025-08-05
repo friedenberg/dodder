@@ -77,7 +77,6 @@ func (cmd Edit) Run(req command.Request) {
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptions(
-			query.BuilderOptionsOld(cmd),
 			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(
 				genres.Tag,

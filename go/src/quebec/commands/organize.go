@@ -59,10 +59,6 @@ func (c *Organize) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 }
 
-func (c *Organize) ModifyBuilder(b *query.Builder) {
-	b.
-		WithRequireNonEmptyQuery()
-}
 
 func (c *Organize) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
@@ -101,8 +97,8 @@ func (cmd *Organize) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
+			query.BuilderOptionRequireNonEmptyQuery(),
 			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 			query.BuilderOptionDefaultSigil(ids.SigilLatest),

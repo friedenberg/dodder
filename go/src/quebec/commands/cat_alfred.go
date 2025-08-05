@@ -42,8 +42,7 @@ func (c CatAlfred) CompletionGenres() ids.Genre {
 func (cmd CatAlfred) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
 			query.BuilderOptionDefaultGenres(
 				genres.Tag,
 				genres.Type,

@@ -69,17 +69,12 @@ func (cmd *Diff) Complete(
 	}
 }
 
-func (c Diff) ModifyBuilder(
-	b *query.Builder,
-) {
-	b.WithHidden(nil)
-}
 
 func (cmd Diff) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
+			query.BuilderOptionHidden(nil),
 			query.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)

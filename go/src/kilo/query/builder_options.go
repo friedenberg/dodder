@@ -5,17 +5,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 // TODO consider moving this whole file into its own package
 
-type QueryBuilderModifier interface {
-	ModifyBuilder(*Builder)
-}
 
-type BuilderOptionGetter interface {
-	GetQueryBuilderOptions() builderOptionsOld
-}
 
 type BuilderOption interface {
 	Apply(*Builder) *Builder
@@ -91,28 +86,6 @@ func (options builderOptionWorkspace) Apply(builder *Builder) *Builder {
 	return builder
 }
 
-type builderOptionsOld struct {
-	QueryBuilderModifier
-}
-
-// TODO remove this
-func BuilderOptionsOld(o any, remainder ...BuilderOption) builderOptions {
-	var options builderOptionsOld
-
-	if qbm, ok := o.(QueryBuilderModifier); ok {
-		options.QueryBuilderModifier = qbm
-	}
-
-	return BuilderOptions(append([]BuilderOption{options}, remainder...)...)
-}
-
-func (options builderOptionsOld) Apply(b *Builder) *Builder {
-	if options.QueryBuilderModifier != nil {
-		options.ModifyBuilder(b)
-	}
-
-	return b
-}
 
 type options struct {
 	defaultGenres  ids.Genre
@@ -141,5 +114,40 @@ func BuilderOptionDefaultGenres(
 
 func (options builderOptionDefaultGenre) Apply(builder *Builder) *Builder {
 	builder.options.defaultGenres = ids.Genre(options)
+	return builder
+}
+
+type builderOptionPermittedSigil ids.Sigil
+
+func BuilderOptionPermittedSigil(sigil ids.Sigil) builderOptionPermittedSigil {
+	return builderOptionPermittedSigil(sigil)
+}
+
+func (option builderOptionPermittedSigil) Apply(builder *Builder) *Builder {
+	builder.WithPermittedSigil(ids.Sigil(option))
+	return builder
+}
+
+type builderOptionRequireNonEmptyQuery struct{}
+
+func BuilderOptionRequireNonEmptyQuery() builderOptionRequireNonEmptyQuery {
+	return builderOptionRequireNonEmptyQuery{}
+}
+
+func (option builderOptionRequireNonEmptyQuery) Apply(builder *Builder) *Builder {
+	builder.WithRequireNonEmptyQuery()
+	return builder
+}
+
+type builderOptionHidden struct {
+	hidden sku.Query
+}
+
+func BuilderOptionHidden(hidden sku.Query) builderOptionHidden {
+	return builderOptionHidden{hidden: hidden}
+}
+
+func (option builderOptionHidden) Apply(builder *Builder) *Builder {
+	builder.WithHidden(option.hidden)
 	return builder
 }

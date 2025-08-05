@@ -28,8 +28,7 @@ type Mergetool struct {
 func (cmd Mergetool) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
 			query.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)

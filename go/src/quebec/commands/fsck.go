@@ -35,7 +35,7 @@ func (cmd *Fsck) SetFlagSet(f *flag.FlagSet) {
 func (cmd Fsck) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(cmd),
+		query.BuilderOptions(),
 	)
 
 	printer := localWorkingCopy.PrinterTransacted()

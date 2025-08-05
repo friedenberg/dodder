@@ -53,8 +53,7 @@ func (cmd Push) Run(req command.Request) {
 	case repo_type.TypeWorkingCopy:
 		queryGroup := cmd.MakeQueryIncludingWorkspace(
 			req,
-			query.BuilderOptionsOld(
-				cmd,
+			query.BuilderOptions(
 				query.BuilderOptionDefaultSigil(
 					ids.SigilHistory,
 					ids.SigilHidden,

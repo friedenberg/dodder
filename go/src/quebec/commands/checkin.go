@@ -107,16 +107,12 @@ func (cmd *Checkin) Complete(
 	}
 }
 
-func (c *Checkin) ModifyBuilder(b *query.Builder) {
-	b.
-		WithRequireNonEmptyQuery()
-}
 
 func (cmd Checkin) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
+			query.BuilderOptionRequireNonEmptyQuery(),
 			query.BuilderOptionDefaultSigil(ids.SigilExternal),
 			query.BuilderOptionDefaultGenres(genres.All()...),
 		),

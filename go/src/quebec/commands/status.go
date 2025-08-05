@@ -19,11 +19,6 @@ type Status struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-func (cmd Status) ModifyBuilder(
-	builder *pkg_query.Builder,
-) {
-	builder.WithHidden(nil)
-}
 
 func (cmd Status) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
@@ -34,7 +29,7 @@ func (cmd Status) Run(req command.Request) {
 		pkg_query.BuilderOptions(
 			pkg_query.BuilderOptionDefaultGenres(genres.All()...),
 			pkg_query.BuilderOptionDefaultSigil(ids.SigilExternal),
-			pkg_query.BuilderOptionsOld(cmd),
+			pkg_query.BuilderOptionHidden(nil),
 		),
 		localWorkingCopy,
 		req.PopArgs(),

@@ -37,12 +37,6 @@ func (cmd *Checkout) SetFlagSet(f *flag.FlagSet) {
 	cmd.CheckoutOptions.SetFlagSet(f)
 }
 
-func (cmd Checkout) ModifyBuilder(b *query.Builder) {
-	b.
-		WithPermittedSigil(ids.SigilLatest).
-		WithPermittedSigil(ids.SigilHidden).
-		WithRequireNonEmptyQuery()
-}
 
 func (cmd Checkout) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
@@ -51,7 +45,9 @@ func (cmd Checkout) Run(req command.Request) {
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptions(
-			query.BuilderOptionsOld(cmd),
+			query.BuilderOptionPermittedSigil(ids.SigilLatest),
+			query.BuilderOptionPermittedSigil(ids.SigilHidden),
+			query.BuilderOptionRequireNonEmptyQuery(),
 			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 		),

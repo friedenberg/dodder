@@ -65,15 +65,12 @@ func (c *Clean) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&c.organize, "organize", false, "")
 }
 
-func (req Clean) ModifyBuilder(b *query.Builder) {
-	b.WithHidden(nil)
-}
 
 func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
+			query.BuilderOptionHidden(nil),
 			query.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)

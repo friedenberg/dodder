@@ -45,8 +45,7 @@ func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
 func (cmd Export) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptionsOld(
-			cmd,
+		query.BuilderOptions(
 			query.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
