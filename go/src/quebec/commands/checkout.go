@@ -45,29 +45,29 @@ func (cmd Checkout) ModifyBuilder(b *query.Builder) {
 }
 
 func (cmd Checkout) Run(req command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
-	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	repo := cmd.MakeLocalWorkingCopy(req)
+	envWorkspace := repo.GetEnvWorkspace()
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptions(
 			query.BuilderOptionsOld(cmd),
-			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 		),
-		localWorkingCopy,
+		repo,
 		req.PopArgs(),
 	)
 
 	opCheckout := user_ops.Checkout{
-		Repo:     localWorkingCopy,
+		Repo:     repo,
 		Organize: cmd.Organize,
 		Options:  cmd.CheckoutOptions,
 	}
 
-	envWorkspace.AssertNotTemporaryOrOfferToCreate(localWorkingCopy)
+	envWorkspace.AssertNotTemporaryOrOfferToCreate(repo)
 
 	if _, err := opCheckout.RunQuery(queryGroup); err != nil {
-		localWorkingCopy.Cancel(err)
+		repo.Cancel(err)
 	}
 }

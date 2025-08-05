@@ -13,15 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
-// import "code.linenisgreat.com/dodder/go/src/juliett/sku"
-
-// type ExternalStore interface {
-// 	sku.ExternalStoreReadAllExternalItems
-// 	sku.ExternalStoreUpdateTransacted
-// 	sku.ExternalStoreReadExternalLikeFromObjectIdLike
-// 	QueryCheckedOut
-// }
-
 type Store struct {
 	store_workspace.Supplies
 	store_workspace.StoreLike
@@ -31,23 +22,23 @@ type Store struct {
 	initError error
 }
 
-func (ve *Store) Initialize() (err error) {
-	ve.onceInit.Do(func() {
-		ve.initError = ve.StoreLike.Initialize(ve.Supplies)
-		ve.didInit = true
+func (store *Store) Initialize() (err error) {
+	store.onceInit.Do(func() {
+		store.initError = store.StoreLike.Initialize(store.Supplies)
+		store.didInit = true
 	})
 
-	err = ve.initError
+	err = store.initError
 
 	return
 }
 
-func (ve *Store) Flush() (err error) {
-	if !ve.didInit {
+func (store *Store) Flush() (err error) {
+	if !store.didInit {
 		return
 	}
 
-	if err = ve.StoreLike.Flush(); err != nil {
+	if err = store.StoreLike.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,18 +46,18 @@ func (ve *Store) Flush() (err error) {
 	return
 }
 
-func (s *Store) QueryCheckedOut(
+func (store *Store) QueryCheckedOut(
 	qg *query.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	es, ok := s.StoreLike.(store_workspace.QueryCheckedOut)
+	es, ok := store.StoreLike.(store_workspace.QueryCheckedOut)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,15 +73,15 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (es *Store) ReadAllExternalItems() (err error) {
-	esado, ok := es.StoreLike.(interfaces.WorkspaceStoreReadAllExternalItems)
+func (store *Store) ReadAllExternalItems() (err error) {
+	esado, ok := store.StoreLike.(interfaces.WorkspaceStoreReadAllExternalItems)
 
 	if !ok {
 		err = errors.ErrorWithStackf("store does not support %T", &esado)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,19 +94,19 @@ func (es *Store) ReadAllExternalItems() (err error) {
 	return
 }
 
-func (s *Store) ReadTransactedFromObjectId(
+func (store *Store) ReadTransactedFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
+	es, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,19 +123,19 @@ func (s *Store) ReadTransactedFromObjectId(
 	return
 }
 
-func (s *Store) ReadExternalLikeFromObjectIdLike(
+func (store *Store) ReadExternalLikeFromObjectIdLike(
 	o sku.CommitOptions,
 	k1 interfaces.Stringer,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
+	es, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -161,18 +152,18 @@ func (s *Store) ReadExternalLikeFromObjectIdLike(
 	return
 }
 
-func (s *Store) CheckoutOne(
+func (store *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (cz sku.SkuType, err error) {
-	es, ok := s.StoreLike.(store_workspace.CheckoutOne)
+	es, ok := store.StoreLike.(store_workspace.CheckoutOne)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -188,15 +179,15 @@ func (s *Store) CheckoutOne(
 	return
 }
 
-func (s *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
-	es, ok := s.StoreLike.(store_workspace.DeleteCheckedOut)
+func (store *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
+	es, ok := store.StoreLike.(store_workspace.DeleteCheckedOut)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -211,15 +202,15 @@ func (s *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
 
 // Takes a given sku.Transacted (internal) and updates it with the state of its
 // checked out counterpart (external).
-func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
-	es, ok := s.StoreLike.(store_workspace.UpdateTransacted)
+func (store *Store) UpdateTransacted(z *sku.Transacted) (err error) {
+	es, ok := store.StoreLike.(store_workspace.UpdateTransacted)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -232,15 +223,15 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
-	es, ok := s.StoreLike.(store_workspace.UpdateTransactedFromBlobs)
+func (store *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
+	es, ok := store.StoreLike.(store_workspace.UpdateTransactedFromBlobs)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &es)
+		err = makeErrUnsupportedOperation(store, &es)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -253,20 +244,20 @@ func (s *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
 	return
 }
 
-func (es *Store) GetObjectIdsForString(
+func (store *Store) GetObjectIdsForString(
 	v string,
 ) (k []sku.ExternalObjectId, err error) {
-	if es == nil {
+	if store == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if k, err = es.StoreLike.GetObjectIdsForString(v); err != nil {
+	if k, err = store.StoreLike.GetObjectIdsForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -274,19 +265,19 @@ func (es *Store) GetObjectIdsForString(
 	return
 }
 
-func (s *Store) Open(
+func (store *Store) Open(
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
 	zsc sku.SkuTypeSet,
 ) (err error) {
-	es, ok := s.StoreLike.(store_workspace.Open)
+	es, ok := store.StoreLike.(store_workspace.Open)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &es)
+		err = makeErrUnsupportedOperation(store, &es)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -299,15 +290,15 @@ func (s *Store) Open(
 	return
 }
 
-func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
-	es, ok := s.StoreLike.(sku.BlobSaver)
+func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {
+	es, ok := store.StoreLike.(sku.BlobSaver)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &es)
+		err = makeErrUnsupportedOperation(store, &es)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -320,18 +311,18 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	return
 }
 
-func (s *Store) UpdateCheckoutFromCheckedOut(
+func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	es, ok := s.StoreLike.(store_workspace.UpdateCheckoutFromCheckedOut)
+	es, ok := store.StoreLike.(store_workspace.UpdateCheckoutFromCheckedOut)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -344,17 +335,17 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	return
 }
 
-func (s *Store) ReadCheckedOutFromTransacted(
+func (store *Store) ReadCheckedOutFromTransacted(
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	es, ok := s.StoreLike.(store_workspace.ReadCheckedOutFromTransacted)
+	es, ok := store.StoreLike.(store_workspace.ReadCheckedOutFromTransacted)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -392,19 +383,19 @@ func (store *Store) Merge(
 	return
 }
 
-func (s *Store) MergeCheckedOut(
+func (store *Store) MergeCheckedOut(
 	co *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
-	es, ok := s.StoreLike.(store_workspace.MergeCheckedOut)
+	es, ok := store.StoreLike.(store_workspace.MergeCheckedOut)
 
 	if !ok {
-		err = makeErrUnsupportedOperation(s, &s)
+		err = makeErrUnsupportedOperation(store, &store)
 		return
 	}
 
-	if err = s.Initialize(); err != nil {
+	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

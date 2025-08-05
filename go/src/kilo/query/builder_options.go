@@ -3,8 +3,11 @@ package query
 import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 )
+
+// TODO consider moving this whole file into its own package
 
 type QueryBuilderModifier interface {
 	ModifyBuilder(*Builder)
@@ -40,30 +43,48 @@ func (options builderOptions) Apply(builder *Builder) *Builder {
 	return builder
 }
 
-type BuilderOptionWorkspaceConfigGetter interface {
+type BuilderOptionWorkspaceConfigEnv interface {
+	env_ui.Env
 	GetWorkspaceConfig() workspace_config_blobs.Config
 }
 
-type BuilderOptionWorkspace struct {
-	Env BuilderOptionWorkspaceConfigGetter
+func BuilderOptionWorkspace(
+	env BuilderOptionWorkspaceConfigEnv,
+) BuilderOption {
+	cliConfig := env.GetCLIConfig()
+	var workspaceConfig workspace_config_blobs.Config
+
+	if env != nil {
+		workspaceConfig = env.GetWorkspaceConfig()
+	}
+
+	_, isTemporaryWorkspace := workspaceConfig.(workspace_config_blobs.ConfigTemporary)
+
+	var builder builderOptionWorkspace
+
+	if isTemporaryWorkspace {
+		builder.workspaceConfig = workspaceConfig
+	} else if !cliConfig.IgnoreWorkspace {
+		builder.workspaceConfig = workspaceConfig
+	}
+
+	return builder
 }
 
-func (options BuilderOptionWorkspace) Apply(builder *Builder) *Builder {
-	if options.Env == nil {
+type builderOptionWorkspace struct {
+	workspaceConfig workspace_config_blobs.Config
+}
+
+func (options builderOptionWorkspace) Apply(builder *Builder) *Builder {
+	if options.workspaceConfig == nil {
 		return builder
 	}
 
 	builder.workspaceEnabled = true
 
-	workspaceConfig := options.Env.GetWorkspaceConfig()
-
-	if workspaceConfig == nil {
-		return builder
-	}
-
 	type WithQueryGroup = workspace_config_blobs.ConfigWithDefaultQueryString
 
-	if withQueryGroup, ok := workspaceConfig.(WithQueryGroup); ok {
+	if withQueryGroup, ok := options.workspaceConfig.(WithQueryGroup); ok {
 		builder.defaultQuery = withQueryGroup.GetDefaultQueryString()
 	}
 

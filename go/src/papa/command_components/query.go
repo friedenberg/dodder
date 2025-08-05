@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
+	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 type Query struct {
@@ -23,22 +24,18 @@ func (cmd *Query) SetFlagSet(flagSet *flag.FlagSet) {
 func (cmd Query) MakeQueryIncludingWorkspace(
 	req command.Request,
 	options pkg_query.BuilderOption,
-	workingCopy repo.WorkingCopy,
+	repo *local_working_copy.Repo,
 	args []string,
 ) (query *pkg_query.Query) {
-	if repo, ok := workingCopy.(repo.LocalWorkingCopy); ok {
-		envWorkspace := repo.GetEnvWorkspace()
-
-		options = pkg_query.BuilderOptions(
-			options,
-			pkg_query.BuilderOptionWorkspace{Env: envWorkspace},
-		)
-	}
+	options = pkg_query.BuilderOptions(
+		options,
+		pkg_query.BuilderOptionWorkspace(repo),
+	)
 
 	return cmd.MakeQuery(
 		req,
 		options,
-		workingCopy,
+		repo,
 		args,
 	)
 }

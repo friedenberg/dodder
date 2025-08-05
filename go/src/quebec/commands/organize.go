@@ -97,27 +97,26 @@ func (cmd Organize) Complete(
 }
 
 func (cmd *Organize) Run(req command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
-	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptionsOld(
 			cmd,
-			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(genres.Zettel),
 			query.BuilderOptionDefaultSigil(ids.SigilLatest),
 		),
-		localWorkingCopy,
+		repo,
 		req.PopArgs(),
 	)
 
-	localWorkingCopy.ApplyToOrganizeOptions(&cmd.Options)
+	repo.ApplyToOrganizeOptions(&cmd.Options)
 
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
-	if err := localWorkingCopy.GetStore().QueryTransactedAsSkuType(
+	if err := repo.GetStore().QueryTransactedAsSkuType(
 		queryGroup,
 		func(co sku.SkuType) (err error) {
 			l.Lock()
@@ -126,7 +125,7 @@ func (cmd *Organize) Run(req command.Request) {
 			return skus.Add(co.Clone())
 		},
 	); err != nil {
-		localWorkingCopy.Cancel(err)
+		repo.Cancel(err)
 	}
 
 	defaultQuery := queryGroup.GetDefaultQuery()
@@ -136,8 +135,8 @@ func (cmd *Organize) Run(req command.Request) {
 	}
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Repo: localWorkingCopy,
-		Options: localWorkingCopy.MakeOrganizeOptionsWithQueryGroup(
+		Repo: repo,
+		Options: repo.MakeOrganizeOptionsWithQueryGroup(
 			cmd.Flags,
 			queryGroup,
 		),
@@ -154,7 +153,7 @@ func (cmd *Organize) Run(req command.Request) {
 	tags := query.GetTags(queryGroup)
 
 	if skus.Len() == 0 {
-		workspace := localWorkingCopy.GetEnvWorkspace()
+		workspace := repo.GetEnvWorkspace()
 		workspaceTags := workspace.GetDefaults().GetTags()
 
 		for t := range workspaceTags.All() {
@@ -176,14 +175,14 @@ func (cmd *Organize) Run(req command.Request) {
 		{
 			var err error
 
-			if f, err = localWorkingCopy.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			if f, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+				"*." + repo.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				localWorkingCopy.Cancel(err)
+				repo.Cancel(err)
 			}
 		}
 
-		defer errors.ContextMustClose(localWorkingCopy, f)
+		defer errors.ContextMustClose(repo, f)
 
 		{
 			var err error
@@ -191,7 +190,7 @@ func (cmd *Organize) Run(req command.Request) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				localWorkingCopy.Cancel(err)
+				repo.Cancel(err)
 			}
 		}
 
@@ -203,15 +202,15 @@ func (cmd *Organize) Run(req command.Request) {
 			var err error
 
 			if organizeText, err = readOrganizeTextOp.Run(
-				localWorkingCopy,
+				repo,
 				os.Stdin,
 				organize_text.NewMetadata(queryGroup.RepoId),
 			); err != nil {
-				localWorkingCopy.Cancel(err)
+				repo.Cancel(err)
 			}
 		}
 
-		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(
+		if _, err := repo.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
@@ -219,13 +218,13 @@ func (cmd *Organize) Run(req command.Request) {
 				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			localWorkingCopy.Cancel(err)
+			repo.Cancel(err)
 		}
 
 	case organize_text_mode.ModeOutputOnly:
 		ui.Log().Print("generate organize file and write to stdout")
 		if _, err := createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
-			localWorkingCopy.Cancel(err)
+			repo.Cancel(err)
 		}
 
 	case organize_text_mode.ModeInteractive:
@@ -239,13 +238,13 @@ func (cmd *Organize) Run(req command.Request) {
 		{
 			var err error
 
-			if f, err = localWorkingCopy.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-				"*." + localWorkingCopy.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			if f, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+				"*." + repo.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
-				localWorkingCopy.Cancel(err)
+				repo.Cancel(err)
 			}
 
-			defer errors.ContextMustClose(localWorkingCopy, f)
+			defer errors.ContextMustClose(repo, f)
 		}
 
 		{
@@ -255,7 +254,7 @@ func (cmd *Organize) Run(req command.Request) {
 				f,
 			); err != nil {
 				errors.ContextCancelWithErrorAndFormat(
-					localWorkingCopy,
+					repo,
 					err,
 					"Organize File: %q",
 					f.Name(),
@@ -269,13 +268,13 @@ func (cmd *Organize) Run(req command.Request) {
 			var err error
 
 			if organizeText, err = cmd.readFromVim(
-				localWorkingCopy,
+				repo,
 				f.Name(),
 				createOrganizeFileResults,
 				queryGroup,
 			); err != nil {
 				errors.ContextCancelWithErrorAndFormat(
-					localWorkingCopy,
+					repo,
 					err,
 					"Organize File: %q",
 					f.Name(),
@@ -283,7 +282,7 @@ func (cmd *Organize) Run(req command.Request) {
 			}
 		}
 
-		if _, err := localWorkingCopy.LockAndCommitOrganizeResults(
+		if _, err := repo.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
@@ -291,11 +290,11 @@ func (cmd *Organize) Run(req command.Request) {
 				QueryGroup: queryGroup,
 			},
 		); err != nil {
-			localWorkingCopy.Cancel(err)
+			repo.Cancel(err)
 		}
 
 	default:
-		errors.ContextCancelWithErrorf(localWorkingCopy, "unknown mode")
+		errors.ContextCancelWithErrorf(repo, "unknown mode")
 	}
 }
 

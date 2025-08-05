@@ -49,11 +49,9 @@ func (local *Repo) MakeQueryBuilderExcludingHidden(
 		genre = ids.MakeGenre(genres.Zettel)
 	}
 
-	envWorkspace := local.GetEnvWorkspace()
-
 	options = query.BuilderOptions(
 		options,
-		query.BuilderOptionWorkspace{Env: envWorkspace},
+		query.BuilderOptionWorkspace(local),
 	)
 
 	return local.makeQueryBuilder().
@@ -73,11 +71,9 @@ func (local *Repo) MakeQueryBuilder(
 		genress = ids.MakeGenre(genres.Zettel)
 	}
 
-	envWorkspace := local.GetEnvWorkspace()
-
 	options = query.BuilderOptions(
 		options,
-		query.BuilderOptionWorkspace{Env: envWorkspace},
+		query.BuilderOptionWorkspace(local),
 	)
 
 	return local.makeQueryBuilder().

@@ -28,6 +28,7 @@ type Edit struct {
 
 	complete command_components.Complete
 
+	// TODO-P3 add force
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
@@ -71,14 +72,13 @@ func (cmd *Edit) Complete(
 }
 
 func (cmd Edit) Run(req command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
-	envWorkspace := localWorkingCopy.GetEnvWorkspace()
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
 		query.BuilderOptions(
 			query.BuilderOptionsOld(cmd),
-			query.BuilderOptionWorkspace{Env: envWorkspace},
+			query.BuilderOptionWorkspace(repo),
 			query.BuilderOptionDefaultGenres(
 				genres.Tag,
 				genres.Zettel,
@@ -86,7 +86,7 @@ func (cmd Edit) Run(req command.Request) {
 				genres.Repo,
 			),
 		),
-		localWorkingCopy,
+		repo,
 		req.PopArgs(),
 	)
 
@@ -95,13 +95,13 @@ func (cmd Edit) Run(req command.Request) {
 	}
 
 	opEdit := user_ops.Checkout{
-		Repo:            localWorkingCopy,
+		Repo:            repo,
 		Options:         options,
 		Edit:            true,
 		RefreshCheckout: true,
 	}
 
 	if _, err := opEdit.RunQuery(queryGroup); err != nil {
-		localWorkingCopy.Cancel(err)
+		repo.Cancel(err)
 	}
 }

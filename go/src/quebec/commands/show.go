@@ -87,9 +87,7 @@ func (cmd Show) Run(req command.Request) {
 	query := cmd.MakeQueryIncludingWorkspace(
 		req,
 		pkg_query.BuilderOptions(
-			pkg_query.BuilderOptionWorkspace{
-				Env: repo.GetEnvWorkspace(),
-			},
+			pkg_query.BuilderOptionWorkspace(repo),
 			pkg_query.BuilderOptionDefaultGenres(genres.Zettel),
 		),
 		repo,

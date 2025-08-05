@@ -52,8 +52,8 @@ func Make(
 	config Config,
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	envRepo env_repo.Env,
-) (out *env, err error) {
-	out = &env{
+) (outputEnv *env, err error) {
+	outputEnv = &env{
 		envRepo:       envRepo,
 		Env:           envLocal,
 		configMutable: config,
@@ -63,19 +63,20 @@ func Make(
 		Type: ids.Type{},
 	}
 
-	dir := out.GetCwd()
+	dir := outputEnv.GetCwd()
 
-	workspaceFile := out.findWorkspaceFile(dir, env_repo.FileWorkspace)
+	workspaceFile := outputEnv.findWorkspaceFile(dir, env_repo.FileWorkspace)
 
 	if workspaceFile == "" {
-		workspaceFile = out.findWorkspaceFile(
+		workspaceFile = outputEnv.findWorkspaceFile(
 			dir,
 			fmt.Sprintf(env_repo.FileWorkspaceTemplate, "zit"),
 		)
 	}
 
 	if workspaceFile == "" {
-		out.isTemporary = true
+		outputEnv.isTemporary = true
+		outputEnv.blob = workspace_config_blobs.Temporary{}
 	} else {
 		if err = workspace_config_blobs.DecodeFromFile(
 			&object,
@@ -85,40 +86,44 @@ func Make(
 			return
 		}
 
-		out.blob = *object.Blob
+		outputEnv.blob = *object.Blob
 	}
 
-	defaults := out.configMutable.GetDefaults()
+	defaults := outputEnv.configMutable.GetDefaults()
 
-	out.defaults = repo_configs.DefaultsV1{
+	outputEnv.defaults = repo_configs.DefaultsV1{
 		Type: defaults.GetType(),
 		Tags: defaults.GetTags(),
 	}
 
-	if out.blob != nil {
-		defaults = out.blob.GetDefaults()
+	if outputEnv.blob != nil {
+		defaults = outputEnv.blob.GetDefaults()
 
 		if newType := defaults.GetType(); !newType.IsEmpty() {
-			out.defaults.Type = newType
+			outputEnv.defaults.Type = newType
 		}
 
 		if newTags := defaults.GetTags(); newTags.Len() > 0 {
-			out.defaults.Tags = append(out.defaults.Tags, newTags...)
+			outputEnv.defaults.Tags = append(
+				outputEnv.defaults.Tags,
+				newTags...,
+			)
 		}
 	}
 
-	if out.isTemporary {
-		if out.dir, err = out.GetTempLocal().DirTempWithTemplate(
+	if outputEnv.isTemporary {
+		if outputEnv.dir, err = outputEnv.GetTempLocal().DirTempWithTemplate(
 			"workspace-*",
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		out.dir = out.GetCwd()
+		// TODO determine this based on the blob
+		outputEnv.dir = outputEnv.GetCwd()
 	}
 
-	if out.storeFS, err = store_fs.Make(
+	if outputEnv.storeFS, err = store_fs.Make(
 		config,
 		deletedPrinter,
 		config.GetFileExtensions(),
@@ -128,7 +133,7 @@ func Make(
 		return
 	}
 
-	out.store.StoreLike = out.storeFS
+	outputEnv.store.StoreLike = outputEnv.storeFS
 
 	return
 }
