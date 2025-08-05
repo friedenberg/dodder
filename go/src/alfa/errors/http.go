@@ -11,11 +11,11 @@ func NewHTTPError(statusCode http_statuses.Code) HTTP {
 }
 
 func BadRequest(err error) error {
-	return WithoutStack(Err400BadRequest.Wrap(err))
+	return WithoutStack(Err400BadRequest.WrapHidden(err))
 }
 
 func BadRequestf(format string, args ...any) error {
-	return WithoutStack(Err400BadRequest.Errorf(format, args...))
+	return WithoutStack(Err400BadRequest.ErrorHiddenf(format, args...))
 }
 
 var (
@@ -76,8 +76,17 @@ func (err HTTP) Wrap(underlying error) HTTP {
 	}
 }
 
+func (err HTTP) WrapHidden(underlying error) HTTP {
+	return HTTP{
+		StatusCode: err.StatusCode,
+		underlying: underlying,
+		hideUnwrap: true,
+	}
+}
+
 func (err HTTP) Errorf(format string, args ...any) HTTP {
-	return err.Wrap(fmt.Errorf(format, args...))
+	err = err.WrapHidden(fmt.Errorf(format, args...))
+	return err
 }
 
 // Creates a new error from `format` and `args` a returns a new HTTP error that
@@ -85,9 +94,8 @@ func (err HTTP) Errorf(format string, args ...any) HTTP {
 //
 // The returned error will satisfy the appropriate `IsHTTPError(err, status)`
 // call, but when using `error_coders` to print it, it won't show the HTTP error
-func (err HTTP) ErrorUnwrappedf(format string, args ...any) HTTP {
-	err = err.Wrap(fmt.Errorf(format, args...))
-	err.hideUnwrap = true
+func (err HTTP) ErrorHiddenf(format string, args ...any) HTTP {
+	err = err.WrapHidden(fmt.Errorf(format, args...))
 	return err
 }
 

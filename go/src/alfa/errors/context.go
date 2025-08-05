@@ -345,7 +345,7 @@ func ContextCancelWithErrorf(
 
 func ContextCancelWithBadRequestError(ctx interfaces.Context, err error) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(WithoutStack(Err400BadRequest.Wrap(err)))
+	ctx.Cancel(BadRequest(err))
 }
 
 func ContextCancelWithBadRequestf(
@@ -354,7 +354,7 @@ func ContextCancelWithBadRequestf(
 	values ...any,
 ) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(WithoutStack(Err400BadRequest.Errorf(format, values...)))
+	ctx.Cancel(BadRequestf(format, values...))
 }
 
 func CancelWithNotImplemented(ctx interfaces.ActiveContext) {

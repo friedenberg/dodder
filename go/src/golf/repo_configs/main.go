@@ -12,9 +12,9 @@ import (
 )
 
 type (
-	TypedBlob = triple_hyphen_io.TypedBlob[Config]
+	TypedBlob = triple_hyphen_io.TypedBlob[ConfigOverlay]
 
-	Config interface {
+	ConfigOverlay interface {
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.Options
@@ -27,9 +27,9 @@ type (
 )
 
 var (
-	_ Config = V0{}
-	_ Config = V1{}
-	_ Config = V2{}
+	_ ConfigOverlay = V0{}
+	_ ConfigOverlay = V1{}
+	_ ConfigOverlay = V2{}
 )
 
 func Default(defaultType ids.Type) TypedBlob {

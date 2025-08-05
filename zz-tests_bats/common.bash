@@ -76,9 +76,9 @@ cmd_dodder_def=(
   -abbreviate-zettel-ids=false
   -abbreviate-shas=false
   -predictable-zettel-ids
-  -print-typen=false
+  -print-types=false
   -print-time=false
-  -print-etiketten=true
+  -print-tags=true
   -print-empty-shas=true
   -print-flush=false
   -print-unchanged=false

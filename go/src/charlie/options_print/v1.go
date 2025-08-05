@@ -18,10 +18,7 @@ type abbreviationsV1 struct {
 }
 
 func (abbreviations abbreviationsV1) GetAbbreviations() Abbreviations {
-	return Abbreviations{
-		ZettelIds: abbreviations.ZettelIds,
-		Shas:      abbreviations.Shas,
-	}
+	return Abbreviations(abbreviations)
 }
 
 type boxV1 struct {

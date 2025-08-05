@@ -14,7 +14,7 @@ type (
 	}
 
 	ConfigWithRepo interface {
-		GetRepoConfig() repo_configs.Config
+		GetRepoConfig() repo_configs.ConfigOverlay
 	}
 
 	ConfigTemporary interface {

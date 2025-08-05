@@ -6,31 +6,31 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
-var Coder = triple_hyphen_io.CoderToTypedBlob[Config]{
-	Metadata: triple_hyphen_io.TypedMetadataCoder[Config]{},
-	Blob: triple_hyphen_io.CoderTypeMapWithoutType[Config](
-		map[string]interfaces.CoderBufferedReadWriter[*Config]{
+var Coder = triple_hyphen_io.CoderToTypedBlob[ConfigOverlay]{
+	Metadata: triple_hyphen_io.TypedMetadataCoder[ConfigOverlay]{},
+	Blob: triple_hyphen_io.CoderTypeMapWithoutType[ConfigOverlay](
+		map[string]interfaces.CoderBufferedReadWriter[*ConfigOverlay]{
 			ids.TypeTomlConfigV0: triple_hyphen_io.CoderToml[
-				Config,
-				*Config,
+				ConfigOverlay,
+				*ConfigOverlay,
 			]{
-				Progenitor: func() Config {
+				Progenitor: func() ConfigOverlay {
 					return &V0{}
 				},
 			},
 			ids.TypeTomlConfigV1: triple_hyphen_io.CoderToml[
-				Config,
-				*Config,
+				ConfigOverlay,
+				*ConfigOverlay,
 			]{
-				Progenitor: func() Config {
+				Progenitor: func() ConfigOverlay {
 					return &V1{}
 				},
 			},
 			ids.TypeTomlConfigV2: triple_hyphen_io.CoderToml[
-				Config,
-				*Config,
+				ConfigOverlay,
+				*ConfigOverlay,
 			]{
-				Progenitor: func() Config {
+				Progenitor: func() ConfigOverlay {
 					return &V2{}
 				},
 			},

@@ -11,9 +11,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
-func PrintUsage(ctx interfaces.Context, in error) {
-	if in != nil {
-		defer ctx.Cancel(in)
+func PrintUsage(ctx interfaces.Context, err error) {
+	if err != nil {
+		defer ctx.Cancel(err)
 	}
 
 	ui.Err().Print("Usage for dodder:")

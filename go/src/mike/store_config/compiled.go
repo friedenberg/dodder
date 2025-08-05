@@ -17,7 +17,7 @@ import (
 )
 
 type (
-	configRepo    = repo_configs.Config
+	configRepo    = repo_configs.ConfigOverlay
 	configGenesis = genesis_configs.ConfigPrivate
 	CLI           = repo_config_cli.Config
 

@@ -36,14 +36,14 @@ type (
 		Newlines            bool
 	}
 
-	Blob interface {
+	Getter interface {
 		GetPrintOptions() Options
 	}
 )
 
 var (
-	_ Blob = V0{}
-	_ Blob = V1{}
+	_ Getter = V0{}
+	_ Getter = V1{}
 )
 
 func Default() V1 {
@@ -174,10 +174,11 @@ func (dst *Options) Merge(src Options, mask Options) {
 	dst.Newlines = src.Newlines
 }
 
+// TODO rename flags away from german
 func (dst *Options) AddToFlags(flagSet *flag.FlagSet, mask *Options) {
 	boolVarWithMask(
 		flagSet,
-		"print-typen",
+		"print-types",
 		&dst.PrintIncludeTypes,
 		&mask.PrintIncludeTypes,
 		"",
@@ -218,7 +219,7 @@ func (dst *Options) AddToFlags(flagSet *flag.FlagSet, mask *Options) {
 
 	boolVarWithMask(
 		flagSet,
-		"print-etiketten",
+		"print-tags",
 		&dst.PrintTagsAlways,
 		&mask.PrintTagsAlways,
 		"",
@@ -234,7 +235,7 @@ func (dst *Options) AddToFlags(flagSet *flag.FlagSet, mask *Options) {
 
 	boolVarWithMask(
 		flagSet,
-		"print-matched-archiviert",
+		"print-matched-dormant",
 		&dst.PrintMatchedDormant,
 		&mask.PrintMatchedDormant,
 		"",

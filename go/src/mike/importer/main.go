@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
-var ErrNeedsMerge = errors.Err409Conflict.ErrorUnwrappedf(
+var ErrNeedsMerge = errors.Err409Conflict.ErrorHiddenf(
 	"import failed with conflicts, merging required",
 )
 

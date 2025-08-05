@@ -42,7 +42,7 @@ type Env interface {
 }
 
 type Config interface {
-	repo_configs.Config
+	repo_configs.ConfigOverlay
 	sku.Config
 	interfaces.FileExtensionsGetter
 }
@@ -151,7 +151,7 @@ type env struct {
 	// Later, dir may be set to $PWD/.dodder-workspace by CreateWorkspace
 	dir string
 
-	configMutable repo_configs.Config
+	configMutable repo_configs.ConfigOverlay
 	blob          workspace_config_blobs.Config
 	defaults      repo_configs.DefaultsV1
 
