@@ -37,7 +37,7 @@ func (defaults DefaultsV1OmitEmpty) GetDefaultTags() quiter.Slice[ids.Tag] {
 
 type V1 struct {
 	Defaults       DefaultsV1            `toml:"defaults"`
-	FileExtensions file_extensions.V1    `toml:"file-extensions"`
+	FileExtensions file_extensions.TOMLV1    `toml:"file-extensions"`
 	PrintOptions   options_print.V1      `toml:"cli-output"`
 	Tools          options_tools.Options `toml:"tools"`
 }

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -294,18 +295,21 @@ func (store *Store) PathForTransacted(dir string, sk *sku.Transacted) string {
 }
 
 func (store *Store) FileExtensionForObject(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) string {
 	var extension string
 
-	if sk.GetGenre() == genres.Blob {
-		extension = store.config.GetTypeExtension(sk.GetType().String())
+	if object.GetGenre() == genres.Blob {
+		extension = store.config.GetTypeExtension(object.GetType().String())
 
 		if extension == "" {
-			extension = sk.GetType().StringSansOp()
+			extension = object.GetType().StringSansOp()
 		}
 	} else {
-		extension = store.fileExtensions.GetFileExtensionForGenre(sk)
+		extension = file_extensions.GetFileExtensionForGenre(
+			store.fileExtensions,
+			object,
+		)
 	}
 
 	if extension == "" {

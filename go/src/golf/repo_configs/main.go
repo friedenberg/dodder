@@ -38,7 +38,7 @@ func Default(defaultType ids.Type) Config {
 	return Config{
 		DefaultType: defaultType,
 		DefaultTags: ids.MakeTagSet(),
-		FileExtensions: file_extensions.V1{
+		FileExtensions: file_extensions.TOMLV1{
 			Type:     "type",
 			Zettel:   "zettel",
 			Organize: "md",
@@ -63,7 +63,7 @@ func DefaultOverlay(defaultType ids.Type) TypedBlob {
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
 			},
-			FileExtensions: file_extensions.V1{
+			FileExtensions: file_extensions.TOMLV1{
 				Type:     "type",
 				Zettel:   "zettel",
 				Organize: "md",

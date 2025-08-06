@@ -15,6 +15,11 @@ type Config struct {
 	ToolOptions    options_tools.Options
 }
 
+type ConfigOverlay2 struct {
+	DefaultType *ids.Type
+	DefaultTags ids.TagSet
+}
+
 func MakeConfigFromOverlays(base Config, overlays ...ConfigOverlay) Config {
 	return Config{}
 }

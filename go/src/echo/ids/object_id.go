@@ -333,7 +333,7 @@ func (k2 *objectId) Abbreviate(
 
 func (k2 *objectId) SetFromPath(
 	path string,
-	fe file_extensions.V0,
+	fe file_extensions.TOMLV0,
 ) (err error) {
 	els := files.PathElements(path)
 	ext := els[0]

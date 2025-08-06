@@ -5,7 +5,6 @@ type FileExtensionsGetter interface {
 }
 
 type FileExtensions interface {
-	GetFileExtensionForGenre(GenreGetter) string
 	GetFileExtensionZettel() string
 	GetFileExtensionOrganize() string
 	GetFileExtensionType() string

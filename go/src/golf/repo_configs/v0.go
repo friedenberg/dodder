@@ -26,7 +26,7 @@ func (defaults DefaultsV0) GetDefaultTags() quiter.Slice[ids.Tag] {
 type V0 struct {
 	Defaults        DefaultsV0                            `toml:"defaults"`
 	HiddenEtiketten []ids.Tag                             `toml:"hidden-etiketten"`
-	FileExtensions  file_extensions.V0                    `toml:"file-extensions"`
+	FileExtensions  file_extensions.TOMLV0                    `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 	PrintOptions    options_print.V1                      `toml:"cli-output"`
