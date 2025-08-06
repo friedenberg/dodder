@@ -1,7 +1,6 @@
 package store_config
 
 import (
-	"fmt"
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -18,13 +17,6 @@ import (
 
 func (config Config) GetFileExtensions() file_extensions.Config {
 	return config.FileExtensions
-}
-
-func (config *Config) GetZettelFileExtension() string {
-	return fmt.Sprintf(
-		".%s",
-		config.GetFileExtensions().GetFileExtensionZettel(),
-	)
 }
 
 func (kc *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {

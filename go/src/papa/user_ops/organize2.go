@@ -43,7 +43,7 @@ func (op Organize2) Run(
 
 	organizeFileTemplate := fmt.Sprintf(
 		"*.%s",
-		fileExtensions.GetFileExtensionOrganize(),
+		fileExtensions.Organize,
 	)
 
 	if file, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(

@@ -1,6 +1,10 @@
 package file_extensions
 
-import "code.linenisgreat.com/dodder/go/src/bravo/equals"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/equals"
+	"code.linenisgreat.com/dodder/go/src/delta/genres"
+)
 
 type (
 	OverlayGetter interface {
@@ -9,15 +13,6 @@ type (
 
 	ConfigGetter interface {
 		GetFileExtensions() Config
-	}
-
-	FileExtensions interface {
-		GetFileExtensionZettel() string
-		GetFileExtensionOrganize() string
-		GetFileExtensionType() string
-		GetFileExtensionTag() string
-		GetFileExtensionRepo() string
-		GetFileExtensionConfig() string
 	}
 
 	Config struct {
@@ -86,30 +81,28 @@ func MakeConfig(base Config, overlays ...OverlayGetter) Config {
 	return base
 }
 
-func (config Config) GetFileExtensions() FileExtensions {
-	return config
-}
+func (config Config) GetFileExtensionForGenre(
+	getter interfaces.GenreGetter,
+) string {
+	genre := genres.Must(getter)
 
-func (config Config) GetFileExtensionZettel() string {
-	return config.Zettel
-}
+	switch genre {
+	case genres.Zettel:
+		return config.Zettel
 
-func (config Config) GetFileExtensionOrganize() string {
-	return config.Organize
-}
+	case genres.Type:
+		return config.Type
 
-func (config Config) GetFileExtensionType() string {
-	return config.Type
-}
+	case genres.Tag:
+		return config.Tag
 
-func (config Config) GetFileExtensionTag() string {
-	return config.Tag
-}
+	case genres.Repo:
+		return config.Repo
 
-func (config Config) GetFileExtensionRepo() string {
-	return config.Repo
-}
+	case genres.Config:
+		return config.Config
 
-func (config Config) GetFileExtensionConfig() string {
-	return "konfig"
+	default:
+		return ""
+	}
 }

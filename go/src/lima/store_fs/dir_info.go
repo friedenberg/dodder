@@ -32,9 +32,9 @@ type dirInfo struct {
 	root          string
 	rootProcessed bool
 
-	file_extensions.FileExtensions
-	envRepo       env_repo.Env
-	storeSupplies store_workspace.Supplies
+	fileExtensions file_extensions.Config
+	envRepo        env_repo.Env
+	storeSupplies  store_workspace.Supplies
 
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData
@@ -43,10 +43,10 @@ type dirInfo struct {
 }
 
 func makeObjectsWithDir(
-	fileExtensions file_extensions.FileExtensions,
+	fileExtensions file_extensions.Config,
 	envRepo env_repo.Env,
 ) (info dirInfo) {
-	info.FileExtensions = fileExtensions
+	info.fileExtensions = fileExtensions
 	info.envRepo = envRepo
 	info.probablyCheckedOut = makeFSItemData()
 	info.definitelyNotCheckedOut = makeFSItemData()
@@ -172,7 +172,7 @@ func (dirInfo *dirInfo) addPathAndDirEntry(
 }
 
 func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
-	if fdee.ExtSansDot() == dirInfo.GetFileExtensionConfig() {
+	if fdee.ExtSansDot() == dirInfo.fileExtensions.Config {
 		key = "konfig"
 		return
 	}
@@ -395,16 +395,16 @@ func (dirInfo *dirInfo) processFDsOnItem(
 		ext := f.ExtSansDot()
 
 		switch ext {
-		case dirInfo.GetFileExtensionZettel():
+		case dirInfo.fileExtensions.Zettel:
 			item.ExternalObjectId.SetGenre(genres.Zettel)
 
-		case dirInfo.GetFileExtensionType():
+		case dirInfo.fileExtensions.Type:
 			item.ExternalObjectId.SetGenre(genres.Type)
 
-		case dirInfo.GetFileExtensionTag():
+		case dirInfo.fileExtensions.Tag:
 			item.ExternalObjectId.SetGenre(genres.Tag)
 
-		case dirInfo.GetFileExtensionRepo():
+		case dirInfo.fileExtensions.Repo:
 			item.ExternalObjectId.SetGenre(genres.Repo)
 
 		case "conflict":

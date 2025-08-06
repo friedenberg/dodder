@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -306,10 +305,7 @@ func (store *Store) FileExtensionForObject(
 			extension = object.GetType().StringSansOp()
 		}
 	} else {
-		extension = file_extensions.GetFileExtensionForGenre(
-			store.fileExtensions,
-			object,
-		)
+		extension = store.fileExtensions.GetFileExtensionForGenre(object)
 	}
 
 	if extension == "" {

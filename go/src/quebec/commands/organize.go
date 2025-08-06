@@ -165,25 +165,25 @@ func (cmd *Organize) Run(req command.Request) {
 
 		var createOrganizeFileResults *organize_text.Text
 
-		var f *os.File
+		var file *os.File
 
 		{
 			var err error
 
-			if f, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-				"*." + repo.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			if file, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+				"*." + repo.GetConfig().GetFileExtensions().Organize,
 			); err != nil {
 				repo.Cancel(err)
 			}
 		}
 
-		defer errors.ContextMustClose(repo, f)
+		defer errors.ContextMustClose(repo, file)
 
 		{
 			var err error
 
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-				f,
+				file,
 			); err != nil {
 				repo.Cancel(err)
 			}
@@ -234,7 +234,7 @@ func (cmd *Organize) Run(req command.Request) {
 			var err error
 
 			if f, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-				"*." + repo.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+				"*." + repo.GetConfig().GetFileExtensions().Organize,
 			); err != nil {
 				repo.Cancel(err)
 			}

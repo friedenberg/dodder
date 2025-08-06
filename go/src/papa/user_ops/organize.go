@@ -127,7 +127,7 @@ func (op Organize) RunWithSkuType(
 	var f *os.File
 
 	if f, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-		"*." + op.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+		"*." + op.GetConfig().GetFileExtensions().Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

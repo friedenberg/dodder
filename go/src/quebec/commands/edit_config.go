@@ -71,7 +71,7 @@ func (cmd EditConfig) editInVim(
 	var file *os.File
 
 	if file, err = repo.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
-		fmt.Sprintf("*.%s", repo.GetConfig().GetFileExtensions().GetFileExtensionConfig()),
+		fmt.Sprintf("*.%s", repo.GetConfig().GetFileExtensions().Config),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
