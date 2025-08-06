@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -44,7 +45,7 @@ type Env interface {
 type Config interface {
 	repo_configs.ConfigOverlay
 	sku.Config
-	interfaces.FileExtensionsGetter
+	file_extensions.FileExtensionsGetter
 }
 
 func Make(

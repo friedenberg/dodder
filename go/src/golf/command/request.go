@@ -45,7 +45,7 @@ func MakeRequest(
 ) Request {
 	return Request{
 		Context: ctx,
-		Config:    config,
+		Config:  config,
 		FlagSet: flagSet,
 		Args: &Args{
 			Context: ctx,

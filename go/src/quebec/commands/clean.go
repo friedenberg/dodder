@@ -65,7 +65,6 @@ func (c *Clean) SetFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&c.organize, "organize", false, "")
 }
 
-
 func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,

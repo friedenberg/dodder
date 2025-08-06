@@ -6,7 +6,7 @@ import (
 )
 
 func GetFileExtensionForGenre(
-	config interfaces.FileExtensions,
+	config FileExtensions,
 	getter interfaces.GenreGetter,
 ) string {
 	genre := genres.Must(getter)

@@ -1,7 +1,6 @@
 package repo_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -26,7 +25,7 @@ func (defaults DefaultsV0) GetDefaultTags() quiter.Slice[ids.Tag] {
 type V0 struct {
 	Defaults        DefaultsV0                            `toml:"defaults"`
 	HiddenEtiketten []ids.Tag                             `toml:"hidden-etiketten"`
-	FileExtensions  file_extensions.TOMLV0                    `toml:"file-extensions"`
+	FileExtensions  file_extensions.TOMLV0                `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 	PrintOptions    options_print.V1                      `toml:"cli-output"`
@@ -70,7 +69,7 @@ func (blob V0) GetDefaults() Defaults {
 	return blob.Defaults
 }
 
-func (blob V0) GetFileExtensions() interfaces.FileExtensions {
+func (blob V0) GetFileExtensions() file_extensions.FileExtensions {
 	return blob.FileExtensions
 }
 

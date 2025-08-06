@@ -1,7 +1,6 @@
 package repo_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -16,7 +15,7 @@ type (
 
 	ConfigOverlay interface {
 		GetDefaults() Defaults
-		GetFileExtensions() interfaces.FileExtensions
+		GetFileExtensions() file_extensions.FileExtensions
 		GetPrintOptions() options_print.Options
 		GetToolOptions() options_tools.Options
 	}

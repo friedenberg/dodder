@@ -69,7 +69,6 @@ func (cmd *Diff) Complete(
 	}
 }
 
-
 func (cmd Diff) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,

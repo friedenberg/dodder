@@ -19,7 +19,6 @@ type Status struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-
 func (cmd Status) Run(req command.Request) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 	localWorkingCopy.GetEnvWorkspace().AssertNotTemporary(req)

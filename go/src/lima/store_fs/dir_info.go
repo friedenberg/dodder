@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -31,7 +32,7 @@ type dirInfo struct {
 	root          string
 	rootProcessed bool
 
-	interfaces.FileExtensions
+	file_extensions.FileExtensions
 	envRepo       env_repo.Env
 	storeSupplies store_workspace.Supplies
 
@@ -42,7 +43,7 @@ type dirInfo struct {
 }
 
 func makeObjectsWithDir(
-	fileExtensions interfaces.FileExtensions,
+	fileExtensions file_extensions.FileExtensions,
 	envRepo env_repo.Env,
 ) (info dirInfo) {
 	info.FileExtensions = fileExtensions

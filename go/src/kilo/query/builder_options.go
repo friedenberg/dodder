@@ -10,8 +10,6 @@ import (
 
 // TODO consider moving this whole file into its own package
 
-
-
 type BuilderOption interface {
 	Apply(*Builder) *Builder
 }
@@ -82,7 +80,6 @@ func (options builderOptionWorkspace) Apply(builder *Builder) *Builder {
 
 	return builder
 }
-
 
 type options struct {
 	defaultGenres  ids.Genre

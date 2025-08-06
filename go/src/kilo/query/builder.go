@@ -2,8 +2,8 @@ package query
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -40,7 +40,7 @@ type Builder struct {
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	workspaceStoreGetter    store_workspace.StoreGetter
 	repoId                  ids.RepoId
-	fileExtensions          interfaces.FileExtensions
+	fileExtensions          file_extensions.FileExtensions
 	expanders               ids.Abbr
 	hidden                  sku.Query
 	doNotMatchEmpty         bool
@@ -125,7 +125,7 @@ func (builder *Builder) WithRepoId(
 
 // TODO refactor into BuilderOption
 func (builder *Builder) WithFileExtensions(
-	feg interfaces.FileExtensions,
+	feg file_extensions.FileExtensions,
 ) *Builder {
 	builder.fileExtensions = feg
 	return builder

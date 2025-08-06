@@ -1,16 +1,16 @@
 package repo_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type Config struct {
 	DefaultType    ids.Type
 	DefaultTags    ids.TagSet
-	FileExtensions interfaces.FileExtensions
+	FileExtensions file_extensions.FileExtensions
 	PrintOptions   options_print.Options
 	ToolOptions    options_tools.Options
 }

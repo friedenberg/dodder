@@ -1,7 +1,6 @@
 package repo_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -36,10 +35,10 @@ func (defaults DefaultsV1OmitEmpty) GetDefaultTags() quiter.Slice[ids.Tag] {
 }
 
 type V1 struct {
-	Defaults       DefaultsV1            `toml:"defaults"`
-	FileExtensions file_extensions.TOMLV1    `toml:"file-extensions"`
-	PrintOptions   options_print.V1      `toml:"cli-output"`
-	Tools          options_tools.Options `toml:"tools"`
+	Defaults       DefaultsV1             `toml:"defaults"`
+	FileExtensions file_extensions.TOMLV1 `toml:"file-extensions"`
+	PrintOptions   options_print.V1       `toml:"cli-output"`
+	Tools          options_tools.Options  `toml:"tools"`
 }
 
 func (blob V1) GetRepoConfig() ConfigOverlay {
@@ -68,7 +67,7 @@ func (blob V1) GetDefaults() Defaults {
 	return blob.Defaults
 }
 
-func (blob V1) GetFileExtensions() interfaces.FileExtensions {
+func (blob V1) GetFileExtensions() file_extensions.FileExtensions {
 	return blob.FileExtensions
 }
 

@@ -37,7 +37,6 @@ func (cmd *Checkout) SetFlagSet(f *flag.FlagSet) {
 	cmd.CheckoutOptions.SetFlagSet(f)
 }
 
-
 func (cmd Checkout) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := repo.GetEnvWorkspace()

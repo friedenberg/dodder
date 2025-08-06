@@ -1,9 +1,5 @@
 package file_extensions
 
-import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-)
-
 type TOMLV1 struct {
 	Zettel   string `toml:"zettel"`
 	Organize string `toml:"organize"`
@@ -13,7 +9,7 @@ type TOMLV1 struct {
 	Config   string `toml:"config"`
 }
 
-func (config TOMLV1) GetFileExtensions() interfaces.FileExtensions {
+func (config TOMLV1) GetFileExtensions() FileExtensions {
 	return config
 }
 

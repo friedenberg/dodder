@@ -1,7 +1,6 @@
 package repo_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
@@ -9,10 +8,10 @@ import (
 )
 
 type V2 struct {
-	Defaults       DefaultsV1            `toml:"defaults"`
-	FileExtensions file_extensions.TOMLV1    `toml:"file-extensions"`
-	PrintOptions   options_print.Options `toml:"cli-output"`
-	Tools          options_tools.Options `toml:"tools"`
+	Defaults       DefaultsV1             `toml:"defaults"`
+	FileExtensions file_extensions.TOMLV1 `toml:"file-extensions"`
+	PrintOptions   options_print.Options  `toml:"cli-output"`
+	Tools          options_tools.Options  `toml:"tools"`
 }
 
 func (config *V2) Reset() {
@@ -37,7 +36,7 @@ func (config V2) GetDefaults() Defaults {
 	return config.Defaults
 }
 
-func (config V2) GetFileExtensions() interfaces.FileExtensions {
+func (config V2) GetFileExtensions() file_extensions.FileExtensions {
 	return config.FileExtensions
 }
 

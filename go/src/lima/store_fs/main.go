@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -30,7 +31,7 @@ func init() {
 func Make(
 	config sku.Config,
 	deletedPrinter interfaces.FuncIter[*fd.FD],
-	fileExtensions interfaces.FileExtensions,
+	fileExtensions file_extensions.FileExtensions,
 	envRepo env_repo.Env,
 ) (fs *Store, err error) {
 	fs = &Store{
@@ -69,7 +70,7 @@ type Store struct {
 	envRepo             env_repo.Env
 	fileEncoder         FileEncoder
 	inlineTypeChecker   ids.InlineTypeChecker
-	fileExtensions      interfaces.FileExtensions
+	fileExtensions      file_extensions.FileExtensions
 	dir                 string
 	objectFormatOptions object_inventory_format.Options
 
