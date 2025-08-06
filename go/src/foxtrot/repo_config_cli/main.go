@@ -80,7 +80,7 @@ func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	)
 
 	config.PrintOptions.AddToFlags(flagSet, &config.maskPrintOptions)
-	config.ToolOptions.AddToFlags(flagSet)
+	config.ToolOptions.SetFlagSet(flagSet)
 
 	flagSet.BoolVar(
 		&config.PrintOptions.Newlines,

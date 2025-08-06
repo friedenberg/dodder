@@ -19,8 +19,8 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 	var tags ids.TagSet
 
 	if defaults != nil {
-		tipe = defaults.GetType()
-		tags = ids.MakeTagSet(defaults.GetTags()...)
+		tipe = defaults.GetDefaultType()
+		tags = ids.MakeTagSet(defaults.GetDefaultTags()...)
 	}
 
 	proto.Metadata.Type = tipe

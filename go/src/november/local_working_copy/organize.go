@@ -70,7 +70,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 	var proto sku.Proto
 
 	workspace := local.GetEnvWorkspace()
-	workspaceType := workspace.GetDefaults().GetType()
+	workspaceType := workspace.GetDefaults().GetDefaultType()
 
 	proto.Type = workspaceType
 

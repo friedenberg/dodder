@@ -14,11 +14,11 @@ type DefaultsV1 struct {
 	Tags []ids.Tag `toml:"tags"`
 }
 
-func (defaults DefaultsV1) GetType() ids.Type {
+func (defaults DefaultsV1) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1) GetTags() quiter.Slice[ids.Tag] {
+func (defaults DefaultsV1) GetDefaultTags() quiter.Slice[ids.Tag] {
 	return quiter.Slice[ids.Tag](defaults.Tags)
 }
 
@@ -27,11 +27,11 @@ type DefaultsV1OmitEmpty struct {
 	Tags []ids.Tag `toml:"tags,omitempty"`
 }
 
-func (defaults DefaultsV1OmitEmpty) GetType() ids.Type {
+func (defaults DefaultsV1OmitEmpty) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1OmitEmpty) GetTags() quiter.Slice[ids.Tag] {
+func (defaults DefaultsV1OmitEmpty) GetDefaultTags() quiter.Slice[ids.Tag] {
 	return quiter.Slice[ids.Tag](defaults.Tags)
 }
 
@@ -74,4 +74,8 @@ func (blob V1) GetFileExtensions() interfaces.FileExtensions {
 
 func (blob V1) GetPrintOptions() options_print.Options {
 	return blob.PrintOptions.GetPrintOptions()
+}
+
+func (blob V1) GetToolOptions() options_tools.Options {
+	return blob.Tools
 }

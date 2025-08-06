@@ -159,7 +159,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	var typedBlob repo_configs.TypedBlob
 
-	coder := repo.GetStore().GetConfigBlobFormat()
+	coder := repo.GetStore().GetConfigBlobCoder()
 
 	// TODO-P3 offer option to edit again
 	if _, err = coder.DecodeFrom(

@@ -15,11 +15,11 @@ type DefaultsV0 struct {
 	Etiketten []ids.Tag `toml:"etiketten"`
 }
 
-func (defaults DefaultsV0) GetType() ids.Type {
+func (defaults DefaultsV0) GetDefaultType() ids.Type {
 	return defaults.Typ
 }
 
-func (defaults DefaultsV0) GetTags() quiter.Slice[ids.Tag] {
+func (defaults DefaultsV0) GetDefaultTags() quiter.Slice[ids.Tag] {
 	return quiter.Slice[ids.Tag](defaults.Etiketten)
 }
 
@@ -76,4 +76,8 @@ func (blob V0) GetFileExtensions() interfaces.FileExtensions {
 
 func (blob V0) GetPrintOptions() options_print.Options {
 	return blob.PrintOptions.GetPrintOptions()
+}
+
+func (blob V0) GetToolOptions() options_tools.Options {
+	return blob.Tools
 }

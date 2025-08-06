@@ -18,21 +18,44 @@ type (
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensions
 		GetPrintOptions() options_print.Options
+		GetToolOptions() options_tools.Options
 	}
 
 	Defaults interface {
-		GetType() ids.Type
-		GetTags() quiter.Slice[ids.Tag]
+		GetDefaultType() ids.Type
+		GetDefaultTags() quiter.Slice[ids.Tag]
 	}
 )
 
 var (
+	// _ ConfigOverlay = Config{}
 	_ ConfigOverlay = V0{}
 	_ ConfigOverlay = V1{}
 	_ ConfigOverlay = V2{}
 )
 
-func Default(defaultType ids.Type) TypedBlob {
+func Default(defaultType ids.Type) Config {
+	return Config{
+		DefaultType: defaultType,
+		DefaultTags: ids.MakeTagSet(),
+		FileExtensions: file_extensions.V1{
+			Type:     "type",
+			Zettel:   "zettel",
+			Organize: "md",
+			Tag:      "tag",
+			Repo:     "repo",
+			Config:   "konfig",
+		},
+		PrintOptions: options_print.Default().GetPrintOptions(),
+		ToolOptions: options_tools.Options{
+			Merge: []string{
+				"vimdiff",
+			},
+		},
+	}
+}
+
+func DefaultOverlay(defaultType ids.Type) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),
 		Blob: V2{

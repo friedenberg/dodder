@@ -93,18 +93,18 @@ func Make(
 	defaults := outputEnv.configMutable.GetDefaults()
 
 	outputEnv.defaults = repo_configs.DefaultsV1{
-		Type: defaults.GetType(),
-		Tags: defaults.GetTags(),
+		Type: defaults.GetDefaultType(),
+		Tags: defaults.GetDefaultTags(),
 	}
 
 	if outputEnv.blob != nil {
 		defaults = outputEnv.blob.GetDefaults()
 
-		if newType := defaults.GetType(); !newType.IsEmpty() {
+		if newType := defaults.GetDefaultType(); !newType.IsEmpty() {
 			outputEnv.defaults.Type = newType
 		}
 
-		if newTags := defaults.GetTags(); newTags.Len() > 0 {
+		if newTags := defaults.GetDefaultTags(); newTags.Len() > 0 {
 			outputEnv.defaults.Tags = append(
 				outputEnv.defaults.Tags,
 				newTags...,

@@ -166,10 +166,10 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 func writeDefaultMutableConfig(
 	repo *Repo,
 	defaultType ids.Type,
-) (sh interfaces.BlobId, typedBlob repo_configs.TypedBlob, err error) {
-	typedBlob = repo_configs.Default(defaultType)
+) (blobId interfaces.BlobId, typedBlob repo_configs.TypedBlob, err error) {
+	typedBlob = repo_configs.DefaultOverlay(defaultType)
 
-	coder := repo.GetStore().GetConfigBlobFormat()
+	coder := repo.GetStore().GetConfigBlobCoder()
 
 	var writeCloser interfaces.WriteCloseBlobIdGetter
 
@@ -188,7 +188,7 @@ func writeDefaultMutableConfig(
 		return
 	}
 
-	sh = sha.MustWithDigester(writeCloser)
+	blobId = sha.MustWithDigester(writeCloser)
 
 	return
 }

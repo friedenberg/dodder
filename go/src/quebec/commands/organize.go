@@ -59,7 +59,6 @@ func (c *Organize) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 }
 
-
 func (c *Organize) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
@@ -109,16 +108,16 @@ func (cmd *Organize) Run(req command.Request) {
 
 	repo.ApplyToOrganizeOptions(&cmd.Options)
 
-	skus := sku.MakeSkuTypeSetMutable()
-	var l sync.Mutex
+	objects := sku.MakeSkuTypeSetMutable()
+	var lock sync.Mutex
 
 	if err := repo.GetStore().QueryTransactedAsSkuType(
 		queryGroup,
-		func(co sku.SkuType) (err error) {
-			l.Lock()
-			defer l.Unlock()
+		func(checkedOut sku.SkuType) (err error) {
+			lock.Lock()
+			defer lock.Unlock()
 
-			return skus.Add(co.Clone())
+			return objects.Add(checkedOut.Clone())
 		},
 	); err != nil {
 		repo.Cancel(err)
@@ -138,7 +137,7 @@ func (cmd *Organize) Run(req command.Request) {
 		),
 	}
 
-	createOrganizeFileOp.Skus = skus
+	createOrganizeFileOp.Skus = objects
 
 	types := query.GetTypes(queryGroup)
 
@@ -148,12 +147,12 @@ func (cmd *Organize) Run(req command.Request) {
 
 	tags := query.GetTags(queryGroup)
 
-	if skus.Len() == 0 {
+	if objects.Len() == 0 {
 		workspace := repo.GetEnvWorkspace()
-		workspaceTags := workspace.GetDefaults().GetTags()
+		workspaceTags := workspace.GetDefaults().GetDefaultTags()
 
-		for t := range workspaceTags.All() {
-			tags.Add(t)
+		for tag := range workspaceTags.All() {
+			tags.Add(tag)
 		}
 	}
 
@@ -210,7 +209,7 @@ func (cmd *Organize) Run(req command.Request) {
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
-				Original:   skus,
+				Original:   objects,
 				QueryGroup: queryGroup,
 			},
 		); err != nil {
@@ -282,7 +281,7 @@ func (cmd *Organize) Run(req command.Request) {
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
-				Original:   skus,
+				Original:   objects,
 				QueryGroup: queryGroup,
 			},
 		); err != nil {

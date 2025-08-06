@@ -55,12 +55,12 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 
 		case "defaults.type":
 			repo.GetUI().Print(
-				envWorkspace.GetWorkspaceConfig().GetDefaults().GetType(),
+				envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultType(),
 			)
 
 		case "defaults.tags":
 			repo.GetUI().Print(
-				envWorkspace.GetWorkspaceConfig().GetDefaults().GetTags(),
+				envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultTags(),
 			)
 		}
 	}

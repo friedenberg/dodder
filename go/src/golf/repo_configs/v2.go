@@ -44,3 +44,7 @@ func (config V2) GetFileExtensions() interfaces.FileExtensions {
 func (config V2) GetPrintOptions() options_print.Options {
 	return config.PrintOptions
 }
+
+func (blob V2) GetToolOptions() options_tools.Options {
+	return blob.Tools
+}

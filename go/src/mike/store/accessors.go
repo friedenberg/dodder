@@ -68,6 +68,6 @@ func (store *Store) GetStreamIndex() *stream_index.Index {
 	return store.streamIndex
 }
 
-func (store *Store) GetConfigBlobFormat() interfaces.CoderReadWriter[*repo_configs.TypedBlob] {
+func (store *Store) GetConfigBlobCoder() interfaces.CoderReadWriter[*repo_configs.TypedBlob] {
 	return store.configBlobCoder
 }
