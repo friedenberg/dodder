@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
@@ -38,9 +39,11 @@ func (op Organize2) Run(
 
 	var file *os.File
 
+	fileExtensions := file_extensions.MakeDefaultConfig(op.GetConfig())
+
 	organizeFileTemplate := fmt.Sprintf(
 		"*.%s",
-		op.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+		fileExtensions.GetFileExtensionOrganize(),
 	)
 
 	if file, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(

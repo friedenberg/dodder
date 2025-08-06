@@ -10,7 +10,7 @@ import (
 type Config struct {
 	DefaultType    ids.Type
 	DefaultTags    ids.TagSet
-	FileExtensions file_extensions.FileExtensions
+	FileExtensions file_extensions.Config
 	PrintOptions   options_print.Options
 	ToolOptions    options_tools.Options
 }

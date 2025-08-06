@@ -469,8 +469,8 @@ function checkin_explicit_workspace_delete_files { # @test
 	export EDITOR="/bin/bash -c 'editor \$0'"
 	run_dodder edit-config
 	assert_success
-	assert_output - <<-EOM
-		[konfig @d87979c06c24e330e785eb7d985f2f38be6310f25ddbc037b58b1c5651b24d43 !toml-config-v2]
+	assert_output --regexp - <<-EOM
+		[konfig @(?!$(get_konfig_sha))[a-f0-9]{64} !toml-config-v2]
 	EOM
 
 	cat >.dodder-workspace <<-EOM

@@ -1,18 +1,5 @@
 package interfaces
 
-type FileExtensionsGetter interface {
-	GetFileExtensions() FileExtensions
-}
-
-type FileExtensions interface {
-	GetFileExtensionZettel() string
-	GetFileExtensionOrganize() string
-	GetFileExtensionType() string
-	GetFileExtensionTag() string
-	GetFileExtensionRepo() string
-	GetFileExtensionConfig() string
-}
-
 type ObjectIOFactory interface {
 	ObjectReaderFactory
 	ObjectWriterFactory

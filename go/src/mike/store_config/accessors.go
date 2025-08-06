@@ -10,10 +10,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
+
+func (config Config) GetFileExtensions() file_extensions.Config {
+	return config.FileExtensions
+}
 
 func (config *Config) GetZettelFileExtension() string {
 	return fmt.Sprintf(

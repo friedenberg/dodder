@@ -1,53 +1,37 @@
 package file_extensions
 
+import "code.linenisgreat.com/dodder/go/src/bravo/equals"
+
 type TOMLV0 struct {
-	Zettel   string `toml:"zettel"`
-	Organize string `toml:"organize"`
-	Type     string `toml:"typ"`
-	Tag      string `toml:"etikett"`
-	Repo     string `toml:"kasten"`
+	Organize *string `toml:"organize"`
+	Repo     *string `toml:"kasten"`
+	Tag      *string `toml:"etikett"`
+	Type     *string `toml:"typ"`
+	Zettel   *string `toml:"zettel"`
 }
 
-func (config TOMLV0) GetFileExtensions() FileExtensions {
-	return config
-}
-
-func (config TOMLV0) GetFileExtensionZettel() string {
-	return config.Zettel
-}
-
-func (config TOMLV0) GetFileExtensionOrganize() string {
-	return config.Organize
-}
-
-func (config TOMLV0) GetFileExtensionType() string {
-	return config.Type
-}
-
-func (config TOMLV0) GetFileExtensionTag() string {
-	return config.Tag
-}
-
-func (config TOMLV0) GetFileExtensionRepo() string {
-	return config.Repo
-}
-
-func (config TOMLV0) GetFileExtensionConfig() string {
-	return "konfig"
+func (config TOMLV0) GetFileExtensionsOverlay() Overlay {
+	return Overlay{
+		Organize: config.Organize,
+		Repo:     config.Repo,
+		Tag:      config.Tag,
+		Type:     config.Type,
+		Zettel:   config.Zettel,
+	}
 }
 
 func (config *TOMLV0) Reset() {
-	config.Zettel = ""
-	config.Organize = ""
-	config.Type = ""
-	config.Tag = ""
-	config.Repo = ""
+	equals.SetIfNotNil(config.Organize, "")
+	equals.SetIfNotNil(config.Repo, "")
+	equals.SetIfNotNil(config.Tag, "")
+	equals.SetIfNotNil(config.Type, "")
+	equals.SetIfNotNil(config.Zettel, "")
 }
 
 func (config *TOMLV0) ResetWith(b TOMLV0) {
-	config.Zettel = b.Zettel
 	config.Organize = b.Organize
-	config.Type = b.Type
-	config.Tag = b.Tag
 	config.Repo = b.Repo
+	config.Tag = b.Tag
+	config.Type = b.Type
+	config.Zettel = b.Zettel
 }

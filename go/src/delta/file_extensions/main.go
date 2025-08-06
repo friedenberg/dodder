@@ -1,8 +1,14 @@
 package file_extensions
 
+import "code.linenisgreat.com/dodder/go/src/bravo/equals"
+
 type (
-	FileExtensionsGetter interface {
-		GetFileExtensions() FileExtensions
+	OverlayGetter interface {
+		GetFileExtensionsOverlay() Overlay
+	}
+
+	ConfigGetter interface {
+		GetFileExtensions() Config
 	}
 
 	FileExtensions interface {
@@ -15,19 +21,70 @@ type (
 	}
 
 	Config struct {
-		Zettel   string
-		Organize string
-		Type     string
-		Tag      string
-		Repo     string
 		Config   string
+		Organize string
+		Repo     string
+		Tag      string
+		Type     string
+		Zettel   string
+	}
+
+	Overlay struct {
+		Config   *string
+		Organize *string
+		Repo     *string
+		Tag      *string
+		Type     *string
+		Zettel   *string
 	}
 )
 
 var (
-	_ FileExtensions = TOMLV0{}
-	_ FileExtensions = TOMLV1{}
+	_ OverlayGetter = TOMLV0{}
+	_ OverlayGetter = TOMLV1{}
 )
+
+func Default() Config {
+	return Config{
+		Config:   "konfig",
+		Organize: "md",
+		Repo:     "repo",
+		Tag:      "tag",
+		Type:     "type",
+		Zettel:   "zettel",
+	}
+}
+
+func DefaultOverlay() TOMLV1 {
+	config := Default()
+
+	return TOMLV1{
+		Config:   &config.Config,
+		Organize: &config.Organize,
+		Repo:     &config.Repo,
+		Tag:      &config.Tag,
+		Type:     &config.Type,
+		Zettel:   &config.Zettel,
+	}
+}
+
+func MakeDefaultConfig(overlays ...OverlayGetter) Config {
+	return MakeConfig(Default(), overlays...)
+}
+
+func MakeConfig(base Config, overlays ...OverlayGetter) Config {
+	for _, overlayGetter := range overlays {
+		overlay := overlayGetter.GetFileExtensionsOverlay()
+		equals.SetIfValueNotNil(&base.Config, overlay.Config)
+		equals.SetIfValueNotNil(&base.Organize, overlay.Organize)
+		equals.SetIfValueNotNil(&base.Repo, overlay.Repo)
+		equals.SetIfValueNotNil(&base.Tag, overlay.Tag)
+		equals.SetIfValueNotNil(&base.Type, overlay.Type)
+		equals.SetIfValueNotNil(&base.Zettel, overlay.Zettel)
+	}
+
+	return base
+}
 
 func (config Config) GetFileExtensions() FileExtensions {
 	return config
@@ -55,20 +112,4 @@ func (config Config) GetFileExtensionRepo() string {
 
 func (config Config) GetFileExtensionConfig() string {
 	return "konfig"
-}
-
-func (config *Config) Reset() {
-	config.Zettel = ""
-	config.Organize = ""
-	config.Type = ""
-	config.Tag = ""
-	config.Repo = ""
-}
-
-func (config *Config) ResetWith(b Config) {
-	config.Zettel = b.Zettel
-	config.Organize = b.Organize
-	config.Type = b.Type
-	config.Tag = b.Tag
-	config.Repo = b.Repo
 }

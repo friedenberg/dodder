@@ -45,7 +45,7 @@ type Env interface {
 type Config interface {
 	repo_configs.ConfigOverlay
 	sku.Config
-	file_extensions.FileExtensionsGetter
+	file_extensions.ConfigGetter
 }
 
 func Make(

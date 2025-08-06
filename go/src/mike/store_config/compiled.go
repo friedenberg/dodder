@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -50,6 +51,8 @@ type (
 
 		// Kasten
 		Repos sku.TransactedMutableSet
+
+		FileExtensions file_extensions.Config
 	}
 )
 

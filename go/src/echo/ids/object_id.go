@@ -9,10 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
 
@@ -331,53 +329,9 @@ func (k2 *objectId) Abbreviate(
 	return
 }
 
-func (k2 *objectId) SetFromPath(
-	path string,
-	fe file_extensions.TOMLV0,
-) (err error) {
-	els := files.PathElements(path)
-	ext := els[0]
-
-	switch ext {
-	case fe.Tag:
-		if err = k2.SetWithGenre(els[1], genres.Tag); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Type:
-		if err = k2.SetWithGenre(els[1], genres.Type); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Repo:
-		if err = k2.SetWithGenre(els[1], genres.Repo); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case fe.Zettel:
-		if len(els) < 3 {
-			err = errors.ErrorWithStackf("not a valid zettel: %q, %q", els, path)
-			return
-		}
-
-		if err = k2.SetWithGenre(els[2]+"/"+els[1], genres.Zettel); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = ErrFDNotId
-		return
-	}
-
-	return
-}
-
 func (h *objectId) SetWithIdLike(
-	k interfaces.ObjectId) (err error) {
+	k interfaces.ObjectId,
+) (err error) {
 	switch kt := k.(type) {
 	case *objectId:
 		if err = kt.left.CopyTo(&h.left); err != nil {

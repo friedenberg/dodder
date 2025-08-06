@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -119,8 +120,8 @@ func (store *store) Initialize(
 	store.Reset()
 	store.config.configGenesis = envRepo.GetConfigPrivate().Blob
 
-	wg := errors.MakeWaitGroupParallel()
-	wg.Do(func() (err error) {
+	errorWaitGroup := errors.MakeWaitGroupParallel()
+	errorWaitGroup.Do(func() (err error) {
 		if err = store.loadMutableConfig(envRepo); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
@@ -132,10 +133,14 @@ func (store *store) Initialize(
 		return
 	})
 
-	if err = wg.GetError(); err != nil {
+	if err = errorWaitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	store.config.FileExtensions = file_extensions.MakeDefaultConfig(
+		store.config,
+	)
 
 	store.config.ApplyPrintOptionsConfig(
 		store.config.GetPrintOptions(),

@@ -69,8 +69,8 @@ func (blob V0) GetDefaults() Defaults {
 	return blob.Defaults
 }
 
-func (blob V0) GetFileExtensions() file_extensions.FileExtensions {
-	return blob.FileExtensions
+func (blob V0) GetFileExtensionsOverlay() file_extensions.Overlay {
+	return blob.FileExtensions.GetFileExtensionsOverlay()
 }
 
 func (blob V0) GetPrintOptions() options_print.Options {

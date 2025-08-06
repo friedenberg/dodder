@@ -15,7 +15,7 @@ type (
 
 	ConfigOverlay interface {
 		GetDefaults() Defaults
-		GetFileExtensions() file_extensions.FileExtensions
+		file_extensions.OverlayGetter
 		GetPrintOptions() options_print.Options
 		GetToolOptions() options_tools.Options
 	}
@@ -35,17 +35,10 @@ var (
 
 func Default(defaultType ids.Type) Config {
 	return Config{
-		DefaultType: defaultType,
-		DefaultTags: ids.MakeTagSet(),
-		FileExtensions: file_extensions.TOMLV1{
-			Type:     "type",
-			Zettel:   "zettel",
-			Organize: "md",
-			Tag:      "tag",
-			Repo:     "repo",
-			Config:   "konfig",
-		},
-		PrintOptions: options_print.Default().GetPrintOptions(),
+		DefaultType:    defaultType,
+		DefaultTags:    ids.MakeTagSet(),
+		FileExtensions: file_extensions.Default(),
+		PrintOptions:   options_print.Default().GetPrintOptions(),
 		ToolOptions: options_tools.Options{
 			Merge: []string{
 				"vimdiff",
@@ -62,14 +55,7 @@ func DefaultOverlay(defaultType ids.Type) TypedBlob {
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
 			},
-			FileExtensions: file_extensions.TOMLV1{
-				Type:     "type",
-				Zettel:   "zettel",
-				Organize: "md",
-				Tag:      "tag",
-				Repo:     "repo",
-				Config:   "konfig",
-			},
+			FileExtensions: file_extensions.DefaultOverlay(),
 			Tools: options_tools.Options{
 				Merge: []string{
 					"vimdiff",

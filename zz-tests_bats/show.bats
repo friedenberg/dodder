@@ -411,12 +411,12 @@ function show_konfig { # @test
 		tags = []
 
 		[file-extensions]
-		zettel = 'zettel'
-		organize = 'md'
-		type = 'type'
-		tag = 'tag'
-		repo = 'repo'
 		config = 'konfig'
+		organize = 'md'
+		repo = 'repo'
+		tag = 'tag'
+		type = 'type'
+		zettel = 'zettel'
 
 		[cli-output]
 		PrintIncludeDescription = false

@@ -36,8 +36,8 @@ func (config V2) GetDefaults() Defaults {
 	return config.Defaults
 }
 
-func (config V2) GetFileExtensions() file_extensions.FileExtensions {
-	return config.FileExtensions
+func (blob V2) GetFileExtensionsOverlay() file_extensions.Overlay {
+	return blob.FileExtensions.GetFileExtensionsOverlay()
 }
 
 func (config V2) GetPrintOptions() options_print.Options {
