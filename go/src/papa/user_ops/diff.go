@@ -124,7 +124,13 @@ func (op Diff) Run(
 		externalFD = &fds.Object
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoBlob(wLeft, op.GetEnvRepo().GetDefaultBlobStore(), local.GetBlobId()))
+		wg.Do(
+			op.makeDoBlob(
+				wLeft,
+				op.GetEnvRepo().GetDefaultBlobStore(),
+				local.GetBlobId(),
+			),
+		)
 		wg.Do(op.makeDoFD(wRight, &fds.Blob))
 		externalFD = &fds.Blob
 
@@ -142,7 +148,7 @@ func (op Diff) Run(
 
 	externalLabel := op.GetEnvRepo().Rel(externalFD.GetPath())
 
-	colorOptions := op.FormatColorOptionsOut()
+	colorOptions := op.FormatColorOptionsOut(op.GetConfig().GetPrintOptions())
 	colorString := "always"
 
 	if colorOptions.OffEntirely {

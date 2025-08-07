@@ -2,7 +2,6 @@ package repo_config_cli
 
 import (
 	"flag"
-	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -25,30 +24,18 @@ type Config struct {
 	CheckoutCacheEnabled bool
 	PredictableZettelIds bool
 
-	PrintOptions, maskPrintOptions options_print.Options
-	ToolOptions                    options_tools.Options
+	printOptionsOverlay options_print.Overlay
+	ToolOptions         options_tools.Options
 
 	descriptions.Description
 }
 
-// TODO add support for all flags
-func (config Config) GetCLIFlags() (flags []string) {
-	flags = append(
-		flags,
-		fmt.Sprintf("-print-time=%t", config.PrintOptions.PrintTime),
-	)
-	flags = append(
-		flags,
-		fmt.Sprintf("-print-colors=%t", config.PrintOptions.PrintColors),
-	)
-
-	if config.Verbose {
-		flags = append(flags, "-verbose")
-	}
-
-	return
+func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
+	return config.printOptionsOverlay
 }
 
+// TODO add support for all flags
+// TODO move to store_config
 func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
@@ -79,15 +66,8 @@ func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 		"generate new zettel ids in order",
 	)
 
-	config.PrintOptions.AddToFlags(flagSet, &config.maskPrintOptions)
+	config.printOptionsOverlay.AddToFlags(flagSet)
 	config.ToolOptions.SetFlagSet(flagSet)
-
-	flagSet.BoolVar(
-		&config.PrintOptions.Newlines,
-		"zittish-newlines",
-		false,
-		"add extra newlines to zittish to improve readability",
-	)
 
 	flagSet.BoolVar(
 		&config.IgnoreHookErrors,
@@ -101,30 +81,19 @@ func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.Var(&config.Description, "comment", "Comment for inventory list")
 }
 
-func Default() (c Config) {
-	c.PrintOptions = options_print.Default().GetPrintOptions()
+func Default() (config Config) {
+	// config.printOptionsOverlay =
+	// options_print.DefaultOverlay().GetPrintOptionsOverlay()
 
 	return
 }
 
-func (config *Config) ApplyPrintOptionsConfig(
-	printOptions options_print.Options,
-) {
-	cliSet := config.PrintOptions
-	config.PrintOptions = printOptions
-	config.PrintOptions.Merge(cliSet, config.maskPrintOptions)
-}
+// func (config Config) GetPrintOptions() options_print.Options {
+// 	return options_print.MakeDefaultConfig(config.printOptionsOverlay)
+// }
 
 func (config Config) UsePredictableZettelIds() bool {
 	return config.PredictableZettelIds
-}
-
-func (config Config) UsePrintTime() bool {
-	return config.PrintOptions.PrintTime
-}
-
-func (config Config) UsePrintTags() bool {
-	return config.PrintOptions.PrintTagsAlways
 }
 
 func (config Config) IsDryRun() bool {

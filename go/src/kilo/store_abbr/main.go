@@ -143,11 +143,11 @@ func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	out.ZettelId.Expand = i.ZettelId().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	if i.Abbreviations.ZettelIds {
+	if i.AbbreviateZettelIds {
 		out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
 	}
 
-	if i.Abbreviations.Shas {
+	if i.AbbreviateShas {
 		out.Sha.Abbreviate = i.Shas().Abbreviate
 	}
 

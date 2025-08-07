@@ -14,13 +14,13 @@ import (
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
-	printOptions := local.config.GetConfig().PrintOptions.
+	printOptions := local.config.GetConfig().GetPrintOptions().
 		WithPrintShas(true).
 		WithPrintTime(false)
 
 	stringEncoder := local.StringFormatWriterSkuBoxCheckedOut(
 		printOptions,
-		local.FormatColorOptionsOut(),
+		local.FormatColorOptionsOut(printOptions),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
 			ConfigDryRunGetter: local.GetConfig(),
@@ -46,7 +46,7 @@ func (local *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
 		local.GetConfig().IsDryRun(),
 		id_fmts.MakeFDCliFormat(
-			local.FormatColorOptionsOut(),
+			local.FormatColorOptionsOut(local.GetConfig().GetPrintOptions()),
 			local.envRepo.MakeRelativePathStringFormatWriter(),
 		),
 	)
@@ -59,14 +59,16 @@ func (local *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 }
 
 func (local *Repo) PrinterHeader() interfaces.FuncIter[string] {
-	if local.config.GetConfig().PrintOptions.PrintFlush {
+	if local.config.GetConfig().GetPrintOptions().PrintFlush {
 		return string_format_writer.MakeDelim(
 			"\n",
 			local.GetErrFile(),
 			string_format_writer.MakeDefaultDatePrefixFormatWriter(
 				local,
 				string_format_writer.MakeColor(
-					local.FormatColorOptionsOut(),
+					local.FormatColorOptionsOut(
+						local.GetConfig().GetPrintOptions(),
+					),
 					string_format_writer.MakeString[string](),
 					string_format_writer.ColorTypeHeading,
 				),
@@ -100,7 +102,7 @@ func (local *Repo) MakePrinterBoxArchive(
 ) interfaces.FuncIter[*sku.Transacted] {
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		local.GetEnv(),
-		local.GetConfig().PrintOptions.WithPrintTai(includeTai),
+		local.GetConfig().GetPrintOptions().WithPrintTai(includeTai),
 	)
 
 	return string_format_writer.MakeDelim(

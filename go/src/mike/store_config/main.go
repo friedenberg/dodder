@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -16,6 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
@@ -77,8 +79,9 @@ func Make() StoreMutable {
 }
 
 type store struct {
-	envRepo env_repo.Env
-	config  Config
+	envRepo      env_repo.Env
+	envWorkspace env_workspace.Env
+	config       Config
 }
 
 func (store *store) GetConfig() Config {
@@ -142,8 +145,9 @@ func (store *store) Initialize(
 		store.config,
 	)
 
-	store.config.ApplyPrintOptionsConfig(
-		store.config.GetPrintOptions(),
+	store.config.PrintOptions = options_print.MakeDefaultConfig(
+		store.config.configRepo,
+		store.config.CLI,
 	)
 
 	return

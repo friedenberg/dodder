@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -25,8 +26,10 @@ type (
 	Config struct {
 		*compiled
 
-		configRepo
 		configGenesis
+
+		// TODO combine below into repo_configs.Config
+		configRepo
 		CLI
 	}
 
@@ -53,25 +56,31 @@ type (
 		Repos sku.TransactedMutableSet
 
 		FileExtensions file_extensions.Config
+
+		PrintOptions options_print.Options
 	}
 )
 
-func (k *compiled) GetSku() *sku.Transacted {
-	return &k.Sku
+func (config Config) GetPrintOptions() options_print.Options {
+	return config.PrintOptions
 }
 
-func (k *compiled) addRepo(
-	c *sku.Transacted,
+func (compiled *compiled) GetSku() *sku.Transacted {
+	return &compiled.Sku
+}
+
+func (compiled *compiled) addRepo(
+	object *sku.Transacted,
 ) (didChange bool, err error) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
 	b := sku.GetTransactedPool().Get()
 
-	sku.Resetter.ResetWith(b, c)
+	sku.Resetter.ResetWith(b, object)
 
 	if didChange, err = quiter.AddOrReplaceIfGreater(
-		k.Repos,
+		compiled.Repos,
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -81,23 +90,23 @@ func (k *compiled) addRepo(
 	return
 }
 
-func (k *compiled) addType(
-	b1 *sku.Transacted,
+func (compiled *compiled) addType(
+	object *sku.Transacted,
 ) (didChange bool, err error) {
-	if err = genres.Type.AssertGenre(b1); err != nil {
+	if err = genres.Type.AssertGenre(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	b := sku.GetTransactedPool().Get()
 
-	sku.Resetter.ResetWith(b, b1)
+	sku.Resetter.ResetWith(b, object)
 
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
 	if didChange, err = quiter.AddOrReplaceIfGreater(
-		k.Types,
+		compiled.Types,
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -107,11 +116,11 @@ func (k *compiled) addType(
 	return
 }
 
-func (config *Config) GetTypeStringFromExtension(t string) string {
+func (config Config) GetTypeStringFromExtension(t string) string {
 	return config.ExtensionsToTypes[t]
 }
 
-func (config *Config) GetTypeExtension(v string) string {
+func (config Config) GetTypeExtension(v string) string {
 	return config.TypesToExtensions[v]
 }
 

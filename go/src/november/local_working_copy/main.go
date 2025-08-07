@@ -129,7 +129,7 @@ func (local *Repo) initialize(
 
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
 		local.GetEnv(),
-		local.GetConfig().PrintOptions.WithPrintTai(true),
+		local.GetConfig().GetPrintOptions().WithPrintTai(true),
 	)
 
 	if err = local.config.Initialize(
@@ -146,7 +146,7 @@ func (local *Repo) initialize(
 
 	if local.envWorkspace, err = env_workspace.Make(
 		local.envRepo,
-		local.config.GetConfigPtr(),
+		local.config.GetConfig(),
 		local.PrinterFDDeleted(),
 		local.GetEnvRepo(),
 	); err != nil {
@@ -155,7 +155,7 @@ func (local *Repo) initialize(
 	}
 
 	if local.storeAbbr, err = store_abbr.NewIndexAbbr(
-		local.config.GetConfig().PrintOptions,
+		local.config.GetConfig().GetPrintOptions(),
 		local.envRepo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
@@ -164,6 +164,7 @@ func (local *Repo) initialize(
 
 	local.envBox = env_box.Make(
 		local.envRepo,
+		local.config.GetConfig(),
 		local.envWorkspace.GetStoreFS(),
 		local.storeAbbr,
 	)
@@ -258,7 +259,7 @@ func (local *Repo) Flush() (err error) {
 }
 
 func (local *Repo) PrintMatchedDormantIfNecessary() {
-	if !local.GetConfig().PrintOptions.PrintMatchedDormant {
+	if !local.GetConfig().GetPrintOptions().PrintMatchedDormant {
 		return
 	}
 

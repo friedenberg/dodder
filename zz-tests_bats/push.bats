@@ -391,13 +391,13 @@ function push_history_default_stdio_twice { # @test
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
-		remote: copied Blob [0-9a-f]+ \([0-9]+ B)
 		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		remote: copied Blob [0-9a-f]+ \(.*)
+		remote: copied Blob [0-9a-f]+ \(.*)
+		remote: copied Blob [0-9a-f]+ \(.*)
+		remote: copied Blob [0-9a-f]+ \(.*)
 		remote: copied Blob [0-9a-f]+ \(.*)
 	EOM
 

@@ -310,6 +310,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 
 	if err := httpRoundTripper.InitializeWithLocal(
 		envRepo,
+		repo.GetConfig(),
 		pubkey,
 	); err != nil {
 		env.Cancel(err)

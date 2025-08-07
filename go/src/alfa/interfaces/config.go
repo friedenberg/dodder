@@ -15,7 +15,6 @@ type (
 	}
 
 	Config interface {
-		UsePrintTime() bool
 		UsePredictableZettelIds() bool
 		GetTypeStringFromExtension(t string) string
 		GetTypeExtension(string) string

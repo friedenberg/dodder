@@ -11,7 +11,7 @@ type Config struct {
 	DefaultType    ids.Type
 	DefaultTags    ids.TagSet
 	FileExtensions file_extensions.Config
-	PrintOptions   options_print.Options
+	PrintOptions   options_print.Overlay
 	ToolOptions    options_tools.Options
 }
 

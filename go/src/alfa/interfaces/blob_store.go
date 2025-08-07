@@ -44,7 +44,7 @@ type (
 
 	BlobStoreConfigMutable interface {
 		BlobStoreConfig
-		CommandComponent
+		CommandComponentWriter
 	}
 
 	BlobStore interface {

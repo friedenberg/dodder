@@ -4,16 +4,12 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -187,46 +183,5 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 		); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
-	}
-}
-
-// TODO add support for query group
-func (cmd Show) runWithArchive(
-	env env_ui.Env,
-	archive repo.Repo,
-) {
-	// TODO replace with sku.ListFormat
-	boxFormat := box_format.MakeBoxTransactedArchive(
-		env,
-		env.GetCLIConfig().PrintOptions,
-	)
-
-	printer := string_format_writer.MakeDelim(
-		"\n",
-		env.GetUIFile(),
-		string_format_writer.MakeFunc(
-			func(
-				writer interfaces.WriterAndStringWriter,
-				object *sku.Transacted,
-			) (n int64, err error) {
-				errors.ContextContinueOrPanic(env)
-				return boxFormat.EncodeStringTo(object, writer)
-			},
-		),
-	)
-
-	inventoryListStore := archive.GetInventoryListStore()
-
-	if err := inventoryListStore.ReadAllSkus(
-		func(_, sk *sku.Transacted) (err error) {
-			if err = printer(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		env.Cancel(err)
 	}
 }

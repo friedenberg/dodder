@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
@@ -12,6 +13,30 @@ type devPrinter struct {
 	printer
 	includesTime  bool
 	includesStack bool
+}
+
+//go:noinline
+func (printer devPrinter) PrintDebug(args ...any) (err error) {
+	if !printer.on {
+		return
+	}
+
+	if printer.includesTime {
+		args = append([]any{time.Now()}, args...)
+	}
+
+	if printer.includesStack {
+		stackFrame, _ := stack_frame.MakeFrame(1)
+		args = append([]any{stackFrame.StringNoFunctionName()}, args...)
+	}
+
+	_, err = fmt.Fprintf(
+		printer.file,
+		strings.Repeat("%#v ", len(args))+"\n",
+		args...,
+	)
+
+	return
 }
 
 //go:noinline

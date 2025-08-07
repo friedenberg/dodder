@@ -38,7 +38,7 @@ func (format *BoxTransacted) ReadStringFormat(
 
 	n = scanner.N()
 
-	if format.optionsPrint.DescriptionInBox {
+	if format.optionsPrint.BoxDescriptionInBox {
 		return
 	}
 

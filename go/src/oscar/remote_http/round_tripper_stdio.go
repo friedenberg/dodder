@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
 type RoundTripperStdio struct {
@@ -24,6 +25,7 @@ type RoundTripperStdio struct {
 
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envRepo env_repo.Env,
+	config store_config.Config,
 	pubkey repo_signing.PublicKey,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
@@ -38,9 +40,11 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 		"serve",
 	}
 
+	cliFlags := config.GetCLIFlags()
+
 	roundTripper.Args = append(
 		roundTripper.Args,
-		envRepo.GetCLIConfig().GetCLIFlags()...,
+		cliFlags...,
 	)
 
 	roundTripper.Args = append(roundTripper.Args, "-")

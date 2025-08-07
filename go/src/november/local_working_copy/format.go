@@ -238,7 +238,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			p := repo.MakePrinterBoxArchive(
 				writer,
-				repo.GetConfig().PrintOptions.PrintTime,
+				repo.GetConfig().GetPrintOptions().BoxPrintTime,
 			)
 
 			return func(object *sku.Transacted) (err error) {

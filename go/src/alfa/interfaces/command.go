@@ -2,7 +2,8 @@ package interfaces
 
 import "flag"
 
-type CommandComponent interface {
+// TODO modify this to expose a `GetCLIFlags() []string` method
+type CommandComponentWriter interface {
 	SetFlagSet(*flag.FlagSet)
 }
 

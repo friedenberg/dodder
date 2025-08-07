@@ -1,48 +1,45 @@
 package options_print
 
 type V1 struct {
-	Abbreviations abbreviationsV1 `toml:"abbreviations"`
+	Abbreviations *abbreviationsV1 `toml:"abbreviations"`
 	boxV1
 
-	PrintMatchedDormant bool `toml:"print-matched-dormant"`
-	PrintShas           bool `toml:"print-shas"`
-	PrintFlush          bool `toml:"print-flush"`
-	PrintUnchanged      bool `toml:"print-unchanged"`
-	PrintColors         bool `toml:"print-colors"`
-	PrintInventoryLists bool `toml:"print-inventory_lists"`
+	PrintMatchedDormant *bool `toml:"print-matched-dormant"`
+	PrintShas           *bool `toml:"print-shas"`
+	PrintFlush          *bool `toml:"print-flush"`
+	PrintUnchanged      *bool `toml:"print-unchanged"`
+	PrintColors         *bool `toml:"print-colors"`
+	PrintInventoryLists *bool `toml:"print-inventory_lists"`
 }
 
 type abbreviationsV1 struct {
-	ZettelIds bool `toml:"zettel-ids"`
-	Shas      bool `toml:"shas"`
-}
-
-func (abbreviations abbreviationsV1) GetAbbreviations() Abbreviations {
-	return Abbreviations(abbreviations)
+	ZettelIds *bool `toml:"zettel-ids"`
+	Shas      *bool `toml:"shas"`
 }
 
 type boxV1 struct {
-	PrintIncludeDescription bool `toml:"print-include-description"`
-	PrintTime               bool `toml:"print-time"`
-	PrintTagsAlways         bool `toml:"print-etiketten-always"`
-	PrintEmptyShas          bool `toml:"print-empty-shas"`
-	PrintIncludeTypes       bool `toml:"print-include-typen"`
+	PrintIncludeDescription *bool `toml:"print-include-description"`
+	PrintTime               *bool `toml:"print-time"`
+	PrintTagsAlways         *bool `toml:"print-etiketten-always"`
+	PrintEmptyShas          *bool `toml:"print-empty-shas"`
+	PrintIncludeTypes       *bool `toml:"print-include-typen"`
+	PrintTai                *bool `toml:"-"`
+	DescriptionInBox        *bool `toml:"-"`
+	ExcludeFields           *bool `toml:"-"`
 }
 
-func (box boxV1) GetBox() Box {
-	return Box{
-		PrintIncludeDescription: box.PrintIncludeDescription,
-		PrintTime:               box.PrintTime,
-		PrintTagsAlways:         box.PrintTagsAlways,
-		PrintEmptyShas:          box.PrintEmptyShas,
-		PrintIncludeTypes:       box.PrintIncludeTypes,
+func (blob V1) GetAbbreviations() *OverlayAbbreviations {
+	if blob.Abbreviations == nil {
+		return nil
+	} else {
+		return (*OverlayAbbreviations)(blob.Abbreviations)
 	}
 }
 
-func (blob V1) GetPrintOptions() Options {
-	return Options{
-		Abbreviations:       blob.Abbreviations.GetAbbreviations(),
-		Box:                 blob.GetBox(),
+func (blob V1) GetPrintOptionsOverlay() Overlay {
+	return Overlay{
+		Abbreviations:       blob.GetAbbreviations(),
+		OverlayBox:          OverlayBox(blob.boxV1),
 		PrintMatchedDormant: blob.PrintMatchedDormant,
 		PrintShas:           blob.PrintShas,
 		PrintFlush:          blob.PrintFlush,

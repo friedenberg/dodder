@@ -33,7 +33,7 @@ func Run(ctx interfaces.Context, args ...string) {
 
 	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
 
-	if cmd, ok := cmd.(interfaces.CommandComponent); ok {
+	if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
 		cmd.SetFlagSet(flagSet)
 	}
 

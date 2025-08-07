@@ -13,10 +13,14 @@ import (
 type (
 	TypedBlob = triple_hyphen_io.TypedBlob[ConfigOverlay]
 
-	ConfigOverlay interface {
+	DefaultsGetter interface {
 		GetDefaults() Defaults
+	}
+
+	ConfigOverlay interface {
+		DefaultsGetter
 		file_extensions.OverlayGetter
-		GetPrintOptions() options_print.Options
+		options_print.OverlayGetter
 		GetToolOptions() options_tools.Options
 	}
 
@@ -38,7 +42,7 @@ func Default(defaultType ids.Type) Config {
 		DefaultType:    defaultType,
 		DefaultTags:    ids.MakeTagSet(),
 		FileExtensions: file_extensions.Default(),
-		PrintOptions:   options_print.Default().GetPrintOptions(),
+		PrintOptions:   options_print.DefaultOverlay().GetPrintOptionsOverlay(),
 		ToolOptions: options_tools.Options{
 			Merge: []string{
 				"vimdiff",
@@ -55,6 +59,7 @@ func DefaultOverlay(defaultType ids.Type) TypedBlob {
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
 			},
+			PrintOptions:   options_print.DefaultOverlay().GetPrintOptionsOverlay(),
 			FileExtensions: file_extensions.DefaultOverlay(),
 			Tools: options_tools.Options{
 				Merge: []string{

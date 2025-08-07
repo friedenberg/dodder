@@ -2,31 +2,41 @@ package env_ui
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
-func (env *env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
-	o.ColorOptionsOut = env.FormatColorOptionsOut()
-	o.ColorOptionsErr = env.FormatColorOptionsErr()
+func (env *env) FormatOutputOptions(
+	printOptions options_print.Options,
+) (o string_format_writer.OutputOptions) {
+	o.ColorOptionsOut = env.FormatColorOptionsOut(printOptions)
+	o.ColorOptionsErr = env.FormatColorOptionsErr(printOptions)
 	return
 }
 
-func (env *env) shouldUseColorOutput(fd fd.Std) bool {
+func (env *env) shouldUseColorOutput(
+	printOptions options_print.Options,
+	fd fd.Std,
+) bool {
 	if env.options.IgnoreTtyState {
-		return env.cliConfig.PrintOptions.PrintColors
+		return printOptions.PrintColors
 	} else {
-		return fd.IsTty() && env.cliConfig.PrintOptions.PrintColors
+		return fd.IsTty() && printOptions.PrintColors
 	}
 }
 
-func (env *env) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !env.shouldUseColorOutput(env.GetOut())
+func (env *env) FormatColorOptionsOut(
+	printOptions options_print.Options,
+) (o string_format_writer.ColorOptions) {
+	o.OffEntirely = !env.shouldUseColorOutput(printOptions, env.GetOut())
 	return
 }
 
-func (env *env) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !env.shouldUseColorOutput(env.GetErr())
+func (env *env) FormatColorOptionsErr(
+	printOptions options_print.Options,
+) (o string_format_writer.ColorOptions) {
+	o.OffEntirely = !env.shouldUseColorOutput(printOptions, env.GetErr())
 	return
 }
 

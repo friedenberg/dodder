@@ -44,7 +44,7 @@ func (blob *V0) Reset() {
 	blob.HiddenEtiketten = make([]ids.Tag, 0)
 	blob.RemoteScripts = make(map[string]script_config.RemoteScript)
 	blob.Actions = make(map[string]script_config.ScriptConfig)
-	blob.PrintOptions = options_print.Default()
+	blob.PrintOptions = options_print.DefaultOverlay()
 	blob.Filters = make(map[string]string)
 }
 
@@ -73,8 +73,8 @@ func (blob V0) GetFileExtensionsOverlay() file_extensions.Overlay {
 	return blob.FileExtensions.GetFileExtensionsOverlay()
 }
 
-func (blob V0) GetPrintOptions() options_print.Options {
-	return blob.PrintOptions.GetPrintOptions()
+func (blob V0) GetPrintOptionsOverlay() options_print.Overlay {
+	return blob.PrintOptions.GetPrintOptionsOverlay()
 }
 
 func (blob V0) GetToolOptions() options_tools.Options {

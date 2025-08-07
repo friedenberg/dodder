@@ -54,7 +54,7 @@ func (store *Store) FlushInventoryList(
 			return
 		}
 
-		if store.GetConfigStore().GetConfig().PrintOptions.PrintInventoryLists {
+		if store.GetConfigStore().GetConfig().GetPrintOptions().PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return

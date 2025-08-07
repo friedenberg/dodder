@@ -14,7 +14,7 @@ func (local *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
 	metadata organize_text.Metadata,
 ) organize_text.Options {
 	options := organizeFlags.GetOptions(
-		local.GetConfig().PrintOptions,
+		local.GetConfig().GetPrintOptions(),
 		nil,
 		local.SkuFormatBoxCheckedOutNoColor(),
 		local.GetStore().GetAbbrStore().GetAbbr(),
@@ -31,7 +31,7 @@ func (local *Repo) MakeOrganizeOptionsWithQueryGroup(
 	qg *query.Query,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
-		local.GetConfig().PrintOptions,
+		local.GetConfig().GetPrintOptions(),
 		query.GetTags(qg),
 		local.SkuFormatBoxCheckedOutNoColor(),
 		local.GetStore().GetAbbrStore().GetAbbr(),
@@ -43,7 +43,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 	results organize_text.OrganizeResults,
 ) (changeResults organize_text.Changes, err error) {
 	if changeResults, err = organize_text.ChangesFromResults(
-		local.GetConfig().PrintOptions,
+		local.GetConfig().GetPrintOptions(),
 		results,
 	); err != nil {
 		err = errors.Wrap(err)

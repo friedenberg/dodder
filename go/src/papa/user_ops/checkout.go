@@ -183,7 +183,7 @@ func (op Checkout) runOrganize(
 	var changeResults organize_text.Changes
 
 	if changeResults, err = organize_text.ChangesFromResults(
-		op.GetConfig().PrintOptions,
+		op.GetConfig().GetPrintOptions(),
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

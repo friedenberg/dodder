@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -31,9 +32,15 @@ type Env interface {
 	Confirm(message string) (success bool)
 	Retry(header, retry string, err error) (tryAgain bool)
 
-	FormatOutputOptions() (o string_format_writer.OutputOptions)
-	FormatColorOptionsOut() (o string_format_writer.ColorOptions)
-	FormatColorOptionsErr() (o string_format_writer.ColorOptions)
+	FormatOutputOptions(
+		options_print.Options,
+	) (o string_format_writer.OutputOptions)
+	FormatColorOptionsOut(
+		options_print.Options,
+	) (o string_format_writer.ColorOptions)
+	FormatColorOptionsErr(
+		options_print.Options,
+	) (o string_format_writer.ColorOptions)
 	StringFormatWriterFields(
 		truncate string_format_writer.CliFormatTruncation,
 		co string_format_writer.ColorOptions,

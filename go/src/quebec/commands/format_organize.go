@@ -93,7 +93,7 @@ func (cmd *FormatOrganize) Run(dep command.Request) {
 	}
 
 	ot.Options = cmd.Flags.GetOptionsWithMetadata(
-		localWorkingCopy.GetConfig().PrintOptions,
+		localWorkingCopy.GetConfig().GetPrintOptions(),
 		localWorkingCopy.SkuFormatBoxCheckedOutNoColor(),
 		localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},

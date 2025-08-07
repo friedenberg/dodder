@@ -170,7 +170,7 @@ function get_konfig_sha() {
   if [[ $storeVersionCurrent -le 10 ]]; then
     echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
   else
-    echo -n "c6c10872d523b3f3c1faa14bbd10010d1315ff72c47fc3d0d9f7decf684b8990"
+    echo -n "d76cbd12cdbf3ee541f460686c3f8a210a6c0d23a9db8d6638c898b456f100aa"
   fi
 }
 

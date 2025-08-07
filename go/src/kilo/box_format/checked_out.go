@@ -73,7 +73,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 		if err = format.addFieldsExternalWithFSItem(
 			external,
 			&box,
-			format.optionsPrint.DescriptionInBox,
+			format.optionsPrint.BoxDescriptionInBox,
 			fds,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -88,7 +88,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 
 	b := &external.Metadata.Description
 
-	if !format.optionsPrint.DescriptionInBox && !b.IsEmpty() {
+	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
 			box.Trailer,
 			string_format_writer.Field{
@@ -238,7 +238,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	m := sk.GetMetadata()
 
 	if options.PrintShas &&
-		(options.PrintEmptyShas || !m.Blob.IsNull()) {
+		(options.BoxPrintEmptyShas || !m.Blob.IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
@@ -255,7 +255,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		)
 	}
 
-	if options.PrintTai && sk.GetGenre() != genres.InventoryList {
+	if options.BoxPrintTai && sk.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldTai(m),
@@ -283,7 +283,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		object_metadata_fmt.MetadataFieldTags(m)...,
 	)
 
-	if !options.ExcludeFields &&
+	if !options.BoxExcludeFields &&
 		(item == nil || item.FDs.Len() == 0) {
 		box.Contents = append(box.Contents, m.Fields...)
 	}
@@ -301,7 +301,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 	var fdAlreadyWritten *fd.FD
 
 	op := format.optionsPrint
-	op.ExcludeFields = true
+	op.BoxExcludeFields = true
 
 	switch co.GetState() {
 	case checked_out_state.Unknown:
@@ -353,7 +353,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 		if err = format.addFieldsMetadata(
 			op,
 			co.GetSkuExternal(),
-			op.DescriptionInBox,
+			op.BoxDescriptionInBox,
 			box,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -448,7 +448,7 @@ func (f *BoxTransacted) addFieldsUntracked(
 	if err = f.addFieldsMetadata(
 		op,
 		co.GetSkuExternal(),
-		f.optionsPrint.DescriptionInBox,
+		f.optionsPrint.BoxDescriptionInBox,
 		box,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -479,7 +479,7 @@ func (f *BoxTransacted) addFieldsRecognized(
 	if err = f.addFieldsMetadata(
 		op,
 		co.GetSkuExternal(),
-		op.DescriptionInBox,
+		op.BoxDescriptionInBox,
 		box,
 	); err != nil {
 		err = errors.Wrap(err)

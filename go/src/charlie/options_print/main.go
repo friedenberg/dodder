@@ -3,289 +3,323 @@ package options_print
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/equals"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
 type (
-	Abbreviations struct {
-		ZettelIds bool
-		Shas      bool
+	OverlayAbbreviations struct {
+		ZettelIds *bool
+		Shas      *bool
 	}
 
-	Box struct {
-		PrintIncludeDescription bool
-		PrintTime               bool
-		PrintTagsAlways         bool
-		PrintEmptyShas          bool
-		PrintIncludeTypes       bool
-		PrintTai                bool
-		DescriptionInBox        bool
-		ExcludeFields           bool
+	OverlayBox struct {
+		PrintIncludeDescription *bool
+		PrintTime               *bool
+		PrintTagsAlways         *bool
+		PrintEmptyShas          *bool
+		PrintIncludeTypes       *bool
+		PrintTai                *bool
+		DescriptionInBox        *bool
+		ExcludeFields           *bool
+	}
+
+	Overlay struct {
+		Abbreviations *OverlayAbbreviations
+		OverlayBox
+
+		PrintMatchedDormant *bool
+		PrintShas           *bool
+		PrintFlush          *bool
+		PrintUnchanged      *bool
+		PrintColors         *bool
+		PrintInventoryLists *bool
+		Newlines            *bool
 	}
 
 	Options struct {
-		Abbreviations Abbreviations
-		Box
-
-		PrintMatchedDormant bool
-		PrintShas           bool
-		PrintFlush          bool
-		PrintUnchanged      bool
-		PrintColors         bool
-		PrintInventoryLists bool
-		Newlines            bool
+		AbbreviateZettelIds        bool
+		AbbreviateShas             bool
+		BoxPrintIncludeDescription bool
+		BoxPrintTime               bool
+		BoxPrintTagsAlways         bool
+		BoxPrintEmptyShas          bool
+		BoxPrintIncludeTypes       bool
+		BoxPrintTai                bool
+		BoxDescriptionInBox        bool
+		BoxExcludeFields           bool
+		PrintMatchedDormant        bool
+		PrintShas                  bool
+		PrintFlush                 bool
+		PrintUnchanged             bool
+		PrintColors                bool
+		PrintInventoryLists        bool
+		Newlines                   bool
 	}
 
-	Getter interface {
+	OverlayGetter interface {
+		GetPrintOptionsOverlay() Overlay
+	}
+
+	OptionGetter interface {
 		GetPrintOptions() Options
 	}
 )
 
 var (
-	_ Getter = V0{}
-	_ Getter = V1{}
+	_ OverlayGetter = Overlay{}
+	_ OverlayGetter = V0{}
+	_ OverlayGetter = V1{}
 )
 
-func Default() V1 {
+func Default() Options {
+	return Options{
+		AbbreviateZettelIds:        true,
+		AbbreviateShas:             true,
+		BoxPrintIncludeTypes:       true,
+		BoxPrintIncludeDescription: true,
+		BoxPrintTime:               true,
+		BoxPrintTagsAlways:         true,
+		BoxPrintEmptyShas:          false,
+		PrintMatchedDormant:        false,
+		PrintShas:                  true,
+		PrintFlush:                 true,
+		PrintUnchanged:             true,
+		PrintColors:                true,
+		PrintInventoryLists:        true,
+	}
+}
+
+func DefaultOverlay() V1 {
+	config := Default()
+
 	return V1{
-		Abbreviations: abbreviationsV1{
-			ZettelIds: true,
-			Shas:      true,
+		Abbreviations: &abbreviationsV1{
+			ZettelIds: &config.AbbreviateZettelIds,
+			Shas:      &config.AbbreviateShas,
 		},
 		boxV1: boxV1{
-			PrintIncludeTypes:       true,
-			PrintIncludeDescription: true,
-			PrintTime:               true,
-			PrintTagsAlways:         true,
-			PrintEmptyShas:          false,
+			PrintIncludeTypes:       &config.BoxPrintIncludeTypes,
+			PrintIncludeDescription: &config.BoxPrintIncludeDescription,
+			PrintTime:               &config.BoxPrintTime,
+			PrintTagsAlways:         &config.BoxPrintTagsAlways,
+			PrintEmptyShas:          &config.BoxPrintEmptyShas,
 		},
-		PrintMatchedDormant: false,
-		PrintShas:           true,
-		PrintFlush:          true,
-		PrintUnchanged:      true,
-		PrintColors:         true,
-		PrintInventoryLists: true,
+		PrintMatchedDormant: &config.PrintMatchedDormant,
+		PrintShas:           &config.PrintShas,
+		PrintFlush:          &config.PrintFlush,
+		PrintUnchanged:      &config.PrintUnchanged,
+		PrintColors:         &config.PrintColors,
+		PrintInventoryLists: &config.PrintInventoryLists,
 	}
 }
 
-func (dst Options) WithPrintShas(v bool) Options {
-	dst.PrintShas = v
-	return dst
+func (options Options) WithPrintShas(v bool) Options {
+	options.PrintShas = v
+	return options
 }
 
-func (dst Options) WithDescriptionInBox(v bool) Options {
-	dst.DescriptionInBox = v
-	return dst
+func (options Options) WithDescriptionInBox(v bool) Options {
+	options.BoxDescriptionInBox = v
+	return options
 }
 
-func (dst Options) WithPrintTai(v bool) Options {
-	dst.PrintTai = v
-	return dst
+func (options Options) WithPrintTai(v bool) Options {
+	options.BoxPrintTai = v
+	return options
 }
 
-func (dst Options) WithExcludeFields(v bool) Options {
-	dst.ExcludeFields = v
-	return dst
+func (options Options) WithExcludeFields(v bool) Options {
+	options.BoxExcludeFields = v
+	return options
 }
 
-func (dst Options) WithPrintTime(v bool) Options {
-	dst.PrintTime = v
-	return dst
+func (options Options) WithPrintTime(v bool) Options {
+	options.BoxPrintTime = v
+	return options
 }
 
-func boolVarWithMask(
-	flagSet *flag.FlagSet,
-	name string,
-	valuePtr *bool,
-	mask *bool,
-	desc string,
-) {
-	flagSet.Func(name,
-		desc,
-		func(value string) (err error) {
-			var bv values.Bool
+func (options Options) UsePrintTime() bool {
+	return options.BoxPrintTime
+}
 
-			*mask = true
+func (options Options) UsePrintTags() bool {
+	return options.BoxPrintTagsAlways
+}
 
-			if err = bv.Set(value); err != nil {
-				return
-			}
+func MakeDefaultConfig(overlays ...OverlayGetter) Options {
+	return MakeConfig(Default(), overlays...)
+}
 
-			*valuePtr = bv.Bool()
+func MakeConfig(base Options, overlays ...OverlayGetter) Options {
+	for _, overlayGetter := range overlays {
+		overlay := overlayGetter.GetPrintOptionsOverlay()
+		if abbreviations := overlay.Abbreviations; abbreviations != nil {
+			equals.SetIfValueNotNil(
+				&base.AbbreviateZettelIds,
+				abbreviations.ZettelIds,
+			)
+			equals.SetIfValueNotNil(&base.AbbreviateShas, abbreviations.Shas)
+		}
 
+		box := overlay.OverlayBox
+		equals.SetIfValueNotNil(&base.BoxDescriptionInBox, box.DescriptionInBox)
+		equals.SetIfValueNotNil(&base.BoxPrintTime, box.PrintTime)
+		equals.SetIfValueNotNil(&base.BoxPrintTagsAlways, box.PrintTagsAlways)
+		equals.SetIfValueNotNil(&base.BoxPrintEmptyShas, box.PrintEmptyShas)
+		equals.SetIfValueNotNil(
+			&base.BoxPrintIncludeTypes,
+			box.PrintIncludeTypes,
+		)
+		equals.SetIfValueNotNil(&base.BoxPrintTai, box.PrintTai)
+		equals.SetIfValueNotNil(
+			&base.BoxPrintIncludeDescription,
+			box.PrintIncludeDescription,
+		)
+		equals.SetIfValueNotNil(&base.BoxExcludeFields, box.ExcludeFields)
+
+		equals.SetIfValueNotNil(
+			&base.PrintMatchedDormant,
+			overlay.PrintMatchedDormant,
+		)
+		equals.SetIfValueNotNil(&base.PrintShas, overlay.PrintShas)
+		equals.SetIfValueNotNil(&base.PrintFlush, overlay.PrintFlush)
+		equals.SetIfValueNotNil(&base.PrintUnchanged, overlay.PrintUnchanged)
+		equals.SetIfValueNotNil(&base.PrintColors, overlay.PrintColors)
+		equals.SetIfValueNotNil(
+			&base.PrintInventoryLists,
+			overlay.PrintInventoryLists,
+		)
+		equals.SetIfValueNotNil(&base.Newlines, overlay.Newlines)
+	}
+	return base
+}
+
+func (overlay Overlay) GetPrintOptionsOverlay() Overlay {
+	return overlay
+}
+
+func makeFlagSetFuncBoolVar(valuePtr **bool) func(value string) (err error) {
+	return func(value string) (err error) {
+		var boolValue values.Bool
+
+		if err = boolValue.Set(value); err != nil {
 			return
-		},
-	)
+		}
+
+		booll := boolValue.Bool()
+
+		*valuePtr = &booll
+
+		return
+	}
 }
 
-func (dst *Options) Merge(src Options, mask Options) {
-	if mask.Abbreviations.ZettelIds {
-		dst.Abbreviations.ZettelIds = src.Abbreviations.ZettelIds
-	}
-
-	if mask.Abbreviations.Shas {
-		dst.Abbreviations.Shas = src.Abbreviations.Shas
-	}
-
-	if mask.PrintIncludeTypes {
-		dst.PrintIncludeTypes = src.PrintIncludeTypes
-	}
-
-	if mask.PrintIncludeDescription {
-		dst.PrintIncludeDescription = src.PrintIncludeDescription
-	}
-
-	if mask.PrintTime {
-		dst.PrintTime = src.PrintTime
-	}
-
-	if mask.PrintTagsAlways {
-		dst.PrintTagsAlways = src.PrintTagsAlways
-	}
-
-	if mask.PrintEmptyShas {
-		dst.PrintEmptyShas = src.PrintEmptyShas
-	}
-
-	if mask.PrintMatchedDormant {
-		dst.PrintMatchedDormant = src.PrintMatchedDormant
-	}
-
-	if mask.PrintShas {
-		dst.PrintShas = src.PrintShas
-	}
-
-	if mask.PrintFlush {
-		dst.PrintFlush = src.PrintFlush
-	}
-
-	if mask.PrintUnchanged {
-		dst.PrintUnchanged = src.PrintUnchanged
-	}
-
-	if mask.PrintColors {
-		dst.PrintColors = src.PrintColors
-	}
-
-	if mask.PrintInventoryLists {
-		dst.PrintInventoryLists = src.PrintInventoryLists
-	}
-
-	dst.Newlines = src.Newlines
-}
-
-// TODO rename flags away from german
-func (dst *Options) AddToFlags(flagSet *flag.FlagSet, mask *Options) {
-	boolVarWithMask(
-		flagSet,
+func (overlay *Overlay) AddToFlags(flagSet *flag.FlagSet) {
+	flagSet.Func(
 		"print-types",
-		&dst.PrintIncludeTypes,
-		&mask.PrintIncludeTypes,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintIncludeTypes),
 	)
 
 	// TODO-P4 combine below three options
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"abbreviate-shas",
-		&dst.Abbreviations.Shas,
-		&mask.Abbreviations.Shas,
 		"",
+		func(value string) (err error) {
+			if overlay.Abbreviations == nil {
+				overlay.Abbreviations = &OverlayAbbreviations{}
+			}
+
+			return makeFlagSetFuncBoolVar(&overlay.Abbreviations.Shas)(value)
+		},
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"abbreviate-zettel-ids",
-		&dst.Abbreviations.ZettelIds,
-		&mask.Abbreviations.ZettelIds,
 		"",
+		func(value string) (err error) {
+			if overlay.Abbreviations == nil {
+				overlay.Abbreviations = &OverlayAbbreviations{}
+			}
+
+			return makeFlagSetFuncBoolVar(
+				&overlay.Abbreviations.ZettelIds,
+			)(
+				value,
+			)
+		},
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-description",
-		&dst.PrintIncludeDescription,
-		&mask.PrintIncludeDescription,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintIncludeDescription),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-time",
-		&dst.PrintTime,
-		&mask.PrintTime,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintTime),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-tags",
-		&dst.PrintTagsAlways,
-		&mask.PrintTagsAlways,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintTagsAlways),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-empty-shas",
-		&dst.PrintEmptyShas,
-		&mask.PrintEmptyShas,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintEmptyShas),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-matched-dormant",
-		&dst.PrintMatchedDormant,
-		&mask.PrintMatchedDormant,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintMatchedDormant),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-shas",
-		&dst.PrintShas,
-		&mask.PrintShas,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintShas),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-flush",
-		&dst.PrintFlush,
-		&mask.PrintFlush,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintFlush),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-unchanged",
-		&dst.PrintUnchanged,
-		&mask.PrintUnchanged,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintUnchanged),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-colors",
-		&dst.PrintColors,
-		&mask.PrintColors,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintColors),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"print-inventory_list",
-		&dst.PrintInventoryLists,
-		&mask.PrintInventoryLists,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.PrintInventoryLists),
 	)
 
-	boolVarWithMask(
-		flagSet,
+	flagSet.Func(
 		"boxed-description",
-		&dst.DescriptionInBox,
-		&mask.DescriptionInBox,
 		"",
+		makeFlagSetFuncBoolVar(&overlay.DescriptionInBox),
+	)
+
+	flagSet.Func(
+		"zittish-newlines",
+		"add extra newlines to zittish to improve readability",
+		makeFlagSetFuncBoolVar(&overlay.Newlines),
 	)
 }

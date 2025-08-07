@@ -761,7 +761,7 @@ func (server *Server) handleGetInventoryList(
 	// TODO replace with sku.ListFormat
 	boxFormat := box_format.MakeBoxTransactedArchive(
 		server.Repo.GetEnv(),
-		server.Repo.GetEnv().GetCLIConfig().PrintOptions.WithPrintTai(true),
+		server.Repo.GetConfig().GetPrintOptions().WithPrintTai(true),
 	)
 
 	printer := string_format_writer.MakeDelim(

@@ -19,24 +19,24 @@ func (config Config) GetFileExtensions() file_extensions.Config {
 	return config.FileExtensions
 }
 
-func (kc *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
+func (compiled *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
 		return
 	}
 
-	if ct1, ok := kc.Types.Get(k.String()); ok {
+	if ct1, ok := compiled.Types.Get(k.String()); ok {
 		ct = ct1.CloneTransacted()
 	}
 
 	return
 }
 
-func (kc *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
+func (compiled *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
 		return
 	}
 
-	if ct1, ok := kc.Repos.Get(k.String()); ok {
+	if ct1, ok := compiled.Repos.Get(k.String()); ok {
 		ct = ct1.CloneTransacted()
 	}
 
@@ -45,14 +45,14 @@ func (kc *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc *compiled) GetApproximatedType(
+func (compiled *compiled) GetApproximatedType(
 	k interfaces.ObjectId,
 ) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
 		return
 	}
 
-	expandedActual := kc.getSortedTypesExpanded(k.String())
+	expandedActual := compiled.getSortedTypesExpanded(k.String())
 	if len(expandedActual) > 0 {
 		ct.HasValue = true
 		ct.Type = expandedActual[0]
@@ -65,7 +65,7 @@ func (kc *compiled) GetApproximatedType(
 	return
 }
 
-func (kc *compiled) GetTagOrRepoIdOrType(
+func (compiled *compiled) GetTagOrRepoIdOrType(
 	v string,
 ) (sk *sku.Transacted, err error) {
 	var k ids.ObjectId
@@ -77,11 +77,11 @@ func (kc *compiled) GetTagOrRepoIdOrType(
 
 	switch k.GetGenre() {
 	case genres.Tag:
-		sk, _ = kc.getTag(&k)
+		sk, _ = compiled.getTag(&k)
 	case genres.Repo:
-		sk = kc.getRepo(&k)
+		sk = compiled.getRepo(&k)
 	case genres.Type:
-		sk = kc.getType(&k)
+		sk = compiled.getType(&k)
 
 	default:
 		err = genres.MakeErrUnsupportedGenre(&k)
@@ -91,7 +91,7 @@ func (kc *compiled) GetTagOrRepoIdOrType(
 	return
 }
 
-func (kc *compiled) getTag(
+func (compiled *compiled) getTag(
 	k interfaces.ObjectId,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != genres.Tag {
@@ -100,8 +100,8 @@ func (kc *compiled) getTag(
 
 	v := k.String()
 
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 	sa := quiter.MakeFuncSetString(expandedMaybe)
@@ -111,11 +111,11 @@ func (kc *compiled) getTag(
 
 	for v := range expandedMaybe.All() {
 		if cursor == nil {
-			cursor, _ = kc.Tags.Get(v.String())
+			cursor, _ = compiled.Tags.Get(v.String())
 			continue
 		}
 
-		next, ok := kc.Tags.Get(v.String())
+		next, ok := compiled.Tags.Get(v.String())
 
 		if !ok {
 			continue
@@ -139,7 +139,7 @@ func (kc *compiled) getTag(
 }
 
 // TODO-P3 merge all the below
-func (c *compiled) getSortedTypesExpanded(
+func (compiled *compiled) getSortedTypesExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
@@ -150,9 +150,9 @@ func (c *compiled) getSortedTypesExpanded(
 	expandedActual = make([]*sku.Transacted, 0)
 
 	for v := range expandedMaybe.All() {
-		c.lock.Lock()
-		ct, ok := c.Types.Get(v.String())
-		c.lock.Unlock()
+		compiled.lock.Lock()
+		ct, ok := compiled.Types.Get(v.String())
+		compiled.lock.Unlock()
 
 		if ok {
 			expandedActual = append(expandedActual, ct)
@@ -170,11 +170,11 @@ func (c *compiled) getSortedTypesExpanded(
 	return
 }
 
-func (c *compiled) getSortedTagsExpanded(
+func (compiled *compiled) getSortedTagsExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 	sa := quiter.MakeFuncSetString(
@@ -184,7 +184,7 @@ func (c *compiled) getSortedTagsExpanded(
 	expandedActual = make([]*sku.Transacted, 0)
 
 	for v := range expandedMaybe.All() {
-		ct, ok := c.Tags.Get(v.String())
+		ct, ok := compiled.Tags.Get(v.String())
 
 		if !ok {
 			continue
@@ -208,10 +208,10 @@ func (c *compiled) getSortedTagsExpanded(
 	return
 }
 
-func (c *compiled) GetImplicitTags(
+func (compiled *compiled) GetImplicitTags(
 	e *ids.Tag,
 ) ids.TagSet {
-	s, ok := c.ImplicitTags[e.String()]
+	s, ok := compiled.ImplicitTags[e.String()]
 
 	if !ok || s == nil {
 		return ids.MakeTagSet()

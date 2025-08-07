@@ -78,7 +78,7 @@ func (cmd Complete) Run(req command.Request) {
 	flagSet.SetOutput(io.Discard)
 	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
 
-	if subcmd, ok := subcmd.(interfaces.CommandComponent); ok {
+	if subcmd, ok := subcmd.(interfaces.CommandComponentWriter); ok {
 		subcmd.SetFlagSet(flagSet)
 	}
 

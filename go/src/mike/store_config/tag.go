@@ -82,10 +82,10 @@ func (e *tag) String() string {
 	return e.Transacted.GetObjectId().String()
 }
 
-func (k *compiled) AccumulateImplicitTags(
+func (compiled *compiled) AccumulateImplicitTags(
 	e ids.Tag,
 ) (err error) {
-	ek, ok := k.Tags.Get(e.String())
+	ek, ok := compiled.Tags.Get(e.String())
 
 	if !ok {
 		return
@@ -105,13 +105,13 @@ func (k *compiled) AccumulateImplicitTags(
 			continue
 		}
 
-		if err = k.AccumulateImplicitTags(e1); err != nil {
+		if err = compiled.AccumulateImplicitTags(e1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		for e2 := range k.GetImplicitTags(&e1).All() {
-			if err = k.ImplicitTags.Set(e, e2); err != nil {
+		for e2 := range compiled.GetImplicitTags(&e1).All() {
+			if err = compiled.ImplicitTags.Set(e, e2); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -119,16 +119,16 @@ func (k *compiled) AccumulateImplicitTags(
 	}
 
 	for e1 := range ek.Transacted.Metadata.GetTags().All() {
-		if k.ImplicitTags.Contains(e1, e) {
+		if compiled.ImplicitTags.Contains(e1, e) {
 			continue
 		}
 
-		if err = k.ImplicitTags.Set(e, e1); err != nil {
+		if err = compiled.ImplicitTags.Set(e, e1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = k.AccumulateImplicitTags(e1); err != nil {
+		if err = compiled.AccumulateImplicitTags(e1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -137,18 +137,18 @@ func (k *compiled) AccumulateImplicitTags(
 	return
 }
 
-func (k *compiled) addTag(
+func (compiled *compiled) addTag(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 ) (didChange bool, err error) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
 	var b tag
 
 	sku.Resetter.ResetWith(&b.Transacted, kinder)
 
-	if didChange, err = quiter.AddOrReplaceIfGreater(k.Tags, &b); err != nil {
+	if didChange, err = quiter.AddOrReplaceIfGreater(compiled.Tags, &b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -24,7 +24,7 @@ func MakeBoxTransactedArchive(
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 
-	co := env.FormatColorOptionsOut()
+	co := env.FormatColorOptionsOut(options)
 	co.OffEntirely = true
 
 	format := MakeBoxTransacted(
@@ -112,7 +112,7 @@ func (format *BoxTransacted) EncodeStringTo(
 	if err = format.addFieldsMetadata(
 		format.optionsPrint,
 		object,
-		format.optionsPrint.DescriptionInBox,
+		format.optionsPrint.BoxDescriptionInBox,
 		&box,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -121,7 +121,7 @@ func (format *BoxTransacted) EncodeStringTo(
 
 	b := &object.Metadata.Description
 
-	if !format.optionsPrint.DescriptionInBox && !b.IsEmpty() {
+	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
 			box.Trailer,
 			string_format_writer.Field{
@@ -238,7 +238,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 	metadata := object.GetMetadata()
 
 	if options.PrintShas &&
-		(options.PrintEmptyShas || !metadata.Blob.IsNull()) {
+		(options.BoxPrintEmptyShas || !metadata.Blob.IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
@@ -255,7 +255,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 		)
 	}
 
-	if options.PrintTai && object.GetGenre() != genres.InventoryList {
+	if options.BoxPrintTai && object.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldTai(metadata),
@@ -291,7 +291,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 		object_metadata_fmt.MetadataFieldTags(metadata)...,
 	)
 
-	if !options.ExcludeFields && !format.isArchive {
+	if !options.BoxExcludeFields && !format.isArchive {
 		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 

@@ -85,7 +85,9 @@ func (cmd Clean) Run(req command.Request) {
 		return
 	}
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock),
+	)
 
 	if err := localWorkingCopy.GetStore().QuerySkuType(
 		queryGroup,
@@ -105,10 +107,15 @@ func (cmd Clean) Run(req command.Request) {
 		localWorkingCopy.Cancel(err)
 	}
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
+	)
 }
 
-func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err error) {
+func (c Clean) runOrganize(
+	u *local_working_copy.Repo,
+	qg *query.Query,
+) (err error) {
 	opOrganize := user_ops.Organize{
 		Repo: u,
 		Metadata: organize_text.Metadata{
@@ -137,7 +144,7 @@ func (c Clean) runOrganize(u *local_working_copy.Repo, qg *query.Query) (err err
 	var changes organize_text.Changes
 
 	if changes, err = organize_text.ChangesFromResults(
-		u.GetConfig().PrintOptions,
+		u.GetConfig().GetPrintOptions(),
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

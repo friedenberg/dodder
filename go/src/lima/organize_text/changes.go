@@ -207,7 +207,7 @@ func applyToText(
 	po options_print.Options,
 	t *Text,
 ) (err error) {
-	if po.PrintTagsAlways {
+	if po.BoxPrintTagsAlways {
 		return
 	}
 

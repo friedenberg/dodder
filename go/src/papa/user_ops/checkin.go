@@ -120,7 +120,7 @@ func (op Checkin) runOrganize(
 	var changes organize_text.Changes
 
 	if changes, err = organize_text.ChangesFromResults(
-		repo.GetConfig().PrintOptions,
+		repo.GetConfig().GetPrintOptions(),
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)

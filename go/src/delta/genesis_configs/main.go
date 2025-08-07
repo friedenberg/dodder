@@ -37,7 +37,7 @@ type (
 
 		SetInventoryListTypeString(string)
 		// TODO separate into non-method function that uses properties
-		interfaces.CommandComponent
+		interfaces.CommandComponentWriter
 		SetRepoType(repo_type.Type)
 		SetRepoId(ids.RepoId)
 		repo_signing.Generator

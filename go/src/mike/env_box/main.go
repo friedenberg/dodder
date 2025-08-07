@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/lima/store_fs"
+	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
 type Env interface {
@@ -40,11 +41,13 @@ type Env interface {
 // TODO make this work even if storeFS and abbr are nil
 func Make(
 	envRepo env_repo.Env,
+	config store_config.Config,
 	storeFS *store_fs.Store,
 	abbr sku.AbbrStore,
 ) Env {
 	env := &env{
 		Env:     envRepo,
+		config:  config,
 		storeFS: storeFS,
 		abbr:    abbr,
 	}
@@ -59,6 +62,7 @@ func Make(
 
 type env struct {
 	env_repo.Env
+	config        store_config.Config
 	storeFS       *store_fs.Store
 	abbr          sku.AbbrStore
 	object_format object_inventory_format.Format
@@ -82,7 +86,7 @@ func (env *env) StringFormatWriterSkuBoxTransacted(
 ) *box_format.BoxTransacted {
 	var headerWriter string_format_writer.HeaderWriter[*sku.Transacted]
 
-	if printOptions.PrintTime && !printOptions.PrintTai {
+	if printOptions.BoxPrintTime && !printOptions.BoxPrintTai {
 		headerWriter = box_format.TransactedHeaderUserTai{}
 	}
 
@@ -115,12 +119,12 @@ func (env *env) StringFormatWriterSkuBoxCheckedOut(
 }
 
 func (env *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
-	colorOptions := env.FormatColorOptionsOut()
+	colorOptions := env.FormatColorOptionsOut(env.config.GetPrintOptions())
 	colorOptions.OffEntirely = true
-	options := env.GetCLIConfig().PrintOptions.WithPrintShas(false)
-	options.PrintTime = false
+	options := env.config.GetPrintOptions().WithPrintShas(false)
+	options.BoxPrintTime = false
 	options.PrintShas = false
-	options.DescriptionInBox = false
+	options.BoxDescriptionInBox = false
 
 	return env.StringFormatWriterSkuBoxTransacted(
 		options,
@@ -129,15 +133,15 @@ func (env *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	)
 }
 
-func (u *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
-	co := u.FormatColorOptionsOut()
+func (env *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
+	co := env.FormatColorOptionsOut(env.config.GetPrintOptions())
 	co.OffEntirely = true
-	options := u.GetCLIConfig().PrintOptions.WithPrintShas(false)
-	options.PrintTime = false
+	options := env.config.GetPrintOptions().WithPrintShas(false)
+	options.BoxPrintTime = false
 	options.PrintShas = false
-	options.DescriptionInBox = false
+	options.BoxDescriptionInBox = false
 
-	return u.StringFormatWriterSkuBoxCheckedOut(
+	return env.StringFormatWriterSkuBoxCheckedOut(
 		options,
 		co,
 		string_format_writer.CliFormatTruncationNone,
@@ -146,13 +150,13 @@ func (u *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 }
 
 func (env *env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	printOptions := env.GetCLIConfig().PrintOptions.
+	printOptions := env.config.GetPrintOptions().
 		WithPrintShas(true).
 		WithExcludeFields(true)
 
 	stringFormatWriter := env.StringFormatWriterSkuBoxTransacted(
 		printOptions,
-		env.FormatColorOptionsOut(),
+		env.FormatColorOptionsOut(printOptions),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 	)
 
@@ -173,9 +177,9 @@ func (env *env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 func (env *env) PrinterCheckedOut(
 	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) interfaces.FuncIter[*sku.CheckedOut] {
-	oo := env.FormatOutputOptions()
-	po := env.GetCLIConfig().PrintOptions.
+	po := env.config.GetPrintOptions().
 		WithPrintShas(true)
+	oo := env.FormatOutputOptions(po)
 
 	out := string_format_writer.MakeDelim(
 		"\n",
@@ -198,7 +202,7 @@ func (env *env) GetUIStorePrinters() sku.UIStorePrinters {
 		TransactedNew:     printerTransacted,
 		TransactedUpdated: printerTransacted,
 		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
-			if !env.GetCLIConfig().PrintOptions.PrintUnchanged {
+			if !env.config.GetPrintOptions().PrintUnchanged {
 				return
 			}
 

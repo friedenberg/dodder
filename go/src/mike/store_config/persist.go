@@ -130,15 +130,15 @@ func (store *store) GetChanges() (out []string) {
 	return
 }
 
-func (kc *compiled) SetNeedsRecompile(reason string) {
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
+func (compiled *compiled) SetNeedsRecompile(reason string) {
+	compiled.lock.Lock()
+	defer compiled.lock.Unlock()
 
-	kc.setNeedsRecompile(reason)
+	compiled.setNeedsRecompile(reason)
 }
 
-func (kc *compiled) setNeedsRecompile(reason string) {
-	kc.changes = append(kc.changes, reason)
+func (compiled *compiled) setNeedsRecompile(reason string) {
+	compiled.changes = append(compiled.changes, reason)
 }
 
 func (store *store) loadMutableConfig(

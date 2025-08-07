@@ -10,7 +10,7 @@ import (
 type V2 struct {
 	Defaults       DefaultsV1             `toml:"defaults"`
 	FileExtensions file_extensions.TOMLV1 `toml:"file-extensions"`
-	PrintOptions   options_print.Options  `toml:"cli-output"`
+	PrintOptions   options_print.Overlay  `toml:"cli-output"`
 	Tools          options_tools.Options  `toml:"tools"`
 }
 
@@ -18,7 +18,7 @@ func (config *V2) Reset() {
 	config.FileExtensions.Reset()
 	config.Defaults.Type = ids.Type{}
 	config.Defaults.Tags = make([]ids.Tag, 0)
-	config.PrintOptions = options_print.Default().GetPrintOptions()
+	config.PrintOptions = options_print.DefaultOverlay().GetPrintOptionsOverlay()
 }
 
 func (config *V2) ResetWith(b *V2) {
@@ -40,7 +40,7 @@ func (blob V2) GetFileExtensionsOverlay() file_extensions.Overlay {
 	return blob.FileExtensions.GetFileExtensionsOverlay()
 }
 
-func (config V2) GetPrintOptions() options_print.Options {
+func (config V2) GetPrintOptionsOverlay() options_print.Overlay {
 	return config.PrintOptions
 }
 
