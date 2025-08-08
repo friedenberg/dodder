@@ -30,7 +30,7 @@ func (ml *memoryLimit) Start(ctx interfaces.Context) (err error) {
 	if memoryLimit, err = getMemoryLimit(); err != nil {
 		memoryLimit = (1500 * 1024 * 1024) // 1.5 GB
 		ui.Err().Printf(
-			"memory limit not found, setting to %s",
+      "error getting memory limit: %s. setting to %s",
 			ui.GetHumanBytesString(memoryLimit),
 		)
 
