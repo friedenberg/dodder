@@ -216,14 +216,6 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 	wg.Do(
 		transacted.makeShaCalcFunc(
 			f,
-			object_inventory_format.Formats.Metadata(),
-			&transacted.Metadata.SelfMetadata,
-		),
-	)
-
-	wg.Do(
-		transacted.makeShaCalcFunc(
-			f,
 			object_inventory_format.Formats.MetadataSansTai(),
 			&transacted.Metadata.SelfMetadataWithoutTai,
 		),

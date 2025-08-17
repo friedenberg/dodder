@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	ShaKeySelfMetadata                 = keys.ShaKeySelfMetadata
 	ShaKeySelfMetadataWithouTai        = keys.ShaKeySelfMetadataWithouTai
 	ShaKeySelfMetadataObjectIdParent   = keys.ShaKeySelfMetadataObjectIdParent
 	ShaKeyParentMetadataObjectIdParent = keys.ShaKeyParentMetadataObjectIdParent
@@ -26,7 +25,6 @@ type Sha struct {
 // TODO consider moving all non-essential digests to a separate key-value store
 type Shas struct {
 	Blob                         sha.Sha
-	SelfMetadata                 sha.Sha
 	SelfMetadataWithoutTai       sha.Sha
 	SelfMetadataObjectIdParent   sha.Sha
 	ParentMetadataObjectIdParent sha.Sha
@@ -34,7 +32,6 @@ type Shas struct {
 
 func (shas *Shas) Reset() {
 	shas.Blob.Reset()
-	shas.SelfMetadata.Reset()
 	shas.SelfMetadataWithoutTai.Reset()
 	shas.SelfMetadataObjectIdParent.Reset()
 	shas.ParentMetadataObjectIdParent.Reset()
@@ -42,8 +39,6 @@ func (shas *Shas) Reset() {
 
 func (shas *Shas) ResetWith(src *Shas) {
 	shas.Blob.ResetWith(&src.Blob)
-	shas.SelfMetadata.ResetWith(&src.SelfMetadata)
-	shas.SelfMetadataWithoutTai.ResetWith(&src.SelfMetadataWithoutTai)
 	shas.SelfMetadataObjectIdParent.ResetWith(&src.SelfMetadataObjectIdParent)
 	shas.ParentMetadataObjectIdParent.ResetWith(
 		&src.ParentMetadataObjectIdParent,
@@ -54,7 +49,6 @@ func (shas *Shas) String() string {
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &shas.Blob)
-	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadata, &shas.SelfMetadata)
 	fmt.Fprintf(
 		&sb,
 		"%s: %s\n",
@@ -67,12 +61,6 @@ func (shas *Shas) String() string {
 
 func (shas *Shas) Add(k, v string) (err error) {
 	switch k {
-	case ShaKeySelfMetadata:
-		if err = shas.SelfMetadata.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case ShaKeySelfMetadataWithouTai:
 		if err = shas.SelfMetadataWithoutTai.Set(v); err != nil {
 			err = errors.Wrap(err)

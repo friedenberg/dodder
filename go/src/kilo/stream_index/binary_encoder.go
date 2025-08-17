@@ -207,22 +207,12 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.ShaMetadata:
-		if err = blob_ids.MakeErrIsNull(&sk.Metadata.SelfMetadata); err != nil {
-			return
-		}
-
-		if n, err = bf.writeFieldWriterTo(&sk.Metadata.SelfMetadata); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case keys.CacheTagImplicit:
-		es := sk.Metadata.Cache.GetImplicitTags()
+		tags := sk.Metadata.Cache.GetImplicitTags()
 
-		for _, e := range quiter.SortedValues[ids.Tag](es) {
+		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
-			n1, err = bf.writeFieldBinaryMarshaler(&e)
+			n1, err = bf.writeFieldBinaryMarshaler(&tag)
 			n += n1
 
 			if err != nil {

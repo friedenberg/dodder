@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	ShaKeySelfMetadata                 = "SelbstMetadatei"
 	ShaKeySelfMetadataWithouTai        = "SelbstMetadateiMutterSansTai"
 	ShaKeySelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
 	ShaKeyParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
