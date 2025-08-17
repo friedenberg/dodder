@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
@@ -26,7 +24,9 @@ func (digests *Digests) Reset() {
 
 func (digests *Digests) ResetWith(src *Digests) {
 	digests.Blob.ResetWith(&src.Blob)
-	digests.SelfMetadataObjectIdParent.ResetWith(&src.SelfMetadataObjectIdParent)
+	digests.SelfMetadataObjectIdParent.ResetWith(
+		&src.SelfMetadataObjectIdParent,
+	)
 	digests.ParentMetadataObjectIdParent.ResetWith(
 		&src.ParentMetadataObjectIdParent,
 	)
@@ -38,26 +38,4 @@ func (digests *Digests) String() string {
 	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &digests.Blob)
 
 	return sb.String()
-}
-
-func (digests *Digests) Add(k, v string) (err error) {
-	switch k {
-	case keys.DigestSelfMetadataObjectIdParent:
-		if err = digests.SelfMetadataObjectIdParent.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case keys.DigestParentMetadataObjectIdParent:
-		if err = digests.ParentMetadataObjectIdParent.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = errors.ErrorWithStackf("unrecognized sha kind: %q", k)
-		return
-	}
-
-	return
 }

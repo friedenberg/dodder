@@ -26,10 +26,10 @@ const (
 	Tai           = 'T'
 	Type          = 't'
 
-	ShaParentMetadataParentObjectId = 'M'
-	ShaMetadataParentObjectId       = 's'
-	ShaMetadataWithoutTai           = 'n'
-	ShaMetadata                     = 'm'
+	DigestParentMetadataParentObjectId = 'M'
+	DigestMetadataParentObjectId       = 's'
+	DigestMetadataWithoutTai           = 'n'
+	DigestMetadata                     = 'm'
 
 	CacheParentTai   = 'p'
 	CacheDormant     = 'a'
