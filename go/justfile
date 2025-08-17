@@ -241,6 +241,11 @@ deploy-github:
   #! /usr/bin/env -S bash -e
   set -euo pipefail
 
+  if [[ "$(git branch --show-current)" != master ]]; then
+    echo "not on master, refusing to deploy" >&2
+    exit 1
+  fi
+
   target="deploy-github"
   timestamp="$(date +"%Y-%m-%d-%H-%M")"
   id="$target-$timestamp"
@@ -282,7 +287,7 @@ deploy-github:
   {
     popd
     git merge --autostash "$id"
-    git push origin/master
+    git push origin master
   }
 
   # remove worktree
