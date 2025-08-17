@@ -189,19 +189,19 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.ShaParentMetadataParentObjectId:
+	case keys.DigestParentMetadataParentObjectId:
 		if n, err = bf.writeSha(sk.Metadata.GetMotherDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.ShaMetadataWithoutTai:
+	case keys.DigestMetadataWithoutTai:
 		if n, err = bf.writeSha(&sk.Metadata.SelfMetadataWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.ShaMetadataParentObjectId:
+	case keys.DigestMetadataParentObjectId:
 		if n, err = bf.writeSha(sk.Metadata.GetDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return

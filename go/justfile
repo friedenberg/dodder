@@ -3,7 +3,7 @@ dir_build := absolute_path("build")
 
 default: build
 
-git-add-and-commit *PATHS:
+git-add_and_commit *PATHS:
   #! /usr/bin/env fish
   set -l argv {{PATHS}}
   if test (count $argv) -gt 0
@@ -237,18 +237,59 @@ deploy-docker: build-docker
   docker tag dodder:latest idealnesswagon5/dodder:latest
   docker push idealnesswagon5/dodder:latest
 
-# TODO modify this to first create a git worktree with all the changes, and then
-# run all the deployments on it to exclude any changes that were added AFTER the
-# task began. The worktree root should follow this pattern
-# ./build/deploy-YEAR-month-date-hour-minute
-deploy-github: \
-    build-go \
-    build-nix-gomod \
-    test \
-    test-bats-next \
-    (git-add-and-commit \
-      "." \
-      "../{zz-pandoc,zz-vim,zz-tests_bats}" \
-      "gomod2nix.toml")
+deploy-github:
+  #! /usr/bin/env -S bash -e
+  set -euo pipefail
+
+  target="deploy-github"
+  timestamp="$(date +"%Y-%m-%d-%H-%M")"
+  id="$target-$timestamp"
+  worktree_dir="$(mktemp -d -t "$id-XXXXXX")"
+
+  # make worktree
+  {
+    git branch "$id"
+    
+    git worktree add "$worktree_dir" "$id"
+    git diff HEAD | git -C "$worktree_dir" apply --3way
+
+    prefix="$(git rev-parse --show-prefix)"
+    
+    pushd "$worktree_dir/$prefix" || exit 1
+  }
+
+  # modify worktree
+  {
+    just build-go build-nix-gomod
+  }
+
+  # commit worktree
+  {
+    git add \
+      . \
+      ../{zz-pandoc,zz-vim,zz-tests_bats} \
+      gomod2nix.toml
+
+    git commit -m update
+  }
+
+  # test worktree
+  {
+    just test test-bats-next
+  }
+
+  # merge worktree and push
+  {
+    popd
+    git merge --autostash "$id"
+    git push origin/master
+  }
+
+  # remove worktree
+  {
+    git worktree remove "$worktree_dir"
+    rm -rf "$worktree_dir"
+    git branch -d "$id"
+  }
 
 deploy: deploy-github deploy-docker

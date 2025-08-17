@@ -4,12 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 )
 
-const (
-	DigestSelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
-	DigestParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
-	DigestSelf                         = "MetadateiTai"
-	DigestParent                       = "MutterMetadateiMutterTai"
-)
+// TODO move this to its own package, src/delta/key_strings
 
 var (
 	KeySigil = catgut.MakeFromString("Sigil")

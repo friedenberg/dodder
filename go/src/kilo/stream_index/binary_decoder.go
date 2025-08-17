@@ -23,9 +23,9 @@ var binaryFieldOrder = []keys.Binary{
 	keys.Tag,
 	keys.Tai,
 	keys.Type,
-	keys.ShaParentMetadataParentObjectId,
-	keys.ShaMetadataParentObjectId,
-	keys.ShaMetadataWithoutTai,
+	keys.DigestParentMetadataParentObjectId,
+	keys.DigestMetadataParentObjectId,
+	keys.DigestMetadataWithoutTai,
 	keys.CacheParentTai,
 	keys.CacheTagImplicit,
 	keys.CacheTagExpanded,
@@ -320,19 +320,19 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.ShaParentMetadataParentObjectId:
+	case keys.DigestParentMetadataParentObjectId:
 		if _, err = sk.Metadata.GetMotherDigest().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.ShaMetadataParentObjectId:
+	case keys.DigestMetadataParentObjectId:
 		if _, err = sk.Metadata.GetDigest().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.ShaMetadataWithoutTai:
+	case keys.DigestMetadataWithoutTai:
 		if _, err = sk.Metadata.SelfMetadataWithoutTai.ReadFrom(
 			&bf.Content,
 		); err != nil {
