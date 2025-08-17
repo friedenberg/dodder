@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -63,7 +64,13 @@ func (f v4) ParsePersistentMetadata(
 			n, err := val.WriteTo(&valBuffer)
 
 			if n != int64(val.Len()) || err != nil {
-				panic(fmt.Sprintf("failed to write val to valBuffer. N: %d, Err: %s", n, err))
+				panic(
+					fmt.Sprintf(
+						"failed to write val to valBuffer. N: %d, Err: %s",
+						n,
+						err,
+					),
+				)
 			}
 		}
 
@@ -113,7 +120,7 @@ func (f v4) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keyTai.Bytes()):
+		case key.Equal(key_strings.Tai.Bytes()):
 			if err = m.Tai.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -179,7 +186,7 @@ func (f v4) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keySha.Bytes()):
+		case key.Equal(key_strings.Sha.Bytes()):
 			if err = m.GetDigest().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return

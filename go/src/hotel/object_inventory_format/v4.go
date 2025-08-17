@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -129,7 +130,7 @@ func (f v4) FormatPersistentMetadata(
 	if o.Tai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			multiWriter,
-			keyTai.String(),
+			key_strings.Tai.String(),
 			metadata.Tai.String(),
 		)
 		n += int64(n1)
@@ -241,7 +242,7 @@ func (f v4) FormatPersistentMetadata(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			bufferedWriter,
-			keySha.String(),
+			key_strings.Sha.String(),
 			blob_ids.Format(actual),
 		)
 

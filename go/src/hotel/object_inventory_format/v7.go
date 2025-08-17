@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -35,7 +35,7 @@ func (f v7) FormatPersistentMetadata(
 	if !m.Blob.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyBlob.String(),
+			key_strings.Blob.String(),
 			m.Blob.String(),
 		)
 		n += int64(n1)
@@ -55,7 +55,7 @@ func (f v7) FormatPersistentMetadata(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyDescription.String(),
+			key_strings.Description.String(),
 			line,
 		)
 		n += int64(n1)
@@ -75,7 +75,7 @@ func (f v7) FormatPersistentMetadata(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyTag.String(),
+			key_strings.Tag.String(),
 			e.String(),
 		)
 		n += int64(n1)
@@ -88,7 +88,7 @@ func (f v7) FormatPersistentMetadata(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		keys.KeyGenre.String(),
+		key_strings.Genre.String(),
 		c.GetObjectId().GetGenre().GetGenreString(),
 	)
 	n += int64(n1)
@@ -100,7 +100,7 @@ func (f v7) FormatPersistentMetadata(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		keys.KeyObjectId.String(),
+		key_strings.ObjectId.String(),
 		c.GetObjectId().String(),
 	)
 	n += int64(n1)
@@ -113,7 +113,7 @@ func (f v7) FormatPersistentMetadata(
 	for _, k := range m.Comments {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyComment.String(),
+			key_strings.Comment.String(),
 			k,
 		)
 		n += int64(n1)
@@ -127,7 +127,7 @@ func (f v7) FormatPersistentMetadata(
 	if o.Tai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyTai.String(),
+			key_strings.Tai.String(),
 			m.Tai.String(),
 		)
 		n += int64(n1)
@@ -141,7 +141,7 @@ func (f v7) FormatPersistentMetadata(
 	if !m.Type.IsEmpty() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keys.KeyType.String(),
+			key_strings.Type.String(),
 			m.GetType().String(),
 		)
 		n += int64(n1)
@@ -154,7 +154,7 @@ func (f v7) FormatPersistentMetadata(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		keys.KeySha.String(),
+		key_strings.Sha.String(),
 		m.GetDigest().String(),
 	)
 
@@ -216,24 +216,30 @@ func (f v7) ParsePersistentMetadata(
 			n, err := val.WriteTo(&valBuffer)
 
 			if n != int64(val.Len()) || err != nil {
-				panic(fmt.Sprintf("failed to write val to valBuffer. N: %d, Err: %s", n, err))
+				panic(
+					fmt.Sprintf(
+						"failed to write val to valBuffer. N: %d, Err: %s",
+						n,
+						err,
+					),
+				)
 			}
 		}
 
 		switch {
-		case key.Equal(keys.KeyBlob.Bytes()):
+		case key.Equal(key_strings.Blob.Bytes()):
 			if err = m.Blob.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeyDescription.Bytes()):
+		case key.Equal(key_strings.Description.Bytes()):
 			if err = m.Description.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeyTag.Bytes()):
+		case key.Equal(key_strings.Tag.Bytes()):
 			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
@@ -246,13 +252,13 @@ func (f v7) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keys.KeyGenre.Bytes()):
+		case key.Equal(key_strings.Genre.Bytes()):
 			if err = g.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeyObjectId.Bytes()):
+		case key.Equal(key_strings.ObjectId.Bytes()):
 			k = ids.GetObjectIdPool().Get()
 			defer ids.GetObjectIdPool().Put(k)
 
@@ -266,25 +272,25 @@ func (f v7) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keys.KeyTai.Bytes()):
+		case key.Equal(key_strings.Tai.Bytes()):
 			if err = m.Tai.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeyType.Bytes()):
+		case key.Equal(key_strings.Type.Bytes()):
 			if err = m.Type.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeySha.Bytes()):
+		case key.Equal(key_strings.Sha.Bytes()):
 			if err = m.GetDigest().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case key.Equal(keys.KeyComment.Bytes()):
+		case key.Equal(key_strings.Comment.Bytes()):
 			m.Comments = append(m.Comments, val.String())
 
 		default:

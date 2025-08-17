@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/german_keys"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings_german"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -54,21 +54,18 @@ var (
 		KeyFormatV6MetadataObjectIdParent,
 	}
 
-	keyAkte                            = german_keys.KeyAkte
-	keyBezeichnung                     = german_keys.KeyBezeichnung
-	keyEtikett                         = german_keys.KeyEtikett
-	keyGattung                         = german_keys.KeyGattung
-	keyKennung                         = german_keys.KeyKennung
-	keyKomment                         = german_keys.KeyKomment
-	keyTyp                             = german_keys.KeyTyp
-	keyShasMutterMetadataKennungMutter = german_keys.KeyShasMutterMetadateiKennungMutter
-	keyVerzeichnisseArchiviert         = german_keys.KeyVerzeichnisseArchiviert
-	keyVerzeichnisseEtikettImplicit    = german_keys.KeyVerzeichnisseEtikettImplicit
-	keyVerzeichnisseEtikettExpanded    = german_keys.KeyVerzeichnisseEtikettExpanded
-
-	keySigil = keys.KeySigil
-	keyTai   = keys.KeyTai
-	keySha   = keys.KeySha
+	// TODO remove local aliases and only use german_keys
+	keyAkte                            = key_strings_german.Akte
+	keyBezeichnung                     = key_strings_german.Bezeichnung
+	keyEtikett                         = key_strings_german.Etikett
+	keyGattung                         = key_strings_german.Gattung
+	keyKennung                         = key_strings_german.Kennung
+	keyKomment                         = key_strings_german.Komment
+	keyTyp                             = key_strings_german.Typ
+	keyShasMutterMetadataKennungMutter = key_strings_german.ShasMutterMetadateiKennungMutter
+	keyVerzeichnisseArchiviert         = key_strings_german.VerzeichnisseArchiviert
+	keyVerzeichnisseEtikettImplicit    = key_strings_german.VerzeichnisseEtikettImplicit
+	keyVerzeichnisseEtikettExpanded    = key_strings_german.VerzeichnisseEtikettExpanded
 )
 
 type FormatGeneric struct {
@@ -103,7 +100,7 @@ func init() {
 		keyBezeichnung,
 		keyEtikett,
 		keyTyp,
-		keyTai,
+		key_strings.Tai,
 	}
 
 	Formats.metadataSansTai.key = KeyFormatV5MetadataWithoutTai
@@ -121,7 +118,7 @@ func init() {
 		keyEtikett,
 		keyKennung,
 		keyTyp,
-		keyTai,
+		key_strings.Tai,
 		keyShasMutterMetadataKennungMutter,
 	}
 }
@@ -303,10 +300,10 @@ func WriteMetadataKeyTo(
 			return
 		}
 
-	case keyTai:
+	case key_strings.Tai:
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keyTai.String(),
+			key_strings.Tai.String(),
 			m.Tai.String(),
 		)
 		n += int64(n1)

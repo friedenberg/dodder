@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -129,7 +130,7 @@ func (f v5) FormatPersistentMetadata(
 	if o.Tai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			keyTai.String(),
+			key_strings.Tai.String(),
 			m.Tai.String(),
 		)
 		n += int64(n1)
@@ -238,7 +239,7 @@ func (f v5) FormatPersistentMetadata(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		keySha.String(),
+		key_strings.Sha.String(),
 		m.GetDigest().String(),
 	)
 
@@ -300,7 +301,13 @@ func (f v5) ParsePersistentMetadata(
 			n, err := val.WriteTo(&valBuffer)
 
 			if n != int64(val.Len()) || err != nil {
-				panic(fmt.Sprintf("failed to write val to valBuffer. N: %d, Err: %s", n, err))
+				panic(
+					fmt.Sprintf(
+						"failed to write val to valBuffer. N: %d, Err: %s",
+						n,
+						err,
+					),
+				)
 			}
 		}
 
@@ -350,7 +357,7 @@ func (f v5) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keyTai.Bytes()):
+		case key.Equal(key_strings.Tai.Bytes()):
 			if err = m.Tai.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -416,7 +423,7 @@ func (f v5) ParsePersistentMetadata(
 				return
 			}
 
-		case key.Equal(keySha.Bytes()):
+		case key.Equal(key_strings.Sha.Bytes()):
 			if err = m.GetDigest().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return

@@ -1,7 +1,5 @@
 package interfaces
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-
 type Delta[T any] interface {
 	GetAdded() SetLike[T]
 	GetRemoved() SetLike[T]
@@ -25,7 +23,7 @@ type SetLike[T any] interface {
 	Key(T) string
 	Get(string) (T, bool)
 	Contains(T) bool
-	AllKeys() interfaces.Seq[string]
+	AllKeys() Seq[string]
 
 	CloneSetLike() SetLike[T]
 	CloneMutableSetLike() MutableSetLike[T]

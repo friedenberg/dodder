@@ -279,6 +279,11 @@ deploy-github:
     just build-go build-nix-gomod
   }
 
+  # test worktree
+  {
+    just test test-bats-next
+  }
+
   # commit worktree
   {
     git add \
@@ -287,11 +292,6 @@ deploy-github:
       gomod2nix.toml
 
     git commit -m update
-  }
-
-  # test worktree
-  {
-    just test test-bats-next
   }
 
   # merge worktree and push
