@@ -237,7 +237,10 @@ deploy-docker: build-docker
   docker tag dodder:latest idealnesswagon5/dodder:latest
   docker push idealnesswagon5/dodder:latest
 
-# TODO modify this to exclude any changes that were added AFTER the task began
+# TODO modify this to first create a git worktree with all the changes, and then
+# run all the deployments on it to exclude any changes that were added AFTER the
+# task began. The worktree root should follow this pattern
+# ./build/deploy-YEAR-month-date-hour-minute
 deploy-github: \
     build-go \
     build-nix-gomod \

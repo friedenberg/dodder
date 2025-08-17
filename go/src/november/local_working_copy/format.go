@@ -912,7 +912,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, &object.Metadata.Shas)
+				_, err = fmt.Fprintln(writer, &object.Metadata.Digests)
 				return
 			}
 		},

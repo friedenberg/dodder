@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	ShaKeySelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
-	ShaKeyParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
-	ShaKeySelf                         = "MetadateiTai"
-	ShaKeyParent                       = "MutterMetadateiMutterTai"
+	DigestSelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
+	DigestParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
+	DigestSelf                         = "MetadateiTai"
+	DigestParent                       = "MutterMetadateiMutterTai"
 )
 
 var (

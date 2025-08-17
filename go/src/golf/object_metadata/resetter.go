@@ -19,7 +19,7 @@ func (resetter) Reset(metadata *Metadata) {
 	ResetterCache.Reset(&metadata.Cache)
 	metadata.Type = ids.Type{}
 	metadata.Tai.Reset()
-	metadata.Shas.Reset()
+	metadata.Digests.Reset()
 	metadata.Fields = metadata.Fields[:0]
 }
 
@@ -38,7 +38,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.Type = src.Type
 	dst.Tai = src.Tai
 
-	dst.Shas.ResetWith(&src.Shas)
+	dst.Digests.ResetWith(&src.Digests)
 }
 
 func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
