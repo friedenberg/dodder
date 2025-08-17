@@ -246,16 +246,27 @@ deploy-github:
     exit 1
   fi
 
+  append_trap() {
+    local sig="${2:-EXIT}"
+    local cmd="$1"
+    local existing=$(trap -p "$sig" | sed "s/.*'\(.*\)'.*/\1/")
+    trap "${existing:+$existing; }$cmd" "$sig"
+  }
+
   target="deploy-github"
   timestamp="$(date +"%Y-%m-%d-%H-%M")"
   id="$target-$timestamp"
   worktree_dir="$(mktemp -d -t "$id-XXXXXX")"
+  append_trap "rm -rf '$worktree_dir'"
 
   # make worktree
   {
     git branch "$id"
+    append_trap "git branch -D '$id'"
     
     git worktree add "$worktree_dir" "$id"
+    append_trap "git worktree remove --force '$worktree_dir'"
+
     git diff HEAD | git -C "$worktree_dir" apply --3way
 
     prefix="$(git rev-parse --show-prefix)"
@@ -288,13 +299,6 @@ deploy-github:
     popd
     git merge --autostash "$id"
     git push origin master
-  }
-
-  # remove worktree
-  {
-    git worktree remove "$worktree_dir"
-    rm -rf "$worktree_dir"
-    git branch -d "$id"
   }
 
 deploy: deploy-github deploy-docker
