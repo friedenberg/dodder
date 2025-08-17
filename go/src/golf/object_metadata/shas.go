@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	ShaKeySelfMetadataWithouTai        = keys.ShaKeySelfMetadataWithouTai
 	ShaKeySelfMetadataObjectIdParent   = keys.ShaKeySelfMetadataObjectIdParent
 	ShaKeyParentMetadataObjectIdParent = keys.ShaKeyParentMetadataObjectIdParent
 	ShaKeySelf                         = keys.ShaKeySelf
@@ -49,24 +48,12 @@ func (shas *Shas) String() string {
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &shas.Blob)
-	fmt.Fprintf(
-		&sb,
-		"%s: %s\n",
-		ShaKeySelfMetadataWithouTai,
-		&shas.SelfMetadataWithoutTai,
-	)
 
 	return sb.String()
 }
 
 func (shas *Shas) Add(k, v string) (err error) {
 	switch k {
-	case ShaKeySelfMetadataWithouTai:
-		if err = shas.SelfMetadataWithoutTai.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case ShaKeySelfMetadataObjectIdParent:
 		if err = shas.SelfMetadataObjectIdParent.Set(v); err != nil {
 			err = errors.Wrap(err)
