@@ -140,7 +140,7 @@ func (format *BoxTransacted) EncodeStringTo(
 	return
 }
 
-func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
+func (format *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	sk *sku.Transacted,
 ) (field string_format_writer.Field, err error) {
 	field = string_format_writer.Field{
@@ -156,25 +156,30 @@ func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	return
 }
 
-func (f *BoxTransacted) makeFieldObjectId(
-	sk *sku.Transacted,
+func (format *BoxTransacted) makeFieldObjectId(
+	object *sku.Transacted,
 ) (field string_format_writer.Field, empty bool, err error) {
-	oid := &sk.ObjectId
+	objectId := &object.ObjectId
 
-	empty = oid.IsEmpty()
+	empty = objectId.IsEmpty()
 
-	oidString := (&ids.ObjectIdStringerSansRepo{oid}).String()
+	if empty {
+		return
+	}
 
-	if f.abbr.ZettelId.Abbreviate != nil &&
-		oid.GetGenre() == genres.Zettel {
-		if oidString, err = f.abbr.ZettelId.Abbreviate(oid); err != nil {
+	objectIdString := (&ids.ObjectIdStringerSansRepo{ObjectIdLike: objectId}).String()
+
+	if format.abbr.ZettelId.Abbreviate != nil &&
+		objectId.GetGenre() == genres.Zettel {
+
+		if objectIdString, err = format.abbr.ZettelId.Abbreviate(objectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	field = string_format_writer.Field{
-		Value:              oidString,
+		Value:              objectIdString,
 		DisableValueQuotes: true,
 		ColorType:          string_format_writer.ColorTypeId,
 	}
@@ -182,13 +187,13 @@ func (f *BoxTransacted) makeFieldObjectId(
 	return
 }
 
-func (f *BoxTransacted) addFieldsObjectIds(
+func (format *BoxTransacted) addFieldsObjectIds(
 	sk *sku.Transacted,
 	box *string_format_writer.Box,
 ) (err error) {
 	var external string_format_writer.Field
 
-	if external, err = f.makeFieldExternalObjectIdsIfNecessary(
+	if external, err = format.makeFieldExternalObjectIdsIfNecessary(
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -198,7 +203,7 @@ func (f *BoxTransacted) addFieldsObjectIds(
 	var internal string_format_writer.Field
 	var externalEmpty bool
 
-	if internal, externalEmpty, err = f.makeFieldObjectId(sk); err != nil {
+	if internal, externalEmpty, err = format.makeFieldObjectId(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

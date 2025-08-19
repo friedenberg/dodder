@@ -188,15 +188,15 @@ func (format *BoxCheckedOut) makeFieldObjectId(
 	return
 }
 
-func (f *BoxTransacted) addFieldsObjectIdsWithFSItem(
-	sk *sku.Transacted,
+func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
+	object *sku.Transacted,
 	box *string_format_writer.Box,
 	preferExternal bool,
 ) (err error) {
 	var external string_format_writer.Field
 
-	if external, err = f.makeFieldExternalObjectIdsIfNecessary(
-		sk,
+	if external, err = format.makeFieldExternalObjectIdsIfNecessary(
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -205,7 +205,7 @@ func (f *BoxTransacted) addFieldsObjectIdsWithFSItem(
 	var internal string_format_writer.Field
 	var internalEmpty bool
 
-	if internal, internalEmpty, err = f.makeFieldObjectId(sk); err != nil {
+	if internal, internalEmpty, err = format.makeFieldObjectId(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -416,8 +416,8 @@ func (f *BoxTransacted) addFieldFSBlob(
 	return
 }
 
-func (f *BoxTransacted) addFieldsUntracked(
-	co *sku.CheckedOut,
+func (format *BoxTransacted) addFieldsUntracked(
+	checkedOut *sku.CheckedOut,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
 	op options_print.Options,
@@ -436,8 +436,8 @@ func (f *BoxTransacted) addFieldsUntracked(
 	// 		Value:     f.relativePath.Rel(fdToPrint.GetPath()),
 	// 	},
 	// )
-	if err = f.addFieldsObjectIdsWithFSItem(
-		co.GetSkuExternal(),
+	if err = format.addFieldsObjectIdsWithFSItem(
+		checkedOut.GetSkuExternal(),
 		box,
 		true,
 	); err != nil {
@@ -445,10 +445,10 @@ func (f *BoxTransacted) addFieldsUntracked(
 		return
 	}
 
-	if err = f.addFieldsMetadata(
+	if err = format.addFieldsMetadata(
 		op,
-		co.GetSkuExternal(),
-		f.optionsPrint.BoxDescriptionInBox,
+		checkedOut.GetSkuExternal(),
+		format.optionsPrint.BoxDescriptionInBox,
 		box,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -42,7 +42,7 @@ func (state *cliTreeState) encode(
 }
 
 // TODO write instead of return string
-func (state *cliTreeState) prefixForDepthChild() string {
+func (state *cliTreeState) prefixWithPipesForDepthChild() string {
 	depth := state.stack.getDepth()
 
 	if depth == 0 {
@@ -75,16 +75,51 @@ func (state *cliTreeState) prefixForDepthChild() string {
 	)
 }
 
+func (state *cliTreeState) prefixWithoutPipesForDepthChild() string {
+	depth := state.stack.getDepth()
+
+	if depth == 0 {
+		return ""
+	}
+
+	var count int
+
+	if depth > 0 {
+		count = (depth - 1) * 4
+	}
+
+	leftPadding := strings.Repeat(" ", count)
+
+	return fmt.Sprintf(
+		"%s%s     ",
+		leftPadding,
+		pipeTopBottom,
+	)
+}
+
+func (state *cliTreeState) writeStrings(values ...string) {
+	for _, value := range values {
+		bytesWritten, _ := state.bufferedWriter.WriteString(value)
+		state.bytesWritten += bytesWritten
+	}
+}
+
+func (state *cliTreeState) writeBytes(bytess []byte) {
+	bytesWritten, _ := state.bufferedWriter.Write(bytess)
+	state.bytesWritten += bytesWritten
+}
+
 func (state *cliTreeState) writeOneErrorMessage(
 	err error,
 	message string,
 ) {
-	prefixWithoutContinuation := state.prefixForDepthChild()
+	// TODO firstPrefix depends on whether more than one line is written
+	firstPrefix := state.prefixWithPipesForDepthChild()
+	remainderPrefix := state.prefixWithoutPipesForDepthChild()
 	messageReader := bytes.NewBufferString(message)
 
 	var isEOF bool
 	var lineIndex int
-	var bytesWritten int
 
 	for !isEOF {
 		line, err := messageReader.ReadBytes('\n')
@@ -94,15 +129,14 @@ func (state *cliTreeState) writeOneErrorMessage(
 		isEOF = err == io.EOF
 
 		if len(line) > 0 {
-			bytesWritten, _ = fmt.Fprintf(
-				state.bufferedWriter,
-				"%s%s\n",
-				prefixWithoutContinuation,
-				line,
-			)
+			if lineIndex > 0 {
+				state.writeStrings(remainderPrefix)
+			} else {
+				state.writeStrings(firstPrefix)
+			}
 
-			state.bytesWritten += bytesWritten
-			bytesWritten = 0
+			state.writeBytes(line)
+			state.writeStrings("\n")
 		}
 
 		lineIndex++
@@ -147,7 +181,13 @@ func (state *cliTreeState) encodeStack() {
 			return
 		}
 
-		state.writeOneErrorMessage(input, input.Error())
+		{
+			root := inputTyped.GetErrorRoot()
+			stackItem.child = root
+			state.encodeStack()
+		}
+
+		stackItem.child = input
 
 		children := inputTyped.GetErrorsAndFrames()
 
@@ -201,11 +241,14 @@ func (state *cliTreeState) encodeStack() {
 	}
 }
 
-func (state cliTreeState) printErrorOneUnwrapper(
-	err interfaces.ErrorOneUnwrapper,
-) {
-	child := err.Unwrap()
+func (state cliTreeState) printErrorOneUnwrapper(err errors.UnwrapOne) {
+	state.printErrorOneUnwrapperWithChild(err, err.Unwrap())
+}
 
+func (state cliTreeState) printErrorOneUnwrapperWithChild(
+	err error,
+	child error,
+) {
 	if child == nil {
 		state.writeOneErrorMessage(err, err.Error())
 		return

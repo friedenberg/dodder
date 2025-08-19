@@ -115,6 +115,10 @@ func Wrap(err error) error {
 		panic("failed to get stack info")
 	}
 
+	if group, ok := err.(Group); ok && group.Len() == 1 {
+		return stackFrame.Wrap(group[0])
+	}
+
 	return stackFrame.Wrap(err)
 }
 

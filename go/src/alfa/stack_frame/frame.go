@@ -204,6 +204,10 @@ func (frame Frame) StringNoFunctionName() string {
 // If the frame is non-zero, return a wrapped error. Otherwise return the input
 // error unwrapped.
 func (frame Frame) Wrap(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	if !frame.nonZero {
 		return err
 	}

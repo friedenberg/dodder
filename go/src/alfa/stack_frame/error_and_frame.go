@@ -7,6 +7,7 @@ type (
 	}
 
 	ErrorsAndFramesGetter interface {
+		GetErrorRoot() error
 		GetErrorsAndFrames() []ErrorAndFrame
 	}
 )

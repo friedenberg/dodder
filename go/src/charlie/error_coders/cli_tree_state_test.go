@@ -87,14 +87,36 @@ func TestCLITreeForwards(t *testing.T) {
 			),
 			expected: "one\n",
 		},
-		// TODO add test case for errors with stack
-		// {
-		// 	TestCaseInfo: ui.MakeTestCaseInfo(
-		// 		"error with stack",
-		// 	),
-		// 	input:    errors.Wrap(errors.New("one")),
-		// 	expected: "one\n",
-		// },
+		{
+			TestCaseInfo: ui.MakeTestCaseInfo(
+				"one error with stack",
+			),
+			input: errors.Wrap(errors.New("one")),
+			expected: `one
+└── # TestCLITreeForwards
+│     src/charlie/error_coders/cli_tree_state_test.go:94
+`,
+		},
+		{
+			TestCaseInfo: ui.MakeTestCaseInfo(
+				"one in group with stack",
+			),
+			input: errors.Wrap(errors.Group{errors.New("one")}),
+			expected: `one
+└── # TestCLITreeForwards
+│     src/charlie/error_coders/cli_tree_state_test.go:104
+`,
+		},
+		{
+			TestCaseInfo: ui.MakeTestCaseInfo(
+				"one with stack in group with stack",
+			),
+			input: errors.Wrap(errors.Group{errors.Errorf("one")}),
+			expected: `one
+└── # TestCLITreeForwards
+│     src/charlie/error_coders/cli_tree_state_test.go:114
+`,
+		},
 	}
 
 	for _, testCase := range testCases {

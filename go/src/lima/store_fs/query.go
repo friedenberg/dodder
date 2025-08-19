@@ -16,13 +16,13 @@ import (
 
 func (store *Store) QueryCheckedOut(
 	queryGroup *query.Query,
-	f interfaces.FuncIter[sku.SkuType],
+	funk interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	wg := errors.MakeWaitGroupParallel()
+	waitGroup := errors.MakeWaitGroupParallel()
 
-	wg.Do(func() (err error) {
+	waitGroup.Do(func() (err error) {
 		funcIterFSItems := store.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
-			store.makeFuncIterFilterAndApply(queryGroup, f),
+			store.makeFuncIterFilterAndApply(queryGroup, funk),
 		)
 
 		for item := range store.probablyCheckedOut.All() {
@@ -36,9 +36,9 @@ func (store *Store) QueryCheckedOut(
 	})
 
 	if !queryGroup.ExcludeUntracked {
-		wg.Do(func() (err error) {
+		waitGroup.Do(func() (err error) {
 			funcIterFSItems := store.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
-				store.makeFuncIterFilterAndApply(queryGroup, f),
+				store.makeFuncIterFilterAndApply(queryGroup, funk),
 			)
 
 			if err = store.queryUntracked(queryGroup, funcIterFSItems); err != nil {
@@ -50,7 +50,7 @@ func (store *Store) QueryCheckedOut(
 		})
 	}
 
-	if err = wg.GetError(); err != nil {
+	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

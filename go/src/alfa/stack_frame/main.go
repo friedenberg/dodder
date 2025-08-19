@@ -1,7 +1,5 @@
 package stack_frame
 
-var _ ErrorsAndFramesGetter = &ErrorsAndFrames{}
-
 //go:noinline
 func Wrap(err error) error {
 	frame, _ := MakeFrame(1)

@@ -39,6 +39,7 @@ type Printer = interfaces.Printer
 
 type DevPrinter interface {
 	Printer
+	// TODO rewrite this to return a dev printer
 	Caller(i int, vs ...any)
 	FunctionName(skip int)
 	Stack(skip, count int)

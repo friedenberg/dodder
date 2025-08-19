@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"slices"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
@@ -28,27 +29,20 @@ type waitGroupParallel struct {
 	isDone bool
 }
 
-func (waitGroup *waitGroupParallel) GetError() (err error) {
+func (waitGroup *waitGroupParallel) GetError() error {
 	waitGroup.wait()
 
-	defer func() {
-		if !waitGroup.errorGroupBuilder.Empty() {
-			err = waitGroup.errorGroupBuilder.GetError()
-		}
-	}()
-
-	for i := len(waitGroup.doAfter) - 1; i >= 0; i-- {
-		doAfter := waitGroup.doAfter[i]
-		err := doAfter.FuncErr()
-		if err != nil {
-			waitGroup.errorGroupBuilder.Add(doAfter.Wrap(err))
-		}
+	for _, doAfter := range slices.Backward(waitGroup.doAfter) {
+		errAfter := doAfter.FuncErr()
+		waitGroup.errorGroupBuilder.Add(doAfter.Wrap(errAfter))
 	}
 
-	return
+	err := waitGroup.errorGroupBuilder.GetError()
+
+	return err
 }
 
-func (waitGroup *waitGroupParallel) Do(f FuncErr) (d bool) {
+func (waitGroup *waitGroupParallel) Do(f FuncErr) (ok bool) {
 	waitGroup.lock.Lock()
 
 	if waitGroup.isDone {
@@ -60,16 +54,16 @@ func (waitGroup *waitGroupParallel) Do(f FuncErr) (d bool) {
 
 	waitGroup.inner.Add(1)
 
-	var si stack_frame.Frame
+	var frame stack_frame.Frame
 
 	if waitGroup.addStackInfo {
-		si, _ = stack_frame.MakeFrame(1)
+		frame, _ = stack_frame.MakeFrame(1)
 	}
 
 	go func() {
 		err := f()
 
-		waitGroup.doneWith(&si, err)
+		waitGroup.doneWith(&frame, err)
 	}()
 
 	return true
@@ -95,10 +89,7 @@ func (waitGroup *waitGroupParallel) doneWith(
 	err error,
 ) {
 	waitGroup.inner.Done()
-
-	if err != nil {
-		waitGroup.errorGroupBuilder.Add(frame.Wrap(err))
-	}
+	waitGroup.errorGroupBuilder.Add(frame.Wrap(err))
 }
 
 func (waitGroup *waitGroupParallel) wait() {

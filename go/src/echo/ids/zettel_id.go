@@ -179,7 +179,7 @@ func (h *ZettelId) Set(v string) (err error) {
 		},
 	) {
 		groupBuilder.Add(
-			errors.ErrorWithStackf("contains invalid characters: %q", v),
+			errors.Errorf("contains invalid characters: %q", v),
 		)
 	}
 
@@ -196,7 +196,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	switch count {
 	default:
-		groupBuilder.Add(errors.ErrorWithStackf(
+		groupBuilder.Add(errors.Errorf(
 			"zettel id needs exactly 2 components, but got %d: %q",
 			count,
 			v,
@@ -207,15 +207,12 @@ func (h *ZettelId) Set(v string) (err error) {
 		h.right = parts[1]
 	}
 
-	if groupBuilder.Len() > 0 {
-		err = groupBuilder.GetError()
-	}
-
 	if (len(h.left) == 0 && len(h.right) > 0) ||
 		(len(h.right) == 0 && len(h.left) > 0) {
-		err = errors.ErrorWithStackf("incomplete zettel id: %s", h)
-		return
+		groupBuilder.Add(errors.Errorf("incomplete zettel id: %s", h))
 	}
+
+	err = groupBuilder.GetError()
 
 	return
 }

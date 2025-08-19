@@ -24,7 +24,7 @@ func MakeErrorTreeOrErr(
 	if tree, _ = err.(*ErrorTree); tree == nil {
 		tree = &ErrorTree{
 			Root:        err,
-			Descendents: make(ErrorsAndFrames, 0, len(frames)),
+			Descendents: make(errorsAndFrames, 0, len(frames)),
 		}
 	}
 
@@ -41,9 +41,11 @@ func MakeErrorTreeOrErr(
 	return tree
 }
 
+var _ ErrorsAndFramesGetter = &ErrorTree{}
+
 type ErrorTree struct {
 	Root        error
-	Descendents ErrorsAndFrames
+	Descendents errorsAndFrames
 }
 
 func (tree *ErrorTree) Error() string {
@@ -62,6 +64,10 @@ func (tree *ErrorTree) Unwrap() error {
 
 func (tree *ErrorTree) Append(childError error, childFrame Frame) {
 	tree.Descendents.Append(childError, childFrame)
+}
+
+func (tree *ErrorTree) GetErrorRoot() error {
+	return tree.Root
 }
 
 func (tree *ErrorTree) GetErrorsAndFrames() []ErrorAndFrame {

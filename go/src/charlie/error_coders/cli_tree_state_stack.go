@@ -21,6 +21,7 @@ func (stack cliTreeStateStack) getDepth() int {
 	return stack.len() - 1
 }
 
+// TODO refactor to remove parent and use stack instead
 func (stack *cliTreeStateStack) push(
 	parent error,
 	child error,
