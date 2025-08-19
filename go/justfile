@@ -253,6 +253,16 @@ deploy-github:
     trap "${existing:+$existing; }$cmd" "$sig"
   }
 
+  # commit worktree before codegen and tests
+  {
+    git add \
+      . \
+      ../{zz-pandoc,zz-vim,zz-tests_bats} \
+      gomod2nix.toml
+
+    git commit -m "update (pre codegen and test)"
+  }
+
   target="deploy-github"
   timestamp="$(date +"%Y-%m-%d-%H-%M")"
   id="$target-$timestamp"
@@ -284,7 +294,7 @@ deploy-github:
     just test test-bats-next
   }
 
-  # commit worktree
+  # commit worktree after codegen and tests
   {
     git add \
       . \
