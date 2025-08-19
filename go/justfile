@@ -277,7 +277,7 @@ deploy-github:
     git worktree add "$worktree_dir" "$id"
     append_trap "git worktree remove --force '$worktree_dir'"
 
-    git diff HEAD | git -C "$worktree_dir" apply --3way
+    # git diff HEAD | git -C "$worktree_dir" apply --3way
 
     prefix="$(git rev-parse --show-prefix)"
     
