@@ -3,6 +3,7 @@ package command_components
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cli"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -32,7 +33,7 @@ type Remote struct {
 
 func (cmd *Remote) SetFlagSet(flagSet *flag.FlagSet) {
 	// TODO remove and replace with repo builtin type options
-	command.FlagSetVarWithCompletion(
+	cli.FlagSetVarWithCompletion(
 		flagSet,
 		&cmd.RemoteConnectionType,
 		"remote-type",

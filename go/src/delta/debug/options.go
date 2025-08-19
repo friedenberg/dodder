@@ -17,41 +17,53 @@ type Options struct {
 	DryRun                 bool
 }
 
-func (o Options) String() string {
+func (options Options) GetCLICompletion() map[string]string {
+	return map[string]string{
+		"no-tempdir-cleanup":        "",
+		"gc_disable":                "",
+		"pprof_cpu":                 "",
+		"pprof_heap":                "",
+		"trace":                     "",
+		"dry-run":                   "",
+		"exit-on-memory-exhaustion": "",
+	}
+}
+
+func (options Options) String() string {
 	sb := string_builder_joined.Make(",")
 
-	if o.NoTempDirCleanup {
+	if options.NoTempDirCleanup {
 		sb.WriteString("no-tempdir-cleanup")
 	}
 
-	if o.GCDisabled {
+	if options.GCDisabled {
 		sb.WriteString("gc_disabled")
 	}
 
-	if o.PProfCPU {
+	if options.PProfCPU {
 		sb.WriteString("pprof_cpu")
 	}
 
-	if o.PProfHeap {
+	if options.PProfHeap {
 		sb.WriteString("pprof_heap")
 	}
 
-	if o.Trace {
+	if options.Trace {
 		sb.WriteString("trace")
 	}
 
-	if o.DryRun {
+	if options.DryRun {
 		sb.WriteString("dry-run")
 	}
 
-	if o.ExitOnMemoryExhaustion {
+	if options.ExitOnMemoryExhaustion {
 		sb.WriteString("exit-on-memory-exhaustion")
 	}
 
 	return sb.String()
 }
 
-func (o *Options) Set(v string) (err error) {
+func (options *Options) Set(v string) (err error) {
 	parts := strings.Split(v, ",")
 
 	if len(parts) == 0 {
@@ -63,34 +75,34 @@ func (o *Options) Set(v string) (err error) {
 		case "false":
 
 		case "gc_disabled":
-			o.GCDisabled = true
+			options.GCDisabled = true
 
 		case "pprof_cpu":
-			o.PProfCPU = true
+			options.PProfCPU = true
 
 		case "pprof_heap":
-			o.PProfHeap = true
+			options.PProfHeap = true
 
 		case "trace":
-			o.Trace = true
+			options.Trace = true
 
 		case "no-tempdir-cleanup":
-			o.NoTempDirCleanup = true
+			options.NoTempDirCleanup = true
 
 		case "dry-run":
-			o.DryRun = true
+			options.DryRun = true
 
 		case "exit-on-memory-exhaustion":
-			o.ExitOnMemoryExhaustion = true
+			options.ExitOnMemoryExhaustion = true
 
 		case "true":
 			fallthrough
 
 		case "all":
-			o.GCDisabled = true
-			o.PProfCPU = true
-			o.PProfHeap = true
-			o.Trace = true
+			options.GCDisabled = true
+			options.PProfCPU = true
+			options.PProfHeap = true
+			options.Trace = true
 
 		default:
 			err = errors.ErrorWithStackf("unsupported debug option: %s", p)

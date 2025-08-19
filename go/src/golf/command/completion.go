@@ -2,10 +2,8 @@ package command
 
 import (
 	"flag"
-	"maps"
-	"slices"
-	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
@@ -13,9 +11,7 @@ type SupportsCompletion interface {
 	SupportsCompletion()
 }
 
-type CLICompleter interface {
-	GetCLICompletion() map[string]string
-}
+type CLICompleter = cli.CLICompleter
 
 type CommandLine struct {
 	FlagsOrArgs []string
@@ -80,26 +76,4 @@ func (completer FlagValueCompleter) Complete(
 	commandLine CommandLine,
 ) {
 	completer.FuncCompleter(req, envLocal, commandLine)
-}
-
-type FlagValueWithCompetion interface {
-	flag.Value
-	CLICompleter
-}
-
-func FlagSetVarWithCompletion(
-	flagSet *flag.FlagSet,
-	value FlagValueWithCompetion,
-	key string,
-) {
-	flagSet.Var(
-		value,
-		key,
-		strings.Join(
-			slices.Collect(
-				maps.Keys(value.GetCLICompletion()),
-			),
-			", ",
-		),
-	)
 }

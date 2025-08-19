@@ -94,9 +94,9 @@ func TestCLITreeForwards(t *testing.T) {
 		// 	),
 		// 	input: errors.Wrap(errors.New("one")),
 		// 	expected: `one
-// └── # TestCLITreeForwards
-// │     src/charlie/error_coders/cli_tree_state_test.go:94
-// `,
+		// └── # TestCLITreeForwards
+		// │     src/charlie/error_coders/cli_tree_state_test.go:94
+		// `,
 		// },
 		// {
 		// 	TestCaseInfo: ui.MakeTestCaseInfo(
@@ -104,9 +104,9 @@ func TestCLITreeForwards(t *testing.T) {
 		// 	),
 		// 	input: errors.Wrap(errors.Group{errors.New("one")}),
 		// 	expected: `one
-// └── # TestCLITreeForwards
-// │     src/charlie/error_coders/cli_tree_state_test.go:104
-// `,
+		// └── # TestCLITreeForwards
+		// │     src/charlie/error_coders/cli_tree_state_test.go:104
+		// `,
 		// },
 		// {
 		// 	TestCaseInfo: ui.MakeTestCaseInfo(
@@ -114,9 +114,9 @@ func TestCLITreeForwards(t *testing.T) {
 		// 	),
 		// 	input: errors.Wrap(errors.Group{errors.Errorf("one")}),
 		// 	expected: `one
-// └── # TestCLITreeForwards
-// │     src/charlie/error_coders/cli_tree_state_test.go:114
-// `,
+		// └── # TestCLITreeForwards
+		// │     src/charlie/error_coders/cli_tree_state_test.go:114
+		// `,
 		// },
 	}
 

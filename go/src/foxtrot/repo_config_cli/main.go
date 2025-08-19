@@ -3,6 +3,7 @@ package repo_config_cli
 import (
 	"flag"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cli"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
@@ -39,7 +40,12 @@ func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
 func (config *Config) SetFlagSet(flagSet *flag.FlagSet) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
-	flagSet.Var(&config.Debug, "debug", "debugging options")
+	cli.FlagSetVarWithCompletion(
+		flagSet,
+		&config.Debug,
+		"debug",
+	)
+
 	flagSet.BoolVar(&config.Todo, "todo", false, "")
 	flagSet.BoolVar(&config.dryRun, "dry-run", false, "")
 	flagSet.BoolVar(&config.Verbose, "verbose", false, "")

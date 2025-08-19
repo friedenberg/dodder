@@ -221,7 +221,7 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 		box.Contents = append(box.Contents, external)
 
 	default:
-		err = errors.ErrorWithStackf("empty id")
+		err = errors.Errorf("empty id")
 		return
 	}
 
@@ -376,7 +376,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 	return
 }
 
-func (f *BoxTransacted) addFieldsFSBlobExcept(
+func (format *BoxTransacted) addFieldsFSBlobExcept(
 	fds *sku.FSItem,
 	except *fd.FD,
 	box *string_format_writer.Box,
@@ -391,7 +391,7 @@ func (f *BoxTransacted) addFieldsFSBlobExcept(
 			continue
 		}
 
-		if err = f.addFieldFSBlob(fd, box); err != nil {
+		if err = format.addFieldFSBlob(fd, box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -400,14 +400,14 @@ func (f *BoxTransacted) addFieldsFSBlobExcept(
 	return
 }
 
-func (f *BoxTransacted) addFieldFSBlob(
+func (format *BoxTransacted) addFieldFSBlob(
 	fd *fd.FD,
 	box *string_format_writer.Box,
 ) (err error) {
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{
-			Value:        f.relativePath.Rel(fd.GetPath()),
+			Value:        format.relativePath.Rel(fd.GetPath()),
 			ColorType:    string_format_writer.ColorTypeId,
 			NeedsNewline: true,
 		},
@@ -458,7 +458,7 @@ func (format *BoxTransacted) addFieldsUntracked(
 	return
 }
 
-func (f *BoxTransacted) addFieldsRecognized(
+func (format *BoxTransacted) addFieldsRecognized(
 	co *sku.CheckedOut,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
@@ -466,7 +466,7 @@ func (f *BoxTransacted) addFieldsRecognized(
 ) (err error) {
 	var id string_format_writer.Field
 
-	if id, _, err = f.makeFieldObjectId(
+	if id, _, err = format.makeFieldObjectId(
 		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -476,7 +476,7 @@ func (f *BoxTransacted) addFieldsRecognized(
 	id.ColorType = string_format_writer.ColorTypeId
 	box.Contents = append(box.Contents, id)
 
-	if err = f.addFieldsMetadata(
+	if err = format.addFieldsMetadata(
 		op,
 		co.GetSkuExternal(),
 		op.BoxDescriptionInBox,
@@ -486,7 +486,7 @@ func (f *BoxTransacted) addFieldsRecognized(
 		return
 	}
 
-	if err = f.addFieldsFSBlobExcept(
+	if err = format.addFieldsFSBlobExcept(
 		item,
 		nil,
 		box,
