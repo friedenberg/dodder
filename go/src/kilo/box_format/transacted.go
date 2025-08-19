@@ -163,14 +163,11 @@ func (format *BoxTransacted) makeFieldObjectId(
 
 	empty = objectId.IsEmpty()
 
-	if empty {
-		return
-	}
-
 	objectIdString := (&ids.ObjectIdStringerSansRepo{ObjectIdLike: objectId}).String()
 
 	if format.abbr.ZettelId.Abbreviate != nil &&
-		objectId.GetGenre() == genres.Zettel {
+		objectId.GetGenre() == genres.Zettel &&
+		!empty {
 
 		if objectIdString, err = format.abbr.ZettelId.Abbreviate(objectId); err != nil {
 			err = errors.Wrap(err)
