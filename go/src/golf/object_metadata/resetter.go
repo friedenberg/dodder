@@ -28,7 +28,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.Comments = dst.Comments[:0]
 	dst.Comments = append(dst.Comments, src.Comments...)
 
-	dst.SetTags(src.Tags)
+	dst.SetTagsFast(src.Tags)
 
 	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 

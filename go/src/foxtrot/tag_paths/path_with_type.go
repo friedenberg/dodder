@@ -12,24 +12,24 @@ type PathWithType struct {
 	Type
 }
 
-func (p *PathWithType) String() string {
+func (path *PathWithType) String() string {
 	return fmt.Sprintf(
 		"%s:%s",
-		p.Type.String(),
-		(*StringBackward)(&p.Path).String(),
+		path.Type.String(),
+		(*StringBackward)(&path.Path).String(),
 	)
 }
 
-func (a *PathWithType) Clone() (b *PathWithType) {
-	b = MakePathWithType(a.Path...)
-	b.Type = a.Type
+func (path *PathWithType) Clone() (clone *PathWithType) {
+	clone = MakePathWithType(path.Path...)
+	clone.Type = path.Type
 
 	return
 }
 
-func (p *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
+func (path *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = p.Type.ReadFrom(r)
+	n1, err = path.Type.ReadFrom(r)
 	n += n1
 
 	if err != nil {
@@ -37,7 +37,7 @@ func (p *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = p.Path.ReadFrom(r)
+	n1, err = path.Path.ReadFrom(r)
 	n += n1
 
 	if err != nil {
@@ -48,9 +48,9 @@ func (p *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (p *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
+func (path *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int64
-	n1, err = p.Type.WriteTo(w)
+	n1, err = path.Type.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (p *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n1, err = p.Path.WriteTo(w)
+	n1, err = path.Path.WriteTo(w)
 	n += n1
 
 	if err != nil {

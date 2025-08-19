@@ -16,22 +16,22 @@ type Tags struct {
 	All   TagsWithParentsAndTypes
 }
 
-func (a *Tags) String() string {
-	return fmt.Sprintf("[Paths: %s, All: %s]", a.Paths, a.All)
+func (tags *Tags) String() string {
+	return fmt.Sprintf("[Paths: %s, All: %s]", tags.Paths, tags.All)
 }
 
-func (a *Tags) Reset() {
+func (tags *Tags) Reset() {
 	// TODO pool *Path's
-	a.Paths.Reset()
-	a.All.Reset()
+	tags.Paths.Reset()
+	tags.All.Reset()
 }
 
 // TODO improve performance
-func (a *Tags) ResetWith(b *Tags) {
-	a.Paths = slices.Grow(a.Paths, len(b.Paths))
+func (tags *Tags) ResetWith(b *Tags) {
+	tags.Paths = slices.Grow(tags.Paths, len(b.Paths))
 
 	for _, p := range b.Paths {
-		a.AddPath(p.Clone())
+		tags.AddPath(p.Clone())
 	}
 	// a.Paths = a.Paths[:cap(a.Paths)]
 	// nPaths := copy(a.Paths, b.Paths)
@@ -42,7 +42,7 @@ func (a *Tags) ResetWith(b *Tags) {
 	// ui.Debug().Print(nPaths, nAll, a, b)
 }
 
-func (a *Tags) AddSuperFrom(
+func (tags *Tags) AddSuperFrom(
 	b *Tags,
 	prefix *Tag,
 ) (err error) {
@@ -60,7 +60,7 @@ func (a *Tags) AddSuperFrom(
 			Type: TypeSuper,
 		}
 
-		if err = a.AddPath(c); err != nil {
+		if err = tags.AddPath(c); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -69,18 +69,18 @@ func (a *Tags) AddSuperFrom(
 	return
 }
 
-func (es *Tags) AddTagOld(e ids.Tag) (err error) {
-	return es.AddTag(catgut.MakeFromString(e.String()))
+func (tags *Tags) AddTagOld(e ids.Tag) (err error) {
+	return tags.AddTag(catgut.MakeFromString(e.String()))
 }
 
-func (es *Tags) AddTag(e *Tag) (err error) {
+func (tags *Tags) AddTag(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}
 
-	p := MakePathWithType(e)
+	path := MakePathWithType(e)
 
-	if err = es.AddPathWithType(p); err != nil {
+	if err = tags.AddPathWithType(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,7 +88,7 @@ func (es *Tags) AddTag(e *Tag) (err error) {
 	return
 }
 
-func (es *Tags) AddSelf(e *Tag) (err error) {
+func (tags *Tags) AddSelf(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}
@@ -96,7 +96,7 @@ func (es *Tags) AddSelf(e *Tag) (err error) {
 	p := MakePathWithType(e)
 	p.Type = TypeSelf
 
-	if err = es.AddPathWithType(p); err != nil {
+	if err = tags.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -104,15 +104,15 @@ func (es *Tags) AddSelf(e *Tag) (err error) {
 	return
 }
 
-func (es *Tags) AddPathWithType(pwt *PathWithType) (err error) {
-	_, alreadyExists := es.Paths.AddPath(pwt)
+func (tags *Tags) AddPathWithType(pwt *PathWithType) (err error) {
+	_, alreadyExists := tags.Paths.AddPath(pwt)
 
 	if alreadyExists {
 		return
 	}
 
 	for _, e := range pwt.Path {
-		if err = es.All.Add(e, pwt); err != nil {
+		if err = tags.All.Add(e, pwt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -121,8 +121,8 @@ func (es *Tags) AddPathWithType(pwt *PathWithType) (err error) {
 	return
 }
 
-func (es *Tags) AddPath(p *PathWithType) (err error) {
-	if err = es.AddPathWithType(p); err != nil {
+func (tags *Tags) AddPath(p *PathWithType) (err error) {
+	if err = tags.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -130,7 +130,7 @@ func (es *Tags) AddPath(p *PathWithType) (err error) {
 	return
 }
 
-func (s *Tags) Set(v string) (err error) {
+func (tags *Tags) Set(v string) (err error) {
 	vs := strings.Split(v, ",")
 
 	for _, v := range vs {
@@ -143,7 +143,7 @@ func (s *Tags) Set(v string) (err error) {
 
 		es := catgut.MakeFromString(e.String())
 
-		if err = s.AddTag(es); err != nil {
+		if err = tags.AddTag(es); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -133,19 +133,19 @@ func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	return
 }
 
-func (metadata *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
+func (metadata *Metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	if err = metadata.Tags.Add(*e); err != nil {
+	if err = metadata.Tags.Add(*tag); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	cs := catgut.MakeFromString(e.String())
+	tagBytestring := catgut.MakeFromString(tag.String())
 
-	if err = metadata.Cache.TagPaths.AddTag(cs); err != nil {
+	if err = metadata.Cache.TagPaths.AddTag(tagBytestring); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -170,6 +170,26 @@ func (metadata *Metadata) SetTags(tags ids.TagSet) {
 
 	for tag := range tags.AllPtr() {
 		errors.PanicIfError(metadata.AddTagPtr(tag))
+	}
+}
+
+func (metadata *Metadata) SetTagsFast(tags ids.TagSet) {
+	if metadata.Tags == nil {
+		metadata.Tags = ids.MakeTagMutableSet()
+	}
+
+	metadata.Tags.Reset()
+
+	if tags == nil {
+		return
+	}
+
+	if tags.Len() == 1 && tags.Any().String() == "" {
+		panic("empty tag set")
+	}
+
+	for tag := range tags.AllPtr() {
+		errors.PanicIfError(metadata.AddTagPtrFast(tag))
 	}
 }
 

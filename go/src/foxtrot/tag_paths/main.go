@@ -15,62 +15,62 @@ type (
 	Path []*Tag
 )
 
-func MakePathWithType(els ...*Tag) *PathWithType {
+func MakePathWithType(tags ...*Tag) *PathWithType {
 	return &PathWithType{
-		Path: makePath(els...),
+		Path: makePath(tags...),
 	}
 }
 
-func makePath(els ...*Tag) Path {
-	p := Path(make([]*Tag, 0, len(els)))
+func makePath(tags ...*Tag) Path {
+	path := Path(make([]*Tag, 0, len(tags)))
 
-	for _, e := range els {
-		p.Add(e)
+	for _, e := range tags {
+		path.Add(e)
 	}
 
-	return p
+	return path
 }
 
-func (a *Path) Clone() *Path {
-	b := makePath(*a...)
-	return &b
+func (path *Path) Clone() *Path {
+	clone := makePath(*path...)
+	return &clone
 }
 
-func (a *Path) CloneAndAddPath(c *Path) *Path {
-	var b Path
-	if a == nil {
-		b = makePath()
+func (path *Path) CloneAndAddPath(c *Path) *Path {
+	var clone Path
+	if path == nil {
+		clone = makePath()
 	} else {
-		b = makePath(*a...)
+		clone = makePath(*path...)
 	}
 
-	b.AddPath(c)
+	clone.AddPath(c)
 
-	return &b
+	return &clone
 }
 
-func (a *Path) IsEmpty() bool {
-	if a == nil {
+func (path *Path) IsEmpty() bool {
+	if path == nil {
 		return true
 	}
 
-	return a.Len() == 0
+	return path.Len() == 0
 }
 
-func (a *Path) First() *Tag {
-	return (*a)[0]
+func (path *Path) First() *Tag {
+	return (*path)[0]
 }
 
-func (a *Path) Last() *Tag {
-	return (*a)[a.Len()-1]
+func (path *Path) Last() *Tag {
+	return (*path)[path.Len()-1]
 }
 
-func (a *Path) Equals(b *Path) bool {
-	if a.Len() != b.Len() {
+func (path *Path) Equals(b *Path) bool {
+	if path.Len() != b.Len() {
 		return false
 	}
 
-	for i, as := range *a {
+	for i, as := range *path {
 		if !as.Equals((*b)[i]) {
 			return false
 		}
@@ -79,8 +79,8 @@ func (a *Path) Equals(b *Path) bool {
 	return true
 }
 
-func (a *Path) Compare(b *Path) int {
-	elsA := *a
+func (path *Path) Compare(b *Path) int {
+	elsA := *path
 	elsB := *b
 
 	for {
@@ -113,19 +113,19 @@ func (a *Path) Compare(b *Path) int {
 	return 0
 }
 
-func (p *Path) String() string {
-	return (*StringBackward)(p).String()
+func (path *Path) String() string {
+	return (*StringBackward)(path).String()
 }
 
-func (a *Path) Copy() (b *Path) {
+func (path *Path) Copy() (b *Path) {
 	b = &Path{}
-	*b = make([]*Tag, a.Len())
+	*b = make([]*Tag, path.Len())
 
-	if a == nil {
+	if path == nil {
 		return
 	}
 
-	for i, s := range *a {
+	for i, s := range *path {
 		sb := catgut.GetPool().Get()
 		s.CopyTo(sb)
 		(*b)[i] = sb
@@ -134,65 +134,65 @@ func (a *Path) Copy() (b *Path) {
 	return
 }
 
-func (p *Path) Len() int {
-	if p == nil {
+func (path *Path) Len() int {
+	if path == nil {
 		return 0
 	}
 
-	return len(*p)
+	return len(*path)
 }
 
-func (p *Path) Cap() int {
-	if p == nil {
+func (path *Path) Cap() int {
+	if path == nil {
 		return 0
 	}
 
-	return cap(*p)
+	return cap(*path)
 }
 
-func (p *Path) Less(i, j int) bool {
-	return bytes.Compare((*p)[i].Bytes(), (*p)[i].Bytes()) == -1
+func (path *Path) Less(i, j int) bool {
+	return bytes.Compare((*path)[i].Bytes(), (*path)[i].Bytes()) == -1
 }
 
-func (p *Path) Swap(i, j int) {
-	a, b := (*p)[i], (*p)[j]
+func (path *Path) Swap(i, j int) {
+	a, b := (*path)[i], (*path)[j]
 	var x Tag
 	x.SetBytes(a.Bytes())
 	a.SetBytes(b.Bytes())
 	b.SetBytes(x.Bytes())
 }
 
-func (a *Path) AddPath(b *Path) {
+func (path *Path) AddPath(b *Path) {
 	if b.IsEmpty() {
 		return
 	}
 
 	for _, e := range *b {
-		*a = append(*a, catgut.GetPool().Get())
-		(*a)[a.Len()-1].SetBytes(e.Bytes())
+		*path = append(*path, catgut.GetPool().Get())
+		(*path)[path.Len()-1].SetBytes(e.Bytes())
 	}
 
-	sort.Sort(a)
+	sort.Sort(path)
 }
 
-func (p *Path) Add(es ...*Tag) {
+func (path *Path) Add(es ...*Tag) {
 	for _, e := range es {
 		if e.IsEmpty() {
 			return
 		}
 
-		if p.Len() > 0 && (*p)[p.Len()-1].Compare(e) == 0 {
+		if path.Len() > 0 && (*path)[path.Len()-1].Compare(e) == 0 {
 			return
 		}
 
-		*p = append(*p, catgut.GetPool().Get())
-		(*p)[p.Len()-1].SetBytes(e.Bytes())
+		*path = append(*path, catgut.GetPool().Get())
+		(*path)[path.Len()-1].SetBytes(e.Bytes())
 	}
 
-	sort.Sort(p)
+	sort.Sort(path)
 }
 
-func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
+func (path *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	var count uint8
 
 	var n1 int
@@ -203,10 +203,10 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 
 	n += int64(n1)
 
-	*p = (*p)[:p.Cap()]
+	*path = (*path)[:path.Cap()]
 
-	if diff := count - uint8(p.Len()); diff > 0 {
-		*p = append(*p, make([]*Tag, diff)...)
+	if diff := count - uint8(path.Len()); diff > 0 {
+		*path = append(*path, make([]*Tag, diff)...)
 	}
 
 	for i := uint8(0); i < count; i++ {
@@ -219,11 +219,11 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 
 		n += int64(n1)
 
-		if (*p)[i] == nil {
-			(*p)[i] = catgut.GetPool().Get()
+		if (*path)[i] == nil {
+			(*path)[i] = catgut.GetPool().Get()
 		}
 
-		_, err = (*p)[i].ReadNFrom(r, int(cl))
+		_, err = (*path)[i].ReadNFrom(r, int(cl))
 		if err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
@@ -233,10 +233,10 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
+func (path *Path) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 
-	n1, err = ohio.WriteUint8(w, uint8(p.Len()))
+	n1, err = ohio.WriteUint8(w, uint8(path.Len()))
 	n += int64(n1)
 
 	if err != nil {
@@ -244,7 +244,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	for _, s := range *p {
+	for _, s := range *path {
 		if s.Len() == 0 {
 			panic("found empty tag in tag_paths")
 		}

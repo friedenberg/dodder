@@ -20,8 +20,8 @@ const (
 )
 
 // TODO determine if this should include type self
-func (t Type) IsDirectOrSelf() bool {
-	switch t {
+func (tipe Type) IsDirectOrSelf() bool {
+	switch tipe {
 	case TypeDirect, TypeSelf:
 		return true
 
@@ -30,15 +30,15 @@ func (t Type) IsDirectOrSelf() bool {
 	}
 }
 
-func (t *Type) SetDirect() {
-	*t = TypeDirect
+func (tipe *Type) SetDirect() {
+	*tipe = TypeDirect
 }
 
-func (t Type) ReadByte() (byte, error) {
-	return byte(t), nil
+func (tipe Type) ReadByte() (byte, error) {
+	return byte(tipe), nil
 }
 
-func (t *Type) ReadFrom(r io.Reader) (n int64, err error) {
+func (tipe *Type) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [1]byte
 
 	var n1 int
@@ -50,15 +50,15 @@ func (t *Type) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*t = Type(b[0])
+	*tipe = Type(b[0])
 
 	return
 }
 
-func (t Type) WriteTo(w io.Writer) (n int64, err error) {
+func (tipe Type) WriteTo(w io.Writer) (n int64, err error) {
 	var b byte
 
-	if b, err = t.ReadByte(); err != nil {
+	if b, err = tipe.ReadByte(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
