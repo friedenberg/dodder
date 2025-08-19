@@ -1,4 +1,4 @@
-name: Publish every Git push to main to FlakeHub
+name: Publish every Git push to master to FlakeHub
  
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./go/zit
+    working-directory: ./go
 
 jobs:
 
@@ -23,11 +23,11 @@ jobs:
           determinate: true
       - uses: "DeterminateSystems/flakehub-push@main"
         with:
-          name: "friedenberg/zit-go"
+          name: "friedenberg/dodder-go"
           rolling: true
           visibility: "public"
           include-output-paths: true
-          directory: ./go/zit
+          directory: ./go
 
   build-nix-package:
     runs-on: ubuntu-22.04
@@ -41,4 +41,4 @@ jobs:
           determinate: true
       - uses: DeterminateSystems/flakehub-cache-action@main
       - run: nix build
-        working-directory: ./go/zit
+        working-directory: ./go
