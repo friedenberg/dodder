@@ -238,8 +238,10 @@ func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 
 		if store, err := blob_stores.MakeBlobStore(
 			env,
-			env.DirFirstBlobStoreInventoryLists(),
-			blob.GetBlobIOWrapper().(blob_store_configs.Config),
+			blob_stores.BlobStoreConfigNamed{
+				BasePath: env.DirFirstBlobStoreInventoryLists(),
+				Config:   blob.GetBlobIOWrapper().(blob_store_configs.Config),
+			},
 			env.GetTempLocal(),
 		); err != nil {
 			env.Cancel(err)

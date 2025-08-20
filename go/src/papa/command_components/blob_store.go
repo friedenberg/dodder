@@ -48,8 +48,10 @@ func (cmd *BlobStore) MakeBlobStore(
 
 			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
 				envRepo,
-				"", // TODO get base path
-				typedConfig.Blob,
+				blob_stores.BlobStoreConfigNamed{
+					// TODO get base path
+					Config: typedConfig.Blob,
+				},
 				envRepo.GetTempLocal(),
 			); err != nil {
 				envRepo.Cancel(err)

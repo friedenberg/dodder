@@ -8,19 +8,14 @@
         "utils": "utils"
       },
       "locked": {
-        "dir": "pkgs/alfa/devenv-go",
-        "lastModified": 1752853196,
-        "narHash": "sha256-V9JC0ENJRE4t96bYdno53BBa1khKHH+6e978Ckehh7U=",
-        "owner": "friedenberg",
-        "repo": "eng",
-        "rev": "812793d14802cc7d6df5b35517b4cd215d8654f2",
-        "type": "github"
+        "lastModified": 1755627249,
+        "narHash": "sha256-1w5+hHXh5UznWBiUaFPeXO1XPY5k3e6gjIAArAraFWU=",
+        "path": "/home/sasha/eng/pkgs/alfa/devenv-go",
+        "type": "path"
       },
       "original": {
-        "dir": "pkgs/alfa/devenv-go",
-        "owner": "friedenberg",
-        "repo": "eng",
-        "type": "github"
+        "path": "/home/sasha/eng/pkgs/alfa/devenv-go",
+        "type": "path"
       }
     },
     "devenv-shell": {

@@ -83,7 +83,7 @@ func (cmd Import) Run(req command.Request) {
 		CheckedOutPrinter: localWorkingCopy.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
-	if cmd.Blobs != "" {
+	if cmd.BasePath != "" {
 		{
 			var err error
 

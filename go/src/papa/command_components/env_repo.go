@@ -22,7 +22,7 @@ func (cmd EnvRepo) MakeEnvRepo(
 		req.Config.Debug,
 	)
 
-	ui := env_ui.Make(
+	envUI := env_ui.Make(
 		req,
 		req.Config,
 		env_ui.Options{},
@@ -39,10 +39,10 @@ func (cmd EnvRepo) MakeEnvRepo(
 		var err error
 
 		if envRepo, err = env_repo.Make(
-			env_local.Make(ui, dir),
+			env_local.Make(envUI, dir),
 			envRepoOptions,
 		); err != nil {
-			ui.Cancel(err)
+			envUI.Cancel(err)
 		}
 	}
 

@@ -27,13 +27,18 @@ var (
 	_ interfaces.BlobStore = &remoteSftp{}
 )
 
-type BlobStoreInitialized struct {
+type BlobStoreConfigNamed struct {
 	Name     string
 	BasePath string
 	blob_store_configs.Config
+}
+
+type BlobStoreInitialized struct {
+	BlobStoreConfigNamed
 	interfaces.BlobStore
 }
 
+// TODO pass in custom UI context for printing
 func MakeBlobStores(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,
@@ -84,8 +89,7 @@ func MakeBlobStores(
 		// TODO use sha of config to determine blob store base path
 		if blobStores[i].BlobStore, err = MakeBlobStore(
 			ctx,
-			blobStore.BasePath,
-			blobStore.Config,
+			blobStore.BlobStoreConfigNamed,
 			envDir.GetTempLocal(),
 		); err != nil {
 			ctx.Cancel(err)
@@ -98,13 +102,10 @@ func MakeBlobStores(
 
 func MakeRemoteBlobStore(
 	ctx interfaces.ActiveContext,
-	basePath string,
-	config blob_store_configs.Config,
+	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 ) (blobStore BlobStoreInitialized) {
-	blobStore.Name = "remote blob store"
-	blobStore.BasePath = basePath
-	blobStore.Config = config
+	blobStore.BlobStoreConfigNamed = config
 
 	{
 		var err error
@@ -112,8 +113,7 @@ func MakeRemoteBlobStore(
 		// TODO use sha of config to determine blob store base path
 		if blobStore.BlobStore, err = MakeBlobStore(
 			ctx,
-			blobStore.BasePath,
-			blobStore.Config,
+			config,
 			tempFS,
 		); err != nil {
 			ctx.Cancel(err)
@@ -127,8 +127,7 @@ func MakeRemoteBlobStore(
 // TODO describe base path agnostically
 func MakeBlobStore(
 	ctx interfaces.ActiveContext,
-	basePath string,
-	config blob_store_configs.Config,
+	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 ) (store interfaces.BlobStore, err error) {
 	// TODO don't use tipe, use interfaces on the config
@@ -141,7 +140,7 @@ func MakeBlobStore(
 		var sshClient *ssh.Client
 		var configSFTP blob_store_configs.ConfigSFTPRemotePath
 
-		switch config := config.(type) {
+		switch config := config.Config.(type) {
 		default:
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
 			return
@@ -166,8 +165,13 @@ func MakeBlobStore(
 		return makeSftpStore(ctx, configSFTP, sshClient)
 
 	case "local":
-		if config, ok := config.(blob_store_configs.ConfigLocalHashBucketed); ok {
-			return makeLocalHashBucketed(ctx, basePath, config, tempFS)
+		if configLocal, ok := config.Config.(blob_store_configs.ConfigLocalHashBucketed); ok {
+			return makeLocalHashBucketed(
+				ctx,
+				config.BasePath,
+				configLocal,
+				tempFS,
+			)
 		} else {
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
 			return

@@ -11,14 +11,21 @@ import (
 
 // TODO migrate to using `command_components.BlobStore`
 type RemoteBlobStore struct {
-	Blobs  string
-	Config blob_store_configs.TomlV0
+	BasePath string
+	Config   blob_store_configs.TomlV0
 }
 
 func (cmd *RemoteBlobStore) SetFlagSet(flagSet *flag.FlagSet) {
 	cmd.Config.CompressionType = compression_type.CompressionTypeDefault
 	cmd.Config.CompressionType.SetFlagSet(flagSet)
-	flagSet.StringVar(&cmd.Blobs, "blobs", "", "")
+	flagSet.StringVar(&cmd.BasePath, "blobs", "", "")
+}
+
+func (cmd *RemoteBlobStore) GetBlobStoreConfigNamed() blob_stores.BlobStoreConfigNamed {
+	return blob_stores.BlobStoreConfigNamed{
+		BasePath: cmd.BasePath,
+		Config:   &cmd.Config,
+	}
 }
 
 func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
@@ -26,8 +33,7 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 ) (blobStore blob_stores.BlobStoreInitialized, err error) {
 	blobStore = blob_stores.MakeRemoteBlobStore(
 		envLocal,
-		cmd.Blobs,
-		&cmd.Config,
+		cmd.GetBlobStoreConfigNamed(),
 		envLocal.GetTempLocal(),
 	)
 
