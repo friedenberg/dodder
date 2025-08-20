@@ -260,7 +260,7 @@ deploy-github:
       ../{zz-pandoc,zz-vim,zz-tests_bats} \
       gomod2nix.toml
 
-    git commit -m "update (pre codegen and test)"
+    git commit --allow-empty -m "update (pre codegen and test)"
   }
 
   target="deploy-github"
