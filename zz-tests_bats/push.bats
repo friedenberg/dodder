@@ -351,10 +351,10 @@ function push_history_default_stdio_local_twice { # @test
 	run_dodder push /them :z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
-		remote: [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
-		remote: [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
-		remote: copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
-		remote: copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
+		(remote) [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
+		(remote) [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
+		(remote) copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
+		(remote) copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
 	EOM
 
 	pushd them || exit 1
@@ -390,15 +390,15 @@ function push_history_default_stdio_twice { # @test
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		remote: copied Blob [0-9a-f]+ \(.*)
-		remote: copied Blob [0-9a-f]+ \(.*)
-		remote: copied Blob [0-9a-f]+ \(.*)
-		remote: copied Blob [0-9a-f]+ \(.*)
-		remote: copied Blob [0-9a-f]+ \(.*)
+		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
+		\(remote) copied Blob [0-9a-f]+ \(.*)
+		\(remote) copied Blob [0-9a-f]+ \(.*)
+		\(remote) copied Blob [0-9a-f]+ \(.*)
+		\(remote) copied Blob [0-9a-f]+ \(.*)
+		\(remote) copied Blob [0-9a-f]+ \(.*)
 	EOM
 
 	pushd them || exit 1

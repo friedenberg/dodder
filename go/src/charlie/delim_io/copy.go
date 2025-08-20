@@ -23,6 +23,8 @@ func CopyWithPrefixOnDelim(
 	source io.Reader,
 	includeLineNumbers bool,
 ) (n int64, err error) {
+	delimiterString := string([]byte{delimiter})
+
 	bufferedReader := pool.GetBufioReader().Get()
 	defer pool.GetBufioReader().Put(bufferedReader)
 
@@ -62,12 +64,7 @@ func CopyWithPrefixOnDelim(
 			fmt.Fprintf(&stringBuilder, "%d:", lineNumber)
 		}
 
-		fmt.Fprint(&stringBuilder, " ")
-		// fmt.Fprint(bw, "\t")
-
-		stringBuilder.WriteString(
-			strings.TrimSuffix(rawLine, string([]byte{delimiter})),
-		)
+		stringBuilder.WriteString(strings.TrimSuffix(rawLine, delimiterString))
 
 		destination.Print(stringBuilder.String())
 		stringBuilder.Reset()
