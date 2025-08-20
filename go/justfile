@@ -131,7 +131,7 @@ build-go-binary tags output:
 # TODO switch the debug build output folder to be build/debug
 build-go: \
     build-go-generate \
-    (build-go-binary "debug" "build") \
+    (build-go-binary "debug" "build/debug") \
     (build-go-binary "" "build/release") \
 
 build-nix-gomod:
@@ -254,6 +254,7 @@ deploy-github:
   }
 
   # commit worktree before codegen and tests
+  # TODO delete branch and reset commit if failure
   {
     git add \
       . \
