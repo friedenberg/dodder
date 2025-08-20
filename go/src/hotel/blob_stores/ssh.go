@@ -16,9 +16,10 @@ import (
 // TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
 func MakeSSHClientForExplicitConfig(
 	ctx interfaces.ActiveContext,
+	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPConfigExplicit,
 ) (sshClient *ssh.Client, err error) {
-	sshConfig := &ssh.ClientConfig{
+	clientConfig := &ssh.ClientConfig{
 		User:            config.GetUser(),
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: make this configurable
 	}
@@ -38,9 +39,9 @@ func MakeSSHClientForExplicitConfig(
 			return
 		}
 
-		sshConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
+		clientConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
 	} else if config.GetPassword() != "" {
-		sshConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
+		clientConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
 	} else {
 		err = errors.Errorf("no authentication method configured")
 		return
@@ -52,18 +53,17 @@ func MakeSSHClientForExplicitConfig(
 		config.GetPort(),
 	)
 
-	if sshClient, err = ssh.Dial("tcp", addr, sshConfig); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH server")
+	if sshClient, err = sshDial(ctx, uiPrinter, clientConfig, addr); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 
 	return
 }
 
 func MakeSSHClientFromSSHConfig(
 	ctx interfaces.ActiveContext,
+	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPUri,
 ) (sshClient *ssh.Client, err error) {
 	socket := os.Getenv("SSH_AUTH_SOCK")
@@ -89,7 +89,7 @@ func MakeSSHClientFromSSHConfig(
 	uri := config.GetUri()
 	url := uri.GetUrl()
 
-	configClient := &ssh.ClientConfig{
+	clientConfig := &ssh.ClientConfig{
 		User: url.User.Username(),
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeysCallback(clientAgent.Signers),
@@ -103,11 +103,26 @@ func MakeSSHClientFromSSHConfig(
 		url.Port(),
 	)
 
-	ui.Log().Printf("connecting via ssh: %q", addr)
+	if sshClient, err = sshDial(ctx, uiPrinter, clientConfig, addr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func sshDial(
+	ctx interfaces.ActiveContext,
+	uiPrinter ui.Printer,
+	configClient *ssh.ClientConfig,
+	addr string,
+) (sshClient *ssh.Client, err error) {
+	uiPrinter.Printf("dialing %q...", addr)
 	if sshClient, err = ssh.Dial("tcp", addr, configClient); err != nil {
 		err = errors.Wrapf(err, "failed to connect to SSH server")
 		return
 	}
+	uiPrinter.Printf("connected to %q...", addr)
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 

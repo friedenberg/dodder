@@ -78,22 +78,16 @@ func (printer devPrinter) Printf(format string, args ...any) (err error) {
 }
 
 //go:noinline
-func (printer devPrinter) Caller(skip int, args ...any) {
+func (printer devPrinter) Caller(skip int) Printer {
 	if !printer.on {
-		return
+		return Null
 	}
 
 	stackFrame, _ := stack_frame.MakeFrame(skip + 1)
 
-	args = append([]any{stackFrame}, args...)
-	// TODO-P4 strip trailing newline and add back
-	printer.printer.Print(args...)
-}
-
-//go:noinline
-func (printer devPrinter) CallerNonEmpty(skip int, arg any) {
-	if arg != nil {
-		printer.Caller(skip+1, "%s", arg)
+	return prefixPrinter{
+		Printer: printer,
+		prefix:  stackFrame.String(),
 	}
 }
 

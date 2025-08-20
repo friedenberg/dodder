@@ -74,7 +74,7 @@ func (b *String) copyCheck() {
 		// TODO-P1: once issue 7921 is fixed, this should be reverted to
 		// just "b.addr = b".
 		if configDebugCopyCheck {
-			ui.Log().Caller(6, "saved addr: %d", unsafe.Pointer(b))
+			ui.Log().Caller(6).Printf("saved addr: %d", unsafe.Pointer(b))
 		}
 		b.addr = (*String)(noescape(unsafe.Pointer(b)))
 		return

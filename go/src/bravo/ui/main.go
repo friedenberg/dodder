@@ -39,8 +39,7 @@ type Printer = interfaces.Printer
 
 type DevPrinter interface {
 	Printer
-	// TODO rewrite this to return a dev printer
-	Caller(i int, vs ...any)
+	Caller(skip int) Printer
 	FunctionName(skip int)
 	Stack(skip, count int)
 }
@@ -49,6 +48,9 @@ var (
 	printerOut, printerErr   printer
 	printerLog, printerDebug devPrinter
 	printerBatsTestBody      devPrinter
+	_                        Printer    = printer{}
+	_                        Printer    = prefixPrinter{}
+	_                        DevPrinter = devPrinter{}
 )
 
 func init() {

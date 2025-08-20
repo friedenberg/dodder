@@ -57,7 +57,6 @@ func CopyWithPrefixOnDelim(
 		}
 
 		stringBuilder.WriteString(prefix)
-		fmt.Fprint(&stringBuilder, ":")
 
 		if includeLineNumbers {
 			fmt.Fprintf(&stringBuilder, "%d:", lineNumber)

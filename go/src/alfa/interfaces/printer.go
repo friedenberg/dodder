@@ -7,7 +7,6 @@ import (
 
 type Printer interface {
 	io.Writer
-	GetPrinter() Printer
 
 	GetFile() *os.File
 	IsTty() bool

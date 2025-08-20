@@ -107,7 +107,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			"remote",
+			"(remote) ",
 			envUI.GetUI(),
 			stderrReadCloser,
 			false,

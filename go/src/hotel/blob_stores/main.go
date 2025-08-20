@@ -1,6 +1,7 @@
 package blob_stores
 
 import (
+	"fmt"
 	"io"
 	"path/filepath"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -130,6 +132,11 @@ func MakeBlobStore(
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 ) (store interfaces.BlobStore, err error) {
+	printer := ui.MakePrefixPrinter(
+		ui.Err(),
+		fmt.Sprintf("(blob_store: %s) ", config.Name),
+	)
+
 	// TODO don't use tipe, use interfaces on the config
 	switch tipe := config.GetBlobStoreType(); tipe {
 	default:
@@ -146,7 +153,7 @@ func MakeBlobStore(
 			return
 
 		case blob_store_configs.ConfigSFTPUri:
-			if sshClient, err = MakeSSHClientFromSSHConfig(ctx, config); err != nil {
+			if sshClient, err = MakeSSHClientFromSSHConfig(ctx, printer, config); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -154,7 +161,7 @@ func MakeBlobStore(
 			configSFTP = config
 
 		case blob_store_configs.ConfigSFTPConfigExplicit:
-			if sshClient, err = MakeSSHClientForExplicitConfig(ctx, config); err != nil {
+			if sshClient, err = MakeSSHClientForExplicitConfig(ctx, printer, config); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -162,7 +169,12 @@ func MakeBlobStore(
 			configSFTP = config
 		}
 
-		return makeSftpStore(ctx, configSFTP, sshClient)
+		return makeSftpStore(
+			ctx,
+			printer,
+			configSFTP,
+			sshClient,
+		)
 
 	case "local":
 		if configLocal, ok := config.Config.(blob_store_configs.ConfigLocalHashBucketed); ok {

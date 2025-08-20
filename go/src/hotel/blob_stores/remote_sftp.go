@@ -26,6 +26,8 @@ import (
 )
 
 type remoteSftp struct {
+	uiPrinter ui.Printer
+
 	buckets []int
 
 	config blob_store_configs.ConfigSFTPRemotePath
@@ -45,10 +47,12 @@ type remoteSftp struct {
 
 func makeSftpStore(
 	ctx interfaces.ActiveContext,
+	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
-) (store *remoteSftp, err error) {
-	store = &remoteSftp{
+) (blobStore *remoteSftp, err error) {
+	blobStore = &remoteSftp{
+		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
 		config:    config,
 		sshClient: sshClient,
@@ -57,14 +61,14 @@ func makeSftpStore(
 
 	ui.Log().Print("creating sftp client")
 
-	if store.sftpClient, err = sftp.NewClient(store.sshClient); err != nil {
+	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
 		err = errors.Wrapf(err, "failed to create SFTP client")
 		return
 	}
 
-	ctx.After(errors.MakeFuncContextFromFuncErr(store.close))
+	ctx.After(errors.MakeFuncContextFromFuncErr(blobStore.close))
 
-	if err = store.ensureRemotePath(); err != nil {
+	if err = blobStore.ensureRemotePath(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +97,7 @@ func (blobStore *remoteSftp) ensureRemotePath() (err error) {
 
 	// Create directory tree if it doesn't exist
 	parts := strings.Split(remotePath, "/")
-	currentPath := ""
+	var currentPath string
 
 	for _, part := range parts {
 		if part == "" {
@@ -106,7 +110,10 @@ func (blobStore *remoteSftp) ensureRemotePath() (err error) {
 			currentPath = path.Join(currentPath, part)
 		}
 
+		blobStore.uiPrinter.Printf("checking directory %q...", currentPath)
 		if _, err = blobStore.sftpClient.Stat(currentPath); err != nil {
+			// TODO check error
+			blobStore.uiPrinter.Printf("creating directory %q...", currentPath)
 			if err = blobStore.sftpClient.Mkdir(currentPath); err != nil {
 				// Directory might exist, continue
 				err = nil
