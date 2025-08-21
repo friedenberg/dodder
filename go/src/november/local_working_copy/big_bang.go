@@ -105,7 +105,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return
 	}
 
-	object.Metadata.Blob.ResetWithShaLike(sh)
+	object.Metadata.BlobId.ResetWithShaLike(sh)
 	object.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(

@@ -17,63 +17,63 @@ type Cache struct {
 	QueryPath
 }
 
-func (v *Cache) GetExpandedTags() ids.TagSet {
-	return v.GetExpandedTagsMutable()
+func (cache *Cache) GetExpandedTags() ids.TagSet {
+	return cache.GetExpandedTagsMutable()
 }
 
-func (v *Cache) AddTagExpandedPtr(e *ids.Tag) (err error) {
+func (cache *Cache) AddTagExpandedPtr(e *ids.Tag) (err error) {
 	return quiter.AddClonePool(
-		v.GetExpandedTagsMutable(),
+		cache.GetExpandedTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
 		e,
 	)
 }
 
-func (v *Cache) GetExpandedTagsMutable() ids.TagMutableSet {
-	if v.ExpandedTags == nil {
-		v.ExpandedTags = ids.MakeTagMutableSet()
+func (cache *Cache) GetExpandedTagsMutable() ids.TagMutableSet {
+	if cache.ExpandedTags == nil {
+		cache.ExpandedTags = ids.MakeTagMutableSet()
 	}
 
-	return v.ExpandedTags
+	return cache.ExpandedTags
 }
 
-func (v *Cache) SetExpandedTags(e ids.TagSet) {
-	es := v.GetExpandedTagsMutable()
-	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
+func (cache *Cache) SetExpandedTags(tags ids.TagSet) {
+	tagsExpanded := cache.GetExpandedTagsMutable()
+	quiter.ResetMutableSetWithPool(tagsExpanded, ids.GetTagPool())
 
-	if e == nil {
+	if tags == nil {
 		return
 	}
 
-	for tag := range e.All() {
-		errors.PanicIfError(es.Add(tag))
+	for tag := range tags.All() {
+		errors.PanicIfError(tagsExpanded.Add(tag))
 	}
 }
 
-func (v *Cache) GetImplicitTags() ids.TagSet {
-	return v.GetImplicitTagsMutable()
+func (cache *Cache) GetImplicitTags() ids.TagSet {
+	return cache.GetImplicitTagsMutable()
 }
 
-func (v *Cache) AddTagsImplicitPtr(e *ids.Tag) (err error) {
+func (cache *Cache) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
 	return quiter.AddClonePool(
-		v.GetImplicitTagsMutable(),
+		cache.GetImplicitTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
-		e,
+		tag,
 	)
 }
 
-func (v *Cache) GetImplicitTagsMutable() ids.TagMutableSet {
-	if v.ImplicitTags == nil {
-		v.ImplicitTags = ids.MakeTagMutableSet()
+func (cache *Cache) GetImplicitTagsMutable() ids.TagMutableSet {
+	if cache.ImplicitTags == nil {
+		cache.ImplicitTags = ids.MakeTagMutableSet()
 	}
 
-	return v.ImplicitTags
+	return cache.ImplicitTags
 }
 
-func (v *Cache) SetImplicitTags(e ids.TagSet) {
-	es := v.GetImplicitTagsMutable()
+func (cache *Cache) SetImplicitTags(e ids.TagSet) {
+	es := cache.GetImplicitTagsMutable()
 	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {

@@ -113,7 +113,7 @@ func (cmd Remote) CreateRemoteObject(
 		}
 	}
 
-	remoteObject.Metadata.Blob.ResetWithShaLike(blobSha)
+	remoteObject.Metadata.BlobId.ResetWithShaLike(blobSha)
 
 	return
 }

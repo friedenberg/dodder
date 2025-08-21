@@ -228,22 +228,23 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) SetObjectSha(v interfaces.BlobId) (err error) {
+func (transacted *Transacted) SetObjectFingerPrint(
+	v interfaces.BlobId,
+) (err error) {
 	return transacted.GetMetadata().GetDigest().SetDigest(v)
 }
 
 // TODO remove
-func (transacted *Transacted) GetObjectSha() interfaces.BlobId {
+func (transacted *Transacted) GetObjectFingerPrint() interfaces.BlobId {
 	return transacted.GetMetadata().GetDigest()
 }
 
 func (transacted *Transacted) GetBlobId() interfaces.BlobId {
-	return &transacted.Metadata.Blob
+	return &transacted.Metadata.BlobId
 }
 
-// TODO rename to SetBlobId
 func (transacted *Transacted) SetBlobId(sh interfaces.BlobId) error {
-	return transacted.Metadata.Blob.SetDigest(sh)
+	return transacted.Metadata.BlobId.SetDigest(sh)
 }
 
 func (transacted *Transacted) GetKey() string {

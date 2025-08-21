@@ -196,7 +196,7 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if err = object.Metadata.Blob.Set(
+			if err = object.Metadata.BlobId.Set(
 				string(seq.At(1).Contents),
 			); err != nil {
 				err = errors.Wrap(err)

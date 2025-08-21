@@ -181,7 +181,7 @@ func WriteMetadataKeyTo(
 		n1, err = writeShaKeyIfNotNull(
 			w,
 			keyAkte,
-			&m.Blob,
+			&m.BlobId,
 		)
 
 		n += int64(n1)
@@ -365,12 +365,12 @@ func GetShaForContext(
 
 	switch f.key {
 	case "Akte", "AkteTyp":
-		if m.Blob.IsNull() {
+		if m.BlobId.IsNull() {
 			return
 		}
 
 	case "AkteBez":
-		if m.Blob.IsNull() && m.Description.IsEmpty() {
+		if m.BlobId.IsNull() && m.Description.IsEmpty() {
 			return
 		}
 	}

@@ -76,7 +76,7 @@ func (f v4) ParsePersistentMetadata(
 
 		switch {
 		case key.Equal(keyAkte.Bytes()):
-			if err = m.Blob.SetHexBytes(valBuffer.Bytes()); err != nil {
+			if err = m.BlobId.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

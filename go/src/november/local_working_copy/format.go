@@ -487,7 +487,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					"%s@%s\n",
 					&object.ObjectId,
-					object.GetObjectSha(),
+					object.GetObjectFingerPrint(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return

@@ -266,7 +266,7 @@ func (bf *binaryDecoder) readFieldKey(
 ) (err error) {
 	switch bf.Binary {
 	case keys.Blob:
-		if _, err = sk.Metadata.Blob.ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadata.BlobId.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

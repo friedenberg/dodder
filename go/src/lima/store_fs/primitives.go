@@ -160,7 +160,7 @@ func (store *Store) readOneExternalBlob(
 			return
 		}
 
-		external.GetMetadata().Blob.SetDigester(writeCloser)
+		external.GetMetadata().BlobId.SetDigester(writeCloser)
 	}
 
 	return

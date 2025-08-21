@@ -39,11 +39,11 @@ func (f v4) FormatPersistentMetadata(
 		n2 int64
 	)
 
-	if !metadata.Blob.IsNull() {
+	if !metadata.BlobId.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			multiWriter,
 			keyAkte.String(),
-			metadata.Blob.String(),
+			metadata.BlobId.String(),
 		)
 		n += int64(n1)
 

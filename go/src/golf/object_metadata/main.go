@@ -40,7 +40,7 @@ func (metadata *Metadata) GetMetadata() *Metadata {
 }
 
 func (metadata *Metadata) GetDigest() *sha.Sha {
-	return &metadata.SelfMetadataObjectIdParent
+	return &metadata.FingerPrint
 }
 
 func (metadata *Metadata) GetMotherDigest() *sha.Sha {
@@ -64,7 +64,7 @@ func (metadata *Metadata) UserInputIsEmpty() bool {
 }
 
 func (metadata *Metadata) IsEmpty() bool {
-	if !metadata.Blob.IsNull() {
+	if !metadata.BlobId.IsNull() {
 		return false
 	}
 
@@ -251,7 +251,7 @@ func (metadata *Metadata) SetMutter(mg Getter) (err error) {
 	}
 
 	if err = metadata.ParentMetadataObjectIdParent.SetDigest(
-		&mutter.SelfMetadataObjectIdParent,
+		&mutter.FingerPrint,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

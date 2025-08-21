@@ -47,7 +47,7 @@ func (json *JSON) FromStringAndMetadata(
 	if blobStore != nil {
 		var readCloser interfaces.ReadCloseBlobIdGetter
 
-		if readCloser, err = blobStore.BlobReader(&metadata.Blob); err != nil {
+		if readCloser, err = blobStore.BlobReader(&metadata.BlobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -64,7 +64,7 @@ func (json *JSON) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = metadata.Blob.String()
+	json.BlobId = metadata.BlobId.String()
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
@@ -145,7 +145,7 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = object.Metadata.Blob.Set(json.BlobId); err != nil {
+		if err = object.Metadata.BlobId.Set(json.BlobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

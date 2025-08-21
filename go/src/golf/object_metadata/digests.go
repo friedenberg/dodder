@@ -9,23 +9,25 @@ import (
 
 // TODO consider moving all non-essential digests to a separate key-value store
 type Digests struct {
-	Blob                         sha.Sha
+	BlobId      sha.Sha
+	FingerPrint sha.Sha
+
+	// TODO move cache
 	SelfMetadataWithoutTai       sha.Sha
-	SelfMetadataObjectIdParent   sha.Sha
 	ParentMetadataObjectIdParent sha.Sha
 }
 
 func (digests *Digests) Reset() {
-	digests.Blob.Reset()
+	digests.BlobId.Reset()
 	digests.SelfMetadataWithoutTai.Reset()
-	digests.SelfMetadataObjectIdParent.Reset()
+	digests.FingerPrint.Reset()
 	digests.ParentMetadataObjectIdParent.Reset()
 }
 
 func (digests *Digests) ResetWith(src *Digests) {
-	digests.Blob.ResetWith(&src.Blob)
-	digests.SelfMetadataObjectIdParent.ResetWith(
-		&src.SelfMetadataObjectIdParent,
+	digests.BlobId.ResetWith(&src.BlobId)
+	digests.FingerPrint.ResetWith(
+		&src.FingerPrint,
 	)
 	digests.ParentMetadataObjectIdParent.ResetWith(
 		&src.ParentMetadataObjectIdParent,
@@ -35,7 +37,7 @@ func (digests *Digests) ResetWith(src *Digests) {
 func (digests *Digests) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &digests.Blob)
+	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &digests.BlobId)
 
 	return sb.String()
 }

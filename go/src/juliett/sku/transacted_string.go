@@ -6,7 +6,7 @@ func (transacted *Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
 		&transacted.ObjectId,
-		transacted.GetObjectSha(),
+		transacted.GetObjectFingerPrint(),
 		transacted.GetBlobId(),
 	)
 }

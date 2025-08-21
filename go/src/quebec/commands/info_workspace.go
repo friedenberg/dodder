@@ -21,47 +21,43 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 	envWorkspace := repo.GetEnvWorkspace()
 	envWorkspace.AssertNotTemporary(repo)
-	args := req.PopArgs()
+	arg := req.PopArgOrDefault("workspace info key", "")
+	req.AssertNoMoreArgs()
 
-	if len(args) == 0 {
-		args = []string{""}
-	}
+	// TODO convert arg to flag.Value type that supports completion
+	switch strings.ToLower(arg) {
+	default:
+		errors.ContextCancelWithBadRequestf(
+			repo,
+			"unsupported info key: %q",
+			arg,
+		)
 
-	for _, arg := range args {
-		switch strings.ToLower(arg) {
-		default:
-			errors.ContextCancelWithBadRequestf(
-				repo,
-				"unsupported info key: %q",
-				arg,
-			)
+	case "":
+		// TODO what should this be?
+		// TODO print toml representation?
 
-		case "":
-			// TODO what should this be?
-			// TODO print toml representation?
+	case "query":
+		workspaceConfig := envWorkspace.GetWorkspaceConfig()
 
-		case "query":
-			workspaceConfig := envWorkspace.GetWorkspaceConfig()
+		type WithQueryGroup = workspace_config_blobs.ConfigWithDefaultQueryString
 
-			type WithQueryGroup = workspace_config_blobs.ConfigWithDefaultQueryString
-
-			if withQueryGroup, ok := workspaceConfig.(WithQueryGroup); ok {
-				repo.GetUI().Print(
-					withQueryGroup.GetDefaultQueryString(),
-				)
-			} else {
-				errors.ContextCancelWithBadRequestf(repo, "workspace does not support default queries")
-			}
-
-		case "defaults.type":
+		if withQueryGroup, ok := workspaceConfig.(WithQueryGroup); ok {
 			repo.GetUI().Print(
-				envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultType(),
+				withQueryGroup.GetDefaultQueryString(),
 			)
-
-		case "defaults.tags":
-			repo.GetUI().Print(
-				envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultTags(),
-			)
+		} else {
+			errors.ContextCancelWithBadRequestf(repo, "workspace does not support default queries")
 		}
+
+	case "defaults.type":
+		repo.GetUI().Print(
+			envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultType(),
+		)
+
+	case "defaults.tags":
+		repo.GetUI().Print(
+			envWorkspace.GetWorkspaceConfig().GetDefaults().GetDefaultTags(),
+		)
 	}
 }

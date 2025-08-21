@@ -27,7 +27,7 @@ func (f v0) FormatPersistentMetadata(
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
-	w.WriteFormat("%s %s", genres.Blob, &m.Blob)
+	w.WriteFormat("%s %s", genres.Blob, &m.BlobId)
 	w.WriteFormat("%s %s", genres.Type, m.GetType())
 	w.WriteFormat("Bezeichnung %s", m.Description)
 
@@ -68,7 +68,7 @@ func (f v0) ParsePersistentMetadata(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
 					"Tai":                m.Tai.Set,
-					genres.Blob.String(): m.Blob.Set,
+					genres.Blob.String(): m.BlobId.Set,
 					genres.Type.String(): typLineReader,
 					"AkteTyp":            typLineReader,
 					"Bezeichnung":        m.Description.Set,

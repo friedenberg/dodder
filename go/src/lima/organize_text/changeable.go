@@ -63,16 +63,16 @@ func (a *Assignment) addToSet(
 			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
-				outputObject.GetSkuExternal().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSkuExternal().Metadata.Blob,
+				outputObject.GetSkuExternal().Metadata.BlobId.ResetWith(
+					&objectOriginal.GetSkuExternal().Metadata.BlobId,
 				)
 
 				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
 					objectOriginal.GetSkuExternal().Metadata.Type,
 				)
 
-				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Blob,
+				outputObject.GetSkuExternal().GetSkuExternal().Metadata.BlobId.ResetWith(
+					&objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.BlobId,
 				)
 
 				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Type.ResetWith(

@@ -40,7 +40,7 @@ func (f textParser) ParseMetadata(
 	var n1 int64
 
 	defer func() {
-		c.SetBlobId(&m.Blob)
+		c.SetBlobId(&m.BlobId)
 	}()
 
 	mp := &textParser2{
@@ -77,7 +77,7 @@ func (f textParser) ParseMetadata(
 
 	inlineBlobSha := sha.MustWithDigester(blobWriter)
 
-	if !m.Blob.IsNull() && !mp.Blob.GetDigest().IsNull() {
+	if !m.BlobId.IsNull() && !mp.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
 				&mp.Blob,
@@ -96,22 +96,22 @@ func (f textParser) ParseMetadata(
 			},
 		)
 
-		m.Blob.SetDigest(mp.Blob.GetDigest())
+		m.BlobId.SetDigest(mp.Blob.GetDigest())
 	}
 
 	switch {
-	case m.Blob.IsNull() && !inlineBlobSha.IsNull():
-		m.Blob.SetDigest(inlineBlobSha)
+	case m.BlobId.IsNull() && !inlineBlobSha.IsNull():
+		m.BlobId.SetDigest(inlineBlobSha)
 
-	case !m.Blob.IsNull() && inlineBlobSha.IsNull():
+	case !m.BlobId.IsNull() && inlineBlobSha.IsNull():
 		// noop
 
-	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
-		!blob_ids.Equals(&m.Blob, inlineBlobSha):
+	case !m.BlobId.IsNull() && !inlineBlobSha.IsNull() &&
+		!blob_ids.Equals(&m.BlobId, inlineBlobSha):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataSha(
 				inlineBlobSha,
-				&m.Blob,
+				&m.BlobId,
 			),
 		)
 

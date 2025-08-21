@@ -121,6 +121,18 @@ func (req *Args) PopArg(name string) string {
 	return value
 }
 
+func (req *Args) PopArgOrDefault(name, defaultArg string) string {
+	if req.RemainingArgCount() == 0 {
+		return defaultArg
+	}
+
+	value := req.args[req.argi]
+	req.consumed = append(req.consumed, consumedArg{name: name, value: value})
+	req.argi++
+
+	return value
+}
+
 func (req *Args) AssertNoMoreArgs() {
 	if req.RemainingArgCount() > 0 {
 		errors.ContextCancelWithBadRequestf(

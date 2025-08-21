@@ -19,7 +19,7 @@ func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
 		o.GetTai(),
 		o.GetGenre(),
 		o.GetObjectId(),
-		o.GetObjectSha(),
+		o.GetObjectFingerPrint(),
 		o.GetBlobId(),
 	)
 

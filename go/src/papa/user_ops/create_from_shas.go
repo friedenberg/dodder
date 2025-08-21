@@ -57,7 +57,7 @@ func (op CreateFromShas) Run(
 		object := sku.GetTransactedPool().Get()
 
 		object.ObjectId.SetGenre(genres.Zettel)
-		object.Metadata.Blob.ResetWith(&sh)
+		object.Metadata.BlobId.ResetWith(&sh)
 
 		op.Proto.Apply(object, genres.Zettel)
 
