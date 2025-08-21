@@ -84,6 +84,10 @@ func (digest *Sha) IsNull() bool {
 		return true
 	}
 
+	if !digest.nonZero {
+		return true
+	}
+
 	if bytes.Equal(digest.data[:], null.data[:]) {
 		return true
 	}
