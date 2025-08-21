@@ -238,7 +238,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	m := sk.GetMetadata()
 
 	if options.PrintShas &&
-		(options.BoxPrintEmptyShas || !m.BlobId.IsNull()) {
+		(options.BoxPrintEmptyShas || !m.Blob.IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(

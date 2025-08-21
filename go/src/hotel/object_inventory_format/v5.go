@@ -35,11 +35,11 @@ func (f v5) FormatPersistentMetadata(
 		n2 int64
 	)
 
-	if !m.BlobId.IsNull() {
+	if !m.Blob.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyAkte.String(),
-			m.BlobId.String(),
+			m.Blob.String(),
 		)
 		n += int64(n1)
 
@@ -313,7 +313,7 @@ func (f v5) ParsePersistentMetadata(
 
 		switch {
 		case key.Equal(keyAkte.Bytes()):
-			if err = m.BlobId.SetHexBytes(valBuffer.Bytes()); err != nil {
+			if err = m.Blob.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

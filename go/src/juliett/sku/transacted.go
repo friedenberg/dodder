@@ -217,7 +217,7 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 		transacted.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadataSansTai(),
-			&transacted.Metadata.SelfMetadataWithoutTai,
+			&transacted.Metadata.SelfWithoutTai,
 		),
 	)
 
@@ -240,17 +240,18 @@ func (transacted *Transacted) GetObjectFingerPrint() interfaces.BlobId {
 }
 
 func (transacted *Transacted) GetBlobId() interfaces.BlobId {
-	return &transacted.Metadata.BlobId
+	return &transacted.Metadata.Blob
 }
 
 func (transacted *Transacted) SetBlobId(sh interfaces.BlobId) error {
-	return transacted.Metadata.BlobId.SetDigest(sh)
+	return transacted.Metadata.Blob.SetDigest(sh)
 }
 
 func (transacted *Transacted) GetKey() string {
 	return ids.FormattedString(transacted.GetObjectId())
 }
 
+// TODO turn into proper merkle tree
 func (transacted *Transacted) Sign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {

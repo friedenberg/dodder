@@ -12,7 +12,7 @@ func StringSansTai(o *Metadata) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(" ")
-	sb.WriteString(o.BlobId.String())
+	sb.WriteString(o.Blob.String())
 
 	m := o.GetMetadata()
 

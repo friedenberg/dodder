@@ -47,7 +47,7 @@ func (json *JSON) FromStringAndMetadata(
 	if blobStore != nil {
 		var readCloser interfaces.ReadCloseBlobIdGetter
 
-		if readCloser, err = blobStore.BlobReader(&metadata.BlobId); err != nil {
+		if readCloser, err = blobStore.BlobReader(&metadata.Blob); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -64,14 +64,14 @@ func (json *JSON) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = metadata.BlobId.String()
+	json.BlobId = metadata.Blob.String()
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
 	json.RepoPubkey = metadata.GetRepoPubkeyValue()
 	json.RepoSig = metadata.GetRepoSigValue()
-	json.Sha = metadata.SelfMetadataWithoutTai.String()
+	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
 	json.Type = metadata.Type.String()
@@ -145,7 +145,7 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = object.Metadata.BlobId.Set(json.BlobId); err != nil {
+		if err = object.Metadata.Blob.Set(json.BlobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -194,7 +194,7 @@ func (json *JSON) ToTransacted(
 
 	// Set SelfMetadataWithoutTai SHA
 	if json.Sha != "" {
-		if err = object.Metadata.SelfMetadataWithoutTai.Set(json.Sha); err != nil {
+		if err = object.Metadata.SelfWithoutTai.Set(json.Sha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -16,6 +15,8 @@ import (
 
 type Field = string_format_writer.Field
 
+// TODO transform into a view object that can be backed by various
+// representations
 type Metadata struct {
 	// Domain
 	RepoPubkey repo_signing.PublicKey
@@ -30,21 +31,18 @@ type Metadata struct {
 	Digests
 	Tai ids.Tai
 
+	// TODO move to Cache
 	Comments []string
-	Cache    Cache
-	Fields   []Field
+
+	// TODO replace with dumber field representation
+	// TODO move to Cache
+	Fields []Field
+
+	Cache Cache
 }
 
 func (metadata *Metadata) GetMetadata() *Metadata {
 	return metadata
-}
-
-func (metadata *Metadata) GetDigest() *sha.Sha {
-	return &metadata.FingerPrint
-}
-
-func (metadata *Metadata) GetMotherDigest() *sha.Sha {
-	return &metadata.ParentMetadataObjectIdParent
 }
 
 func (metadata *Metadata) UserInputIsEmpty() bool {
@@ -64,7 +62,7 @@ func (metadata *Metadata) UserInputIsEmpty() bool {
 }
 
 func (metadata *Metadata) IsEmpty() bool {
-	if !metadata.BlobId.IsNull() {
+	if !metadata.Blob.IsNull() {
 		return false
 	}
 
@@ -238,26 +236,6 @@ func (metadata *Metadata) Subtract(
 
 func (metadata *Metadata) AddComment(f string, vals ...any) {
 	metadata.Comments = append(metadata.Comments, fmt.Sprintf(f, vals...))
-}
-
-func (metadata *Metadata) SetMutter(mg Getter) (err error) {
-	mutter := mg.GetMetadata()
-
-	if err = metadata.GetMotherDigest().SetDigest(
-		mutter.GetDigest(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = metadata.ParentMetadataObjectIdParent.SetDigest(
-		&mutter.FingerPrint,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (metadata *Metadata) GenerateExpandedTags() {

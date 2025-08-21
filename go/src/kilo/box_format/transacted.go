@@ -240,7 +240,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 	metadata := object.GetMetadata()
 
 	if options.PrintShas &&
-		(options.BoxPrintEmptyShas || !metadata.BlobId.IsNull()) {
+		(options.BoxPrintEmptyShas || !metadata.Blob.IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(

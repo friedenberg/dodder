@@ -232,8 +232,8 @@ func TestReadWithoutBlob(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if !actual.BlobId.IsNull() {
-		t.Fatalf("blob:\nexpected empty but got %q", &actual.BlobId)
+	if !actual.Blob.IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
 	}
 }
 
@@ -271,8 +271,8 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if !actual.BlobId.IsNull() {
-		t.Fatalf("blob:\nexpected empty but got %q", &actual.BlobId)
+	if !actual.Blob.IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
 	}
 }
 
@@ -304,7 +304,7 @@ the body`,
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.BlobId.ResetWith(expectedSha)
+	expected.Blob.ResetWith(expectedSha)
 
 	expected.SetTags(makeTagSet(t,
 		"tag1",
@@ -371,7 +371,7 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.BlobId.SetDigest(&blobSha); err != nil {
+	if err = m.Blob.SetDigest(&blobSha); err != nil {
 		t.Fatalf("%s", err)
 	}
 

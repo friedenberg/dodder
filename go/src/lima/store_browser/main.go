@@ -299,7 +299,7 @@ func (store *Store) SaveBlob(e sku.ExternalLike) (err error) {
 		}
 	}()
 
-	e.GetSku().Metadata.BlobId.SetDigester(blobWriter)
+	e.GetSku().Metadata.Blob.SetDigester(blobWriter)
 
 	return
 }

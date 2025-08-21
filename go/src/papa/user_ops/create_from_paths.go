@@ -62,7 +62,7 @@ func (op CreateFromPaths) Run(
 			return
 		}
 
-		sh := &z.Metadata.Digests.SelfMetadataWithoutTai
+		sh := &z.Metadata.Digests.SelfWithoutTai
 
 		if sh.IsNull() {
 			return

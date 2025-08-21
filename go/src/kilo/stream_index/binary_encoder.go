@@ -107,7 +107,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Blob:
-		if n, err = bf.writeSha(&sk.Metadata.BlobId, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadata.Blob, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -196,7 +196,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestMetadataWithoutTai:
-		if n, err = bf.writeSha(&sk.Metadata.SelfMetadataWithoutTai, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadata.SelfWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

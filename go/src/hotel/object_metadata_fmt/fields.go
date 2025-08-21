@@ -15,7 +15,7 @@ func MetadataShaString(
 	metadata *object_metadata.Metadata,
 	abbr ids.FuncAbbreviateString,
 ) (value string, err error) {
-	s := &metadata.BlobId
+	s := &metadata.Blob
 	value = s.String()
 
 	if abbr != nil {

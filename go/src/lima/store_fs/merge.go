@@ -49,7 +49,7 @@ func (store *Store) MergeCheckedOut(
 		}
 
 		return
-	} else if blob_ids.Equals(&co.GetSku().Metadata.BlobId, &co.GetSkuExternal().Metadata.BlobId) {
+	} else if blob_ids.Equals(&co.GetSku().Metadata.Blob, &co.GetSkuExternal().Metadata.Blob) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

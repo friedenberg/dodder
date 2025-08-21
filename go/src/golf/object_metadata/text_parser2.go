@@ -133,7 +133,7 @@ func (f *textParser2) setBlobSha(
 	m *Metadata,
 	maybeSha string,
 ) (err error) {
-	if err = m.BlobId.Set(maybeSha); err != nil {
+	if err = m.Blob.Set(maybeSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

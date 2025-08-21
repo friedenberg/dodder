@@ -27,9 +27,9 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !blob_ids.Equals(&a.BlobId, &b.BlobId) {
+	if !blob_ids.Equals(&a.Blob, &b.Blob) {
 		if debug {
-			ui.Debug().Print(&a.BlobId, "->", &b.BlobId)
+			ui.Debug().Print(&a.Blob, "->", &b.Blob)
 		}
 		return false
 	}

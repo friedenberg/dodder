@@ -7,37 +7,45 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
-// TODO consider moving all non-essential digests to a separate key-value store
 type Digests struct {
-	BlobId      sha.Sha
-	FingerPrint sha.Sha
+	// TODO transform into byte slices
+	Blob   sha.Sha
+	Self   sha.Sha
+	Mother sha.Sha
 
-	// TODO move cache
-	SelfMetadataWithoutTai       sha.Sha
-	ParentMetadataObjectIdParent sha.Sha
+	// TODO moving to a separate key-value store
+	SelfWithoutTai sha.Sha
+}
+
+func (digests *Digests) GetDigest() *sha.Sha {
+	return &digests.Self
+}
+
+func (digests *Digests) GetMotherDigest() *sha.Sha {
+	return &digests.Mother
 }
 
 func (digests *Digests) Reset() {
-	digests.BlobId.Reset()
-	digests.SelfMetadataWithoutTai.Reset()
-	digests.FingerPrint.Reset()
-	digests.ParentMetadataObjectIdParent.Reset()
+	digests.Blob.Reset()
+	digests.SelfWithoutTai.Reset()
+	digests.Self.Reset()
+	digests.Mother.Reset()
 }
 
 func (digests *Digests) ResetWith(src *Digests) {
-	digests.BlobId.ResetWith(&src.BlobId)
-	digests.FingerPrint.ResetWith(
-		&src.FingerPrint,
+	digests.Blob.ResetWith(&src.Blob)
+	digests.Self.ResetWith(
+		&src.Self,
 	)
-	digests.ParentMetadataObjectIdParent.ResetWith(
-		&src.ParentMetadataObjectIdParent,
+	digests.Mother.ResetWith(
+		&src.Mother,
 	)
 }
 
 func (digests *Digests) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &digests.BlobId)
+	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &digests.Blob)
 
 	return sb.String()
 }

@@ -19,18 +19,17 @@ import (
 const (
 	Type       = "sha256"
 	ByteSize   = 32
-	NullString = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-	Null       = NullString
+	nullString = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 )
 
 type byteArray [ByteSize]byte
 
-var digestNull Sha
+var null Sha
 
 func init() {
-	errors.PanicIfError(digestNull.Set(NullString))
+	errors.PanicIfError(null.Set(nullString))
 
-	if !digestNull.IsNull() {
+	if !null.IsNull() {
 		panic("null digest is not null")
 	}
 }
@@ -41,7 +40,8 @@ type PathComponents interface {
 
 // TODO rename to digest
 type Sha struct {
-	data *byteArray
+	nonZero bool
+	data    byteArray
 }
 
 func (digest *Sha) GetSize() int {
@@ -50,7 +50,7 @@ func (digest *Sha) GetSize() int {
 
 func (digest *Sha) GetBytes() []byte {
 	if digest.IsNull() {
-		return digestNull.data[:]
+		return null.data[:]
 	} else {
 		return digest.data[:]
 	}
@@ -58,7 +58,7 @@ func (digest *Sha) GetBytes() []byte {
 
 func (digest *Sha) String() string {
 	if digest == nil || digest.IsNull() {
-		return fmt.Sprintf("%x", digestNull.data[:])
+		return fmt.Sprintf("%x", null.data[:])
 	} else {
 		return fmt.Sprintf("%x", digest.data[:])
 	}
@@ -80,11 +80,11 @@ func (digest *Sha) GetBlobId() interfaces.BlobId {
 }
 
 func (digest *Sha) IsNull() bool {
-	if digest == nil || digest.data == nil {
+	if digest == nil {
 		return true
 	}
 
-	if bytes.Equal(digest.data[:], digestNull.data[:]) {
+	if bytes.Equal(digest.data[:], null.data[:]) {
 		return true
 	}
 
@@ -120,7 +120,7 @@ func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
 //                                |___/
 
 func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 	b := h.Sum(digest.data[:0])
 	err = blob_ids.MakeErrLength(ByteSize, len(b))
 	return
@@ -148,7 +148,7 @@ func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
 }
 
 func (digest *Sha) SetBytes(bytess []byte) (err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	err = blob_ids.MakeErrLength(
 		ByteSize,
@@ -199,7 +199,7 @@ func (digest *Sha) ReadAtFrom(
 	reader io.ReaderAt,
 	start int64,
 ) (bytesRead int64, err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	var bytesCount int
 	bytesCount, err = reader.ReadAt(digest.data[:], start)
@@ -219,7 +219,7 @@ func (digest *Sha) ReadAtFrom(
 }
 
 func (digest *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	var bytesCount int
 	bytesCount, err = ohio.ReadAllOrDieTrying(reader, digest.data[:])
@@ -240,7 +240,7 @@ func (digest *Sha) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
 
 // TODO move to digests package
 func (digest *Sha) SetHexBytes(bytess []byte) (err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	bytess = bytes.TrimSpace(bytess)
 
@@ -259,7 +259,7 @@ func (digest *Sha) SetHexBytes(bytess []byte) (err error) {
 }
 
 func (digest *Sha) Set(value string) (err error) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	value1 := strings.TrimSpace(value)
 	value1 = strings.TrimPrefix(value1, "@")
@@ -280,31 +280,27 @@ func (digest *Sha) Set(value string) (err error) {
 	return
 }
 
-func (digest *Sha) allocDataIfNecessary() {
-	if digest.data != nil {
-		return
-	}
-
-	digest.data = &byteArray{}
+func (digest *Sha) setNonZero() {
+	digest.nonZero = true
 }
 
 func (digest *Sha) Reset() {
-	digest.allocDataIfNecessary()
-	digest.ResetWith(&digestNull)
+	digest.setNonZero()
+	digest.ResetWith(&null)
 }
 
 func (digest *Sha) ResetWith(other *Sha) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 
 	if other.IsNull() {
-		copy(digest.data[:], digestNull.data[:])
+		copy(digest.data[:], null.data[:])
 	} else {
 		copy(digest.data[:], other.data[:])
 	}
 }
 
 func (digest *Sha) ResetWithShaLike(other interfaces.BlobId) {
-	digest.allocDataIfNecessary()
+	digest.setNonZero()
 	copy(digest.data[:], other.GetBytes())
 }
 

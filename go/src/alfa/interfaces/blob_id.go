@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+// TODO rename to digest
+
 type (
 	BlobId interface {
 		BlobIdGetter
