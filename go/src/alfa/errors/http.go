@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/http_statuses"
 )
@@ -11,6 +12,11 @@ func NewHTTPError(statusCode http_statuses.Code) HTTP {
 }
 
 func BadRequest(err error) error {
+	fmt.Fprintf(os.Stderr, "%#v\n", err)
+	if Is400BadRequest(err) {
+		return err
+	}
+
 	return WithoutStack(Err400BadRequest.WrapHidden(err))
 }
 

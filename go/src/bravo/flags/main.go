@@ -1126,7 +1126,9 @@ func (f *FlagSet) parseOne() (bool, error) {
 			value, f.args = f.args[0], f.args[1:]
 		}
 		if !hasValue {
-			return false, errors.BadRequestf("flag needs an argument: -%s", name)
+			// TODO switch to errors.BadRequestf once error tree rewriting is
+			// extracted
+			return false, errors.Errorf("flag needs an argument: -%s", name)
 		}
 		if err := flag.Value.Set(value); err != nil {
 			var errInvalidValue ErrInvalidValue

@@ -21,18 +21,26 @@ func (printer devPrinter) PrintDebug(args ...any) (err error) {
 		return
 	}
 
+	var sb strings.Builder
+
 	if printer.includesTime {
-		args = append([]any{time.Now()}, args...)
+		fmt.Fprintf(&sb, "%s ", time.Now())
 	}
 
 	if printer.includesStack {
 		stackFrame, _ := stack_frame.MakeFrame(1)
-		args = append([]any{stackFrame.StringNoFunctionName()}, args...)
+		fmt.Fprintf(&sb, "%s ", stackFrame.StringNoFunctionName())
 	}
+
+	for range args {
+		sb.WriteString("%#v ")
+	}
+
+	sb.WriteString("\n")
 
 	_, err = fmt.Fprintf(
 		printer.file,
-		strings.Repeat("%#v ", len(args))+"\n",
+		sb.String(),
 		args...,
 	)
 
