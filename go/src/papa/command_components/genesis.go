@@ -1,8 +1,7 @@
 package command_components
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -18,7 +17,7 @@ type Genesis struct {
 	LocalWorkingCopy
 }
 
-func (cmd *Genesis) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Genesis) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.BigBang.SetFlagSet(flagSet)
 }
 

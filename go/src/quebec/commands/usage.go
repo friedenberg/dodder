@@ -3,10 +3,10 @@ package commands
 import (
 	"bufio"
 	"bytes"
-	"flag"
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
@@ -20,12 +20,12 @@ func PrintUsage(ctx interfaces.Context, err error) {
 
 	commands := command.Commands()
 
-	flagSets := make([]*flag.FlagSet, 0, len(commands))
+	flagSets := make([]*flags.FlagSet, 0, len(commands))
 
 	for name, cmd := range commands {
-		flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
+		flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 
-		if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
+		if cmd, ok := cmd.(flags.CommandComponentWriter); ok {
 			cmd.SetFlagSet(flagSet)
 		}
 
@@ -41,7 +41,7 @@ func PrintUsage(ctx interfaces.Context, err error) {
 	}
 }
 
-func PrintSubcommandUsage(flags flag.FlagSet) {
+func PrintSubcommandUsage(flags flags.FlagSet) {
 	printTabbed := func(s string) {
 		ui.Err().Print(s)
 	}

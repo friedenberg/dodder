@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -27,7 +26,7 @@ type Fsck struct {
 	Genres ids.Genre
 }
 
-func (cmd *Fsck) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Fsck) SetFlagSet(f *flags.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	f.Var(&cmd.Genres, "genres", "")
 }

@@ -18,7 +18,7 @@ function format_mutter_sha_one { # @test
 	assert_success
 	sha="$(echo -n "$output" | head -n1)"
 
-	run_dodder show -format mutter-sha one/uno
+	run_dodder show -format digests-mother one/uno
 	assert_success
 	assert_output - <<-EOM
 		$sha
@@ -26,7 +26,7 @@ function format_mutter_sha_one { # @test
 }
 
 function format_mutter_one { # @test
-	run_dodder show -format mutter one/uno
+	run_dodder show -format mother one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
@@ -34,7 +34,7 @@ function format_mutter_one { # @test
 }
 
 function format_mutter_all { # @test
-	run_dodder show -format mutter :
+	run_dodder show -format mother :
 	assert_success
 	assert_output - <<-EOM
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]

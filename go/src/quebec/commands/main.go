@@ -1,14 +1,14 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
+// TODO switch to activecontext
 func Run(ctx interfaces.Context, args ...string) {
 	if len(args) <= 1 {
 		PrintUsage(
@@ -27,13 +27,13 @@ func Run(ctx interfaces.Context, args ...string) {
 	if cmd, ok = cmds[name]; !ok {
 		PrintUsage(
 			ctx,
-			errors.BadRequestf("No subcommand '%s'", name),
+			errors.BadRequestf("No subcommand %q", name),
 		)
 	}
 
-	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
+	flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 
-	if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
+	if cmd, ok := cmd.(flags.CommandComponentWriter); ok {
 		cmd.SetFlagSet(flagSet)
 	}
 

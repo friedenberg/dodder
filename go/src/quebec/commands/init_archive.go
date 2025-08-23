@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -24,7 +23,7 @@ type InitArchive struct {
 	env_repo.BigBang
 }
 
-func (cmd *InitArchive) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *InitArchive) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.BigBang.SetFlagSet(flagSet)
 	cmd.GenesisConfig.Blob.SetRepoType(repo_type.TypeArchive)
 }

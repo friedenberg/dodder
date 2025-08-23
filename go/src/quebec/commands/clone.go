@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -31,7 +30,7 @@ type Clone struct {
 	command_components.Query
 }
 
-func (cmd *Clone) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Clone) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.Genesis.SetFlagSet(flagSet)
 	cmd.RemoteTransfer.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)

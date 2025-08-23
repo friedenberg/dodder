@@ -1,8 +1,7 @@
 package command_components
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
@@ -14,7 +13,7 @@ type Query struct {
 	sku.ExternalQueryOptions
 }
 
-func (cmd *Query) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Query) SetFlagSet(flagSet *flags.FlagSet) {
 	// TODO switch to repo
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 	flagSet.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")

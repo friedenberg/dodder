@@ -1,8 +1,7 @@
 package repo
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -15,7 +14,7 @@ type RemoteTransferOptions struct {
 	AllowMergeConflicts bool
 }
 
-func (options *RemoteTransferOptions) SetFlagSet(f *flag.FlagSet) {
+func (options *RemoteTransferOptions) SetFlagSet(f *flags.FlagSet) {
 	f.BoolVar(
 		&options.IncludeObjects,
 		"include-objects",

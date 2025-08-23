@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -33,7 +33,7 @@ type InitWorkspace struct {
 	Proto             sku.Proto
 }
 
-func (cmd *InitWorkspace) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *InitWorkspace) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 	// TODO add command.Completer variants of tags, type, and query flags
 

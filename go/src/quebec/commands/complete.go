@@ -1,13 +1,12 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"slices"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -35,7 +34,7 @@ func (cmd Complete) GetDescription() command.Description {
 	}
 }
 
-func (cmd *Complete) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Complete) SetFlagSet(f *flags.FlagSet) {
 	f.BoolVar(&cmd.bashStyle, "bash-style", false, "")
 	f.StringVar(&cmd.inProgress, "in-progress", "", "")
 }
@@ -74,11 +73,11 @@ func (cmd Complete) Run(req command.Request) {
 		return
 	}
 
-	flagSet := flag.NewFlagSet(name, flag.ContinueOnError)
+	flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
 	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
 
-	if subcmd, ok := subcmd.(interfaces.CommandComponentWriter); ok {
+	if subcmd, ok := subcmd.(flags.CommandComponentWriter); ok {
 		subcmd.SetFlagSet(flagSet)
 	}
 
@@ -155,7 +154,7 @@ func (cmd Complete) completeSubcommandFlags(
 	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Command,
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 	commandLine command.CommandLine,
 	lastArg string,
 ) (shouldNotCompleteArgs bool) {
@@ -172,7 +171,7 @@ func (cmd Complete) completeSubcommandFlags(
 	}
 
 	if commandLine.InProgress != "" {
-		flagSet.VisitAll(func(flag *flag.Flag) {
+		flagSet.VisitAll(func(flag *flags.Flag) {
 			envLocal.GetUI().Printf("-%s\t%s", flag.Name, flag.Usage)
 		})
 	} else if err := flagSet.Parse([]string{lastArg}); err != nil {
@@ -185,7 +184,7 @@ func (cmd Complete) completeSubcommandFlags(
 			err,
 		)
 	} else {
-		flagSet.VisitAll(func(flag *flag.Flag) {
+		flagSet.VisitAll(func(flag *flags.Flag) {
 			envLocal.GetUI().Printf("-%s\t%s", flag.Name, flag.Usage)
 		})
 	}
@@ -197,7 +196,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Command,
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 	commandLine command.CommandLine,
 	err error,
 ) {
@@ -215,7 +214,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 		return
 	}
 
-	var flag *flag.Flag
+	var flag *flags.Flag
 
 	if flag = flagSet.Lookup(after); flag == nil {
 		// exception

@@ -1,13 +1,13 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"sync/atomic"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -31,7 +31,7 @@ type BlobStoreWrite struct {
 	UtilityAfter  script_value.Utility
 }
 
-func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.BoolVar(
 		&cmd.Check,
 		"check",

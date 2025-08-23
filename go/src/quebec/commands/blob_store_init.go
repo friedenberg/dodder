@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"flag"
 	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -46,7 +46,7 @@ type BlobStoreInit struct {
 	command_components.EnvRepo
 }
 
-func (cmd *BlobStoreInit) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *BlobStoreInit) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.blobStoreConfig.SetFlagSet(flagSet)
 }
 

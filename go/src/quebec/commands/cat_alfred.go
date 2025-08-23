@@ -2,9 +2,9 @@ package commands
 
 import (
 	"bufio"
-	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/alfred"
@@ -26,7 +26,7 @@ type CatAlfred struct {
 	genres.Genre
 }
 
-func (cmd *CatAlfred) SetFlagSet(f *flag.FlagSet) {
+func (cmd *CatAlfred) SetFlagSet(f *flags.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	f.Var(&cmd.Genre, "genre", "extract this element from all matching objects")
 }

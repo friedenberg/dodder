@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"flag"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -35,7 +35,7 @@ type FormatObject struct {
 	UTIGroup string
 }
 
-func (cmd *FormatObject) SetFlagSet(f *flag.FlagSet) {
+func (cmd *FormatObject) SetFlagSet(f *flags.FlagSet) {
 	f.BoolVar(
 		&cmd.Stdin,
 		"stdin",

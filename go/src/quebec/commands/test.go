@@ -1,8 +1,7 @@
 package commands
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
@@ -12,6 +11,6 @@ func init() {
 	command.Register("test", &Test{})
 }
 
-func (*Test) SetFlagSet(*flag.FlagSet) {}
+func (*Test) SetFlagSet(*flags.FlagSet) {}
 
 func (c Test) Run(dep command.Request) {}

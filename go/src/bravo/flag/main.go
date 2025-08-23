@@ -1,15 +1,15 @@
 package flag
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/flag_policy"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 type (
-	FlagSet = flag.FlagSet
-	Value   = flag.Value
+	FlagSet = flags.FlagSet
+	Value   = interfaces.FlagValue
 )
 
 func Make(

@@ -149,7 +149,7 @@ function show_simple_one_zettel_hidden_past { # @test
 }
 
 function show_all_mutter { # @test
-	run_dodder show -format mutter-sha :
+	run_dodder show -format digests-mother :
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		.*

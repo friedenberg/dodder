@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -23,7 +22,7 @@ type Pull struct {
 	command_components.Query
 }
 
-func (cmd *Pull) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Pull) SetFlagSet(f *flags.FlagSet) {
 	cmd.RemoteTransfer.SetFlagSet(f)
 	cmd.Query.SetFlagSet(f)
 	cmd.LocalWorkingCopy.SetFlagSet(f)

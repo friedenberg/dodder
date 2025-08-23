@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"flag"
 	"net"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/oscar/remote_http"
@@ -24,10 +24,10 @@ type Serve struct {
 	TailscaleTLS bool
 }
 
-func (cmd *Serve) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Serve) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 
-	flag.BoolVar(
+	flags.BoolVar(
 		&cmd.TailscaleTLS,
 		"tailscale-tls",
 		false,

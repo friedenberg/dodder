@@ -1,5 +1,5 @@
 package cli
 
-import "flag"
+import "code.linenisgreat.com/dodder/go/src/bravo/flags"
 
-type FlagSet = flag.FlagSet
+type FlagSet = flags.FlagSet

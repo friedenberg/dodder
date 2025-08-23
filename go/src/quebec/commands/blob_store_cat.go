@@ -1,13 +1,13 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
@@ -33,7 +33,7 @@ type BlobStoreCat struct {
 	PrefixSha bool
 }
 
-func (cmd *BlobStoreCat) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *BlobStoreCat) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(&cmd.Utility, "utility", "")
 	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")

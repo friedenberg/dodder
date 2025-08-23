@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -10,6 +9,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -26,7 +26,7 @@ type Deinit struct {
 	Force bool
 }
 
-func (cmd *Deinit) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Deinit) SetFlagSet(f *flags.FlagSet) {
 	f.BoolVar(
 		&cmd.Force,
 		"force",

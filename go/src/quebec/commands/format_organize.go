@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"flag"
 	"io"
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -31,7 +31,7 @@ type FormatOrganize struct {
 	Flags organize_text.Flags
 }
 
-func (cmd *FormatOrganize) SetFlagSet(f *flag.FlagSet) {
+func (cmd *FormatOrganize) SetFlagSet(f *flags.FlagSet) {
 	cmd.Flags.SetFlagSet(f)
 }
 

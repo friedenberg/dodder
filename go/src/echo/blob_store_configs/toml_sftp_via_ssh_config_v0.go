@@ -1,8 +1,6 @@
 package blob_store_configs
 
-import (
-	"flag"
-)
+import "code.linenisgreat.com/dodder/go/src/bravo/flags"
 
 type TomlSFTPViaSSHConfigV0 struct {
 	TomlUriV0
@@ -13,7 +11,7 @@ func (*TomlSFTPViaSSHConfigV0) GetBlobStoreType() string {
 }
 
 func (config *TomlSFTPViaSSHConfigV0) SetFlagSet(
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 ) {
 	config.TomlUriV0.SetFlagSet(flagSet)
 }

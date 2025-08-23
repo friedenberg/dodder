@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -31,7 +30,7 @@ type Checkout struct {
 	Organize        bool
 }
 
-func (cmd *Checkout) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Checkout) SetFlagSet(f *flags.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	f.BoolVar(&cmd.Organize, "organize", false, "")
 	cmd.CheckoutOptions.SetFlagSet(f)

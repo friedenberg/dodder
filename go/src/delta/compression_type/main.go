@@ -3,12 +3,12 @@ package compression_type
 import (
 	"compress/gzip"
 	"compress/zlib"
-	"flag"
 	"fmt"
 	"io"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"github.com/DataDog/zstd"
 )
@@ -40,7 +40,7 @@ func (compressionType *CompressionType) GetBlobCompression() interfaces.BlobComp
 	return compressionType
 }
 
-func (compressionType *CompressionType) SetFlagSet(flagSet *flag.FlagSet) {
+func (compressionType *CompressionType) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(compressionType, "compression-type", "")
 }
 

@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -24,7 +23,7 @@ type Revert struct {
 	Last bool
 }
 
-func (c *Revert) SetFlagSet(f *flag.FlagSet) {
+func (c *Revert) SetFlagSet(f *flags.FlagSet) {
 	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	f.BoolVar(&c.Last, "last", false, "revert the last changes")
 }

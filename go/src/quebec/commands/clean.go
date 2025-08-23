@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
@@ -31,7 +30,7 @@ type Clean struct {
 	organize                 bool
 }
 
-func (c *Clean) SetFlagSet(f *flag.FlagSet) {
+func (c *Clean) SetFlagSet(f *flags.FlagSet) {
 	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
 	f.BoolVar(

@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -61,12 +62,12 @@ func (formatFlag *FormatFlag) String() string {
 			return fmt.Sprintf(
 				"Default: %s, All: %q",
 				formatFlag.DefaultFormatter.Name,
-				slices.Collect(maps.Keys(formatters)),
+				slices.Sorted(maps.Keys(formatters)),
 			)
 		} else {
 			return fmt.Sprintf(
 				"%q",
-				slices.Collect(maps.Keys(formatters)),
+				slices.Sorted(maps.Keys(formatters)),
 			)
 		}
 	} else if formatFlag.formatter.description != "" {
@@ -99,11 +100,10 @@ func (formatFlag *FormatFlag) Set(value string) (err error) {
 	var entry FormatFuncConstructorEntry
 
 	if entry, ok = formatters[value]; !ok {
-		err = errors.BadRequestf(
-			"unsupported format %q. Available formats: %s",
-			value,
-			slices.Collect(maps.Keys(formatters)),
-		)
+		err = flags.ErrInvalidValue{
+			Actual:   value,
+			Expected: slices.Sorted(maps.Keys(formatters)),
+		}
 
 		return
 	}

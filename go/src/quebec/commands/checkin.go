@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"flag"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -39,7 +39,7 @@ type Checkin struct {
 	OpenBlob           bool
 }
 
-func (cmd *Checkin) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Checkin) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
 
 	flagSet.BoolVar(

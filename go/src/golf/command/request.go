@@ -1,11 +1,11 @@
 package command
 
 import (
-	"flag"
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -14,7 +14,7 @@ import (
 type Request struct {
 	interfaces.Context
 	repo_config_cli.Config
-	*flag.FlagSet
+	*flags.FlagSet
 	*Args
 }
 
@@ -30,6 +30,7 @@ func (arg consumedArg) String() string {
 	}
 }
 
+// TODO switch to ActiveContext
 type Args struct {
 	interfaces.Context
 	args []string
@@ -41,7 +42,7 @@ type Args struct {
 func MakeRequest(
 	ctx interfaces.Context,
 	config repo_config_cli.Config,
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 ) Request {
 	return Request{
 		Context: ctx,

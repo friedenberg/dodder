@@ -2,6 +2,7 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -10,7 +11,10 @@ import (
 
 type (
 	Config        = interfaces.BlobStoreConfig
-	ConfigMutable = interfaces.BlobStoreConfigMutable
+	ConfigMutable interface {
+		interfaces.BlobStoreConfig
+		flags.CommandComponentWriter
+	}
 
 	// TODO add config interface for local file stores
 	ConfigLocalHashBucketed interface {

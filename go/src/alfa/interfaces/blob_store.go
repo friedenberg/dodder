@@ -42,11 +42,6 @@ type (
 		GetBlobStoreType() string
 	}
 
-	BlobStoreConfigMutable interface {
-		BlobStoreConfig
-		CommandComponentWriter
-	}
-
 	BlobStore interface {
 		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string

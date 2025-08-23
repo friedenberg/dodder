@@ -93,7 +93,8 @@ func (err HTTP) Errorf(format string, args ...any) HTTP {
 // wraps it, but does not expose the HTTP error's message.
 //
 // The returned error will satisfy the appropriate `IsHTTPError(err, status)`
-// call, but when using `error_coders` to print it, it won't show the HTTP error
+// call, but when using `error_coders` to print it, but it won't show the HTTP
+// error
 func (err HTTP) ErrorHiddenf(format string, args ...any) HTTP {
 	err = err.WrapHidden(fmt.Errorf(format, args...))
 	return err

@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"flag"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -35,7 +35,7 @@ type Export struct {
 	CompressionType compression_type.CompressionType
 }
 
-func (cmd *Export) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Export) SetFlagSet(f *flags.FlagSet) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
 	f.Var(&cmd.AgeIdentity, "age-identity", "")

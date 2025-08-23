@@ -1,8 +1,7 @@
 package blob_store_configs
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
@@ -11,7 +10,7 @@ type TomlUriV0 struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (config *TomlUriV0) SetFlagSet(flagSet *flag.FlagSet) {
+func (config *TomlUriV0) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(
 		&config.Uri,
 		"uri",

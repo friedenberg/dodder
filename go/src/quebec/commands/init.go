@@ -1,8 +1,7 @@
 package commands
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -23,7 +22,7 @@ type Init struct {
 	command_components.Genesis
 }
 
-func (cmd *Init) SetFlagSet(flagSet *flag.FlagSet) {
+func (cmd *Init) SetFlagSet(flagSet *flags.FlagSet) {
 	cmd.Genesis.SetFlagSet(flagSet)
 }
 

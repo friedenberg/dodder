@@ -1,9 +1,8 @@
 package checkout_options
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 type Options struct {
@@ -17,7 +16,7 @@ type OptionsWithoutMode struct {
 	StoreSpecificOptions any
 }
 
-func (c *Options) SetFlagSet(flagSet *flag.FlagSet) {
+func (c *Options) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 	flagSet.BoolVar(
 		&c.Force,

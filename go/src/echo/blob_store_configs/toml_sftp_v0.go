@@ -1,8 +1,6 @@
 package blob_store_configs
 
-import (
-	"flag"
-)
+import "code.linenisgreat.com/dodder/go/src/bravo/flags"
 
 type TomlSFTPV0 struct {
 	// TODO replace the below with a url scheme
@@ -18,7 +16,7 @@ func (*TomlSFTPV0) GetBlobStoreType() string {
 	return "sftp"
 }
 
-func (blobStoreConfig *TomlSFTPV0) SetFlagSet(flagSet *flag.FlagSet) {
+func (blobStoreConfig *TomlSFTPV0) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.StringVar(
 		&blobStoreConfig.Host,
 		"host",

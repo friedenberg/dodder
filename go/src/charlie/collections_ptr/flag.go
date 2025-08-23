@@ -1,7 +1,6 @@
 package collections_ptr
 
 import (
-	"flag"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -26,7 +25,7 @@ type Flag[
 	T interfaces.ValueLike,
 	TPtr flagPtr[T],
 ] interface {
-	flag.Value
+	interfaces.FlagValue
 	SetMany(vs ...string) (err error)
 	interfaces.MutableSetPtrLike[T, TPtr]
 	GetSetPtrLike() interfaces.SetPtrLike[T, TPtr]

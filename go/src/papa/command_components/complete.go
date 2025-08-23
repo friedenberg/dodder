@@ -1,7 +1,8 @@
 package command_components
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flag"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -20,9 +21,9 @@ type Complete struct {
 
 func (cmd Complete) GetFlagValueMetadataTags(
 	metadata *object_metadata.Metadata,
-) flag.Value {
+) interfaces.FlagValue {
 	return command.FlagValueCompleter{
-		Value: cmd.ObjectMetadata.GetFlagValueMetadataTags(metadata),
+		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataTags(metadata),
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
@@ -41,9 +42,9 @@ func (cmd Complete) GetFlagValueMetadataTags(
 
 func (cmd Complete) GetFlagValueStringTags(
 	value *values.String,
-) flag.Value {
+) interfaces.FlagValue {
 	return command.FlagValueCompleter{
-		Value: value,
+		FlagValue: value,
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
@@ -62,9 +63,9 @@ func (cmd Complete) GetFlagValueStringTags(
 
 func (cmd Complete) GetFlagValueMetadataType(
 	metadata *object_metadata.Metadata,
-) flag.Value {
+) interfaces.FlagValue {
 	return command.FlagValueCompleter{
-		Value: cmd.ObjectMetadata.GetFlagValueMetadataType(metadata),
+		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataType(metadata),
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
@@ -83,7 +84,7 @@ func (cmd Complete) GetFlagValueMetadataType(
 
 func (cmd Complete) SetFlagsProto(
 	proto *sku.Proto,
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 	descriptionUsage string,
 	tagUsage string,
 	typeUsage string,

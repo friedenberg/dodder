@@ -2,10 +2,10 @@ package genesis_configs
 
 import (
 	"crypto/ed25519"
-	"flag"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -31,7 +31,7 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (config *TomlV1Common) SetFlagSet(flagSet *flag.FlagSet) {
+func (config *TomlV1Common) SetFlagSet(flagSet *flags.FlagSet) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		config.BlobStore.SetFlagSet(flagSet)
 	}

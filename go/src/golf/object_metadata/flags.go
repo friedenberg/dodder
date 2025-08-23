@@ -6,10 +6,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/flag_policy"
 	"code.linenisgreat.com/dodder/go/src/bravo/flag"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 // TODO replace with command_components.ObjectMetadata
-func (metadata *Metadata) SetFlagSet(flagSet *flag.FlagSet) {
+func (metadata *Metadata) SetFlagSet(flagSet *flags.FlagSet) {
 	metadata.SetFlagSetDescription(
 		flagSet,
 		"the description to use for created or updated Zettels",
@@ -26,7 +27,7 @@ func (metadata *Metadata) SetFlagSet(flagSet *flag.FlagSet) {
 	)
 }
 
-func (metadata *Metadata) SetFlagSetDescription(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetDescription(f *flags.FlagSet, usage string) {
 	f.Var(
 		&metadata.Description,
 		"description",
@@ -34,7 +35,7 @@ func (metadata *Metadata) SetFlagSetDescription(f *flag.FlagSet, usage string) {
 	)
 }
 
-func (metadata *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetTags(f *flags.FlagSet, usage string) {
 	// TODO add support for tag_paths
 	fes := flag.Make(
 		flag_policy.FlagPolicyAppend,
@@ -65,7 +66,7 @@ func (metadata *Metadata) SetFlagSetTags(f *flag.FlagSet, usage string) {
 	)
 }
 
-func (metadata *Metadata) SetFlagSetType(f *flag.FlagSet, usage string) {
+func (metadata *Metadata) SetFlagSetType(f *flags.FlagSet, usage string) {
 	f.Func(
 		"type",
 		usage,

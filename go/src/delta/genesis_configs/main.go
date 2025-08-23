@@ -1,8 +1,8 @@
 package genesis_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -37,7 +37,7 @@ type (
 
 		SetInventoryListTypeString(string)
 		// TODO separate into non-method function that uses properties
-		interfaces.CommandComponentWriter
+		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type)
 		SetRepoId(ids.RepoId)
 		repo_signing.Generator

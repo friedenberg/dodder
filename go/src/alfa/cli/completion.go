@@ -1,10 +1,12 @@
 package cli
 
 import (
-	"flag"
 	"maps"
 	"slices"
 	"strings"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 // TODO add support for comma-separated values
@@ -13,12 +15,12 @@ type CLICompleter interface {
 }
 
 type FlagValueWithCompetion interface {
-	flag.Value
+	interfaces.FlagValue
 	CLICompleter
 }
 
 func FlagSetVarWithCompletion(
-	flagSet *flag.FlagSet,
+	flagSet *flags.FlagSet,
 	value FlagValueWithCompetion,
 	key string,
 ) {

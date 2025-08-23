@@ -1,11 +1,10 @@
 package genesis_configs
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -29,7 +28,7 @@ type V0Private struct {
 	V0Common
 }
 
-func (config *V0Common) SetFlagSet(flagSet *flag.FlagSet) {
+func (config *V0Common) SetFlagSet(flagSet *flags.FlagSet) {
 	panic(errors.Err405MethodNotAllowed)
 }
 

@@ -1,8 +1,7 @@
 package env_repo
 
 import (
-	"flag"
-
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -35,7 +34,7 @@ func (bigBang *BigBang) SetDefaults() {
 }
 
 // TODO switch to flagset wrapper that enforces non-empty descriptions
-func (bigBang *BigBang) SetFlagSet(flagSet *flag.FlagSet) {
+func (bigBang *BigBang) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(
 		&bigBang.InventoryListType,
 		"inventory_list-type",

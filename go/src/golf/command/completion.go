@@ -1,9 +1,8 @@
 package command
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/cli"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
@@ -55,7 +54,7 @@ type Completer interface {
 type FuncCompleter func(Request, env_local.Env, CommandLine)
 
 type FlagValueCompleter struct {
-	flag.Value
+	interfaces.FlagValue
 	FuncCompleter
 }
 
@@ -63,10 +62,10 @@ func (completer FlagValueCompleter) String() string {
 	// TODO still not sure why this condition can exist, but this makes the
 	// output
 	// nice
-	if completer.Value == nil {
+	if completer.FlagValue == nil {
 		return ""
 	} else {
-		return completer.Value.String()
+		return completer.FlagValue.String()
 	}
 }
 
