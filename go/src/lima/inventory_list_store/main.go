@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
@@ -35,8 +34,7 @@ type Store struct {
 	inventoryListBlobStore
 	blobBlobStore interfaces.BlobStore
 
-	options object_inventory_format.Options
-	box     *box_format.BoxTransacted
+	box *box_format.BoxTransacted
 
 	ui sku.UIStorePrinters
 }
@@ -59,8 +57,6 @@ func (store *Store) Initialize(
 	clock ids.Clock,
 	inventoryListCoderCloset inventory_list_coders.Closet,
 ) (err error) {
-	op := object_inventory_format.Options{Tai: true}
-
 	*store = Store{
 		envRepo:       envRepo,
 		lockSmith:     envRepo.GetLockSmith(),
@@ -71,7 +67,6 @@ func (store *Store) Initialize(
 			envRepo,
 			options_print.Options{}.WithPrintTai(true),
 		),
-		options: op,
 	}
 
 	blobType := ids.MustType(

@@ -17,13 +17,6 @@ type (
 		SetObjectIdLike(interfaces.ObjectId) error
 	}
 
-	Options struct {
-		Tai           bool
-		ExcludeMutter bool
-		Verzeichnisse bool
-		PrintFinalSha bool
-	}
-
 	nopFormatterContext struct {
 		object_metadata.PersistentFormatterContext
 	}
@@ -31,9 +24,4 @@ type (
 
 func (nopFormatterContext) GetObjectId() *ids.ObjectId {
 	return nil
-}
-
-func (o Options) SansVerzeichnisse() Options {
-	o.Verzeichnisse = false
-	return o
 }

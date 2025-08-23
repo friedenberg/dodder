@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -39,16 +38,6 @@ const (
 	DigitWidth = 1
 	PageCount  = 1 << (DigitWidth * 4)
 )
-
-var options object_inventory_format.Options
-
-func init() {
-	options = object_inventory_format.Options{
-		Tai:           true,
-		Verzeichnisse: true,
-		PrintFinalSha: true,
-	}
-}
 
 type Index struct {
 	directoryLayout env_repo.Env
