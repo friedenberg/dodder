@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
@@ -26,10 +25,6 @@ func (store *Store) GetEnnui() object_probe_index.Index {
 
 func (store *Store) GetProtoZettel() sku.Proto {
 	return store.protoZettel
-}
-
-func (store *Store) GetPersistentMetadataFormat() object_inventory_format.Format {
-	return store.persistentObjectFormat
 }
 
 func (store *Store) GetTime() thyme.Time {

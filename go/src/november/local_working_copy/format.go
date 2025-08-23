@@ -439,16 +439,19 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			fo := object_inventory_format.FormatForVersion(
-				repo.GetConfig().GetGenesisConfigPublic().GetStoreVersion(),
+			format, err := object_inventory_format.FormatForKeyError(
+				object_inventory_format.KeyFormatV6MetadataObjectIdParent,
 			)
-
-			o := object_inventory_format.Options{
-				Tai: true,
+			if err != nil {
+				errors.ContextCancelWithBadRequestError(repo, err)
 			}
 
 			return func(object *sku.Transacted) (err error) {
-				if _, err = fo.FormatPersistentMetadata(writer, object, o); err != nil {
+				if _, err = object_inventory_format.WriteMetadata(
+					writer,
+					format,
+					object,
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

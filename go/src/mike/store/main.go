@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
@@ -33,11 +32,10 @@ type Store struct {
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.AbbrStore
 
-	inventoryList          *sku.OpenList
-	persistentObjectFormat object_inventory_format.Format
-	configBlobCoder        interfaces.CoderReadWriter[*repo_configs.TypedBlob]
-	envLua                 env_lua.Env
-	tagLock                sync.Mutex
+	inventoryList   *sku.OpenList
+	configBlobCoder interfaces.CoderReadWriter[*repo_configs.TypedBlob]
+	envLua          env_lua.Env
+	tagLock         sync.Mutex
 
 	streamIndex   *stream_index.Index
 	zettelIdIndex zettel_id_index.Index
@@ -53,7 +51,6 @@ func (store *Store) Initialize(
 	config store_config.StoreMutable,
 	envRepo env_repo.Env,
 	envWorkspace env_workspace.Env,
-	pmf object_inventory_format.Format,
 	sunrise ids.Tai,
 	envLua env_lua.Env,
 	queryBuilder *query.Builder,
@@ -66,7 +63,6 @@ func (store *Store) Initialize(
 	store.envRepo = envRepo
 	store.envWorkspace = envWorkspace
 	store.typedBlobStore = typedBlobStore
-	store.persistentObjectFormat = pmf
 	store.sunrise = sunrise
 	store.envLua = envLua
 	store.queryBuilder = queryBuilder

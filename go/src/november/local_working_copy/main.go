@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/store_workspace"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
@@ -123,10 +122,6 @@ func (local *Repo) initialize(
 		return
 	}
 
-	objectFormat := object_inventory_format.FormatForVersion(
-		local.envRepo.GetStoreVersion(),
-	)
-
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
 		local.GetEnv(),
 		local.GetConfig().GetPrintOptions().WithPrintTai(true),
@@ -185,7 +180,6 @@ func (local *Repo) initialize(
 	local.typedBlobStore = typed_blob_store.MakeStores(
 		local.envRepo,
 		local.envLua,
-		objectFormat,
 		boxFormatArchive,
 	)
 
@@ -193,7 +187,6 @@ func (local *Repo) initialize(
 		local.config,
 		local.envRepo,
 		local.envWorkspace,
-		objectFormat,
 		local.sunrise,
 		local.envLua,
 		local.makeQueryBuilder().

@@ -35,9 +35,8 @@ type Store struct {
 	inventoryListBlobStore
 	blobBlobStore interfaces.BlobStore
 
-	objectFormat object_inventory_format.Format
-	options      object_inventory_format.Options
-	box          *box_format.BoxTransacted
+	options object_inventory_format.Options
+	box     *box_format.BoxTransacted
 
 	ui sku.UIStorePrinters
 }

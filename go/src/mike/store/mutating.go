@@ -127,7 +127,7 @@ func (store *Store) Commit(
 
 	var parent *sku.Transacted
 
-	if parent, err = store.fetchParentIfNecessary(child); err != nil {
+	if parent, err = store.fetchMotherIfNecessary(child); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -268,19 +268,19 @@ func (store *Store) Commit(
 	return
 }
 
-func (store *Store) fetchParentIfNecessary(
-	sk *sku.Transacted,
-) (mutter *sku.Transacted, err error) {
-	mutter = sku.GetTransactedPool().Get()
+func (store *Store) fetchMotherIfNecessary(
+	object *sku.Transacted,
+) (mother *sku.Transacted, err error) {
+	mother = sku.GetTransactedPool().Get()
 	// TODO find a way to make this more performant when operating over sshfs
 	if err = store.GetStreamIndex().ReadOneObjectId(
-		sk.GetObjectId(),
-		mutter,
+		object.GetObjectId(),
+		mother,
 	); err != nil {
 		if collections.IsErrNotFound(err) || errors.IsNotExist(err) {
 			// TODO decide if this should continue to virtual stores
-			sku.GetTransactedPool().Put(mutter)
-			mutter = nil
+			sku.GetTransactedPool().Put(mother)
+			mother = nil
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -289,7 +289,7 @@ func (store *Store) fetchParentIfNecessary(
 		return
 	}
 
-	sk.Metadata.GetMotherDigest().ResetWith(mutter.Metadata.GetDigest())
+	object.Metadata.GetMotherDigest().ResetWith(mother.Metadata.GetDigest())
 
 	return
 }
@@ -297,7 +297,7 @@ func (store *Store) fetchParentIfNecessary(
 // TODO add results for which stores had which change types
 func (store *Store) commitTransacted(
 	object *sku.Transacted,
-	parent *sku.Transacted,
+	mother *sku.Transacted,
 ) (err error) {
 	if !store.inventoryList.LastTai.Less(object.GetTai()) {
 		object.Metadata.Tai = store.GetTai()

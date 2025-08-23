@@ -18,11 +18,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
-type (
-	Metadata = object_metadata.Metadata
-	Sha      = sha.Sha
-)
-
 const (
 	KeyFormatV5Metadata               = "Metadatei"
 	KeyFormatV5MetadataWithoutTai     = "MetadateiSansTai"
@@ -123,8 +118,8 @@ func init() {
 	}
 }
 
-func FormatForKeyError(k string) (fo FormatGeneric, err error) {
-	switch k {
+func FormatForKeyError(key string) (fo FormatGeneric, err error) {
+	switch key {
 	case KeyFormatV5Metadata:
 		fo = Formats.metadata
 
@@ -135,7 +130,7 @@ func FormatForKeyError(k string) (fo FormatGeneric, err error) {
 		fo = Formats.metadataObjectIdParent
 
 	default:
-		err = errInvalidGenericFormat(k)
+		err = errInvalidGenericFormat(key)
 		return
 	}
 
@@ -143,19 +138,19 @@ func FormatForKeyError(k string) (fo FormatGeneric, err error) {
 }
 
 func FormatForKey(k string) FormatGeneric {
-	f, err := FormatForKeyError(k)
+	format, err := FormatForKeyError(k)
 	errors.PanicIfError(err)
-	return f
+	return format
 }
 
-func (f FormatGeneric) WriteMetadataTo(
-	w io.Writer,
-	c FormatterContext,
+func (format FormatGeneric) WriteMetadataTo(
+	writer io.Writer,
+	context FormatterContext,
 ) (n int64, err error) {
 	var n1 int64
 
-	for _, k := range f.keys {
-		n1, err = WriteMetadataKeyTo(w, c, k)
+	for _, k := range format.keys {
+		n1, err = WriteMetadataKeyTo(writer, context, k)
 		n += n1
 
 		if err != nil {
@@ -168,18 +163,18 @@ func (f FormatGeneric) WriteMetadataTo(
 }
 
 func WriteMetadataKeyTo(
-	w io.Writer,
-	c FormatterContext,
+	writer io.Writer,
+	context FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
-	m := c.GetMetadata()
+	m := context.GetMetadata()
 
 	var n1 int
 
 	switch key {
 	case keyAkte:
 		n1, err = writeShaKeyIfNotNull(
-			w,
+			writer,
 			keyAkte,
 			&m.Blob,
 		)
@@ -200,7 +195,7 @@ func WriteMetadataKeyTo(
 			}
 
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
+				writer,
 				keyBezeichnung.String(),
 				line,
 			)
@@ -235,7 +230,7 @@ func WriteMetadataKeyTo(
 			}
 
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
+				writer,
 				keyEtikett.String(),
 				e.String(),
 			)
@@ -249,9 +244,9 @@ func WriteMetadataKeyTo(
 
 	case keyKennung:
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			w,
+			writer,
 			keyGattung.String(),
-			c.GetObjectId().GetGenre().GetGenreString(),
+			context.GetObjectId().GetGenre().GetGenreString(),
 		)
 		n += int64(n1)
 
@@ -261,9 +256,9 @@ func WriteMetadataKeyTo(
 		}
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			w,
+			writer,
 			keyKennung.String(),
-			c.GetObjectId().String(),
+			context.GetObjectId().String(),
 		)
 		n += int64(n1)
 
@@ -274,7 +269,7 @@ func WriteMetadataKeyTo(
 
 	case keyShasMutterMetadataKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
-			w,
+			writer,
 			keyShasMutterMetadataKennungMutter,
 			m.GetMotherDigest(),
 		)
@@ -288,7 +283,7 @@ func WriteMetadataKeyTo(
 
 	case keyShasMutterMetadataKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
-			w,
+			writer,
 			keyShasMutterMetadataKennungMutter,
 			&m.Mother,
 		)
@@ -302,7 +297,7 @@ func WriteMetadataKeyTo(
 
 	case key_strings.Tai:
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			w,
+			writer,
 			key_strings.Tai.String(),
 			m.Tai.String(),
 		)
@@ -316,7 +311,7 @@ func WriteMetadataKeyTo(
 	case keyTyp:
 		if !m.Type.IsEmpty() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
+				writer,
 				keyTyp.String(),
 				m.GetType().String(),
 			)
@@ -385,7 +380,7 @@ func GetShaForContext(
 
 func GetShaForMetadata(
 	f FormatGeneric,
-	m *Metadata,
+	m *object_metadata.Metadata,
 ) (sh interfaces.BlobId, err error) {
 	return GetShaForContext(f, nopFormatterContext{m})
 }
@@ -441,7 +436,7 @@ func GetShaForContextDebug(
 }
 
 func GetShasForMetadata(
-	m *Metadata,
+	m *object_metadata.Metadata,
 ) (blobIds map[string]interfaces.BlobId, err error) {
 	blobIds = make(map[string]interfaces.BlobId, len(FormatKeysV5))
 

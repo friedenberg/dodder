@@ -62,11 +62,10 @@ func Make(
 
 type env struct {
 	env_repo.Env
-	config        store_config.Config
-	storeFS       *store_fs.Store
-	abbr          sku.AbbrStore
-	object_format object_inventory_format.Format
-	options       object_inventory_format.Options
+	config  store_config.Config
+	storeFS *store_fs.Store
+	abbr    sku.AbbrStore
+	options object_inventory_format.Options
 
 	box *box_format.BoxTransacted
 }
