@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/hecks"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -254,7 +255,7 @@ func (digest *Sha) SetHexBytes(bytess []byte) (err error) {
 
 	var bytesDecoded int
 
-	if _, bytesDecoded, err = hexDecode(digest.data[:0], bytess); err != nil {
+	if bytesDecoded, err = hecks.Decode(digest.data[:0], bytess); err != nil {
 		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, bytess)
 		return
 	}

@@ -1,4 +1,4 @@
-package sha
+package hecks
 
 import "encoding/hex"
 
@@ -31,7 +31,7 @@ const (
 // characters and that src has even length.
 // If the input is malformed, Decode returns the number
 // of bytes decoded before the error.
-func hexDecode(dst, src []byte) ([]byte, int, error) {
+func Decode(dst, src []byte) (int, error) {
 	i, j := 0, 1
 	for ; j < len(src); j += 2 {
 		p := src[j-1]
@@ -40,10 +40,10 @@ func hexDecode(dst, src []byte) ([]byte, int, error) {
 		a := reverseHexTable[p]
 		b := reverseHexTable[q]
 		if a > 0x0f {
-			return dst, i, hex.InvalidByteError(p)
+			return i, hex.InvalidByteError(p)
 		}
 		if b > 0x0f {
-			return dst, i, hex.InvalidByteError(q)
+			return i, hex.InvalidByteError(q)
 		}
 		dst = append(dst, (a<<4)|b)
 		i++
@@ -52,9 +52,9 @@ func hexDecode(dst, src []byte) ([]byte, int, error) {
 		// Check for invalid char before reporting bad length,
 		// since the invalid char (if present) is an earlier problem.
 		if reverseHexTable[src[j-1]] > 0x0f {
-			return dst, i, hex.InvalidByteError(src[j-1])
+			return i, hex.InvalidByteError(src[j-1])
 		}
-		return dst, i, hex.ErrLength
+		return i, hex.ErrLength
 	}
-	return dst, i, nil
+	return i, nil
 }

@@ -906,18 +906,19 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"shas": {
+	"digests": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
+			// TODO
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, &object.Metadata.Digests)
+				_, err = fmt.Fprintln(writer, &object.Metadata)
 				return
 			}
 		},
 	},
-	"mutter-sha": {
+	"digests-mother": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -928,7 +929,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"probe-shas": {
+	"digests-probe": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -945,7 +946,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"mutter": {
+	"mother": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -1004,7 +1005,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"blob-sha": {
+	"digest-blob": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -1034,7 +1035,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"verzeichnisse": {
+	"index": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -1042,18 +1043,18 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			p := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
-				sk := sku.GetTransactedPool().Get()
-				defer sku.GetTransactedPool().Put(sk)
+				indexObject := sku.GetTransactedPool().Get()
+				defer sku.GetTransactedPool().Put(indexObject)
 
 				if err = repo.GetStore().GetStreamIndex().ReadOneObjectId(
 					object.GetObjectId(),
-					sk,
+					indexObject,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				if err = p(sk); err != nil {
+				if err = p(indexObject); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -27,31 +27,31 @@ func (op CreateFromPaths) Run(
 	toCreate := make(map[string]*sku.Transacted)
 	toDelete := fd.MakeMutableSet()
 
-	o := sku.CommitOptions{
+	commitOptions := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsRealizeWithProto(),
 	}
 
 	for _, arg := range args {
-		var z *sku.Transacted
-		var i sku.FSItem
+		var object *sku.Transacted
+		var fsItem sku.FSItem
 
-		i.Reset()
+		fsItem.Reset()
 
-		i.ExternalObjectId.SetGenre(genres.Zettel)
+		fsItem.ExternalObjectId.SetGenre(genres.Zettel)
 
-		if err = i.Object.Set(arg); err != nil {
+		if err = fsItem.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = i.FDs.Add(&i.Object); err != nil {
+		if err = fsItem.FDs.Add(&fsItem.Object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if z, err = op.GetEnvWorkspace().GetStoreFS().ReadExternalFromItem(
-			o,
-			&i,
+		if object, err = op.GetEnvWorkspace().GetStoreFS().ReadExternalFromItem(
+			commitOptions,
+			&fsItem,
 			nil,
 		); err != nil {
 			err = errors.ErrorWithStackf(
@@ -62,51 +62,47 @@ func (op CreateFromPaths) Run(
 			return
 		}
 
-		sh := &z.Metadata.Digests.SelfWithoutTai
+		digestWithoutTai := &object.Metadata.SelfWithoutTai
 
-		if sh.IsNull() {
+		if digestWithoutTai.IsNull() {
 			return
 		}
 
-		digestBytes := sh.GetBytes()
+		digestBytes := digestWithoutTai.GetBytes()
 		existing, ok := toCreate[string(digestBytes)]
 
 		if ok {
 			if err = existing.Metadata.Description.Set(
-				z.Metadata.Description.String(),
+				object.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			toCreate[string(digestBytes)] = z
+			toCreate[string(digestBytes)] = object
 		}
 
 		if op.Delete {
 			{
-				var object *fd.FD
+				var fdObject *fd.FD
 
-				if object, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
+				if fdObject, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(object); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				var f fd.FD
-				f.ResetWith(object)
-				toDelete.Add(&f)
+				toDelete.Add(fdObject)
 			}
 
 			{
-				var blob *fd.FD
+				var fdBlob *fd.FD
 
-				if blob, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(z); err != nil {
+				if fdBlob, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(object); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				var f fd.FD
-				f.ResetWith(blob)
-				toDelete.Add(&f)
+				toDelete.Add(fdBlob)
 			}
 		}
 	}
@@ -118,36 +114,36 @@ func (op CreateFromPaths) Run(
 		return
 	}
 
-	for _, z := range toCreate {
-		if z.Metadata.IsEmpty() {
+	for _, object := range toCreate {
+		if object.Metadata.IsEmpty() {
 			return
 		}
 
-		op.Proto.Apply(z, genres.Zettel)
+		op.Proto.Apply(object, genres.Zettel)
 
 		if err = op.GetStore().CreateOrUpdateDefaultProto(
-			z,
+			object,
 			sku.StoreOptions{
 				ApplyProto: true,
 			},
 		); err != nil {
 			// TODO-P2 add file for error handling
-			op.handleStoreError(z, "", err)
+			op.handleStoreError(object, "", err)
 			err = nil
 			continue
 		}
 
-		results.Add(z)
+		results.Add(object)
 	}
 
-	for f := range toDelete.All() {
+	for fdToDelete := range toDelete.All() {
 		// TODO-P2 move to checkout store
-		if err = op.GetEnvRepo().Delete(f.GetPath()); err != nil {
+		if err = op.GetEnvRepo().Delete(fdToDelete.GetPath()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		pathRel := op.GetEnvRepo().RelToCwdOrSame(f.GetPath())
+		pathRel := op.GetEnvRepo().RelToCwdOrSame(fdToDelete.GetPath())
 
 		// TODO-P2 move to printer
 		op.GetUI().Printf("[%s] (deleted)", pathRel)

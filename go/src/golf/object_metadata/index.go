@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/tag_paths"
 )
 
-type Cache struct {
+type Index struct {
 	ParentTai    ids.Tai
 	Dormant      values.Bool
 	ExpandedTags ids.TagMutableSet // public for gob, but should be private
@@ -17,29 +17,29 @@ type Cache struct {
 	QueryPath
 }
 
-func (cache *Cache) GetExpandedTags() ids.TagSet {
-	return cache.GetExpandedTagsMutable()
+func (index *Index) GetExpandedTags() ids.TagSet {
+	return index.GetExpandedTagsMutable()
 }
 
-func (cache *Cache) AddTagExpandedPtr(e *ids.Tag) (err error) {
+func (index *Index) AddTagExpandedPtr(e *ids.Tag) (err error) {
 	return quiter.AddClonePool(
-		cache.GetExpandedTagsMutable(),
+		index.GetExpandedTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
 		e,
 	)
 }
 
-func (cache *Cache) GetExpandedTagsMutable() ids.TagMutableSet {
-	if cache.ExpandedTags == nil {
-		cache.ExpandedTags = ids.MakeTagMutableSet()
+func (index *Index) GetExpandedTagsMutable() ids.TagMutableSet {
+	if index.ExpandedTags == nil {
+		index.ExpandedTags = ids.MakeTagMutableSet()
 	}
 
-	return cache.ExpandedTags
+	return index.ExpandedTags
 }
 
-func (cache *Cache) SetExpandedTags(tags ids.TagSet) {
-	tagsExpanded := cache.GetExpandedTagsMutable()
+func (index *Index) SetExpandedTags(tags ids.TagSet) {
+	tagsExpanded := index.GetExpandedTagsMutable()
 	quiter.ResetMutableSetWithPool(tagsExpanded, ids.GetTagPool())
 
 	if tags == nil {
@@ -51,29 +51,29 @@ func (cache *Cache) SetExpandedTags(tags ids.TagSet) {
 	}
 }
 
-func (cache *Cache) GetImplicitTags() ids.TagSet {
-	return cache.GetImplicitTagsMutable()
+func (index *Index) GetImplicitTags() ids.TagSet {
+	return index.GetImplicitTagsMutable()
 }
 
-func (cache *Cache) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
+func (index *Index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
 	return quiter.AddClonePool(
-		cache.GetImplicitTagsMutable(),
+		index.GetImplicitTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
 		tag,
 	)
 }
 
-func (cache *Cache) GetImplicitTagsMutable() ids.TagMutableSet {
-	if cache.ImplicitTags == nil {
-		cache.ImplicitTags = ids.MakeTagMutableSet()
+func (index *Index) GetImplicitTagsMutable() ids.TagMutableSet {
+	if index.ImplicitTags == nil {
+		index.ImplicitTags = ids.MakeTagMutableSet()
 	}
 
-	return cache.ImplicitTags
+	return index.ImplicitTags
 }
 
-func (cache *Cache) SetImplicitTags(e ids.TagSet) {
-	es := cache.GetImplicitTagsMutable()
+func (index *Index) SetImplicitTags(e ids.TagSet) {
+	es := index.GetImplicitTagsMutable()
 	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {

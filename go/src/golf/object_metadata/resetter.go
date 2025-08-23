@@ -19,7 +19,10 @@ func (resetter) Reset(metadata *Metadata) {
 	ResetterCache.Reset(&metadata.Cache)
 	metadata.Type = ids.Type{}
 	metadata.Tai.Reset()
-	metadata.Digests.Reset()
+	metadata.Blob.Reset()
+	metadata.SelfWithoutTai.Reset()
+	metadata.Self.Reset()
+	metadata.Mother.Reset()
 	metadata.Fields = metadata.Fields[:0]
 }
 
@@ -38,7 +41,13 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.Type = src.Type
 	dst.Tai = src.Tai
 
-	dst.Digests.ResetWith(&src.Digests)
+	dst.Blob.ResetWith(&src.Blob)
+	dst.Self.ResetWith(
+		&src.Self,
+	)
+	dst.Mother.ResetWith(
+		&src.Mother,
+	)
 }
 
 func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
@@ -51,7 +60,7 @@ var ResetterCache resetterCache
 
 type resetterCache struct{}
 
-func (resetterCache) Reset(a *Cache) {
+func (resetterCache) Reset(a *Index) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
@@ -60,7 +69,7 @@ func (resetterCache) Reset(a *Cache) {
 	a.QueryPath.Reset()
 }
 
-func (resetterCache) ResetWith(a, b *Cache) {
+func (resetterCache) ResetWith(a, b *Index) {
 	a.ParentTai.ResetWith(b.ParentTai)
 	a.TagPaths.ResetWith(&b.TagPaths)
 	a.Dormant.ResetWith(b.Dormant)

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -28,17 +29,17 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	Digests
-	Tai ids.Tai
+	Blob           sha.Sha
+	Self           sha.Sha
+	Mother         sha.Sha
+	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
+	Tai            ids.Tai
 
 	// TODO move to Cache
 	Comments []string
 
-	// TODO replace with dumber field representation
-	// TODO move to Cache
-	Fields []Field
-
-	Cache Cache
+	blob
+	Cache Index
 }
 
 func (metadata *Metadata) GetMetadata() *Metadata {
@@ -75,6 +76,14 @@ func (metadata *Metadata) IsEmpty() bool {
 	}
 
 	return true
+}
+
+func (metadata *Metadata) GetDigest() *sha.Sha {
+	return &metadata.Self
+}
+
+func (metadata *Metadata) GetMotherDigest() *sha.Sha {
+	return &metadata.Mother
 }
 
 // TODO fix issue with GetTags being nil sometimes
