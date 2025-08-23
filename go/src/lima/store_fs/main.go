@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
@@ -51,7 +50,6 @@ func Make(
 		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		objectFormatOptions: object_inventory_format.Options{Tai: true},
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
 				EnvDir:    envRepo,
@@ -64,15 +62,14 @@ func Make(
 }
 
 type Store struct {
-	config              sku.Config
-	deletedPrinter      interfaces.FuncIter[*fd.FD]
-	metadataTextParser  object_metadata.TextParser
-	envRepo             env_repo.Env
-	fileEncoder         FileEncoder
-	inlineTypeChecker   ids.InlineTypeChecker
-	fileExtensions      file_extensions.Config
-	dir                 string
-	objectFormatOptions object_inventory_format.Options
+	config             sku.Config
+	deletedPrinter     interfaces.FuncIter[*fd.FD]
+	metadataTextParser object_metadata.TextParser
+	envRepo            env_repo.Env
+	fileEncoder        FileEncoder
+	inlineTypeChecker  ids.InlineTypeChecker
+	fileExtensions     file_extensions.Config
+	dir                string
 
 	dirInfo
 

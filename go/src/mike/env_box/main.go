@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/lima/store_fs"
@@ -65,7 +64,6 @@ type env struct {
 	config  store_config.Config
 	storeFS *store_fs.Store
 	abbr    sku.AbbrStore
-	options object_inventory_format.Options
 
 	box *box_format.BoxTransacted
 }
