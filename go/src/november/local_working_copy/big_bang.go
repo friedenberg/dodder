@@ -43,6 +43,7 @@ func Genesis(
 func (local *Repo) initDefaultTypeAndConfig(
 	bigBang env_repo.BigBang,
 ) (err error) {
+	// TODO determine if this lock/unlock is necessary
 	if err = local.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -127,10 +128,10 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	var sh interfaces.BlobId
+	var blobId interfaces.BlobId
 	var typedBlob repo_configs.TypedBlob
 
-	if sh, typedBlob, err = writeDefaultMutableConfig(
+	if blobId, typedBlob, err = writeDefaultMutableConfig(
 		local,
 		defaultTypeObjectId,
 	); err != nil {
@@ -145,7 +146,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	if err = newConfig.SetBlobId(sh); err != nil {
+	if err = newConfig.SetBlobId(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

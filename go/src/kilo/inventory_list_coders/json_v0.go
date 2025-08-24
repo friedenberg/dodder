@@ -96,7 +96,7 @@ func (coder jsonV0) DecodeFrom(
 		if err = repo_signing.VerifySignature(
 			object.Metadata.RepoPubkey,
 			digest.GetBytes(),
-			object.Metadata.RepoSig,
+			object.Metadata.RepoSig.GetBytes(),
 		); err != nil {
 			err = errors.Wrapf(
 				err,

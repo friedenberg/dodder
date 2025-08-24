@@ -13,7 +13,7 @@ type resetter struct{}
 func (resetter) Reset(metadata *Metadata) {
 	metadata.Description.Reset()
 	metadata.Comments = metadata.Comments[:0]
-	metadata.RepoSig = nil
+	metadata.RepoSig.Reset()
 	metadata.RepoPubkey = nil
 	metadata.ResetTags()
 	ResetterCache.Reset(&metadata.Cache)
@@ -35,7 +35,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 
 	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 
-	dst.RepoSig.ResetWith(src.RepoSig)
+	dst.RepoSig.ResetWith(&src.RepoSig)
 	dst.RepoPubkey.ResetWith(src.RepoPubkey)
 
 	dst.Type = src.Type

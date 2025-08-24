@@ -40,10 +40,10 @@ const (
 )
 
 type Index struct {
-	directoryLayout env_repo.Env
-	sunrise         ids.Tai
-	preWrite        interfaces.FuncIter[*sku.Transacted]
-	path            string
+	envRepo  env_repo.Env
+	sunrise  ids.Tai
+	preWrite interfaces.FuncIter[*sku.Transacted]
+	path     string
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
 	historicalChanges []string
@@ -57,11 +57,11 @@ func MakeIndex(
 	sunrise ids.Tai,
 ) (i *Index, err error) {
 	i = &Index{
-		directoryLayout: s,
-		sunrise:         sunrise,
-		preWrite:        preWrite,
-		path:            dir,
-		CacheIOFactory:  s,
+		envRepo:        s,
+		sunrise:        sunrise,
+		preWrite:       preWrite,
+		path:           dir,
+		CacheIOFactory: s,
 	}
 
 	if err = i.probe_index.Initialize(

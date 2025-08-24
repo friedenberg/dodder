@@ -234,9 +234,9 @@ func (store *store) AddTransacted(
 }
 
 func (store *store) setTransacted(
-	kt1 *sku.Transacted,
+	object *sku.Transacted,
 ) (didChange bool, err error) {
-	if !sku.TransactedLessor.LessPtr(&store.config.Sku, kt1) {
+	if !sku.TransactedLessor.LessPtr(&store.config.Sku, object) {
 		return
 	}
 
@@ -245,7 +245,7 @@ func (store *store) setTransacted(
 
 	didChange = true
 
-	sku.Resetter.ResetWith(&store.config.Sku, kt1)
+	sku.Resetter.ResetWith(&store.config.Sku, object)
 
 	store.config.setNeedsRecompile(
 		fmt.Sprintf("updated konfig: %s", &store.config.Sku),

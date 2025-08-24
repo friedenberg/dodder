@@ -22,7 +22,7 @@ type Field = string_format_writer.Field
 type Metadata struct {
 	// Domain
 	RepoPubkey repo_signing.PublicKey
-	RepoSig    repo_signing.Data
+	RepoSig    repo_signing.BinaryId
 	// InventoryListTai
 
 	Description descriptions.Description
@@ -96,6 +96,14 @@ func (metadata *Metadata) GetMotherDigest() interfaces.BlobId {
 
 func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlobId {
 	return &metadata.mother
+}
+
+func (metadata *Metadata) GetContentSig() interfaces.BinaryId {
+	return &metadata.RepoSig
+}
+
+func (metadata *Metadata) GetContentSigMutable() interfaces.MutableBinaryId {
+	return &metadata.RepoSig
 }
 
 // TODO fix issue with GetTags being nil sometimes
@@ -278,6 +286,6 @@ func (metadata *Metadata) GetRepoSigValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
 		HRP:  repo_signing.HRPRepoSigV1,
-		Data: metadata.RepoSig,
+		Data: metadata.RepoSig.GetBytes(),
 	}
 }

@@ -47,7 +47,11 @@ func (store *store) recompileTags() (err error) {
 		var e ids.Tag
 
 		if err = e.Set(ke.String()); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
+			err = errors.Wrapf(
+				err,
+				"Sku: %s",
+				sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted),
+			)
 			return
 		}
 
@@ -84,7 +88,11 @@ func (store *store) recompileTypes(
 		defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
 
 		if commonBlob == nil {
-			err = errors.ErrorWithStackf("nil type blob for type: %q. Sku: %s", tipe, ct)
+			err = errors.ErrorWithStackf(
+				"nil type blob for type: %q. Sku: %s",
+				tipe,
+				ct,
+			)
 			return
 		}
 
@@ -179,7 +187,7 @@ func (store *store) loadMutableConfig(
 }
 
 func (store *store) Flush(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -187,9 +195,9 @@ func (store *store) Flush(
 		return
 	}
 
-	wg := errors.MakeWaitGroupParallel()
-	wg.Do(func() (err error) {
-		if err = store.flushMutableConfig(dirLayout, blobStore, printerHeader); err != nil {
+	waitGroup := errors.MakeWaitGroupParallel()
+	waitGroup.Do(func() (err error) {
+		if err = store.flushMutableConfig(envRepo, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -197,7 +205,7 @@ func (store *store) Flush(
 		return
 	})
 
-	if err = wg.GetError(); err != nil {
+	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -208,7 +216,7 @@ func (store *store) Flush(
 }
 
 func (store *store) flushMutableConfig(
-	s env_repo.Env,
+	envRepo env_repo.Env,
 	blobStore typed_blob_store.Stores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -222,18 +230,18 @@ func (store *store) flushMutableConfig(
 		return
 	}
 
-	p := s.FileConfigMutable()
+	path := envRepo.FileConfigMutable()
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.OpenCreateWriteOnlyTruncate(p); err != nil {
+	if file, err = files.OpenCreateWriteOnlyTruncate(path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	enc := gob.NewEncoder(f)
+	enc := gob.NewEncoder(file)
 
 	if err = enc.Encode(&store.config.compiled); err != nil {
 		err = errors.Wrap(err)

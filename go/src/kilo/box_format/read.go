@@ -262,15 +262,15 @@ LOOP_AFTER_OID:
 			}
 
 		case genres.Tag:
-			var e ids.Tag
+			var tag ids.Tag
 
-			if err = e.TodoSetFromObjectId(&objectId); err != nil {
+			if err = tag.TodoSetFromObjectId(&objectId); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if e.IsDodderTag() {
-				value := e.String()
+			if tag.IsDodderTag() {
+				value := tag.String()
 
 				if strings.HasPrefix(value, repo_signing.HRPRepoPubKeyV1) {
 					var pubKey blech32.Value
@@ -290,13 +290,21 @@ LOOP_AFTER_OID:
 						return
 					}
 
-					object.Metadata.RepoSig.SetBytes(repoSig.Data)
+					if err = object.Metadata.RepoSig.SetType("ed25519"); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if err = object.Metadata.RepoSig.SetBytes(repoSig.Data); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				} else {
 					err = errors.Errorf("unsupported dodder tag: %q", value)
 					return
 				}
 			} else {
-				if err = object.AddTagPtr(&e); err != nil {
+				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

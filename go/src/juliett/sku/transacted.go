@@ -287,10 +287,24 @@ func (transacted *Transacted) Sign(
 
 	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
-	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
-		config.GetPrivateKey(),
+	privateKey := config.GetPrivateKey()
+
+	var bites []byte
+
+	if bites, err = repo_signing.Sign(
+		privateKey,
 		transacted.Metadata.GetDigest().GetBytes(),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.Metadata.RepoSig.SetType(privateKey.GetType()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.Metadata.RepoSig.SetBytes(bites); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -324,7 +338,7 @@ func (transacted *Transacted) Verify() (err error) {
 	if err = repo_signing.VerifySignature(
 		transacted.Metadata.RepoPubkey,
 		transacted.Metadata.GetDigestMutable().GetBytes(),
-		transacted.Metadata.RepoSig,
+		transacted.Metadata.RepoSig.GetBytes(),
 	); err != nil {
 		err = errors.Wrapf(
 			err,

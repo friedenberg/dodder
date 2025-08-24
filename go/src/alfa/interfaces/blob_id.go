@@ -5,11 +5,14 @@ import (
 	"io"
 )
 
-// TODO figure out if this is a blob id, digest, fingerprint, or what
+// TODO rename to MerkelId
 
 type (
 	BinaryId interface {
 		GetBytes() []byte
+		GetSize() int
+		GetType() string
+		IsNull() bool
 	}
 
 	MutableBinaryId interface {
@@ -21,9 +24,6 @@ type (
 	BlobId interface {
 		BinaryId
 		BlobIdGetter
-		GetSize() int
-		GetType() string
-		IsNull() bool
 	}
 
 	MutableBlobId interface {

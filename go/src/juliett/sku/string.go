@@ -61,6 +61,12 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
+	sb.WriteString(object.Metadata.GetRepoPubkeyValue().String())
+
+	sb.WriteString(" ")
+	sb.WriteString(object.Metadata.GetRepoSigValue().String())
+
+	sb.WriteString(" ")
 	sb.WriteString(blob_ids.Format(object.GetBlobId()))
 
 	m := object.GetMetadata()
@@ -77,7 +83,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			quiter.StringDelimiterSeparated[ids.Tag](
+			quiter.StringDelimiterSeparated(
 				" ",
 				m.GetTags(),
 			),

@@ -41,22 +41,22 @@ const (
 
 var ErrInvalid = errors.New("invalid key")
 
-func (s Binary) String() string {
-	return fmt.Sprintf("%c", byte(s))
+func (key Binary) String() string {
+	return fmt.Sprintf("%c", byte(key))
 }
 
-func (s *Binary) Reset() {
-	*s = 0
+func (key *Binary) Reset() {
+	*key = 0
 }
 
-func (s *Binary) ReadByte() (byte, error) {
-	return byte(*s), nil
+func (key *Binary) ReadByte() (byte, error) {
+	return byte(*key), nil
 }
 
-func (s *Binary) WriteTo(w io.Writer) (n int64, err error) {
-	b := [1]byte{byte(*s)}
+func (key *Binary) WriteTo(w io.Writer) (n int64, err error) {
+	bites := [1]byte{byte(*key)}
 	var n1 int
-	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
+	n1, err = ohio.WriteAllOrDieTrying(w, bites[:])
 	n += int64(n1)
 
 	if err != nil {
@@ -67,16 +67,16 @@ func (s *Binary) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (s *Binary) WriteByte(b byte) (err error) {
-	*s = Binary(b)
+func (key *Binary) WriteByte(b byte) (err error) {
+	*key = Binary(b)
 
 	return
 }
 
-func (s *Binary) ReadFrom(r io.Reader) (n int64, err error) {
-	var b [1]byte
+func (key *Binary) ReadFrom(r io.Reader) (n int64, err error) {
+	var bite [1]byte
 	var n1 int
-	n1, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n1, err = ohio.ReadAllOrDieTrying(r, bite[:])
 	n += int64(n1)
 
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Binary) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	err = s.WriteByte(b[0])
+	err = key.WriteByte(bite[0])
 
 	return
 }

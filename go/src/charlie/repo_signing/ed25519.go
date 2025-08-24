@@ -10,6 +10,10 @@ import (
 
 type PrivateKey ed25519.PrivateKey
 
+func (privateKey PrivateKey) GetType() string {
+	return "ed25519"
+}
+
 func (privateKey *PrivateKey) Generate(rand io.Reader) (err error) {
 	var src ed25519.PrivateKey
 

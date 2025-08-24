@@ -71,8 +71,8 @@ func EqualsReader(
 	return
 }
 
-func Equals(a, b interfaces.BlobId) bool {
-	return bytes.Equal(a.GetBytes(), b.GetBytes())
+func Equals(a, b interfaces.BinaryId) bool {
+	return a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 
 func Clone(src interfaces.BlobId) interfaces.BlobId {

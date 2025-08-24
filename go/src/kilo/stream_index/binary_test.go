@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -16,7 +17,7 @@ import (
 func TestBinaryOne(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	b := new(bytes.Buffer)
+	buffer := new(bytes.Buffer)
 	coder := binaryEncoder{Sigil: ids.SigilLatest}
 	decoder := makeBinary(ids.SigilLatest)
 	expected := &sku.Transacted{}
@@ -58,10 +59,16 @@ func TestBinaryOne(t1 *testing.T) {
 
 		t.AssertNoError(expected.CalculateObjectDigests())
 
+		{
+			config := genesis_configs.Default().Blob
+			t.AssertNoError(config.GeneratePrivateKey())
+			t.AssertNoError(expected.Sign(config))
+		}
+
 		t.Logf("%s", expected)
 
 		expectedN, err = coder.writeFormat(
-			b,
+			buffer,
 			skuWithSigil{Transacted: expected},
 		)
 		t.AssertNoError(err)
@@ -74,7 +81,7 @@ func TestBinaryOne(t1 *testing.T) {
 	}
 
 	{
-		n, err := decoder.readFormatAndMatchSigil(b, &actual)
+		n, err := decoder.readFormatAndMatchSigil(buffer, &actual)
 		t.AssertNoError(err)
 		t.Logf("%s", actual)
 

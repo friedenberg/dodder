@@ -177,7 +177,11 @@ func (json *JSON) ToTransacted(
 	object.Metadata.GenerateExpandedTags()
 
 	object.Metadata.RepoPubkey = json.RepoPubkey.Data
-	object.Metadata.RepoSig = json.RepoSig.Data
+
+	if err = object.Metadata.RepoSig.SetBytes(json.RepoSig.Data); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {

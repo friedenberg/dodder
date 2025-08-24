@@ -1,6 +1,7 @@
 package repo_signing
 
 import (
+	"bytes"
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -84,4 +85,50 @@ func (binaryId *BinaryId) ResetWith(src *BinaryId) {
 
 func (binaryId *BinaryId) GetBlobId() interfaces.BlobId {
 	return binaryId
+}
+
+func (binaryId *BinaryId) UnmarshalBinary(
+	bites []byte,
+) (err error) {
+	tipeBytes, bytesAfterTipe, ok := bytes.Cut(bites, []byte{'\x00'})
+
+	if !ok {
+		err = errors.Errorf("expected empty byte, but none found")
+		return
+	}
+
+	if err = binaryId.SetType(string(tipeBytes)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = binaryId.SetBytes(bytesAfterTipe); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// structure (in bytes):
+// <256: type
+// 1: empty byte
+// <256: id
+func (binaryId BinaryId) MarshalBinary() (bytes []byte, err error) {
+	// TODO confirm few allocations
+	// TODO confirm size of type is less than 256
+	tipe := binaryId.GetType()
+	bites := binaryId.GetBytes()
+
+	if tipe == "" && len(bites) == 0 {
+	} else if tipe == "" {
+		err = errors.Errorf("empty type")
+		return
+	}
+
+	bytes = append(bytes, []byte(tipe)...)
+	bytes = append(bytes, '\x00')
+	bytes = append(bytes, bites...)
+
+	return
 }

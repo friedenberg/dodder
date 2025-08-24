@@ -1,12 +1,5 @@
 package repo_signing
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-
-var (
-	_ interfaces.BinaryId        = Data{}
-	_ interfaces.MutableBinaryId = &Data{}
-)
-
 type Data []byte
 
 func (data Data) GetBytes() []byte {

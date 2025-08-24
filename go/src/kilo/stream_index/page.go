@@ -25,43 +25,43 @@ type Page struct {
 	*probe_index
 	added, addedLatest *sku.ListTransacted
 	hasChanges         bool
-	repoLayout         env_repo.Env
+	envRepo            env_repo.Env
 	preWrite           interfaces.FuncIter[*sku.Transacted]
 	config             store_config.Store
 	oids               map[string]struct{}
 }
 
-func (pt *Page) initialize(
+func (page *Page) initialize(
 	pid page_id.PageId,
 	i *Index,
 ) {
-	pt.repoLayout = i.directoryLayout
-	pt.sunrise = i.sunrise
-	pt.PageId = pid
-	pt.added = sku.MakeListTransacted()
-	pt.addedLatest = sku.MakeListTransacted()
-	pt.preWrite = i.preWrite
-	pt.probe_index = &i.probe_index
-	pt.oids = make(map[string]struct{})
+	page.envRepo = i.envRepo
+	page.sunrise = i.sunrise
+	page.PageId = pid
+	page.added = sku.MakeListTransacted()
+	page.addedLatest = sku.MakeListTransacted()
+	page.preWrite = i.preWrite
+	page.probe_index = &i.probe_index
+	page.oids = make(map[string]struct{})
 }
 
-func (s *Page) readOneRange(
-	ra object_probe_index.Range,
-	sk *sku.Transacted,
+func (page *Page) readOneRange(
+	raynge object_probe_index.Range,
+	object *sku.Transacted,
 ) (err error) {
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.Open(s.Path()); err != nil {
+	if file, err = files.Open(page.Path()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	b := make([]byte, ra.ContentLength)
+	bites := make([]byte, raynge.ContentLength)
 
-	if _, err = f.ReadAt(b, ra.Offset); err != nil {
-		err = errors.Wrapf(err, "Range: %q, Page: %q", ra, s.PageId)
+	if _, err = file.ReadAt(bites, raynge.Offset); err != nil {
+		err = errors.Wrapf(err, "Range: %q, Page: %q", raynge, page.PageId)
 		return
 	}
 
@@ -69,44 +69,48 @@ func (s *Page) readOneRange(
 
 	skWR := skuWithRangeAndSigil{
 		skuWithSigil: skuWithSigil{
-			Transacted: sk,
+			Transacted: object,
 		},
-		Range: ra,
+		Range: raynge,
 	}
 
-	if _, err = dec.readFormatExactly(f, &skWR); err != nil {
-		err = errors.Wrapf(err, "Range: %q, Page: %q", ra, s.PageId.Path())
+	if _, err = dec.readFormatExactly(file, &skWR); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Range: %q, Page: %q",
+			raynge,
+			page.PageId.Path(),
+		)
 		return
 	}
 
 	return
 }
 
-func (pt *Page) add(
-	z1 *sku.Transacted,
+func (page *Page) add(
+	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	pt.oids[z1.ObjectId.String()] = struct{}{}
-	z := sku.GetTransactedPool().Get()
+	page.oids[object.ObjectId.String()] = struct{}{}
+	objectClone := object.CloneTransacted()
 
-	sku.TransactedResetter.ResetWith(z, z1)
-
-	if pt.sunrise.Less(z.GetTai()) || options.StreamIndexOptions.ForceLatest {
-		pt.addedLatest.Add(z)
+	if page.sunrise.Less(objectClone.GetTai()) ||
+		options.StreamIndexOptions.ForceLatest {
+		page.addedLatest.Add(objectClone)
 	} else {
-		pt.added.Add(z)
+		page.added.Add(objectClone)
 	}
 
-	pt.hasChanges = true
+	page.hasChanges = true
 
 	return
 }
 
-func (pt *Page) waitingToAddLen() int {
-	return pt.added.Len() + pt.addedLatest.Len()
+func (page *Page) waitingToAddLen() int {
+	return page.added.Len() + page.addedLatest.Len()
 }
 
-func (pt *Page) copyJustHistoryFrom(
+func (page *Page) copyJustHistoryFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[skuWithRangeAndSigil],
@@ -136,14 +140,14 @@ func (pt *Page) copyJustHistoryFrom(
 	}
 }
 
-func (pt *Page) copyJustHistoryAndAdded(
+func (page *Page) copyJustHistoryAndAdded(
 	s sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return pt.copyHistoryAndMaybeLatest(s, w, true, false)
+	return page.copyHistoryAndMaybeLatest(s, w, true, false)
 }
 
-func (pt *Page) copyHistoryAndMaybeLatest(
+func (page *Page) copyHistoryAndMaybeLatest(
 	qg sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[*sku.Transacted],
 	includeAdded bool,
@@ -151,7 +155,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = pt.repoLayout.ReadCloserCache(pt.Path()); err != nil {
+	if r, err = page.envRepo.ReadCloserCache(page.Path()); err != nil {
 		if errors.IsNotExist(err) {
 			r = io.NopCloser(bytes.NewReader(nil))
 			err = nil
@@ -166,7 +170,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 	br := bufio.NewReader(r)
 
 	if !includeAdded && !includeAddedLatest {
-		if err = pt.copyJustHistoryFrom(
+		if err = page.copyJustHistoryFrom(
 			br,
 			qg,
 			func(sk skuWithRangeAndSigil) (err error) {
@@ -188,7 +192,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 	dec := makeBinaryWithQueryGroup(qg, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
-	added := pt.added.Copy()
+	added := page.added.Copy()
 
 	var sk skuWithRangeAndSigil
 
@@ -220,7 +224,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 		return
 	}
 
-	addedLatest := pt.addedLatest.Copy()
+	addedLatest := page.addedLatest.Copy()
 
 	if err = heap.MergeStream(
 		&addedLatest,
@@ -237,13 +241,13 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 	return
 }
 
-func (pt *Page) MakeFlush(
+func (page *Page) MakeFlush(
 	changesAreHistorical bool,
 ) func() error {
 	return func() (err error) {
 		pw := &writer{
-			Page:        pt,
-			probe_index: pt.probe_index,
+			Page:        page,
+			probe_index: page.probe_index,
 		}
 
 		if changesAreHistorical {
@@ -256,7 +260,7 @@ func (pt *Page) MakeFlush(
 			return
 		}
 
-		pt.hasChanges = false
+		page.hasChanges = false
 
 		return
 	}

@@ -182,17 +182,6 @@ func (store *Store) Commit(
 		return
 	}
 
-	if options.AddToInventoryList ||
-		options.StreamIndexOptions.AddToStreamIndex {
-		if err = store.storeConfig.AddTransacted(
-			child,
-			parent,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	if child.GetGenre() == genres.Zettel {
 		if err = store.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
 			if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
@@ -209,6 +198,17 @@ func (store *Store) Commit(
 		ui.Log().Print("adding to inventory list", options, child)
 		if err = store.commitTransacted(child, parent); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(child))
+			return
+		}
+	}
+
+	if options.AddToInventoryList ||
+		options.StreamIndexOptions.AddToStreamIndex {
+		if err = store.storeConfig.AddTransacted(
+			child,
+			parent,
+		); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	}
