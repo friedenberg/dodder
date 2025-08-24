@@ -1008,7 +1008,24 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"digest-blob": {
+	"digests-sig": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				sig := object.Metadata.GetRepoSigValue()
+
+				if _, err = fmt.Fprintln(writer, sig); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			}
+		},
+	},
+	"digests-blob": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -1074,7 +1091,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			e := json.NewEncoder(writer)
 
 			return func(object *sku.Transacted) (err error) {
-				var a map[string]interface{}
+				var a map[string]any
 
 				var readCloser interfaces.ReadCloseBlobIdGetter
 
@@ -1114,7 +1131,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				ui.TodoP3("limit to only zettels supporting toml")
-				var a map[string]interface{}
+				var a map[string]any
 
 				var readCloser interfaces.ReadCloseBlobIdGetter
 

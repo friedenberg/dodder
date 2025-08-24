@@ -256,6 +256,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	return
 }
 
+// TODO change to writeDigest
 func (bf *binaryEncoder) writeSha(
 	sh *sha.Sha,
 	allowNull bool,

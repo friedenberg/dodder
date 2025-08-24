@@ -74,16 +74,16 @@ type formats struct {
 	metadataObjectIdParent FormatGeneric
 }
 
-func (fs formats) MetadataSansTai() FormatGeneric {
-	return fs.metadataSansTai
+func (formats formats) MetadataSansTai() FormatGeneric {
+	return formats.metadataSansTai
 }
 
-func (fs formats) Metadata() FormatGeneric {
-	return fs.metadata
+func (formats formats) Metadata() FormatGeneric {
+	return formats.metadata
 }
 
-func (fs formats) MetadataObjectIdParent() FormatGeneric {
-	return fs.metadataObjectIdParent
+func (formats formats) MetadataObjectIdParent() FormatGeneric {
+	return formats.metadataObjectIdParent
 }
 
 var Formats formats

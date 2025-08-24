@@ -13,7 +13,7 @@ teardown() {
 	chflags_and_rm
 }
 
-function format_mutter_sha_one { # @test
+function format_mother_sha_one { # @test
 	run_dodder show -format sha one/uno+
 	assert_success
 	sha="$(echo -n "$output" | head -n1)"
@@ -25,7 +25,7 @@ function format_mutter_sha_one { # @test
 	EOM
 }
 
-function format_mutter_one { # @test
+function format_mother_one { # @test
 	run_dodder show -format mother one/uno
 	assert_success
 	assert_output - <<-EOM
@@ -33,7 +33,7 @@ function format_mutter_one { # @test
 	EOM
 }
 
-function format_mutter_all { # @test
+function format_mother_all { # @test
 	run_dodder show -format mother :
 	assert_success
 	assert_output - <<-EOM

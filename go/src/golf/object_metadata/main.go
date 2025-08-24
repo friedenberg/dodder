@@ -29,9 +29,12 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	Blob           sha.Sha
-	Self           sha.Sha
-	Mother         sha.Sha
+	Blob sha.Sha
+
+	// TODO change to signatures / fingerprints
+	Self   sha.Sha
+	Mother sha.Sha
+
 	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
 	Tai            ids.Tai
 
@@ -256,6 +259,7 @@ func (metadata *Metadata) GenerateExpandedTags() {
 
 func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 	return blech32.Value{
+		// TODO determine based on object root type
 		HRP:  repo_signing.HRPRepoPubKeyV1,
 		Data: metadata.RepoPubkey,
 	}
@@ -263,6 +267,7 @@ func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 
 func (metadata *Metadata) GetRepoSigValue() blech32.Value {
 	return blech32.Value{
+		// TODO determine based on object root type
 		HRP:  repo_signing.HRPRepoSigV1,
 		Data: metadata.RepoSig,
 	}

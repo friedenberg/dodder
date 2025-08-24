@@ -1,27 +1,35 @@
 package repo_signing
 
+import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+
+var (
+	_ interfaces.BinaryId        = Data{}
+	_ interfaces.MutableBinaryId = &Data{}
+)
+
 type Data []byte
 
-func (data *Data) SetBytes(bs []byte) {
+func (data Data) GetBytes() []byte {
+	return data
+}
+
+func (data Data) IsEmpty() bool {
+	return len(data) == 0
+}
+
+func (data Data) MarshalBinary() (bytes []byte, err error) {
+	bytes = data
+	return
+}
+
+func (data *Data) SetBytes(bs []byte) (err error) {
 	data.Reset()
 	*data = append(*data, bs...)
-}
-
-func (data *Data) GetBytes() []byte {
-	return []byte(*data)
-}
-
-func (data *Data) IsEmpty() bool {
-	return len(*data) == 0
+	return
 }
 
 func (data *Data) UnmarshalBinary(bytes []byte) (err error) {
 	*data = bytes
-	return
-}
-
-func (data *Data) MarshalBinary() (bytes []byte, err error) {
-	bytes = []byte(*data)
 	return
 }
 

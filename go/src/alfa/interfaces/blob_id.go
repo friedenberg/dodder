@@ -5,13 +5,23 @@ import (
 	"io"
 )
 
-// TODO rename to digest
+// TODO figure out if this is a blob id, digest, fingerprint, or what
 
 type (
+	BinaryId interface {
+		GetBytes() []byte
+	}
+
+	MutableBinaryId interface {
+		BinaryId
+		SetBytes([]byte) error
+		Reset()
+	}
+
 	BlobId interface {
+		BinaryId
 		BlobIdGetter
 		GetSize() int
-		GetBytes() []byte
 		GetType() string
 		IsNull() bool
 	}
@@ -21,6 +31,11 @@ type (
 		SetDigest(BlobId) error
 		SetBytes([]byte) error
 		Reset()
+	}
+
+	MutableGenericBlobId interface {
+		MutableBlobId
+		SetType(string) error
 	}
 
 	BlobIdGetter interface {
