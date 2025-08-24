@@ -4,12 +4,10 @@ package ui
 
 import (
 	"errors"
-	"fmt"
 	"io"
-	"os"
+	"strings"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -17,15 +15,11 @@ import (
 var testStackFramePrefix = "    "
 
 // TODO make this private and switch users over to MakeTestContext
+// and add a printer
 
 type T struct {
 	*testing.T
 	skip int
-}
-
-//go:noinline
-func (test *T) MakeStackInfo(skip int) (stackFrame stack_frame.Frame) {
-	return stack_frame.MustFrame(skip + 1)
 }
 
 //go:noinline
@@ -64,16 +58,12 @@ func (test *T) Run(testCaseInfo TestCaseInfo, funk func(*T)) {
 
 //go:noinline
 func (test *T) ui(skip int, args ...any) {
-	stackFrame := test.MakeStackInfo(test.skip + 1 + skip)
-	args = append([]any{stackFrame.StringNoFunctionName()}, args...)
-	fmt.Fprintln(os.Stderr, args...)
+	Err().Caller(test.skip + 1 + skip).Print(args...)
 }
 
 //go:noinline
 func (test *T) logf(skip int, format string, args ...any) {
-	stackFrame := test.MakeStackInfo(test.skip + 1 + skip)
-	args = append([]any{stackFrame.StringNoFunctionName()}, args...)
-	fmt.Fprintf(os.Stderr, "%s "+format+"\n", args...)
+	Err().Caller(test.skip+1+skip).Printf(format, args...)
 }
 
 //go:noinline
@@ -163,7 +153,9 @@ func (test *T) AssertNoError(err error) {
 	test.Helper()
 
 	if err != nil {
-		test.fatalf(1, "expected no error but got: %s", err)
+		var sb strings.Builder
+		CLIErrorTreeEncoder.EncodeTo(err, &sb)
+		test.fatalf(1, "expected no error but got:\n%s", &sb)
 	}
 }
 

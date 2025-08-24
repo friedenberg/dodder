@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
-	"code.linenisgreat.com/dodder/go/src/charlie/error_coders"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"github.com/gorilla/mux"
 )
 
@@ -53,7 +53,7 @@ func (response *Response) ErrorWithStatus(status int, err error) {
 	if err != nil {
 		var buffer bytes.Buffer
 
-		error_coders.Encoder.EncodeTo(err, &buffer)
+		ui.CLIErrorTreeEncoder.EncodeTo(err, &buffer)
 		response.Body = io.NopCloser(&buffer)
 	}
 }

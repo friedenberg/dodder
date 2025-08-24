@@ -268,7 +268,7 @@ func WriteMetadataKeyTo(
 		}
 
 	case keyShasMutterMetadataKennungMutter:
-		n1, err = writeShaKeyIfNotNull(
+		n1, err = writeBlobIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
 			m.GetMotherDigest(),
@@ -282,7 +282,7 @@ func WriteMetadataKeyTo(
 		}
 
 	case keyShasMutterMetadataKennungMutter:
-		n1, err = writeShaKeyIfNotNull(
+		n1, err = writeBlobIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
 			m.GetMotherDigest(),
@@ -325,6 +325,28 @@ func WriteMetadataKeyTo(
 
 	default:
 		panic(fmt.Sprintf("unsupported key: %s", key))
+	}
+
+	return
+}
+
+func writeBlobIdKeyIfNotNull(
+	w io.Writer,
+	key *catgut.String,
+	blobId interfaces.BlobId,
+) (n int, err error) {
+	if blobId.IsNull() {
+		return
+	}
+
+	n, err = ohio.WriteKeySpaceValueNewlineString(
+		w,
+		key.String(),
+		blob_ids.Format(blobId),
+	)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

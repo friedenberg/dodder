@@ -31,6 +31,10 @@ func (null) IsTty() bool {
 	return false
 }
 
+func (printer null) Caller(_ int) Printer {
+	return printer
+}
+
 func (null) PrintDebug(_ ...any) (err error) {
 	return
 }

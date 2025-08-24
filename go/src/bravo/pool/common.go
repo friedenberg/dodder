@@ -27,10 +27,12 @@ var (
 	)
 )
 
+// TODO remove
 func GetBufioReader() interfaces.Pool[bufio.Reader, *bufio.Reader] {
 	return bufioReader
 }
 
+// TODO remove
 func GetBufioWriter() interfaces.Pool[bufio.Writer, *bufio.Writer] {
 	return bufioWriter
 }

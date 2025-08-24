@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/error_coders"
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
 
@@ -75,7 +74,7 @@ func handleMainErrors(
 	_, frames := ctx.CauseWithStackFrames()
 	err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 
-	error_coders.Encoder.EncodeTo(err, ui.Err())
+	ui.CLIErrorTreeEncoder.EncodeTo(err, ui.Err())
 
 	return
 }

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/keys"
@@ -262,23 +263,23 @@ func (bf *binaryDecoder) readSigil(
 }
 
 func (bf *binaryDecoder) readFieldKey(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
 	switch bf.Binary {
 	case keys.Blob:
-		if _, err = sk.Metadata.Blob.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.Metadata.Blob.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.RepoPubKey:
-		sk.Metadata.RepoPubkey.SetBytes(bf.Content.Bytes())
+		object.Metadata.RepoPubkey.SetBytes(bf.Content.Bytes())
 
 	case keys.RepoSig:
-		sk.Metadata.RepoSig.SetBytes(bf.Content.Bytes())
+		object.Metadata.RepoSig.SetBytes(bf.Content.Bytes())
 
 	case keys.Description:
-		if err = sk.Metadata.Description.Set(bf.Content.String()); err != nil {
+		if err = object.Metadata.Description.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -291,49 +292,57 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.AddTagPtrFast(&e); err != nil {
+		if err = object.AddTagPtrFast(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ObjectId:
-		if _, err = sk.ObjectId.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.ObjectId.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Tai:
-		if _, err = sk.Metadata.Tai.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.Metadata.Tai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.CacheParentTai:
-		if _, err = sk.Metadata.Cache.ParentTai.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Type:
-		if err = sk.Metadata.Type.Set(bf.Content.String()); err != nil {
+		if err = object.Metadata.Type.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestParentMetadataParentObjectId:
-		if _, err = sk.Metadata.GetMotherDigest().ReadFrom(&bf.Content); err != nil {
+		unmarshaler := blob_ids.BlobIdBinaryUnmarshaler{
+			MutableGenericBlobId: object.Metadata.GetMotherDigestMutable(),
+		}
+
+		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		if err = sk.Metadata.GetDigestMutable().SetBytes(bf.Content.Bytes()); err != nil {
+		unmarshaler := blob_ids.BlobIdBinaryUnmarshaler{
+			MutableGenericBlobId: object.Metadata.GetDigestMutable(),
+		}
+
+		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestMetadataWithoutTai:
-		if _, err = sk.Metadata.SelfWithoutTai.ReadFrom(
+		if _, err = object.Metadata.SelfWithoutTai.ReadFrom(
 			&bf.Content,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -348,7 +357,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadata.Cache.AddTagsImplicitPtr(&e); err != nil {
+		if err = object.Metadata.Cache.AddTagsImplicitPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -361,7 +370,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadata.Cache.AddTagExpandedPtr(&e); err != nil {
+		if err = object.Metadata.Cache.AddTagExpandedPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -374,7 +383,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		sk.Metadata.Cache.TagPaths.AddPath(&e)
+		object.Metadata.Cache.TagPaths.AddPath(&e)
 
 	default:
 		err = errors.ErrorWithStackf("unsupported key: %s", bf.Binary)

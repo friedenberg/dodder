@@ -91,14 +91,14 @@ func (bf *binaryEncoder) writeFormat(
 }
 
 func (bf *binaryEncoder) writeFieldKey(
-	sk skuWithSigil,
+	object skuWithSigil,
 ) (n int64, err error) {
 	switch bf.Binary {
 	case keys.Sigil:
-		s := sk.Sigil
+		s := object.Sigil
 		s.Add(bf.Sigil)
 
-		if sk.Metadata.Cache.Dormant.Bool() {
+		if object.Metadata.Cache.Dormant.Bool() {
 			s.Add(ids.SigilHidden)
 		}
 
@@ -108,14 +108,14 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Blob:
-		if n, err = bf.writeSha(&sk.Metadata.Blob, true); err != nil {
+		if n, err = bf.writeSha(&object.Metadata.Blob, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.RepoPubKey:
 		if n, err = bf.writeFieldBinaryMarshaler(
-			&sk.Metadata.RepoPubkey,
+			&object.Metadata.RepoPubkey,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -123,30 +123,30 @@ func (bf *binaryEncoder) writeFieldKey(
 
 	case keys.RepoSig:
 		if n, err = bf.writeFieldBinaryMarshaler(
-			&sk.Metadata.RepoSig,
+			&object.Metadata.RepoSig,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Description:
-		if sk.Metadata.Description.IsEmpty() {
+		if object.Metadata.Description.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadata.Description); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&object.Metadata.Description); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.CacheParentTai:
-		if n, err = bf.writeFieldWriterTo(&sk.Metadata.Cache.ParentTai); err != nil {
+		if n, err = bf.writeFieldWriterTo(&object.Metadata.Cache.ParentTai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Tag:
-		es := sk.GetTags()
+		es := object.GetTags()
 
 		for _, e := range quiter.SortedValues(es) {
 			if e.IsVirtual() {
@@ -169,47 +169,47 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ObjectId:
-		if n, err = bf.writeFieldWriterTo(&sk.ObjectId); err != nil {
+		if n, err = bf.writeFieldWriterTo(&object.ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Tai:
-		if n, err = bf.writeFieldWriterTo(&sk.Metadata.Tai); err != nil {
+		if n, err = bf.writeFieldWriterTo(&object.Metadata.Tai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Type:
-		if sk.Metadata.Type.IsEmpty() {
+		if object.Metadata.Type.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadata.Type); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&object.Metadata.Type); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestParentMetadataParentObjectId:
-		if n, err = bf.writeSha(sk.Metadata.GetMotherDigest(), true); err != nil {
+		if n, err = bf.writeFieldBinaryId(object.Metadata.GetMotherDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestMetadataWithoutTai:
-		if n, err = bf.writeSha(&sk.Metadata.SelfWithoutTai, true); err != nil {
+		if n, err = bf.writeSha(&object.Metadata.SelfWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		if n, err = bf.writeFieldBinaryId(sk.Metadata.GetDigest()); err != nil {
+		if n, err = bf.writeFieldBinaryId(object.Metadata.GetDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.CacheTagImplicit:
-		tags := sk.Metadata.Cache.GetImplicitTags()
+		tags := object.Metadata.Cache.GetImplicitTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
@@ -223,7 +223,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.CacheTagExpanded:
-		es := sk.Metadata.Cache.GetExpandedTags()
+		es := object.Metadata.Cache.GetExpandedTags()
 
 		for _, e := range quiter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -237,7 +237,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.CacheTags:
-		es := sk.Metadata.Cache.TagPaths
+		es := object.Metadata.Cache.TagPaths
 
 		for _, e := range es.Paths {
 			var n1 int64
@@ -295,16 +295,26 @@ func (bf *binaryEncoder) writeFieldWriterTo(
 }
 
 func (bf *binaryEncoder) writeFieldBinaryId(
-	bm interfaces.BinaryId,
+	blobId interfaces.BlobId,
+	allowNull bool,
 ) (n int64, err error) {
-	bites := bm.GetBytes()
+	if blobId.IsNull() {
+		if !allowNull {
+			err = blob_ids.MakeErrIsNull(blobId)
+		}
 
-	if _, err = ohio.WriteAllOrDieTrying(&bf.Content, bites); err != nil {
+		return
+	}
+
+	marshaler := blob_ids.BlobIdBinaryMarshaler{BlobId: blobId}
+	var bites []byte
+
+	if bites, err = marshaler.MarshalBinary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err != nil {
+	if _, err = ohio.WriteAllOrDieTrying(&bf.Content, bites); err != nil {
 		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return
 	}
@@ -329,11 +339,6 @@ func (bf *binaryEncoder) writeFieldBinaryMarshaler(
 	}
 
 	if _, err = ohio.WriteAllOrDieTrying(&bf.Content, b); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err != nil {
 		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return
 	}

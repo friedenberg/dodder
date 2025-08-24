@@ -54,6 +54,20 @@ func (printer printer) IsTty() bool {
 	return printer.isTty
 }
 
+//go:noinline
+func (printer printer) Caller(skip int) Printer {
+	if !printer.on {
+		return Null
+	}
+
+	stackFrame, _ := stack_frame.MakeFrame(skip + 1)
+
+	return prefixPrinter{
+		Printer: printer,
+		prefix:  stackFrame.StringNoFunctionName() + " ",
+	}
+}
+
 func (printer printer) PrintDebug(args ...any) (err error) {
 	if !printer.on {
 		return

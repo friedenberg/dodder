@@ -170,14 +170,14 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 }
 
 func (transacted *Transacted) makeDigestCalcFunc(
-	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	funkMakeBlobId func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
 	objectFormat object_inventory_format.FormatGeneric,
 	digest interfaces.MutableBlobId,
 ) errors.FuncErr {
 	return func() (err error) {
 		var actual interfaces.BlobId
 
-		if actual, err = f(
+		if actual, err = funkMakeBlobId(
 			objectFormat,
 			transacted,
 		); err != nil {

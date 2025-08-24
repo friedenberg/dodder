@@ -15,7 +15,7 @@ import (
 // Internal may be nil, which means that the external is hydrated without an
 // overlay.
 func (store *Store) HydrateExternalFromItem(
-	o sku.CommitOptions,
+	options sku.CommitOptions,
 	item *sku.FSItem,
 	internal *sku.Transacted,
 	external *sku.Transacted,
@@ -70,8 +70,8 @@ func (store *Store) HydrateExternalFromItem(
 		return
 	}
 
-	if o.Clock == nil {
-		o.Clock = item
+	if options.Clock == nil {
+		options.Clock = item
 	}
 
 	if err = store.WriteFSItemToExternal(item, external); err != nil {
@@ -80,11 +80,11 @@ func (store *Store) HydrateExternalFromItem(
 	}
 
 	// Don't apply the proto object as that would artificially create deltas
-	o.StoreOptions.ApplyProto = false
+	options.StoreOptions.ApplyProto = false
 
 	if err = store.storeSupplies.Commit(
 		external,
-		o,
+		options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

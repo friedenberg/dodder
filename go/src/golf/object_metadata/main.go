@@ -33,8 +33,8 @@ type Metadata struct {
 	Blob sha.Sha
 
 	// TODO change to signatures / fingerprints
-	self   sha.Sha
-	mother sha.Sha
+	self   repo_signing.BinaryId
+	mother repo_signing.BinaryId
 
 	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
 	Tai            ids.Tai
@@ -86,11 +86,15 @@ func (metadata *Metadata) GetDigest() interfaces.BlobId {
 	return &metadata.self
 }
 
-func (metadata *Metadata) GetDigestMutable() interfaces.MutableBlobId {
+func (metadata *Metadata) GetDigestMutable() interfaces.MutableGenericBlobId {
 	return &metadata.self
 }
 
-func (metadata *Metadata) GetMotherDigest() *sha.Sha {
+func (metadata *Metadata) GetMotherDigest() interfaces.BlobId {
+	return &metadata.mother
+}
+
+func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlobId {
 	return &metadata.mother
 }
 
