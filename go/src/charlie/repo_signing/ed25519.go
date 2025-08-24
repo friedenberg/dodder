@@ -10,7 +10,7 @@ import (
 
 type PrivateKey ed25519.PrivateKey
 
-func (dst *PrivateKey) Generate(rand io.Reader) (err error) {
+func (privateKey *PrivateKey) Generate(rand io.Reader) (err error) {
 	var src ed25519.PrivateKey
 
 	if _, src, err = ed25519.GenerateKey(rand); err != nil {
@@ -18,7 +18,7 @@ func (dst *PrivateKey) Generate(rand io.Reader) (err error) {
 		return
 	}
 
-	*dst = PrivateKey(src)
+	*privateKey = PrivateKey(src)
 
 	return
 }

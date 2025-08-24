@@ -8,7 +8,6 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 )
 
@@ -26,16 +25,6 @@ var (
 		},
 	)
 )
-
-// TODO remove
-func GetBufioReader() interfaces.Pool[bufio.Reader, *bufio.Reader] {
-	return bufioReader
-}
-
-// TODO remove
-func GetBufioWriter() interfaces.Pool[bufio.Writer, *bufio.Writer] {
-	return bufioWriter
-}
 
 func GetStringReader(
 	value string,

@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -282,16 +283,55 @@ func (transacted *Transacted) GetKey() string {
 func (transacted *Transacted) Sign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	transacted.Metadata.RepoPubkey = config.GetPublicKey()
+	transacted.CalculateObjectDigests()
 
-	sh := sha.MustWithDigester(transacted.GetTai())
-	defer blob_ids.PutBlobId(sh)
+	transacted.Metadata.RepoPubkey = config.GetPublicKey()
 
 	if transacted.Metadata.RepoSig, err = repo_signing.Sign(
 		config.GetPrivateKey(),
-		sh.GetBytes(),
+		transacted.Metadata.GetDigest().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (transacted *Transacted) Verify() (err error) {
+	if len(transacted.Metadata.RepoPubkey) == 0 {
+		err = errors.ErrorWithStackf(
+			"RepoPubkey missing for %s. Fields: %#v",
+			String(transacted),
+			transacted.Metadata.Fields,
+		)
+
+		return
+	}
+
+	if transacted.Metadata.RepoSig.IsEmpty() {
+		err = errors.ErrorWithStackf(
+			"signature missing for %s. Fields: %#v",
+			String(transacted),
+			transacted.Metadata.Fields,
+		)
+
+		return
+	}
+
+	transacted.CalculateObjectDigests()
+
+	if err = repo_signing.VerifySignature(
+		transacted.Metadata.RepoPubkey,
+		transacted.Metadata.GetDigestMutable().GetBytes(),
+		transacted.Metadata.RepoSig,
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Sku: %s, Tags %s",
+			String(transacted),
+			quiter.StringCommaSeparated(transacted.Metadata.GetTags()),
+		)
 		return
 	}
 

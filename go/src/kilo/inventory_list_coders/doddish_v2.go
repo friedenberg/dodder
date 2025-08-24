@@ -6,11 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -77,38 +73,8 @@ func (coder doddishV2) DecodeFrom(
 	}
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
-		sh := sha.MustWithDigester(object.GetTai())
-		defer blob_ids.PutBlobId(sh)
-
-		if len(object.Metadata.RepoPubkey) == 0 {
-			err = errors.ErrorWithStackf(
-				"RepoPubkey missing for %s. Fields: %#v",
-				sku.String(object),
-				object.Metadata.Fields,
-			)
-			return
-		}
-
-		if object.Metadata.RepoSig.IsEmpty() {
-			err = errors.ErrorWithStackf(
-				"signature missing for %s. Fields: %#v",
-				sku.String(object),
-				object.Metadata.Fields,
-			)
-			return
-		}
-
-		if err = repo_signing.VerifySignature(
-			object.Metadata.RepoPubkey,
-			sh.GetBytes(),
-			object.Metadata.RepoSig,
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Sku: %s, Tags %s",
-				sku.String(object),
-				quiter.StringCommaSeparated(object.Metadata.GetTags()),
-			)
+		if err = object.Verify(); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	} else {

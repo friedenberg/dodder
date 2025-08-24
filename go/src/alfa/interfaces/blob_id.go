@@ -33,6 +33,8 @@ type (
 		Reset()
 	}
 
+	// TODO design a better pattern for interfaces that have concrete
+	// implementations and polymorphic implementations
 	MutableGenericBlobId interface {
 		MutableBlobId
 		SetType(string) error

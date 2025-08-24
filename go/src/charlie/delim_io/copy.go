@@ -25,10 +25,8 @@ func CopyWithPrefixOnDelim(
 ) (n int64, err error) {
 	delimiterString := string([]byte{delimiter})
 
-	bufferedReader := pool.GetBufioReader().Get()
-	defer pool.GetBufioReader().Put(bufferedReader)
-
-	bufferedReader.Reset(source)
+	bufferedReader, repool := pool.GetBufferedReader(source)
+	defer repool()
 
 	var (
 		isEOF      bool

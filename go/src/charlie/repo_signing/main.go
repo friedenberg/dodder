@@ -45,7 +45,7 @@ func VerifySignature(
 		sig,
 		&ed25519.Options{},
 	); err != nil {
-		err = errors.Wrapf(err, "invalid signature: %q", string(sig))
+		err = errors.Wrapf(err, "invalid signature: %x", sig)
 		return
 	}
 

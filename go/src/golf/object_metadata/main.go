@@ -30,9 +30,9 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
+	// TODO switch to blob id
 	Blob sha.Sha
 
-	// TODO change to signatures / fingerprints
 	self   repo_signing.BinaryId
 	mother repo_signing.BinaryId
 
