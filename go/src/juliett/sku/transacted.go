@@ -169,6 +169,33 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 	return transacted.calculateObjectSha(false)
 }
 
+func (transacted *Transacted) makeDigestCalcFunc(
+	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	objectFormat object_inventory_format.FormatGeneric,
+	digest interfaces.MutableBlobId,
+) errors.FuncErr {
+	return func() (err error) {
+		var actual interfaces.BlobId
+
+		if actual, err = f(
+			objectFormat,
+			transacted,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer blob_ids.PutBlobId(actual)
+
+		if err = digest.SetDigest(actual); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
 func (transacted *Transacted) makeShaCalcFunc(
 	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
 	objectFormat object_inventory_format.FormatGeneric,
@@ -206,10 +233,10 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(
-		transacted.makeShaCalcFunc(
+		transacted.makeDigestCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadataObjectIdParent(),
-			transacted.Metadata.GetDigest(),
+			transacted.Metadata.GetDigestMutable(),
 		),
 	)
 
@@ -231,7 +258,7 @@ func (transacted *Transacted) SetDormant(v bool) {
 func (transacted *Transacted) SetObjectFingerPrint(
 	v interfaces.BlobId,
 ) (err error) {
-	return transacted.GetMetadata().GetDigest().SetDigest(v)
+	return transacted.GetMetadata().GetDigestMutable().SetDigest(v)
 }
 
 // TODO remove

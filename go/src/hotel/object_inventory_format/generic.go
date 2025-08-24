@@ -285,7 +285,7 @@ func WriteMetadataKeyTo(
 		n1, err = writeShaKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
-			&m.Mother,
+			m.GetMotherDigest(),
 		)
 
 		n += int64(n1)

@@ -6,6 +6,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+// TODO remove in favor of blech
+
 func SignBase64(key PrivateKey, message []byte) (signature string, err error) {
 	var sig []byte
 

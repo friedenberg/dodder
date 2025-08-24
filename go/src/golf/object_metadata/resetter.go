@@ -21,8 +21,8 @@ func (resetter) Reset(metadata *Metadata) {
 	metadata.Tai.Reset()
 	metadata.Blob.Reset()
 	metadata.SelfWithoutTai.Reset()
-	metadata.Self.Reset()
-	metadata.Mother.Reset()
+	metadata.self.Reset()
+	metadata.mother.Reset()
 	metadata.Fields = metadata.Fields[:0]
 }
 
@@ -42,11 +42,11 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.Tai = src.Tai
 
 	dst.Blob.ResetWith(&src.Blob)
-	dst.Self.ResetWith(
-		&src.Self,
+	dst.self.ResetWith(
+		&src.self,
 	)
-	dst.Mother.ResetWith(
-		&src.Mother,
+	dst.mother.ResetWith(
+		&src.mother,
 	)
 }
 

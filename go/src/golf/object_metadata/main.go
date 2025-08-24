@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
@@ -32,8 +33,8 @@ type Metadata struct {
 	Blob sha.Sha
 
 	// TODO change to signatures / fingerprints
-	Self   sha.Sha
-	Mother sha.Sha
+	self   sha.Sha
+	mother sha.Sha
 
 	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
 	Tai            ids.Tai
@@ -81,12 +82,16 @@ func (metadata *Metadata) IsEmpty() bool {
 	return true
 }
 
-func (metadata *Metadata) GetDigest() *sha.Sha {
-	return &metadata.Self
+func (metadata *Metadata) GetDigest() interfaces.BlobId {
+	return &metadata.self
+}
+
+func (metadata *Metadata) GetDigestMutable() interfaces.MutableBlobId {
+	return &metadata.self
 }
 
 func (metadata *Metadata) GetMotherDigest() *sha.Sha {
-	return &metadata.Mother
+	return &metadata.mother
 }
 
 // TODO fix issue with GetTags being nil sometimes

@@ -8,6 +8,7 @@ import (
 	"math"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -202,7 +203,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		if n, err = bf.writeSha(sk.Metadata.GetDigest(), false); err != nil {
+		if n, err = bf.writeFieldBinaryId(sk.Metadata.GetDigest()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -282,6 +283,29 @@ func (bf *binaryEncoder) writeFieldWriterTo(
 ) (n int64, err error) {
 	_, err = wt.WriteTo(&bf.Content)
 	if err != nil {
+		return
+	}
+
+	if n, err = bf.binaryField.WriteTo(&bf.Buffer); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (bf *binaryEncoder) writeFieldBinaryId(
+	bm interfaces.BinaryId,
+) (n int64, err error) {
+	bites := bm.GetBytes()
+
+	if _, err = ohio.WriteAllOrDieTrying(&bf.Content, bites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err != nil {
+		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return
 	}
 
