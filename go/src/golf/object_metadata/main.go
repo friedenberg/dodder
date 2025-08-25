@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
@@ -21,8 +19,6 @@ type Field = string_format_writer.Field
 // representations
 type Metadata struct {
 	// Domain
-	RepoPubkey merkle.PublicKey
-	RepoSig    merkle.Id
 	// InventoryListTai
 
 	Description descriptions.Description
@@ -33,8 +29,10 @@ type Metadata struct {
 	// TODO switch to blob id
 	Blob sha.Sha
 
-	self   merkle.Id
-	mother merkle.Id
+	RepoPubkey   merkle.PublicKey
+	RepoSig      merkle.Id
+	digestSelf   merkle.Id
+	digestMother merkle.Id
 
 	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
 	Tai            ids.Tai
@@ -80,30 +78,6 @@ func (metadata *Metadata) IsEmpty() bool {
 	}
 
 	return true
-}
-
-func (metadata *Metadata) GetDigest() interfaces.BlobId {
-	return &metadata.self
-}
-
-func (metadata *Metadata) GetDigestMutable() interfaces.MutableGenericBlobId {
-	return &metadata.self
-}
-
-func (metadata *Metadata) GetMotherDigest() interfaces.BlobId {
-	return &metadata.mother
-}
-
-func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlobId {
-	return &metadata.mother
-}
-
-func (metadata *Metadata) GetContentSig() interfaces.MerkleId {
-	return &metadata.RepoSig
-}
-
-func (metadata *Metadata) GetContentSigMutable() interfaces.MutableMerkleId {
-	return &metadata.RepoSig
 }
 
 // TODO fix issue with GetTags being nil sometimes
@@ -272,20 +246,4 @@ func (metadata *Metadata) GenerateExpandedTags() {
 		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))
-}
-
-func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
-	return blech32.Value{
-		// TODO determine based on object root type
-		HRP:  merkle.HRPRepoPubKeyV1,
-		Data: metadata.RepoPubkey,
-	}
-}
-
-func (metadata *Metadata) GetRepoSigValue() blech32.Value {
-	return blech32.Value{
-		// TODO determine based on object root type
-		HRP:  merkle.HRPRepoSigV1,
-		Data: metadata.RepoSig.GetBytes(),
-	}
 }

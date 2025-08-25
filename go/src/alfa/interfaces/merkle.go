@@ -1,12 +1,14 @@
 package interfaces
 
 import (
+	"encoding"
 	"hash"
 	"io"
 )
 
 type (
 	MerkleId interface {
+		encoding.BinaryMarshaler
 		GetBytes() []byte
 		GetSize() int
 		GetType() string
@@ -14,6 +16,7 @@ type (
 	}
 
 	MutableMerkleId interface {
+		encoding.BinaryUnmarshaler
 		MerkleId
 		SetBytes([]byte) error
 		Reset()

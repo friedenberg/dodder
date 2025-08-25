@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/keys"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -129,8 +129,10 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.RepoSig:
-		if n, err = encoder.writeFieldBinaryId(
-			object.Metadata.RepoSig,
+		merkleId := object.Metadata.GetContentSig()
+
+		if n, err = encoder.writeMerkleId(
+			merkleId,
 			false,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -265,6 +267,25 @@ func (encoder *binaryEncoder) writeFieldKey(
 	return
 }
 
+func (encoder *binaryEncoder) writeMerkleId(
+	merkleId interfaces.MerkleId,
+	allowNull bool,
+) (n int64, err error) {
+	if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if n, err = encoder.writeFieldBinaryMarshaler(
+		merkleId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO change to writeDigest
 func (encoder *binaryEncoder) writeSha(
 	sh *sha.Sha,
@@ -338,12 +359,11 @@ func (encoder *binaryEncoder) writeFieldBlobId(
 	blobId interfaces.BlobId,
 	allowNull bool,
 ) (n int64, err error) {
-	if blobId.IsNull() {
-		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(blobId)
+	if !allowNull {
+		if err = merkle_ids.MakeErrIsNull(blobId); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
-
-		return
 	}
 
 	marshaler := merkle_ids.BlobIdBinaryMarshaler{BlobId: blobId}
@@ -368,17 +388,17 @@ func (encoder *binaryEncoder) writeFieldBlobId(
 }
 
 func (encoder *binaryEncoder) writeFieldBinaryMarshaler(
-	bm encoding.BinaryMarshaler,
+	binaryMarshaler encoding.BinaryMarshaler,
 ) (n int64, err error) {
-	var b []byte
+	var bites []byte
 
-	b, err = bm.MarshalBinary()
+	bites, err = binaryMarshaler.MarshalBinary()
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, b); err != nil {
+	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, bites); err != nil {
 		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return
 	}
@@ -392,16 +412,16 @@ func (encoder *binaryEncoder) writeFieldBinaryMarshaler(
 }
 
 func (encoder *binaryEncoder) writeFieldByteReader(
-	br io.ByteReader,
+	byteReader io.ByteReader,
 ) (n int64, err error) {
-	var b byte
+	var bite byte
 
-	b, err = br.ReadByte()
+	bite, err = byteReader.ReadByte()
 	if err != nil {
 		return
 	}
 
-	err = encoder.Content.WriteByte(b)
+	err = encoder.Content.WriteByte(bite)
 	if err != nil {
 		return
 	}

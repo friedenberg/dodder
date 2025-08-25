@@ -11,7 +11,7 @@ import (
 var _ interfaces.MutableGenericBlobId = &Id{}
 
 type Id struct {
-	tipe string // hrp
+	tipe string
 	data []byte
 }
 
