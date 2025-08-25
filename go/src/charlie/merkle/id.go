@@ -2,10 +2,10 @@ package merkle
 
 import (
 	"bytes"
-	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 var _ interfaces.MutableGenericBlobId = &Id{}
@@ -16,7 +16,18 @@ type Id struct {
 }
 
 func (id Id) String() string {
-	return fmt.Sprintf("%s-%x", id.tipe, id.data)
+	bites, err := blech32.Encode(id.tipe, id.data)
+	errors.PanicIfError(err)
+	return string(bites)
+}
+
+func (id *Id) Set(value string) (err error) {
+	if id.tipe, id.data, err = blech32.DecodeString(value); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (id Id) IsEmpty() bool {

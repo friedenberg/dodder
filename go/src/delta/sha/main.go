@@ -152,6 +152,10 @@ func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
 	return
 }
 
+func (digest *Sha) SetType(tipe string) (err error) {
+	return errors.Err501NotImplemented
+}
+
 func (digest *Sha) SetBytes(bytess []byte) (err error) {
 	digest.setNonZero()
 

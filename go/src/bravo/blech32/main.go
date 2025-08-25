@@ -154,10 +154,11 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 	return bytes.ToUpper(ret.Bytes()), nil
 }
 
-// Decode decodes a Blech32 string. If the string is uppercase, the HRP will be
+// DecodeString decodes a Blech32 string. If the string is uppercase, the HRP
+// will be
 // uppercase.
-// TODO switch to consuming []byte
-func Decode(s string) (hrp string, data []byte, err error) {
+// TODO duplicate with function that consumes []byte
+func DecodeString(s string) (hrp string, data []byte, err error) {
 	if strings.ToLower(s) != s && strings.ToUpper(s) != s {
 		return "", nil, fmt.Errorf("mixed case")
 	}

@@ -94,7 +94,7 @@ func TestBlech32(t1 *testing.T) {
 			testCaseInfo{ui.MakeTestCaseInfo(""), tc},
 			func(t *ui.T) {
 				expected := tc.str
-				hrp, decoded, err := Decode(expected)
+				hrp, decoded, err := DecodeString(expected)
 				if !tc.valid {
 					// Invalid string decoding should result in error.
 					if err == nil {
@@ -129,7 +129,7 @@ func TestBlech32(t1 *testing.T) {
 				flipped := expected[:pos+1] + string(
 					(expected[pos+1] ^ 1),
 				) + expected[pos+2:]
-				if _, _, err = Decode(flipped); err == nil {
+				if _, _, err = DecodeString(flipped); err == nil {
 					t.Error("expected decoding to fail")
 				}
 			},

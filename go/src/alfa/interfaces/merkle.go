@@ -8,6 +8,7 @@ import (
 
 type (
 	MerkleId interface {
+		Stringer
 		encoding.BinaryMarshaler
 		GetBytes() []byte
 		GetSize() int
@@ -16,8 +17,11 @@ type (
 	}
 
 	MutableMerkleId interface {
-		encoding.BinaryUnmarshaler
 		MerkleId
+		Setter
+		encoding.BinaryUnmarshaler
+		// TODO combine SetType and SetBytes into SetMerkleId
+		SetType(string) error
 		SetBytes([]byte) error
 		Reset()
 	}

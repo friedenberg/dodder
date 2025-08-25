@@ -323,7 +323,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if transacted.Metadata.RepoSig.IsEmpty() {
+	if transacted.Metadata.GetContentSig().IsNull() {
 		err = errors.ErrorWithStackf(
 			"signature missing for %s. Fields: %#v",
 			String(transacted),
@@ -338,7 +338,7 @@ func (transacted *Transacted) Verify() (err error) {
 	if err = merkle.VerifySignature(
 		transacted.Metadata.RepoPubkey,
 		transacted.Metadata.GetDigestMutable().GetBytes(),
-		transacted.Metadata.RepoSig.GetBytes(),
+		transacted.Metadata.GetContentSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrapf(
 			err,

@@ -26,7 +26,7 @@ func (coder doddishV2) EncodeTo(
 		return
 	}
 
-	if object.Metadata.RepoSig.IsEmpty() {
+	if object.Metadata.GetContentSig().IsNull() {
 		err = errors.ErrorWithStackf("no repo signature")
 		return
 	}

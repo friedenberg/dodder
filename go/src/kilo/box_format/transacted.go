@@ -264,7 +264,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 		)
 	}
 
-	if format.isArchive && !object.Metadata.RepoSig.IsEmpty() {
+	if format.isArchive && !object.Metadata.GetContentSig().IsNull() {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldRepoPubKey(metadata),

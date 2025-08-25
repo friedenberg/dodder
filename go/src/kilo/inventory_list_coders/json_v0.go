@@ -28,7 +28,7 @@ func (coder jsonV0) EncodeTo(
 		return
 	}
 
-	if object.Metadata.RepoSig.IsEmpty() {
+	if object.Metadata.GetContentSig().IsNull() {
 		err = errors.ErrorWithStackf("no repo signature")
 		return
 	}
@@ -84,7 +84,7 @@ func (coder jsonV0) DecodeFrom(
 			return
 		}
 
-		if object.Metadata.RepoSig.IsEmpty() {
+		if object.Metadata.GetContentSig().IsNull() {
 			err = errors.ErrorWithStackf(
 				"signature missing for %s. Fields: %#v",
 				sku.String(object),
@@ -96,7 +96,7 @@ func (coder jsonV0) DecodeFrom(
 		if err = merkle.VerifySignature(
 			object.Metadata.RepoPubkey,
 			digest.GetBytes(),
-			object.Metadata.RepoSig.GetBytes(),
+			object.Metadata.GetContentSig().GetBytes(),
 		); err != nil {
 			err = errors.Wrapf(
 				err,

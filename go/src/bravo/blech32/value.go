@@ -1,6 +1,9 @@
 package blech32
 
-import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+)
 
 // TODO make generic
 type Value struct {
@@ -63,7 +66,7 @@ func (value *Value) Set(text string) (err error) {
 		return
 	}
 
-	if value.HRP, value.Data, err = Decode(text); err != nil {
+	if value.HRP, value.Data, err = DecodeString(text); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -89,7 +92,23 @@ func (value *Value) UnmarshalText(text []byte) (err error) {
 		return
 	}
 
-	if value.HRP, value.Data, err = Decode(string(text)); err != nil {
+	if value.HRP, value.Data, err = DecodeString(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (value Value) WriteToMerkleId(
+	merkleId interfaces.MutableMerkleId,
+) (err error) {
+	if err = merkleId.SetType(value.HRP); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = merkleId.SetBytes(value.Data); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

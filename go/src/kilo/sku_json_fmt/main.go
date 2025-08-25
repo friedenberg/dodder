@@ -146,7 +146,9 @@ func (json *Transacted) ToTransacted(
 
 	object.Metadata.RepoPubkey = json.RepoPubkey.Data
 
-	if err = object.Metadata.RepoSig.SetBytes(json.RepoSig.Data); err != nil {
+	if err = json.RepoSig.WriteToMerkleId(
+		object.Metadata.GetContentSigMutable(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
