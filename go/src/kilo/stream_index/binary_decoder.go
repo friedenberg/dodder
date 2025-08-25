@@ -279,7 +279,9 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.RepoSig:
-		if err = object.Metadata.RepoSig.UnmarshalBinary(bf.Content.Bytes()); err != nil {
+		if err = object.Metadata.GetContentSigMutable().UnmarshalBinary(
+			bf.Content.Bytes(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
