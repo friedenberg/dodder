@@ -90,6 +90,15 @@ func (id *Id) ResetWith(src *Id) {
 	copy(id.data, bites)
 }
 
+func (id *Id) ResetWithMerkleId(src interfaces.MerkleId) {
+	id.tipe = src.GetType()
+	bites := src.GetBytes()
+	id.data = make([]byte, len(bites))
+	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
+	// binaryId.data = binaryId.data[:cap(binaryId.data)]
+	copy(id.data, bites)
+}
+
 func (id *Id) GetBlobId() interfaces.BlobId {
 	return id
 }

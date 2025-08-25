@@ -24,6 +24,7 @@ type (
 		encoding.BinaryUnmarshaler
 		SetMerkleId(tipe string, bites []byte) error
 		Reset()
+		ResetWithMerkleId(MerkleId)
 	}
 
 	BlobId interface {

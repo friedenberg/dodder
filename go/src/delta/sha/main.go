@@ -308,6 +308,10 @@ func (digest *Sha) ResetWith(other *Sha) {
 	}
 }
 
+func (digest *Sha) ResetWithMerkleId(src interfaces.MerkleId) {
+	panic(errors.Err405MethodNotAllowed)
+}
+
 func (digest *Sha) ResetWithShaLike(other interfaces.BlobId) {
 	digest.setNonZero()
 	copy(digest.data[:], other.GetBytes())

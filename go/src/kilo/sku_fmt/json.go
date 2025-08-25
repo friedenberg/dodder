@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -29,7 +30,7 @@ type JSON struct {
 	Description string        `json:"description"`
 	Dormant     bool          `json:"dormant"`
 	ObjectId    string        `json:"object-id"`
-	RepoPubkey  blech32.Value `json:"repo-pub_key"`
+	RepoPubkey  merkle.Id     `json:"repo-pub_key"`
 	RepoSig     blech32.Value `json:"repo-sig"`
 	Sha         string        `json:"sha"`
 	Tags        []string      `json:"tags"`
@@ -69,7 +70,7 @@ func (json *JSON) FromStringAndMetadata(
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
-	json.RepoPubkey = metadata.GetRepoPubkeyValue()
+	json.RepoPubkey.ResetWithMerkleId(metadata.GetPubKey())
 	json.RepoSig = metadata.GetRepoSigValue()
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
@@ -176,12 +177,7 @@ func (json *JSON) ToTransacted(
 	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
-	if err = json.RepoPubkey.WriteToMerkleId(
-		object.Metadata.GetPubKeyMutable(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
 
 	if err = json.RepoSig.WriteToMerkleId(
 		object.Metadata.GetContentSigMutable(),

@@ -61,7 +61,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(object.Metadata.GetRepoPubkeyValue().String())
+	sb.WriteString(object.Metadata.GetPubKey().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(object.Metadata.GetRepoSigValue().String())
