@@ -12,9 +12,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -927,7 +927,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, object.Metadata.GetMotherObjectDigest())
+				_, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetMotherObjectDigest(),
+				)
 				return
 			}
 		},
@@ -1014,7 +1017,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				sig := object.Metadata.GetRepoSigValue()
+				sig := object.Metadata.GetObjectSig()
 
 				if _, err = fmt.Fprintln(writer, sig); err != nil {
 					err = errors.Wrap(err)

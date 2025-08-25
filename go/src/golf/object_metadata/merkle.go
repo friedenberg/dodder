@@ -2,8 +2,6 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 func (metadata *Metadata) GetBlobDigest() interfaces.MerkleId {
@@ -44,12 +42,4 @@ func (metadata *Metadata) GetObjectSig() interfaces.MerkleId {
 
 func (metadata *Metadata) GetObjectSigMutable() interfaces.MutableMerkleId {
 	return &metadata.sigRepo
-}
-
-func (metadata *Metadata) GetRepoSigValue() blech32.Value {
-	return blech32.Value{
-		// TODO determine based on object root type
-		HRP:  merkle.HRPRepoSigV1,
-		Data: metadata.sigRepo.GetBytes(),
-	}
 }

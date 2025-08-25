@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -24,18 +23,18 @@ type JSONMCP struct {
 
 type JSON struct {
 	// TODO rename to blob-id
-	BlobId      string        `json:"blob-sha"`
-	BlobString  string        `json:"blob-string,omitempty"`
-	Date        string        `json:"date"`
-	Description string        `json:"description"`
-	Dormant     bool          `json:"dormant"`
-	ObjectId    string        `json:"object-id"`
-	RepoPubkey  merkle.Id     `json:"repo-pub_key"`
-	RepoSig     blech32.Value `json:"repo-sig"`
-	Sha         string        `json:"sha"`
-	Tags        []string      `json:"tags"`
-	Tai         string        `json:"tai"`
-	Type        string        `json:"type"`
+	BlobId      string    `json:"blob-sha"`
+	BlobString  string    `json:"blob-string,omitempty"`
+	Date        string    `json:"date"`
+	Description string    `json:"description"`
+	Dormant     bool      `json:"dormant"`
+	ObjectId    string    `json:"object-id"`
+	RepoPubkey  merkle.Id `json:"repo-pub_key"`
+	RepoSig     merkle.Id `json:"repo-sig"`
+	Sha         string    `json:"sha"`
+	Tags        []string  `json:"tags"`
+	Tai         string    `json:"tai"`
+	Type        string    `json:"type"`
 
 	JSONMCP
 }
@@ -71,7 +70,7 @@ func (json *JSON) FromStringAndMetadata(
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMerkleId(metadata.GetRepoPubKey())
-	json.RepoSig = metadata.GetRepoSigValue()
+	json.RepoSig.ResetWithMerkleId(metadata.GetObjectSig())
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
@@ -178,13 +177,7 @@ func (json *JSON) ToTransacted(
 	object.Metadata.GenerateExpandedTags()
 
 	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
-
-	if err = json.RepoSig.WriteToMerkleId(
-		object.Metadata.GetObjectSigMutable(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {

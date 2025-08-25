@@ -114,7 +114,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb.WriteString(object.Metadata.GetRepoPubKey().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(object.Metadata.GetRepoSigValue().String())
+	sb.WriteString(object.Metadata.GetObjectSig().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(merkle_ids.Format(object.GetBlobId()))
