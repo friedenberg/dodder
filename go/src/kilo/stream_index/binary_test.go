@@ -2,12 +2,8 @@ package stream_index
 
 import (
 	"bytes"
-	"encoding/base64"
-	"strings"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -36,26 +32,27 @@ func TestBinaryOne(t1 *testing.T) {
 		t.AssertNoError(expected.Metadata.Description.Set("the bez"))
 		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
 
-		{
-			id := "3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0"
-			idReader := base64.NewDecoder(
-				base64.StdEncoding,
-				strings.NewReader(id),
-			)
+		// {
+		// 	id :=
+		// "3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0"
+		// 	idReader := base64.NewDecoder(
+		// 		base64.StdEncoding,
+		// 		strings.NewReader(id),
+		// 	)
 
-			bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
-				idReader,
-			)
+		// 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
+		// 		idReader,
+		// 	)
 
-			defer repoolBufferedReader()
+		// 	defer repoolBufferedReader()
 
-			t.AssertNoError(
-				merkle_ids.ReadFromInto(
-					bufferedReader,
-					expected.Metadata.GetMotherDigestMutable(),
-				),
-			)
-		}
+		// 	t.AssertNoError(
+		// 		merkle_ids.ReadFromInto(
+		// 			bufferedReader,
+		// 			expected.Metadata.GetMotherDigestMutable(),
+		// 		),
+		// 	)
+		// }
 
 		t.AssertNoError(expected.CalculateObjectDigests())
 

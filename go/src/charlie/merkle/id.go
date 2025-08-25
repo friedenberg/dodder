@@ -51,12 +51,7 @@ func (id Id) IsNull() bool {
 }
 
 func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
-	if err = id.SetType(digest.GetType()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = id.SetBytes(digest.GetBytes()); err != nil {
+	if err = id.SetMerkleId(digest.GetType(), digest.GetBytes()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -64,7 +59,7 @@ func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
 	return
 }
 
-func (id *Id) SetType(tipe string) (err error) {
+func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
 	if tipe == "" {
 		err = errors.Errorf("empty type")
 		return
@@ -72,16 +67,13 @@ func (id *Id) SetType(tipe string) (err error) {
 
 	id.tipe = tipe
 
-	return
-}
-
-// TODO optimize this
-func (id *Id) SetBytes(bytes []byte) error {
-	id.data = make([]byte, len(bytes))
+	// TODO optimize this
+	id.data = make([]byte, len(bites))
 	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
 	// binaryId.data = binaryId.data[:cap(binaryId.data)]
-	copy(id.data, bytes)
-	return nil
+	copy(id.data, bites)
+
+	return
 }
 
 func (id *Id) Reset() {
@@ -91,7 +83,11 @@ func (id *Id) Reset() {
 
 func (id *Id) ResetWith(src *Id) {
 	id.tipe = src.tipe
-	errors.PanicIfError(id.SetBytes(src.GetBytes()))
+	bites := src.data
+	id.data = make([]byte, len(bites))
+	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
+	// binaryId.data = binaryId.data[:cap(binaryId.data)]
+	copy(id.data, bites)
 }
 
 func (id *Id) GetBlobId() interfaces.BlobId {
@@ -108,12 +104,7 @@ func (id *Id) UnmarshalBinary(
 		return
 	}
 
-	if err = id.SetType(string(tipeBytes)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = id.SetBytes(bytesAfterTipe); err != nil {
+	if err = id.SetMerkleId(string(tipeBytes), bytesAfterTipe); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

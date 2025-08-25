@@ -32,12 +32,7 @@ func (blobId BlobIdBinaryUnmarshaler) UnmarshalBinary(
 		return
 	}
 
-	if err = blobId.SetType(string(tipeBytes)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = blobId.SetBytes(bytesAfterTipe); err != nil {
+	if err = blobId.SetMerkleId(string(tipeBytes), bytesAfterTipe); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

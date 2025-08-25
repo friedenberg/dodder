@@ -152,7 +152,7 @@ func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
 	return
 }
 
-func (digest *Sha) SetType(tipe string) (err error) {
+func (digest *Sha) SetMerkleId(tipe string, bites []byte) (err error) {
 	return errors.Err501NotImplemented
 }
 

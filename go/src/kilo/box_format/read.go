@@ -290,12 +290,9 @@ LOOP_AFTER_OID:
 						return
 					}
 
-					if err = object.Metadata.RepoSig.SetType("ed25519"); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if err = object.Metadata.RepoSig.SetBytes(repoSig.Data); err != nil {
+					if err = repoSig.WriteToMerkleId(
+						object.Metadata.GetContentSigMutable(),
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

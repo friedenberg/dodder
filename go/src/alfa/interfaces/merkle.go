@@ -11,6 +11,8 @@ type (
 		Stringer
 		encoding.BinaryMarshaler
 		GetBytes() []byte
+		// TODO rethink size as it works completely different between sha and
+		// merkle
 		GetSize() int
 		GetType() string
 		IsNull() bool
@@ -20,9 +22,7 @@ type (
 		MerkleId
 		Setter
 		encoding.BinaryUnmarshaler
-		// TODO combine SetType and SetBytes into SetMerkleId
-		SetType(string) error
-		SetBytes([]byte) error
+		SetMerkleId(tipe string, bites []byte) error
 		Reset()
 	}
 
@@ -41,7 +41,6 @@ type (
 	// implementations and polymorphic implementations
 	MutableGenericBlobId interface {
 		MutableBlobId
-		SetType(string) error
 	}
 
 	BlobIdGetter interface {

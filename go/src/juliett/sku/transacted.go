@@ -299,12 +299,7 @@ func (transacted *Transacted) Sign(
 		return
 	}
 
-	if err = transacted.Metadata.RepoSig.SetType(privateKey.GetType()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = transacted.Metadata.RepoSig.SetBytes(bites); err != nil {
+	if err = transacted.Metadata.RepoSig.SetMerkleId(privateKey.GetType(), bites); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
