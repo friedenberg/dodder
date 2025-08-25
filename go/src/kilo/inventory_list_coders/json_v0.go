@@ -75,7 +75,7 @@ func (coder jsonV0) DecodeFrom(
 		digest := sha.MustWithDigester(object.GetTai())
 		defer merkle_ids.PutBlobId(digest)
 
-		if len(object.Metadata.RepoPubkey) == 0 {
+		if object.Metadata.RepoPubkey.IsNull() {
 			err = errors.ErrorWithStackf(
 				"RepoPubkey missing for %s. Fields: %#v",
 				sku.String(object),
@@ -94,7 +94,7 @@ func (coder jsonV0) DecodeFrom(
 		}
 
 		if err = merkle.VerifySignature(
-			object.Metadata.RepoPubkey,
+			object.Metadata.RepoPubkey.GetBytes(),
 			digest.GetBytes(),
 			object.Metadata.GetContentSig().GetBytes(),
 		); err != nil {

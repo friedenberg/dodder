@@ -273,7 +273,9 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.RepoPubKey:
-		if err = object.Metadata.RepoPubkey.SetBytes(bf.Content.Bytes()); err != nil {
+		if err = object.Metadata.GetPubKeyMutable().UnmarshalBinary(
+			bf.Content.Bytes(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

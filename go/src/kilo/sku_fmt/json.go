@@ -176,7 +176,12 @@ func (json *JSON) ToTransacted(
 	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
-	object.Metadata.RepoPubkey = json.RepoPubkey.Data
+	if err = json.RepoPubkey.WriteToMerkleId(
+		object.Metadata.GetPubKeyMutable(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = json.RepoSig.WriteToMerkleId(
 		object.Metadata.GetContentSigMutable(),

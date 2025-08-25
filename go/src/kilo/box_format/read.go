@@ -280,7 +280,13 @@ LOOP_AFTER_OID:
 						return
 					}
 
-					object.Metadata.RepoPubkey = pubKey.Data
+					if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
+						"ed25519",
+						pubKey.Data,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 
 				} else if strings.HasPrefix(value, merkle.HRPRepoSigV1) {
 					var repoSig blech32.Value

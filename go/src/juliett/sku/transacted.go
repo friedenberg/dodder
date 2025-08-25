@@ -285,7 +285,13 @@ func (transacted *Transacted) Sign(
 ) (err error) {
 	transacted.CalculateObjectDigests()
 
-	transacted.Metadata.RepoPubkey = config.GetPublicKey()
+	if err = transacted.Metadata.GetPubKeyMutable().SetMerkleId(
+		"ed25519",
+		config.GetPublicKey(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	privateKey := config.GetPrivateKey()
 
@@ -299,7 +305,10 @@ func (transacted *Transacted) Sign(
 		return
 	}
 
-	if err = transacted.Metadata.RepoSig.SetMerkleId(privateKey.GetType(), bites); err != nil {
+	if err = transacted.Metadata.GetContentSigMutable().SetMerkleId(
+		privateKey.GetType(),
+		bites,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -308,7 +317,7 @@ func (transacted *Transacted) Sign(
 }
 
 func (transacted *Transacted) Verify() (err error) {
-	if len(transacted.Metadata.RepoPubkey) == 0 {
+	if transacted.Metadata.RepoPubkey.IsNull() {
 		err = errors.ErrorWithStackf(
 			"RepoPubkey missing for %s. Fields: %#v",
 			String(transacted),
@@ -331,7 +340,7 @@ func (transacted *Transacted) Verify() (err error) {
 	transacted.CalculateObjectDigests()
 
 	if err = merkle.VerifySignature(
-		transacted.Metadata.RepoPubkey,
+		transacted.Metadata.RepoPubkey.GetBytes(),
 		transacted.Metadata.GetDigestMutable().GetBytes(),
 		transacted.Metadata.GetContentSig().GetBytes(),
 	); err != nil {

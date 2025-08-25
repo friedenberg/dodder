@@ -22,19 +22,27 @@ func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlob
 	return &metadata.digestMother
 }
 
+func (metadata *Metadata) GetPubKey() interfaces.MerkleId {
+	return metadata.RepoPubkey
+}
+
+func (metadata *Metadata) GetPubKeyMutable() interfaces.MutableMerkleId {
+	return &metadata.RepoPubkey
+}
+
 func (metadata *Metadata) GetContentSig() interfaces.MerkleId {
-	return &metadata.RepoSig
+	return &metadata.sigRepo
 }
 
 func (metadata *Metadata) GetContentSigMutable() interfaces.MutableMerkleId {
-	return &metadata.RepoSig
+	return &metadata.sigRepo
 }
 
 func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
 		HRP:  merkle.HRPRepoPubKeyV1,
-		Data: metadata.RepoPubkey,
+		Data: metadata.RepoPubkey.GetBytes(),
 	}
 }
 
@@ -42,6 +50,6 @@ func (metadata *Metadata) GetRepoSigValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
 		HRP:  merkle.HRPRepoSigV1,
-		Data: metadata.RepoSig.GetBytes(),
+		Data: metadata.sigRepo.GetBytes(),
 	}
 }

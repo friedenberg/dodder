@@ -29,8 +29,8 @@ type Metadata struct {
 	// TODO switch to blob id
 	Blob sha.Sha
 
-	RepoPubkey   merkle.PublicKey
-	RepoSig      merkle.Id
+	RepoPubkey   merkle.Id
+	sigRepo      merkle.Id
 	digestSelf   merkle.Id
 	digestMother merkle.Id
 
