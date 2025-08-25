@@ -289,8 +289,8 @@ func (store *Store) fetchMotherIfNecessary(
 		return
 	}
 
-	if err = object.Metadata.GetMotherDigestMutable().SetDigest(
-		mother.Metadata.GetDigest(),
+	if err = object.Metadata.GetMotherObjectDigestMutable().SetDigest(
+		mother.Metadata.GetObjectDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

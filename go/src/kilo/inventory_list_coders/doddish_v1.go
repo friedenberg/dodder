@@ -18,7 +18,7 @@ func (coder doddishV1) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetDigest().IsNull() {
+	if object.Metadata.GetObjectDigest().IsNull() {
 		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
 		return
 	}

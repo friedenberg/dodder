@@ -257,7 +257,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, object.Metadata.GetDigest())
+				_, err = fmt.Fprintln(writer, object.Metadata.GetObjectDigest())
 				return
 			}
 		},
@@ -271,8 +271,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				_, err = fmt.Fprintf(
 					writer,
 					"%s -> %s\n",
-					object.Metadata.GetDigest(),
-					object.Metadata.GetMotherDigest(),
+					object.Metadata.GetObjectDigest(),
+					object.Metadata.GetMotherObjectDigest(),
 				)
 				return
 			}
@@ -927,7 +927,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, object.Metadata.GetMotherDigest())
+				_, err = fmt.Fprintln(writer, object.Metadata.GetMotherObjectDigest())
 				return
 			}
 		},
@@ -957,7 +957,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			p := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
-				if object.Metadata.GetMotherDigest().IsNull() {
+				if object.Metadata.GetMotherObjectDigest().IsNull() {
 					return
 				}
 

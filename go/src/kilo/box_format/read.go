@@ -297,7 +297,7 @@ LOOP_AFTER_OID:
 					}
 
 					if err = repoSig.WriteToMerkleId(
-						object.Metadata.GetContentSigMutable(),
+						object.Metadata.GetObjectSigMutable(),
 					); err != nil {
 						err = errors.Wrap(err)
 						return

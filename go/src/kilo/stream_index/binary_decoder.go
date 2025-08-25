@@ -281,7 +281,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.RepoSig:
-		if err = object.Metadata.GetContentSigMutable().UnmarshalBinary(
+		if err = object.Metadata.GetObjectSigMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -333,7 +333,7 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case keys.DigestParentMetadataParentObjectId:
 		unmarshaler := merkle_ids.BlobIdBinaryUnmarshaler{
-			MutableGenericBlobId: object.Metadata.GetMotherDigestMutable(),
+			MutableGenericBlobId: object.Metadata.GetMotherObjectDigestMutable(),
 		}
 
 		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {
@@ -343,7 +343,7 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case keys.DigestMetadataParentObjectId:
 		unmarshaler := merkle_ids.BlobIdBinaryUnmarshaler{
-			MutableGenericBlobId: object.Metadata.GetDigestMutable(),
+			MutableGenericBlobId: object.Metadata.GetObjectDigestMutable(),
 		}
 
 		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {

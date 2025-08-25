@@ -93,7 +93,7 @@ func MetadataFieldRepoPubKey(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:      metadata.GetPubKey().String(),
+		Value:      metadata.GetRepoPubKey().String(),
 		NoTruncate: true,
 		ColorType:  string_format_writer.ColorTypeHash,
 	}

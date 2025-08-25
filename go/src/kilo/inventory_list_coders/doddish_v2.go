@@ -21,12 +21,12 @@ func (coder doddishV2) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetDigest().IsNull() {
+	if object.Metadata.GetObjectDigest().IsNull() {
 		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
 		return
 	}
 
-	if object.Metadata.GetContentSig().IsNull() {
+	if object.Metadata.GetObjectSig().IsNull() {
 		err = errors.ErrorWithStackf("no repo signature")
 		return
 	}

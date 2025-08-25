@@ -158,7 +158,7 @@ func (transacted *Transacted) GetGenre() interfaces.Genre {
 }
 
 func (transacted *Transacted) IsNew() bool {
-	return transacted.Metadata.GetMotherDigest().IsNull()
+	return transacted.Metadata.GetMotherObjectDigest().IsNull()
 }
 
 func (transacted *Transacted) CalculateObjectShaDebug() (err error) {
@@ -237,7 +237,7 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 		transacted.makeDigestCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadataObjectIdParent(),
-			transacted.Metadata.GetDigestMutable(),
+			transacted.Metadata.GetObjectDigestMutable(),
 		),
 	)
 
@@ -259,12 +259,12 @@ func (transacted *Transacted) SetDormant(v bool) {
 func (transacted *Transacted) SetObjectFingerPrint(
 	v interfaces.BlobId,
 ) (err error) {
-	return transacted.GetMetadata().GetDigestMutable().SetDigest(v)
+	return transacted.GetMetadata().GetObjectDigestMutable().SetDigest(v)
 }
 
 // TODO remove
 func (transacted *Transacted) GetObjectFingerPrint() interfaces.BlobId {
-	return transacted.GetMetadata().GetDigest()
+	return transacted.GetMetadata().GetObjectDigest()
 }
 
 func (transacted *Transacted) GetBlobId() interfaces.BlobId {
@@ -299,13 +299,13 @@ func (transacted *Transacted) Sign(
 
 	if bites, err = merkle.Sign(
 		privateKey,
-		transacted.Metadata.GetDigest().GetBytes(),
+		transacted.Metadata.GetObjectDigest().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = transacted.Metadata.GetContentSigMutable().SetMerkleId(
+	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
 		privateKey.GetType(),
 		bites,
 	); err != nil {
@@ -317,7 +317,7 @@ func (transacted *Transacted) Sign(
 }
 
 func (transacted *Transacted) Verify() (err error) {
-	if transacted.Metadata.GetPubKey().IsNull() {
+	if transacted.Metadata.GetRepoPubKey().IsNull() {
 		err = errors.ErrorWithStackf(
 			"RepoPubkey missing for %s. Fields: %#v",
 			String(transacted),
@@ -327,7 +327,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if transacted.Metadata.GetContentSig().IsNull() {
+	if transacted.Metadata.GetObjectSig().IsNull() {
 		err = errors.ErrorWithStackf(
 			"signature missing for %s. Fields: %#v",
 			String(transacted),
@@ -340,9 +340,9 @@ func (transacted *Transacted) Verify() (err error) {
 	transacted.CalculateObjectDigests()
 
 	if err = merkle.VerifySignature(
-		transacted.Metadata.GetPubKey().GetBytes(),
-		transacted.Metadata.GetDigestMutable().GetBytes(),
-		transacted.Metadata.GetContentSig().GetBytes(),
+		transacted.Metadata.GetRepoPubKey().GetBytes(),
+		transacted.Metadata.GetObjectDigestMutable().GetBytes(),
+		transacted.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrapf(
 			err,

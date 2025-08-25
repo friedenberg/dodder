@@ -271,7 +271,7 @@ func WriteMetadataKeyTo(
 		n1, err = writeBlobIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
-			m.GetMotherDigest(),
+			m.GetMotherObjectDigest(),
 		)
 
 		n += int64(n1)
@@ -285,7 +285,7 @@ func WriteMetadataKeyTo(
 		n1, err = writeBlobIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
-			m.GetMotherDigest(),
+			m.GetMotherObjectDigest(),
 		)
 
 		n += int64(n1)

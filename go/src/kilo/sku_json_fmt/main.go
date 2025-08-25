@@ -59,7 +59,7 @@ func (json *Transacted) FromStringAndMetadata(
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.ObjectId = objectId
-	json.RepoPubkey.ResetWithMerkleId(metadata.GetPubKey())
+	json.RepoPubkey.ResetWithMerkleId(metadata.GetRepoPubKey())
 	json.RepoSig = metadata.GetRepoSigValue()
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
@@ -148,7 +148,7 @@ func (json *Transacted) ToTransacted(
 	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
 
 	if err = json.RepoSig.WriteToMerkleId(
-		object.Metadata.GetContentSigMutable(),
+		object.Metadata.GetObjectSigMutable(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

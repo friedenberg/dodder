@@ -121,14 +121,14 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case keys.RepoPubKey:
 		if n, err = encoder.writeFieldBinaryMarshaler(
-			object.Metadata.GetPubKey(),
+			object.Metadata.GetRepoPubKey(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.RepoSig:
-		merkleId := object.Metadata.GetContentSig()
+		merkleId := object.Metadata.GetObjectSig()
 
 		if n, err = encoder.writeMerkleId(
 			merkleId,
@@ -200,7 +200,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestParentMetadataParentObjectId:
-		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetMotherDigest(), true); err != nil {
+		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetMotherObjectDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -212,7 +212,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetDigest(), false); err != nil {
+		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetObjectDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

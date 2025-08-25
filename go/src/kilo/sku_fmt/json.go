@@ -70,7 +70,7 @@ func (json *JSON) FromStringAndMetadata(
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
-	json.RepoPubkey.ResetWithMerkleId(metadata.GetPubKey())
+	json.RepoPubkey.ResetWithMerkleId(metadata.GetRepoPubKey())
 	json.RepoSig = metadata.GetRepoSigValue()
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
@@ -180,7 +180,7 @@ func (json *JSON) ToTransacted(
 	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
 
 	if err = json.RepoSig.WriteToMerkleId(
-		object.Metadata.GetContentSigMutable(),
+		object.Metadata.GetObjectSigMutable(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

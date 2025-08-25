@@ -32,6 +32,7 @@ func TestBinaryOne(t1 *testing.T) {
 		t.AssertNoError(expected.Metadata.Description.Set("the bez"))
 		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
 
+		// TODO add mother digest field and test
 		// {
 		// 	id :=
 		// "3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0"

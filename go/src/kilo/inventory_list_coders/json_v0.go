@@ -23,12 +23,12 @@ func (coder jsonV0) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetDigest().IsNull() {
+	if object.Metadata.GetObjectDigest().IsNull() {
 		err = errors.ErrorWithStackf("empty digest: %q", sku.String(object))
 		return
 	}
 
-	if object.Metadata.GetContentSig().IsNull() {
+	if object.Metadata.GetObjectSig().IsNull() {
 		err = errors.ErrorWithStackf("no repo signature")
 		return
 	}
@@ -75,7 +75,7 @@ func (coder jsonV0) DecodeFrom(
 		digest := sha.MustWithDigester(object.GetTai())
 		defer merkle_ids.PutBlobId(digest)
 
-		if object.Metadata.GetPubKey().IsNull() {
+		if object.Metadata.GetRepoPubKey().IsNull() {
 			err = errors.ErrorWithStackf(
 				"RepoPubkey missing for %s. Fields: %#v",
 				sku.String(object),
@@ -84,7 +84,7 @@ func (coder jsonV0) DecodeFrom(
 			return
 		}
 
-		if object.Metadata.GetContentSig().IsNull() {
+		if object.Metadata.GetObjectSig().IsNull() {
 			err = errors.ErrorWithStackf(
 				"signature missing for %s. Fields: %#v",
 				sku.String(object),
@@ -94,9 +94,9 @@ func (coder jsonV0) DecodeFrom(
 		}
 
 		if err = merkle.VerifySignature(
-			object.Metadata.GetPubKey().GetBytes(),
+			object.Metadata.GetRepoPubKey().GetBytes(),
 			digest.GetBytes(),
-			object.Metadata.GetContentSig().GetBytes(),
+			object.Metadata.GetObjectSig().GetBytes(),
 		); err != nil {
 			err = errors.Wrapf(
 				err,

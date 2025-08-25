@@ -192,7 +192,7 @@ func (importer importer) importLeafSku(
 	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
 	// TODO set this as an importer option
-	if checkedOut.GetSkuExternal().Metadata.GetContentSig().IsNull() {
+	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
 		if err = checkedOut.GetSkuExternal().Sign(
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
