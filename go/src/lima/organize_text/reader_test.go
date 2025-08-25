@@ -15,12 +15,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
+// TODO transition this to ui.TestContext, and add a config object with a public
+// key
+
 func TestMain(m *testing.M) {
 	code := m.Run()
 	os.Exit(code)
 }
 
-func makeZettelId(t *testing.T, v string) (k *ids.ObjectId) {
+func makeZettelId(t *ui.T, v string) (k *ids.ObjectId) {
 	var err error
 
 	var h ids.ZettelId
@@ -32,7 +35,7 @@ func makeZettelId(t *testing.T, v string) (k *ids.ObjectId) {
 	return ids.MustObjectId(h)
 }
 
-func makeDescription(t *testing.T, v string) (b descriptions.Description) {
+func makeDescription(t *ui.T, v string) (b descriptions.Description) {
 	var err error
 
 	if err = b.Set(v); err != nil {
@@ -43,21 +46,27 @@ func makeDescription(t *testing.T, v string) (b descriptions.Description) {
 }
 
 func makeObjWithZettelIdAndDescription(
-	t *testing.T,
+	t *ui.T,
 	zettelId string,
 	description string,
-) (o *obj) {
-	object := sku.MakeSkuType()
-	object.GetSkuExternal().Metadata.Description = makeDescription(
+) (object *obj) {
+	object = &obj{
+		sku: sku.MakeSkuType(),
+	}
+
+	object.sku.GetSkuExternal().Metadata.Description = makeDescription(
 		t,
 		description,
 	)
+	object.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, zettelId))
 
-	o = &obj{
-		sku: object,
-	}
-
-	o.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, zettelId))
+	// TODO add pubkeys to assignment reader
+	// {
+	// 	config := genesis_configs.Default().Blob
+	// 	t.AssertNoError(config.GeneratePrivateKey())
+	// 	t.AssertNoError(object.sku.GetSkuExternal().Sign(config))
+	// 	t.AssertNoError(object.sku.GetSku().Sign(config))
+	// }
 
 	return
 }
@@ -137,8 +146,8 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	}
 }
 
-func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
-	t1 := ui.T{T: t}
+func TestAssignmentLineReader2Heading2Zettels(t1 *testing.T) {
+	t := &ui.T{T: t1}
 
 	input := `# wow
 - [one/wow] uno
@@ -177,26 +186,12 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
-	}
-
-	if false {
-		t := ui.T{T: t}
-		var actualOut strings.Builder
-		sut := Text{
-			Options:    sub.options,
-			Assignment: sub.root,
-		}
-
-		_, err := sut.WriteTo(&actualOut)
-		t.AssertNoError(err)
-
-		t.AssertEqual(input, actualOut.String())
+		assertEqualObjects(t, expected, actual)
 	}
 }
 
 func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
-	t := ui.T{T: t1}
+	t := &ui.T{T: t1}
 
 	input := `# wow
 ## sub-wow
@@ -254,19 +249,19 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 	{
 		expected := make(Objects, 0)
-		expected.Add(makeObjWithZettelIdAndDescription(t.T, "one/wow", "uno"))
+		expected.Add(makeObjWithZettelIdAndDescription(t, "one/wow", "uno"))
 		expected.Add(
-			makeObjWithZettelIdAndDescription(t.T, "dos/wow", "two/wow"),
+			makeObjWithZettelIdAndDescription(t, "dos/wow", "two/wow"),
 		)
 
 		actual := sub.root.Children[0].Children[0].Objects
 
-		assertEqualObjects(&t, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 }
 
-func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
-	t1 := ui.T{T: t}
+func TestAssignmentLineReader2_1Heading2_2_2Zettels(t1 *testing.T) {
+	t := &ui.T{T: t1}
 
 	input := `# wow
 
@@ -346,7 +341,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 
 	{
@@ -356,12 +351,12 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[1].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 }
 
-func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
-	t1 := ui.T{T: t}
+func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t1 *testing.T) {
+	t := &ui.T{T: t1}
 
 	input := `
 - [one/wow] uno
@@ -423,7 +418,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 
 	{
@@ -433,12 +428,12 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[1].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 }
 
-func TestAssignmentLineReaderBigCheese(t *testing.T) {
-	t1 := ui.T{T: t}
+func TestAssignmentLineReaderBigCheese(t1 *testing.T) {
+	t := &ui.T{T: t1}
 
 	input := `# task
 - [one/wow] uno
@@ -485,7 +480,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 
 	// ## priority-1
@@ -522,7 +517,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 
 	// ##
@@ -533,7 +528,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 
 	// ## priority-2
@@ -547,6 +542,6 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[1].Objects
 
-		assertEqualObjects(&t1, expected, actual)
+		assertEqualObjects(t, expected, actual)
 	}
 }
