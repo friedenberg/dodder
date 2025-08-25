@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/keys"
@@ -201,7 +200,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestParentMetadataParentObjectId:
-		if n, err = encoder.writeFieldBlobId(object.Metadata.GetMotherDigest(), true); err != nil {
+		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetMotherDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -213,7 +212,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		if n, err = encoder.writeFieldBlobId(object.Metadata.GetDigest(), false); err != nil {
+		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -323,63 +322,19 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 	return
 }
 
-func (encoder *binaryEncoder) writeFieldBinaryId(
-	blobId merkle.Id,
+func (encoder *binaryEncoder) writeFieldMerkleId(
+	merkleId interfaces.MerkleId,
 	allowNull bool,
 ) (n int64, err error) {
-	if blobId.IsNull() {
+	if merkleId.IsNull() {
 		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(blobId)
+			err = merkle_ids.MakeErrIsNull(merkleId)
 		}
 
 		return
 	}
 
-	var bites []byte
-
-	if bites, err = blobId.MarshalBinary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, bites); err != nil {
-		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-		return
-	}
-
-	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (encoder *binaryEncoder) writeFieldBlobId(
-	blobId interfaces.BlobId,
-	allowNull bool,
-) (n int64, err error) {
-	if !allowNull {
-		if err = merkle_ids.MakeErrIsNull(blobId); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	marshaler := merkle_ids.BlobIdBinaryMarshaler{BlobId: blobId}
-	var bites []byte
-
-	if bites, err = marshaler.MarshalBinary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, bites); err != nil {
-		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-		return
-	}
-
-	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
+	if n, err = encoder.writeFieldBinaryMarshaler(merkleId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
