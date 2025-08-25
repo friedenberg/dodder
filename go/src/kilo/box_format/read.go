@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -272,7 +272,7 @@ LOOP_AFTER_OID:
 			if tag.IsDodderTag() {
 				value := tag.String()
 
-				if strings.HasPrefix(value, repo_signing.HRPRepoPubKeyV1) {
+				if strings.HasPrefix(value, merkle.HRPRepoPubKeyV1) {
 					var pubKey blech32.Value
 
 					if err = pubKey.Set(value); err != nil {
@@ -282,7 +282,7 @@ LOOP_AFTER_OID:
 
 					object.Metadata.RepoPubkey = pubKey.Data
 
-				} else if strings.HasPrefix(value, repo_signing.HRPRepoSigV1) {
+				} else if strings.HasPrefix(value, merkle.HRPRepoSigV1) {
 					var repoSig blech32.Value
 
 					if err = repoSig.Set(value); err != nil {

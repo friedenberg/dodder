@@ -1,4 +1,4 @@
-package repo_signing
+package merkle
 
 type Data []byte
 

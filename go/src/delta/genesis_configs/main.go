@@ -3,7 +3,7 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -14,7 +14,7 @@ import (
 type (
 	Config interface {
 		GetStoreVersion() store_version.Version
-		GetPublicKey() repo_signing.PublicKey
+		GetPublicKey() merkle.PublicKey
 		GetRepoType() repo_type.Type
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeString() string
@@ -29,7 +29,7 @@ type (
 		Config
 		GetGenesisConfigPublic() ConfigPublic
 		GetGenesisConfig() ConfigPrivate
-		GetPrivateKey() repo_signing.PrivateKey
+		GetPrivateKey() merkle.PrivateKey
 	}
 
 	ConfigPrivateMutable interface {
@@ -40,7 +40,7 @@ type (
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type)
 		SetRepoId(ids.RepoId)
-		repo_signing.Generator
+		merkle.Generator
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

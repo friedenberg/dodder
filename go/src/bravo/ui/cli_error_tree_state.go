@@ -156,6 +156,7 @@ func (state *cliTreeState) writeOneChildErrorAndFrame(
 	}
 }
 
+// TODO separate tree transformation from writing
 func (state *cliTreeState) encodeStack() {
 	stackItem := state.stack.getLast()
 	input := stackItem.child

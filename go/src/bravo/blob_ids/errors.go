@@ -9,7 +9,7 @@ import (
 
 var ErrIsNull = errors.New("digest is null")
 
-func MakeErrIsNull(binaryId interfaces.BinaryId) error {
+func MakeErrIsNull(binaryId interfaces.MerkleId) error {
 	if binaryId.IsNull() {
 		return errors.WrapSkip(1, ErrIsNull)
 	}
@@ -18,14 +18,14 @@ func MakeErrIsNull(binaryId interfaces.BinaryId) error {
 }
 
 type ErrNotEqual struct {
-	Expected, Actual interfaces.BinaryId
+	Expected, Actual interfaces.MerkleId
 }
 
 func IsErrNotEqual(err error) bool {
 	return errors.Is(err, ErrNotEqual{})
 }
 
-func MakeErrNotEqual(expected, actual interfaces.BinaryId) (err error) {
+func MakeErrNotEqual(expected, actual interfaces.MerkleId) (err error) {
 	if Equals(expected, actual) {
 		return
 	}

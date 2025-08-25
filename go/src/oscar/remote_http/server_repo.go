@@ -10,10 +10,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -65,12 +66,17 @@ func (server *Server) writeInventoryList(
 		logEntry.EntryType = log_remote_inventory_lists.EntryTypeReceived
 		logEntry.Transacted = listObject
 
-		sig := request.request.Header.Get(headerSha256Sig)
+		var sig blech32.Value
 
-		if err := repo_signing.VerifyBase64Signature(
+		if err := sig.Set(request.request.Header.Get(headerRepoSig)); err != nil {
+			response.Error(err)
+			return
+		}
+
+		if err := merkle.VerifySignature(
 			logEntry.PublicKey,
 			expected.GetBytes(),
-			sig,
+			sig.Data,
 		); err != nil {
 			response.Error(err)
 			return

@@ -2,11 +2,11 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 type TomlUriV0 struct {
-	repo_signing.TomlPublicKeyV0
+	merkle.TomlPublicKeyV0
 	Uri values.Uri `toml:"uri"`
 }
 

@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 )
 
@@ -18,7 +18,7 @@ type RoundTripperUnixSocket struct {
 // TODO add public key
 func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
-	pubkey repo_signing.PublicKey,
+	pubkey merkle.PublicKey,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

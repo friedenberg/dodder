@@ -1,4 +1,4 @@
-package repo_signing
+package merkle
 
 import (
 	"crypto"

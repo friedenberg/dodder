@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -21,8 +21,8 @@ type Field = string_format_writer.Field
 // representations
 type Metadata struct {
 	// Domain
-	RepoPubkey repo_signing.PublicKey
-	RepoSig    repo_signing.BinaryId
+	RepoPubkey merkle.PublicKey
+	RepoSig    merkle.Id
 	// InventoryListTai
 
 	Description descriptions.Description
@@ -33,8 +33,8 @@ type Metadata struct {
 	// TODO switch to blob id
 	Blob sha.Sha
 
-	self   repo_signing.BinaryId
-	mother repo_signing.BinaryId
+	self   merkle.Id
+	mother merkle.Id
 
 	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
 	Tai            ids.Tai
@@ -98,11 +98,11 @@ func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlob
 	return &metadata.mother
 }
 
-func (metadata *Metadata) GetContentSig() interfaces.BinaryId {
+func (metadata *Metadata) GetContentSig() interfaces.MerkleId {
 	return &metadata.RepoSig
 }
 
-func (metadata *Metadata) GetContentSigMutable() interfaces.MutableBinaryId {
+func (metadata *Metadata) GetContentSigMutable() interfaces.MutableMerkleId {
 	return &metadata.RepoSig
 }
 
@@ -277,7 +277,7 @@ func (metadata *Metadata) GenerateExpandedTags() {
 func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
-		HRP:  repo_signing.HRPRepoPubKeyV1,
+		HRP:  merkle.HRPRepoPubKeyV1,
 		Data: metadata.RepoPubkey,
 	}
 }
@@ -285,7 +285,7 @@ func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 func (metadata *Metadata) GetRepoSigValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
-		HRP:  repo_signing.HRPRepoSigV1,
+		HRP:  merkle.HRPRepoSigV1,
 		Data: metadata.RepoSig.GetBytes(),
 	}
 }

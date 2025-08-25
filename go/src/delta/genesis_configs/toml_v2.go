@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -19,12 +19,12 @@ type TomlV2Common struct {
 }
 
 type TomlV2Private struct {
-	repo_signing.TomlPrivateKeyV0
+	merkle.TomlPrivateKeyV0
 	TomlV2Common
 }
 
 type TomlV2Public struct {
-	repo_signing.TomlPublicKeyV0
+	merkle.TomlPublicKeyV0
 	TomlV2Common
 }
 
@@ -64,12 +64,12 @@ func (config *TomlV2Private) GetGenesisConfigPublic() ConfigPublic {
 	}
 }
 
-func (config *TomlV2Private) GetPrivateKey() repo_signing.PrivateKey {
-	return repo_signing.NewKeyFromSeed(config.PrivateKey.Data)
+func (config *TomlV2Private) GetPrivateKey() merkle.PrivateKey {
+	return merkle.NewKeyFromSeed(config.PrivateKey.Data)
 }
 
-func (config *TomlV2Private) GetPublicKey() repo_signing.PublicKey {
-	return repo_signing.PublicKey(
+func (config *TomlV2Private) GetPublicKey() merkle.PublicKey {
+	return merkle.PublicKey(
 		config.GetPrivateKey().Public().(ed25519.PublicKey),
 	)
 }
@@ -78,7 +78,7 @@ func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV2Public) GetPublicKey() repo_signing.PublicKey {
+func (config TomlV2Public) GetPublicKey() merkle.PublicKey {
 	return config.PublicKey.Data
 }
 

@@ -5,24 +5,22 @@ import (
 	"io"
 )
 
-// TODO rename to MerkelId
-
 type (
-	BinaryId interface {
+	MerkleId interface {
 		GetBytes() []byte
 		GetSize() int
 		GetType() string
 		IsNull() bool
 	}
 
-	MutableBinaryId interface {
-		BinaryId
+	MutableMerkleId interface {
+		MerkleId
 		SetBytes([]byte) error
 		Reset()
 	}
 
 	BlobId interface {
-		BinaryId
+		MerkleId
 		BlobIdGetter
 	}
 

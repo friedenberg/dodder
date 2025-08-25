@@ -24,7 +24,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -246,7 +246,7 @@ func (server *Server) addSignatureIfNecessary(
 	var nonce blech32.Value
 
 	if nonce, err = blech32.MakeValueWithExpectedHRP(
-		repo_signing.HRPRequestAuthChallengeV1,
+		merkle.HRPRequestAuthChallengeV1,
 		nonceString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -254,7 +254,7 @@ func (server *Server) addSignatureIfNecessary(
 	}
 
 	pubkey := blech32.Value{
-		HRP:  repo_signing.HRPRepoPubKeyV1,
+		HRP:  merkle.HRPRepoPubKeyV1,
 		Data: server.Repo.GetImmutableConfigPublic().GetPublicKey(),
 	}
 
@@ -263,10 +263,10 @@ func (server *Server) addSignatureIfNecessary(
 	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	sig := blech32.Value{
-		HRP: repo_signing.HRPRequestAuthResponseV1,
+		HRP: merkle.HRPRequestAuthResponseV1,
 	}
 
-	if sig.Data, err = repo_signing.Sign(privateKey, nonce.Data); err != nil {
+	if sig.Data, err = merkle.Sign(privateKey, nonce.Data); err != nil {
 		server.EnvLocal.Cancel(err)
 		return
 	}

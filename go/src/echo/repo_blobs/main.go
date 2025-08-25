@@ -8,14 +8,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
 type Blob interface {
 	GetRepoBlob() Blob
-	GetPublicKey() repo_signing.PublicKey
+	GetPublicKey() merkle.PublicKey
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
 }

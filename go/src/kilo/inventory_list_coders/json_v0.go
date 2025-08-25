@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -93,7 +93,7 @@ func (coder jsonV0) DecodeFrom(
 			return
 		}
 
-		if err = repo_signing.VerifySignature(
+		if err = merkle.VerifySignature(
 			object.Metadata.RepoPubkey,
 			digest.GetBytes(),
 			object.Metadata.RepoSig.GetBytes(),

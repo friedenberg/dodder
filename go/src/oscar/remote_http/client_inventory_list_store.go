@@ -10,11 +10,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -103,11 +104,13 @@ func (client client) ImportInventoryList(
 	}
 
 	{
+		sig := blech32.Value{
+			HRP: merkle.HRPRepoSigV1,
+		}
+
 		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
-		var sig string
-
-		if sig, err = repo_signing.SignBase64(
+		if sig.Data, err = merkle.Sign(
 			key,
 			listSku.GetBlobId().GetBytes(),
 		); err != nil {
@@ -115,7 +118,7 @@ func (client client) ImportInventoryList(
 			return
 		}
 
-		request.Header.Add(headerSha256Sig, sig)
+		request.Header.Add(headerRepoSig, sig.String())
 	}
 
 	// TODO ensure that conflicts were addressed prior to importing

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/keys"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -303,7 +303,7 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 }
 
 func (encoder *binaryEncoder) writeFieldBinaryId(
-	blobId repo_signing.BinaryId,
+	blobId merkle.Id,
 	allowNull bool,
 ) (n int64, err error) {
 	if blobId.IsNull() {

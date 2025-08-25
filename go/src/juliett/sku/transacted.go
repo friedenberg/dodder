@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -291,7 +291,7 @@ func (transacted *Transacted) Sign(
 
 	var bites []byte
 
-	if bites, err = repo_signing.Sign(
+	if bites, err = merkle.Sign(
 		privateKey,
 		transacted.Metadata.GetDigest().GetBytes(),
 	); err != nil {
@@ -335,7 +335,7 @@ func (transacted *Transacted) Verify() (err error) {
 
 	transacted.CalculateObjectDigests()
 
-	if err = repo_signing.VerifySignature(
+	if err = merkle.VerifySignature(
 		transacted.Metadata.RepoPubkey,
 		transacted.Metadata.GetDigestMutable().GetBytes(),
 		transacted.Metadata.RepoSig.GetBytes(),

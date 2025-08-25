@@ -1,4 +1,4 @@
-package repo_signing
+package merkle
 
 const (
 	HRPRepoPubKeyV1           = "dodder-repo-public_key-v1"

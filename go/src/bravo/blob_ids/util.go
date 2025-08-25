@@ -71,7 +71,7 @@ func EqualsReader(
 	return
 }
 
-func Equals(a, b interfaces.BinaryId) bool {
+func Equals(a, b interfaces.MerkleId) bool {
 	return a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 

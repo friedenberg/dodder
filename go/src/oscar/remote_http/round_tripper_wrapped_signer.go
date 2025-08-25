@@ -7,18 +7,18 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 const (
 	headerChallengeNonce    = "X-Dodder-Challenge-Nonce"
 	headerChallengeResponse = "X-Dodder-Challenge-Response"
 	headerRepoPublicKey     = "X-Dodder-Repo-Public_Key"
-	headerSha256Sig         = "X-Dodder-Sha256-Sig"
+	headerRepoSig           = "X-Dodder-Repo-Sig"
 )
 
 type RoundTripperBufioWrappedSigner struct {
-	repo_signing.PublicKey
+	merkle.PublicKey
 	roundTripperBufio
 }
 
@@ -34,7 +34,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	}
 
 	nonce := blech32.Value{
-		HRP:  repo_signing.HRPRequestAuthChallengeV1,
+		HRP:  merkle.HRPRequestAuthChallengeV1,
 		Data: nonceBytes,
 	}
 
@@ -57,7 +57,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var sig blech32.Value
 
 	if sig, err = blech32.MakeValueWithExpectedHRP(
-		repo_signing.HRPRequestAuthResponseV1,
+		merkle.HRPRequestAuthResponseV1,
 		sigString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var pubkey blech32.Value
 
 	if pubkey, err = blech32.MakeValueWithExpectedHRP(
-		repo_signing.HRPRepoPubKeyV1,
+		merkle.HRPRepoPubKeyV1,
 		pubkeyString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -90,7 +90,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		}
 	}
 
-	if err = repo_signing.VerifySignature(
+	if err = merkle.VerifySignature(
 		pubkey.Data,
 		nonceBytes,
 		sig.Data,

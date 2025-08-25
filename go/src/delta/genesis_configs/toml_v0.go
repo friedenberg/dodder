@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/repo_signing"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -61,11 +61,11 @@ func (config V0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (config V0Common) GetPrivateKey() repo_signing.PrivateKey {
+func (config V0Common) GetPrivateKey() merkle.PrivateKey {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config V0Common) GetPublicKey() repo_signing.PublicKey {
+func (config V0Common) GetPublicKey() merkle.PublicKey {
 	panic(errors.Err405MethodNotAllowed)
 }
 
