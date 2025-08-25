@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -73,7 +73,7 @@ func (coder jsonV0) DecodeFrom(
 
 	if object.GetType().String() == ids.TypeInventoryListV2 {
 		digest := sha.MustWithDigester(object.GetTai())
-		defer blob_ids.PutBlobId(digest)
+		defer merkle_ids.PutBlobId(digest)
 
 		if len(object.Metadata.RepoPubkey) == 0 {
 			err = errors.ErrorWithStackf(

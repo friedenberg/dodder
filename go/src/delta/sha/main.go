@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/hecks"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
@@ -106,7 +106,7 @@ func (digest *Sha) GetTail() string {
 
 // TODO remove
 func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
-	return blob_ids.MakeErrNotEqual(digest, b)
+	return merkle_ids.MakeErrNotEqual(digest, b)
 }
 
 // func (digest *Sha) EqualsAny(b any) bool {
@@ -127,7 +127,7 @@ func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
 func (digest *Sha) SetFromHash(h hash.Hash) (err error) {
 	digest.setNonZero()
 	b := h.Sum(digest.data[:0])
-	err = blob_ids.MakeErrLength(ByteSize, len(b))
+	err = merkle_ids.MakeErrLength(ByteSize, len(b))
 	return
 }
 
@@ -155,7 +155,7 @@ func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
 func (digest *Sha) SetBytes(bytess []byte) (err error) {
 	digest.setNonZero()
 
-	err = blob_ids.MakeErrLength(
+	err = merkle_ids.MakeErrLength(
 		ByteSize,
 		copy(digest.data[:], bytess),
 	)
@@ -278,7 +278,7 @@ func (digest *Sha) Set(value string) (err error) {
 
 	bytesWritten := copy(digest.data[:], decodedBytes)
 
-	if err = blob_ids.MakeErrLength(ByteSize, bytesWritten); err != nil {
+	if err = merkle_ids.MakeErrLength(ByteSize, bytesWritten); err != nil {
 		return
 	}
 

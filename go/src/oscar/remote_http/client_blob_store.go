@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -40,7 +40,7 @@ func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 		if request, err = client.newRequest(
 			"HEAD",
 			"/blobs",
-			strings.NewReader(blob_ids.Format(sh.GetBlobId())),
+			strings.NewReader(merkle_ids.Format(sh.GetBlobId())),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -68,7 +68,7 @@ func (client *client) BlobReader(
 
 	if request, err = client.newRequest(
 		"GET",
-		fmt.Sprintf("/blobs/%s", blob_ids.Format(sh.GetBlobId())),
+		fmt.Sprintf("/blobs/%s", merkle_ids.Format(sh.GetBlobId())),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -92,7 +92,7 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		reader = blob_ids.MakeReadCloser(sha.Env{}, response.Body)
+		reader = merkle_ids.MakeReadCloser(sha.Env{}, response.Body)
 	}
 
 	return

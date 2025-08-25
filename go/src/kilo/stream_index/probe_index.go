@@ -3,7 +3,7 @@ package stream_index
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -88,7 +88,7 @@ func (index *probe_index) saveOneLocString(
 	loc object_probe_index.Loc,
 ) (err error) {
 	digest := sha.FromStringContent(str)
-	defer blob_ids.PutBlobId(digest)
+	defer merkle_ids.PutBlobId(digest)
 
 	if err = index.Index.AddSha(digest, loc); err != nil {
 		err = errors.Wrap(err)

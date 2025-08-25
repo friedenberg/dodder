@@ -3,7 +3,7 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -58,7 +58,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 
 	actual := readCloser.GetBlobId()
 
-	if !blob_ids.Equals(actual, digest) {
+	if !merkle_ids.Equals(actual, digest) {
 		err = errors.ErrorWithStackf(
 			"expected sha %s but got %s",
 			digest,

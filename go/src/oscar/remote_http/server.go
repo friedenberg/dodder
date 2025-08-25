@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -567,7 +567,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(blob_ids.Format(result)),
+			strings.NewReader(merkle_ids.Format(result)),
 		)
 
 		return
@@ -603,7 +603,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(blob_ids.Format(result)),
+		strings.NewReader(merkle_ids.Format(result)),
 	)
 
 	return

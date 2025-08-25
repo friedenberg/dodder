@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -352,7 +352,7 @@ func (s *Index) ObjectExists(
 	}
 
 	sh := sha.FromStringContent(objectIdString)
-	defer blob_ids.PutBlobId(sh)
+	defer merkle_ids.PutBlobId(sh)
 
 	if _, err = s.readOneShaLoc(sh); err != nil {
 		err = errors.Wrap(err)
@@ -367,7 +367,7 @@ func (s *Index) ReadOneObjectId(
 	sk *sku.Transacted,
 ) (err error) {
 	sh := sha.FromStringContent(oid.String())
-	defer blob_ids.PutBlobId(sh)
+	defer merkle_ids.PutBlobId(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
 		return
@@ -380,7 +380,7 @@ func (s *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	sh := sha.FromStringContent(id.String())
-	defer blob_ids.PutBlobId(sh)
+	defer merkle_ids.PutBlobId(sh)
 
 	if skus, err = s.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
@@ -401,7 +401,7 @@ func (s *Index) ReadOneObjectIdTai(
 	}
 
 	sh := sha.FromStringContent(k.String() + t.String())
-	defer blob_ids.PutBlobId(sh)
+	defer merkle_ids.PutBlobId(sh)
 
 	sk = sku.GetTransactedPool().Get()
 

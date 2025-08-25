@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -340,7 +340,7 @@ func (arf blobReaderFactory) BlobReader(
 		arf.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
-	readCloser = blob_ids.MakeNopReadCloser(
+	readCloser = merkle_ids.MakeNopReadCloser(
 		sha.Env{},
 		io.NopCloser(strings.NewReader(v)),
 	)

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -942,8 +942,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				sh2 := sha.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
-				defer blob_ids.PutBlobId(sh1)
-				defer blob_ids.PutBlobId(sh2)
+				defer merkle_ids.PutBlobId(sh1)
+				defer merkle_ids.PutBlobId(sh2)
 				_, err = fmt.Fprintln(writer, object.GetObjectId(), sh1, sh2)
 				return
 			}

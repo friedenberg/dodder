@@ -1,4 +1,4 @@
-package blob_ids
+package merkle_ids
 
 import (
 	"bufio"

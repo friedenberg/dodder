@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
@@ -140,7 +140,7 @@ func (cmd BlobStoreWrite) doOne(
 	if cmd.Check {
 		{
 			var repool func()
-			writeCloser, repool = blob_ids.MakeWriterWithRepool(sha.Env{}, nil)
+			writeCloser, repool = merkle_ids.MakeWriterWithRepool(sha.Env{}, nil)
 			defer repool()
 		}
 	} else {

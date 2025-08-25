@@ -18,7 +18,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -252,7 +252,7 @@ func (blobStore *remoteSftp) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.GetBlobId().IsNull() {
-		readCloser = blob_ids.MakeNopReadCloser(
+		readCloser = merkle_ids.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -266,7 +266,7 @@ func (blobStore *remoteSftp) BlobReader(
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobIdGetter: blob_ids.Clone(digest),
+				BlobIdGetter: merkle_ids.Clone(digest),
 				Path:         remotePath,
 			}
 		} else {

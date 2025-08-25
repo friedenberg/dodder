@@ -25,10 +25,9 @@ type (
 	}
 
 	MutableBlobId interface {
+		MutableMerkleId
 		BlobId
 		SetDigest(BlobId) error
-		SetBytes([]byte) error
-		Reset()
 	}
 
 	// TODO design a better pattern for interfaces that have concrete

@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
 var (
-	_ = blob_ids.RegisterEnv(Env{})
+	_ = merkle_ids.RegisterEnv(Env{})
 
 	sha256Hash = pool_value.Make(
 		func() hash.Hash {
@@ -69,7 +69,7 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
-	if err := blob_ids.MakeErrLength(ByteSize, hash.Size()); err != nil {
+	if err := merkle_ids.MakeErrLength(ByteSize, hash.Size()); err != nil {
 		return nil, err
 	}
 
@@ -80,11 +80,11 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 }
 
 func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, interfaces.FuncRepool) {
-	return blob_ids.MakeWriterWithRepool(env, nil)
+	return merkle_ids.MakeWriterWithRepool(env, nil)
 }
 
 func (env Env) MakeWriteDigester() interfaces.WriteBlobIdGetter {
-	return blob_ids.MakeWriter(env, nil)
+	return merkle_ids.MakeWriter(env, nil)
 }
 
 // TODO switch to being functions on Env that return interfaces.Digest

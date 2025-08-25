@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -272,7 +272,7 @@ func (encoder *binaryEncoder) writeSha(
 ) (n int64, err error) {
 	if sh.IsNull() {
 		if !allowNull {
-			err = blob_ids.MakeErrIsNull(sh)
+			err = merkle_ids.MakeErrIsNull(sh)
 		}
 
 		return
@@ -308,7 +308,7 @@ func (encoder *binaryEncoder) writeFieldBinaryId(
 ) (n int64, err error) {
 	if blobId.IsNull() {
 		if !allowNull {
-			err = blob_ids.MakeErrIsNull(blobId)
+			err = merkle_ids.MakeErrIsNull(blobId)
 		}
 
 		return
@@ -340,13 +340,13 @@ func (encoder *binaryEncoder) writeFieldBlobId(
 ) (n int64, err error) {
 	if blobId.IsNull() {
 		if !allowNull {
-			err = blob_ids.MakeErrIsNull(blobId)
+			err = merkle_ids.MakeErrIsNull(blobId)
 		}
 
 		return
 	}
 
-	marshaler := blob_ids.BlobIdBinaryMarshaler{BlobId: blobId}
+	marshaler := merkle_ids.BlobIdBinaryMarshaler{BlobId: blobId}
 	var bites []byte
 
 	if bites, err = marshaler.MarshalBinary(); err != nil {

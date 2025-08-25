@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -50,7 +50,7 @@ func TestBinaryOne(t1 *testing.T) {
 			defer repoolBufferedReader()
 
 			t.AssertNoError(
-				blob_ids.ReadFromInto(
+				merkle_ids.ReadFromInto(
 					bufferedReader,
 					expected.Metadata.GetMotherDigestMutable(),
 				),

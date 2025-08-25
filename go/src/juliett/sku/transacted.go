@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blob_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
@@ -186,7 +186,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 			return
 		}
 
-		defer blob_ids.PutBlobId(actual)
+		defer merkle_ids.PutBlobId(actual)
 
 		if err = digest.SetDigest(actual); err != nil {
 			err = errors.Wrap(err)
@@ -213,7 +213,7 @@ func (transacted *Transacted) makeShaCalcFunc(
 			return
 		}
 
-		defer blob_ids.PutBlobId(actual)
+		defer merkle_ids.PutBlobId(actual)
 
 		if err = sh.SetDigest(actual); err != nil {
 			err = errors.Wrap(err)

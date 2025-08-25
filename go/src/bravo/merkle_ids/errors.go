@@ -1,4 +1,4 @@
-package blob_ids
+package merkle_ids
 
 import (
 	"fmt"
@@ -62,10 +62,10 @@ func MakeErrLength(expected, actual int) error {
 	}
 }
 
-func (e errLength) Error() string {
+func (err errLength) Error() string {
 	return fmt.Sprintf(
 		"expected digest to have length %d, but got %d",
-		e[0],
-		e[1],
+		err[0],
+		err[1],
 	)
 }
