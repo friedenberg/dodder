@@ -153,7 +153,7 @@ func (store *Store) MakeBlobDigestBytesMap() (blobShaBytes map[string][]string, 
 			l.Lock()
 			defer l.Unlock()
 
-			digestBytes := sk.Metadata.Blob.GetBytes()
+			digestBytes := sk.Metadata.GetBlobDigest().GetBytes()
 			oids := blobShaBytes[string(digestBytes)]
 			oid := sk.ObjectId.String()
 			loc, found := slices.BinarySearch(oids, oid)
@@ -164,7 +164,7 @@ func (store *Store) MakeBlobDigestBytesMap() (blobShaBytes map[string][]string, 
 
 			oids = slices.Insert(oids, loc, oid)
 
-			blobShaBytes[string(sk.Metadata.Blob.GetBytes())] = oids
+			blobShaBytes[string(sk.Metadata.GetBlobDigest().GetBytes())] = oids
 
 			return
 		},

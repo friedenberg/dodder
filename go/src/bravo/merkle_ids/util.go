@@ -5,10 +5,59 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/hecks"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
+
+func SetHex(
+	tipe string,
+	dst interfaces.MutableMerkleId,
+	hex string,
+) (err error) {
+	hex = strings.TrimSpace(hex)
+
+	if len(hex) == 0 {
+		return
+	}
+
+	var bytesDecoded int
+
+	if bytesDecoded, err = hecks.Decode(dst.GetBytes(), []byte(hex)); err != nil {
+		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, hex)
+		return
+	}
+
+	return
+}
+
+func SetHexBytes(
+	tipe string,
+	dst interfaces.MutableMerkleId,
+	bites []byte,
+) (err error) {
+	bites = bytes.TrimSpace(bites)
+
+	if len(bites) == 0 {
+		return
+	}
+
+	var bytesDecoded int
+
+	if bytesDecoded, err = hecks.Decode(dst.GetBytes(), bites); err != nil {
+		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, bites)
+		return
+	}
+
+	return
+}
+
+func SetDigester(dst interfaces.MutableMerkleId, src interfaces.BlobIdGetter) {
+	blobId := src.GetBlobId()
+	dst.SetMerkleId(blobId.GetType(), blobId.GetBytes())
+}
 
 func EqualsReader(
 	expectedBlobId interfaces.BlobId,

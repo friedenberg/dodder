@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -308,15 +307,15 @@ func (store *Store) queryUntracked(
 	allRecognized := make([]*fsItemRecognized, 0)
 
 	addRecognizedIfNecessary := func(
-		sk *sku.Transacted,
-		shaBlob *sha.Sha,
+		object *sku.Transacted,
+		digest interfaces.MutableMerkleId,
 		digestCache map[string]interfaces.MutableSetLike[*sku.FSItem],
 	) (item *fsItemRecognized, err error) {
-		if shaBlob.IsNull() {
+		if digest.IsNull() {
 			return
 		}
 
-		key := shaBlob.GetBytes()
+		key := digest.GetBytes()
 		recognized, ok := digestCache[string(key)]
 
 		if !ok {
@@ -325,7 +324,7 @@ func (store *Store) queryUntracked(
 
 		item = &fsItemRecognized{}
 
-		sku.TransactedResetter.ResetWith(&item.Recognized, sk)
+		sku.TransactedResetter.ResetWith(&item.Recognized, object)
 
 		for recognized := range recognized.All() {
 			item.Matching = append(item.Matching, recognized)
@@ -336,12 +335,12 @@ func (store *Store) queryUntracked(
 
 	if err = store.storeSupplies.ReadPrimitiveQuery(
 		nil,
-		func(sk *sku.Transacted) (err error) {
+		func(object *sku.Transacted) (err error) {
 			var recognizedBlob, recognizedObject *fsItemRecognized
 
 			if recognizedBlob, err = addRecognizedIfNecessary(
-				sk,
-				&sk.Metadata.Blob,
+				object,
+				object.Metadata.GetBlobDigestMutable(),
 				definitelyNotCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -349,8 +348,8 @@ func (store *Store) queryUntracked(
 			}
 
 			if recognizedObject, err = addRecognizedIfNecessary(
-				sk,
-				&sk.Metadata.SelfWithoutTai,
+				object,
+				&object.Metadata.SelfWithoutTai,
 				store.probablyCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)

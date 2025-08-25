@@ -5,8 +5,8 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -49,7 +49,7 @@ func (store *Store) MergeCheckedOut(
 		}
 
 		return
-	} else if merkle_ids.Equals(&co.GetSku().Metadata.Blob, &co.GetSkuExternal().Metadata.Blob) {
+	} else if merkle_ids.Equals(co.GetSku().Metadata.GetBlobDigest(), co.GetSkuExternal().Metadata.GetBlobDigest()) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

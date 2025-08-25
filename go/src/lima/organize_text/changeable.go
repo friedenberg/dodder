@@ -53,7 +53,9 @@ func (a *Assignment) addToSet(
 			ot.ObjectFactory.ResetWith(outputObject, organizeObject.sku)
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().Metadata.Type.ResetWith(ot.Metadata.Type)
+				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
+					ot.Metadata.Type,
+				)
 			}
 
 			outputObject.GetSkuExternal().RepoId.ResetWith(ot.Metadata.RepoId)
@@ -63,16 +65,16 @@ func (a *Assignment) addToSet(
 			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
-				outputObject.GetSkuExternal().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSkuExternal().Metadata.Blob,
+				outputObject.GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMerkleId(
+					objectOriginal.GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 
 				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
 					objectOriginal.GetSkuExternal().Metadata.Type,
 				)
 
-				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Blob,
+				outputObject.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMerkleId(
+					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 
 				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Type.ResetWith(
@@ -106,7 +108,9 @@ func (a *Assignment) addToSet(
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().Metadata.Type.ResetWith(ot.Metadata.Type)
+				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
+					ot.Metadata.Type,
+				)
 			}
 		} else {
 			outputObject = previouslyProcessedObject.sku

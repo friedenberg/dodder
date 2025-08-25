@@ -114,7 +114,10 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Blob:
-		if n, err = encoder.writeSha(&object.Metadata.Blob, true); err != nil {
+		if n, err = encoder.writeMerkleId(
+			object.Metadata.GetBlobDigest(),
+			true,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

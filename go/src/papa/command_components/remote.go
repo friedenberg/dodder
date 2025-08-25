@@ -112,7 +112,7 @@ func (cmd Remote) CreateRemoteObject(
 		}
 	}
 
-	remoteObject.Metadata.Blob.ResetWithShaLike(blobSha)
+	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMerkleId(blobSha)
 
 	return
 }

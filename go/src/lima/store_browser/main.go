@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -266,7 +267,7 @@ func (store *Store) QueryCheckedOut(
 
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
-func (store *Store) SaveBlob(e sku.ExternalLike) (err error) {
+func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 	var blobWriter interfaces.WriteCloseBlobIdGetter
 
 	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
@@ -278,7 +279,7 @@ func (store *Store) SaveBlob(e sku.ExternalLike) (err error) {
 
 	var item Item
 
-	if err = item.ReadFromExternal(e.GetSku()); err != nil {
+	if err = item.ReadFromExternal(object.GetSku()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -299,7 +300,10 @@ func (store *Store) SaveBlob(e sku.ExternalLike) (err error) {
 		}
 	}()
 
-	e.GetSku().Metadata.Blob.SetDigester(blobWriter)
+	merkle_ids.SetDigester(
+		object.GetSku().Metadata.GetBlobDigestMutable(),
+		blobWriter,
+	)
 
 	return
 }

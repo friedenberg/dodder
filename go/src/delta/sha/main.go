@@ -137,23 +137,23 @@ func (digest *Sha) SetDigester(src interfaces.BlobIdGetter) (err error) {
 
 // TODO replace
 func (digest *Sha) SetDigest(src interfaces.BlobId) (err error) {
-	if src.GetType() != digest.GetType() {
+	return digest.SetMerkleId(src.GetType(), src.GetBytes())
+}
+
+func (digest *Sha) SetMerkleId(tipe string, bites []byte) (err error) {
+	if tipe != digest.GetType() {
 		err = errors.Errorf(
 			"cannot set digest from type %q, need %q",
-			src.GetType(),
+			tipe,
 			digest.GetType(),
 		)
 
 		return
 	}
 
-	digest.SetBytes(src.GetBytes())
+	digest.SetBytes(bites)
 
 	return
-}
-
-func (digest *Sha) SetMerkleId(tipe string, bites []byte) (err error) {
-	return errors.Err501NotImplemented
 }
 
 func (digest *Sha) SetBytes(bytess []byte) (err error) {

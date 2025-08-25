@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -145,7 +146,11 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = object.Metadata.Blob.Set(json.BlobId); err != nil {
+		if err = merkle_ids.SetHex(
+			"sha256",
+			object.Metadata.GetBlobDigestMutable(),
+			json.BlobId,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
