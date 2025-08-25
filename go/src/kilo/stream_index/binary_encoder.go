@@ -121,7 +121,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case keys.RepoPubKey:
 		if n, err = encoder.writeFieldBinaryMarshaler(
-			&object.Metadata.RepoPubkey,
+			object.Metadata.GetPubKey(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

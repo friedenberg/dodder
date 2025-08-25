@@ -14,15 +14,15 @@ func (resetter) Reset(metadata *Metadata) {
 	metadata.Description.Reset()
 	metadata.Comments = metadata.Comments[:0]
 	metadata.sigRepo.Reset()
-	metadata.RepoPubkey.Reset()
+	metadata.pubRepo.Reset()
 	metadata.ResetTags()
 	ResetterCache.Reset(&metadata.Cache)
 	metadata.Type = ids.Type{}
 	metadata.Tai.Reset()
 	metadata.Blob.Reset()
 	metadata.SelfWithoutTai.Reset()
-	metadata.digestSelf.Reset()
-	metadata.digestMother.Reset()
+	metadata.digSelf.Reset()
+	metadata.digMother.Reset()
 	metadata.Fields = metadata.Fields[:0]
 }
 
@@ -36,17 +36,17 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 
 	dst.sigRepo.ResetWith(&src.sigRepo)
-	dst.RepoPubkey.ResetWith(&src.RepoPubkey)
+	dst.pubRepo.ResetWith(&src.pubRepo)
 
 	dst.Type = src.Type
 	dst.Tai = src.Tai
 
 	dst.Blob.ResetWith(&src.Blob)
-	dst.digestSelf.ResetWith(
-		&src.digestSelf,
+	dst.digSelf.ResetWith(
+		&src.digSelf,
 	)
-	dst.digestMother.ResetWith(
-		&src.digestMother,
+	dst.digMother.ResetWith(
+		&src.digMother,
 	)
 }
 

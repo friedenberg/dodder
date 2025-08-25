@@ -7,27 +7,27 @@ import (
 )
 
 func (metadata *Metadata) GetDigest() interfaces.BlobId {
-	return &metadata.digestSelf
+	return &metadata.digSelf
 }
 
 func (metadata *Metadata) GetDigestMutable() interfaces.MutableGenericBlobId {
-	return &metadata.digestSelf
+	return &metadata.digSelf
 }
 
 func (metadata *Metadata) GetMotherDigest() interfaces.BlobId {
-	return &metadata.digestMother
+	return &metadata.digMother
 }
 
 func (metadata *Metadata) GetMotherDigestMutable() interfaces.MutableGenericBlobId {
-	return &metadata.digestMother
+	return &metadata.digMother
 }
 
 func (metadata *Metadata) GetPubKey() interfaces.MerkleId {
-	return metadata.RepoPubkey
+	return metadata.pubRepo
 }
 
 func (metadata *Metadata) GetPubKeyMutable() interfaces.MutableMerkleId {
-	return &metadata.RepoPubkey
+	return &metadata.pubRepo
 }
 
 func (metadata *Metadata) GetContentSig() interfaces.MerkleId {
@@ -42,7 +42,7 @@ func (metadata *Metadata) GetRepoPubkeyValue() blech32.Value {
 	return blech32.Value{
 		// TODO determine based on object root type
 		HRP:  merkle.HRPRepoPubKeyV1,
-		Data: metadata.RepoPubkey.GetBytes(),
+		Data: metadata.pubRepo.GetBytes(),
 	}
 }
 

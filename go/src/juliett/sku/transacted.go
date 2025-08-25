@@ -317,7 +317,7 @@ func (transacted *Transacted) Sign(
 }
 
 func (transacted *Transacted) Verify() (err error) {
-	if transacted.Metadata.RepoPubkey.IsNull() {
+	if transacted.Metadata.GetPubKey().IsNull() {
 		err = errors.ErrorWithStackf(
 			"RepoPubkey missing for %s. Fields: %#v",
 			String(transacted),
@@ -340,7 +340,7 @@ func (transacted *Transacted) Verify() (err error) {
 	transacted.CalculateObjectDigests()
 
 	if err = merkle.VerifySignature(
-		transacted.Metadata.RepoPubkey.GetBytes(),
+		transacted.Metadata.GetPubKey().GetBytes(),
 		transacted.Metadata.GetDigestMutable().GetBytes(),
 		transacted.Metadata.GetContentSig().GetBytes(),
 	); err != nil {
