@@ -289,12 +289,9 @@ func (store *Store) fetchMotherIfNecessary(
 		return
 	}
 
-	if err = object.Metadata.GetMotherObjectDigestMutable().SetDigest(
+	object.Metadata.GetMotherObjectDigestMutable().ResetWithMerkleId(
 		mother.Metadata.GetObjectDigest(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	return
 }

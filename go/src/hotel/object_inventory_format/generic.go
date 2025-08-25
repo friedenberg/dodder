@@ -268,7 +268,7 @@ func WriteMetadataKeyTo(
 		}
 
 	case keyShasMutterMetadataKennungMutter:
-		n1, err = writeBlobIdKeyIfNotNull(
+		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
 			m.GetMotherObjectDigest(),
@@ -282,7 +282,7 @@ func WriteMetadataKeyTo(
 		}
 
 	case keyShasMutterMetadataKennungMutter:
-		n1, err = writeBlobIdKeyIfNotNull(
+		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
 			m.GetMotherObjectDigest(),
@@ -330,19 +330,19 @@ func WriteMetadataKeyTo(
 	return
 }
 
-func writeBlobIdKeyIfNotNull(
+func writeMerkleIdKeyIfNotNull(
 	w io.Writer,
 	key *catgut.String,
-	blobId interfaces.BlobId,
+	merkleId interfaces.MerkleId,
 ) (n int, err error) {
-	if blobId.IsNull() {
+	if merkleId.IsNull() {
 		return
 	}
 
 	n, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		key.String(),
-		merkle_ids.Format(blobId),
+		merkle_ids.Format(merkleId),
 	)
 	if err != nil {
 		err = errors.Wrap(err)

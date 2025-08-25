@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/keys"
@@ -332,21 +331,17 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.DigestParentMetadataParentObjectId:
-		unmarshaler := merkle_ids.BlobIdBinaryUnmarshaler{
-			MutableGenericBlobId: object.Metadata.GetMotherObjectDigestMutable(),
-		}
-
-		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {
+		if err = object.Metadata.GetMotherObjectDigestMutable().UnmarshalBinary(
+			bf.Content.Bytes(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.DigestMetadataParentObjectId:
-		unmarshaler := merkle_ids.BlobIdBinaryUnmarshaler{
-			MutableGenericBlobId: object.Metadata.GetObjectDigestMutable(),
-		}
-
-		if err = unmarshaler.UnmarshalBinary(bf.Content.Bytes()); err != nil {
+		if err = object.Metadata.GetObjectDigestMutable().UnmarshalBinary(
+			bf.Content.Bytes(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

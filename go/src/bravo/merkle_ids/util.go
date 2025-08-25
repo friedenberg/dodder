@@ -45,6 +45,6 @@ func Clone(src interfaces.BlobId) interfaces.BlobId {
 
 // Creates a human-readable string representation of a digest.
 // TODO add type information
-func Format(digest interfaces.BlobId) string {
-	return fmt.Sprintf("%x", digest.GetBytes())
+func Format(merkleId interfaces.MerkleId) string {
+	return fmt.Sprintf("%x", merkleId.GetBytes())
 }

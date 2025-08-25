@@ -173,7 +173,7 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 func (transacted *Transacted) makeDigestCalcFunc(
 	funkMakeBlobId func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
 	objectFormat object_inventory_format.FormatGeneric,
-	digest interfaces.MutableBlobId,
+	digest interfaces.MutableMerkleId,
 ) errors.FuncErr {
 	return func() (err error) {
 		var actual interfaces.BlobId
@@ -188,10 +188,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 
 		defer merkle_ids.PutBlobId(actual)
 
-		if err = digest.SetDigest(actual); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		digest.ResetWithMerkleId(actual)
 
 		return
 	}
@@ -259,11 +256,14 @@ func (transacted *Transacted) SetDormant(v bool) {
 func (transacted *Transacted) SetObjectFingerPrint(
 	v interfaces.BlobId,
 ) (err error) {
-	return transacted.GetMetadata().GetObjectDigestMutable().SetDigest(v)
+	return transacted.GetMetadata().GetObjectDigestMutable().SetMerkleId(
+		v.GetType(),
+		v.GetBytes(),
+	)
 }
 
 // TODO remove
-func (transacted *Transacted) GetObjectFingerPrint() interfaces.BlobId {
+func (transacted *Transacted) GetObjectFingerPrint() interfaces.MerkleId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 

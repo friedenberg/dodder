@@ -14,19 +14,19 @@ func (metadata *Metadata) GetBlobDigestMutable() interfaces.MutableMerkleId {
 	return &metadata.Blob
 }
 
-func (metadata *Metadata) GetObjectDigest() interfaces.BlobId {
+func (metadata *Metadata) GetObjectDigest() interfaces.MerkleId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableGenericBlobId {
+func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableMerkleId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetMotherObjectDigest() interfaces.BlobId {
+func (metadata *Metadata) GetMotherObjectDigest() interfaces.MerkleId {
 	return &metadata.digMother
 }
 
-func (metadata *Metadata) GetMotherObjectDigestMutable() interfaces.MutableGenericBlobId {
+func (metadata *Metadata) GetMotherObjectDigestMutable() interfaces.MutableMerkleId {
 	return &metadata.digMother
 }
 
