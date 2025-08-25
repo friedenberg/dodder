@@ -273,9 +273,11 @@ func (encoder *binaryEncoder) writeMerkleId(
 	merkleId interfaces.MerkleId,
 	allowNull bool,
 ) (n int64, err error) {
-	if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
-		err = errors.Wrap(err)
-		return
+	if !allowNull {
+		if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if n, err = encoder.writeFieldBinaryMarshaler(
