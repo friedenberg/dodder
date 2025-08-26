@@ -124,7 +124,7 @@ func (readCloser readCloser) Close() (err error) {
 	return
 }
 
-func (readCloser readCloser) GetBlobId() interfaces.MerkleId {
+func (readCloser readCloser) GetBlobId() interfaces.BlobId {
 	digest, err := readCloser.envDigest.MakeDigestFromHash(readCloser.hash)
 	errors.PanicIfError(err)
 	return digest
@@ -154,6 +154,6 @@ func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
 	return io.Copy(writer, readCloser.ReadCloser)
 }
 
-func (readCloser nopReadCloser) GetBlobId() interfaces.MerkleId {
+func (readCloser nopReadCloser) GetBlobId() interfaces.BlobId {
 	return readCloser.envDigest.GetBlobId()
 }

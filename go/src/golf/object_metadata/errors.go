@@ -20,20 +20,20 @@ type ErrBlobFormatterFailed struct {
 	*exec.ExitError
 }
 
-func (e ErrBlobFormatterFailed) Error() string {
+func (err ErrBlobFormatterFailed) Error() string {
 	return fmt.Sprintf(
 		"blob formatter failed (exit status: %d): %q",
-		e.ExitCode(),
-		e.Stderr,
+		err.ExitCode(),
+		err.Stderr,
 	)
 }
 
-func (e ErrBlobFormatterFailed) Is(target error) bool {
+func (err ErrBlobFormatterFailed) Is(target error) bool {
 	_, ok := target.(ErrBlobFormatterFailed)
 	return ok
 }
 
-func (e ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
+func (err ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
 	return false
 }
 
@@ -52,17 +52,17 @@ type ErrHasInlineBlobAndFilePath struct {
 	InlineSha sha.Sha
 }
 
-func (e *ErrHasInlineBlobAndFilePath) Error() string {
+func (err *ErrHasInlineBlobAndFilePath) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
-		e.BlobFD.GetPath(),
-		e.BlobFD.GetDigest(),
-		&e.InlineSha,
+		err.BlobFD.GetPath(),
+		err.BlobFD.GetDigest(),
+		&err.InlineSha,
 	)
 }
 
 func MakeErrHasInlineBlobAndMetadataBlobId(
-	inline, metadata interfaces.MerkleId,
+	inline, metadata interfaces.BlobId,
 ) (err *ErrHasInlineBlobAndMetadataSha) {
 	err = &ErrHasInlineBlobAndMetadataSha{}
 	err.Metadata = merkle_ids.Clone(metadata)
@@ -71,14 +71,14 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 }
 
 type ErrHasInlineBlobAndMetadataSha struct {
-	Inline   interfaces.MerkleId
-	Metadata interfaces.MerkleId
+	Inline   interfaces.BlobId
+	Metadata interfaces.BlobId
 }
 
-func (e *ErrHasInlineBlobAndMetadataSha) Error() string {
+func (err *ErrHasInlineBlobAndMetadataSha) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and metadata blob id: \ninline sha: %s\n metadata sha: %s",
-		merkle_ids.Format(e.Inline),
-		merkle_ids.Format(e.Metadata),
+		merkle_ids.Format(err.Inline),
+		merkle_ids.Format(err.Metadata),
 	)
 }

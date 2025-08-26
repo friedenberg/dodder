@@ -145,7 +145,7 @@ func (blobStore *remoteSftp) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore *remoteSftp) remotePathForMerkleId(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) string {
 	return env_dir.MakeHashBucketPathFromMerkleId(
 		merkleId,
@@ -155,7 +155,7 @@ func (blobStore *remoteSftp) remotePathForMerkleId(
 }
 
 func (blobStore *remoteSftp) HasBlob(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
@@ -183,8 +183,8 @@ func (blobStore *remoteSftp) HasBlob(
 	return
 }
 
-func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
-	return func(yield func(interfaces.MerkleId, error) bool) {
+func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+	return func(yield func(interfaces.BlobId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -250,7 +250,7 @@ func (blobStore *remoteSftp) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore *remoteSftp) BlobReader(
-	digest interfaces.MerkleId,
+	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = merkle_ids.MakeNopReadCloser(
@@ -268,7 +268,7 @@ func (blobStore *remoteSftp) BlobReader(
 		if os.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
 				BlobId: merkle_ids.Clone(digest),
-				Path:     remotePath,
+				Path:   remotePath,
 			}
 		} else {
 			err = errors.Wrap(err)
@@ -427,7 +427,7 @@ func (mover *sftpMover) Close() (err error) {
 	return
 }
 
-func (mover *sftpMover) GetBlobId() interfaces.MerkleId {
+func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 	if mover.writer == nil {
 		// Return empty SHA if no data written
 		return sha.Env{}.GetBlobId()
@@ -599,6 +599,6 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetBlobId() interfaces.MerkleId {
+func (reader *sftpReader) GetBlobId() interfaces.BlobId {
 	return sha.FromHash(reader.hash)
 }

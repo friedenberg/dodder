@@ -170,7 +170,7 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 func (transacted *Transacted) makeDigestCalcFunc(
 	funkMakeBlobId func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
 	objectFormat object_inventory_format.Format,
-	digest interfaces.MutableMerkleId,
+	digest interfaces.MutableBlobId,
 ) errors.FuncErr {
 	return func() (err error) {
 		var actual interfaces.BlobId
@@ -251,7 +251,7 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) GetObjectDigest() interfaces.MerkleId {
+func (transacted *Transacted) GetObjectDigest() interfaces.BlobId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
@@ -260,7 +260,7 @@ func (transacted *Transacted) GetBlobDigest() interfaces.BlobId {
 }
 
 func (transacted *Transacted) SetBlobDigest(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) (err error) {
 	if err = transacted.Metadata.GetBlobDigestMutable().SetMerkleId(
 		merkleId.GetType(),

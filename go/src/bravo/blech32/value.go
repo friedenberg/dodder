@@ -101,7 +101,7 @@ func (value *Value) UnmarshalText(text []byte) (err error) {
 }
 
 func (value Value) WriteToMerkleId(
-	merkleId interfaces.MutableMerkleId,
+	merkleId interfaces.MutableBlobId,
 ) (err error) {
 	if err = merkleId.SetMerkleId(value.HRP, value.Data); err != nil {
 		err = errors.Wrap(err)

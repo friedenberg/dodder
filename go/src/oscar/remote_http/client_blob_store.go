@@ -31,7 +31,7 @@ func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) HasBlob(merkleId interfaces.MerkleId) (ok bool) {
+func (client *client) HasBlob(merkleId interfaces.BlobId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -100,7 +100,7 @@ func (client *client) BlobReader(
 
 func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
-	expected interfaces.MerkleId,
+	expected interfaces.BlobId,
 ) (err error) {
 	var actual sha.Sha
 
@@ -195,7 +195,7 @@ func (client *client) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
+func (client *client) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 	panic(errors.Err501NotImplemented)
 }
 

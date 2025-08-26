@@ -130,7 +130,7 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
-) (blobId interfaces.MerkleId, err error) {
+) (blobId interfaces.BlobId, err error) {
 	var readCloser io.ReadCloser
 
 	if readCloser, err = env_dir.NewFileReader(

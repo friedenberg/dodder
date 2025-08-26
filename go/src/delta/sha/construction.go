@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MustWithMerkleId(merkleId interfaces.MerkleId) *Sha {
+func MustWithMerkleId(merkleId interfaces.BlobId) *Sha {
 	if digest, ok := merkleId.(*Sha); ok {
 		return digest
 	}

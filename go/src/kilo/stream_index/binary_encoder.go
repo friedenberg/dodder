@@ -270,7 +270,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 }
 
 func (encoder *binaryEncoder) writeMerkleId(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 	allowNull bool,
 ) (n int64, err error) {
 	if !allowNull {
@@ -328,7 +328,7 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 }
 
 func (encoder *binaryEncoder) writeFieldMerkleId(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 	allowNull bool,
 ) (n int64, err error) {
 	if merkleId.IsNull() {

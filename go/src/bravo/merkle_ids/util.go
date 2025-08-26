@@ -13,7 +13,7 @@ import (
 
 func SetHexBytes(
 	tipe string,
-	dst interfaces.MutableMerkleId,
+	dst interfaces.MutableBlobId,
 	bites []byte,
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
@@ -39,7 +39,7 @@ func SetHexBytes(
 }
 
 func SetDigester(
-	dst interfaces.MutableMerkleId,
+	dst interfaces.MutableBlobId,
 	src interfaces.BlobIdGetter,
 ) {
 	digest := src.GetBlobId()
@@ -68,11 +68,11 @@ func EqualsReader(
 	return
 }
 
-func Equals(a, b interfaces.MerkleId) bool {
+func Equals(a, b interfaces.BlobId) bool {
 	return a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 
-func Clone(src interfaces.MerkleId) interfaces.BlobId {
+func Clone(src interfaces.BlobId) interfaces.BlobId {
 	env := GetEnv(src.GetType())
 	dst := env.GetBlobId()
 	dst.ResetWithMerkleId(src)
@@ -81,6 +81,6 @@ func Clone(src interfaces.MerkleId) interfaces.BlobId {
 
 // Creates a human-readable string representation of a digest.
 // TODO add type information
-func Format(merkleId interfaces.MerkleId) string {
+func Format(merkleId interfaces.BlobId) string {
 	return fmt.Sprintf("%x", merkleId.GetBytes())
 }

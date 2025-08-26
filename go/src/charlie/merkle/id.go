@@ -100,7 +100,7 @@ func (id *Id) ResetWith(src *Id) {
 	copy(id.data, bites)
 }
 
-func (id *Id) ResetWithMerkleId(src interfaces.MerkleId) {
+func (id *Id) ResetWithMerkleId(src interfaces.BlobId) {
 	errors.PanicIfError(id.SetMerkleId(src.GetType(), src.GetBytes()))
 }
 

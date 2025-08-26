@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	MerkleId interface {
+	BlobId interface {
 		Stringer
 		encoding.BinaryMarshaler
 		GetBytes() []byte
@@ -18,20 +18,17 @@ type (
 		IsNull() bool
 	}
 
-	MutableMerkleId interface {
-		MerkleId
+	MutableBlobId interface {
+		BlobId
 		Setter
 		encoding.BinaryUnmarshaler
 		SetMerkleId(tipe string, bites []byte) error
 		Reset()
-		ResetWithMerkleId(MerkleId)
+		ResetWithMerkleId(BlobId)
 	}
 
-	BlobId        = MerkleId
-	MutableBlobId = MutableMerkleId
-
 	BlobIdGetter interface {
-		GetBlobId() MerkleId
+		GetBlobId() BlobId
 	}
 
 	EnvBlobId interface {

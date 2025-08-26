@@ -34,7 +34,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
-		SetBlobDigest(interfaces.MerkleId) error
+		SetBlobDigest(interfaces.BlobId) error
 	}
 
 	TextFormatOutput struct {

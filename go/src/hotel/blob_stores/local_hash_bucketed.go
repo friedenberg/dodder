@@ -68,7 +68,7 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
@@ -86,8 +86,8 @@ func (blobStore localHashBucketed) HasBlob(
 }
 
 // TODO add support for other bucket sizes and digest types
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
-	return func(yield func(interfaces.MerkleId, error) bool) {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+	return func(yield func(interfaces.BlobId, error) bool) {
 		var digest sha.Sha
 
 		for path, err := range files.DirNamesLevel2(blobStore.basePath) {
@@ -208,7 +208,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		if errors.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
 				BlobId: merkle_ids.Clone(digest),
-				Path:     path,
+				Path:   path,
 			}
 		} else {
 			err = errors.Wrapf(

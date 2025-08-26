@@ -322,7 +322,7 @@ func writeMetadataKeyStringTo(
 func writeMerkleIdKey(
 	w io.Writer,
 	key *catgut.String,
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) (n int, err error) {
 	if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
 		err = errors.Wrap(err)
@@ -345,7 +345,7 @@ func writeMerkleIdKey(
 func writeMerkleIdKeyIfNotNull(
 	w io.Writer,
 	key *catgut.String,
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 ) (n int, err error) {
 	if merkleId.IsNull() {
 		return
@@ -379,7 +379,7 @@ func writeShaKeyIfNotNull(
 func GetDigestForContext(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.MerkleId, err error) {
+) (digest interfaces.BlobId, err error) {
 	m := context.GetMetadata()
 
 	switch format.key {
@@ -405,7 +405,7 @@ func GetDigestForContext(
 func GetDigestForMetadata(
 	format Format,
 	metadata *object_metadata.Metadata,
-) (digest interfaces.MerkleId, err error) {
+) (digest interfaces.BlobId, err error) {
 	return GetDigestForContext(format, nopFormatterContext{metadata})
 }
 
@@ -413,7 +413,7 @@ func WriteMetadata(
 	w io.Writer,
 	f Format,
 	c FormatterContext,
-) (blobDigest interfaces.MerkleId, err error) {
+) (blobDigest interfaces.BlobId, err error) {
 	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, w)
 	defer repool()
 
@@ -431,7 +431,7 @@ func WriteMetadata(
 func getDigestForContext(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.MerkleId, err error) {
+) (digest interfaces.BlobId, err error) {
 	if digest, err = WriteMetadata(nil, format, context); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -443,7 +443,7 @@ func getDigestForContext(
 func GetDigestForContextDebug(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.MerkleId, err error) {
+) (digest interfaces.BlobId, err error) {
 	var sb strings.Builder
 	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, &sb)
 	defer repool()
@@ -463,13 +463,13 @@ func GetDigestForContextDebug(
 
 func GetDigestsForMetadata(
 	metadata *object_metadata.Metadata,
-) (digests map[string]interfaces.MerkleId, err error) {
-	digests = make(map[string]interfaces.MerkleId, len(FormatKeysV5))
+) (digests map[string]interfaces.BlobId, err error) {
+	digests = make(map[string]interfaces.BlobId, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)
 
-		var digest interfaces.MerkleId
+		var digest interfaces.BlobId
 
 		if digest, err = GetDigestForMetadata(f, metadata); err != nil {
 			err = errors.Wrap(err)

@@ -76,7 +76,7 @@ func (digest *Sha) GetType() string {
 	return Type
 }
 
-func (digest *Sha) GetBlobId() interfaces.MerkleId {
+func (digest *Sha) GetBlobId() interfaces.BlobId {
 	return digest
 }
 
@@ -303,7 +303,7 @@ func (digest *Sha) ResetWith(other *Sha) {
 	}
 }
 
-func (digest *Sha) ResetWithMerkleId(src interfaces.MerkleId) {
+func (digest *Sha) ResetWithMerkleId(src interfaces.BlobId) {
 	errors.PanicIfError(digest.SetMerkleId(src.GetType(), src.GetBytes()))
 }
 

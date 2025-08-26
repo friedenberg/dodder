@@ -278,7 +278,7 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.BlobStore,
-	merkleId interfaces.MerkleId,
+	merkleId interfaces.BlobId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that

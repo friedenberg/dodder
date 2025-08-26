@@ -106,7 +106,7 @@ func (writer *writer) Close() (err error) {
 	return
 }
 
-func (writer *writer) GetBlobId() interfaces.MerkleId {
+func (writer *writer) GetBlobId() interfaces.BlobId {
 	digest, err := writer.envDigest.MakeDigestFromHash(writer.hash)
 	errors.PanicIfError(err)
 
