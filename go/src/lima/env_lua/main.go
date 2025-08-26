@@ -115,7 +115,7 @@ func (s *env) LuaRequire(ls *lua.LState) int {
 	var ar interfaces.ReadCloseBlobIdGetter
 
 	if ar, err = s.envRepo.GetDefaultBlobStore().BlobReader(
-		sk.GetBlobId(),
+		sk.GetBlobDigest(),
 	); err != nil {
 		panic(err)
 	}

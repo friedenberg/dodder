@@ -15,13 +15,13 @@ func MetadataShaString(
 	metadata *object_metadata.Metadata,
 	abbr ids.FuncAbbreviateString,
 ) (value string, err error) {
-	s := &metadata.Blob
-	value = s.String()
+	blobDigest := metadata.GetBlobDigest()
+	value = blobDigest.String()
 
 	if abbr != nil {
 		var v1 string
 
-		sh := sha.MustWithDigest(s)
+		sh := sha.MustWithMerkleId(blobDigest)
 
 		if v1, err = abbr(sh); err != nil {
 			err = errors.Wrap(err)

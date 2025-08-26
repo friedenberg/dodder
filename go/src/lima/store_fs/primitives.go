@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -160,7 +161,10 @@ func (store *Store) readOneExternalBlob(
 			return
 		}
 
-		external.GetMetadata().Blob.SetDigester(writeCloser)
+		merkle_ids.SetDigester(
+			external.GetMetadata().GetBlobDigestMutable(),
+			writeCloser,
+		)
 	}
 
 	return

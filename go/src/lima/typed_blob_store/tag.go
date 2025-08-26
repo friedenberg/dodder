@@ -80,7 +80,7 @@ func (store Tag) GetBlob(
 	object *sku.Transacted,
 ) (blobGeneric tag_blobs.Blob, repool interfaces.FuncRepool, err error) {
 	tipe := object.GetType()
-	blobDigest := object.GetBlobId()
+	blobDigest := object.GetBlobDigest()
 
 	switch tipe.String() {
 	case "", ids.TypeTomlTagV0:

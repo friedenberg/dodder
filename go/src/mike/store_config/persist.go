@@ -79,7 +79,7 @@ func (store *store) recompileTypes(
 
 		if commonBlob, _, err = blobStore.Type.ParseTypedBlob(
 			tipe,
-			ct.GetBlobId(),
+			ct.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -177,7 +177,7 @@ func (store *store) loadMutableConfig(
 
 	if err = store.loadMutableConfigBlob(
 		store.config.Sku.GetType(),
-		store.config.Sku.GetBlobId(),
+		store.config.Sku.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

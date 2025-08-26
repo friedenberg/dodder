@@ -32,7 +32,7 @@ func (store *Store) tryNewHook(
 
 	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
-		t.GetBlobId(),
+		t.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -90,7 +90,7 @@ func (store *Store) TryFormatHook(
 
 	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		objectType.GetType(),
-		objectType.GetBlobId(),
+		objectType.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -154,7 +154,7 @@ func (store *Store) tryPreCommitHooks(
 
 	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
-		t.GetBlobId(),
+		t.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

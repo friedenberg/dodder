@@ -46,7 +46,7 @@ func (cmd Fsck) Run(dep command.Request) {
 				return
 			}
 
-			blobSha := sk.GetBlobId()
+			blobSha := sk.GetBlobDigest()
 
 			if localWorkingCopy.GetEnvRepo().GetDefaultBlobStore().HasBlob(blobSha) {
 				return

@@ -232,8 +232,8 @@ func TestReadWithoutBlob(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if !actual.Blob.IsNull() {
-		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
+	if !actual.GetBlobDigest().IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", actual.GetBlobDigest())
 	}
 }
 
@@ -271,8 +271,8 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if !actual.Blob.IsNull() {
-		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
+	if !actual.GetBlobDigest().IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", actual.GetBlobDigest())
 	}
 }
 
@@ -304,7 +304,7 @@ the body`,
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.Blob.ResetWith(expectedSha)
+	expected.GetBlobDigestMutable().ResetWithMerkleId(expectedSha)
 
 	expected.SetTags(makeTagSet(t,
 		"tag1",
@@ -364,16 +364,14 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	blobShaRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var blobSha sha.Sha
+	blobDigestRaw := fmt.Sprintf("%x", hash.Sum(nil))
+	var blobDigest sha.Sha
 
-	if err := blobSha.Set(blobShaRaw); err != nil {
+	if err := blobDigest.Set(blobDigestRaw); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.Blob.SetDigest(&blobSha); err != nil {
-		t.Fatalf("%s", err)
-	}
+	m.GetBlobDigestMutable().ResetWithMerkleId(&blobDigest)
 
 	sb := &strings.Builder{}
 

@@ -71,7 +71,7 @@ func (c Exec) runBash(
 		var ar io.ReadCloser
 
 		if ar, err = u.GetEnvRepo().GetDefaultBlobStore().BlobReader(
-			tz.GetBlobId(),
+			tz.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

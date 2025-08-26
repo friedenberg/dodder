@@ -255,7 +255,7 @@ func (transacted *Transacted) GetObjectDigest() interfaces.MerkleId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
-func (transacted *Transacted) GetBlobId() interfaces.BlobId {
+func (transacted *Transacted) GetBlobDigest() interfaces.BlobId {
 	return &transacted.Metadata.Blob
 }
 

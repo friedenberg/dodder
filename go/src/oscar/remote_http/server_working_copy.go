@@ -140,7 +140,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			return
 		}
 
-		if blobStore.HasBlob(listSku.GetBlobId()) {
+		if blobStore.HasBlob(listSku.GetBlobDigest()) {
 			response.StatusCode = http.StatusFound
 			return
 		}

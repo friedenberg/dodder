@@ -275,7 +275,7 @@ func (blobStore *remoteSftp) BlobReader(
 		return
 	}
 
-	sh1 := sha.MustWithDigest(digest)
+	sh1 := sha.MustWithMerkleId(digest)
 	blobStore.blobCacheLock.Lock()
 	blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
 	blobStore.blobCacheLock.Unlock()
@@ -415,7 +415,7 @@ func (mover *sftpMover) Close() (err error) {
 		}
 	}
 
-	sh1 := sha.MustWithDigest(sh)
+	sh1 := sha.MustWithMerkleId(sh)
 	mover.store.blobCacheLock.Lock()
 	mover.store.blobCache[string(sh1.GetBytes())] = struct{}{}
 	mover.store.blobCacheLock.Unlock()

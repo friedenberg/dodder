@@ -109,10 +109,10 @@ func writeMetadataKeyStringTo(
 
 	switch key {
 	case key_strings_german.Akte, key_strings.Blob:
-		n1, err = writeShaKeyIfNotNull(
+		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			key,
-			&m.Blob,
+			m.GetBlobDigestMutable(),
 		)
 
 		n += int64(n1)
@@ -384,12 +384,12 @@ func GetShaForContext(
 
 	switch f.key {
 	case "Akte", "AkteTyp":
-		if m.Blob.IsNull() {
+		if m.GetBlobDigest().IsNull() {
 			return
 		}
 
 	case "AkteBez":
-		if m.Blob.IsNull() && m.Description.IsEmpty() {
+		if m.GetBlobDigest().IsNull() && m.Description.IsEmpty() {
 			return
 		}
 	}

@@ -165,7 +165,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(
-		merkle_ids.Format(o.GetBlobId()),
+		merkle_ids.Format(o.GetBlobDigest()),
 	)
 
 	ks := o.GetObjectId().String()

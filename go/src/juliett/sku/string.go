@@ -20,7 +20,7 @@ func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
 		o.GetGenre(),
 		o.GetObjectId(),
 		o.GetObjectDigest(),
-		o.GetBlobId(),
+		o.GetBlobDigest(),
 	)
 
 	return
@@ -30,7 +30,7 @@ func StringObjectIdBlobMetadataSansTai(o *Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s",
 		o.GetObjectId(),
-		o.GetBlobId(),
+		o.GetBlobDigest(),
 		StringMetadataSansTai(o),
 	)
 
@@ -61,7 +61,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle_ids.Format(object.GetBlobId()))
+	sb.WriteString(merkle_ids.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 
@@ -121,7 +121,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle_ids.Format(object.GetBlobId()))
+	sb.WriteString(merkle_ids.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 

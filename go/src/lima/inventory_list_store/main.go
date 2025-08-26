@@ -214,7 +214,7 @@ func (store *Store) Create(
 	}
 
 	actual := openList.Mover.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobId())
+	expected := sha.MustWithDigester(object.GetBlobDigest())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
@@ -249,7 +249,7 @@ func (store *Store) WriteInventoryListBlob(
 	list *sku.ListTransacted,
 ) (err error) {
 	if list.Len() == 0 {
-		if !object.GetBlobId().IsNull() {
+		if !object.GetBlobDigest().IsNull() {
 			err = errors.ErrorWithStackf(
 				"inventory list has non-empty blob but passed in list is empty. %q",
 				sku.String(object),
@@ -289,7 +289,7 @@ func (store *Store) WriteInventoryListBlob(
 	}
 
 	actual := writeCloser.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobId())
+	expected := sha.MustWithDigester(object.GetBlobDigest())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
@@ -394,7 +394,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 			}
 
 			iter := store.IterInventoryList(
-				listObject.GetBlobId(),
+				listObject.GetBlobDigest(),
 			)
 
 			for object, iterErr := range iter {
@@ -429,7 +429,7 @@ func (store *Store) ReadAllSkus(
 		}
 
 		iter := store.IterInventoryList(
-			listObject.GetBlobId(),
+			listObject.GetBlobDigest(),
 		)
 
 		for object, iterErr := range iter {

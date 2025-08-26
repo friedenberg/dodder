@@ -1,25 +1,24 @@
 package sha
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MustWithDigest(digest interfaces.BlobId) *Sha {
-	// TODO instead of checking type, check `GetType()` and use GetBytes
-	switch st := digest.(type) {
-	case *Sha:
-		return st
-
-	default:
-		panic(fmt.Sprintf("wrong type: %T", st))
+func MustWithMerkleId(merkleId interfaces.MerkleId) *Sha {
+	if digest, ok := merkleId.(*Sha); ok {
+		return digest
 	}
+
+	digest := poolSha.Get()
+	errors.PanicIfError(
+		digest.SetMerkleId(merkleId.GetType(), merkleId.GetBytes()),
+	)
+	return digest
 }
 
 func MustWithDigester(digester interfaces.BlobIdGetter) *Sha {
-	return MustWithDigest(digester.GetBlobId())
+	return MustWithMerkleId(digester.GetBlobId())
 }
 
 func MustWithString(v string) (sh *Sha) {

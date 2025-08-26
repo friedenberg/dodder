@@ -356,7 +356,7 @@ func (server *Server) readMCPResourceObject(
 
 			if typeBlob, _, err = repo.GetTypedBlobStore().Type.ParseTypedBlob(
 				typeObject.GetType(),
-				typeObject.GetBlobId(),
+				typeObject.GetBlobDigest(),
 			); err != nil {
 				return nil, errors.Wrap(err)
 			}

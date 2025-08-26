@@ -132,7 +132,7 @@ func (cmd Remote) MakeRemote(
 
 		if blob, _, err = typedRepoBlobStore.ReadTypedBlob(
 			object.Metadata.Type,
-			object.GetBlobId(),
+			object.GetBlobDigest(),
 		); err != nil {
 			req.Cancel(err)
 		}

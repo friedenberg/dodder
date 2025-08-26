@@ -87,7 +87,7 @@ func (a Config) FormatTypedBlob(
 	sk := tg.GetSku()
 
 	tipe := sk.GetType()
-	blobSha := sk.GetBlobId()
+	blobSha := sk.GetBlobDigest()
 
 	var store interfaces.SavedBlobFormatter
 	switch tipe.String() {

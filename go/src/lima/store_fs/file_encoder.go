@@ -84,7 +84,7 @@ func (e *fileEncoder) EncodeObject(
 
 	var ar interfaces.ReadCloseBlobIdGetter
 
-	if ar, err = e.envRepo.GetDefaultBlobStore().BlobReader(z.GetBlobId()); err != nil {
+	if ar, err = e.envRepo.GetDefaultBlobStore().BlobReader(z.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

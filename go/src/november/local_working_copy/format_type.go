@@ -66,7 +66,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 				}
 
 				if typeObject == nil || typeObject.ObjectId.IsEmpty() ||
-					typeObject.GetBlobId().IsNull() {
+					typeObject.GetBlobDigest().IsNull() {
 					ty := ""
 
 					switch object.GetGenre() {
@@ -89,7 +89,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if typeBlob, _, err = typeBlobStore.ParseTypedBlob(
 					typeObject.GetType(),
-					typeObject.GetBlobId(),
+					typeObject.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -127,7 +127,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if ta, _, err = typeBlobStore.ParseTypedBlob(
 					tt.GetType(),
-					tt.GetBlobId(),
+					tt.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -188,7 +188,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if blob, _, err = typeBlobStore.ParseTypedBlob(
 					object.GetType(),
-					object.GetBlobId(),
+					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return

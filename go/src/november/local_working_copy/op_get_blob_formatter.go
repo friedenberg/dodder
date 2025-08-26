@@ -36,7 +36,7 @@ func (local *Repo) GetBlobFormatter(
 
 	if typeBlob, _, err = local.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
 		typeObject.GetType(),
-		typeObject.GetBlobId(),
+		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

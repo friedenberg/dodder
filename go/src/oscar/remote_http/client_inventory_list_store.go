@@ -74,7 +74,7 @@ func (client client) ImportInventoryList(
 
 	var listBlobReader io.ReadCloser
 
-	if listBlobReader, err = blobStore.BlobReader(listSku.GetBlobId()); err != nil {
+	if listBlobReader, err = blobStore.BlobReader(listSku.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,7 +112,7 @@ func (client client) ImportInventoryList(
 
 		if sig.Data, err = merkle.Sign(
 			key,
-			listSku.GetBlobId().GetBytes(),
+			listSku.GetBlobDigest().GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

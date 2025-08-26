@@ -204,7 +204,7 @@ func (store Closet) StreamInventoryListBlobSkus(
 	return func(yield func(*sku.Transacted, error) bool) {
 		object := transactedGetter.GetSku()
 		tipe := object.GetType()
-		blobDigest := object.GetBlobId()
+		blobDigest := object.GetBlobDigest()
 
 		var readCloser interfaces.ReadCloseBlobIdGetter
 

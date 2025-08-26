@@ -20,7 +20,7 @@ func (store *Store) MakeLuaVMPoolV1WithSku(
 
 	var readCloser interfaces.ReadCloseBlobIdGetter
 
-	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobId()); err != nil {
+	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().BlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

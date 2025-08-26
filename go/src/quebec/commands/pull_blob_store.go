@@ -66,7 +66,7 @@ func (cmd *PullBlobStore) Run(
 			if err = importer.ImportBlobIfNecessary(object); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					err = nil
-					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", object.GetBlobId())
+					localWorkingCopy.GetUI().Printf("Blob missing from remote: %q", object.GetBlobDigest())
 				} else {
 					err = errors.Wrap(err)
 				}

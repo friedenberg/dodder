@@ -299,7 +299,7 @@ func VerifyBlob(
 		return
 	}
 
-	expected := sha.MustWithDigest(sh)
+	expected := sha.MustWithMerkleId(sh)
 
 	if err = expected.AssertEqualsShaLike(readCloser.GetBlobId()); err != nil {
 		err = errors.Wrap(err)
