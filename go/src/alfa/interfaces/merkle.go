@@ -36,7 +36,6 @@ type (
 
 		GetHash() (hash.Hash, FuncRepool)
 
-		// TODO rename
 		GetBlobId() MutableBlobId
 		PutBlobId(BlobId)
 

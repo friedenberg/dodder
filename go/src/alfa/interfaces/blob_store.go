@@ -25,7 +25,7 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(MerkleId) (ReadCloseBlobIdGetter, error)
+		BlobReader(BlobId) (ReadCloseBlobIdGetter, error)
 	}
 
 	BlobWriter interface {
@@ -45,10 +45,10 @@ type (
 	BlobStore interface {
 		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string
-		HasBlob(MerkleId) bool
+		HasBlob(BlobId) bool
 		BlobReader
 		BlobWriter
-		AllBlobs() SeqError[MerkleId]
+		AllBlobs() SeqError[BlobId]
 		GetBlobIOWrapper() BlobIOWrapper
 		Mover() (Mover, error)
 	}
