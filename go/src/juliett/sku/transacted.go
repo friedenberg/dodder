@@ -255,12 +255,8 @@ func (transacted *Transacted) GetObjectDigest() interfaces.MerkleId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
-// func (transacted *Transacted) GetBlobDigest() interfaces.MerkleId {
-// 	return transacted.Metadata.GetBlobDigest()
-// }
-
 func (transacted *Transacted) GetBlobDigest() interfaces.BlobId {
-	return &transacted.Metadata.Blob
+	return transacted.Metadata.GetBlobDigest()
 }
 
 func (transacted *Transacted) SetBlobDigest(

@@ -30,12 +30,6 @@ type (
 	BlobId        = MerkleId
 	MutableBlobId = MutableMerkleId
 
-	// TODO design a better pattern for interfaces that have concrete
-	// implementations and polymorphic implementations
-	MutableGenericBlobId interface {
-		MutableBlobId
-	}
-
 	BlobIdGetter interface {
 		GetBlobId() MerkleId
 	}

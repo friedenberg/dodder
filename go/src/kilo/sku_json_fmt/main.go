@@ -38,7 +38,9 @@ func (json *Transacted) FromStringAndMetadata(
 	if blobStore != nil {
 		var readCloser interfaces.ReadCloseBlobIdGetter
 
-		if readCloser, err = blobStore.BlobReader(&metadata.Blob); err != nil {
+		if readCloser, err = blobStore.BlobReader(
+			metadata.GetBlobDigest(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -55,7 +57,7 @@ func (json *Transacted) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = metadata.Blob.String()
+	json.BlobId = merkle_ids.Format(metadata.GetBlobDigest())
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.ObjectId = objectId

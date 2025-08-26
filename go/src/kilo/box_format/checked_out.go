@@ -230,19 +230,19 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 
 func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	options options_print.Options,
-	sk *sku.Transacted,
+	object *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
 ) (err error) {
-	m := sk.GetMetadata()
+	metadata := object.GetMetadata()
 
 	if options.PrintShas &&
-		(options.BoxPrintEmptyShas || !m.Blob.IsNull()) {
+		(options.BoxPrintEmptyShas || !metadata.GetBlobDigest().IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
-			m,
+			metadata,
 			format.abbr.Sha.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -255,37 +255,37 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		)
 	}
 
-	if options.BoxPrintTai && sk.GetGenre() != genres.InventoryList {
+	if options.BoxPrintTai && object.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldTai(m),
+			object_metadata_fmt.MetadataFieldTai(metadata),
 		)
 	}
 
-	if !m.Type.IsEmpty() {
+	if !metadata.Type.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldType(m),
+			object_metadata_fmt.MetadataFieldType(metadata),
 		)
 	}
 
-	b := m.Description
+	b := metadata.Description
 
 	if includeDescriptionInBox && !b.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldDescription(m),
+			object_metadata_fmt.MetadataFieldDescription(metadata),
 		)
 	}
 
 	box.Contents = append(
 		box.Contents,
-		object_metadata_fmt.MetadataFieldTags(m)...,
+		object_metadata_fmt.MetadataFieldTags(metadata)...,
 	)
 
 	if !options.BoxExcludeFields &&
 		(item == nil || item.FDs.Len() == 0) {
-		box.Contents = append(box.Contents, m.Fields...)
+		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 
 	return

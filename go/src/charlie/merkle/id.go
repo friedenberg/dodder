@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	_ interfaces.MutableGenericBlobId = &Id{}
-	_ encoding.TextMarshaler          = Id{}
-	_ encoding.TextUnmarshaler        = &Id{}
+	_ encoding.TextMarshaler   = Id{}
+	_ encoding.TextUnmarshaler = &Id{}
 )
 
 type Id struct {
