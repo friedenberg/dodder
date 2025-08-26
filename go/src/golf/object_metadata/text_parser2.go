@@ -18,17 +18,17 @@ type textParser2 struct {
 	Blob fd.FD
 }
 
-func (f *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
-	m := f.GetMetadata()
+func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
+	m := parser.GetMetadata()
 	Resetter.Reset(m)
 
-	dr := delim_reader.MakeDelimReader('\n', r)
-	defer delim_reader.PutDelimReader(dr)
+	delimReader := delim_reader.MakeDelimReader('\n', r)
+	defer delim_reader.PutDelimReader(delimReader)
 
 	for {
 		var line string
 
-		line, err = dr.ReadOneString()
+		line, err = delimReader.ReadOneString()
 
 		if err == io.EOF {
 			err = nil
@@ -57,14 +57,20 @@ func (f *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 			m.AddTagString(remainder)
 
 		case '!':
-			err = f.readTyp(m, remainder)
+			err = parser.readTyp(m, remainder)
 
 		default:
 			err = errors.ErrorWithStackf("unsupported entry: %q", line)
 		}
 
 		if err != nil {
-			err = errors.Wrapf(err, "Line: %q, Key: %q, Value: %q", line, key, remainder)
+			err = errors.Wrapf(
+				err,
+				"Line: %q, Key: %q, Value: %q",
+				line,
+				key,
+				remainder,
+			)
 			return
 		}
 	}
@@ -72,7 +78,7 @@ func (f *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (f *textParser2) readTyp(
+func (parser *textParser2) readTyp(
 	m *Metadata,
 	desc string,
 ) (err error) {
@@ -91,14 +97,14 @@ func (f *textParser2) readTyp(
 			return
 		}
 
-		if err = f.Blob.SetWithBlobWriterFactory(desc, f.BlobWriter); err != nil {
+		if err = parser.Blob.SetWithBlobWriterFactory(desc, parser.BlobWriter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	//! <sha>.<typ ext>
 	case tail != "":
-		if err = f.setBlobSha(m, head); err != nil {
+		if err = parser.setBlobSha(m, head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -110,7 +116,7 @@ func (f *textParser2) readTyp(
 
 	//! <sha>
 	case tail == "":
-		if err = f.setBlobSha(m, head); err == nil {
+		if err = parser.setBlobSha(m, head); err == nil {
 			return
 		}
 
@@ -129,7 +135,7 @@ func (f *textParser2) readTyp(
 	return
 }
 
-func (f *textParser2) setBlobSha(
+func (parser *textParser2) setBlobSha(
 	m *Metadata,
 	maybeSha string,
 ) (err error) {

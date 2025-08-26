@@ -35,7 +35,7 @@ type DelimReader interface {
 
 type delimReader struct {
 	delim byte
-	*bufio.Reader
+	bufio.Reader
 	n         int64
 	lastReadN int
 	segments  int64
@@ -44,113 +44,108 @@ type delimReader struct {
 
 func MakeDelimReader(
 	delim byte,
-	r io.Reader,
-) (dr *delimReader) {
-	dr = delimReaderPool.Get()
-	dr.Reader.Reset(r)
-	dr.delim = delim
+	ioReader io.Reader,
+) (reader *delimReader) {
+	reader = delimReaderPool.Get()
+	reader.Reader.Reset(ioReader)
+	reader.delim = delim
 
 	return
 }
 
-func (lr *delimReader) N() int64 {
-	return lr.n
+func (reader *delimReader) N() int64 {
+	return reader.n
 }
 
-func (lr *delimReader) Segments() int64 {
-	return lr.segments
+func (reader *delimReader) Segments() int64 {
+	return reader.segments
 }
 
-func (lr *delimReader) IsEOF() bool {
-	return lr.eof
+func (reader *delimReader) IsEOF() bool {
+	return reader.eof
 }
 
-func (lr *delimReader) ResetWith(dr delimReader) {
-	lr.Reader.Reset(nil)
-	lr.delim = dr.delim
+func (reader *delimReader) ResetWith(dr delimReader) {
+	reader.Reader.Reset(nil)
+	reader.delim = dr.delim
 }
 
-func (lr *delimReader) Reset() {
-	if lr.Reader == nil {
-		lr.Reader = bufio.NewReader(nil)
-	} else {
-		lr.Reader.Reset(nil)
-	}
-
-	lr.n = 0
-	lr.lastReadN = 0
-	lr.segments = 0
-	lr.eof = false
+func (reader *delimReader) Reset() {
+	reader.Reader.Reset(nil)
+	reader.n = 0
+	reader.lastReadN = 0
+	reader.segments = 0
+	reader.eof = false
 }
 
-func (lr *delimReader) ReadOneBytes() (str []byte, err error) {
-	if lr.eof {
+func (reader *delimReader) ReadOneBytes() (str []byte, err error) {
+	if reader.eof {
 		err = io.EOF
 		return
 	}
 
 	var rawLine []byte
 
-	rawLine, err = lr.Reader.ReadSlice(lr.delim)
-	lr.lastReadN = len(rawLine)
-	lr.n += int64(lr.lastReadN)
+	rawLine, err = reader.Reader.ReadSlice(reader.delim)
+	reader.lastReadN = len(rawLine)
+	reader.n += int64(reader.lastReadN)
 
 	if err == io.EOF {
-		lr.eof = true
+		reader.eof = true
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	str = bytes.TrimSuffix(rawLine, []byte{lr.delim})
+	str = bytes.TrimSuffix(rawLine, []byte{reader.delim})
 
-	lr.segments++
+	reader.segments++
 
 	return
 }
 
 // Not safe for parallel use
-func (lr *delimReader) ReadOneString() (str string, err error) {
-	if lr.eof {
+func (reader *delimReader) ReadOneString() (str string, err error) {
+	if reader.eof {
 		err = io.EOF
 		return
 	}
 
 	var rawLine string
 
-	rawLine, err = lr.Reader.ReadString(lr.delim)
-	lr.lastReadN = len(rawLine)
-	lr.n += int64(lr.lastReadN)
+	rawLine, err = reader.Reader.ReadString(reader.delim)
+	reader.lastReadN = len(rawLine)
+	reader.n += int64(reader.lastReadN)
 
 	if err == io.EOF {
-		lr.eof = true
+		reader.eof = true
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	str = strings.TrimSuffix(rawLine, string([]byte{lr.delim}))
+	str = strings.TrimSuffix(rawLine, string([]byte{reader.delim}))
 
-	lr.segments++
+	reader.segments++
 
 	return
 }
 
 // Not safe for parallel use
-func (lr *delimReader) ReadOneKeyValue(
+func (reader *delimReader) ReadOneKeyValue(
 	sep string,
 ) (key, val string, err error) {
-	if lr.eof {
+	if reader.eof {
 		err = io.EOF
 		return
 	}
 
-	str, err := lr.ReadOneString()
+	str, err := reader.ReadOneString()
 	if err != nil {
 		if err == io.EOF {
-			lr.eof = true
+			reader.eof = true
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -175,18 +170,18 @@ func (lr *delimReader) ReadOneKeyValue(
 	return
 }
 
-func (lr *delimReader) ReadOneKeyValueBytes(
+func (reader *delimReader) ReadOneKeyValueBytes(
 	sep byte,
 ) (key, val []byte, err error) {
-	if lr.eof {
+	if reader.eof {
 		err = io.EOF
 		return
 	}
 
-	str, err := lr.ReadOneBytes()
+	str, err := reader.ReadOneBytes()
 	if err != nil {
 		if err == io.EOF {
-			lr.eof = true
+			reader.eof = true
 		} else {
 			err = errors.Wrap(err)
 		}
