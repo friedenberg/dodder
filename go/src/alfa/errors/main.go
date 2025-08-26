@@ -36,12 +36,12 @@ func PanicIfError(err any) {
 		return
 	}
 
-	switch t := err.(type) {
+	switch errOrFunk := err.(type) {
 	case func() error:
-		PanicIfError(t())
+		PanicIfError(errOrFunk())
 
 	case error:
-		panic(t)
+		panic(WrapSkip(1, errOrFunk))
 	}
 }
 

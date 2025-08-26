@@ -140,12 +140,19 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 					ctx.cancel(err)
 				}
 
-			case runtime.Error:
-				ctx.captureCancelStackFramesIfNecessary(2, err)
-				ctx.cancel(err)
-
 			case error:
-				ctx.cancel(err)
+				var runtimeError runtime.Error
+				var stackFrameError *stack_frame.ErrorTree
+
+				if As(err, &runtimeError) {
+					ctx.captureCancelStackFramesIfNecessary(2, err)
+					ctx.cancel(err)
+				} else if As(err, &stackFrameError) {
+					ctx.captureCancelStackFramesIfNecessary(2, err)
+					ctx.cancel(err)
+				} else {
+					ctx.cancel(err)
+				}
 
 			default:
 				ctx.captureCancelStackFramesIfNecessary(2, nil)

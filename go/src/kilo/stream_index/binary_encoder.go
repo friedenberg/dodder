@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
+	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -100,7 +100,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 	object skuWithSigil,
 ) (n int64, err error) {
 	switch encoder.Binary {
-	case keys.Sigil:
+	case key_bytes.Sigil:
 		s := object.Sigil
 		s.Add(encoder.Sigil)
 
@@ -113,7 +113,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.Blob:
+	case key_bytes.Blob:
 		if n, err = encoder.writeMerkleId(
 			object.Metadata.GetBlobDigest(),
 			true,
@@ -122,7 +122,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.RepoPubKey:
+	case key_bytes.RepoPubKey:
 		if n, err = encoder.writeFieldBinaryMarshaler(
 			object.Metadata.GetRepoPubKey(),
 		); err != nil {
@@ -130,7 +130,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.RepoSig:
+	case key_bytes.RepoSig:
 		merkleId := object.Metadata.GetObjectSig()
 
 		if n, err = encoder.writeMerkleId(
@@ -141,7 +141,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.Description:
+	case key_bytes.Description:
 		if object.Metadata.Description.IsEmpty() {
 			return
 		}
@@ -151,13 +151,13 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.CacheParentTai:
+	case key_bytes.CacheParentTai:
 		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Cache.ParentTai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Tag:
+	case key_bytes.Tag:
 		es := object.GetTags()
 
 		for _, e := range quiter.SortedValues(es) {
@@ -180,19 +180,19 @@ func (encoder *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case keys.ObjectId:
+	case key_bytes.ObjectId:
 		if n, err = encoder.writeFieldWriterTo(&object.ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Tai:
+	case key_bytes.Tai:
 		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Tai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Type:
+	case key_bytes.Type:
 		if object.Metadata.Type.IsEmpty() {
 			return
 		}
@@ -202,25 +202,25 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.DigestParentMetadataParentObjectId:
+	case key_bytes.SigParentMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetMotherObjectDigest(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.DigestMetadataWithoutTai:
+	case key_bytes.DigestMetadataWithoutTai:
 		if n, err = encoder.writeSha(&object.Metadata.SelfWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.DigestMetadataParentObjectId:
+	case key_bytes.DigestMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetObjectDigest(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.CacheTagImplicit:
+	case key_bytes.CacheTagImplicit:
 		tags := object.Metadata.Cache.GetImplicitTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
@@ -234,7 +234,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case keys.CacheTagExpanded:
+	case key_bytes.CacheTagExpanded:
 		tags := object.Metadata.Cache.GetExpandedTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
@@ -248,7 +248,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case keys.CacheTags:
+	case key_bytes.CacheTags:
 		tags := object.Metadata.Cache.TagPaths
 
 		for _, tag := range tags.Paths {

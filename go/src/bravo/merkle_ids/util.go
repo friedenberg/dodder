@@ -3,35 +3,13 @@ package merkle_ids
 import (
 	"bufio"
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/hecks"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
-
-func SetHex(
-	tipe string,
-	dst interfaces.MutableMerkleId,
-	hex string,
-) (err error) {
-	hex = strings.TrimSpace(hex)
-
-	if len(hex) == 0 {
-		return
-	}
-
-	var bytesDecoded int
-
-	if bytesDecoded, err = hecks.Decode(dst.GetBytes(), []byte(hex)); err != nil {
-		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, hex)
-		return
-	}
-
-	return
-}
 
 func SetHexBytes(
 	tipe string,
@@ -44,10 +22,16 @@ func SetHexBytes(
 		return
 	}
 
-	var bytesDecoded int
+	var numberOfBytesDecoded int
+	bytesDecoded := make([]byte, hex.DecodedLen(len(bites)))
 
-	if bytesDecoded, err = hecks.Decode(dst.GetBytes(), bites); err != nil {
-		err = errors.Wrapf(err, "N: %d, Data: %q", bytesDecoded, bites)
+	if numberOfBytesDecoded, err = hex.Decode(bytesDecoded, bites); err != nil {
+		err = errors.Wrapf(err, "N: %d, Data: %q", numberOfBytesDecoded, bites)
+		return
+	}
+
+	if err = dst.SetMerkleId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

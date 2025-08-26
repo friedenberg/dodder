@@ -10,7 +10,7 @@ import (
 )
 
 func String(object *Transacted) (str string) {
-	return StringMetadataTai(object)
+	return StringMetadataTaiMerkle(object)
 }
 
 func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
@@ -19,7 +19,7 @@ func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
 		o.GetTai(),
 		o.GetGenre(),
 		o.GetObjectId(),
-		o.GetObjectFingerPrint(),
+		o.GetObjectDigest(),
 		o.GetBlobId(),
 	)
 
@@ -37,7 +37,7 @@ func StringObjectIdBlobMetadataSansTai(o *Transacted) (str string) {
 	return
 }
 
-func StringMetadataTai(object *Transacted) (str string) {
+func StringMetadataTaiMerkle(object *Transacted) (str string) {
 	tai := object.GetTai()
 	taiFormatted := ids.MakeTaiRFC3339Value(tai)
 
@@ -45,7 +45,7 @@ func StringMetadataTai(object *Transacted) (str string) {
 		"%s (%s) %s",
 		tai,
 		taiFormatted,
-		StringMetadataSansTai(object),
+		StringMetadataSansTaiMerkle(object),
 	)
 }
 
@@ -99,6 +99,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	return sb.String()
 }
 
+// TODO switch to using fmt.Fprintf for panic recovery
 func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb := &strings.Builder{}
 
@@ -111,10 +112,13 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(object.Metadata.GetRepoPubKey().String())
+	fmt.Fprintf(sb, "%s", object.Metadata.GetRepoPubKey())
 
 	sb.WriteString(" ")
-	sb.WriteString(object.Metadata.GetObjectSig().String())
+	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectSig())
+
+	sb.WriteString(" ")
+	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
 
 	sb.WriteString(" ")
 	sb.WriteString(merkle_ids.Format(object.GetBlobId()))

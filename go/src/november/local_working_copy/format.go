@@ -20,7 +20,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -434,32 +433,6 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"object": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			format, err := object_inventory_format.FormatForKeyError(
-				object_inventory_format.KeyFormatV6MetadataObjectIdParent,
-			)
-			if err != nil {
-				errors.ContextCancelWithBadRequestError(repo, err)
-			}
-
-			return func(object *sku.Transacted) (err error) {
-				if _, err = object_inventory_format.WriteMetadata(
-					writer,
-					format,
-					object,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			}
-		},
-	},
 	"object-id-parent-tai": {
 		FormatFuncConstructor: func(
 			repo *Repo,
@@ -490,7 +463,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					"%s@%s\n",
 					&object.ObjectId,
-					object.GetObjectFingerPrint(),
+					object.GetObjectDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -585,44 +558,6 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					sku_fmt.StringMetadataSansTai(object),
 				)
-				return
-			}
-		},
-	},
-	"metadata": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			fo, err := object_inventory_format.FormatForKeyError(
-				object_inventory_format.KeyFormatV5Metadata,
-			)
-			if err != nil {
-				repo.Cancel(err)
-				return nil
-			}
-
-			return func(object *sku.Transacted) (err error) {
-				_, err = fo.WriteMetadataTo(writer, object)
-				return
-			}
-		},
-	},
-	"metadata-plus-mutter": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			fo, err := object_inventory_format.FormatForKeyError(
-				object_inventory_format.KeyFormatV5MetadataObjectIdParent,
-			)
-			if err != nil {
-				repo.Cancel(err)
-				return nil
-			}
-
-			return func(object *sku.Transacted) (err error) {
-				_, err = fo.WriteMetadataTo(writer, object)
 				return
 			}
 		},
@@ -1182,7 +1117,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(
 					writer,
-					sku.StringMetadataTai(object),
+					sku.StringMetadataTaiMerkle(object),
 				)
 				return
 			}

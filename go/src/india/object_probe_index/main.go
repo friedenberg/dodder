@@ -161,7 +161,7 @@ func (index *object_probe_index) ReadOneKey(
 	kf string,
 	m *object_metadata.Metadata,
 ) (loc Loc, err error) {
-	var f object_inventory_format.FormatGeneric
+	var f object_inventory_format.Format
 
 	if f, err = object_inventory_format.FormatForKeyError(kf); err != nil {
 		err = errors.Wrap(err)
@@ -190,7 +190,7 @@ func (index *object_probe_index) ReadManyKeys(
 	m *object_metadata.Metadata,
 	h *[]Loc,
 ) (err error) {
-	var f object_inventory_format.FormatGeneric
+	var f object_inventory_format.Format
 
 	if f, err = object_inventory_format.FormatForKeyError(kf); err != nil {
 		err = errors.Wrap(err)

@@ -199,6 +199,7 @@ LOOP_AFTER_OID:
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
 			if err = merkle_ids.SetHexBytes(
 				"sha256",
+				// merkle.HRPObjectBlobDigestSha256V1,
 				object.Metadata.GetBlobDigestMutable(),
 				seq.At(1).Contents,
 			); err != nil {
@@ -284,7 +285,7 @@ LOOP_AFTER_OID:
 					}
 
 					if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
-						"ed25519",
+						merkle.HRPRepoPubKeyV1,
 						pubKey.Data,
 					); err != nil {
 						err = errors.Wrap(err)

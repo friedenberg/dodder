@@ -250,8 +250,6 @@ function init_with_json_inventory_list_type { # @test
 		-inventory_list-type inventory_list-json-v0 \
 		test-repo-id
 
-	# TODO add assertion about json type
-
 	assert_success
 	assert_output - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]

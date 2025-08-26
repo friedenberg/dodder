@@ -7,30 +7,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
+	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
-
-var binaryFieldOrder = []keys.Binary{
-	keys.Sigil,
-	keys.ObjectId,
-	keys.Blob,
-	keys.RepoPubKey,
-	keys.RepoSig,
-	keys.Description,
-	keys.Tag,
-	keys.Tai,
-	keys.Type,
-	keys.DigestParentMetadataParentObjectId,
-	keys.DigestMetadataParentObjectId,
-	keys.DigestMetadataWithoutTai,
-	keys.CacheParentTai,
-	keys.CacheTagImplicit,
-	keys.CacheTagExpanded,
-	keys.CacheTags,
-}
 
 func makeBinary(s ids.Sigil) binaryDecoder {
 	return binaryDecoder{
@@ -246,7 +227,7 @@ func (bf *binaryDecoder) readSigil(
 		return
 	}
 
-	if bf.Binary != keys.Sigil {
+	if bf.Binary != key_bytes.Sigil {
 		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Binary)
 		return
 	}
@@ -265,7 +246,7 @@ func (bf *binaryDecoder) readFieldKey(
 	object *sku.Transacted,
 ) (err error) {
 	switch bf.Binary {
-	case keys.Blob:
+	case key_bytes.Blob:
 		if err = object.Metadata.GetBlobDigestMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
@@ -273,7 +254,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.RepoPubKey:
+	case key_bytes.RepoPubKey:
 		if err = object.Metadata.GetPubKeyMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
@@ -281,7 +262,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.RepoSig:
+	case key_bytes.RepoSig:
 		if err = object.Metadata.GetObjectSigMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
@@ -289,13 +270,13 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.Description:
+	case key_bytes.Description:
 		if err = object.Metadata.Description.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Tag:
+	case key_bytes.Tag:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -308,31 +289,31 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.ObjectId:
+	case key_bytes.ObjectId:
 		if _, err = object.ObjectId.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Tai:
+	case key_bytes.Tai:
 		if _, err = object.Metadata.Tai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.CacheParentTai:
+	case key_bytes.CacheParentTai:
 		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.Type:
+	case key_bytes.Type:
 		if err = object.Metadata.Type.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case keys.DigestParentMetadataParentObjectId:
+	case key_bytes.SigParentMetadataParentObjectId:
 		if err = object.Metadata.GetMotherObjectDigestMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
@@ -340,7 +321,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.DigestMetadataParentObjectId:
+	case key_bytes.DigestMetadataParentObjectId:
 		if err = object.Metadata.GetObjectDigestMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
@@ -348,7 +329,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.DigestMetadataWithoutTai:
+	case key_bytes.DigestMetadataWithoutTai:
 		if _, err = object.Metadata.SelfWithoutTai.ReadFrom(
 			&bf.Content,
 		); err != nil {
@@ -356,7 +337,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.CacheTagImplicit:
+	case key_bytes.CacheTagImplicit:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -369,7 +350,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.CacheTagExpanded:
+	case key_bytes.CacheTagExpanded:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -382,7 +363,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.CacheTags:
+	case key_bytes.CacheTags:
 		var e tag_paths.PathWithType
 
 		if _, err = e.ReadFrom(&bf.Content); err != nil {

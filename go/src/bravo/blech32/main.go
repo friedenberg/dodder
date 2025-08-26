@@ -29,9 +29,14 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-var charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+var (
+	charsetString = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+	charset       = []byte(charsetString)
+)
 
 var generator = []uint32{
 	0x3b6a57b2,
@@ -127,7 +132,7 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 		return nil, err
 	}
 	if len(hrp) < 1 {
-		return nil, fmt.Errorf("invalid HRP: %q", hrp)
+		return nil, errors.Errorf("invalid HRP: %q", hrp)
 	}
 	for p, c := range hrp {
 		if c < 33 || c > 126 {
@@ -143,10 +148,10 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 	ret.WriteString(hrp)
 	ret.WriteString("-")
 	for _, p := range values {
-		ret.WriteByte(charset[p])
+		ret.WriteByte(charsetString[p])
 	}
 	for _, p := range createChecksum(hrp, values) {
-		ret.WriteByte(charset[p])
+		ret.WriteByte(charsetString[p])
 	}
 	if lower {
 		return ret.Bytes(), nil
@@ -157,7 +162,6 @@ func Encode(hrp string, data []byte) ([]byte, error) {
 // DecodeString decodes a Blech32 string. If the string is uppercase, the HRP
 // will be
 // uppercase.
-// TODO duplicate with function that consumes []byte
 func DecodeString(s string) (hrp string, data []byte, err error) {
 	if strings.ToLower(s) != s && strings.ToUpper(s) != s {
 		return "", nil, fmt.Errorf("mixed case")
@@ -182,7 +186,54 @@ func DecodeString(s string) (hrp string, data []byte, err error) {
 	}
 	s = strings.ToLower(s)
 	for p, c := range s[pos+1:] {
-		d := strings.IndexRune(charset, c)
+		d := strings.IndexRune(charsetString, c)
+		if d == -1 {
+			return "", nil, fmt.Errorf(
+				"invalid character data part: s[%d]=%v",
+				p,
+				c,
+			)
+		}
+		data = append(data, byte(d))
+	}
+	if !verifyChecksum(hrp, data) {
+		return "", nil, fmt.Errorf("invalid checksum")
+	}
+	data, err = convertBits(data[:len(data)-6], 5, 8, false)
+	if err != nil {
+		return "", nil, err
+	}
+	return hrp, data, nil
+}
+
+// Decode decodes a Blech32 string. If the string is uppercase, the HRP
+// will be uppercase.
+func Decode(bites []byte) (hrp string, data []byte, err error) {
+	if bytes.Equal(bytes.ToLower(bites), bites) &&
+		bytes.Equal(bytes.ToUpper(bites), bites) {
+		return "", nil, fmt.Errorf("mixed case")
+	}
+	pos := bytes.LastIndex(bites, []byte("-"))
+	if pos < 1 || pos+7 > len(bites) {
+		return "", nil, fmt.Errorf(
+			"separator '-' at invalid position: pos=%d, len=%d",
+			pos,
+			len(bites),
+		)
+	}
+	hrp = string(bites[:pos])
+	for p, c := range hrp {
+		if c < 33 || c > 126 {
+			return "", nil, fmt.Errorf(
+				"invalid character human-readable part: s[%d]=%d",
+				p,
+				c,
+			)
+		}
+	}
+	bites = bytes.ToLower(bites)
+	for p, c := range bites[pos+1:] {
+		d := bytes.IndexRune(charset, rune(c))
 		if d == -1 {
 			return "", nil, fmt.Errorf(
 				"invalid character data part: s[%d]=%v",

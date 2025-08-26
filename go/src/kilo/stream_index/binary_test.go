@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -26,10 +27,12 @@ func TestBinaryOne(t1 *testing.T) {
 			expected.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")),
 		)
 		expected.SetTai(ids.NowTai())
-		t.AssertNoError(merkle_ids.SetHex(
-			"sha256",
+		t.AssertNoError(merkle_ids.SetHexBytes(
+			merkle.HRPObjectBlobDigestSha256V1,
 			expected.Metadata.GetBlobDigestMutable(),
-			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
+			[]byte(
+				"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
+			),
 		))
 		t.AssertNoError(expected.Metadata.Type.Set("da-typ"))
 		t.AssertNoError(expected.Metadata.Description.Set("the bez"))
@@ -58,11 +61,13 @@ func TestBinaryOne(t1 *testing.T) {
 		// 	)
 		// }
 
-		t.AssertNoError(expected.CalculateObjectDigests())
-
 		{
 			config := genesis_configs.Default().Blob
 			t.AssertNoError(config.GeneratePrivateKey())
+			t.AssertNoError(expected.Metadata.GetPubKeyMutable().SetMerkleId(
+				merkle.HRPRepoPubKeyV1,
+				config.GetPublicKey(),
+			))
 			t.AssertNoError(expected.Sign(config))
 		}
 

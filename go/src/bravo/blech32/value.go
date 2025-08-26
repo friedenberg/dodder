@@ -55,7 +55,7 @@ func (value Value) String() string {
 	var err error
 
 	if text, err = Encode(value.HRP, value.Data); err != nil {
-		panic(err)
+		panic(errors.Wrap(err))
 	}
 
 	return string(text)

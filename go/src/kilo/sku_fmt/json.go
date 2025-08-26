@@ -146,10 +146,10 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = merkle_ids.SetHex(
-			"sha256",
+		if err = merkle_ids.SetHexBytes(
+			merkle.HRPObjectBlobDigestSha256V0,
 			object.Metadata.GetBlobDigestMutable(),
-			json.BlobId,
+			[]byte(json.BlobId),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

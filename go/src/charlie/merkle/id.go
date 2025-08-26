@@ -2,13 +2,19 @@ package merkle
 
 import (
 	"bytes"
+	"encoding"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
-var _ interfaces.MutableGenericBlobId = &Id{}
+var (
+	_ interfaces.MutableGenericBlobId = &Id{}
+	_ encoding.TextMarshaler          = Id{}
+	_ encoding.TextUnmarshaler        = &Id{}
+)
 
 type Id struct {
 	tipe string
@@ -19,15 +25,6 @@ func (id Id) String() string {
 	bites, err := blech32.Encode(id.tipe, id.data)
 	errors.PanicIfError(err)
 	return string(bites)
-}
-
-func (id *Id) Set(value string) (err error) {
-	if id.tipe, id.data, err = blech32.DecodeString(value); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (id Id) IsEmpty() bool {
@@ -50,6 +47,20 @@ func (id Id) IsNull() bool {
 	return len(id.data) == 0
 }
 
+func (id *Id) Set(value string) (err error) {
+	if id.tipe, id.data, err = blech32.DecodeString(value); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = id.SetMerkleId(id.tipe, id.data); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
 	if err = id.SetMerkleId(digest.GetType(), digest.GetBytes()); err != nil {
 		err = errors.Wrap(err)
@@ -60,14 +71,14 @@ func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
 }
 
 func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
-	if tipe == "" {
-		err = errors.Errorf("empty type")
+	if !slices.Contains(hrpValid, tipe) {
+		err = errors.Errorf("invalid type: %q", tipe)
 		return
 	}
 
 	id.tipe = tipe
 
-	// TODO optimize this
+	// TODO optimize this and validate against type
 	id.data = make([]byte, len(bites))
 	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
 	// binaryId.data = binaryId.data[:cap(binaryId.data)]
@@ -91,12 +102,7 @@ func (id *Id) ResetWith(src *Id) {
 }
 
 func (id *Id) ResetWithMerkleId(src interfaces.MerkleId) {
-	id.tipe = src.GetType()
-	bites := src.GetBytes()
-	id.data = make([]byte, len(bites))
-	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
-	// binaryId.data = binaryId.data[:cap(binaryId.data)]
-	copy(id.data, bites)
+	errors.PanicIfError(id.SetMerkleId(src.GetType(), src.GetBytes()))
 }
 
 func (id *Id) GetBlobId() interfaces.BlobId {
@@ -140,6 +146,24 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 	bytes = append(bytes, []byte(tipe)...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
+
+	return
+}
+
+func (id Id) MarshalText() (bites []byte, err error) {
+	if bites, err = blech32.Encode(id.tipe, id.data); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (id *Id) UnmarshalText(bites []byte) (err error) {
+	if id.tipe, id.data, err = blech32.Decode(bites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

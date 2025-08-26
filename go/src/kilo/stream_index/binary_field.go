@@ -8,17 +8,41 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/keys"
+	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 )
 
+var binaryFieldOrder = []key_bytes.Binary{
+	key_bytes.Sigil,
+	key_bytes.ObjectId,
+	key_bytes.Blob,
+	key_bytes.RepoPubKey,
+	key_bytes.RepoSig,
+	key_bytes.Description,
+	key_bytes.Tag,
+	key_bytes.Tai,
+	key_bytes.Type,
+	key_bytes.SigParentMetadataParentObjectId,
+	key_bytes.DigestMetadataParentObjectId,
+	key_bytes.DigestMetadataWithoutTai,
+	key_bytes.CacheParentTai,
+	key_bytes.CacheTagImplicit,
+	key_bytes.CacheTagExpanded,
+	key_bytes.CacheTags,
+}
+
 type binaryField struct {
-	keys.Binary
+	key_bytes.Binary
 	ContentLength uint16
 	Content       bytes.Buffer
 }
 
 func (bf *binaryField) String() string {
-	return fmt.Sprintf("%s:%d:%x", bf.Binary, bf.ContentLength, bf.Content.Bytes())
+	return fmt.Sprintf(
+		"%s:%d:%x",
+		bf.Binary,
+		bf.ContentLength,
+		bf.Content.Bytes(),
+	)
 }
 
 func (bf *binaryField) Reset() {

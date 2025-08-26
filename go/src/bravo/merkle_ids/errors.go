@@ -9,6 +9,7 @@ import (
 
 var ErrIsNull = errors.New("digest is null")
 
+// TODO include digest type
 func MakeErrIsNull(binaryId interfaces.MerkleId) error {
 	if binaryId.IsNull() {
 		return errors.WrapSkip(1, ErrIsNull)

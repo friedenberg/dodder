@@ -5,11 +5,8 @@ import (
 	"encoding/json"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -23,13 +20,13 @@ func (coder jsonV0) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetObjectDigest().IsNull() {
-		err = errors.ErrorWithStackf("empty digest: %q", sku.String(object))
-		return
-	}
-
-	if object.Metadata.GetObjectSig().IsNull() {
-		err = errors.ErrorWithStackf("no repo signature")
+	if err = object.Verify(); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Sku: %s, Tags %s",
+			sku.String(object),
+			quiter.StringCommaSeparated(object.Metadata.GetTags()),
+		)
 		return
 	}
 
@@ -56,48 +53,23 @@ func (coder jsonV0) DecodeFrom(
 ) (n int64, err error) {
 	var objectJson sku_json_fmt.Transacted
 
-	bytess, err := bufferedReader.ReadBytes('\n')
+	bites, err := bufferedReader.ReadBytes('\n')
 	if err != nil {
 		return
 	}
 
-	if err = json.Unmarshal(bytess, &objectJson); err != nil {
-		err = errors.Wrapf(err, "Line: %q", bytess)
+	if err = json.Unmarshal(bites, &objectJson); err != nil {
+		err = errors.Wrapf(err, "Line: %q", bites)
 		return
 	}
 
 	if err = objectJson.ToTransacted(object, nil); err != nil {
-		err = errors.Wrapf(err, "Line: %q", bytess)
+		err = errors.Wrapf(err, "Line: %q", bites)
 		return
 	}
 
-	if object.GetType().String() == ids.TypeInventoryListV2 {
-		digest := sha.MustWithDigester(object.GetTai())
-		defer merkle_ids.PutBlobId(digest)
-
-		if object.Metadata.GetRepoPubKey().IsNull() {
-			err = errors.ErrorWithStackf(
-				"RepoPubkey missing for %s. Fields: %#v",
-				sku.String(object),
-				object.Metadata.Fields,
-			)
-			return
-		}
-
-		if object.Metadata.GetObjectSig().IsNull() {
-			err = errors.ErrorWithStackf(
-				"signature missing for %s. Fields: %#v",
-				sku.String(object),
-				object.Metadata.Fields,
-			)
-			return
-		}
-
-		if err = merkle.VerifySignature(
-			object.Metadata.GetRepoPubKey().GetBytes(),
-			digest.GetBytes(),
-			object.Metadata.GetObjectSig().GetBytes(),
-		); err != nil {
+	if object.GetType().String() == ids.TypeInventoryListJsonV0 {
+		if err = object.Verify(); err != nil {
 			err = errors.Wrapf(
 				err,
 				"Sku: %s, Tags %s",
@@ -108,11 +80,6 @@ func (coder jsonV0) DecodeFrom(
 		}
 	} else {
 		// TODO determine how to handle this
-	}
-
-	if err = object.CalculateObjectDigests(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

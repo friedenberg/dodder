@@ -161,18 +161,15 @@ func (transacted *Transacted) IsNew() bool {
 	return transacted.Metadata.GetMotherObjectDigest().IsNull()
 }
 
-func (transacted *Transacted) CalculateObjectShaDebug() (err error) {
-	return transacted.calculateObjectSha(true)
-}
-
 // TODO replace this with repo signatures
+// TODO include repo pubkey
 func (transacted *Transacted) CalculateObjectDigests() (err error) {
 	return transacted.calculateObjectSha(false)
 }
 
 func (transacted *Transacted) makeDigestCalcFunc(
-	funkMakeBlobId func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
-	objectFormat object_inventory_format.FormatGeneric,
+	funkMakeBlobId func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	objectFormat object_inventory_format.Format,
 	digest interfaces.MutableMerkleId,
 ) errors.FuncErr {
 	return func() (err error) {
@@ -188,15 +185,18 @@ func (transacted *Transacted) makeDigestCalcFunc(
 
 		defer merkle_ids.PutBlobId(actual)
 
-		digest.ResetWithMerkleId(actual)
+		if err = digest.SetMerkleId(merkle.HRPObjectDigestSha256V1, actual.GetBytes()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}
 }
 
 func (transacted *Transacted) makeShaCalcFunc(
-	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
-	objectFormat object_inventory_format.FormatGeneric,
+	f func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	objectFormat object_inventory_format.Format,
 	sh *sha.Sha,
 ) errors.FuncErr {
 	return func() (err error) {
@@ -229,41 +229,29 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 	}
 
 	wg := errors.MakeWaitGroupParallel()
-
-	wg.Do(
-		transacted.makeDigestCalcFunc(
-			f,
-			object_inventory_format.Formats.MetadataObjectIdParent(),
-			transacted.Metadata.GetObjectDigestMutable(),
-		),
-	)
+	wg.Do(transacted.calculateObjectDigest)
 
 	wg.Do(
 		transacted.makeShaCalcFunc(
 			f,
-			object_inventory_format.Formats.MetadataSansTai(),
+			object_inventory_format.FormatsV5MetadataSansTai,
 			&transacted.Metadata.SelfWithoutTai,
 		),
 	)
 
-	return wg.GetError()
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) SetObjectFingerPrint(
-	v interfaces.BlobId,
-) (err error) {
-	return transacted.GetMetadata().GetObjectDigestMutable().SetMerkleId(
-		v.GetType(),
-		v.GetBytes(),
-	)
-}
-
-// TODO remove
-func (transacted *Transacted) GetObjectFingerPrint() interfaces.MerkleId {
+func (transacted *Transacted) GetObjectDigest() interfaces.MerkleId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
@@ -279,16 +267,34 @@ func (transacted *Transacted) GetKey() string {
 	return ids.FormattedString(transacted.GetObjectId())
 }
 
+func (transacted *Transacted) calculateObjectDigest() (err error) {
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.makeDigestCalcFunc(
+		object_inventory_format.GetShaForContext,
+		object_inventory_format.FormatV11ObjectDigest,
+		transacted.Metadata.GetObjectDigestMutable(),
+	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO turn into proper merkle tree
 func (transacted *Transacted) Sign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	transacted.CalculateObjectDigests()
 
-	if err = transacted.Metadata.GetPubKeyMutable().SetMerkleId(
-		"ed25519",
-		config.GetPublicKey(),
-	); err != nil {
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -306,7 +312,7 @@ func (transacted *Transacted) Sign(
 	}
 
 	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
-		privateKey.GetType(),
+		merkle.HRPRepoSigV1,
 		bites,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -317,27 +323,34 @@ func (transacted *Transacted) Sign(
 }
 
 func (transacted *Transacted) Verify() (err error) {
-	if transacted.Metadata.GetRepoPubKey().IsNull() {
-		err = errors.ErrorWithStackf(
-			"RepoPubkey missing for %s. Fields: %#v",
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey(),
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Object: %s, Fields: %#v",
 			String(transacted),
 			transacted.Metadata.Fields,
 		)
-
 		return
 	}
 
-	if transacted.Metadata.GetObjectSig().IsNull() {
-		err = errors.ErrorWithStackf(
-			"signature missing for %s. Fields: %#v",
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetObjectSig(),
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Object: %s, Fields: %#v",
 			String(transacted),
 			transacted.Metadata.Fields,
 		)
-
 		return
 	}
 
-	transacted.CalculateObjectDigests()
+	if err = transacted.CalculateObjectDigests(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = merkle.VerifySignature(
 		transacted.Metadata.GetRepoPubKey().GetBytes(),

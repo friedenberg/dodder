@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
@@ -15,10 +16,11 @@ import (
 )
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
-// runs the new hook, validates the blob, then calculates the sha for the object
+// runs the new hook, validates the blob, then calculates the digest for the
+// object
 func (store *Store) tryPrecommit(
 	external sku.ExternalLike,
-	parent *sku.Transacted,
+	mutter *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	if err = store.SaveBlob(external); err != nil {
@@ -26,15 +28,15 @@ func (store *Store) tryPrecommit(
 		return
 	}
 
-	kinder := external.GetSku()
+	object := external.GetSku()
 
-	if parent == nil {
-		options.Proto.Apply(kinder, kinder)
+	if mutter == nil {
+		options.Proto.Apply(object, object)
 	}
 
 	// TODO decide if the type proto should actually be applied every time
 	if options.ApplyProtoType {
-		store.protoZettel.ApplyType(kinder, kinder)
+		store.protoZettel.ApplyType(object, object)
 	}
 
 	if genres.Type == external.GetSku().GetGenre() {
@@ -46,7 +48,7 @@ func (store *Store) tryPrecommit(
 	}
 
 	// modify pre commit hooks to support import
-	if err = store.tryPreCommitHooks(kinder, parent, options); err != nil {
+	if err = store.tryPreCommitHooks(object, mutter, options); err != nil {
 		if store.storeConfig.GetConfig().IgnoreHookErrors {
 			err = nil
 		} else {
@@ -56,8 +58,8 @@ func (store *Store) tryPrecommit(
 	}
 
 	// TODO just just mutter == nil
-	if parent == nil {
-		if err = store.tryNewHook(kinder, options); err != nil {
+	if mutter == nil {
+		if err = store.tryNewHook(object, options); err != nil {
 			if store.storeConfig.GetConfig().IgnoreHookErrors {
 				err = nil
 			} else {
@@ -67,12 +69,20 @@ func (store *Store) tryPrecommit(
 		}
 	}
 
-	if err = store.validate(kinder, parent, options); err != nil {
+	if err = store.validate(object, mutter, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = kinder.CalculateObjectDigests(); err != nil {
+	if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
+		merkle.HRPRepoPubKeyV1,
+		store.storeConfig.GetConfig().GetPublicKey(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

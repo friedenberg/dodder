@@ -111,10 +111,10 @@ func (json *Transacted) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = merkle_ids.SetHex(
-			"sha256",
+		if err = merkle_ids.SetHexBytes(
+			merkle.HRPObjectBlobDigestSha256V0,
 			object.Metadata.GetBlobDigestMutable(),
-			json.BlobId,
+			[]byte(json.BlobId),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -149,9 +149,13 @@ func (json *Transacted) ToTransacted(
 	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
-	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
+	if !json.RepoPubkey.IsNull() {
+		object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
+	}
 
-	object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
+	if !json.RepoSig.IsNull() {
+		object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
+	}
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {

@@ -123,6 +123,13 @@ function teardown_repo {
   chflags_and_rm
 }
 
+function run_dodder_debug {
+  cmd="$1"
+  shift
+  #shellcheck disable=SC2068
+  timeout --preserve-status "2s" "$DODDER_BIN" "$cmd" ${cmd_dodder_def[@]} "$@"
+}
+
 function run_dodder {
   cmd="$1"
   shift
@@ -197,10 +204,10 @@ function run_dodder_init_disable_age {
     "${args[@]}"
 
   assert_success
-  # assert_output - <<-EOM
-# [!md @$(get_type_blob_sha) !toml-type-v1]
-# [konfig @$(get_konfig_sha) !toml-config-v1]
-# EOM
+  assert_output - <<-EOM
+[!md @$(get_type_blob_sha) !toml-type-v1]
+[konfig @$(get_konfig_sha) !toml-config-v2]
+EOM
 
   run_dodder blob_store-cat "$(get_konfig_sha)"
   assert_success
