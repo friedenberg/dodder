@@ -17,7 +17,7 @@ import (
 var poolObjectId interfaces.Pool[objectId, *objectId]
 
 func init() {
-	poolObjectId = pool.MakePool(
+	poolObjectId = pool.Make(
 		nil,
 		func(k *objectId) {
 			k.Reset()

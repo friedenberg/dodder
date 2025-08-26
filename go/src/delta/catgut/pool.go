@@ -18,7 +18,7 @@ func init() {
 func GetPool() interfaces.Pool[String, *String] {
 	ponce.Do(
 		func() {
-			p = pool.MakePool[String, *String](
+			p = pool.Make[String, *String](
 				nil,
 				func(v *String) {
 					v.Reset()

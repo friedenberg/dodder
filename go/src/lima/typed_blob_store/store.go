@@ -28,7 +28,7 @@ func MakeBlobStore[
 ) (blobStore *BlobStore[BLOB, BLOB_PTR]) {
 	blobStore = &BlobStore[BLOB, BLOB_PTR]{
 		envRepo:   repoLayout,
-		pool:      pool.MakePool(nil, resetFunc),
+		pool:      pool.Make(nil, resetFunc),
 		Format:    format,
 		resetFunc: resetFunc,
 	}

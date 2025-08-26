@@ -7,21 +7,27 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-type pool[T any, TPtr interfaces.Ptr[T]] struct {
+type pool[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]] struct {
 	inner *sync.Pool
-	reset func(TPtr)
+	reset func(SWIMMER_PTR)
 }
 
-func MakePool[T any, TPtr interfaces.Ptr[T]](
-	New func() TPtr,
-	Reset func(TPtr),
-) *pool[T, TPtr] {
-	return &pool[T, TPtr]{
+func MakeWithResetable[SWIMMER any, SWIMMER_PTR interfaces.Resetable[SWIMMER]]() *pool[SWIMMER, SWIMMER_PTR] {
+	return Make(nil, func(swimmer SWIMMER_PTR) {
+		swimmer.Reset()
+	})
+}
+
+func Make[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]](
+	New func() SWIMMER_PTR,
+	Reset func(SWIMMER_PTR),
+) *pool[SWIMMER, SWIMMER_PTR] {
+	return &pool[SWIMMER, SWIMMER_PTR]{
 		reset: Reset,
 		inner: &sync.Pool{
 			New: func() (swimmer any) {
 				if New == nil {
-					swimmer = new(T)
+					swimmer = new(SWIMMER)
 				} else {
 					swimmer = New()
 				}
@@ -32,7 +38,10 @@ func MakePool[T any, TPtr interfaces.Ptr[T]](
 	}
 }
 
-func (pool pool[T, TPtr]) Apply(funk interfaces.FuncIter[T], e T) (err error) {
+func (pool pool[SWIMMER, SWIMMER_PTR]) Apply(
+	funk interfaces.FuncIter[SWIMMER],
+	e SWIMMER,
+) (err error) {
 	err = funk(e)
 
 	switch {
@@ -57,11 +66,13 @@ func (pool pool[T, TPtr]) Apply(funk interfaces.FuncIter[T], e T) (err error) {
 	return
 }
 
-func (pool pool[T, TPtr]) Get() TPtr {
-	return pool.inner.Get().(TPtr)
+func (pool pool[SWIMMER, SWIMMER_PTR]) Get() SWIMMER_PTR {
+	return pool.inner.Get().(SWIMMER_PTR)
 }
 
-func (pool pool[T, TPtr]) PutMany(swimmers ...TPtr) (err error) {
+func (pool pool[SWIMMER, SWIMMER_PTR]) PutMany(
+	swimmers ...SWIMMER_PTR,
+) (err error) {
 	for _, i := range swimmers {
 		if err = pool.Put(i); err != nil {
 			err = errors.Wrap(err)
@@ -72,7 +83,7 @@ func (pool pool[T, TPtr]) PutMany(swimmers ...TPtr) (err error) {
 	return
 }
 
-func (pool pool[T, TPtr]) Put(swimmer TPtr) (err error) {
+func (pool pool[SWIMMER, SWIMMER_PTR]) Put(swimmer SWIMMER_PTR) (err error) {
 	if swimmer == nil {
 		return
 	}

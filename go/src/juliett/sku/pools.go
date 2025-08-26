@@ -11,12 +11,12 @@ var (
 )
 
 func init() {
-	poolTransacted = pool.MakePool(
+	poolTransacted = pool.Make(
 		nil,
 		TransactedResetter.Reset,
 	)
 
-	poolCheckedOut = pool.MakePool(
+	poolCheckedOut = pool.Make(
 		nil,
 		CheckedOutResetter.Reset,
 	)

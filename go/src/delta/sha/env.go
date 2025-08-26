@@ -25,7 +25,7 @@ var (
 		},
 	)
 
-	poolSha = pool.MakePool(
+	poolSha = pool.Make(
 		nil,
 		func(sh *Sha) {
 			sh.Reset()

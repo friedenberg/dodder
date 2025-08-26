@@ -14,7 +14,7 @@ import (
 var delimReaderPool interfaces.Pool[delimReader, *delimReader]
 
 func init() {
-	delimReaderPool = pool.MakePoolWithReset[delimReader]()
+	delimReaderPool = pool.MakeWithResetable[delimReader]()
 }
 
 func PutDelimReader(dr *delimReader) {

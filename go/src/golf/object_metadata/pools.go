@@ -8,7 +8,7 @@ import (
 var thePool interfaces.Pool[Metadata, *Metadata]
 
 func init() {
-	thePool = pool.MakePool[Metadata, *Metadata](
+	thePool = pool.Make[Metadata, *Metadata](
 		nil,
 		Resetter.Reset,
 	)

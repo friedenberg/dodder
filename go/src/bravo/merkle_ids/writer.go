@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var poolWriter = pool.MakePool[writer](nil, nil)
+var poolWriter = pool.Make[writer](nil, nil)
 
 func MakeWriterWithRepool(
 	envDigest interfaces.EnvBlobId,

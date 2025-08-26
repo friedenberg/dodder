@@ -31,9 +31,9 @@ type objectFactoryCheckedOut struct {
 	interfaces.Resetter3[*CheckedOut]
 }
 
-func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryCheckedOut {
-	if of.Resetter3 == nil {
-		of.Resetter3 = pool.BespokeResetter[*CheckedOut]{
+func (factory *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryCheckedOut {
+	if factory.Resetter3 == nil {
+		factory.Resetter3 = pool.BespokeResetter[*CheckedOut]{
 			FuncReset: func(e *CheckedOut) {
 				CheckedOutResetter.Reset(e)
 			},
@@ -43,8 +43,8 @@ func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryChecked
 		}
 	}
 
-	if of.PoolValue == nil {
-		of.PoolValue = pool.Bespoke[*CheckedOut]{
+	if factory.PoolValue == nil {
+		factory.PoolValue = pool.Bespoke[*CheckedOut]{
 			FuncGet: func() *CheckedOut {
 				return GetCheckedOutPool().Get()
 			},
@@ -54,5 +54,5 @@ func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryChecked
 		}
 	}
 
-	return *of
+	return *factory
 }

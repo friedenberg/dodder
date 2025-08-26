@@ -57,6 +57,5 @@ type (
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[BLOB any] interface {
 		GetBlob(BlobId) (BLOB, FuncRepool, error)
-		PutBlob(BLOB)
 	}
 )

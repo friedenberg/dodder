@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var poolMatchBuilder = pool.MakePool(
+var poolMatchBuilder = pool.Make(
 	NewMatchBuilder,
 	func(matchBuilder *MatchBuilder) {
 		matchBuilder.Buffer.Reset()

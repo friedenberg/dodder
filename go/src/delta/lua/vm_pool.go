@@ -21,7 +21,7 @@ func (sp *VMPool) PrepareVM(
 	vm *VM,
 	apply interfaces.FuncIter[*VM],
 ) (err error) {
-	vm.Pool = pool.MakePool(
+	vm.Pool = pool.Make(
 		func() (t *lua.LTable) {
 			t = vm.NewTable()
 			return

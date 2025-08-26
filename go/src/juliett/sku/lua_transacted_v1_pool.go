@@ -68,7 +68,7 @@ func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
 }
 
 func MakeLuaTablePoolV1(vm *lua.VM) LuaTablePoolV1 {
-	return pool.MakePool(
+	return pool.Make(
 		func() (t *LuaTableV1) {
 			t = &LuaTableV1{
 				Transacted:   vm.Pool.Get(),

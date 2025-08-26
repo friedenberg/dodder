@@ -12,12 +12,12 @@ var (
 )
 
 func init() {
-	poolExternal = pool.MakePool[sku.Transacted](
+	poolExternal = pool.Make[sku.Transacted](
 		nil,
 		nil,
 	)
 
-	poolCheckedOut = pool.MakePool[sku.CheckedOut](
+	poolCheckedOut = pool.Make[sku.CheckedOut](
 		nil,
 		nil,
 	)

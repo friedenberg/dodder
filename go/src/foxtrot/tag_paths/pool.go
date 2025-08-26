@@ -8,7 +8,7 @@ import (
 var p interfaces.Pool[Path, *Path]
 
 func init() {
-	p = pool.MakePool(
+	p = pool.Make(
 		func() *Path {
 			return &Path{}
 		},

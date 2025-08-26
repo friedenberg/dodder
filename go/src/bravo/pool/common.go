@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	bufioReader   = MakePool[bufio.Reader](nil, nil)
-	bufioWriter   = MakePool[bufio.Writer](nil, nil)
-	byteReaders   = MakePool[bytes.Reader](nil, nil)
-	stringReaders = MakePool[strings.Reader](nil, nil)
+	bufioReader   = Make[bufio.Reader](nil, nil)
+	bufioWriter   = Make[bufio.Writer](nil, nil)
+	byteReaders   = Make[bytes.Reader](nil, nil)
+	stringReaders = Make[strings.Reader](nil, nil)
 	sha256Hash    = pool_value.Make(
 		func() hash.Hash {
 			return sha256.New()

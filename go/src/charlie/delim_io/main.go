@@ -14,7 +14,7 @@ import (
 var _pool interfaces.Pool[reader, *reader]
 
 func init() {
-	_pool = pool.MakePoolWithReset[reader]()
+	_pool = pool.MakeWithResetable[reader]()
 }
 
 func PutReader(dr *reader) {

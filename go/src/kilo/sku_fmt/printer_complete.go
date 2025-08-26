@@ -23,7 +23,7 @@ func MakePrinterComplete(envLocal env_local.Env) *PrinterComplete {
 		chObjects:      make(chan *sku.Transacted),
 		chDone:         make(chan struct{}),
 		bufferedWriter: bufio.NewWriter(envLocal.GetUIFile()),
-		pool: pool.MakePool[sku.Transacted](
+		pool: pool.Make[sku.Transacted](
 			nil,
 			nil,
 		),

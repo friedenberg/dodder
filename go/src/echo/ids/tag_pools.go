@@ -48,7 +48,7 @@ var (
 func GetTagPool() interfaces.Pool[Tag, *Tag] {
 	tagPoolOnce.Do(
 		func() {
-			tagPool = pool.MakePool(
+			tagPool = pool.Make(
 				func() *Tag {
 					e := &Tag{}
 					e.init()
