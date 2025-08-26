@@ -77,8 +77,8 @@ type ErrHasInlineBlobAndMetadataSha struct {
 
 func (e *ErrHasInlineBlobAndMetadataSha) Error() string {
 	return fmt.Sprintf(
-		"text has inline blob and metadata sha: \ninline sha: %s\n metadata sha: %s",
-		&e.Inline,
-		&e.Metadata,
+		"text has inline blob and metadata blob id: \ninline sha: %s\n metadata sha: %s",
+		merkle_ids.Format(e.Inline),
+		merkle_ids.Format(e.Metadata),
 	)
 }

@@ -5,11 +5,11 @@ import (
 )
 
 func (metadata *Metadata) GetBlobDigest() interfaces.MerkleId {
-	return &metadata.Blob
+	return &metadata.DigBlob
 }
 
 func (metadata *Metadata) GetBlobDigestMutable() interfaces.MutableMerkleId {
-	return &metadata.Blob
+	return &metadata.DigBlob
 }
 
 func (metadata *Metadata) GetObjectDigest() interfaces.MerkleId {

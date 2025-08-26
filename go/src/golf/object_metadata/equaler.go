@@ -27,9 +27,9 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !merkle_ids.Equals(&a.Blob, &b.Blob) {
+	if !merkle_ids.Equals(&a.DigBlob, &b.DigBlob) {
 		if debug {
-			ui.Debug().Print(&a.Blob, "->", &b.Blob)
+			ui.Debug().Print(&a.DigBlob, "->", &b.DigBlob)
 		}
 		return false
 	}

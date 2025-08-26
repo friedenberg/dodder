@@ -19,7 +19,7 @@ func (resetter) Reset(metadata *Metadata) {
 	ResetterCache.Reset(&metadata.Cache)
 	metadata.Type = ids.Type{}
 	metadata.Tai.Reset()
-	metadata.Blob.Reset()
+	metadata.DigBlob.Reset()
 	metadata.SelfWithoutTai.Reset()
 	metadata.digSelf.Reset()
 	metadata.digMother.Reset()
@@ -41,7 +41,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.Type = src.Type
 	dst.Tai = src.Tai
 
-	dst.Blob.ResetWith(&src.Blob)
+	dst.DigBlob.ResetWith(&src.DigBlob)
 	dst.digSelf.ResetWith(
 		&src.digSelf,
 	)

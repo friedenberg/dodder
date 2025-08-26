@@ -26,7 +26,7 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	Blob      merkle.Id
+	DigBlob   merkle.Id
 	pubRepo   merkle.Id
 	sigRepo   merkle.Id
 	digSelf   merkle.Id
@@ -63,7 +63,7 @@ func (metadata *Metadata) UserInputIsEmpty() bool {
 }
 
 func (metadata *Metadata) IsEmpty() bool {
-	if !metadata.Blob.IsNull() {
+	if !metadata.DigBlob.IsNull() {
 		return false
 	}
 

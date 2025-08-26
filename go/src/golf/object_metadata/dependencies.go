@@ -141,7 +141,7 @@ func (f Dependencies) writeShaTyp(
 		w1,
 		fmt.Sprintf(
 			"! %s.%s",
-			&m.Blob,
+			&m.DigBlob,
 			m.Type.StringSansOp(),
 		),
 	)
@@ -177,7 +177,7 @@ func (f Dependencies) writeBlob(
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.BlobStore.BlobReader(&m.Blob); err != nil {
+	if ar, err = f.BlobStore.BlobReader(&m.DigBlob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
