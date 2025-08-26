@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
@@ -59,24 +61,24 @@ func (e *ErrHasInlineBlobAndFilePath) Error() string {
 	)
 }
 
-func MakeErrHasInlineBlobAndMetadataSha(
-	inline, object_metadata *sha.Sha,
+func MakeErrHasInlineBlobAndMetadataBlobId(
+	inline, metadata interfaces.MerkleId,
 ) (err *ErrHasInlineBlobAndMetadataSha) {
 	err = &ErrHasInlineBlobAndMetadataSha{}
-	err.MetadataSha.SetDigest(object_metadata)
-	err.InlineSha.SetDigest(inline)
+	err.Metadata = merkle_ids.Clone(metadata)
+	err.Inline = merkle_ids.Clone(inline)
 	return
 }
 
 type ErrHasInlineBlobAndMetadataSha struct {
-	InlineSha   sha.Sha
-	MetadataSha sha.Sha
+	Inline   interfaces.MerkleId
+	Metadata interfaces.MerkleId
 }
 
 func (e *ErrHasInlineBlobAndMetadataSha) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and metadata sha: \ninline sha: %s\n metadata sha: %s",
-		&e.InlineSha,
-		&e.MetadataSha,
+		&e.Inline,
+		&e.Metadata,
 	)
 }

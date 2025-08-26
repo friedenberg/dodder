@@ -109,7 +109,7 @@ func (f textParser) ParseMetadata(
 	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
 		!merkle_ids.Equals(&m.Blob, inlineBlobSha):
 		err = errors.Wrap(
-			MakeErrHasInlineBlobAndMetadataSha(
+			MakeErrHasInlineBlobAndMetadataBlobId(
 				inlineBlobSha,
 				&m.Blob,
 			),

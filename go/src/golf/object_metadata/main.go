@@ -15,7 +15,7 @@ import (
 
 type Field = string_format_writer.Field
 
-// TODO transform into a view object that can be backed by various
+// TODO transform into a view interface that can be backed by various
 // representations
 type Metadata struct {
 	// Domain
@@ -26,9 +26,7 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	// TODO switch to blob id
-	Blob sha.Sha
-
+	Blob      merkle.Id
 	pubRepo   merkle.Id
 	sigRepo   merkle.Id
 	digSelf   merkle.Id
