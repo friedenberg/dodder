@@ -86,8 +86,9 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 				}
 
 				var typeBlob type_blobs.Blob
+				var repool interfaces.FuncRepool
 
-				if typeBlob, _, err = typeBlobStore.ParseTypedBlob(
+				if typeBlob, repool, _, err = typeBlobStore.ParseTypedBlob(
 					typeObject.GetType(),
 					typeObject.GetBlobDigest(),
 				); err != nil {
@@ -95,7 +96,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					return
 				}
 
-				defer typeBlobStore.PutTypedBlob(typeObject.GetType(), typeBlob)
+				defer repool()
 
 				if _, err = fmt.Fprintln(
 					writer,
@@ -115,39 +116,40 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			typeBlobStore typed_blob_store.Type,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			return func(o *sku.Transacted) (err error) {
-				var tt *sku.Transacted
+			return func(object *sku.Transacted) (err error) {
+				var typeObject *sku.Transacted
 
-				if tt, err = repo.GetStore().ReadTransactedFromObjectId(o.GetType()); err != nil {
+				if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(object.GetType()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				var ta type_blobs.Blob
+				var typeBlob type_blobs.Blob
+				var repool interfaces.FuncRepool
 
-				if ta, _, err = typeBlobStore.ParseTypedBlob(
-					tt.GetType(),
-					tt.GetBlobDigest(),
+				if typeBlob, repool, _, err = typeBlobStore.ParseTypedBlob(
+					typeObject.GetType(),
+					typeObject.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				defer typeBlobStore.PutTypedBlob(tt.GetType(), ta)
+				defer repool()
 
-				lw := format.MakeLineWriter()
+				lineWriter := format.MakeLineWriter()
 
-				for fn, f := range ta.GetFormatters() {
+				for fn, f := range typeBlob.GetFormatters() {
 					fe := f.FileExtension
 
 					if fe == "" {
 						fe = fn
 					}
 
-					lw.WriteFormat("%s\t%s", fn, fe)
+					lineWriter.WriteFormat("%s\t%s", fn, fe)
 				}
 
-				if _, err = lw.WriteTo(writer); err != nil {
+				if _, err = lineWriter.WriteTo(writer); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -185,8 +187,9 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				var blob type_blobs.Blob
+				var repool interfaces.FuncRepool
 
-				if blob, _, err = typeBlobStore.ParseTypedBlob(
+				if blob, repool, _, err = typeBlobStore.ParseTypedBlob(
 					object.GetType(),
 					object.GetBlobDigest(),
 				); err != nil {
@@ -194,7 +197,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					return
 				}
 
-				defer typeBlobStore.PutTypedBlob(object.GetType(), blob)
+				defer repool()
 
 				script := blob.GetStringLuaHooks()
 

@@ -76,8 +76,9 @@ func (store *store) recompileTypes(
 	for ct := range store.config.Types.All() {
 		tipe := ct.GetSku().GetType()
 		var commonBlob type_blobs.Blob
+		var repool interfaces.FuncRepool
 
-		if commonBlob, _, err = blobStore.Type.ParseTypedBlob(
+		if commonBlob, repool, _, err = blobStore.Type.ParseTypedBlob(
 			tipe,
 			ct.GetBlobDigest(),
 		); err != nil {
@@ -85,7 +86,7 @@ func (store *store) recompileTypes(
 			return
 		}
 
-		defer blobStore.Type.PutTypedBlob(tipe, commonBlob)
+		defer repool()
 
 		if commonBlob == nil {
 			err = errors.ErrorWithStackf(

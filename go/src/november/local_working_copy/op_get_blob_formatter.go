@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -33,8 +34,9 @@ func (local *Repo) GetBlobFormatter(
 	}
 
 	var typeBlob type_blobs.Blob
+	var repool interfaces.FuncRepool
 
-	if typeBlob, _, err = local.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
+	if typeBlob, repool, _, err = local.GetStore().GetTypedBlobStore().Type.ParseTypedBlob(
 		typeObject.GetType(),
 		typeObject.GetBlobDigest(),
 	); err != nil {
@@ -42,10 +44,7 @@ func (local *Repo) GetBlobFormatter(
 		return
 	}
 
-	defer local.GetStore().GetTypedBlobStore().Type.PutTypedBlob(
-		typeObject.GetType(),
-		typeBlob,
-	)
+	defer repool()
 
 	ok := false
 

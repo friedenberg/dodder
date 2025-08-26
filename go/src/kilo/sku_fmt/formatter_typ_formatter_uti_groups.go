@@ -14,12 +14,7 @@ type TypeBlobStore interface {
 	ParseTypedBlob(
 		tipe interfaces.ObjectId,
 		blobSha interfaces.BlobId,
-	) (common type_blobs.Blob, n int64, err error)
-
-	PutTypedBlob(
-		tipe interfaces.ObjectId,
-		common type_blobs.Blob,
-	) (err error)
+	) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error)
 }
 
 type formatterTypFormatterUTIGroups struct {
@@ -50,8 +45,9 @@ func (format formatterTypFormatterUTIGroups) Format(
 	}
 
 	var blob type_blobs.Blob
+	var repool interfaces.FuncRepool
 
-	if blob, _, err = format.store.ParseTypedBlob(
+	if blob, repool, _, err = format.store.ParseTypedBlob(
 		skuTyp.GetType(),
 		skuTyp.GetBlobDigest(),
 	); err != nil {
@@ -59,7 +55,7 @@ func (format formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	defer format.store.PutTypedBlob(skuTyp.GetType(), blob)
+	defer repool()
 
 	for groupName, group := range blob.GetFormatterUTIGroups() {
 		sb := bytes.NewBuffer(nil)

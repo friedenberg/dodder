@@ -2,6 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
@@ -29,8 +30,9 @@ func (store *Store) tryNewHook(
 	}
 
 	var blob type_blobs.Blob
+	var repool interfaces.FuncRepool
 
-	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobDigest(),
 	); err != nil {
@@ -38,7 +40,7 @@ func (store *Store) tryNewHook(
 		return
 	}
 
-	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer repool()
 
 	script := blob.GetStringLuaHooks()
 
@@ -87,8 +89,9 @@ func (store *Store) TryFormatHook(
 	}
 
 	var blob type_blobs.Blob
+	var repool interfaces.FuncRepool
 
-	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		objectType.GetType(),
 		objectType.GetBlobDigest(),
 	); err != nil {
@@ -96,10 +99,7 @@ func (store *Store) TryFormatHook(
 		return
 	}
 
-	defer store.GetTypedBlobStore().Type.PutTypedBlob(
-		objectType.GetType(),
-		blob,
-	)
+	defer repool()
 
 	script := blob.GetStringLuaHooks()
 
@@ -151,8 +151,9 @@ func (store *Store) tryPreCommitHooks(
 	}
 
 	var blob type_blobs.Blob
+	var repool interfaces.FuncRepool
 
-	if blob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
+	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 		t.GetType(),
 		t.GetBlobDigest(),
 	); err != nil {
@@ -160,7 +161,7 @@ func (store *Store) tryPreCommitHooks(
 		return
 	}
 
-	defer store.GetTypedBlobStore().Type.PutTypedBlob(t.GetType(), blob)
+	defer repool()
 
 	script := blob.GetStringLuaHooks()
 

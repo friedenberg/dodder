@@ -2,34 +2,35 @@ package store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 func (store *Store) validate(
-	el sku.ExternalLike, mutter *sku.Transacted,
-	o sku.CommitOptions,
+	object sku.ExternalLike,
+	motherObject *sku.Transacted,
+	options sku.CommitOptions,
 ) (err error) {
-	if !o.Validate {
+	if !options.Validate {
 		return
 	}
 
-	switch el.GetSku().GetGenre() {
+	switch object.GetSku().GetGenre() {
 	case genres.Type:
-		tipe := el.GetSku().GetType()
+		tipe := object.GetSku().GetType()
 
-		var commonBlob type_blobs.Blob
+		var repool interfaces.FuncRepool
 
-		if commonBlob, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
+		if _, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 			tipe,
-			el.GetSku().GetBlobDigest(),
+			object.GetSku().GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer store.GetTypedBlobStore().Type.PutTypedBlob(tipe, commonBlob)
+		defer repool()
 	}
 
 	return

@@ -46,15 +46,10 @@ func MakeTypeStore(
 	}
 }
 
-func (store Type) GetCommonStore() interfaces.TypedBlobStore[type_blobs.Blob] {
-	return store
-}
-
-// TODO return repool function
 func (store Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
 	blobSha interfaces.BlobId,
-) (common type_blobs.Blob, n int64, err error) {
+) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	default:
 		err = errors.Errorf("unsupported type: %q", tipe)
@@ -64,7 +59,7 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v0
 		var blob *type_blobs.TomlV0
 
-		if blob, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob2(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -75,37 +70,12 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v1
 		var blob *type_blobs.TomlV1
 
-		if blob, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob2(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		common = blob
-	}
-
-	return
-}
-
-func (store Type) PutTypedBlob(
-	tipe interfaces.ObjectId,
-	common type_blobs.Blob,
-) (err error) {
-	switch tipe.String() {
-	case "", ids.TypeTomlTypeV0:
-		if blob, ok := common.(*type_blobs.TomlV0); !ok {
-			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
-			return
-		} else {
-			store.toml_v0.PutBlob(blob)
-		}
-
-	case ids.TypeTomlTypeV1:
-		if blob, ok := common.(*type_blobs.TomlV1); !ok {
-			err = errors.ErrorWithStackf("expected %T but got %T", blob, common)
-			return
-		} else {
-			store.toml_v1.PutBlob(blob)
-		}
 	}
 
 	return

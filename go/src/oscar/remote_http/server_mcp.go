@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -353,15 +354,16 @@ func (server *Server) readMCPResourceObject(
 
 		{
 			var err error
+			var repool interfaces.FuncRepool
 
-			if typeBlob, _, err = repo.GetTypedBlobStore().Type.ParseTypedBlob(
+			if typeBlob, repool, _, err = repo.GetTypedBlobStore().Type.ParseTypedBlob(
 				typeObject.GetType(),
 				typeObject.GetBlobDigest(),
 			); err != nil {
 				return nil, errors.Wrap(err)
 			}
 
-			defer repo.GetTypedBlobStore().Type.PutTypedBlob(tipe, typeBlob)
+			defer repool()
 		}
 	}
 
