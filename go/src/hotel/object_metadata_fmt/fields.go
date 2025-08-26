@@ -11,25 +11,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
-func MetadataShaString(
+func MetadataBlobIdString(
 	metadata *object_metadata.Metadata,
 	abbr ids.FuncAbbreviateString,
-) (value string, err error) {
-	blobDigest := metadata.GetBlobDigest()
-	value = blobDigest.String()
+) (digestString string, err error) {
+	digest := sha.MustWithMerkleId(metadata.GetBlobDigest())
+	defer sha.Env{}.PutBlobId(digest)
+
+	digestString = digest.String()
 
 	if abbr != nil {
-		var v1 string
+		var abbreviatedDigestString string
 
-		sh := sha.MustWithMerkleId(blobDigest)
-
-		if v1, err = abbr(sh); err != nil {
+		if abbreviatedDigestString, err = abbr(digest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if v1 != "" {
-			value = v1
+		if abbreviatedDigestString != "" {
+			digestString = abbreviatedDigestString
 		} else {
 			ui.Todo("abbreviate sha produced empty string")
 		}
@@ -71,7 +71,7 @@ func MetadataFieldError(
 	}
 }
 
-func MetadataFieldShaString(
+func MetadataFieldBlobIdString(
 	value string,
 ) string_format_writer.Field {
 	return string_format_writer.Field{

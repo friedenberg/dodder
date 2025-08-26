@@ -1,6 +1,7 @@
 package merkle_ids
 
 import (
+	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -33,6 +34,6 @@ func GetEnv(tipe string) interfaces.EnvBlobId {
 	if env, ok := envs[tipe]; ok {
 		return env
 	} else {
-		panic(errors.Errorf("no env registered for digest type: %s", tipe))
+		panic(fmt.Sprintf("no env registered for digest type: %s", tipe))
 	}
 }

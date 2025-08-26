@@ -11,9 +11,13 @@ func MustWithMerkleId(merkleId interfaces.BlobId) *Sha {
 	}
 
 	digest := poolSha.Get()
-	errors.PanicIfError(
-		digest.SetMerkleId(merkleId.GetType(), merkleId.GetBytes()),
-	)
+
+	if !merkleId.IsNull() {
+		errors.PanicIfError(
+			digest.SetMerkleId(merkleId.GetType(), merkleId.GetBytes()),
+		)
+	}
+
 	return digest
 }
 

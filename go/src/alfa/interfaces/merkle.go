@@ -10,6 +10,7 @@ type (
 	BlobId interface {
 		Stringer
 		encoding.BinaryMarshaler
+		encoding.TextMarshaler
 		GetBytes() []byte
 		// TODO rethink size as it works completely different between sha and
 		// merkle
@@ -22,6 +23,7 @@ type (
 		BlobId
 		Setter
 		encoding.BinaryUnmarshaler
+		encoding.TextUnmarshaler
 		SetMerkleId(tipe string, bites []byte) error
 		Reset()
 		ResetWithMerkleId(BlobId)

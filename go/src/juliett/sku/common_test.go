@@ -229,7 +229,11 @@ func TestReadWithoutBlob(t1 *testing.T) {
 	))
 
 	if !actual.Equals(expected) {
-		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
+		t.Fatalf(
+			"zettel:\nexpected: %s\n  actual: %s",
+			StringMetadataSansTaiMerkle2(expected),
+			StringMetadataSansTaiMerkle2(actual),
+		)
 	}
 
 	if !actual.GetBlobDigest().IsNull() {
@@ -431,7 +435,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 - tag1
 - tag2
 - tag3
-! sha256-l2py96vlfztxefg5py45yva5g6z37s440t2sxxl3x0sa6anc0ulqrsggrq.md
+! fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e.md
 ---
 `
 

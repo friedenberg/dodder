@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
 func String(object *Transacted) (str string) {
@@ -119,6 +120,59 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 
 	sb.WriteString(" ")
 	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
+
+	sb.WriteString(" ")
+	sb.WriteString(merkle_ids.Format(object.GetBlobDigest()))
+
+	m := object.GetMetadata()
+
+	t := m.GetType()
+
+	if !t.IsEmpty() {
+		sb.WriteString(" ")
+		sb.WriteString(ids.FormattedString(m.GetType()))
+	}
+
+	es := m.GetTags()
+
+	if es.Len() > 0 {
+		sb.WriteString(" ")
+		sb.WriteString(
+			quiter.StringDelimiterSeparated(
+				" ",
+				m.GetTags(),
+			),
+		)
+	}
+
+	b := m.Description
+
+	if !b.IsEmpty() {
+		sb.WriteString(" ")
+		sb.WriteString("\"" + b.String() + "\"")
+	}
+
+	for _, field := range m.Fields {
+		sb.WriteString(" ")
+		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
+	}
+
+	return sb.String()
+}
+
+func StringMetadataSansTaiMerkle2(
+	object *object_metadata.Metadata,
+) (str string) {
+	sb := &strings.Builder{}
+
+	sb.WriteString(" ")
+	fmt.Fprintf(sb, "%s", object.GetRepoPubKey())
+
+	sb.WriteString(" ")
+	fmt.Fprintf(sb, "%s", object.GetObjectSig())
+
+	sb.WriteString(" ")
+	fmt.Fprintf(sb, "%s", object.GetObjectDigest())
 
 	sb.WriteString(" ")
 	sb.WriteString(merkle_ids.Format(object.GetBlobDigest()))

@@ -7,11 +7,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-var ErrIsNull = errors.New("digest is null")
+var (
+	ErrIsNull    = errors.New("digest is null")
+	ErrEmptyType = errors.New("type is empty")
+)
+
+func MakeErrEmptyType(id interfaces.BlobId) error {
+	if id.GetType() == "" {
+		return errors.WrapSkip(1, ErrEmptyType)
+	}
+
+	return nil
+}
 
 // TODO include digest type
-func MakeErrIsNull(binaryId interfaces.BlobId) error {
-	if binaryId.IsNull() {
+func MakeErrIsNull(id interfaces.BlobId) error {
+	if id.IsNull() {
 		return errors.WrapSkip(1, ErrIsNull)
 	}
 

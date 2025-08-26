@@ -100,6 +100,11 @@ func (mover *localFileMover) Close() (err error) {
 
 	digest := mover.GetBlobId()
 
+	if err = merkle_ids.MakeErrEmptyType(digest); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",
 	// 	fi.Size(),

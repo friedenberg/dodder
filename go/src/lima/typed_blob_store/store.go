@@ -61,7 +61,8 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 
 	if !merkle_ids.Equals(actual, blobId) {
 		err = errors.ErrorWithStackf(
-			"expected sha %s but got %s",
+			"expected blob id (%T) %s but got %s",
+			blobId,
 			blobId,
 			actual,
 		)

@@ -2,7 +2,7 @@ package merkle
 
 import (
 	"bytes"
-	"encoding"
+	"fmt"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	_ encoding.TextMarshaler   = Id{}
-	_ encoding.TextUnmarshaler = &Id{}
+	_ interfaces.BlobId        = Id{}
+	_ interfaces.MutableBlobId = &Id{}
 )
 
 type Id struct {
@@ -21,9 +21,17 @@ type Id struct {
 }
 
 func (id Id) String() string {
-	bites, err := blech32.Encode(id.tipe, id.data)
-	errors.PanicIfError(err)
-	return string(bites)
+	if id.tipe == "" && len(id.data) == 0 {
+		return ""
+	}
+
+	if id.tipe == HRPObjectBlobDigestSha256V0 {
+		return fmt.Sprintf("%x", id.data)
+	} else {
+		bites, err := blech32.Encode(id.tipe, id.data)
+		errors.PanicIfError(err)
+		return string(bites)
+	}
 }
 
 func (id Id) IsEmpty() bool {
@@ -70,6 +78,11 @@ func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
 }
 
 func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
+	if tipe == "" && len(bites) == 0 {
+		id.Reset()
+		return
+	}
+
 	if !slices.Contains(hrpValid, tipe) {
 		err = errors.Errorf("invalid type: %q", tipe)
 		return
@@ -111,6 +124,10 @@ func (id *Id) GetBlobId() interfaces.BlobId {
 func (id *Id) UnmarshalBinary(
 	bites []byte,
 ) (err error) {
+	if len(bites) == 0 {
+		return
+	}
+
 	tipeBytes, bytesAfterTipe, ok := bytes.Cut(bites, []byte{'\x00'})
 
 	if !ok {
@@ -137,6 +154,7 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 	bites := id.GetBytes()
 
 	if tipe == "" && len(bites) == 0 {
+		return
 	} else if tipe == "" {
 		err = errors.Errorf("empty type")
 		return
@@ -150,9 +168,13 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 }
 
 func (id Id) MarshalText() (bites []byte, err error) {
-	if bites, err = blech32.Encode(id.tipe, id.data); err != nil {
-		err = errors.Wrap(err)
-		return
+	if id.tipe == HRPObjectBlobDigestSha256V0 {
+		bites = fmt.Appendf(nil, "%x", id.data)
+	} else {
+		if bites, err = blech32.Encode(id.tipe, id.data); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

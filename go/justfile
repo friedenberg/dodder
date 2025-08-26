@@ -173,6 +173,12 @@ test-go-unit *flags:
 
 test-go: test-go-unit
 
+test-bats-generate $PATH=(dir_build + ":" + env("PATH")):
+  just ../zz-tests_bats/test-generate_fixtures
+
+test-bats-run $PATH=(dir_build + ":" + env("PATH")):
+  just ../zz-tests_bats/test
+
 test-bats $PATH=(dir_build + ":" + env("PATH")):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test

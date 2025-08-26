@@ -69,13 +69,20 @@ func EqualsReader(
 }
 
 func Equals(a, b interfaces.BlobId) bool {
-	return a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes())
+	return (a.IsNull() && b.IsNull()) ||
+		(a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes()))
 }
 
 func Clone(src interfaces.BlobId) interfaces.BlobId {
+	if src.IsNull() {
+		return Null
+	}
+
+	errors.PanicIfError(MakeErrEmptyType(src))
 	env := GetEnv(src.GetType())
 	dst := env.GetBlobId()
 	dst.ResetWithMerkleId(src)
+
 	return dst
 }
 

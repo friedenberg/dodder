@@ -215,7 +215,14 @@ func (store *Store) Create(
 	}
 
 	actual := openList.Mover.GetBlobId()
-	expected := sha.MustWithMerkleId(object.GetBlobDigest())
+	// expected := &merkle.Id{}
+
+	expected := merkle_ids.Clone(object.GetBlobDigest())
+	// if err = expected.SetMerkleId(merkle.HRPObjectBlobDigestSha256V0,
+	// actual.GetBytes()); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
