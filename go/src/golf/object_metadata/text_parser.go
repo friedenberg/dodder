@@ -40,7 +40,7 @@ func (f textParser) ParseMetadata(
 	var n1 int64
 
 	defer func() {
-		c.SetBlobId(&m.Blob)
+		c.SetBlobDigest(&m.Blob)
 	}()
 
 	mp := &textParser2{

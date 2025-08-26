@@ -31,7 +31,7 @@ func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
+func (client *client) HasBlob(merkleId interfaces.MerkleId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -40,7 +40,7 @@ func (client *client) HasBlob(sh interfaces.BlobId) (ok bool) {
 		if request, err = client.newRequest(
 			"HEAD",
 			"/blobs",
-			strings.NewReader(merkle_ids.Format(sh.GetBlobId())),
+			strings.NewReader(merkle_ids.Format(merkleId)),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}

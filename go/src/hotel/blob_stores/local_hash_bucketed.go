@@ -68,15 +68,15 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	digest interfaces.BlobId,
+	merkleId interfaces.MerkleId,
 ) (ok bool) {
-	if digest.GetBlobId().IsNull() {
+	if merkleId.IsNull() {
 		ok = true
 		return
 	}
 
-	path := env_dir.MakeHashBucketPathFromSha(
-		digest,
+	path := env_dir.MakeHashBucketPathFromMerkleId(
+		merkleId,
 		blobStore.buckets,
 		blobStore.basePath,
 	)
@@ -194,7 +194,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		return
 	}
 
-	path = env_dir.MakeHashBucketPathFromSha(
+	path = env_dir.MakeHashBucketPathFromMerkleId(
 		digest.GetBlobId(),
 		blobStore.buckets,
 		path,

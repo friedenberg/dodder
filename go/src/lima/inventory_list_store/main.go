@@ -219,7 +219,7 @@ func (store *Store) Create(
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
-		object.SetBlobId(actual)
+		object.SetBlobDigest(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
 			err = errors.Wrap(err)
@@ -294,7 +294,7 @@ func (store *Store) WriteInventoryListBlob(
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
-		object.SetBlobId(actual)
+		object.SetBlobDigest(actual)
 	} else {
 		if err = expected.AssertEqualsShaLike(actual); err != nil {
 			err = errors.Wrap(err)

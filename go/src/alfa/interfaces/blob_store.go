@@ -45,7 +45,7 @@ type (
 	BlobStore interface {
 		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string
-		HasBlob(sh BlobId) (ok bool)
+		HasBlob(MerkleId) bool
 		BlobReader
 		BlobWriter
 		AllBlobs() SeqError[BlobId]

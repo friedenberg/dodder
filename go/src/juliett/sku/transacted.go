@@ -255,12 +255,26 @@ func (transacted *Transacted) GetObjectDigest() interfaces.MerkleId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
+// func (transacted *Transacted) GetBlobDigest() interfaces.MerkleId {
+// 	return transacted.Metadata.GetBlobDigest()
+// }
+
 func (transacted *Transacted) GetBlobDigest() interfaces.BlobId {
 	return &transacted.Metadata.Blob
 }
 
-func (transacted *Transacted) SetBlobId(sh interfaces.BlobId) error {
-	return transacted.Metadata.Blob.SetDigest(sh)
+func (transacted *Transacted) SetBlobDigest(
+	merkleId interfaces.MerkleId,
+) (err error) {
+	if err = transacted.Metadata.GetBlobDigestMutable().SetMerkleId(
+		merkleId.GetType(),
+		merkleId.GetBytes(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (transacted *Transacted) GetKey() string {

@@ -146,7 +146,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	if err = newConfig.SetBlobId(blobId); err != nil {
+	if err = newConfig.SetBlobDigest(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

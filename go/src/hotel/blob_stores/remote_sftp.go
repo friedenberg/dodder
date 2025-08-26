@@ -144,38 +144,38 @@ func (blobStore *remoteSftp) makeEnvDirConfig() env_dir.Config {
 	// )
 }
 
-func (blobStore *remoteSftp) remotePathForSha(
-	sh interfaces.BlobId,
+func (blobStore *remoteSftp) remotePathForMerkleId(
+	merkleId interfaces.MerkleId,
 ) string {
-	return env_dir.MakeHashBucketPathFromSha(
-		sh,
+	return env_dir.MakeHashBucketPathFromMerkleId(
+		merkleId,
 		blobStore.buckets,
 		strings.TrimPrefix(blobStore.config.GetRemotePath(), "/"),
 	)
 }
 
 func (blobStore *remoteSftp) HasBlob(
-	blobId interfaces.BlobId,
+	merkleId interfaces.MerkleId,
 ) (ok bool) {
-	if blobId.GetBlobId().IsNull() {
+	if merkleId.IsNull() {
 		ok = true
 		return
 	}
 
 	blobStore.blobCacheLock.RLock()
 
-	if _, ok = blobStore.blobCache[string(blobId.GetBytes())]; ok {
+	if _, ok = blobStore.blobCache[string(merkleId.GetBytes())]; ok {
 		blobStore.blobCacheLock.RUnlock()
 		return
 	}
 
 	blobStore.blobCacheLock.RUnlock()
 
-	remotePath := blobStore.remotePathForSha(blobId)
+	remotePath := blobStore.remotePathForMerkleId(merkleId)
 
 	if _, err := blobStore.sftpClient.Stat(remotePath); err == nil {
 		blobStore.blobCacheLock.Lock()
-		blobStore.blobCache[string(blobId.GetBytes())] = struct{}{}
+		blobStore.blobCache[string(merkleId.GetBytes())] = struct{}{}
 		blobStore.blobCacheLock.Unlock()
 		ok = true
 	}
@@ -259,7 +259,7 @@ func (blobStore *remoteSftp) BlobReader(
 		return
 	}
 
-	remotePath := blobStore.remotePathForSha(digest)
+	remotePath := blobStore.remotePathForMerkleId(digest)
 
 	var remoteFile *sftp.File
 
@@ -393,7 +393,7 @@ func (mover *sftpMover) Close() (err error) {
 
 	// Get the calculated SHA and determine final path
 	sh := mover.writer.GetDigest()
-	finalPath := mover.store.remotePathForSha(sh)
+	finalPath := mover.store.remotePathForMerkleId(sh)
 
 	// Ensure the target directory exists (Git-like bucketing)
 	finalDir := path.Dir(finalPath)

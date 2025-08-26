@@ -13,15 +13,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 )
 
-func MakeHashBucketPathFromSha(
-	sh interfaces.BlobId,
+func MakeHashBucketPathFromMerkleId(
+	merkleId interfaces.MerkleId,
 	buckets []int,
 	pathComponents ...string,
 ) string {
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(merkle_ids.Format(sh)),
+		[]byte(merkle_ids.Format(merkleId)),
 		buckets,
 		pathComponents...,
 	)

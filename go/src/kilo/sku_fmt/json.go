@@ -141,7 +141,7 @@ func (json *JSON) ToTransacted(
 
 		// TODO just compare blob digests
 		// TODO-P1 support states of blob vs blob sha
-		object.SetBlobId(writeCloser.GetBlobId())
+		object.SetBlobDigest(writeCloser.GetBlobId())
 	}
 
 	// Set BlobId from JSON even if not writing to blob store
