@@ -124,11 +124,11 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	blobSha := listObject.GetBlobDigest()
+	blobDigest := listObject.GetBlobDigest()
 
-	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobSha) {
+	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobDigest) {
 		err = env_dir.ErrBlobMissing{
-			BlobIdGetter: blobSha,
+			BlobId: blobDigest,
 		}
 
 		return

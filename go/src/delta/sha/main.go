@@ -76,7 +76,7 @@ func (digest *Sha) GetType() string {
 	return Type
 }
 
-func (digest *Sha) GetBlobId() interfaces.BlobId {
+func (digest *Sha) GetBlobId() interfaces.MerkleId {
 	return digest
 }
 
@@ -102,11 +102,6 @@ func (digest *Sha) GetHead() string {
 
 func (digest *Sha) GetTail() string {
 	return digest.String()[2:]
-}
-
-// TODO remove
-func (digest *Sha) AssertEqualsShaLike(b interfaces.BlobId) error {
-	return merkle_ids.MakeErrNotEqual(digest, b)
 }
 
 // func (digest *Sha) EqualsAny(b any) bool {

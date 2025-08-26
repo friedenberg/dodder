@@ -13,15 +13,15 @@ type ErrBlobMissing struct {
 }
 
 // TODO add recovery text
-func (e ErrBlobMissing) Error() string {
+func (err ErrBlobMissing) Error() string {
 	return fmt.Sprintf(
 		"Blob for %q with sha %q does not exist locally.",
-		e.ObjectId,
-		e.GetBlobId(),
+		err.ObjectId,
+		err.BlobId,
 	)
 }
 
-func (e ErrBlobMissing) Is(target error) bool {
+func (err ErrBlobMissing) Is(target error) bool {
 	_, ok := target.(ErrBlobMissing)
 	return ok
 }

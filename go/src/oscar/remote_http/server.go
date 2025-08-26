@@ -596,7 +596,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 
-	if err := sh.AssertEqualsShaLike(result); err != nil {
+	if err := merkle_ids.MakeErrNotEqual(&sh, result); err != nil {
 		response.Error(err)
 		return
 	}

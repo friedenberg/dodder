@@ -376,13 +376,13 @@ func writeShaKeyIfNotNull(
 	return
 }
 
-func GetShaForContext(
-	f Format,
-	c FormatterContext,
-) (sh interfaces.BlobId, err error) {
-	m := c.GetMetadata()
+func GetDigestForContext(
+	format Format,
+	context FormatterContext,
+) (digest interfaces.MerkleId, err error) {
+	m := context.GetMetadata()
 
-	switch f.key {
+	switch format.key {
 	case "Akte", "AkteTyp":
 		if m.GetBlobDigest().IsNull() {
 			return
@@ -399,21 +399,21 @@ func GetShaForContext(
 		return
 	}
 
-	return getShaForContext(f, c)
+	return getDigestForContext(format, context)
 }
 
-func GetShaForMetadata(
-	f Format,
-	m *object_metadata.Metadata,
-) (sh interfaces.BlobId, err error) {
-	return GetShaForContext(f, nopFormatterContext{m})
+func GetDigestForMetadata(
+	format Format,
+	metadata *object_metadata.Metadata,
+) (digest interfaces.MerkleId, err error) {
+	return GetDigestForContext(format, nopFormatterContext{metadata})
 }
 
 func WriteMetadata(
 	w io.Writer,
 	f Format,
 	c FormatterContext,
-) (blobId interfaces.BlobId, err error) {
+) (blobDigest interfaces.MerkleId, err error) {
 	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, w)
 	defer repool()
 
@@ -423,16 +423,16 @@ func WriteMetadata(
 		return
 	}
 
-	blobId = writer.GetBlobId()
+	blobDigest = writer.GetBlobId()
 
 	return
 }
 
-func getShaForContext(
-	f Format,
-	c FormatterContext,
-) (sh interfaces.BlobId, err error) {
-	if sh, err = WriteMetadata(nil, f, c); err != nil {
+func getDigestForContext(
+	format Format,
+	context FormatterContext,
+) (digest interfaces.MerkleId, err error) {
+	if digest, err = WriteMetadata(nil, format, context); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -440,10 +440,10 @@ func getShaForContext(
 	return
 }
 
-func GetShaForContextDebug(
+func GetDigestForContextDebug(
 	format Format,
 	context FormatterContext,
-) (blobId interfaces.BlobId, err error) {
+) (digest interfaces.MerkleId, err error) {
 	var sb strings.Builder
 	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, &sb)
 	defer repool()
@@ -454,33 +454,33 @@ func GetShaForContextDebug(
 		return
 	}
 
-	blobId = writer.GetBlobId()
+	digest = writer.GetBlobId()
 
-	ui.Debug().Printf("%q -> %s", &sb, merkle_ids.Format(blobId))
+	ui.Debug().Printf("%q -> %s", &sb, merkle_ids.Format(digest))
 
 	return
 }
 
-func GetShasForMetadata(
-	m *object_metadata.Metadata,
-) (blobIds map[string]interfaces.BlobId, err error) {
-	blobIds = make(map[string]interfaces.BlobId, len(FormatKeysV5))
+func GetDigestsForMetadata(
+	metadata *object_metadata.Metadata,
+) (digests map[string]interfaces.MerkleId, err error) {
+	digests = make(map[string]interfaces.MerkleId, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)
 
-		var sh interfaces.BlobId
+		var digest interfaces.MerkleId
 
-		if sh, err = GetShaForMetadata(f, m); err != nil {
+		if digest, err = GetDigestForMetadata(f, metadata); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if sh == nil {
+		if digest == nil {
 			continue
 		}
 
-		blobIds[k] = sh
+		digests[k] = digest
 	}
 
 	return

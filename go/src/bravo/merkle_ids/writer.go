@@ -46,6 +46,8 @@ type writer struct {
 	hash      hash.Hash
 }
 
+var _ interfaces.BlobIdGetter = &writer{}
+
 func (writer *writer) Reset(envDigest interfaces.EnvBlobId, in io.Writer) {
 	writer.envDigest = envDigest
 
@@ -104,7 +106,7 @@ func (writer *writer) Close() (err error) {
 	return
 }
 
-func (writer *writer) GetBlobId() interfaces.BlobId {
+func (writer *writer) GetBlobId() interfaces.MerkleId {
 	digest, err := writer.envDigest.MakeDigestFromHash(writer.hash)
 	errors.PanicIfError(err)
 

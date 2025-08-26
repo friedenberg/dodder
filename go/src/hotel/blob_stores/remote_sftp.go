@@ -183,8 +183,8 @@ func (blobStore *remoteSftp) HasBlob(
 	return
 }
 
-func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
-	return func(yield func(interfaces.BlobId, error) bool) {
+func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
+	return func(yield func(interfaces.MerkleId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -208,9 +208,10 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 			relPath := strings.TrimPrefix(walker.Path(), basePath)
 			relPath = strings.TrimPrefix(relPath, "/")
 
-			var sh sha.Sha
+			var digest sha.Sha
 
-			if err := sh.SetFromPath(relPath); err != nil {
+			// TODO use config to determine which digest type to set
+			if err := digest.SetFromPath(relPath); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
@@ -219,10 +220,10 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 			}
 
 			blobStore.blobCacheLock.Lock()
-			blobStore.blobCache[string(sh.GetBytes())] = struct{}{}
+			blobStore.blobCache[string(digest.GetBytes())] = struct{}{}
 			blobStore.blobCacheLock.Unlock()
 
-			if !yield(&sh, nil) {
+			if !yield(&digest, nil) {
 				return
 			}
 		}
@@ -249,9 +250,9 @@ func (blobStore *remoteSftp) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore *remoteSftp) BlobReader(
-	digest interfaces.BlobId,
+	digest interfaces.MerkleId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
-	if digest.GetBlobId().IsNull() {
+	if digest.IsNull() {
 		readCloser = merkle_ids.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
@@ -266,8 +267,8 @@ func (blobStore *remoteSftp) BlobReader(
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobIdGetter: merkle_ids.Clone(digest),
-				Path:         remotePath,
+				BlobId: merkle_ids.Clone(digest),
+				Path:     remotePath,
 			}
 		} else {
 			err = errors.Wrap(err)
@@ -426,11 +427,10 @@ func (mover *sftpMover) Close() (err error) {
 	return
 }
 
-func (mover *sftpMover) GetBlobId() interfaces.BlobId {
+func (mover *sftpMover) GetBlobId() interfaces.MerkleId {
 	if mover.writer == nil {
 		// Return empty SHA if no data written
-		// TODO use sha.GetPool()
-		return &sha.Sha{}
+		return sha.Env{}.GetBlobId()
 	}
 
 	return mover.writer.GetDigest()
@@ -599,6 +599,6 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetBlobId() interfaces.BlobId {
+func (reader *sftpReader) GetBlobId() interfaces.MerkleId {
 	return sha.FromHash(reader.hash)
 }

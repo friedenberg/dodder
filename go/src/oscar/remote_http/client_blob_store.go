@@ -62,13 +62,13 @@ func (client *client) HasBlob(merkleId interfaces.MerkleId) (ok bool) {
 }
 
 func (client *client) BlobReader(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 ) (reader interfaces.ReadCloseBlobIdGetter, err error) {
 	var request *http.Request
 
 	if request, err = client.newRequest(
 		"GET",
-		fmt.Sprintf("/blobs/%s", merkle_ids.Format(sh.GetBlobId())),
+		fmt.Sprintf("/blobs/%s", merkle_ids.Format(blobId)),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -85,7 +85,7 @@ func (client *client) BlobReader(
 	switch {
 	case response.StatusCode == http.StatusNotFound:
 		err = env_dir.ErrBlobMissing{
-			BlobIdGetter: sh,
+			BlobId: blobId,
 		}
 
 	case response.StatusCode >= 300:
@@ -100,7 +100,7 @@ func (client *client) BlobReader(
 
 func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
-	expected *sha.Sha,
+	expected interfaces.MerkleId,
 ) (err error) {
 	var actual sha.Sha
 
@@ -166,7 +166,7 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = expected.AssertEqualsShaLike(&actual); err != nil {
+	if err = merkle_ids.MakeErrNotEqual(expected, &actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -195,7 +195,7 @@ func (client *client) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+func (client *client) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
 	panic(errors.Err501NotImplemented)
 }
 

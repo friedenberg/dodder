@@ -47,7 +47,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	expected := sha.MustWithDigester(listObject.GetBlobDigest())
+	expected := sha.MustWithMerkleId(listObject.GetBlobDigest())
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 
@@ -161,7 +161,7 @@ func (server *Server) writeInventoryList(
 
 	actual := blobWriter.GetBlobId()
 
-	if err := expected.AssertEqualsShaLike(actual); err != nil {
+	if err := merkle_ids.MakeErrNotEqual(expected, actual); err != nil {
 		ui.Err().Printf(
 			"received list has different sha: expected: %s, actual: %s",
 			expected,

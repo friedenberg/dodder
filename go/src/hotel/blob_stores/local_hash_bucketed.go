@@ -86,9 +86,9 @@ func (blobStore localHashBucketed) HasBlob(
 }
 
 // TODO add support for other bucket sizes and digest types
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
-	return func(yield func(interfaces.BlobId, error) bool) {
-		var sh sha.Sha
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.MerkleId] {
+	return func(yield func(interfaces.MerkleId, error) bool) {
+		var digest sha.Sha
 
 		for path, err := range files.DirNamesLevel2(blobStore.basePath) {
 			if errors.IsErrno(err, syscall.ENOTDIR) {
@@ -103,18 +103,19 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 				}
 			}
 
-			if err = sh.SetFromPath(path); err != nil {
+			// TODO use config to determine which digest type to set
+			if err = digest.SetFromPath(path); err != nil {
 				err = errors.Wrap(err)
 				if !yield(nil, err) {
 					return
 				}
 			}
 
-			if sh.IsNull() {
+			if digest.IsNull() {
 				continue
 			}
 
-			if !yield(&sh, nil) {
+			if !yield(&digest, nil) {
 				return
 			}
 		}
@@ -142,7 +143,7 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 func (blobStore localHashBucketed) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
-	if digest.GetBlobId().IsNull() {
+	if digest.IsNull() {
 		readCloser = merkle_ids.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
@@ -195,7 +196,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	}
 
 	path = env_dir.MakeHashBucketPathFromMerkleId(
-		digest.GetBlobId(),
+		digest,
 		blobStore.buckets,
 		path,
 	)
@@ -206,8 +207,8 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobIdGetter: merkle_ids.Clone(digest),
-				Path:         path,
+				BlobId: merkle_ids.Clone(digest),
+				Path:     path,
 			}
 		} else {
 			err = errors.Wrapf(

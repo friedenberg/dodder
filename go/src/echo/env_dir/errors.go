@@ -13,7 +13,7 @@ func IsErrBlobAlreadyExists(err error) bool {
 }
 
 func MakeErrBlobAlreadyExists(
-	blobId interfaces.BlobId,
+	blobId interfaces.MerkleId,
 	path string,
 ) ErrBlobAlreadyExists {
 	return ErrBlobAlreadyExists{
@@ -45,26 +45,26 @@ func IsErrBlobMissing(err error) bool {
 }
 
 type ErrBlobMissing struct {
-	interfaces.BlobIdGetter
-	Path string
+	BlobId interfaces.MerkleId
+	Path   string
 }
 
-func (e ErrBlobMissing) Error() string {
-	if e.Path == "" {
+func (err ErrBlobMissing) Error() string {
+	if err.Path == "" {
 		return fmt.Sprintf(
-			"Blob with sha %q does not exist locally",
-			e.GetBlobId(),
+			"Blob with id %q does not exist locally",
+			merkle_ids.Format(err.BlobId),
 		)
 	} else {
 		return fmt.Sprintf(
-			"Blob with sha %q does not exist locally: %q",
-			e.GetBlobId(),
-			e.Path,
+			"Blob with id %q does not exist locally: %q",
+			merkle_ids.Format(err.BlobId),
+			err.Path,
 		)
 	}
 }
 
-func (e ErrBlobMissing) Is(target error) bool {
+func (err ErrBlobMissing) Is(target error) bool {
 	_, ok := target.(ErrBlobMissing)
 	return ok
 }

@@ -92,14 +92,22 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					answer.GetBlobId(),
+					merkle_ids.Format(answer.BlobId),
 					answer.Path,
 				)
 			} else {
-				blobStore.GetUI().Printf("%s %s (checked in)", answer.GetBlobId(), answer.Path)
+				blobStore.GetUI().Printf(
+					"%s %s (checked in)",
+					merkle_ids.Format(answer.BlobId),
+					answer.Path,
+				)
 			}
 		} else {
-			ui.Err().Printf("%s %s (untracked)", answer.GetBlobId(), answer.Path)
+			ui.Err().Printf(
+				"%s %s (untracked)",
+				merkle_ids.Format(answer.BlobId),
+				answer.Path,
+			)
 
 			if cmd.Check {
 				failCount.Add(1)
@@ -122,7 +130,7 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
-) (sh interfaces.BlobId, err error) {
+) (blobId interfaces.MerkleId, err error) {
 	var readCloser io.ReadCloser
 
 	if readCloser, err = env_dir.NewFileReader(
@@ -140,7 +148,10 @@ func (cmd BlobStoreWrite) doOne(
 	if cmd.Check {
 		{
 			var repool func()
-			writeCloser, repool = merkle_ids.MakeWriterWithRepool(sha.Env{}, nil)
+			writeCloser, repool = merkle_ids.MakeWriterWithRepool(
+				sha.Env{},
+				nil,
+			)
 			defer repool()
 		}
 	} else {
@@ -157,7 +168,7 @@ func (cmd BlobStoreWrite) doOne(
 		return
 	}
 
-	sh = writeCloser.GetBlobId()
+	blobId = writeCloser.GetBlobId()
 
 	return
 }

@@ -222,10 +222,10 @@ func (transacted *Transacted) makeShaCalcFunc(
 }
 
 func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
-	f := object_inventory_format.GetShaForContext
+	f := object_inventory_format.GetDigestForContext
 
 	if debug {
-		f = object_inventory_format.GetShaForContextDebug
+		f = object_inventory_format.GetDigestForContextDebug
 	}
 
 	wg := errors.MakeWaitGroupParallel()
@@ -290,7 +290,7 @@ func (transacted *Transacted) calculateObjectDigest() (err error) {
 	}
 
 	if err = transacted.makeDigestCalcFunc(
-		object_inventory_format.GetShaForContext,
+		object_inventory_format.GetDigestForContext,
 		object_inventory_format.FormatV11ObjectDigest,
 		transacted.Metadata.GetObjectDigestMutable(),
 	)(); err != nil {

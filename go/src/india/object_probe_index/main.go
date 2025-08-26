@@ -90,7 +90,7 @@ func (index *object_probe_index) GetObjectProbeIndex() Index {
 func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	var shas map[string]interfaces.BlobId
 
-	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
+	if shas, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -170,7 +170,7 @@ func (index *object_probe_index) ReadOneKey(
 
 	var sh interfaces.BlobId
 
-	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
+	if sh, err = object_inventory_format.GetDigestForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -199,7 +199,7 @@ func (index *object_probe_index) ReadManyKeys(
 
 	var sh interfaces.BlobId
 
-	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
+	if sh, err = object_inventory_format.GetDigestForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -213,7 +213,7 @@ func (index *object_probe_index) ReadAll(
 ) (err error) {
 	var shas map[string]interfaces.BlobId
 
-	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
+	if shas, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

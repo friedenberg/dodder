@@ -27,16 +27,8 @@ type (
 		ResetWithMerkleId(MerkleId)
 	}
 
-	BlobId interface {
-		MerkleId
-		BlobIdGetter
-	}
-
-	MutableBlobId interface {
-		MutableMerkleId
-		BlobId
-		SetDigest(BlobId) error
-	}
+	BlobId        = MerkleId
+	MutableBlobId = MutableMerkleId
 
 	// TODO design a better pattern for interfaces that have concrete
 	// implementations and polymorphic implementations
@@ -45,7 +37,7 @@ type (
 	}
 
 	BlobIdGetter interface {
-		GetBlobId() BlobId
+		GetBlobId() MerkleId
 	}
 
 	EnvBlobId interface {
@@ -53,6 +45,7 @@ type (
 
 		GetHash() (hash.Hash, FuncRepool)
 
+		// TODO rename
 		GetBlobId() MutableBlobId
 		PutBlobId(BlobId)
 

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -214,14 +215,14 @@ func (store *Store) Create(
 	}
 
 	actual := openList.Mover.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobDigest())
+	expected := sha.MustWithMerkleId(object.GetBlobDigest())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = expected.AssertEqualsShaLike(actual); err != nil {
+		if err = merkle_ids.MakeErrNotEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -289,14 +290,14 @@ func (store *Store) WriteInventoryListBlob(
 	}
 
 	actual := writeCloser.GetBlobId()
-	expected := sha.MustWithDigester(object.GetBlobDigest())
+	expected := sha.MustWithMerkleId(object.GetBlobDigest())
 
 	ui.Log().Print("expected", expected, "actual", actual)
 
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = expected.AssertEqualsShaLike(actual); err != nil {
+		if err = merkle_ids.MakeErrNotEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

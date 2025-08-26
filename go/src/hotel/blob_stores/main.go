@@ -195,25 +195,23 @@ func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobShaGetter interfaces.BlobIdGetter,
+	blobId interfaces.BlobId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	blobSha := blobShaGetter.GetBlobId()
-
-	if dst.HasBlob(blobSha) || blobSha.IsNull() {
+	if dst.HasBlob(blobId) || blobId.IsNull() {
 		err = env_dir.MakeErrBlobAlreadyExists(
-			blobSha,
+			blobId,
 			"",
 		)
 
 		return
 	}
 
-	return CopyBlob(env, dst, src, blobSha, extraWriter)
+	return CopyBlob(env, dst, src, blobId, extraWriter)
 }
 
 // TODO make this honor context closure and abort early
@@ -280,7 +278,7 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.BlobStore,
-	sh interfaces.BlobId,
+	merkleId interfaces.MerkleId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
@@ -289,7 +287,7 @@ func VerifyBlob(
 
 	var readCloser interfaces.ReadCloseBlobIdGetter
 
-	if readCloser, err = blobStore.BlobReader(sh); err != nil {
+	if readCloser, err = blobStore.BlobReader(merkleId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -299,9 +297,9 @@ func VerifyBlob(
 		return
 	}
 
-	expected := sha.MustWithMerkleId(sh)
+	expected := sha.MustWithMerkleId(merkleId)
 
-	if err = expected.AssertEqualsShaLike(readCloser.GetBlobId()); err != nil {
+	if err = merkle_ids.MakeErrNotEqual(expected, readCloser.GetBlobId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

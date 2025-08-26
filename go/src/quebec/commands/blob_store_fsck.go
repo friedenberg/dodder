@@ -68,7 +68,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 		if err := errors.RunChildContextWithPrintTicker(
 			envRepo,
 			func(ctx interfaces.Context) {
-				for sh, err := range blobStore.AllBlobs() {
+				for digest, err := range blobStore.AllBlobs() {
 					errors.ContextContinueOrPanic(ctx)
 					// TODO keep track of blobs in a tridex and compare
 					// subsequent stores
@@ -85,7 +85,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 					// - verify can open
 					// - print size
 					// - compare against other blob stores
-					if !blobStore.HasBlob(sh) {
+					if !blobStore.HasBlob(digest) {
 						blobErrors = append(blobErrors, errorBlob{err: errors.Errorf("blob missing")})
 						continue
 					}
@@ -93,7 +93,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 					if err = blob_stores.VerifyBlob(
 						ctx,
 						blobStore,
-						sh,
+						digest,
 						&progressWriter,
 					); err != nil {
 						blobErrors = append(blobErrors, errorBlob{err: err})

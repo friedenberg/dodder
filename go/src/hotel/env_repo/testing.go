@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
@@ -89,7 +90,7 @@ func MakeTesting(
 		shActual := writeCloser.GetBlobId()
 		expected := sha.MustWithString(shaExpected)
 
-		err = expected.AssertEqualsShaLike(shActual)
+		err = merkle_ids.MakeErrNotEqual(expected, shActual)
 		if err != nil {
 			errors.ContextCancelWithErrorAndFormat(
 				t.Context,

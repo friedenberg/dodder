@@ -38,9 +38,12 @@ func SetHexBytes(
 	return
 }
 
-func SetDigester(dst interfaces.MutableMerkleId, src interfaces.BlobIdGetter) {
-	blobId := src.GetBlobId()
-	dst.SetMerkleId(blobId.GetType(), blobId.GetBytes())
+func SetDigester(
+	dst interfaces.MutableMerkleId,
+	src interfaces.BlobIdGetter,
+) {
+	digest := src.GetBlobId()
+	dst.SetMerkleId(digest.GetType(), digest.GetBytes())
 }
 
 func EqualsReader(
@@ -69,10 +72,10 @@ func Equals(a, b interfaces.MerkleId) bool {
 	return a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 
-func Clone(src interfaces.BlobId) interfaces.BlobId {
+func Clone(src interfaces.MerkleId) interfaces.BlobId {
 	env := GetEnv(src.GetType())
 	dst := env.GetBlobId()
-	errors.PanicIfError(dst.SetDigest(src))
+	dst.ResetWithMerkleId(src)
 	return dst
 }
 
