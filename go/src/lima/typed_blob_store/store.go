@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -12,6 +13,7 @@ type BlobStore[
 	BLOB_PTR interfaces.Ptr[BLOB],
 ] struct {
 	envRepo env_repo.Env
+	pool    interfaces.Pool[BLOB, BLOB_PTR]
 	Format[BLOB, BLOB_PTR]
 	resetFunc func(BLOB_PTR)
 }
@@ -26,6 +28,7 @@ func MakeBlobStore[
 ) (blobStore *BlobStore[BLOB, BLOB_PTR]) {
 	blobStore = &BlobStore[BLOB, BLOB_PTR]{
 		envRepo:   repoLayout,
+		pool:      pool.MakePool(nil, resetFunc),
 		Format:    format,
 		resetFunc: resetFunc,
 	}
@@ -33,13 +36,13 @@ func MakeBlobStore[
 	return
 }
 
-func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
-	digest interfaces.BlobId,
+func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
+	blobId interfaces.BlobId,
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
 	var readCloser interfaces.ReadCloseBlobIdGetter
 
 	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(
-		digest,
+		blobId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -47,9 +50,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	var blob BLOB
-	blobPtr = BLOB_PTR(&blob)
-	blobStore.resetFunc(blobPtr)
+	blobPtr = blobStore.pool.Get()
 
 	if _, err = blobStore.DecodeFrom(blobPtr, readCloser); err != nil {
 		err = errors.Wrapf(err, "BlobReader: %q", readCloser)
@@ -58,10 +59,10 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 
 	actual := readCloser.GetBlobId()
 
-	if !merkle_ids.Equals(actual, digest) {
+	if !merkle_ids.Equals(actual, blobId) {
 		err = errors.ErrorWithStackf(
 			"expected sha %s but got %s",
-			digest,
+			blobId,
 			actual,
 		)
 
@@ -69,16 +70,9 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob2(
 	}
 
 	repool = func() {
-		blobStore.PutBlob(blobPtr)
+		blobStore.pool.Put(blobPtr)
 	}
 
-	return
-}
-
-func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
-	digest interfaces.BlobId,
-) (a BLOB_PTR, err error) {
-	a, _, err = blobStore.GetBlob2(digest)
 	return
 }
 

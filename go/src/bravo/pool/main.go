@@ -19,11 +19,11 @@ func MakePool[T any, TPtr interfaces.Ptr[T]](
 	return &pool[T, TPtr]{
 		reset: Reset,
 		inner: &sync.Pool{
-			New: func() (o interface{}) {
+			New: func() (swimmer any) {
 				if New == nil {
-					o = new(T)
+					swimmer = new(T)
 				} else {
-					o = New()
+					swimmer = New()
 				}
 
 				return
@@ -32,8 +32,8 @@ func MakePool[T any, TPtr interfaces.Ptr[T]](
 	}
 }
 
-func (p pool[T, TPtr]) Apply(f interfaces.FuncIter[T], e T) (err error) {
-	err = f(e)
+func (pool pool[T, TPtr]) Apply(funk interfaces.FuncIter[T], e T) (err error) {
+	err = funk(e)
 
 	switch {
 
@@ -43,7 +43,7 @@ func (p pool[T, TPtr]) Apply(f interfaces.FuncIter[T], e T) (err error) {
 
 	case errors.IsStopIteration(err):
 		err = nil
-		p.Put(&e)
+		pool.Put(&e)
 
 	case err != nil:
 		err = errors.Wrap(err)
@@ -51,19 +51,19 @@ func (p pool[T, TPtr]) Apply(f interfaces.FuncIter[T], e T) (err error) {
 		fallthrough
 
 	default:
-		p.Put(&e)
+		pool.Put(&e)
 	}
 
 	return
 }
 
-func (ip pool[T, TPtr]) Get() TPtr {
-	return ip.inner.Get().(TPtr)
+func (pool pool[T, TPtr]) Get() TPtr {
+	return pool.inner.Get().(TPtr)
 }
 
-func (ip pool[T, TPtr]) PutMany(is ...TPtr) (err error) {
-	for _, i := range is {
-		if err = ip.Put(i); err != nil {
+func (pool pool[T, TPtr]) PutMany(swimmers ...TPtr) (err error) {
+	for _, i := range swimmers {
+		if err = pool.Put(i); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -72,16 +72,16 @@ func (ip pool[T, TPtr]) PutMany(is ...TPtr) (err error) {
 	return
 }
 
-func (ip pool[T, TPtr]) Put(i TPtr) (err error) {
-	if i == nil {
+func (pool pool[T, TPtr]) Put(swimmer TPtr) (err error) {
+	if swimmer == nil {
 		return
 	}
 
-	if ip.reset != nil {
-		ip.reset(i)
+	if pool.reset != nil {
+		pool.reset(swimmer)
 	}
 
-	ip.inner.Put(i)
+	pool.inner.Put(swimmer)
 
 	return
 }

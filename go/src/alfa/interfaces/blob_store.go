@@ -56,9 +56,7 @@ type (
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[BLOB any] interface {
-		GetBlob2(BlobId) (BLOB, FuncRepool, error)
-		// TODO replace with above
-		GetBlob(BlobId) (BLOB, error)
+		GetBlob(BlobId) (BLOB, FuncRepool, error)
 		PutBlob(BLOB)
 	}
 )

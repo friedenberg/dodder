@@ -59,7 +59,7 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v0
 		var blob *type_blobs.TomlV0
 
-		if blob, repool, err = store.GetBlob2(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -70,7 +70,7 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v1
 		var blob *type_blobs.TomlV1
 
-		if blob, repool, err = store.GetBlob2(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

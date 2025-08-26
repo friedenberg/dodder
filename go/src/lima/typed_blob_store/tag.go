@@ -55,7 +55,7 @@ func MakeTagStore(
 		),
 		lua_v1: MakeBlobStore(
 			envRepo,
-			MakeBlobFormat[tag_blobs.LuaV1, *tag_blobs.LuaV1](
+			MakeBlobFormat[tag_blobs.LuaV1](
 				nil,
 				nil,
 				envRepo.GetDefaultBlobStore(),
@@ -65,7 +65,7 @@ func MakeTagStore(
 		),
 		lua_v2: MakeBlobStore(
 			envRepo,
-			MakeBlobFormat[tag_blobs.LuaV2, *tag_blobs.LuaV2](
+			MakeBlobFormat[tag_blobs.LuaV2](
 				nil,
 				nil,
 				envRepo.GetDefaultBlobStore(),
@@ -76,6 +76,7 @@ func MakeTagStore(
 	}
 }
 
+// TODO check repool funcs
 func (store Tag) GetBlob(
 	object *sku.Transacted,
 ) (blobGeneric tag_blobs.Blob, repool interfaces.FuncRepool, err error) {
@@ -84,17 +85,15 @@ func (store Tag) GetBlob(
 
 	switch tipe.String() {
 	case "", ids.TypeTomlTagV0:
-		if blobGeneric, repool, err = store.toml_v0.GetBlob2(blobDigest); err != nil {
+		if blobGeneric, repool, err = store.toml_v0.GetBlob(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		repool = func() { store.toml_v0.PutBlob(blobGeneric.(*tag_blobs.V0)) }
-
 	case ids.TypeTomlTagV1:
 		var blob *tag_blobs.TomlV1
 
-		if blob, repool, err = store.toml_v1.GetBlob2(blobDigest); err != nil {
+		if blob, repool, err = store.toml_v1.GetBlob(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
