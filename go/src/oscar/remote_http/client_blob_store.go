@@ -92,7 +92,7 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		reader = merkle_ids.MakeReadCloser(sha.Env{}, response.Body)
+		reader = merkle_ids.MakeReadCloser(sha.Env, response.Body)
 	}
 
 	return

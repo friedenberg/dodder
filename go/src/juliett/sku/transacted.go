@@ -280,6 +280,7 @@ func (transacted *Transacted) GetKey() string {
 func (transacted *Transacted) calculateObjectDigest() (err error) {
 	if err = merkle_ids.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -304,7 +305,9 @@ func (transacted *Transacted) Sign(
 	transacted.CalculateObjectDigests()
 
 	if err = merkle_ids.MakeErrIsNull(
-		transacted.Metadata.GetRepoPubKey()); err != nil {
+		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -335,6 +338,7 @@ func (transacted *Transacted) Sign(
 func (transacted *Transacted) Verify() (err error) {
 	if err = merkle_ids.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
 	); err != nil {
 		err = errors.Wrapf(
 			err,
@@ -347,6 +351,7 @@ func (transacted *Transacted) Verify() (err error) {
 
 	if err = merkle_ids.MakeErrIsNull(
 		transacted.Metadata.GetObjectSig(),
+		"object-sig",
 	); err != nil {
 		err = errors.Wrapf(
 			err,

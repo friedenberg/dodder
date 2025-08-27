@@ -324,7 +324,7 @@ func writeMerkleIdKey(
 	key *catgut.String,
 	merkleId interfaces.BlobId,
 ) (n int, err error) {
-	if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
+	if err = merkle_ids.MakeErrIsNull(merkleId, key.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -414,7 +414,7 @@ func WriteMetadata(
 	f Format,
 	c FormatterContext,
 ) (blobDigest interfaces.BlobId, err error) {
-	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, w)
+	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env, w)
 	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
@@ -445,7 +445,7 @@ func GetDigestForContextDebug(
 	context FormatterContext,
 ) (digest interfaces.BlobId, err error) {
 	var sb strings.Builder
-	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env{}, &sb)
+	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env, &sb)
 	defer repool()
 
 	_, err = format.WriteMetadataTo(writer, context)

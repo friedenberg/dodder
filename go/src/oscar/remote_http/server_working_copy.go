@@ -24,10 +24,6 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 ) (response Response) {
 	listCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
-	seq := listCoderCloset.AllDecodedObjectsFromStream(
-		bufio.NewReader(request.Body),
-	)
-
 	responseBuffer := bytes.NewBuffer(nil)
 
 	// TODO make option to read from headers
@@ -72,6 +68,10 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 	importer := server.Repo.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsRemoteTransfer(),
+	)
+
+	seq := listCoderCloset.AllDecodedObjectsFromStream(
+		bufio.NewReader(request.Body),
 	)
 
 	if err := server.Repo.ImportSeq(

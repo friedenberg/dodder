@@ -11,10 +11,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 var (
-	_ = merkle_ids.RegisterEnv(Env{})
+	Env = env{tipe: Type}
+	_   = merkle_ids.RegisterEnv(Env)
+	_   = merkle_ids.RegisterEnv(env{merkle.HRPObjectBlobDigestSha256V1})
+	_   = merkle_ids.RegisterEnv(env{merkle.HRPObjectDigestSha256V1})
 
 	sha256Hash = pool_value.Make(
 		func() hash.Hash {
@@ -33,25 +37,27 @@ var (
 	)
 )
 
-type Env struct{}
-
-func (env Env) GetType() string {
-	return Type
+type env struct {
+	tipe string
 }
 
-func (env Env) GetHash() (hash.Hash, interfaces.FuncRepool) {
+func (env env) GetType() string {
+	return env.tipe
+}
+
+func (env env) GetHash() (hash.Hash, interfaces.FuncRepool) {
 	return pool.GetSha256Hash()
 }
 
-func (env Env) GetBlobId() interfaces.MutableBlobId {
+func (env env) GetBlobId() interfaces.MutableBlobId {
 	return poolSha.Get()
 }
 
-func (env Env) PutBlobId(digest interfaces.BlobId) {
+func (env env) PutBlobId(digest interfaces.BlobId) {
 	poolSha.Put(digest.(*Sha))
 }
 
-func (env Env) MakeDigestFromString(
+func (env env) MakeDigestFromString(
 	value string,
 ) (interfaces.BlobId, interfaces.FuncRepool, error) {
 	digest := poolSha.Get()
@@ -65,7 +71,7 @@ func (env Env) MakeDigestFromString(
 	return digest, func() { poolSha.Put(digest) }, nil
 }
 
-func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
+func (env env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	digest := poolSha.Get()
 	digest.Reset()
 
@@ -79,11 +85,11 @@ func (env Env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
 	return digest, nil
 }
 
-func (env Env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, interfaces.FuncRepool) {
+func (env env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, interfaces.FuncRepool) {
 	return merkle_ids.MakeWriterWithRepool(env, nil)
 }
 
-func (env Env) MakeWriteDigester() interfaces.WriteBlobIdGetter {
+func (env env) MakeWriteDigester() interfaces.WriteBlobIdGetter {
 	return merkle_ids.MakeWriter(env, nil)
 }
 
@@ -112,10 +118,8 @@ func FromStringer(v interfaces.Stringer) interfaces.BlobId {
 }
 
 func FromHash(hash hash.Hash) interfaces.BlobId {
-	digest, err := Env{}.MakeDigestFromHash(hash)
-	if err != nil {
-		panic(err)
-	}
+	digest, err := Env.MakeDigestFromHash(hash)
+	errors.PanicIfError(err)
 
 	return digest
 }

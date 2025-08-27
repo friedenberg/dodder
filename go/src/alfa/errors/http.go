@@ -30,8 +30,12 @@ var (
 		http_statuses.Code405MethodNotAllowed,
 	)
 	Err409Conflict            = NewHTTPError(http_statuses.Code409Conflict)
+	Err422UnprocessableEntity = NewHTTPError(http_statuses.Code409Conflict)
 	Err499ClientClosedRequest = NewHTTPError(
 		http_statuses.Code499ClientClosedRequest,
+	)
+	Err500InternalServerError = NewHTTPError(
+		http_statuses.Code500InternalServerError,
 	)
 	Err501NotImplemented = NewHTTPError(
 		http_statuses.Code501NotImplemented,
@@ -60,6 +64,10 @@ type HTTP struct {
 	StatusCode http_statuses.Code
 	hideUnwrap bool
 	underlying error
+}
+
+func (err HTTP) GetStatusCode() int {
+	return int(err.StatusCode)
 }
 
 func (err HTTP) Error() string {

@@ -149,7 +149,7 @@ func (cmd BlobStoreWrite) doOne(
 		{
 			var repool func()
 			writeCloser, repool = merkle_ids.MakeWriterWithRepool(
-				sha.Env{},
+				sha.Env,
 				nil,
 			)
 			defer repool()

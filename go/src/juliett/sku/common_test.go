@@ -345,7 +345,7 @@ func (arf blobReaderFactory) BlobReader(
 	}
 
 	readCloser = merkle_ids.MakeNopReadCloser(
-		sha.Env{},
+		sha.Env,
 		io.NopCloser(strings.NewReader(v)),
 	)
 

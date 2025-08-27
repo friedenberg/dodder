@@ -138,7 +138,12 @@ func (store Closet) WriteObjectToWriter(
 	}
 	sku.TransactedResetter.ResetWith(&typedBlob.Blob, object)
 
-	return store.objectCoders.EncodeTo(typedBlob, bufferedWriter)
+	if n, err = store.objectCoders.EncodeTo(typedBlob, bufferedWriter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 // TODO consume interfaces.SeqError and expose as a coder instead

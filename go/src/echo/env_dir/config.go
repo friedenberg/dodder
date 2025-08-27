@@ -27,7 +27,7 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionType       = age.Age{}
 	DefaultConfig               = Config{
-		envDigest:   sha.Env{},
+		envDigest:   sha.Env,
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionType,
 	}

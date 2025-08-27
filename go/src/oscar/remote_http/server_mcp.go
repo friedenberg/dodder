@@ -412,7 +412,7 @@ func (server *Server) readMCPResourceBlobs(
 
 	blobDigest := pathComponents[0]
 
-	digest, repool, err := sha.Env{}.MakeDigestFromString(blobDigest)
+	digest, repool, err := sha.Env.MakeDigestFromString(blobDigest)
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}

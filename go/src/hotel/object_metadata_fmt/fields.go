@@ -16,7 +16,7 @@ func MetadataBlobIdString(
 	abbr ids.FuncAbbreviateString,
 ) (digestString string, err error) {
 	digest := sha.MustWithMerkleId(metadata.GetBlobDigest())
-	defer sha.Env{}.PutBlobId(digest)
+	defer sha.Env.PutBlobId(digest)
 
 	digestString = digest.String()
 

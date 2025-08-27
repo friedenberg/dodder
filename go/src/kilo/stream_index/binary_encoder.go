@@ -117,6 +117,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeMerkleId(
 			object.Metadata.GetBlobDigest(),
 			true,
+			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -133,9 +134,11 @@ func (encoder *binaryEncoder) writeFieldKey(
 	case key_bytes.RepoSig:
 		merkleId := object.Metadata.GetObjectSig()
 
+		// TODO change to false once dropping V8
 		if n, err = encoder.writeMerkleId(
 			merkleId,
-			false,
+			true,
+			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -203,19 +206,31 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
-		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetMotherObjectDigest(), true); err != nil {
+		if n, err = encoder.writeFieldMerkleId(
+			object.Metadata.GetMotherObjectDigest(),
+			true,
+			encoder.Binary.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if n, err = encoder.writeSha(&object.Metadata.SelfWithoutTai, true); err != nil {
+		if n, err = encoder.writeSha(
+			&object.Metadata.SelfWithoutTai,
+			true,
+			encoder.Binary.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case key_bytes.DigestMetadataParentObjectId:
-		if n, err = encoder.writeFieldMerkleId(object.Metadata.GetObjectDigest(), false); err != nil {
+		if n, err = encoder.writeFieldMerkleId(
+			object.Metadata.GetObjectDigest(),
+			false,
+			encoder.Binary.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -272,9 +287,10 @@ func (encoder *binaryEncoder) writeFieldKey(
 func (encoder *binaryEncoder) writeMerkleId(
 	merkleId interfaces.BlobId,
 	allowNull bool,
+	key string,
 ) (n int64, err error) {
 	if !allowNull {
-		if err = merkle_ids.MakeErrIsNull(merkleId); err != nil {
+		if err = merkle_ids.MakeErrIsNull(merkleId, key); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -294,10 +310,11 @@ func (encoder *binaryEncoder) writeMerkleId(
 func (encoder *binaryEncoder) writeSha(
 	sh *sha.Sha,
 	allowNull bool,
+	key string,
 ) (n int64, err error) {
 	if sh.IsNull() {
 		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(sh)
+			err = merkle_ids.MakeErrIsNull(sh, key)
 		}
 
 		return
@@ -330,10 +347,11 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 func (encoder *binaryEncoder) writeFieldMerkleId(
 	merkleId interfaces.BlobId,
 	allowNull bool,
+	key string,
 ) (n int64, err error) {
 	if merkleId.IsNull() {
 		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(merkleId)
+			err = merkle_ids.MakeErrIsNull(merkleId, key)
 		}
 
 		return

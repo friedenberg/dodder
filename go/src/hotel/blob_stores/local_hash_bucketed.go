@@ -17,7 +17,7 @@ import (
 
 type localHashBucketed struct {
 	// TODO move to config
-	envDigest sha.Env
+	envDigest interfaces.EnvBlobId
 	buckets   []int
 	config    blob_store_configs.ConfigLocalHashBucketed
 	basePath  string
@@ -32,10 +32,11 @@ func makeLocalHashBucketed(
 ) (localHashBucketed, error) {
 	// TODO validate
 	store := localHashBucketed{
-		buckets:  config.GetHashBuckets(),
-		config:   config,
-		basePath: basePath,
-		tempFS:   tempFS,
+		envDigest: sha.Env,
+		buckets:   config.GetHashBuckets(),
+		config:    config,
+		basePath:  basePath,
+		tempFS:    tempFS,
 	}
 
 	return store, nil
@@ -59,8 +60,8 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.BlobStore {
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-		// TODO move to config
-		sha.Env{},
+
+		sha.Env,
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),

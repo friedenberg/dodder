@@ -59,7 +59,10 @@ func (response *Response) ErrorWithStatus(status int, err error) {
 }
 
 func (response *Response) Error(err error) {
-	response.ErrorWithStatus(http.StatusInternalServerError, err)
+	httpError := errors.Err500InternalServerError
+
+	errors.As(err, &httpError)
+	response.ErrorWithStatus(httpError.GetStatusCode(), err)
 }
 
 func (response *Response) MCPError(

@@ -247,7 +247,9 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	buffer := bytes.NewBuffer(nil)
 
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(buffer)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+		buffer,
+	)
 	defer repoolBufferedWriter()
 
 	inventoryListCoderCloset := client.repo.GetInventoryListCoderCloset()

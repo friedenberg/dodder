@@ -33,7 +33,7 @@ type remoteSftp struct {
 	config blob_store_configs.ConfigSFTPRemotePath
 
 	// TODO move to config
-	envDigest sha.Env
+	envDigest interfaces.EnvBlobId
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -52,6 +52,7 @@ func makeSftpStore(
 	sshClient *ssh.Client,
 ) (blobStore *remoteSftp, err error) {
 	blobStore = &remoteSftp{
+		envDigest: sha.Env,
 		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
 		config:    config,
@@ -430,7 +431,7 @@ func (mover *sftpMover) Close() (err error) {
 func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 	if mover.writer == nil {
 		// Return empty SHA if no data written
-		return sha.Env{}.GetBlobId()
+		return sha.Env.GetBlobId()
 	}
 
 	return mover.writer.GetDigest()

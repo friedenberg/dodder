@@ -45,7 +45,11 @@ func VerifySignature(
 		sig,
 		&ed25519.Options{},
 	); err != nil {
-		err = errors.Wrapf(err, "invalid signature: %x", sig)
+		err = errors.Err422UnprocessableEntity.Errorf(
+			"invalid signature: %w. Signature: %x",
+			err,
+			sig,
+		)
 		return
 	}
 

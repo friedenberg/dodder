@@ -1,16 +1,14 @@
 package merkle_ids
 
 import (
+	"bytes"
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-var (
-	ErrIsNull    = errors.New("digest is null")
-	ErrEmptyType = errors.New("type is empty")
-)
+var ErrEmptyType = errors.New("type is empty")
 
 func MakeErrEmptyType(id interfaces.BlobId) error {
 	if id.GetType() == "" {
@@ -20,21 +18,51 @@ func MakeErrEmptyType(id interfaces.BlobId) error {
 	return nil
 }
 
-// TODO include digest type
-func MakeErrIsNull(id interfaces.BlobId) error {
-	if id.IsNull() {
-		return errors.WrapSkip(1, ErrIsNull)
+func MakeErrIsNotNull(id interfaces.BlobId) error {
+	if !id.IsNull() {
+		// TODO clone
+		return errors.WrapSkip(1, errIsNotNull{id: id})
 	}
 
 	return nil
 }
 
-type ErrNotEqual struct {
-	Expected, Actual interfaces.BlobId
+type errIsNotNull struct {
+	id interfaces.BlobId
 }
 
-func IsErrNotEqual(err error) bool {
-	return errors.Is(err, ErrNotEqual{})
+func (err errIsNotNull) Error() string {
+	return fmt.Sprintf("blob id is not null %q", err.id)
+}
+
+func (err errIsNotNull) Is(target error) bool {
+	_, ok := target.(errIsNotNull)
+	return ok
+}
+
+func MakeErrIsNull(id interfaces.BlobId, key string) error {
+	if id.IsNull() {
+		return errors.WrapSkip(1, errIsNull{key: key})
+	}
+
+	return nil
+}
+
+type errIsNull struct {
+	key string
+}
+
+func (err errIsNull) Error() string {
+	return fmt.Sprintf("blob id is null for key %q", err.key)
+}
+
+func (err errIsNull) Is(target error) bool {
+	_, ok := target.(errIsNull)
+	return ok
+}
+
+type ErrNotEqual struct {
+	Expected, Actual interfaces.BlobId
 }
 
 func MakeErrNotEqual(expected, actual interfaces.BlobId) (err error) {
@@ -60,6 +88,36 @@ func (err ErrNotEqual) Error() string {
 
 func (err ErrNotEqual) Is(target error) bool {
 	_, ok := target.(ErrNotEqual)
+	return ok
+}
+
+type ErrNotEqualBytes struct {
+	Expected, Actual []byte
+}
+
+func MakeErrNotEqualBytes(expected, actual []byte) (err error) {
+	if bytes.Equal(expected, actual) {
+		return
+	}
+
+	err = ErrNotEqualBytes{
+		Expected: expected,
+		Actual:   actual,
+	}
+
+	return
+}
+
+func (err ErrNotEqualBytes) Error() string {
+	return fmt.Sprintf(
+		"expected digest %x but got %x",
+		err.Expected,
+		err.Actual,
+	)
+}
+
+func (err ErrNotEqualBytes) Is(target error) bool {
+	_, ok := target.(ErrNotEqualBytes)
 	return ok
 }
 

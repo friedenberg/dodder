@@ -56,8 +56,8 @@ func (cmd Import) Run(req command.Request) {
 
 		if readCloser, err = env_dir.NewFileReader(
 			env_dir.MakeConfig(
-				// TODO ready from config
-				sha.Env{},
+
+				sha.Env,
 				env_dir.MakeHashBucketPathJoinFunc(cmd.Config.GetHashBuckets()),
 				cmd.Config.GetBlobCompression(),
 				cmd.Config.GetBlobEncryption(),

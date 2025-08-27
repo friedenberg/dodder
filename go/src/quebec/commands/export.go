@@ -84,8 +84,8 @@ func (cmd Export) Run(req command.Request) {
 
 		if writeCloser, err = env_dir.NewWriter(
 			env_dir.MakeConfig(
-				// TODO read from config
-				sha.Env{},
+
+				sha.Env,
 				env_dir.MakeHashBucketPathJoinFunc([]int{2}),
 				&cmd.CompressionType,
 				&ag,
