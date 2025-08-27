@@ -56,7 +56,10 @@ func (transacted *Transacted) makeDigestCalcFunc(
 
 		defer merkle_ids.PutBlobId(actual)
 
-		if err = digest.SetMerkleId(merkle.HRPObjectDigestSha256V1, actual.GetBytes()); err != nil {
+		if err = digest.SetMerkleId(
+			merkle.HRPObjectDigestSha256V1,
+			actual.GetBytes(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -156,16 +159,13 @@ func (transacted *Transacted) SignOverwrite(
 }
 
 func (transacted *Transacted) Verify() (err error) {
+	pubKey := transacted.Metadata.GetRepoPubKey()
+
 	if err = merkle_ids.MakeErrIsNull(
-		transacted.Metadata.GetRepoPubKey(),
+		pubKey,
 		"repo-pubkey",
 	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Object: %s, Fields: %#v",
-			String(transacted),
-			transacted.Metadata.Fields,
-		)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -173,12 +173,7 @@ func (transacted *Transacted) Verify() (err error) {
 		transacted.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Object: %s, Fields: %#v",
-			String(transacted),
-			transacted.Metadata.Fields,
-		)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -188,7 +183,7 @@ func (transacted *Transacted) Verify() (err error) {
 	}
 
 	if err = merkle.VerifySignature(
-		transacted.Metadata.GetRepoPubKey().GetBytes(),
+		pubKey.GetBytes(),
 		transacted.Metadata.GetObjectDigestMutable().GetBytes(),
 		transacted.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
