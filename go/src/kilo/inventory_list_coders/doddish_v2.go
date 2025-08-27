@@ -14,8 +14,8 @@ import (
 )
 
 type doddishV2 struct {
-	Box                    *box_format.BoxTransacted
-	ImmutableConfigPrivate genesis_configs.ConfigPrivate
+	box           *box_format.BoxTransacted
+	genesisConfig genesis_configs.ConfigPrivate
 }
 
 func (coder doddishV2) EncodeTo(
@@ -41,7 +41,7 @@ func (coder doddishV2) EncodeTo(
 	var n1 int64
 	var n2 int
 
-	n1, err = coder.Box.EncodeStringTo(object, bufferedWriter)
+	n1, err = coder.box.EncodeStringTo(object, bufferedWriter)
 	n += n1
 
 	if err != nil {
@@ -66,7 +66,7 @@ func (coder doddishV2) DecodeFrom(
 ) (n int64, err error) {
 	var isEOF bool
 
-	if n, err = coder.Box.ReadStringFormat(object, bufferedReader); err != nil {
+	if n, err = coder.box.ReadStringFormat(object, bufferedReader); err != nil {
 		if err == io.EOF {
 			isEOF = true
 

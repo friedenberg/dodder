@@ -13,7 +13,7 @@ import (
 )
 
 type jsonV0 struct {
-	ImmutableConfigPrivate genesis_configs.ConfigPrivate
+	genesisConfig genesis_configs.ConfigPrivate
 }
 
 func (coder jsonV0) EncodeTo(

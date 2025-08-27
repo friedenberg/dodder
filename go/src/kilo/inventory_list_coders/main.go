@@ -24,7 +24,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
 		return doddishV1{
-			Box: box,
+			box: box,
 		}
 	},
 	ids.TypeInventoryListV2: func(
@@ -32,8 +32,8 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
 		return doddishV2{
-			Box:                    box,
-			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
+			box:                    box,
+			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 	},
 	ids.TypeInventoryListJsonV0: func(
@@ -41,7 +41,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
 		return jsonV0{
-			ImmutableConfigPrivate: envRepo.GetConfigPrivate().Blob,
+			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 	},
 }

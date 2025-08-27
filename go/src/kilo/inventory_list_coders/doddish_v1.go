@@ -12,7 +12,7 @@ import (
 )
 
 type doddishV1 struct {
-	Box *box_format.BoxTransacted
+	box *box_format.BoxTransacted
 }
 
 func (coder doddishV1) EncodeTo(
@@ -30,7 +30,7 @@ func (coder doddishV1) EncodeTo(
 	var n1 int64
 	var n2 int
 
-	n1, err = coder.Box.EncodeStringTo(object, bufferedWriter)
+	n1, err = coder.box.EncodeStringTo(object, bufferedWriter)
 	n += n1
 
 	if err != nil {
@@ -55,7 +55,7 @@ func (coder doddishV1) DecodeFrom(
 ) (n int64, err error) {
 	var isEOF bool
 
-	if n, err = coder.Box.ReadStringFormat(object, bufferedReader); err != nil {
+	if n, err = coder.box.ReadStringFormat(object, bufferedReader); err != nil {
 		if err == io.EOF {
 			isEOF = true
 
