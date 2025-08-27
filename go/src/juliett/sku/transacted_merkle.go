@@ -17,6 +17,27 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 	return transacted.calculateObjectSha(false)
 }
 
+func (transacted *Transacted) calculateObjectDigest() (err error) {
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.makeDigestCalcFunc(
+		object_inventory_format.GetDigestForContext,
+		object_inventory_format.FormatV11ObjectDigest,
+		transacted.Metadata.GetObjectDigestMutable(),
+	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (transacted *Transacted) makeDigestCalcFunc(
 	funkMakeBlobId func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
 	objectFormat object_inventory_format.Format,

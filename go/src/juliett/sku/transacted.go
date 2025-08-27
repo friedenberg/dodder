@@ -5,13 +5,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
 type Transacted struct {
@@ -185,27 +183,6 @@ func (transacted *Transacted) SetBlobDigest(
 
 func (transacted *Transacted) GetKey() string {
 	return ids.FormattedString(transacted.GetObjectId())
-}
-
-func (transacted *Transacted) calculateObjectDigest() (err error) {
-	if err = merkle_ids.MakeErrIsNull(
-		transacted.Metadata.GetRepoPubKey(),
-		"repo-pubkey",
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = transacted.makeDigestCalcFunc(
-		object_inventory_format.GetDigestForContext,
-		object_inventory_format.FormatV11ObjectDigest,
-		transacted.Metadata.GetObjectDigestMutable(),
-	)(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 type transactedLessorTaiOnly struct{}
