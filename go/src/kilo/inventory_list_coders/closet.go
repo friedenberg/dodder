@@ -395,11 +395,6 @@ func (store Closet) ReadInventoryListBlob(
 			return
 		}
 
-		if err = object.CalculateObjectDigests(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if err = list.Add(object); err != nil {
 			err = errors.Wrap(err)
 			return

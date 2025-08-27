@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -21,13 +22,19 @@ func (coder doddishV2) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetObjectDigest().IsNull() {
-		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
+	if err = merkle_ids.MakeErrIsNull(
+		object.Metadata.GetObjectDigest(),
+		"object-digest",
+	); err != nil {
+		err = errors.Wrapf(err, "Object: %q", sku.String(object))
 		return
 	}
 
-	if object.Metadata.GetObjectSig().IsNull() {
-		err = errors.ErrorWithStackf("no repo signature")
+	if err = merkle_ids.MakeErrIsNull(
+		object.Metadata.GetObjectSig(),
+		"object-sig",
+	); err != nil {
+		err = errors.Wrapf(err, "Object: %q", sku.String(object))
 		return
 	}
 

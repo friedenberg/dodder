@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -18,8 +19,11 @@ func (coder doddishV1) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if object.Metadata.GetObjectDigest().IsNull() {
-		err = errors.ErrorWithStackf("empty sha: %q", sku.String(object))
+	if err = merkle_ids.MakeErrIsNull(
+		object.Metadata.GetObjectDigest(),
+		"object-digest",
+	); err != nil {
+		err = errors.Wrapf(err, "Object: %q", sku.String(object))
 		return
 	}
 
