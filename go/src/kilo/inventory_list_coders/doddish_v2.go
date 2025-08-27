@@ -79,6 +79,11 @@ func (coder doddishV2) DecodeFrom(
 		}
 	}
 
+	if err = object.CalculateObjectDigests(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if object.GetType().String() == ids.TypeInventoryListV2 {
 		if err = object.Verify(); err != nil {
 			err = errors.Wrap(err)
@@ -86,11 +91,6 @@ func (coder doddishV2) DecodeFrom(
 		}
 	} else {
 		// TODO determine how to handle this
-	}
-
-	if err = object.CalculateObjectDigests(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	if isEOF {
