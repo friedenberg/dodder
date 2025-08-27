@@ -7,12 +7,14 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
 type doddishV1 struct {
-	box *box_format.BoxTransacted
+	configGenesis genesis_configs.ConfigPrivate
+	box           *box_format.BoxTransacted
 }
 
 func (coder doddishV1) EncodeTo(

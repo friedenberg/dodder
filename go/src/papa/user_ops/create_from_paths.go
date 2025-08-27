@@ -3,8 +3,10 @@ package user_ops
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -64,7 +66,11 @@ func (op CreateFromPaths) Run(
 
 		digestWithoutTai := &object.Metadata.SelfWithoutTai
 
-		if digestWithoutTai.IsNull() {
+		if err = merkle_ids.MakeErrIsNull(
+			digestWithoutTai,
+			key_bytes.DigestMetadataWithoutTai.String(),
+		); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
