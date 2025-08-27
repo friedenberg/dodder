@@ -14,31 +14,43 @@ func String(object *Transacted) (str string) {
 	return StringMetadataTaiMerkle(object)
 }
 
-func StringTaiGenreObjectIdShaBlob(o *Transacted) (str string) {
+func StringTaiGenreObjectIdShaBlob(object *Transacted) (str string) {
+	if object == nil {
+		return "nil object!"
+	}
+
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
-		o.GetTai(),
-		o.GetGenre(),
-		o.GetObjectId(),
-		o.GetObjectDigest(),
-		o.GetBlobDigest(),
+		object.GetTai(),
+		object.GetGenre(),
+		object.GetObjectId(),
+		object.GetObjectDigest(),
+		object.GetBlobDigest(),
 	)
 
 	return
 }
 
-func StringObjectIdBlobMetadataSansTai(o *Transacted) (str string) {
+func StringObjectIdBlobMetadataSansTai(object *Transacted) (str string) {
+	if object == nil {
+		return "nil object!"
+	}
+
 	str = fmt.Sprintf(
 		"%s %s %s",
-		o.GetObjectId(),
-		o.GetBlobDigest(),
-		StringMetadataSansTai(o),
+		object.GetObjectId(),
+		object.GetBlobDigest(),
+		StringMetadataSansTai(object),
 	)
 
 	return
 }
 
 func StringMetadataTaiMerkle(object *Transacted) (str string) {
+	if object == nil {
+		return "nil object!"
+	}
+
 	tai := object.GetTai()
 	taiFormatted := ids.MakeTaiRFC3339Value(tai)
 

@@ -54,10 +54,10 @@ func (op CreateFromPaths) Run(
 			&fsItem,
 			nil,
 		); err != nil {
-			err = errors.ErrorWithStackf(
+			err = errors.Wrapf(
+				err,
 				"zettel text format error for path: %s: %s",
 				arg,
-				err,
 			)
 			return
 		}

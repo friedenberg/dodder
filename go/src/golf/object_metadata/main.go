@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -32,7 +31,7 @@ type Metadata struct {
 	digSelf   merkle.Id
 	digMother merkle.Id
 
-	SelfWithoutTai sha.Sha // TODO moving to a separate key-value store
+	SelfWithoutTai merkle.Id // TODO moving to a separate key-value store
 	Tai            ids.Tai
 
 	// TODO move to Cache

@@ -216,7 +216,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if n, err = encoder.writeSha(
+		if n, err = encoder.writeFieldMerkleId(
 			&object.Metadata.SelfWithoutTai,
 			true,
 			encoder.Binary.String(),

@@ -91,6 +91,7 @@ func (store *Store) tryPrecommit(
 }
 
 // TODO add RealizeAndOrStore result
+// TODO switch to using a child context for each object commit
 func (store *Store) Commit(
 	external sku.ExternalLike,
 	options sku.CommitOptions,
@@ -100,7 +101,7 @@ func (store *Store) Commit(
 	ui.Log().Printf("%s -> %s", options, child)
 
 	// TODO remove this lock check and perform it when actually necessary (when
-	// persisting the changes).
+	// persisting the changes on flush).
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() &&
 		(options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{

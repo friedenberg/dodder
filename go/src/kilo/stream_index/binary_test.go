@@ -18,7 +18,7 @@ func TestBinaryOne(t1 *testing.T) {
 	buffer := new(bytes.Buffer)
 	coder := binaryEncoder{Sigil: ids.SigilLatest}
 	decoder := makeBinary(ids.SigilLatest)
-	expected := &sku.Transacted{}
+	expected := sku.GetTransactedPool().Get()
 	var expectedN int64
 	var err error
 

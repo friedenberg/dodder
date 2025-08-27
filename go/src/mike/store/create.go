@@ -75,7 +75,12 @@ func (store *Store) CreateOrUpdateDefaultProto(
 		StoreOptions: storeOptions,
 	}
 
-	return store.CreateOrUpdate(external, options)
+	if err = store.CreateOrUpdate(external, options); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (store *Store) CreateOrUpdate(
@@ -194,7 +199,10 @@ func (store *Store) CreateOrUpdateCheckedOut(
 
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", internal.GetObjectId()),
+			Operation: fmt.Sprintf(
+				"create or update %s",
+				internal.GetObjectId(),
+			),
 		}
 
 		return

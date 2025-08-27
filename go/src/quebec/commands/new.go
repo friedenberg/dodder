@@ -37,24 +37,24 @@ type New struct {
 	sku.Proto
 }
 
-func (cmd *New) SetFlagSet(f *flags.FlagSet) {
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
+func (cmd *New) SetFlagSet(flagSet *flags.FlagSet) {
+	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 
-	f.BoolVar(
+	flagSet.BoolVar(
 		&cmd.Shas,
 		"shas",
 		false,
 		"treat arguments as blobs that are already checked in",
 	)
 
-	f.IntVar(
+	flagSet.IntVar(
 		&cmd.Count,
 		"count",
 		1,
 		"when creating new empty zettels, how many to create. otherwise ignored",
 	)
 
-	f.Var(
+	flagSet.Var(
 		&cmd.Filter,
 		"filter",
 		"a script to run for each file to transform it the standard zettel format",
@@ -62,20 +62,20 @@ func (cmd *New) SetFlagSet(f *flags.FlagSet) {
 
 	cmd.complete.SetFlagsProto(
 		&cmd.Proto,
-		f,
+		flagSet,
 		"description to use for new zettels",
 		"tags added for new zettels",
 		"type used for new zettels",
 	)
 
-	cmd.Checkout.SetFlagSet(f)
+	cmd.Checkout.SetFlagSet(flagSet)
 }
 
-func (c New) ValidateFlagsAndArgs(
-	u *local_working_copy.Repo,
+func (cmd New) ValidateFlagsAndArgs(
+	repo *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
-	if u.GetConfig().IsDryRun() && len(args) == 0 {
+	if repo.GetConfig().IsDryRun() && len(args) == 0 {
 		err = errors.ErrorWithStackf(
 			"when -dry-run is set, paths to existing zettels must be provided",
 		)

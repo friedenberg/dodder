@@ -112,7 +112,7 @@ func (transacted *Transacted) calculateObjectSha(
 	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(
-		transacted.makeShaCalcFunc(
+		transacted.makeDigestCalcFunc(
 			funcCalcDigest,
 			object_inventory_format.FormatsV5MetadataSansTai,
 			&transacted.Metadata.SelfWithoutTai,

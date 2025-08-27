@@ -330,8 +330,8 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if _, err = object.Metadata.SelfWithoutTai.ReadFrom(
-			&bf.Content,
+		if err = object.Metadata.SelfWithoutTai.UnmarshalBinary(
+			bf.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
