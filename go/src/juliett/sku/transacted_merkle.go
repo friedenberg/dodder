@@ -169,15 +169,36 @@ func (transacted *Transacted) calculateMerkleObjectDigest(
 	return
 }
 
+func (transacted *Transacted) SignIfNecessary(
+	config genesis_configs.ConfigPrivate,
+) (err error) {
+	if !transacted.Metadata.GetObjectSig().IsNull() {
+		return
+	}
+
+	if err = transacted.SignOverwrite(config); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (transacted *Transacted) SignOverwrite(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	transacted.CalculateObjectDigests()
+	transacted.Metadata.GetObjectSigMutable().Reset()
+	transacted.Metadata.GetRepoPubKeyMutable().Reset()
 
-	if err = merkle_ids.MakeErrIsNull(
-		transacted.Metadata.GetRepoPubKey(),
-		"repo-pubkey",
+	if err = transacted.Metadata.GetRepoPubKeyMutable().SetMerkleId(
+		merkle.HRPRepoPubKeyV1,
+		config.GetPublicKey(),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.CalculateObjectDigestsAndMerkleUsingObject(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -224,7 +245,8 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = transacted.CalculateObjectDigests(); err != nil {
+	// TODO should the sig be recaculated like this?
+	if err = transacted.CalculateObjectDigestsAndMerkleUsingObject(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
