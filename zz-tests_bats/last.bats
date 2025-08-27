@@ -22,7 +22,7 @@ function last_after_init { # @test
 	EOM
 }
 
-function last_after_typ_mutate { # @test
+function last_after_type_mutate { # @test
 	run_dodder_init_disable_age
 
 	cat >md.type <<-EOM

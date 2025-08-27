@@ -84,12 +84,17 @@ function mergetool_conflict_one_local { # @test
 
 	export BATS_TEST_BODY=true
 
+	run cat one/dos.conflict
+	assert_output --regexp - <<-'EOM'
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 .* dodder-repo-public_key-v1-.* dodder-repo-sig-v1-.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 .* dodder-repo-public_key-v1-.* dodder-repo-sig-v1-.* !md "wow ok again" tag-3 tag-4]
+		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 .* dodder-repo-public_key-v1-.* dodder-repo-sig-v1-.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+	EOM
+
 	# TODO add `-delete` option to `merge-tool`
 	run_dodder merge-tool -merge-tool "/bin/bash -c 'cat \"\$0\" >\"\$3\"'" .
 	assert_success
 	assert_output - <<-EOM
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
 		          deleted [one/]
@@ -101,17 +106,19 @@ function mergetool_conflict_one_local { # @test
 		not another one
 	EOM
 
-	# run_dodder status .
-	# assert_success
-	# assert_output - <<-EOM
-	# 	          changed [one/dos.zettel @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
-	# EOM
+	run_dodder status .
+	assert_success
+	assert_output ''
 
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 	EOM
 }
 
@@ -125,7 +132,7 @@ function mergetool_conflict_one_remote { # @test
 	assert_output - <<-EOM
 		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
 		          deleted [one/]
@@ -148,11 +155,61 @@ function mergetool_conflict_one_remote { # @test
 	assert_output_unsorted - <<-EOM
 		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 }
 
 function mergetool_conflict_one_merged { # @test
+	#TODO-project-2022-zit-collapse_skus
+	mergetool_conflict_base
+
+	cat - >merged <<-EOM
+		---
+		# wow ok again
+		- get_this_shit_merged
+		- new-etikett-for-all
+		- tag-3
+		- tag-4
+		! txt2
+		---
+
+		not another one, conflict time
+	EOM
+
+	# TODO add `-delete` option to `merge-tool`
+	run_dodder merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
+	assert_success
+	assert_output - <<-EOM
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		          deleted [one/dos.conflict]
+		          deleted [one/dos.zettel]
+		          deleted [one/]
+	EOM
+
+	run_dodder show -format blob one/dos
+	assert_success
+	assert_output - <<-EOM
+		not another one, conflict time
+	EOM
+
+	# run_dodder status .
+	# assert_success
+	# assert_output - <<-EOM
+	# 	          changed [one/dos.zettel @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+	# EOM
+
+	run_dodder last
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+	EOM
+}
+
+function mergetool_conflict_one_no_merge { # @test
 	#TODO-project-2022-zit-collapse_skus
 	mergetool_conflict_base
 

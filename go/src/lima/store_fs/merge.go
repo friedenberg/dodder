@@ -196,10 +196,14 @@ func (store *Store) checkoutConflictedForMerge(
 func (store *Store) MakeMergedTransacted(
 	conflicted sku.Conflicted,
 ) (merged *sku.Transacted, err error) {
-	if err = conflicted.MergeTags(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// tags have to be manually merged at the moment, even though there is a
+	// simple algorithm to merge them automatically. this is because the tags
+	// get merged before running diff3, but then local, base, and remote have
+	// the merged tag set, and then their signatures become incorrect.
+	// if err = conflicted.MergeTags(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	var localItem, baseItem, remoteItem *sku.FSItem
 

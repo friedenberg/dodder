@@ -1,6 +1,8 @@
 package sku
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -15,6 +17,15 @@ type ParentNegotiator interface {
 type Conflicted struct {
 	*CheckedOut
 	Local, Base, Remote *Transacted
+}
+
+func (conflicted Conflicted) String() string {
+	return fmt.Sprintf(
+		"Local: %q\nBase: %q\nRemote: %q\n",
+		String(conflicted.Local),
+		String(conflicted.Base),
+		String(conflicted.Remote),
+	)
 }
 
 func (conflicted *Conflicted) FindBestCommonAncestor(
@@ -130,40 +141,40 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 		return
 	}
 
-	for e := range middle.AllPtr() {
-		if left.ContainsKey(left.KeyPtr(e)) &&
-			right.ContainsKey(right.KeyPtr(e)) {
-			if err = removeFromAllButAddTo(e, same); err != nil {
+	for tag := range middle.AllPtr() {
+		if left.ContainsKey(left.KeyPtr(tag)) &&
+			right.ContainsKey(right.KeyPtr(tag)) {
+			if err = removeFromAllButAddTo(tag, same); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		} else if left.ContainsKey(left.KeyPtr(e)) || right.ContainsKey(right.KeyPtr(e)) {
-			if err = removeFromAllButAddTo(e, deleted); err != nil {
+		} else if left.ContainsKey(left.KeyPtr(tag)) || right.ContainsKey(right.KeyPtr(tag)) {
+			if err = removeFromAllButAddTo(tag, deleted); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	for e := range left.AllPtr() {
-		if err = same.AddPtr(e); err != nil {
+	for tag := range left.AllPtr() {
+		if err = same.AddPtr(tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for e := range right.AllPtr() {
-		if err = same.AddPtr(e); err != nil {
+	for tag := range right.AllPtr() {
+		if err = same.AddPtr(tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	ets := same.CloneSetPtrLike()
+	tags := same.CloneSetPtrLike()
 
-	conflicted.Local.GetMetadata().SetTags(ets)
-	conflicted.Base.GetMetadata().SetTags(ets)
-	conflicted.Remote.GetMetadata().SetTags(ets)
+	conflicted.Local.GetMetadata().SetTags(tags)
+	conflicted.Base.GetMetadata().SetTags(tags)
+	conflicted.Remote.GetMetadata().SetTags(tags)
 
 	return
 }
