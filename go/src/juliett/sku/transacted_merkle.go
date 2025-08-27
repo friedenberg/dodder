@@ -17,7 +17,11 @@ func (transacted *Transacted) CalculateObjectDigests() (err error) {
 	return transacted.calculateObjectSha(false)
 }
 
-func (transacted *Transacted) calculateObjectDigest() (err error) {
+type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error)
+
+func (transacted *Transacted) calculateObjectDigest(
+	funcCalcDigest funcCalcDigest,
+) (err error) {
 	if err = merkle_ids.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
@@ -27,7 +31,7 @@ func (transacted *Transacted) calculateObjectDigest() (err error) {
 	}
 
 	if err = transacted.makeDigestCalcFunc(
-		object_inventory_format.GetDigestForContext,
+		funcCalcDigest,
 		object_inventory_format.FormatV11ObjectDigest,
 		transacted.Metadata.GetObjectDigestMutable(),
 	)(); err != nil {
@@ -39,14 +43,14 @@ func (transacted *Transacted) calculateObjectDigest() (err error) {
 }
 
 func (transacted *Transacted) makeDigestCalcFunc(
-	funkMakeBlobId func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	funcCalcDigest funcCalcDigest,
 	objectFormat object_inventory_format.Format,
 	digest interfaces.MutableBlobId,
 ) errors.FuncErr {
 	return func() (err error) {
 		var actual interfaces.BlobId
 
-		if actual, err = funkMakeBlobId(
+		if actual, err = funcCalcDigest(
 			objectFormat,
 			transacted,
 		); err != nil {
@@ -69,14 +73,14 @@ func (transacted *Transacted) makeDigestCalcFunc(
 }
 
 func (transacted *Transacted) makeShaCalcFunc(
-	f func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error),
+	funcCalcDigest funcCalcDigest,
 	objectFormat object_inventory_format.Format,
 	sh *sha.Sha,
 ) errors.FuncErr {
 	return func() (err error) {
 		var actual interfaces.BlobId
 
-		if actual, err = f(
+		if actual, err = funcCalcDigest(
 			objectFormat,
 			transacted,
 		); err != nil {
@@ -96,22 +100,25 @@ func (transacted *Transacted) makeShaCalcFunc(
 }
 
 func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
-	f := object_inventory_format.GetDigestForContext
+	funcCalcDigest := object_inventory_format.GetDigestForContext
 
 	if debug {
-		f = object_inventory_format.GetDigestForContextDebug
+		funcCalcDigest = object_inventory_format.GetDigestForContextDebug
 	}
 
 	wg := errors.MakeWaitGroupParallel()
-	wg.Do(transacted.calculateObjectDigest)
 
 	wg.Do(
 		transacted.makeShaCalcFunc(
-			f,
+			funcCalcDigest,
 			object_inventory_format.FormatsV5MetadataSansTai,
 			&transacted.Metadata.SelfWithoutTai,
 		),
 	)
+
+	wg.Do(func() error {
+		return transacted.calculateObjectDigest(funcCalcDigest)
+	})
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -121,7 +128,38 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 	return
 }
 
-// TODO turn into proper merkle tree
+func (transacted *Transacted) calculateMerkleObjectDigest(
+	funcCalcDigest funcCalcDigest,
+) (err error) {
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO enforce that existing object digests are explicitly discarded before
+	// overwriting
+	// if err = merkle_ids.MakeErrIsNotNull(
+	// 	transacted.Metadata.GetObjectDigest(),
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	if err = transacted.makeDigestCalcFunc(
+		funcCalcDigest,
+		object_inventory_format.FormatV11ObjectDigest,
+		transacted.Metadata.GetObjectDigestMutable(),
+	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (transacted *Transacted) SignOverwrite(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
