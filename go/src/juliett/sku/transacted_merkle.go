@@ -14,7 +14,7 @@ import (
 // TODO replace this with repo signatures
 // TODO include repo pubkey
 func (transacted *Transacted) CalculateObjectDigests() (err error) {
-	return transacted.calculateObjectSha(false)
+	return transacted.calculateObjectSha(false, false)
 }
 
 type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error)
@@ -99,7 +99,10 @@ func (transacted *Transacted) makeShaCalcFunc(
 	}
 }
 
-func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
+func (transacted *Transacted) calculateObjectSha(
+	debug bool,
+	includeMerkle bool,
+) (err error) {
 	funcCalcDigest := object_inventory_format.GetDigestForContext
 
 	if debug {
@@ -115,6 +118,12 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 			&transacted.Metadata.SelfWithoutTai,
 		),
 	)
+
+	if includeMerkle {
+		wg.Do(func() error {
+			return transacted.calculateMerkleObjectDigest(funcCalcDigest)
+		})
+	}
 
 	wg.Do(func() error {
 		return transacted.calculateObjectDigest(funcCalcDigest)
