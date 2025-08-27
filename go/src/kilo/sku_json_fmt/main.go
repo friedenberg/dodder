@@ -155,7 +155,7 @@ func (json *Transacted) ToTransacted(
 	object.Metadata.GenerateExpandedTags()
 
 	if !json.RepoPubkey.IsNull() {
-		object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
+		object.Metadata.GetRepoPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
 	}
 
 	if !json.RepoSig.IsNull() {

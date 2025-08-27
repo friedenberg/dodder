@@ -235,7 +235,7 @@ func (store *Store) Create(
 		}
 	}
 
-	if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
+	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
 		merkle.HRPRepoPubKeyV1,
 		store.envRepo.GetConfigPublic().Blob.GetPublicKey(),
 	); err != nil {

@@ -284,7 +284,7 @@ LOOP_AFTER_OID:
 						return
 					}
 
-					if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
+					if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
 						merkle.HRPRepoPubKeyV1,
 						pubKey.Data,
 					); err != nil {

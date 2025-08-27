@@ -32,7 +32,7 @@ func (metadata *Metadata) GetRepoPubKey() interfaces.BlobId {
 	return metadata.pubRepo
 }
 
-func (metadata *Metadata) GetPubKeyMutable() interfaces.MutableBlobId {
+func (metadata *Metadata) GetRepoPubKeyMutable() interfaces.MutableBlobId {
 	return &metadata.pubRepo
 }
 

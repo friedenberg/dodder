@@ -255,7 +255,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.RepoPubKey:
-		if err = object.Metadata.GetPubKeyMutable().UnmarshalBinary(
+		if err = object.Metadata.GetRepoPubKeyMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

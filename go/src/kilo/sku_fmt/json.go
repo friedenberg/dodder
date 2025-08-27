@@ -183,7 +183,7 @@ func (json *JSON) ToTransacted(
 	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
-	object.Metadata.GetPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
+	object.Metadata.GetRepoPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
 	object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
 
 	// Set Tai from either Date or Tai field

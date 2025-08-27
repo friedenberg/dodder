@@ -74,7 +74,7 @@ func (store *Store) tryPrecommit(
 		return
 	}
 
-	if err = object.Metadata.GetPubKeyMutable().SetMerkleId(
+	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
 		merkle.HRPRepoPubKeyV1,
 		store.storeConfig.GetConfig().GetPublicKey(),
 	); err != nil {
