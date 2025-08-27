@@ -329,7 +329,7 @@ func (store *Store) GenerateConflictMarker(
 	blobStore := store.storeSupplies.BlobStore.InventoryList
 
 	for object := range conflicted.All() {
-		if err = object.Sign(
+		if err = object.SignOverwrite(
 			store.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)

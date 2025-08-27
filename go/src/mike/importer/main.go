@@ -193,7 +193,7 @@ func (importer importer) importLeafSku(
 
 	// TODO set this as an importer option
 	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
-		if err = checkedOut.GetSkuExternal().Sign(
+		if err = checkedOut.GetSkuExternal().SignOverwrite(
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)

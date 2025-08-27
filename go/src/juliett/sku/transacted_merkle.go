@@ -98,7 +98,7 @@ func (transacted *Transacted) calculateObjectSha(debug bool) (err error) {
 }
 
 // TODO turn into proper merkle tree
-func (transacted *Transacted) Sign(
+func (transacted *Transacted) SignOverwrite(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	transacted.CalculateObjectDigests()

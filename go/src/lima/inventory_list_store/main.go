@@ -154,7 +154,7 @@ func (store *Store) AddObjectToOpenList(
 	openList *sku.OpenList,
 	object *sku.Transacted,
 ) (err error) {
-	if err = object.Sign(
+	if err = object.SignOverwrite(
 		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)

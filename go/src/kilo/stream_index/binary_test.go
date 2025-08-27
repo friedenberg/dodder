@@ -68,7 +68,7 @@ func TestBinaryOne(t1 *testing.T) {
 				merkle.HRPRepoPubKeyV1,
 				config.GetPublicKey(),
 			))
-			t.AssertNoError(expected.Sign(config))
+			t.AssertNoError(expected.SignOverwrite(config))
 		}
 
 		t.Logf("%s", expected)

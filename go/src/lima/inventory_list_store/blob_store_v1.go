@@ -98,7 +98,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 		return
 	}
 
-	if err = object.Sign(
+	if err = object.SignOverwrite(
 		blobStore.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)
