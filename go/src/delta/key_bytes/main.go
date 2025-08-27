@@ -1,13 +1,13 @@
 package key_bytes
 
 import (
-	"fmt"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
+//go:generate stringer -type=Binary
 type Binary byte
 
 const (
@@ -38,12 +38,6 @@ const (
 	CacheTags        = Binary('x')
 	CacheTags2       = Binary('y')
 )
-
-var ErrInvalid = errors.New("invalid key")
-
-func (key Binary) String() string {
-	return fmt.Sprintf("%c", byte(key))
-}
 
 func (key *Binary) Reset() {
 	*key = 0
