@@ -131,6 +131,9 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectSig())
 
 	sb.WriteString(" ")
+	fmt.Fprintf(sb, "%s", object.Metadata.GetMotherObjectSig())
+
+	sb.WriteString(" ")
 	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
 
 	sb.WriteString(" ")

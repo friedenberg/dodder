@@ -148,8 +148,8 @@ function show_simple_one_zettel_hidden_past { # @test
 	EOM
 }
 
-function show_all_mutter { # @test
-	run_dodder show -format digests-mother :
+function show_all_mother { # @test
+	run_dodder show -format sig-mother :
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		.*

@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -71,20 +70,18 @@ func (op CreateFromShas) Run(
 		return
 	}
 
-	for _, z := range toCreate {
+	for _, object := range toCreate {
 		if err = op.GetStore().CreateOrUpdateDefaultProto(
-			z,
+			object,
 			sku.StoreOptions{
 				ApplyProto: true,
 			},
 		); err != nil {
-			// TODO-P2 add file for error handling
-			op.handleStoreError(z, "", err)
-			err = nil
-			continue
+			err = errors.Wrap(err)
+			return
 		}
 
-		results.Add(z)
+		results.Add(object)
 	}
 
 	if err = op.Unlock(); err != nil {
@@ -93,21 +90,4 @@ func (op CreateFromShas) Run(
 	}
 
 	return
-}
-
-func (op CreateFromShas) handleStoreError(
-	object *sku.Transacted,
-	path string,
-	in error,
-) {
-	var err error
-
-	var normalError interfaces.ErrorStackTracer
-
-	if errors.As(in, &normalError) {
-		ui.Err().Printf("%s", normalError.Error())
-	} else {
-		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", path, in)
-		ui.Err().Print(err)
-	}
 }

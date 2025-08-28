@@ -21,18 +21,19 @@ func MakeErrEmptyType(id interfaces.BlobId) error {
 func MakeErrIsNotNull(id interfaces.BlobId) error {
 	if !id.IsNull() {
 		// TODO clone
-		return errors.WrapSkip(1, errIsNotNull{id: id})
+		return errors.WrapSkip(1, errIsNotNull{id: id, value: id.String()})
 	}
 
 	return nil
 }
 
 type errIsNotNull struct {
-	id interfaces.BlobId
+	value string
+	id    interfaces.BlobId
 }
 
 func (err errIsNotNull) Error() string {
-	return fmt.Sprintf("blob id is not null %q", err.id)
+	return fmt.Sprintf("blob id is not null %q", err.value)
 }
 
 func (err errIsNotNull) Is(target error) bool {

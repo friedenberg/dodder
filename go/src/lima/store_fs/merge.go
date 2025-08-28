@@ -74,6 +74,11 @@ func (store *Store) MergeCheckedOut(
 		return
 	}
 
+	if err = conflicted.Remote.SetMother(conflicted.Base); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var skuReplacement *sku.Transacted
 
 	// TODO pass mode / conflicts
@@ -331,9 +336,10 @@ func (store *Store) GenerateConflictMarker(
 	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	blobStore := store.storeSupplies.BlobStore.InventoryList
+	// TODO assert that left and right both have a mother sig
 
 	for object := range conflicted.All() {
-		if err = object.SignOverwrite(
+		if err = object.FinalizeAndSignIfNecessary(
 			store.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)

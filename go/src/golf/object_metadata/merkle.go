@@ -20,12 +20,12 @@ func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableBlobId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetMotherObjectDigest() interfaces.BlobId {
-	return &metadata.digMother
+func (metadata *Metadata) GetMotherObjectSig() interfaces.BlobId {
+	return &metadata.sigMother
 }
 
-func (metadata *Metadata) GetMotherObjectDigestMutable() interfaces.MutableBlobId {
-	return &metadata.digMother
+func (metadata *Metadata) GetMotherObjectSigMutable() interfaces.MutableBlobId {
+	return &metadata.sigMother
 }
 
 func (metadata *Metadata) GetRepoPubKey() interfaces.BlobId {

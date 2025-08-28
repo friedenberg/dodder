@@ -64,7 +64,7 @@ func TestBinaryOne(t1 *testing.T) {
 		{
 			config := genesis_configs.Default().Blob
 			t.AssertNoError(config.GeneratePrivateKey())
-			t.AssertNoError(expected.SignOverwrite(config))
+			t.AssertNoError(expected.FinalizeAndSignOverwrite(config))
 		}
 
 		t.Logf("%s", expected)

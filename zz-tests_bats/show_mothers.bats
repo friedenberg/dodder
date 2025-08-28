@@ -14,14 +14,14 @@ teardown() {
 }
 
 function format_mother_sha_one { # @test
-	run_dodder show -format sha one/uno+
+	run_dodder show -format sig-bytes-hex one/uno+
 	assert_success
-	sha="$(echo -n "$output" | head -n1)"
+	sig="$(echo -n "$output" | head -n1)"
 
-	run_dodder show -format digests-mother one/uno
+	run_dodder show -format sig-mother-bytes-hex one/uno
 	assert_success
 	assert_output - <<-EOM
-		$sha
+		$sig
 	EOM
 }
 

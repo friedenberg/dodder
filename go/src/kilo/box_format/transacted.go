@@ -270,6 +270,13 @@ func (format *BoxTransacted) addFieldsMetadata(
 			object_metadata_fmt.MetadataFieldRepoPubKey(metadata),
 			object_metadata_fmt.MetadataFieldRepoSig(metadata),
 		)
+
+		if !object.Metadata.GetMotherObjectSig().IsNull() {
+			box.Contents = append(
+				box.Contents,
+				object_metadata_fmt.MetadataFieldMotherSig(metadata),
+			)
+		}
 	}
 
 	if !metadata.Type.IsEmpty() {

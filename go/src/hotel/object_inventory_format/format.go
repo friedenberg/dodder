@@ -59,7 +59,7 @@ func (format Format) WriteMetadataTo(
 	var n1 int64
 
 	for _, k := range format.keys {
-		n1, err = WriteMetadataKeyTo(writer, context, k)
+		n1, err = writeMetadataKeyTo(writer, context, k)
 		n += n1
 
 		if err != nil {
@@ -71,7 +71,7 @@ func (format Format) WriteMetadataTo(
 	return
 }
 
-func WriteMetadataKeyTo(
+func writeMetadataKeyTo(
 	writer io.Writer,
 	context FormatterContext,
 	key keyType,
@@ -232,7 +232,7 @@ func writeMetadataKeyStringTo(
 		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
-			m.GetMotherObjectDigest(),
+			m.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -260,7 +260,7 @@ func writeMetadataKeyStringTo(
 		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			key,
-			m.GetMotherObjectDigest(),
+			m.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -274,7 +274,7 @@ func writeMetadataKeyStringTo(
 		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
 			keyShasMutterMetadataKennungMutter,
-			m.GetMotherObjectDigest(),
+			m.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -456,7 +456,9 @@ func GetDigestForContextDebug(
 
 	digest = writer.GetBlobId()
 
-	ui.Debug().Printf("%q -> %s", &sb, merkle_ids.Format(digest))
+	value := sb.String()
+
+	ui.Debug().Printf("%q -> %s", value, merkle_ids.Format(digest))
 
 	return
 }

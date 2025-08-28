@@ -266,7 +266,7 @@ func (server *Server) addSignatureIfNecessary(
 		HRP: merkle.HRPRequestAuthResponseV1,
 	}
 
-	if sig.Data, err = merkle.Sign(privateKey, nonce.Data); err != nil {
+	if sig.Data, err = merkle.SignBytes(privateKey, nonce.Data); err != nil {
 		server.EnvLocal.Cancel(err)
 		return
 	}

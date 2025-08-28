@@ -109,6 +109,16 @@ func MetadataFieldRepoSig(
 	}
 }
 
+func MetadataFieldMotherSig(
+	metadata *object_metadata.Metadata,
+) string_format_writer.Field {
+	return string_format_writer.Field{
+		Value:      metadata.GetMotherObjectSig().String(),
+		NoTruncate: true,
+		ColorType:  string_format_writer.ColorTypeHash,
+	}
+}
+
 func MetadataFieldType(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {

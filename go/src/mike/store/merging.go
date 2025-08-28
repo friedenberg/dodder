@@ -7,10 +7,10 @@ import (
 )
 
 func (store *Store) ReadExternalAndMergeIfNecessary(
-	left, parent *sku.Transacted,
+	left, mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	if parent == nil {
+	if mother == nil {
 		return
 	}
 
@@ -18,7 +18,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 
 	if co, err = store.ReadCheckedOutFromTransacted(
 		options.RepoId,
-		parent,
+		mother,
 	); err != nil {
 		err = nil
 		return
@@ -28,9 +28,10 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 
 	right := co.GetSkuExternal().GetSku()
 
-	parentEqualsExternal := right.Metadata.EqualsSansTai(&co.GetSku().Metadata)
+	// TODO switch to using mother
+	motherEqualsExternal := right.Metadata.EqualsSansTai(&co.GetSku().Metadata)
 
-	if parentEqualsExternal {
+	if motherEqualsExternal {
 		op := checkout_options.OptionsWithoutMode{
 			Force: true,
 		}
@@ -48,10 +49,15 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 		return
 	}
 
+	if err = right.SetMother(mother); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	conflicted := sku.Conflicted{
 		CheckedOut: co,
 		Local:      left,
-		Base:       parent,
+		Base:       mother,
 		Remote:     right,
 	}
 

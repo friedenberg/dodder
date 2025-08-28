@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
@@ -154,7 +153,7 @@ func (store *Store) AddObjectToOpenList(
 	openList *sku.OpenList,
 	object *sku.Transacted,
 ) (err error) {
-	if err = object.SignOverwrite(
+	if err = object.FinalizeAndSignOverwrite(
 		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -235,13 +234,13 @@ func (store *Store) Create(
 		}
 	}
 
-	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-		merkle.HRPRepoPubKeyV1,
-		store.envRepo.GetConfigPublic().Blob.GetPublicKey(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
+	// 	merkle.HRPRepoPubKeyV1,
+	// 	store.envRepo.GetConfigPublic().Blob.GetPublicKey(),
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	if err = store.WriteInventoryListObject(object); err != nil {
 		err = errors.Wrapf(err, "OpenList: %d", openList.Len)

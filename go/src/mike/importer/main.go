@@ -93,7 +93,7 @@ func (importer *importer) SetCheckedOutPrinter(
 
 func (importer importer) Import(
 	external *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
+) (checkedOut *sku.CheckedOut, err error) {
 	errors.ContextContinueOrPanic(importer.envRepo)
 
 	if err = importer.ImportBlobIfNecessary(external); err != nil {
@@ -102,12 +102,12 @@ func (importer importer) Import(
 	}
 
 	if external.GetGenre() == genres.InventoryList {
-		if co, err = importer.importInventoryList(external); err != nil {
+		if checkedOut, err = importer.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if co, err = importer.importLeafSku(external); err != nil {
+		if checkedOut, err = importer.importLeafSku(external); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -175,8 +175,7 @@ func (importer importer) importLeafSku(
 	external *sku.Transacted,
 ) (checkedOut *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
-		// TODO remove this, it's expensive
-		err = errors.ErrorWithStackf("skipping because objects are excluded")
+		err = ErrSkipped
 		return
 	}
 
@@ -191,19 +190,23 @@ func (importer importer) importLeafSku(
 
 	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
+	checkedOut.GetSkuExternal().Metadata.GetObjectDigestMutable().Reset()
+
+	// TODO confirm repo pub key
+
+	if err = checkedOut.GetSkuExternal().FinalizeUsingObject(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	// TODO set this as an importer option
 	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
-		if err = checkedOut.GetSkuExternal().SignOverwrite(
+		if err = checkedOut.GetSkuExternal().FinalizeAndSignOverwrite(
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	if err = checkedOut.GetSkuExternal().CalculateObjectDigests(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	if importer.indexObject != nil {

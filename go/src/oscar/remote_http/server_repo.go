@@ -73,7 +73,7 @@ func (server *Server) writeInventoryList(
 			return
 		}
 
-		if err := merkle.VerifySignature(
+		if err := merkle.VerifyBytes(
 			logEntry.PublicKey,
 			expected.GetBytes(),
 			sig.Data,

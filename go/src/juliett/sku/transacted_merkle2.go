@@ -2,38 +2,124 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
-func (transacted *Transacted) CalculateObjectDigestsAndMerkleUsingObject() (err error) {
-	return transacted.CalculateObjectDigestsAndMerkleUsingRepoPubKey(
-		transacted.Metadata.GetRepoPubKey().GetBytes(),
-	)
-}
+type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error)
 
-func (transacted *Transacted) CalculateObjectDigestsAndMerkleUsingRepoPubKey(
-	pubKey merkle.PublicKey,
+// calculates the respective digests
+func (transacted *Transacted) finalize(
+	debug bool,
+	includeMerkle bool,
 ) (err error) {
-	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
+	funcCalcDigest := object_inventory_format.GetDigestForContext
 
-	if pubKeyMutable.IsNull() {
-		if err = pubKeyMutable.SetMerkleId(
-			merkle.HRPRepoPubKeyV1,
-			pubKey,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = merkle_ids.MakeErrNotEqualBytes(
-			pubKey,
-			pubKeyMutable.GetBytes(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if debug {
+		funcCalcDigest = object_inventory_format.GetDigestForContextDebug
 	}
 
-	return transacted.calculateObjectSha(false, true)
+	wg := errors.MakeWaitGroupParallel()
+
+	wg.Do(
+		transacted.makeDigestCalcFunc(
+			funcCalcDigest,
+			object_inventory_format.FormatsV5MetadataSansTai,
+			&transacted.Metadata.SelfWithoutTai,
+			merkle.HRPObjectDigestSha256V1,
+		),
+	)
+
+	if includeMerkle {
+		wg.Do(func() error {
+			return transacted.calculateObjectDigestMerkle(funcCalcDigest)
+		})
+	}
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (transacted *Transacted) makeDigestCalcFunc(
+	funcCalcDigest funcCalcDigest,
+	objectFormat object_inventory_format.Format,
+	digest interfaces.MutableBlobId,
+	tipe string,
+) errors.FuncErr {
+	return func() (err error) {
+		var actual interfaces.BlobId
+
+		if actual, err = funcCalcDigest(
+			objectFormat,
+			transacted,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer merkle_ids.PutBlobId(actual)
+
+		if err = digest.SetMerkleId(
+			tipe,
+			actual.GetBytes(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
+func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
+	funcCalcDigest funcCalcDigest,
+) (err error) {
+	if err = transacted.makeDigestCalcFunc(
+		funcCalcDigest,
+		object_inventory_format.FormatsV5MetadataSansTai,
+		&transacted.Metadata.SelfWithoutTai,
+		merkle.HRPObjectDigestSha256V1,
+	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (transacted *Transacted) calculateObjectDigestMerkle(
+	funcCalcDigest funcCalcDigest,
+) (err error) {
+	if err = merkle_ids.MakeErrIsNull(
+		transacted.Metadata.GetRepoPubKey(),
+		"repo-pubkey",
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = merkle_ids.MakeErrIsNotNull(
+		transacted.Metadata.GetObjectDigest(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transacted.makeDigestCalcFunc(
+		funcCalcDigest,
+		object_inventory_format.FormatV11ObjectDigest,
+		transacted.Metadata.GetObjectDigestMutable(),
+		merkle.HRPObjectDigestSha256V1,
+	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

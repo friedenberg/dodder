@@ -23,12 +23,12 @@ type Revert struct {
 	Last bool
 }
 
-func (c *Revert) SetFlagSet(f *flags.FlagSet) {
-	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
-	f.BoolVar(&c.Last, "last", false, "revert the last changes")
+func (md *Revert) SetFlagSet(f *flags.FlagSet) {
+	md.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+	f.BoolVar(&md.Last, "last", false, "revert the last changes")
 }
 
-func (c Revert) CompletionGenres() ids.Genre {
+func (md Revert) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -38,8 +38,8 @@ func (c Revert) CompletionGenres() ids.Genre {
 	)
 }
 
-func (cmd Revert) Run(dep command.Request) {
-	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
+func (md Revert) Run(dep command.Request) {
+	localWorkingCopy, queryGroup := md.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		query.BuilderOptions(
 			query.BuilderOptionDefaultGenres(
@@ -51,24 +51,28 @@ func (cmd Revert) Run(dep command.Request) {
 		),
 	)
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock),
+	)
 
 	switch {
-	case cmd.Last:
-		if err := cmd.runRevertFromLast(localWorkingCopy); err != nil {
+	case md.Last:
+		if err := md.runRevertFromLast(localWorkingCopy); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 
 	default:
-		if err := cmd.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
+		if err := md.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 	}
 
-	localWorkingCopy.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock))
+	localWorkingCopy.Must(
+		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
+	)
 }
 
-func (c Revert) runRevertFromQuery(
+func (md Revert) runRevertFromQuery(
 	u *local_working_copy.Repo,
 	eq *query.Query,
 ) (err error) {
@@ -95,25 +99,34 @@ func (c Revert) runRevertFromQuery(
 	return
 }
 
-func (c Revert) runRevertFromLast(
-	u *local_working_copy.Repo,
+func (md Revert) runRevertFromLast(
+	repo *local_working_copy.Repo,
 ) (err error) {
-	s := u.GetStore()
+	stoar := repo.GetStore()
 
-	var b *sku.Transacted
+	var listObject *sku.Transacted
 
-	if b, err = s.GetInventoryListStore().ReadLast(); err != nil {
+	if listObject, err = stoar.GetInventoryListStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for z, errIter := range s.GetInventoryListStore().IterInventoryList(b.GetBlobDigest()) {
+	seq := stoar.GetInventoryListStore().IterInventoryList(
+		listObject.GetBlobDigest(),
+	)
+
+	for object, errIter := range seq {
+		if errIter != nil {
+			err = errors.Wrap(errIter)
+			return
+		}
+
 		var cachedSku *sku.Transacted
 
-		if cachedSku, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
-			z.GetObjectId(),
-			z.GetTai(),
-		); errIter != nil {
+		if cachedSku, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+			object.GetObjectId(),
+			object.GetTai(),
+		); err != nil {
 			err = errors.Wrap(errIter)
 			return
 		}
@@ -125,7 +138,7 @@ func (c Revert) runRevertFromLast(
 			Tai:      cachedSku.Metadata.Cache.ParentTai,
 		}
 
-		if err = u.GetStore().RevertTo(rt); err != nil {
+		if err = repo.GetStore().RevertTo(rt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

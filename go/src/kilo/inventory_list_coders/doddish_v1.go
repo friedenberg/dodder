@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -70,7 +71,16 @@ func (coder doddishV1) DecodeFrom(
 		}
 	}
 
-	if err = object.CalculateObjectDigests(); err != nil {
+	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
+		merkle.HRPRepoPubKeyV1,
+		coder.configGenesis.GetPublicKey(),
+	); err != nil {
+
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = object.FinalizeAndVerify(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

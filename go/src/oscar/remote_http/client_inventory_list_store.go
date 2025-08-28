@@ -105,12 +105,12 @@ func (client client) ImportInventoryList(
 
 	{
 		sig := blech32.Value{
-			HRP: merkle.HRPRepoSigV1,
+			HRP: merkle.HRPObjectSigV1,
 		}
 
 		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
-		if sig.Data, err = merkle.Sign(
+		if sig.Data, err = merkle.SignBytes(
 			key,
 			listSku.GetBlobDigest().GetBytes(),
 		); err != nil {

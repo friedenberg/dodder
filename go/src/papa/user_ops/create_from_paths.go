@@ -2,9 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
@@ -134,9 +132,8 @@ func (op CreateFromPaths) Run(
 			},
 		); err != nil {
 			// TODO-P2 add file for error handling
-			op.handleStoreError(object, "", err)
-			err = nil
-			continue
+			err = errors.Wrap(err)
+			return
 		}
 
 		results.Add(object)
@@ -161,21 +158,4 @@ func (op CreateFromPaths) Run(
 	}
 
 	return
-}
-
-func (op CreateFromPaths) handleStoreError(
-	object *sku.Transacted,
-	path string,
-	in error,
-) {
-	var err error
-
-	var normalError interfaces.ErrorStackTracer
-
-	if errors.As(in, &normalError) {
-		ui.Err().Printf("%s", normalError.Error())
-	} else {
-		err = errors.ErrorWithStackf("writing zettel failed: %s: %s", path, in)
-		ui.Err().Print(err)
-	}
 }

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -79,18 +78,9 @@ func (coder doddishV2) DecodeFrom(
 		}
 	}
 
-	if err = object.CalculateObjectDigests(); err != nil {
+	if err = object.FinalizeAndVerify(); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if object.GetType().String() == ids.TypeInventoryListV2 {
-		if err = object.Verify(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		// TODO determine how to handle this
 	}
 
 	if isEOF {

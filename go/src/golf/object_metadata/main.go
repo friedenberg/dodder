@@ -26,10 +26,10 @@ type Metadata struct {
 	Type ids.Type
 
 	DigBlob   merkle.Id
-	pubRepo   merkle.Id
-	sigRepo   merkle.Id
 	digSelf   merkle.Id
-	digMother merkle.Id
+	pubRepo   merkle.Id
+	sigMother merkle.Id
+	sigRepo   merkle.Id
 
 	SelfWithoutTai merkle.Id // TODO moving to a separate key-value store
 	Tai            ids.Tai

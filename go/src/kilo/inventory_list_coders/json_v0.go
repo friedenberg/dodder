@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 )
@@ -68,18 +67,9 @@ func (coder jsonV0) DecodeFrom(
 		return
 	}
 
-	if object.GetType().String() == ids.TypeInventoryListJsonV0 {
-		if err = object.Verify(); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Sku: %s, Tags %s",
-				sku.String(object),
-				quiter.StringCommaSeparated(object.Metadata.GetTags()),
-			)
-			return
-		}
-	} else {
-		// TODO determine how to handle this
+	if err = object.FinalizeAndVerify(); err != nil {
+		err = errors.Wrapf(err, "Line: %q", bites)
+		return
 	}
 
 	return

@@ -271,7 +271,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					"%s -> %s\n",
 					object.Metadata.GetObjectDigest(),
-					object.Metadata.GetMotherObjectDigest(),
+					object.Metadata.GetMotherObjectSig(),
 				)
 				return
 			}
@@ -856,7 +856,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"digests-mother": {
+	"sig": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -864,7 +864,51 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetMotherObjectDigest(),
+					object.Metadata.GetObjectSig(),
+				)
+				return
+			}
+		},
+	},
+	"sig-bytes-hex": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				_, err = fmt.Fprintf(
+					writer,
+					"%x\n",
+					object.Metadata.GetObjectSig().GetBytes(),
+				)
+				return
+			}
+		},
+	},
+	"sig-mother-bytes-hex": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				_, err = fmt.Fprintf(
+					writer,
+					"%x\n",
+					object.Metadata.GetMotherObjectSig().GetBytes(),
+				)
+				return
+			}
+		},
+	},
+	"sig-mother": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				_, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetMotherObjectSig(),
 				)
 				return
 			}
@@ -895,7 +939,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			p := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
-				if object.Metadata.GetMotherObjectDigest().IsNull() {
+				if object.Metadata.GetMotherObjectSig().IsNull() {
 					return
 				}
 

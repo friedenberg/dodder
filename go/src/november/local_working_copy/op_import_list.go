@@ -41,42 +41,21 @@ func (local *Repo) ImportSeq(
 			return
 		}
 
-		checkedOut, importError := importerr.Import(object)
+		var hasOneConflict bool
 
-		func() {
-			defer sku.GetCheckedOutPool().Put(checkedOut)
+		if hasOneConflict, err = local.importOne(
+			importerr,
+			object,
+			missingBlobs,
+		); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sku.String(object))
+			importErrors.Add(err)
+			err = nil
+		}
 
-			if importError == nil {
-				if checkedOut.GetState() == checked_out_state.Conflicted {
-					hasConflicts = true
-				}
-
-				return
-			}
-
-			if errors.Is(importError, collections.ErrExists) {
-				return
-			}
-
-			if genres.IsErrUnsupportedGenre(importError) {
-				return
-			}
-
-			if env_dir.IsErrBlobMissing(importError) {
-				checkedOut := sku.GetCheckedOutPool().Get()
-				sku.TransactedResetter.ResetWith(
-					checkedOut.GetSkuExternal(),
-					object,
-				)
-				checkedOut.SetState(checked_out_state.Untracked)
-
-				missingBlobs.Add(checkedOut)
-
-				return
-			}
-
-			importErrors.Add(errors.Wrapf(err, "Sku: %s", sku.String(object)))
-		}()
+		if hasOneConflict {
+			hasConflicts = true
+		}
 	}
 
 	checkedOutPrinter = local.GetUIStorePrinters().CheckedOutCheckedOut
@@ -104,6 +83,54 @@ func (local *Repo) ImportSeq(
 	}
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
+
+	return
+}
+
+func (repo *Repo) importOne(
+	importerr sku.Importer,
+	object *sku.Transacted,
+	missingBlobs *sku.ListCheckedOut,
+) (hasConflicts bool, err error) {
+	var checkedOut *sku.CheckedOut
+	checkedOut, err = importerr.Import(object)
+	defer sku.GetCheckedOutPool().Put(checkedOut)
+
+	if err == nil {
+		if checkedOut.GetState() == checked_out_state.Conflicted {
+			hasConflicts = true
+		}
+
+		return
+	}
+
+	if errors.Is(err, importer.ErrSkipped) {
+		err = nil
+		return
+	}
+
+	if errors.Is(err, collections.ErrExists) {
+		err = nil
+		return
+	}
+
+	if genres.IsErrUnsupportedGenre(err) {
+		err = nil
+		return
+	}
+
+	if env_dir.IsErrBlobMissing(err) {
+		checkedOut := sku.GetCheckedOutPool().Get()
+		sku.TransactedResetter.ResetWith(
+			checkedOut.GetSkuExternal(),
+			object,
+		)
+		checkedOut.SetState(checked_out_state.Untracked)
+
+		missingBlobs.Add(checkedOut)
+
+		return
+	}
 
 	return
 }

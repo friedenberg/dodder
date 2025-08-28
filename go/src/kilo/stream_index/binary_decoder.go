@@ -314,7 +314,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
-		if err = object.Metadata.GetMotherObjectDigestMutable().UnmarshalBinary(
+		if err = object.Metadata.GetMotherObjectSigMutable().UnmarshalBinary(
 			bf.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

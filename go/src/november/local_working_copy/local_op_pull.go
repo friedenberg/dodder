@@ -14,11 +14,16 @@ func (local *Repo) PullQueryGroupFromRemote(
 	qg *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
-	return local.pullQueryGroupFromWorkingCopy(
+	if err = local.pullQueryGroupFromWorkingCopy(
 		remote.(repo.WorkingCopy),
 		qg,
 		options,
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(

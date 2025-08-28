@@ -207,7 +207,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.SigParentMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(
-			object.Metadata.GetMotherObjectDigest(),
+			object.Metadata.GetMotherObjectSig(),
 			true,
 			encoder.Binary.String(),
 		); err != nil {

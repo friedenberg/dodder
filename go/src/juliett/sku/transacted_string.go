@@ -48,6 +48,6 @@ func (transacted *Transacted) StringObjectIdParent() string {
 	return fmt.Sprintf(
 		"%s^@%s",
 		&transacted.ObjectId,
-		transacted.GetMetadata().GetMotherObjectDigest(),
+		transacted.GetMetadata().GetMotherObjectSig(),
 	)
 }

@@ -90,7 +90,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		}
 	}
 
-	if err = merkle.VerifySignature(
+	if err = merkle.VerifyBytes(
 		pubkey.Data,
 		nonceBytes,
 		sig.Data,

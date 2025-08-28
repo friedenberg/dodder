@@ -22,7 +22,7 @@ func (resetter) Reset(metadata *Metadata) {
 	metadata.DigBlob.Reset()
 	metadata.SelfWithoutTai.Reset()
 	metadata.digSelf.Reset()
-	metadata.digMother.Reset()
+	metadata.sigMother.Reset()
 	metadata.Fields = metadata.Fields[:0]
 }
 
@@ -45,8 +45,8 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.digSelf.ResetWith(
 		&src.digSelf,
 	)
-	dst.digMother.ResetWith(
-		&src.digMother,
+	dst.sigMother.ResetWith(
+		&src.sigMother,
 	)
 }
 

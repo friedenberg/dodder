@@ -152,7 +152,7 @@ func (transacted *Transacted) GetGenre() interfaces.Genre {
 }
 
 func (transacted *Transacted) IsNew() bool {
-	return transacted.Metadata.GetMotherObjectDigest().IsNull()
+	return transacted.Metadata.GetMotherObjectSig().IsNull()
 }
 
 func (transacted *Transacted) SetDormant(v bool) {

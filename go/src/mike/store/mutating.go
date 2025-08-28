@@ -4,14 +4,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -74,15 +75,9 @@ func (store *Store) tryPrecommit(
 		return
 	}
 
-	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-		merkle.HRPRepoPubKeyV1,
-		store.storeConfig.GetConfig().GetPublicKey(),
+	if err = object.CalculateObjectDigestSelfWithTai(
+		object_inventory_format.GetDigestForContext,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -136,78 +131,82 @@ func (store *Store) Commit(
 		}
 	}
 
-	var parent *sku.Transacted
+	var mother *sku.Transacted
 
-	if parent, err = store.fetchMotherIfNecessary(child); err != nil {
+	if mother, err = store.fetchMotherIfNecessary(child); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if parent != nil {
-		defer sku.GetTransactedPool().Put(parent)
-		child.Metadata.Cache.ParentTai = parent.GetTai()
+	if mother != nil {
+		defer sku.GetTransactedPool().Put(mother)
+		child.Metadata.Cache.ParentTai = mother.GetTai()
 	}
 
-	if err = store.tryPrecommit(external, parent, options); err != nil {
+	if err = store.tryPrecommit(external, mother, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if options.AddToInventoryList {
-		if err = store.addMissingTypeAndTags(options, child); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if options.AddToInventoryList ||
-		options.StreamIndexOptions.AddToStreamIndex {
-		if err = store.addObjectToAbbrStore(child); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	// short circuits if the parent is equal to the child
-	if options.AddToInventoryList &&
-		parent != nil &&
-		ids.Equals(child.GetObjectId(), parent.GetObjectId()) &&
-		child.Metadata.EqualsSansTai(&parent.Metadata) {
-
-		sku.TransactedResetter.ResetWithExceptFields(child, parent)
-
-		if store.sunrise.Less(child.GetTai()) {
-			if err = store.ui.TransactedUnchanged(child); err != nil {
+	{
+		if options.AddToInventoryList {
+			if err = store.addMissingTypeAndTags(options, child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		return
-	}
-
-	if err = store.applyDormantAndRealizeTags(
-		child,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if child.GetGenre() == genres.Zettel {
-		if err = store.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
-			if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
-				ui.Log().Printf("object id does not contain value: %s", err)
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
+		if options.AddToInventoryList ||
+			options.StreamIndexOptions.AddToStreamIndex {
+			if err = store.addObjectToAbbrStore(child); err != nil {
+				err = errors.Wrap(err)
 				return
+			}
+		}
+
+		// short circuits if the parent is equal to the child
+		if options.AddToInventoryList &&
+			mother != nil &&
+			ids.Equals(child.GetObjectId(), mother.GetObjectId()) &&
+			child.Metadata.EqualsSansTai(&mother.Metadata) {
+
+			sku.TransactedResetter.ResetWithExceptFields(child, mother)
+
+			if store.sunrise.Less(child.GetTai()) {
+				if err = store.ui.TransactedUnchanged(child); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		}
+
+		if err = store.applyDormantAndRealizeTags(
+			child,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if child.GetGenre() == genres.Zettel {
+			if err = store.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
+				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
+					ui.Log().Printf("object id does not contain value: %s", err)
+					err = nil
+				} else {
+					err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
+					return
+				}
 			}
 		}
 	}
 
 	if options.AddToInventoryList {
-		ui.Log().Print("adding to inventory list", options, child)
-		if err = store.commitTransacted(child, parent); err != nil {
+		// external.GetSku().Metadata.GetObjectSigMutable().Reset()
+		external.GetSku().Metadata.GetObjectDigestMutable().Reset()
+
+		if err = store.commitTransacted(child, mother); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(child))
 			return
 		}
@@ -215,17 +214,22 @@ func (store *Store) Commit(
 
 	if options.AddToInventoryList ||
 		options.StreamIndexOptions.AddToStreamIndex {
-		if err = store.storeConfig.AddTransacted(
-			child,
-			parent,
+		if err = merkle_ids.MakeErrIsNull(
+			child.Metadata.GetObjectSig(),
+			"object-sig",
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
 
-	if options.AddToInventoryList ||
-		options.StreamIndexOptions.AddToStreamIndex {
+		if err = store.storeConfig.AddTransacted(
+			child,
+			mother,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = store.GetStreamIndex().Add(
 			child,
 			options,
@@ -234,7 +238,7 @@ func (store *Store) Commit(
 			return
 		}
 
-		if parent == nil {
+		if mother == nil {
 			if child.GetGenre() == genres.Zettel {
 				// TODO if this is a local zettel (i.e., not a different repo
 				// and not a
@@ -268,7 +272,7 @@ func (store *Store) Commit(
 	if options.MergeCheckedOut {
 		if err = store.ReadExternalAndMergeIfNecessary(
 			child,
-			parent,
+			mother,
 			options,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -300,9 +304,10 @@ func (store *Store) fetchMotherIfNecessary(
 		return
 	}
 
-	object.Metadata.GetMotherObjectDigestMutable().ResetWithMerkleId(
-		mother.Metadata.GetObjectDigest(),
-	)
+	if err = object.SetMother(mother); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

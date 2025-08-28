@@ -155,9 +155,9 @@ func (cmd Last) runWithInventoryList(
 		listObject,
 	)
 
-	for sk, seqError := range seq {
+	for object, seqError := range seq {
 		if seqError != nil {
-			ui.Err().Print(seqError)
+			ui.CLIErrorTreeEncoder.EncodeTo(seqError, ui.Err())
 			continue
 		}
 
@@ -167,7 +167,7 @@ func (cmd Last) runWithInventoryList(
 			// determine why repooling here is breaking things
 			// defer sku.GetTransactedPool().Put(sk)
 
-			if err = funcIter(sk); err != nil {
+			if err = funcIter(object); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
