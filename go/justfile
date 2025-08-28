@@ -303,7 +303,7 @@ deploy-github:
       # test-bats-next
     )
 
-    just "{$to_test[@]}"
+    just "${to_test[@]}"
   }
 
   # commit worktree after codegen and tests
