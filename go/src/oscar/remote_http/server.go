@@ -574,14 +574,14 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		return
 	}
 
-	var sh sha.Sha
+	var blobDigest merkle.Id
 
-	if err := sh.Set(shString); err != nil {
+	if err := blobDigest.SetMaybeSha256(shString); err != nil {
 		response.Error(err)
 		return
 	}
 
-	if server.Repo.GetBlobStore().HasBlob(&sh) {
+	if server.Repo.GetBlobStore().HasBlob(&blobDigest) {
 		response.StatusCode = http.StatusFound
 		return
 	}
@@ -589,7 +589,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	{
 		var err error
 
-		if result, err = server.copyBlob(request.Body, &sh); err != nil {
+		if result, err = server.copyBlob(request.Body, &blobDigest); err != nil {
 			response.Error(err)
 			return
 		}
@@ -597,7 +597,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 
-	if err := merkle_ids.MakeErrNotEqual(&sh, result); err != nil {
+	if err := merkle_ids.MakeErrNotEqual(&blobDigest, result); err != nil {
 		response.Error(err)
 		return
 	}
@@ -612,7 +612,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
-	expected *sha.Sha,
+	expected interfaces.BlobId,
 ) (result interfaces.BlobId, err error) {
 	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.WriteCloseBlobIdGetter

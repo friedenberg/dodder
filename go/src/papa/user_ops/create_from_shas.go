@@ -3,8 +3,8 @@ package user_ops
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -27,19 +27,19 @@ func (op CreateFromShas) Run(
 	toCreate := make(map[string]*sku.Transacted)
 
 	for _, arg := range args {
-		var sh sha.Sha
+		var digest merkle.Id
 
-		if err = sh.Set(arg); err != nil {
+		if err = digest.Set(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		digestBytes := sh.GetBytes()
+		digestBytes := digest.GetBytes()
 
 		if _, ok := toCreate[string(digestBytes)]; ok {
 			ui.Err().Printf(
 				"%s appears in arguments more than once. Ignoring",
-				&sh,
+				&digest,
 			)
 			continue
 		}
@@ -47,7 +47,7 @@ func (op CreateFromShas) Run(
 		if oids, ok := lookupStored[string(digestBytes)]; ok {
 			ui.Err().Printf(
 				"%s appears in object already checked in (%q). Ignoring",
-				&sh,
+				&digest,
 				oids,
 			)
 			continue
@@ -56,7 +56,7 @@ func (op CreateFromShas) Run(
 		object := sku.GetTransactedPool().Get()
 
 		object.ObjectId.SetGenre(genres.Zettel)
-		object.Metadata.GetBlobDigestMutable().ResetWithMerkleId(&sh)
+		object.Metadata.GetBlobDigestMutable().ResetWithMerkleId(&digest)
 
 		op.Proto.Apply(object, genres.Zettel)
 
