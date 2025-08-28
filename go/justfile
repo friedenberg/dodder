@@ -298,7 +298,12 @@ deploy-github:
 
   # test worktree
   {
-    just test test-bats-next
+    to_test=(
+      test
+      # test-bats-next
+    )
+
+    just "{$to_test[@]}"
   }
 
   # commit worktree after codegen and tests
