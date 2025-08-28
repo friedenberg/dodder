@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
@@ -134,7 +135,7 @@ func MakeFromFileInfoWithDir(
 		return
 	}
 
-	fd.sha.SetDigester(writer)
+	merkle_ids.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
 	return

@@ -37,5 +37,5 @@ func MakeMutableSetSha() MutableSet {
 type KeyerSha struct{}
 
 func (KeyerSha) GetKey(fd *FD) string {
-	return fd.sha.String()
+	return fd.digest.String()
 }

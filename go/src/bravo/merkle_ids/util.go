@@ -43,7 +43,7 @@ func SetDigester(
 	src interfaces.BlobIdGetter,
 ) {
 	digest := src.GetBlobId()
-	dst.SetMerkleId(digest.GetType(), digest.GetBytes())
+	errors.PanicIfError(dst.SetMerkleId(digest.GetType(), digest.GetBytes()))
 }
 
 func EqualsReader(

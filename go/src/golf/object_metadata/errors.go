@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
@@ -43,13 +43,13 @@ func MakeErrHasInlineBlobAndFilePath(
 ) (err *ErrHasInlineBlobAndFilePath) {
 	err = &ErrHasInlineBlobAndFilePath{}
 	err.BlobFD.ResetWith(blobFD)
-	err.InlineSha.SetDigest(inlineBlobDigest)
+	err.InlineDigest.SetDigest(inlineBlobDigest)
 	return
 }
 
 type ErrHasInlineBlobAndFilePath struct {
-	BlobFD    fd.FD
-	InlineSha sha.Sha
+	BlobFD       fd.FD
+	InlineDigest merkle.Id
 }
 
 func (err *ErrHasInlineBlobAndFilePath) Error() string {
@@ -57,7 +57,7 @@ func (err *ErrHasInlineBlobAndFilePath) Error() string {
 		"text has inline blob and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
 		err.BlobFD.GetPath(),
 		err.BlobFD.GetDigest(),
-		&err.InlineSha,
+		&err.InlineDigest,
 	)
 }
 

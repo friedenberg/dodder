@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
 )
 
@@ -19,7 +19,7 @@ type FD struct {
 	isDir   bool
 	path    string
 	modTime thyme.Time
-	sha     sha.Sha
+	digest  merkle.Id
 	state   State
 }
 
@@ -60,7 +60,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !merkle_ids.Equals(&a.sha, &b.sha) {
+	if !merkle_ids.Equals(&a.digest, &b.digest) {
 		return false
 	}
 
@@ -147,7 +147,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 		return
 	}
 
-	fd.sha.SetDigester(writer)
+	merkle_ids.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
 	return
@@ -202,7 +202,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 	}
 
 	fd.path = path
-	fd.sha.SetDigester(blobWriter)
+	merkle_ids.SetDigester(&fd.digest, blobWriter)
 	fd.state = StateStored
 
 	return
@@ -385,11 +385,11 @@ func (fd *FD) IsDir() bool {
 }
 
 func (fd *FD) SetShaLike(v interfaces.BlobId) (err error) {
-	return fd.sha.SetDigest(v)
+	return fd.digest.SetDigest(v)
 }
 
 func (fd *FD) GetDigest() interfaces.BlobId {
-	return &fd.sha
+	return &fd.digest
 }
 
 func (fd *FD) GetState() State {
@@ -427,7 +427,7 @@ func (fd *FD) Reset() {
 	fd.isDir = false
 	fd.path = ""
 	fd.modTime.Reset()
-	fd.sha.Reset()
+	fd.digest.Reset()
 }
 
 func (dst *FD) ResetWith(src *FD) {
@@ -435,7 +435,7 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	dst.sha.ResetWith(&src.sha)
+	dst.digest.ResetWith(&src.digest)
 }
 
 func (src *FD) Clone() (dst *FD) {
@@ -444,6 +444,6 @@ func (src *FD) Clone() (dst *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	dst.sha.ResetWith(&src.sha)
+	dst.digest.ResetWith(&src.digest)
 	return
 }
