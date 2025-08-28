@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
@@ -214,12 +215,17 @@ func (store *Store) Commit(
 
 	if options.AddToInventoryList ||
 		options.StreamIndexOptions.AddToStreamIndex {
-		if err = merkle_ids.MakeErrIsNull(
-			child.Metadata.GetObjectSig(),
-			"object-sig",
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		if store_version.GreaterOrEqual(
+			store.storeConfig.GetConfig().GetStoreVersion(),
+			store_version.V11,
+		) {
+			if err = merkle_ids.MakeErrIsNull(
+				child.Metadata.GetObjectSig(),
+				"object-sig",
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		if err = store.storeConfig.AddTransacted(
@@ -585,11 +591,11 @@ func (store *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
 }
 
 func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
-	o := sku.CommitOptions{
+	options := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = store.Commit(object.Object, o); err != nil {
+	if err = store.Commit(object.Object, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

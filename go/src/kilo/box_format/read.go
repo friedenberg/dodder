@@ -5,14 +5,15 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -274,54 +275,8 @@ LOOP_AFTER_OID:
 			}
 
 			if tag.IsDodderTag() {
-				value := tag.String()
-
-				if strings.HasPrefix(value, merkle.HRPRepoPubKeyV1) {
-					var pubKey blech32.Value
-
-					if err = pubKey.Set(value); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-						merkle.HRPRepoPubKeyV1,
-						pubKey.Data,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				} else if strings.HasPrefix(value, merkle.HRPObjectSigV1) {
-					var repoSig blech32.Value
-
-					if err = repoSig.Set(value); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if err = repoSig.WriteToMerkleId(
-						object.Metadata.GetObjectSigMutable(),
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-				} else if strings.HasPrefix(value, merkle.HRPObjectMotherSigV1) {
-					var repoSig blech32.Value
-
-					if err = repoSig.Set(value); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if err = repoSig.WriteToMerkleId(
-						object.Metadata.GetMotherObjectSigMutable(),
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-				} else {
-					err = errors.Errorf("unsupported dodder tag: %q", value)
+				if err = format.parseDodderTag(object, tag); err != nil {
+					err = errors.Wrap(err)
 					return
 				}
 			} else {
@@ -342,6 +297,37 @@ LOOP_AFTER_OID:
 
 	if scanner.Error() != nil {
 		err = errors.Wrap(scanner.Error())
+		return
+	}
+
+	return
+}
+
+var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableBlobId{
+	merkle.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
+	merkle.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
+	merkle.HRPObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
+	merkle.HRPObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
+}
+
+// TODO create a sustainable system for this
+func (format *BoxTransacted) parseDodderTag(
+	object *sku.Transacted,
+	tag ids.Tag,
+) (err error) {
+	tagString := tag.String()
+	key := tagString[:strings.LastIndex(tagString, "-")]
+
+	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[key]; ok {
+		mutableBlobId := getMutableMerkleIdMethod(&object.Metadata)
+		if err = mutableBlobId.Set(
+			tagString,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		err = errors.Wrap(ErrUnsupportedDodderTag{tag: tagString})
 		return
 	}
 

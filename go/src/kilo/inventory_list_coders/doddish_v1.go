@@ -80,7 +80,7 @@ func (coder doddishV1) DecodeFrom(
 		return
 	}
 
-	if err = object.FinalizeAndVerify(); err != nil {
+	if err = object.FinalizeUsingObject(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

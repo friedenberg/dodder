@@ -16,6 +16,7 @@ type TomlV2Common struct {
 	RepoType          repo_type.Type        `toml:"repo-type"`
 	RepoId            ids.RepoId            `toml:"id"`
 	InventoryListType string                `toml:"inventory_list-type"`
+	ObjectSigType     string                `toml:"object-sig-type"`
 }
 
 type TomlV2Private struct {
@@ -49,8 +50,20 @@ func (config *TomlV2Common) GetInventoryListTypeString() string {
 	}
 }
 
+func (config *TomlV2Common) GetObjectSigTypeString() string {
+	if config.ObjectSigType == "" {
+		return merkle.HRPObjectSigV1
+	} else {
+		return config.ObjectSigType
+	}
+}
+
 func (config *TomlV2Common) SetInventoryListTypeString(value string) {
 	config.InventoryListType = value
+}
+
+func (config *TomlV2Common) SetObjectSigTypeString(value string) {
+	config.ObjectSigType = value
 }
 
 func (config *TomlV2Private) GetGenesisConfig() ConfigPrivate {

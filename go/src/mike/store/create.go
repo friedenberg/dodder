@@ -47,7 +47,11 @@ func (store *Store) Reindex() (err error) {
 				continue
 			}
 
-			err = errors.Wrap(iterErr)
+			err = errors.Wrapf(
+				iterErr,
+				"List: %s",
+				sku.String(objectWithList.List),
+			)
 			return
 		}
 

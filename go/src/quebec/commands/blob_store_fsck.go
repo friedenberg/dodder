@@ -59,8 +59,8 @@ func (cmd BlobFsck) Run(req command.Request) {
 		countSuccessPtr := &count
 
 		type errorBlob struct {
-			sha interfaces.BlobId
-			err error
+			blobId interfaces.BlobId
+			err    error
 		}
 
 		var blobErrors []errorBlob
@@ -120,7 +120,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 		ui.Out().Printf("blobs with errors: %d", len(blobErrors))
 
 		for _, errorBlob := range blobErrors {
-			ui.Out().Printf("%s: %s", errorBlob.sha, errorBlob.err)
+			ui.Out().Printf("%s: %s", errorBlob.blobId, errorBlob.err)
 		}
 	}
 }

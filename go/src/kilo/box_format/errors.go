@@ -43,3 +43,16 @@ func (err ErrBoxReadSeq) Error() string {
 		err.actual,
 	)
 }
+
+type ErrUnsupportedDodderTag struct {
+	tag string
+}
+
+func (err ErrUnsupportedDodderTag) Error() string {
+	return fmt.Sprintf("unsupported dodder tag: %q", err.tag)
+}
+
+func (err ErrUnsupportedDodderTag) Is(target error) bool {
+	_, ok := target.(ErrUnsupportedDodderTag)
+	return ok
+}

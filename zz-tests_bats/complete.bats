@@ -131,6 +131,7 @@ function complete_subcmd { # @test
 		read-blob
 		reindex
 		remote-add
+		repo-fsck
 		revert
 		save
 		serve

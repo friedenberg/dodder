@@ -93,6 +93,14 @@ func (config V0Common) GetInventoryListTypeString() string {
 	return ids.TypeInventoryListV0
 }
 
+func (config V0Common) GetObjectSigTypeString() string {
+	return merkle.HRPObjectSigV0
+}
+
 func (config V0Common) SetInventoryListTypeString(string) {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (config V0Common) SetObjectSigTypeString(string) {
 	panic(errors.Err405MethodNotAllowed)
 }

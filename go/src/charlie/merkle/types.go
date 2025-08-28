@@ -6,6 +6,7 @@ const (
 	HRPObjectBlobDigestSha256V1 = "dodder-object-blob-digest-sha256-v1"
 	HRPObjectDigestSha256V1     = "dodder-object-digest-sha256-v1"
 	HRPObjectMotherSigV1        = "dodder-object-mother-sig-v1"
+	HRPObjectSigV0              = "dodder-repo-sig-v1"
 	HRPObjectSigV1              = "dodder-object-sig-v1"
 	HRPRepoPrivateKeyV1         = "dodder-repo-private_key-v1"
 	HRPRepoPubKeyV1             = "dodder-repo-public_key-v1"
@@ -19,6 +20,7 @@ var hrpValid = []string{
 	HRPObjectBlobDigestSha256V1,
 	HRPObjectDigestSha256V1,
 	HRPObjectMotherSigV1,
+	HRPObjectSigV0,
 	HRPObjectSigV1,
 	HRPRepoPrivateKeyV1,
 	HRPRepoPubKeyV1,

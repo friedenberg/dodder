@@ -3,6 +3,7 @@ package genesis_configs
 import (
 	"crypto/ed25519"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
@@ -53,6 +54,14 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	} else {
 		return config.InventoryListType
 	}
+}
+
+func (config *TomlV1Common) GetObjectSigTypeString() string {
+	return merkle.HRPObjectSigV0
+}
+
+func (config *TomlV1Common) SetObjectSigTypeString(string) {
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (config *TomlV1Common) SetInventoryListTypeString(value string) {

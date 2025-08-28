@@ -113,7 +113,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 func (blobStore *blobStoreV0) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		for sh, err := range blobStore.BlobStore.AllBlobs() {
+		for blobId, err := range blobStore.BlobStore.AllBlobs() {
 			if err != nil {
 				if !yield(nil, err) {
 					return
@@ -121,19 +121,19 @@ func (blobStore *blobStoreV0) AllInventoryListObjects() interfaces.SeqError[*sku
 			}
 
 			// TODO make changes to prevent null shas from ever being written
-			if sh.IsNull() {
+			if blobId.IsNull() {
 				continue
 			}
 
-			var decodedList *sku.Transacted
+			var list *sku.Transacted
 
-			if decodedList, err = blobStore.ReadOneBlobId(sh); err != nil {
-				if !yield(nil, errors.Wrapf(err, "Sha: %q", sh)) {
+			if list, err = blobStore.ReadOneBlobId(blobId); err != nil {
+				if !yield(nil, errors.Wrapf(err, "BlobId: %q", blobId)) {
 					return
 				}
 			}
 
-			if !yield(decodedList, nil) {
+			if !yield(list, nil) {
 				return
 			}
 		}

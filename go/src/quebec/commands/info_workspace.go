@@ -13,6 +13,7 @@ func init() {
 	command.Register("info-workspace", &InfoWorkspace{})
 }
 
+// TODO rename to WorkspaceInfo
 type InfoWorkspace struct {
 	command_components.LocalWorkingCopy
 }

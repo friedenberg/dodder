@@ -309,7 +309,7 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 			},
 			bufferedReader,
 		); err != nil {
-			yield(nil, errors.Wrap(err))
+			yield(nil, errors.Wrapf(err, "List Blob Id: %s", blobId))
 			return
 		}
 	}

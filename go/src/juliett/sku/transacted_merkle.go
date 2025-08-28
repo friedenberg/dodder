@@ -155,7 +155,7 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
-		merkle.HRPObjectSigV1,
+		config.GetObjectSigTypeString(),
 		bites,
 	); err != nil {
 		err = errors.Wrap(err)

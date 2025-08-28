@@ -18,6 +18,7 @@ type (
 		GetRepoType() repo_type.Type
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeString() string
+		GetObjectSigTypeString() string
 	}
 
 	ConfigPublic interface {
@@ -36,6 +37,7 @@ type (
 		ConfigPrivate
 
 		SetInventoryListTypeString(string)
+		SetObjectSigTypeString(string)
 		// TODO separate into non-method function that uses properties
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type)
