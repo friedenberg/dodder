@@ -97,6 +97,10 @@ func (config V0Common) GetObjectSigTypeString() string {
 	return merkle.HRPObjectSigV0
 }
 
+func (config V0Common) GetBlobDigestTypeString() string {
+	return merkle.HRPObjectBlobDigestSha256V0
+}
+
 func (config V0Common) SetInventoryListTypeString(string) {
 	panic(errors.Err405MethodNotAllowed)
 }

@@ -5,17 +5,23 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
-func MetadataBlobIdString(
+// TODO add support for other digest types
+func MetadataBlobDigestString(
 	metadata *object_metadata.Metadata,
 	abbr ids.FuncAbbreviateString,
 ) (digestString string, err error) {
-	digest := sha.MustWithMerkleId(metadata.GetBlobDigest())
+	digest := sha.MustWithMerkleIdWithType(
+		metadata.GetBlobDigest(),
+		merkle.HRPObjectBlobDigestSha256V0,
+	)
+
 	defer sha.Env.PutBlobId(digest)
 
 	digestString = digest.String()

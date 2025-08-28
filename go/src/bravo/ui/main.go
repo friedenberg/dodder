@@ -37,6 +37,7 @@ func IsVerbose() bool {
 
 type Printer = interfaces.Printer
 
+// TODO make utility functions
 type DevPrinter interface {
 	Printer
 	Caller(skip int) Printer

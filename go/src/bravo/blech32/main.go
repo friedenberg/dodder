@@ -31,6 +31,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 )
 
 var (
@@ -80,7 +81,12 @@ func verifyChecksum(hrp string, data []byte) bool {
 }
 
 func createChecksum(hrp string, data []byte) []byte {
-	values := append(hrpExpand(hrp), data...)
+	var values []byte
+	if hrp != "" {
+		values = append(hrpExpand(hrp), data...)
+	} else {
+		values = data
+	}
 	values = append(values, []byte{0, 0, 0, 0, 0, 0}...)
 	mod := polymod(values) ^ 1
 	ret := make([]byte, 6)
@@ -127,67 +133,139 @@ func convertBits(data []byte, frombits, tobits byte, pad bool) ([]byte, error) {
 // Encode encodes the HRP and a bytes slice to Blech32. If the HRP is uppercase,
 // the output will be uppercase.
 func Encode(hrp string, data []byte) ([]byte, error) {
+	if len(hrp) < 1 {
+		return nil, errors.Wrap(ErrEmptyHRP)
+	}
+	for p, c := range hrp {
+		if c < 33 || c > 126 {
+			// TODO turn into error type
+			return nil, fmt.Errorf("invalid HRP character: hrp[%d]=%d", p, c)
+		}
+	}
+	return encode(hrp, data)
+}
+
+func EncodeDataOnly(data []byte) ([]byte, error) {
+	return encode("", data)
+}
+
+// Encode encodes the HRP and a bytes slice to Blech32. If the HRP is uppercase,
+// the output will be uppercase.
+func encode(hrp string, data []byte) ([]byte, error) {
 	values, err := convertBits(data, 8, 5, true)
 	if err != nil {
 		return nil, err
 	}
-	if len(hrp) < 1 {
-		return nil, errors.Errorf("invalid HRP: %q", hrp)
+
+	var lower bool
+
+	if lower, err = validateCaseString(hrp); err != nil {
+		err = errors.Wrapf(err, "hrp: %q", hrp)
+		return nil, err
 	}
-	for p, c := range hrp {
-		if c < 33 || c > 126 {
-			return nil, fmt.Errorf("invalid HRP character: hrp[%d]=%d", p, c)
-		}
-	}
-	if strings.ToUpper(hrp) != hrp && strings.ToLower(hrp) != hrp {
-		return nil, fmt.Errorf("mixed case HRP: %q", hrp)
-	}
-	lower := strings.ToLower(hrp) == hrp
+
 	hrp = strings.ToLower(hrp)
+
 	var ret bytes.Buffer
+
 	ret.WriteString(hrp)
 	ret.WriteString("-")
+
 	for _, p := range values {
 		ret.WriteByte(charsetString[p])
 	}
+
 	for _, p := range createChecksum(hrp, values) {
 		ret.WriteByte(charsetString[p])
 	}
+
 	if lower {
 		return ret.Bytes(), nil
 	}
+
 	return bytes.ToUpper(ret.Bytes()), nil
 }
 
-// DecodeString decodes a Blech32 string. If the string is uppercase, the HRP
-// will be
-// uppercase.
-func DecodeString(s string) (hrp string, data []byte, err error) {
-	if strings.ToLower(s) != s && strings.ToUpper(s) != s {
-		return "", nil, fmt.Errorf("mixed case")
-	}
-	pos := strings.LastIndex(s, "-")
-	if pos < 1 || pos+7 > len(s) {
-		return "", nil, fmt.Errorf(
-			"separator '-' at invalid position: pos=%d, len=%d",
-			pos,
-			len(s),
-		)
-	}
-	hrp = s[:pos]
+func validateHRP(hrp string) (err error) {
 	for p, c := range hrp {
 		if c < 33 || c > 126 {
-			return "", nil, fmt.Errorf(
+			// TODO turn into error type
+			return fmt.Errorf(
 				"invalid character human-readable part: s[%d]=%d",
 				p,
 				c,
 			)
 		}
 	}
-	s = strings.ToLower(s)
-	for p, c := range s[pos+1:] {
+
+	return
+}
+
+func validateCaseString(s string) (lower bool, err error) {
+	toLower := strings.ToLower(s)
+	toUpper := strings.ToUpper(s)
+
+	if toLower != s && toUpper != s {
+		// TODO turn into error type
+		err = fmt.Errorf("mixed case")
+		return
+	} else {
+		lower = toLower == s
+	}
+
+	return
+}
+
+func validateCase(bites []byte) (lower bool, err error) {
+	lowerCount, _, upperCount := unicorn.CountCase(bites)
+
+	if lowerCount != 0 && upperCount != 0 {
+		err = fmt.Errorf(
+			"mixed case: lower: %d, upper: %d",
+			lowerCount,
+			upperCount,
+		)
+		return
+	}
+
+	lower = upperCount == 0
+
+	return
+}
+
+// DecodeString decodes a Blech32 string. If the string is uppercase, the HRP
+// will be
+// uppercase.
+func DecodeString(input string) (hrp string, data []byte, err error) {
+	if _, err = validateCaseString(input); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	pos := strings.LastIndex(input, "-")
+
+	if pos < 1 || pos+7 > len(input) {
+		// TODO turn into error type
+		return "", nil, fmt.Errorf(
+			"separator '-' at invalid position: pos=%d, len=%d",
+			pos,
+			len(input),
+		)
+	}
+
+	hrp = input[:pos]
+
+	if err = validateHRP(hrp); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	input = strings.ToLower(input)
+
+	for p, c := range input[pos+1:] {
 		d := strings.IndexRune(charsetString, c)
 		if d == -1 {
+			// TODO turn into error type
 			return "", nil, fmt.Errorf(
 				"invalid character data part: s[%d]=%v",
 				p,
@@ -197,11 +275,12 @@ func DecodeString(s string) (hrp string, data []byte, err error) {
 		data = append(data, byte(d))
 	}
 	if !verifyChecksum(hrp, data) {
+		// TODO turn into error type
 		return "", nil, fmt.Errorf("invalid checksum")
 	}
 	data, err = convertBits(data[:len(data)-6], 5, 8, false)
 	if err != nil {
-		return "", nil, err
+		return "", nil, errors.Wrap(err)
 	}
 	return hrp, data, nil
 }
@@ -209,46 +288,93 @@ func DecodeString(s string) (hrp string, data []byte, err error) {
 // Decode decodes a Blech32 string. If the string is uppercase, the HRP
 // will be uppercase.
 func Decode(bites []byte) (hrp string, data []byte, err error) {
-	if bytes.Equal(bytes.ToLower(bites), bites) &&
-		bytes.Equal(bytes.ToUpper(bites), bites) {
-		return "", nil, fmt.Errorf("mixed case")
-	}
 	pos := bytes.LastIndex(bites, []byte("-"))
+
 	if pos < 1 || pos+7 > len(bites) {
+		// TODO turn into error type
 		return "", nil, fmt.Errorf(
 			"separator '-' at invalid position: pos=%d, len=%d",
 			pos,
 			len(bites),
 		)
 	}
+
 	hrp = string(bites[:pos])
-	for p, c := range hrp {
-		if c < 33 || c > 126 {
-			return "", nil, fmt.Errorf(
-				"invalid character human-readable part: s[%d]=%d",
-				p,
-				c,
-			)
-		}
+	bites = bites[pos+1:]
+
+	if data, err = decode(hrp, bites); err != nil {
+		return
 	}
-	bites = bytes.ToLower(bites)
-	for p, c := range bites[pos+1:] {
+
+	return
+}
+
+// Decode decodes a Blech32 string. If the string is uppercase, the HRP
+// will be uppercase.
+func DecodeDataOnly(bites []byte) (hrp string, data []byte, err error) {
+	pos := bytes.LastIndex(bites, []byte("-"))
+
+	if pos == 0 || pos+7 > len(bites) {
+		// TODO turn into error type
+		return "", nil, fmt.Errorf(
+			"separator '-' at invalid position: pos=%d, len=%d",
+			pos,
+			len(bites),
+		)
+	}
+
+	if pos != -1 {
+		hrp = string(bites[:pos])
+
+		if err = validateHRP(hrp); err != nil {
+			err = errors.Wrapf(err, "hrp: %q", hrp)
+			return
+		}
+
+		bites = bites[pos+1:]
+	}
+
+	if data, err = decode(hrp, bites); err != nil {
+		return
+	}
+
+	return
+}
+
+// Decode decodes a Blech32 string. If the string is uppercase, the HRP
+// will be uppercase.
+func decode(hrp string, bites []byte) (data []byte, err error) {
+	if _, err = validateCase(bites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	unicorn.ToLower(bites)
+
+	for p, c := range bites {
 		d := bytes.IndexRune(charset, rune(c))
+
 		if d == -1 {
-			return "", nil, fmt.Errorf(
+			// TODO turn into error type
+			return nil, fmt.Errorf(
 				"invalid character data part: s[%d]=%v",
 				p,
 				c,
 			)
 		}
+
 		data = append(data, byte(d))
 	}
+
 	if !verifyChecksum(hrp, data) {
-		return "", nil, fmt.Errorf("invalid checksum")
+		// TODO turn into error type
+		return nil, fmt.Errorf("invalid checksum")
 	}
+
 	data, err = convertBits(data[:len(data)-6], 5, 8, false)
 	if err != nil {
-		return "", nil, err
+		return nil, errors.Wrap(err)
 	}
-	return hrp, data, nil
+
+	return data, nil
 }

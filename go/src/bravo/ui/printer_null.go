@@ -18,6 +18,10 @@ type null struct {
 	file *os.File
 }
 
+var _ Printer = null{}
+
+// var _ DevPrinter = null{}
+
 func (null) Write(b []byte) (n int, err error) {
 	n = len(b)
 	return

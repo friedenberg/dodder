@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -22,14 +21,6 @@ func (coder doddishV1) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if err = merkle_ids.MakeErrIsNull(
-		object.Metadata.GetObjectDigest(),
-		"object-digest",
-	); err != nil {
-		err = errors.Wrapf(err, "Object: %q", sku.String(object))
-		return
-	}
-
 	var n1 int64
 	var n2 int
 

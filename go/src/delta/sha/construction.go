@@ -21,6 +21,22 @@ func MustWithMerkleId(merkleId interfaces.BlobId) *Sha {
 	return digest
 }
 
+func MustWithMerkleIdWithType(merkleId interfaces.BlobId, tipe string) *Sha {
+	if digest, ok := merkleId.(*Sha); ok {
+		return digest
+	}
+
+	digest := poolSha.Get()
+
+	if !merkleId.IsNull() {
+		errors.PanicIfError(
+			digest.SetMerkleId(tipe, merkleId.GetBytes()),
+		)
+	}
+
+	return digest
+}
+
 func MustWithDigester(digester interfaces.BlobIdGetter) *Sha {
 	return MustWithMerkleId(digester.GetBlobId())
 }

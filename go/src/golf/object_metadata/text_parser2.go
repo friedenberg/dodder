@@ -10,14 +10,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_reader"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
 type textParser2 struct {
 	interfaces.BlobWriter
 	TextParserContext
-	Blob fd.FD
+	blobDigestType string
+	Blob           fd.FD
 }
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
@@ -138,12 +138,12 @@ func (parser *textParser2) readTyp(
 }
 
 func (parser *textParser2) setBlobSha(
-	m *Metadata,
+	metadata *Metadata,
 	maybeSha string,
 ) (err error) {
 	if err = merkle_ids.SetHexBytes(
-		merkle.HRPObjectBlobDigestSha256V0,
-		m.GetBlobDigestMutable(),
+		parser.blobDigestType,
+		metadata.GetBlobDigestMutable(),
 		[]byte(maybeSha),
 	); err != nil {
 		err = errors.Wrap(err)

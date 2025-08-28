@@ -13,8 +13,9 @@ import (
 )
 
 type textParser struct {
-	awf interfaces.BlobWriter
-	af  script_config.RemoteScript
+	blobDigestType string
+	blobWriter     interfaces.BlobWriter
+	blobFormatter  script_config.RemoteScript
 }
 
 func MakeTextParser(
@@ -25,32 +26,34 @@ func MakeTextParser(
 	}
 
 	return textParser{
-		awf: dependencies.BlobStore,
-		af:  dependencies.BlobFormatter,
+		blobDigestType: dependencies.GetBlobDigestType(),
+		blobWriter:     dependencies.BlobStore,
+		blobFormatter:  dependencies.BlobFormatter,
 	}
 }
 
-func (f textParser) ParseMetadata(
-	r io.Reader,
-	c TextParserContext,
+func (parser textParser) ParseMetadata(
+	reader io.Reader,
+	context TextParserContext,
 ) (n int64, err error) {
-	m := c.GetMetadata()
+	m := context.GetMetadata()
 	Resetter.Reset(m)
 
 	var n1 int64
 
 	defer func() {
-		c.SetBlobDigest(&m.DigBlob)
+		context.SetBlobDigest(&m.DigBlob)
 	}()
 
 	mp := &textParser2{
-		BlobWriter:        f.awf,
-		TextParserContext: c,
+		BlobWriter:        parser.blobWriter,
+		blobDigestType:    parser.blobDigestType,
+		TextParserContext: context,
 	}
 
 	var blobWriter interfaces.WriteCloseBlobIdGetter
 
-	if blobWriter, err = f.awf.BlobWriter(); err != nil {
+	if blobWriter, err = parser.blobWriter.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +70,7 @@ func (f textParser) ParseMetadata(
 		Blob:     blobWriter,
 	}
 
-	if n, err = mr.ReadFrom(r); err != nil {
+	if n, err = mr.ReadFrom(reader); err != nil {
 		n += n1
 		err = errors.Wrap(err)
 		return

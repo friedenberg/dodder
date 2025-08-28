@@ -19,6 +19,7 @@ type (
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeString() string
 		GetObjectSigTypeString() string
+		GetBlobDigestTypeString() string
 	}
 
 	ConfigPublic interface {
@@ -38,6 +39,7 @@ type (
 
 		SetInventoryListTypeString(string)
 		SetObjectSigTypeString(string)
+		SetBlobDigestTypeString(string)
 		// TODO separate into non-method function that uses properties
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type)
@@ -88,6 +90,8 @@ func DefaultWithVersion(
 					StoreVersion:      storeVersion,
 					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
+					ObjectSigType:     merkle.HRPObjectSigV1,
+					BlobDigestType:    merkle.HRPObjectBlobDigestSha256V1,
 				},
 			},
 		}

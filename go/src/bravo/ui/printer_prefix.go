@@ -14,15 +14,15 @@ type prefixPrinter struct {
 	prefix string
 }
 
-func (printer prefixPrinter) Print(v ...any) error {
+func (printer prefixPrinter) Print(args ...any) error {
 	return printer.Printer.Print(
-		append([]any{printer.prefix}, v...)...,
+		append([]any{printer.prefix}, args...)...,
 	)
 }
 
-func (printer prefixPrinter) Printf(format string, v ...any) error {
+func (printer prefixPrinter) Printf(format string, args ...any) error {
 	return printer.Printer.Printf(
 		fmt.Sprintf("%s%s", printer.prefix, format),
-		v...,
+		args...,
 	)
 }

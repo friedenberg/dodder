@@ -5,6 +5,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
+func AllTrue[ITEM any](
+	seq interfaces.Seq[ITEM],
+	predicate func(ITEM) bool,
+) bool {
+	for item := range seq {
+		if predicate(item) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func MakeFuncSetString[
 	E any,
 	EPtr interfaces.SetterPtr[E],

@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -20,9 +21,18 @@ import (
 )
 
 type Dependencies struct {
-	EnvDir        env_dir.Env
-	BlobStore     interfaces.BlobStore
-	BlobFormatter script_config.RemoteScript
+	EnvDir         env_dir.Env
+	BlobStore      interfaces.BlobStore
+	BlobFormatter  script_config.RemoteScript
+	BlobDigestType string
+}
+
+func (f Dependencies) GetBlobDigestType() string {
+	if f.BlobDigestType == "" {
+		return merkle.HRPObjectBlobDigestSha256V0
+	} else {
+		return f.BlobDigestType
+	}
 }
 
 func (f Dependencies) writeComments(

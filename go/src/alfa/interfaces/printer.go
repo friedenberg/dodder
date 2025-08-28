@@ -10,6 +10,7 @@ type Printer interface {
 
 	GetFile() *os.File
 	IsTty() bool
+	// TODO add "isOn" function
 	Print(a ...any) (err error)
 	Caller(skip int) Printer
 	PrintDebug(a ...any) (err error)

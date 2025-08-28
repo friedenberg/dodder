@@ -40,9 +40,10 @@ func MakeTextFormatterWithBlobFormatter(
 		InlineTypeChecker: inlineTypeChecker,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir:        envRepo,
-				BlobStore:     envRepo.GetDefaultBlobStore(),
-				BlobFormatter: formatter,
+				EnvDir:         envRepo,
+				BlobStore:      envRepo.GetDefaultBlobStore(),
+				BlobFormatter:  formatter,
+				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
 			},
 		),
 		checkoutMode: checkoutMode,
@@ -92,7 +93,8 @@ func (tf textFormatter) WriteStringFormatWithMode(
 		TextFormatterOptions:       tf.options,
 	}
 
-	if genres.Config.EqualsGenre(sk.GetGenre()) || mode == checkout_mode.BlobOnly {
+	if genres.Config.EqualsGenre(sk.GetGenre()) ||
+		mode == checkout_mode.BlobOnly {
 		n, err = tf.BlobOnly.FormatMetadata(w, ctx)
 	} else if tf.InlineTypeChecker.IsInlineType(sk.GetType()) {
 		n, err = tf.InlineBlob.FormatMetadata(w, ctx)

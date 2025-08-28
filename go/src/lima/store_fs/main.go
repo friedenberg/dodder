@@ -52,8 +52,9 @@ func Make(
 		),
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				EnvDir:    envRepo,
-				BlobStore: envRepo.GetDefaultBlobStore(),
+				EnvDir:         envRepo,
+				BlobStore:      envRepo.GetDefaultBlobStore(),
+				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
 			},
 		),
 	}

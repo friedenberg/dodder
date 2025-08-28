@@ -136,3 +136,109 @@ func TestBlech32(t1 *testing.T) {
 		)
 	}
 }
+
+func TestBlech32DataOnly(t1 *testing.T) {
+	t1.Skip()
+	t := ui.T{T: t1}
+
+	type testCase struct {
+		str   string
+		valid bool
+	}
+
+	tests := []testCase{
+		{"2UEL5L", true}, // empty
+		{"2uel5l", true},
+		{
+			"tt5tgs",
+			true,
+		},
+		{"qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw", true},
+		{
+			"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqc8247j",
+			true,
+		},
+		{"checkupstagehandshakeupstreamerranterredcaperred2y9e3w", true},
+
+		// invalid checksum
+		{"checkupstagehandshakeupstreamerranterredcaperred2y9e2w", false},
+		// invalid character (space) in hrp
+		{"checkupstagehandshakeupstreamerranterredcaperredp8hs2p", true},
+		{"cheo2y9e2w", false}, // invalid character (o) in data part
+		{"a2y9w", false},      // too short data part
+		{
+			"checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+			false,
+		}, // empty hrp
+		// invalid character (DEL) in hrp
+
+		// long vectors that we do accept despite the spec, see Issue 453
+		{
+			"0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7rc0pu8s7qfcsvr0",
+			true,
+		},
+		{
+			"569pvx",
+			true,
+		},
+
+		// BIP 173 invalid vectors.
+		{"pzry9x0s0muk", false},
+		{"-pzry9x0s0muk", false},
+	}
+
+	type testCaseInfo struct {
+		ui.TestCaseInfo
+		testCase testCase
+	}
+
+	for _, tc := range tests {
+		t.Run(
+			testCaseInfo{ui.MakeTestCaseInfo(""), tc},
+			func(t *ui.T) {
+				expected := tc.str
+				hrp, decoded, err := DecodeDataOnly([]byte(expected))
+				if hrp != "" {
+					t.Errorf("expected empty HRP but got %q", hrp)
+				}
+				if !tc.valid {
+					// Invalid string decoding should result in error.
+					if err == nil {
+						t.Errorf(
+							"expected decoding to fail for invalid string %v",
+							tc.str,
+						)
+					}
+					return
+				}
+
+				// Valid string decoding should result in no error.
+				if err != nil {
+					t.Errorf("expected string to be valid blech32: %v", err)
+				}
+
+				// Check that it encodes to the same string.
+				actual, err := EncodeDataOnly(decoded)
+				if err != nil {
+					t.Errorf("encoding failed: %v", err)
+				}
+				if string(actual) != expected {
+					t.Errorf(
+						"expected data to encode to %v, but got %v",
+						expected,
+						string(actual),
+					)
+				}
+
+				// Flip a bit in the string an make sure it is caught.
+				pos := strings.LastIndexAny(expected, "1")
+				flipped := expected[:pos+1] + string(
+					(expected[pos+1] ^ 1),
+				) + expected[pos+2:]
+				if _, _, err = DecodeString(flipped); err == nil {
+					t.Error("expected decoding to fail")
+				}
+			},
+		)
+	}
+}

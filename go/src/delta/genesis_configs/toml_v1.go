@@ -56,6 +56,10 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	}
 }
 
+func (config *TomlV1Common) SetInventoryListTypeString(value string) {
+	config.InventoryListType = value
+}
+
 func (config *TomlV1Common) GetObjectSigTypeString() string {
 	return merkle.HRPObjectSigV0
 }
@@ -64,8 +68,12 @@ func (config *TomlV1Common) SetObjectSigTypeString(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *TomlV1Common) SetInventoryListTypeString(value string) {
-	config.InventoryListType = value
+func (config *TomlV1Common) GetBlobDigestTypeString() string {
+	return merkle.HRPObjectBlobDigestSha256V0
+}
+
+func (config *TomlV1Common) SetBlobDigestTypeString(string) {
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
