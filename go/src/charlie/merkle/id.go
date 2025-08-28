@@ -2,6 +2,7 @@ package merkle
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"slices"
 
@@ -52,6 +53,41 @@ func (id Id) GetType() string {
 
 func (id Id) IsNull() bool {
 	return len(id.data) == 0
+}
+
+func (id *Id) SetMaybeSha256(value string) (err error) {
+	if len(value) == 64 {
+		if err = id.SetSha256(value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = id.Set(value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (id *Id) SetSha256(value string) (err error) {
+	var decodedBytes []byte
+
+	if decodedBytes, err = hex.DecodeString(value); err != nil {
+		err = errors.Wrapf(err, "%q", value)
+		return
+	}
+
+	if err = id.SetMerkleId(
+		HRPObjectBlobDigestSha256V0,
+		decodedBytes,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (id *Id) Set(value string) (err error) {

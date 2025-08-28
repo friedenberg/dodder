@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -39,18 +39,18 @@ func (cmd *BlobStoreCat) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")
 }
 
-type shaWithReadCloser struct {
-	Sha        *sha.Sha
+type blobIdWithReadCloser struct {
+	BlobId     interfaces.BlobId
 	ReadCloser io.ReadCloser
 }
 
 func (cmd BlobStoreCat) makeBlobWriter(
 	envRepo env_repo.Env,
 	blobStore blob_stores.BlobStoreInitialized,
-) interfaces.FuncIter[shaWithReadCloser] {
+) interfaces.FuncIter[blobIdWithReadCloser] {
 	if cmd.Utility.IsEmpty() {
 		return quiter.MakeSyncSerializer(
-			func(readCloser shaWithReadCloser) (err error) {
+			func(readCloser blobIdWithReadCloser) (err error) {
 				if err = cmd.copy(envRepo, blobStore, readCloser); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -61,7 +61,7 @@ func (cmd BlobStoreCat) makeBlobWriter(
 		)
 	} else {
 		return quiter.MakeSyncSerializer(
-			func(readCloser shaWithReadCloser) (err error) {
+			func(readCloser blobIdWithReadCloser) (err error) {
 				defer errors.DeferredCloser(&err, readCloser.ReadCloser)
 
 				utility := exec.Command(cmd.Utility.Head(), cmd.Utility.Tail()...)
@@ -82,8 +82,8 @@ func (cmd BlobStoreCat) makeBlobWriter(
 				if err = cmd.copy(
 					envRepo,
 					blobStore,
-					shaWithReadCloser{
-						Sha:        readCloser.Sha,
+					blobIdWithReadCloser{
+						BlobId:     readCloser.BlobId,
 						ReadCloser: out,
 					},
 				); err != nil {
@@ -112,13 +112,13 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 	blobWriter := cmd.makeBlobWriter(envRepo, blobStore)
 
 	for _, v := range req.PopArgs() {
-		var sh sha.Sha
+		var blobId merkle.Id
 
-		if err := sh.Set(v); err != nil {
+		if err := blobId.SetMaybeSha256(v); err != nil {
 			envRepo.Cancel(err)
 		}
 
-		if err := cmd.blob(blobStore, &sh, blobWriter); err != nil {
+		if err := cmd.blob(blobStore, blobId, blobWriter); err != nil {
 			ui.Err().Print(err)
 		}
 	}
@@ -127,14 +127,14 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 func (cmd BlobStoreCat) copy(
 	envRepo env_repo.Env,
 	blobStore blob_stores.BlobStoreInitialized,
-	readCloser shaWithReadCloser,
+	readCloser blobIdWithReadCloser,
 ) (err error) {
 	defer errors.DeferredCloser(&err, readCloser.ReadCloser)
 
 	if cmd.PrefixSha {
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			merkle_ids.Format(readCloser.Sha.GetBlobId()),
+			merkle_ids.Format(readCloser.BlobId),
 			envRepo.GetUI(),
 			readCloser.ReadCloser,
 			true,
@@ -154,17 +154,17 @@ func (cmd BlobStoreCat) copy(
 
 func (cmd BlobStoreCat) blob(
 	blobStore blob_stores.BlobStoreInitialized,
-	sh *sha.Sha,
-	blobWriter interfaces.FuncIter[shaWithReadCloser],
+	blobId interfaces.BlobId,
+	blobWriter interfaces.FuncIter[blobIdWithReadCloser],
 ) (err error) {
 	var r interfaces.ReadCloseBlobIdGetter
 
-	if r, err = blobStore.BlobReader(sh); err != nil {
+	if r, err = blobStore.BlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = blobWriter(shaWithReadCloser{Sha: sh, ReadCloser: r}); err != nil {
+	if err = blobWriter(blobIdWithReadCloser{BlobId: blobId, ReadCloser: r}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

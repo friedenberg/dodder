@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -114,24 +113,24 @@ func (cmd CheckinBlob) Run(req command.Request) {
 
 type externalBlobPair struct {
 	objectIdString string
-	pathOrSha      string
+	pathOrDigest   string
 
 	*ids.ZettelId
-	BlobFD  fd.FD
-	BlobSha sha.Sha
+	BlobFD     fd.FD
+	BlobDigest interfaces.MutableBlobId
 
 	object *sku.Transacted
 }
 
 func (pair *externalBlobPair) SetArgs(
-	objectIdString, pathOrSha string,
+	objectIdString, pathOrDigest string,
 	envRepo env_repo.Env,
 ) (err error) {
 	pair.BlobFD.Reset()
-	pair.BlobSha.Reset()
+	pair.BlobDigest.Reset()
 
 	pair.objectIdString = objectIdString
-	pair.pathOrSha = pathOrSha
+	pair.pathOrDigest = pathOrDigest
 
 	if pair.ZettelId, err = ids.MakeZettelId(pair.objectIdString); err != nil {
 		err = errors.Wrap(err)
@@ -140,11 +139,11 @@ func (pair *externalBlobPair) SetArgs(
 
 	if err = pair.BlobFD.SetFromPath(
 		envRepo.GetCwd(),
-		pathOrSha,
+		pathOrDigest,
 		envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			if err = pair.BlobSha.Set(pair.pathOrSha); err != nil {
+			if err = pair.BlobDigest.Set(pair.pathOrDigest); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -161,11 +160,11 @@ func (pair *externalBlobPair) GetDigest() interfaces.BlobId {
 	if !pair.BlobFD.IsEmpty() {
 		return pair.BlobFD.GetDigest()
 	} else {
-		return pair.BlobSha.GetBlobId()
+		return pair.BlobDigest
 	}
 }
 
-func (pair *externalBlobPair) PopulateBlobSha() (err error) {
+func (pair *externalBlobPair) PopulateBlobDigest() (err error) {
 	if err = pair.object.SetBlobDigest(pair.GetDigest()); err != nil {
 		err = errors.Wrap(err)
 		return

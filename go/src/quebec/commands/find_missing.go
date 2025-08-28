@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -27,23 +27,23 @@ func (cmd FindMissing) Run(dep command.Request) {
 		}
 	}
 
-	for _, digestString := range dep.PopArgs() {
-		var digest sha.Sha
+	for _, blobDigestString := range dep.PopArgs() {
+		var blobDigest merkle.Id
 
-		if err := digest.Set(digestString); err != nil {
+		if err := blobDigest.SetMaybeSha256(blobDigestString); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 
-		objectIds, ok := lookupStored[string(digest.GetBytes())]
+		objectIds, ok := lookupStored[string(blobDigest.GetBytes())]
 
 		if ok {
 			localWorkingCopy.GetUI().Printf(
 				"%s (checked in as %q)",
-				&digest,
+				&blobDigest,
 				objectIds,
 			)
 		} else {
-			localWorkingCopy.GetUI().Printf("%s (missing)", &digest)
+			localWorkingCopy.GetUI().Printf("%s (missing)", &blobDigest)
 		}
 	}
 }
