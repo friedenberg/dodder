@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
+// TODO switch to methods for all
 type CommitOptions struct {
 	StoreOptions
 	ids.RepoId
@@ -13,11 +14,13 @@ type CommitOptions struct {
 	DontAddMissingType bool
 }
 
+// TODO switch to methods for all
 type StreamIndexOptions struct {
 	ForceLatest      bool
 	AddToStreamIndex bool
 }
 
+// TODO switch to methods for all
 type StoreOptions struct {
 	StreamIndexOptions StreamIndexOptions
 	AddToInventoryList bool
@@ -57,7 +60,6 @@ func GetStoreOptionsImport() StoreOptions {
 	return StoreOptions{
 		AddToInventoryList: true,
 		RunHooks:           true,
-		UpdateTai:          true,
 		Validate:           true,
 	}
 }

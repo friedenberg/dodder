@@ -113,7 +113,8 @@ func (store *Store) Commit(
 			options.Clock = store
 		}
 
-		child.SetTai(options.Clock.GetTai())
+		tai := options.Clock.GetTai()
+		child.SetTai(tai)
 	}
 
 	if options.AddToInventoryList && (child.ObjectId.IsEmpty() ||

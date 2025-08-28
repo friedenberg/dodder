@@ -94,6 +94,8 @@ function clone_history_zettel_type_tag { # @test
 	bootstrap "$them"
 	assert_success
 
+  BATS_TEST_FILE=true
+
 	us="us"
 	set_xdg "$us"
 	run_clone_default_with \

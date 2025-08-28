@@ -30,7 +30,7 @@ func Make(
 	storeOptions sku.StoreOptions,
 	envRepo env_repo.Env,
 	typedInventoryListBlobStore inventory_list_coders.Closet,
-	indexObject sku.IndexObject,
+	indexObject sku.Index,
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.RepoStore,
 ) sku.Importer {
@@ -40,7 +40,7 @@ func Make(
 
 	importer := &importer{
 		typedInventoryListBlobStore: typedInventoryListBlobStore,
-		indexObject:                 indexObject,
+		index:                       indexObject,
 		storeExternal:               storeExternalMergeCheckedOut,
 		storeObject:                 storeObject,
 		envRepo:                     envRepo,
@@ -67,7 +67,7 @@ func Make(
 
 type importer struct {
 	typedInventoryListBlobStore inventory_list_coders.Closet
-	indexObject                 sku.IndexObject
+	index                       sku.Index
 	storeExternal               store_workspace.MergeCheckedOut
 	storeObject                 sku.RepoStore
 	envRepo                     env_repo.Env
@@ -86,9 +86,9 @@ func (importer importer) GetCheckedOutPrinter() interfaces.FuncIter[*sku.Checked
 }
 
 func (importer *importer) SetCheckedOutPrinter(
-	p interfaces.FuncIter[*sku.CheckedOut],
+	printer interfaces.FuncIter[*sku.CheckedOut],
 ) {
-	importer.checkedOutPrinter = p
+	importer.checkedOutPrinter = printer
 }
 
 func (importer importer) Import(
@@ -107,7 +107,7 @@ func (importer importer) Import(
 			return
 		}
 	} else {
-		if checkedOut, err = importer.importLeafSku(external); err != nil {
+		if checkedOut, err = importer.importLeaf(external); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -117,14 +117,14 @@ func (importer importer) Import(
 }
 
 func (importer importer) importInventoryList(
-	listObject *sku.Transacted,
+	list *sku.Transacted,
 ) (checkedOut *sku.CheckedOut, err error) {
-	if err = genres.InventoryList.AssertGenre(listObject.GetGenre()); err != nil {
+	if err = genres.InventoryList.AssertGenre(list.GetGenre()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	blobDigest := listObject.GetBlobDigest()
+	blobDigest := list.GetBlobDigest()
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobDigest) {
 		err = env_dir.ErrBlobMissing{
@@ -134,18 +134,18 @@ func (importer importer) importInventoryList(
 		return
 	}
 
-	iter := importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
-		listObject,
+	seq := importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
+		list,
 	)
 
-	for sk, errIter := range iter {
+	for object, errIter := range seq {
 		if errIter != nil {
 			err = errors.Wrap(errIter)
 			return
 		}
 
 		if _, err = importer.Import(
-			sk,
+			object,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -161,8 +161,8 @@ func (importer importer) importInventoryList(
 	// 	listObject.Metadata.Type = ids.GetOrPanic(inventoryListTypeString).Type
 	// }
 
-	if checkedOut, err = importer.importLeafSku(
-		listObject,
+	if checkedOut, err = importer.importLeaf(
+		list,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -171,7 +171,7 @@ func (importer importer) importInventoryList(
 	return
 }
 
-func (importer importer) importLeafSku(
+func (importer importer) importLeaf(
 	external *sku.Transacted,
 ) (checkedOut *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
@@ -209,8 +209,8 @@ func (importer importer) importLeafSku(
 		}
 	}
 
-	if importer.indexObject != nil {
-		_, err = importer.indexObject.ReadOneObjectIdTai(
+	if importer.index != nil {
+		_, err = importer.index.ReadOneObjectIdTai(
 			checkedOut.GetSkuExternal().GetObjectId(),
 			checkedOut.GetSkuExternal().GetTai(),
 		)
@@ -232,17 +232,14 @@ func (importer importer) importLeafSku(
 		checkedOut.GetSku(),
 	); err != nil {
 		if collections.IsErrNotFound(err) {
-			if err = importer.storeObject.Commit(
+			if err = importer.importNewObject(
 				checkedOut.GetSkuExternal(),
-				sku.CommitOptions{
-					Clock:              checkedOut.GetSkuExternal(),
-					StoreOptions:       importer.storeOptions,
-					DontAddMissingTags: true,
-					DontAddMissingType: true,
-				},
 			); err != nil {
-				err = errors.WrapExceptSentinel(err, collections.ErrExists)
+				err = errors.Wrap(err)
+				return
 			}
+
+			return
 		} else {
 			err = errors.Wrapf(err, "ObjectId: %s", external.GetObjectId())
 		}
@@ -287,6 +284,29 @@ func (importer importer) importLeafSku(
 
 	if err = importer.checkedOutPrinter(checkedOut); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (importer importer) importNewObject(
+	object *sku.Transacted,
+) (err error) {
+	options := sku.CommitOptions{
+		Clock:              object,
+		StoreOptions:       importer.storeOptions,
+		DontAddMissingTags: true,
+		DontAddMissingType: true,
+	}
+
+	options.UpdateTai = false
+
+	if err = importer.storeObject.Commit(
+		object,
+		options,
+	); err != nil {
+		err = errors.WrapExceptSentinel(err, collections.ErrExists)
 		return
 	}
 

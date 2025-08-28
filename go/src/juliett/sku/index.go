@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	IndexObject interface {
+	Index interface {
 		ReadOneObjectIdTai(
 			k interfaces.ObjectId,
 			t ids.Tai,
