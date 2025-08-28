@@ -26,7 +26,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -512,21 +511,21 @@ func (server *Server) handleBlobsHeadOrGet(
 		return
 	}
 
-	var sh *sha.Sha
+	var blobDigest merkle.Id
 
 	{
 		var err error
 
-		if sh, err = sha.MakeWithString(shString); err != nil {
+		if err = blobDigest.SetMaybeSha256(shString); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}
 	}
 
-	ui.Log().Printf("blob requested: %q", sh)
+	ui.Log().Printf("blob requested: %q", blobDigest)
 
 	if request.Method == "HEAD" {
-		if server.Repo.GetBlobStore().HasBlob(sh) {
+		if server.Repo.GetBlobStore().HasBlob(blobDigest) {
 			response.StatusCode = http.StatusNoContent
 		} else {
 			response.StatusCode = http.StatusNotFound
@@ -537,7 +536,7 @@ func (server *Server) handleBlobsHeadOrGet(
 		{
 			var err error
 
-			if rc, err = server.Repo.GetBlobStore().BlobReader(sh); err != nil {
+			if rc, err = server.Repo.GetBlobStore().BlobReader(blobDigest); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					response.StatusCode = http.StatusNotFound
 				} else {
@@ -555,10 +554,10 @@ func (server *Server) handleBlobsHeadOrGet(
 }
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
-	shString := request.Vars()["sha"]
+	digestString := request.Vars()["sha"]
 	var result interfaces.BlobId
 
-	if shString == "" {
+	if digestString == "" {
 		var err error
 
 		if result, err = server.copyBlob(request.Body, nil); err != nil {
@@ -576,7 +575,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	var blobDigest merkle.Id
 
-	if err := blobDigest.SetMaybeSha256(shString); err != nil {
+	if err := blobDigest.SetMaybeSha256(digestString); err != nil {
 		response.Error(err)
 		return
 	}

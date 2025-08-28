@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -299,28 +298,6 @@ func (encoder *binaryEncoder) writeMerkleId(
 	if n, err = encoder.writeFieldBinaryMarshaler(
 		merkleId,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO change to writeDigest
-func (encoder *binaryEncoder) writeSha(
-	sh *sha.Sha,
-	allowNull bool,
-	key string,
-) (n int64, err error) {
-	if sh.IsNull() {
-		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(sh, key)
-		}
-
-		return
-	}
-
-	if n, err = encoder.writeFieldWriterTo(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

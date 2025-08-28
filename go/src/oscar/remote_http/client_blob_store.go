@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -102,7 +103,7 @@ func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
 	expected interfaces.BlobId,
 ) (err error) {
-	var actual sha.Sha
+	var actual merkle.Id
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
@@ -149,9 +150,9 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	var shString strings.Builder
+	var digestString strings.Builder
 
-	if _, err = io.Copy(&shString, response.Body); err != nil {
+	if _, err = io.Copy(&digestString, response.Body); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -161,7 +162,7 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = actual.Set(strings.TrimSpace(shString.String())); err != nil {
+	if err = actual.SetMaybeSha256(strings.TrimSpace(digestString.String())); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -335,7 +336,7 @@ type blobReaderFactory struct {
 }
 
 func (arf blobReaderFactory) BlobReader(
-	digest sha.Sha,
+	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	var v string
 	var ok bool
@@ -369,9 +370,9 @@ func writeFormat(
 	}
 
 	blobDigestRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var blobDigest sha.Sha
+	var blobDigest merkle.Id
 
-	if err := blobDigest.Set(blobDigestRaw); err != nil {
+	if err := blobDigest.SetMaybeSha256(blobDigestRaw); err != nil {
 		t.Fatalf("%s", err)
 	}
 

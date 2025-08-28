@@ -354,28 +354,6 @@ func writeMerkleIdKeyIfNotNull(
 	return writeMerkleIdKey(w, key, merkleId)
 }
 
-func writeShaKeyIfNotNull(
-	w io.Writer,
-	key *catgut.String,
-	sh *sha.Sha,
-) (n int, err error) {
-	if sh.IsNull() {
-		return
-	}
-
-	n, err = ohio.WriteKeySpaceValueNewlineString(
-		w,
-		key.String(),
-		sh.String(),
-	)
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func GetDigestForContext(
 	format Format,
 	context FormatterContext,

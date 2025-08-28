@@ -92,7 +92,7 @@ func (id *Id) SetSha256(value string) (err error) {
 
 func (id *Id) Set(value string) (err error) {
 	if id.tipe, id.data, err = blech32.DecodeString(value); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Value: %q", value)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -117,7 +118,7 @@ type externalBlobPair struct {
 
 	*ids.ZettelId
 	BlobFD     fd.FD
-	BlobDigest interfaces.MutableBlobId
+	BlobDigest merkle.Id
 
 	object *sku.Transacted
 }
@@ -143,7 +144,7 @@ func (pair *externalBlobPair) SetArgs(
 		envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			if err = pair.BlobDigest.Set(pair.pathOrDigest); err != nil {
+			if err = pair.BlobDigest.SetMaybeSha256(pair.pathOrDigest); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

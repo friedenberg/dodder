@@ -29,7 +29,7 @@ func (op CreateFromShas) Run(
 	for _, arg := range args {
 		var digest merkle.Id
 
-		if err = digest.Set(arg); err != nil {
+		if err = digest.SetMaybeSha256(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

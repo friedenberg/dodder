@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 var poolObjectId2 interfaces.Pool[objectId2, *objectId2]
@@ -36,7 +35,6 @@ type objectId2 struct {
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
 	repoId      catgut.String
-	sha         sha.Sha
 	// Domain
 }
 
