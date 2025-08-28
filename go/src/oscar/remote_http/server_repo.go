@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -47,7 +46,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	expected := sha.MustWithMerkleId(listObject.GetBlobDigest())
+	expected := listObject.GetBlobDigest()
 
 	pubBase64 := request.request.Header.Get(headerRepoPublicKey)
 

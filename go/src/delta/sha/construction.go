@@ -5,22 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MustWithMerkleId(merkleId interfaces.BlobId) *Sha {
-	if digest, ok := merkleId.(*Sha); ok {
-		return digest
-	}
-
-	digest := poolSha.Get()
-
-	if !merkleId.IsNull() {
-		errors.PanicIfError(
-			digest.SetMerkleId(merkleId.GetType(), merkleId.GetBytes()),
-		)
-	}
-
-	return digest
-}
-
 func MustWithMerkleIdWithType(merkleId interfaces.BlobId, tipe string) *Sha {
 	if digest, ok := merkleId.(*Sha); ok {
 		return digest
@@ -35,10 +19,6 @@ func MustWithMerkleIdWithType(merkleId interfaces.BlobId, tipe string) *Sha {
 	}
 
 	return digest
-}
-
-func MustWithDigester(digester interfaces.BlobIdGetter) *Sha {
-	return MustWithMerkleId(digester.GetBlobId())
 }
 
 func MustWithString(v string) (sh *Sha) {

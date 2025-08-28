@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -278,7 +277,7 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.BlobStore,
-	merkleId interfaces.BlobId,
+	expected interfaces.BlobId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
@@ -287,7 +286,7 @@ func VerifyBlob(
 
 	var readCloser interfaces.ReadCloseBlobIdGetter
 
-	if readCloser, err = blobStore.BlobReader(merkleId); err != nil {
+	if readCloser, err = blobStore.BlobReader(expected); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -297,9 +296,10 @@ func VerifyBlob(
 		return
 	}
 
-	expected := sha.MustWithMerkleId(merkleId)
-
-	if err = merkle_ids.MakeErrNotEqual(expected, readCloser.GetBlobId()); err != nil {
+	if err = merkle_ids.MakeErrNotEqual(
+		expected,
+		readCloser.GetBlobId(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

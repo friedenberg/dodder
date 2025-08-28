@@ -39,11 +39,11 @@ func (err ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
 
 func MakeErrHasInlineBlobAndFilePath(
 	blobFD *fd.FD,
-	sh *sha.Sha,
+	inlineBlobDigest interfaces.BlobId,
 ) (err *ErrHasInlineBlobAndFilePath) {
 	err = &ErrHasInlineBlobAndFilePath{}
 	err.BlobFD.ResetWith(blobFD)
-	err.InlineSha.SetDigest(sh)
+	err.InlineSha.SetDigest(inlineBlobDigest)
 	return
 }
 

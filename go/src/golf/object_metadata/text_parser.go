@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -78,13 +77,13 @@ func (parser textParser) ParseMetadata(
 
 	n += n1
 
-	inlineBlobSha := sha.MustWithDigester(blobWriter)
+	inlineBlobDigest := blobWriter.GetBlobId()
 
 	if !m.DigBlob.IsNull() && !mp.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
 				&mp.Blob,
-				inlineBlobSha,
+				inlineBlobDigest,
 			),
 		)
 
@@ -103,17 +102,17 @@ func (parser textParser) ParseMetadata(
 	}
 
 	switch {
-	case m.DigBlob.IsNull() && !inlineBlobSha.IsNull():
-		m.DigBlob.SetDigest(inlineBlobSha)
+	case m.DigBlob.IsNull() && !inlineBlobDigest.IsNull():
+		m.DigBlob.SetDigest(inlineBlobDigest)
 
-	case !m.DigBlob.IsNull() && inlineBlobSha.IsNull():
+	case !m.DigBlob.IsNull() && inlineBlobDigest.IsNull():
 		// noop
 
-	case !m.DigBlob.IsNull() && !inlineBlobSha.IsNull() &&
-		!merkle_ids.Equals(&m.DigBlob, inlineBlobSha):
+	case !m.DigBlob.IsNull() && !inlineBlobDigest.IsNull() &&
+		!merkle_ids.Equals(&m.DigBlob, inlineBlobDigest):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataBlobId(
-				inlineBlobSha,
+				inlineBlobDigest,
 				&m.DigBlob,
 			),
 		)

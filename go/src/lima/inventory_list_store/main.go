@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -296,7 +295,7 @@ func (store *Store) WriteInventoryListBlob(
 	}
 
 	actual := writeCloser.GetBlobId()
-	expected := sha.MustWithMerkleId(object.GetBlobDigest())
+	expected := object.GetBlobDigest()
 
 	ui.Log().Print("expected", expected, "actual", actual)
 

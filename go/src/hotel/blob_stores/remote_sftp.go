@@ -277,9 +277,8 @@ func (blobStore *remoteSftp) BlobReader(
 		return
 	}
 
-	sh1 := sha.MustWithMerkleId(digest)
 	blobStore.blobCacheLock.Lock()
-	blobStore.blobCache[string(sh1.GetBytes())] = struct{}{}
+	blobStore.blobCache[string(digest.GetBytes())] = struct{}{}
 	blobStore.blobCacheLock.Unlock()
 
 	// Create streaming reader that handles decompression/decryption
@@ -394,8 +393,8 @@ func (mover *sftpMover) Close() (err error) {
 	}
 
 	// Get the calculated SHA and determine final path
-	sh := mover.writer.GetDigest()
-	finalPath := mover.store.remotePathForMerkleId(sh)
+	blobDigest := mover.writer.GetDigest()
+	finalPath := mover.store.remotePathForMerkleId(blobDigest)
 
 	// Ensure the target directory exists (Git-like bucketing)
 	finalDir := path.Dir(finalPath)
@@ -417,9 +416,8 @@ func (mover *sftpMover) Close() (err error) {
 		}
 	}
 
-	sh1 := sha.MustWithMerkleId(sh)
 	mover.store.blobCacheLock.Lock()
-	mover.store.blobCache[string(sh1.GetBytes())] = struct{}{}
+	mover.store.blobCache[string(blobDigest.GetBytes())] = struct{}{}
 	mover.store.blobCacheLock.Unlock()
 
 	// Clear temp path so cleanup doesn't try to remove it

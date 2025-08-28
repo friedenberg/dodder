@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
@@ -341,7 +340,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 			if err = client.WriteBlobToRemote(
 				remote.GetBlobStore(),
-				sha.MustWithMerkleId(expected.GetBlobDigest()),
+				expected.GetBlobDigest(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

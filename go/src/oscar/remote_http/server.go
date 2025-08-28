@@ -501,6 +501,7 @@ func (server *Server) makeHandler(
 func (server *Server) handleBlobsHeadOrGet(
 	request Request,
 ) (response Response) {
+	// TODO rename to blob id
 	shString := request.Vars()["sha"]
 
 	if shString == "" {
