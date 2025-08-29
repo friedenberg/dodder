@@ -62,19 +62,19 @@ func (err *ErrHasInlineBlobAndFilePath) Error() string {
 
 func MakeErrHasInlineBlobAndMetadataBlobId(
 	inline, metadata interfaces.BlobId,
-) (err *ErrHasInlineBlobAndMetadataSha) {
-	err = &ErrHasInlineBlobAndMetadataSha{}
+) (err *ErrHasInlineBlobAndMetadataDigest) {
+	err = &ErrHasInlineBlobAndMetadataDigest{}
 	err.Metadata = merkle.Clone(metadata)
 	err.Inline = merkle.Clone(inline)
 	return
 }
 
-type ErrHasInlineBlobAndMetadataSha struct {
+type ErrHasInlineBlobAndMetadataDigest struct {
 	Inline   interfaces.BlobId
 	Metadata interfaces.BlobId
 }
 
-func (err *ErrHasInlineBlobAndMetadataSha) Error() string {
+func (err *ErrHasInlineBlobAndMetadataDigest) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and metadata blob id: \ninline blob id: %s\n metadata blob id: %s",
 		err.Inline,

@@ -124,8 +124,7 @@ func Clone(src interfaces.BlobId) interfaces.BlobId {
 	}
 
 	errors.PanicIfError(MakeErrEmptyType(src))
-	env := GetEnv(src.GetType())
-	dst := env.GetBlobId()
+	dst := idPool.Get()
 	dst.ResetWithMerkleId(src)
 
 	return dst

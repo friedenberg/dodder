@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -74,7 +73,7 @@ func (index *object_probe_index) initialize(
 	envRepo env_repo.Env,
 	dir string,
 ) (err error) {
-	index.rowWidth = sha.ByteSize + 1 + 8 + 8
+	index.rowWidth = index.hashType.GetSize() + 1 + 8 + 8
 
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
