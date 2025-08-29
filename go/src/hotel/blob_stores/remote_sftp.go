@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/rand"
-	"crypto/sha256"
 	"fmt"
-	"hash"
 	"io"
 	"os"
 	"path"
@@ -239,7 +237,7 @@ func (blobStore *remoteSftp) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, 
 		config: blobStore.makeEnvDirConfig(),
 	}
 
-	if err = mover.initialize(); err != nil {
+	if err = mover.initialize(blobStore.hashType.Get()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -312,7 +310,7 @@ type sftpMover struct {
 	closed   bool
 }
 
-func (mover *sftpMover) initialize() (err error) {
+func (mover *sftpMover) initialize(hash merkle.Hash) (err error) {
 	// Create a temporary file on the remote server
 	var tempNameBytes [16]byte
 	if _, err = rand.Read(tempNameBytes[:]); err != nil {
@@ -333,6 +331,7 @@ func (mover *sftpMover) initialize() (err error) {
 	if mover.writer, err = newSftpWriter(
 		mover.config,
 		mover.tempFile,
+		hash,
 	); err != nil {
 		mover.tempFile.Close()
 		mover.store.sftpClient.Remove(mover.tempPath)
@@ -441,7 +440,7 @@ func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 
 // sftpWriter implements the streaming writer with compression/encryption
 type sftpWriter struct {
-	hash            hash.Hash
+	hash            merkle.Hash
 	tee             io.Writer
 	wCompress, wAge io.WriteCloser
 	wBuf            *bufio.Writer
@@ -450,6 +449,7 @@ type sftpWriter struct {
 func newSftpWriter(
 	config env_dir.Config,
 	ioWriter io.Writer,
+	hash merkle.Hash,
 ) (writer *sftpWriter, err error) {
 	writer = &sftpWriter{}
 
@@ -460,7 +460,7 @@ func newSftpWriter(
 		return
 	}
 
-	writer.hash = sha256.New()
+	writer.hash = hash
 
 	if writer.wCompress, err = config.GetBlobCompression().WrapWriter(writer.wAge); err != nil {
 		err = errors.Wrap(err)
@@ -511,7 +511,8 @@ func (writer *sftpWriter) Close() (err error) {
 }
 
 func (writer *sftpWriter) GetDigest() interfaces.BlobId {
-	return sha.FromHash(writer.hash)
+	id, _ := writer.hash.MakeBlobId()
+	return id
 }
 
 // sftpStreamingReader handles decompression/decryption while reading from SFTP
@@ -605,5 +606,6 @@ func (reader *sftpReader) Close() error {
 }
 
 func (reader *sftpReader) GetBlobId() interfaces.BlobId {
-	return sha.FromHash(reader.hash)
+	id, _ := reader.hash.MakeBlobId()
+	return id
 }

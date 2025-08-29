@@ -35,19 +35,15 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 
 	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 
-	dst.sigRepo.ResetWith(&src.sigRepo)
-	dst.pubRepo.ResetWith(&src.pubRepo)
+	dst.sigRepo.ResetWith(src.sigRepo)
+	dst.pubRepo.ResetWith(src.pubRepo)
 
 	dst.Type = src.Type
 	dst.Tai = src.Tai
 
-	dst.DigBlob.ResetWith(&src.DigBlob)
-	dst.digSelf.ResetWith(
-		&src.digSelf,
-	)
-	dst.sigMother.ResetWith(
-		&src.sigMother,
-	)
+	dst.DigBlob.ResetWith(src.DigBlob)
+	dst.digSelf.ResetWith(src.digSelf)
+	dst.sigMother.ResetWith(src.sigMother)
 }
 
 func (r resetter) ResetWith(dst *Metadata, src *Metadata) {

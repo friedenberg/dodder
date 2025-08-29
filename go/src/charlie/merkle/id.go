@@ -140,7 +140,7 @@ func (id *Id) Reset() {
 	id.data = id.data[:0]
 }
 
-func (id *Id) ResetWith(src *Id) {
+func (id *Id) ResetWith(src Id) {
 	id.tipe = src.tipe
 	bites := src.data
 	id.data = make([]byte, len(bites))

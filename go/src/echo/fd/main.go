@@ -434,7 +434,7 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	dst.digest.ResetWith(&src.digest)
+	dst.digest.ResetWith(src.digest)
 }
 
 func (src *FD) Clone() (dst *FD) {
@@ -443,6 +443,6 @@ func (src *FD) Clone() (dst *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	dst.digest.ResetWith(&src.digest)
+	dst.digest.ResetWith(src.digest)
 	return
 }

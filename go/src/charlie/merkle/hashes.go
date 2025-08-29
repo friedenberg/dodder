@@ -19,6 +19,19 @@ func (hash Hash) GetType() string {
 	return hash.tipe
 }
 
+func (hash Hash) MakeBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
+	id := idPool.Get()
+
+	// TODO verify this works as expected
+	digest := hash.Sum(id.data)
+
+	errors.PanicIfError(id.SetMerkleId(hash.tipe, digest))
+
+	return id, func() {
+		idPool.Put(id)
+	}
+}
+
 var HashTypeSha256 = HashType{
 	pool: pool.MakeValue(
 		func() Hash {
