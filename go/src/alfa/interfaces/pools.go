@@ -1,13 +1,11 @@
 package interfaces
 
 // an object borrowed from a pool that knows how to return itself
-type Borrowed interface {
-	Return()
-}
+// type Borrowed interface {
+// 	Return()
+// }
 
 type FuncRepool func()
-
-type Poolable[T any] any
 
 type PoolablePtr[T any] interface {
 	Ptr[T]

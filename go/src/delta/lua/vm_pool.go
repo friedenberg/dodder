@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool2"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -132,7 +131,7 @@ func (sp *VMPool) SetCompiled(
 ) (err error) {
 	sp.compiled = compiled
 
-	sp.PoolWithErrorsPtr = pool2.MakePool(
+	sp.PoolWithErrorsPtr = pool.MakeWithError(
 		func() (vm *VM, err error) {
 			vm = &VM{
 				LState: lua.NewState(),

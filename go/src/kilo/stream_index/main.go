@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -51,27 +52,28 @@ type Index struct {
 }
 
 func MakeIndex(
-	s env_repo.Env,
+	envRepo env_repo.Env,
 	preWrite interfaces.FuncIter[*sku.Transacted],
 	dir string,
 	sunrise ids.Tai,
-) (i *Index, err error) {
-	i = &Index{
-		envRepo:        s,
+) (index *Index, err error) {
+	index = &Index{
+		envRepo:        envRepo,
 		sunrise:        sunrise,
 		preWrite:       preWrite,
 		path:           dir,
-		CacheIOFactory: s,
+		CacheIOFactory: envRepo,
 	}
 
-	if err = i.probe_index.Initialize(
-		s,
+	if err = index.probe_index.Initialize(
+		envRepo,
+		merkle.HashTypeSha256,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = i.Initialize(); err != nil {
+	if err = index.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool2"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 )
 
@@ -16,26 +15,26 @@ type LuaVMV2 struct {
 }
 
 func PushTopFuncV2(
-	lvm LuaVMPoolV2,
+	luaVMPool LuaVMPoolV2,
 	args []string,
 ) (vm *LuaVMV2, argsOut []string, err error) {
-	if vm, err = lvm.Get(); err != nil {
+	if vm, err = luaVMPool.Get(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	vm.LValue = vm.Top
 
-	var f *lua.LFunction
+	var luaFunction *lua.LFunction
 
-	if f, argsOut, err = vm.GetTopFunctionOrFunctionNamedError(
+	if luaFunction, argsOut, err = vm.GetTopFunctionOrFunctionNamedError(
 		args,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	vm.Push(f)
+	vm.Push(luaFunction)
 
 	return
 }
@@ -45,12 +44,12 @@ type (
 	LuaTablePoolV2 = interfaces.Pool[LuaTableV2, *LuaTableV2]
 )
 
-func MakeLuaVMPoolV2(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV2 {
-	return pool2.MakePool(
+func MakeLuaVMPoolV2(luaVMPool *lua.VMPool, self *Transacted) LuaVMPoolV2 {
+	return pool.MakeWithError(
 		func() (out *LuaVMV2, err error) {
 			var vm *lua.VM
 
-			if vm, err = lvp.PoolWithErrorsPtr.Get(); err != nil {
+			if vm, err = luaVMPool.PoolWithErrorsPtr.Get(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -58,7 +57,7 @@ func MakeLuaVMPoolV2(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV2 {
 			out = &LuaVMV2{
 				VM:        vm,
 				TablePool: MakeLuaTablePoolV2(vm),
-				Selbst:    selbst,
+				Selbst:    self,
 			}
 
 			return

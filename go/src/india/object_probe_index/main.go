@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -43,16 +44,16 @@ const (
 )
 
 type object_probe_index struct {
-	blobIdType string
-	pages      [PageCount]page
+	hashType merkle.HashType
+	pages    [PageCount]page
 }
 
 func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
-	blobIdType string,
+	hashType merkle.HashType,
 ) (index *object_probe_index, err error) {
-	index = &object_probe_index{blobIdType: blobIdType}
+	index = &object_probe_index{hashType: hashType}
 	err = index.initialize(rowEqualerComplete{}, envRepo, path)
 	return
 }
@@ -60,9 +61,9 @@ func MakePermitDuplicates(
 func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
-	blobIdType string,
+	hashType merkle.HashType,
 ) (index *object_probe_index, err error) {
-	index = &object_probe_index{blobIdType: blobIdType}
+	index = &object_probe_index{hashType: hashType}
 	err = index.initialize(rowEqualerShaOnly{}, envRepo, dir)
 	return
 }
@@ -78,7 +79,7 @@ func (index *object_probe_index) initialize(
 			equaler,
 			envRepo,
 			page_id.PageIdFromPath(uint8(pageIndex), dir),
-			index.blobIdType,
+			index.hashType,
 		)
 	}
 

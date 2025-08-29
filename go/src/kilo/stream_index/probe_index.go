@@ -3,9 +3,7 @@ package stream_index
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -14,17 +12,20 @@ import (
 type probe_index struct {
 	envRepo env_repo.Env
 	object_probe_index.Index
+	hashType merkle.HashType
 }
 
 func (index *probe_index) Initialize(
 	envRepo env_repo.Env,
+	hashType merkle.HashType,
 ) (err error) {
 	index.envRepo = envRepo
+	index.hashType = hashType
 
 	if index.Index, err = object_probe_index.MakeNoDuplicates(
 		index.envRepo,
 		index.envRepo.DirCacheObjectPointers(),
-		merkle.HRPObjectSigV0,
+		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -89,10 +90,9 @@ func (index *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
-	digest := sha.FromStringContent(str)
-	defer merkle_ids.PutBlobId(digest)
+	blobDigest := merkle.FromStringContent(index.hashType, str)
 
-	if err = index.Index.AddBlobId(digest, loc); err != nil {
+	if err = index.Index.AddBlobId(blobDigest, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

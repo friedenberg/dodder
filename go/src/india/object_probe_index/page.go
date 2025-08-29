@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -19,7 +20,7 @@ import (
 
 type page struct {
 	sync.Mutex     // for the buffered reader
-	blobIdType     string
+	hashType       merkle.HashType
 	file           *os.File
 	bufferedReader bufio.Reader
 	added          *heap.Heap[row, *row]
@@ -32,7 +33,7 @@ func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	pageId page_id.PageId,
-	blobIdType string,
+	hashType merkle.HashType,
 ) (err error) {
 	page.added = heap.Make(
 		equaler,
@@ -42,7 +43,7 @@ func (page *page) initialize(
 
 	page.envRepo = envRepo
 	page.id = pageId
-	page.blobIdType = blobIdType
+	page.hashType = hashType
 
 	page.searchFunc = page.seekToFirstBinarySearch
 

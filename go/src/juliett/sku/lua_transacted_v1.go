@@ -13,61 +13,83 @@ type LuaTableV1 struct {
 	TagsImplicit *lua.LTable
 }
 
-func ToLuaTableV1(tg TransactedGetter, l *lua.LState, t *LuaTableV1) {
-	o := tg.GetSku()
+func ToLuaTableV1(
+	tg TransactedGetter,
+	luaState *lua.LState,
+	luaTable *LuaTableV1,
+) {
+	object := tg.GetSku()
 
-	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
-	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
-	l.SetField(t.Transacted, "Typ", lua.LString(o.GetType().String()))
+	luaState.SetField(
+		luaTable.Transacted,
+		"Gattung",
+		lua.LString(object.GetGenre().String()),
+	)
+	luaState.SetField(
+		luaTable.Transacted,
+		"Kennung",
+		lua.LString(object.GetObjectId().String()),
+	)
+	luaState.SetField(
+		luaTable.Transacted,
+		"Typ",
+		lua.LString(object.GetType().String()),
+	)
 
-	tags := t.Tags
+	tags := luaTable.Tags
 
-	for e := range o.Metadata.GetTags().AllPtr() {
-		l.SetField(tags, e.String(), lua.LBool(true))
+	for tag := range object.Metadata.GetTags().AllPtr() {
+		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 
-	tags = t.TagsImplicit
+	tags = luaTable.TagsImplicit
 
-	for e := range o.Metadata.Cache.GetImplicitTags().AllPtr() {
-		l.SetField(tags, e.String(), lua.LBool(true))
+	for tag := range object.Metadata.Cache.GetImplicitTags().AllPtr() {
+		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 }
 
-func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
-	t := lt.Transacted
+func FromLuaTableV1(
+	object *Transacted,
+	luaState *lua.LState,
+	luaTable *LuaTableV1,
+) (err error) {
+	transacted := luaTable.Transacted
 
-	g := genres.MakeOrUnknown(l.GetField(t, "Gattung").String())
+	genre := genres.MakeOrUnknown(
+		luaState.GetField(transacted, "Gattung").String(),
+	)
 
-	o.ObjectId.SetGenre(g)
-	k := l.GetField(t, "Kennung").String()
+	object.ObjectId.SetGenre(genre)
+	id := luaState.GetField(transacted, "Kennung").String()
 
-	if k != "" {
-		if err = o.ObjectId.Set(k); err != nil {
+	if id != "" {
+		if err = object.ObjectId.Set(id); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	et := l.GetField(t, "Etiketten")
-	ets, ok := et.(*lua.LTable)
+	tags := luaState.GetField(transacted, "Etiketten")
+	tagsTable, ok := tags.(*lua.LTable)
 
 	if !ok {
-		err = errors.ErrorWithStackf("expected table but got %T", et)
+		err = errors.ErrorWithStackf("expected table but got %T", tags)
 		return
 	}
 
-	o.Metadata.SetTags(nil)
+	object.Metadata.SetTags(nil)
 
-	ets.ForEach(
+	tagsTable.ForEach(
 		func(key, value lua.LValue) {
-			var e ids.Tag
+			var tag ids.Tag
 
-			if err = e.Set(key.String()); err != nil {
+			if err = tag.Set(key.String()); err != nil {
 				err = errors.Wrap(err)
 				panic(err)
 			}
 
-			errors.PanicIfError(o.Metadata.AddTagPtr(&e))
+			errors.PanicIfError(object.Metadata.AddTagPtr(&tag))
 		},
 	)
 

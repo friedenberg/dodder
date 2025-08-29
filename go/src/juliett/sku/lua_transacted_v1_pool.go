@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool2"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 )
 
@@ -45,12 +44,12 @@ type (
 	LuaTablePoolV1 = interfaces.Pool[LuaTableV1, *LuaTableV1]
 )
 
-func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
-	return pool2.MakePool(
+func MakeLuaVMPoolV1(vmPool *lua.VMPool, self *Transacted) LuaVMPoolV1 {
+	return pool.MakeWithError(
 		func() (out *LuaVMV1, err error) {
 			var vm *lua.VM
 
-			if vm, err = lvp.PoolWithErrorsPtr.Get(); err != nil {
+			if vm, err = vmPool.PoolWithErrorsPtr.Get(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -58,7 +57,7 @@ func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
 			out = &LuaVMV1{
 				VM:        vm,
 				TablePool: MakeLuaTablePoolV1(vm),
-				Selbst:    selbst,
+				Selbst:    self,
 			}
 
 			return
@@ -69,15 +68,19 @@ func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
 
 func MakeLuaTablePoolV1(vm *lua.VM) LuaTablePoolV1 {
 	return pool.Make(
-		func() (t *LuaTableV1) {
-			t = &LuaTableV1{
+		func() (table *LuaTableV1) {
+			table = &LuaTableV1{
 				Transacted:   vm.Pool.Get(),
 				Tags:         vm.Pool.Get(),
 				TagsImplicit: vm.Pool.Get(),
 			}
 
-			vm.SetField(t.Transacted, "Etiketten", t.Tags)
-			vm.SetField(t.Transacted, "EtikettenImplicit", t.TagsImplicit)
+			vm.SetField(table.Transacted, "Etiketten", table.Tags)
+			vm.SetField(
+				table.Transacted,
+				"EtikettenImplicit",
+				table.TagsImplicit,
+			)
 
 			return
 		},
