@@ -12,7 +12,7 @@ type (
 	FuncAbbreviateString func(Abbreviatable) (string, error)
 
 	Abbr struct {
-		Sha      abbrOne
+		BlobId   abbrOne
 		ZettelId abbrOne
 	}
 

@@ -9,17 +9,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type indexAbbrEncodableTridexes struct {
-	Shas     indexNotZettelId[sha.Sha, *sha.Sha]
+	BlobId   indexNotZettelId[merkle.Id, *merkle.Id]
 	ZettelId indexZettelId
 }
 
@@ -49,7 +49,7 @@ func NewIndexAbbr(
 		path:    envRepo.DirCache("Abbr"),
 		envRepo: envRepo,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
+			BlobId: indexNotZettelId[merkle.Id, *merkle.Id]{
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
@@ -60,7 +60,7 @@ func NewIndexAbbr(
 	}
 
 	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.BlobId.readFunc = i.readIfNecessary
 
 	return
 }
@@ -141,14 +141,14 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	out.ZettelId.Expand = i.ZettelId().ExpandStringString
-	out.Sha.Expand = i.Shas().ExpandStringString
+	out.BlobId.Expand = i.BlobId().ExpandStringString
 
 	if i.AbbreviateZettelIds {
 		out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
 	}
 
 	if i.AbbreviateShas {
-		out.Sha.Abbreviate = i.Shas().Abbreviate
+		out.BlobId.Abbreviate = i.BlobId().Abbreviate
 	}
 
 	return
@@ -164,7 +164,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(
+	i.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
 		merkle_ids.Format(o.GetBlobDigest()),
 	)
 
@@ -203,8 +203,8 @@ func (i *indexAbbr) ZettelId() (asg sku.AbbrStoreGeneric[ids.ZettelId, *ids.Zett
 	return
 }
 
-func (i *indexAbbr) Shas() (asg sku.AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
-	asg = &i.indexAbbrEncodableTridexes.Shas
+func (i *indexAbbr) BlobId() (asg sku.AbbrStoreGeneric[merkle.Id, *merkle.Id]) {
+	asg = &i.indexAbbrEncodableTridexes.BlobId
 
 	return
 }

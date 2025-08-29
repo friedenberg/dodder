@@ -243,7 +243,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 		if shaString, err = object_metadata_fmt.MetadataBlobDigestString(
 			metadata,
-			format.abbr.Sha.Abbreviate,
+			format.abbr.BlobId.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

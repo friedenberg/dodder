@@ -90,7 +90,7 @@ func (index *probe_index) saveOneLocString(
 	digest := sha.FromStringContent(str)
 	defer merkle_ids.PutBlobId(digest)
 
-	if err = index.Index.AddSha(digest, loc); err != nil {
+	if err = index.Index.AddBlobId(digest, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

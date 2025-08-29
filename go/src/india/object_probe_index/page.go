@@ -80,7 +80,7 @@ func (page *page) GetObjectProbeIndexPage() pageInterface {
 	return page
 }
 
-func (page *page) AddSha(sh interfaces.BlobId, loc Loc) (err error) {
+func (page *page) AddBlobId(sh interfaces.BlobId, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}

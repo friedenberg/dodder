@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -24,7 +24,7 @@ type (
 
 	AbbrStore interface {
 		ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
-		Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
+		BlobId() AbbrStoreGeneric[merkle.Id, *merkle.Id]
 
 		AddObjectToAbbreviationStore(*Transacted) error
 		GetAbbr() ids.Abbr

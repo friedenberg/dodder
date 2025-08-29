@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -13,13 +12,12 @@ import (
 )
 
 type (
-	Sha = sha.Sha
-
+	// TODO add support for different digests
 	commonInterface interface {
 		// TODO rename to AddDigest and enforce digest type
-		AddSha(interfaces.BlobId, Loc) error
-		ReadOne(sh interfaces.BlobId) (loc Loc, err error)
-		ReadMany(sh interfaces.BlobId, locs *[]Loc) (err error)
+		AddBlobId(interfaces.BlobId, Loc) error
+		ReadOne(id interfaces.BlobId) (loc Loc, err error)
+		ReadMany(id interfaces.BlobId, locs *[]Loc) (err error)
 	}
 
 	pageInterface interface {
@@ -105,7 +103,7 @@ func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	return
 }
 
-func (index *object_probe_index) AddSha(
+func (index *object_probe_index) AddBlobId(
 	sh interfaces.BlobId,
 	loc Loc,
 ) (err error) {
@@ -127,7 +125,7 @@ func (index *object_probe_index) addSha(
 		return
 	}
 
-	return index.pages[i].AddSha(sh, loc)
+	return index.pages[i].AddBlobId(sh, loc)
 }
 
 func (index *object_probe_index) ReadOne(
