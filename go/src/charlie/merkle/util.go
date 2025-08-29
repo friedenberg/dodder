@@ -67,17 +67,37 @@ func SetHexBytes(
 		return
 	}
 
-	var numberOfBytesDecoded int
-	bytesDecoded := make([]byte, hex.DecodedLen(len(bites)))
+	if id, ok := dst.(*Id); ok {
+		id.tipe = tipe
+		id.allocDataAndSetToCapIfNecessary(hex.DecodedLen(len(bites)))
 
-	if numberOfBytesDecoded, err = hex.Decode(bytesDecoded, bites); err != nil {
-		err = errors.Wrapf(err, "N: %d, Data: %q", numberOfBytesDecoded, bites)
-		return
-	}
+		var numberOfBytesDecoded int
 
-	if err = dst.SetMerkleId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
-		err = errors.Wrap(err)
-		return
+		numberOfBytesDecoded, err = hex.Decode(id.data, bites)
+		id.data = id.data[:numberOfBytesDecoded]
+
+		if err != nil {
+			err = errors.Wrapf(
+				err,
+				"N: %d, Data: %q",
+				numberOfBytesDecoded,
+				bites,
+			)
+			return
+		}
+	} else {
+		var numberOfBytesDecoded int
+		bytesDecoded := make([]byte, hex.DecodedLen(len(bites)))
+
+		if numberOfBytesDecoded, err = hex.Decode(bytesDecoded, bites); err != nil {
+			err = errors.Wrapf(err, "N: %d, Data: %q", numberOfBytesDecoded, bites)
+			return
+		}
+
+		if err = dst.SetMerkleId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
