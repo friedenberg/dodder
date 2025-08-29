@@ -136,6 +136,11 @@ func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
 	return
 }
 
+func (id *Id) allocDataIfNecessary(size int) {
+	id.data = id.data[:0]
+	id.data = slices.Grow(id.data, size)
+}
+
 func (id *Id) Reset() {
 	id.tipe = ""
 	id.data = id.data[:0]

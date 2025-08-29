@@ -259,10 +259,9 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 	for {
 		var current row
 
-		if _, err = writeIntoRow(
+		if _, err = page.writeIntoRow(
 			&current,
 			&page.bufferedReader,
-			page.rowWidth,
 		); err != nil {
 			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 			return
@@ -311,7 +310,7 @@ func (page *page) Flush() (err error) {
 		}
 
 		var n int64
-		n, err = writeIntoRow(&current, &page.bufferedReader, page.rowWidth)
+		n, err = page.writeIntoRow(&current, &page.bufferedReader)
 		if err != nil {
 			if errors.IsEOF(err) {
 				// no-op
@@ -341,7 +340,7 @@ func (page *page) Flush() (err error) {
 			return
 		},
 		func(row *row) (err error) {
-			_, err = readFromRow(row, bufferedWriter, page.rowWidth)
+			_, err = page.readFromRow(row, bufferedWriter)
 			return
 		},
 	); err != nil {

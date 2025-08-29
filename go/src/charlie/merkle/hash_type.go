@@ -23,15 +23,15 @@ var HashTypeSha256 = HashType{
 			hash.Reset()
 		},
 	),
-	tipe:  HRPObjectBlobDigestSha256V0,
-	width: 32,
+	tipe: HRPObjectBlobDigestSha256V0,
+	size: 32,
 }
 
 type HashType struct {
 	crypto.Hash
-	pool  interfaces.PoolValue[interfaces.Hash]
-	tipe  string
-	width int
+	pool interfaces.PoolValue[interfaces.Hash]
+	tipe string
+	size int
 }
 
 var _ interfaces.HashType = HashType{}
@@ -47,6 +47,10 @@ func (hashType HashType) Put(hash interfaces.Hash) {
 
 func (hashType HashType) GetType() string {
 	return hashType.tipe
+}
+
+func (hashType HashType) GetSize() int {
+	return hashType.size
 }
 
 func (hashType HashType) GetBlobIdForString(
