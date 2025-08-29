@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 )
 
 func MakeLuaSelfApplyV1(
@@ -17,15 +18,15 @@ func MakeLuaSelfApplyV1(
 	self := selfOriginal.CloneTransacted()
 
 	return func(vm *lua.VM) (err error) {
-		selfTable := sku.MakeLuaTablePoolV1(vm).Get()
-		sku.ToLuaTableV1(self, vm.LState, selfTable)
+		selfTable := sku_lua.MakeLuaTablePoolV1(vm).Get()
+		sku_lua.ToLuaTableV1(self, vm.LState, selfTable)
 		vm.SetGlobal("Selbst", selfTable.Transacted)
 		return
 	}
 }
 
 type LuaV1 struct {
-	sku.LuaVMPoolV1
+	sku_lua.LuaVMPoolV1
 }
 
 func (a *LuaV1) GetQueryable() sku.Queryable {
@@ -64,7 +65,7 @@ func (tb *LuaV1) ContainsSku(tg sku.TransactedGetter) bool {
 
 	vm.VM.Push(f)
 
-	sku.ToLuaTableV1(
+	sku_lua.ToLuaTableV1(
 		tg,
 		vm.VM.LState,
 		tSku,

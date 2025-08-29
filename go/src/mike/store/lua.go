@@ -7,14 +7,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/kilo/tag_blobs"
 )
 
 func (store *Store) MakeLuaVMPoolV1WithSku(
 	sk *sku.Transacted,
-) (lvp sku.LuaVMPoolV1, err error) {
+) (lvp sku_lua.LuaVMPoolV1, err error) {
 	if sk.GetType().String() != "lua" {
-		err = errors.ErrorWithStackf("unsupported typ: %s, Sku: %s", sk.GetType(), sk)
+		err = errors.ErrorWithStackf(
+			"unsupported typ: %s, Sku: %s",
+			sk.GetType(),
+			sk,
+		)
 		return
 	}
 
@@ -38,7 +43,7 @@ func (store *Store) MakeLuaVMPoolV1WithSku(
 func (store *Store) MakeLuaVMPoolV1(
 	self *sku.Transacted,
 	script string,
-) (vp sku.LuaVMPoolV1, err error) {
+) (vp sku_lua.LuaVMPoolV1, err error) {
 	b := store.envLua.MakeLuaVMPoolBuilder().
 		WithScript(script).
 		WithApply(tag_blobs.MakeLuaSelfApplyV1(self))
@@ -50,7 +55,7 @@ func (store *Store) MakeLuaVMPoolV1(
 		return
 	}
 
-	vp = sku.MakeLuaVMPoolV1(lvmp, self)
+	vp = sku_lua.MakeLuaVMPoolV1(lvmp, self)
 
 	return
 }
@@ -58,7 +63,7 @@ func (store *Store) MakeLuaVMPoolV1(
 func (store *Store) MakeLuaVMPoolWithReader(
 	selbst *sku.Transacted,
 	r io.Reader,
-) (vp sku.LuaVMPoolV1, err error) {
+) (vp sku_lua.LuaVMPoolV1, err error) {
 	b := store.envLua.MakeLuaVMPoolBuilder().
 		WithReader(r).
 		WithApply(tag_blobs.MakeLuaSelfApplyV1(selbst))
@@ -70,7 +75,7 @@ func (store *Store) MakeLuaVMPoolWithReader(
 		return
 	}
 
-	vp = sku.MakeLuaVMPoolV1(lvmp, selbst)
+	vp = sku_lua.MakeLuaVMPoolV1(lvmp, selbst)
 
 	return
 }

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/kilo/tag_blobs"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 )
@@ -111,7 +112,7 @@ func (store Tag) GetBlob(
 			return
 		}
 
-		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(luaVMPool, nil)
+		blob.LuaVMPoolV1 = sku_lua.MakeLuaVMPoolV1(luaVMPool, nil)
 		blobGeneric = blob
 
 	case ids.TypeLuaTagV1:
@@ -142,7 +143,7 @@ func (store Tag) GetBlob(
 		}
 
 		blobGeneric = &tag_blobs.LuaV1{
-			LuaVMPoolV1: sku.MakeLuaVMPoolV1(luaVMPool, nil),
+			LuaVMPoolV1: sku_lua.MakeLuaVMPoolV1(luaVMPool, nil),
 		}
 
 	case ids.TypeLuaTagV2:
@@ -171,7 +172,7 @@ func (store Tag) GetBlob(
 		}
 
 		blobGeneric = &tag_blobs.LuaV2{
-			LuaVMPoolV2: sku.MakeLuaVMPoolV2(luaVMPool, nil),
+			LuaVMPoolV2: sku_lua.MakeLuaVMPoolV2(luaVMPool, nil),
 		}
 	}
 

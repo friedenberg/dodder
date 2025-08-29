@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
@@ -206,14 +207,14 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 				}
 
 				// TODO switch to typed variant
-				var vp sku.LuaVMPoolV1
+				var vp sku_lua.LuaVMPoolV1
 
 				if vp, err = repo.GetStore().MakeLuaVMPoolV1(object, script); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				var vm *sku.LuaVMV1
+				var vm *sku_lua.LuaVMV1
 
 				if vm, err = vp.Get(); err != nil {
 					err = errors.Wrap(err)

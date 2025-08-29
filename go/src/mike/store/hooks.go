@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 )
 
 func (store *Store) tryNewHook(
@@ -217,14 +218,14 @@ func (store *Store) tryPreCommitHook(
 		return
 	}
 
-	var vp sku.LuaVMPoolV1
+	var vp sku_lua.LuaVMPoolV1
 
 	if vp, err = store.MakeLuaVMPoolV1(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVMV1
+	var vm *sku_lua.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
@@ -249,19 +250,19 @@ func (store *Store) tryPreCommitHook(
 	tableKinder := vm.TablePool.Get()
 	defer vm.TablePool.Put(tableKinder)
 
-	sku.ToLuaTableV1(
+	sku_lua.ToLuaTableV1(
 		kinder,
 		vm.LState,
 		tableKinder,
 	)
 
-	var tableMutter *sku.LuaTableV1
+	var tableMutter *sku_lua.LuaTableV1
 
 	if mutter != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
-		sku.ToLuaTableV1(
+		sku_lua.ToLuaTableV1(
 			mutter,
 			vm.LState,
 			tableMutter,
@@ -285,7 +286,7 @@ func (store *Store) tryPreCommitHook(
 		return
 	}
 
-	if err = sku.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku_lua.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -302,14 +303,14 @@ func (store *Store) tryHookWithName(
 	script string,
 	name string,
 ) (err error) {
-	var vp sku.LuaVMPoolV1
+	var vp sku_lua.LuaVMPoolV1
 
 	if vp, err = store.MakeLuaVMPoolV1(self, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVMV1
+	var vm *sku_lua.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
@@ -338,19 +339,19 @@ func (store *Store) tryHookWithName(
 	tableKinder := vm.TablePool.Get()
 	defer vm.TablePool.Put(tableKinder)
 
-	sku.ToLuaTableV1(
+	sku_lua.ToLuaTableV1(
 		kinder,
 		vm.LState,
 		tableKinder,
 	)
 
-	var tableMutter *sku.LuaTableV1
+	var tableMutter *sku_lua.LuaTableV1
 
 	if mutter != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
-		sku.ToLuaTableV1(
+		sku_lua.ToLuaTableV1(
 			mutter,
 			vm.LState,
 			tableMutter,
@@ -379,7 +380,7 @@ func (store *Store) tryHookWithName(
 		return
 	}
 
-	if err = sku.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku_lua.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

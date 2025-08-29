@@ -4,10 +4,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 )
 
 type TomlV1 struct {
-	sku.LuaVMPoolV1
+	sku_lua.LuaVMPoolV1
 	Filter string `toml:"filter"`
 }
 
@@ -45,7 +46,7 @@ func (tb *TomlV1) ContainsSku(tg sku.TransactedGetter) bool {
 
 	vm.VM.Push(f)
 
-	sku.ToLuaTableV1(
+	sku_lua.ToLuaTableV1(
 		tg,
 		vm.VM.LState,
 		tSku,

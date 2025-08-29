@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -12,16 +13,16 @@ type ExecLua struct {
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
-	var lvp sku.LuaVMPoolV1
+	var lvp sku_lua.LuaVMPoolV1
 
 	if lvp, err = u.GetStore().MakeLuaVMPoolV1WithSku(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVMV1
+	var vm *sku_lua.LuaVMV1
 
-	if vm, args, err = sku.PushTopFuncV1(lvp, args); err != nil {
+	if vm, args, err = sku_lua.PushTopFuncV1(lvp, args); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

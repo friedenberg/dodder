@@ -1,17 +1,18 @@
-package sku
+package sku_lua
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type LuaVMV2 struct {
 	lua.LValue
 	*lua.VM
 	TablePool LuaTablePoolV2
-	Selbst    *Transacted
+	Selbst    *sku.Transacted
 }
 
 func PushTopFuncV2(
@@ -44,7 +45,7 @@ type (
 	LuaTablePoolV2 = interfaces.Pool[LuaTableV2, *LuaTableV2]
 )
 
-func MakeLuaVMPoolV2(luaVMPool *lua.VMPool, self *Transacted) LuaVMPoolV2 {
+func MakeLuaVMPoolV2(luaVMPool *lua.VMPool, self *sku.Transacted) LuaVMPoolV2 {
 	return pool.MakeWithError(
 		func() (out *LuaVMV2, err error) {
 			var vm *lua.VM

@@ -1,38 +1,42 @@
-package sku
+package sku_lua
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/lua"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type LuaTableV1 struct {
-	Transacted   *lua.LTable
+type LuaTableV2 struct {
+	Transacted *lua.LTable
+
+	// TODO transition to single Tags table with Tag objects that reflect
+	// tag_paths.PathWithType
 	Tags         *lua.LTable
 	TagsImplicit *lua.LTable
 }
 
-func ToLuaTableV1(
-	tg TransactedGetter,
+func ToLuaTableV2(
+	tg sku.TransactedGetter,
 	luaState *lua.LState,
-	luaTable *LuaTableV1,
+	luaTable *LuaTableV2,
 ) {
 	object := tg.GetSku()
 
 	luaState.SetField(
 		luaTable.Transacted,
-		"Gattung",
+		"Genre",
 		lua.LString(object.GetGenre().String()),
 	)
 	luaState.SetField(
 		luaTable.Transacted,
-		"Kennung",
+		"ObjectId",
 		lua.LString(object.GetObjectId().String()),
 	)
 	luaState.SetField(
 		luaTable.Transacted,
-		"Typ",
+		"Type",
 		lua.LString(object.GetType().String()),
 	)
 
@@ -49,19 +53,17 @@ func ToLuaTableV1(
 	}
 }
 
-func FromLuaTableV1(
-	object *Transacted,
+func FromLuaTableV2(
+	object *sku.Transacted,
 	luaState *lua.LState,
-	luaTable *LuaTableV1,
+	luaTable *LuaTableV2,
 ) (err error) {
-	transacted := luaTable.Transacted
+	t := luaTable.Transacted
 
-	genre := genres.MakeOrUnknown(
-		luaState.GetField(transacted, "Gattung").String(),
-	)
+	genre := genres.MakeOrUnknown(luaState.GetField(t, "Genre").String())
 
 	object.ObjectId.SetGenre(genre)
-	id := luaState.GetField(transacted, "Kennung").String()
+	id := luaState.GetField(t, "ObjectId").String()
 
 	if id != "" {
 		if err = object.ObjectId.Set(id); err != nil {
@@ -70,7 +72,7 @@ func FromLuaTableV1(
 		}
 	}
 
-	tags := luaState.GetField(transacted, "Etiketten")
+	tags := luaState.GetField(t, "Tags")
 	tagsTable, ok := tags.(*lua.LTable)
 
 	if !ok {
@@ -93,11 +95,11 @@ func FromLuaTableV1(
 		},
 	)
 
-	// TODO Bezeichnung
-	// TODO Typ
+	// TODO Description
+	// TODO Type
 	// TODO Tai
 	// TODO Blob
-	// TODO Verzeichnisse
+	// TODO Cache
 
 	return
 }
