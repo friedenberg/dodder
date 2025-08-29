@@ -7,9 +7,9 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_reader"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
@@ -141,7 +141,7 @@ func (parser *textParser2) setBlobSha(
 	metadata *Metadata,
 	maybeSha string,
 ) (err error) {
-	if err = merkle_ids.SetHexBytes(
+	if err = merkle.SetHexBytes(
 		parser.blobDigestType,
 		metadata.GetBlobDigestMutable(),
 		[]byte(maybeSha),

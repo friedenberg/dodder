@@ -3,8 +3,8 @@ package sku_fmt
 import (
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -18,7 +18,7 @@ func StringMetadataSansTai(object *sku.Transacted) (str string) {
 	sb.WriteString(object.GetObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle_ids.Format(object.GetBlobDigest()))
+	sb.WriteString(merkle.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 

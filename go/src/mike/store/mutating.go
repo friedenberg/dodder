@@ -4,10 +4,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -220,7 +220,7 @@ func (store *Store) Commit(
 			store.storeConfig.GetConfig().GetStoreVersion(),
 			store_version.V11,
 		) {
-			if err = merkle_ids.MakeErrIsNull(
+			if err = merkle.MakeErrIsNull(
 				child.Metadata.GetObjectSig(),
 				"object-sig",
 			); err != nil {

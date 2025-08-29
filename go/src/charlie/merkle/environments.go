@@ -1,4 +1,4 @@
-package merkle_ids
+package merkle
 
 import (
 	"fmt"

@@ -5,7 +5,6 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
@@ -65,8 +64,8 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 	inline, metadata interfaces.BlobId,
 ) (err *ErrHasInlineBlobAndMetadataSha) {
 	err = &ErrHasInlineBlobAndMetadataSha{}
-	err.Metadata = merkle_ids.Clone(metadata)
-	err.Inline = merkle_ids.Clone(inline)
+	err.Metadata = merkle.Clone(metadata)
+	err.Inline = merkle.Clone(inline)
 	return
 }
 

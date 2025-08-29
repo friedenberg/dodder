@@ -1,4 +1,4 @@
-package merkle_ids
+package merkle
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"

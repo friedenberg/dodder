@@ -3,7 +3,6 @@ package sku
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
@@ -63,7 +62,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 			return
 		}
 
-		defer merkle_ids.PutBlobId(actual)
+		defer merkle.PutBlobId(actual)
 
 		if err = digest.SetMerkleId(
 			tipe,
@@ -96,7 +95,7 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 func (transacted *Transacted) calculateObjectDigestMerkle(
 	funcCalcDigest funcCalcDigest,
 ) (err error) {
-	if err = merkle_ids.MakeErrIsNull(
+	if err = merkle.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -104,7 +103,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 		return
 	}
 
-	if err = merkle_ids.MakeErrIsNotNull(
+	if err = merkle.MakeErrIsNotNull(
 		transacted.Metadata.GetObjectDigest(),
 	); err != nil {
 		err = errors.Wrap(err)

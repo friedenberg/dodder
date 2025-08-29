@@ -6,8 +6,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
@@ -16,7 +16,7 @@ func (page *page) seekToFirstBinarySearch(
 ) (mid int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle_ids.Format(shMet),
+			"fd nil: " + merkle.Format(shMet),
 		)
 		return
 	}
@@ -68,7 +68,7 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, merkle_ids.Format(shMet)),
+		fmt.Sprintf("%d: %s", loops, merkle.Format(shMet)),
 	)
 
 	return
@@ -79,7 +79,7 @@ func (page *page) seekToFirstLinearSearch(
 ) (loc int64, err error) {
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle_ids.Format(shMet),
+			"fd nil: " + merkle.Format(shMet),
 		)
 		return
 	}
@@ -115,7 +115,7 @@ func (page *page) seekToFirstLinearSearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(merkle_ids.Format(shMet))
+	err = collections.MakeErrNotFoundString(merkle.Format(shMet))
 
 	return
 }

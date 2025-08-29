@@ -6,10 +6,10 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
@@ -215,7 +215,7 @@ func (store *Store) Create(
 	actual := openList.Mover.GetBlobId()
 	// expected := &merkle.Id{}
 
-	expected := merkle_ids.Clone(object.GetBlobDigest())
+	expected := merkle.Clone(object.GetBlobDigest())
 	// if err = expected.SetMerkleId(merkle.HRPObjectBlobDigestSha256V0,
 	// actual.GetBytes()); err != nil {
 	// 	err = errors.Wrap(err)
@@ -227,7 +227,7 @@ func (store *Store) Create(
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = merkle_ids.MakeErrNotEqual(expected, actual); err != nil {
+		if err = merkle.MakeErrNotEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -302,7 +302,7 @@ func (store *Store) WriteInventoryListBlob(
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = merkle_ids.MakeErrNotEqual(expected, actual); err != nil {
+		if err = merkle.MakeErrNotEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

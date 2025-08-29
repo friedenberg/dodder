@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -165,7 +164,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
-		merkle_ids.Format(o.GetBlobDigest()),
+		merkle.Format(o.GetBlobDigest()),
 	)
 
 	ks := o.GetObjectId().String()

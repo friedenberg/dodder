@@ -7,9 +7,9 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
@@ -324,7 +324,7 @@ func writeMerkleIdKey(
 	key *catgut.String,
 	merkleId interfaces.BlobId,
 ) (n int, err error) {
-	if err = merkle_ids.MakeErrIsNull(merkleId, key.String()); err != nil {
+	if err = merkle.MakeErrIsNull(merkleId, key.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -332,7 +332,7 @@ func writeMerkleIdKey(
 	n, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		key.String(),
-		merkle_ids.Format(merkleId),
+		merkle.Format(merkleId),
 	)
 	if err != nil {
 		err = errors.Wrap(err)
@@ -392,7 +392,7 @@ func WriteMetadata(
 	f Format,
 	c FormatterContext,
 ) (blobDigest interfaces.BlobId, err error) {
-	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env, w)
+	writer, repool := merkle.MakeWriterWithRepool(sha.Env, w)
 	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
@@ -423,7 +423,7 @@ func GetDigestForContextDebug(
 	context FormatterContext,
 ) (digest interfaces.BlobId, err error) {
 	var sb strings.Builder
-	writer, repool := merkle_ids.MakeWriterWithRepool(sha.Env, &sb)
+	writer, repool := merkle.MakeWriterWithRepool(sha.Env, &sb)
 	defer repool()
 
 	_, err = format.WriteMetadataTo(writer, context)
@@ -436,7 +436,7 @@ func GetDigestForContextDebug(
 
 	value := sb.String()
 
-	ui.Debug().Printf("%q -> %s", value, merkle_ids.Format(digest))
+	ui.Debug().Printf("%q -> %s", value, merkle.Format(digest))
 
 	return
 }

@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -203,7 +202,7 @@ func (page *page) readCurrentLoc(
 		return
 	}
 
-	if found, err = merkle_ids.EqualsReader(expectedBlobId, bufferedReader); err != nil {
+	if found, err = merkle.EqualsReader(expectedBlobId, bufferedReader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	} else if !found {

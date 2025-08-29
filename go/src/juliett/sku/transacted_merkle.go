@@ -4,7 +4,6 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -31,7 +30,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 // calculates the object digests using the object's repo pubkey
 func (transacted *Transacted) FinalizeUsingObject() (err error) {
-	if err = merkle_ids.MakeErrIsNull(
+	if err = merkle.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -59,7 +58,7 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 			return
 		}
 	} else {
-		if err = merkle_ids.MakeErrNotEqualBytes(
+		if err = merkle.MakeErrNotEqualBytes(
 			pubKey,
 			pubKeyMutable.GetBytes(),
 		); err != nil {
@@ -115,14 +114,14 @@ func (transacted *Transacted) FinalizeAndSignOverwrite(
 func (transacted *Transacted) FinalizeAndSign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	if err = merkle_ids.MakeErrIsNotNull(
+	if err = merkle.MakeErrIsNotNull(
 		transacted.Metadata.GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = merkle_ids.MakeErrIsNotNull(
+	if err = merkle.MakeErrIsNotNull(
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -194,7 +193,7 @@ func (transacted *Transacted) FinalizeAndVerify() (err error) {
 func (transacted *Transacted) Verify() (err error) {
 	pubKey := transacted.Metadata.GetRepoPubKey()
 
-	if err = merkle_ids.MakeErrIsNull(
+	if err = merkle.MakeErrIsNull(
 		pubKey,
 		"repo-pubkey",
 	); err != nil {
@@ -202,7 +201,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = merkle_ids.MakeErrIsNull(
+	if err = merkle.MakeErrIsNull(
 		transacted.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -210,7 +209,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = merkle_ids.MakeErrIsNull(
+	if err = merkle.MakeErrIsNull(
 		transacted.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {

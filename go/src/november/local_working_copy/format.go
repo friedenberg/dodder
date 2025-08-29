@@ -14,11 +14,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
@@ -924,8 +924,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				sh2 := sha.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
-				defer merkle_ids.PutBlobId(sh1)
-				defer merkle_ids.PutBlobId(sh2)
+				defer merkle.PutBlobId(sh1)
+				defer merkle.PutBlobId(sh2)
 				_, err = fmt.Fprintln(writer, object.GetObjectId(), sh1, sh2)
 				return
 			}

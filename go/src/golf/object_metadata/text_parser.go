@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
@@ -109,7 +109,7 @@ func (parser textParser) ParseMetadata(
 		// noop
 
 	case !m.DigBlob.IsNull() && !inlineBlobDigest.IsNull() &&
-		!merkle_ids.Equals(&m.DigBlob, inlineBlobDigest):
+		!merkle.Equals(&m.DigBlob, inlineBlobDigest):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataBlobId(
 				inlineBlobDigest,

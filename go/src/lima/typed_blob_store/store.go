@@ -3,8 +3,8 @@ package typed_blob_store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -59,7 +59,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 
 	actual := readCloser.GetBlobId()
 
-	if !merkle_ids.Equals(actual, blobId) {
+	if !merkle.Equals(actual, blobId) {
 		err = errors.ErrorWithStackf(
 			"expected blob id (%T) %s but got %s",
 			blobId,

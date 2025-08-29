@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -92,20 +92,20 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					merkle_ids.Format(answer.BlobId),
+					merkle.Format(answer.BlobId),
 					answer.Path,
 				)
 			} else {
 				blobStore.GetUI().Printf(
 					"%s %s (checked in)",
-					merkle_ids.Format(answer.BlobId),
+					merkle.Format(answer.BlobId),
 					answer.Path,
 				)
 			}
 		} else {
 			ui.Err().Printf(
 				"%s %s (untracked)",
-				merkle_ids.Format(answer.BlobId),
+				merkle.Format(answer.BlobId),
 				answer.Path,
 			)
 
@@ -148,7 +148,7 @@ func (cmd BlobStoreWrite) doOne(
 	if cmd.Check {
 		{
 			var repool func()
-			writeCloser, repool = merkle_ids.MakeWriterWithRepool(
+			writeCloser, repool = merkle.MakeWriterWithRepool(
 				sha.Env,
 				nil,
 			)

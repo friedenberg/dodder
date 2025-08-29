@@ -3,7 +3,6 @@ package object_probe_index
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -190,7 +189,7 @@ func (index *object_probe_index) ReadOneKey(
 		return
 	}
 
-	defer merkle_ids.PutBlobId(blobId)
+	defer merkle.PutBlobId(blobId)
 
 	if loc, err = index.ReadOne(blobId); err != nil {
 		err = errors.Wrapf(err, "Key: %s", formatKey)

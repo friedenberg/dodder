@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -67,7 +66,7 @@ func (json *JSON) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = merkle_ids.Format(metadata.GetBlobDigest())
+	json.BlobId = merkle.Format(metadata.GetBlobDigest())
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
@@ -148,7 +147,7 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = merkle_ids.SetHexBytes(
+		if err = merkle.SetHexBytes(
 			merkle.HRPObjectBlobDigestSha256V0,
 			object.Metadata.GetBlobDigestMutable(),
 			[]byte(json.BlobId),

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 func MakeHashBucketPathFromMerkleId(
@@ -21,7 +21,7 @@ func MakeHashBucketPathFromMerkleId(
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(merkle_ids.Format(merkleId)),
+		[]byte(merkle.Format(merkleId)),
 		buckets,
 		pathComponents...,
 	)

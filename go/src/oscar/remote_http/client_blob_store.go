@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -41,7 +40,7 @@ func (client *client) HasBlob(merkleId interfaces.BlobId) (ok bool) {
 		if request, err = client.newRequest(
 			"HEAD",
 			"/blobs",
-			strings.NewReader(merkle_ids.Format(merkleId)),
+			strings.NewReader(merkle.Format(merkleId)),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -69,7 +68,7 @@ func (client *client) BlobReader(
 
 	if request, err = client.newRequest(
 		"GET",
-		fmt.Sprintf("/blobs/%s", merkle_ids.Format(blobId)),
+		fmt.Sprintf("/blobs/%s", merkle.Format(blobId)),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -93,7 +92,7 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		reader = merkle_ids.MakeReadCloser(sha.Env, response.Body)
+		reader = merkle.MakeReadCloser(sha.Env, response.Body)
 	}
 
 	return
@@ -167,7 +166,7 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = merkle_ids.MakeErrNotEqual(expected, &actual); err != nil {
+	if err = merkle.MakeErrNotEqual(expected, &actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

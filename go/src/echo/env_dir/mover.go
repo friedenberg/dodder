@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 type MoveOptions struct {
@@ -100,7 +100,7 @@ func (mover *localFileMover) Close() (err error) {
 
 	digest := mover.GetBlobId()
 
-	if err = merkle_ids.MakeErrEmptyType(digest); err != nil {
+	if err = merkle.MakeErrEmptyType(digest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,7 +120,7 @@ func (mover *localFileMover) Close() (err error) {
 		}
 
 		if mover.objectPath, err = MakeDirIfNecessary(
-			merkle_ids.Format(digest),
+			merkle.Format(digest),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {

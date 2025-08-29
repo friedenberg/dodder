@@ -11,9 +11,9 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
@@ -126,8 +126,8 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.GetBlobDigest(),
 	)
 
-	key = merkle_ids.Format(digest)
-	merkle_ids.PutBlobId(digest)
+	key = merkle.Format(digest)
+	merkle.PutBlobId(digest)
 
 	return
 }

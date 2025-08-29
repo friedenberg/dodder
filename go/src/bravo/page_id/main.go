@@ -9,8 +9,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
 // TODO rename to Id
@@ -70,7 +70,7 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	bucketIndexString := merkle_ids.Format(digest)[:width]
+	bucketIndexString := merkle.Format(digest)[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)

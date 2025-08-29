@@ -8,8 +8,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -145,7 +145,7 @@ func (blobStore localHashBucketed) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = merkle_ids.MakeNopReadCloser(
+		readCloser = merkle.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -189,7 +189,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	path string,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = merkle_ids.MakeNopReadCloser(
+		readCloser = merkle.MakeNopReadCloser(
 			blobStore.envDigest,
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -208,7 +208,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobId: merkle_ids.Clone(digest),
+				BlobId: merkle.Clone(digest),
 				Path:   path,
 			}
 		} else {

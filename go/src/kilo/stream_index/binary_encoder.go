@@ -9,8 +9,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
@@ -289,7 +289,7 @@ func (encoder *binaryEncoder) writeMerkleId(
 	key string,
 ) (n int64, err error) {
 	if !allowNull {
-		if err = merkle_ids.MakeErrIsNull(merkleId, key); err != nil {
+		if err = merkle.MakeErrIsNull(merkleId, key); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -328,7 +328,7 @@ func (encoder *binaryEncoder) writeFieldMerkleId(
 ) (n int64, err error) {
 	if merkleId.IsNull() {
 		if !allowNull {
-			err = merkle_ids.MakeErrIsNull(merkleId, key)
+			err = merkle.MakeErrIsNull(merkleId, key)
 		}
 
 		return

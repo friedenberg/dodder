@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -198,7 +197,7 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if err = merkle_ids.SetHexBytes(
+			if err = merkle.SetHexBytes(
 				"sha256",
 				// merkle.HRPObjectBlobDigestSha256V1,
 				object.Metadata.GetBlobDigestMutable(),

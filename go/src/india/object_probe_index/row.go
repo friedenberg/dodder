@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
@@ -95,7 +95,7 @@ func (row *row) WriteTo(w io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return merkle_ids.Equals(&a.BlobId, &b.BlobId) &&
+	return merkle.Equals(&a.BlobId, &b.BlobId) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
@@ -104,7 +104,7 @@ func (rowEqualerComplete) Equals(a, b *row) bool {
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return merkle_ids.Equals(&a.BlobId, &b.BlobId)
+	return merkle.Equals(&a.BlobId, &b.BlobId)
 }
 
 type rowResetter struct{}

@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -60,7 +59,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !merkle_ids.Equals(&a.digest, &b.digest) {
+	if !merkle.Equals(&a.digest, &b.digest) {
 		return false
 	}
 
@@ -147,7 +146,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 		return
 	}
 
-	merkle_ids.SetDigester(&fd.digest, writer)
+	merkle.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
 	return
@@ -202,7 +201,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 	}
 
 	fd.path = path
-	merkle_ids.SetDigester(&fd.digest, blobWriter)
+	merkle.SetDigester(&fd.digest, blobWriter)
 	fd.state = StateStored
 
 	return

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -27,7 +26,7 @@ func TestBinaryOne(t1 *testing.T) {
 			expected.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")),
 		)
 		expected.SetTai(ids.NowTai())
-		t.AssertNoError(merkle_ids.SetHexBytes(
+		t.AssertNoError(merkle.SetHexBytes(
 			merkle.HRPObjectBlobDigestSha256V0,
 			expected.Metadata.GetBlobDigestMutable(),
 			[]byte(
