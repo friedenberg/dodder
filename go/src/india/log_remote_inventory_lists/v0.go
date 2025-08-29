@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -118,7 +117,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		return
 	}
 
-	digest := sha.FromFormatString(
+	digest, repool := merkle.HashTypeSha256.FromStringFormat(
 		"%s%s%s%s",
 		entry.EntryType,
 		base64.URLEncoding.EncodeToString(entry.PublicKey),
@@ -126,8 +125,9 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		entry.GetBlobDigest(),
 	)
 
+	defer repool()
+
 	key = merkle.Format(digest)
-	merkle.PutBlobId(digest)
 
 	return
 }

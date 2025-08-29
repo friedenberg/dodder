@@ -2,6 +2,7 @@ package merkle
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -39,17 +40,28 @@ func (hashType HashType) Put(hash Hash) {
 }
 
 func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
-	stringReader, repoolStringReader := pool.GetStringReader(input)
-	defer repoolStringReader()
-
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
-	if _, err := io.Copy(hash.hash, stringReader); err != nil {
+	if _, err := io.WriteString(hash.hash, input); err != nil {
 		errors.PanicIfError(err)
 	}
 
 	id, _ := hash.GetBlobId()
 
 	return id
+}
+
+func (hashType HashType) FromStringFormat(
+	format string,
+	args ...any,
+) (interfaces.BlobId, interfaces.FuncRepool) {
+	hash := hashType.pool.Get()
+	defer hashType.pool.Put(hash)
+
+	if _, err := fmt.Fprintf(hash.hash, format, args...); err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return hash.GetBlobId()
 }
