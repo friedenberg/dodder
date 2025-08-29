@@ -2,7 +2,6 @@ package merkle
 
 import (
 	"crypto/sha256"
-	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -10,38 +9,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-type Hash struct {
-	hash.Hash
-	tipe string
-}
-
-func (hash Hash) GetType() string {
-	return hash.tipe
-}
-
-func (hash Hash) GetBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
-	id := idPool.Get()
-
-	// TODO verify this works as expected
-	digest := hash.Sum(id.data)
-
-	errors.PanicIfError(id.SetMerkleId(hash.tipe, digest))
-
-	return id, func() {
-		idPool.Put(id)
-	}
-}
-
 var HashTypeSha256 = HashType{
 	pool: pool.MakeValue(
 		func() Hash {
 			return Hash{
-				Hash: sha256.New(),
+				hash: sha256.New(),
 				tipe: HRPObjectBlobDigestSha256V0,
 			}
 		},
 		func(hash Hash) {
-			hash.Reset()
+			hash.hash.Reset()
 		},
 	),
 	tipe: HRPObjectBlobDigestSha256V0,
@@ -68,7 +45,7 @@ func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
-	if _, err := io.Copy(hash, stringReader); err != nil {
+	if _, err := io.Copy(hash.hash, stringReader); err != nil {
 		errors.PanicIfError(err)
 	}
 
