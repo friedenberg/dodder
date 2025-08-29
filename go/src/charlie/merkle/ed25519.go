@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+// TODO convert into interface and structure like Hash
 type PrivateKey ed25519.PrivateKey
 
 func (privateKey PrivateKey) GetType() string {

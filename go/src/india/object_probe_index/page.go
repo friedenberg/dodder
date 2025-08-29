@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
@@ -20,6 +21,7 @@ import (
 type page struct {
 	sync.Mutex     // for the buffered reader
 	hashType       merkle.HashType
+	rowWidth       int
 	file           *os.File
 	bufferedReader bufio.Reader
 	added          *heap.Heap[row, *row]
@@ -33,6 +35,7 @@ func (page *page) initialize(
 	envRepo env_repo.Env,
 	pageId page_id.PageId,
 	hashType merkle.HashType,
+	rowWidth int,
 ) (err error) {
 	page.added = heap.Make(
 		equaler,
@@ -43,6 +46,7 @@ func (page *page) initialize(
 	page.envRepo = envRepo
 	page.id = pageId
 	page.hashType = hashType
+	page.rowWidth = rowWidth
 
 	page.searchFunc = page.seekToFirstBinarySearch
 
@@ -121,18 +125,18 @@ func (page *page) GetRowCount() (n int64, err error) {
 		return
 	}
 
-	n = fi.Size()/RowSize - 1
+	n = fi.Size()/int64(page.rowWidth) - 1
 
 	return
 }
 
-func (page *page) ReadOne(sh interfaces.BlobId) (loc Loc, err error) {
+func (page *page) ReadOne(id interfaces.BlobId) (loc Loc, err error) {
 	page.Lock()
 	defer page.Unlock()
 
 	var start int64
 
-	if start, err = page.searchFunc(sh); err != nil {
+	if start, err = page.searchFunc(id); err != nil {
 		if !collections.IsErrNotFound(err) {
 			err = errors.Wrap(err)
 		}
@@ -145,7 +149,7 @@ func (page *page) ReadOne(sh interfaces.BlobId) (loc Loc, err error) {
 		return
 	}
 
-	if loc, _, err = page.readCurrentLoc(sh, &page.bufferedReader); err != nil {
+	if loc, _, err = page.readCurrentLoc(id, &page.bufferedReader); err != nil {
 		err = errors.Wrapf(err, "Start: %d", start)
 		return
 	}
@@ -226,7 +230,10 @@ func (page *page) readCurrentLoc(
 }
 
 func (page *page) seekAndResetTo(loc int64) (err error) {
-	if _, err = page.file.Seek(loc*RowSize, io.SeekStart); err != nil {
+	if _, err = page.file.Seek(
+		loc*int64(page.rowWidth),
+		io.SeekStart,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -252,7 +259,11 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 	for {
 		var current row
 
-		if _, err = current.ReadFrom(&page.bufferedReader); err != nil {
+		if _, err = writeIntoRow(
+			&current,
+			&page.bufferedReader,
+			page.rowWidth,
+		); err != nil {
 			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 			return
 		}
@@ -276,30 +287,31 @@ func (page *page) Flush() (err error) {
 		}
 	}
 
-	var ft *os.File
+	var temporaryFile *os.File
 
-	if ft, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
+	if temporaryFile, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, ft)
+	defer errors.DeferredCloser(&err, temporaryFile)
 
-	w := bufio.NewWriter(ft)
+	bufferedWriter, repool := pool.GetBufferedWriter(temporaryFile)
+	defer repool()
 
-	defer errors.DeferredFlusher(&err, w)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	var current row
 
 	// TODO make iterator
-	getOne := func() (r *row, err error) {
+	getOne := func() (row *row, err error) {
 		if page.file == nil {
 			err = io.EOF
 			return
 		}
 
 		var n int64
-		n, err = current.ReadFrom(&page.bufferedReader)
+		n, err = writeIntoRow(&current, &page.bufferedReader, page.rowWidth)
 		if err != nil {
 			if errors.IsEOF(err) {
 				// no-op
@@ -312,24 +324,24 @@ func (page *page) Flush() (err error) {
 			return
 		}
 
-		r = &current
+		row = &current
 
 		return
 	}
 
 	if err = heap.MergeStream(
 		page.added,
-		func() (tz *row, err error) {
-			tz, err = getOne()
+		func() (row *row, err error) {
+			row, err = getOne()
 
-			if errors.IsEOF(err) || tz == nil {
+			if errors.IsEOF(err) || row == nil {
 				err = errors.MakeErrStopIteration()
 			}
 
 			return
 		},
-		func(r *row) (err error) {
-			_, err = r.WriteTo(w)
+		func(row *row) (err error) {
+			_, err = readFromRow(row, bufferedWriter, page.rowWidth)
 			return
 		},
 	); err != nil {
@@ -338,7 +350,7 @@ func (page *page) Flush() (err error) {
 	}
 
 	if err = os.Rename(
-		ft.Name(),
+		temporaryFile.Name(),
 		page.id.Path(),
 	); err != nil {
 		err = errors.Wrap(err)

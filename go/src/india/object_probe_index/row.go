@@ -10,11 +10,45 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
-const RowSize = sha.ByteSize + 1 + 8 + 8
-
 type row struct {
 	BlobId sha.Sha
 	Loc
+}
+
+func writeIntoRow(
+	row *row,
+	reader io.Reader,
+	rowWidth int,
+) (n int64, err error) {
+	if n, err = row.ReadFrom(reader); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	if err = merkle.MakeErrLength(int64(rowWidth), n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func readFromRow(
+	row *row,
+	writer io.Writer,
+	rowWidth int,
+) (n int64, err error) {
+	if n, err = row.WriteTo(writer); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	if err = merkle.MakeErrLength(int64(rowWidth), n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (row *row) IsEmpty() bool {
@@ -29,10 +63,10 @@ func (row *row) String() string {
 	)
 }
 
-func (row *row) ReadFrom(r io.Reader) (n int64, err error) {
+func (row *row) ReadFrom(reader io.Reader) (n int64, err error) {
 	var n1 int64
 
-	n1, err = row.BlobId.ReadFrom(r)
+	n1, err = row.BlobId.ReadFrom(reader)
 	n += n1
 
 	if err != nil {
@@ -40,7 +74,7 @@ func (row *row) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = row.Loc.ReadFrom(r)
+	n1, err = row.Loc.ReadFrom(reader)
 	n += int64(n1)
 
 	if err != nil {
@@ -48,23 +82,14 @@ func (row *row) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	if n != RowSize {
-		err = errors.ErrorWithStackf(
-			"expected to read %d but read %d",
-			RowSize,
-			n,
-		)
-		return
-	}
-
 	return
 }
 
-func (row *row) WriteTo(w io.Writer) (n int64, err error) {
+func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n, err = row.BlobId.WriteTo(w)
+	n, err = row.BlobId.WriteTo(writer)
 	n += int64(n1)
 
 	if err != nil {
@@ -72,20 +97,11 @@ func (row *row) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n2, err = row.Loc.WriteTo(w)
+	n2, err = row.Loc.WriteTo(writer)
 	n += int64(n2)
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if n != RowSize {
-		err = errors.ErrorWithStackf(
-			"expected to write %d but wrote %d",
-			RowSize,
-			n,
-		)
 		return
 	}
 

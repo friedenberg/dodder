@@ -40,7 +40,7 @@ func (page *page) seekToFirstBinarySearch(
 
 		// var loc int64
 
-		if _, err = shMid.ReadAtFrom(page.file, mid*RowSize); err != nil {
+		if _, err = shMid.ReadAtFrom(page.file, mid*int64(page.rowWidth)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -93,7 +93,7 @@ func (page *page) seekToFirstLinearSearch(
 	}
 
 	page.bufferedReader.Reset(page.file)
-	buf := bytes.NewBuffer(make([]byte, RowSize))
+	buf := bytes.NewBuffer(make([]byte, page.rowWidth))
 	buf.Reset()
 
 	for loc = int64(0); loc <= rowCount; loc++ {

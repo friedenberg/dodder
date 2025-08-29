@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"golang.org/x/exp/constraints"
 )
 
 var ErrEmptyType = errors.New("type is empty")
@@ -122,18 +123,20 @@ func (err ErrNotEqualBytes) Is(target error) bool {
 	return ok
 }
 
-type errLength [2]int
+type errLength[INTEGER constraints.Integer] [2]INTEGER
 
 // TODO add another "wrong hasher" error type
-func MakeErrLength(expected, actual int) error {
+func MakeErrLength[INTEGER constraints.Integer](
+	expected, actual INTEGER,
+) error {
 	if expected != actual {
-		return errLength{expected, actual}
+		return errLength[INTEGER]{expected, actual}
 	} else {
 		return nil
 	}
 }
 
-func (err errLength) Error() string {
+func (err errLength[_]) Error() string {
 	return fmt.Sprintf(
 		"expected digest to have length %d, but got %d",
 		err[0],

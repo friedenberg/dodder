@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -44,6 +45,7 @@ const (
 
 type object_probe_index struct {
 	hashType merkle.HashType
+	rowWidth int
 	pages    [PageCount]page
 }
 
@@ -72,6 +74,8 @@ func (index *object_probe_index) initialize(
 	envRepo env_repo.Env,
 	dir string,
 ) (err error) {
+	index.rowWidth = sha.ByteSize + 1 + 8 + 8
+
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
 		page.initialize(
@@ -79,6 +83,7 @@ func (index *object_probe_index) initialize(
 			envRepo,
 			page_id.PageIdFromPath(uint8(pageIndex), dir),
 			index.hashType,
+			index.rowWidth,
 		)
 	}
 

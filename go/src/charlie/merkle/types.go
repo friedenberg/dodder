@@ -1,5 +1,8 @@
 package merkle
 
+// TODO move to ids' builtin types
+// and then add registration
+
 const (
 	// keep sorted
 	HRPObjectBlobDigestSha256V0 = "sha256"

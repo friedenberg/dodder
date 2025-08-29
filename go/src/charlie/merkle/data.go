@@ -1,5 +1,6 @@
 package merkle
 
+// TODO remove
 type Data []byte
 
 func (data Data) GetBytes() []byte {

@@ -8,6 +8,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
+// TODO remove
+
 var (
 	envsLock sync.Mutex
 	envs     = make(map[string]interfaces.EnvBlobId)
