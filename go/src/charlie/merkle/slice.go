@@ -1,19 +1,18 @@
-package sha
+package merkle
 
 import (
-	"bufio"
 	"io"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-// TODO move to generic digest package
-type Slice []*Sha
+type Slice []Id
 
 func (slice *Slice) ReadFrom(reader io.Reader) (n int64, err error) {
-	// TODO use pool
-	bufferedReader := bufio.NewReader(reader)
+	bufferedReader, repool := pool.GetBufferedReader(reader)
+	defer repool()
 
 	var isEOF bool
 
@@ -33,14 +32,14 @@ func (slice *Slice) ReadFrom(reader io.Reader) (n int64, err error) {
 			continue
 		}
 
-		sh := poolSha.Get()
+		var id Id
 
-		if err = sh.Set(strings.TrimSpace(line)); err != nil {
+		if err = id.Set(strings.TrimSpace(line)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		*slice = append(*slice, sh)
+		*slice = append(*slice, id)
 	}
 
 	return

@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -143,7 +142,7 @@ func (client client) ImportInventoryList(
 		return
 	}
 
-	var digests sha.Slice
+	var digests merkle.Slice
 
 	if _, err = digests.ReadFrom(bufio.NewReader(response.Body)); err != nil {
 		err = errors.Wrap(err)
