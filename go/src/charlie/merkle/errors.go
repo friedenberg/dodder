@@ -140,3 +140,28 @@ func (err errLength) Error() string {
 		err[1],
 	)
 }
+
+func MakeErrWrongType(expected, actual string) error {
+	if expected != actual {
+		return errWrongType{expected: expected, actual: actual}
+	}
+
+	return nil
+}
+
+type errWrongType struct {
+	expected, actual string
+}
+
+func (err errWrongType) Error() string {
+	return fmt.Sprintf(
+		"wrong type. expected %q but got %q",
+		err.expected,
+		err.actual,
+	)
+}
+
+func (err errWrongType) Is(target error) bool {
+	_, ok := target.(errWrongType)
+	return ok
+}

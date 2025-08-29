@@ -33,8 +33,8 @@ func (hashType HashType) Get() Hash {
 	return hashType.pool.Get()
 }
 
-// TODO assert type somehow?
 func (hashType HashType) Put(hash Hash) {
+	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.tipe))
 	hashType.pool.Put(hash)
 }
 
