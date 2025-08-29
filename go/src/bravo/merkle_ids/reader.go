@@ -136,11 +136,11 @@ type nopReadCloser struct {
 }
 
 func MakeNopReadCloser(
-	envDigest interfaces.EnvBlobId,
+	hash interfaces.EnvBlobId,
 	readCloser io.ReadCloser,
 ) interfaces.ReadCloseBlobIdGetter {
 	return nopReadCloser{
-		envDigest:  envDigest,
+		envDigest:  hash,
 		ReadCloser: readCloser,
 	}
 }

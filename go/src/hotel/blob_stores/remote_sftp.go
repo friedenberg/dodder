@@ -20,6 +20,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -32,6 +33,7 @@ type remoteSftp struct {
 
 	config blob_store_configs.ConfigSFTPRemotePath
 
+	hashType merkle.HashType
 	// TODO move to config
 	envDigest interfaces.EnvBlobId
 
@@ -52,6 +54,7 @@ func makeSftpStore(
 	sshClient *ssh.Client,
 ) (blobStore *remoteSftp, err error) {
 	blobStore = &remoteSftp{
+		hashType:  merkle.HashTypeSha256,
 		envDigest: sha.Env,
 		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
@@ -288,7 +291,9 @@ func (blobStore *remoteSftp) BlobReader(
 		config: config,
 	}
 
-	if readCloser, err = streamingReader.createReader(); err != nil {
+	if readCloser, err = streamingReader.createReader(
+		blobStore.hashType.Get(),
+	); err != nil {
 		remoteFile.Close()
 		err = errors.Wrap(err)
 		return
@@ -517,14 +522,16 @@ type sftpStreamingReader struct {
 	config interfaces.BlobIOWrapper
 }
 
-func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+func (reader *sftpStreamingReader) createReader(
+	hash merkle.Hash,
+) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,
 		config: reader.config,
 	}
 
-	if err = sftpReader.initialize(); err != nil {
+	if err = sftpReader.initialize(hash); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -538,13 +545,13 @@ func (reader *sftpStreamingReader) createReader() (readCloser interfaces.ReadClo
 type sftpReader struct {
 	file      *sftp.File
 	config    interfaces.BlobIOWrapper
-	hash      hash.Hash
+	hash      merkle.Hash
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
 }
 
-func (reader *sftpReader) initialize() (err error) {
+func (reader *sftpReader) initialize(hash merkle.Hash) (err error) {
 	// Set up decryption
 	if reader.decrypter, err = reader.config.GetBlobEncryption().WrapReader(reader.file); err != nil {
 		err = errors.Wrap(err)
@@ -559,7 +566,7 @@ func (reader *sftpReader) initialize() (err error) {
 
 	// Set up SHA calculation
 	// TODO sha.GetPool()
-	reader.hash = sha256.New()
+	reader.hash = hash
 	reader.tee = io.TeeReader(reader.expander, reader.hash)
 
 	return

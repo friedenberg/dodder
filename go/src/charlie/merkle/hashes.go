@@ -10,21 +10,42 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-type HashType struct {
-	pool interfaces.PoolValue[hash.Hash]
+type Hash struct {
+	hash.Hash
 	tipe string
+}
+
+func (hash Hash) GetType() string {
+	return hash.tipe
 }
 
 var HashTypeSha256 = HashType{
 	pool: pool.MakeValue(
-		func() hash.Hash {
-			return sha256.New()
+		func() Hash {
+			return Hash{
+				Hash: sha256.New(),
+				tipe: HRPObjectBlobDigestSha256V0,
+			}
 		},
-		func(hash hash.Hash) {
+		func(hash Hash) {
 			hash.Reset()
 		},
 	),
 	tipe: HRPObjectBlobDigestSha256V0,
+}
+
+type HashType struct {
+	pool interfaces.PoolValue[Hash]
+	tipe string
+}
+
+func (hashType HashType) Get() Hash {
+	return hashType.pool.Get()
+}
+
+// TODO assert type somehow?
+func (hashType HashType) Put(hash Hash) {
+	hashType.pool.Put(hash)
 }
 
 func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
@@ -42,7 +63,7 @@ func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
 
 	var id Id
 
-	errors.PanicIfError(id.SetMerkleId(hashType.tipe, digest))
+	errors.PanicIfError(id.SetMerkleId(hash.tipe, digest))
 
 	return id
 }

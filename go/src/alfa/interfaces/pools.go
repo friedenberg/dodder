@@ -21,6 +21,8 @@ type Pool[T any, TPtr Ptr[T]] interface {
 	PutMany(...TPtr) error
 }
 
+// TODO remove below in favor of panicking
+
 type PoolWithErrors[T any] interface {
 	Get() (T, error)
 	Put(i T) (err error)

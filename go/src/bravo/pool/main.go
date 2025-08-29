@@ -38,35 +38,6 @@ func Make[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]](
 	}
 }
 
-// TODO extract as function on interface
-func (pool pool[SWIMMER, SWIMMER_PTR]) Apply(
-	funk interfaces.FuncIter[SWIMMER],
-	swimmer SWIMMER,
-) (err error) {
-	err = funk(swimmer)
-
-	switch {
-
-	case IsDoNotRepool(err):
-		err = nil
-		return
-
-	case errors.IsStopIteration(err):
-		err = nil
-		pool.Put(&swimmer)
-
-	case err != nil:
-		err = errors.Wrap(err)
-
-		fallthrough
-
-	default:
-		pool.Put(&swimmer)
-	}
-
-	return
-}
-
 func (pool pool[SWIMMER, SWIMMER_PTR]) Get() SWIMMER_PTR {
 	return pool.inner.Get().(SWIMMER_PTR)
 }

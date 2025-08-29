@@ -90,7 +90,7 @@ func (index *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
-	blobDigest := merkle.FromStringContent(index.hashType, str)
+	blobDigest := index.hashType.FromStringContent(str)
 
 	if err = index.Index.AddBlobId(blobDigest, loc); err != nil {
 		err = errors.Wrap(err)
