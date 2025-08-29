@@ -11,16 +11,16 @@ import (
 )
 
 func (store *Store) tryNewHook(
-	kinder *sku.Transacted,
-	o sku.CommitOptions,
+	child *sku.Transacted,
+	options sku.CommitOptions,
 ) (err error) {
-	if !o.RunHooks {
+	if !options.RunHooks {
 		return
 	}
 
-	var t *sku.Transacted
+	var typeObject *sku.Transacted
 
-	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
+	if typeObject, err = store.ReadOneObjectId(child.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -28,14 +28,16 @@ func (store *Store) tryNewHook(
 		}
 
 		return
+	} else if typeObject == nil {
+		return
 	}
 
 	var blob type_blobs.Blob
 	var repool interfaces.FuncRepool
 
 	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
-		t.GetType(),
-		t.GetBlobDigest(),
+		typeObject.GetType(),
+		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -50,10 +52,10 @@ func (store *Store) tryNewHook(
 	}
 
 	if err = store.tryHookWithName(
-		kinder,
+		child,
 		nil,
-		o,
-		t,
+		options,
+		typeObject,
 		script,
 		"on_new",
 	); err != nil {
@@ -124,11 +126,11 @@ func (store *Store) TryFormatHook(
 }
 
 func (store *Store) tryPreCommitHooks(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
-	o sku.CommitOptions,
+	child *sku.Transacted,
+	mother *sku.Transacted,
+	options sku.CommitOptions,
 ) (err error) {
-	if !o.RunHooks {
+	if !options.RunHooks {
 		return
 	}
 
@@ -139,9 +141,9 @@ func (store *Store) tryPreCommitHooks(
 
 	hooks := []hook{}
 
-	var t *sku.Transacted
+	var typeObject *sku.Transacted
 
-	if t, err = store.ReadOneObjectId(kinder.GetType()); err != nil {
+	if typeObject, err = store.ReadOneObjectId(child.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -149,14 +151,16 @@ func (store *Store) tryPreCommitHooks(
 		}
 
 		return
+	} else if typeObject == nil {
+		return
 	}
 
 	var blob type_blobs.Blob
 	var repool interfaces.FuncRepool
 
 	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
-		t.GetType(),
-		t.GetBlobDigest(),
+		typeObject.GetType(),
+		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -181,15 +185,15 @@ func (store *Store) tryPreCommitHooks(
 		}
 
 		if err = store.tryHookWithName(
-			kinder,
-			mutter,
-			o,
-			t,
+			child,
+			mother,
+			options,
+			typeObject,
 			h.script,
 			"on_pre_commit",
 		); err != nil {
 			err = errors.Wrapf(err, "Hook: %#v", h)
-			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
+			err = errors.Wrapf(err, "Type: %q", child.GetType())
 
 			if store.envRepo.Retry(
 				"hook failed",
@@ -208,8 +212,8 @@ func (store *Store) tryPreCommitHooks(
 }
 
 func (store *Store) tryPreCommitHook(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
+	child *sku.Transacted,
+	mother *sku.Transacted,
 	storeOptions sku.StoreOptions,
 	selbst *sku.Transacted,
 	script string,
@@ -251,19 +255,19 @@ func (store *Store) tryPreCommitHook(
 	defer vm.TablePool.Put(tableKinder)
 
 	sku_lua.ToLuaTableV1(
-		kinder,
+		child,
 		vm.LState,
 		tableKinder,
 	)
 
 	var tableMutter *sku_lua.LuaTableV1
 
-	if mutter != nil {
+	if mother != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
 		sku_lua.ToLuaTableV1(
-			mutter,
+			mother,
 			vm.LState,
 			tableMutter,
 		)
@@ -286,7 +290,7 @@ func (store *Store) tryPreCommitHook(
 		return
 	}
 
-	if err = sku_lua.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku_lua.FromLuaTableV1(child, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -296,9 +300,9 @@ func (store *Store) tryPreCommitHook(
 
 // TODO add method with hook with reader
 func (store *Store) tryHookWithName(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
-	o sku.CommitOptions,
+	child *sku.Transacted,
+	mother *sku.Transacted,
+	options sku.CommitOptions,
 	self *sku.Transacted,
 	script string,
 	name string,
@@ -340,19 +344,19 @@ func (store *Store) tryHookWithName(
 	defer vm.TablePool.Put(tableKinder)
 
 	sku_lua.ToLuaTableV1(
-		kinder,
+		child,
 		vm.LState,
 		tableKinder,
 	)
 
 	var tableMutter *sku_lua.LuaTableV1
 
-	if mutter != nil {
+	if mother != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
 		sku_lua.ToLuaTableV1(
-			mutter,
+			mother,
 			vm.LState,
 			tableMutter,
 		)
@@ -380,7 +384,7 @@ func (store *Store) tryHookWithName(
 		return
 	}
 
-	if err = sku_lua.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku_lua.FromLuaTableV1(child, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

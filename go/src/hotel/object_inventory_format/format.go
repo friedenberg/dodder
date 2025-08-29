@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings_german"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
@@ -392,7 +391,10 @@ func WriteMetadata(
 	f Format,
 	c FormatterContext,
 ) (blobDigest interfaces.BlobId, err error) {
-	writer, repool := merkle.MakeWriterWithRepool(sha.Env, w)
+	writer, repool := merkle.MakeWriterWithRepool(
+		merkle.HashTypeSha256.Get(),
+		w,
+	)
 	defer repool()
 
 	_, err = f.WriteMetadataTo(writer, c)
@@ -423,7 +425,10 @@ func GetDigestForContextDebug(
 	context FormatterContext,
 ) (digest interfaces.BlobId, err error) {
 	var sb strings.Builder
-	writer, repool := merkle.MakeWriterWithRepool(sha.Env, &sb)
+	writer, repool := merkle.MakeWriterWithRepool(
+		merkle.HashTypeSha256.Get(),
+		&sb,
+	)
 	defer repool()
 
 	_, err = format.WriteMetadataTo(writer, context)

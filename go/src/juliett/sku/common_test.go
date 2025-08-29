@@ -53,25 +53,23 @@ func readFormat(
 	format object_metadata.TextFormat,
 	contents string,
 ) (metadata *object_metadata.Metadata) {
-	var zt Transacted
+	var object Transacted
 
-	t := t1.Skip(1)
+	t := t1
 
 	reader, repool := pool.GetStringReader(contents)
 	defer repool()
 	n, err := format.ParseMetadata(
 		reader,
-		&zt,
+		&object,
 	)
-	if err != nil {
-		t.Fatalf("failed to read zettel format: %s", err)
-	}
+	t.AssertNoError(err)
 
 	if n != int64(len(contents)) {
 		t.Fatalf("expected to read %d but only read %d", len(contents), n)
 	}
 
-	metadata = zt.GetMetadata()
+	metadata = object.GetMetadata()
 
 	return
 }
@@ -194,8 +192,9 @@ func makeTestTextFormat(
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			EnvDir:    envDir,
-			BlobStore: blobStore,
+			EnvDir:         envDir,
+			BlobStore:      blobStore,
+			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
 		},
 	)
 }
@@ -417,7 +416,8 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.Dependencies{
-			BlobStore: envRepo.GetDefaultBlobStore(),
+			BlobStore:      envRepo.GetDefaultBlobStore(),
+			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
 		},
 	)
 
@@ -467,7 +467,8 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.Dependencies{
-			BlobStore: envRepo.GetDefaultBlobStore(),
+			BlobStore:      envRepo.GetDefaultBlobStore(),
+			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
 		},
 	)
 

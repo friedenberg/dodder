@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
+// TODO add awareness of HashType and null values
 var (
 	_ interfaces.BlobId        = Id{}
 	_ interfaces.MutableBlobId = &Id{}

@@ -105,6 +105,15 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
+	if digest.IsNull() {
+		return
+	}
+
+	// if err = merkle.MakeErrIsNull(digest, ""); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
 	// log.Log().Printf(
 	// 	"wrote %d bytes to %s, sha %s",
 	// 	fi.Size(),

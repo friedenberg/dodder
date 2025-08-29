@@ -1,7 +1,6 @@
 package merkle
 
 import (
-	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -12,11 +11,11 @@ import (
 var poolWriter = pool.Make[writer](nil, nil)
 
 func MakeWriterWithRepool(
-	envDigest interfaces.EnvBlobId,
+	hash interfaces.Hash,
 	in io.Writer,
 ) (writer *writer, repool func()) {
 	writer = poolWriter.Get()
-	writer.Reset(envDigest, in)
+	writer.Reset(hash, in)
 
 	repool = func() {
 		PutWriter(writer)
@@ -26,10 +25,10 @@ func MakeWriterWithRepool(
 }
 
 func MakeWriter(
-	envDigest interfaces.EnvBlobId,
+	hash interfaces.Hash,
 	in io.Writer,
 ) (writer *writer) {
-	writer, _ = MakeWriterWithRepool(envDigest, in)
+	writer, _ = MakeWriterWithRepool(hash, in)
 	return
 }
 
@@ -38,18 +37,21 @@ func PutWriter(writer *writer) {
 }
 
 type writer struct {
-	envDigest interfaces.EnvBlobId
-	closed    bool
-	in        io.Writer
-	closer    io.Closer
-	writer    io.Writer
-	hash      hash.Hash
+	closed bool
+	in     io.Writer
+	closer io.Closer
+	writer io.Writer
+	hash   interfaces.Hash
 }
 
 var _ interfaces.BlobIdGetter = &writer{}
 
-func (writer *writer) Reset(envDigest interfaces.EnvBlobId, in io.Writer) {
-	writer.envDigest = envDigest
+func (writer *writer) Reset(hash interfaces.Hash, in io.Writer) {
+	if writer.hash == nil || writer.hash.GetType() != hash.GetType() {
+		writer.hash = hash
+	} else {
+		writer.hash.Reset()
+	}
 
 	if in == nil {
 		in = io.Discard
@@ -59,12 +61,6 @@ func (writer *writer) Reset(envDigest interfaces.EnvBlobId, in io.Writer) {
 
 	if closer, ok := in.(io.Closer); ok {
 		writer.closer = closer
-	}
-
-	if writer.hash == nil {
-		writer.hash, _ = writer.envDigest.GetHash()
-	} else {
-		writer.hash.Reset()
 	}
 
 	writer.writer = io.MultiWriter(writer.hash, writer.in)
@@ -107,8 +103,6 @@ func (writer *writer) Close() (err error) {
 }
 
 func (writer *writer) GetBlobId() interfaces.BlobId {
-	digest, err := writer.envDigest.MakeDigestFromHash(writer.hash)
-	errors.PanicIfError(err)
-
+	digest, _ := writer.hash.GetBlobId()
 	return digest
 }

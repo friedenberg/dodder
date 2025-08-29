@@ -12,32 +12,32 @@ import (
 
 var HashTypeSha256 = HashType{
 	pool: pool.MakeValue(
-		func() Hash {
-			return Hash{
+		func() interfaces.Hash {
+			return &Hash{
 				hash: sha256.New(),
 				tipe: HRPObjectBlobDigestSha256V0,
 			}
 		},
-		func(hash Hash) {
-			hash.hash.Reset()
+		func(hash interfaces.Hash) {
+			hash.Reset()
 		},
 	),
 	tipe: HRPObjectBlobDigestSha256V0,
 }
 
 type HashType struct {
-	pool interfaces.PoolValue[Hash]
+	pool interfaces.PoolValue[interfaces.Hash]
 	tipe string
 }
 
 var _ interfaces.HashType = HashType{}
 
-func (hashType HashType) Get() Hash {
+func (hashType HashType) Get() interfaces.Hash {
 	return hashType.pool.Get()
 }
 
-func (hashType HashType) Put(hash Hash) {
-	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.tipe))
+func (hashType HashType) Put(hash interfaces.Hash) {
+	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.GetType()))
 	hashType.pool.Put(hash)
 }
 
@@ -47,7 +47,7 @@ func (hashType HashType) GetBlobIdForString(
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
-	if _, err := io.WriteString(hash.hash, input); err != nil {
+	if _, err := io.WriteString(hash, input); err != nil {
 		errors.PanicIfError(err)
 	}
 
@@ -66,7 +66,7 @@ func (hashType HashType) FromStringFormat(
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
-	if _, err := fmt.Fprintf(hash.hash, format, args...); err != nil {
+	if _, err := fmt.Fprintf(hash, format, args...); err != nil {
 		errors.PanicIfError(err)
 	}
 

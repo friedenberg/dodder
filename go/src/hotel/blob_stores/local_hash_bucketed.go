@@ -60,8 +60,7 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.BlobStore {
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-
-		sha.Env,
+		merkle.HashTypeSha256,
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -56,8 +56,7 @@ func (cmd Import) Run(req command.Request) {
 
 		if readCloser, err = env_dir.NewFileReader(
 			env_dir.MakeConfig(
-
-				sha.Env,
+				merkle.HashTypeSha256,
 				env_dir.MakeHashBucketPathJoinFunc(cmd.Config.GetHashBuckets()),
 				cmd.Config.GetBlobCompression(),
 				cmd.Config.GetBlobEncryption(),

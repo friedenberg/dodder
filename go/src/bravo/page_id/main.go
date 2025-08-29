@@ -57,7 +57,12 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	bucketIndexString := merkle.Format(digest)[:width]
+	if err = merkle.MakeErrIsNull(digest, "page id"); err != nil {
+		panic(err)
+	}
+
+	digestString := merkle.Format(digest)
+	bucketIndexString := digestString[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)

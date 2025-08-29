@@ -7,10 +7,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -84,8 +84,7 @@ func (cmd Export) Run(req command.Request) {
 
 		if writeCloser, err = env_dir.NewWriter(
 			env_dir.MakeConfig(
-
-				sha.Env,
+				merkle.HashTypeSha256,
 				env_dir.MakeHashBucketPathJoinFunc([]int{2}),
 				&cmd.CompressionType,
 				&ag,

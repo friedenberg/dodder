@@ -107,6 +107,10 @@ func MakeZettelId(v string) (h *ZettelId, err error) {
 	return
 }
 
+func (a ZettelId) IsEmpty() bool {
+	return a.left == "" && a.right == ""
+}
+
 func (a ZettelId) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }

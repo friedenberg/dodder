@@ -34,6 +34,10 @@ func ErrOnConfig(v string) (err error) {
 
 type Config struct{}
 
+func (a Config) IsEmpty() bool {
+	return false
+}
+
 func (a Config) GetGenre() interfaces.Genre {
 	return genres.Config
 }

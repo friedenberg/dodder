@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -410,12 +410,9 @@ func (server *Server) readMCPResourceBlobs(
 		return nil, errors.BadRequestf("blob digest not provided")
 	}
 
-	blobDigest := pathComponents[0]
+	blobDigestString := pathComponents[0]
 
-	digest, repool, err := sha.Env.MakeDigestFromString(blobDigest)
-	if err != nil {
-		return nil, errors.Wrap(err)
-	}
+	digest, repool := merkle.HashTypeSha256.GetBlobIdForString(blobDigestString)
 
 	defer repool()
 

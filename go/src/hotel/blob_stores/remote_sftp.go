@@ -310,7 +310,7 @@ type sftpMover struct {
 	closed   bool
 }
 
-func (mover *sftpMover) initialize(hash merkle.Hash) (err error) {
+func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
 	// Create a temporary file on the remote server
 	var tempNameBytes [16]byte
 	if _, err = rand.Read(tempNameBytes[:]); err != nil {
@@ -440,7 +440,7 @@ func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 
 // sftpWriter implements the streaming writer with compression/encryption
 type sftpWriter struct {
-	hash            merkle.Hash
+	hash            interfaces.Hash
 	tee             io.Writer
 	wCompress, wAge io.WriteCloser
 	wBuf            *bufio.Writer
@@ -449,7 +449,7 @@ type sftpWriter struct {
 func newSftpWriter(
 	config env_dir.Config,
 	ioWriter io.Writer,
-	hash merkle.Hash,
+	hash interfaces.Hash,
 ) (writer *sftpWriter, err error) {
 	writer = &sftpWriter{}
 
@@ -523,7 +523,7 @@ type sftpStreamingReader struct {
 }
 
 func (reader *sftpStreamingReader) createReader(
-	hash merkle.Hash,
+	hash interfaces.Hash,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
@@ -545,13 +545,13 @@ func (reader *sftpStreamingReader) createReader(
 type sftpReader struct {
 	file      *sftp.File
 	config    interfaces.BlobIOWrapper
-	hash      merkle.Hash
+	hash      interfaces.Hash
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
 }
 
-func (reader *sftpReader) initialize(hash merkle.Hash) (err error) {
+func (reader *sftpReader) initialize(hash interfaces.Hash) (err error) {
 	// Set up decryption
 	if reader.decrypter, err = reader.config.GetBlobEncryption().WrapReader(reader.file); err != nil {
 		err = errors.Wrap(err)

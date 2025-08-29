@@ -1,7 +1,6 @@
 package merkle
 
 import (
-	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -13,15 +12,13 @@ type readCloser struct {
 	tee       io.Reader
 	reader    io.Reader
 	writer    io.Writer
-	hash      hash.Hash
+	hash      interfaces.Hash
 }
 
 func MakeReadCloser(
-	envDigest interfaces.EnvBlobId,
+	hash interfaces.Hash,
 	reader io.Reader,
 ) (src readCloser) {
-	src.envDigest = envDigest
-
 	switch rt := reader.(type) {
 	case *readCloser:
 		src = *rt
@@ -30,7 +27,7 @@ func MakeReadCloser(
 		src = rt
 
 	default:
-		src.hash, _ = src.envDigest.GetHash()
+		src.hash = hash
 		src.reader = reader
 	}
 
@@ -40,12 +37,10 @@ func MakeReadCloser(
 }
 
 func MakeReadCloserTee(
-	envDigest interfaces.EnvBlobId,
+	hash interfaces.Hash,
 	reader io.Reader,
 	writer io.Writer,
 ) (src readCloser) {
-	src.envDigest = envDigest
-
 	switch rt := reader.(type) {
 	case *readCloser:
 		src = *rt
@@ -56,7 +51,7 @@ func MakeReadCloserTee(
 		src.writer = writer
 
 	default:
-		src.hash, _ = src.envDigest.GetHash()
+		src.hash = hash
 		src.reader = reader
 		src.writer = writer
 	}
@@ -125,8 +120,7 @@ func (readCloser readCloser) Close() (err error) {
 }
 
 func (readCloser readCloser) GetBlobId() interfaces.BlobId {
-	digest, err := readCloser.envDigest.MakeDigestFromHash(readCloser.hash)
-	errors.PanicIfError(err)
+	digest, _ := readCloser.hash.GetBlobId()
 	return digest
 }
 

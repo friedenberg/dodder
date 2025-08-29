@@ -2,21 +2,21 @@ package env_dir
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 // TODO move to own package
 
 func MakeConfig(
-	envDigest interfaces.EnvBlobId,
+	hashType merkle.HashType,
 	funcJoin func(string, ...string) string,
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
 ) Config {
 	return Config{
-		envDigest:   envDigest,
+		hashType:    hashType,
 		funcJoin:    funcJoin,
 		compression: compression,
 		encryption:  encryption,
@@ -27,7 +27,7 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionType       = age.Age{}
 	DefaultConfig               = Config{
-		envDigest:   sha.Env,
+		hashType:    merkle.HashTypeSha256,
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionType,
 	}
@@ -36,7 +36,7 @@ var (
 )
 
 type Config struct {
-	envDigest interfaces.EnvBlobId
+	hashType merkle.HashType
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.BlobCompression

@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 )
@@ -92,7 +91,11 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		reader = merkle.MakeReadCloser(sha.Env, response.Body)
+		// TODO use correct hash type
+		reader = merkle.MakeReadCloser(
+			merkle.HashTypeSha256.Get(),
+			response.Body,
+		)
 	}
 
 	return

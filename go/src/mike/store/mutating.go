@@ -22,7 +22,7 @@ import (
 // object
 func (store *Store) tryPrecommit(
 	external sku.ExternalLike,
-	mutter *sku.Transacted,
+	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	if err = store.SaveBlob(external); err != nil {
@@ -32,7 +32,7 @@ func (store *Store) tryPrecommit(
 
 	object := external.GetSku()
 
-	if mutter == nil {
+	if mother == nil {
 		options.Proto.Apply(object, object)
 	}
 
@@ -50,7 +50,7 @@ func (store *Store) tryPrecommit(
 	}
 
 	// modify pre commit hooks to support import
-	if err = store.tryPreCommitHooks(object, mutter, options); err != nil {
+	if err = store.tryPreCommitHooks(object, mother, options); err != nil {
 		if store.storeConfig.GetConfig().IgnoreHookErrors {
 			err = nil
 		} else {
@@ -60,7 +60,7 @@ func (store *Store) tryPrecommit(
 	}
 
 	// TODO just just mutter == nil
-	if mutter == nil {
+	if mother == nil {
 		if err = store.tryNewHook(object, options); err != nil {
 			if store.storeConfig.GetConfig().IgnoreHookErrors {
 				err = nil
@@ -71,7 +71,7 @@ func (store *Store) tryPrecommit(
 		}
 	}
 
-	if err = store.validate(object, mutter, options); err != nil {
+	if err = store.validate(object, mother, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -293,10 +293,16 @@ func (store *Store) Commit(
 func (store *Store) fetchMotherIfNecessary(
 	object *sku.Transacted,
 ) (mother *sku.Transacted, err error) {
+	objectId := object.GetObjectId()
+
+	if objectId.IsEmpty() {
+		return
+	}
+
 	mother = sku.GetTransactedPool().Get()
 	// TODO find a way to make this more performant when operating over sshfs
 	if err = store.GetStreamIndex().ReadOneObjectId(
-		object.GetObjectId(),
+		objectId,
 		mother,
 	); err != nil {
 		if collections.IsErrNotFound(err) || errors.IsNotExist(err) {

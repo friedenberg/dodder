@@ -91,3 +91,11 @@ func Clone(src interfaces.BlobId) interfaces.BlobId {
 func Format(merkleId interfaces.BlobId) string {
 	return fmt.Sprintf("%x", merkleId.GetBytes())
 }
+
+func FormatOrEmptyOnNull(merkleId interfaces.BlobId) string {
+	if merkleId.IsNull() {
+		return ""
+	} else {
+		return Format(merkleId)
+	}
+}

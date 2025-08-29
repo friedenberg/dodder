@@ -28,12 +28,17 @@ func (store *Store) ReadTransactedFromObjectId(
 	return
 }
 
+// TODO transition to a context-based panic / cancel semantic
 func (store *Store) ReadOneObjectId(
-	k interfaces.ObjectId,
-) (sk *sku.Transacted, err error) {
-	sk = sku.GetTransactedPool().Get()
+	objectId interfaces.ObjectId,
+) (object *sku.Transacted, err error) {
+	if objectId.IsEmpty() {
+		return
+	}
 
-	if err = store.GetStreamIndex().ReadOneObjectId(k, sk); err != nil {
+	object = sku.GetTransactedPool().Get()
+
+	if err = store.GetStreamIndex().ReadOneObjectId(objectId, object); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrNotFound)
 		return
 	}

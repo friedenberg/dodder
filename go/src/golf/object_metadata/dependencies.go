@@ -142,7 +142,7 @@ func (f Dependencies) writeTyp(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type.StringSansOp()))
 }
 
-func (f Dependencies) writeShaTyp(
+func (f Dependencies) writeBlobDigestAndType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {

@@ -36,7 +36,7 @@ func NewFileReader(
 		}
 
 		config = MakeConfig(
-			config.envDigest,
+			config.hashType,
 			config.funcJoin,
 			config.GetBlobCompression(),
 			&age.Age{},

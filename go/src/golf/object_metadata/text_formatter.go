@@ -35,7 +35,7 @@ func MakeTextFormatterMetadataOnly(
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
-			common.writeShaTyp,
+			common.writeBlobDigestAndType,
 			common.writeComments,
 			common.writeBoundary,
 		},

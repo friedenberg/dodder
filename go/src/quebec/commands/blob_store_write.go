@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -43,7 +42,7 @@ func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.Var(&cmd.UtilityAfter, "utility-after", "")
 }
 
-type answer struct {
+type blobWriteResult struct {
 	error
 	interfaces.BlobId
 	Path string
@@ -62,51 +61,56 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 
 	sawStdin := false
 
-	for _, p := range req.PopArgs() {
+	for _, arg := range req.PopArgs() {
 		switch {
 		case sawStdin:
 			ui.Err().Print("'-' passed in more than once. Ignoring")
 			continue
 
-		case p == "-":
+		case arg == "-":
 			sawStdin = true
 		}
 
-		answer := answer{Path: p}
+		result := blobWriteResult{Path: arg}
 
-		answer.BlobId, answer.error = cmd.doOne(blobStore, p)
+		result.BlobId, result.error = cmd.doOne(blobStore, arg)
 
-		if answer.error != nil {
+		if result.IsNull() {
+			ui.Err().Printf("digest for arg %q was null", arg)
+			continue
+		}
+
+		if result.error != nil {
 			blobStore.GetErr().Printf(
 				"%s: (error: %q)",
-				answer.Path,
-				answer.error,
+				result.Path,
+				result.error,
 			)
 			failCount.Add(1)
 			continue
 		}
 
-		hasBlob := blobStore.HasBlob(answer.BlobId)
+		hasBlob := blobStore.HasBlob(result.BlobId)
 
 		if hasBlob {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					merkle.Format(answer.BlobId),
-					answer.Path,
+					merkle.Format(result.BlobId),
+					result.Path,
 				)
 			} else {
 				blobStore.GetUI().Printf(
 					"%s %s (checked in)",
-					merkle.Format(answer.BlobId),
-					answer.Path,
+					merkle.Format(result.BlobId),
+					result.Path,
 				)
 			}
 		} else {
 			ui.Err().Printf(
 				"%s %s (untracked)",
-				merkle.Format(answer.BlobId),
-				answer.Path,
+				merkle.Format(result.BlobId),
+				result.Path,
 			)
 
 			if cmd.Check {
@@ -127,6 +131,7 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 	}
 }
 
+// TODO rewrite to just return blobWriteResult
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
@@ -149,7 +154,7 @@ func (cmd BlobStoreWrite) doOne(
 		{
 			var repool func()
 			writeCloser, repool = merkle.MakeWriterWithRepool(
-				sha.Env,
+				merkle.HashTypeSha256.Get(),
 				nil,
 			)
 			defer repool()

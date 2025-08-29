@@ -4,6 +4,7 @@ type ObjectId interface {
 	GenreGetter
 	Stringer
 	Parts() [3]string
+	IsEmpty() bool
 }
 
 type RepoId interface {

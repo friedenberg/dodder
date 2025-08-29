@@ -36,9 +36,9 @@ func DeferredFlusher(
 
 func DeferredYieldCloser[T any](
 	yield func(T, error) bool,
-	c io.Closer,
+	closer io.Closer,
 ) {
-	if err := c.Close(); err != nil {
+	if err := closer.Close(); err != nil {
 		var t T
 		yield(t, err)
 	}
@@ -46,13 +46,13 @@ func DeferredYieldCloser[T any](
 
 func DeferredCloser(
 	err *error,
-	c io.Closer,
+	closer io.Closer,
 ) {
-	if err1 := c.Close(); err1 != nil {
+	if err1 := closer.Close(); err1 != nil {
 		if err == nil {
 			panic(err)
 		} else {
-			*err = Join(*err, err1)
+			*err = Join(*err, WrapSkip(1, err1))
 		}
 	}
 }

@@ -52,10 +52,6 @@ type (
 
 		GetBlobId() MutableBlobId
 		PutBlobId(BlobId)
-
-		MakeWriteDigesterWithRepool() (WriteBlobIdGetter, FuncRepool)
-		MakeWriteDigester() WriteBlobIdGetter
-		MakeDigestFromHash(hash.Hash) (BlobId, error)
 	}
 
 	WriteBlobIdGetter interface {

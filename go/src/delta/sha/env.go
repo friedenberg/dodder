@@ -2,11 +2,8 @@ package sha
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"hash"
-	"io"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool_value"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
@@ -68,57 +65,4 @@ func (env env) MakeDigestFromString(
 	}
 
 	return digest, func() { poolSha.Put(digest) }, nil
-}
-
-func (env env) MakeDigestFromHash(hash hash.Hash) (interfaces.BlobId, error) {
-	digest := poolSha.Get()
-	digest.Reset()
-
-	if err := merkle.MakeErrLength(ByteSize, hash.Size()); err != nil {
-		return nil, err
-	}
-
-	// the return value isn't used because s.data is already the right size
-	hash.Sum(digest.data[:0])
-
-	return digest, nil
-}
-
-func (env env) MakeWriteDigesterWithRepool() (interfaces.WriteBlobIdGetter, interfaces.FuncRepool) {
-	return merkle.MakeWriterWithRepool(env, nil)
-}
-
-func (env env) MakeWriteDigester() interfaces.WriteBlobIdGetter {
-	return merkle.MakeWriter(env, nil)
-}
-
-// TODO switch to being functions on Env that return interfaces.Digest
-
-func FromFormatString(f string, vs ...any) interfaces.BlobId {
-	return FromStringContent(fmt.Sprintf(f, vs...))
-}
-
-func FromStringContent(s string) interfaces.BlobId {
-	hash, repool := pool.GetSha256Hash()
-	defer repool()
-
-	stringReader, repool2 := pool.GetStringReader(s)
-	defer repool2()
-
-	if _, err := io.Copy(hash, stringReader); err != nil {
-		errors.PanicIfError(err)
-	}
-
-	return FromHash(hash)
-}
-
-func FromStringer(v interfaces.Stringer) interfaces.BlobId {
-	return FromStringContent(v.String())
-}
-
-func FromHash(hash hash.Hash) interfaces.BlobId {
-	digest, err := Env.MakeDigestFromHash(hash)
-	errors.PanicIfError(err)
-
-	return digest
 }

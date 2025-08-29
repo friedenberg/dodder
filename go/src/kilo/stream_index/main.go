@@ -305,6 +305,8 @@ func (index *Index) ReadOneSha(
 	blobId interfaces.BlobId,
 	object *sku.Transacted,
 ) (err error) {
+	errors.PanicIfError(merkle.MakeErrIsNull(blobId, "index lookup"))
+
 	var loc object_probe_index.Loc
 
 	if loc, err = index.readOneShaLoc(blobId); err != nil {
@@ -377,13 +379,21 @@ func (index *Index) ObjectExists(
 }
 
 func (index *Index) ReadOneObjectId(
-	oid interfaces.ObjectId,
-	sk *sku.Transacted,
+	objectId interfaces.ObjectId,
+	object *sku.Transacted,
 ) (err error) {
-	sh := merkle.HashTypeSha256.FromStringContent(oid.String())
-	defer merkle.PutBlobId(sh)
+	objectIdString := objectId.String()
 
-	if err = index.ReadOneSha(sh, sk); err != nil {
+	if objectIdString == "" {
+		panic("empty object id")
+	}
+
+	digest, repool := merkle.HashTypeSha256.GetBlobIdForString(
+		objectIdString,
+	)
+	defer repool()
+
+	if err = index.ReadOneSha(digest, object); err != nil {
 		return
 	}
 
