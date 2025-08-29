@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -40,6 +39,7 @@ const (
 )
 
 type Index struct {
+	hashType merkle.HashType
 	envRepo  env_repo.Env
 	sunrise  ids.Tai
 	preWrite interfaces.FuncIter[*sku.Transacted]
@@ -57,6 +57,7 @@ func MakeIndex(
 	sunrise ids.Tai,
 ) (index *Index, err error) {
 	index = &Index{
+		hashType:       merkle.HashTypeSha256,
 		envRepo:        envRepo,
 		sunrise:        sunrise,
 		preWrite:       preWrite,
@@ -66,7 +67,7 @@ func MakeIndex(
 
 	if err = index.probe_index.Initialize(
 		envRepo,
-		merkle.HashTypeSha256,
+		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -80,44 +81,44 @@ func MakeIndex(
 	return
 }
 
-func (i *Index) Initialize() (err error) {
-	for n := range i.pages {
-		i.pages[n].initialize(
+func (index *Index) Initialize() (err error) {
+	for n := range index.pages {
+		index.pages[n].initialize(
 			page_id.PageId{
 				Prefix: "Page",
-				Dir:    i.path,
+				Dir:    index.path,
 				Index:  uint8(n),
 			},
-			i,
+			index,
 		)
 	}
 
 	return
 }
 
-func (i *Index) GetPage(n uint8) (p *Page) {
-	p = &i.pages[n]
+func (index *Index) GetPage(n uint8) (p *Page) {
+	p = &index.pages[n]
 	return
 }
 
-func (i *Index) GetProbeIndex() *probe_index {
-	return &i.probe_index
+func (index *Index) GetProbeIndex() *probe_index {
+	return &index.probe_index
 }
 
-func (i *Index) SetNeedsFlushHistory(changes []string) {
-	i.historicalChanges = changes
+func (index *Index) SetNeedsFlushHistory(changes []string) {
+	index.historicalChanges = changes
 }
 
-func (i *Index) Flush(
+func (index *Index) Flush(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
-	if len(i.historicalChanges) > 0 {
-		if err = i.flushEverything(printerHeader); err != nil {
+	if len(index.historicalChanges) > 0 {
+		if err = index.flushEverything(printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = i.flushAdded(printerHeader); err != nil {
+		if err = index.flushAdded(printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -126,7 +127,7 @@ func (i *Index) Flush(
 	return
 }
 
-func (i *Index) flushAdded(
+func (index *Index) flushAdded(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
@@ -134,13 +135,13 @@ func (i *Index) flushAdded(
 
 	actualFlushCount := 0
 
-	for n := range i.pages {
-		if i.pages[n].hasChanges {
+	for n := range index.pages {
+		if index.pages[n].hasChanges {
 			ui.Log().Printf("actual flush for %d", n)
 			actualFlushCount++
 		}
 
-		wg.Do(i.pages[n].MakeFlush(false))
+		wg.Do(index.pages[n].MakeFlush(false))
 	}
 
 	if actualFlushCount > 0 {
@@ -148,7 +149,7 @@ func (i *Index) flushAdded(
 			fmt.Sprintf(
 				"appending to index (%d/%d pages)",
 				actualFlushCount,
-				len(i.pages),
+				len(index.pages),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -156,7 +157,7 @@ func (i *Index) flushAdded(
 		}
 	}
 
-	wg.DoAfter(i.Index.Flush)
+	wg.DoAfter(index.Index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -168,7 +169,7 @@ func (i *Index) flushAdded(
 			fmt.Sprintf(
 				"appended to index (%d/%d pages)",
 				actualFlushCount,
-				len(i.pages),
+				len(index.pages),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -179,27 +180,27 @@ func (i *Index) flushAdded(
 	return
 }
 
-func (i *Index) flushEverything(
+func (index *Index) flushEverything(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
 	wg := errors.MakeWaitGroupParallel()
 
-	for n := range i.pages {
-		wg.Do(i.pages[n].MakeFlush(true))
+	for n := range index.pages {
+		wg.Do(index.pages[n].MakeFlush(true))
 	}
 
 	if err = printerHeader(
 		fmt.Sprintf(
 			"writing index (%d pages)",
-			len(i.pages),
+			len(index.pages),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for n, change := range i.historicalChanges {
+	for n, change := range index.historicalChanges {
 		if err = printerHeader(fmt.Sprintf("change: %s", change)); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -209,7 +210,7 @@ func (i *Index) flushEverything(
 			if err = printerHeader(
 				fmt.Sprintf(
 					"(%d more changes omitted)",
-					len(i.historicalChanges)-100,
+					len(index.historicalChanges)-100,
 				),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -220,7 +221,7 @@ func (i *Index) flushEverything(
 		}
 	}
 
-	wg.DoAfter(i.Index.Flush)
+	wg.DoAfter(index.Index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -230,7 +231,7 @@ func (i *Index) flushEverything(
 	if err = printerHeader(
 		fmt.Sprintf(
 			"wrote index (%d pages)",
-			len(i.pages),
+			len(index.pages),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -243,20 +244,12 @@ func (i *Index) flushEverything(
 func PageIndexForObject(
 	width uint8,
 	object *sku.Transacted,
+	hashType interfaces.HashType,
 ) (n uint8, err error) {
-	if n, err = PageIndexForObjectId(width, object.GetObjectId()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
-	if n, err = page_id.PageIndexForString(
+	if n, err = PageIndexForObjectId(
 		width,
-		oid.String(),
-		sha.Env,
+		object.GetObjectId(),
+		hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -265,23 +258,41 @@ func PageIndexForObjectId(width uint8, oid *ids.ObjectId) (n uint8, err error) {
 	return
 }
 
-func (i *Index) Add(
-	z *sku.Transacted,
+func PageIndexForObjectId(
+	width uint8,
+	oid *ids.ObjectId,
+	hashType interfaces.HashType,
+) (n uint8, err error) {
+	if n, err = page_id.PageIndexForString(
+		width,
+		oid.String(),
+		hashType,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (index *Index) Add(
+	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	var n uint8
 
 	if n, err = PageIndexForObject(
 		DigitWidth,
-		z,
+		object,
+		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	p := i.GetPage(n)
+	p := index.GetPage(n)
 
-	if err = p.add(z, options); err != nil {
+	if err = p.add(object, options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -289,29 +300,31 @@ func (i *Index) Add(
 	return
 }
 
-func (s *Index) ReadOneSha(
-	sh interfaces.BlobId,
-	sk *sku.Transacted,
+// TODO rename
+func (index *Index) ReadOneSha(
+	blobId interfaces.BlobId,
+	object *sku.Transacted,
 ) (err error) {
 	var loc object_probe_index.Loc
 
-	if loc, err = s.readOneShaLoc(sh); err != nil {
+	if loc, err = index.readOneShaLoc(blobId); err != nil {
 		return
 	}
 
-	if err = s.readOneLoc(loc, sk); err != nil {
+	if err = index.readOneLoc(loc, object); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *Index) ReadManySha(
-	sh interfaces.BlobId,
-) (skus []*sku.Transacted, err error) {
+// TODO rename
+func (index *Index) ReadManySha(
+	blobId interfaces.BlobId,
+) (objects []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
-	if locs, err = s.readManyShaLoc(sh); err != nil {
+	if locs, err = index.readManyShaLoc(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -319,18 +332,18 @@ func (s *Index) ReadManySha(
 	for _, loc := range locs {
 		sk := sku.GetTransactedPool().Get()
 
-		if err = s.readOneLoc(loc, sk); err != nil {
+		if err = index.readOneLoc(loc, sk); err != nil {
 			err = errors.Wrapf(err, "Loc: %s", loc)
 			return
 		}
 
-		skus = append(skus, sk)
+		objects = append(objects, sk)
 	}
 
 	return
 }
 
-func (s *Index) ObjectExists(
+func (index *Index) ObjectExists(
 	objectId *ids.ObjectId,
 ) (err error) {
 	var n uint8
@@ -340,13 +353,13 @@ func (s *Index) ObjectExists(
 	if n, err = page_id.PageIndexForString(
 		DigitWidth,
 		objectIdString,
-		sha.Env,
+		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	p := s.GetPage(n)
+	p := index.GetPage(n)
 
 	if _, ok := p.oids[objectIdString]; ok {
 		return
@@ -355,7 +368,7 @@ func (s *Index) ObjectExists(
 	digest := merkle.HashTypeSha256.FromStringContent(objectIdString)
 	defer merkle.PutBlobId(digest)
 
-	if _, err = s.readOneShaLoc(digest); err != nil {
+	if _, err = index.readOneShaLoc(digest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -363,27 +376,27 @@ func (s *Index) ObjectExists(
 	return
 }
 
-func (s *Index) ReadOneObjectId(
+func (index *Index) ReadOneObjectId(
 	oid interfaces.ObjectId,
 	sk *sku.Transacted,
 ) (err error) {
 	sh := merkle.HashTypeSha256.FromStringContent(oid.String())
 	defer merkle.PutBlobId(sh)
 
-	if err = s.ReadOneSha(sh, sk); err != nil {
+	if err = index.ReadOneSha(sh, sk); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *Index) ReadManyObjectId(
+func (index *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	sh := merkle.HashTypeSha256.FromStringContent(id.String())
 	defer merkle.PutBlobId(sh)
 
-	if skus, err = s.ReadManySha(sh); err != nil {
+	if skus, err = index.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -392,7 +405,7 @@ func (s *Index) ReadManyObjectId(
 }
 
 // TODO switch to empty=not found semantics instead of error
-func (s *Index) ReadOneObjectIdTai(
+func (index *Index) ReadOneObjectIdTai(
 	k interfaces.ObjectId,
 	t ids.Tai,
 ) (sk *sku.Transacted, err error) {
@@ -406,18 +419,18 @@ func (s *Index) ReadOneObjectIdTai(
 
 	sk = sku.GetTransactedPool().Get()
 
-	if err = s.ReadOneSha(sh, sk); err != nil {
+	if err = index.ReadOneSha(sh, sk); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *Index) readOneLoc(
+func (index *Index) readOneLoc(
 	loc object_probe_index.Loc,
 	sk *sku.Transacted,
 ) (err error) {
-	p := s.pages[loc.Page]
+	p := index.pages[loc.Page]
 
 	if err = p.readOneRange(loc.Range, sk); err != nil {
 		err = errors.Wrap(err)
@@ -428,7 +441,7 @@ func (s *Index) readOneLoc(
 }
 
 // TODO add support for *errors.Context closure
-func (i *Index) ReadPrimitiveQuery(
+func (index *Index) ReadPrimitiveQuery(
 	qg sku.PrimitiveQueryGroup,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -453,7 +466,7 @@ func (i *Index) ReadPrimitiveQuery(
 		funcIter,
 	)
 
-	for n := range i.pages {
+	for n := range index.pages {
 		waitGroup.Add(1)
 
 		go func(p *Page, openFileCh chan struct{}) {
@@ -490,7 +503,7 @@ func (i *Index) ReadPrimitiveQuery(
 
 				break
 			}
-		}(&i.pages[n], ch)
+		}(&index.pages[n], ch)
 	}
 
 	waitGroup.Wait()

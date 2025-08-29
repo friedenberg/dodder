@@ -2,14 +2,12 @@ package page_id
 
 import (
 	"fmt"
-	"io"
 	"math"
 	"path/filepath"
 	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 )
 
@@ -40,21 +38,10 @@ func (id *PageId) Path() string {
 func PageIndexForString(
 	width uint8,
 	value string,
-	envDigest interfaces.EnvBlobId,
+	hashType interfaces.HashType,
 ) (n uint8, err error) {
-	stringReader, repool := pool.GetStringReader(value)
+	digest, repool := hashType.GetBlobIdForString(value)
 	defer repool()
-
-	writer, repool := envDigest.MakeWriteDigesterWithRepool()
-	defer repool()
-
-	if _, err = io.Copy(writer, stringReader); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	digest := envDigest.GetBlobId()
-	defer envDigest.PutBlobId(digest)
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
 		err = errors.Wrap(err)
