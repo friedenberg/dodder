@@ -13,26 +13,26 @@ import (
 const RowSize = sha.ByteSize + 1 + 8 + 8
 
 type row struct {
-	sha sha.Sha
+	BlobId sha.Sha
 	Loc
 }
 
-func (r *row) IsEmpty() bool {
-	return r.Loc.IsEmpty() && r.sha.IsNull()
+func (row *row) IsEmpty() bool {
+	return row.Loc.IsEmpty() && row.BlobId.IsNull()
 }
 
-func (r *row) String() string {
+func (row *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
-		&r.Loc,
-		r.sha.String(),
+		&row.Loc,
+		row.BlobId.String(),
 	)
 }
 
-func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
+func (row *row) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
 
-	n1, err = current.sha.ReadFrom(r)
+	n1, err = row.BlobId.ReadFrom(r)
 	n += n1
 
 	if err != nil {
@@ -40,7 +40,7 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = current.Loc.ReadFrom(r)
+	n1, err = row.Loc.ReadFrom(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -60,11 +60,11 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (r *row) WriteTo(w io.Writer) (n int64, err error) {
+func (row *row) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n, err = r.sha.WriteTo(w)
+	n, err = row.BlobId.WriteTo(w)
 	n += int64(n1)
 
 	if err != nil {
@@ -72,7 +72,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n2, err = r.Loc.WriteTo(w)
+	n2, err = row.Loc.WriteTo(w)
 	n += int64(n2)
 
 	if err != nil {
@@ -95,7 +95,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return merkle_ids.Equals(&a.sha, &b.sha) &&
+	return merkle_ids.Equals(&a.BlobId, &b.BlobId) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
@@ -104,20 +104,20 @@ func (rowEqualerComplete) Equals(a, b *row) bool {
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return merkle_ids.Equals(&a.sha, &b.sha)
+	return merkle_ids.Equals(&a.BlobId, &b.BlobId)
 }
 
 type rowResetter struct{}
 
 func (rowResetter) Reset(a *row) {
-	a.sha.Reset()
+	a.BlobId.Reset()
 	a.Page = 0
 	a.Offset = 0
 	a.ContentLength = 0
 }
 
 func (rowResetter) ResetWith(a, b *row) {
-	a.sha.ResetWith(&b.sha)
+	a.BlobId.ResetWith(&b.BlobId)
 	a.Page = b.Page
 	a.Offset = b.Offset
 	a.ContentLength = b.ContentLength
@@ -126,7 +126,7 @@ func (rowResetter) ResetWith(a, b *row) {
 type rowLessor struct{}
 
 func (rowLessor) Less(a, b *row) bool {
-	cmp := bytes.Compare(a.sha.GetBytes(), b.sha.GetBytes())
+	cmp := bytes.Compare(a.BlobId.GetBytes(), b.BlobId.GetBytes())
 
 	if cmp != 0 {
 		return cmp == -1

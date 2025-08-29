@@ -19,6 +19,7 @@ import (
 
 type page struct {
 	sync.Mutex     // for the buffered reader
+	blobIdType     string
 	file           *os.File
 	bufferedReader bufio.Reader
 	added          *heap.Heap[row, *row]
@@ -30,7 +31,8 @@ type page struct {
 func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
-	pid page_id.PageId,
+	pageId page_id.PageId,
+	blobIdType string,
 ) (err error) {
 	page.added = heap.Make(
 		equaler,
@@ -39,7 +41,8 @@ func (page *page) initialize(
 	)
 
 	page.envRepo = envRepo
-	page.id = pid
+	page.id = pageId
+	page.blobIdType = blobIdType
 
 	page.searchFunc = page.seekToFirstBinarySearch
 
@@ -100,7 +103,7 @@ func (page *page) addSha(sh interfaces.BlobId, loc Loc) (err error) {
 		Loc: loc,
 	}
 
-	if err = r.sha.SetDigest(sh); err != nil {
+	if err = r.BlobId.SetDigest(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

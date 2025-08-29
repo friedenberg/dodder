@@ -12,21 +12,21 @@ type Range struct {
 	Offset, ContentLength int64
 }
 
-func (l *Range) Size() int {
+func (raynge *Range) Size() int {
 	return 8 * 2
 }
 
-func (l Range) IsEmpty() bool {
-	return l.Offset == 0 && l.ContentLength == 0
+func (raynge Range) IsEmpty() bool {
+	return raynge.Offset == 0 && raynge.ContentLength == 0
 }
 
-func (l Range) String() string {
-	return fmt.Sprintf("%03d+%03d", l.Offset, l.ContentLength)
+func (raynge Range) String() string {
+	return fmt.Sprintf("%03d+%03d", raynge.Offset, raynge.ContentLength)
 }
 
-func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
+func (raynge *Range) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
-	n1, l.Offset, err = ohio.ReadFixedInt64(r)
+	n1, raynge.Offset, err = ohio.ReadFixedInt64(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -34,7 +34,7 @@ func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, l.ContentLength, err = ohio.ReadFixedInt64(r)
+	n1, raynge.ContentLength, err = ohio.ReadFixedInt64(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -45,9 +45,9 @@ func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (l *Range) WriteTo(w io.Writer) (n int64, err error) {
+func (raynge *Range) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	n1, err = ohio.WriteFixedInt64(w, l.Offset)
+	n1, err = ohio.WriteFixedInt64(w, raynge.Offset)
 	n += int64(n1)
 
 	if err != nil {
@@ -55,7 +55,7 @@ func (l *Range) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n1, err = ohio.WriteFixedInt64(w, l.ContentLength)
+	n1, err = ohio.WriteFixedInt64(w, raynge.ContentLength)
 	n += int64(n1)
 
 	if err != nil {

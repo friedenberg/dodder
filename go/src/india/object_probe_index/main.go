@@ -43,14 +43,16 @@ const (
 )
 
 type object_probe_index struct {
-	pages [PageCount]page
+	blobIdType string
+	pages      [PageCount]page
 }
 
 func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
+	blobIdType string,
 ) (index *object_probe_index, err error) {
-	index = &object_probe_index{}
+	index = &object_probe_index{blobIdType: blobIdType}
 	err = index.initialize(rowEqualerComplete{}, envRepo, path)
 	return
 }
@@ -58,8 +60,9 @@ func MakePermitDuplicates(
 func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
+	blobIdType string,
 ) (index *object_probe_index, err error) {
-	index = &object_probe_index{}
+	index = &object_probe_index{blobIdType: blobIdType}
 	err = index.initialize(rowEqualerShaOnly{}, envRepo, dir)
 	return
 }
@@ -69,12 +72,13 @@ func (index *object_probe_index) initialize(
 	envRepo env_repo.Env,
 	dir string,
 ) (err error) {
-	for i := range index.pages {
-		page := &index.pages[i]
+	for pageIndex := range index.pages {
+		page := &index.pages[pageIndex]
 		page.initialize(
 			equaler,
 			envRepo,
-			page_id.PageIdFromPath(uint8(i), dir),
+			page_id.PageIdFromPath(uint8(pageIndex), dir),
+			index.blobIdType,
 		)
 	}
 
@@ -86,15 +90,15 @@ func (index *object_probe_index) GetObjectProbeIndex() Index {
 }
 
 func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
-	var shas map[string]interfaces.BlobId
+	var blobIds map[string]interfaces.BlobId
 
-	if shas, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
+	if blobIds, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for _, s := range shas {
-		if err = index.addSha(s, loc); err != nil {
+	for _, blobId := range blobIds {
+		if err = index.addBlobId(blobId, loc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -104,132 +108,151 @@ func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 }
 
 func (index *object_probe_index) AddBlobId(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 	loc Loc,
 ) (err error) {
-	return index.addSha(sh, loc)
+	return index.addBlobId(blobId, loc)
 }
 
-func (index *object_probe_index) addSha(
-	sh interfaces.BlobId,
+func (index *object_probe_index) addBlobId(
+	blobId interfaces.BlobId,
 	loc Loc,
 ) (err error) {
-	if sh.IsNull() {
+	if blobId.IsNull() {
 		return
 	}
 
-	var i uint8
+	var pageIndex uint8
 
-	if i, err = page_id.PageIndexForDigest(DigitWidth, sh); err != nil {
+	if pageIndex, err = page_id.PageIndexForDigest(
+		DigitWidth,
+		blobId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[i].AddBlobId(sh, loc)
+	return index.pages[pageIndex].AddBlobId(blobId, loc)
 }
 
 func (index *object_probe_index) ReadOne(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 ) (loc Loc, err error) {
-	var i uint8
+	var pageIndex uint8
 
-	if i, err = page_id.PageIndexForDigest(DigitWidth, sh); err != nil {
+	if pageIndex, err = page_id.PageIndexForDigest(
+		DigitWidth,
+		blobId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[i].ReadOne(sh)
+	return index.pages[pageIndex].ReadOne(blobId)
 }
 
 func (index *object_probe_index) ReadMany(
-	sh interfaces.BlobId,
-	locs *[]Loc,
+	blobId interfaces.BlobId,
+	locations *[]Loc,
 ) (err error) {
-	var i uint8
+	var pageIndex uint8
 
-	if i, err = page_id.PageIndexForDigest(DigitWidth, sh); err != nil {
+	if pageIndex, err = page_id.PageIndexForDigest(
+		DigitWidth,
+		blobId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[i].ReadMany(sh, locs)
+	return index.pages[pageIndex].ReadMany(blobId, locations)
 }
 
 func (index *object_probe_index) ReadOneKey(
-	kf string,
-	m *object_metadata.Metadata,
+	formatKey string,
+	metadata *object_metadata.Metadata,
 ) (loc Loc, err error) {
-	var f object_inventory_format.Format
+	var format object_inventory_format.Format
 
-	if f, err = object_inventory_format.FormatForKeyError(kf); err != nil {
+	if format, err = object_inventory_format.FormatForKeyError(formatKey); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var sh interfaces.BlobId
+	var blobId interfaces.BlobId
 
-	if sh, err = object_inventory_format.GetDigestForMetadata(f, m); err != nil {
+	if blobId, err = object_inventory_format.GetDigestForMetadata(
+		format,
+		metadata,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer merkle_ids.PutBlobId(sh)
+	defer merkle_ids.PutBlobId(blobId)
 
-	if loc, err = index.ReadOne(sh); err != nil {
-		err = errors.Wrapf(err, "Key: %s", kf)
+	if loc, err = index.ReadOne(blobId); err != nil {
+		err = errors.Wrapf(err, "Key: %s", formatKey)
 		return
 	}
 
 	return
 }
 
+// TODO remove formatKey and switch to setting formatter on init
 func (index *object_probe_index) ReadManyKeys(
-	kf string,
-	m *object_metadata.Metadata,
-	h *[]Loc,
+	formatKey string,
+	metadata *object_metadata.Metadata,
+	locations *[]Loc,
 ) (err error) {
-	var f object_inventory_format.Format
+	var format object_inventory_format.Format
 
-	if f, err = object_inventory_format.FormatForKeyError(kf); err != nil {
+	if format, err = object_inventory_format.FormatForKeyError(
+		formatKey,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var sh interfaces.BlobId
+	var blobId interfaces.BlobId
 
-	if sh, err = object_inventory_format.GetDigestForMetadata(f, m); err != nil {
+	if blobId, err = object_inventory_format.GetDigestForMetadata(
+		format,
+		metadata,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.ReadMany(sh, h)
+	return index.ReadMany(blobId, locations)
 }
 
 func (index *object_probe_index) ReadAll(
-	m *object_metadata.Metadata,
-	h *[]Loc,
+	metadata *object_metadata.Metadata,
+	locations *[]Loc,
 ) (err error) {
-	var shas map[string]interfaces.BlobId
+	var blobIds map[string]interfaces.BlobId
 
-	if shas, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
+	if blobIds, err = object_inventory_format.GetDigestsForMetadata(
+		metadata,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	wg := errors.MakeWaitGroupParallel()
 
-	for k, s := range shas {
-		s := s
+	for key, blobId := range blobIds {
 		wg.Do(
 			func() (err error) {
 				var loc Loc
 
-				if loc, err = index.ReadOne(s); err != nil {
-					err = errors.Wrapf(err, "Key: %s", k)
+				if loc, err = index.ReadOne(blobId); err != nil {
+					err = errors.Wrapf(err, "Key: %s", key)
 					return
 				}
 
-				*h = append(*h, loc)
+				*locations = append(*locations, loc)
 
 				return
 			},
@@ -240,10 +263,10 @@ func (index *object_probe_index) ReadAll(
 }
 
 func (index *object_probe_index) PrintAll(env env_ui.Env) (err error) {
-	for i := range index.pages {
-		p := &index.pages[i]
+	for pageIndex := range index.pages {
+		page := &index.pages[pageIndex]
 
-		if err = p.PrintAll(env); err != nil {
+		if err = page.PrintAll(env); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -255,9 +278,9 @@ func (index *object_probe_index) PrintAll(env env_ui.Env) (err error) {
 func (index *object_probe_index) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
-	for i := range index.pages {
-		p := &index.pages[i]
-		wg.Do(p.Flush)
+	for pageIndex := range index.pages {
+		page := &index.pages[pageIndex]
+		wg.Do(page.Flush)
 	}
 
 	return wg.GetError()

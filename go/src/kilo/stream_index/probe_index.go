@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/merkle_ids"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -23,6 +24,7 @@ func (index *probe_index) Initialize(
 	if index.Index, err = object_probe_index.MakeNoDuplicates(
 		index.envRepo,
 		index.envRepo.DirCacheObjectPointers(),
+		merkle.HRPObjectSigV0,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -41,9 +43,9 @@ func (index *probe_index) Flush() (err error) {
 }
 
 func (index *probe_index) readOneShaLoc(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 ) (loc object_probe_index.Loc, err error) {
-	if loc, err = index.Index.ReadOne(sh); err != nil {
+	if loc, err = index.Index.ReadOne(blobId); err != nil {
 		return
 	}
 
@@ -51,9 +53,9 @@ func (index *probe_index) readOneShaLoc(
 }
 
 func (index *probe_index) readManyShaLoc(
-	sh interfaces.BlobId,
+	blobId interfaces.BlobId,
 ) (locs []object_probe_index.Loc, err error) {
-	if err = index.Index.ReadMany(sh, &locs); err != nil {
+	if err = index.Index.ReadMany(blobId, &locs); err != nil {
 		return
 	}
 
@@ -61,11 +63,11 @@ func (index *probe_index) readManyShaLoc(
 }
 
 func (index *probe_index) saveOneLoc(
-	o *sku.Transacted,
+	object *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
 	if err = index.saveOneLocString(
-		o.GetObjectId().String(),
+		object.GetObjectId().String(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -73,7 +75,7 @@ func (index *probe_index) saveOneLoc(
 	}
 
 	if err = index.saveOneLocString(
-		o.GetObjectId().String()+o.GetTai().String(),
+		object.GetObjectId().String()+object.GetTai().String(),
 		loc,
 	); err != nil {
 		err = errors.Wrap(err)
