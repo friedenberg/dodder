@@ -30,6 +30,8 @@ type HashType struct {
 	tipe string
 }
 
+var _ interfaces.HashType = HashType{}
+
 func (hashType HashType) Get() Hash {
 	return hashType.pool.Get()
 }
@@ -39,7 +41,9 @@ func (hashType HashType) Put(hash Hash) {
 	hashType.pool.Put(hash)
 }
 
-func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
+func (hashType HashType) GetBlobIdForString(
+	input string,
+) (interfaces.BlobId, interfaces.FuncRepool) {
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
@@ -47,8 +51,11 @@ func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
 		errors.PanicIfError(err)
 	}
 
-	id, _ := hash.GetBlobId()
+	return hash.GetBlobId()
+}
 
+func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
+	id, _ := hashType.GetBlobIdForString(input)
 	return id
 }
 

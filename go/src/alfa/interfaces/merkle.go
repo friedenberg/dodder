@@ -33,6 +33,18 @@ type (
 		GetBlobId() BlobId
 	}
 
+	Hash interface {
+		hash.Hash
+		GetType() string
+		GetBlobId() (BlobId, FuncRepool)
+	}
+
+	HashType interface {
+		GetBlobIdForString(input string) (BlobId, FuncRepool)
+		// TODO rename
+		FromStringFormat(format string, args ...any) (BlobId, FuncRepool)
+	}
+
 	EnvBlobId interface {
 		GetType() string
 

@@ -12,7 +12,7 @@ type Hash struct {
 	tipe string
 }
 
-var _ hash.Hash = Hash{}
+var _ interfaces.Hash = Hash{}
 
 func (hash Hash) Write(bites []byte) (int, error) {
 	return hash.hash.Write(bites)
