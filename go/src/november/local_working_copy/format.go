@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -920,8 +919,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				sh1 := sha.FromStringContent(object.GetObjectId().String())
-				sh2 := sha.FromStringContent(
+				sh1 := merkle.HashTypeSha256.FromStringContent(object.GetObjectId().String())
+				sh2 := merkle.HashTypeSha256.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
 				defer merkle.PutBlobId(sh1)

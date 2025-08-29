@@ -511,7 +511,7 @@ func (writer *sftpWriter) Close() (err error) {
 }
 
 func (writer *sftpWriter) GetDigest() interfaces.BlobId {
-	id, _ := writer.hash.MakeBlobId()
+	id, _ := writer.hash.GetBlobId()
 	return id
 }
 
@@ -606,6 +606,6 @@ func (reader *sftpReader) Close() error {
 }
 
 func (reader *sftpReader) GetBlobId() interfaces.BlobId {
-	id, _ := reader.hash.MakeBlobId()
+	id, _ := reader.hash.GetBlobId()
 	return id
 }

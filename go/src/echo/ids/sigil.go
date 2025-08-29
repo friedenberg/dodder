@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type Sigil byte
@@ -164,7 +164,7 @@ func (i *Sigil) Set(v string) (err error) {
 }
 
 func (i Sigil) GetDigest() interfaces.BlobId {
-	return sha.FromStringContent(i.String())
+	return merkle.HashTypeSha256.FromStringContent(i.String())
 }
 
 func (i Sigil) Byte() byte {

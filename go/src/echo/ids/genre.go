@@ -8,9 +8,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
+	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 type Genre byte
@@ -169,7 +169,7 @@ func (g *Genre) ReadFromBoxScanner(
 }
 
 func (i Genre) GetDigest() interfaces.BlobId {
-	return sha.FromStringContent(i.String())
+	return merkle.HashTypeSha256.FromStringContent(i.String())
 }
 
 func (i Genre) Byte() byte {

@@ -352,10 +352,10 @@ func (s *Index) ObjectExists(
 		return
 	}
 
-	sh := sha.FromStringContent(objectIdString)
-	defer merkle.PutBlobId(sh)
+	digest := merkle.HashTypeSha256.FromStringContent(objectIdString)
+	defer merkle.PutBlobId(digest)
 
-	if _, err = s.readOneShaLoc(sh); err != nil {
+	if _, err = s.readOneShaLoc(digest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -367,7 +367,7 @@ func (s *Index) ReadOneObjectId(
 	oid interfaces.ObjectId,
 	sk *sku.Transacted,
 ) (err error) {
-	sh := sha.FromStringContent(oid.String())
+	sh := merkle.HashTypeSha256.FromStringContent(oid.String())
 	defer merkle.PutBlobId(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
@@ -380,7 +380,7 @@ func (s *Index) ReadOneObjectId(
 func (s *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
-	sh := sha.FromStringContent(id.String())
+	sh := merkle.HashTypeSha256.FromStringContent(id.String())
 	defer merkle.PutBlobId(sh)
 
 	if skus, err = s.ReadManySha(sh); err != nil {
@@ -401,7 +401,7 @@ func (s *Index) ReadOneObjectIdTai(
 		return
 	}
 
-	sh := sha.FromStringContent(k.String() + t.String())
+	sh := merkle.HashTypeSha256.FromStringContent(k.String() + t.String())
 	defer merkle.PutBlobId(sh)
 
 	sk = sku.GetTransactedPool().Get()

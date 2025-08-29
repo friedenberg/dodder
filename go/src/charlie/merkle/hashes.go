@@ -19,7 +19,7 @@ func (hash Hash) GetType() string {
 	return hash.tipe
 }
 
-func (hash Hash) MakeBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
+func (hash Hash) GetBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
 	id := idPool.Get()
 
 	// TODO verify this works as expected
@@ -72,11 +72,7 @@ func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
 		errors.PanicIfError(err)
 	}
 
-	digest := hash.Sum(nil)
-
-	var id Id
-
-	errors.PanicIfError(id.SetMerkleId(hash.tipe, digest))
+	id, _ := hash.GetBlobId()
 
 	return id
 }
