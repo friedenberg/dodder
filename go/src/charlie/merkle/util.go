@@ -13,8 +13,7 @@ import (
 
 func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
 	id.tipe = hashType.GetType()
-	id.allocDataIfNecessary(hashType.GetSize())
-	id.data = id.data[:hashType.GetSize()]
+	id.allocDataAndSetToCapIfNecessary(hashType.GetSize())
 
 	if n, err = io.ReadFull(reader, id.data); err != nil {
 		errors.WrapExceptSentinel(err, io.EOF)
@@ -31,8 +30,7 @@ func CompareToReader(
 	actual := idPool.Get()
 	defer idPool.Put(actual)
 
-	actual.allocDataIfNecessary(expected.GetSize())
-	actual.data = actual.data[:expected.GetSize()]
+	actual.allocDataAndSetToCapIfNecessary(expected.GetSize())
 
 	if _, err := io.ReadFull(reader, actual.data); err != nil {
 		panic(errors.Wrap(err))
@@ -49,8 +47,7 @@ func CompareToReaderAt(
 	actual := idPool.Get()
 	defer idPool.Put(actual)
 
-	actual.allocDataIfNecessary(expected.GetSize())
-	actual.data = actual.data[:expected.GetSize()]
+	actual.allocDataAndSetToCapIfNecessary(expected.GetSize())
 
 	if _, err := readerAt.ReadAt(actual.data, offset); err != nil {
 		panic(errors.Wrap(err))

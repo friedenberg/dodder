@@ -126,12 +126,7 @@ func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
 	}
 
 	id.tipe = tipe
-
-	// TODO optimize this and validate against type
-	id.data = make([]byte, len(bites))
-	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
-	// binaryId.data = binaryId.data[:cap(binaryId.data)]
-	copy(id.data, bites)
+	id.setData(bites)
 
 	return
 }
@@ -141,6 +136,17 @@ func (id *Id) allocDataIfNecessary(size int) {
 	id.data = slices.Grow(id.data, size)
 }
 
+func (id *Id) allocDataAndSetToCapIfNecessary(size int) {
+	id.allocDataIfNecessary(size)
+	id.data = id.data[:size]
+}
+
+func (id *Id) setData(data []byte) {
+	// TODO validate against type
+	id.allocDataAndSetToCapIfNecessary(len(data))
+	copy(id.data, data)
+}
+
 func (id *Id) Reset() {
 	id.tipe = ""
 	id.data = id.data[:0]
@@ -148,11 +154,7 @@ func (id *Id) Reset() {
 
 func (id *Id) ResetWith(src Id) {
 	id.tipe = src.tipe
-	bites := src.data
-	id.data = make([]byte, len(bites))
-	// binaryId.data = slices.Grow(binaryId.data, len(bytes)-len(binaryId.data))
-	// binaryId.data = binaryId.data[:cap(binaryId.data)]
-	copy(id.data, bites)
+	id.setData(src.data)
 }
 
 func (id *Id) ResetWithMerkleId(src interfaces.BlobId) {
