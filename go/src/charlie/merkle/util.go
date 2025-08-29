@@ -6,10 +6,48 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
+
+func CompareToReader(
+	reader io.Reader,
+	expected interfaces.BlobId,
+) int {
+	actual := idPool.Get()
+	defer idPool.Put(actual)
+
+	actual.data = actual.data[:0]
+	actual.data = slices.Grow(actual.data, expected.GetSize())
+	actual.data = actual.data[:expected.GetSize()]
+
+	if _, err := io.ReadFull(reader, actual.data); err != nil {
+		panic(errors.Wrap(err))
+	}
+
+	return bytes.Compare(expected.GetBytes(), actual.GetBytes())
+}
+
+func CompareToReaderAt(
+	readerAt io.ReaderAt,
+	offset int64,
+	expected interfaces.BlobId,
+) int {
+	actual := idPool.Get()
+	defer idPool.Put(actual)
+
+	actual.data = actual.data[:0]
+	actual.data = slices.Grow(actual.data, expected.GetSize())
+	actual.data = actual.data[:expected.GetSize()]
+
+	if _, err := readerAt.ReadAt(actual.data, offset); err != nil {
+		panic(errors.Wrap(err))
+	}
+
+	return bytes.Compare(expected.GetBytes(), actual.GetBytes())
+}
 
 func SetHexBytes(
 	tipe string,

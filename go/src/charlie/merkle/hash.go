@@ -2,6 +2,8 @@ package merkle
 
 import (
 	"hash"
+	"io"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -53,6 +55,43 @@ func (hash *Hash) GetBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
 	}
 
 	errors.PanicIfError(id.SetMerkleId(hash.tipe, digestBytes))
+
+	return id, func() {
+		idPool.Put(id)
+	}
+}
+
+func (hash *Hash) GetBlobIdForReader(
+	reader io.Reader,
+) (interfaces.BlobId, interfaces.FuncRepool) {
+	id := idPool.Get()
+
+	id.data = id.data[:0]
+	id.data = slices.Grow(id.data, hash.Size())
+	id.data = id.data[:hash.Size()]
+
+	if _, err := io.ReadFull(reader, id.data); err != nil {
+		panic(errors.Wrap(err))
+	}
+
+	return id, func() {
+		idPool.Put(id)
+	}
+}
+
+func (hash *Hash) GetBlobIdForReaderAt(
+	reader io.ReaderAt,
+	off int64,
+) (interfaces.BlobId, interfaces.FuncRepool) {
+	id := idPool.Get()
+
+	id.data = id.data[:0]
+	id.data = slices.Grow(id.data, hash.Size())
+	id.data = id.data[:hash.Size()]
+
+	if _, err := reader.ReadAt(id.data, off); err != nil {
+		panic(errors.Wrap(err))
+	}
 
 	return id, func() {
 		idPool.Put(id)

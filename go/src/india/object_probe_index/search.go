@@ -1,28 +1,32 @@
 package object_probe_index
 
 import (
-	"bytes"
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 )
 
 func (page *page) seekToFirstBinarySearch(
-	shMet interfaces.BlobId,
+	expected interfaces.BlobId,
 ) (mid int64, err error) {
+	errors.PanicIfError(
+		merkle.MakeErrWrongType(
+			page.hashType.GetType(),
+			expected.GetType(),
+		),
+	)
+
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle.Format(shMet),
+			"fd nil: " + merkle.Format(expected),
 		)
 		return
 	}
 
 	var low, hi int64
-	shMid := &sha.Sha{}
 
 	var rowCount int64
 
@@ -40,12 +44,11 @@ func (page *page) seekToFirstBinarySearch(
 
 		// var loc int64
 
-		if _, err = shMid.ReadAtFrom(page.file, mid*int64(page.rowWidth)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		cmp := bytes.Compare(shMet.GetBytes(), shMid.GetBytes())
+		cmp := merkle.CompareToReaderAt(
+			page.file,
+			mid*int64(page.rowWidth),
+			expected,
+		)
 
 		switch cmp {
 		case -1:
@@ -68,24 +71,30 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, merkle.Format(shMet)),
+		fmt.Sprintf("%d: %s", loops, merkle.Format(expected)),
 	)
 
 	return
 }
 
 func (page *page) seekToFirstLinearSearch(
-	shMet interfaces.BlobId,
+	expected interfaces.BlobId,
 ) (loc int64, err error) {
+	errors.PanicIfError(
+		merkle.MakeErrWrongType(
+			page.hashType.GetType(),
+			expected.GetType(),
+		),
+	)
+
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle.Format(shMet),
+			"fd nil: " + merkle.Format(expected),
 		)
 		return
 	}
 
 	var rowCount int64
-	shMid := &sha.Sha{}
 
 	if rowCount, err = page.GetRowCount(); err != nil {
 		err = errors.Wrap(err)
@@ -93,29 +102,16 @@ func (page *page) seekToFirstLinearSearch(
 	}
 
 	page.bufferedReader.Reset(page.file)
-	buf := bytes.NewBuffer(make([]byte, page.rowWidth))
-	buf.Reset()
 
 	for loc = int64(0); loc <= rowCount; loc++ {
 		// var loc int64
 
-		if _, err = buf.ReadFrom(&page.bufferedReader); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = shMid.ReadFrom(buf); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if bytes.Equal(shMet.GetBytes(), shMid.GetBytes()) {
-			// found
+		if merkle.CompareToReader(&page.bufferedReader, expected) == 0 {
 			return
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(merkle.Format(shMet))
+	err = collections.MakeErrNotFoundString(merkle.Format(expected))
 
 	return
 }

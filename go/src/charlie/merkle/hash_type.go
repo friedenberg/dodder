@@ -1,6 +1,7 @@
 package merkle
 
 import (
+	"crypto"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -22,12 +23,15 @@ var HashTypeSha256 = HashType{
 			hash.Reset()
 		},
 	),
-	tipe: HRPObjectBlobDigestSha256V0,
+	tipe:  HRPObjectBlobDigestSha256V0,
+	width: 32,
 }
 
 type HashType struct {
-	pool interfaces.PoolValue[interfaces.Hash]
-	tipe string
+	crypto.Hash
+	pool  interfaces.PoolValue[interfaces.Hash]
+	tipe  string
+	width int
 }
 
 var _ interfaces.HashType = HashType{}
@@ -39,6 +43,10 @@ func (hashType HashType) Get() interfaces.Hash {
 func (hashType HashType) Put(hash interfaces.Hash) {
 	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.GetType()))
 	hashType.pool.Put(hash)
+}
+
+func (hashType HashType) GetType() string {
+	return hashType.tipe
 }
 
 func (hashType HashType) GetBlobIdForString(

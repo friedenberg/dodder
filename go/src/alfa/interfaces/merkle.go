@@ -11,6 +11,7 @@ type (
 		Stringer
 		encoding.BinaryMarshaler
 		encoding.TextMarshaler
+		// io.WriterTo
 		GetBytes() []byte
 		// TODO rethink size as it works completely different between sha and
 		// merkle
@@ -24,6 +25,7 @@ type (
 		Setter
 		encoding.BinaryUnmarshaler
 		encoding.TextUnmarshaler
+		// io.ReaderFrom
 		SetMerkleId(tipe string, bites []byte) error
 		Reset()
 		ResetWithMerkleId(BlobId)
