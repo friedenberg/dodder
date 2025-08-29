@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -56,7 +55,7 @@ func MakeTesting(
 		return
 	}
 
-	for shaExpected, content := range contents {
+	for expectedDigestString, content := range contents {
 		var writeCloser interfaces.WriteCloseBlobIdGetter
 
 		writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
@@ -87,14 +86,16 @@ func MakeTesting(
 			)
 		}
 
-		shActual := writeCloser.GetBlobId()
-		expected := sha.MustWithString(shaExpected)
+		actual := writeCloser.GetBlobId()
+		expected, _ := merkle.HashTypeSha256.GetBlobIdForHexString(
+			expectedDigestString,
+		)
 
-		err = merkle.MakeErrNotEqual(expected, shActual)
+		err = merkle.MakeErrNotEqual(expected, actual)
 		if err != nil {
 			errors.ContextCancelWithErrorAndFormat(
 				t.Context,
-				err, "sha mismatch: %s, %q", shaExpected, content,
+				err, "sha mismatch: %s, %q", expectedDigestString, content,
 			)
 		}
 	}

@@ -255,7 +255,7 @@ func (blobStore *remoteSftp) BlobReader(
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = merkle.MakeNopReadCloser(
-			blobStore.envDigest,
+			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
 		return

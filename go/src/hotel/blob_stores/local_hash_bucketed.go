@@ -17,11 +17,11 @@ import (
 
 type localHashBucketed struct {
 	// TODO move to config
-	envDigest interfaces.EnvBlobId
-	buckets   []int
-	config    blob_store_configs.ConfigLocalHashBucketed
-	basePath  string
-	tempFS    env_dir.TemporaryFS
+	hashType merkle.HashType
+	buckets  []int
+	config   blob_store_configs.ConfigLocalHashBucketed
+	basePath string
+	tempFS   env_dir.TemporaryFS
 }
 
 func makeLocalHashBucketed(
@@ -32,11 +32,11 @@ func makeLocalHashBucketed(
 ) (localHashBucketed, error) {
 	// TODO validate
 	store := localHashBucketed{
-		envDigest: sha.Env,
-		buckets:   config.GetHashBuckets(),
-		config:    config,
-		basePath:  basePath,
-		tempFS:    tempFS,
+		hashType: merkle.HashTypeSha256,
+		buckets:  config.GetHashBuckets(),
+		config:   config,
+		basePath: basePath,
+		tempFS:   tempFS,
 	}
 
 	return store, nil
@@ -145,7 +145,7 @@ func (blobStore localHashBucketed) BlobReader(
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = merkle.MakeNopReadCloser(
-			blobStore.envDigest,
+			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
 		return
@@ -189,7 +189,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = merkle.MakeNopReadCloser(
-			blobStore.envDigest,
+			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
 		return

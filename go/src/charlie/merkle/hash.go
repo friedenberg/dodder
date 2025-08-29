@@ -44,7 +44,7 @@ func (hash *Hash) GetType() string {
 	return hash.tipe
 }
 
-func (hash *Hash) GetBlobId() (interfaces.BlobId, interfaces.FuncRepool) {
+func (hash *Hash) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) {
 	id := idPool.Get()
 
 	var digestBytes []byte

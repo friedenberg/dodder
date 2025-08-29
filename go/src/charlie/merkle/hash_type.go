@@ -84,3 +84,16 @@ func (hashType HashType) FromStringFormat(
 
 	return hash.GetBlobId()
 }
+
+func (hashType HashType) GetBlobIdForHexString(
+	input string,
+) (interfaces.BlobId, interfaces.FuncRepool) {
+	hash := hashType.pool.Get()
+	defer hashType.pool.Put(hash)
+
+	id, repool := hash.GetBlobId()
+
+	errors.PanicIfError(SetHexBytes(hashType.tipe, id, []byte(input)))
+
+	return id, repool
+}

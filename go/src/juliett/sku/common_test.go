@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -298,7 +297,7 @@ func TestReadWithBlob(t1 *testing.T) {
 the body`,
 	)
 
-	expectedSha := sha.MustWithString(
+	expectedSha, _ := merkle.HashTypeSha256.GetBlobIdForHexString(
 		"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e",
 	)
 
@@ -344,7 +343,7 @@ func (arf blobReaderFactory) BlobReader(
 	}
 
 	readCloser = merkle.MakeNopReadCloser(
-		sha.Env,
+		merkle.HashTypeSha256.Get(),
 		io.NopCloser(strings.NewReader(v)),
 	)
 

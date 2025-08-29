@@ -38,7 +38,7 @@ type (
 	Hash interface {
 		hash.Hash
 		GetType() string
-		GetBlobId() (BlobId, FuncRepool)
+		GetBlobId() (MutableBlobId, FuncRepool)
 	}
 
 	HashType interface {

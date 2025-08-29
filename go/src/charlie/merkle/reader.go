@@ -125,16 +125,16 @@ func (readCloser readCloser) GetBlobId() interfaces.BlobId {
 }
 
 type nopReadCloser struct {
-	envDigest interfaces.EnvBlobId
+	hash interfaces.Hash
 	io.ReadCloser
 }
 
 func MakeNopReadCloser(
-	hash interfaces.EnvBlobId,
+	hash interfaces.Hash,
 	readCloser io.ReadCloser,
 ) interfaces.ReadCloseBlobIdGetter {
 	return nopReadCloser{
-		envDigest:  hash,
+		hash:       hash,
 		ReadCloser: readCloser,
 	}
 }
@@ -149,5 +149,6 @@ func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
 }
 
 func (readCloser nopReadCloser) GetBlobId() interfaces.BlobId {
-	return readCloser.envDigest.GetBlobId()
+	id, _ := readCloser.hash.GetBlobId()
+	return id
 }
