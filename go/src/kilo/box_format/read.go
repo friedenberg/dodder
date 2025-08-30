@@ -1,7 +1,6 @@
 package box_format
 
 import (
-	"bytes"
 	"io"
 	"strings"
 
@@ -198,7 +197,16 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if err = format.parseBlobIdTag(object, seq); err != nil {
+			if err = format.parseOldBlobIdTag(object, seq); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			continue
+
+			// key@abcd
+		case seq.MatchAll(doddish.TokenTypeIdentifier, doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
+			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -245,9 +253,9 @@ LOOP_AFTER_OID:
 			return
 		}
 
-		g := objectId.GetGenre()
+		genre := objectId.GetGenre()
 
-		switch g {
+		switch genre {
 		case genres.InventoryList:
 			// TODO make more performant
 			if err = object.Metadata.Tai.Set(objectId.String()); err != nil {
@@ -299,34 +307,34 @@ LOOP_AFTER_OID:
 }
 
 // expects `seq` to include `@` as the first token
-func (format *BoxTransacted) parseBlobIdTag(
+func (format *BoxTransacted) parseOldBlobIdTag(
 	object *sku.Transacted,
 	seq doddish.Seq,
 ) (err error) {
-	second := seq.At(1).Contents
-	lastIndex := bytes.LastIndex(second, []byte(`-`))
+	if err = markl.SetHexBytes(
+		"sha256",
+		// merkle.HRPObjectBlobDigestSha256V1,
+		object.Metadata.GetBlobDigestMutable(),
+		seq.At(1).Contents,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if lastIndex > -1 {
-		key := second[:lastIndex]
+	return
+}
 
-		if err = object.Metadata.GetBlobDigestMutable().SetMerkleId(
-			string(key),
-			second[lastIndex+1:],
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	} else {
-		if err = markl.SetHexBytes(
-			"sha256",
-			// merkle.HRPObjectBlobDigestSha256V1,
-			object.Metadata.GetBlobDigestMutable(),
-			seq.At(1).Contents,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// expects `seq` to include `@` as the first token
+func (format *BoxTransacted) parseMarklIdTag(
+	object *sku.Transacted,
+	seq doddish.Seq,
+) (err error) {
+	if err = object.Metadata.GetBlobDigestMutable().SetMerkleId(
+		string(seq.At(0).Contents),
+		seq.At(2).Contents,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

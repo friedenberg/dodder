@@ -4,7 +4,9 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -70,11 +72,20 @@ func MetadataFieldError(
 }
 
 func MetadataFieldBlobDigestString(
+	digest interfaces.MarklId,
 	value string,
 ) string_format_writer.Field {
-	return string_format_writer.Field{
-		Value:     "@" + value,
-		ColorType: string_format_writer.ColorTypeHash,
+	if digest.GetType() == markl.HRPObjectBlobDigestSha256V0 {
+		return string_format_writer.Field{
+			Value:     "@" + value,
+			ColorType: string_format_writer.ColorTypeHash,
+		}
+	} else {
+		return string_format_writer.Field{
+			Key:       digest.GetType(),
+			Value:     "@" + value,
+			ColorType: string_format_writer.ColorTypeHash,
+		}
 	}
 }
 

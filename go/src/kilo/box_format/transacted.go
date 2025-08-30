@@ -251,14 +251,11 @@ func (format *BoxTransacted) addFieldsMetadata(
 			return
 		}
 
-		if blobDigestString != "" {
-			box.Contents = append(
-				box.Contents,
-				object_metadata_fmt.MetadataFieldBlobDigestString(
-					blobDigestString,
-				),
-			)
-		}
+		box.Contents = object_metadata_fmt.AddBlobDigestIfNecessary(
+			box.Contents,
+			metadata.GetBlobDigest(),
+			blobDigestString,
+		)
 	}
 
 	if options.BoxPrintTai && object.GetGenre() != genres.InventoryList {
