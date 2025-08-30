@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	hashTypes      map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
+	types      map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
 	HashTypeSha256 HashType
 )
 
@@ -46,7 +46,7 @@ func makeHashType(
 	constructor func() hash.Hash,
 	self *HashType,
 ) HashType {
-	_, alreadyExists := hashTypes[tipe]
+	_, alreadyExists := types[tipe]
 
 	if alreadyExists {
 		panic(fmt.Sprintf("hash type already registered: %q", tipe))
@@ -73,7 +73,7 @@ func makeHashType(
 	hashType.null.allocDataIfNecessary(cryptoHash.Size())
 	hashType.null.data = hash.Sum(hashType.null.data)
 
-	hashTypes[tipe] = hashType
+	types[tipe] = hashType
 
 	return hashType
 }

@@ -37,14 +37,14 @@ var hrpValid = []string{
 	HRPRequestAuthResponseV1,
 }
 
-var hrpToHashType = map[string]*HashType{
+var typeLookup = map[string]*HashType{
 	HRPObjectBlobDigestSha256V0: &HashTypeSha256,
 	HRPObjectBlobDigestSha256V1: &HashTypeSha256,
 	HRPObjectDigestSha256V1:     &HashTypeSha256,
 }
 
-func GetHashTypeOrError(tipe string) (*HashType, error) {
-	hashType, ok := hrpToHashType[tipe]
+func GetHashTypeOrError(tipe string) (interfaces.MarklType, error) {
+	hashType, ok := types[tipe]
 
 	if !ok {
 		err := errors.Errorf("unknown type: %q", tipe)
@@ -65,7 +65,7 @@ func (tipe fakeHashType) GetType() string {
 }
 
 func makeFakeHashType(tipe string) {
-	_, alreadyExists := hashTypes[tipe]
+	_, alreadyExists := types[tipe]
 
 	if alreadyExists {
 		panic(fmt.Sprintf("hash type already registered: %q", tipe))
@@ -75,5 +75,5 @@ func makeFakeHashType(tipe string) {
 		tipe: tipe,
 	}
 
-	hashTypes[tipe] = hashType
+	types[tipe] = hashType
 }

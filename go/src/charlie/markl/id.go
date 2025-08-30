@@ -76,7 +76,7 @@ func (id Id) IsNull() bool {
 		panic("empty type")
 	}
 
-	hashType, ok := hrpToHashType[id.tipe.GetType()]
+	hashType, ok := typeLookup[id.tipe.GetType()]
 
 	// this is not an Id for a hash, so it can never be null with non-zero data
 	// contents
