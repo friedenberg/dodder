@@ -4,39 +4,9 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
-
-// TODO add support for other digest types
-func MetadataBlobDigestString(
-	metadata *object_metadata.Metadata,
-	abbr ids.FuncAbbreviateString,
-) (digestString string, err error) {
-	digest := metadata.GetBlobDigest()
-	digestString = digest.String()
-
-	if abbr != nil {
-		var abbreviatedDigestString string
-
-		if abbreviatedDigestString, err = abbr(digest); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if abbreviatedDigestString != "" {
-			digestString = abbreviatedDigestString
-		} else {
-			ui.Todo("abbreviate sha produced empty string")
-		}
-	}
-
-	return
-}
 
 func MetadataFieldError(
 	err error,
@@ -67,24 +37,6 @@ func MetadataFieldError(
 				ColorType:  string_format_writer.ColorTypeUserData,
 				NoTruncate: true,
 			},
-		}
-	}
-}
-
-func MetadataFieldBlobDigestString(
-	digest interfaces.MarklId,
-	value string,
-) string_format_writer.Field {
-	if digest.GetType() == markl.HRPObjectBlobDigestSha256V0 {
-		return string_format_writer.Field{
-			Value:     "@" + value,
-			ColorType: string_format_writer.ColorTypeHash,
-		}
-	} else {
-		return string_format_writer.Field{
-			Key:       digest.GetType(),
-			Value:     "@" + value,
-			ColorType: string_format_writer.ColorTypeHash,
 		}
 	}
 }

@@ -241,20 +241,10 @@ func (format *BoxTransacted) addFieldsMetadata(
 
 	if options.PrintBlobIds &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
-		var blobDigestString string
-
-		if blobDigestString, err = object_metadata_fmt.MetadataBlobDigestString(
-			metadata,
-			format.abbr.BlobId.Abbreviate,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		box.Contents = object_metadata_fmt.AddBlobDigestIfNecessary(
 			box.Contents,
 			metadata.GetBlobDigest(),
-			blobDigestString,
+			format.abbr.BlobId.Abbreviate,
 		)
 	}
 
