@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -412,7 +412,7 @@ func (server *Server) readMCPResourceBlobs(
 
 	blobDigestString := pathComponents[0]
 
-	digest, repool := merkle.HashTypeSha256.GetBlobIdForString(blobDigestString)
+	digest, repool := markl.HashTypeSha256.GetBlobIdForString(blobDigestString)
 
 	defer repool()
 

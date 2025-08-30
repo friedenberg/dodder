@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -21,12 +21,12 @@ type TomlV2Common struct {
 }
 
 type TomlV2Private struct {
-	merkle.TomlPrivateKeyV0
+	markl.TomlPrivateKeyV0
 	TomlV2Common
 }
 
 type TomlV2Public struct {
-	merkle.TomlPublicKeyV0
+	markl.TomlPublicKeyV0
 	TomlV2Common
 }
 
@@ -53,7 +53,7 @@ func (config *TomlV2Common) GetInventoryListTypeString() string {
 
 func (config *TomlV2Common) GetObjectSigTypeString() string {
 	if config.ObjectSigType == "" {
-		return merkle.HRPObjectSigV1
+		return markl.HRPObjectSigV1
 	} else {
 		return config.ObjectSigType
 	}
@@ -61,7 +61,7 @@ func (config *TomlV2Common) GetObjectSigTypeString() string {
 
 func (config *TomlV2Common) GetBlobDigestTypeString() string {
 	if config.BlobDigestType == "" {
-		return merkle.HRPObjectBlobDigestSha256V0
+		return markl.HRPObjectBlobDigestSha256V0
 	} else {
 		return config.BlobDigestType
 	}
@@ -90,12 +90,12 @@ func (config *TomlV2Private) GetGenesisConfigPublic() ConfigPublic {
 	}
 }
 
-func (config *TomlV2Private) GetPrivateKey() merkle.PrivateKey {
-	return merkle.NewKeyFromSeed(config.PrivateKey.Data)
+func (config *TomlV2Private) GetPrivateKey() markl.PrivateKey {
+	return markl.NewKeyFromSeed(config.PrivateKey.Data)
 }
 
-func (config *TomlV2Private) GetPublicKey() merkle.PublicKey {
-	return merkle.PublicKey(
+func (config *TomlV2Private) GetPublicKey() markl.PublicKey {
+	return markl.PublicKey(
 		config.GetPrivateKey().Public().(ed25519.PublicKey),
 	)
 }
@@ -104,7 +104,7 @@ func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV2Public) GetPublicKey() merkle.PublicKey {
+func (config TomlV2Public) GetPublicKey() markl.PublicKey {
 	return config.PublicKey.Data
 }
 

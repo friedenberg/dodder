@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -43,7 +43,7 @@ const (
 )
 
 type object_probe_index struct {
-	hashType merkle.HashType
+	hashType markl.HashType
 	rowWidth int
 	pages    [PageCount]page
 }
@@ -51,7 +51,7 @@ type object_probe_index struct {
 func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
-	hashType merkle.HashType,
+	hashType markl.HashType,
 ) (index *object_probe_index, err error) {
 	index = &object_probe_index{hashType: hashType}
 	err = index.initialize(rowEqualerComplete{}, envRepo, path)
@@ -61,7 +61,7 @@ func MakePermitDuplicates(
 func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
-	hashType merkle.HashType,
+	hashType markl.HashType,
 ) (index *object_probe_index, err error) {
 	index = &object_probe_index{hashType: hashType}
 	err = index.initialize(rowEqualerShaOnly{}, envRepo, dir)
@@ -193,7 +193,7 @@ func (index *object_probe_index) ReadOneKey(
 		return
 	}
 
-	defer merkle.PutBlobId(blobId)
+	defer markl.PutBlobId(blobId)
 
 	if loc, err = index.ReadOne(blobId); err != nil {
 		err = errors.Wrapf(err, "Key: %s", formatKey)

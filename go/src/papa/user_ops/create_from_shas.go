@@ -3,7 +3,7 @@ package user_ops
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -27,7 +27,7 @@ func (op CreateFromShas) Run(
 	toCreate := make(map[string]*sku.Transacted)
 
 	for _, arg := range args {
-		var digest merkle.Id
+		var digest markl.Id
 
 		if err = digest.SetMaybeSha256(arg); err != nil {
 			err = errors.Wrap(err)

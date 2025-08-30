@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
@@ -59,7 +59,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 
 	actual := readCloser.GetBlobId()
 
-	if err = merkle.MakeErrNotEqual(blobId, actual); err != nil {
+	if err = markl.MakeErrNotEqual(blobId, actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

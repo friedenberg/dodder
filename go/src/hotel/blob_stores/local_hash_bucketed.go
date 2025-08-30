@@ -9,14 +9,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
 type localHashBucketed struct {
 	// TODO move to config
-	hashType merkle.HashType
+	hashType markl.HashType
 	buckets  []int
 	config   blob_store_configs.ConfigLocalHashBucketed
 	basePath string
@@ -31,7 +31,7 @@ func makeLocalHashBucketed(
 ) (localHashBucketed, error) {
 	// TODO validate
 	store := localHashBucketed{
-		hashType: merkle.HashTypeSha256,
+		hashType: markl.HashTypeSha256,
 		buckets:  config.GetHashBuckets(),
 		config:   config,
 		basePath: basePath,
@@ -59,7 +59,7 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.BlobStore {
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-		merkle.HashTypeSha256,
+		markl.HashTypeSha256,
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
@@ -103,7 +103,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 				}
 			}
 
-			if err = merkle.SetHexStringFromPath(id, path); err != nil {
+			if err = markl.SetHexStringFromPath(id, path); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
@@ -144,7 +144,7 @@ func (blobStore localHashBucketed) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = merkle.MakeNopReadCloser(
+		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -188,7 +188,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	path string,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = merkle.MakeNopReadCloser(
+		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -207,7 +207,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobId: merkle.Clone(digest),
+				BlobId: markl.Clone(digest),
 				Path:   path,
 			}
 		} else {

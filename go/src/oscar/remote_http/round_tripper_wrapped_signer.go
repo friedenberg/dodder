@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 )
 
 type RoundTripperBufioWrappedSigner struct {
-	merkle.PublicKey
+	markl.PublicKey
 	roundTripperBufio
 }
 
@@ -34,7 +34,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	}
 
 	nonce := blech32.Value{
-		HRP:  merkle.HRPRequestAuthChallengeV1,
+		HRP:  markl.HRPRequestAuthChallengeV1,
 		Data: nonceBytes,
 	}
 
@@ -57,7 +57,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var sig blech32.Value
 
 	if sig, err = blech32.MakeValueWithExpectedHRP(
-		merkle.HRPRequestAuthResponseV1,
+		markl.HRPRequestAuthResponseV1,
 		sigString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var pubkey blech32.Value
 
 	if pubkey, err = blech32.MakeValueWithExpectedHRP(
-		merkle.HRPRepoPubKeyV1,
+		markl.HRPRepoPubKeyV1,
 		pubkeyString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -90,7 +90,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		}
 	}
 
-	if err = merkle.VerifyBytes(
+	if err = markl.VerifyBytes(
 		pubkey.Data,
 		nonceBytes,
 		sig.Data,

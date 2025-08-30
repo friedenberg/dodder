@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -20,7 +20,7 @@ import (
 
 type page struct {
 	sync.Mutex     // for the buffered reader
-	hashType       merkle.HashType
+	hashType       markl.HashType
 	rowWidth       int
 	file           *os.File
 	bufferedReader bufio.Reader
@@ -34,7 +34,7 @@ func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	pageId page_id.PageId,
-	hashType merkle.HashType,
+	hashType markl.HashType,
 	rowWidth int,
 ) (err error) {
 	page.added = heap.Make(
@@ -206,7 +206,7 @@ func (page *page) readCurrentLoc(
 		return
 	}
 
-	if found, err = merkle.EqualsReader(expectedBlobId, bufferedReader); err != nil {
+	if found, err = markl.EqualsReader(expectedBlobId, bufferedReader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	} else if !found {

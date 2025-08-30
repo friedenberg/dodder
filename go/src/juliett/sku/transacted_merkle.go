@@ -4,7 +4,7 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -18,7 +18,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMerkleId(
-		merkle.HRPObjectMotherSigV1,
+		markl.HRPObjectMotherSigV1,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -30,7 +30,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 // calculates the object digests using the object's repo pubkey
 func (transacted *Transacted) FinalizeUsingObject() (err error) {
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -45,20 +45,20 @@ func (transacted *Transacted) FinalizeUsingObject() (err error) {
 
 // calculates the object digests using the provided repo pubkey
 func (transacted *Transacted) FinalizeUsingRepoPubKey(
-	pubKey merkle.PublicKey,
+	pubKey markl.PublicKey,
 ) (err error) {
 	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {
 		if err = pubKeyMutable.SetMerkleId(
-			merkle.HRPRepoPubKeyV1,
+			markl.HRPRepoPubKeyV1,
 			pubKey,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = merkle.MakeErrNotEqualBytes(
+		if err = markl.MakeErrNotEqualBytes(
 			pubKey,
 			pubKeyMutable.GetBytes(),
 		); err != nil {
@@ -114,14 +114,14 @@ func (transacted *Transacted) FinalizeAndSignOverwrite(
 func (transacted *Transacted) FinalizeAndSign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	if err = merkle.MakeErrIsNotNull(
+	if err = markl.MakeErrIsNotNull(
 		transacted.Metadata.GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = merkle.MakeErrIsNotNull(
+	if err = markl.MakeErrIsNotNull(
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -129,7 +129,7 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-		merkle.HRPRepoPubKeyV1,
+		markl.HRPRepoPubKeyV1,
 		config.GetPublicKey(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -145,7 +145,7 @@ func (transacted *Transacted) FinalizeAndSign(
 
 	var bites []byte
 
-	if bites, err = merkle.SignBytes(
+	if bites, err = markl.SignBytes(
 		privateKey,
 		transacted.Metadata.GetObjectDigest().GetBytes(),
 	); err != nil {
@@ -193,7 +193,7 @@ func (transacted *Transacted) FinalizeAndVerify() (err error) {
 func (transacted *Transacted) Verify() (err error) {
 	pubKey := transacted.Metadata.GetRepoPubKey()
 
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		pubKey,
 		"repo-pubkey",
 	); err != nil {
@@ -201,7 +201,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		transacted.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -209,7 +209,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		transacted.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {
@@ -217,7 +217,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = merkle.VerifyBytes(
+	if err = markl.VerifyBytes(
 		pubKey.GetBytes(),
 		transacted.Metadata.GetObjectDigest().GetBytes(),
 		transacted.Metadata.GetObjectSig().GetBytes(),

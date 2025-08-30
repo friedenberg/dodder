@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -161,7 +161,7 @@ func (store *Store) readOneExternalBlob(
 			return
 		}
 
-		merkle.SetDigester(
+		markl.SetDigester(
 			external.GetMetadata().GetBlobDigestMutable(),
 			writeCloser,
 		)

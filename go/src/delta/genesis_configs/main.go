@@ -3,7 +3,7 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -14,7 +14,7 @@ import (
 type (
 	Config interface {
 		GetStoreVersion() store_version.Version
-		GetPublicKey() merkle.PublicKey
+		GetPublicKey() markl.PublicKey
 		GetRepoType() repo_type.Type
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeString() string
@@ -31,7 +31,7 @@ type (
 		Config
 		GetGenesisConfigPublic() ConfigPublic
 		GetGenesisConfig() ConfigPrivate
-		GetPrivateKey() merkle.PrivateKey
+		GetPrivateKey() markl.PrivateKey
 	}
 
 	ConfigPrivateMutable interface {
@@ -44,7 +44,7 @@ type (
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type)
 		SetRepoId(ids.RepoId)
-		merkle.Generator
+		markl.Generator
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]
@@ -90,8 +90,8 @@ func DefaultWithVersion(
 					StoreVersion:      storeVersion,
 					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
-					ObjectSigType:     merkle.HRPObjectSigV1,
-					BlobDigestType:    merkle.HRPObjectBlobDigestSha256V0,
+					ObjectSigType:     markl.HRPObjectSigV1,
+					BlobDigestType:    markl.HRPObjectBlobDigestSha256V0,
 				},
 			},
 		}

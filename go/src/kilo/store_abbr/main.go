@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -18,7 +18,7 @@ import (
 )
 
 type indexAbbrEncodableTridexes struct {
-	BlobId   indexNotZettelId[merkle.Id, *merkle.Id]
+	BlobId   indexNotZettelId[markl.Id, *markl.Id]
 	ZettelId indexZettelId
 }
 
@@ -48,7 +48,7 @@ func NewIndexAbbr(
 		path:    envRepo.DirCache("Abbr"),
 		envRepo: envRepo,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			BlobId: indexNotZettelId[merkle.Id, *merkle.Id]{
+			BlobId: indexNotZettelId[markl.Id, *markl.Id]{
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
@@ -164,7 +164,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
-		merkle.Format(o.GetBlobDigest()),
+		markl.Format(o.GetBlobDigest()),
 	)
 
 	ks := o.GetObjectId().String()
@@ -202,7 +202,7 @@ func (i *indexAbbr) ZettelId() (asg sku.AbbrStoreGeneric[ids.ZettelId, *ids.Zett
 	return
 }
 
-func (i *indexAbbr) BlobId() (asg sku.AbbrStoreGeneric[merkle.Id, *merkle.Id]) {
+func (i *indexAbbr) BlobId() (asg sku.AbbrStoreGeneric[markl.Id, *markl.Id]) {
 	asg = &i.indexAbbrEncodableTridexes.BlobId
 
 	return

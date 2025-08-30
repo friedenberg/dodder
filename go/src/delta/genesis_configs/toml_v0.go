@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -61,11 +61,11 @@ func (config V0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (config V0Common) GetPrivateKey() merkle.PrivateKey {
+func (config V0Common) GetPrivateKey() markl.PrivateKey {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config V0Common) GetPublicKey() merkle.PublicKey {
+func (config V0Common) GetPublicKey() markl.PublicKey {
 	panic(errors.Err405MethodNotAllowed)
 }
 
@@ -94,11 +94,11 @@ func (config V0Common) GetInventoryListTypeString() string {
 }
 
 func (config V0Common) GetObjectSigTypeString() string {
-	return merkle.HRPObjectSigV0
+	return markl.HRPObjectSigV0
 }
 
 func (config V0Common) GetBlobDigestTypeString() string {
-	return merkle.HRPObjectBlobDigestSha256V0
+	return markl.HRPObjectBlobDigestSha256V0
 }
 
 func (config V0Common) SetInventoryListTypeString(string) {

@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -29,7 +29,7 @@ type remoteSftp struct {
 
 	config blob_store_configs.ConfigSFTPRemotePath
 
-	hashType merkle.HashType
+	hashType markl.HashType
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -48,7 +48,7 @@ func makeSftpStore(
 	sshClient *ssh.Client,
 ) (blobStore *remoteSftp, err error) {
 	blobStore = &remoteSftp{
-		hashType:  merkle.HashTypeSha256,
+		hashType:  markl.HashTypeSha256,
 		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
 		config:    config,
@@ -208,7 +208,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 			relPath := strings.TrimPrefix(walker.Path(), basePath)
 			relPath = strings.TrimPrefix(relPath, "/")
 
-			if err := merkle.SetHexStringFromPath(digest, relPath); err != nil {
+			if err := markl.SetHexStringFromPath(digest, relPath); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
@@ -250,7 +250,7 @@ func (blobStore *remoteSftp) BlobReader(
 	digest interfaces.BlobId,
 ) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = merkle.MakeNopReadCloser(
+		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -264,7 +264,7 @@ func (blobStore *remoteSftp) BlobReader(
 	if remoteFile, err = blobStore.sftpClient.Open(remotePath); err != nil {
 		if os.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
-				BlobId: merkle.Clone(digest),
+				BlobId: markl.Clone(digest),
 				Path:   remotePath,
 			}
 		} else {

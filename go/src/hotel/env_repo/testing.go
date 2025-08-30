@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -87,11 +87,11 @@ func MakeTesting(
 		}
 
 		actual := writeCloser.GetBlobId()
-		expected, _ := merkle.HashTypeSha256.GetBlobIdForHexString(
+		expected, _ := markl.HashTypeSha256.GetBlobIdForHexString(
 			expectedDigestString,
 		)
 
-		err = merkle.MakeErrNotEqual(expected, actual)
+		err = markl.MakeErrNotEqual(expected, actual)
 		if err != nil {
 			errors.ContextCancelWithErrorAndFormat(
 				t.Context,

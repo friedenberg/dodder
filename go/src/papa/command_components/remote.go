@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -220,7 +220,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	xdgDotenvPath string,
 	options env_ui.Options,
 	repo *local_working_copy.Repo,
-	pubkey merkle.PublicKey,
+	pubkey markl.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
@@ -292,7 +292,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	env env_local.Env,
 	dir string,
 	repo *local_working_copy.Repo,
-	pubkey merkle.PublicKey,
+	pubkey markl.PublicKey,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 

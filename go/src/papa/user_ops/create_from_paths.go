@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
@@ -64,7 +64,7 @@ func (op CreateFromPaths) Run(
 
 		digestWithoutTai := &object.Metadata.SelfWithoutTai
 
-		if err = merkle.MakeErrIsNull(
+		if err = markl.MakeErrIsNull(
 			digestWithoutTai,
 			key_bytes.DigestMetadataWithoutTai.String(),
 		); err != nil {

@@ -3,7 +3,7 @@ package log_remote_inventory_lists
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -25,7 +25,7 @@ const (
 
 type Entry struct {
 	EntryType
-	merkle.PublicKey
+	markl.PublicKey
 	*sku.Transacted
 }
 

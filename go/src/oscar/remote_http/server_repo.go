@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
@@ -71,7 +71,7 @@ func (server *Server) writeInventoryList(
 			return
 		}
 
-		if err := merkle.VerifyBytes(
+		if err := markl.VerifyBytes(
 			logEntry.PublicKey,
 			expected.GetBytes(),
 			sig.Data,
@@ -136,7 +136,7 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			blobShaString := merkle.Format(blobSha)
+			blobShaString := markl.Format(blobSha)
 
 			if ok || writtenNeededBlobs.ContainsExpansion(blobShaString) {
 				continue
@@ -159,7 +159,7 @@ func (server *Server) writeInventoryList(
 
 	actual := blobWriter.GetBlobId()
 
-	if err := merkle.MakeErrNotEqual(expected, actual); err != nil {
+	if err := markl.MakeErrNotEqual(expected, actual); err != nil {
 		ui.Err().Printf(
 			"received list has different sha: expected: %s, actual: %s",
 			expected,

@@ -3,7 +3,7 @@ package stream_index
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -12,12 +12,12 @@ import (
 type probe_index struct {
 	envRepo env_repo.Env
 	object_probe_index.Index
-	hashType merkle.HashType
+	hashType markl.HashType
 }
 
 func (index *probe_index) Initialize(
 	envRepo env_repo.Env,
-	hashType merkle.HashType,
+	hashType markl.HashType,
 ) (err error) {
 	index.envRepo = envRepo
 	index.hashType = hashType

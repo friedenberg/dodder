@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -300,7 +300,7 @@ func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 		}
 	}()
 
-	merkle.SetDigester(
+	markl.SetDigester(
 		object.GetSku().Metadata.GetBlobDigestMutable(),
 		blobWriter,
 	)

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -23,12 +23,12 @@ type TomlV1Common struct {
 }
 
 type TomlV1Private struct {
-	merkle.TomlPrivateKeyV0
+	markl.TomlPrivateKeyV0
 	TomlV1Common
 }
 
 type TomlV1Public struct {
-	merkle.TomlPublicKeyV0
+	markl.TomlPublicKeyV0
 	TomlV1Common
 }
 
@@ -61,7 +61,7 @@ func (config *TomlV1Common) SetInventoryListTypeString(value string) {
 }
 
 func (config *TomlV1Common) GetObjectSigTypeString() string {
-	return merkle.HRPObjectSigV0
+	return markl.HRPObjectSigV0
 }
 
 func (config *TomlV1Common) SetObjectSigTypeString(string) {
@@ -69,7 +69,7 @@ func (config *TomlV1Common) SetObjectSigTypeString(string) {
 }
 
 func (config *TomlV1Common) GetBlobDigestTypeString() string {
-	return merkle.HRPObjectBlobDigestSha256V0
+	return markl.HRPObjectBlobDigestSha256V0
 }
 
 func (config *TomlV1Common) SetBlobDigestTypeString(string) {
@@ -87,12 +87,12 @@ func (config *TomlV1Private) GetGenesisConfigPublic() ConfigPublic {
 	}
 }
 
-func (config *TomlV1Private) GetPrivateKey() merkle.PrivateKey {
-	return merkle.NewKeyFromSeed(config.PrivateKey.Data)
+func (config *TomlV1Private) GetPrivateKey() markl.PrivateKey {
+	return markl.NewKeyFromSeed(config.PrivateKey.Data)
 }
 
-func (config *TomlV1Private) GetPublicKey() merkle.PublicKey {
-	return merkle.PublicKey(
+func (config *TomlV1Private) GetPublicKey() markl.PublicKey {
+	return markl.PublicKey(
 		config.GetPrivateKey().Public().(ed25519.PublicKey),
 	)
 }
@@ -101,7 +101,7 @@ func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV1Public) GetPublicKey() merkle.PublicKey {
+func (config TomlV1Public) GetPublicKey() markl.PublicKey {
 	return config.PublicKey.Data
 }
 

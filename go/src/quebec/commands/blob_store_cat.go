@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -111,7 +111,7 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 	blobWriter := cmd.makeBlobWriter(envRepo, blobStore)
 
 	for _, v := range req.PopArgs() {
-		var blobId merkle.Id
+		var blobId markl.Id
 
 		if err := blobId.SetMaybeSha256(v); err != nil {
 			envRepo.Cancel(err)
@@ -133,7 +133,7 @@ func (cmd BlobStoreCat) copy(
 	if cmd.PrefixSha {
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			merkle.Format(readCloser.BlobId),
+			markl.Format(readCloser.BlobId),
 			envRepo.GetUI(),
 			readCloser.ReadCloser,
 			true,

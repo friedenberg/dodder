@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
@@ -30,7 +30,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 				return
 			}
 
-			serverBlobCache.shas.Add(merkle.Format(sh))
+			serverBlobCache.shas.Add(markl.Format(sh))
 			count++
 		}
 
@@ -56,7 +56,7 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 	}
 
 	if serverBlobCache.shas.ContainsExpansion(
-		merkle.Format(blobSha),
+		markl.Format(blobSha),
 	) {
 		ok = true
 		return

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 func (page *page) writeIntoRow(
@@ -18,7 +18,7 @@ func (page *page) writeIntoRow(
 		return
 	}
 
-	if err = merkle.MakeErrLength(int64(page.rowWidth), n); err != nil {
+	if err = markl.MakeErrLength(int64(page.rowWidth), n); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -35,7 +35,7 @@ func (page *page) readFromRow(
 		return
 	}
 
-	if err = merkle.MakeErrLength(int64(page.rowWidth), n); err != nil {
+	if err = markl.MakeErrLength(int64(page.rowWidth), n); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -44,7 +44,7 @@ func (page *page) readFromRow(
 }
 
 type row struct {
-	BlobId merkle.Id
+	BlobId markl.Id
 	Loc
 }
 
@@ -62,12 +62,12 @@ func (row *row) String() string {
 
 func (row *row) ReadFrom(
 	reader io.Reader,
-	hashType merkle.HashType,
+	hashType markl.HashType,
 ) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n1, err = merkle.ReadFrom(reader, &row.BlobId, hashType)
+	n1, err = markl.ReadFrom(reader, &row.BlobId, hashType)
 	n += int64(n1)
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return merkle.Equals(&a.BlobId, &b.BlobId) &&
+	return markl.Equals(&a.BlobId, &b.BlobId) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
@@ -121,7 +121,7 @@ func (rowEqualerComplete) Equals(a, b *row) bool {
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return merkle.Equals(&a.BlobId, &b.BlobId)
+	return markl.Equals(&a.BlobId, &b.BlobId)
 }
 
 type rowResetter struct{}

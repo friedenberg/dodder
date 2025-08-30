@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -259,8 +259,8 @@ func CopyBlob(
 	shaRc := rc.GetBlobId()
 	shaWc := wc.GetBlobId()
 
-	if !merkle.Equals(shaRc, blobSha) ||
-		!merkle.Equals(shaWc, blobSha) {
+	if !markl.Equals(shaRc, blobSha) ||
+		!markl.Equals(shaWc, blobSha) {
 		err = errors.ErrorWithStackf(
 			"lookup sha was %s, read sha was %s, but written sha was %s",
 			blobSha,
@@ -296,7 +296,7 @@ func VerifyBlob(
 		return
 	}
 
-	if err = merkle.MakeErrNotEqual(
+	if err = markl.MakeErrNotEqual(
 		expected,
 		readCloser.GetBlobId(),
 	); err != nil {

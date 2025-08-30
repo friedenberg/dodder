@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -21,7 +21,7 @@ func (coder doddishV2) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		object.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -29,7 +29,7 @@ func (coder doddishV2) EncodeTo(
 		return
 	}
 
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		object.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {

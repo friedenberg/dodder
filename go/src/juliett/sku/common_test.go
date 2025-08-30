@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -193,7 +193,7 @@ func makeTestTextFormat(
 		object_metadata.Dependencies{
 			EnvDir:         envDir,
 			BlobStore:      blobStore,
-			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
 		},
 	)
 }
@@ -297,7 +297,7 @@ func TestReadWithBlob(t1 *testing.T) {
 the body`,
 	)
 
-	expectedSha, _ := merkle.HashTypeSha256.GetBlobIdForHexString(
+	expectedSha, _ := markl.HashTypeSha256.GetBlobIdForHexString(
 		"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e",
 	)
 
@@ -342,8 +342,8 @@ func (arf blobReaderFactory) BlobReader(
 		arf.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
-	readCloser = merkle.MakeNopReadCloser(
-		merkle.HashTypeSha256.Get(),
+	readCloser = markl.MakeNopReadCloser(
+		markl.HashTypeSha256.Get(),
 		io.NopCloser(strings.NewReader(v)),
 	)
 
@@ -367,7 +367,7 @@ func writeFormat(
 	}
 
 	blobDigestRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var blobDigest merkle.Id
+	var blobDigest markl.Id
 
 	if err := blobDigest.SetMaybeSha256(blobDigestRaw); err != nil {
 		t.Fatalf("%s", err)
@@ -416,7 +416,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.Dependencies{
 			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
 		},
 	)
 
@@ -467,7 +467,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.Dependencies{
 			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: merkle.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
 		},
 	)
 

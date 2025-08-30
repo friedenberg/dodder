@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
@@ -74,7 +74,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(object.GetExternalObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle.Format(object.GetBlobDigest()))
+	sb.WriteString(markl.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 
@@ -137,7 +137,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle.Format(object.GetBlobDigest()))
+	sb.WriteString(markl.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 
@@ -190,7 +190,7 @@ func StringMetadataSansTaiMerkle2(
 	fmt.Fprintf(sb, "%s", object.GetObjectDigest())
 
 	sb.WriteString(" ")
-	sb.WriteString(merkle.Format(object.GetBlobDigest()))
+	sb.WriteString(markl.Format(object.GetBlobDigest()))
 
 	m := object.GetMetadata()
 

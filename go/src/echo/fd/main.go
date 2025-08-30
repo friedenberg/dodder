@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
 )
 
@@ -18,7 +18,7 @@ type FD struct {
 	isDir   bool
 	path    string
 	modTime thyme.Time
-	digest  merkle.Id
+	digest  markl.Id
 	state   State
 }
 
@@ -59,7 +59,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !merkle.Equals(&a.digest, &b.digest) {
+	if !markl.Equals(&a.digest, &b.digest) {
 		return false
 	}
 
@@ -146,7 +146,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 		return
 	}
 
-	merkle.SetDigester(&fd.digest, writer)
+	markl.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
 	return
@@ -201,7 +201,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 	}
 
 	fd.path = path
-	merkle.SetDigester(&fd.digest, blobWriter)
+	markl.SetDigester(&fd.digest, blobWriter)
 	fd.state = StateStored
 
 	return

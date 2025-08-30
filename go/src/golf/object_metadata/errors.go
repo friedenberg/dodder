@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
@@ -48,7 +48,7 @@ func MakeErrHasInlineBlobAndFilePath(
 
 type ErrHasInlineBlobAndFilePath struct {
 	BlobFD       fd.FD
-	InlineDigest merkle.Id
+	InlineDigest markl.Id
 }
 
 func (err *ErrHasInlineBlobAndFilePath) Error() string {
@@ -64,8 +64,8 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 	inline, metadata interfaces.BlobId,
 ) (err *ErrHasInlineBlobAndMetadataDigest) {
 	err = &ErrHasInlineBlobAndMetadataDigest{}
-	err.Metadata = merkle.Clone(metadata)
-	err.Inline = merkle.Clone(inline)
+	err.Metadata = markl.Clone(metadata)
+	err.Inline = markl.Clone(inline)
 	return
 }
 

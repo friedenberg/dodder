@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -39,7 +39,7 @@ const (
 )
 
 type Index struct {
-	hashType merkle.HashType
+	hashType markl.HashType
 	envRepo  env_repo.Env
 	sunrise  ids.Tai
 	preWrite interfaces.FuncIter[*sku.Transacted]
@@ -57,7 +57,7 @@ func MakeIndex(
 	sunrise ids.Tai,
 ) (index *Index, err error) {
 	index = &Index{
-		hashType:       merkle.HashTypeSha256,
+		hashType:       markl.HashTypeSha256,
 		envRepo:        envRepo,
 		sunrise:        sunrise,
 		preWrite:       preWrite,
@@ -305,7 +305,7 @@ func (index *Index) ReadOneSha(
 	blobId interfaces.BlobId,
 	object *sku.Transacted,
 ) (err error) {
-	errors.PanicIfError(merkle.MakeErrIsNull(blobId, "index lookup"))
+	errors.PanicIfError(markl.MakeErrIsNull(blobId, "index lookup"))
 
 	var loc object_probe_index.Loc
 
@@ -367,8 +367,8 @@ func (index *Index) ObjectExists(
 		return
 	}
 
-	digest := merkle.HashTypeSha256.FromStringContent(objectIdString)
-	defer merkle.PutBlobId(digest)
+	digest := markl.HashTypeSha256.FromStringContent(objectIdString)
+	defer markl.PutBlobId(digest)
 
 	if _, err = index.readOneShaLoc(digest); err != nil {
 		err = errors.Wrap(err)
@@ -388,7 +388,7 @@ func (index *Index) ReadOneObjectId(
 		panic("empty object id")
 	}
 
-	digest, repool := merkle.HashTypeSha256.GetBlobIdForString(
+	digest, repool := markl.HashTypeSha256.GetBlobIdForString(
 		objectIdString,
 	)
 	defer repool()
@@ -403,8 +403,8 @@ func (index *Index) ReadOneObjectId(
 func (index *Index) ReadManyObjectId(
 	id interfaces.ObjectId,
 ) (skus []*sku.Transacted, err error) {
-	sh := merkle.HashTypeSha256.FromStringContent(id.String())
-	defer merkle.PutBlobId(sh)
+	sh := markl.HashTypeSha256.FromStringContent(id.String())
+	defer markl.PutBlobId(sh)
 
 	if skus, err = index.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
@@ -424,8 +424,8 @@ func (index *Index) ReadOneObjectIdTai(
 		return
 	}
 
-	sh := merkle.HashTypeSha256.FromStringContent(k.String() + t.String())
-	defer merkle.PutBlobId(sh)
+	sh := markl.HashTypeSha256.FromStringContent(k.String() + t.String())
+	defer markl.PutBlobId(sh)
 
 	sk = sku.GetTransactedPool().Get()
 

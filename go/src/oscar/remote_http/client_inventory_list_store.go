@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -104,12 +104,12 @@ func (client client) ImportInventoryList(
 
 	{
 		sig := blech32.Value{
-			HRP: merkle.HRPObjectSigV1,
+			HRP: markl.HRPObjectSigV1,
 		}
 
 		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
-		if sig.Data, err = merkle.SignBytes(
+		if sig.Data, err = markl.SignBytes(
 			key,
 			listSku.GetBlobDigest().GetBytes(),
 		); err != nil {
@@ -142,7 +142,7 @@ func (client client) ImportInventoryList(
 		return
 	}
 
-	var digests merkle.Slice
+	var digests markl.Slice
 
 	if _, err = digests.ReadFrom(bufio.NewReader(response.Body)); err != nil {
 		err = errors.Wrap(err)

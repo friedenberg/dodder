@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -205,7 +205,7 @@ func (tai *Tai) Set(value string) (err error) {
 }
 
 func (tai Tai) GetBlobId() interfaces.BlobId {
-	return merkle.HashTypeSha256.FromStringContent(tai.String())
+	return markl.HashTypeSha256.FromStringContent(tai.String())
 }
 
 func (tai Tai) IsZero() (ok bool) {

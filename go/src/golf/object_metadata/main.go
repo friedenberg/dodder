@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
@@ -25,13 +25,13 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	DigBlob   merkle.Id
-	digSelf   merkle.Id
-	pubRepo   merkle.Id
-	sigMother merkle.Id
-	sigRepo   merkle.Id
+	DigBlob   markl.Id
+	digSelf   markl.Id
+	pubRepo   markl.Id
+	sigMother markl.Id
+	sigRepo   markl.Id
 
-	SelfWithoutTai merkle.Id // TODO moving to a separate key-value store
+	SelfWithoutTai markl.Id // TODO moving to a separate key-value store
 	Tai            ids.Tai
 
 	// TODO move to Cache

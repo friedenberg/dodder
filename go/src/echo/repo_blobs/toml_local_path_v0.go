@@ -1,9 +1,9 @@
 package repo_blobs
 
-import "code.linenisgreat.com/dodder/go/src/charlie/merkle"
+import "code.linenisgreat.com/dodder/go/src/charlie/markl"
 
 type TomlLocalPathV0 struct {
-	merkle.TomlPublicKeyV0
+	markl.TomlPublicKeyV0
 	Path string `toml:"path"`
 }
 

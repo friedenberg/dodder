@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -318,7 +318,7 @@ func (format *BoxTransacted) parseBlobIdTag(
 		}
 
 	} else {
-		if err = merkle.SetHexBytes(
+		if err = markl.SetHexBytes(
 			"sha256",
 			// merkle.HRPObjectBlobDigestSha256V1,
 			object.Metadata.GetBlobDigestMutable(),
@@ -333,10 +333,10 @@ func (format *BoxTransacted) parseBlobIdTag(
 }
 
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableBlobId{
-	merkle.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
-	merkle.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
-	merkle.HRPObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
-	merkle.HRPObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
+	markl.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
+	markl.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.HRPObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.HRPObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
 }
 
 // TODO create a sustainable system for this

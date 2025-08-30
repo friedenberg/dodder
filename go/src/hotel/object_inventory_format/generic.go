@@ -1,7 +1,7 @@
 package object_inventory_format
 
 import (
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings_german"
 )
@@ -10,7 +10,7 @@ const (
 	KeyFormatV5Metadata               = "Metadatei"
 	KeyFormatV5MetadataWithoutTai     = "MetadateiSansTai"
 	KeyFormatV5MetadataObjectIdParent = "MetadateiKennungMutter"
-	KeyFormatV11ObjectDigest          = merkle.HRPObjectDigestSha256V1
+	KeyFormatV11ObjectDigest          = markl.HRPObjectDigestSha256V1
 )
 
 var (

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -29,8 +29,8 @@ type JSON struct {
 	Description string    `json:"description"`
 	Dormant     bool      `json:"dormant"`
 	ObjectId    string    `json:"object-id"`
-	RepoPubkey  merkle.Id `json:"repo-pub_key"`
-	RepoSig     merkle.Id `json:"repo-sig"`
+	RepoPubkey  markl.Id `json:"repo-pub_key"`
+	RepoSig     markl.Id `json:"repo-sig"`
 	Sha         string    `json:"sha"`
 	Tags        []string  `json:"tags"`
 	Tai         string    `json:"tai"`
@@ -66,7 +66,7 @@ func (json *JSON) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = merkle.Format(metadata.GetBlobDigest())
+	json.BlobId = markl.Format(metadata.GetBlobDigest())
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
@@ -147,8 +147,8 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = merkle.SetHexBytes(
-			merkle.HRPObjectBlobDigestSha256V0,
+		if err = markl.SetHexBytes(
+			markl.HRPObjectBlobDigestSha256V0,
 			object.Metadata.GetBlobDigestMutable(),
 			[]byte(json.BlobId),
 		); err != nil {

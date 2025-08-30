@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 )
@@ -39,7 +39,7 @@ func (client *client) HasBlob(merkleId interfaces.BlobId) (ok bool) {
 		if request, err = client.newRequest(
 			"HEAD",
 			"/blobs",
-			strings.NewReader(merkle.Format(merkleId)),
+			strings.NewReader(markl.Format(merkleId)),
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -67,7 +67,7 @@ func (client *client) BlobReader(
 
 	if request, err = client.newRequest(
 		"GET",
-		fmt.Sprintf("/blobs/%s", merkle.Format(blobId)),
+		fmt.Sprintf("/blobs/%s", markl.Format(blobId)),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -92,8 +92,8 @@ func (client *client) BlobReader(
 
 	default:
 		// TODO use correct hash type
-		reader = merkle.MakeReadCloser(
-			merkle.HashTypeSha256.Get(),
+		reader = markl.MakeReadCloser(
+			markl.HashTypeSha256.Get(),
 			response.Body,
 		)
 	}
@@ -105,7 +105,7 @@ func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
 	expected interfaces.BlobId,
 ) (err error) {
-	var actual merkle.Id
+	var actual markl.Id
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
@@ -169,7 +169,7 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = merkle.MakeErrNotEqual(expected, &actual); err != nil {
+	if err = markl.MakeErrNotEqual(expected, &actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 type Writer interface {
@@ -35,7 +35,7 @@ func NewWriter(
 		return
 	}
 
-	w.digester = merkle.MakeWriter(config.hashType.Get(), nil)
+	w.digester = markl.MakeWriter(config.hashType.Get(), nil)
 
 	if w.compressor, err = config.GetBlobCompression().WrapWriter(w.encrypter); err != nil {
 		err = errors.Wrap(err)

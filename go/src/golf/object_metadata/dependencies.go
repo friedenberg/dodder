@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -29,7 +29,7 @@ type Dependencies struct {
 
 func (f Dependencies) GetBlobDigestType() string {
 	if f.BlobDigestType == "" {
-		return merkle.HRPObjectBlobDigestSha256V0
+		return markl.HRPObjectBlobDigestSha256V0
 	} else {
 		return f.BlobDigestType
 	}

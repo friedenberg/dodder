@@ -2,7 +2,7 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 var (
@@ -27,7 +27,7 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !merkle.Equals(&a.DigBlob, &b.DigBlob) {
+	if !markl.Equals(&a.DigBlob, &b.DigBlob) {
 		if debug {
 			ui.Debug().Print(&a.DigBlob, "->", &b.DigBlob)
 		}

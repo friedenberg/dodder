@@ -3,7 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
@@ -27,7 +27,7 @@ func (transacted *Transacted) finalize(
 			funcCalcDigest,
 			object_inventory_format.FormatsV5MetadataSansTai,
 			&transacted.Metadata.SelfWithoutTai,
-			merkle.HRPObjectDigestSha256V1,
+			markl.HRPObjectDigestSha256V1,
 		),
 	)
 
@@ -62,7 +62,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 			return
 		}
 
-		defer merkle.PutBlobId(actual)
+		defer markl.PutBlobId(actual)
 
 		if err = digest.SetMerkleId(
 			tipe,
@@ -83,7 +83,7 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 		funcCalcDigest,
 		object_inventory_format.FormatsV5MetadataSansTai,
 		&transacted.Metadata.SelfWithoutTai,
-		merkle.HRPObjectDigestSha256V1,
+		markl.HRPObjectDigestSha256V1,
 	)(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -95,7 +95,7 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 func (transacted *Transacted) calculateObjectDigestMerkle(
 	funcCalcDigest funcCalcDigest,
 ) (err error) {
-	if err = merkle.MakeErrIsNull(
+	if err = markl.MakeErrIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -103,7 +103,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 		return
 	}
 
-	if err = merkle.MakeErrIsNotNull(
+	if err = markl.MakeErrIsNotNull(
 		transacted.Metadata.GetObjectDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -114,7 +114,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 		funcCalcDigest,
 		object_inventory_format.FormatV11ObjectDigest,
 		transacted.Metadata.GetObjectDigestMutable(),
-		merkle.HRPObjectDigestSha256V1,
+		markl.HRPObjectDigestSha256V1,
 	)(); err != nil {
 		err = errors.Wrap(err)
 		return

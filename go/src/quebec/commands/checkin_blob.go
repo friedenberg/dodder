@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -118,7 +118,7 @@ type externalBlobPair struct {
 
 	*ids.ZettelId
 	BlobFD     fd.FD
-	BlobDigest merkle.Id
+	BlobDigest markl.Id
 
 	object *sku.Transacted
 }

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -96,20 +96,20 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					merkle.Format(result.BlobId),
+					markl.Format(result.BlobId),
 					result.Path,
 				)
 			} else {
 				blobStore.GetUI().Printf(
 					"%s %s (checked in)",
-					merkle.Format(result.BlobId),
+					markl.Format(result.BlobId),
 					result.Path,
 				)
 			}
 		} else {
 			ui.Err().Printf(
 				"%s %s (untracked)",
-				merkle.Format(result.BlobId),
+				markl.Format(result.BlobId),
 				result.Path,
 			)
 
@@ -153,8 +153,8 @@ func (cmd BlobStoreWrite) doOne(
 	if cmd.Check {
 		{
 			var repool func()
-			writeCloser, repool = merkle.MakeWriterWithRepool(
-				merkle.HashTypeSha256.Get(),
+			writeCloser, repool = markl.MakeWriterWithRepool(
+				markl.HashTypeSha256.Get(),
 				nil,
 			)
 			defer repool()

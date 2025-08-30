@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 func IsErrBlobAlreadyExists(err error) bool {
@@ -18,7 +18,7 @@ func MakeErrBlobAlreadyExists(
 ) ErrBlobAlreadyExists {
 	return ErrBlobAlreadyExists{
 		Path:   path,
-		BlobId: merkle.Clone(blobId),
+		BlobId: markl.Clone(blobId),
 	}
 }
 
@@ -30,7 +30,7 @@ type ErrBlobAlreadyExists struct {
 func (err ErrBlobAlreadyExists) Error() string {
 	return fmt.Sprintf(
 		"File with blob_id %s already exists: %s",
-		merkle.Format(err.BlobId),
+		markl.Format(err.BlobId),
 		err.Path,
 	)
 }
@@ -53,12 +53,12 @@ func (err ErrBlobMissing) Error() string {
 	if err.Path == "" {
 		return fmt.Sprintf(
 			"Blob with id %q does not exist locally",
-			merkle.Format(err.BlobId),
+			markl.Format(err.BlobId),
 		)
 	} else {
 		return fmt.Sprintf(
 			"Blob with id %q does not exist locally: %q",
-			merkle.Format(err.BlobId),
+			markl.Format(err.BlobId),
 			err.Path,
 		)
 	}

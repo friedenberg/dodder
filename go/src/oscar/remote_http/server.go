@@ -23,7 +23,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -244,7 +244,7 @@ func (server *Server) addSignatureIfNecessary(
 	var nonce blech32.Value
 
 	if nonce, err = blech32.MakeValueWithExpectedHRP(
-		merkle.HRPRequestAuthChallengeV1,
+		markl.HRPRequestAuthChallengeV1,
 		nonceString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -252,7 +252,7 @@ func (server *Server) addSignatureIfNecessary(
 	}
 
 	pubkey := blech32.Value{
-		HRP:  merkle.HRPRepoPubKeyV1,
+		HRP:  markl.HRPRepoPubKeyV1,
 		Data: server.Repo.GetImmutableConfigPublic().GetPublicKey(),
 	}
 
@@ -261,10 +261,10 @@ func (server *Server) addSignatureIfNecessary(
 	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	sig := blech32.Value{
-		HRP: merkle.HRPRequestAuthResponseV1,
+		HRP: markl.HRPRequestAuthResponseV1,
 	}
 
-	if sig.Data, err = merkle.SignBytes(privateKey, nonce.Data); err != nil {
+	if sig.Data, err = markl.SignBytes(privateKey, nonce.Data); err != nil {
 		server.EnvLocal.Cancel(err)
 		return
 	}
@@ -510,7 +510,7 @@ func (server *Server) handleBlobsHeadOrGet(
 		return
 	}
 
-	var blobDigest merkle.Id
+	var blobDigest markl.Id
 
 	{
 		var err error
@@ -566,13 +566,13 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(merkle.Format(result)),
+			strings.NewReader(markl.Format(result)),
 		)
 
 		return
 	}
 
-	var blobDigest merkle.Id
+	var blobDigest markl.Id
 
 	if err := blobDigest.SetMaybeSha256(digestString); err != nil {
 		response.Error(err)
@@ -595,14 +595,14 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 
-	if err := merkle.MakeErrNotEqual(&blobDigest, result); err != nil {
+	if err := markl.MakeErrNotEqual(&blobDigest, result); err != nil {
 		response.Error(err)
 		return
 	}
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(merkle.Format(result)),
+		strings.NewReader(markl.Format(result)),
 	)
 
 	return

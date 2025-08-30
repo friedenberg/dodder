@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
@@ -323,7 +323,7 @@ func writeMerkleIdKey(
 	key *catgut.String,
 	merkleId interfaces.BlobId,
 ) (n int, err error) {
-	if err = merkle.MakeErrIsNull(merkleId, key.String()); err != nil {
+	if err = markl.MakeErrIsNull(merkleId, key.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -331,7 +331,7 @@ func writeMerkleIdKey(
 	n, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		key.String(),
-		merkle.Format(merkleId),
+		markl.Format(merkleId),
 	)
 	if err != nil {
 		err = errors.Wrap(err)
@@ -391,8 +391,8 @@ func WriteMetadata(
 	f Format,
 	c FormatterContext,
 ) (blobDigest interfaces.BlobId, err error) {
-	writer, repool := merkle.MakeWriterWithRepool(
-		merkle.HashTypeSha256.Get(),
+	writer, repool := markl.MakeWriterWithRepool(
+		markl.HashTypeSha256.Get(),
 		w,
 	)
 	defer repool()
@@ -425,8 +425,8 @@ func GetDigestForContextDebug(
 	context FormatterContext,
 ) (digest interfaces.BlobId, err error) {
 	var sb strings.Builder
-	writer, repool := merkle.MakeWriterWithRepool(
-		merkle.HashTypeSha256.Get(),
+	writer, repool := markl.MakeWriterWithRepool(
+		markl.HashTypeSha256.Get(),
 		&sb,
 	)
 	defer repool()
@@ -441,7 +441,7 @@ func GetDigestForContextDebug(
 
 	value := sb.String()
 
-	ui.Debug().Printf("%q -> %s", value, merkle.Format(digest))
+	ui.Debug().Printf("%q -> %s", value, markl.Format(digest))
 
 	return
 }

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -28,7 +28,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 	}
 
 	for _, blobDigestString := range dep.PopArgs() {
-		var blobDigest merkle.Id
+		var blobDigest markl.Id
 
 		if err := blobDigest.SetMaybeSha256(blobDigestString); err != nil {
 			localWorkingCopy.Cancel(err)

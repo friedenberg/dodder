@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -220,7 +220,7 @@ func (store *Store) Commit(
 			store.storeConfig.GetConfig().GetStoreVersion(),
 			store_version.V11,
 		) {
-			if err = merkle.MakeErrIsNull(
+			if err = markl.MakeErrIsNull(
 				child.Metadata.GetObjectSig(),
 				"object-sig",
 			); err != nil {

@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 // TODO rename to Id
@@ -57,11 +57,11 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	if err = merkle.MakeErrIsNull(digest, "page id"); err != nil {
+	if err = markl.MakeErrIsNull(digest, "page id"); err != nil {
 		panic(err)
 	}
 
-	digestString := merkle.Format(digest)
+	digestString := markl.Format(digest)
 	bucketIndexString := digestString[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {

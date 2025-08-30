@@ -2,7 +2,7 @@ package env_dir
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
@@ -10,7 +10,7 @@ import (
 // TODO move to own package
 
 func MakeConfig(
-	hashType merkle.HashType,
+	hashType markl.HashType,
 	funcJoin func(string, ...string) string,
 	compression interfaces.BlobCompression,
 	encryption interfaces.BlobEncryption,
@@ -27,7 +27,7 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionType       = age.Age{}
 	DefaultConfig               = Config{
-		hashType:    merkle.HashTypeSha256,
+		hashType:    markl.HashTypeSha256,
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionType,
 	}
@@ -36,7 +36,7 @@ var (
 )
 
 type Config struct {
-	hashType merkle.HashType
+	hashType markl.HashType
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.BlobCompression

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -117,7 +117,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		return
 	}
 
-	digest, repool := merkle.HashTypeSha256.FromStringFormat(
+	digest, repool := markl.HashTypeSha256.FromStringFormat(
 		"%s%s%s%s",
 		entry.EntryType,
 		base64.URLEncoding.EncodeToString(entry.PublicKey),
@@ -127,7 +127,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 
 	defer repool()
 
-	key = merkle.Format(digest)
+	key = markl.Format(digest)
 
 	return
 }

@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -919,12 +919,12 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				sh1 := merkle.HashTypeSha256.FromStringContent(object.GetObjectId().String())
-				sh2 := merkle.HashTypeSha256.FromStringContent(
+				sh1 := markl.HashTypeSha256.FromStringContent(object.GetObjectId().String())
+				sh2 := markl.HashTypeSha256.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
-				defer merkle.PutBlobId(sh1)
-				defer merkle.PutBlobId(sh2)
+				defer markl.PutBlobId(sh1)
+				defer markl.PutBlobId(sh2)
 				_, err = fmt.Fprintln(writer, object.GetObjectId(), sh1, sh2)
 				return
 			}

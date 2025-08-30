@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -37,7 +37,7 @@ func (store *Store) MergeCheckedOut(
 	var conflicts checkout_mode.Mode
 
 	// TODO add checkout_mode.BlobOnly
-	if merkle.Equals(
+	if markl.Equals(
 		co.GetSku().Metadata.GetObjectDigest(),
 		co.GetSkuExternal().Metadata.GetObjectDigest(),
 	) {
@@ -49,7 +49,7 @@ func (store *Store) MergeCheckedOut(
 		}
 
 		return
-	} else if merkle.Equals(co.GetSku().Metadata.GetBlobDigest(), co.GetSkuExternal().Metadata.GetBlobDigest()) {
+	} else if markl.Equals(co.GetSku().Metadata.GetBlobDigest(), co.GetSkuExternal().Metadata.GetBlobDigest()) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

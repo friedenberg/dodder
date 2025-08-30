@@ -1,4 +1,4 @@
-package merkle
+package markl
 
 import (
 	"crypto/ed25519"

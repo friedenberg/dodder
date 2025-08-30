@@ -1,4 +1,4 @@
-package merkle
+package markl
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"

@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 func (page *page) seekToFirstBinarySearch(
 	expected interfaces.BlobId,
 ) (mid int64, err error) {
 	errors.PanicIfError(
-		merkle.MakeErrWrongType(
+		markl.MakeErrWrongType(
 			page.hashType.GetType(),
 			expected.GetType(),
 		),
@@ -21,7 +21,7 @@ func (page *page) seekToFirstBinarySearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle.Format(expected),
+			"fd nil: " + markl.Format(expected),
 		)
 		return
 	}
@@ -44,7 +44,7 @@ func (page *page) seekToFirstBinarySearch(
 
 		// var loc int64
 
-		cmp := merkle.CompareToReaderAt(
+		cmp := markl.CompareToReaderAt(
 			page.file,
 			mid*int64(page.rowWidth),
 			expected,
@@ -71,7 +71,7 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, merkle.Format(expected)),
+		fmt.Sprintf("%d: %s", loops, markl.Format(expected)),
 	)
 
 	return
@@ -81,7 +81,7 @@ func (page *page) seekToFirstLinearSearch(
 	expected interfaces.BlobId,
 ) (loc int64, err error) {
 	errors.PanicIfError(
-		merkle.MakeErrWrongType(
+		markl.MakeErrWrongType(
 			page.hashType.GetType(),
 			expected.GetType(),
 		),
@@ -89,7 +89,7 @@ func (page *page) seekToFirstLinearSearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + merkle.Format(expected),
+			"fd nil: " + markl.Format(expected),
 		)
 		return
 	}
@@ -106,12 +106,12 @@ func (page *page) seekToFirstLinearSearch(
 	for loc = int64(0); loc <= rowCount; loc++ {
 		// var loc int64
 
-		if merkle.CompareToReader(&page.bufferedReader, expected) == 0 {
+		if markl.CompareToReader(&page.bufferedReader, expected) == 0 {
 			return
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(merkle.Format(expected))
+	err = collections.MakeErrNotFoundString(markl.Format(expected))
 
 	return
 }
