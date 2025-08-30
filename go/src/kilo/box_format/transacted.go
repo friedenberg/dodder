@@ -239,11 +239,11 @@ func (format *BoxTransacted) addFieldsMetadata(
 ) (err error) {
 	metadata := object.GetMetadata()
 
-	if options.PrintShas &&
-		(options.BoxPrintEmptyShas || !metadata.GetBlobDigest().IsNull()) {
-		var shaString string
+	if options.PrintBlobIds &&
+		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
+		var blobDigestString string
 
-		if shaString, err = object_metadata_fmt.MetadataBlobDigestString(
+		if blobDigestString, err = object_metadata_fmt.MetadataBlobDigestString(
 			metadata,
 			format.abbr.BlobId.Abbreviate,
 		); err != nil {
@@ -251,10 +251,14 @@ func (format *BoxTransacted) addFieldsMetadata(
 			return
 		}
 
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldBlobIdString(shaString),
-		)
+		if blobDigestString != "" {
+			box.Contents = append(
+				box.Contents,
+				object_metadata_fmt.MetadataFieldBlobDigestString(
+					blobDigestString,
+				),
+			)
+		}
 	}
 
 	if options.BoxPrintTai && object.GetGenre() != genres.InventoryList {

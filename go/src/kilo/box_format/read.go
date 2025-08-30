@@ -1,6 +1,7 @@
 package box_format
 
 import (
+	"bytes"
 	"io"
 	"strings"
 
@@ -197,12 +198,7 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if err = merkle.SetHexBytes(
-				"sha256",
-				// merkle.HRPObjectBlobDigestSha256V1,
-				object.Metadata.GetBlobDigestMutable(),
-				seq.At(1).Contents,
-			); err != nil {
+			if err = format.parseBlobIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -297,6 +293,40 @@ LOOP_AFTER_OID:
 	if scanner.Error() != nil {
 		err = errors.Wrap(scanner.Error())
 		return
+	}
+
+	return
+}
+
+// expects `seq` to include `@` as the first token
+func (format *BoxTransacted) parseBlobIdTag(
+	object *sku.Transacted,
+	seq doddish.Seq,
+) (err error) {
+	second := seq.At(1).Contents
+	lastIndex := bytes.LastIndex(second, []byte(`-`))
+
+	if lastIndex > -1 {
+		key := second[:lastIndex]
+
+		if err = object.Metadata.GetBlobDigestMutable().SetMerkleId(
+			string(key),
+			second[lastIndex+1:],
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	} else {
+		if err = merkle.SetHexBytes(
+			"sha256",
+			// merkle.HRPObjectBlobDigestSha256V1,
+			object.Metadata.GetBlobDigestMutable(),
+			seq.At(1).Contents,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

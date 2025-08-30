@@ -120,7 +120,7 @@ func (env *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	colorOptions.OffEntirely = true
 	options := env.config.GetPrintOptions().WithPrintShas(false)
 	options.BoxPrintTime = false
-	options.PrintShas = false
+	options.PrintBlobIds = false
 	options.BoxDescriptionInBox = false
 
 	return env.StringFormatWriterSkuBoxTransacted(
@@ -135,7 +135,7 @@ func (env *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	co.OffEntirely = true
 	options := env.config.GetPrintOptions().WithPrintShas(false)
 	options.BoxPrintTime = false
-	options.PrintShas = false
+	options.PrintBlobIds = false
 	options.BoxDescriptionInBox = false
 
 	return env.StringFormatWriterSkuBoxCheckedOut(

@@ -237,8 +237,8 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 ) (err error) {
 	metadata := object.GetMetadata()
 
-	if options.PrintShas &&
-		(options.BoxPrintEmptyShas || !metadata.GetBlobDigest().IsNull()) {
+	if options.PrintBlobIds &&
+		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
 		var shaString string
 
 		if shaString, err = object_metadata_fmt.MetadataBlobDigestString(
@@ -251,7 +251,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 		box.Contents = append(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldBlobIdString(shaString),
+			object_metadata_fmt.MetadataFieldBlobDigestString(shaString),
 		)
 	}
 

@@ -42,13 +42,13 @@ type (
 		BoxPrintIncludeDescription bool
 		BoxPrintTime               bool
 		BoxPrintTagsAlways         bool
-		BoxPrintEmptyShas          bool
+		BoxPrintEmptyBlobIds          bool
 		BoxPrintIncludeTypes       bool
 		BoxPrintTai                bool
 		BoxDescriptionInBox        bool
 		BoxExcludeFields           bool
 		PrintMatchedDormant        bool
-		PrintShas                  bool
+		PrintBlobIds                  bool
 		PrintFlush                 bool
 		PrintUnchanged             bool
 		PrintColors                bool
@@ -79,9 +79,9 @@ func Default() Options {
 		BoxPrintIncludeDescription: true,
 		BoxPrintTime:               true,
 		BoxPrintTagsAlways:         true,
-		BoxPrintEmptyShas:          false,
+		BoxPrintEmptyBlobIds:          false,
 		PrintMatchedDormant:        false,
-		PrintShas:                  true,
+		PrintBlobIds:                  true,
 		PrintFlush:                 true,
 		PrintUnchanged:             true,
 		PrintColors:                true,
@@ -102,10 +102,10 @@ func DefaultOverlay() V1 {
 			PrintIncludeDescription: &config.BoxPrintIncludeDescription,
 			PrintTime:               &config.BoxPrintTime,
 			PrintTagsAlways:         &config.BoxPrintTagsAlways,
-			PrintEmptyShas:          &config.BoxPrintEmptyShas,
+			PrintEmptyShas:          &config.BoxPrintEmptyBlobIds,
 		},
 		PrintMatchedDormant: &config.PrintMatchedDormant,
-		PrintShas:           &config.PrintShas,
+		PrintShas:           &config.PrintBlobIds,
 		PrintFlush:          &config.PrintFlush,
 		PrintUnchanged:      &config.PrintUnchanged,
 		PrintColors:         &config.PrintColors,
@@ -114,7 +114,7 @@ func DefaultOverlay() V1 {
 }
 
 func (options Options) WithPrintShas(v bool) Options {
-	options.PrintShas = v
+	options.PrintBlobIds = v
 	return options
 }
 
@@ -165,7 +165,7 @@ func MakeConfig(base Options, overlays ...OverlayGetter) Options {
 		equals.SetIfValueNotNil(&base.BoxDescriptionInBox, box.DescriptionInBox)
 		equals.SetIfValueNotNil(&base.BoxPrintTime, box.PrintTime)
 		equals.SetIfValueNotNil(&base.BoxPrintTagsAlways, box.PrintTagsAlways)
-		equals.SetIfValueNotNil(&base.BoxPrintEmptyShas, box.PrintEmptyShas)
+		equals.SetIfValueNotNil(&base.BoxPrintEmptyBlobIds, box.PrintEmptyShas)
 		equals.SetIfValueNotNil(
 			&base.BoxPrintIncludeTypes,
 			box.PrintIncludeTypes,
@@ -181,7 +181,7 @@ func MakeConfig(base Options, overlays ...OverlayGetter) Options {
 			&base.PrintMatchedDormant,
 			overlay.PrintMatchedDormant,
 		)
-		equals.SetIfValueNotNil(&base.PrintShas, overlay.PrintShas)
+		equals.SetIfValueNotNil(&base.PrintBlobIds, overlay.PrintShas)
 		equals.SetIfValueNotNil(&base.PrintFlush, overlay.PrintFlush)
 		equals.SetIfValueNotNil(&base.PrintUnchanged, overlay.PrintUnchanged)
 		equals.SetIfValueNotNil(&base.PrintColors, overlay.PrintColors)

@@ -77,7 +77,7 @@ func MetadataFieldError(
 	}
 }
 
-func MetadataFieldBlobIdString(
+func MetadataFieldBlobDigestString(
 	value string,
 ) string_format_writer.Field {
 	return string_format_writer.Field{

@@ -8,6 +8,7 @@ import (
 
 type (
 	BlobId interface {
+		// TODO consider removing Stringer and Setter
 		Stringer
 		encoding.BinaryMarshaler
 		encoding.TextMarshaler
