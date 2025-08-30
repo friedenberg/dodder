@@ -166,8 +166,21 @@ func EqualsReader(
 }
 
 func Equals(a, b interfaces.MarklId) bool {
-	return (a.IsNull() && b.IsNull()) ||
-		(a.GetType().GetType() == b.GetType().GetType() && bytes.Equal(a.GetBytes(), b.GetBytes()))
+	if a.IsNull() && b.IsNull() {
+		return true
+	}
+
+	var aType, bType string
+
+	if a.GetType() != nil {
+		aType = a.GetType().GetType()
+	}
+
+	if b.GetType() != nil {
+		bType = b.GetType().GetType()
+	}
+
+	return aType == bType && bytes.Equal(a.GetBytes(), b.GetBytes())
 }
 
 func Clone(src interfaces.MarklId) interfaces.MarklId {
