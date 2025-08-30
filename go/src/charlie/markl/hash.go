@@ -39,8 +39,8 @@ func (hash *Hash) BlockSize() int {
 	return hash.hash.BlockSize()
 }
 
-func (hash *Hash) GetType() string {
-	return hash.hashType.GetType()
+func (hash *Hash) GetType() interfaces.HashType {
+	return hash.hashType
 }
 
 func (hash *Hash) GetMarklId() (interfaces.MutableMarklId, interfaces.FuncRepool) {

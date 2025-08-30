@@ -11,12 +11,12 @@ import (
 func AddBlobDigestIfNecessary(
 	boxContents []string_format_writer.Field,
 	digest interfaces.MarklId,
-	abbr ids.FuncAbbreviateString,
+	funcAbbreviate ids.FuncAbbreviateString,
 ) []string_format_writer.Field {
 	value := digest.String()
 
-	if abbr != nil {
-		abbreviatedDigestString, err := abbr(digest)
+	if funcAbbreviate != nil {
+		abbreviatedDigestString, err := funcAbbreviate(digest)
 		if err != nil {
 			panic(err)
 		}
@@ -24,7 +24,7 @@ func AddBlobDigestIfNecessary(
 		if abbreviatedDigestString != "" {
 			value = abbreviatedDigestString
 		} else {
-			ui.Todo("abbreviate sha produced empty string")
+			ui.Todo("abbreviation func produced empty string")
 		}
 	}
 
@@ -32,19 +32,13 @@ func AddBlobDigestIfNecessary(
 		return boxContents
 	}
 
-	var field string_format_writer.Field
+	field := string_format_writer.Field{
+		Value:     "@" + value,
+		ColorType: string_format_writer.ColorTypeHash,
+	}
 
-	if digest.GetType() == markl.HRPObjectBlobDigestSha256V0 {
-		field = string_format_writer.Field{
-			Value:     "@" + value,
-			ColorType: string_format_writer.ColorTypeHash,
-		}
-	} else {
-		field = string_format_writer.Field{
-			Key:       digest.GetType(),
-			Value:     "@" + value,
-			ColorType: string_format_writer.ColorTypeHash,
-		}
+	if digest.GetType().GetType() != markl.HRPObjectBlobDigestSha256V0 {
+		field.Key = digest.GetType().GetType()
 	}
 
 	return append(boxContents, field)

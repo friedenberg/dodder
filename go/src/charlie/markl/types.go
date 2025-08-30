@@ -1,5 +1,7 @@
 package markl
 
+import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+
 const (
 	// keep sorted
 	// TODO move to ids' builtin types
@@ -34,4 +36,15 @@ var hrpToHashType = map[string]*HashType{
 	HRPObjectBlobDigestSha256V0: &HashTypeSha256,
 	HRPObjectBlobDigestSha256V1: &HashTypeSha256,
 	HRPObjectDigestSha256V1:     &HashTypeSha256,
+}
+
+func GetHashTypeOrError(tipe string) (*HashType, error) {
+	hashType, ok := hrpToHashType[tipe]
+
+	if !ok {
+		err := errors.Errorf("unknown type: %q", tipe)
+		return nil, err
+	}
+
+	return hashType, nil
 }

@@ -59,7 +59,7 @@ func makeHashType(
 	}
 
 	hash := constructor()
-	hashType.null.tipe = tipe
+	hashType.null.tipe = self
 	hashType.null.allocDataIfNecessary(cryptoHash.Size())
 	hashType.null.data = hash.Sum(hashType.null.data)
 
@@ -84,7 +84,9 @@ func (hashType *HashType) Get() *Hash {
 }
 
 func (hashType HashType) Put(hash *Hash) {
-	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.GetType()))
+	errors.PanicIfError(
+		MakeErrWrongType(hashType.tipe, hash.GetType().GetType()),
+	)
 	hashType.pool.Put(*hash)
 }
 

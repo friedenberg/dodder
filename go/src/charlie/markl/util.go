@@ -33,7 +33,7 @@ func SetHexStringFromPath(
 		return
 	}
 
-	if err = SetHexBytes(id.GetType(), id, []byte(head+tail)); err != nil {
+	if err = SetHexBytes(id.GetType().GetType(), id, []byte(head+tail)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -42,7 +42,7 @@ func SetHexStringFromPath(
 }
 
 func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
-	id.tipe = hashType.GetType()
+	id.tipe = hashType
 	id.allocDataAndSetToCapIfNecessary(hashType.GetSize())
 
 	if n, err = io.ReadFull(reader, id.data); err != nil {
@@ -94,7 +94,11 @@ func SetHexBytes(
 	bites = bytes.TrimSpace(bites)
 
 	if id, ok := dst.(*Id); ok {
-		id.tipe = tipe
+		if id.tipe, err = GetHashTypeOrError(tipe); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		id.allocDataAndSetToCapIfNecessary(hex.DecodedLen(len(bites)))
 
 		var numberOfBytesDecoded int
@@ -134,7 +138,9 @@ func SetDigester(
 	src interfaces.MarklIdGetter,
 ) {
 	digest := src.GetMarklId()
-	errors.PanicIfError(dst.SetMerkleId(digest.GetType(), digest.GetBytes()))
+	errors.PanicIfError(
+		dst.SetMerkleId(digest.GetType().GetType(), digest.GetBytes()),
+	)
 }
 
 func EqualsReader(

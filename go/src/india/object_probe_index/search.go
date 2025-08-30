@@ -15,7 +15,7 @@ func (page *page) seekToFirstBinarySearch(
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
 			page.hashType.GetType(),
-			expected.GetType(),
+			expected.GetType().GetType(),
 		),
 	)
 
@@ -83,7 +83,7 @@ func (page *page) seekToFirstLinearSearch(
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
 			page.hashType.GetType(),
-			expected.GetType(),
+			expected.GetType().GetType(),
 		),
 	)
 

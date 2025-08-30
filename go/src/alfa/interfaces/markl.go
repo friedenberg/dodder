@@ -7,6 +7,19 @@ import (
 )
 
 type (
+	HashType interface {
+		GetType() string
+		GetMarklIdForString(input string) (MarklId, FuncRepool)
+		// TODO rename
+		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
+	}
+
+	Hash interface {
+		hash.Hash
+		GetType() HashType
+		GetMarklId() (MutableMarklId, FuncRepool)
+	}
+
 	MarklId interface {
 		// TODO consider removing Stringer and Setter
 		Stringer
@@ -17,7 +30,7 @@ type (
 		// TODO rethink size as it works completely different between sha and
 		// merkle
 		GetSize() int
-		GetType() string
+		GetType() HashType
 		IsNull() bool
 	}
 
@@ -27,25 +40,13 @@ type (
 		encoding.BinaryUnmarshaler
 		encoding.TextUnmarshaler
 		// io.ReaderFrom
-		SetMerkleId(tipe string, bites []byte) error
+		SetMerkleId(typeId string, bites []byte) error
 		Reset()
 		ResetWithMarklId(MarklId)
 	}
 
 	MarklIdGetter interface {
 		GetMarklId() MarklId
-	}
-
-	Hash interface {
-		hash.Hash
-		GetType() string
-		GetMarklId() (MutableMarklId, FuncRepool)
-	}
-
-	HashType interface {
-		GetMarklIdForString(input string) (MarklId, FuncRepool)
-		// TODO rename
-		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
 	}
 
 	WriteMarklIdGetter interface {
