@@ -302,6 +302,7 @@ func (blobStore *remoteSftp) BlobReader(
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
 // TODO explore using env_dir.Mover generically instead of this
 type sftpMover struct {
+	hash     interfaces.Hash
 	store    *remoteSftp
 	config   env_dir.Config
 	tempFile *sftp.File
@@ -311,6 +312,8 @@ type sftpMover struct {
 }
 
 func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
+	mover.hash = hash
+
 	// Create a temporary file on the remote server
 	var tempNameBytes [16]byte
 	if _, err = rand.Read(tempNameBytes[:]); err != nil {
@@ -383,7 +386,7 @@ func (mover *sftpMover) Close() (err error) {
 		return nil
 	}
 
-	// Close the writer to finalize compression/encryption and SHA calculation
+	// Close the writer to finalize compression/encryption and digest calculation
 	if err = mover.writer.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -395,7 +398,7 @@ func (mover *sftpMover) Close() (err error) {
 		return
 	}
 
-	// Get the calculated SHA and determine final path
+	// Get the calculated digest and determine final path
 	blobDigest := mover.writer.GetDigest()
 	finalPath := mover.store.remotePathForMerkleId(blobDigest)
 
@@ -431,8 +434,7 @@ func (mover *sftpMover) Close() (err error) {
 
 func (mover *sftpMover) GetBlobId() interfaces.BlobId {
 	if mover.writer == nil {
-		// Return empty SHA if no data written
-		return sha.Env.GetBlobId()
+		return mover.GetBlobId()
 	}
 
 	return mover.writer.GetDigest()
@@ -564,8 +566,6 @@ func (reader *sftpReader) initialize(hash interfaces.Hash) (err error) {
 		return
 	}
 
-	// Set up SHA calculation
-	// TODO sha.GetPool()
 	reader.hash = hash
 	reader.tee = io.TeeReader(reader.expander, reader.hash)
 
