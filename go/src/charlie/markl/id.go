@@ -76,7 +76,7 @@ func (id Id) IsNull() bool {
 		panic("empty type")
 	}
 
-	hashType, ok := typeLookup[id.tipe.GetMarklTypeId()]
+	hashType, ok := hashTypes[id.tipe.GetMarklTypeId()]
 
 	// this is not an Id for a hash, so it can never be null with non-zero data
 	// contents

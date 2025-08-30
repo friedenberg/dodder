@@ -1,6 +1,7 @@
 package markl
 
 import (
+	"fmt"
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -9,8 +10,12 @@ import (
 func TestIdNullAndEqual(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	hashType := HashTypeSha256
+	for _, hashType := range hashTypes {
+		testIdNullAndEqual(t, hashType)
+	}
+}
 
+func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	{
 		t.AssertError(MakeErrIsNull(hashType.null, ""))
 		t.AssertNoError(MakeErrIsNotNull(hashType.null))
@@ -46,7 +51,7 @@ func TestIdNullAndEqual(t1 *testing.T) {
 
 	{
 		idNull, _ := hashType.GetBlobIdForHexString(
-			"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			fmt.Sprintf("%x", hashType.null.GetBytes()),
 		)
 
 		t.AssertNoError(MakeErrIsNotNull(idZero))
@@ -64,4 +69,48 @@ func TestIdNullAndEqual(t1 *testing.T) {
 		t.AssertError(MakeErrNotEqual(idNonZero, idZero))
 		t.AssertError(MakeErrNotEqual(idZero, idNonZero))
 	}
+}
+
+func TestIdEncodeDecode(t1 *testing.T) {
+	t := ui.MakeTestContext(t1)
+
+	for _, hashType := range hashTypes {
+		hash := hashType.Get()
+
+		{
+			id, _ := hash.GetMarklId()
+			stringValue := StringHRPCombined(id)
+
+			t.Log(stringValue)
+
+			t.AssertNoError(
+				SetBlechCombinedHRPAndData(id, stringValue),
+			)
+		}
+	}
+}
+
+func FuzzIdStringLen(f *testing.F) {
+	f.Add("testing")
+	f.Add("holidays")
+
+	hashType := HashTypeBlake2s256
+
+	f.Fuzz(
+		func(t1 *testing.T, input string) {
+			id, repool := hashType.GetMarklIdForString(input)
+			defer repool()
+
+			if input == "" {
+				return
+			}
+
+			actual := len(id.String()) - len(hashType.GetMarklTypeId())
+			expected := 59
+
+			if actual != expected {
+				t1.Errorf("expected %d but got %d", expected, actual)
+			}
+		},
+	)
 }

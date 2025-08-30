@@ -20,6 +20,7 @@ const (
 
 var (
 	types              map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
+	hashTypes          map[string]HashType             = map[string]HashType{}
 	HashTypeSha256     HashType
 	HashTypeBlake2s256 HashType
 )
@@ -83,6 +84,7 @@ func makeHashType(
 	hashType.null.data = hash.Sum(hashType.null.data)
 
 	types[tipe] = hashType
+	hashTypes[tipe] = hashType
 
 	return hashType
 }

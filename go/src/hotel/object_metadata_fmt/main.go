@@ -32,8 +32,9 @@ func AddBlobDigestIfNecessary(
 	}
 
 	field := string_format_writer.Field{
-		Value:     "@" + value,
-		ColorType: string_format_writer.ColorTypeHash,
+		Value:      "@" + value,
+		ColorType:  string_format_writer.ColorTypeHash,
+		NoTruncate: true,
 	}
 
 	return append(boxContents, field)

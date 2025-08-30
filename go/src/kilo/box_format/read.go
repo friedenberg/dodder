@@ -336,7 +336,15 @@ func (format *BoxTransacted) parseMarklIdTag(
 	object *sku.Transacted,
 	seq doddish.Seq,
 ) (err error) {
-	key := string(seq.At(1).Contents)
+	var key string
+	var value []byte
+
+	if seq.Len() == 3 {
+		key = string(seq.At(1).Contents)
+		value = seq.At(2).Contents
+	} else {
+		value = seq.At(1).Contents
+	}
 
 	switch key {
 	case "":
@@ -344,7 +352,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 
 	case "blob":
 		if err = object.Metadata.GetBlobDigestMutable().Set(
-			string(seq.At(2).Contents),
+			string(value),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

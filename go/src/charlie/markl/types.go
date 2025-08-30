@@ -37,12 +37,6 @@ var hrpValid = []string{
 	HRPRequestAuthResponseV1,
 }
 
-var typeLookup = map[string]*HashType{
-	HRPObjectBlobDigestSha256V0: &HashTypeSha256,
-	HRPObjectBlobDigestSha256V1: &HashTypeSha256,
-	HRPObjectDigestSha256V1:     &HashTypeSha256,
-}
-
 func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
 	tipe, ok := types[typeId]
 

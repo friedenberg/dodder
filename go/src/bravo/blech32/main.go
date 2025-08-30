@@ -30,7 +30,6 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 )
 
@@ -133,7 +132,7 @@ func convertBits(data []byte, frombits, tobits byte, pad bool) ([]byte, error) {
 // the output will be uppercase.
 func Encode(hrp string, data []byte) ([]byte, error) {
 	if len(hrp) < 1 {
-		return nil, errors.Wrap(ErrEmptyHRP)
+		return nil, ErrEmptyHRP
 	}
 	for p, c := range hrp {
 		if c < 33 || c > 126 {
@@ -159,7 +158,6 @@ func encode(hrp string, data []byte) ([]byte, error) {
 	var lower bool
 
 	if lower, err = validateCaseString(hrp); err != nil {
-		err = errors.Wrapf(err, "hrp: %q", hrp)
 		return nil, err
 	}
 
@@ -177,6 +175,48 @@ func encode(hrp string, data []byte) ([]byte, error) {
 	}
 
 	for _, p := range createChecksum(hrp, values) {
+		ret.WriteByte(charsetString[p])
+	}
+
+	if lower {
+		return ret.Bytes(), nil
+	}
+
+	return bytes.ToUpper(ret.Bytes()), nil
+}
+
+func EncodeHRPAsData(hrp string, data []byte) ([]byte, error) {
+	dataConverted, err := convertBits(data, 8, 5, true)
+	if err != nil {
+		return nil, err
+	}
+
+	var lower bool
+
+	hrpBytes := []byte(hrp)
+
+	if lower, err = validateCase(hrpBytes); err != nil {
+		return nil, err
+	}
+
+	unicorn.ToLower(hrpBytes)
+
+	var ret bytes.Buffer
+
+	hrpBytesConverted, err := convertBits(hrpBytes, 8, 5, true)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range hrpBytesConverted {
+		ret.WriteByte(charsetString[p])
+	}
+
+	for _, p := range dataConverted {
+		ret.WriteByte(charsetString[p])
+	}
+
+	for _, p := range createChecksum(hrp, dataConverted) {
 		ret.WriteByte(charsetString[p])
 	}
 
@@ -239,7 +279,6 @@ func validateCase(bites []byte) (lower bool, err error) {
 // uppercase.
 func DecodeString(input string) (hrp string, data []byte, err error) {
 	if _, err = validateCaseString(input); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -257,7 +296,6 @@ func DecodeString(input string) (hrp string, data []byte, err error) {
 	hrp = input[:pos]
 
 	if err = validateHRP(hrp); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -281,7 +319,7 @@ func DecodeString(input string) (hrp string, data []byte, err error) {
 	}
 	data, err = convertBits(data[:len(data)-6], 5, 8, false)
 	if err != nil {
-		return "", nil, errors.Wrap(err)
+		return "", nil, err
 	}
 	return hrp, data, nil
 }
@@ -324,7 +362,6 @@ func DecodeDataOnly(bites []byte) (data []byte, err error) {
 // will be uppercase.
 func decode(hrp string, bites []byte) (data []byte, err error) {
 	if _, err = validateCase(bites); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -352,7 +389,7 @@ func decode(hrp string, bites []byte) (data []byte, err error) {
 
 	data, err = convertBits(data[:len(data)-6], 5, 8, false)
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, err
 	}
 
 	return data, nil
