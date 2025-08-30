@@ -23,9 +23,10 @@ var (
 	V10 = Version(values.Int(10))
 	V11 = Version(values.Int(11))
 	V12 = Version(values.Int(12))
+	V13 = Version(values.Int(13))
 
-	VCurrent = V11
-	VNext    = V12
+	VCurrent = V12
+	VNext    = V13
 )
 
 // TODO replace with Int
