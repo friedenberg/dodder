@@ -96,6 +96,13 @@ func (hashType HashType) GetSize() int {
 	return hashType.Hash.Size()
 }
 
+func (hashType HashType) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) {
+	hash := hashType.Get()
+	defer hashType.Put(hash)
+
+	return hash.GetBlobId()
+}
+
 func (hashType HashType) GetBlobIdForString(
 	input string,
 ) (interfaces.BlobId, interfaces.FuncRepool) {

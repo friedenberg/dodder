@@ -6,10 +6,42 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
+
+func SetHexStringFromPath(
+	id interfaces.MutableBlobId,
+	path string,
+) (err error) {
+	id.Reset()
+
+	tail := filepath.Base(path)
+	head := filepath.Base(filepath.Dir(path))
+
+	switch {
+	case tail == string(filepath.Separator) || head == string(filepath.Separator):
+		fallthrough
+
+	case tail == "." || head == ".":
+		err = errors.ErrorWithStackf(
+			"path cannot be turned into a head/tail pair: '%s/%s'",
+			head,
+			tail,
+		)
+
+		return
+	}
+
+	if err = SetHexBytes(id.GetType(), id, []byte(head+tail)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
 
 func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
 	id.tipe = hashType.GetType()
@@ -86,6 +118,8 @@ func SetHexBytes(
 			return
 		}
 	} else {
+		dst.Reset()
+
 		var numberOfBytesDecoded int
 		bytesDecoded := make([]byte, hex.DecodedLen(len(bites)))
 

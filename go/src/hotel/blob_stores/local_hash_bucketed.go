@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -88,7 +87,8 @@ func (blobStore localHashBucketed) HasBlob(
 // TODO add support for other bucket sizes and digest types
 func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 	return func(yield func(interfaces.BlobId, error) bool) {
-		var digest sha.Sha
+		id, repool := blobStore.hashType.GetBlobId()
+		defer repool()
 
 		for path, err := range files.DirNamesLevel2(blobStore.basePath) {
 			if errors.IsErrno(err, syscall.ENOTDIR) {
@@ -104,18 +104,18 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 			}
 
 			// TODO use config to determine which digest type to set
-			if err = digest.SetFromPath(path); err != nil {
+			if err = merkle.SetHexStringFromPath(id, path); err != nil {
 				err = errors.Wrap(err)
 				if !yield(nil, err) {
 					return
 				}
 			}
 
-			if digest.IsNull() {
+			if id.IsNull() {
 				continue
 			}
 
-			if !yield(&digest, nil) {
+			if !yield(id, nil) {
 				return
 			}
 		}
