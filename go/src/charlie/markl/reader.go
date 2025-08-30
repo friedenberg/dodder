@@ -8,11 +8,10 @@ import (
 )
 
 type readCloser struct {
-	envDigest interfaces.EnvBlobId
-	tee       io.Reader
-	reader    io.Reader
-	writer    io.Writer
-	hash      interfaces.Hash
+	tee    io.Reader
+	reader io.Reader
+	writer io.Writer
+	hash   interfaces.Hash
 }
 
 func MakeReadCloser(

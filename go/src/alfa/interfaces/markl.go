@@ -48,15 +48,6 @@ type (
 		FromStringFormat(format string, args ...any) (BlobId, FuncRepool)
 	}
 
-	EnvBlobId interface {
-		GetType() string
-
-		GetHash() (hash.Hash, FuncRepool)
-
-		GetBlobId() MutableBlobId
-		PutBlobId(BlobId)
-	}
-
 	WriteBlobIdGetter interface {
 		io.Writer
 		BlobIdGetter

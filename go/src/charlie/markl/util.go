@@ -165,22 +165,13 @@ func Equals(a, b interfaces.BlobId) bool {
 }
 
 func Clone(src interfaces.BlobId) interfaces.BlobId {
-	if src.IsNull() {
-		return Null
+	if !src.IsNull() {
+		errors.PanicIfError(MakeErrEmptyType(src))
 	}
 
-	errors.PanicIfError(MakeErrEmptyType(src))
 	dst := idPool.Get()
 	dst.ResetWithMerkleId(src)
 
-	return dst
-}
-
-func CloneId(src interfaces.BlobId) *Id {
-	errors.PanicIfError(MakeErrEmptyType(src))
-	errors.PanicIfError(MakeErrIsNull(src, ""))
-	dst := idPool.Get()
-	dst.ResetWithMerkleId(src)
 	return dst
 }
 

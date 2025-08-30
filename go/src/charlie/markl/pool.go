@@ -17,12 +17,6 @@ func PutBlobId(digest interfaces.BlobId) {
 		idPool.Put(id)
 
 	default:
-		tipe := digest.GetType()
-
-		if env, ok := envs[tipe]; ok {
-			env.PutBlobId(digest)
-		} else {
-			panic(errors.Errorf("no env registered for digest type: %s", tipe))
-		}
+		panic(errors.Errorf("unsupported id type: %T", digest))
 	}
 }
