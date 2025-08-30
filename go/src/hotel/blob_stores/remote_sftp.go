@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/merkle"
-	"code.linenisgreat.com/dodder/go/src/delta/sha"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -31,8 +30,6 @@ type remoteSftp struct {
 	config blob_store_configs.ConfigSFTPRemotePath
 
 	hashType merkle.HashType
-	// TODO move to config
-	envDigest interfaces.EnvBlobId
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -52,7 +49,6 @@ func makeSftpStore(
 ) (blobStore *remoteSftp, err error) {
 	blobStore = &remoteSftp{
 		hashType:  merkle.HashTypeSha256,
-		envDigest: sha.Env,
 		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
 		config:    config,
@@ -191,6 +187,9 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 		// Walk through the two-level directory structure (Git-like bucketing)
 		walker := blobStore.sftpClient.Walk(basePath)
 
+		digest, repool := blobStore.hashType.GetBlobId()
+		defer repool()
+
 		for walker.Step() {
 			if err := walker.Err(); err != nil {
 				if !yield(nil, errors.Wrapf(err, "BasePath: %q", basePath)) {
@@ -209,10 +208,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 			relPath := strings.TrimPrefix(walker.Path(), basePath)
 			relPath = strings.TrimPrefix(relPath, "/")
 
-			var digest sha.Sha
-
-			// TODO use config to determine which digest type to set
-			if err := digest.SetFromPath(relPath); err != nil {
+			if err := merkle.SetHexStringFromPath(digest, relPath); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
@@ -224,7 +220,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 			blobStore.blobCache[string(digest.GetBytes())] = struct{}{}
 			blobStore.blobCacheLock.Unlock()
 
-			if !yield(&digest, nil) {
+			if !yield(digest, nil) {
 				return
 			}
 		}
@@ -386,7 +382,8 @@ func (mover *sftpMover) Close() (err error) {
 		return nil
 	}
 
-	// Close the writer to finalize compression/encryption and digest calculation
+	// Close the writer to finalize compression/encryption and digest
+	// calculation
 	if err = mover.writer.Close(); err != nil {
 		err = errors.Wrap(err)
 		return

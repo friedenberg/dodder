@@ -103,12 +103,12 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 				}
 			}
 
-			// TODO use config to determine which digest type to set
 			if err = merkle.SetHexStringFromPath(id, path); err != nil {
-				err = errors.Wrap(err)
-				if !yield(nil, err) {
+				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
+
+				continue
 			}
 
 			if id.IsNull() {
