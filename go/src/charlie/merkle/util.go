@@ -16,8 +16,6 @@ func SetHexStringFromPath(
 	id interfaces.MutableBlobId,
 	path string,
 ) (err error) {
-	id.Reset()
-
 	tail := filepath.Base(path)
 	head := filepath.Base(filepath.Dir(path))
 
@@ -114,8 +112,6 @@ func SetHexBytes(
 			return
 		}
 	} else {
-		dst.Reset()
-
 		var numberOfBytesDecoded int
 		bytesDecoded := make([]byte, hex.DecodedLen(len(bites)))
 
