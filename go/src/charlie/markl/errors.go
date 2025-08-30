@@ -12,7 +12,7 @@ import (
 var ErrEmptyType = errors.New("type is empty")
 
 func MakeErrEmptyType(id interfaces.MarklId) error {
-	if id.GetType() == nil {
+	if id.GetMarklType() == nil {
 		return errors.WrapSkip(1, ErrEmptyType)
 	}
 

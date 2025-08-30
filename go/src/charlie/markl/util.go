@@ -33,7 +33,7 @@ func SetHexStringFromPath(
 		return
 	}
 
-	if err = SetHexBytes(id.GetType().GetType(), id, []byte(head+tail)); err != nil {
+	if err = SetHexBytes(id.GetMarklType().GetMarklTypeId(), id, []byte(head+tail)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -139,7 +139,7 @@ func SetDigester(
 ) {
 	digest := src.GetMarklId()
 	errors.PanicIfError(
-		dst.SetMerkleId(digest.GetType().GetType(), digest.GetBytes()),
+		dst.SetMerkleId(digest.GetMarklType().GetMarklTypeId(), digest.GetBytes()),
 	)
 }
 
@@ -172,12 +172,12 @@ func Equals(a, b interfaces.MarklId) bool {
 
 	var aType, bType string
 
-	if a.GetType() != nil {
-		aType = a.GetType().GetType()
+	if a.GetMarklType() != nil {
+		aType = a.GetMarklType().GetMarklTypeId()
 	}
 
-	if b.GetType() != nil {
-		bType = b.GetType().GetType()
+	if b.GetMarklType() != nil {
+		bType = b.GetMarklType().GetMarklTypeId()
 	}
 
 	return aType == bType && bytes.Equal(a.GetBytes(), b.GetBytes())

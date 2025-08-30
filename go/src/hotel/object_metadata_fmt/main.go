@@ -37,8 +37,8 @@ func AddBlobDigestIfNecessary(
 		ColorType: string_format_writer.ColorTypeHash,
 	}
 
-	if digest.GetType().GetType() != markl.HRPObjectBlobDigestSha256V0 {
-		field.Key = digest.GetType().GetType()
+	if digest.GetMarklType().GetMarklTypeId() != markl.HRPObjectBlobDigestSha256V0 {
+		field.Key = digest.GetMarklType().GetMarklTypeId()
 	}
 
 	return append(boxContents, field)

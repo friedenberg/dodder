@@ -39,13 +39,13 @@ func (hash *Hash) BlockSize() int {
 	return hash.hash.BlockSize()
 }
 
-func (hash *Hash) GetType() interfaces.MarklType {
+func (hash *Hash) GetMarklType() interfaces.MarklType {
 	return hash.hashType
 }
 
 func (hash *Hash) GetMarklId() (interfaces.MutableMarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
-	id.tipe = hash.GetType()
+	id.tipe = hash.GetMarklType()
 	id.allocDataIfNecessary(hash.Size())
 
 	if hash.written > 0 {
@@ -62,7 +62,7 @@ func (hash *Hash) GetBlobIdForReader(
 	reader io.Reader,
 ) (interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
-	id.tipe = hash.GetType()
+	id.tipe = hash.GetMarklType()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())
 
 	if _, err := io.ReadFull(reader, id.data); err != nil && err != io.EOF {
@@ -79,7 +79,7 @@ func (hash *Hash) GetBlobIdForReaderAt(
 	off int64,
 ) (interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
-	id.tipe = hash.GetType()
+	id.tipe = hash.GetMarklType()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())
 
 	if _, err := reader.ReadAt(id.data, off); err != nil {

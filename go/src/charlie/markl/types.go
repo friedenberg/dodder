@@ -60,7 +60,7 @@ type fakeHashType struct {
 
 var _ interfaces.MarklType = fakeHashType{}
 
-func (tipe fakeHashType) GetType() string {
+func (tipe fakeHashType) GetMarklTypeId() string {
 	return tipe.tipe
 }
 

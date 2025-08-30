@@ -42,12 +42,12 @@ func (id Id) String() string {
 		return ""
 	}
 
-	if id.tipe.GetType() == HRPObjectBlobDigestSha256V0 {
+	if id.tipe.GetMarklTypeId() == HRPObjectBlobDigestSha256V0 {
 		return fmt.Sprintf("%x", id.data)
 	} else if len(id.data) == 0 {
 		return ""
 	} else {
-		bites, err := blech32.Encode(id.tipe.GetType(), id.data)
+		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
 		errors.PanicIfError(err)
 		return string(bites)
 	}
@@ -65,7 +65,7 @@ func (id Id) GetBytes() []byte {
 	return id.data
 }
 
-func (id Id) GetType() interfaces.MarklType {
+func (id Id) GetMarklType() interfaces.MarklType {
 	return id.tipe
 }
 
@@ -76,7 +76,7 @@ func (id Id) IsNull() bool {
 		panic("empty type")
 	}
 
-	hashType, ok := typeLookup[id.tipe.GetType()]
+	hashType, ok := typeLookup[id.tipe.GetMarklTypeId()]
 
 	// this is not an Id for a hash, so it can never be null with non-zero data
 	// contents
@@ -144,7 +144,7 @@ func (id *Id) Set(value string) (err error) {
 
 func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	if err = id.SetMerkleId(
-		digest.GetType().GetType(),
+		digest.GetMarklType().GetMarklTypeId(),
 		digest.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -202,7 +202,7 @@ func (id *Id) ResetWith(src Id) {
 }
 
 func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
-	errors.PanicIfError(id.SetMerkleId(src.GetType().GetType(), src.GetBytes()))
+	errors.PanicIfError(id.SetMerkleId(src.GetMarklType().GetMarklTypeId(), src.GetBytes()))
 }
 
 func (id *Id) GetBlobId() interfaces.MarklId {
@@ -238,7 +238,7 @@ func (id *Id) UnmarshalBinary(
 func (id Id) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	tipe := id.GetType()
+	tipe := id.GetMarklType()
 	bites := id.GetBytes()
 
 	if tipe == nil && len(bites) == 0 {
@@ -248,7 +248,7 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 		return
 	}
 
-	bytes = append(bytes, []byte(tipe.GetType())...)
+	bytes = append(bytes, []byte(tipe.GetMarklTypeId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 
@@ -256,10 +256,10 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 }
 
 func (id Id) MarshalText() (bites []byte, err error) {
-	if id.tipe.GetType() == HRPObjectBlobDigestSha256V0 {
+	if id.tipe.GetMarklTypeId() == HRPObjectBlobDigestSha256V0 {
 		bites = fmt.Appendf(nil, "%x", id.data)
 	} else {
-		if bites, err = blech32.Encode(id.tipe.GetType(), id.data); err != nil {
+		if bites, err = blech32.Encode(id.tipe.GetMarklTypeId(), id.data); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -95,12 +95,12 @@ func (hashType *HashType) Get() *Hash {
 
 func (hashType HashType) Put(hash *Hash) {
 	errors.PanicIfError(
-		MakeErrWrongType(hashType.tipe, hash.GetType().GetType()),
+		MakeErrWrongType(hashType.tipe, hash.GetMarklType().GetMarklTypeId()),
 	)
 	hashType.pool.Put(*hash)
 }
 
-func (hashType HashType) GetType() string {
+func (hashType HashType) GetMarklTypeId() string {
 	return hashType.tipe
 }
 

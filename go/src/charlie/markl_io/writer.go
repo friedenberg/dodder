@@ -47,7 +47,7 @@ type writer struct {
 var _ interfaces.MarklIdGetter = &writer{}
 
 func (writer *writer) Reset(hash interfaces.Hash, in io.Writer) {
-	if writer.hash == nil || writer.hash.GetType() != hash.GetType() {
+	if writer.hash == nil || writer.hash.GetMarklType() != hash.GetMarklType() {
 		writer.hash = hash
 	} else {
 		writer.hash.Reset()
