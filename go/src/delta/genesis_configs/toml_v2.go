@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -21,12 +22,12 @@ type TomlV2Common struct {
 }
 
 type TomlV2Private struct {
-	markl.TomlPrivateKeyV0
+	markl_toml.TomlPrivateKeyV0
 	TomlV2Common
 }
 
 type TomlV2Public struct {
-	markl.TomlPublicKeyV0
+	markl_toml.TomlPublicKeyV0
 	TomlV2Common
 }
 

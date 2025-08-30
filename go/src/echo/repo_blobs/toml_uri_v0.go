@@ -2,11 +2,11 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 )
 
 type TomlUriV0 struct {
-	markl.TomlPublicKeyV0
+	markl_toml.TomlPublicKeyV0
 	Uri values.Uri `toml:"uri"`
 }
 

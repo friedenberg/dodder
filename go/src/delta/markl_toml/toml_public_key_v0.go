@@ -1,9 +1,10 @@
-package markl
+package markl_toml
 
 import (
 	"crypto"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 // TODO hide inner fields
@@ -16,6 +17,6 @@ func (b TomlPublicKeyV0) GetPublicKey() PublicKey {
 }
 
 func (b *TomlPublicKeyV0) SetPublicKey(key crypto.PublicKey) {
-	b.PublicKey.HRP = HRPRepoPubKeyV1
+	b.PublicKey.HRP = markl.HRPRepoPubKeyV1
 	b.PublicKey.Data = key.(PublicKey)
 }

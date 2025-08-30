@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -23,12 +24,12 @@ type TomlV1Common struct {
 }
 
 type TomlV1Private struct {
-	markl.TomlPrivateKeyV0
+	markl_toml.TomlPrivateKeyV0
 	TomlV1Common
 }
 
 type TomlV1Public struct {
-	markl.TomlPublicKeyV0
+	markl_toml.TomlPublicKeyV0
 	TomlV1Common
 }
 

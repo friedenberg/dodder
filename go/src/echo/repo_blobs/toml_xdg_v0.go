@@ -1,12 +1,12 @@
 package repo_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
 type TomlXDGV0 struct {
-	markl.TomlPublicKeyV0
+	markl_toml.TomlPublicKeyV0
 	Data    string `toml:"data"`
 	Config  string `toml:"config"`
 	State   string `toml:"state"`
