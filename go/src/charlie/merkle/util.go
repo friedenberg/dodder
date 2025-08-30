@@ -95,10 +95,6 @@ func SetHexBytes(
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
 
-	if len(bites) == 0 {
-		return
-	}
-
 	if id, ok := dst.(*Id); ok {
 		id.tipe = tipe
 		id.allocDataAndSetToCapIfNecessary(hex.DecodedLen(len(bites)))
