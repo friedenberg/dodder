@@ -63,7 +63,7 @@ type (
 	}
 
 	BlobCopyResult struct {
-		*Transacted       // may be nil
+		*Transacted        // may be nil
 		interfaces.MarklId // may not be nil
 
 		// -1: no remote blob store and the blob doesn't exist locally

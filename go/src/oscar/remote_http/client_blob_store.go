@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 )
@@ -92,7 +93,7 @@ func (client *client) BlobReader(
 
 	default:
 		// TODO use correct hash type
-		reader = markl.MakeReadCloser(
+		reader = markl_io.MakeReadCloser(
 			markl.HashTypeSha256.Get(),
 			response.Body,
 		)

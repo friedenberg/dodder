@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -153,7 +154,7 @@ func (cmd BlobStoreWrite) doOne(
 	if cmd.Check {
 		{
 			var repool func()
-			writeCloser, repool = markl.MakeWriterWithRepool(
+			writeCloser, repool = markl_io.MakeWriterWithRepool(
 				markl.HashTypeSha256.Get(),
 				nil,
 			)

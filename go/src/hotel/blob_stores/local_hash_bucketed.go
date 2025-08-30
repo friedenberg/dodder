@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -144,7 +145,7 @@ func (blobStore localHashBucketed) BlobReader(
 	digest interfaces.MarklId,
 ) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = markl.MakeNopReadCloser(
+		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
@@ -188,7 +189,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	path string,
 ) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
-		readCloser = markl.MakeNopReadCloser(
+		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)

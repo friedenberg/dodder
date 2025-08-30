@@ -23,18 +23,18 @@ type JSONMCP struct {
 
 type JSON struct {
 	// TODO rename to blob-id
-	BlobId      string    `json:"blob-sha"`
-	BlobString  string    `json:"blob-string,omitempty"`
-	Date        string    `json:"date"`
-	Description string    `json:"description"`
-	Dormant     bool      `json:"dormant"`
-	ObjectId    string    `json:"object-id"`
+	BlobId      string   `json:"blob-sha"`
+	BlobString  string   `json:"blob-string,omitempty"`
+	Date        string   `json:"date"`
+	Description string   `json:"description"`
+	Dormant     bool     `json:"dormant"`
+	ObjectId    string   `json:"object-id"`
 	RepoPubkey  markl.Id `json:"repo-pub_key"`
 	RepoSig     markl.Id `json:"repo-sig"`
-	Sha         string    `json:"sha"`
-	Tags        []string  `json:"tags"`
-	Tai         string    `json:"tai"`
-	Type        string    `json:"type"`
+	Sha         string   `json:"sha"`
+	Tags        []string `json:"tags"`
+	Tai         string   `json:"tai"`
+	Type        string   `json:"type"`
 
 	JSONMCP
 }

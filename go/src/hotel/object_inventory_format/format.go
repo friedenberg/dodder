@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
@@ -391,7 +392,7 @@ func WriteMetadata(
 	f Format,
 	c FormatterContext,
 ) (blobDigest interfaces.MarklId, err error) {
-	writer, repool := markl.MakeWriterWithRepool(
+	writer, repool := markl_io.MakeWriterWithRepool(
 		markl.HashTypeSha256.Get(),
 		w,
 	)
@@ -425,7 +426,7 @@ func GetDigestForContextDebug(
 	context FormatterContext,
 ) (digest interfaces.MarklId, err error) {
 	var sb strings.Builder
-	writer, repool := markl.MakeWriterWithRepool(
+	writer, repool := markl_io.MakeWriterWithRepool(
 		markl.HashTypeSha256.Get(),
 		&sb,
 	)

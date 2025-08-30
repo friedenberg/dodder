@@ -80,7 +80,7 @@ func (blobImporter *BlobImporter) emitMissingBlob(
 		if err = blobImporter.CopierDelegate(
 			sku.BlobCopyResult{
 				Transacted: object,
-				MarklId:     blobId,
+				MarklId:    blobId,
 				N:          n,
 			},
 		); err != nil {
@@ -134,7 +134,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 				if err = blobImporter.CopierDelegate(
 					sku.BlobCopyResult{
 						Transacted: object,
-						MarklId:     blobId,
+						MarklId:    blobId,
 						N:          n,
 					},
 				); err != nil {

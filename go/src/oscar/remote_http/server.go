@@ -660,7 +660,7 @@ func (server *Server) copyBlob(
 	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
 			MarklId: result,
-			N:      progressWriter.GetWritten(),
+			N:       progressWriter.GetWritten(),
 		},
 	); err != nil {
 		err = errors.Wrap(err)

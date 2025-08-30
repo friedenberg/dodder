@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -342,7 +343,7 @@ func (arf blobReaderFactory) BlobReader(
 		arf.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
-	readCloser = markl.MakeNopReadCloser(
+	readCloser = markl_io.MakeNopReadCloser(
 		markl.HashTypeSha256.Get(),
 		io.NopCloser(strings.NewReader(v)),
 	)

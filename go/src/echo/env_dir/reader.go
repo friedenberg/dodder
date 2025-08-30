@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
@@ -39,7 +39,7 @@ func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
 		}
 	}
 
-	r.digester = markl.MakeWriter(config.hashType.Get(), nil)
+	r.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
 	r.tee = io.TeeReader(r.expander, r.digester)
 
 	return

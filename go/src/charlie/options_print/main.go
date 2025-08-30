@@ -42,13 +42,13 @@ type (
 		BoxPrintIncludeDescription bool
 		BoxPrintTime               bool
 		BoxPrintTagsAlways         bool
-		BoxPrintEmptyBlobIds          bool
+		BoxPrintEmptyBlobIds       bool
 		BoxPrintIncludeTypes       bool
 		BoxPrintTai                bool
 		BoxDescriptionInBox        bool
 		BoxExcludeFields           bool
 		PrintMatchedDormant        bool
-		PrintBlobIds                  bool
+		PrintBlobIds               bool
 		PrintFlush                 bool
 		PrintUnchanged             bool
 		PrintColors                bool
@@ -79,9 +79,9 @@ func Default() Options {
 		BoxPrintIncludeDescription: true,
 		BoxPrintTime:               true,
 		BoxPrintTagsAlways:         true,
-		BoxPrintEmptyBlobIds:          false,
+		BoxPrintEmptyBlobIds:       false,
 		PrintMatchedDormant:        false,
-		PrintBlobIds:                  true,
+		PrintBlobIds:               true,
 		PrintFlush:                 true,
 		PrintUnchanged:             true,
 		PrintColors:                true,
