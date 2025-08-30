@@ -7,8 +7,15 @@ import (
 )
 
 type (
-	HashType interface {
+	MarklType interface {
 		GetType() string
+		// GetMarklIdForString(input string) (MarklId, FuncRepool)
+		// TODO rename
+		// FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
+	}
+
+	HashType interface {
+		MarklType
 		GetMarklIdForString(input string) (MarklId, FuncRepool)
 		// TODO rename
 		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
@@ -16,7 +23,7 @@ type (
 
 	Hash interface {
 		hash.Hash
-		GetType() HashType
+		GetType() MarklType
 		GetMarklId() (MutableMarklId, FuncRepool)
 	}
 
@@ -30,7 +37,7 @@ type (
 		// TODO rethink size as it works completely different between sha and
 		// merkle
 		GetSize() int
-		GetType() HashType
+		GetType() MarklType
 		IsNull() bool
 	}
 

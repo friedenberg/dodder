@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	hashTypes      map[string]HashType = map[string]HashType{}
+	hashTypes      map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
 	HashTypeSha256 HashType
 )
 
@@ -28,6 +28,16 @@ func init() {
 		sha256.New,
 		&HashTypeSha256,
 	)
+
+	makeFakeHashType(HRPObjectBlobDigestSha256V1)
+	makeFakeHashType(HRPObjectDigestSha256V1)
+	makeFakeHashType(HRPObjectMotherSigV1)
+	makeFakeHashType(HRPObjectSigV0)
+	makeFakeHashType(HRPObjectSigV1)
+	makeFakeHashType(HRPRepoPrivateKeyV1)
+	makeFakeHashType(HRPRepoPubKeyV1)
+	makeFakeHashType(HRPRequestAuthChallengeV1)
+	makeFakeHashType(HRPRequestAuthResponseV1)
 }
 
 func makeHashType(
@@ -36,13 +46,13 @@ func makeHashType(
 	constructor func() hash.Hash,
 	self *HashType,
 ) HashType {
-	hashType, alreadyExists := hashTypes[tipe]
+	_, alreadyExists := hashTypes[tipe]
 
 	if alreadyExists {
 		panic(fmt.Sprintf("hash type already registered: %q", tipe))
 	}
 
-	hashType = HashType{
+	hashType := HashType{
 		Hash: cryptoHash,
 		pool: pool.MakeValue(
 			func() Hash {
@@ -75,7 +85,7 @@ type HashType struct {
 	null Id
 }
 
-var _ interfaces.HashType = HashType{}
+var _ interfaces.MarklType = HashType{}
 
 func (hashType *HashType) Get() *Hash {
 	hash := hashType.pool.Get()

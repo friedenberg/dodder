@@ -39,7 +39,7 @@ func (hash *Hash) BlockSize() int {
 	return hash.hash.BlockSize()
 }
 
-func (hash *Hash) GetType() interfaces.HashType {
+func (hash *Hash) GetType() interfaces.MarklType {
 	return hash.hashType
 }
 

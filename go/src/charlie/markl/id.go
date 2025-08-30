@@ -33,7 +33,7 @@ var (
 )
 
 type Id struct {
-	tipe interfaces.HashType
+	tipe interfaces.MarklType
 	data []byte
 }
 
@@ -65,7 +65,7 @@ func (id Id) GetBytes() []byte {
 	return id.data
 }
 
-func (id Id) GetType() interfaces.HashType {
+func (id Id) GetType() interfaces.MarklType {
 	return id.tipe
 }
 

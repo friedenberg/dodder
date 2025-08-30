@@ -1,6 +1,11 @@
 package markl
 
-import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+)
 
 const (
 	// keep sorted
@@ -47,4 +52,28 @@ func GetHashTypeOrError(tipe string) (*HashType, error) {
 	}
 
 	return hashType, nil
+}
+
+type fakeHashType struct {
+	tipe string
+}
+
+var _ interfaces.MarklType = fakeHashType{}
+
+func (tipe fakeHashType) GetType() string {
+	return tipe.tipe
+}
+
+func makeFakeHashType(tipe string) {
+	_, alreadyExists := hashTypes[tipe]
+
+	if alreadyExists {
+		panic(fmt.Sprintf("hash type already registered: %q", tipe))
+	}
+
+	hashType := fakeHashType{
+		tipe: tipe,
+	}
+
+	hashTypes[tipe] = hashType
 }
