@@ -94,7 +94,7 @@ func SetHexBytes(
 	bites = bytes.TrimSpace(bites)
 
 	if id, ok := dst.(*Id); ok {
-		if id.tipe, err = GetHashTypeOrError(tipe); err != nil {
+		if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -139,7 +139,10 @@ func SetDigester(
 ) {
 	digest := src.GetMarklId()
 	errors.PanicIfError(
-		dst.SetMerkleId(digest.GetMarklType().GetMarklTypeId(), digest.GetBytes()),
+		dst.SetMerkleId(
+			digest.GetMarklType().GetMarklTypeId(),
+			digest.GetBytes(),
+		),
 	)
 }
 
@@ -186,6 +189,10 @@ func Equals(a, b interfaces.MarklId) bool {
 func Clone(src interfaces.MarklId) interfaces.MarklId {
 	if !src.IsNull() {
 		errors.PanicIfError(MakeErrEmptyType(src))
+	}
+
+	if src.GetMarklType() == nil {
+		panic("empty markl type")
 	}
 
 	dst := idPool.Get()

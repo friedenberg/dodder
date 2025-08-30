@@ -29,10 +29,11 @@ func makeLocalHashBucketed(
 	basePath string,
 	config blob_store_configs.ConfigLocalHashBucketed,
 	tempFS env_dir.TemporaryFS,
+	hashType markl.HashType,
 ) (localHashBucketed, error) {
 	// TODO validate
 	store := localHashBucketed{
-		hashType: markl.HashTypeSha256,
+		hashType: hashType,
 		buckets:  config.GetHashBuckets(),
 		config:   config,
 		basePath: basePath,
@@ -60,7 +61,7 @@ func (blobStore localHashBucketed) GetLocalBlobStore() interfaces.BlobStore {
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 	return env_dir.MakeConfig(
-		markl.HashTypeSha256,
+		blobStore.hashType,
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
@@ -193,6 +194,18 @@ func (blobStore localHashBucketed) blobReaderFrom(
 			blobStore.hashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
+		return
+	}
+
+	marklType := digest.GetMarklType()
+
+	if marklType == nil {
+		err = errors.Errorf("empty markl type")
+		return
+	}
+
+	if marklType.GetMarklTypeId() == "" {
+		err = errors.Errorf("empty markl type id")
 		return
 	}
 

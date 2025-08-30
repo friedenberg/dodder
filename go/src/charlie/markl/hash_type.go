@@ -1,11 +1,12 @@
 package markl
 
 import (
-	"crypto"
 	"crypto/sha256"
 	"fmt"
 	"hash"
 	"io"
+
+	"golang.org/x/crypto/blake2b"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -13,20 +14,30 @@ import (
 )
 
 const (
-	HashTypeIdSha256 = "sha256"
+	HashTypeIdSha256     = "sha256"
+	HashTypeIdBlake2s256 = "blake2s256"
 )
 
 var (
-	types      map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
-	HashTypeSha256 HashType
+	types              map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
+	HashTypeSha256     HashType
+	HashTypeBlake2s256 HashType
 )
 
 func init() {
 	HashTypeSha256 = makeHashType(
-		crypto.SHA256,
-		HashTypeIdSha256,
 		sha256.New,
+		HashTypeIdSha256,
 		&HashTypeSha256,
+	)
+
+	HashTypeBlake2s256 = makeHashType(
+		func() hash.Hash {
+			hash, _ := blake2b.New256(nil)
+			return hash
+		},
+		HashTypeIdBlake2s256,
+		&HashTypeBlake2s256,
 	)
 
 	makeFakeHashType(HRPObjectBlobDigestSha256V1)
@@ -41,9 +52,8 @@ func init() {
 }
 
 func makeHashType(
-	cryptoHash crypto.Hash,
-	tipe string,
 	constructor func() hash.Hash,
+	tipe string,
 	self *HashType,
 ) HashType {
 	_, alreadyExists := types[tipe]
@@ -53,7 +63,6 @@ func makeHashType(
 	}
 
 	hashType := HashType{
-		Hash: cryptoHash,
 		pool: pool.MakeValue(
 			func() Hash {
 				return Hash{
@@ -70,7 +79,7 @@ func makeHashType(
 
 	hash := constructor()
 	hashType.null.tipe = self
-	hashType.null.allocDataIfNecessary(cryptoHash.Size())
+	hashType.null.allocDataIfNecessary(hash.Size())
 	hashType.null.data = hash.Sum(hashType.null.data)
 
 	types[tipe] = hashType
@@ -79,7 +88,6 @@ func makeHashType(
 }
 
 type HashType struct {
-	crypto.Hash
 	pool interfaces.PoolValue[Hash]
 	tipe string
 	null Id
@@ -105,7 +113,7 @@ func (hashType HashType) GetMarklTypeId() string {
 }
 
 func (hashType HashType) GetSize() int {
-	return hashType.Hash.Size()
+	return hashType.null.GetSize()
 }
 
 func (hashType HashType) GetBlobId() (interfaces.MutableMarklId, interfaces.FuncRepool) {

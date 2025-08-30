@@ -50,6 +50,10 @@ func MakeErrIsNull(id interfaces.MarklId, key string) error {
 	return nil
 }
 
+func IsErrNull(target error) bool {
+	return errors.Is(target, errIsNull{})
+}
+
 type errIsNull struct {
 	key string
 }

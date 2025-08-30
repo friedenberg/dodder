@@ -3,7 +3,6 @@ package object_metadata_fmt
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -35,10 +34,6 @@ func AddBlobDigestIfNecessary(
 	field := string_format_writer.Field{
 		Value:     "@" + value,
 		ColorType: string_format_writer.ColorTypeHash,
-	}
-
-	if digest.GetMarklType().GetMarklTypeId() != markl.HRPObjectBlobDigestSha256V0 {
-		field.Key = digest.GetMarklType().GetMarklTypeId()
 	}
 
 	return append(boxContents, field)

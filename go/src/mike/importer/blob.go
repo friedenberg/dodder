@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -113,8 +114,11 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 				blobId,
 				&progressWriter,
 			); err != nil {
-				ui.Log().Print("copy failed", err, dst.GetBlobStoreDescription(), blobId)
 				if errors.Is(err, env_dir.ErrBlobAlreadyExists{}) {
+					blobImporter.Counts.Ignored++
+					n = -3
+					err = nil
+				} else if markl.IsErrNull(err) {
 					blobImporter.Counts.Ignored++
 					n = -3
 					err = nil

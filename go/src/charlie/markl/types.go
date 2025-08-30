@@ -43,37 +43,50 @@ var typeLookup = map[string]*HashType{
 	HRPObjectDigestSha256V1:     &HashTypeSha256,
 }
 
-func GetHashTypeOrError(tipe string) (interfaces.MarklType, error) {
-	hashType, ok := types[tipe]
+func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
+	tipe, ok := types[typeId]
 
 	if !ok {
-		err := errors.Errorf("unknown type: %q", tipe)
+		err := errors.Errorf("unknown type: %q", typeId)
 		return nil, err
 	}
 
-	return hashType, nil
+	return tipe, nil
+}
+
+func GetHashTypeOrError(typeId string) (hashType HashType, err error) {
+	tipe, ok := types[typeId]
+
+	if !ok {
+		err = errors.Errorf("unknown type: %q", typeId)
+		return
+	}
+
+	hashType = tipe.(HashType)
+
+	return
 }
 
 type fakeHashType struct {
-	tipe string
+	typeId string
 }
 
 var _ interfaces.MarklType = fakeHashType{}
 
 func (tipe fakeHashType) GetMarklTypeId() string {
-	return tipe.tipe
+	return tipe.typeId
 }
 
-func makeFakeHashType(tipe string) {
-	_, alreadyExists := types[tipe]
+func makeFakeHashType(typeId string) {
+	_, alreadyExists := types[typeId]
 
 	if alreadyExists {
-		panic(fmt.Sprintf("hash type already registered: %q", tipe))
+		panic(fmt.Sprintf("hash type already registered: %q", typeId))
 	}
 
-	hashType := fakeHashType{
-		tipe: tipe,
+	tipe := fakeHashType{
+		typeId: typeId,
 	}
 
-	types[tipe] = hashType
+	types[typeId] = tipe
 }

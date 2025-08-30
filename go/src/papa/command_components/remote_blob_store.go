@@ -2,6 +2,7 @@ package command_components
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -34,6 +35,8 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 		envLocal,
 		cmd.GetBlobStoreConfigNamed(),
 		envLocal.GetTempLocal(),
+		// TODO inject instead of hardcode
+		markl.HashTypeSha256,
 	)
 
 	return

@@ -160,12 +160,7 @@ func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
 		return
 	}
 
-	if !slices.Contains(hrpValid, tipe) {
-		err = errors.Errorf("invalid type: %q", tipe)
-		return
-	}
-
-	if id.tipe, err = GetHashTypeOrError(tipe); err != nil {
+	if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -202,7 +197,25 @@ func (id *Id) ResetWith(src Id) {
 }
 
 func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
-	errors.PanicIfError(id.SetMerkleId(src.GetMarklType().GetMarklTypeId(), src.GetBytes()))
+	marklType := src.GetMarklType()
+	bites := src.GetBytes()
+
+	var marklTypeId string
+
+	if marklType == nil && len(bites) > 0 {
+		panic(
+			fmt.Sprintf(
+				"markl id with empty tipe but populated bytes: (bites: %x)",
+				bites,
+			),
+		)
+	} else if marklType != nil {
+		marklTypeId = marklType.GetMarklTypeId()
+	}
+
+	errors.PanicIfError(
+		id.SetMerkleId(marklTypeId, bites),
+	)
 }
 
 func (id *Id) GetBlobId() interfaces.MarklId {
@@ -275,7 +288,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 		return
 	}
 
-	if id.tipe, err = GetHashTypeOrError(typeId); err != nil {
+	if id.tipe, err = GetMarklTypeOrError(typeId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

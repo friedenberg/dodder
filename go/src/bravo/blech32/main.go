@@ -64,6 +64,10 @@ func polymod(values []byte) uint32 {
 }
 
 func hrpExpand(hrp string) []byte {
+	if hrp == "" {
+		return nil
+	}
+
 	h := []byte(strings.ToLower(hrp))
 	var ret []byte
 	for _, c := range h {
@@ -81,12 +85,7 @@ func verifyChecksum(hrp string, data []byte) bool {
 }
 
 func createChecksum(hrp string, data []byte) []byte {
-	var values []byte
-	if hrp != "" {
-		values = append(hrpExpand(hrp), data...)
-	} else {
-		values = data
-	}
+	values := append(hrpExpand(hrp), data...)
 	values = append(values, []byte{0, 0, 0, 0, 0, 0}...)
 	mod := polymod(values) ^ 1
 	ret := make([]byte, 6)
@@ -168,8 +167,10 @@ func encode(hrp string, data []byte) ([]byte, error) {
 
 	var ret bytes.Buffer
 
-	ret.WriteString(hrp)
-	ret.WriteString("-")
+	if hrp != "" {
+		ret.WriteString(hrp)
+		ret.WriteString("-")
+	}
 
 	for _, p := range values {
 		ret.WriteByte(charsetString[p])
@@ -311,30 +312,8 @@ func Decode(bites []byte) (hrp string, data []byte, err error) {
 
 // Decode decodes a Blech32 string. If the string is uppercase, the HRP
 // will be uppercase.
-func DecodeDataOnly(bites []byte) (hrp string, data []byte, err error) {
-	pos := bytes.LastIndex(bites, []byte("-"))
-
-	if pos == 0 || pos+7 > len(bites) {
-		// TODO turn into error type
-		return "", nil, fmt.Errorf(
-			"separator '-' at invalid position: pos=%d, len=%d",
-			pos,
-			len(bites),
-		)
-	}
-
-	if pos != -1 {
-		hrp = string(bites[:pos])
-
-		if err = validateHRP(hrp); err != nil {
-			err = errors.Wrapf(err, "hrp: %q", hrp)
-			return
-		}
-
-		bites = bites[pos+1:]
-	}
-
-	if data, err = decode(hrp, bites); err != nil {
+func DecodeDataOnly(bites []byte) (data []byte, err error) {
+	if data, err = decode("", bites); err != nil {
 		return
 	}
 

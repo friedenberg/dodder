@@ -20,6 +20,19 @@ func MakeTesting(
 	t *ui.TestContext,
 	contents map[string]string,
 ) (envRepo Env) {
+	var bigBang BigBang
+	bigBang.SetDefaults()
+
+	bigBang.GenesisConfig.Blob.SetBlobDigestTypeString(markl.HashTypeIdSha256)
+
+	return MakeTestingWithBigBang(t, contents, bigBang)
+}
+
+func MakeTestingWithBigBang(
+	t *ui.TestContext,
+	contents map[string]string,
+	bigBang BigBang,
+) (envRepo Env) {
 	t = t.Skip(1)
 
 	dirTemp := t.TempDir()
@@ -44,10 +57,6 @@ func MakeTesting(
 			return
 		}
 	}
-
-	var bigBang BigBang
-
-	bigBang.SetDefaults()
 
 	envRepo.Genesis(bigBang)
 
@@ -91,13 +100,7 @@ func MakeTesting(
 			expectedDigestString,
 		)
 
-		err = markl.MakeErrNotEqual(expected, actual)
-		if err != nil {
-			errors.ContextCancelWithErrorAndFormat(
-				t.Context,
-				err, "sha mismatch: %s, %q", expectedDigestString, content,
-			)
-		}
+		t.AssertNoError(markl.MakeErrNotEqual(expected, actual))
 	}
 
 	return

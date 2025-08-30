@@ -47,9 +47,10 @@ func makeSftpStore(
 	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
+	hashType markl.HashType,
 ) (blobStore *remoteSftp, err error) {
 	blobStore = &remoteSftp{
-		hashType:  markl.HashTypeSha256,
+		hashType:  hashType,
 		uiPrinter: uiPrinter,
 		buckets:   defaultBuckets,
 		config:    config,

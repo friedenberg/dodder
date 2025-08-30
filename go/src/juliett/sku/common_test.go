@@ -282,7 +282,10 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	envRepo := env_repo.MakeTesting(t, nil)
+	envRepo := env_repo.MakeTesting(
+		t,
+		nil,
+	)
 
 	actual := readFormat(
 		t,

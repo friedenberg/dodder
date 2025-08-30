@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -43,6 +44,19 @@ func (cmd *BlobStore) MakeBlobStore(
 
 		blobStore.Config = typedConfig.Blob
 
+		var hashType markl.HashType
+
+		{
+			var err error
+
+			if hashType, err = markl.GetHashTypeOrError(
+				envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+			); err != nil {
+				envRepo.Cancel(err)
+				return
+			}
+		}
+
 		{
 			var err error
 
@@ -53,6 +67,7 @@ func (cmd *BlobStore) MakeBlobStore(
 					Config: typedConfig.Blob,
 				},
 				envRepo.GetTempLocal(),
+				hashType,
 			); err != nil {
 				envRepo.Cancel(err)
 				return

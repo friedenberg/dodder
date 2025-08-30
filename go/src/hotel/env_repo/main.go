@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -236,6 +237,19 @@ func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
 		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
 
+		var hashType markl.HashType
+
+		{
+			var err error
+
+			if hashType, err = markl.GetHashTypeOrError(
+				env.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+			); err != nil {
+				env.Cancel(err)
+				return nil
+			}
+		}
+
 		if store, err := blob_stores.MakeBlobStore(
 			env,
 			blob_stores.BlobStoreConfigNamed{
@@ -243,6 +257,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 				Config:   blob.GetBlobIOWrapper().(blob_store_configs.Config),
 			},
 			env.GetTempLocal(),
+			hashType,
 		); err != nil {
 			env.Cancel(err)
 			return nil

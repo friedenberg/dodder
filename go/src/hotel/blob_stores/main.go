@@ -46,6 +46,17 @@ func MakeBlobStores(
 	config genesis_configs.ConfigPrivate,
 	directoryLayout interfaces.DirectoryLayout,
 ) (blobStores []BlobStoreInitialized) {
+	var hashType markl.HashType
+
+	{
+		var err error
+
+		if hashType, err = markl.GetHashTypeOrError(config.GetBlobDigestTypeString()); err != nil {
+			ctx.Cancel(err)
+			return
+		}
+	}
+
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
@@ -92,6 +103,7 @@ func MakeBlobStores(
 			ctx,
 			blobStore.BlobStoreConfigNamed,
 			envDir.GetTempLocal(),
+			hashType,
 		); err != nil {
 			ctx.Cancel(err)
 			return
@@ -105,6 +117,7 @@ func MakeRemoteBlobStore(
 	ctx interfaces.ActiveContext,
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
+	hashType markl.HashType,
 ) (blobStore BlobStoreInitialized) {
 	blobStore.BlobStoreConfigNamed = config
 
@@ -116,6 +129,7 @@ func MakeRemoteBlobStore(
 			ctx,
 			config,
 			tempFS,
+			hashType,
 		); err != nil {
 			ctx.Cancel(err)
 			return
@@ -130,6 +144,7 @@ func MakeBlobStore(
 	ctx interfaces.ActiveContext,
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
+	hashType markl.HashType,
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
@@ -173,6 +188,7 @@ func MakeBlobStore(
 			printer,
 			configSFTP,
 			sshClient,
+			hashType,
 		)
 
 	case "local":
@@ -182,6 +198,7 @@ func MakeBlobStore(
 				config.BasePath,
 				configLocal,
 				tempFS,
+				hashType,
 			)
 		} else {
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
@@ -201,7 +218,11 @@ func CopyBlobIfNecessary(
 		return
 	}
 
-	if dst.HasBlob(blobId) || blobId.IsNull() {
+	if err = markl.MakeErrIsNull(blobId, ""); err != nil {
+		return
+	}
+
+	if dst.HasBlob(blobId) {
 		err = env_dir.MakeErrBlobAlreadyExists(
 			blobId,
 			"",
@@ -210,7 +231,12 @@ func CopyBlobIfNecessary(
 		return
 	}
 
-	return CopyBlob(env, dst, src, blobId, extraWriter)
+	if n, err = CopyBlob(env, dst, src, blobId, extraWriter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 // TODO make this honor context closure and abort early
@@ -218,54 +244,56 @@ func CopyBlob(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobSha interfaces.MarklId,
+	expectedDigest interfaces.MarklId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	var rc interfaces.ReadCloseMarklIdGetter
+	errors.PanicIfError(markl.MakeErrIsNull(expectedDigest, ""))
 
-	if rc, err = src.BlobReader(blobSha); err != nil {
+	var readCloser interfaces.ReadCloseMarklIdGetter
+
+	if readCloser, err = src.BlobReader(expectedDigest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.ContextMustClose(env, rc)
+	defer errors.ContextMustClose(env, readCloser)
 
-	var wc interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if wc, err = dst.BlobWriter(); err != nil {
+	if writeCloser, err = dst.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO should this be closed with an error when the shas don't match to
 	// prevent a garbage object in the store?
-	defer errors.ContextMustClose(env, wc)
+	defer errors.ContextMustClose(env, writeCloser)
 
-	outputWriter := io.Writer(wc)
+	outputWriter := io.Writer(writeCloser)
 
 	if extraWriter != nil {
 		outputWriter = io.MultiWriter(outputWriter, extraWriter)
 	}
 
-	if n, err = io.Copy(outputWriter, rc); err != nil {
+	if n, err = io.Copy(outputWriter, readCloser); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	shaRc := rc.GetMarklId()
-	shaWc := wc.GetMarklId()
+	readerDigest := readCloser.GetMarklId()
+	writerDigest := writeCloser.GetMarklId()
 
-	if !markl.Equals(shaRc, blobSha) ||
-		!markl.Equals(shaWc, blobSha) {
-		err = errors.ErrorWithStackf(
+	if !markl.Equals(readerDigest, expectedDigest) ||
+		!markl.Equals(writerDigest, expectedDigest) {
+		err = errors.Errorf(
 			"lookup sha was %s, read sha was %s, but written sha was %s",
-			blobSha,
-			shaRc,
-			shaWc,
+			expectedDigest,
+			readerDigest,
+			writerDigest,
 		)
 	}
 

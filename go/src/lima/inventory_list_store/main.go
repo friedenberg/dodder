@@ -215,7 +215,7 @@ func (store *Store) Create(
 	actual := openList.Mover.GetMarklId()
 	// expected := &merkle.Id{}
 
-	expected := markl.Clone(object.GetBlobDigest())
+	expected := object.GetBlobDigest()
 	// if err = expected.SetMerkleId(merkle.HRPObjectBlobDigestSha256V0,
 	// actual.GetBytes()); err != nil {
 	// 	err = errors.Wrap(err)

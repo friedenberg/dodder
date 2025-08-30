@@ -197,9 +197,16 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if err = format.parseOldBlobIdTag(object, seq); err != nil {
-				err = errors.Wrap(err)
-				return
+			if len(seq.At(1).Contents) == 64 {
+				if err = format.parseOldBlobIdTag(object, seq); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				if err = format.parseMarklIdTag(object, seq); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			continue
@@ -329,11 +336,22 @@ func (format *BoxTransacted) parseMarklIdTag(
 	object *sku.Transacted,
 	seq doddish.Seq,
 ) (err error) {
-	if err = object.Metadata.GetBlobDigestMutable().SetMerkleId(
-		string(seq.At(0).Contents),
-		seq.At(2).Contents,
-	); err != nil {
-		err = errors.Wrap(err)
+	key := string(seq.At(1).Contents)
+
+	switch key {
+	case "":
+		fallthrough
+
+	case "blob":
+		if err = object.Metadata.GetBlobDigestMutable().Set(
+			string(seq.At(2).Contents),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = errors.Errorf("unsupported markl field: %q", key)
 		return
 	}
 
