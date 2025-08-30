@@ -45,7 +45,7 @@ func (json *JSON) FromStringAndMetadata(
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var readCloser interfaces.ReadCloseBlobIdGetter
+		var readCloser interfaces.ReadCloseMarklIdGetter
 
 		if readCloser, err = blobStore.BlobReader(
 			metadata.GetBlobDigest(),
@@ -71,8 +71,8 @@ func (json *JSON) FromStringAndMetadata(
 	json.Description = metadata.Description.String()
 	json.Dormant = metadata.Cache.Dormant.Bool()
 	json.ObjectId = objectId
-	json.RepoPubkey.ResetWithMerkleId(metadata.GetRepoPubKey())
-	json.RepoSig.ResetWithMerkleId(metadata.GetObjectSig())
+	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
+	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
@@ -123,7 +123,7 @@ func (json *JSON) ToTransacted(
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var writeCloser interfaces.WriteCloseBlobIdGetter
+		var writeCloser interfaces.WriteCloseMarklIdGetter
 
 		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
@@ -142,7 +142,7 @@ func (json *JSON) ToTransacted(
 
 		// TODO just compare blob digests
 		// TODO-P1 support states of blob vs blob sha
-		object.SetBlobDigest(writeCloser.GetBlobId())
+		object.SetBlobDigest(writeCloser.GetMarklId())
 	}
 
 	// Set BlobId from JSON even if not writing to blob store
@@ -182,8 +182,8 @@ func (json *JSON) ToTransacted(
 	object.Metadata.SetTags(tagSet)
 	object.Metadata.GenerateExpandedTags()
 
-	object.Metadata.GetRepoPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
-	object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
+	object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
+	object.Metadata.GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {

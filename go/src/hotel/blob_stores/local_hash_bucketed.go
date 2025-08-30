@@ -67,7 +67,7 @@ func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
@@ -85,8 +85,8 @@ func (blobStore localHashBucketed) HasBlob(
 }
 
 // TODO add support for other bucket sizes and digest types
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
-	return func(yield func(interfaces.BlobId, error) bool) {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+	return func(yield func(interfaces.MarklId, error) bool) {
 		id, repool := blobStore.hashType.GetBlobId()
 		defer repool()
 
@@ -122,7 +122,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Blo
 	}
 }
 
-func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
+func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloseMarklIdGetter, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -141,8 +141,8 @@ func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore localHashBucketed) BlobReader(
-	digest interfaces.BlobId,
-) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+	digest interfaces.MarklId,
+) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),
@@ -184,9 +184,9 @@ func (blobStore localHashBucketed) blobWriterTo(
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
-	digest interfaces.BlobId,
+	digest interfaces.MarklId,
 	path string,
-) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),

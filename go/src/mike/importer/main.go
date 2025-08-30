@@ -332,7 +332,7 @@ func (importer importer) ImportBlobIfNecessary(
 			if err = importer.blobCopierDelegate(
 				sku.BlobCopyResult{
 					Transacted: object,
-					BlobId:     blobId,
+					MarklId:     blobId,
 					N:          n,
 				},
 			); err != nil {
@@ -379,7 +379,7 @@ func (importer importer) ImportBlobIfNecessary(
 				if err = importer.blobCopierDelegate(
 					sku.BlobCopyResult{
 						Transacted: object,
-						BlobId:     blobId,
+						MarklId:     blobId,
 						N:          n,
 					},
 				); err != nil {

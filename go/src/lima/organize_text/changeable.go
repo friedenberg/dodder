@@ -65,7 +65,7 @@ func (a *Assignment) addToSet(
 			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
-				outputObject.GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMerkleId(
+				outputObject.GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMarklId(
 					objectOriginal.GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 
@@ -73,7 +73,7 @@ func (a *Assignment) addToSet(
 					objectOriginal.GetSkuExternal().Metadata.Type,
 				)
 
-				outputObject.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMerkleId(
+				outputObject.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMarklId(
 					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 

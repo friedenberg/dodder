@@ -38,7 +38,7 @@ func (err ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
 
 func MakeErrHasInlineBlobAndFilePath(
 	blobFD *fd.FD,
-	inlineBlobDigest interfaces.BlobId,
+	inlineBlobDigest interfaces.MarklId,
 ) (err *ErrHasInlineBlobAndFilePath) {
 	err = &ErrHasInlineBlobAndFilePath{}
 	err.BlobFD.ResetWith(blobFD)
@@ -61,7 +61,7 @@ func (err *ErrHasInlineBlobAndFilePath) Error() string {
 }
 
 func MakeErrHasInlineBlobAndMetadataBlobId(
-	inline, metadata interfaces.BlobId,
+	inline, metadata interfaces.MarklId,
 ) (err *ErrHasInlineBlobAndMetadataDigest) {
 	err = &ErrHasInlineBlobAndMetadataDigest{}
 	err.Metadata = markl.Clone(metadata)
@@ -70,8 +70,8 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 }
 
 type ErrHasInlineBlobAndMetadataDigest struct {
-	Inline   interfaces.BlobId
-	Metadata interfaces.BlobId
+	Inline   interfaces.MarklId
+	Metadata interfaces.MarklId
 }
 
 func (err *ErrHasInlineBlobAndMetadataDigest) Error() string {

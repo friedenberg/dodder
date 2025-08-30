@@ -302,7 +302,7 @@ func (index *Index) Add(
 
 // TODO rename
 func (index *Index) ReadOneSha(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
 	errors.PanicIfError(markl.MakeErrIsNull(blobId, "index lookup"))
@@ -322,7 +322,7 @@ func (index *Index) ReadOneSha(
 
 // TODO rename
 func (index *Index) ReadManySha(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) (objects []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
@@ -388,7 +388,7 @@ func (index *Index) ReadOneObjectId(
 		panic("empty object id")
 	}
 
-	digest, repool := markl.HashTypeSha256.GetBlobIdForString(
+	digest, repool := markl.HashTypeSha256.GetMarklIdForString(
 		objectIdString,
 	)
 	defer repool()

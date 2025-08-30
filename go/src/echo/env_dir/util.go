@@ -14,7 +14,7 @@ import (
 )
 
 func MakeHashBucketPathFromMerkleId(
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 	buckets []int,
 	pathComponents ...string,
 ) string {

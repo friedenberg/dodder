@@ -11,7 +11,7 @@ import (
 
 var ErrEmptyType = errors.New("type is empty")
 
-func MakeErrEmptyType(id interfaces.BlobId) error {
+func MakeErrEmptyType(id interfaces.MarklId) error {
 	if id.GetType() == "" {
 		return errors.WrapSkip(1, ErrEmptyType)
 	}
@@ -19,7 +19,7 @@ func MakeErrEmptyType(id interfaces.BlobId) error {
 	return nil
 }
 
-func MakeErrIsNotNull(id interfaces.BlobId) error {
+func MakeErrIsNotNull(id interfaces.MarklId) error {
 	if !id.IsNull() {
 		// TODO clone
 		return errors.WrapSkip(1, errIsNotNull{id: id, value: id.String()})
@@ -30,7 +30,7 @@ func MakeErrIsNotNull(id interfaces.BlobId) error {
 
 type errIsNotNull struct {
 	value string
-	id    interfaces.BlobId
+	id    interfaces.MarklId
 }
 
 func (err errIsNotNull) Error() string {
@@ -42,7 +42,7 @@ func (err errIsNotNull) Is(target error) bool {
 	return ok
 }
 
-func MakeErrIsNull(id interfaces.BlobId, key string) error {
+func MakeErrIsNull(id interfaces.MarklId, key string) error {
 	if id.IsNull() {
 		return errors.WrapSkip(1, errIsNull{key: key})
 	}
@@ -64,10 +64,10 @@ func (err errIsNull) Is(target error) bool {
 }
 
 type ErrNotEqual struct {
-	Expected, Actual interfaces.BlobId
+	Expected, Actual interfaces.MarklId
 }
 
-func MakeErrNotEqual(expected, actual interfaces.BlobId) (err error) {
+func MakeErrNotEqual(expected, actual interfaces.MarklId) (err error) {
 	if Equals(expected, actual) {
 		return
 	}

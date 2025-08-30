@@ -13,7 +13,7 @@ import (
 type TypeBlobStore interface {
 	ParseTypedBlob(
 		tipe interfaces.ObjectId,
-		blobSha interfaces.BlobId,
+		blobSha interfaces.MarklId,
 	) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error)
 }
 

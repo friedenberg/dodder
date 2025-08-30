@@ -530,7 +530,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			response.StatusCode = http.StatusNotFound
 		}
 	} else {
-		var rc interfaces.ReadCloseBlobIdGetter
+		var rc interfaces.ReadCloseMarklIdGetter
 
 		{
 			var err error
@@ -554,7 +554,7 @@ func (server *Server) handleBlobsHeadOrGet(
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
 	digestString := request.Vars()["sha"]
-	var result interfaces.BlobId
+	var result interfaces.MarklId
 
 	if digestString == "" {
 		var err error
@@ -610,10 +610,10 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
-	expected interfaces.BlobId,
-) (result interfaces.BlobId, err error) {
+	expected interfaces.MarklId,
+) (result interfaces.MarklId, err error) {
 	var progressWriter env_ui.ProgressWriter
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
 	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -651,7 +651,7 @@ func (server *Server) copyBlob(
 		return
 	}
 
-	result = writeCloser.GetBlobId()
+	result = writeCloser.GetMarklId()
 
 	blobCopierDelegate := sku.MakeBlobCopierDelegate(
 		server.Repo.GetEnv().GetUI(),
@@ -659,7 +659,7 @@ func (server *Server) copyBlob(
 
 	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
-			BlobId: result,
+			MarklId: result,
 			N:      progressWriter.GetWritten(),
 		},
 	); err != nil {

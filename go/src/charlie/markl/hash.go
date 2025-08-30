@@ -43,7 +43,7 @@ func (hash *Hash) GetType() string {
 	return hash.hashType.GetType()
 }
 
-func (hash *Hash) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) {
+func (hash *Hash) GetMarklId() (interfaces.MutableMarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.tipe = hash.GetType()
 	id.allocDataIfNecessary(hash.Size())
@@ -60,7 +60,7 @@ func (hash *Hash) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) 
 
 func (hash *Hash) GetBlobIdForReader(
 	reader io.Reader,
-) (interfaces.BlobId, interfaces.FuncRepool) {
+) (interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.tipe = hash.GetType()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())
@@ -77,7 +77,7 @@ func (hash *Hash) GetBlobIdForReader(
 func (hash *Hash) GetBlobIdForReaderAt(
 	reader io.ReaderAt,
 	off int64,
-) (interfaces.BlobId, interfaces.FuncRepool) {
+) (interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.tipe = hash.GetType()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())

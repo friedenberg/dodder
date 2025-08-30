@@ -44,7 +44,7 @@ type writer struct {
 	hash   interfaces.Hash
 }
 
-var _ interfaces.BlobIdGetter = &writer{}
+var _ interfaces.MarklIdGetter = &writer{}
 
 func (writer *writer) Reset(hash interfaces.Hash, in io.Writer) {
 	if writer.hash == nil || writer.hash.GetType() != hash.GetType() {
@@ -102,7 +102,7 @@ func (writer *writer) Close() (err error) {
 	return
 }
 
-func (writer *writer) GetBlobId() interfaces.BlobId {
-	digest, _ := writer.hash.GetBlobId()
+func (writer *writer) GetMarklId() interfaces.MarklId {
+	digest, _ := writer.hash.GetMarklId()
 	return digest
 }

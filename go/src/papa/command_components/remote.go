@@ -99,7 +99,7 @@ func (cmd Remote) CreateRemoteObject(
 	remoteConfig := remote.GetImmutableConfigPublic()
 	blob.SetPublicKey(remoteConfig.GetPublicKey())
 
-	var blobSha interfaces.BlobId
+	var blobSha interfaces.MarklId
 
 	{
 		var err error
@@ -112,7 +112,7 @@ func (cmd Remote) CreateRemoteObject(
 		}
 	}
 
-	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMerkleId(blobSha)
+	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMarklId(blobSha)
 
 	return
 }

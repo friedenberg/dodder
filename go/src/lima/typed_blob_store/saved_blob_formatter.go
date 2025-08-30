@@ -21,9 +21,9 @@ func MakeSavedBlobFormatter(
 
 func (f savedBlobFormatter) FormatSavedBlob(
 	w io.Writer,
-	sh interfaces.BlobId,
+	sh interfaces.MarklId,
 ) (n int64, err error) {
-	var ar interfaces.ReadCloseBlobIdGetter
+	var ar interfaces.ReadCloseMarklIdGetter
 
 	if ar, err = f.arf.BlobReader(sh); err != nil {
 		if errors.IsNotExist(err) {

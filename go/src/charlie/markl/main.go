@@ -62,9 +62,9 @@ func VerifyBytes(
 
 func Sign(
 	key PrivateKey,
-	message interfaces.BlobId,
+	message interfaces.MarklId,
 	tipe string,
-	dst interfaces.MutableBlobId,
+	dst interfaces.MutableMarklId,
 ) (err error) {
 	var sig []byte
 
@@ -86,7 +86,7 @@ func Sign(
 }
 
 func Verify(
-	publicKey, message, sig interfaces.BlobId,
+	publicKey, message, sig interfaces.MarklId,
 ) (err error) {
 	defer errors.DeferredRecover(&err)
 

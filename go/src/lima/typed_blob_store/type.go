@@ -48,7 +48,7 @@ func MakeTypeStore(
 
 func (store Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
-	blobSha interfaces.BlobId,
+	blobSha interfaces.MarklId,
 ) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	default:

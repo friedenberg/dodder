@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
-type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.BlobId, error)
+type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.MarklId, error)
 
 // calculates the respective digests
 func (transacted *Transacted) finalize(
@@ -48,11 +48,11 @@ func (transacted *Transacted) finalize(
 func (transacted *Transacted) makeDigestCalcFunc(
 	funcCalcDigest funcCalcDigest,
 	objectFormat object_inventory_format.Format,
-	digest interfaces.MutableBlobId,
+	digest interfaces.MutableMarklId,
 	tipe string,
 ) errors.FuncErr {
 	return func() (err error) {
-		var actual interfaces.BlobId
+		var actual interfaces.MarklId
 
 		if actual, err = funcCalcDigest(
 			objectFormat,

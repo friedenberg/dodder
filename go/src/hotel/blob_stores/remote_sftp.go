@@ -142,7 +142,7 @@ func (blobStore *remoteSftp) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore *remoteSftp) remotePathForMerkleId(
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) string {
 	return env_dir.MakeHashBucketPathFromMerkleId(
 		merkleId,
@@ -152,7 +152,7 @@ func (blobStore *remoteSftp) remotePathForMerkleId(
 }
 
 func (blobStore *remoteSftp) HasBlob(
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
@@ -180,8 +180,8 @@ func (blobStore *remoteSftp) HasBlob(
 	return
 }
 
-func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
-	return func(yield func(interfaces.BlobId, error) bool) {
+func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+	return func(yield func(interfaces.MarklId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -227,7 +227,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
 	}
 }
 
-func (blobStore *remoteSftp) BlobWriter() (w interfaces.WriteCloseBlobIdGetter, err error) {
+func (blobStore *remoteSftp) BlobWriter() (w interfaces.WriteCloseMarklIdGetter, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -247,8 +247,8 @@ func (blobStore *remoteSftp) Mover() (mover interfaces.Mover, err error) {
 }
 
 func (blobStore *remoteSftp) BlobReader(
-	digest interfaces.BlobId,
-) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+	digest interfaces.MarklId,
+) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = markl.MakeNopReadCloser(
 			blobStore.hashType.Get(),
@@ -429,9 +429,9 @@ func (mover *sftpMover) Close() (err error) {
 	return
 }
 
-func (mover *sftpMover) GetBlobId() interfaces.BlobId {
+func (mover *sftpMover) GetMarklId() interfaces.MarklId {
 	if mover.writer == nil {
-		return mover.GetBlobId()
+		return mover.GetMarklId()
 	}
 
 	return mover.writer.GetDigest()
@@ -509,8 +509,8 @@ func (writer *sftpWriter) Close() (err error) {
 	return
 }
 
-func (writer *sftpWriter) GetDigest() interfaces.BlobId {
-	id, _ := writer.hash.GetBlobId()
+func (writer *sftpWriter) GetDigest() interfaces.MarklId {
+	id, _ := writer.hash.GetMarklId()
 	return id
 }
 
@@ -523,7 +523,7 @@ type sftpStreamingReader struct {
 
 func (reader *sftpStreamingReader) createReader(
 	hash interfaces.Hash,
-) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,
@@ -602,7 +602,7 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetBlobId() interfaces.BlobId {
-	id, _ := reader.hash.GetBlobId()
+func (reader *sftpReader) GetMarklId() interfaces.MarklId {
+	id, _ := reader.hash.GetMarklId()
 	return id
 }

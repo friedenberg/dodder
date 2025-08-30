@@ -19,7 +19,7 @@ type MoveOptions struct {
 type localFileMover struct {
 	funcJoin func(string, ...string) string
 	file     *os.File
-	interfaces.WriteCloseBlobIdGetter
+	interfaces.WriteCloseMarklIdGetter
 
 	basePath                  string
 	objectPath                string
@@ -59,7 +59,7 @@ func newMover(
 		return
 	}
 
-	if mover.WriteCloseBlobIdGetter, err = NewWriter(
+	if mover.WriteCloseMarklIdGetter, err = NewWriter(
 		config,
 		mover.file,
 	); err != nil {
@@ -76,12 +76,12 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	if mover.WriteCloseBlobIdGetter == nil {
+	if mover.WriteCloseMarklIdGetter == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = mover.WriteCloseBlobIdGetter.Close(); err != nil {
+	if err = mover.WriteCloseMarklIdGetter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,7 +98,7 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	digest := mover.GetBlobId()
+	digest := mover.GetMarklId()
 
 	if err = markl.MakeErrEmptyType(digest); err != nil {
 		err = errors.Wrap(err)

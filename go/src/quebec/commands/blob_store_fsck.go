@@ -59,7 +59,7 @@ func (cmd BlobFsck) Run(req command.Request) {
 		countSuccessPtr := &count
 
 		type errorBlob struct {
-			blobId interfaces.BlobId
+			blobId interfaces.MarklId
 			err    error
 		}
 

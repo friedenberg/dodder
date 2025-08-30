@@ -10,12 +10,12 @@ import (
 )
 
 type Writer interface {
-	interfaces.WriteCloseBlobIdGetter
-	interfaces.BlobIdGetter
+	interfaces.WriteCloseMarklIdGetter
+	interfaces.MarklIdGetter
 }
 
 type writer struct {
-	digester              interfaces.WriteBlobIdGetter
+	digester              interfaces.WriteMarklIdGetter
 	tee                   io.Writer
 	compressor, encrypter io.WriteCloser
 	buffer                *bufio.Writer
@@ -83,6 +83,6 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) GetBlobId() interfaces.BlobId {
-	return w.digester.GetBlobId()
+func (w *writer) GetMarklId() interfaces.MarklId {
+	return w.digester.GetMarklId()
 }

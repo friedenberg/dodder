@@ -42,7 +42,7 @@ type Counts struct {
 }
 
 func (blobImporter *BlobImporter) ImportBlobIfNecessary(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
 	if len(blobImporter.Dsts) == 0 {
@@ -64,7 +64,7 @@ func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 }
 
 func (blobImporter *BlobImporter) emitMissingBlob(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
 	// when this is a dumb HTTP remote, we expect local to push the missing
@@ -80,7 +80,7 @@ func (blobImporter *BlobImporter) emitMissingBlob(
 		if err = blobImporter.CopierDelegate(
 			sku.BlobCopyResult{
 				Transacted: object,
-				BlobId:     blobId,
+				MarklId:     blobId,
 				N:          n,
 			},
 		); err != nil {
@@ -94,7 +94,7 @@ func (blobImporter *BlobImporter) emitMissingBlob(
 
 func (blobImporter *BlobImporter) importBlobIfNecessary(
 	dst interfaces.BlobStore,
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
 	var progressWriter env_ui.ProgressWriter
@@ -134,7 +134,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 				if err = blobImporter.CopierDelegate(
 					sku.BlobCopyResult{
 						Transacted: object,
-						BlobId:     blobId,
+						MarklId:     blobId,
 						N:          n,
 					},
 				); err != nil {

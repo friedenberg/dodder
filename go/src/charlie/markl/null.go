@@ -8,7 +8,7 @@ import (
 // TODO remove
 
 var (
-	_    interfaces.BlobId = null{}
+	_    interfaces.MarklId = null{}
 	Null                   = null{}
 )
 

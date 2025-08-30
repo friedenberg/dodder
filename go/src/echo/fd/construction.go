@@ -121,7 +121,7 @@ func MakeFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.WriteCloseBlobIdGetter
+	var writer interfaces.WriteCloseMarklIdGetter
 
 	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

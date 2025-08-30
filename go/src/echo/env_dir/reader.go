@@ -10,7 +10,7 @@ import (
 )
 
 type reader struct {
-	digester  interfaces.WriteBlobIdGetter
+	digester  interfaces.WriteMarklIdGetter
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
@@ -73,6 +73,6 @@ func (reader *reader) Close() (err error) {
 	return
 }
 
-func (reader *reader) GetBlobId() interfaces.BlobId {
-	return reader.digester.GetBlobId()
+func (reader *reader) GetMarklId() interfaces.MarklId {
+	return reader.digester.GetMarklId()
 }

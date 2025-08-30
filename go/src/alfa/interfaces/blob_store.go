@@ -25,17 +25,17 @@ type (
 	}
 
 	BlobReader interface {
-		BlobReader(BlobId) (ReadCloseBlobIdGetter, error)
+		BlobReader(MarklId) (ReadCloseMarklIdGetter, error)
 	}
 
 	BlobWriter interface {
-		BlobWriter() (WriteCloseBlobIdGetter, error)
+		BlobWriter() (WriteCloseMarklIdGetter, error)
 	}
 
 	Mover interface {
 		io.WriteCloser
 		io.ReaderFrom
-		BlobIdGetter
+		MarklIdGetter
 	}
 
 	BlobStoreConfig interface {
@@ -45,10 +45,10 @@ type (
 	BlobStore interface {
 		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string
-		HasBlob(BlobId) bool
+		HasBlob(MarklId) bool
 		BlobReader
 		BlobWriter
-		AllBlobs() SeqError[BlobId]
+		AllBlobs() SeqError[MarklId]
 		GetBlobIOWrapper() BlobIOWrapper
 		Mover() (Mover, error)
 	}
@@ -56,6 +56,6 @@ type (
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[BLOB any] interface {
-		GetBlob(BlobId) (BLOB, FuncRepool, error)
+		GetBlob(MarklId) (BLOB, FuncRepool, error)
 	}
 )

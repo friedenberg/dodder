@@ -56,7 +56,7 @@ func MakeTesting(
 	}
 
 	for expectedDigestString, content := range contents {
-		var writeCloser interfaces.WriteCloseBlobIdGetter
+		var writeCloser interfaces.WriteCloseMarklIdGetter
 
 		writeCloser, err := envRepo.GetDefaultBlobStore().BlobWriter()
 		if err != nil {
@@ -86,7 +86,7 @@ func MakeTesting(
 			)
 		}
 
-		actual := writeCloser.GetBlobId()
+		actual := writeCloser.GetMarklId()
 		expected, _ := markl.HashTypeSha256.GetBlobIdForHexString(
 			expectedDigestString,
 		)

@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	BlobId interface {
+	MarklId interface {
 		// TODO consider removing Stringer and Setter
 		Stringer
 		encoding.BinaryMarshaler
@@ -21,52 +21,52 @@ type (
 		IsNull() bool
 	}
 
-	MutableBlobId interface {
-		BlobId
+	MutableMarklId interface {
+		MarklId
 		Setter
 		encoding.BinaryUnmarshaler
 		encoding.TextUnmarshaler
 		// io.ReaderFrom
 		SetMerkleId(tipe string, bites []byte) error
 		Reset()
-		ResetWithMerkleId(BlobId)
+		ResetWithMarklId(MarklId)
 	}
 
-	BlobIdGetter interface {
-		GetBlobId() BlobId
+	MarklIdGetter interface {
+		GetMarklId() MarklId
 	}
 
 	Hash interface {
 		hash.Hash
 		GetType() string
-		GetBlobId() (MutableBlobId, FuncRepool)
+		GetMarklId() (MutableMarklId, FuncRepool)
 	}
 
 	HashType interface {
-		GetBlobIdForString(input string) (BlobId, FuncRepool)
+		GetMarklIdForString(input string) (MarklId, FuncRepool)
 		// TODO rename
-		FromStringFormat(format string, args ...any) (BlobId, FuncRepool)
+		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
 	}
 
-	WriteBlobIdGetter interface {
+	WriteMarklIdGetter interface {
 		io.Writer
-		BlobIdGetter
+		MarklIdGetter
 	}
 
-	ReadBlobIdGetter interface {
+	ReadMarklIdGetter interface {
 		io.Reader
-		BlobIdGetter
+		MarklIdGetter
 	}
 
-	ReadCloseBlobIdGetter interface {
+	ReadCloseMarklIdGetter interface {
 		io.WriterTo
 		io.ReadCloser
-		BlobIdGetter
+		MarklIdGetter
 	}
 
-	WriteCloseBlobIdGetter interface {
+	WriteCloseMarklIdGetter interface {
 		io.ReaderFrom
 		io.WriteCloser
-		BlobIdGetter
+		MarklIdGetter
 	}
 )

@@ -15,9 +15,9 @@ type (
 	// TODO add support for different digests
 	commonInterface interface {
 		// TODO rename to AddDigest and enforce digest type
-		AddBlobId(interfaces.BlobId, Loc) error
-		ReadOne(id interfaces.BlobId) (loc Loc, err error)
-		ReadMany(id interfaces.BlobId, locs *[]Loc) (err error)
+		AddBlobId(interfaces.MarklId, Loc) error
+		ReadOne(id interfaces.MarklId) (loc Loc, err error)
+		ReadMany(id interfaces.MarklId, locs *[]Loc) (err error)
 	}
 
 	pageInterface interface {
@@ -94,7 +94,7 @@ func (index *object_probe_index) GetObjectProbeIndex() Index {
 }
 
 func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
-	var blobIds map[string]interfaces.BlobId
+	var blobIds map[string]interfaces.MarklId
 
 	if blobIds, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
 		err = errors.Wrap(err)
@@ -112,14 +112,14 @@ func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 }
 
 func (index *object_probe_index) AddBlobId(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
 	return index.addBlobId(blobId, loc)
 }
 
 func (index *object_probe_index) addBlobId(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
 	if blobId.IsNull() {
@@ -140,7 +140,7 @@ func (index *object_probe_index) addBlobId(
 }
 
 func (index *object_probe_index) ReadOne(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) (loc Loc, err error) {
 	var pageIndex uint8
 
@@ -156,7 +156,7 @@ func (index *object_probe_index) ReadOne(
 }
 
 func (index *object_probe_index) ReadMany(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
 	var pageIndex uint8
@@ -183,7 +183,7 @@ func (index *object_probe_index) ReadOneKey(
 		return
 	}
 
-	var blobId interfaces.BlobId
+	var blobId interfaces.MarklId
 
 	if blobId, err = object_inventory_format.GetDigestForMetadata(
 		format,
@@ -218,7 +218,7 @@ func (index *object_probe_index) ReadManyKeys(
 		return
 	}
 
-	var blobId interfaces.BlobId
+	var blobId interfaces.MarklId
 
 	if blobId, err = object_inventory_format.GetDigestForMetadata(
 		format,
@@ -235,7 +235,7 @@ func (index *object_probe_index) ReadAll(
 	metadata *object_metadata.Metadata,
 	locations *[]Loc,
 ) (err error) {
-	var blobIds map[string]interfaces.BlobId
+	var blobIds map[string]interfaces.MarklId
 
 	if blobIds, err = object_inventory_format.GetDigestsForMetadata(
 		metadata,

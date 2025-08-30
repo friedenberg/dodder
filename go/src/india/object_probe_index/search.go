@@ -10,7 +10,7 @@ import (
 )
 
 func (page *page) seekToFirstBinarySearch(
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 ) (mid int64, err error) {
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
@@ -78,7 +78,7 @@ func (page *page) seekToFirstBinarySearch(
 }
 
 func (page *page) seekToFirstLinearSearch(
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 ) (loc int64, err error) {
 	errors.PanicIfError(
 		markl.MakeErrWrongType(

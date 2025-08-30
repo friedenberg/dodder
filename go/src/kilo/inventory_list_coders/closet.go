@@ -211,7 +211,7 @@ func (store Closet) StreamInventoryListBlobSkus(
 		tipe := object.GetType()
 		blobDigest := object.GetBlobDigest()
 
-		var readCloser interfaces.ReadCloseBlobIdGetter
+		var readCloser interfaces.ReadCloseMarklIdGetter
 
 		if blobDigest.IsNull() {
 			return
@@ -275,10 +275,10 @@ func (store Closet) AllDecodedObjectsFromStream(
 func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var readCloser interfaces.ReadCloseBlobIdGetter
+		var readCloser interfaces.ReadCloseMarklIdGetter
 
 		{
 			var err error

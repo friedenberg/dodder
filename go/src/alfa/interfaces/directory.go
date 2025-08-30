@@ -36,6 +36,6 @@ type Directory interface {
 }
 
 type CacheIOFactory interface {
-	ReadCloserCache(string) (ReadCloseBlobIdGetter, error)
-	WriteCloserCache(string) (WriteCloseBlobIdGetter, error)
+	ReadCloserCache(string) (ReadCloseMarklIdGetter, error)
+	WriteCloserCache(string) (WriteCloseMarklIdGetter, error)
 }

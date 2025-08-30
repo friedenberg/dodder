@@ -159,16 +159,16 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.Metadata.Cache.Dormant.SetBool(v)
 }
 
-func (transacted *Transacted) GetObjectDigest() interfaces.BlobId {
+func (transacted *Transacted) GetObjectDigest() interfaces.MarklId {
 	return transacted.GetMetadata().GetObjectDigest()
 }
 
-func (transacted *Transacted) GetBlobDigest() interfaces.BlobId {
+func (transacted *Transacted) GetBlobDigest() interfaces.MarklId {
 	return transacted.Metadata.GetBlobDigest()
 }
 
 func (transacted *Transacted) SetBlobDigest(
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) (err error) {
 	if err = transacted.Metadata.GetBlobDigestMutable().SetMerkleId(
 		merkleId.GetType(),

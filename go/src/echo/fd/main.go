@@ -132,7 +132,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.WriteCloseBlobIdGetter
+	var writer interfaces.WriteCloseMarklIdGetter
 
 	if writer, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -174,7 +174,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	defer errors.DeferredCloser(&err, f)
 
-	var blobWriter interfaces.WriteCloseBlobIdGetter
+	var blobWriter interfaces.WriteCloseMarklIdGetter
 
 	if blobWriter, err = blobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -383,11 +383,11 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v interfaces.BlobId) (err error) {
+func (fd *FD) SetShaLike(v interfaces.MarklId) (err error) {
 	return fd.digest.SetDigest(v)
 }
 
-func (fd *FD) GetDigest() interfaces.BlobId {
+func (fd *FD) GetDigest() interfaces.MarklId {
 	return &fd.digest
 }
 

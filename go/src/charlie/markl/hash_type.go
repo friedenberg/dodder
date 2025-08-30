@@ -96,16 +96,16 @@ func (hashType HashType) GetSize() int {
 	return hashType.Hash.Size()
 }
 
-func (hashType HashType) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) {
+func (hashType HashType) GetBlobId() (interfaces.MutableMarklId, interfaces.FuncRepool) {
 	hash := hashType.Get()
 	defer hashType.Put(hash)
 
-	return hash.GetBlobId()
+	return hash.GetMarklId()
 }
 
-func (hashType HashType) GetBlobIdForString(
+func (hashType HashType) GetMarklIdForString(
 	input string,
-) (interfaces.BlobId, interfaces.FuncRepool) {
+) (interfaces.MarklId, interfaces.FuncRepool) {
 	hash := hashType.Get()
 	defer hashType.Put(hash)
 
@@ -113,18 +113,18 @@ func (hashType HashType) GetBlobIdForString(
 		errors.PanicIfError(err)
 	}
 
-	return hash.GetBlobId()
+	return hash.GetMarklId()
 }
 
-func (hashType HashType) FromStringContent(input string) interfaces.BlobId {
-	id, _ := hashType.GetBlobIdForString(input)
+func (hashType HashType) FromStringContent(input string) interfaces.MarklId {
+	id, _ := hashType.GetMarklIdForString(input)
 	return id
 }
 
 func (hashType HashType) FromStringFormat(
 	format string,
 	args ...any,
-) (interfaces.BlobId, interfaces.FuncRepool) {
+) (interfaces.MarklId, interfaces.FuncRepool) {
 	hash := hashType.Get()
 	defer hashType.Put(hash)
 
@@ -132,16 +132,16 @@ func (hashType HashType) FromStringFormat(
 		errors.PanicIfError(err)
 	}
 
-	return hash.GetBlobId()
+	return hash.GetMarklId()
 }
 
 func (hashType HashType) GetBlobIdForHexString(
 	input string,
-) (interfaces.BlobId, interfaces.FuncRepool) {
+) (interfaces.MarklId, interfaces.FuncRepool) {
 	hash := hashType.pool.Get()
 	defer hashType.pool.Put(hash)
 
-	id, repool := hash.GetBlobId()
+	id, repool := hash.GetMarklId()
 
 	errors.PanicIfError(SetHexBytes(hashType.tipe, id, []byte(input)))
 

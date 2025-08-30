@@ -51,7 +51,7 @@ func MakeConfigStore(
 
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
-	blobSha interfaces.BlobId,
+	blobSha interfaces.MarklId,
 ) (common repo_configs.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:

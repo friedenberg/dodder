@@ -55,8 +55,8 @@ func (c ReadBlob) Run(dep command.Request) {
 func (ReadBlob) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
-) (digest interfaces.BlobId, err error) {
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+) (digest interfaces.MarklId, err error) {
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -70,7 +70,7 @@ func (ReadBlob) readOneBlob(
 		return
 	}
 
-	digest = writeCloser.GetBlobId()
+	digest = writeCloser.GetMarklId()
 
 	return
 }

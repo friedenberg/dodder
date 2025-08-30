@@ -168,7 +168,7 @@ func (g *Genre) ReadFromBoxScanner(
 	return
 }
 
-func (i Genre) GetDigest() interfaces.BlobId {
+func (i Genre) GetDigest() interfaces.MarklId {
 	return markl.HashTypeSha256.FromStringContent(i.String())
 }
 

@@ -8,7 +8,7 @@ import (
 
 var idPool interfaces.Pool[Id, *Id] = pool.MakeWithResetable[Id]()
 
-func PutBlobId(digest interfaces.BlobId) {
+func PutBlobId(digest interfaces.MarklId) {
 	switch id := digest.(type) {
 	case Id:
 		idPool.Put(&id)

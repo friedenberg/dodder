@@ -40,7 +40,7 @@ func PageIndexForString(
 	value string,
 	hashType interfaces.HashType,
 ) (n uint8, err error) {
-	digest, repool := hashType.GetBlobIdForString(value)
+	digest, repool := hashType.GetMarklIdForString(value)
 	defer repool()
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
@@ -53,7 +53,7 @@ func PageIndexForString(
 
 func PageIndexForDigest(
 	width uint8,
-	digest interfaces.BlobId,
+	digest interfaces.MarklId,
 ) (n uint8, err error) {
 	var n1 int64
 

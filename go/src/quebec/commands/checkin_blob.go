@@ -157,7 +157,7 @@ func (pair *externalBlobPair) SetArgs(
 	return
 }
 
-func (pair *externalBlobPair) GetDigest() interfaces.BlobId {
+func (pair *externalBlobPair) GetDigest() interfaces.MarklId {
 	if !pair.BlobFD.IsEmpty() {
 		return pair.BlobFD.GetDigest()
 	} else {

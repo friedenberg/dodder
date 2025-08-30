@@ -44,7 +44,7 @@ func (index *probe_index) Flush() (err error) {
 }
 
 func (index *probe_index) readOneShaLoc(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.Index.ReadOne(blobId); err != nil {
 		return
@@ -54,7 +54,7 @@ func (index *probe_index) readOneShaLoc(
 }
 
 func (index *probe_index) readManyShaLoc(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.Index.ReadMany(blobId, &locs); err != nil {
 		return

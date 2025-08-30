@@ -13,7 +13,7 @@ import (
 )
 
 func SetHexStringFromPath(
-	id interfaces.MutableBlobId,
+	id interfaces.MutableMarklId,
 	path string,
 ) (err error) {
 	tail := filepath.Base(path)
@@ -55,7 +55,7 @@ func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
 
 func CompareToReader(
 	reader io.Reader,
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 ) int {
 	actual := idPool.Get()
 	defer idPool.Put(actual)
@@ -72,7 +72,7 @@ func CompareToReader(
 func CompareToReaderAt(
 	readerAt io.ReaderAt,
 	offset int64,
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 ) int {
 	actual := idPool.Get()
 	defer idPool.Put(actual)
@@ -88,7 +88,7 @@ func CompareToReaderAt(
 
 func SetHexBytes(
 	tipe string,
-	dst interfaces.MutableBlobId,
+	dst interfaces.MutableMarklId,
 	bites []byte,
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
@@ -130,15 +130,15 @@ func SetHexBytes(
 }
 
 func SetDigester(
-	dst interfaces.MutableBlobId,
-	src interfaces.BlobIdGetter,
+	dst interfaces.MutableMarklId,
+	src interfaces.MarklIdGetter,
 ) {
-	digest := src.GetBlobId()
+	digest := src.GetMarklId()
 	errors.PanicIfError(dst.SetMerkleId(digest.GetType(), digest.GetBytes()))
 }
 
 func EqualsReader(
-	expectedBlobId interfaces.BlobId,
+	expectedBlobId interfaces.MarklId,
 	bufferedReader *bufio.Reader,
 ) (ok bool, err error) {
 	var actualBytes []byte
@@ -159,29 +159,29 @@ func EqualsReader(
 	return
 }
 
-func Equals(a, b interfaces.BlobId) bool {
+func Equals(a, b interfaces.MarklId) bool {
 	return (a.IsNull() && b.IsNull()) ||
 		(a.GetType() == b.GetType() && bytes.Equal(a.GetBytes(), b.GetBytes()))
 }
 
-func Clone(src interfaces.BlobId) interfaces.BlobId {
+func Clone(src interfaces.MarklId) interfaces.MarklId {
 	if !src.IsNull() {
 		errors.PanicIfError(MakeErrEmptyType(src))
 	}
 
 	dst := idPool.Get()
-	dst.ResetWithMerkleId(src)
+	dst.ResetWithMarklId(src)
 
 	return dst
 }
 
 // Creates a human-readable string representation of a digest.
 // TODO add type information
-func Format(merkleId interfaces.BlobId) string {
+func Format(merkleId interfaces.MarklId) string {
 	return fmt.Sprintf("%x", merkleId.GetBytes())
 }
 
-func FormatOrEmptyOnNull(merkleId interfaces.BlobId) string {
+func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	if merkleId.IsNull() {
 		return ""
 	} else {

@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	_ interfaces.BlobId        = Id{}
-	_ interfaces.MutableBlobId = &Id{}
+	_ interfaces.MarklId        = Id{}
+	_ interfaces.MutableMarklId = &Id{}
 )
 
 type Id struct {
@@ -124,7 +124,7 @@ func (id *Id) Set(value string) (err error) {
 	return
 }
 
-func (id *Id) SetDigest(digest interfaces.BlobId) (err error) {
+func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	if err = id.SetMerkleId(digest.GetType(), digest.GetBytes()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -176,11 +176,11 @@ func (id *Id) ResetWith(src Id) {
 	id.setData(src.data)
 }
 
-func (id *Id) ResetWithMerkleId(src interfaces.BlobId) {
+func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	errors.PanicIfError(id.SetMerkleId(src.GetType(), src.GetBytes()))
 }
 
-func (id *Id) GetBlobId() interfaces.BlobId {
+func (id *Id) GetBlobId() interfaces.MarklId {
 	return id
 }
 

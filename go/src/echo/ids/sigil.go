@@ -163,7 +163,7 @@ func (i *Sigil) Set(v string) (err error) {
 	return
 }
 
-func (i Sigil) GetDigest() interfaces.BlobId {
+func (i Sigil) GetDigest() interfaces.MarklId {
 	return markl.HashTypeSha256.FromStringContent(i.String())
 }
 

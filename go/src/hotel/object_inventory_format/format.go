@@ -321,7 +321,7 @@ func writeMetadataKeyStringTo(
 func writeMerkleIdKey(
 	w io.Writer,
 	key *catgut.String,
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) (n int, err error) {
 	if err = markl.MakeErrIsNull(merkleId, key.String()); err != nil {
 		err = errors.Wrap(err)
@@ -344,7 +344,7 @@ func writeMerkleIdKey(
 func writeMerkleIdKeyIfNotNull(
 	w io.Writer,
 	key *catgut.String,
-	merkleId interfaces.BlobId,
+	merkleId interfaces.MarklId,
 ) (n int, err error) {
 	if merkleId.IsNull() {
 		return
@@ -356,7 +356,7 @@ func writeMerkleIdKeyIfNotNull(
 func GetDigestForContext(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.BlobId, err error) {
+) (digest interfaces.MarklId, err error) {
 	m := context.GetMetadata()
 
 	switch format.key {
@@ -382,7 +382,7 @@ func GetDigestForContext(
 func GetDigestForMetadata(
 	format Format,
 	metadata *object_metadata.Metadata,
-) (digest interfaces.BlobId, err error) {
+) (digest interfaces.MarklId, err error) {
 	return GetDigestForContext(format, nopFormatterContext{metadata})
 }
 
@@ -390,7 +390,7 @@ func WriteMetadata(
 	w io.Writer,
 	f Format,
 	c FormatterContext,
-) (blobDigest interfaces.BlobId, err error) {
+) (blobDigest interfaces.MarklId, err error) {
 	writer, repool := markl.MakeWriterWithRepool(
 		markl.HashTypeSha256.Get(),
 		w,
@@ -403,7 +403,7 @@ func WriteMetadata(
 		return
 	}
 
-	blobDigest = writer.GetBlobId()
+	blobDigest = writer.GetMarklId()
 
 	return
 }
@@ -411,7 +411,7 @@ func WriteMetadata(
 func getDigestForContext(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.BlobId, err error) {
+) (digest interfaces.MarklId, err error) {
 	if digest, err = WriteMetadata(nil, format, context); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -423,7 +423,7 @@ func getDigestForContext(
 func GetDigestForContextDebug(
 	format Format,
 	context FormatterContext,
-) (digest interfaces.BlobId, err error) {
+) (digest interfaces.MarklId, err error) {
 	var sb strings.Builder
 	writer, repool := markl.MakeWriterWithRepool(
 		markl.HashTypeSha256.Get(),
@@ -437,7 +437,7 @@ func GetDigestForContextDebug(
 		return
 	}
 
-	digest = writer.GetBlobId()
+	digest = writer.GetMarklId()
 
 	value := sb.String()
 
@@ -448,13 +448,13 @@ func GetDigestForContextDebug(
 
 func GetDigestsForMetadata(
 	metadata *object_metadata.Metadata,
-) (digests map[string]interfaces.BlobId, err error) {
-	digests = make(map[string]interfaces.BlobId, len(FormatKeysV5))
+) (digests map[string]interfaces.MarklId, err error) {
+	digests = make(map[string]interfaces.MarklId, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
 		f := FormatForKey(k)
 
-		var digest interfaces.BlobId
+		var digest interfaces.MarklId
 
 		if digest, err = GetDigestForMetadata(f, metadata); err != nil {
 			err = errors.Wrap(err)

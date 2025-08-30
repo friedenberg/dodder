@@ -5,13 +5,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-func (env Env) ReadCloserCache(path string) (interfaces.ReadCloseBlobIdGetter, error) {
+func (env Env) ReadCloserCache(path string) (interfaces.ReadCloseMarklIdGetter, error) {
 	return env_dir.NewFileReader(env_dir.DefaultConfig, path)
 }
 
 func (env Env) WriteCloserCache(
 	path string,
-) (interfaces.WriteCloseBlobIdGetter, error) {
+) (interfaces.WriteCloseMarklIdGetter, error) {
 	return env_dir.NewMover(
 		env_dir.DefaultConfig,
 		env_dir.MoveOptions{

@@ -46,7 +46,7 @@ type inventoryListBlobStore interface {
 	getFormat() sku.ListCoder
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
-	ReadOneBlobId(interfaces.BlobId) (*sku.Transacted, error)
+	ReadOneBlobId(interfaces.MarklId) (*sku.Transacted, error)
 	WriteInventoryListObject(*sku.Transacted) error
 
 	AllInventoryListObjects() interfaces.SeqError[*sku.Transacted]
@@ -212,7 +212,7 @@ func (store *Store) Create(
 		return
 	}
 
-	actual := openList.Mover.GetBlobId()
+	actual := openList.Mover.GetMarklId()
 	// expected := &merkle.Id{}
 
 	expected := markl.Clone(object.GetBlobDigest())
@@ -267,7 +267,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
 	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -294,7 +294,7 @@ func (store *Store) WriteInventoryListBlob(
 		return
 	}
 
-	actual := writeCloser.GetBlobId()
+	actual := writeCloser.GetMarklId()
 	expected := object.GetBlobDigest()
 
 	ui.Log().Print("expected", expected, "actual", actual)
@@ -330,7 +330,7 @@ func (store *Store) WriteInventoryListBlob(
 }
 
 func (store *Store) IterInventoryList(
-	blobSha interfaces.BlobId,
+	blobSha interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return store.GetInventoryListCoderCloset().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),

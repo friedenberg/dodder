@@ -23,7 +23,7 @@ func TestIdNullAndEqual(t1 *testing.T) {
 	hash := hashType.Get()
 
 	{
-		idNull, _ := hash.GetBlobId()
+		idNull, _ := hash.GetMarklId()
 
 		t.AssertNoError(MakeErrIsNotNull(idZero))
 		t.AssertNoError(MakeErrIsNotNull(idNull))
@@ -34,7 +34,7 @@ func TestIdNullAndEqual(t1 *testing.T) {
 	}
 
 	{
-		idNull, _ := hashType.GetBlobIdForString("")
+		idNull, _ := hashType.GetMarklIdForString("")
 
 		t.AssertNoError(MakeErrIsNotNull(idZero))
 		t.AssertNoError(MakeErrIsNotNull(idNull))
@@ -58,7 +58,7 @@ func TestIdNullAndEqual(t1 *testing.T) {
 	}
 
 	{
-		idNonZero, _ := hashType.GetBlobIdForString("nonZero")
+		idNonZero, _ := hashType.GetMarklIdForString("nonZero")
 		t.AssertNoError(MakeErrIsNull(idNonZero, ""))
 		t.AssertError(MakeErrIsNotNull(idNonZero))
 		t.AssertError(MakeErrNotEqual(idNonZero, idZero))

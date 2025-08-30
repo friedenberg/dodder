@@ -87,7 +87,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return
 	}
 
-	var sh interfaces.BlobId
+	var sh interfaces.MarklId
 
 	// TODO remove and replace with two-step process
 	if sh, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
@@ -105,7 +105,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return
 	}
 
-	object.Metadata.GetBlobDigestMutable().ResetWithMerkleId(sh)
+	object.Metadata.GetBlobDigestMutable().ResetWithMarklId(sh)
 	object.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
@@ -127,7 +127,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return
 	}
 
-	var blobId interfaces.BlobId
+	var blobId interfaces.MarklId
 	var typedBlob repo_configs.TypedBlob
 
 	if blobId, typedBlob, err = writeDefaultMutableConfig(
@@ -166,12 +166,12 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 func writeDefaultMutableConfig(
 	repo *Repo,
 	defaultType ids.Type,
-) (blobId interfaces.BlobId, typedBlob repo_configs.TypedBlob, err error) {
+) (blobId interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
 	typedBlob = repo_configs.DefaultOverlay(defaultType)
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +188,7 @@ func writeDefaultMutableConfig(
 		return
 	}
 
-	blobId = writeCloser.GetBlobId()
+	blobId = writeCloser.GetMarklId()
 
 	return
 }

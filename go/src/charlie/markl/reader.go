@@ -14,6 +14,8 @@ type readCloser struct {
 	hash   interfaces.Hash
 }
 
+var _ interfaces.ReadCloseMarklIdGetter = readCloser{}
+
 func MakeReadCloser(
 	hash interfaces.Hash,
 	reader io.Reader,
@@ -118,8 +120,8 @@ func (readCloser readCloser) Close() (err error) {
 	return
 }
 
-func (readCloser readCloser) GetBlobId() interfaces.BlobId {
-	digest, _ := readCloser.hash.GetBlobId()
+func (readCloser readCloser) GetMarklId() interfaces.MarklId {
+	digest, _ := readCloser.hash.GetMarklId()
 	return digest
 }
 
@@ -128,10 +130,12 @@ type nopReadCloser struct {
 	io.ReadCloser
 }
 
+var _ interfaces.ReadCloseMarklIdGetter = nopReadCloser{}
+
 func MakeNopReadCloser(
 	hash interfaces.Hash,
 	readCloser io.ReadCloser,
-) interfaces.ReadCloseBlobIdGetter {
+) interfaces.ReadCloseMarklIdGetter {
 	return nopReadCloser{
 		hash:       hash,
 		ReadCloser: readCloser,
@@ -147,7 +151,7 @@ func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
 	return io.Copy(writer, readCloser.ReadCloser)
 }
 
-func (readCloser nopReadCloser) GetBlobId() interfaces.BlobId {
-	id, _ := readCloser.hash.GetBlobId()
+func (readCloser nopReadCloser) GetMarklId() interfaces.MarklId {
+	id, _ := readCloser.hash.GetMarklId()
 	return id
 }

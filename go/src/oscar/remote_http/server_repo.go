@@ -97,7 +97,7 @@ func (server *Server) writeInventoryList(
 
 	typedInventoryListStore := server.Repo.GetInventoryListCoderCloset()
 
-	var blobWriter interfaces.WriteCloseBlobIdGetter
+	var blobWriter interfaces.WriteCloseMarklIdGetter
 
 	{
 		var err error
@@ -157,7 +157,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	actual := blobWriter.GetBlobId()
+	actual := blobWriter.GetMarklId()
 
 	if err := markl.MakeErrNotEqual(expected, actual); err != nil {
 		ui.Err().Printf(

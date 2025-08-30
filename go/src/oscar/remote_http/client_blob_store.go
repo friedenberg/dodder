@@ -30,7 +30,7 @@ func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) HasBlob(merkleId interfaces.BlobId) (ok bool) {
+func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -61,8 +61,8 @@ func (client *client) HasBlob(merkleId interfaces.BlobId) (ok bool) {
 }
 
 func (client *client) BlobReader(
-	blobId interfaces.BlobId,
-) (reader interfaces.ReadCloseBlobIdGetter, err error) {
+	blobId interfaces.MarklId,
+) (reader interfaces.ReadCloseMarklIdGetter, err error) {
 	var request *http.Request
 
 	if request, err = client.newRequest(
@@ -103,13 +103,13 @@ func (client *client) BlobReader(
 
 func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 ) (err error) {
 	var actual markl.Id
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.ReadCloseBlobIdGetter
+	var reader interfaces.ReadCloseMarklIdGetter
 
 	if reader, err = localBlobStore.BlobReader(
 		expected,
@@ -198,7 +198,7 @@ func (client *client) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) AllBlobs() interfaces.SeqError[interfaces.BlobId] {
+func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 	panic(errors.Err501NotImplemented)
 }
 
@@ -206,6 +206,6 @@ func (client *client) Mover() (interfaces.Mover, error) {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) BlobWriter() (interfaces.WriteCloseBlobIdGetter, error) {
+func (client *client) BlobWriter() (interfaces.WriteCloseMarklIdGetter, error) {
 	panic(errors.Err501NotImplemented)
 }

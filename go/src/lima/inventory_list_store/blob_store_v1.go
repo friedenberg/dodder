@@ -38,9 +38,9 @@ func (blobStore *blobStoreV1) GetInventoryListCoderCloset() inventory_list_coder
 }
 
 func (blobStore *blobStoreV1) ReadOneBlobId(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 ) (object *sku.Transacted, err error) {
-	var readCloser interfaces.ReadCloseBlobIdGetter
+	var readCloser interfaces.ReadCloseMarklIdGetter
 
 	if readCloser, err = blobStore.BlobStore.BlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (blobStore *blobStoreV1) ReadOneBlobId(
 func (blobStore *blobStoreV1) WriteInventoryListObject(
 	object *sku.Transacted,
 ) (err error) {
-	var blobStoreWriteCloser interfaces.WriteCloseBlobIdGetter
+	var blobStoreWriteCloser interfaces.WriteCloseMarklIdGetter
 
 	if blobStoreWriteCloser, err = blobStore.BlobStore.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

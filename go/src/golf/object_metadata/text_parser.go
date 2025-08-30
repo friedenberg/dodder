@@ -46,7 +46,7 @@ func (parser textParser) ParseMetadata(
 		TextParserContext: context,
 	}
 
-	var blobWriter interfaces.WriteCloseBlobIdGetter
+	var blobWriter interfaces.WriteCloseMarklIdGetter
 
 	if blobWriter, err = parser.blobWriter.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -73,7 +73,7 @@ func (parser textParser) ParseMetadata(
 
 	n += n1
 
-	inlineBlobDigest := blobWriter.GetBlobId()
+	inlineBlobDigest := blobWriter.GetMarklId()
 
 	if !metadata.DigBlob.IsNull() && !parser2.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(

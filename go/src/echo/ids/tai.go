@@ -204,7 +204,7 @@ func (tai *Tai) Set(value string) (err error) {
 	return
 }
 
-func (tai Tai) GetBlobId() interfaces.BlobId {
+func (tai Tai) GetBlobId() interfaces.MarklId {
 	return markl.HashTypeSha256.FromStringContent(tai.String())
 }
 

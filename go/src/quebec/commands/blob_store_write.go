@@ -44,7 +44,7 @@ func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flags.FlagSet) {
 
 type blobWriteResult struct {
 	error
-	interfaces.BlobId
+	interfaces.MarklId
 	Path string
 }
 
@@ -73,7 +73,7 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 
 		result := blobWriteResult{Path: arg}
 
-		result.BlobId, result.error = cmd.doOne(blobStore, arg)
+		result.MarklId, result.error = cmd.doOne(blobStore, arg)
 
 		if result.IsNull() {
 			ui.Err().Printf("digest for arg %q was null", arg)
@@ -90,26 +90,26 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 			continue
 		}
 
-		hasBlob := blobStore.HasBlob(result.BlobId)
+		hasBlob := blobStore.HasBlob(result.MarklId)
 
 		if hasBlob {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					markl.Format(result.BlobId),
+					markl.Format(result.MarklId),
 					result.Path,
 				)
 			} else {
 				blobStore.GetUI().Printf(
 					"%s %s (checked in)",
-					markl.Format(result.BlobId),
+					markl.Format(result.MarklId),
 					result.Path,
 				)
 			}
 		} else {
 			ui.Err().Printf(
 				"%s %s (untracked)",
-				markl.Format(result.BlobId),
+				markl.Format(result.MarklId),
 				result.Path,
 			)
 
@@ -135,7 +135,7 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 func (cmd BlobStoreWrite) doOne(
 	blobStore command_components.BlobStoreWithEnv,
 	path string,
-) (blobId interfaces.BlobId, err error) {
+) (blobId interfaces.MarklId, err error) {
 	var readCloser io.ReadCloser
 
 	if readCloser, err = env_dir.NewFileReader(
@@ -148,7 +148,7 @@ func (cmd BlobStoreWrite) doOne(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	var writeCloser interfaces.WriteCloseBlobIdGetter
+	var writeCloser interfaces.WriteCloseMarklIdGetter
 
 	if cmd.Check {
 		{
@@ -173,7 +173,7 @@ func (cmd BlobStoreWrite) doOne(
 		return
 	}
 
-	blobId = writeCloser.GetBlobId()
+	blobId = writeCloser.GetMarklId()
 
 	return
 }

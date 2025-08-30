@@ -13,7 +13,7 @@ func IsErrBlobAlreadyExists(err error) bool {
 }
 
 func MakeErrBlobAlreadyExists(
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	path string,
 ) ErrBlobAlreadyExists {
 	return ErrBlobAlreadyExists{
@@ -23,7 +23,7 @@ func MakeErrBlobAlreadyExists(
 }
 
 type ErrBlobAlreadyExists struct {
-	BlobId interfaces.BlobId
+	BlobId interfaces.MarklId
 	Path   string
 }
 
@@ -45,7 +45,7 @@ func IsErrBlobMissing(err error) bool {
 }
 
 type ErrBlobMissing struct {
-	BlobId interfaces.BlobId
+	BlobId interfaces.MarklId
 	Path   string
 }
 

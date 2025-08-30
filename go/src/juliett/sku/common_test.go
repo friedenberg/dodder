@@ -306,7 +306,7 @@ the body`,
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.GetBlobDigestMutable().ResetWithMerkleId(expectedSha)
+	expected.GetBlobDigestMutable().ResetWithMarklId(expectedSha)
 
 	expected.SetTags(makeTagSet(t,
 		"tag1",
@@ -333,8 +333,8 @@ type blobReaderFactory struct {
 }
 
 func (arf blobReaderFactory) BlobReader(
-	digest interfaces.BlobId,
-) (readCloser interfaces.ReadCloseBlobIdGetter, err error) {
+	digest interfaces.MarklId,
+) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	var v string
 	var ok bool
 
@@ -373,7 +373,7 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	m.GetBlobDigestMutable().ResetWithMerkleId(&blobDigest)
+	m.GetBlobDigestMutable().ResetWithMarklId(&blobDigest)
 
 	sb := &strings.Builder{}
 

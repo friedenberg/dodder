@@ -35,7 +35,7 @@ func (json *Transacted) FromStringAndMetadata(
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var readCloser interfaces.ReadCloseBlobIdGetter
+		var readCloser interfaces.ReadCloseMarklIdGetter
 
 		if readCloser, err = blobStore.BlobReader(
 			metadata.GetBlobDigest(),
@@ -60,8 +60,8 @@ func (json *Transacted) FromStringAndMetadata(
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.ObjectId = objectId
-	json.RepoPubkey.ResetWithMerkleId(metadata.GetRepoPubKey())
-	json.RepoSig.ResetWithMerkleId(metadata.GetObjectSig())
+	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
+	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
 	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
 	json.Tai = metadata.Tai.String()
@@ -88,7 +88,7 @@ func (json *Transacted) ToTransacted(
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var writeCloser interfaces.WriteCloseBlobIdGetter
+		var writeCloser interfaces.WriteCloseMarklIdGetter
 
 		if writeCloser, err = blobStore.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
@@ -154,11 +154,11 @@ func (json *Transacted) ToTransacted(
 	object.Metadata.GenerateExpandedTags()
 
 	if !json.RepoPubkey.IsNull() {
-		object.Metadata.GetRepoPubKeyMutable().ResetWithMerkleId(json.RepoPubkey)
+		object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
 	}
 
 	if !json.RepoSig.IsNull() {
-		object.Metadata.GetObjectSigMutable().ResetWithMerkleId(json.RepoSig)
+		object.Metadata.GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
 	}
 
 	// Set Tai from either Date or Tai field

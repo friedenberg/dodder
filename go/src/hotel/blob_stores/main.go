@@ -194,7 +194,7 @@ func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
@@ -218,14 +218,14 @@ func CopyBlob(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobSha interfaces.BlobId,
+	blobSha interfaces.MarklId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	var rc interfaces.ReadCloseBlobIdGetter
+	var rc interfaces.ReadCloseMarklIdGetter
 
 	if rc, err = src.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -234,7 +234,7 @@ func CopyBlob(
 
 	defer errors.ContextMustClose(env, rc)
 
-	var wc interfaces.WriteCloseBlobIdGetter
+	var wc interfaces.WriteCloseMarklIdGetter
 
 	if wc, err = dst.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -256,8 +256,8 @@ func CopyBlob(
 		return
 	}
 
-	shaRc := rc.GetBlobId()
-	shaWc := wc.GetBlobId()
+	shaRc := rc.GetMarklId()
+	shaWc := wc.GetMarklId()
 
 	if !markl.Equals(shaRc, blobSha) ||
 		!markl.Equals(shaWc, blobSha) {
@@ -277,14 +277,14 @@ func CopyBlob(
 func VerifyBlob(
 	ctx interfaces.Context,
 	blobStore interfaces.BlobStore,
-	expected interfaces.BlobId,
+	expected interfaces.MarklId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.ReadCloseBlobIdGetter
+	var readCloser interfaces.ReadCloseMarklIdGetter
 
 	if readCloser, err = blobStore.BlobReader(expected); err != nil {
 		err = errors.Wrap(err)
@@ -298,7 +298,7 @@ func VerifyBlob(
 
 	if err = markl.MakeErrNotEqual(
 		expected,
-		readCloser.GetBlobId(),
+		readCloser.GetMarklId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

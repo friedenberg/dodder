@@ -150,7 +150,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 	listCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
-	var blobWriter interfaces.WriteCloseBlobIdGetter
+	var blobWriter interfaces.WriteCloseMarklIdGetter
 
 	{
 		var err error

@@ -39,7 +39,7 @@ func (cmd *BlobStoreCat) SetFlagSet(flagSet *flags.FlagSet) {
 }
 
 type blobIdWithReadCloser struct {
-	BlobId     interfaces.BlobId
+	BlobId     interfaces.MarklId
 	ReadCloser io.ReadCloser
 }
 
@@ -153,10 +153,10 @@ func (cmd BlobStoreCat) copy(
 
 func (cmd BlobStoreCat) blob(
 	blobStore blob_stores.BlobStoreInitialized,
-	blobId interfaces.BlobId,
+	blobId interfaces.MarklId,
 	blobWriter interfaces.FuncIter[blobIdWithReadCloser],
 ) (err error) {
-	var r interfaces.ReadCloseBlobIdGetter
+	var r interfaces.ReadCloseMarklIdGetter
 
 	if r, err = blobStore.BlobReader(blobId); err != nil {
 		err = errors.Wrap(err)

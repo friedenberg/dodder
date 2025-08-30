@@ -412,7 +412,7 @@ func (server *Server) readMCPResourceBlobs(
 
 	blobDigestString := pathComponents[0]
 
-	digest, repool := markl.HashTypeSha256.GetBlobIdForString(blobDigestString)
+	digest, repool := markl.HashTypeSha256.GetMarklIdForString(blobDigestString)
 
 	defer repool()
 
