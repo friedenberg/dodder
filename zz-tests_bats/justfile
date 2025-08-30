@@ -14,7 +14,7 @@ clean-fixtures:
   git reset HEAD migration/v*/
   ./../bin/chflags.bash -R nouchg migration/v*/
   git clean -fd migration/v*/
-  git checkout migration/
+  git checkout migration/v*/
 
 [group("clean")]
 clean: clean-fixtures
