@@ -1,11 +1,10 @@
 package merkle
 
-// TODO move to ids' builtin types
-// and then add registration
-
 const (
 	// keep sorted
-	HRPObjectBlobDigestSha256V0 = "sha256"
+	// TODO move to ids' builtin types
+	// and then add registration
+	HRPObjectBlobDigestSha256V0 = HashTypeIdSha256
 	HRPObjectBlobDigestSha256V1 = "dodder-object-blob-digest-sha256-v1"
 	HRPObjectDigestSha256V1     = "dodder-object-digest-sha256-v1"
 	HRPObjectMotherSigV1        = "dodder-object-mother-sig-v1"
@@ -29,4 +28,10 @@ var hrpValid = []string{
 	HRPRepoPubKeyV1,
 	HRPRequestAuthChallengeV1,
 	HRPRequestAuthResponseV1,
+}
+
+var hrpToHashType = map[string]*HashType{
+	HRPObjectBlobDigestSha256V0: &HashTypeSha256,
+	HRPObjectBlobDigestSha256V1: &HashTypeSha256,
+	HRPObjectDigestSha256V1:     &HashTypeSha256,
 }

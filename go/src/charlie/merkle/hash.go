@@ -3,16 +3,15 @@ package merkle
 import (
 	"hash"
 	"io"
-	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type Hash struct {
-	hash    hash.Hash
-	tipe    string
-	written int64
+	hash     hash.Hash
+	hashType *HashType
+	written  int64
 }
 
 var _ interfaces.Hash = &Hash{}
@@ -41,20 +40,18 @@ func (hash *Hash) BlockSize() int {
 }
 
 func (hash *Hash) GetType() string {
-	return hash.tipe
+	return hash.hashType.GetType()
 }
 
 func (hash *Hash) GetBlobId() (interfaces.MutableBlobId, interfaces.FuncRepool) {
 	id := idPool.Get()
-
-	var digestBytes []byte
+	id.tipe = hash.GetType()
+	id.allocDataIfNecessary(hash.Size())
 
 	if hash.written > 0 {
 		// TODO verify this works as expected
-		digestBytes = hash.hash.Sum(id.data)
+		id.data = hash.hash.Sum(id.data)
 	}
-
-	errors.PanicIfError(id.SetMerkleId(hash.tipe, digestBytes))
 
 	return id, func() {
 		idPool.Put(id)
@@ -65,12 +62,10 @@ func (hash *Hash) GetBlobIdForReader(
 	reader io.Reader,
 ) (interfaces.BlobId, interfaces.FuncRepool) {
 	id := idPool.Get()
+	id.tipe = hash.GetType()
+	id.allocDataAndSetToCapIfNecessary(hash.Size())
 
-	id.data = id.data[:0]
-	id.data = slices.Grow(id.data, hash.Size())
-	id.data = id.data[:hash.Size()]
-
-	if _, err := io.ReadFull(reader, id.data); err != nil {
+	if _, err := io.ReadFull(reader, id.data); err != nil && err != io.EOF {
 		panic(errors.Wrap(err))
 	}
 
@@ -84,10 +79,8 @@ func (hash *Hash) GetBlobIdForReaderAt(
 	off int64,
 ) (interfaces.BlobId, interfaces.FuncRepool) {
 	id := idPool.Get()
-
-	id.data = id.data[:0]
-	id.data = slices.Grow(id.data, hash.Size())
-	id.data = id.data[:hash.Size()]
+	id.tipe = hash.GetType()
+	id.allocDataAndSetToCapIfNecessary(hash.Size())
 
 	if _, err := reader.ReadAt(id.data, off); err != nil {
 		panic(errors.Wrap(err))

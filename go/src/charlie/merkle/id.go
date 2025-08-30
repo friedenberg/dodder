@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
-// TODO add awareness of HashType and null values
 var (
 	_ interfaces.BlobId        = Id{}
 	_ interfaces.MutableBlobId = &Id{}
@@ -53,7 +52,25 @@ func (id Id) GetType() string {
 }
 
 func (id Id) IsNull() bool {
-	return len(id.data) == 0
+	if len(id.data) == 0 {
+		return true
+	} else if id.tipe == "" {
+		panic("empty type")
+	}
+
+	hashType, ok := hrpToHashType[id.tipe]
+
+	// this is not an Id for a hash, so it can never be null with non-zero data
+	// contents
+	if !ok {
+		return false
+	}
+
+	if bytes.Equal(id.data, hashType.null.GetBytes()) {
+		return true
+	}
+
+	return false
 }
 
 func (id *Id) SetMaybeSha256(value string) (err error) {

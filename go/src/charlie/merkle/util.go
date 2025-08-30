@@ -150,6 +150,14 @@ func Clone(src interfaces.BlobId) interfaces.BlobId {
 	return dst
 }
 
+func CloneId(src interfaces.BlobId) *Id {
+	errors.PanicIfError(MakeErrEmptyType(src))
+	errors.PanicIfError(MakeErrIsNull(src, ""))
+	dst := idPool.Get()
+	dst.ResetWithMerkleId(src)
+	return dst
+}
+
 // Creates a human-readable string representation of a digest.
 // TODO add type information
 func Format(merkleId interfaces.BlobId) string {

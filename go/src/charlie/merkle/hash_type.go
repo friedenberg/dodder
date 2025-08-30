@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/sha256"
 	"fmt"
+	"hash"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -11,38 +12,80 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var HashTypeSha256 = HashType{
-	pool: pool.MakeValue(
-		func() interfaces.Hash {
-			return &Hash{
-				hash: sha256.New(),
-				tipe: HRPObjectBlobDigestSha256V0,
-			}
-		},
-		func(hash interfaces.Hash) {
-			hash.Reset()
-		},
-	),
-	tipe: HRPObjectBlobDigestSha256V0,
-	size: 32,
+const (
+	HashTypeIdSha256 = "sha256"
+)
+
+var (
+	hashTypes      map[string]HashType = map[string]HashType{}
+	HashTypeSha256 HashType
+)
+
+func init() {
+	HashTypeSha256 = makeHashType(
+		crypto.SHA256,
+		HashTypeIdSha256,
+		sha256.New,
+		&HashTypeSha256,
+	)
+}
+
+func makeHashType(
+	cryptoHash crypto.Hash,
+	tipe string,
+	constructor func() hash.Hash,
+	self *HashType,
+) HashType {
+	hashType, alreadyExists := hashTypes[tipe]
+
+	if alreadyExists {
+		panic(fmt.Sprintf("hash type already registered: %q", tipe))
+	}
+
+	hashType = HashType{
+		Hash: cryptoHash,
+		pool: pool.MakeValue(
+			func() Hash {
+				return Hash{
+					hash:     constructor(),
+					hashType: self,
+				}
+			},
+			func(hash Hash) {
+				hash.Reset()
+			},
+		),
+		tipe: tipe,
+	}
+
+	hash := constructor()
+	hashType.null.tipe = tipe
+	hashType.null.allocDataIfNecessary(cryptoHash.Size())
+	hashType.null.data = hash.Sum(hashType.null.data)
+
+	hashTypes[tipe] = hashType
+
+	return hashType
 }
 
 type HashType struct {
 	crypto.Hash
-	pool interfaces.PoolValue[interfaces.Hash]
+	pool interfaces.PoolValue[Hash]
 	tipe string
-	size int
+	null Id
 }
 
 var _ interfaces.HashType = HashType{}
 
-func (hashType HashType) Get() interfaces.Hash {
-	return hashType.pool.Get()
+func (hashType *HashType) Get() *Hash {
+	hash := hashType.pool.Get()
+	hash.hashType = hashType
+	return &hash
 }
 
-func (hashType HashType) Put(hash interfaces.Hash) {
+func (hashType HashType) Put(hash *Hash) {
 	errors.PanicIfError(MakeErrWrongType(hashType.tipe, hash.GetType()))
-	hashType.pool.Put(hash)
+	hashType.pool.Put(*hash)
 }
 
 func (hashType HashType) GetType() string {
@@ -50,14 +93,14 @@ func (hashType HashType) GetType() string {
 }
 
 func (hashType HashType) GetSize() int {
-	return hashType.size
+	return hashType.Hash.Size()
 }
 
 func (hashType HashType) GetBlobIdForString(
 	input string,
 ) (interfaces.BlobId, interfaces.FuncRepool) {
-	hash := hashType.pool.Get()
-	defer hashType.pool.Put(hash)
+	hash := hashType.Get()
+	defer hashType.Put(hash)
 
 	if _, err := io.WriteString(hash, input); err != nil {
 		errors.PanicIfError(err)
@@ -75,8 +118,8 @@ func (hashType HashType) FromStringFormat(
 	format string,
 	args ...any,
 ) (interfaces.BlobId, interfaces.FuncRepool) {
-	hash := hashType.pool.Get()
-	defer hashType.pool.Put(hash)
+	hash := hashType.Get()
+	defer hashType.Put(hash)
 
 	if _, err := fmt.Fprintf(hash, format, args...); err != nil {
 		errors.PanicIfError(err)

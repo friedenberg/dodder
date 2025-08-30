@@ -82,7 +82,7 @@ func MakeErrNotEqual(expected, actual interfaces.BlobId) (err error) {
 
 func (err ErrNotEqual) Error() string {
 	return fmt.Sprintf(
-		"expected digest %s but got %s",
+		"expected digest %q but got %q",
 		err.Expected,
 		err.Actual,
 	)

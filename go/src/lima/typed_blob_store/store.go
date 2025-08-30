@@ -59,14 +59,8 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 
 	actual := readCloser.GetBlobId()
 
-	if !merkle.Equals(actual, blobId) {
-		err = errors.ErrorWithStackf(
-			"expected blob id (%T) %s but got %s",
-			blobId,
-			blobId,
-			actual,
-		)
-
+	if err = merkle.MakeErrNotEqual(blobId, actual); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
