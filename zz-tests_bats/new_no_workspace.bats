@@ -19,7 +19,7 @@ function new_empty_no_edit { # @test
 	run_dodder new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+		[two/uno !md]
 	EOM
 }
 
@@ -28,7 +28,7 @@ function new_empty_edit { # @test
 	run_dodder new
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+		[two/uno !md]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 
@@ -52,8 +52,8 @@ function can_duplicate_zettel_content { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[et1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[et2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[et1]
+		[et2]
 		[two/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
@@ -96,7 +96,7 @@ function use_blob_shas { # @test
 	run_dodder new -edit=false -shas -type txt "$the_blob2_sha"
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[!txt !toml-type-v1]
 		[one/tres @$the_blob2_sha !txt]
 	EOM
 

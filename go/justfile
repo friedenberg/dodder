@@ -262,6 +262,7 @@ deploy-github:
   # commit worktree before codegen and tests
   # TODO delete branch and reset commit if failure
   {
+    just ../zz-tests_bats/clean
     git add \
       . \
       ../{zz-pandoc,zz-vim,zz-tests_bats} \

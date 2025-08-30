@@ -35,16 +35,12 @@ func (parser textParser) ParseMetadata(
 	reader io.Reader,
 	context TextParserContext,
 ) (n int64, err error) {
-	m := context.GetMetadata()
-	Resetter.Reset(m)
+	metadata := context.GetMetadata()
+	Resetter.Reset(metadata)
 
 	var n1 int64
 
-	defer func() {
-		context.SetBlobDigest(&m.DigBlob)
-	}()
-
-	mp := &textParser2{
+	parser2 := &textParser2{
 		BlobWriter:        parser.blobWriter,
 		blobDigestType:    parser.blobDigestType,
 		TextParserContext: context,
@@ -64,12 +60,12 @@ func (parser textParser) ParseMetadata(
 
 	defer errors.DeferredCloser(&err, blobWriter)
 
-	mr := triple_hyphen_io.Reader{
-		Metadata: mp,
+	metadataReader := triple_hyphen_io.Reader{
+		Metadata: parser2,
 		Blob:     blobWriter,
 	}
 
-	if n, err = mr.ReadFrom(reader); err != nil {
+	if n, err = metadataReader.ReadFrom(reader); err != nil {
 		n += n1
 		err = errors.Wrap(err)
 		return
@@ -79,41 +75,41 @@ func (parser textParser) ParseMetadata(
 
 	inlineBlobDigest := blobWriter.GetBlobId()
 
-	if !m.DigBlob.IsNull() && !mp.Blob.GetDigest().IsNull() {
+	if !metadata.DigBlob.IsNull() && !parser2.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
-				&mp.Blob,
+				&parser2.Blob,
 				inlineBlobDigest,
 			),
 		)
 
 		return
-	} else if !mp.Blob.GetDigest().IsNull() {
-		m.Fields = append(
-			m.Fields,
+	} else if !parser2.Blob.GetDigest().IsNull() {
+		metadata.Fields = append(
+			metadata.Fields,
 			Field{
 				Key:       "blob",
-				Value:     mp.Blob.GetPath(),
+				Value:     parser2.Blob.GetPath(),
 				ColorType: string_format_writer.ColorTypeId,
 			},
 		)
 
-		m.DigBlob.SetDigest(mp.Blob.GetDigest())
+		metadata.DigBlob.SetDigest(parser2.Blob.GetDigest())
 	}
 
 	switch {
-	case m.DigBlob.IsNull() && !inlineBlobDigest.IsNull():
-		m.DigBlob.SetDigest(inlineBlobDigest)
+	case metadata.DigBlob.IsNull() && !inlineBlobDigest.IsNull():
+		metadata.DigBlob.SetDigest(inlineBlobDigest)
 
-	case !m.DigBlob.IsNull() && inlineBlobDigest.IsNull():
+	case !metadata.DigBlob.IsNull() && inlineBlobDigest.IsNull():
 		// noop
 
-	case !m.DigBlob.IsNull() && !inlineBlobDigest.IsNull() &&
-		!merkle.Equals(&m.DigBlob, inlineBlobDigest):
+	case !metadata.DigBlob.IsNull() && !inlineBlobDigest.IsNull() &&
+		!merkle.Equals(&metadata.DigBlob, inlineBlobDigest):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataBlobId(
 				inlineBlobDigest,
-				&m.DigBlob,
+				&metadata.DigBlob,
 			),
 		)
 

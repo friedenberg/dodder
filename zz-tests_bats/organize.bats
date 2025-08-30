@@ -43,7 +43,7 @@ function organize_empty_commit { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "test"]
+		[two/uno !md "test"]
 	EOM
 }
 
@@ -82,31 +82,31 @@ function organize_simple_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 %virtual_etikett new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all]
+		[new-etikett-for]
+		[new-etikett]
+		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" %virtual_etikett new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" %virtual_etikett new-etikett-for-all tag-3 tag-4]
-		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
-		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
-		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 %virtual_etikett new-etikett-for-all]
+		[tag-1 %virtual_etikett new-etikett-for-all]
+		[tag-2 %virtual_etikett new-etikett-for-all]
+		[tag-3 %virtual_etikett new-etikett-for-all]
+		[tag-4 %virtual_etikett new-etikett-for-all]
+		[tag %virtual_etikett new-etikett-for-all]
 	EOM
 
 	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
-		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[tag-1 new-etikett-for-all]
+		[tag-2 new-etikett-for-all]
+		[tag-3 new-etikett-for-all]
+		[tag-4 new-etikett-for-all]
+		[tag new-etikett-for-all]
 	EOM
 }
 
@@ -131,15 +131,15 @@ function organize_simple_checkedout_matchesmutter { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[-tag new-etikett-for-all]
+		[new-etikett-for-all]
+		[new-etikett-for]
+		[new-etikett]
+		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -148,12 +148,12 @@ function organize_simple_checkedout_matchesmutter { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[-tag new-etikett-for-all]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -198,15 +198,15 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[-tag new-etikett-for-all]
+		[new-etikett-for-all]
+		[new-etikett-for]
+		[new-etikett]
+		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -215,12 +215,12 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[-tag new-etikett-for-all]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -297,15 +297,15 @@ function organize_simple_checkedout_merge_conflict { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag new-etikett-for-all]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[new]
+		[new-etikett]
+		[new-etikett-for]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -314,12 +314,12 @@ function organize_simple_checkedout_merge_conflict { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1 new-etikett-for-all]
+		[-tag-2 new-etikett-for-all]
+		[-tag-3 new-etikett-for-all]
+		[-tag-4 new-etikett-for-all]
+		[-tag new-etikett-for-all]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -349,20 +349,20 @@ function organize_hides_hidden_tags_from_organize { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[project @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[project-2021 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[project-2021-dodder @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-archive @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-archive-task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-archive-task-done @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
+		[project]
+		[project-2021]
+		[project-2021-dodder]
+		[zz]
+		[zz-archive]
+		[zz-archive-task]
+		[zz-archive-task-done]
+		[two/uno !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
 	EOM
 
 	run_dodder show two/uno
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
+		[two/uno !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
 	EOM
 
 	run_dodder organize -mode output-only project-2021-dodder:z
@@ -423,7 +423,7 @@ function organize_with_type_commit { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[!txt !toml-type-v1]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt "wow the first" tag-3 tag-4]
 	EOM
@@ -456,9 +456,9 @@ function add_named { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[added_tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 with-tag]
-		[with-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[with @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[added_tag with-tag]
+		[with-tag]
+		[with]
 	EOM
 }
 
@@ -475,8 +475,8 @@ function organize_v5_outputs_organize_one_tag { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
+		[ok]
+		[two/uno !md "wow" ok]
 	EOM
 
 	run_dodder show -format object-id o/u
@@ -508,9 +508,9 @@ function organize_v5_outputs_organize_two_tags { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[brown @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[ok @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" brown ok]
+		[brown]
+		[ok]
+		[two/uno !md "wow" brown ok]
 	EOM
 
 	run_dodder organize "${cmd_def_organize[@]}" -mode output-only ok brown
@@ -534,7 +534,7 @@ function organize_v5_outputs_organize_two_tags { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
+		[two/uno !md "wow" ok]
 	EOM
 
 	run_dodder show -format text two/uno
@@ -563,11 +563,11 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[priority @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[priority-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[priority-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" priority-1 priority-2 task]
+		[priority]
+		[priority-1]
+		[priority-2]
+		[task]
+		[two/uno !md "wow" priority-1 priority-2 task]
 	EOM
 
 	run_dodder organize "${cmd_def_organize[@]}" \
@@ -629,10 +629,10 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[priority-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[priority @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task]
+		[priority-1]
+		[priority]
+		[task]
+		[two/uno !md "one/uno" priority-1 task]
 	EOM
 
 	to_add="$(mktemp)"
@@ -648,8 +648,8 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[priority-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-2 task]
+		[priority-2]
+		[one/tres !md "two/dos" priority-2 task]
 	EOM
 
 	# add prefix joints
@@ -916,14 +916,14 @@ function organize_v5_commits_no_changes { # @test
 	run_dodder new -edit=false "$one"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[priority-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[priority @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
-		[w-2022-07-07 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[w-2022-07 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[w-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[w @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-1]
+		[priority]
+		[task]
+		[two/uno !md "one/uno" priority-1 task w-2022-07-07]
+		[w-2022-07-07]
+		[w-2022-07]
+		[w-2022]
+		[w]
 	EOM
 
 	two="$(mktemp)"
@@ -940,8 +940,8 @@ function organize_v5_commits_no_changes { # @test
 	run_dodder new -edit=false "$two"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[w-2022-07-06 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
+		[w-2022-07-06]
+		[one/tres !md "two/dos" priority-1 task w-2022-07-06]
 	EOM
 
 	three="$(mktemp)"
@@ -958,7 +958,7 @@ function organize_v5_commits_no_changes { # @test
 	run_dodder new -edit=false "$three"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[two/dos @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
+		[two/dos !md "3" priority-1 task w-2022-07-06]
 	EOM
 
 	# TODO add prefix joints
@@ -1012,9 +1012,9 @@ function organize_v5_commits_no_changes { # @test
 		EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-07]
-		[two/dos @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-07]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-06]
+		[one/tres !md "two/dos" priority-1 task w-2022-07-07]
+		[two/dos !md "3" priority-1 task w-2022-07-07]
+		[two/uno !md "one/uno" priority-1 task w-2022-07-06]
 	EOM
 }
 
@@ -1115,9 +1115,9 @@ function organize_v5_tags_correct { # @test
 	assert_success
 
 	assert_output - <<-EOM
-		[test1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[test1-wow @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "zettel bez" test1-wow]
+		[test1]
+		[test1-wow]
+		[two/uno !md "zettel bez" test1-wow]
 	EOM
 
 	mkdir -p one
@@ -1131,8 +1131,8 @@ function organize_v5_tags_correct { # @test
 	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[test4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test4]
+		[test4]
+		[one/uno !md test4]
 	EOM
 
 	# TODO-P2 fix issue with kennung schwanzen
@@ -1151,8 +1151,8 @@ function organize_v5_tags_correct { # @test
 
 	run_dodder checkin one/uno.zettel
 	assert_output - <<-EOM
-		[test1-ok @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
+		[test1-ok]
+		[one/uno !md test1-ok test4]
 	EOM
 }
 
@@ -1200,7 +1200,7 @@ function organize_update_checkout { # @test
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4 test]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 test]
-		[test @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test]
 	EOM
 
 	run_dodder status
@@ -1245,10 +1245,10 @@ function create_structured_zettels { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !task "second" tag-3 test]
-		[test @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "first" test]
+		[!task !toml-type-v1]
+		[one/tres !task "second" tag-3 test]
+		[test]
+		[two/uno !md "first" test]
 	EOM
 }
 
@@ -1258,8 +1258,8 @@ function description_with_literal_characters { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[payee @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[terb/ala @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "thoughts on quincey's contract / scope of work" payee]
+		[payee]
+		[terb/ala !md "thoughts on quincey's contract / scope of work" payee]
 	EOM
 }
 
@@ -1272,10 +1272,10 @@ function tags_with_extended_tags_noop { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new]
+		[new-etikett]
+		[new-etikett-for]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -1338,7 +1338,7 @@ function organize_new_objects_default_tags { # @test
 	run_dodder organize
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "new zettel object"]
+		[two/uno !md "new zettel object"]
 	EOM
 
 	# shellcheck disable=SC2317
@@ -1349,9 +1349,9 @@ function organize_new_objects_default_tags { # @test
 	run_dodder organize
 	assert_success
 	assert_output - <<-EOM
-		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "new zettel object" zz-inbox]
+		[zz]
+		[zz-inbox]
+		[one/tres !md "new zettel object" zz-inbox]
 	EOM
 }
 
@@ -1365,7 +1365,7 @@ function object_with_newline_in_description { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "description that has newline"]
+		[two/uno !md "description that has newline"]
 	EOM
 }
 
@@ -1376,11 +1376,11 @@ function organize_checked_out { # @test
 		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-1.tag]
+		      checked out [tag-2.tag]
+		      checked out [tag-3.tag]
+		      checked out [tag-4.tag]
+		      checked out [tag.tag]
 	EOM
 
 	run_dodder organize -mode output-only .
@@ -1468,10 +1468,10 @@ function organize_default_tags_workspace { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[today @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[today]
 		[two/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "test default tags" tag-3 today zz-inbox]
-		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz]
+		[zz-inbox]
 	EOM
 
 	actual="$(mktemp)"
@@ -1541,9 +1541,9 @@ function organize_dot_operator_workspace_delete_files { # @test
 	run_dodder organize .
 	assert_success
 	assert_output - <<-EOM
-		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-two]
 		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-3 tag-two]
-		[tag-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-one]
 		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-3 tag-one]
 		          deleted [1.md]
 		          deleted [2.md]

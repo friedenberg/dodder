@@ -55,18 +55,18 @@ function mergetool_conflict_base {
 	EOM
 	assert_success
 	# assert_output_unsorted - <<-EOM
-	# 	[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-	# 	[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	# 	[!txt2 !toml-type-v1]
+	# 	[new-etikett-for-all]
+	# 	[new-etikett-for]
+	# 	[new-etikett]
+	# 	[new]
 	# 	[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	# EOM
 
 	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
@@ -113,12 +113,12 @@ function mergetool_conflict_one_local { # @test
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new]
+		[new-etikett]
+		[new-etikett-for-all]
+		[new-etikett-for]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
-		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[!txt2 !toml-type-v1]
 	EOM
 }
 
@@ -130,8 +130,8 @@ function mergetool_conflict_one_remote { # @test
 	run_dodder merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt !toml-type-v1]
+		[get_this_shit_merged]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
@@ -153,8 +153,8 @@ function mergetool_conflict_one_remote { # @test
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt !toml-type-v1]
+		[get_this_shit_merged]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 }
@@ -180,8 +180,8 @@ function mergetool_conflict_one_merged { # @test
 	run_dodder merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt !toml-type-v1]
+		[get_this_shit_merged]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
@@ -203,8 +203,8 @@ function mergetool_conflict_one_merged { # @test
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
-		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt !toml-type-v1]
+		[get_this_shit_merged]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 }

@@ -164,7 +164,7 @@ function show_simple_one_zettel_binary { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [file.bin]
-		[!bin @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[!bin !toml-type-v1]
 		[two/uno @b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
 	EOM
 
@@ -374,22 +374,22 @@ function show_simple_type_history { # @test
 function show_simple_tag_tail { # @test
 	run_dodder show :e
 	assert_output_unsorted - <<-EOM
-		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1]
+		[tag-2]
+		[tag-3]
+		[tag-4]
+		[tag]
 	EOM
 }
 
 function show_simple_tag_history { # @test
 	run_dodder show +e
 	assert_output_unsorted - <<-EOM
-		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1]
+		[tag-2]
+		[tag-3]
+		[tag-4]
+		[tag]
 	EOM
 }
 
@@ -447,11 +447,11 @@ function show_history_all { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1]
+		[tag-2]
+		[tag-3]
+		[tag-4]
+		[tag]
 	EOM
 }
 
@@ -571,7 +571,7 @@ function show_tags_exact { # @test
 	run_dodder show =tag:e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag]
 	EOM
 
 	run_dodder show =tag
@@ -632,7 +632,7 @@ function show_workspace_default { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
-		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-5]
 	EOM
 
 	run_dodder init-workspace -query tag-5
@@ -653,7 +653,7 @@ function show_workspace_exactly_one_zettel { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
-		[tag-5 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-5]
 	EOM
 
 	run_dodder init-workspace -query tag-3

@@ -21,8 +21,8 @@ type textParser2 struct {
 }
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
-	m := parser.GetMetadata()
-	Resetter.Reset(m)
+	metadata := parser.GetMetadata()
+	Resetter.Reset(metadata)
 
 	delimReader := delim_reader.MakeDelimReader('\n', r)
 	defer delim_reader.PutDelimReader(delimReader)
@@ -50,16 +50,16 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 
 		switch key {
 		case '#':
-			err = m.Description.Set(remainder)
+			err = metadata.Description.Set(remainder)
 
 		case '%':
-			m.Comments = append(m.Comments, remainder)
+			metadata.Comments = append(metadata.Comments, remainder)
 
 		case '-':
-			m.AddTagString(remainder)
+			metadata.AddTagString(remainder)
 
 		case '!':
-			err = parser.readTyp(m, remainder)
+			err = parser.readTyp(metadata, remainder)
 
 		default:
 			err = errors.ErrorWithStackf("unsupported entry: %q", line)
@@ -81,7 +81,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (parser *textParser2) readTyp(
-	m *Metadata,
+	metadata *Metadata,
 	desc string,
 ) (err error) {
 	if desc == "" {
@@ -94,7 +94,7 @@ func (parser *textParser2) readTyp(
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = m.Type.Set(tail); err != nil {
+		if err = metadata.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -106,19 +106,19 @@ func (parser *textParser2) readTyp(
 
 	//! <sha>.<typ ext>
 	case tail != "":
-		if err = parser.setBlobSha(m, head); err != nil {
+		if err = parser.setBlobSha(metadata, head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = m.Type.Set(tail); err != nil {
+		if err = metadata.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	//! <sha>
 	case tail == "":
-		if err = parser.setBlobSha(m, head); err == nil {
+		if err = parser.setBlobSha(metadata, head); err == nil {
 			return
 		}
 
@@ -128,7 +128,7 @@ func (parser *textParser2) readTyp(
 
 	//! <typ ext>
 	default:
-		if err = m.Type.Set(head); err != nil {
+		if err = metadata.Type.Set(head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -17,7 +17,7 @@ function new_empty_no_edit { # @test
 	run_dodder new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+		[two/uno !md]
 	EOM
 }
 
@@ -26,7 +26,7 @@ function new_empty_edit { # @test
 	run_dodder new
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+		[two/uno !md]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 }
@@ -47,8 +47,8 @@ function can_duplicate_zettel_content { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[et1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[et2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[et1]
+		[et2]
 		[two/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
@@ -91,7 +91,7 @@ function use_blob_shas { # @test
 	run_dodder new -edit=false -shas -type txt "$the_blob2_sha"
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[!txt !toml-type-v1]
 		[one/tres @$the_blob2_sha !txt]
 	EOM
 
@@ -111,9 +111,9 @@ function new_empty_no_edit_workspace { # @test
 	run_dodder new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[workspace @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[workspace-tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
+		[workspace]
+		[workspace-tags]
+		[two/uno !md workspace-tags]
 	EOM
 }
 
@@ -125,10 +125,10 @@ function new_empty_edit_workspace { # @test
 	run_dodder new
 	assert_success
 	assert_output - <<-EOM
-		[workspace @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[workspace-tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
-		      checked out [two/uno.zettel @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md workspace-tags]
+		[workspace]
+		[workspace-tags]
+		[two/uno !md workspace-tags]
+		      checked out [two/uno.zettel !md workspace-tags]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
 
@@ -137,4 +137,70 @@ function new_empty_edit_workspace { # @test
 	assert_output - <<-EOM
 		             same [two/uno.zettel @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
 	EOM
+}
+
+function new_zettel_file { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_dodder new -edit=false "$to_add"
+	assert_success
+	assert_output - <<-EOM
+		[ok]
+		[two/uno !md "wow" ok]
+	EOM
+
+	run_dodder show -format text two/uno:z
+	assert_success
+	assert_output "$(cat "$to_add")"
+}
+
+function new_zettel_stdin { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_dodder new -edit=false - <"$to_add"
+	assert_success
+	assert_output - <<-EOM
+		[ok]
+		[two/uno !md "wow" ok]
+	EOM
+
+	run_dodder show -format text two/uno:z
+	assert_success
+	assert_output "$(cat "$to_add")"
+}
+
+function new_zettel { # @test
+	expected="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "! md"
+		echo "---"
+	} >"$expected"
+
+	run_dodder new -edit=false -description wow -tags ok
+	assert_success
+	assert_output - <<-EOM
+		[ok]
+		[two/uno !md "wow" ok]
+	EOM
+
+	run_dodder show -format text two/uno:z
+	assert_success
+	assert_output "$(cat "$expected")"
 }

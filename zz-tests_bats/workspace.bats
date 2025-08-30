@@ -30,7 +30,7 @@ function workspace_show { # @test
 	run_dodder show :e
 	assert_success
 	assert_output_unsorted - <<-eom
-		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-3]
 	eom
 
 	run_dodder show one/uno
@@ -48,7 +48,7 @@ function workspace_edit { # @test
 	run_dodder edit
 	assert_success
 	assert_output_unsorted - <<-EOM
-		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
@@ -125,7 +125,7 @@ function workspace_add_no_organize { # @test
 	run_dodder add -delete -tags new_tags -description "added file" todo.wow.md
 	assert_success
 	assert_output - <<-EOM
-		[new_tags @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new_tags]
 		[two/uno @84b683398cc5974fa1e383573fb104d31312c20f6053ef422463f3522e15be15 !md "added file" new_tags tag-3]
 		          deleted [todo.wow.md]
 	EOM
@@ -159,9 +159,9 @@ function workspace_add_yes_organize { # @test
 	run_dodder add -organize -delete ./*.md
 	assert_success
 	assert_output - <<-EOM
-		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-two]
 		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-two]
-		[tag-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-one]
 		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-one]
 		          deleted [1.md]
 		          deleted [2.md]
@@ -192,7 +192,7 @@ function workspace_add_yes_organize_omit_one { # @test
 	run_dodder add -organize -delete ./*.md
 	assert_success
 	assert_output - <<-EOM
-		[tag-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-two]
 		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-two]
 		          deleted [1.md]
 	EOM

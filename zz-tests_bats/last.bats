@@ -79,8 +79,8 @@ function last_organize { # @test
 	run_dodder last -organize
 	assert_success
 	assert_output - <<-EOM
-		[added @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[added-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[added]
+		[added-tag]
 		[!md @1c62d833a8ba10d4d272c29b849c4ab2e1e4fed1c6576709940453d5370832cf !toml-type-v1 added-tag]
 	EOM
 }

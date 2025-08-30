@@ -91,7 +91,7 @@ func DefaultWithVersion(
 					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
 					ObjectSigType:     merkle.HRPObjectSigV1,
-					BlobDigestType:    merkle.HRPObjectBlobDigestSha256V1,
+					BlobDigestType:    merkle.HRPObjectBlobDigestSha256V0,
 				},
 			},
 		}

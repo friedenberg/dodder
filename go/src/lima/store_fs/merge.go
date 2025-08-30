@@ -430,21 +430,21 @@ func (store *Store) RunMergeTool(
 		return
 	}
 
-	var skuReplacement *sku.Transacted
-	var replacement *sku.FSItem
+	var replacementObject *sku.Transacted
+	var replacementItem *sku.FSItem
 
-	if skuReplacement, err = store.MakeMergedTransacted(conflicted); err != nil {
+	if replacementObject, err = store.MakeMergedTransacted(conflicted); err != nil {
 		var mergeConflict *sku.ErrMergeConflict
 
 		if errors.As(err, &mergeConflict) {
 			err = nil
-			replacement = &mergeConflict.FSItem
+			replacementItem = &mergeConflict.FSItem
 		} else {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if replacement, err = store.ReadFSItemFromExternal(skuReplacement); err != nil {
+		if replacementItem, err = store.ReadFSItemFromExternal(replacementObject); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -455,7 +455,7 @@ func (store *Store) RunMergeTool(
 		localItem.Object.GetPath(),
 		baseItem.Object.GetPath(),
 		remoteItem.Object.GetPath(),
-		replacement.Object.GetPath(),
+		replacementItem.Object.GetPath(),
 	)
 
 	// TODO merge blobs
@@ -482,18 +482,18 @@ func (store *Store) RunMergeTool(
 		return
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.Open(replacement.Object.GetPath()); err != nil {
+	if file, err = files.Open(replacementItem.Object.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	// TODO open blob
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	if err = store.ReadOneExternalObjectReader(f, external); err != nil {
+	if err = store.ReadOneExternalObjectReader(file, external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

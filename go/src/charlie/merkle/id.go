@@ -28,6 +28,8 @@ func (id Id) String() string {
 
 	if id.tipe == HRPObjectBlobDigestSha256V0 {
 		return fmt.Sprintf("%x", id.data)
+	} else if len(id.data) == 0 {
+		return ""
 	} else {
 		bites, err := blech32.Encode(id.tipe, id.data)
 		errors.PanicIfError(err)
