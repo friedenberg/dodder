@@ -2,7 +2,6 @@ package box_format
 
 import (
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -329,37 +328,6 @@ func (format *BoxTransacted) parseOldBlobIdTag(
 	return
 }
 
-// expects `seq` to include `@` as the first token
-func (format *BoxTransacted) parseMarklIdTag(
-	object *sku.Transacted,
-	seq doddish.Seq,
-) (err error) {
-	var key string
-	var value []byte
-
-	if seq.Len() == 3 {
-		key = string(seq.At(0).Contents)
-		value = seq.At(2).Contents
-	} else {
-		value = seq.At(1).Contents
-	}
-
-	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[key]; ok {
-		mutableBlobId := getMutableMerkleIdMethod(&object.Metadata)
-		if err = mutableBlobId.Set(
-			string(value),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})
-		return
-	}
-
-	return
-}
-
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
 	"":                              (*object_metadata.Metadata).GetBlobDigestMutable,
 	markl.FormatIdRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
@@ -368,24 +336,37 @@ var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metada
 	markl.FormatIdObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
 }
 
-// TODO create a sustainable system for this
-func (format *BoxTransacted) parseDodderTag(
+// expects `seq` to include `@` as the first token
+func (format *BoxTransacted) parseMarklIdTag(
 	object *sku.Transacted,
-	tag ids.Tag,
+	seq doddish.Seq,
 ) (err error) {
-	tagString := tag.String()
-	key := tagString[:strings.LastIndex(tagString, "-")]
+	var marklFormatId string
+	var value []byte
 
-	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[key]; ok {
-		mutableBlobId := getMutableMerkleIdMethod(&object.Metadata)
-		if err = mutableBlobId.Set(
-			tagString,
+	if seq.Len() == 3 {
+		marklFormatId = string(seq.At(0).Contents)
+		value = seq.At(2).Contents
+	} else {
+		value = seq.At(1).Contents
+	}
+
+	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[marklFormatId]; ok {
+		marklId := getMutableMerkleIdMethod(&object.Metadata)
+
+		if err = marklId.SetFormat(marklFormatId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = marklId.Set(
+			string(value),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		err = errors.Wrap(ErrUnsupportedDodderTag{tag: tagString})
+		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})
 		return
 	}
 
