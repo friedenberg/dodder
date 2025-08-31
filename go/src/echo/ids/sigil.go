@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
@@ -54,73 +53,75 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 	return
 }
 
-func (a Sigil) GetGenre() interfaces.Genre {
+func (sigil Sigil) GetGenre() interfaces.Genre {
 	return genres.None
 }
 
-func (a Sigil) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (sigil Sigil) EqualsAny(b any) bool {
+	return values.Equals(sigil, b)
 }
 
-func (a Sigil) Equals(b Sigil) bool {
-	return a == b
+func (sigil Sigil) Equals(b Sigil) bool {
+	return sigil == b
 }
 
-func (a Sigil) IsEmpty() bool {
-	return a == SigilUnknown
+func (sigil Sigil) IsEmpty() bool {
+	return sigil == SigilUnknown
 }
 
-func (a *Sigil) Reset() {
-	*a = SigilLatest
+func (sigil *Sigil) Reset() {
+	*sigil = SigilLatest
 }
 
-func (a *Sigil) ResetWith(b Sigil) {
-	*a = b
+func (sigil *Sigil) ResetWith(b Sigil) {
+	*sigil = b
 }
 
-func (a *Sigil) Add(b Sigil) {
-	*a |= b
+func (sigil *Sigil) Add(b Sigil) {
+	*sigil |= b
 }
 
-func (a *Sigil) Del(b Sigil) {
-	*a &= ^b
+func (sigil *Sigil) Del(b Sigil) {
+	*sigil &= ^b
 }
 
-func (a Sigil) Contains(b Sigil) bool {
-	return byte(a&b) == byte(b)
+func (sigil Sigil) Contains(b Sigil) bool {
+	return byte(sigil&b) == byte(b)
 }
 
-func (a Sigil) ContainsOneOf(b Sigil) bool {
-	return a&b != 0
+func (sigil Sigil) ContainsOneOf(b Sigil) bool {
+	return sigil&b != 0
 }
 
-func (a Sigil) IsLatestOrUnknown() bool {
-	return a == SigilLatest || a == SigilUnknown ||
-		a == SigilLatest|SigilUnknown
+func (sigil Sigil) IsLatestOrUnknown() bool {
+	return sigil == SigilLatest || sigil == SigilUnknown ||
+		sigil == SigilLatest|SigilUnknown
 }
 
-func (a Sigil) IncludesLatest() bool {
-	return a.ContainsOneOf(SigilLatest) || a.ContainsOneOf(SigilHistory) ||
-		a == 0
+func (sigil Sigil) IncludesLatest() bool {
+	return sigil.ContainsOneOf(SigilLatest) ||
+		sigil.ContainsOneOf(SigilHistory) ||
+		sigil == 0
 }
 
-func (a Sigil) IncludesHistory() bool {
-	return a.ContainsOneOf(SigilHistory)
+func (sigil Sigil) IncludesHistory() bool {
+	return sigil.ContainsOneOf(SigilHistory)
 }
 
-func (a Sigil) IncludesExternal() bool {
-	return a.ContainsOneOf(SigilExternal)
+func (sigil Sigil) IncludesExternal() bool {
+	return sigil.ContainsOneOf(SigilExternal)
 }
 
-func (a Sigil) IncludesHidden() bool {
-	return a.ContainsOneOf(SigilHidden) || a.ContainsOneOf(SigilExternal)
+func (sigil Sigil) IncludesHidden() bool {
+	return sigil.ContainsOneOf(SigilHidden) ||
+		sigil.ContainsOneOf(SigilExternal)
 }
 
-func (a Sigil) String() string {
+func (sigil Sigil) String() string {
 	sb := strings.Builder{}
 
 	for s := SigilLatest; s <= SigilMax; s++ {
-		if a&s != 0 {
+		if sigil&s != 0 {
 			r, ok := mapSigilToRune[s]
 
 			if !ok {
@@ -134,9 +135,9 @@ func (a Sigil) String() string {
 	return sb.String()
 }
 
-func (i *Sigil) SetByte(r byte) (err error) {
+func (sigil *Sigil) SetByte(r byte) (err error) {
 	if v, ok := mapRuneToSigil[rune(r)]; ok {
-		i.Add(v)
+		sigil.Add(v)
 	} else {
 		err = errors.Wrap(errInvalidSigil(r))
 		return
@@ -145,7 +146,7 @@ func (i *Sigil) SetByte(r byte) (err error) {
 	return
 }
 
-func (i *Sigil) Set(v string) (err error) {
+func (sigil *Sigil) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
@@ -153,7 +154,7 @@ func (i *Sigil) Set(v string) (err error) {
 
 	for _, v1 := range els {
 		if _, ok := mapRuneToSigil[v1]; ok {
-			i.Add(mapRuneToSigil[v1])
+			sigil.Add(mapRuneToSigil[v1])
 		} else {
 			err = errors.Wrap(errInvalidSigil(v))
 			return
@@ -163,23 +164,19 @@ func (i *Sigil) Set(v string) (err error) {
 	return
 }
 
-func (i Sigil) GetDigest() interfaces.MarklId {
-	return markl.HashTypeSha256.FromStringContent(i.String())
-}
-
-func (i Sigil) Byte() byte {
-	if i == SigilUnknown {
+func (sigil Sigil) Byte() byte {
+	if sigil == SigilUnknown {
 		return byte(SigilLatest)
 	} else {
-		return byte(i)
+		return byte(sigil)
 	}
 }
 
-func (i Sigil) ReadByte() (byte, error) {
-	return byte(i), nil
+func (sigil Sigil) ReadByte() (byte, error) {
+	return byte(sigil), nil
 }
 
-func (i *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
+func (sigil *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [1]byte
 
 	var n1 int
@@ -191,15 +188,15 @@ func (i *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*i = Sigil(b[0])
+	*sigil = Sigil(b[0])
 
 	return
 }
 
-func (i *Sigil) WriteTo(w io.Writer) (n int64, err error) {
+func (sigil *Sigil) WriteTo(w io.Writer) (n int64, err error) {
 	var b byte
 
-	if b, err = i.ReadByte(); err != nil {
+	if b, err = sigil.ReadByte(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

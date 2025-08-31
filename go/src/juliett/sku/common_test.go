@@ -194,7 +194,7 @@ func makeTestTextFormat(
 		object_metadata.Dependencies{
 			EnvDir:         envDir,
 			BlobStore:      blobStore,
-			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HashTypeIdSha256,
 		},
 	)
 }
@@ -420,7 +420,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.Dependencies{
 			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HashTypeIdSha256,
 		},
 	)
 
@@ -471,7 +471,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.Dependencies{
 			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: markl.HRPObjectBlobDigestSha256V1,
+			BlobDigestType: markl.HashTypeIdSha256,
 		},
 	)
 

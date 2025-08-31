@@ -92,9 +92,17 @@ func (client *client) BlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		// TODO use correct hash type
+		var hashType markl.HashType
+
+		if hashType, err = markl.GetHashTypeOrError(
+			blobId.GetMarklType().GetMarklTypeId(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		reader = markl_io.MakeReadCloser(
-			markl.HashTypeSha256.Get(),
+			hashType.Get(),
 			response.Body,
 		)
 	}

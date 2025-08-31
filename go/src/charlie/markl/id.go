@@ -42,7 +42,7 @@ func (id Id) String() string {
 		return ""
 	}
 
-	if id.tipe.GetMarklTypeId() == HRPObjectBlobDigestSha256V0 {
+	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
 		return fmt.Sprintf("%x", id.data)
 	} else if len(id.data) == 0 {
 		return ""
@@ -116,7 +116,7 @@ func (id *Id) SetSha256(value string) (err error) {
 	}
 
 	if err = id.SetMerkleId(
-		HRPObjectBlobDigestSha256V0,
+		HashTypeIdSha256,
 		decodedBytes,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -269,7 +269,7 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 }
 
 func (id Id) MarshalText() (bites []byte, err error) {
-	if id.tipe.GetMarklTypeId() == HRPObjectBlobDigestSha256V0 {
+	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
 		bites = fmt.Appendf(nil, "%x", id.data)
 	} else {
 		if bites, err = blech32.Encode(id.tipe.GetMarklTypeId(), id.data); err != nil {

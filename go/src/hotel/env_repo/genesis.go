@@ -32,7 +32,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		return
 	}
 
-	bigBang.GenesisConfig.Blob.SetInventoryListTypeString(
+	bigBang.GenesisConfig.Blob.SetInventoryListTypeId(
 		bigBang.InventoryListType.String(),
 	)
 
@@ -101,7 +101,7 @@ func (env Env) writeInventoryListLog() {
 	}
 
 	tipe := ids.GetOrPanic(
-		env.config.Blob.GetInventoryListTypeString(),
+		env.config.Blob.GetInventoryListTypeId(),
 	).Type
 
 	subject := triple_hyphen_io.TypedBlobEmpty{

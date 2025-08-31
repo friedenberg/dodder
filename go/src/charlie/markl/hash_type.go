@@ -15,14 +15,15 @@ import (
 
 const (
 	HashTypeIdSha256     = "sha256"
-	HashTypeIdBlake2s256 = "blake2s256"
+	HashTypeIdBlake2b256 = "blake2b256"
 )
 
 var (
-	types              map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
-	hashTypes          map[string]HashType             = map[string]HashType{}
+	types     map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
+	hashTypes map[string]HashType             = map[string]HashType{}
+
 	HashTypeSha256     HashType
-	HashTypeBlake2s256 HashType
+	HashTypeBlake2b256 HashType
 )
 
 func init() {
@@ -32,16 +33,16 @@ func init() {
 		&HashTypeSha256,
 	)
 
-	HashTypeBlake2s256 = makeHashType(
+	HashTypeBlake2b256 = makeHashType(
 		func() hash.Hash {
 			hash, _ := blake2b.New256(nil)
 			return hash
 		},
-		HashTypeIdBlake2s256,
-		&HashTypeBlake2s256,
+		HashTypeIdBlake2b256,
+		&HashTypeBlake2b256,
 	)
 
-	makeFakeHashType(HRPObjectBlobDigestSha256V1)
+	makeFakeHashType(HashTypeIdSha256)
 	makeFakeHashType(HRPObjectDigestSha256V1)
 	makeFakeHashType(HRPObjectMotherSigV1)
 	makeFakeHashType(HRPObjectSigV0)

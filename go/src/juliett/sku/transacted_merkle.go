@@ -154,7 +154,7 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
-		config.GetObjectSigTypeString(),
+		config.GetObjectSigTypeId(),
 		bites,
 	); err != nil {
 		err = errors.Wrap(err)

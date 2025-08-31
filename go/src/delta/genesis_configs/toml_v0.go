@@ -89,15 +89,15 @@ func (config V0Common) GetLockInternalFiles() bool {
 	return config.LockInternalFiles
 }
 
-func (config V0Common) GetInventoryListTypeString() string {
+func (config V0Common) GetInventoryListTypeId() string {
 	return ids.TypeInventoryListV0
 }
 
-func (config V0Common) GetObjectSigTypeString() string {
+func (config V0Common) GetObjectSigTypeId() string {
 	return markl.HRPObjectSigV0
 }
 
-func (config V0Common) GetBlobDigestTypeString() string {
+func (config V0Common) GetBlobHashTypeId() string {
 	return markl.HashTypeIdSha256
 }
 

@@ -44,8 +44,8 @@ func SetBlechCombinedHRPAndData(
 
 	if bytes.HasPrefix(typeIdAndData, []byte(HashTypeIdSha256)) {
 		typeId = HashTypeIdSha256
-	} else if bytes.HasPrefix(typeIdAndData, []byte(HashTypeIdBlake2s256)) {
-		typeId = HashTypeIdBlake2s256
+	} else if bytes.HasPrefix(typeIdAndData, []byte(HashTypeIdBlake2b256)) {
+		typeId = HashTypeIdBlake2b256
 	} else {
 		err = errors.Errorf("unsupported format: %x", typeIdAndData)
 		return

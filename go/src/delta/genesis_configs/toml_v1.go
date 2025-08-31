@@ -49,7 +49,7 @@ func (config *TomlV1Common) SetRepoId(id ids.RepoId) {
 	config.RepoId = id
 }
 
-func (config *TomlV1Common) GetInventoryListTypeString() string {
+func (config *TomlV1Common) GetInventoryListTypeId() string {
 	if config.InventoryListType == "" {
 		return ids.TypeInventoryListV1
 	} else {
@@ -57,23 +57,23 @@ func (config *TomlV1Common) GetInventoryListTypeString() string {
 	}
 }
 
-func (config *TomlV1Common) SetInventoryListTypeString(value string) {
+func (config *TomlV1Common) SetInventoryListTypeId(value string) {
 	config.InventoryListType = value
 }
 
-func (config *TomlV1Common) GetObjectSigTypeString() string {
+func (config *TomlV1Common) GetObjectSigTypeId() string {
 	return markl.HRPObjectSigV0
 }
 
-func (config *TomlV1Common) SetObjectSigTypeString(string) {
+func (config *TomlV1Common) SetObjectSigTypeId(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *TomlV1Common) GetBlobDigestTypeString() string {
+func (config *TomlV1Common) GetBlobHashTypeId() string {
 	return markl.HashTypeIdSha256
 }
 
-func (config *TomlV1Common) SetBlobDigestTypeString(string) {
+func (config *TomlV1Common) SetBlobHashTypeId(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
 

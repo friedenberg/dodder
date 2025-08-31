@@ -99,7 +99,7 @@ func (cmd *New) Run(req command.Request) {
 		object_metadata.Dependencies{
 			EnvDir:         repo.GetEnvRepo(),
 			BlobStore:      repo.GetEnvRepo().GetDefaultBlobStore(),
-			BlobDigestType: repo.GetEnvRepo().GetConfigPublic().Blob.GetBlobDigestTypeString(),
+			BlobDigestType: repo.GetEnvRepo().GetConfigPublic().Blob.GetBlobHashTypeId(),
 		},
 	)
 

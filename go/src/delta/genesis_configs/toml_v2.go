@@ -14,7 +14,7 @@ import (
 // must be public for toml coding to function
 type TomlV2Common struct {
 	StoreVersion      store_version.Version `toml:"store-version"`
-	RepoType          repo_type.Type        `toml:"repo-type"`
+	RepoType          repo_type.Type        `toml:"repo-type"` // TODO remove
 	RepoId            ids.RepoId            `toml:"id"`
 	InventoryListType string                `toml:"inventory_list-type"`
 	ObjectSigType     string                `toml:"object-sig-type"`
@@ -44,7 +44,7 @@ func (config *TomlV2Common) SetRepoId(id ids.RepoId) {
 	config.RepoId = id
 }
 
-func (config *TomlV2Common) GetInventoryListTypeString() string {
+func (config *TomlV2Common) GetInventoryListTypeId() string {
 	if config.InventoryListType == "" {
 		return ids.TypeInventoryListV1
 	} else {
@@ -52,7 +52,7 @@ func (config *TomlV2Common) GetInventoryListTypeString() string {
 	}
 }
 
-func (config *TomlV2Common) GetObjectSigTypeString() string {
+func (config *TomlV2Common) GetObjectSigTypeId() string {
 	if config.ObjectSigType == "" {
 		return markl.HRPObjectSigV1
 	} else {
@@ -60,7 +60,7 @@ func (config *TomlV2Common) GetObjectSigTypeString() string {
 	}
 }
 
-func (config *TomlV2Common) GetBlobDigestTypeString() string {
+func (config *TomlV2Common) GetBlobHashTypeId() string {
 	if config.BlobDigestType == "" {
 		return markl.HashTypeIdSha256
 	} else {
@@ -68,15 +68,15 @@ func (config *TomlV2Common) GetBlobDigestTypeString() string {
 	}
 }
 
-func (config *TomlV2Common) SetInventoryListTypeString(value string) {
+func (config *TomlV2Common) SetInventoryListTypeId(value string) {
 	config.InventoryListType = value
 }
 
-func (config *TomlV2Common) SetObjectSigTypeString(value string) {
+func (config *TomlV2Common) SetObjectSigTypeId(value string) {
 	config.ObjectSigType = value
 }
 
-func (config *TomlV2Common) SetBlobDigestTypeString(value string) {
+func (config *TomlV2Common) SetBlobHashTypeId(value string) {
 	config.BlobDigestType = value
 }
 

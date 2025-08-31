@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )
@@ -24,52 +23,52 @@ func MakeGenre(vs ...genres.Genre) (s Genre) {
 	return
 }
 
-func (a Genre) IsEmpty() bool {
-	return a == 0
+func (genre Genre) IsEmpty() bool {
+	return genre == 0
 }
 
-func (a Genre) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (genre Genre) EqualsAny(b any) bool {
+	return values.Equals(genre, b)
 }
 
-func (a Genre) Equals(b Genre) bool {
-	return a == b
+func (genre Genre) Equals(b Genre) bool {
+	return genre == b
 }
 
-func (a *Genre) Reset() {
-	*a = 0
+func (genre *Genre) Reset() {
+	*genre = 0
 }
 
-func (a *Genre) ResetWith(b Genre) {
-	*a = b
+func (genre *Genre) ResetWith(b Genre) {
+	*genre = b
 }
 
-func (a *Genre) Add(bs ...genres.Genre) {
+func (genre *Genre) Add(bs ...genres.Genre) {
 	for _, b := range bs {
-		*a |= Genre(b.GetGenre().GetGenreBitInt())
+		*genre |= Genre(b.GetGenre().GetGenreBitInt())
 	}
 }
 
-func (a *Genre) Del(b interfaces.GenreGetter) {
-	*a &= ^Genre(b.GetGenre().GetGenreBitInt())
+func (genre *Genre) Del(b interfaces.GenreGetter) {
+	*genre &= ^Genre(b.GetGenre().GetGenreBitInt())
 }
 
-func (a Genre) Contains(b interfaces.GenreGetter) bool {
+func (genre Genre) Contains(b interfaces.GenreGetter) bool {
 	bg := Genre(b.GetGenre().GetGenreBitInt())
-	return byte(a&bg) == byte(bg)
+	return byte(genre&bg) == byte(bg)
 }
 
-func (a Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
+func (genre Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
 	bg := Genre(b.GetGenre().GetGenreBitInt())
-	return a&bg != 0
+	return genre&bg != 0
 }
 
-func (a Genre) Slice() []genres.Genre {
+func (genre Genre) Slice() []genres.Genre {
 	tg := genres.All()
 	out := make([]genres.Genre, 0, len(tg))
 
 	for _, g := range tg {
-		if !a.ContainsOneOf(g) {
+		if !genre.ContainsOneOf(g) {
 			continue
 		}
 
@@ -79,13 +78,13 @@ func (a Genre) Slice() []genres.Genre {
 	return out
 }
 
-func (a Genre) String() string {
+func (genre Genre) String() string {
 	sb := strings.Builder{}
 
 	first := true
 
 	for _, g := range genres.All() {
-		if !a.ContainsOneOf(g) {
+		if !genre.ContainsOneOf(g) {
 			continue
 		}
 
@@ -100,7 +99,7 @@ func (a Genre) String() string {
 	return sb.String()
 }
 
-func (i *Genre) AddString(v string) (err error) {
+func (genre *Genre) AddString(v string) (err error) {
 	var g genres.Genre
 
 	if err = g.Set(v); err != nil {
@@ -108,17 +107,17 @@ func (i *Genre) AddString(v string) (err error) {
 		return
 	}
 
-	i.Add(g)
+	genre.Add(g)
 
 	return
 }
 
-func (gs *Genre) Set(v string) (err error) {
+func (genre *Genre) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
 	for _, g := range strings.Split(v, ",") {
-		if err = gs.AddString(g); err != nil {
+		if err = genre.AddString(g); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -127,7 +126,7 @@ func (gs *Genre) Set(v string) (err error) {
 	return
 }
 
-func (g *Genre) ReadFromBoxScanner(
+func (genre *Genre) ReadFromBoxScanner(
 	scanner *doddish.Scanner,
 ) (err error) {
 	for scanner.Scan() {
@@ -136,7 +135,7 @@ func (g *Genre) ReadFromBoxScanner(
 		switch {
 		case seq.MatchAll(doddish.TokenTypeIdentifier):
 			// etikett type zettel kasten konfig
-			if err = g.AddString(string(seq.At(0).Contents)); err != nil {
+			if err = genre.AddString(string(seq.At(0).Contents)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -168,19 +167,15 @@ func (g *Genre) ReadFromBoxScanner(
 	return
 }
 
-func (i Genre) GetDigest() interfaces.MarklId {
-	return markl.HashTypeSha256.FromStringContent(i.String())
+func (genre Genre) Byte() byte {
+	return byte(genre)
 }
 
-func (i Genre) Byte() byte {
-	return byte(i)
+func (genre Genre) ReadByte() (byte, error) {
+	return byte(genre), nil
 }
 
-func (i Genre) ReadByte() (byte, error) {
-	return byte(i), nil
-}
-
-func (i *Genre) ReadFrom(r io.Reader) (n int64, err error) {
+func (genre *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [1]byte
 
 	var n1 int
@@ -192,15 +187,15 @@ func (i *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*i = Genre(b[0])
+	*genre = Genre(b[0])
 
 	return
 }
 
-func (i *Genre) WriteTo(w io.Writer) (n int64, err error) {
+func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
 	var b byte
 
-	if b, err = i.ReadByte(); err != nil {
+	if b, err = genre.ReadByte(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

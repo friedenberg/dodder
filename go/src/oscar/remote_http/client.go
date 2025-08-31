@@ -150,7 +150,7 @@ func (client *client) MakeInventoryList(
 	queryGroup *query.Query,
 ) (list *sku.ListTransacted, err error) {
 	var request *http.Request
-	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeString()
+	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeId()
 
 	if request, err = client.newRequest(
 		"GET",
@@ -241,7 +241,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	// TODO local / remote version negotiation
 
 	listType := ids.GetOrPanic(
-		client.repo.GetImmutableConfigPublic().GetInventoryListTypeString(),
+		client.repo.GetImmutableConfigPublic().GetInventoryListTypeId(),
 	).Type
 
 	buffer := bytes.NewBuffer(nil)
@@ -316,7 +316,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 		if listMissingSkus, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
 			client.GetEnv(),
 			ids.GetOrPanic(
-				client.configImmutable.Blob.GetInventoryListTypeString(),
+				client.configImmutable.Blob.GetInventoryListTypeId(),
 			).Type,
 			bufferedReader,
 		); err != nil {

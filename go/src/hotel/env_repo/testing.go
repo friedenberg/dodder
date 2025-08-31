@@ -23,7 +23,7 @@ func MakeTesting(
 	var bigBang BigBang
 	bigBang.SetDefaults()
 
-	bigBang.GenesisConfig.Blob.SetBlobDigestTypeString(markl.HashTypeIdSha256)
+	bigBang.GenesisConfig.Blob.SetBlobHashTypeId(markl.HashTypeIdSha256)
 
 	return MakeTestingWithBigBang(t, contents, bigBang)
 }

@@ -22,18 +22,7 @@ type State int
 const (
 	StateUnread = State(iota)
 	StateChanged
-)
 
-type PageDelegate interface {
-	ShouldAddVerzeichnisse(*sku.Transacted) error
-	ShouldFlushVerzeichnisse(*sku.Transacted) error
-}
-
-type PageDelegateGetter interface {
-	GetVerzeichnissePageDelegate(uint8) PageDelegate
-}
-
-const (
 	DigitWidth = 1
 	PageCount  = 1 << (DigitWidth * 4)
 )

@@ -29,7 +29,7 @@ type Dependencies struct {
 
 func (f Dependencies) GetBlobDigestType() string {
 	if f.BlobDigestType == "" {
-		return markl.HRPObjectBlobDigestSha256V0
+		return markl.HashTypeIdSha256
 	} else {
 		return f.BlobDigestType
 	}

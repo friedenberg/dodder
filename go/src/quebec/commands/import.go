@@ -28,17 +28,17 @@ type Import struct {
 	sku.Proto
 }
 
-func (cmd *Import) SetFlagSet(f *flags.FlagSet) {
-	f.StringVar(&cmd.InventoryList, "inventory-list", "", "")
-	cmd.RemoteBlobStore.SetFlagSet(f)
-	f.BoolVar(
+func (cmd *Import) SetFlagSet(flagSet *flags.FlagSet) {
+	flagSet.StringVar(&cmd.InventoryList, "inventory-list", "", "")
+	cmd.RemoteBlobStore.SetFlagSet(flagSet)
+	flagSet.BoolVar(
 		&cmd.PrintCopies,
 		"print-copies",
 		true,
 		"output when blobs are copied",
 	)
 
-	cmd.Proto.SetFlagSet(f)
+	cmd.Proto.SetFlagSet(flagSet)
 }
 
 func (cmd Import) Run(req command.Request) {

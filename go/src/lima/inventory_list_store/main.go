@@ -70,7 +70,7 @@ func (store *Store) Initialize(
 	}
 
 	blobType := ids.MustType(
-		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
+		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeId(),
 	)
 
 	inventoryListBlobStore := envRepo.GetInventoryListBlobStore()
@@ -119,7 +119,7 @@ func (store *Store) FormatForVersion(
 	storeVersion interfaces.StoreVersion,
 ) sku.ListCoder {
 	tipe := ids.GetOrPanic(
-		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeString(),
+		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeId(),
 	).Type
 
 	return store.GetInventoryListCoderCloset().GetCoderForType(tipe)

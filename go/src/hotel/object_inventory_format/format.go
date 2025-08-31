@@ -388,23 +388,23 @@ func GetDigestForMetadata(
 }
 
 func WriteMetadata(
-	w io.Writer,
-	f Format,
-	c FormatterContext,
+	writer io.Writer,
+	format Format,
+	context FormatterContext,
 ) (blobDigest interfaces.MarklId, err error) {
-	writer, repool := markl_io.MakeWriterWithRepool(
+	marklWriter, repool := markl_io.MakeWriterWithRepool(
 		markl.HashTypeSha256.Get(),
-		w,
+		writer,
 	)
 	defer repool()
 
-	_, err = f.WriteMetadataTo(writer, c)
+	_, err = format.WriteMetadataTo(marklWriter, context)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	blobDigest = writer.GetMarklId()
+	blobDigest = marklWriter.GetMarklId()
 
 	return
 }

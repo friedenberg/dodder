@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
-type Generator interface {
+type PrivateKeyGenerator interface {
 	GeneratePrivateKey() (err error)
 }
 

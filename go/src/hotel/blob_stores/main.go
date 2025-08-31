@@ -51,7 +51,7 @@ func MakeBlobStores(
 	{
 		var err error
 
-		if hashType, err = markl.GetHashTypeOrError(config.GetBlobDigestTypeString()); err != nil {
+		if hashType, err = markl.GetHashTypeOrError(config.GetBlobHashTypeId()); err != nil {
 			ctx.Cancel(err)
 			return
 		}

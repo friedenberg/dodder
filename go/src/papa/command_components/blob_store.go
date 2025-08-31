@@ -50,7 +50,7 @@ func (cmd *BlobStore) MakeBlobStore(
 			var err error
 
 			if hashType, err = markl.GetHashTypeOrError(
-				envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+				envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
 			); err != nil {
 				envRepo.Cancel(err)
 				return

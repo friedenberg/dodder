@@ -243,7 +243,7 @@ func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 			var err error
 
 			if hashType, err = markl.GetHashTypeOrError(
-				env.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+				env.GetConfigPublic().Blob.GetBlobHashTypeId(),
 			); err != nil {
 				env.Cancel(err)
 				return nil

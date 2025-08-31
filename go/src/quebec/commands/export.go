@@ -105,7 +105,7 @@ func (cmd Export) Run(req command.Request) {
 
 	if _, err := inventoryListCoderCloset.WriteTypedBlobToWriter(
 		req,
-		ids.GetOrPanic(localWorkingCopy.GetImmutableConfigPublic().GetInventoryListTypeString()).Type,
+		ids.GetOrPanic(localWorkingCopy.GetImmutableConfigPublic().GetInventoryListTypeId()).Type,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
 	); err != nil {

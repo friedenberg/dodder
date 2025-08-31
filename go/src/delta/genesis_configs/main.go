@@ -15,11 +15,11 @@ type (
 	Config interface {
 		GetStoreVersion() store_version.Version
 		GetPublicKey() markl.PublicKey
-		GetRepoType() repo_type.Type
+		GetRepoType() repo_type.Type // TODO remove
 		GetRepoId() ids.RepoId
-		GetInventoryListTypeString() string
-		GetObjectSigTypeString() string
-		GetBlobDigestTypeString() string
+		GetInventoryListTypeId() string
+		GetObjectSigTypeId() string
+		GetBlobHashTypeId() string
 	}
 
 	ConfigPublic interface {
@@ -37,14 +37,14 @@ type (
 	ConfigPrivateMutable interface {
 		ConfigPrivate
 
-		SetInventoryListTypeString(string)
-		SetObjectSigTypeString(string)
-		SetBlobDigestTypeString(string)
+		SetInventoryListTypeId(string)
+		SetObjectSigTypeId(string)
+		SetBlobHashTypeId(string)
 		// TODO separate into non-method function that uses properties
 		flags.CommandComponentWriter
-		SetRepoType(repo_type.Type)
+		SetRepoType(repo_type.Type) // TODO remove
 		SetRepoId(ids.RepoId)
-		markl.Generator
+		markl.PrivateKeyGenerator
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

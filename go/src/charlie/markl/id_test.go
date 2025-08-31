@@ -94,7 +94,7 @@ func FuzzIdStringLen(f *testing.F) {
 	f.Add("testing")
 	f.Add("holidays")
 
-	hashType := HashTypeBlake2s256
+	hashType := HashTypeBlake2b256
 
 	f.Fuzz(
 		func(t1 *testing.T, input string) {

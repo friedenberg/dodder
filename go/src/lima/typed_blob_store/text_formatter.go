@@ -43,7 +43,7 @@ func MakeTextFormatterWithBlobFormatter(
 				EnvDir:         envRepo,
 				BlobStore:      envRepo.GetDefaultBlobStore(),
 				BlobFormatter:  formatter,
-				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
 			},
 		),
 		checkoutMode: checkoutMode,

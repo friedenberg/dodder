@@ -919,13 +919,21 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				sh1 := markl.HashTypeSha256.FromStringContent(object.GetObjectId().String())
-				sh2 := markl.HashTypeSha256.FromStringContent(
+				// TODO synchronize with logic used to actually generate probe
+				// index
+				dig1 := markl.HashTypeSha256.FromStringContent(
+					object.GetObjectId().String(),
+				)
+
+				dig2 := markl.HashTypeSha256.FromStringContent(
 					object.GetObjectId().String() + object.GetTai().String(),
 				)
-				defer markl.PutBlobId(sh1)
-				defer markl.PutBlobId(sh2)
-				_, err = fmt.Fprintln(writer, object.GetObjectId(), sh1, sh2)
+
+				defer markl.PutBlobId(dig1)
+				defer markl.PutBlobId(dig2)
+
+				_, err = fmt.Fprintln(writer, object.GetObjectId(), dig1, dig2)
+
 				return
 			}
 		},

@@ -148,7 +148,7 @@ func (json *JSON) ToTransacted(
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
 		if err = markl.SetHexBytes(
-			markl.HRPObjectBlobDigestSha256V0,
+			markl.HashTypeIdSha256,
 			object.Metadata.GetBlobDigestMutable(),
 			[]byte(json.BlobId),
 		); err != nil {

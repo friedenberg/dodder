@@ -54,7 +54,7 @@ func Make(
 			object_metadata.Dependencies{
 				EnvDir:         envRepo,
 				BlobStore:      envRepo.GetDefaultBlobStore(),
-				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobDigestTypeString(),
+				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
 			},
 		),
 	}
