@@ -93,7 +93,7 @@ func (config V0Common) GetInventoryListTypeId() string {
 	return ids.TypeInventoryListV0
 }
 
-func (config V0Common) GetObjectSigTypeId() string {
+func (config V0Common) GetObjectSigMarklTypeId() string {
 	return markl.HRPObjectSigV0
 }
 

@@ -8,7 +8,7 @@ func (metadata *Metadata) GetBlobDigest() interfaces.MarklId {
 	return &metadata.DigBlob
 }
 
-func (metadata *Metadata) GetBlobDigestMutable() interfaces.MutableMarklId {
+func (metadata *Metadata) GetBlobDigestMutable() interfaces.MutableMarklIdWithFormat {
 	return &metadata.DigBlob
 }
 
@@ -16,7 +16,7 @@ func (metadata *Metadata) GetObjectDigest() interfaces.MarklId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableMarklId {
+func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableMarklIdWithFormat {
 	return &metadata.digSelf
 }
 
@@ -24,7 +24,7 @@ func (metadata *Metadata) GetMotherObjectSig() interfaces.MarklId {
 	return &metadata.sigMother
 }
 
-func (metadata *Metadata) GetMotherObjectSigMutable() interfaces.MutableMarklId {
+func (metadata *Metadata) GetMotherObjectSigMutable() interfaces.MutableMarklIdWithFormat {
 	return &metadata.sigMother
 }
 
@@ -32,7 +32,7 @@ func (metadata *Metadata) GetRepoPubKey() interfaces.MarklId {
 	return metadata.pubRepo
 }
 
-func (metadata *Metadata) GetRepoPubKeyMutable() interfaces.MutableMarklId {
+func (metadata *Metadata) GetRepoPubKeyMutable() interfaces.MutableMarklIdWithFormat {
 	return &metadata.pubRepo
 }
 
@@ -40,6 +40,6 @@ func (metadata *Metadata) GetObjectSig() interfaces.MarklId {
 	return &metadata.sigRepo
 }
 
-func (metadata *Metadata) GetObjectSigMutable() interfaces.MutableMarklId {
+func (metadata *Metadata) GetObjectSigMutable() interfaces.MutableMarklIdWithFormat {
 	return &metadata.sigRepo
 }

@@ -8,26 +8,19 @@ import (
 
 const (
 	KeyFormatV5Metadata               = "Metadatei"
-	KeyFormatV5MetadataWithoutTai     = "MetadateiSansTai"
+	KeyFormatV5MetadataWithoutTai     = markl.MarklTypeIdV5MetadataDigestWithoutTai
 	KeyFormatV5MetadataObjectIdParent = "MetadateiKennungMutter"
-	KeyFormatV11ObjectDigest          = markl.HRPObjectDigestSha256V1
 )
 
 var (
-	FormatKeys = []string{
-		KeyFormatV5Metadata,
-		KeyFormatV5MetadataWithoutTai,
-		KeyFormatV5MetadataObjectIdParent,
-	}
-
 	FormatKeysV5 = []string{
 		KeyFormatV5Metadata,
 		KeyFormatV5MetadataWithoutTai,
 		KeyFormatV5MetadataObjectIdParent,
 	}
 
-	FormatsV5MetadataSansTai = Format{
-		key: KeyFormatV5MetadataWithoutTai,
+	formatV5MetadataWithoutTai = Format{
+		key: markl.MarklTypeIdV5MetadataDigestWithoutTai,
 		keys: []keyType{
 			keyAkte,
 			keyBezeichnung,
@@ -36,8 +29,8 @@ var (
 		},
 	}
 
-	FormatV11ObjectDigest = Format{
-		key: KeyFormatV11ObjectDigest,
+	formatV11ObjectDigest = Format{
+		key: markl.MarklTypeIdObjectDigestSha256V1,
 		keys: []keyType{
 			key_strings.Blob,
 			key_strings.Description,
@@ -64,21 +57,11 @@ var (
 )
 
 type formats struct {
-	metadataSansTai        Format
-	metadata               Format
-	metadataObjectIdParent Format
-}
-
-func (formats formats) MetadataSansTai() Format {
-	return formats.metadataSansTai
+	metadata Format
 }
 
 func (formats formats) Metadata() Format {
 	return formats.metadata
-}
-
-func (formats formats) MetadataObjectIdParent() Format {
-	return formats.metadataObjectIdParent
 }
 
 // TODO remove
@@ -92,24 +75,5 @@ func init() {
 		keyEtikett,
 		keyTyp,
 		key_strings.Tai,
-	}
-
-	Formats.metadataSansTai.key = KeyFormatV5MetadataWithoutTai
-	Formats.metadataSansTai.keys = []keyType{
-		keyAkte,
-		keyBezeichnung,
-		keyEtikett,
-		keyTyp,
-	}
-
-	Formats.metadataObjectIdParent.key = KeyFormatV5MetadataObjectIdParent
-	Formats.metadataObjectIdParent.keys = []keyType{
-		keyAkte,
-		keyBezeichnung,
-		keyEtikett,
-		keyKennung,
-		keyTyp,
-		key_strings.Tai,
-		keyShasMutterMetadataKennungMutter,
 	}
 }

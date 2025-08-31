@@ -18,7 +18,7 @@ type (
 		GetRepoType() repo_type.Type // TODO remove
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
-		GetObjectSigTypeId() string
+		GetObjectSigMarklTypeId() string
 		GetBlobHashTypeId() string
 	}
 
@@ -38,7 +38,7 @@ type (
 		ConfigPrivate
 
 		SetInventoryListTypeId(string)
-		SetObjectSigTypeId(string)
+		SetObjectSigMarklTypeId(string)
 		SetBlobHashTypeId(string)
 		// TODO separate into non-method function that uses properties
 		flags.CommandComponentWriter

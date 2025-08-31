@@ -25,9 +25,8 @@ func (transacted *Transacted) finalize(
 	wg.Do(
 		transacted.makeDigestCalcFunc(
 			funcCalcDigest,
-			object_inventory_format.FormatsV5MetadataSansTai,
+			markl.MarklTypeIdV5MetadataDigestWithoutTai,
 			&transacted.Metadata.SelfWithoutTai,
-			markl.HRPObjectDigestSha256V1,
 		),
 	)
 
@@ -47,11 +46,19 @@ func (transacted *Transacted) finalize(
 
 func (transacted *Transacted) makeDigestCalcFunc(
 	funcCalcDigest funcCalcDigest,
-	objectFormat object_inventory_format.Format,
-	digest interfaces.MutableMarklId,
-	tipe string,
+	formatTypeId string,
+	digest interfaces.MutableMarklIdWithFormat,
 ) errors.FuncErr {
 	return func() (err error) {
+		var objectFormat object_inventory_format.Format
+
+		if objectFormat, err = object_inventory_format.FormatForKeyError(
+			formatTypeId,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		var actual interfaces.MarklId
 
 		if actual, err = funcCalcDigest(
@@ -65,7 +72,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 		defer markl.PutBlobId(actual)
 
 		if err = digest.SetMerkleId(
-			tipe,
+			actual.GetMarklType().GetMarklTypeId(),
 			actual.GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -81,9 +88,8 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 ) (err error) {
 	if err = transacted.makeDigestCalcFunc(
 		funcCalcDigest,
-		object_inventory_format.FormatsV5MetadataSansTai,
+		markl.MarklTypeIdV5MetadataDigestWithoutTai,
 		&transacted.Metadata.SelfWithoutTai,
-		markl.HRPObjectDigestSha256V1,
 	)(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -112,9 +118,9 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 
 	if err = transacted.makeDigestCalcFunc(
 		funcCalcDigest,
-		object_inventory_format.FormatV11ObjectDigest,
+		// TODO do not hardcode markl type id
+		markl.MarklTypeIdObjectDigestSha256V1,
 		transacted.Metadata.GetObjectDigestMutable(),
-		markl.HRPObjectDigestSha256V1,
 	)(); err != nil {
 		err = errors.Wrap(err)
 		return

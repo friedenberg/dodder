@@ -52,7 +52,7 @@ func (config *TomlV2Common) GetInventoryListTypeId() string {
 	}
 }
 
-func (config *TomlV2Common) GetObjectSigTypeId() string {
+func (config *TomlV2Common) GetObjectSigMarklTypeId() string {
 	if config.ObjectSigType == "" {
 		return markl.HRPObjectSigV1
 	} else {
@@ -72,7 +72,7 @@ func (config *TomlV2Common) SetInventoryListTypeId(value string) {
 	config.InventoryListType = value
 }
 
-func (config *TomlV2Common) SetObjectSigTypeId(value string) {
+func (config *TomlV2Common) SetObjectSigMarklTypeId(value string) {
 	config.ObjectSigType = value
 }
 

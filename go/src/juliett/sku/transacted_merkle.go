@@ -18,9 +18,14 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMerkleId(
-		markl.HRPObjectMotherSigV1,
+		markl.MarklTypeIdEd25519,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = motherSig.SetFormat(markl.HRPObjectMotherSigV1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -154,7 +159,7 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
-		config.GetObjectSigTypeId(),
+		config.GetObjectSigMarklTypeId(),
 		bites,
 	); err != nil {
 		err = errors.Wrap(err)

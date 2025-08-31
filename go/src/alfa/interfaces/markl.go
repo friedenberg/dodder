@@ -57,6 +57,17 @@ type (
 		ResetWithMarklId(MarklId)
 	}
 
+	MarklIdWithFormat interface {
+		MarklId
+		GetFormat() string
+	}
+
+	MutableMarklIdWithFormat interface {
+		MarklIdWithFormat
+		MutableMarklId
+		SetFormat(string) error
+	}
+
 	MarklIdGetter interface {
 		GetMarklId() MarklId
 	}

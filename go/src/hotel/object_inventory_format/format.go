@@ -32,11 +32,11 @@ func FormatForKeyError(key string) (format Format, err error) {
 	case KeyFormatV5Metadata:
 		format = Formats.metadata
 
-	case KeyFormatV5MetadataWithoutTai:
-		format = Formats.metadataSansTai
+	case markl.MarklTypeIdV5MetadataDigestWithoutTai:
+		format = formatV5MetadataWithoutTai
 
-	case KeyFormatV5MetadataObjectIdParent:
-		format = Formats.metadataObjectIdParent
+	case markl.MarklTypeIdObjectDigestSha256V1:
+		format = formatV11ObjectDigest
 
 	default:
 		err = errInvalidGenericFormat(key)
@@ -447,6 +447,7 @@ func GetDigestForContextDebug(
 	return
 }
 
+// TODO switch to accepting objects
 func GetDigestsForMetadata(
 	metadata *object_metadata.Metadata,
 ) (digests map[string]interfaces.MarklId, err error) {

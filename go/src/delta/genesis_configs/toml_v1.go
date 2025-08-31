@@ -61,11 +61,11 @@ func (config *TomlV1Common) SetInventoryListTypeId(value string) {
 	config.InventoryListType = value
 }
 
-func (config *TomlV1Common) GetObjectSigTypeId() string {
+func (config *TomlV1Common) GetObjectSigMarklTypeId() string {
 	return markl.HRPObjectSigV0
 }
 
-func (config *TomlV1Common) SetObjectSigTypeId(string) {
+func (config *TomlV1Common) SetObjectSigMarklTypeId(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
 

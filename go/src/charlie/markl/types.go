@@ -11,7 +11,9 @@ const (
 	// keep sorted
 	// TODO move to ids' builtin types
 	// and then add registration
-	HRPObjectDigestSha256V1   = "dodder-object-digest-sha256-v1"
+	MarklTypeIdObjectDigestSha256V1       = "dodder-object-digest-sha256-v1"
+	MarklTypeIdV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
+
 	HRPObjectMotherSigV1      = "dodder-object-mother-sig-v1"
 	HRPObjectSigV0            = "dodder-repo-sig-v1"
 	HRPObjectSigV1            = "dodder-object-sig-v1"
@@ -19,6 +21,8 @@ const (
 	HRPRepoPubKeyV1           = "dodder-repo-public_key-v1"
 	HRPRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
 	HRPRequestAuthResponseV1  = "dodder-request_auth-response-v1"
+
+	MarklTypeIdEd25519 = "ed25519"
 )
 
 func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {

@@ -360,7 +360,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 	return
 }
 
-var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
+var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklIdWithFormat{
 	"":                         (*object_metadata.Metadata).GetBlobDigestMutable,
 	markl.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
 	markl.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,

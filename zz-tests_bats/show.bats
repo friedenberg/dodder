@@ -152,7 +152,7 @@ function show_all_mother { # @test
 	run_dodder show -format sig-mother :
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
-		dodder-object-mother-sig-v1-
+		ed25519-
 	EOM
 }
 
