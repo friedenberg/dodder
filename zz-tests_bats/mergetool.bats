@@ -45,7 +45,7 @@ function mergetool_conflict_base {
 		not another one, conflict time
 	EOM
 
-	run_dodder_debug organize -mode commit-directly one/dos <<-EOM
+	run_dodder organize -mode commit-directly one/dos <<-EOM
 		---
 		! txt2
 		---
@@ -54,14 +54,14 @@ function mergetool_conflict_base {
 		- [one/dos  tag-3 tag-4] wow ok again
 	EOM
 	assert_success
-	# assert_output_unsorted - <<-EOM
-	# 	[!txt2 !toml-type-v1]
-	# 	[new-etikett-for-all]
-	# 	[new-etikett-for]
-	# 	[new-etikett]
-	# 	[new]
-	# 	[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
-	# EOM
+	assert_output_unsorted - <<-EOM
+		[!txt2 !toml-type-v1]
+		[new-etikett-for-all]
+		[new-etikett-for]
+		[new-etikett]
+		[new]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+	EOM
 
 	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
@@ -86,9 +86,9 @@ function mergetool_conflict_one_local { # @test
 
 	run cat one/dos.conflict
 	assert_output --regexp - <<-'EOM'
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 .* dodder-repo-public_key-v1-.* dodder-object-sig-v1-.* dodder-object-mother-sig-v1-.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 .* dodder-repo-public_key-v1-.* dodder-object-sig-v1-.* !md "wow ok again" tag-3 tag-4]
-		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 .* dodder-repo-public_key-v1-.* dodder-object-sig-v1-.* dodder-object-mother-sig-v1-.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-repo-sig-v1@.* !md "wow ok again" tag-3 tag-4]
+		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* dodder-repo-sig-v1@.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 
 	# TODO add `-delete` option to `merge-tool`

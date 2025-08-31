@@ -178,6 +178,11 @@ assert_output_unsorted() {
       | batslib_decorate 'ERROR: assert_output_unsorted' \
       | fail
     elif ! [[ $output_sorted =~ $expected_sorted ]]; then
+      # diff="$(git diff --no-index --word-diff <(echo "$expected_sorted") <(echo "$output_sorted") || true)"
+      # batslib_print_kv_single_or_multi 4 \
+      # 'diff' "$diff" \
+      # | batslib_decorate 'output differs' \
+      # | fail
       batslib_print_kv_single_or_multi 6 \
       'regexp'  "$expected_sorted" \
       'output' "$output_sorted" \
@@ -194,11 +199,18 @@ assert_output_unsorted() {
     fi
   else
     if [[ $output_sorted != "$expected_sorted" ]]; then
-      batslib_print_kv_single_or_multi 8 \
-      'expected' "$expected_sorted" \
-      'actual'   "$output_sorted" \
+      diff="$(git diff --no-index --word-diff <(echo "$expected_sorted") <(echo "$output_sorted"))"
+      batslib_print_kv_single_or_multi 4 \
+      'diff' "$diff" \
       | batslib_decorate 'output differs' \
       | fail
     fi
+    # if [[ $output_sorted != "$expected_sorted" ]]; then
+    #   batslib_print_kv_single_or_multi 8 \
+    #   'expected' "$expected_sorted" \
+    #   'actual'   "$output_sorted" \
+    #   | batslib_decorate 'output differs' \
+    #   | fail
+    # fi
   fi
 }

@@ -256,18 +256,20 @@ func (format *BoxTransacted) addFieldsMetadata(
 	}
 
 	if format.isArchive && !object.Metadata.GetObjectSig().IsNull() {
-		box.Contents = append(
+		box.Contents = object_metadata_fmt.AddRepoPubKey(
 			box.Contents,
-			object_metadata_fmt.MetadataFieldRepoPubKey(metadata),
-			object_metadata_fmt.MetadataFieldRepoSig(metadata),
+			metadata,
 		)
 
-		if !object.Metadata.GetMotherObjectSig().IsNull() {
-			box.Contents = append(
-				box.Contents,
-				object_metadata_fmt.MetadataFieldMotherSig(metadata),
-			)
-		}
+		box.Contents = object_metadata_fmt.AddMotherSigIfNecessary(
+			box.Contents,
+			metadata,
+		)
+
+		box.Contents = object_metadata_fmt.AddObjectSig(
+			box.Contents,
+			metadata,
+		)
 	}
 
 	if !metadata.Type.IsEmpty() {

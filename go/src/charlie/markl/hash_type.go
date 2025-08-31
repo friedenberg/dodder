@@ -42,7 +42,6 @@ func init() {
 		&HashTypeBlake2b256,
 	)
 
-	makeFakeHashType(HashTypeIdSha256)
 	makeFakeHashType(HRPObjectDigestSha256V1)
 	makeFakeHashType(HRPObjectMotherSigV1)
 	makeFakeHashType(HRPObjectSigV0)

@@ -247,13 +247,13 @@ function clone_archive_history_default_allow_conflicts { # @test
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
-		copied Blob [0-9a-f]+ \([0-9]+ B)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
+		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
 		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
 		\[konfig @[0-9a-f]+ !toml-config-v2]

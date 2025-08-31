@@ -285,10 +285,8 @@ LOOP_AFTER_OID:
 			}
 
 			if tag.IsDodderTag() {
-				if err = format.parseDodderTag(object, tag); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+				err = errors.Err405MethodNotAllowed
+				return
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)
@@ -340,26 +338,22 @@ func (format *BoxTransacted) parseMarklIdTag(
 	var value []byte
 
 	if seq.Len() == 3 {
-		key = string(seq.At(1).Contents)
+		key = string(seq.At(0).Contents)
 		value = seq.At(2).Contents
 	} else {
 		value = seq.At(1).Contents
 	}
 
-	switch key {
-	case "":
-		fallthrough
-
-	case "blob":
-		if err = object.Metadata.GetBlobDigestMutable().Set(
+	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[key]; ok {
+		mutableBlobId := getMutableMerkleIdMethod(&object.Metadata)
+		if err = mutableBlobId.Set(
 			string(value),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-	default:
-		err = errors.Errorf("unsupported markl field: %q", key)
+	} else {
+		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})
 		return
 	}
 
@@ -367,6 +361,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 }
 
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
+	"":                         (*object_metadata.Metadata).GetBlobDigestMutable,
 	markl.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
 	markl.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
 	markl.HRPObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,

@@ -50,36 +50,6 @@ func MetadataFieldTai(
 	}
 }
 
-func MetadataFieldRepoPubKey(
-	metadata *object_metadata.Metadata,
-) string_format_writer.Field {
-	return string_format_writer.Field{
-		Value:      metadata.GetRepoPubKey().String(),
-		NoTruncate: true,
-		ColorType:  string_format_writer.ColorTypeHash,
-	}
-}
-
-func MetadataFieldRepoSig(
-	metadata *object_metadata.Metadata,
-) string_format_writer.Field {
-	return string_format_writer.Field{
-		Value:      metadata.GetObjectSig().String(),
-		NoTruncate: true,
-		ColorType:  string_format_writer.ColorTypeHash,
-	}
-}
-
-func MetadataFieldMotherSig(
-	metadata *object_metadata.Metadata,
-) string_format_writer.Field {
-	return string_format_writer.Field{
-		Value:      metadata.GetMotherObjectSig().String(),
-		NoTruncate: true,
-		ColorType:  string_format_writer.ColorTypeHash,
-	}
-}
-
 func MetadataFieldType(
 	metadata *object_metadata.Metadata,
 ) string_format_writer.Field {
