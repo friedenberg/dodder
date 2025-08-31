@@ -170,6 +170,8 @@ LOOP_AFTER_OID:
 	for scanner.ScanDotAllowedInIdentifiers() {
 		seq := scanner.GetSeq()
 
+		// TODO convert this into a decision tree based on token type sequences
+		// instead of a switch
 		switch {
 		// ] ' '
 		case seq.MatchAll(doddish.TokenTypeOperator):
@@ -196,19 +198,7 @@ LOOP_AFTER_OID:
 
 			// @abcd
 		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-			if len(seq.At(1).Contents) == 64 {
-				if err = format.parseOldBlobIdTag(object, seq); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				if err = format.parseMarklIdTag(object, seq); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			continue
+			fallthrough
 
 			// key@abcd
 		case seq.MatchAll(doddish.TokenTypeIdentifier, doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):

@@ -1,94 +1,12 @@
 package markl
 
 import (
-	"crypto/sha256"
 	"fmt"
-	"hash"
 	"io"
-
-	"golang.org/x/crypto/blake2b"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
-
-const (
-	HashTypeIdSha256     = "sha256"
-	HashTypeIdBlake2b256 = "blake2b256"
-)
-
-var (
-	types     map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
-	hashTypes map[string]HashType             = map[string]HashType{}
-
-	HashTypeSha256     HashType
-	HashTypeBlake2b256 HashType
-)
-
-func init() {
-	HashTypeSha256 = makeHashType(
-		sha256.New,
-		HashTypeIdSha256,
-		&HashTypeSha256,
-	)
-
-	HashTypeBlake2b256 = makeHashType(
-		func() hash.Hash {
-			hash, _ := blake2b.New256(nil)
-			return hash
-		},
-		HashTypeIdBlake2b256,
-		&HashTypeBlake2b256,
-	)
-
-	makeFakeHashType(FormatIdObjectMotherSigV1)
-	makeFakeHashType(FormatIdObjectSigV0)
-	makeFakeHashType(FormatIdObjectSigV1)
-	makeFakeHashType(FormatIdRepoPrivateKeyV1)
-	makeFakeHashType(FormatIdRepoPubKeyV1)
-	makeFakeHashType(FormatIdRequestAuthChallengeV1)
-	makeFakeHashType(FormatIdRequestAuthResponseV1)
-
-	makeFakeHashType(TypeIdEd25519)
-}
-
-func makeHashType(
-	constructor func() hash.Hash,
-	tipe string,
-	self *HashType,
-) HashType {
-	_, alreadyExists := types[tipe]
-
-	if alreadyExists {
-		panic(fmt.Sprintf("hash type already registered: %q", tipe))
-	}
-
-	hashType := HashType{
-		pool: pool.MakeValue(
-			func() Hash {
-				return Hash{
-					hash:     constructor(),
-					hashType: self,
-				}
-			},
-			func(hash Hash) {
-				hash.Reset()
-			},
-		),
-		tipe: tipe,
-	}
-
-	hash := constructor()
-	hashType.null.tipe = self
-	hashType.null.allocDataIfNecessary(hash.Size())
-	hashType.null.data = hash.Sum(hashType.null.data)
-
-	types[tipe] = hashType
-	hashTypes[tipe] = hashType
-
-	return hashType
-}
 
 type HashType struct {
 	pool interfaces.PoolValue[Hash]
