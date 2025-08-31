@@ -220,7 +220,7 @@ func (store *Store) Commit(
 			store.storeConfig.GetConfig().GetStoreVersion(),
 			store_version.V11,
 		) {
-			if err = markl.MakeErrIsNull(
+			if err = markl.AssertIdIsNotNull(
 				child.Metadata.GetObjectSig(),
 				"object-sig",
 			); err != nil {

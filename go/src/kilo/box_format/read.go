@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -275,7 +274,7 @@ LOOP_AFTER_OID:
 			}
 
 			if tag.IsDodderTag() {
-				err = errors.Err405MethodNotAllowed
+				err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
 				return
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
@@ -343,28 +342,15 @@ func (format *BoxTransacted) parseMarklIdTag(
 	}
 
 	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[marklFormatId]; ok {
-		marklId := getMutableMerkleIdMethod(&object.Metadata)
+		id := getMutableMerkleIdMethod(&object.Metadata)
 
-		if err = marklId.SetFormat(marklFormatId); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = marklId.Set(
+		if err = markl.SetMerkleIdWithFormatBlech32(
+			id,
+			marklFormatId,
 			string(value),
 		); err != nil {
-			if errors.Is(err, blech32.ErrSeparatorMissing) {
-				if err = markl.SetSha256(
-					marklId,
-					string(value),
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+			err = errors.Wrapf(err, "Seq: %q", seq)
+			return
 		}
 	} else {
 		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})

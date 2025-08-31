@@ -298,7 +298,7 @@ func writeMerkleIdKey(
 	key *catgut.String,
 	merkleId interfaces.MarklId,
 ) (n int, err error) {
-	if err = markl.MakeErrIsNull(merkleId, key.String()); err != nil {
+	if err = markl.AssertIdIsNotNull(merkleId, key.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

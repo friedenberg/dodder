@@ -21,7 +21,7 @@ func (coder doddishV2) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		object.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -29,7 +29,7 @@ func (coder doddishV2) EncodeTo(
 		return
 	}
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		object.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {

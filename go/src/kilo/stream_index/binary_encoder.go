@@ -289,7 +289,7 @@ func (encoder *binaryEncoder) writeMerkleId(
 	key string,
 ) (n int64, err error) {
 	if !allowNull {
-		if err = markl.MakeErrIsNull(merkleId, key); err != nil {
+		if err = markl.AssertIdIsNotNull(merkleId, key); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -328,7 +328,7 @@ func (encoder *binaryEncoder) writeFieldMerkleId(
 ) (n int64, err error) {
 	if merkleId.IsNull() {
 		if !allowNull {
-			err = markl.MakeErrIsNull(merkleId, key)
+			err = markl.AssertIdIsNotNull(merkleId, key)
 		}
 
 		return

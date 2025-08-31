@@ -19,7 +19,7 @@ func MakeErrEmptyType(id interfaces.MarklId) error {
 	return nil
 }
 
-func MakeErrIsNotNull(id interfaces.MarklId) error {
+func AssertIdIsNull(id interfaces.MarklId) error {
 	if !id.IsNull() {
 		// TODO clone
 		return errors.WrapSkip(1, errIsNotNull{id: id, value: id.String()})
@@ -42,7 +42,7 @@ func (err errIsNotNull) Is(target error) bool {
 	return ok
 }
 
-func MakeErrIsNull(id interfaces.MarklId, key string) error {
+func AssertIdIsNotNull(id interfaces.MarklId, key string) error {
 	if id.IsNull() {
 		return errors.WrapSkip(1, errIsNull{key: key})
 	}

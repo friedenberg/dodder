@@ -18,7 +18,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMerkleId(
-		markl.TypeIdEd25519,
+		markl.TypeIdEd25519Sig,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -37,7 +37,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 // calculates the object digests using the object's repo pubkey
 func (transacted *Transacted) FinalizeUsingObject() (err error) {
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -57,7 +57,8 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {
-		if err = pubKeyMutable.SetMerkleId(
+		if err = markl.SetMerkleIdWithFormat(
+			transacted.Metadata.GetRepoPubKeyMutable(),
 			markl.FormatIdRepoPubKeyV1,
 			pubKey,
 		); err != nil {
@@ -99,6 +100,10 @@ func (transacted *Transacted) FinalizeAndSignIfNecessary(
 		return
 	}
 
+	if transacted.Metadata.GetRepoPubKey().GetFormat() == "" {
+		panic("empty pbukey format")
+	}
+
 	return
 }
 
@@ -122,21 +127,22 @@ func (transacted *Transacted) FinalizeAndSignOverwrite(
 func (transacted *Transacted) FinalizeAndSign(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	if err = markl.MakeErrIsNotNull(
+	if err = markl.AssertIdIsNull(
 		transacted.Metadata.GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = markl.MakeErrIsNotNull(
+	if err = markl.AssertIdIsNull(
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = transacted.Metadata.GetRepoPubKeyMutable().SetMerkleId(
+	if err = markl.SetMerkleIdWithFormat(
+		transacted.Metadata.GetRepoPubKeyMutable(),
 		markl.FormatIdRepoPubKeyV1,
 		config.GetPublicKey(),
 	); err != nil {
@@ -149,7 +155,7 @@ func (transacted *Transacted) FinalizeAndSign(
 		return
 	}
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -169,7 +175,8 @@ func (transacted *Transacted) FinalizeAndSign(
 		return
 	}
 
-	if err = transacted.Metadata.GetObjectSigMutable().SetMerkleId(
+	if err = markl.SetMerkleIdWithFormat(
+		transacted.Metadata.GetObjectSigMutable(),
 		config.GetObjectSigMarklTypeId(),
 		bites,
 	); err != nil {
@@ -209,7 +216,7 @@ func (transacted *Transacted) FinalizeAndVerify() (err error) {
 func (transacted *Transacted) Verify() (err error) {
 	pubKey := transacted.Metadata.GetRepoPubKey()
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		pubKey,
 		"repo-pubkey",
 	); err != nil {
@@ -217,7 +224,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {
@@ -225,7 +232,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectSig(),
 		"object-sig",
 	); err != nil {

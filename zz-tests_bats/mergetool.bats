@@ -87,8 +87,8 @@ function mergetool_conflict_one_local { # @test
 	run cat one/dos.conflict
 	assert_output --regexp - <<-'EOM'
 		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-repo-sig-v1@.* !md "wow ok again" tag-3 tag-4]
-		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* dodder-repo-sig-v1@.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-sig-v1@.* !md "wow ok again" tag-3 tag-4]
+		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* dodder-object-sig-v1@.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 
 	# TODO add `-delete` option to `merge-tool`

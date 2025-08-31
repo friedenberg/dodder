@@ -62,11 +62,11 @@ func (coder doddishV1) DecodeFrom(
 		}
 	}
 
-	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
+	if err = markl.SetMerkleIdWithFormat(
+		object.Metadata.GetRepoPubKeyMutable(),
 		markl.FormatIdRepoPubKeyV1,
 		coder.configGenesis.GetPublicKey(),
 	); err != nil {
-
 		err = errors.Wrap(err)
 		return
 	}

@@ -17,8 +17,8 @@ func TestIdNullAndEqual(t1 *testing.T) {
 
 func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	{
-		t.AssertError(MakeErrIsNull(hashType.null, ""))
-		t.AssertNoError(MakeErrIsNotNull(hashType.null))
+		t.AssertError(AssertIdIsNotNull(hashType.null, ""))
+		t.AssertNoError(AssertIdIsNull(hashType.null))
 		t.AssertNoError(
 			MakeErrLength(hashType.GetSize(), len(hashType.null.GetBytes())),
 		)
@@ -30,10 +30,10 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	{
 		idNull, _ := hash.GetMarklId()
 
-		t.AssertNoError(MakeErrIsNotNull(idZero))
-		t.AssertNoError(MakeErrIsNotNull(idNull))
-		t.AssertError(MakeErrIsNull(idZero, ""))
-		t.AssertError(MakeErrIsNull(idNull, ""))
+		t.AssertNoError(AssertIdIsNull(idZero))
+		t.AssertNoError(AssertIdIsNull(idNull))
+		t.AssertError(AssertIdIsNotNull(idZero, ""))
+		t.AssertError(AssertIdIsNotNull(idNull, ""))
 		t.AssertNoError(MakeErrNotEqual(idZero, idNull))
 		t.AssertNoError(MakeErrNotEqual(idNull, idZero))
 	}
@@ -41,10 +41,10 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	{
 		idNull, _ := hashType.GetMarklIdForString("")
 
-		t.AssertNoError(MakeErrIsNotNull(idZero))
-		t.AssertNoError(MakeErrIsNotNull(idNull))
-		t.AssertError(MakeErrIsNull(idZero, ""))
-		t.AssertError(MakeErrIsNull(idNull, ""))
+		t.AssertNoError(AssertIdIsNull(idZero))
+		t.AssertNoError(AssertIdIsNull(idNull))
+		t.AssertError(AssertIdIsNotNull(idZero, ""))
+		t.AssertError(AssertIdIsNotNull(idNull, ""))
 		t.AssertNoError(MakeErrNotEqual(idZero, idNull))
 		t.AssertNoError(MakeErrNotEqual(idNull, idZero))
 	}
@@ -54,18 +54,18 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 			fmt.Sprintf("%x", hashType.null.GetBytes()),
 		)
 
-		t.AssertNoError(MakeErrIsNotNull(idZero))
-		t.AssertNoError(MakeErrIsNotNull(idNull))
-		t.AssertError(MakeErrIsNull(idZero, ""))
-		t.AssertError(MakeErrIsNull(idNull, ""))
+		t.AssertNoError(AssertIdIsNull(idZero))
+		t.AssertNoError(AssertIdIsNull(idNull))
+		t.AssertError(AssertIdIsNotNull(idZero, ""))
+		t.AssertError(AssertIdIsNotNull(idNull, ""))
 		t.AssertNoError(MakeErrNotEqual(idZero, idNull))
 		t.AssertNoError(MakeErrNotEqual(idNull, idZero))
 	}
 
 	{
 		idNonZero, _ := hashType.GetMarklIdForString("nonZero")
-		t.AssertNoError(MakeErrIsNull(idNonZero, ""))
-		t.AssertError(MakeErrIsNotNull(idNonZero))
+		t.AssertNoError(AssertIdIsNotNull(idNonZero, ""))
+		t.AssertError(AssertIdIsNull(idNonZero))
 		t.AssertError(MakeErrNotEqual(idNonZero, idZero))
 		t.AssertError(MakeErrNotEqual(idZero, idNonZero))
 	}

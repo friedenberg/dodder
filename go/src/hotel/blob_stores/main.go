@@ -218,7 +218,7 @@ func CopyBlobIfNecessary(
 		return
 	}
 
-	if err = markl.MakeErrIsNull(blobId, ""); err != nil {
+	if err = markl.AssertIdIsNotNull(blobId, ""); err != nil {
 		return
 	}
 
@@ -251,7 +251,7 @@ func CopyBlob(
 		return
 	}
 
-	errors.PanicIfError(markl.MakeErrIsNull(expectedDigest, ""))
+	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest, ""))
 
 	var readCloser interfaces.ReadCloseMarklIdGetter
 

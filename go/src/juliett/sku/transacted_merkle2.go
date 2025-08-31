@@ -111,7 +111,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 	marklFormatId string,
 	funcCalcDigest funcCalcDigest,
 ) (err error) {
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetRepoPubKey(),
 		"repo-pubkey",
 	); err != nil {
@@ -119,7 +119,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 		return
 	}
 
-	if err = markl.MakeErrIsNotNull(
+	if err = markl.AssertIdIsNull(
 		transacted.Metadata.GetObjectDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -135,7 +135,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 		return
 	}
 
-	if err = markl.MakeErrIsNull(
+	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectDigest(),
 		"object-digest",
 	); err != nil {

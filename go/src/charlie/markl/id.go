@@ -182,9 +182,11 @@ func (id *Id) setData(data []byte) {
 func (id *Id) Reset() {
 	id.tipe = nil
 	id.data = id.data[:0]
+	id.format = ""
 }
 
 func (id *Id) ResetWith(src Id) {
+	id.format = src.format
 	id.tipe = src.tipe
 	id.setData(src.data)
 }
@@ -217,78 +219,4 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 
 func (id *Id) GetBlobId() interfaces.MarklId {
 	return id
-}
-
-func (id *Id) UnmarshalBinary(
-	bites []byte,
-) (err error) {
-	if len(bites) == 0 {
-		return
-	}
-
-	tipeBytes, bytesAfterTipe, ok := bytes.Cut(bites, []byte{'\x00'})
-
-	if !ok {
-		err = errors.Errorf("expected empty byte, but none found")
-		return
-	}
-
-	if err = id.SetMerkleId(string(tipeBytes), bytesAfterTipe); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// structure (in bytes):
-// <256: type
-// 1: empty byte
-// <256: id
-func (id Id) MarshalBinary() (bytes []byte, err error) {
-	// TODO confirm few allocations
-	// TODO confirm size of type is less than 256
-	tipe := id.GetMarklType()
-	bites := id.GetBytes()
-
-	if tipe == nil && len(bites) == 0 {
-		return
-	} else if tipe == nil {
-		err = errors.Errorf("empty type")
-		return
-	}
-
-	bytes = append(bytes, []byte(tipe.GetMarklTypeId())...)
-	bytes = append(bytes, '\x00')
-	bytes = append(bytes, bites...)
-
-	return
-}
-
-func (id Id) MarshalText() (bites []byte, err error) {
-	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
-		bites = fmt.Appendf(nil, "%x", id.data)
-	} else {
-		if bites, err = blech32.Encode(id.tipe.GetMarklTypeId(), id.data); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (id *Id) UnmarshalText(bites []byte) (err error) {
-	var typeId string
-	if typeId, id.data, err = blech32.Decode(bites); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if id.tipe, err = GetMarklTypeOrError(typeId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

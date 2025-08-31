@@ -1,9 +1,10 @@
 package object_metadata_fmt
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -46,15 +47,9 @@ func AddRepoPubKey(
 	boxContents []string_format_writer.Field,
 	metadata *object_metadata.Metadata,
 ) []string_format_writer.Field {
-	return append(
+	return addMarklIdIfNotNull(
 		boxContents,
-		string_format_writer.Field{
-			Key:        markl.FormatIdRepoPubKeyV1,
-			Separator:  '@',
-			Value:      metadata.GetRepoPubKey().String(),
-			NoTruncate: true,
-			ColorType:  string_format_writer.ColorTypeHash,
-		},
+		metadata.GetRepoPubKey(),
 	)
 }
 
@@ -64,13 +59,7 @@ func AddObjectSig(
 ) []string_format_writer.Field {
 	return append(
 		boxContents,
-		string_format_writer.Field{
-			Key:        markl.FormatIdObjectSigV0,
-			Separator:  '@',
-			Value:      metadata.GetObjectSig().String(),
-			NoTruncate: true,
-			ColorType:  string_format_writer.ColorTypeHash,
-		},
+		makeMarklIdField(metadata.GetObjectSig()),
 	)
 }
 
@@ -78,19 +67,45 @@ func AddMotherSigIfNecessary(
 	boxContents []string_format_writer.Field,
 	metadata *object_metadata.Metadata,
 ) []string_format_writer.Field {
-	motherSig := metadata.GetMotherObjectSig()
-	if motherSig.IsNull() {
+	return addMarklIdIfNotNull(
+		boxContents,
+		metadata.GetMotherObjectSig(),
+	)
+}
+
+func addMarklIdIfNotNull(
+	boxContents []string_format_writer.Field,
+	id interfaces.MarklId,
+) []string_format_writer.Field {
+	if id.IsNull() {
 		return boxContents
 	}
 
+	return addMarklId(boxContents, id)
+}
+
+func addMarklId(
+	boxContents []string_format_writer.Field,
+	id interfaces.MarklId,
+) []string_format_writer.Field {
 	return append(
 		boxContents,
-		string_format_writer.Field{
-			Key:        markl.FormatIdObjectMotherSigV1,
-			Separator:  '@',
-			Value:      motherSig.String(),
-			NoTruncate: true,
-			ColorType:  string_format_writer.ColorTypeHash,
-		},
+		makeMarklIdField(id),
 	)
+}
+
+func makeMarklIdField(
+	id interfaces.MarklId,
+) string_format_writer.Field {
+	if id.GetFormat() == "" {
+		panic(fmt.Sprintf("empty format for markl id: %q", id))
+	}
+
+	return string_format_writer.Field{
+		Key:        id.GetFormat(),
+		Separator:  '@',
+		Value:      id.String(),
+		NoTruncate: true,
+		ColorType:  string_format_writer.ColorTypeHash,
+	}
 }

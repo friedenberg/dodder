@@ -16,7 +16,7 @@ func MakeErrBlobAlreadyExists(
 	blobId interfaces.MarklId,
 	path string,
 ) ErrBlobAlreadyExists {
-	errors.PanicIfError(markl.MakeErrIsNull(blobId, ""))
+	errors.PanicIfError(markl.AssertIdIsNotNull(blobId, ""))
 
 	return ErrBlobAlreadyExists{
 		Path:   path,

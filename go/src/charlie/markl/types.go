@@ -9,11 +9,15 @@ const (
 	// TODO move to ids' builtin types
 	// and then add registration
 	// keep sorted
-	TypeIdEd25519 = "ed25519"
+	TypeIdEd25519Pub = "ed25519_pub"
+	TypeIdEd25519Sec = "ed25519_sec"
+	TypeIdEd25519Sig = "ed25519_sig"
 )
 
 func init() {
-	makeType(TypeIdEd25519)
+	makeType(TypeIdEd25519Pub)
+	makeType(TypeIdEd25519Sec)
+	makeType(TypeIdEd25519Sig)
 }
 
 func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {

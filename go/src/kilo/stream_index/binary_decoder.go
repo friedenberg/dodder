@@ -5,6 +5,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
@@ -338,43 +340,58 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.CacheTagImplicit:
-		var e ids.Tag
+		var tag ids.Tag
 
-		if err = e.Set(bf.Content.String()); err != nil {
+		if err = tag.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = object.Metadata.Cache.AddTagsImplicitPtr(&e); err != nil {
+		if err = object.Metadata.Cache.AddTagsImplicitPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case key_bytes.CacheTagExpanded:
-		var e ids.Tag
+		var tag ids.Tag
 
-		if err = e.Set(bf.Content.String()); err != nil {
+		if err = tag.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = object.Metadata.Cache.AddTagExpandedPtr(&e); err != nil {
+		if err = object.Metadata.Cache.AddTagExpandedPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case key_bytes.CacheTags:
-		var e tag_paths.PathWithType
+		var tag tag_paths.PathWithType
 
-		if _, err = e.ReadFrom(&bf.Content); err != nil {
+		if _, err = tag.ReadFrom(&bf.Content); err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
 			return
 		}
 
-		object.Metadata.Cache.TagPaths.AddPath(&e)
+		object.Metadata.Cache.TagPaths.AddPath(&tag)
 
 	default:
 		err = errors.ErrorWithStackf("unsupported key: %s", bf.Binary)
+		return
+	}
+
+	return
+}
+
+func unmarshalMarklId(id interfaces.MutableMarklId, bites []byte) (err error) {
+	unmarshaler := markl.IdBinaryDecodingFormatTypeData{
+		MutableMarklId: id,
+	}
+
+	if err = unmarshaler.UnmarshalBinary(
+		bites,
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

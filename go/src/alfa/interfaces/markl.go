@@ -36,7 +36,7 @@ type (
 		// TODO consider removing Stringer and Setter
 		Stringer
 		encoding.BinaryMarshaler
-		encoding.TextMarshaler
+		// encoding.TextMarshaler
 		// io.WriterTo
 		GetBytes() []byte
 		// TODO rethink size as it works completely different between sha and
@@ -51,7 +51,7 @@ type (
 		MarklId
 		Setter
 		encoding.BinaryUnmarshaler
-		encoding.TextUnmarshaler
+		// encoding.TextUnmarshaler
 		// io.ReaderFrom
 		SetMerkleId(typeId string, bites []byte) error
 		Reset()

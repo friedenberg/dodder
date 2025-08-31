@@ -294,7 +294,7 @@ func (index *Index) ReadOneSha(
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
-	errors.PanicIfError(markl.MakeErrIsNull(blobId, "index lookup"))
+	errors.PanicIfError(markl.AssertIdIsNotNull(blobId, "index lookup"))
 
 	var loc object_probe_index.Loc
 
