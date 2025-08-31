@@ -69,7 +69,7 @@ func (resetterList) ResetWith(a, b *ListTransacted) {
 }
 
 func CollectList(
-	seq interfaces.SeqError[*Transacted],
+	seq Seq,
 ) (list *ListTransacted, err error) {
 	list = MakeListTransacted()
 

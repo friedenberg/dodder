@@ -352,11 +352,11 @@ func (store *Store) handleUnchanged(
 }
 
 func (store *Store) UpdateKonfig(
-	sh interfaces.MarklId,
+	blobId interfaces.MarklId,
 ) (kt *sku.Transacted, err error) {
 	return store.CreateOrUpdateBlobSha(
 		&ids.Config{},
-		sh,
+		blobId,
 	)
 }
 

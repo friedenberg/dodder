@@ -9,11 +9,11 @@ type TransactedHeaderUserTai struct{}
 
 func (f TransactedHeaderUserTai) WriteBoxHeader(
 	header *string_format_writer.BoxHeader,
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	t := sk.GetTai()
+	tai := object.GetTai()
 	header.RightAligned = true
-	header.Value = t.Format(string_format_writer.StringFormatDateTime)
+	header.Value = tai.Format(string_format_writer.StringFormatDateTime)
 
 	return
 }

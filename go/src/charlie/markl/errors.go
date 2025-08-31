@@ -42,9 +42,10 @@ func (err errIsNotNull) Is(target error) bool {
 	return ok
 }
 
+// TODO remove key
 func AssertIdIsNotNull(id interfaces.MarklId, key string) error {
 	if id.IsNull() {
-		return errors.WrapSkip(1, errIsNull{key: key})
+		return errors.WrapSkip(1, errIsNull{key: id.GetFormat()})
 	}
 
 	return nil

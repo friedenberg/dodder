@@ -39,6 +39,8 @@ type Store struct {
 	ui sku.UIStorePrinters
 }
 
+var _ sku.InventoryListStore = &Store{}
+
 type inventoryListBlobStore interface {
 	interfaces.BlobStore
 
