@@ -39,16 +39,6 @@ func init() {
 		HashTypeIdBlake2b256,
 		&HashTypeBlake2b256,
 	)
-
-	makeType(FormatIdObjectMotherSigV1)
-	makeType(FormatIdObjectSigV0)
-	makeType(FormatIdObjectSigV1)
-	makeType(FormatIdRepoPrivateKeyV1)
-	makeType(FormatIdRepoPubKeyV1)
-	makeType(FormatIdRequestAuthChallengeV1)
-	makeType(FormatIdRequestAuthResponseV1)
-
-	makeType(TypeIdEd25519)
 }
 
 func makeHashType(
