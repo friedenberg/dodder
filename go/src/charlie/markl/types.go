@@ -8,21 +8,19 @@ import (
 )
 
 const (
-	// keep sorted
 	// TODO move to ids' builtin types
 	// and then add registration
-	MarklTypeIdObjectDigestSha256V1       = "dodder-object-digest-sha256-v1"
-	MarklTypeIdV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
-
-	HRPObjectMotherSigV1      = "dodder-object-mother-sig-v1"
-	HRPObjectSigV0            = "dodder-repo-sig-v1"
-	HRPObjectSigV1            = "dodder-object-sig-v1"
-	HRPRepoPrivateKeyV1       = "dodder-repo-private_key-v1"
-	HRPRepoPubKeyV1           = "dodder-repo-public_key-v1"
-	HRPRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
-	HRPRequestAuthResponseV1  = "dodder-request_auth-response-v1"
-
-	MarklTypeIdEd25519 = "ed25519"
+	// keep sorted
+	FormatIdObjectDigestSha256V1       = "dodder-object-digest-sha256-v1"
+	FormatIdObjectMotherSigV1          = "dodder-object-mother-sig-v1"
+	FormatIdObjectSigV0                = "dodder-repo-sig-v1"
+	FormatIdObjectSigV1                = "dodder-object-sig-v1"
+	FormatIdRepoPrivateKeyV1           = "dodder-repo-private_key-v1"
+	FormatIdRepoPubKeyV1               = "dodder-repo-public_key-v1"
+	FormatIdRequestAuthChallengeV1     = "dodder-request_auth-challenge-v1"
+	FormatIdRequestAuthResponseV1      = "dodder-request_auth-response-v1"
+	FormatIdV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
+	TypeIdEd25519                      = "ed25519"
 )
 
 func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
@@ -37,14 +35,13 @@ func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
 }
 
 func GetHashTypeOrError(typeId string) (hashType HashType, err error) {
-	tipe, ok := types[typeId]
+	var ok bool
+	hashType, ok = hashTypes[typeId]
 
 	if !ok {
 		err = errors.Errorf("unknown type: %q", typeId)
 		return
 	}
-
-	hashType = tipe.(HashType)
 
 	return
 }

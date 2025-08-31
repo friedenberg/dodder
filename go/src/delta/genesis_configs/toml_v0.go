@@ -94,7 +94,7 @@ func (config V0Common) GetInventoryListTypeId() string {
 }
 
 func (config V0Common) GetObjectSigMarklTypeId() string {
-	return markl.HRPObjectSigV0
+	return markl.FormatIdObjectSigV0
 }
 
 func (config V0Common) GetBlobHashTypeId() string {

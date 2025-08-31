@@ -25,7 +25,7 @@ func (transacted *Transacted) finalize(
 	wg.Do(
 		transacted.makeDigestCalcFunc(
 			funcCalcDigest,
-			markl.MarklTypeIdV5MetadataDigestWithoutTai,
+			markl.FormatIdV5MetadataDigestWithoutTai,
 			&transacted.Metadata.SelfWithoutTai,
 		),
 	)
@@ -47,13 +47,18 @@ func (transacted *Transacted) finalize(
 func (transacted *Transacted) makeDigestCalcFunc(
 	funcCalcDigest funcCalcDigest,
 	formatTypeId string,
-	digest interfaces.MutableMarklIdWithFormat,
+	digest interfaces.MutableMarklId,
 ) errors.FuncErr {
 	return func() (err error) {
+		if err = digest.SetFormat(formatTypeId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		var objectFormat object_inventory_format.Format
 
-		if objectFormat, err = object_inventory_format.FormatForKeyError(
-			formatTypeId,
+		if objectFormat, err = object_inventory_format.FormatForMarklFormatIdError(
+			digest.GetFormat(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -88,7 +93,7 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 ) (err error) {
 	if err = transacted.makeDigestCalcFunc(
 		funcCalcDigest,
-		markl.MarklTypeIdV5MetadataDigestWithoutTai,
+		markl.FormatIdV5MetadataDigestWithoutTai,
 		&transacted.Metadata.SelfWithoutTai,
 	)(); err != nil {
 		err = errors.Wrap(err)
@@ -119,9 +124,17 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 	if err = transacted.makeDigestCalcFunc(
 		funcCalcDigest,
 		// TODO do not hardcode markl type id
-		markl.MarklTypeIdObjectDigestSha256V1,
+		markl.FormatIdObjectDigestSha256V1,
 		transacted.Metadata.GetObjectDigestMutable(),
 	)(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = markl.MakeErrIsNull(
+		transacted.Metadata.GetObjectDigest(),
+		"object-digest",
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

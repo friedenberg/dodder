@@ -62,7 +62,7 @@ func (config *TomlV1Common) SetInventoryListTypeId(value string) {
 }
 
 func (config *TomlV1Common) GetObjectSigMarklTypeId() string {
-	return markl.HRPObjectSigV0
+	return markl.FormatIdObjectSigV0
 }
 
 func (config *TomlV1Common) SetObjectSigMarklTypeId(string) {

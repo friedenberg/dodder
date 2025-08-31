@@ -6,23 +6,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-type errInvalidGenericFormat string
+var ErrEmptyTai = errors.New("empty tai")
 
-func (err errInvalidGenericFormat) Error() string {
-	return fmt.Sprintf("invalid format: %q", string(err))
+type errUnknownFormatKey string
+
+func (err errUnknownFormatKey) Error() string {
+	return fmt.Sprintf("unknown format key: %q", string(err))
 }
 
-func (err errInvalidGenericFormat) Is(target error) bool {
-	_, ok := target.(errInvalidGenericFormat)
+func (err errUnknownFormatKey) Is(target error) bool {
+	_, ok := target.(errUnknownFormatKey)
 	return ok
 }
-
-var (
-	ErrEmptyTai                    = errors.New("empty tai")
-	ErrV4ExpectedSpaceSeparatedKey = errors.New("expected space separated key")
-	errV4EmptyKey                  = errors.New("empty key")
-	errV4ExpectedNewline           = errors.New("expected newline")
-	errV4InvalidKey                = errors.New("invalid key")
-	errV4KeysNotSorted             = errors.New("keys not sorted")
-	errV6InvalidKey                = errors.New("invalid key")
-)

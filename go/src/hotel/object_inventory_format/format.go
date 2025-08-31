@@ -20,34 +20,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
-type keyType = *catgut.String
-
-type Format struct {
-	key  string
-	keys []keyType
-}
-
-func FormatForKeyError(key string) (format Format, err error) {
-	switch key {
-	case KeyFormatV5Metadata:
-		format = Formats.metadata
-
-	case markl.MarklTypeIdV5MetadataDigestWithoutTai:
-		format = formatV5MetadataWithoutTai
-
-	case markl.MarklTypeIdObjectDigestSha256V1:
-		format = formatV11ObjectDigest
-
-	default:
-		err = errInvalidGenericFormat(key)
-		return
-	}
-
-	return
-}
-
 func FormatForKey(k string) Format {
-	format, err := FormatForKeyError(k)
+	format, err := FormatForMarklFormatIdError(k)
 	errors.PanicIfError(err)
 	return format
 }
@@ -206,7 +180,7 @@ func writeMetadataKeyStringTo(
 	case key_strings_german.Kennung:
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
-			keyGattung.String(),
+			key_strings_german.Gattung.String(),
 			context.GetObjectId().GetGenre().GetGenreString(),
 		)
 		n += int64(n1)
@@ -218,7 +192,7 @@ func writeMetadataKeyStringTo(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
-			keyKennung.String(),
+			key_strings_german.Kennung.String(),
 			context.GetObjectId().String(),
 		)
 		n += int64(n1)
@@ -231,7 +205,7 @@ func writeMetadataKeyStringTo(
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
 		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
-			keyShasMutterMetadataKennungMutter,
+			key_strings_german.ShasMutterMetadateiKennungMutter,
 			m.GetMotherObjectSig(),
 		)
 
@@ -273,7 +247,7 @@ func writeMetadataKeyStringTo(
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
 		n1, err = writeMerkleIdKeyIfNotNull(
 			writer,
-			keyShasMutterMetadataKennungMutter,
+			key,
 			m.GetMotherObjectSig(),
 		)
 
@@ -360,7 +334,7 @@ func GetDigestForContext(
 ) (digest interfaces.MarklId, err error) {
 	m := context.GetMetadata()
 
-	switch format.key {
+	switch format.marklFormatId {
 	case "Akte", "AkteTyp":
 		if m.GetBlobDigest().IsNull() {
 			return
@@ -451,10 +425,10 @@ func GetDigestForContextDebug(
 func GetDigestsForMetadata(
 	metadata *object_metadata.Metadata,
 ) (digests map[string]interfaces.MarklId, err error) {
-	digests = make(map[string]interfaces.MarklId, len(FormatKeysV5))
+	digests = make(map[string]interfaces.MarklId, len(formatsList))
 
-	for _, k := range FormatKeysV5 {
-		f := FormatForKey(k)
+	for _, format := range formatsList {
+		f := FormatForKey(format.marklFormatId)
 
 		var digest interfaces.MarklId
 
@@ -467,7 +441,7 @@ func GetDigestsForMetadata(
 			continue
 		}
 
-		digests[k] = digest
+		digests[format.marklFormatId] = digest
 	}
 
 	return

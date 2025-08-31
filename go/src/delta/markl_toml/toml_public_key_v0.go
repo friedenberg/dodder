@@ -17,6 +17,6 @@ func (b TomlPublicKeyV0) GetPublicKey() PublicKey {
 }
 
 func (b *TomlPublicKeyV0) SetPublicKey(key crypto.PublicKey) {
-	b.PublicKey.HRP = markl.HRPRepoPubKeyV1
+	b.PublicKey.HRP = markl.FormatIdRepoPubKeyV1
 	b.PublicKey.Data = key.(PublicKey)
 }

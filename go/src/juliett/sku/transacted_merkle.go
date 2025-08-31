@@ -18,14 +18,16 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMerkleId(
-		markl.MarklTypeIdEd25519,
+		markl.TypeIdEd25519,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = motherSig.SetFormat(markl.HRPObjectMotherSigV1); err != nil {
+	if err = motherSig.SetFormat(
+		markl.FormatIdObjectMotherSigV1,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -56,7 +58,7 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 
 	if pubKeyMutable.IsNull() {
 		if err = pubKeyMutable.SetMerkleId(
-			markl.HRPRepoPubKeyV1,
+			markl.FormatIdRepoPubKeyV1,
 			pubKey,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -103,6 +105,7 @@ func (transacted *Transacted) FinalizeAndSignIfNecessary(
 func (transacted *Transacted) FinalizeAndSignOverwrite(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
+	// TODO populate format ids
 	transacted.Metadata.GetObjectSigMutable().Reset()
 	transacted.Metadata.GetRepoPubKeyMutable().Reset()
 
@@ -134,7 +137,7 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-		markl.HRPRepoPubKeyV1,
+		markl.FormatIdRepoPubKeyV1,
 		config.GetPublicKey(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -142,6 +145,14 @@ func (transacted *Transacted) FinalizeAndSign(
 	}
 
 	if err = transacted.FinalizeUsingObject(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = markl.MakeErrIsNull(
+		transacted.Metadata.GetObjectDigest(),
+		"object-digest",
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

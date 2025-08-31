@@ -42,15 +42,15 @@ func init() {
 		&HashTypeBlake2b256,
 	)
 
-	makeFakeHashType(HRPObjectMotherSigV1)
-	makeFakeHashType(HRPObjectSigV0)
-	makeFakeHashType(HRPObjectSigV1)
-	makeFakeHashType(HRPRepoPrivateKeyV1)
-	makeFakeHashType(HRPRepoPubKeyV1)
-	makeFakeHashType(HRPRequestAuthChallengeV1)
-	makeFakeHashType(HRPRequestAuthResponseV1)
+	makeFakeHashType(FormatIdObjectMotherSigV1)
+	makeFakeHashType(FormatIdObjectSigV0)
+	makeFakeHashType(FormatIdObjectSigV1)
+	makeFakeHashType(FormatIdRepoPrivateKeyV1)
+	makeFakeHashType(FormatIdRepoPubKeyV1)
+	makeFakeHashType(FormatIdRequestAuthChallengeV1)
+	makeFakeHashType(FormatIdRequestAuthResponseV1)
 
-	makeFakeHashType(MarklTypeIdEd25519)
+	makeFakeHashType(TypeIdEd25519)
 }
 
 func makeHashType(

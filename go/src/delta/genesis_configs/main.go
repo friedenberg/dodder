@@ -90,7 +90,7 @@ func DefaultWithVersion(
 					StoreVersion:      storeVersion,
 					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
-					ObjectSigType:     markl.HRPObjectSigV1,
+					ObjectSigType:     markl.FormatIdObjectSigV1,
 					BlobDigestType:    markl.HashTypeIdSha256,
 				},
 			},

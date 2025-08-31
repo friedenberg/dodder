@@ -63,7 +63,7 @@ func (coder doddishV1) DecodeFrom(
 	}
 
 	if err = object.Metadata.GetRepoPubKeyMutable().SetMerkleId(
-		markl.HRPRepoPubKeyV1,
+		markl.FormatIdRepoPubKeyV1,
 		coder.configGenesis.GetPublicKey(),
 	); err != nil {
 

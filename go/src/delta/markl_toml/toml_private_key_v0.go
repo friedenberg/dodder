@@ -30,7 +30,7 @@ func (b *TomlPrivateKeyV0) GeneratePrivateKey() (err error) {
 	}
 
 	b.PrivateKey.Data = privateKey.Seed()
-	b.PrivateKey.HRP = markl.HRPRepoPrivateKeyV1
+	b.PrivateKey.HRP = markl.FormatIdRepoPrivateKeyV1
 
 	return
 }
@@ -40,13 +40,13 @@ func (b TomlPrivateKeyV0) GetPrivateKey() PrivateKey {
 }
 
 func (b *TomlPrivateKeyV0) SetPrivateKey(key crypto.PrivateKey) {
-	b.PrivateKey.HRP = markl.HRPRepoPrivateKeyV1
+	b.PrivateKey.HRP = markl.FormatIdRepoPrivateKeyV1
 	b.PrivateKey.Data = key.(PrivateKey)
 }
 
 func (b *TomlPrivateKeyV0) GetPublicKey() TomlPublicKeyV0 {
 	pub := blech32.Value{
-		HRP:  markl.HRPRepoPubKeyV1,
+		HRP:  markl.FormatIdRepoPubKeyV1,
 		Data: b.GetPrivateKey().Public().(ed25519.PublicKey),
 	}
 

@@ -34,7 +34,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	}
 
 	nonce := blech32.Value{
-		HRP:  markl.HRPRequestAuthChallengeV1,
+		HRP:  markl.FormatIdRequestAuthChallengeV1,
 		Data: nonceBytes,
 	}
 
@@ -57,7 +57,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var sig blech32.Value
 
 	if sig, err = blech32.MakeValueWithExpectedHRP(
-		markl.HRPRequestAuthResponseV1,
+		markl.FormatIdRequestAuthResponseV1,
 		sigString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	var pubkey blech32.Value
 
 	if pubkey, err = blech32.MakeValueWithExpectedHRP(
-		markl.HRPRepoPubKeyV1,
+		markl.FormatIdRepoPubKeyV1,
 		pubkeyString,
 	); err != nil {
 		err = errors.Wrap(err)

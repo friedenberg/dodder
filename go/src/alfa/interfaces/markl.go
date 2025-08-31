@@ -44,6 +44,7 @@ type (
 		GetSize() int
 		MarklTypeGetter
 		IsNull() bool
+		GetFormat() string
 	}
 
 	MutableMarklId interface {
@@ -55,16 +56,6 @@ type (
 		SetMerkleId(typeId string, bites []byte) error
 		Reset()
 		ResetWithMarklId(MarklId)
-	}
-
-	MarklIdWithFormat interface {
-		MarklId
-		GetFormat() string
-	}
-
-	MutableMarklIdWithFormat interface {
-		MarklIdWithFormat
-		MutableMarklId
 		SetFormat(string) error
 	}
 

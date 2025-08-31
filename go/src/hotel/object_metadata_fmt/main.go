@@ -49,7 +49,7 @@ func AddRepoPubKey(
 	return append(
 		boxContents,
 		string_format_writer.Field{
-			Key:        markl.HRPRepoPubKeyV1,
+			Key:        markl.FormatIdRepoPubKeyV1,
 			Separator:  '@',
 			Value:      metadata.GetRepoPubKey().String(),
 			NoTruncate: true,
@@ -65,7 +65,7 @@ func AddObjectSig(
 	return append(
 		boxContents,
 		string_format_writer.Field{
-			Key:        markl.HRPObjectSigV0,
+			Key:        markl.FormatIdObjectSigV0,
 			Separator:  '@',
 			Value:      metadata.GetObjectSig().String(),
 			NoTruncate: true,
@@ -86,7 +86,7 @@ func AddMotherSigIfNecessary(
 	return append(
 		boxContents,
 		string_format_writer.Field{
-			Key:        markl.HRPObjectMotherSigV1,
+			Key:        markl.FormatIdObjectMotherSigV1,
 			Separator:  '@',
 			Value:      motherSig.String(),
 			NoTruncate: true,

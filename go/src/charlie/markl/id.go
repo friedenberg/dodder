@@ -33,8 +33,9 @@ var (
 )
 
 type Id struct {
-	tipe interfaces.MarklType
-	data []byte
+	format string
+	tipe   interfaces.MarklType
+	data   []byte
 }
 
 func (id Id) String() string {
@@ -51,6 +52,29 @@ func (id Id) String() string {
 		errors.PanicIfError(err)
 		return string(bites)
 	}
+}
+
+func (id Id) StringWithFormat() string {
+	if id.tipe == nil && len(id.data) == 0 {
+		return ""
+	}
+
+	if len(id.data) == 0 {
+		return ""
+	} else {
+		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
+		errors.PanicIfError(err)
+		return fmt.Sprintf("%s@%s", id.format, bites)
+	}
+}
+
+func (id Id) GetFormat() string {
+	return id.format
+}
+
+func (id *Id) SetFormat(value string) error {
+	id.format = value
+	return nil
 }
 
 func (id Id) IsEmpty() bool {
@@ -143,6 +167,11 @@ func (id *Id) Set(value string) (err error) {
 }
 
 func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
+	if err = id.SetFormat(digest.GetFormat()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = id.SetMerkleId(
 		digest.GetMarklType().GetMarklTypeId(),
 		digest.GetBytes(),
@@ -212,6 +241,10 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	} else if marklType != nil {
 		marklTypeId = marklType.GetMarklTypeId()
 	}
+
+	errors.PanicIfError(
+		id.SetFormat(src.GetFormat()),
+	)
 
 	errors.PanicIfError(
 		id.SetMerkleId(marklTypeId, bites),

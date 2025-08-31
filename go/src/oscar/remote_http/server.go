@@ -244,7 +244,7 @@ func (server *Server) addSignatureIfNecessary(
 	var nonce blech32.Value
 
 	if nonce, err = blech32.MakeValueWithExpectedHRP(
-		markl.HRPRequestAuthChallengeV1,
+		markl.FormatIdRequestAuthChallengeV1,
 		nonceString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -252,7 +252,7 @@ func (server *Server) addSignatureIfNecessary(
 	}
 
 	pubkey := blech32.Value{
-		HRP:  markl.HRPRepoPubKeyV1,
+		HRP:  markl.FormatIdRepoPubKeyV1,
 		Data: server.Repo.GetImmutableConfigPublic().GetPublicKey(),
 	}
 
@@ -261,7 +261,7 @@ func (server *Server) addSignatureIfNecessary(
 	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	sig := blech32.Value{
-		HRP: markl.HRPRequestAuthResponseV1,
+		HRP: markl.FormatIdRequestAuthResponseV1,
 	}
 
 	if sig.Data, err = markl.SignBytes(privateKey, nonce.Data); err != nil {

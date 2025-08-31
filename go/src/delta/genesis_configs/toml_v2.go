@@ -54,7 +54,7 @@ func (config *TomlV2Common) GetInventoryListTypeId() string {
 
 func (config *TomlV2Common) GetObjectSigMarklTypeId() string {
 	if config.ObjectSigType == "" {
-		return markl.HRPObjectSigV1
+		return markl.FormatIdObjectSigV1
 	} else {
 		return config.ObjectSigType
 	}

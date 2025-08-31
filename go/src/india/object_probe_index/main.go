@@ -178,7 +178,7 @@ func (index *object_probe_index) ReadOneKey(
 ) (loc Loc, err error) {
 	var format object_inventory_format.Format
 
-	if format, err = object_inventory_format.FormatForKeyError(formatKey); err != nil {
+	if format, err = object_inventory_format.FormatForMarklFormatIdError(formatKey); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -211,7 +211,7 @@ func (index *object_probe_index) ReadManyKeys(
 ) (err error) {
 	var format object_inventory_format.Format
 
-	if format, err = object_inventory_format.FormatForKeyError(
+	if format, err = object_inventory_format.FormatForMarklFormatIdError(
 		formatKey,
 	); err != nil {
 		err = errors.Wrap(err)

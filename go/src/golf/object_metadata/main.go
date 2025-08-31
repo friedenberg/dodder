@@ -25,13 +25,13 @@ type Metadata struct {
 	Tags ids.TagMutableSet // public for gob, but should be private
 	Type ids.Type
 
-	DigBlob   markl.IdWithFormat
-	digSelf   markl.IdWithFormat
-	pubRepo   markl.IdWithFormat
-	sigMother markl.IdWithFormat
-	sigRepo   markl.IdWithFormat
+	DigBlob   markl.Id
+	digSelf   markl.Id
+	pubRepo   markl.Id
+	sigMother markl.Id
+	sigRepo   markl.Id
 
-	SelfWithoutTai markl.IdWithFormat // TODO moving to a separate key-value store
+	SelfWithoutTai markl.Id // TODO moving to a separate key-value store
 	Tai            ids.Tai
 
 	// TODO move to Cache

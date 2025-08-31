@@ -360,12 +360,12 @@ func (format *BoxTransacted) parseMarklIdTag(
 	return
 }
 
-var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklIdWithFormat{
-	"":                         (*object_metadata.Metadata).GetBlobDigestMutable,
-	markl.HRPRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
-	markl.HRPObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.HRPObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.HRPObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
+var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
+	"":                              (*object_metadata.Metadata).GetBlobDigestMutable,
+	markl.FormatIdRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
+	markl.FormatIdObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.FormatIdObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.FormatIdObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
 }
 
 // TODO create a sustainable system for this

@@ -104,7 +104,7 @@ func (client client) ImportInventoryList(
 
 	{
 		sig := blech32.Value{
-			HRP: markl.HRPObjectSigV1,
+			HRP: markl.FormatIdObjectSigV1,
 		}
 
 		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
