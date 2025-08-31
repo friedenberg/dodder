@@ -144,7 +144,10 @@ func (pair *externalBlobPair) SetArgs(
 		envRepo.GetDefaultBlobStore(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			if err = pair.BlobDigest.SetMaybeSha256(pair.pathOrDigest); err != nil {
+			if err = markl.SetMaybeSha256(
+				&pair.BlobDigest,
+				pair.pathOrDigest,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

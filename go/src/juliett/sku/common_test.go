@@ -373,7 +373,10 @@ func writeFormat(
 	blobDigestRaw := fmt.Sprintf("%x", hash.Sum(nil))
 	var blobDigest markl.Id
 
-	if err := blobDigest.SetMaybeSha256(blobDigestRaw); err != nil {
+	if err := markl.SetMaybeSha256(
+		&blobDigest,
+		blobDigestRaw,
+	); err != nil {
 		t.Fatalf("%s", err)
 	}
 

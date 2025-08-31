@@ -515,7 +515,10 @@ func (server *Server) handleBlobsHeadOrGet(
 	{
 		var err error
 
-		if err = blobDigest.SetMaybeSha256(shString); err != nil {
+		if err = markl.SetMaybeSha256(
+			&blobDigest,
+			shString,
+		); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}
@@ -574,7 +577,10 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	var blobDigest markl.Id
 
-	if err := blobDigest.SetMaybeSha256(digestString); err != nil {
+	if err := markl.SetMaybeSha256(
+		&blobDigest,
+		digestString,
+	); err != nil {
 		response.Error(err)
 		return
 	}

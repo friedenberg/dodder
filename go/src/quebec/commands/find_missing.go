@@ -30,7 +30,10 @@ func (cmd FindMissing) Run(dep command.Request) {
 	for _, blobDigestString := range dep.PopArgs() {
 		var blobDigest markl.Id
 
-		if err := blobDigest.SetMaybeSha256(blobDigestString); err != nil {
+		if err := markl.SetMaybeSha256(
+			&blobDigest,
+			blobDigestString,
+		); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 

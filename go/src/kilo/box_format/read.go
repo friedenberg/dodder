@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -352,8 +353,18 @@ func (format *BoxTransacted) parseMarklIdTag(
 		if err = marklId.Set(
 			string(value),
 		); err != nil {
-			err = errors.Wrap(err)
-			return
+			if errors.Is(err, blech32.ErrSeparatorMissing) {
+				if err = markl.SetSha256(
+					marklId,
+					string(value),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	} else {
 		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})

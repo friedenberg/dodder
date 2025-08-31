@@ -113,7 +113,10 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 	for _, v := range req.PopArgs() {
 		var blobId markl.Id
 
-		if err := blobId.SetMaybeSha256(v); err != nil {
+		if err := markl.SetMaybeSha256(
+			&blobId,
+			v,
+		); err != nil {
 			envRepo.Cancel(err)
 		}
 

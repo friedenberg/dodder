@@ -2,6 +2,7 @@ package markl
 
 import (
 	"bytes"
+	"encoding/hex"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -54,6 +55,41 @@ func SetBlechCombinedHRPAndData(
 	data := typeIdAndData[len(typeId):]
 
 	if err = id.SetMerkleId(typeId, data); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
+	if len(value) == 64 {
+		if err = SetSha256(id, value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = id.Set(value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
+	var decodedBytes []byte
+
+	if decodedBytes, err = hex.DecodeString(value); err != nil {
+		err = errors.Wrapf(err, "%q", value)
+		return
+	}
+
+	if err = id.SetMerkleId(
+		HashTypeIdSha256,
+		decodedBytes,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

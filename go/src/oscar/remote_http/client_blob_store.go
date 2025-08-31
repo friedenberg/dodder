@@ -173,7 +173,10 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = actual.SetMaybeSha256(strings.TrimSpace(digestString.String())); err != nil {
+	if err = markl.SetMaybeSha256(
+		&actual,
+		strings.TrimSpace(digestString.String()),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -274,6 +274,30 @@ func validateCase(bites []byte) (lower bool, err error) {
 	return
 }
 
+type bytesOrString interface {
+	~[]byte | ~string
+}
+
+func validateSeparatorPosition[INPUT bytesOrString](
+	input INPUT,
+	pos int,
+) error {
+	if pos < 1 || pos+7 > len(input) {
+		if pos < 1 {
+			return ErrSeparatorMissing
+		} else {
+			// TODO turn into error type
+			return fmt.Errorf(
+				"separator '-' at invalid position: pos=%d, len=%d",
+				pos,
+				len(input),
+			)
+		}
+	}
+
+	return nil
+}
+
 // DecodeString decodes a Blech32 string. If the string is uppercase, the HRP
 // will be
 // uppercase.
@@ -284,13 +308,8 @@ func DecodeString(input string) (hrp string, data []byte, err error) {
 
 	pos := strings.LastIndex(input, "-")
 
-	if pos < 1 || pos+7 > len(input) {
-		// TODO turn into error type
-		return "", nil, fmt.Errorf(
-			"separator '-' at invalid position: pos=%d, len=%d",
-			pos,
-			len(input),
-		)
+	if err = validateSeparatorPosition(input, pos); err != nil {
+		return
 	}
 
 	hrp = input[:pos]
@@ -329,13 +348,8 @@ func DecodeString(input string) (hrp string, data []byte, err error) {
 func Decode(bites []byte) (hrp string, data []byte, err error) {
 	pos := bytes.LastIndex(bites, []byte("-"))
 
-	if pos < 1 || pos+7 > len(bites) {
-		// TODO turn into error type
-		return "", nil, fmt.Errorf(
-			"separator '-' at invalid position: pos=%d, len=%d",
-			pos,
-			len(bites),
-		)
+	if err = validateSeparatorPosition(bites, pos); err != nil {
+		return
 	}
 
 	hrp = string(bites[:pos])

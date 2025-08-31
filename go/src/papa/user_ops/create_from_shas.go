@@ -29,7 +29,10 @@ func (op CreateFromShas) Run(
 	for _, arg := range args {
 		var digest markl.Id
 
-		if err = digest.SetMaybeSha256(arg); err != nil {
+		if err = markl.SetMaybeSha256(
+			&digest,
+			arg,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

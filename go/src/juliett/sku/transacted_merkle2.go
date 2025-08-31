@@ -32,7 +32,11 @@ func (transacted *Transacted) finalize(
 
 	if includeMerkle {
 		wg.Do(func() error {
-			return transacted.calculateObjectDigestMerkle(funcCalcDigest)
+			// TODO do not hardcode markl type id
+			return transacted.calculateObjectDigestMerkle(
+				markl.FormatIdObjectDigestSha256V1,
+				funcCalcDigest,
+			)
 		})
 	}
 
@@ -88,7 +92,7 @@ func (transacted *Transacted) makeDigestCalcFunc(
 	}
 }
 
-func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
+func (transacted *Transacted) CalculateObjectDigestSelfWithoutTai(
 	funcCalcDigest funcCalcDigest,
 ) (err error) {
 	if err = transacted.makeDigestCalcFunc(
@@ -104,6 +108,7 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithTai(
 }
 
 func (transacted *Transacted) calculateObjectDigestMerkle(
+	marklFormatId string,
 	funcCalcDigest funcCalcDigest,
 ) (err error) {
 	if err = markl.MakeErrIsNull(
@@ -123,8 +128,7 @@ func (transacted *Transacted) calculateObjectDigestMerkle(
 
 	if err = transacted.makeDigestCalcFunc(
 		funcCalcDigest,
-		// TODO do not hardcode markl type id
-		markl.FormatIdObjectDigestSha256V1,
+		marklFormatId,
 		transacted.Metadata.GetObjectDigestMutable(),
 	)(); err != nil {
 		err = errors.Wrap(err)
