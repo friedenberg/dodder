@@ -98,7 +98,7 @@ func (config V0Common) GetObjectSigTypeString() string {
 }
 
 func (config V0Common) GetBlobDigestTypeString() string {
-	return markl.HRPObjectBlobDigestSha256V0
+	return markl.HashTypeIdSha256
 }
 
 func (config V0Common) SetInventoryListTypeString(string) {

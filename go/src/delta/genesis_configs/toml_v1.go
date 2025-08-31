@@ -70,7 +70,7 @@ func (config *TomlV1Common) SetObjectSigTypeString(string) {
 }
 
 func (config *TomlV1Common) GetBlobDigestTypeString() string {
-	return markl.HRPObjectBlobDigestSha256V0
+	return markl.HashTypeIdSha256
 }
 
 func (config *TomlV1Common) SetBlobDigestTypeString(string) {

@@ -62,7 +62,7 @@ func (config *TomlV2Common) GetObjectSigTypeString() string {
 
 func (config *TomlV2Common) GetBlobDigestTypeString() string {
 	if config.BlobDigestType == "" {
-		return markl.HRPObjectBlobDigestSha256V0
+		return markl.HashTypeIdSha256
 	} else {
 		return config.BlobDigestType
 	}
