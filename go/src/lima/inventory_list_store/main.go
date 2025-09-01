@@ -271,7 +271,7 @@ func (store *Store) WriteInventoryListBlob(
 
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

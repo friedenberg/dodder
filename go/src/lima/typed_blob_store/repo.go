@@ -60,7 +60,7 @@ func (store RepoStore) WriteTypedBlob(
 ) (sh interfaces.MarklId, n int64, err error) {
 	var writer interfaces.WriteCloseMarklIdGetter
 
-	if writer, err = store.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writer, err = store.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

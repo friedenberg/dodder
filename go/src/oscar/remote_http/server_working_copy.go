@@ -155,7 +155,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	{
 		var err error
 
-		if blobWriter, err = blobStore.BlobWriter(); err != nil {
+		if blobWriter, err = blobStore.BlobWriter(""); err != nil {
 			response.Error(err)
 			return
 		}

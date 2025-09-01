@@ -29,7 +29,7 @@ type (
 	}
 
 	BlobWriter interface {
-		BlobWriter() (WriteCloseMarklIdGetter, error)
+		BlobWriter(marklHashTypeId string) (WriteCloseMarklIdGetter, error)
 	}
 
 	Mover interface {

@@ -30,7 +30,7 @@ func (f nopBlobParseSaver[O, OPtr]) ParseBlob(
 ) (n int64, err error) {
 	var aw interfaces.WriteCloseMarklIdGetter
 
-	if aw, err = f.awf.BlobWriter(); err != nil {
+	if aw, err = f.awf.BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

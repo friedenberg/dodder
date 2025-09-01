@@ -81,7 +81,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 ) (sh interfaces.MarklId, n int64, err error) {
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

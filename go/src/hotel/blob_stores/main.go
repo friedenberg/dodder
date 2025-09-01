@@ -264,7 +264,7 @@ func CopyBlob(
 
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = dst.BlobWriter(); err != nil {
+	if writeCloser, err = dst.BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

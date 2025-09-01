@@ -103,7 +103,7 @@ func (e *fileEncoder) EncodeObject(
 				if errors.IsExist(err) {
 					var aw interfaces.WriteCloseMarklIdGetter
 
-					if aw, err = e.envRepo.GetDefaultBlobStore().BlobWriter(); err != nil {
+					if aw, err = e.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

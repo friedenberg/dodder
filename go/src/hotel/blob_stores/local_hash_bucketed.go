@@ -124,7 +124,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Mar
 	}
 }
 
-func (blobStore localHashBucketed) BlobWriter() (w interfaces.WriteCloseMarklIdGetter, err error) {
+func (blobStore localHashBucketed) BlobWriter(marklHashTypeId string) (w interfaces.WriteCloseMarklIdGetter, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -90,7 +90,7 @@ func (json *Transacted) ToTransacted(
 	if blobStore != nil {
 		var writeCloser interfaces.WriteCloseMarklIdGetter
 
-		if writeCloser, err = blobStore.BlobWriter(); err != nil {
+		if writeCloser, err = blobStore.BlobWriter(""); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

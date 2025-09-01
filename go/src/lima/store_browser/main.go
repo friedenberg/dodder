@@ -270,7 +270,7 @@ func (store *Store) QueryCheckedOut(
 func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().BlobWriter(); err != nil {
+	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
