@@ -782,7 +782,7 @@ func (server *Server) handleGetInventoryList(
 		),
 	)
 
-	iter := inventoryListStore.AllInventoryListObjects()
+	iter := inventoryListStore.AllInventoryLists()
 
 	for sk, err := range iter {
 		if err != nil {

@@ -122,7 +122,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	return
 }
 
-func (blobStore *blobStoreV1) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
+func (blobStore *blobStoreV1) AllInventoryLists() sku.Seq {
 	return func(yield func(*sku.Transacted, error) bool) {
 		var file *os.File
 

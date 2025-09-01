@@ -38,7 +38,7 @@ func (cmd RepoFsck) Run(req command.Request) {
 	store := repo.GetStore()
 	missingObjects := sku.MakeListTransacted()
 
-	for objectWithList, err := range store.GetInventoryListStore().IterAllSkus() {
+	for objectWithList, err := range store.GetInventoryListStore().AllInventoryListObjectsAndContents() {
 		errors.ContextContinueOrPanic(repo)
 
 		if err == nil {

@@ -51,7 +51,7 @@ type inventoryListBlobStore interface {
 	ReadOneBlobId(interfaces.MarklId) (*sku.Transacted, error)
 	WriteInventoryListObject(*sku.Transacted) error
 
-	AllInventoryListObjects() interfaces.SeqError[*sku.Transacted]
+	AllInventoryLists() interfaces.SeqError[*sku.Transacted]
 }
 
 func (store *Store) Initialize(
@@ -331,9 +331,9 @@ func (store *Store) WriteInventoryListBlob(
 	return
 }
 
-func (store *Store) IterInventoryList(
+func (store *Store) AllInventoryListContents(
 	blobSha interfaces.MarklId,
-) interfaces.SeqError[*sku.Transacted] {
+) sku.Seq {
 	return store.GetInventoryListCoderCloset().IterInventoryListBlobSkusFromBlobStore(
 		store.getType(),
 		store.blobBlobStore,
@@ -344,7 +344,7 @@ func (store *Store) IterInventoryList(
 func (store *Store) ReadLast() (*sku.Transacted, error) {
 	max := sku.GetTransactedPool().Get()
 
-	for list, err := range store.AllInventoryListObjects() {
+	for list, err := range store.AllInventoryLists() {
 		if err != nil {
 			return nil, errors.Wrap(err)
 		}
@@ -357,37 +357,11 @@ func (store *Store) ReadLast() (*sku.Transacted, error) {
 	return max, nil
 }
 
-func (store *Store) ReadAllSorted(
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	var skus []*sku.Transacted
-
-	for list, iterErr := range store.AllInventoryListObjects() {
-		if iterErr != nil {
-			err = errors.Wrap(iterErr)
-			return
-		}
-
-		skus = append(skus, list)
-	}
-
-	sort.Slice(skus, func(i, j int) bool { return skus[i].Less(skus[j]) })
-
-	for _, o := range skus {
-		if err = output(o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
+func (store *Store) AllInventoryListObjectsAndContents() interfaces.SeqError[sku.ObjectWithList] {
 	return func(yield func(sku.ObjectWithList, error) bool) {
 		var objectWithList sku.ObjectWithList
 
-		for listObject, iterErr := range store.AllInventoryListObjects() {
+		for listObject, iterErr := range store.AllInventoryLists() {
 			objectWithList.List = listObject
 			objectWithList.Object = listObject
 
@@ -401,7 +375,7 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 				return
 			}
 
-			iter := store.IterInventoryList(
+			iter := store.AllInventoryListContents(
 				listObject.GetBlobDigest(),
 			)
 
@@ -416,52 +390,30 @@ func (store *Store) IterAllSkus() interfaces.SeqError[sku.ObjectWithList] {
 	}
 }
 
-// TODO rewrite as iterator
-func (store *Store) ReadAllSkus(
-	f func(listSku, sk *sku.Transacted) error,
-) (err error) {
-	for listObject, iterErr := range store.AllInventoryListObjects() {
-		if iterErr != nil {
-			err = errors.Wrap(iterErr)
-			return
-		}
+func (store *Store) AllInventoryListsSorted() sku.Seq {
+	return func(yield func(*sku.Transacted, error) bool) {
+		// TODO optimize space by storing digest and tai but not anything else
+		var lists []*sku.Transacted
 
-		if err = f(listObject, listObject); err != nil {
-			err = errors.Wrapf(
-				err,
-				"InventoryList: %s",
-				listObject.GetObjectId(),
-			)
-
-			return
-		}
-
-		iter := store.IterInventoryList(
-			listObject.GetBlobDigest(),
-		)
-
-		for object, iterErr := range iter {
+		for list, iterErr := range store.AllInventoryLists() {
 			if iterErr != nil {
-				if object == nil {
-					err = errors.Wrap(iterErr)
-				} else {
-					err = errors.Wrapf(iterErr, "Sku: %s", sku.String(object))
+				if !yield(nil, errors.Wrap(iterErr)) {
+					return
 				}
-
-				return
 			}
 
-			if err = f(listObject, object); err != nil {
-				err = errors.Wrapf(
-					err,
-					"InventoryList: %s",
-					listObject.GetObjectId(),
-				)
+			lists = append(lists, list)
+		}
 
+		sort.Slice(
+			lists,
+			func(i, j int) bool { return lists[i].Less(lists[j]) },
+		)
+
+		for _, list := range lists {
+			if !yield(list, nil) {
 				return
 			}
 		}
 	}
-
-	return
 }

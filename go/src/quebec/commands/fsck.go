@@ -1,65 +1,144 @@
 package commands
 
 import (
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
 func init() {
 	command.Register(
 		"fsck",
-		&Fsck{
-			Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
-		},
+		&Fsck{},
 	)
 }
 
+// TODO add options to verify blobs, type formats, tags
 type Fsck struct {
-	command_components.LocalWorkingCopyWithQueryGroup
-
-	Genres ids.Genre
+	command_components.LocalWorkingCopy
+	command_components.Query
 }
 
-func (cmd *Fsck) SetFlagSet(f *flags.FlagSet) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
-	f.Var(&cmd.Genres, "genres", "")
+func (cmd *Fsck) SetFlagSet(flagSet *flags.FlagSet) {
+	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 }
 
-func (cmd Fsck) Run(dep command.Request) {
-	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
-		query.BuilderOptions(),
+func (cmd Fsck) Run(req command.Request) {
+	repo := cmd.MakeLocalWorkingCopy(req)
+
+	query := cmd.MakeQueryIncludingWorkspace(
+		req,
+		pkg_query.BuilderOptions(
+			pkg_query.BuilderOptionWorkspace(repo),
+			pkg_query.BuilderOptionDefaultGenres(genres.All()...),
+			pkg_query.BuilderOptionDefaultSigil(
+				ids.SigilLatest,
+				ids.SigilHistory,
+				ids.SigilHidden,
+			),
+		),
+		repo,
+		req.PopArgs(),
 	)
 
-	printer := localWorkingCopy.PrinterTransacted()
+	ui.Out().Printf("Verification for %q objects in progress...", query)
 
-	if err := localWorkingCopy.GetStore().QueryTransacted(
-		queryGroup,
-		func(sk *sku.Transacted) (err error) {
-			if !cmd.Genres.Contains(sk.GetGenre()) {
-				return
+	var count atomic.Uint32
+
+	type objectError struct {
+		object *sku.Transacted
+		err    error
+	}
+
+	var objectErrorsLock sync.Mutex
+	var objectErrors []objectError
+
+	if err := errors.RunChildContextWithPrintTicker(
+		repo,
+		func(ctx interfaces.Context) {
+			if err := repo.GetStore().QueryTransacted(
+				query,
+				func(object *sku.Transacted) (err error) {
+					if err = markl.AssertIdIsNotNull(
+						object.GetObjectDigest(),
+						"object-dig",
+					); err != nil {
+						objectErrorsLock.Lock()
+
+						objectErrors = append(
+							objectErrors,
+							objectError{
+								err:    err,
+								object: object.CloneTransacted(),
+							},
+						)
+
+						objectErrorsLock.Unlock()
+
+						err = nil
+						return
+					}
+
+					if err = object.Verify(); err != nil {
+						objectErrorsLock.Lock()
+
+						objectErrors = append(
+							objectErrors,
+							objectError{
+								err:    err,
+								object: object.CloneTransacted(),
+							},
+						)
+
+						objectErrorsLock.Unlock()
+
+						err = nil
+						return
+					}
+
+					count.Add(1)
+
+					return
+				},
+			); err != nil {
+				ui.Err().Print(err)
+				err = nil
 			}
-
-			blobSha := sk.GetBlobDigest()
-
-			if localWorkingCopy.GetEnvRepo().GetDefaultBlobStore().HasBlob(blobSha) {
-				return
-			}
-
-			if err = printer(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
 		},
+		func(time time.Time) {
+			ui.Out().Printf(
+				"(in progress) %d verified, %d errors",
+				count.Load(),
+				len(objectErrors),
+			)
+		},
+		3*time.Second,
 	); err != nil {
-		localWorkingCopy.Cancel(err)
+		repo.Cancel(err)
+		return
+	}
+
+	ui.Out().Printf("complete")
+	ui.Out().Printf("objects verified: %d", count.Load())
+	ui.Out().Printf("objects with errors: %d", len(objectErrors))
+
+	for _, objectError := range objectErrors {
+		ui.Out().Printf(
+			"%s: %s",
+			sku.StringMetadataTaiMerkle(objectError.object),
+			objectError.err,
+		)
 	}
 }

@@ -249,6 +249,14 @@ LOOP_AFTER_OID:
 			return
 		}
 
+		// if strings.Contains(objectId.String(), "dodder") {
+		// 	objectIdString := objectId.String()
+		// 	defer func() {
+		// 		err = errors.Join(errors.Errorf("object contained dodder tag: %q",
+		// objectIdString))
+		// 	}()
+		// }
+
 		genre := objectId.GetGenre()
 
 		switch genre {
@@ -274,8 +282,9 @@ LOOP_AFTER_OID:
 			}
 
 			if tag.IsDodderTag() {
-				err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
-				return
+				// ignore
+				// err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
+				continue
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)

@@ -8,42 +8,28 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-type InventoryListStore interface {
-	WriteInventoryListObject(t *Transacted) (err error)
-	// WriteInventoryListStream(list *Transacted, ) (err error)
-	// ReadInventoryList(ids.Tai) (*sku.Transacted, *sku.List, error)
+type (
+	Seq            = interfaces.SeqError[*Transacted]
+	ListCoder      = interfaces.CoderBufferedReadWriter[*Transacted]
+	ListTransacted = heap.Heap[Transacted, *Transacted]
 
-	ReadLast() (max *Transacted, err error)
+	InventoryListStore interface {
+		WriteInventoryListObject(*Transacted) (err error)
+		ReadLast() (max *Transacted, err error)
+		AllInventoryListContents(interfaces.MarklId) Seq
+		AllInventoryLists() Seq
+	}
 
-	IterInventoryList(interfaces.MarklId) interfaces.SeqError[*Transacted]
-
-	ReadAllSkus(
-		f func(besty, sk *Transacted) error,
-	) (err error)
-
-	// ReadAllInventoryListsSince(
-	// since ids.Tai,
-	// 	f interfaces.FuncIter[*sku.Transacted],
-	// ) (err error)
-
-	AllInventoryListObjects() interfaces.SeqError[*Transacted]
-}
-
-type Seq = interfaces.SeqError[*Transacted]
-
-type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
-
-type ListTransacted = heap.Heap[Transacted, *Transacted]
+	OpenList struct {
+		Tipe        ids.Type
+		Mover       interfaces.Mover
+		Description descriptions.Description
+		LastTai     ids.Tai
+		Len         int
+	}
+)
 
 // TODO add buffered writer
-type OpenList struct {
-	Tipe        ids.Type
-	Mover       interfaces.Mover
-	Description descriptions.Description
-	LastTai     ids.Tai
-	Len         int
-}
-
 func MakeListTransacted() *ListTransacted {
 	h := heap.Make(
 		transactedEqualer{},

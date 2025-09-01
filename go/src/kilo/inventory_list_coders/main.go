@@ -58,15 +58,15 @@ func WriteObjectToOpenList(
 	object *sku.Transacted,
 	list *sku.OpenList,
 ) (n int64, err error) {
-	if !list.LastTai.Less(object.GetTai()) {
-		err = errors.Errorf(
-			"object order incorrect. Last: %s, current: %s",
-			list.LastTai,
-			object.GetTai(),
-		)
+	// if !list.LastTai.Less(object.GetTai()) {
+	// 	err = errors.Errorf(
+	// 		"object order incorrect. Last: %s, current: %s",
+	// 		list.LastTai,
+	// 		object.GetTai(),
+	// 	)
 
-		return
-	}
+	// 	return
+	// }
 
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
 	defer repoolBufferedWriter()

@@ -179,7 +179,7 @@ func (client client) ReadLast() (max *sku.Transacted, err error) {
 	return nil, comments.Implement()
 }
 
-func (client client) IterInventoryList(
+func (client client) AllInventoryListContents(
 	blobSha interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return nil
@@ -191,7 +191,7 @@ func (client client) ReadAllSkus(
 	return comments.Implement()
 }
 
-func (client client) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
+func (client client) AllInventoryLists() interfaces.SeqError[*sku.Transacted] {
 	var request *http.Request
 
 	{

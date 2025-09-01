@@ -92,9 +92,9 @@ func (store *Store) Commit(
 	external sku.ExternalLike,
 	options sku.CommitOptions,
 ) (err error) {
-	child := external.GetSku()
+	daughter := external.GetSku()
 
-	ui.Log().Printf("%s -> %s", options, child)
+	ui.Log().Printf("%s -> %s", options, daughter)
 
 	// TODO remove this lock check and perform it when actually necessary (when
 	// persisting the changes on flush).
@@ -114,12 +114,12 @@ func (store *Store) Commit(
 		}
 
 		tai := options.Clock.GetTai()
-		child.SetTai(tai)
+		daughter.SetTai(tai)
 	}
 
-	if options.AddToInventoryList && (child.ObjectId.IsEmpty() ||
-		child.GetGenre() == genres.None ||
-		child.GetGenre() == genres.Blob) {
+	if options.AddToInventoryList && (daughter.ObjectId.IsEmpty() ||
+		daughter.GetGenre() == genres.None ||
+		daughter.GetGenre() == genres.Blob) {
 		var zettelId *ids.ZettelId
 
 		if zettelId, err = store.zettelIdIndex.CreateZettelId(); err != nil {
@@ -127,7 +127,7 @@ func (store *Store) Commit(
 			return
 		}
 
-		if err = child.ObjectId.SetWithIdLike(zettelId); err != nil {
+		if err = daughter.ObjectId.SetWithIdLike(zettelId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -135,14 +135,14 @@ func (store *Store) Commit(
 
 	var mother *sku.Transacted
 
-	if mother, err = store.fetchMotherIfNecessary(child); err != nil {
+	if mother, err = store.fetchMotherIfNecessary(daughter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if mother != nil {
 		defer sku.GetTransactedPool().Put(mother)
-		child.Metadata.Cache.ParentTai = mother.GetTai()
+		daughter.Metadata.Cache.ParentTai = mother.GetTai()
 	}
 
 	if err = store.tryPrecommit(external, mother, options); err != nil {
@@ -152,7 +152,7 @@ func (store *Store) Commit(
 
 	{
 		if options.AddToInventoryList {
-			if err = store.addMissingTypeAndTags(options, child); err != nil {
+			if err = store.addMissingTypeAndTags(options, daughter); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -160,7 +160,7 @@ func (store *Store) Commit(
 
 		if options.AddToInventoryList ||
 			options.StreamIndexOptions.AddToStreamIndex {
-			if err = store.addObjectToAbbrStore(child); err != nil {
+			if err = store.addObjectToAbbrStore(daughter); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -169,13 +169,13 @@ func (store *Store) Commit(
 		// short circuits if the parent is equal to the child
 		if options.AddToInventoryList &&
 			mother != nil &&
-			ids.Equals(child.GetObjectId(), mother.GetObjectId()) &&
-			child.Metadata.EqualsSansTai(&mother.Metadata) {
+			ids.Equals(daughter.GetObjectId(), mother.GetObjectId()) &&
+			daughter.Metadata.EqualsSansTai(&mother.Metadata) {
 
-			sku.TransactedResetter.ResetWithExceptFields(child, mother)
+			sku.TransactedResetter.ResetWithExceptFields(daughter, mother)
 
-			if store.sunrise.Less(child.GetTai()) {
-				if err = store.ui.TransactedUnchanged(child); err != nil {
+			if store.sunrise.Less(daughter.GetTai()) {
+				if err = store.ui.TransactedUnchanged(daughter); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -185,19 +185,19 @@ func (store *Store) Commit(
 		}
 
 		if err = store.applyDormantAndRealizeTags(
-			child,
+			daughter,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if child.GetGenre() == genres.Zettel {
-			if err = store.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
+		if daughter.GetGenre() == genres.Zettel {
+			if err = store.zettelIdIndex.AddZettelId(&daughter.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("object id does not contain value: %s", err)
 					err = nil
 				} else {
-					err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
+					err = errors.Wrapf(err, "failed to write zettel to index: %s", daughter)
 					return
 				}
 			}
@@ -208,8 +208,8 @@ func (store *Store) Commit(
 		// external.GetSku().Metadata.GetObjectSigMutable().Reset()
 		external.GetSku().Metadata.GetObjectDigestMutable().Reset()
 
-		if err = store.commitTransacted(child, mother); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sku.String(child))
+		if err = store.commitTransacted(daughter, mother); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sku.String(daughter))
 			return
 		}
 	}
@@ -221,7 +221,7 @@ func (store *Store) Commit(
 			store_version.V11,
 		) {
 			if err = markl.AssertIdIsNotNull(
-				child.Metadata.GetObjectSig(),
+				daughter.Metadata.GetObjectSig(),
 				"object-sig",
 			); err != nil {
 				err = errors.Wrap(err)
@@ -230,7 +230,7 @@ func (store *Store) Commit(
 		}
 
 		if err = store.storeConfig.AddTransacted(
-			child,
+			daughter,
 			mother,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -238,7 +238,7 @@ func (store *Store) Commit(
 		}
 
 		if err = store.GetStreamIndex().Add(
-			child,
+			daughter,
 			options,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -246,7 +246,7 @@ func (store *Store) Commit(
 		}
 
 		if mother == nil {
-			if child.GetGenre() == genres.Zettel {
+			if daughter.GetGenre() == genres.Zettel {
 				// TODO if this is a local zettel (i.e., not a different repo
 				// and not a
 				// different domain)
@@ -256,7 +256,7 @@ func (store *Store) Commit(
 				// abort
 			}
 
-			if err = store.ui.TransactedNew(child); err != nil {
+			if err = store.ui.TransactedNew(daughter); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -268,7 +268,7 @@ func (store *Store) Commit(
 			// 	return
 			// }
 
-			if err = store.ui.TransactedUpdated(child); err != nil {
+			if err = store.ui.TransactedUpdated(daughter); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -278,7 +278,7 @@ func (store *Store) Commit(
 
 	if options.MergeCheckedOut {
 		if err = store.ReadExternalAndMergeIfNecessary(
-			child,
+			daughter,
 			mother,
 			options,
 		); err != nil {
@@ -327,16 +327,12 @@ func (store *Store) fetchMotherIfNecessary(
 
 // TODO add results for which stores had which change types
 func (store *Store) commitTransacted(
-	object *sku.Transacted,
+	daughter *sku.Transacted,
 	mother *sku.Transacted,
 ) (err error) {
-	if !store.inventoryList.LastTai.Less(object.GetTai()) {
-		object.Metadata.Tai = store.GetTai()
-	}
-
 	if err = store.inventoryListStore.AddObjectToOpenList(
 		store.inventoryList,
-		object,
+		daughter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

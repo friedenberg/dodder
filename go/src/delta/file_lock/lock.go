@@ -32,15 +32,15 @@ func New(
 	}
 }
 
-func (l *Lock) Path() string {
-	return l.path
+func (lock *Lock) Path() string {
+	return lock.path
 }
 
-func (l *Lock) IsAcquired() (acquired bool) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
+func (lock *Lock) IsAcquired() (acquired bool) {
+	lock.mutex.Lock()
+	defer lock.mutex.Unlock()
 
-	acquired = l.file != nil
+	acquired = lock.file != nil
 
 	return
 }

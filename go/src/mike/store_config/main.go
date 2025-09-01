@@ -154,65 +154,74 @@ func (store *store) Initialize(
 }
 
 func (store *store) AddTransacted(
-	child *sku.Transacted,
-	parent *sku.Transacted,
+	daughter *sku.Transacted,
+	mother *sku.Transacted,
 ) (err error) {
 	didChange := false
 
-	g := child.ObjectId.GetGenre()
+	genre := daughter.ObjectId.GetGenre()
 
-	switch g {
+	// if strings.Contains(daughter.GetObjectId().String(), "dodder") {
+	// 	err = errors.Errorf(
+	// 		"dodder tag: %q",
+	// 		sku.StringMetadataSansTaiMerkle(daughter),
+	// 	)
+
+	// 	return
+	// }
+
+	switch genre {
 	case genres.Type:
-		if didChange, err = store.config.addType(child); err != nil {
+		if didChange, err = store.config.addType(daughter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if didChange {
 			store.config.SetNeedsRecompile(
-				fmt.Sprintf("modified type: %s", child),
+				fmt.Sprintf("modified type: %s", daughter),
 			)
 		}
 
 		return
 
 	case genres.Tag:
-		if didChange, err = store.config.addTag(child, parent); err != nil {
+		if didChange, err = store.config.addTag(daughter, mother); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		var tag ids.Tag
 
-		if err = tag.TodoSetFromObjectId(child.GetObjectId()); err != nil {
+		if err = tag.TodoSetFromObjectId(daughter.GetObjectId()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if child.Metadata.GetTags().Len() > 0 {
+		if daughter.Metadata.GetTags().Len() > 0 {
 			store.config.SetNeedsRecompile(
 				fmt.Sprintf(
 					"tag with tags added: %q -> %q",
 					tag,
-					quiter.SortedValues(child.Metadata.GetTags()),
+					quiter.SortedValues(daughter.Metadata.GetTags()),
 				),
 			)
 		}
 
 	case genres.Repo:
-		if didChange, err = store.config.addRepo(child); err != nil {
+		if didChange, err = store.config.addRepo(daughter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Config:
-		if didChange, err = store.setTransacted(child); err != nil {
+		if didChange, err = store.setTransacted(daughter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if g != genres.Tag {
+	if genre != genres.Tag {
 		return
 	}
 
@@ -220,15 +229,15 @@ func (store *store) AddTransacted(
 		return
 	}
 
-	if parent == nil {
+	if mother == nil {
 		return
 	}
 
-	if quiter.SetEquals(child.Metadata.Tags, parent.Metadata.Tags) {
+	if quiter.SetEquals(daughter.Metadata.Tags, mother.Metadata.Tags) {
 		return
 	}
 
-	store.config.SetNeedsRecompile(fmt.Sprintf("modified: %s", child))
+	store.config.SetNeedsRecompile(fmt.Sprintf("modified: %s", daughter))
 
 	return
 }

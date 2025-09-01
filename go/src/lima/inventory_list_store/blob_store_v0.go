@@ -111,7 +111,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 	return
 }
 
-func (blobStore *blobStoreV0) AllInventoryListObjects() interfaces.SeqError[*sku.Transacted] {
+func (blobStore *blobStoreV0) AllInventoryLists() sku.Seq {
 	return func(yield func(*sku.Transacted, error) bool) {
 		for blobId, err := range blobStore.BlobStore.AllBlobs() {
 			if err != nil {

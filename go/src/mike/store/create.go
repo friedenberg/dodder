@@ -5,10 +5,10 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -38,33 +38,72 @@ func (store *Store) Reindex() (err error) {
 		return
 	}
 
-	missingObjects := sku.MakeListTransacted()
+	type objectWithError struct {
+		error
+		sku.ObjectWithList
+	}
 
-	for objectWithList, iterErr := range store.GetInventoryListStore().IterAllSkus() {
+	objectsWithErrors := make(map[string]objectWithError)
+	unidentifiedErrors := make([]error, 0)
+
+	for objectWithList, iterErr := range store.GetInventoryListStore().AllInventoryListObjectsAndContents() {
 		if iterErr != nil {
-			if env_dir.IsErrBlobMissing(iterErr) {
-				missingObjects.Add(objectWithList.List)
-				continue
+			if objectWithList.List == nil {
+				unidentifiedErrors = append(unidentifiedErrors, iterErr)
+			} else {
+				keyBytes := objectWithList.List.GetObjectDigest().GetBytes()
+
+				objectsWithErrors[string(keyBytes)] = objectWithError{
+					error: iterErr,
+					ObjectWithList: sku.ObjectWithList{
+						List: objectWithList.List.CloneTransacted(),
+					},
+				}
 			}
 
-			err = errors.Wrapf(
-				iterErr,
-				"List: %s",
-				sku.String(objectWithList.List),
-			)
-			return
+			continue
 		}
 
 		if err = store.reindexOne(objectWithList); err != nil {
-			err = errors.Wrap(err)
-			return
+			keyBytes := objectWithList.List.GetObjectDigest().GetBytes()
+
+			objectsWithErrors[string(keyBytes)] = objectWithError{
+				error: err,
+				ObjectWithList: sku.ObjectWithList{
+					Object: objectWithList.Object.CloneTransacted(),
+					List:   objectWithList.List.CloneTransacted(),
+				},
+			}
+
+			continue
 		}
 	}
 
-	store.envRepo.GetUI().Print("missing list blobs: ")
+	store.envRepo.GetUI().Print("unidentified errors:")
 
-	for missingList := range missingObjects.All() {
-		store.envRepo.GetUI().Print(sku.String(missingList))
+	for _, err := range unidentifiedErrors {
+		ui.CLIErrorTreeEncoder.EncodeTo(err, store.envRepo.GetUI())
+	}
+
+	store.envRepo.GetUI().Print("objects with errors:")
+
+	for _, objectWithError := range objectsWithErrors {
+		ui.CLIErrorTreeEncoder.EncodeTo(err, store.envRepo.GetUI())
+
+		if objectWithError.Object == nil {
+			store.envRepo.GetUI().Printf(
+				"Error: %s, List: %q",
+				objectWithError.error,
+				sku.String(objectWithError.List),
+			)
+		} else {
+			store.envRepo.GetUI().Printf(
+				"Error: %s, List: %q, Object: %q",
+				objectWithError.error,
+				sku.String(objectWithError.List),
+				sku.String(objectWithError.Object),
+			)
+		}
 	}
 
 	return

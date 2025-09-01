@@ -111,7 +111,7 @@ func (md Revert) runRevertFromLast(
 		return
 	}
 
-	seq := stoar.GetInventoryListStore().IterInventoryList(
+	seq := stoar.GetInventoryListStore().AllInventoryListContents(
 		listObject.GetBlobDigest(),
 	)
 
