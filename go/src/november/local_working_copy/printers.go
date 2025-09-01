@@ -15,7 +15,7 @@ import (
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (local *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 	printOptions := local.config.GetConfig().GetPrintOptions().
-		WithPrintShas(true).
+		WithPrintBlobDigests(true).
 		WithPrintTime(false)
 
 	stringEncoder := local.StringFormatWriterSkuBoxCheckedOut(

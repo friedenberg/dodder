@@ -49,7 +49,7 @@ func (blob *V1) Reset() {
 	blob.FileExtensions.Reset()
 	blob.Defaults.Type = ids.Type{}
 	blob.Defaults.Tags = make([]ids.Tag, 0)
-	blob.PrintOptions = options_print.DefaultOverlay()
+	blob.PrintOptions = options_print.V1{}
 }
 
 func (blob *V1) ResetWith(b *V1) {

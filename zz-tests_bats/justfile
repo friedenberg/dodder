@@ -11,10 +11,11 @@ dir_git_root := shell("git rev-parse --show-toplevel")
 clean-fixtures:
   #! /bin/bash -ex
 
-  git reset HEAD migration/v*/
-  ./../bin/chflags.bash -R nouchg migration/v*/
-  git clean -fd migration/v*/
-  git checkout migration/v*
+  dir="migration/{{DODDER_VERSION}}"
+  git reset HEAD "$dir"
+  ./../bin/chflags.bash -R nouchg "$dir"
+  git clean -fd "$dir"
+  git checkout "$dir"
 
 [group("clean")]
 clean: clean-fixtures

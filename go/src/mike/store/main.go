@@ -47,6 +47,8 @@ type Store struct {
 	ui sku.UIStorePrinters
 }
 
+var _ sku.RepoStore = &Store{}
+
 func (store *Store) Initialize(
 	config store_config.StoreMutable,
 	envRepo env_repo.Env,

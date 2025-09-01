@@ -20,7 +20,7 @@ func MakeBoxTransactedArchive(
 	options options_print.Options,
 ) *BoxTransacted {
 	po := options.
-		WithPrintShas(true).
+		WithPrintBlobDigests(true).
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 
@@ -239,7 +239,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 ) (err error) {
 	metadata := object.GetMetadata()
 
-	if options.PrintBlobIds &&
+	if options.PrintBlobDigests &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
 		box.Contents = object_metadata_fmt.AddBlobDigestIfNecessary(
 			box.Contents,

@@ -59,7 +59,7 @@ func DefaultOverlay(defaultType ids.Type) TypedBlob {
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
 			},
-			PrintOptions:   options_print.DefaultOverlay().GetPrintOptionsOverlay(),
+			PrintOptions:   options_print.DefaultOverlay(),
 			FileExtensions: file_extensions.DefaultOverlay(),
 			Tools: options_tools.Options{
 				Merge: []string{

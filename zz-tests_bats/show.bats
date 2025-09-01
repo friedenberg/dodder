@@ -418,21 +418,21 @@ function show_konfig { # @test
 		zettel = 'zettel'
 
 		[cli-output]
-		PrintIncludeDescription = true
-		PrintTime = true
-		PrintTagsAlways = true
-		PrintEmptyShas = false
-		PrintIncludeTypes = true
-		PrintMatchedDormant = false
-		PrintShas = true
-		PrintFlush = true
-		PrintUnchanged = true
-		PrintColors = true
-		PrintInventoryLists = true
+		print-blob_digests = true
+		print-colors = true
+		print-empty-blob_digests = false
+		print-flush = true
+		print-include-description = true
+		print-include-types = true
+		print-inventory_lists = true
+		print-matched-dormant = false
+		print-tags-always = true
+		print-time = true
+		print-unchanged = true
 
-		[cli-output.Abbreviations]
-		ZettelIds = true
-		Shas = true
+		[cli-output.abbreviations]
+		zettel_ids = true
+		merkle_ids = true
 
 		[tools]
 		merge = ['vimdiff']

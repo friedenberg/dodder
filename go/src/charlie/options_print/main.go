@@ -16,7 +16,7 @@ type (
 		PrintIncludeDescription *bool
 		PrintTime               *bool
 		PrintTagsAlways         *bool
-		PrintEmptyShas          *bool
+		PrintEmptyMarklIds      *bool
 		PrintIncludeTypes       *bool
 		PrintTai                *bool
 		DescriptionInBox        *bool
@@ -28,7 +28,7 @@ type (
 		OverlayBox
 
 		PrintMatchedDormant *bool
-		PrintShas           *bool
+		PrintBlobDigests    *bool
 		PrintFlush          *bool
 		PrintUnchanged      *bool
 		PrintColors         *bool
@@ -48,7 +48,7 @@ type (
 		BoxDescriptionInBox        bool
 		BoxExcludeFields           bool
 		PrintMatchedDormant        bool
-		PrintBlobIds               bool
+		PrintBlobDigests           bool
 		PrintFlush                 bool
 		PrintUnchanged             bool
 		PrintColors                bool
@@ -69,6 +69,7 @@ var (
 	_ OverlayGetter = Overlay{}
 	_ OverlayGetter = V0{}
 	_ OverlayGetter = V1{}
+	_ OverlayGetter = V2{}
 )
 
 func Default() Options {
@@ -81,7 +82,7 @@ func Default() Options {
 		BoxPrintTagsAlways:         true,
 		BoxPrintEmptyBlobIds:       false,
 		PrintMatchedDormant:        false,
-		PrintBlobIds:               true,
+		PrintBlobDigests:           true,
 		PrintFlush:                 true,
 		PrintUnchanged:             true,
 		PrintColors:                true,
@@ -89,32 +90,30 @@ func Default() Options {
 	}
 }
 
-func DefaultOverlay() V1 {
+func DefaultOverlay() V2 {
 	config := Default()
 
-	return V1{
-		Abbreviations: &abbreviationsV1{
+	return V2{
+		Abbreviations: &abbreviationsV2{
 			ZettelIds: &config.AbbreviateZettelIds,
 			MarklIds:  &config.AbbreviateMarklIds,
 		},
-		boxV1: boxV1{
-			PrintIncludeTypes:       &config.BoxPrintIncludeTypes,
-			PrintIncludeDescription: &config.BoxPrintIncludeDescription,
-			PrintTime:               &config.BoxPrintTime,
-			PrintTagsAlways:         &config.BoxPrintTagsAlways,
-			PrintEmptyShas:          &config.BoxPrintEmptyBlobIds,
-		},
-		PrintMatchedDormant: &config.PrintMatchedDormant,
-		PrintShas:           &config.PrintBlobIds,
-		PrintFlush:          &config.PrintFlush,
-		PrintUnchanged:      &config.PrintUnchanged,
-		PrintColors:         &config.PrintColors,
-		PrintInventoryLists: &config.PrintInventoryLists,
+		PrintBlobDigests:        &config.PrintBlobDigests,
+		PrintColors:             &config.PrintColors,
+		PrintEmptyBlobDigests:   &config.BoxPrintEmptyBlobIds,
+		PrintFlush:              &config.PrintFlush,
+		PrintIncludeDescription: &config.BoxPrintIncludeDescription,
+		PrintIncludeTypes:       &config.BoxPrintIncludeTypes,
+		PrintInventoryLists:     &config.PrintInventoryLists,
+		PrintMatchedDormant:     &config.PrintMatchedDormant,
+		PrintTagsAlways:         &config.BoxPrintTagsAlways,
+		PrintTime:               &config.BoxPrintTime,
+		PrintUnchanged:          &config.PrintUnchanged,
 	}
 }
 
-func (options Options) WithPrintShas(v bool) Options {
-	options.PrintBlobIds = v
+func (options Options) WithPrintBlobDigests(v bool) Options {
+	options.PrintBlobDigests = v
 	return options
 }
 
@@ -168,7 +167,10 @@ func MakeConfig(base Options, overlays ...OverlayGetter) Options {
 		equals.SetIfValueNotNil(&base.BoxDescriptionInBox, box.DescriptionInBox)
 		equals.SetIfValueNotNil(&base.BoxPrintTime, box.PrintTime)
 		equals.SetIfValueNotNil(&base.BoxPrintTagsAlways, box.PrintTagsAlways)
-		equals.SetIfValueNotNil(&base.BoxPrintEmptyBlobIds, box.PrintEmptyShas)
+		equals.SetIfValueNotNil(
+			&base.BoxPrintEmptyBlobIds,
+			box.PrintEmptyMarklIds,
+		)
 		equals.SetIfValueNotNil(
 			&base.BoxPrintIncludeTypes,
 			box.PrintIncludeTypes,
@@ -184,7 +186,10 @@ func MakeConfig(base Options, overlays ...OverlayGetter) Options {
 			&base.PrintMatchedDormant,
 			overlay.PrintMatchedDormant,
 		)
-		equals.SetIfValueNotNil(&base.PrintBlobIds, overlay.PrintShas)
+		equals.SetIfValueNotNil(
+			&base.PrintBlobDigests,
+			overlay.PrintBlobDigests,
+		)
 		equals.SetIfValueNotNil(&base.PrintFlush, overlay.PrintFlush)
 		equals.SetIfValueNotNil(&base.PrintUnchanged, overlay.PrintUnchanged)
 		equals.SetIfValueNotNil(&base.PrintColors, overlay.PrintColors)
@@ -278,7 +283,7 @@ func (overlay *Overlay) AddToFlags(flagSet *flags.FlagSet) {
 	flagSet.Func(
 		"print-empty-shas",
 		"",
-		makeFlagSetFuncBoolVar(&overlay.PrintEmptyShas),
+		makeFlagSetFuncBoolVar(&overlay.PrintEmptyMarklIds),
 	)
 
 	flagSet.Func(
@@ -290,7 +295,7 @@ func (overlay *Overlay) AddToFlags(flagSet *flags.FlagSet) {
 	flagSet.Func(
 		"print-shas",
 		"",
-		makeFlagSetFuncBoolVar(&overlay.PrintShas),
+		makeFlagSetFuncBoolVar(&overlay.PrintBlobDigests),
 	)
 
 	flagSet.Func(

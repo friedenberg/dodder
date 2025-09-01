@@ -237,7 +237,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 ) (err error) {
 	metadata := object.GetMetadata()
 
-	if options.PrintBlobIds &&
+	if options.PrintBlobDigests &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
 		box.Contents = object_metadata_fmt.AddBlobDigestIfNecessary(
 			box.Contents,

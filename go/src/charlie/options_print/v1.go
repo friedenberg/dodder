@@ -38,10 +38,19 @@ func (blob V1) GetAbbreviations() *OverlayAbbreviations {
 
 func (blob V1) GetPrintOptionsOverlay() Overlay {
 	return Overlay{
-		Abbreviations:       blob.GetAbbreviations(),
-		OverlayBox:          OverlayBox(blob.boxV1),
+		Abbreviations: blob.GetAbbreviations(),
+		OverlayBox: OverlayBox{
+			PrintIncludeDescription: blob.PrintIncludeDescription,
+			PrintTime:               blob.PrintTime,
+			PrintTagsAlways:         blob.PrintTagsAlways,
+			PrintEmptyMarklIds:      blob.PrintEmptyShas,
+			PrintIncludeTypes:       blob.PrintIncludeTypes,
+			PrintTai:                blob.PrintTai,
+			DescriptionInBox:        blob.DescriptionInBox,
+			ExcludeFields:           blob.ExcludeFields,
+		},
 		PrintMatchedDormant: blob.PrintMatchedDormant,
-		PrintShas:           blob.PrintShas,
+		PrintBlobDigests:       blob.PrintShas,
 		PrintFlush:          blob.PrintFlush,
 		PrintUnchanged:      blob.PrintUnchanged,
 		PrintColors:         blob.PrintColors,

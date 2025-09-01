@@ -584,8 +584,10 @@ func (store *Store) addMissingTypeAndTags(
 	return
 }
 
-func (store *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
-	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(m); err != nil {
+func (store *Store) addObjectToAbbrStore(object *sku.Transacted) (err error) {
+	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(
+		object,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

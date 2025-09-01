@@ -111,3 +111,10 @@ func (store *Store) ReadOneInto(
 
 	return
 }
+
+func (store *Store) ReadPrimitiveQuery(
+	query sku.PrimitiveQueryGroup,
+	funcIter interfaces.FuncIter[*sku.Transacted],
+) (err error) {
+	return store.GetStreamIndex().ReadPrimitiveQuery(query, funcIter)
+}

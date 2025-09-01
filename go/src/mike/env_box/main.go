@@ -118,9 +118,9 @@ func (env *env) StringFormatWriterSkuBoxCheckedOut(
 func (env *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	colorOptions := env.FormatColorOptionsOut(env.config.GetPrintOptions())
 	colorOptions.OffEntirely = true
-	options := env.config.GetPrintOptions().WithPrintShas(false)
+	options := env.config.GetPrintOptions().WithPrintBlobDigests(false)
 	options.BoxPrintTime = false
-	options.PrintBlobIds = false
+	options.PrintBlobDigests = false
 	options.BoxDescriptionInBox = false
 
 	return env.StringFormatWriterSkuBoxTransacted(
@@ -133,9 +133,9 @@ func (env *env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 func (env *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	co := env.FormatColorOptionsOut(env.config.GetPrintOptions())
 	co.OffEntirely = true
-	options := env.config.GetPrintOptions().WithPrintShas(false)
+	options := env.config.GetPrintOptions().WithPrintBlobDigests(false)
 	options.BoxPrintTime = false
-	options.PrintBlobIds = false
+	options.PrintBlobDigests = false
 	options.BoxDescriptionInBox = false
 
 	return env.StringFormatWriterSkuBoxCheckedOut(
@@ -148,7 +148,7 @@ func (env *env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 
 func (env *env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	printOptions := env.config.GetPrintOptions().
-		WithPrintShas(true).
+		WithPrintBlobDigests(true).
 		WithExcludeFields(true)
 
 	stringFormatWriter := env.StringFormatWriterSkuBoxTransacted(
@@ -175,7 +175,7 @@ func (env *env) PrinterCheckedOut(
 	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	po := env.config.GetPrintOptions().
-		WithPrintShas(true)
+		WithPrintBlobDigests(true)
 	oo := env.FormatOutputOptions(po)
 
 	out := string_format_writer.MakeDelim(
