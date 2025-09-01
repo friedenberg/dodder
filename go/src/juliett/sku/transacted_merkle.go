@@ -54,6 +54,7 @@ func (transacted *Transacted) FinalizeUsingObject() (err error) {
 func (transacted *Transacted) FinalizeUsingRepoPubKey(
 	pubKey markl.PublicKey,
 ) (err error) {
+	// TODO migrate this to config
 	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {

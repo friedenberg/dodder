@@ -249,6 +249,24 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
+	"merkle-repo-pubkey": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				if _, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetRepoPubKey().StringWithFormat(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			}
+		},
+	},
 	"merkle-object": {
 		FormatFuncConstructor: func(
 			repo *Repo,
@@ -257,7 +275,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetObjectDigest(),
+					object.Metadata.GetObjectDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
