@@ -14,7 +14,9 @@ func String(object *Transacted) (str string) {
 	return StringMetadataTaiMerkle(object)
 }
 
-func StringTaiGenreObjectIdShaBlob(object *Transacted) (str string) {
+func StringTaiGenreObjectIdObjectDigestBlobDigest(
+	object *Transacted,
+) (str string) {
 	if object == nil {
 		return "nil object!"
 	}

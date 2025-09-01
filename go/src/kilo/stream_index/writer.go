@@ -25,7 +25,7 @@ type writer struct {
 
 	changesAreHistorical bool
 
-	*probe_index
+	*probeIndex
 	object_probe_index.Range
 	offsetLast     int64
 	ObjectIdShaMap ObjectIdShaMap
@@ -223,7 +223,7 @@ func (pw *writer) writeOne(
 		return
 	}
 
-	if err = pw.probe_index.saveOneObjectLoc(
+	if err = pw.probeIndex.saveOneObjectLoc(
 		z,
 		object_probe_index.Loc{
 			Page:  pw.PageId.Index,

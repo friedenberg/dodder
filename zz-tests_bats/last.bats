@@ -14,7 +14,7 @@ teardown() {
 function last_after_init { # @test
 	run_dodder_init_disable_age
 
-	run_dodder last -format inventory-list-sans-tai
+	run_dodder last -format inventory_list-sans-tai
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		\\[!md @$(get_type_blob_sha) .* !toml-type-v1]
@@ -43,7 +43,7 @@ function last_after_type_mutate { # @test
   # to support both <v10 separate inventory list blob store, and >=v11 combined inventory list blob store
   [[ "$output" -ge 2 ]]
 
-	run_dodder last -format inventory-list-sans-tai
+	run_dodder last -format inventory_list-sans-tai
 	assert_success
 	assert_output --regexp - <<-EOM
 		\\[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 .* !toml-type-v1]

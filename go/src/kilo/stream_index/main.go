@@ -36,7 +36,7 @@ type Index struct {
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
 	historicalChanges []string
-	probe_index
+	probeIndex
 }
 
 func MakeIndex(
@@ -54,7 +54,7 @@ func MakeIndex(
 		CacheIOFactory: envRepo,
 	}
 
-	if err = index.probe_index.Initialize(
+	if err = index.probeIndex.Initialize(
 		envRepo,
 		index.hashType,
 	); err != nil {
@@ -90,8 +90,8 @@ func (index *Index) GetPage(n uint8) (p *Page) {
 	return
 }
 
-func (index *Index) GetProbeIndex() *probe_index {
-	return &index.probe_index
+func (index *Index) GetProbeIndex() *probeIndex {
+	return &index.probeIndex
 }
 
 func (index *Index) SetNeedsFlushHistory(changes []string) {
@@ -352,7 +352,7 @@ func (index *Index) ObjectExists(
 
 	p := index.GetPage(n)
 
-	if _, ok := p.oids[objectIdString]; ok {
+	if _, ok := p.addedObjectIdLookup[objectIdString]; ok {
 		return
 	}
 

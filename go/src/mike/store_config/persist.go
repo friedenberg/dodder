@@ -50,7 +50,7 @@ func (store *store) recompileTags() (err error) {
 			err = errors.Wrapf(
 				err,
 				"Sku: %s",
-				sku.StringTaiGenreObjectIdShaBlob(&ke.Transacted),
+				sku.StringTaiGenreObjectIdObjectDigestBlobDigest(&ke.Transacted),
 			)
 			return
 		}

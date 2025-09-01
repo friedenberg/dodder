@@ -185,32 +185,9 @@ func (transacted *Transacted) GetKey() string {
 	return ids.FormattedString(transacted.GetObjectId())
 }
 
-type transactedLessorTaiOnly struct{}
-
-func (transactedLessorTaiOnly) Less(a, b *Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
-}
-
-func (transactedLessorTaiOnly) LessPtr(a, b *Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
-}
-
-type transactedLessorStable struct{}
-
-func (transactedLessorStable) Less(a, b *Transacted) bool {
-	if result := a.GetTai().SortCompare(b.GetTai()); !result.Equal() {
-		return result.Less()
+func (transacted *Transacted) GetProbeKeys() map[string]string {
+	return map[string]string{
+		"objectId":     transacted.GetObjectId().String(),
+		"objectId+tai": transacted.GetObjectId().String() + transacted.GetTai().String(),
 	}
-
-	return a.GetObjectId().String() < b.GetObjectId().String()
-}
-
-func (transactedLessorStable) LessPtr(a, b *Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
-}
-
-type transactedEqualer struct{}
-
-func (transactedEqualer) Equals(a, b *Transacted) bool {
-	return a.Equals(b)
 }

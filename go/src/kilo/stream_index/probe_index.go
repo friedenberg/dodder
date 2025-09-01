@@ -9,13 +9,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type probe_index struct {
+type probeIndex struct {
 	envRepo env_repo.Env
 	object_probe_index.Index
 	hashType markl.HashType
 }
 
-func (index *probe_index) Initialize(
+func (index *probeIndex) Initialize(
 	envRepo env_repo.Env,
 	hashType markl.HashType,
 ) (err error) {
@@ -34,7 +34,7 @@ func (index *probe_index) Initialize(
 	return
 }
 
-func (index *probe_index) Flush() (err error) {
+func (index *probeIndex) Flush() (err error) {
 	if err = index.Index.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -43,7 +43,7 @@ func (index *probe_index) Flush() (err error) {
 	return
 }
 
-func (index *probe_index) readOneMarklIdLoc(
+func (index *probeIndex) readOneMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.Index.ReadOne(blobId); err != nil {
@@ -53,7 +53,7 @@ func (index *probe_index) readOneMarklIdLoc(
 	return
 }
 
-func (index *probe_index) readManyMarklIdLoc(
+func (index *probeIndex) readManyMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.Index.ReadMany(blobId, &locs); err != nil {
@@ -63,30 +63,24 @@ func (index *probe_index) readManyMarklIdLoc(
 	return
 }
 
-func (index *probe_index) saveOneObjectLoc(
+func (index *probeIndex) saveOneObjectLoc(
 	object *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
-	if err = index.saveOneLocString(
-		object.GetObjectId().String(),
-		loc,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = index.saveOneLocString(
-		object.GetObjectId().String()+object.GetTai().String(),
-		loc,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, key := range object.GetProbeKeys() {
+		if err = index.saveOneLocString(
+			key,
+			loc,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
-func (index *probe_index) saveOneLocString(
+func (index *probeIndex) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {

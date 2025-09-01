@@ -249,29 +249,40 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"sha": {
+	"merkle-object": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, object.Metadata.GetObjectDigest())
+				if _, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetObjectDigest(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
 		},
 	},
-	"sha-mutter": {
+	"merkle-mother": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintf(
+				if _, err = fmt.Fprintf(
 					writer,
-					"%s -> %s\n",
-					object.Metadata.GetObjectDigest(),
-					object.Metadata.GetMotherObjectSig(),
-				)
+					"%q -> %q\n",
+					object.Metadata.GetObjectDigest().StringWithFormat(),
+					object.Metadata.GetMotherObjectSig().StringWithFormat(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
 		},
@@ -452,7 +463,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"object-id-sha": {
+	"object-id-digest": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -462,7 +473,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					"%s@%s\n",
 					&object.ObjectId,
-					object.GetObjectDigest(),
+					object.GetObjectDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -472,7 +483,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"object-id-blob-sha": {
+	"object-id-blob-digest": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -480,9 +491,9 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				ui.TodoP3("convert into an option")
 
-				sh := object.GetBlobDigest()
+				digest := object.GetBlobDigest()
 
-				if sh.IsNull() {
+				if digest.IsNull() {
 					return
 				}
 
@@ -490,7 +501,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					"%s %s\n",
 					&object.ObjectId,
-					sh,
+					digest.StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -754,7 +765,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"text-sku-prefix": {
+	"text-box-prefix": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -802,7 +813,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"blob-sku-prefix": {
+	"blob-box-prefix": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -843,7 +854,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"digests": {
+	"merkle": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -851,20 +862,6 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			// TODO
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(writer, &object.Metadata)
-				return
-			}
-		},
-	},
-	"sig": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(
-					writer,
-					object.Metadata.GetObjectSig(),
-				)
 				return
 			}
 		},
@@ -905,34 +902,40 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(
+				if _, err = fmt.Fprintln(
 					writer,
 					object.Metadata.GetMotherObjectSig(),
-				)
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
 		},
 	},
-	"digests-probe": {
+	"merkle-probe": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				// TODO synchronize with logic used to actually generate probe
-				// index
-				dig1 := markl.HashTypeSha256.FromStringContent(
-					object.GetObjectId().String(),
-				)
+				for description, key := range object.GetProbeKeys() {
+					dig := markl.HashTypeSha256.FromStringContent(key)
+					defer markl.PutBlobId(dig)
 
-				dig2 := markl.HashTypeSha256.FromStringContent(
-					object.GetObjectId().String() + object.GetTai().String(),
-				)
-
-				defer markl.PutBlobId(dig1)
-				defer markl.PutBlobId(dig2)
-
-				_, err = fmt.Fprintln(writer, object.GetObjectId(), dig1, dig2)
+					if _, err = fmt.Fprintf(
+						writer,
+						"%s (%q): %q -> %q\n",
+						object.GetObjectId(),
+						description,
+						key,
+						dig.StringWithFormat(),
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+				}
 
 				return
 			}
@@ -963,15 +966,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"inventory-list": {
+	"inventory_list": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			p := repo.MakePrinterBoxArchive(repo.GetUIFile(), true)
+			funcPrint := repo.MakePrinterBoxArchive(repo.GetUIFile(), true)
 
 			return func(object *sku.Transacted) (err error) {
-				if err = p(object); err != nil {
+				if err = funcPrint(object); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -980,15 +983,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"inventory-list-sans-tai": {
+	"inventory_list-sans-tai": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			p := repo.MakePrinterBoxArchive(repo.GetUIFile(), false)
+			funcPrint := repo.MakePrinterBoxArchive(repo.GetUIFile(), false)
 
 			return func(object *sku.Transacted) (err error) {
-				if err = p(object); err != nil {
+				if err = funcPrint(object); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -997,30 +1000,33 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"digests-sig": {
+	"merkle-sig": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				sig := object.Metadata.GetObjectSig()
-
-				if _, err = fmt.Fprintln(writer, sig); err != nil {
+				if _, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetObjectSig().StringWithFormat(),
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
 				return
 			}
 		},
 	},
-	"digests-blob": {
+	"merkle-blob": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				if _, err = fmt.Fprintln(writer, object.GetBlobDigest()); err != nil {
+				if _, err = fmt.Fprintln(
+					writer,
+					object.GetBlobDigest().StringWithFormat(),
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -1182,7 +1188,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(
 					writer,
-					sku.StringTaiGenreObjectIdShaBlob(object),
+					sku.StringTaiGenreObjectIdObjectDigestBlobDigest(object),
 				)
 				return
 			}

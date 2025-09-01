@@ -35,6 +35,7 @@ type (
 	MarklId interface {
 		// TODO consider removing Stringer and Setter
 		Stringer
+		StringWithFormat() string
 		encoding.BinaryMarshaler
 		// encoding.TextMarshaler
 		// io.WriterTo

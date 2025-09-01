@@ -22,27 +22,27 @@ import (
 type Page struct {
 	page_id.PageId
 	sunrise ids.Tai
-	*probe_index
-	added, addedLatest *sku.ListTransacted
-	hasChanges         bool
-	envRepo            env_repo.Env
-	preWrite           interfaces.FuncIter[*sku.Transacted]
-	config             store_config.Store
-	oids               map[string]struct{}
+	*probeIndex
+	added, addedLatest  *sku.ListTransacted
+	hasChanges          bool
+	envRepo             env_repo.Env
+	preWrite            interfaces.FuncIter[*sku.Transacted]
+	config              store_config.Store
+	addedObjectIdLookup map[string]struct{}
 }
 
 func (page *Page) initialize(
 	pid page_id.PageId,
-	i *Index,
+	index *Index,
 ) {
-	page.envRepo = i.envRepo
-	page.sunrise = i.sunrise
+	page.envRepo = index.envRepo
+	page.sunrise = index.sunrise
 	page.PageId = pid
 	page.added = sku.MakeListTransacted()
 	page.addedLatest = sku.MakeListTransacted()
-	page.preWrite = i.preWrite
-	page.probe_index = &i.probe_index
-	page.oids = make(map[string]struct{})
+	page.preWrite = index.preWrite
+	page.probeIndex = &index.probeIndex
+	page.addedObjectIdLookup = make(map[string]struct{})
 }
 
 func (page *Page) readOneRange(
@@ -91,7 +91,7 @@ func (page *Page) add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	page.oids[object.ObjectId.String()] = struct{}{}
+	page.addedObjectIdLookup[object.ObjectId.String()] = struct{}{}
 	objectClone := object.CloneTransacted()
 
 	if page.sunrise.Less(objectClone.GetTai()) ||
@@ -247,7 +247,7 @@ func (page *Page) MakeFlush(
 	return func() (err error) {
 		pw := &writer{
 			Page:        page,
-			probe_index: page.probe_index,
+			probeIndex: page.probeIndex,
 		}
 
 		if changesAreHistorical {

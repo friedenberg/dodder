@@ -64,7 +64,7 @@ func (writer *Writer) PrintOne(object *sku.Transacted) (err error) {
 	default:
 		item = writer.Get()
 		item.Title = fmt.Sprintf("not implemented for genre: %q", g)
-		item.Subtitle = sku.StringTaiGenreObjectIdShaBlob(object)
+		item.Subtitle = sku.StringTaiGenreObjectIdObjectDigestBlobDigest(object)
 	}
 
 	writer.alfredWriter.WriteItem(item)

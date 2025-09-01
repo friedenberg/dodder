@@ -199,7 +199,7 @@ function checkin_simple_tag { # @test
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
-	run_dodder last -format inventory-list-sans-tai
+	run_dodder last -format inventory_list-sans-tai
 	assert_success
 	assert_output --regexp - <<-'EOM'
 		\[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93 .*]
