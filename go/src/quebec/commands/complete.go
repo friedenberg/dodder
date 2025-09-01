@@ -34,9 +34,9 @@ func (cmd Complete) GetDescription() command.Description {
 	}
 }
 
-func (cmd *Complete) SetFlagSet(f *flags.FlagSet) {
-	f.BoolVar(&cmd.bashStyle, "bash-style", false, "")
-	f.StringVar(&cmd.inProgress, "in-progress", "", "")
+func (cmd *Complete) SetFlagSet(flagSet *flags.FlagSet) {
+	flagSet.BoolVar(&cmd.bashStyle, "bash-style", false, "")
+	flagSet.StringVar(&cmd.inProgress, "in-progress", "", "")
 }
 
 func (cmd Complete) Run(req command.Request) {

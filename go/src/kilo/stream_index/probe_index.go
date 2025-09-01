@@ -43,7 +43,7 @@ func (index *probe_index) Flush() (err error) {
 	return
 }
 
-func (index *probe_index) readOneShaLoc(
+func (index *probe_index) readOneMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.Index.ReadOne(blobId); err != nil {
@@ -53,7 +53,7 @@ func (index *probe_index) readOneShaLoc(
 	return
 }
 
-func (index *probe_index) readManyShaLoc(
+func (index *probe_index) readManyMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.Index.ReadMany(blobId, &locs); err != nil {
@@ -63,7 +63,7 @@ func (index *probe_index) readManyShaLoc(
 	return
 }
 
-func (index *probe_index) saveOneLoc(
+func (index *probe_index) saveOneObjectLoc(
 	object *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
@@ -90,9 +90,9 @@ func (index *probe_index) saveOneLocString(
 	str string,
 	loc object_probe_index.Loc,
 ) (err error) {
-	blobDigest := index.hashType.FromStringContent(str)
+	marklId := index.hashType.FromStringContent(str)
 
-	if err = index.Index.AddBlobId(blobDigest, loc); err != nil {
+	if err = index.Index.AddMarklId(marklId, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

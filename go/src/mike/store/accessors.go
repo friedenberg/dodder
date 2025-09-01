@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_store"
@@ -17,10 +16,6 @@ import (
 
 func (store *Store) GetTypedBlobStore() typed_blob_store.Stores {
 	return store.typedBlobStore
-}
-
-func (store *Store) GetEnnui() object_probe_index.Index {
-	return nil
 }
 
 func (store *Store) GetProtoZettel() sku.Proto {
@@ -39,7 +34,7 @@ func (store *Store) GetInventoryListStore() *inventory_list_store.Store {
 	return &store.inventoryListStore
 }
 
-func (store *Store) GetAbbrStore() sku.AbbrStore {
+func (store *Store) GetAbbrStore() sku.IdIndex {
 	return store.Abbr
 }
 

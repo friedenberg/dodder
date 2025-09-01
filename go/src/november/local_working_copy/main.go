@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/kilo/store_abbr"
+	index_ids "code.linenisgreat.com/dodder/go/src/kilo/store_abbr"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 	"code.linenisgreat.com/dodder/go/src/lima/store_browser"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
@@ -38,7 +38,7 @@ type Repo struct {
 	envRepo env_repo.Env
 	config  store_config.StoreMutable
 
-	storeAbbr    sku.AbbrStore
+	indexIds     sku.IdIndex
 	dormantIndex dormant_index.Index
 
 	storesInitialized bool
@@ -149,7 +149,7 @@ func (local *Repo) initialize(
 		return
 	}
 
-	if local.storeAbbr, err = store_abbr.NewIndexAbbr(
+	if local.indexIds, err = index_ids.NewIndex(
 		local.config.GetConfig().GetPrintOptions(),
 		local.envRepo,
 	); err != nil {
@@ -161,7 +161,7 @@ func (local *Repo) initialize(
 		local.envRepo,
 		local.config.GetConfig(),
 		local.envWorkspace.GetStoreFS(),
-		local.storeAbbr,
+		local.indexIds,
 	)
 
 	local.envLua = env_lua.Make(
@@ -194,7 +194,7 @@ func (local *Repo) initialize(
 		boxFormatArchive,
 		local.typedBlobStore,
 		&local.dormantIndex,
-		local.storeAbbr,
+		local.indexIds,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

@@ -16,15 +16,15 @@ func (store *Store) applyDormantAndRealizeTags(
 	object *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", object)
-	mp := &object.Metadata
+	metadata := &object.Metadata
 
-	mp.Cache.SetExpandedTags(ids.ExpandMany(
-		mp.GetTags(),
+	metadata.Cache.SetExpandedTags(ids.ExpandMany(
+		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))
 
-	g := genres.Must(object.GetGenre())
-	isTag := g == genres.Tag
+	genre := genres.Must(object.GetGenre())
+	isTag := genre == genres.Tag
 
 	// if g.HasParents() {
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
@@ -35,26 +35,28 @@ func (store *Store) applyDormantAndRealizeTags(
 	// TODO better solution for "realizing" tags against Config.
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
-	mp.Cache.TagPaths.Reset()
-	for tag := range mp.GetTags().All() {
-		mp.Cache.TagPaths.AddTagOld(tag)
+	metadata.Cache.TagPaths.Reset()
+	for tag := range metadata.GetTags().All() {
+		metadata.Cache.TagPaths.AddTagOld(tag)
 	}
 
 	if isTag {
-		ks := object.ObjectId.String()
+		objectIdString := object.ObjectId.String()
 
-		if err = tag.Set(ks); err != nil {
+		if err = tag.Set(objectIdString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		object.Metadata.Cache.TagPaths.AddSelf(catgut.MakeFromString(ks))
+		object.Metadata.Cache.TagPaths.AddSelf(
+			catgut.MakeFromString(objectIdString),
+		)
 
 		ids.ExpandOneInto(
 			tag,
 			ids.MakeTag,
 			expansion.ExpanderRight,
-			mp.Cache.GetExpandedTagsMutable(),
+			metadata.Cache.GetExpandedTagsMutable(),
 		)
 	}
 
@@ -74,43 +76,50 @@ func (store *Store) applyDormantAndRealizeTags(
 }
 
 func (store *Store) addSuperTags(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	g := sk.GetGenre()
+	genre := object.GetGenre()
 
 	var expanded []string
-	var ks string
+	var objectIdString string
 
-	switch g {
+	switch genre {
 	case genres.Tag, genres.Type, genres.Repo:
-		ks = sk.ObjectId.String()
+		objectIdString = object.ObjectId.String()
 
 		expansion.ExpanderRight.Expand(
 			func(v string) (err error) {
 				expanded = append(expanded, v)
 				return
 			},
-			ks,
+			objectIdString,
 		)
 
 	default:
 		return
 	}
 
-	for _, ex := range expanded {
-		if ex == ks || ex == "" {
+	for _, expandedObjectIdComponent := range expanded {
+		if expandedObjectIdComponent == objectIdString ||
+			expandedObjectIdComponent == "" {
 			continue
 		}
 
 		func() {
-			var ek *sku.Transacted
+			var tagOrRepoOrTypeObject *sku.Transacted
 
-			if ek, err = store.storeConfig.GetConfig().GetTagOrRepoIdOrType(ex); err != nil {
-				err = errors.Wrapf(err, "Expanded: %q", ex)
+			if tagOrRepoOrTypeObject, err = store.storeConfig.GetConfig().GetTagOrRepoIdOrType(
+				expandedObjectIdComponent,
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Expanded: %q",
+					expandedObjectIdComponent,
+				)
 				return
 			}
 
-			if ek == nil {
+			if tagOrRepoOrTypeObject == nil {
 				// this is ok because currently, konfig is applied twice.
 				// However, this
 				// is fragile as the order in which this method is called is
@@ -119,17 +128,21 @@ func (store *Store) addSuperTags(
 				return
 			}
 
-			defer sku.GetTransactedPool().Put(ek)
+			defer sku.GetTransactedPool().Put(tagOrRepoOrTypeObject)
 
-			if ek.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
-				ui.Log().Print(ks, ex, ek.Metadata.Cache.TagPaths)
+			if tagOrRepoOrTypeObject.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
+				ui.Log().Print(
+					objectIdString,
+					expandedObjectIdComponent,
+					tagOrRepoOrTypeObject.Metadata.Cache.TagPaths,
+				)
 				return
 			}
 
-			prefix := catgut.MakeFromString(ex)
+			prefix := catgut.MakeFromString(expandedObjectIdComponent)
 
-			a := &sk.Metadata.Cache.TagPaths
-			b := &ek.Metadata.Cache.TagPaths
+			a := &object.Metadata.Cache.TagPaths
+			b := &tagOrRepoOrTypeObject.Metadata.Cache.TagPaths
 
 			ui.Log().Print("a", a)
 			ui.Log().Print("b", b)
@@ -149,59 +162,62 @@ func (store *Store) addSuperTags(
 }
 
 func (store *Store) addImplicitTags(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	mp := &sk.Metadata
-	ie := ids.MakeTagMutableSet()
+	metadata := &object.Metadata
+	tagSet := ids.MakeTagMutableSet()
 
-	addImplicitTags := func(e *ids.Tag) (err error) {
-		p1 := tag_paths.MakePathWithType()
-		p1.Type = tag_paths.TypeIndirect
-		p1.Add(catgut.MakeFromString(e.String()))
+	addImplicitTags := func(tag *ids.Tag) (err error) {
+		tagPathWithType := tag_paths.MakePathWithType()
+		tagPathWithType.Type = tag_paths.TypeIndirect
+		tagPathWithType.Add(catgut.MakeFromString(tag.String()))
 
-		implicitTags := store.storeConfig.GetConfig().GetImplicitTags(e)
+		implicitTags := store.storeConfig.GetConfig().GetImplicitTags(tag)
 
 		if implicitTags.Len() == 0 {
-			sk.Metadata.Cache.TagPaths.AddPathWithType(p1)
+			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithType)
 			return
 		}
 
-		for e1 := range implicitTags.All() {
-			p2 := p1.Clone()
-			p2.Add(catgut.MakeFromString(e1.String()))
-			sk.Metadata.Cache.TagPaths.AddPathWithType(p2)
+		for implicitTag := range implicitTags.All() {
+			tagPathWithTypeClone := tagPathWithType.Clone()
+			tagPathWithTypeClone.Add(
+				catgut.MakeFromString(implicitTag.String()),
+			)
+			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithTypeClone)
 		}
 
 		return
 	}
 
-	for e := range mp.GetTags().AllPtr() {
-		if err = addImplicitTags(e); err != nil {
+	for tag := range metadata.GetTags().AllPtr() {
+		if err = addImplicitTags(tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	typKonfig := store.storeConfig.GetConfig().GetApproximatedType(
-		mp.GetType(),
+	typeObject := store.storeConfig.GetConfig().GetApproximatedType(
+		metadata.GetType(),
 	).ApproximatedOrActual()
 
-	if typKonfig != nil {
-		for e := range typKonfig.GetTags().AllPtr() {
-			if err = ie.AddPtr(e); err != nil {
+	if typeObject != nil {
+		for tag := range typeObject.GetTags().AllPtr() {
+			if err = tagSet.AddPtr(tag); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
-		for e := range typKonfig.GetTags().AllPtr() {
-			if err = addImplicitTags(e); err != nil {
+
+		for tag := range typeObject.GetTags().AllPtr() {
+			if err = addImplicitTags(tag); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	mp.Cache.SetImplicitTags(ie)
+	metadata.Cache.SetImplicitTags(tagSet)
 
 	return
 }

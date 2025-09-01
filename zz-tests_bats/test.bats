@@ -33,7 +33,6 @@ function can_checkout_and_checkin { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[one/uno !md "wow" ok]
 	EOM
 
@@ -75,7 +74,6 @@ function can_checkout_via_tags { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[one/uno !md "wow" ok]
 	EOM
 
@@ -106,8 +104,6 @@ function can_new_zettel_with_metadata { # @test
 	run_dodder new -edit=false -description bez -tags et1,et2
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[et1]
-		[et2]
 		[one/uno !md "bez" et1 et2]
 	EOM
 }
@@ -135,8 +131,6 @@ function indexes_are_implicitly_correct { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[et1]
-		[et2]
 		[one/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
@@ -197,8 +191,6 @@ function checkouts_dont_overwrite { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[et1]
-		[et2]
 		[one/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 

@@ -374,22 +374,12 @@ function show_simple_type_history { # @test
 function show_simple_tag_tail { # @test
 	run_dodder show :e
 	assert_output_unsorted - <<-EOM
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
-		[tag]
 	EOM
 }
 
 function show_simple_tag_history { # @test
 	run_dodder show +e
 	assert_output_unsorted - <<-EOM
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
-		[tag]
 	EOM
 }
 
@@ -447,11 +437,6 @@ function show_history_all { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
-		[tag]
 	EOM
 }
 
@@ -559,11 +544,6 @@ function show_tags_paths { # @test
 	run_dodder show -format tags-path :e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		tag [Paths: [TypeSelf:[tag]], All: [tag:[TypeSelf:[tag]]]]
-		tag-1 [Paths: [TypeSelf:[tag-1]], All: [tag-1:[TypeSelf:[tag-1]]]]
-		tag-2 [Paths: [TypeSelf:[tag-2]], All: [tag-2:[TypeSelf:[tag-2]]]]
-		tag-3 [Paths: [TypeSelf:[tag-3]], All: [tag-3:[TypeSelf:[tag-3]]]]
-		tag-4 [Paths: [TypeSelf:[tag-4]], All: [tag-4:[TypeSelf:[tag-4]]]]
 	EOM
 }
 
@@ -571,7 +551,6 @@ function show_tags_exact { # @test
 	run_dodder show =tag:e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[tag]
 	EOM
 
 	run_dodder show =tag
@@ -632,7 +611,6 @@ function show_workspace_default { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 tag-5]
-		[tag-5]
 	EOM
 
 	run_dodder init-workspace -query tag-5

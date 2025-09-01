@@ -5,28 +5,30 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type (
-	AbbrStorePresenceGeneric[V any] interface {
+	IdAbbrIndexPresenceGeneric[_ any] interface {
 		Exists([3]string) error
 	}
 
-	AbbrStoreGeneric[V any, VPtr interfaces.Ptr[V]] interface {
-		AbbrStorePresenceGeneric[V]
+	IdAbbrIndexGeneric[ID any, ID_PTR interfaces.Ptr[ID]] interface {
+		IdAbbrIndexPresenceGeneric[ID]
 		ExpandStringString(string) (string, error)
-		ExpandString(string) (VPtr, error)
-		Expand(VPtr) (VPtr, error)
+		ExpandString(string) (ID_PTR, error)
+		Expand(ID_PTR) (ID_PTR, error)
 		Abbreviate(ids.Abbreviatable) (string, error)
 	}
 
-	AbbrStore interface {
-		ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
-		BlobId() AbbrStoreGeneric[markl.Id, *markl.Id]
+	IdIndex interface {
+		GetSeenIds() map[genres.Genre]interfaces.Collection[string]
+		GetZettelIds() IdAbbrIndexGeneric[ids.ZettelId, *ids.ZettelId]
+		GetBlobIds() IdAbbrIndexGeneric[markl.Id, *markl.Id]
 
-		AddObjectToAbbreviationStore(*Transacted) error
+		AddObjectToIdIndex(*Transacted) error
 		GetAbbr() ids.Abbr
 
 		errors.Flusher

@@ -31,7 +31,6 @@ function bootstrap {
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
-		[tag]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
@@ -48,8 +47,6 @@ function bootstrap {
 
 	assert_success
 	assert_output - <<-EOM
-		[this_is_the_first]
-		[this_is_the_second]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 
@@ -110,9 +107,6 @@ function clone_history_zettel_type_tag { # @test
 		\[konfig @[0-9a-f]{64} !toml-config-v2]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		\[tag]
-		\[this_is_the_first]
-		\[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b \(36 B)
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 \(5 B)
 		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 \(51 B)
@@ -140,9 +134,6 @@ function clone_history_zettel_type_tag_stdio_local { # @test
 		\[konfig @[0-9a-f]{64} !toml-config-v2]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		\[tag]
-		\[this_is_the_first]
-		\[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b \(36 B)
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 \(5 B)
 		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 \(51 B)
@@ -191,9 +182,6 @@ function clone_history_zettel_type_tag_stdio_ssh { # @test
 		\[konfig @[0-9a-f]{64} !toml-config-v2]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		\[tag]
-		\[this_is_the_first]
-		\[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b \(36 B)
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 \(5 B)
 		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 \(51 B)
@@ -222,9 +210,6 @@ function clone_history_default_allow_conflicts { # @test
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag]
-		[this_is_the_first]
-		[this_is_the_second]
 	EOM
 
 	try_add_new_after_clone
@@ -260,9 +245,6 @@ function clone_archive_history_default_allow_conflicts { # @test
 		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		\[tag]
-		\[this_is_the_first]
-		\[this_is_the_second]
 	EOM
 
 	run_dodder show :z,b,t,e,konfig
@@ -274,9 +256,6 @@ function clone_archive_history_default_allow_conflicts { # @test
 		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		\[tag]
-		\[this_is_the_first]
-		\[this_is_the_second]
 	EOM
 }
 
@@ -309,7 +288,6 @@ function clone_history_zettel_type_tag_port { # @test
 		[konfig @b2c9398d2585afe1be26ed36a13703c051311256dc9dab03cf826b377ba237a6 !toml-config-v2]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag]
 		[this_is_the_first]
 		[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 B)

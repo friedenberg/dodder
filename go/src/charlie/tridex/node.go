@@ -6,208 +6,220 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func (n *node) Add(v string) {
-	if len(v) == 0 {
-		n.IncludesTerminus = true
+type node struct {
+	Count            int
+	Children         map[byte]node
+	Value            string
+	IsRoot           bool
+	IncludesTerminus bool
+}
+
+func (noad *node) Add(value string) {
+	if len(value) == 0 {
+		noad.IncludesTerminus = true
 		return
 	}
 
-	if v != n.Value {
-		n.Count += 1
+	if value != noad.Value {
+		noad.Count += 1
 	}
 
-	if n.Count == 1 {
-		n.Value = v
+	if noad.Count == 1 {
+		noad.Value = value
 		return
-	} else if n.Value != "" && n.Value != v {
-		n.Add(n.Value)
-		n.Value = ""
+	} else if noad.Value != "" && noad.Value != value {
+		noad.Add(noad.Value)
+		noad.Value = ""
 	}
 
-	c := v[0]
+	c := value[0]
 
 	var child node
 	ok := false
-	child, ok = n.Children[c]
+	child, ok = noad.Children[c]
 
 	if !ok {
 		child = node{Children: make(map[byte]node)}
 	}
 
-	child.Add(v[1:])
+	child.Add(value[1:])
 
-	n.Children[c] = child
+	noad.Children[c] = child
 }
 
-func (n *node) Remove(v string) {
-	if v == "" {
-		n.Count -= 1
-		n.IncludesTerminus = false
+func (noad *node) Remove(value string) {
+	if value == "" {
+		noad.Count -= 1
+		noad.IncludesTerminus = false
 		return
 	}
 
-	if n.Value == v {
-		n.Count -= 1
-		n.Value = ""
+	if noad.Value == value {
+		noad.Count -= 1
+		noad.Value = ""
 		return
 	}
 
-	first := v[0]
+	first := value[0]
 
 	rest := ""
 
-	if len(v) > 1 {
-		rest = v[1:]
+	if len(value) > 1 {
+		rest = value[1:]
 	}
 
-	child, ok := n.Children[first]
+	child, ok := noad.Children[first]
 
 	if ok {
 		child.Remove(rest)
-		n.Count -= 1
+		noad.Count -= 1
 
 		if child.Count == 0 {
-			delete(n.Children, first)
+			delete(noad.Children, first)
 		} else {
-			n.Children[first] = child
+			noad.Children[first] = child
 		}
 	}
 }
 
-func (n node) Contains(v string) (ok bool) {
-	if len(v) == 0 {
+func (noad node) Contains(value string) (ok bool) {
+	if len(value) == 0 {
 		ok = true
 		return
 	}
 
-	if n.Count == 1 && n.Value != "" {
-		ok = strings.HasPrefix(n.Value, v)
+	if noad.Count == 1 && noad.Value != "" {
+		ok = strings.HasPrefix(noad.Value, value)
 		return
 	}
 
-	c := v[0]
+	c := value[0]
 
 	var child node
 
-	child, ok = n.Children[c]
+	child, ok = noad.Children[c]
 
 	if ok {
-		ok = child.Contains(v[1:])
+		ok = child.Contains(value[1:])
 	}
 
 	return
 }
 
-func (n node) ContainsExactly(v string) (ok bool) {
-	if len(v) == 0 {
-		ok = n.IncludesTerminus
+func (noad node) ContainsExactly(value string) (ok bool) {
+	if len(value) == 0 {
+		ok = noad.IncludesTerminus
 		return
 	}
 
-	if n.Value != "" {
-		ok = n.Value == v
+	if noad.Value != "" {
+		ok = noad.Value == value
 		return
 	}
 
-	c := v[0]
+	c := value[0]
 
 	var child node
 
-	child, ok = n.Children[c]
+	child, ok = noad.Children[c]
 
 	if ok {
-		ok = child.ContainsExactly(v[1:])
+		ok = child.ContainsExactly(value[1:])
 	}
 
 	return
 }
 
-func (n node) Any() byte {
-	for c := range n.Children {
+func (noad node) Any() byte {
+	for c := range noad.Children {
 		return c
 	}
 
 	return 0
 }
 
-func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
+func (noad node) Expand(
+	value string,
+	stringBuilder *strings.Builder,
+) (ok bool) {
 	var c byte
 	var rem string
 
-	if len(v) == 0 {
-		switch n.Count {
+	if len(value) == 0 {
+		switch noad.Count {
 
 		case 0:
 			return true
 
 		case 1:
-			if !n.IncludesTerminus {
-				sb.WriteString(n.Value)
+			if !noad.IncludesTerminus {
+				stringBuilder.WriteString(noad.Value)
 			}
 
 			return true
 		}
 	} else {
-		switch n.Count {
+		switch noad.Count {
 		case 1:
-			ok = strings.HasPrefix(n.Value, v)
+			ok = strings.HasPrefix(noad.Value, value)
 
 			if ok {
-				sb.WriteString(n.Value)
+				stringBuilder.WriteString(noad.Value)
 			}
 
 			return
 
 		default:
-			rem = v[1:]
-			c = v[0]
+			rem = value[1:]
+			c = value[0]
 		}
 	}
 
 	var child node
 
-	if child, ok = n.Children[c]; ok {
-		sb.WriteByte(c)
-		return child.Expand(rem, sb)
+	if child, ok = noad.Children[c]; ok {
+		stringBuilder.WriteByte(c)
+		return child.Expand(rem, stringBuilder)
 	}
 
 	return
 }
 
-func (n node) Abbreviate(v string, loc int) string {
-	if n.IsRoot && len(n.Children) == 0 {
-		if n.Value != "" {
-			return n.Value[0:1]
+func (noad node) Abbreviate(value string, loc int) string {
+	if noad.IsRoot && len(noad.Children) == 0 {
+		if noad.Value != "" {
+			return noad.Value[0:1]
 		} else {
 			return ""
 		}
 	}
 
-	if len(v)-1 < loc {
-		return v
+	if len(value)-1 < loc {
+		return value
 	}
 
-	if n.Count == 1 && n.ContainsExactly(v[loc:]) && !n.IncludesTerminus {
-		return v[0:loc]
+	if noad.Count == 1 && noad.ContainsExactly(value[loc:]) &&
+		!noad.IncludesTerminus {
+		return value[0:loc]
 	}
 
-	c := v[loc]
+	c := value[loc]
 
-	child, ok := n.Children[c]
+	child, ok := noad.Children[c]
 
 	if ok {
-		return child.Abbreviate(v, loc+1)
+		return child.Abbreviate(value, loc+1)
 	} else {
-		if len(v)-1 < loc {
-			return v
+		if len(value)-1 < loc {
+			return value
 		} else {
-			return v[0 : loc+1]
+			return value[0 : loc+1]
 		}
 	}
 }
 
-func (a *node) Copy() (b node) {
-	b = *a
+func (noad *node) Copy() (b node) {
+	b = *noad
 
 	for i, c := range b.Children {
 		b.Children[i] = c.Copy()
@@ -216,24 +228,26 @@ func (a *node) Copy() (b node) {
 	return
 }
 
-func (n *node) Each(f interfaces.FuncIter[string], acc string) (err error) {
-	if n.Value != "" {
-		if err = f(acc + n.Value); err != nil {
-			return
+func (noad *node) allWithAcc(acc string) interfaces.Seq[string] {
+	return func(yield func(string) bool) {
+		if noad.Value != "" {
+			if !yield(acc + noad.Value) {
+				return
+			}
+		}
+
+		if noad.IncludesTerminus {
+			if !yield(acc) {
+				return
+			}
+		}
+
+		for char, child := range noad.Children {
+			for value := range child.allWithAcc(acc + string(char)) {
+				if !yield(value) {
+					return
+				}
+			}
 		}
 	}
-
-	if n.IncludesTerminus {
-		if err = f(acc); err != nil {
-			return
-		}
-	}
-
-	for r, c := range n.Children {
-		if err = c.Each(f, acc+string(r)); err != nil {
-			return
-		}
-	}
-
-	return
 }

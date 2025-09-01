@@ -16,6 +16,21 @@ type (
 		flags.CommandComponentWriter
 	}
 
+	ConfigLocalSingleHashBucketed interface {
+		Config
+		interfaces.BlobIOWrapper
+		GetHashBuckets() []int
+		GetLockInternalFiles() bool
+		GetHashTypeId() string
+	}
+
+	ConfigLocalMultiHashBucketed interface {
+		Config
+		interfaces.BlobIOWrapper
+		GetHashBuckets() []int
+		GetLockInternalFiles() bool
+	}
+
 	// TODO add config interface for local file stores
 	ConfigLocalHashBucketed interface {
 		Config

@@ -146,29 +146,29 @@ func (store *Store) CreateOrUpdate(
 	return
 }
 
-func (store *Store) CreateOrUpdateBlobSha(
-	k interfaces.ObjectId,
-	sh interfaces.MarklId,
-) (t *sku.Transacted, err error) {
+func (store *Store) CreateOrUpdateBlobDigest(
+	objectId interfaces.ObjectId,
+	blobDigest interfaces.MarklId,
+) (object *sku.Transacted, err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
-				k.GetGenre(),
+				objectId.GetGenre(),
 			),
 		}
 
 		return
 	}
 
-	t = sku.GetTransactedPool().Get()
+	object = sku.GetTransactedPool().Get()
 
-	if err = t.ObjectId.SetWithIdLike(k); err != nil {
+	if err = object.ObjectId.SetWithIdLike(objectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = store.ReadOneInto(k, t); err != nil {
+	if err = store.ReadOneInto(objectId, object); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -177,10 +177,10 @@ func (store *Store) CreateOrUpdateBlobSha(
 		}
 	}
 
-	t.SetBlobDigest(sh)
+	object.SetBlobDigest(blobDigest)
 
 	if err = store.Commit(
-		t,
+		object,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
@@ -196,9 +196,9 @@ type RevertId struct {
 }
 
 func (store *Store) RevertTo(
-	ri RevertId,
+	revertId RevertId,
 ) (err error) {
-	if ri.Tai.IsEmpty() {
+	if revertId.Tai.IsEmpty() {
 		return
 	}
 
@@ -210,20 +210,20 @@ func (store *Store) RevertTo(
 		return
 	}
 
-	var mutter *sku.Transacted
+	var mother *sku.Transacted
 
-	if mutter, err = store.GetStreamIndex().ReadOneObjectIdTai(
-		ri.ObjectId,
-		ri.Tai,
+	if mother, err = store.GetStreamIndex().ReadOneObjectIdTai(
+		revertId.ObjectId,
+		revertId.Tai,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer sku.GetTransactedPool().Put(mutter)
+	defer sku.GetTransactedPool().Put(mother)
 
 	if err = store.Commit(
-		mutter,
+		mother,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)

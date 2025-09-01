@@ -6,7 +6,6 @@ import (
 	"strings"
 	"sync"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
@@ -24,13 +23,7 @@ type Tridex struct {
 	Root node
 }
 
-type node struct {
-	Count            int
-	Children         map[byte]node
-	Value            string
-	IsRoot           bool
-	IncludesTerminus bool
-}
+var _ interfaces.MutableTridex = &Tridex{}
 
 func Make(vs ...string) (t interfaces.MutableTridex) {
 	t = &Tridex{
@@ -52,64 +45,64 @@ func Make(vs ...string) (t interfaces.MutableTridex) {
 	return
 }
 
-func (a *Tridex) MutableClone() (b interfaces.MutableTridex) {
+func (tridex *Tridex) MutableClone() (b interfaces.MutableTridex) {
 	ui.TodoP4("improve the performance of this")
 	ui.TodoP4("collections-copy")
 	ui.TodoP4("collections-reset")
 	ui.TodoP4("collections-recycle")
 
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
 	b = &Tridex{
-		Root: a.Root.Copy(),
+		Root: tridex.Root.Copy(),
 	}
 
 	return
 }
 
-func (t *Tridex) Len() int {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+func (tridex *Tridex) Len() int {
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
-	return t.Root.Count
+	return tridex.Root.Count
 }
 
-func (t *Tridex) ContainsAbbreviation(v string) bool {
-	return t.Contains(v)
+func (tridex *Tridex) ContainsAbbreviation(v string) bool {
+	return tridex.Contains(v)
 }
 
-func (t *Tridex) Contains(v string) bool {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+func (tridex *Tridex) Contains(v string) bool {
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
-	return t.Root.Contains(v)
+	return tridex.Root.Contains(v)
 }
 
-func (t *Tridex) ContainsExpansion(v string) bool {
-	return t.ContainsExactly(v)
+func (tridex *Tridex) ContainsExpansion(v string) bool {
+	return tridex.ContainsExactly(v)
 }
 
-func (t *Tridex) ContainsExactly(v string) bool {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+func (tridex *Tridex) ContainsExactly(v string) bool {
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
-	return t.Root.ContainsExactly(v)
+	return tridex.Root.ContainsExactly(v)
 }
 
-func (t *Tridex) Abbreviate(v string) string {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+func (tridex *Tridex) Abbreviate(v string) string {
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
-	return t.Root.Abbreviate(v, 0)
+	return tridex.Root.Abbreviate(v, 0)
 }
 
-func (t *Tridex) Expand(v string) string {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+func (tridex *Tridex) Expand(v string) string {
+	tridex.lock.RLock()
+	defer tridex.lock.RUnlock()
 
 	sb := &strings.Builder{}
-	ok := t.Root.Expand(v, sb)
+	ok := tridex.Root.Expand(v, sb)
 
 	if ok {
 		return sb.String()
@@ -118,39 +111,44 @@ func (t *Tridex) Expand(v string) string {
 	}
 }
 
-func (t *Tridex) Remove(v string) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (tridex *Tridex) Remove(v string) {
+	tridex.lock.Lock()
+	defer tridex.lock.Unlock()
 
-	t.Root.Remove(v)
+	tridex.Root.Remove(v)
 }
 
-func (t *Tridex) Add(v string) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (tridex *Tridex) Add(v string) {
+	tridex.lock.Lock()
+	defer tridex.lock.Unlock()
 
-	if t.Root.ContainsExactly(v) {
+	if tridex.Root.ContainsExactly(v) {
 		return
 	}
 
-	t.Root.Add(v)
+	tridex.Root.Add(v)
 }
 
-func (t *Tridex) EachString(f interfaces.FuncIter[string]) (err error) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (tridex *Tridex) Any() string {
+	var value string
+	for value = range tridex.All() {
+		break
+	}
 
-	if err = t.Root.Each(f, ""); err != nil {
-		if errors.IsStopIteration(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
+	return value
+}
+
+func (tridex *Tridex) All() interfaces.Seq[string] {
+	return func(yield func(string) bool) {
+		tridex.lock.Lock()
+		defer tridex.lock.Unlock()
+
+		for value := range tridex.Root.allWithAcc("") {
+			if !yield(value) {
+				return
+			}
 		}
-
-		return
 	}
-
-	return
 }
 
 // TODO-P2 add Each and EachPtr methods

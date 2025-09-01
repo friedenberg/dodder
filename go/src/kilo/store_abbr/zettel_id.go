@@ -8,30 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
-
-// TODO refactor this whole thing to be simpler and get rid of generics
-type AbbrStoreMutableGeneric[V any, VPtr interfaces.Ptr[V]] interface {
-	Add(VPtr) error
-}
-
-type AbbrStoreCompleteGeneric[V any, VPtr interfaces.Ptr[V]] interface {
-	sku.AbbrStoreGeneric[V, VPtr]
-	AbbrStoreMutableGeneric[V, VPtr]
-}
-
-type indexNoAbbr[
-	V interfaces.Stringer,
-	VPtr interfaces.SetterPtr[V],
-] struct {
-	sku.AbbrStoreGeneric[V, VPtr]
-}
-
-func (ih indexNoAbbr[V, VPtr]) Abbreviate(h V) (v string, err error) {
-	v = h.String()
-	return
-}
 
 type indexZettelId struct {
 	readFunc func() error
@@ -117,7 +94,9 @@ func (ih *indexZettelId) Expand(
 	return
 }
 
-func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) {
+func (ih *indexZettelId) Abbreviate(
+	id ids.Abbreviatable,
+) (v string, err error) {
 	var h ids.ZettelId
 
 	switch idt := id.(type) {
@@ -159,109 +138,6 @@ func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) 
 	}
 
 	v = fmt.Sprintf("%s/%s", head, tail)
-
-	return
-}
-
-type indexNotZettelId[
-	K any,
-	KPtr interfaces.StringerSetterPtr[K],
-] struct {
-	readFunc  func() error
-	ObjectIds interfaces.MutableTridex
-}
-
-func (ih *indexNotZettelId[K, KPtr]) Add(k KPtr) (err error) {
-	ih.ObjectIds.Add(k.String())
-	return
-}
-
-func (ih *indexNotZettelId[K, KPtr]) Exists(parts [3]string) (err error) {
-	if err = ih.readFunc(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !ih.ObjectIds.ContainsExpansion(parts[2]) {
-		err = collections.MakeErrNotFoundString(parts[2])
-		return
-	}
-
-	return
-}
-
-func (ih *indexNotZettelId[K, KPtr]) ExpandStringString(
-	in string,
-) (out string, err error) {
-	var k KPtr
-
-	if k, err = ih.ExpandString(in); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	out = k.String()
-
-	return
-}
-
-func (ih *indexNotZettelId[K, KPtr]) ExpandString(s string) (k KPtr, err error) {
-	if err = ih.readFunc(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var k1 K
-	k = &k1
-
-	if err = k.Set(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if k, err = ih.Expand(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (ih *indexNotZettelId[K, KPtr]) Expand(
-	abbr KPtr,
-) (exp KPtr, err error) {
-	if err = ih.readFunc(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ex := ih.ObjectIds.Expand(abbr.String())
-
-	if ex == "" {
-		// TODO-P4 should try to use the expansion if possible
-		ex = abbr.String()
-	}
-
-	var k K
-	exp = &k
-
-	if err = exp.Set(ex); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (ih *indexNotZettelId[K, KPtr]) Abbreviate(
-	k ids.Abbreviatable,
-) (v string, err error) {
-	if err = ih.readFunc(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	v = ih.ObjectIds.Abbreviate(k.String())
 
 	return
 }

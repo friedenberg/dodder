@@ -56,11 +56,6 @@ function organize_simple { # @test
 		- [!md !toml-type-v1]
 		- [one/dos !md tag-3 tag-4] wow ok again
 		- [one/uno !md tag-3 tag-4] wow the first
-		- [tag-1]
-		- [tag-2]
-		- [tag-3]
-		- [tag-4]
-		- [tag]
 	EOM
 }
 
@@ -82,10 +77,6 @@ function organize_simple_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 %virtual_etikett new-etikett-for-all]
-		[new-etikett-for-all]
-		[new-etikett-for]
-		[new-etikett]
-		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" %virtual_etikett new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" %virtual_etikett new-etikett-for-all tag-3 tag-4]
 		[tag-1 %virtual_etikett new-etikett-for-all]
@@ -99,7 +90,6 @@ function organize_simple_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 		[tag-1 new-etikett-for-all]
@@ -136,10 +126,6 @@ function organize_simple_checkedout_matchesmutter { # @test
 		[-tag-3 new-etikett-for-all]
 		[-tag-4 new-etikett-for-all]
 		[-tag new-etikett-for-all]
-		[new-etikett-for-all]
-		[new-etikett-for]
-		[new-etikett]
-		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -153,7 +139,6 @@ function organize_simple_checkedout_matchesmutter { # @test
 		[-tag-3 new-etikett-for-all]
 		[-tag-4 new-etikett-for-all]
 		[-tag new-etikett-for-all]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -187,26 +172,12 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	run_dodder organize -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
 		- [   !md   ]
-		- [   -tag  ]
-		- [   -tag-1]
-		- [   -tag-2]
-		- [   -tag-3]
-		- [   -tag-4]
 		- [one/dos   !md tag-3 tag-4] wow ok again
 		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 new-etikett-for-all]
-		[-tag-2 new-etikett-for-all]
-		[-tag-3 new-etikett-for-all]
-		[-tag-4 new-etikett-for-all]
-		[-tag new-etikett-for-all]
-		[new-etikett-for-all]
-		[new-etikett-for]
-		[new-etikett]
-		[new]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -215,12 +186,6 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
-		[-tag-1 new-etikett-for-all]
-		[-tag-2 new-etikett-for-all]
-		[-tag-3 new-etikett-for-all]
-		[-tag-4 new-etikett-for-all]
-		[-tag new-etikett-for-all]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -302,10 +267,6 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[-tag-2 new-etikett-for-all]
 		[-tag-3 new-etikett-for-all]
 		[-tag-4 new-etikett-for-all]
-		[new]
-		[new-etikett]
-		[new-etikett-for]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -319,7 +280,6 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[-tag-3 new-etikett-for-all]
 		[-tag-4 new-etikett-for-all]
 		[-tag new-etikett-for-all]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -349,13 +309,6 @@ function organize_hides_hidden_tags_from_organize { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[project]
-		[project-2021]
-		[project-2021-dodder]
-		[zz]
-		[zz-archive]
-		[zz-archive-task]
-		[zz-archive-task-done]
 		[two/uno !md "split hinweis for usability" project-2021-dodder zz-archive-task-done]
 	EOM
 
@@ -445,6 +398,11 @@ function modify_description { # @test
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again was modified" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first was modified too" tag-3 tag-4]
+		[tag]
+		[tag-1]
+		[tag-2]
+		[tag-3]
+		[tag-4]
 	EOM
 }
 
@@ -457,8 +415,6 @@ function add_named { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[added_tag with-tag]
-		[with-tag]
-		[with]
 	EOM
 }
 
@@ -475,7 +431,6 @@ function organize_v5_outputs_organize_one_tag { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[two/uno !md "wow" ok]
 	EOM
 
@@ -508,8 +463,6 @@ function organize_v5_outputs_organize_two_tags { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[brown]
-		[ok]
 		[two/uno !md "wow" brown ok]
 	EOM
 
@@ -563,10 +516,6 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[priority]
-		[priority-1]
-		[priority-2]
-		[task]
 		[two/uno !md "wow" priority-1 priority-2 task]
 	EOM
 
@@ -629,9 +578,6 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[priority-1]
-		[priority]
-		[task]
 		[two/uno !md "one/uno" priority-1 task]
 	EOM
 
@@ -648,7 +594,6 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[priority-2]
 		[one/tres !md "two/dos" priority-2 task]
 	EOM
 
@@ -916,14 +861,7 @@ function organize_v5_commits_no_changes { # @test
 	run_dodder new -edit=false "$one"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[priority-1]
-		[priority]
-		[task]
 		[two/uno !md "one/uno" priority-1 task w-2022-07-07]
-		[w-2022-07-07]
-		[w-2022-07]
-		[w-2022]
-		[w]
 	EOM
 
 	two="$(mktemp)"
@@ -940,7 +878,6 @@ function organize_v5_commits_no_changes { # @test
 	run_dodder new -edit=false "$two"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[w-2022-07-06]
 		[one/tres !md "two/dos" priority-1 task w-2022-07-06]
 	EOM
 
@@ -1115,8 +1052,6 @@ function organize_v5_tags_correct { # @test
 	assert_success
 
 	assert_output - <<-EOM
-		[test1]
-		[test1-wow]
 		[two/uno !md "zettel bez" test1-wow]
 	EOM
 
@@ -1131,7 +1066,6 @@ function organize_v5_tags_correct { # @test
 	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[test4]
 		[one/uno !md test4]
 	EOM
 
@@ -1151,7 +1085,6 @@ function organize_v5_tags_correct { # @test
 
 	run_dodder checkin one/uno.zettel
 	assert_output - <<-EOM
-		[test1-ok]
 		[one/uno !md test1-ok test4]
 	EOM
 }
@@ -1200,7 +1133,6 @@ function organize_update_checkout { # @test
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4 test]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 test]
-		[test]
 	EOM
 
 	run_dodder status
@@ -1247,7 +1179,6 @@ function create_structured_zettels { # @test
 	assert_output_unsorted - <<-EOM
 		[!task !toml-type-v1]
 		[one/tres !task "second" tag-3 test]
-		[test]
 		[two/uno !md "first" test]
 	EOM
 }
@@ -1258,7 +1189,6 @@ function description_with_literal_characters { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[payee]
 		[terb/ala !md "thoughts on quincey's contract / scope of work" payee]
 	EOM
 }
@@ -1272,10 +1202,6 @@ function tags_with_extended_tags_noop { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[new]
-		[new-etikett]
-		[new-etikett-for]
-		[new-etikett-for-all]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -1349,8 +1275,6 @@ function organize_new_objects_default_tags { # @test
 	run_dodder organize
 	assert_success
 	assert_output - <<-EOM
-		[zz]
-		[zz-inbox]
 		[one/tres !md "new zettel object" zz-inbox]
 	EOM
 }
@@ -1376,11 +1300,6 @@ function organize_checked_out { # @test
 		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.tag]
-		      checked out [tag-2.tag]
-		      checked out [tag-3.tag]
-		      checked out [tag-4.tag]
-		      checked out [tag.tag]
 	EOM
 
 	run_dodder organize -mode output-only .
@@ -1390,11 +1309,6 @@ function organize_checked_out { # @test
 		- [md.type !toml-type-v1]
 		- [one/dos.zettel !md tag-3 tag-4] wow ok again
 		- [one/uno.zettel !md tag-3 tag-4] wow the first
-		- [tag.tag]
-		- [tag-1.tag]
-		- [tag-2.tag]
-		- [tag-3.tag]
-		- [tag-4.tag]
 	EOM
 }
 
@@ -1468,10 +1382,7 @@ function organize_default_tags_workspace { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[today]
 		[two/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "test default tags" tag-3 today zz-inbox]
-		[zz]
-		[zz-inbox]
 	EOM
 
 	actual="$(mktemp)"
@@ -1541,9 +1452,7 @@ function organize_dot_operator_workspace_delete_files { # @test
 	run_dodder organize .
 	assert_success
 	assert_output - <<-EOM
-		[tag-two]
 		[two/uno @38dfdd64dc162365079f6e2b02942ada29fba3aa7cd36cd5e6b13c0fde3777d5 !md "1" tag-3 tag-two]
-		[tag-one]
 		[one/tres @626e7fcba179d01d0d58237102d25aa566b249a09a9e6ed8a5948dacf2d45ead !md "2" tag-3 tag-one]
 		          deleted [1.md]
 		          deleted [2.md]

@@ -298,7 +298,7 @@ func (index *Index) ReadOneSha(
 
 	var loc object_probe_index.Loc
 
-	if loc, err = index.readOneShaLoc(blobId); err != nil {
+	if loc, err = index.readOneMarklIdLoc(blobId); err != nil {
 		return
 	}
 
@@ -315,7 +315,7 @@ func (index *Index) ReadManySha(
 ) (objects []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
-	if locs, err = index.readManyShaLoc(blobId); err != nil {
+	if locs, err = index.readManyMarklIdLoc(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -359,7 +359,7 @@ func (index *Index) ObjectExists(
 	digest := markl.HashTypeSha256.FromStringContent(objectIdString)
 	defer markl.PutBlobId(digest)
 
-	if _, err = index.readOneShaLoc(digest); err != nil {
+	if _, err = index.readOneMarklIdLoc(digest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

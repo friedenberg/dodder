@@ -32,7 +32,6 @@ function bootstrap_with_content {
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
-		[tag]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
@@ -49,8 +48,6 @@ function bootstrap_with_content {
 
 	assert_success
 	assert_output - <<-EOM
-		[this_is_the_first]
-		[this_is_the_second]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 }
@@ -120,11 +117,6 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
 		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
 		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
 		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
@@ -138,11 +130,6 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
 	EOM
 }
 
@@ -174,10 +161,6 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
 		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
 		import failed with conflicts, merging required
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
 	EOM
 
 	run_dodder status .
@@ -194,11 +177,6 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
 	EOM
 }
 
@@ -231,11 +209,6 @@ function push_history_default { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
-		[tag]
 	EOM
 
 	set_xdg them
@@ -246,11 +219,6 @@ function push_history_default { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
 	EOM
 }
 
@@ -292,11 +260,6 @@ function push_history_default_only_blobs { # @test
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		[tag-1]
-		[tag-2]
-		[tag-3]
-		[tag-4]
-		[tag]
 	EOM
 
 	set_xdg them
@@ -415,11 +378,6 @@ function push_history_default_stdio_twice { # @test
 		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		\[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 		\[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		\[tag-1]
-		\[tag-2]
-		\[tag-3]
-		\[tag-4]
-		\[tag]
 	EOM
 	popd || exit 1
 

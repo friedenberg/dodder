@@ -31,35 +31,37 @@ func MakePrinterComplete(envLocal env_local.Env) *PrinterComplete {
 
 	envLocal.After(printer.Close)
 
-	go func(s *PrinterComplete) {
-		for sk := range s.chObjects {
+	go func() {
+		for object := range printer.chObjects {
 			ui.TodoP4("handle write errors")
-			s.bufferedWriter.WriteString(sk.GetObjectId().String())
-			s.bufferedWriter.WriteByte('\t')
+			printer.bufferedWriter.WriteString(object.GetObjectId().String())
+			printer.bufferedWriter.WriteByte('\t')
 
-			g := sk.GetObjectId().GetGenre()
-			s.bufferedWriter.WriteString(g.String())
+			g := object.GetObjectId().GetGenre()
+			printer.bufferedWriter.WriteString(g.String())
 
-			tipe := sk.GetType().String()
+			tipe := object.GetType().String()
 
 			if tipe != "" {
-				s.bufferedWriter.WriteString(": ")
-				s.bufferedWriter.WriteString(sk.GetType().String())
+				printer.bufferedWriter.WriteString(": ")
+				printer.bufferedWriter.WriteString(object.GetType().String())
 			}
 
-			description := sk.GetMetadata().Description.String()
+			description := object.GetMetadata().Description.String()
 
 			if description != "" {
-				s.bufferedWriter.WriteString(" ")
-				s.bufferedWriter.WriteString(sk.GetMetadata().Description.String())
+				printer.bufferedWriter.WriteString(" ")
+				printer.bufferedWriter.WriteString(
+					object.GetMetadata().Description.String(),
+				)
 			}
 
-			s.bufferedWriter.WriteString("\n")
-			printer.pool.Put(sk)
+			printer.bufferedWriter.WriteString("\n")
+			printer.pool.Put(object)
 		}
 
-		s.chDone <- struct{}{}
-	}(printer)
+		printer.chDone <- struct{}{}
+	}()
 
 	return printer
 }

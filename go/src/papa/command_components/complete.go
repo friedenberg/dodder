@@ -113,21 +113,25 @@ func (cmd Complete) CompleteObjectsIncludingWorkspace(
 	queryBuilderOptions pkg_query.BuilderOption,
 	args ...string,
 ) {
-	printerCompletions := sku_fmt.MakePrinterComplete(local)
-
-	query := cmd.MakeQueryIncludingWorkspace(
-		req,
-		queryBuilderOptions,
-		local,
-		args,
+	sku_fmt.OutputCliCompletions(
+		local.GetEnvRepo().Env,
+		local.GetAbbr().GetSeenIds(),
 	)
+	// printerCompletions := sku_fmt.MakePrinterComplete(local)
 
-	if err := local.GetStore().QueryTransacted(
-		query,
-		printerCompletions.PrintOne,
-	); err != nil {
-		local.Cancel(err)
-	}
+	// query := cmd.MakeQueryIncludingWorkspace(
+	// 	req,
+	// 	queryBuilderOptions,
+	// 	local,
+	// 	args,
+	// )
+
+	// if err := local.GetStore().QueryTransacted(
+	// 	query,
+	// 	printerCompletions.PrintOne,
+	// ); err != nil {
+	// 	local.Cancel(err)
+	// }
 }
 
 func (cmd Complete) CompleteObjects(
@@ -136,19 +140,23 @@ func (cmd Complete) CompleteObjects(
 	queryBuilderOptions pkg_query.BuilderOption,
 	args ...string,
 ) {
-	printerCompletions := sku_fmt.MakePrinterComplete(local)
-
-	query := cmd.MakeQuery(
-		req,
-		queryBuilderOptions,
-		local,
-		args,
+	sku_fmt.OutputCliCompletions(
+		local.GetEnvRepo().Env,
+		local.GetAbbr().GetSeenIds(),
 	)
+	// printerCompletions := sku_fmt.MakePrinterComplete(local)
 
-	if err := local.GetStore().QueryTransacted(
-		query,
-		printerCompletions.PrintOne,
-	); err != nil {
-		local.Cancel(err)
-	}
+	// query := cmd.MakeQuery(
+	// 	req,
+	// 	queryBuilderOptions,
+	// 	local,
+	// 	args,
+	// )
+
+	// if err := local.GetStore().QueryTransacted(
+	// 	query,
+	// 	printerCompletions.PrintOne,
+	// ); err != nil {
+	// 	local.Cancel(err)
+	// }
 }

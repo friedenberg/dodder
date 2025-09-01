@@ -50,11 +50,6 @@ function checkout_simple_all { # @test
 		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.tag]
-		      checked out [tag-2.tag]
-		      checked out [tag-3.tag]
-		      checked out [tag-4.tag]
-		      checked out [tag.tag]
 	EOM
 }
 

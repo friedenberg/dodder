@@ -223,7 +223,7 @@ func (pw *writer) writeOne(
 		return
 	}
 
-	if err = pw.probe_index.saveOneLoc(
+	if err = pw.probe_index.saveOneObjectLoc(
 		z,
 		object_probe_index.Loc{
 			Page:  pw.PageId.Index,

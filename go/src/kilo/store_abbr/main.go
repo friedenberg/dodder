@@ -1,12 +1,13 @@
 package store_abbr
 
 import (
-	"bufio"
 	"encoding/gob"
 	"io"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -17,9 +18,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type indexAbbrEncodableTridexes struct {
-	BlobId   indexNotZettelId[markl.Id, *markl.Id]
-	ZettelId indexZettelId
+type indexCodable struct {
+	SeenIds    map[genres.Genre]interfaces.MutableTridex
+	BlobDigest indexNotZettelId[markl.Id, *markl.Id]
+	ZettelId   indexZettelId
 }
 
 type indexAbbr struct {
@@ -31,24 +33,32 @@ type indexAbbr struct {
 
 	path string
 
-	indexAbbrEncodableTridexes
+	indexCodable
 
 	didRead    bool
 	hasChanges bool
 }
 
-func NewIndexAbbr(
+var _ sku.IdIndex = &indexAbbr{}
+
+func NewIndex(
 	options options_print.Options,
 	envRepo env_repo.Env,
-) (i *indexAbbr, err error) {
-	i = &indexAbbr{
+) (index *indexAbbr, err error) {
+	index = &indexAbbr{
 		Options: options,
 		lock:    &sync.Mutex{},
 		once:    &sync.Once{},
 		path:    envRepo.DirCache("Abbr"),
 		envRepo: envRepo,
-		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			BlobId: indexNotZettelId[markl.Id, *markl.Id]{
+		indexCodable: indexCodable{
+			SeenIds: map[genres.Genre]interfaces.MutableTridex{
+				genres.Repo:   tridex.Make(),
+				genres.Tag:    tridex.Make(),
+				genres.Type:   tridex.Make(),
+				genres.Zettel: tridex.Make(),
+			},
+			BlobDigest: indexNotZettelId[markl.Id, *markl.Id]{
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
@@ -58,8 +68,8 @@ func NewIndexAbbr(
 		},
 	}
 
-	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.BlobId.readFunc = i.readIfNecessary
+	index.ZettelId.readFunc = index.readIfNecessary
+	index.BlobDigest.readFunc = index.readIfNecessary
 
 	return
 }
@@ -73,22 +83,23 @@ func (index *indexAbbr) Flush() (err error) {
 		return
 	}
 
-	var w1 io.WriteCloser
+	var writer io.WriteCloser
 
-	if w1, err = index.envRepo.WriteCloserCache(index.path); err != nil {
+	if writer, err = index.envRepo.WriteCloserCache(index.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, w1)
+	defer errors.DeferredCloser(&err, writer)
 
-	w := bufio.NewWriter(w1)
+	bufferedWriter, repool := pool.GetBufferedWriter(writer)
+	defer repool()
 
-	defer errors.DeferredFlusher(&err, w)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
-	enc := gob.NewEncoder(w)
+	enc := gob.NewEncoder(bufferedWriter)
 
-	if err = enc.Encode(index.indexAbbrEncodableTridexes); err != nil {
+	if err = enc.Encode(index.indexCodable); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded object id")
 		return
 	}
@@ -107,9 +118,9 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 
 			index.didRead = true
 
-			var r1 io.ReadCloser
+			var reader io.ReadCloser
 
-			if r1, err = index.envRepo.ReadCloserCache(index.path); err != nil {
+			if reader, err = index.envRepo.ReadCloserCache(index.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -119,15 +130,16 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 				return
 			}
 
-			defer errors.Deferred(&err, r1.Close)
+			defer errors.DeferredCloser(&err, reader)
 
-			r := bufio.NewReader(r1)
+			bufferedReader, repool := pool.GetBufferedReader(reader)
+			defer repool()
 
-			dec := gob.NewDecoder(r)
+			dec := gob.NewDecoder(bufferedReader)
 
 			ui.Log().Print("starting decode")
 
-			if err = dec.Decode(&index.indexAbbrEncodableTridexes); err != nil {
+			if err = dec.Decode(&index.indexCodable); err != nil {
 				ui.Log().Print("finished decode unsuccessfully")
 				err = errors.Wrap(err)
 				return
@@ -139,23 +151,42 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 }
 
 func (index *indexAbbr) GetAbbr() (out ids.Abbr) {
-	out.ZettelId.Expand = index.ZettelId().ExpandStringString
-	out.BlobId.Expand = index.BlobId().ExpandStringString
+	out.ZettelId.Expand = index.GetZettelIds().ExpandStringString
+	out.BlobId.Expand = index.GetBlobIds().ExpandStringString
 
 	if index.AbbreviateZettelIds {
-		out.ZettelId.Abbreviate = index.ZettelId().Abbreviate
+		out.ZettelId.Abbreviate = index.GetZettelIds().Abbreviate
 	}
 
 	if index.AbbreviateMarklIds {
-		out.BlobId.Abbreviate = index.BlobId().Abbreviate
+		out.BlobId.Abbreviate = index.GetBlobIds().Abbreviate
 	}
 
 	return
 }
 
-func (index *indexAbbr) AddObjectToAbbreviationStore(
+func (index *indexAbbr) AddObjectToIdIndex(
 	object *sku.Transacted,
 ) (err error) {
+	genre := genres.Must(object.GetGenre())
+
+	switch genre {
+	case genres.Config:
+		return
+
+	case genres.InventoryList:
+		return
+
+	case genres.Zettel, genres.Type, genres.Tag, genres.Repo:
+
+	default:
+		err = errors.ErrorWithStackf(
+			"unsupported object id: %qv",
+			object.GetObjectId(),
+		)
+		return
+	}
+
 	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -163,14 +194,10 @@ func (index *indexAbbr) AddObjectToAbbreviationStore(
 
 	index.hasChanges = true
 
-	index.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
-		markl.Format(object.GetBlobDigest()),
-	)
-
 	objectIdString := object.GetObjectId().String()
+	index.SeenIds[genre].Add(objectIdString)
 
-	switch object.GetGenre() {
-	case genres.Zettel:
+	if genre == genres.Zettel {
 		var zettelId ids.ZettelId
 
 		if err = zettelId.SetFromIdParts(object.GetObjectId().Parts()); err != nil {
@@ -178,31 +205,42 @@ func (index *indexAbbr) AddObjectToAbbreviationStore(
 			return
 		}
 
-		index.indexAbbrEncodableTridexes.ZettelId.Heads.Add(zettelId.GetHead())
-		index.indexAbbrEncodableTridexes.ZettelId.Tails.Add(zettelId.GetTail())
-
-	case genres.Type,
-		genres.Tag,
-		genres.Config,
-		genres.InventoryList,
-		genres.Repo:
-		return
-
-	default:
-		err = errors.ErrorWithStackf(
-			"unsupported object id: %#v",
-			objectIdString,
-		)
-		return
+		index.ZettelId.Heads.Add(zettelId.GetHead())
+		index.ZettelId.Tails.Add(zettelId.GetTail())
 	}
+
+	for tag := range object.Metadata.GetTags().All() {
+		index.SeenIds[genres.Tag].Add(tag.String())
+	}
+
+	// TODO add indexes based on hash types
+	index.BlobDigest.ObjectIds.Add(
+		markl.Format(object.GetBlobDigest()),
+	)
+
+	index.SeenIds[genres.Type].Add(object.GetType().String())
+	index.SeenIds[genres.Repo].Add(object.GetRepoId().String())
 
 	return
 }
 
-func (index *indexAbbr) ZettelId() sku.AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId] {
-	return &index.indexAbbrEncodableTridexes.ZettelId
+func (index *indexAbbr) GetZettelIds() sku.IdAbbrIndexGeneric[ids.ZettelId, *ids.ZettelId] {
+	return &index.ZettelId
 }
 
-func (index *indexAbbr) BlobId() sku.AbbrStoreGeneric[markl.Id, *markl.Id] {
-	return &index.indexAbbrEncodableTridexes.BlobId
+func (index *indexAbbr) GetBlobIds() sku.IdAbbrIndexGeneric[markl.Id, *markl.Id] {
+	return &index.BlobDigest
+}
+
+func (index *indexAbbr) GetSeenIds() map[genres.Genre]interfaces.Collection[string] {
+	output := make(
+		map[genres.Genre]interfaces.Collection[string],
+		len(index.SeenIds),
+	)
+
+	for genre, tridex := range index.SeenIds {
+		output[genre] = tridex
+	}
+
+	return output
 }

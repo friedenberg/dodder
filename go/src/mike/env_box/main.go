@@ -42,7 +42,7 @@ func Make(
 	envRepo env_repo.Env,
 	config store_config.Config,
 	storeFS *store_fs.Store,
-	abbr sku.AbbrStore,
+	abbr sku.IdIndex,
 ) Env {
 	env := &env{
 		Env:     envRepo,
@@ -63,7 +63,7 @@ type env struct {
 	env_repo.Env
 	config  store_config.Config
 	storeFS *store_fs.Store
-	abbr    sku.AbbrStore
+	abbr    sku.IdIndex
 
 	box *box_format.BoxTransacted
 }

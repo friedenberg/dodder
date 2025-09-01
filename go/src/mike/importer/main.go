@@ -296,7 +296,6 @@ func (importer importer) importNewObject(
 	options := sku.CommitOptions{
 		Clock:              object,
 		StoreOptions:       importer.storeOptions,
-		DontAddMissingTags: true,
 		DontAddMissingType: true,
 	}
 

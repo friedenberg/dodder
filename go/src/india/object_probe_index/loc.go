@@ -13,17 +13,17 @@ type Loc struct {
 	Range
 }
 
-func (l Loc) IsEmpty() bool {
-	return l.Page == 0 && l.Offset == 0 && l.ContentLength == 0
+func (loc Loc) IsEmpty() bool {
+	return loc.Page == 0 && loc.Offset == 0 && loc.ContentLength == 0
 }
 
-func (l Loc) String() string {
-	return fmt.Sprintf("%02d@%s", l.Page, l.Range)
+func (loc Loc) String() string {
+	return fmt.Sprintf("%02d@%s", loc.Page, loc.Range)
 }
 
-func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
+func (loc *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
-	l.Page, n1, err = ohio.ReadFixedUint8(r)
+	loc.Page, n1, err = ohio.ReadFixedUint8(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -32,7 +32,7 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	var n2 int64
-	n2, err = l.Range.ReadFrom(r)
+	n2, err = loc.Range.ReadFrom(r)
 	n += n2
 
 	if err != nil {
@@ -43,9 +43,9 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
+func (loc *Loc) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	n1, err = ohio.WriteUint8(w, l.Page)
+	n1, err = ohio.WriteUint8(w, loc.Page)
 	n += int64(n1)
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	var n2 int64
-	n2, err = l.Range.WriteTo(w)
+	n2, err = loc.Range.WriteTo(w)
 	n += n2
 
 	if err != nil {

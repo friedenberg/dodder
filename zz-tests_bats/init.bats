@@ -186,7 +186,6 @@ function init_and_init { # @test
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[tag]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 

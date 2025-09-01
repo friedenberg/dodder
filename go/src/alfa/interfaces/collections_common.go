@@ -24,11 +24,11 @@ type ContainsKeyer interface {
 	ContainsKey(string) bool
 }
 
-type Iterable[T any] interface {
-	Any() T
-	All() Seq[T]
+type Iterable[ELEMENT any] interface {
+	Any() ELEMENT // TODO make derived
+	All() Seq[ELEMENT]
 }
 
-type IterablePtr[T any, TPtr Ptr[T]] interface {
-	AllPtr() Seq[TPtr]
+type IterablePtr[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
+	AllPtr() Seq[ELEMENT_PTR]
 }

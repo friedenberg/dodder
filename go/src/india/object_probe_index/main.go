@@ -15,7 +15,7 @@ type (
 	// TODO add support for different digests
 	commonInterface interface {
 		// TODO rename to AddDigest and enforce digest type
-		AddBlobId(interfaces.MarklId, Loc) error
+		AddMarklId(interfaces.MarklId, Loc) error
 		ReadOne(id interfaces.MarklId) (loc Loc, err error)
 		ReadMany(id interfaces.MarklId, locs *[]Loc) (err error)
 	}
@@ -111,7 +111,7 @@ func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	return
 }
 
-func (index *object_probe_index) AddBlobId(
+func (index *object_probe_index) AddMarklId(
 	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
@@ -136,7 +136,7 @@ func (index *object_probe_index) addBlobId(
 		return
 	}
 
-	return index.pages[pageIndex].AddBlobId(blobId, loc)
+	return index.pages[pageIndex].AddMarklId(blobId, loc)
 }
 
 func (index *object_probe_index) ReadOne(

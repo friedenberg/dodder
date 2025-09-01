@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -152,7 +151,7 @@ func (store *Store) Commit(
 
 	{
 		if options.AddToInventoryList {
-			if err = store.addMissingTypeAndTags(options, daughter); err != nil {
+			if err = store.addMissingTypes(options, daughter); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -160,7 +159,9 @@ func (store *Store) Commit(
 
 		if options.AddToInventoryList ||
 			options.StreamIndexOptions.AddToStreamIndex {
-			if err = store.addObjectToAbbrStore(daughter); err != nil {
+			if err = store.GetAbbrStore().AddObjectToIdIndex(
+				daughter,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -174,8 +175,9 @@ func (store *Store) Commit(
 
 			sku.TransactedResetter.ResetWithExceptFields(daughter, mother)
 
+			// TODO why is this condition here
 			if store.sunrise.Less(daughter.GetTai()) {
-				if err = store.ui.TransactedUnchanged(daughter); err != nil {
+				if err = store.handleUnchanged(daughter); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -291,9 +293,9 @@ func (store *Store) Commit(
 }
 
 func (store *Store) fetchMotherIfNecessary(
-	object *sku.Transacted,
+	daughter *sku.Transacted,
 ) (mother *sku.Transacted, err error) {
-	objectId := object.GetObjectId()
+	objectId := daughter.GetObjectId()
 
 	if objectId.IsEmpty() {
 		return
@@ -317,7 +319,7 @@ func (store *Store) fetchMotherIfNecessary(
 		return
 	}
 
-	if err = object.SetMother(mother); err != nil {
+	if err = daughter.SetMother(mother); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -342,55 +344,42 @@ func (store *Store) commitTransacted(
 }
 
 func (store *Store) handleUnchanged(
-	t *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	return store.ui.TransactedUnchanged(t)
+	return store.ui.TransactedUnchanged(object)
 }
 
 func (store *Store) UpdateKonfig(
 	blobId interfaces.MarklId,
 ) (kt *sku.Transacted, err error) {
-	return store.CreateOrUpdateBlobSha(
+	return store.CreateOrUpdateBlobDigest(
 		&ids.Config{},
 		blobId,
 	)
 }
 
-func (store *Store) createTagsOrType(k *ids.ObjectId) (err error) {
-	t := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(t)
+func (store *Store) createType(typeId *ids.ObjectId) (err error) {
+	typeObject := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(typeObject)
 
-	switch k.GetGenre() {
+	switch typeId.GetGenre() {
 	default:
-		err = genres.MakeErrUnsupportedGenre(k.GetGenre())
+		err = genres.MakeErrUnsupportedGenre(typeId.GetGenre())
 		return
 
 	case genres.Type:
-		t.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
-
-	case genres.Tag:
+		typeObject.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
 	}
 
-	if err = t.ObjectId.SetWithIdLike(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = store.addObjectToAbbrStore(t); err != nil {
+	if err = typeObject.ObjectId.SetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = store.Commit(
-		t,
+		typeObject,
 		sku.CommitOptions{
-			StoreOptions:       sku.GetStoreOptionsUpdate(),
-			DontAddMissingTags: true,
+			StoreOptions: sku.GetStoreOptionsUpdate(),
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -400,35 +389,35 @@ func (store *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 	return
 }
 
-func (store *Store) addType(
-	t ids.Type,
+func (store *Store) addTypeIfNecessary(
+	typeId ids.Type,
 ) (err error) {
-	if t.IsEmpty() {
+	if typeId.IsEmpty() {
 		err = errors.ErrorWithStackf("attempting to add empty type")
 		return
 	}
 
-	var oid ids.ObjectId
+	var objectId ids.ObjectId
 
-	if err = oid.ResetWithIdLike(t); err != nil {
+	if err = objectId.ResetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = store.GetStreamIndex().ObjectExists(&oid); err == nil {
+	if err = store.GetStreamIndex().ObjectExists(&objectId); err == nil {
 		return
 	}
 
 	err = nil
 
-	var k ids.ObjectId
+	var typeObjectId ids.ObjectId
 
-	if err = k.SetWithIdLike(t); err != nil {
+	if err = typeObjectId.SetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = store.createTagsOrType(&k); err != nil {
+	if err = store.createType(&typeObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -454,7 +443,7 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	)
 
 	for _, tipe := range typesExpanded {
-		if err = store.addType(tipe); err != nil {
+		if err = store.addTypeIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -463,47 +452,7 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	return
 }
 
-func (store *Store) addTags(
-	tags []ids.Tag,
-) (err error) {
-	store.tagLock.Lock()
-	defer store.tagLock.Unlock()
-
-	var oid ids.ObjectId
-
-	for _, tag := range tags {
-		if tag.IsVirtual() {
-			continue
-		}
-
-		if err = oid.ResetWithIdLike(tag); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = store.GetStreamIndex().ObjectExists(&oid); err == nil {
-			continue
-		}
-
-		err = nil
-
-		var k ids.ObjectId
-
-		if err = k.SetWithIdLike(tag); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = store.createTagsOrType(&k); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (store *Store) addMissingTypeAndTags(
+func (store *Store) addMissingTypes(
 	commitOptions sku.CommitOptions,
 	object *sku.Transacted,
 ) (err error) {
@@ -514,82 +463,8 @@ func (store *Store) addMissingTypeAndTags(
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	if !commitOptions.DontAddMissingTags && object.GetGenre() == genres.Tag {
-		var tag ids.Tag
-
-		if err = tag.TodoSetFromObjectId(object.GetObjectId()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		tagsExpanded := ids.ExpandOneSlice(
-			tag,
-			ids.MakeTag,
-			expansion.ExpanderRight,
-		)
-
-		if len(tagsExpanded) > 0 {
-			tagsExpanded = tagsExpanded[:len(tagsExpanded)-1]
-		}
-
-		if err = store.addTags(tagsExpanded); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if !commitOptions.DontAddMissingTags {
-		es := quiter.SortedValues(object.Metadata.GetTags())
-
-		if object.GetGenre() == genres.Tag {
-			var tag ids.Tag
-
-			if err = tag.TodoSetFromObjectId(object.GetObjectId()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			tagsExpanded := ids.ExpandOneSlice(
-				tag,
-				ids.MakeTag,
-				expansion.ExpanderRight,
-			)
-
-			if len(tagsExpanded) > 0 {
-				tagsExpanded = tagsExpanded[:len(tagsExpanded)-1]
-			}
-
-			if err = store.addTags(tagsExpanded); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		for _, e := range es {
-			tagsExpanded := ids.ExpandOneSlice(
-				e,
-				ids.MakeTag,
-				expansion.ExpanderRight,
-			)
-
-			if err = store.addTags(tagsExpanded); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	return
-}
-
-func (store *Store) addObjectToAbbrStore(object *sku.Transacted) (err error) {
-	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(
-		object,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	} else {
+		// TODO enforce that object has signature
 	}
 
 	return
@@ -605,7 +480,7 @@ func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
 		return
 	}
 
-	if err = store.GetAbbrStore().AddObjectToAbbreviationStore(
+	if err = store.GetAbbrStore().AddObjectToIdIndex(
 		object.Object,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -1,8 +1,6 @@
 package store
 
 import (
-	"sync"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -30,12 +28,11 @@ type Store struct {
 
 	typedBlobStore     typed_blob_store.Stores
 	inventoryListStore inventory_list_store.Store
-	Abbr               sku.AbbrStore
+	Abbr               sku.IdIndex
 
 	inventoryList   *sku.OpenList
 	configBlobCoder interfaces.CoderReadWriter[*repo_configs.TypedBlob]
 	envLua          env_lua.Env
-	tagLock         sync.Mutex
 
 	streamIndex   *stream_index.Index
 	zettelIdIndex zettel_id_index.Index
@@ -59,7 +56,7 @@ func (store *Store) Initialize(
 	box *box_format.BoxTransacted,
 	typedBlobStore typed_blob_store.Stores,
 	dormantIndex *dormant_index.Index,
-	abbrStore sku.AbbrStore,
+	abbrStore sku.IdIndex,
 ) (err error) {
 	store.storeConfig = config
 	store.envRepo = envRepo

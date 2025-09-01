@@ -104,6 +104,6 @@ func (local *Repo) GetStore() *store.Store {
 	return &local.store
 }
 
-func (local *Repo) GetAbbr() sku.AbbrStore {
-	return local.storeAbbr
+func (local *Repo) GetAbbr() sku.IdIndex {
+	return local.indexIds
 }

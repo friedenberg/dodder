@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"slices"
 	"sort"
 	"testing"
 
@@ -378,7 +379,7 @@ func TestRemove(t1 *testing.T) {
 	}
 }
 
-func TestEachString(t1 *testing.T) {
+func TestAll(t1 *testing.T) {
 	testCases := [][]string{
 		{
 			"12",
@@ -412,24 +413,13 @@ func TestEachString(t1 *testing.T) {
 
 				sut := Make(expected...)
 
-				actual := make([]string, 0)
-
-				err := sut.EachString(
-					func(e string) (err error) {
-						actual = append(actual, e)
-						return
-					},
-				)
+				actual := slices.Collect(sut.All())
 
 				sort.Strings(expected)
 				sort.Strings(actual)
 
 				if !reflect.DeepEqual(expected, actual) {
 					t.Errorf("expected %v, but got %v", expected, actual)
-				}
-
-				if err != nil {
-					t.Errorf("expected no error but got %s", err)
 				}
 			},
 		)
@@ -520,7 +510,8 @@ func TestEachString(t1 *testing.T) {
 
 // 	for a, e := range expectedContains {
 // 		if ca := sut.Expand(a); ca != e {
-// 			test_logz.Errorf(t, "%#v: expected expanded %q but got %q", string(b), e, ca)
+// 			test_logz.Errorf(t, "%#v: expected expanded %q but got %q", string(b), e,
+// ca)
 // 		}
 // 	}
 // }

@@ -87,7 +87,7 @@ func (page *page) GetObjectProbeIndexPage() pageInterface {
 	return page
 }
 
-func (page *page) AddBlobId(sh interfaces.MarklId, loc Loc) (err error) {
+func (page *page) AddMarklId(sh interfaces.MarklId, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}

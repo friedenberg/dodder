@@ -10,7 +10,6 @@ type CommitOptions struct {
 	ids.RepoId
 	ids.Clock
 	Proto
-	DontAddMissingTags bool
 	DontAddMissingType bool
 }
 

@@ -47,8 +47,6 @@ function can_duplicate_zettel_content { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[et1]
-		[et2]
 		[two/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
@@ -111,8 +109,6 @@ function new_empty_no_edit_workspace { # @test
 	run_dodder new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[workspace]
-		[workspace-tags]
 		[two/uno !md workspace-tags]
 	EOM
 }
@@ -125,8 +121,6 @@ function new_empty_edit_workspace { # @test
 	run_dodder new
 	assert_success
 	assert_output - <<-EOM
-		[workspace]
-		[workspace-tags]
 		[two/uno !md workspace-tags]
 		      checked out [two/uno.zettel !md workspace-tags]
 		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
@@ -152,7 +146,6 @@ function new_zettel_file { # @test
 	run_dodder new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[two/uno !md "wow" ok]
 	EOM
 
@@ -174,7 +167,6 @@ function new_zettel_stdin { # @test
 	run_dodder new -edit=false - <"$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[two/uno !md "wow" ok]
 	EOM
 
@@ -196,7 +188,6 @@ function new_zettel { # @test
 	run_dodder new -edit=false -description wow -tags ok
 	assert_success
 	assert_output - <<-EOM
-		[ok]
 		[two/uno !md "wow" ok]
 	EOM
 

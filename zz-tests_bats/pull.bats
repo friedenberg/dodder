@@ -42,7 +42,6 @@ function bootstrap_content {
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
-		[tag]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
 
@@ -59,8 +58,6 @@ function bootstrap_content {
 
 	assert_success
 	assert_output - <<-EOM
-		[this_is_the_first]
-		[this_is_the_second]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 
@@ -124,10 +121,7 @@ function pull_history_zettel_type_tag_no_conflicts { # @test
 		copied Blob bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 (15 B)
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag]
 		[!task @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
-		[this_is_the_first]
-		[this_is_the_second]
 	EOM
 
 	try_add_new_after_pull
@@ -161,10 +155,7 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 		copied Blob bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 (15 B)
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag]
 		[!task @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
-		[this_is_the_first]
-		[this_is_the_second]
 	EOM
 
 	try_add_new_after_pull
@@ -213,8 +204,6 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	assert_output_unsorted --partial - <<-EOM
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 B)
 		       conflicted [one/uno]
-		[this_is_the_first]
-		[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 B)
 		       conflicted [one/dos]
 		copied Blob bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 (15 B)
@@ -328,12 +317,8 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 	assert_success
   # TODO address the bandaid of two `[tag]` objects
 	assert_output_unsorted - <<-EOM
-		[tag]
-		[tag]
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 B)
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[this_is_the_first]
-		[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 B)
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		copied Blob bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 (15 B)
@@ -412,9 +397,6 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 		       conflicted [one/uno]
 		[!task @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-		[tag]
-		[this_is_the_first]
-		[this_is_the_second]
 		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 B)
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 B)
 		copied Blob bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 (15 B)
@@ -493,10 +475,7 @@ function pull_history_default_no_conflict { # @test
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-		[tag]
 		[!task @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
-		[this_is_the_first]
-		[this_is_the_second]
 	EOM
 
 	run_dodder show one/dos+
