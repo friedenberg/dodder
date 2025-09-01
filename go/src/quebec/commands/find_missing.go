@@ -22,7 +22,7 @@ func (cmd FindMissing) Run(dep command.Request) {
 	{
 		var err error
 
-		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobDigestBytesMap(); err != nil {
+		if lookupStored, err = localWorkingCopy.GetStore().MakeBlobDigestObjectIdsMap(); err != nil {
 			dep.Cancel(err)
 		}
 	}

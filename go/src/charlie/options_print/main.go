@@ -9,7 +9,7 @@ import (
 type (
 	OverlayAbbreviations struct {
 		ZettelIds *bool
-		Shas      *bool
+		MarklIds  *bool
 	}
 
 	OverlayBox struct {
@@ -38,7 +38,7 @@ type (
 
 	Options struct {
 		AbbreviateZettelIds        bool
-		AbbreviateShas             bool
+		AbbreviateMarklIds         bool
 		BoxPrintIncludeDescription bool
 		BoxPrintTime               bool
 		BoxPrintTagsAlways         bool
@@ -74,7 +74,7 @@ var (
 func Default() Options {
 	return Options{
 		AbbreviateZettelIds:        true,
-		AbbreviateShas:             true,
+		AbbreviateMarklIds:         true,
 		BoxPrintIncludeTypes:       true,
 		BoxPrintIncludeDescription: true,
 		BoxPrintTime:               true,
@@ -95,7 +95,7 @@ func DefaultOverlay() V1 {
 	return V1{
 		Abbreviations: &abbreviationsV1{
 			ZettelIds: &config.AbbreviateZettelIds,
-			Shas:      &config.AbbreviateShas,
+			MarklIds:  &config.AbbreviateMarklIds,
 		},
 		boxV1: boxV1{
 			PrintIncludeTypes:       &config.BoxPrintIncludeTypes,
@@ -158,7 +158,10 @@ func MakeConfig(base Options, overlays ...OverlayGetter) Options {
 				&base.AbbreviateZettelIds,
 				abbreviations.ZettelIds,
 			)
-			equals.SetIfValueNotNil(&base.AbbreviateShas, abbreviations.Shas)
+			equals.SetIfValueNotNil(
+				&base.AbbreviateMarklIds,
+				abbreviations.MarklIds,
+			)
 		}
 
 		box := overlay.OverlayBox
@@ -230,7 +233,11 @@ func (overlay *Overlay) AddToFlags(flagSet *flags.FlagSet) {
 				overlay.Abbreviations = &OverlayAbbreviations{}
 			}
 
-			return makeFlagSetFuncBoolVar(&overlay.Abbreviations.Shas)(value)
+			return makeFlagSetFuncBoolVar(
+				&overlay.Abbreviations.MarklIds,
+			)(
+				value,
+			)
 		},
 	)
 

@@ -8,36 +8,36 @@ import (
 )
 
 type nopBlobParseSaver[
-	O any,
-	OPtr interfaces.Ptr[O],
+	OBJECT any,
+	OBJECT_PTR interfaces.Ptr[OBJECT],
 ] struct {
-	awf interfaces.BlobWriter
+	blobStore interfaces.BlobWriter
 }
 
 func MakeNopBlobParseSaver[
-	O any,
-	OPtr interfaces.Ptr[O],
+	OBJECT any,
+	OBJECT_PTR interfaces.Ptr[OBJECT],
 ](awf interfaces.BlobWriter,
-) nopBlobParseSaver[O, OPtr] {
-	return nopBlobParseSaver[O, OPtr]{
-		awf: awf,
+) nopBlobParseSaver[OBJECT, OBJECT_PTR] {
+	return nopBlobParseSaver[OBJECT, OBJECT_PTR]{
+		blobStore: awf,
 	}
 }
 
-func (f nopBlobParseSaver[O, OPtr]) ParseBlob(
-	r io.Reader,
-	t OPtr,
+func (parseSaver nopBlobParseSaver[OBJECT, OBJECT_PTR]) ParseBlob(
+	reader io.Reader,
+	object OBJECT_PTR,
 ) (n int64, err error) {
-	var aw interfaces.WriteCloseMarklIdGetter
+	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if aw, err = f.awf.BlobWriter(""); err != nil {
+	if blobWriter, err = parseSaver.blobStore.BlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer errors.DeferredCloser(&err, blobWriter)
 
-	if n, err = io.Copy(aw, r); err != nil {
+	if n, err = io.Copy(blobWriter, reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

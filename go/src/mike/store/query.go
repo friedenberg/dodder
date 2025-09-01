@@ -12,16 +12,16 @@ import (
 
 // TODO make iterator
 func (store *Store) QueryPrimitive(
-	qg sku.PrimitiveQueryGroup,
-	f interfaces.FuncIter[*sku.Transacted],
+	group sku.PrimitiveQueryGroup,
+	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	e := pkg_query.MakeExecutorPrimitive(
-		qg,
+	executor := pkg_query.MakeExecutorPrimitive(
+		group,
 		store.GetStreamIndex().ReadPrimitiveQuery,
 		store.ReadOneInto,
 	)
 
-	if err = e.ExecuteTransacted(f); err != nil {
+	if err = executor.ExecuteTransacted(funcIter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -31,27 +31,27 @@ func (store *Store) QueryPrimitive(
 
 // TODO make iterator
 func (store *Store) QueryTransacted(
-	qg *pkg_query.Query,
-	output interfaces.FuncIter[*sku.Transacted],
+	group *pkg_query.Query,
+	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var e pkg_query.Executor
+	var executor pkg_query.Executor
 
-	if e, err = store.makeQueryExecutor(qg); err != nil {
+	if executor, err = store.makeQueryExecutor(group); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var sk *sku.Transacted
+	var object *sku.Transacted
 
 	switch {
 	case true:
 		// TODO why does this not work with trying to read internal
-		if sk, err = e.ExecuteExactlyOneExternalObject(false); err != nil {
+		if object, err = executor.ExecuteExactlyOneExternalObject(false); err != nil {
 			err = nil
 			break
 		}
 
-		if err = output(sk); err != nil {
+		if err = funcIter(object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -59,7 +59,7 @@ func (store *Store) QueryTransacted(
 		return
 	}
 
-	if err = e.ExecuteTransacted(output); err != nil {
+	if err = executor.ExecuteTransacted(funcIter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,17 +69,17 @@ func (store *Store) QueryTransacted(
 
 // TODO make iterator
 func (store *Store) QueryTransactedAsSkuType(
-	qg *pkg_query.Query,
-	f interfaces.FuncIter[sku.SkuType],
+	query *pkg_query.Query,
+	funcIter interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	var e pkg_query.Executor
+	var executor pkg_query.Executor
 
-	if e, err = store.makeQueryExecutor(qg); err != nil {
+	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.ExecuteTransactedAsSkuType(f); err != nil {
+	if err = executor.ExecuteTransactedAsSkuType(funcIter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +109,7 @@ func (store *Store) QuerySkuType(
 
 func (store *Store) QueryExactlyOneExternal(
 	query *pkg_query.Query,
-) (sk *sku.Transacted, err error) {
+) (object *sku.Transacted, err error) {
 	var executor pkg_query.Executor
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
@@ -117,7 +117,7 @@ func (store *Store) QueryExactlyOneExternal(
 		return
 	}
 
-	if sk, err = executor.ExecuteExactlyOneExternalObject(true); err != nil {
+	if object, err = executor.ExecuteExactlyOneExternalObject(true); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,7 +127,7 @@ func (store *Store) QueryExactlyOneExternal(
 
 func (store *Store) QueryExactlyOne(
 	queryGroup *pkg_query.Query,
-) (sk *sku.Transacted, err error) {
+) (object *sku.Transacted, err error) {
 	var executor pkg_query.Executor
 
 	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
@@ -135,7 +135,7 @@ func (store *Store) QueryExactlyOne(
 		return
 	}
 
-	if sk, err = executor.ExecuteExactlyOne(); err != nil {
+	if object, err = executor.ExecuteExactlyOne(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -143,28 +143,29 @@ func (store *Store) QueryExactlyOne(
 	return
 }
 
-func (store *Store) MakeBlobDigestBytesMap() (blobShaBytes map[string][]string, err error) {
-	blobShaBytes = make(map[string][]string)
-	var l sync.Mutex
+func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string][]string, err error) {
+	blobDigestObjectIds = make(map[string][]string)
+	var lock sync.Mutex
 
 	if err = store.QueryPrimitive(
 		sku.MakePrimitiveQueryGroup(),
-		func(sk *sku.Transacted) (err error) {
-			l.Lock()
-			defer l.Unlock()
+		func(object *sku.Transacted) (err error) {
+			lock.Lock()
+			defer lock.Unlock()
 
-			digestBytes := sk.Metadata.GetBlobDigest().GetBytes()
-			oids := blobShaBytes[string(digestBytes)]
-			oid := sk.ObjectId.String()
-			loc, found := slices.BinarySearch(oids, oid)
+			digestBytes := object.Metadata.GetBlobDigest().GetBytes()
+			objectIds := blobDigestObjectIds[string(digestBytes)]
+			oid := object.ObjectId.String()
+			loc, found := slices.BinarySearch(objectIds, oid)
 
 			if found {
 				return
 			}
 
-			oids = slices.Insert(oids, loc, oid)
+			objectIds = slices.Insert(objectIds, loc, oid)
 
-			blobShaBytes[string(sk.Metadata.GetBlobDigest().GetBytes())] = oids
+			bites := object.Metadata.GetBlobDigest().GetBytes()
+			blobDigestObjectIds[string(bites)] = objectIds
 
 			return
 		},

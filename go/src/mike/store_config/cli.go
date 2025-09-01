@@ -9,7 +9,7 @@ func (config Config) GetCLIFlags() (flags []string) {
 		flags,
 		fmt.Sprintf("-print-time=%t", printOptions.BoxPrintTime),
 		fmt.Sprintf("-print-colors=%t", printOptions.PrintColors),
-		fmt.Sprintf("-abbreviate-shas=%t", printOptions.AbbreviateShas),
+		fmt.Sprintf("-abbreviate-shas=%t", printOptions.AbbreviateMarklIds),
 		fmt.Sprintf(
 			"-abbreviate-zettel-ids=%t",
 			printOptions.AbbreviateZettelIds,

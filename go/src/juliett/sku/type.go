@@ -15,6 +15,8 @@ package sku
 // )
 
 type (
+	// SkuType is a remnant of a refactoring where there used to be several
+	// different structure to represent checked out objects.
 	SkuType           = *CheckedOut
 	SkuTypeSet        = CheckedOutSet
 	SkuTypeSetMutable = CheckedOutMutableSet

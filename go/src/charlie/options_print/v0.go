@@ -32,7 +32,10 @@ func (blob V0) GetAbbreviations() *OverlayAbbreviations {
 	if blob.Abbreviations == nil {
 		return nil
 	} else {
-		return (*OverlayAbbreviations)(blob.Abbreviations)
+		return &OverlayAbbreviations{
+			ZettelIds: blob.Abbreviations.ZettelIds,
+			MarklIds:  blob.Abbreviations.Shas,
+		}
 	}
 }
 

@@ -14,7 +14,7 @@ type V1 struct {
 
 type abbreviationsV1 struct {
 	ZettelIds *bool `toml:"zettel-ids"`
-	Shas      *bool `toml:"shas"`
+	MarklIds  *bool `toml:"shas"`
 }
 
 type boxV1 struct {

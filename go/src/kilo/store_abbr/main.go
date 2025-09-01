@@ -64,18 +64,18 @@ func NewIndexAbbr(
 	return
 }
 
-func (i *indexAbbr) Flush() (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+func (index *indexAbbr) Flush() (err error) {
+	index.lock.Lock()
+	defer index.lock.Unlock()
 
-	if !i.hasChanges {
+	if !index.hasChanges {
 		ui.Log().Print("no changes")
 		return
 	}
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.envRepo.WriteCloserCache(i.path); err != nil {
+	if w1, err = index.envRepo.WriteCloserCache(index.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,7 +88,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	enc := gob.NewEncoder(w)
 
-	if err = enc.Encode(i.indexAbbrEncodableTridexes); err != nil {
+	if err = enc.Encode(index.indexAbbrEncodableTridexes); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded object id")
 		return
 	}
@@ -96,20 +96,20 @@ func (i *indexAbbr) Flush() (err error) {
 	return
 }
 
-func (i *indexAbbr) readIfNecessary() (err error) {
-	i.once.Do(
+func (index *indexAbbr) readIfNecessary() (err error) {
+	index.once.Do(
 		func() {
-			if i.didRead {
+			if index.didRead {
 				return
 			}
 
 			ui.Log().Print("reading")
 
-			i.didRead = true
+			index.didRead = true
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.envRepo.ReadCloserCache(i.path); err != nil {
+			if r1, err = index.envRepo.ReadCloserCache(index.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -127,7 +127,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			ui.Log().Print("starting decode")
 
-			if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
+			if err = dec.Decode(&index.indexAbbrEncodableTridexes); err != nil {
 				ui.Log().Print("finished decode unsuccessfully")
 				err = errors.Wrap(err)
 				return
@@ -138,48 +138,48 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
-	out.ZettelId.Expand = i.ZettelId().ExpandStringString
-	out.BlobId.Expand = i.BlobId().ExpandStringString
+func (index *indexAbbr) GetAbbr() (out ids.Abbr) {
+	out.ZettelId.Expand = index.ZettelId().ExpandStringString
+	out.BlobId.Expand = index.BlobId().ExpandStringString
 
-	if i.AbbreviateZettelIds {
-		out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
+	if index.AbbreviateZettelIds {
+		out.ZettelId.Abbreviate = index.ZettelId().Abbreviate
 	}
 
-	if i.AbbreviateShas {
-		out.BlobId.Abbreviate = i.BlobId().Abbreviate
+	if index.AbbreviateMarklIds {
+		out.BlobId.Abbreviate = index.BlobId().Abbreviate
 	}
 
 	return
 }
 
-func (i *indexAbbr) AddObjectToAbbreviationStore(
-	o *sku.Transacted,
+func (index *indexAbbr) AddObjectToAbbreviationStore(
+	object *sku.Transacted,
 ) (err error) {
-	if err = i.readIfNecessary(); err != nil {
+	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	i.hasChanges = true
+	index.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
-		markl.Format(o.GetBlobDigest()),
+	index.indexAbbrEncodableTridexes.BlobId.ObjectIds.Add(
+		markl.Format(object.GetBlobDigest()),
 	)
 
-	ks := o.GetObjectId().String()
+	objectIdString := object.GetObjectId().String()
 
-	switch o.GetGenre() {
+	switch object.GetGenre() {
 	case genres.Zettel:
-		var h ids.ZettelId
+		var zettelId ids.ZettelId
 
-		if err = h.SetFromIdParts(o.GetObjectId().Parts()); err != nil {
+		if err = zettelId.SetFromIdParts(object.GetObjectId().Parts()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		i.indexAbbrEncodableTridexes.ZettelId.Heads.Add(h.GetHead())
-		i.indexAbbrEncodableTridexes.ZettelId.Tails.Add(h.GetTail())
+		index.indexAbbrEncodableTridexes.ZettelId.Heads.Add(zettelId.GetHead())
+		index.indexAbbrEncodableTridexes.ZettelId.Tails.Add(zettelId.GetTail())
 
 	case genres.Type,
 		genres.Tag,
@@ -189,21 +189,20 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(
 		return
 
 	default:
-		err = errors.ErrorWithStackf("unsupported object id: %#v", ks)
+		err = errors.ErrorWithStackf(
+			"unsupported object id: %#v",
+			objectIdString,
+		)
 		return
 	}
 
 	return
 }
 
-func (i *indexAbbr) ZettelId() (asg sku.AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
-	asg = &i.indexAbbrEncodableTridexes.ZettelId
-
-	return
+func (index *indexAbbr) ZettelId() sku.AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId] {
+	return &index.indexAbbrEncodableTridexes.ZettelId
 }
 
-func (i *indexAbbr) BlobId() (asg sku.AbbrStoreGeneric[markl.Id, *markl.Id]) {
-	asg = &i.indexAbbrEncodableTridexes.BlobId
-
-	return
+func (index *indexAbbr) BlobId() sku.AbbrStoreGeneric[markl.Id, *markl.Id] {
+	return &index.indexAbbrEncodableTridexes.BlobId
 }
