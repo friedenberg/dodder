@@ -64,6 +64,11 @@ func (op CreateFromPaths) Run(
 
 		digestWithoutTai := &object.Metadata.SelfWithoutTai
 
+		if err = object.CalculateDigests(false, object.GetDigestWriteMapWithoutMerkle()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = markl.AssertIdIsNotNull(
 			digestWithoutTai,
 			key_bytes.DigestMetadataWithoutTai.String(),

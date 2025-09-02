@@ -9,25 +9,25 @@ import (
 
 type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.MarklId, error)
 
-type digestWriteMap map[string]interfaces.MutableMarklId
+type ObjectDigestWriteMap map[string]interfaces.MutableMarklId
 
-func (transacted *Transacted) getDigestWriteMapWithMerkle() digestWriteMap {
-	return digestWriteMap{
+func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
+	return ObjectDigestWriteMap{
 		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
 		markl.FormatIdObjectDigestSha256V1:       transacted.Metadata.GetObjectDigestMutable(),
 	}
 }
 
-func (transacted *Transacted) getDigestWriteMapWithoutMerkle() digestWriteMap {
-	return digestWriteMap{
+func (transacted *Transacted) GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap {
+	return ObjectDigestWriteMap{
 		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
 	}
 }
 
 // calculates the respective digests
-func (transacted *Transacted) finalize(
+func (transacted *Transacted) CalculateDigests(
 	debug bool,
-	formats digestWriteMap,
+	formats ObjectDigestWriteMap,
 ) (err error) {
 	funcCalcDigest := object_inventory_format.GetDigestForContext
 
@@ -97,19 +97,4 @@ func (transacted *Transacted) makeDigestCalcFunc(
 
 		return
 	}
-}
-
-func (transacted *Transacted) CalculateObjectDigestSelfWithoutTai(
-	funcCalcDigest funcCalcDigest,
-) (err error) {
-	if err = transacted.makeDigestCalcFunc(
-		funcCalcDigest,
-		markl.FormatIdV5MetadataDigestWithoutTai,
-		&transacted.Metadata.SelfWithoutTai,
-	)(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

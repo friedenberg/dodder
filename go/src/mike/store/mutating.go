@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -71,14 +70,6 @@ func (store *Store) tryPrecommit(
 	}
 
 	if err = store.validate(object, mother, options); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO determine if this is necessary
-	if err = object.CalculateObjectDigestSelfWithoutTai(
-		object_inventory_format.GetDigestForContext,
-	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

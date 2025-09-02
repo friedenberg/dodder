@@ -78,9 +78,9 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 		}
 	}
 
-	if err = transacted.finalize(
+	if err = transacted.CalculateDigests(
 		false,
-		transacted.getDigestWriteMapWithMerkle(),
+		transacted.GetDigestWriteMapWithMerkle(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -91,9 +91,9 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 
 // TODO remove / rename
 func (transacted *Transacted) CalculateObjectDigests() (err error) {
-	return transacted.finalize(
+	return transacted.CalculateDigests(
 		false,
-		transacted.getDigestWriteMapWithoutMerkle(),
+		transacted.GetDigestWriteMapWithoutMerkle(),
 	)
 }
 
