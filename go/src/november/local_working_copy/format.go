@@ -938,17 +938,14 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for description, key := range object.GetProbeKeys() {
-					dig := markl.HashTypeSha256.FromStringContent(key)
-					defer markl.PutBlobId(dig)
-
+				for probeId := range object.AllProbeIds(markl.HashTypeSha256) {
 					if _, err = fmt.Fprintf(
 						writer,
 						"%s (%q): %q -> %q\n",
 						object.GetObjectId(),
-						description,
-						key,
-						dig.StringWithFormat(),
+						probeId.Key,
+						probeId.Value(),
+						probeId.Id.StringWithFormat(),
 					); err != nil {
 						err = errors.Wrap(err)
 						return

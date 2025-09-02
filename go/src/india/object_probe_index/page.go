@@ -87,45 +87,37 @@ func (page *page) GetObjectProbeIndexPage() pageInterface {
 	return page
 }
 
-func (page *page) AddMarklId(sh interfaces.MarklId, loc Loc) (err error) {
-	if sh.IsNull() {
+func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
+	if id.IsNull() {
 		return
 	}
 
 	page.Lock()
 	defer page.Unlock()
 
-	return page.addSha(sh, loc)
-}
-
-func (page *page) addSha(sh interfaces.MarklId, loc Loc) (err error) {
-	if sh.IsNull() {
-		return
-	}
-
-	r := &row{
+	row := &row{
 		Loc: loc,
 	}
 
-	if err = r.BlobId.SetDigest(sh); err != nil {
+	if err = row.BlobId.SetDigest(id); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	page.added.Push(r)
+	page.added.Push(row)
 
 	return
 }
 
 func (page *page) GetRowCount() (n int64, err error) {
-	var fi os.FileInfo
+	var fileInfo os.FileInfo
 
-	if fi, err = page.file.Stat(); err != nil {
+	if fileInfo, err = page.file.Stat(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	n = fi.Size()/int64(page.rowWidth) - 1
+	n = fileInfo.Size()/int64(page.rowWidth) - 1
 
 	return
 }

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -189,5 +190,58 @@ func (transacted *Transacted) GetProbeKeys() map[string]string {
 	return map[string]string{
 		"objectId":     transacted.GetObjectId().String(),
 		"objectId+tai": transacted.GetObjectId().String() + transacted.GetTai().String(),
+	}
+}
+
+type ProbeId struct {
+	Key   string
+	Value func() string
+	Id    interfaces.MarklId
+}
+
+func (transacted *Transacted) AllProbeIds(
+	hashType markl.HashType,
+) interfaces.Seq[ProbeId] {
+	return func(yield func(ProbeId) bool) {
+		for key, value := range transacted.GetProbeKeys() {
+			id, repool := hashType.GetMarklIdForString(value)
+
+			probeId := ProbeId{
+				Key:   key,
+				Value: func() string { return value },
+				Id:    id,
+			}
+
+			if !yield(probeId) {
+				repool()
+				return
+			}
+
+			repool()
+		}
+
+		{
+			probeId := ProbeId{
+				Key:   markl.FormatIdObjectDigestSha256V1,
+				Value: func() string { return "" },
+				Id:    transacted.Metadata.GetObjectDigest(),
+			}
+
+			if !yield(probeId) {
+				return
+			}
+		}
+
+		{
+			probeId := ProbeId{
+				Key:   markl.FormatIdV5MetadataDigestWithoutTai,
+				Value: func() string { return "" },
+				Id:    transacted.Metadata.SelfWithoutTai,
+			}
+
+			if !yield(probeId) {
+				return
+			}
+		}
 	}
 }

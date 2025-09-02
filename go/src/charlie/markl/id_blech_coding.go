@@ -3,6 +3,7 @@ package markl
 import (
 	"bytes"
 	"encoding/hex"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -63,12 +64,23 @@ func SetBlechCombinedHRPAndData(
 }
 
 func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
-	if len(value) == 64 {
+	switch len(value) {
+	case 65:
+		if value[0] != '@' {
+			err = errors.Errorf("unknown format: %q", value)
+			return
+		}
+
+		value = strings.TrimPrefix(value, "@")
+		fallthrough
+
+	case 64:
 		if err = SetSha256(id, value); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
+
+	default:
 		if err = id.Set(value); err != nil {
 			err = errors.Wrap(err)
 			return
