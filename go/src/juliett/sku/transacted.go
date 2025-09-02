@@ -223,25 +223,55 @@ func (transacted *Transacted) allProbeIds(
 		}
 
 		{
+			id, repool := hashType.GetMarklIdForMarklId(
+				transacted.Metadata.GetObjectSig(),
+			)
+
 			probeId := ProbeId{
 				Key: markl.FormatIdObjectDigestSha256V1,
-				Id:  transacted.Metadata.GetObjectDigest(),
+				Id:  id,
 			}
 
 			if !yield(probeId) {
+				repool()
 				return
 			}
+			repool()
 		}
 
 		{
+			id, repool := hashType.GetMarklIdForMarklId(
+				transacted.Metadata.GetObjectSig(),
+			)
+
 			probeId := ProbeId{
 				Key: markl.FormatIdV5MetadataDigestWithoutTai,
-				Id:  transacted.Metadata.SelfWithoutTai,
+				Id:  id,
 			}
 
 			if !yield(probeId) {
+				repool()
 				return
 			}
+			repool()
+		}
+
+		{
+			id, repool := hashType.GetMarklIdForMarklId(
+				transacted.Metadata.GetObjectSig(),
+			)
+
+			probeId := ProbeId{
+				Key: "object-sig",
+				Id:  id,
+			}
+
+			if !yield(probeId) {
+				repool()
+				return
+			}
+
+			repool()
 		}
 	}
 }

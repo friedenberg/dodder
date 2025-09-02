@@ -57,6 +57,19 @@ func (hashType HashType) GetMarklIdForString(
 	return hash.GetMarklId()
 }
 
+func (hashType HashType) GetMarklIdForMarklId(
+	input interfaces.MarklId,
+) (interfaces.MarklId, interfaces.FuncRepool) {
+	hash := hashType.Get()
+	defer hashType.Put(hash)
+
+	if _, err := hash.Write(input.GetBytes()); err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return hash.GetMarklId()
+}
+
 func (hashType HashType) FromStringContent(input string) interfaces.MarklId {
 	id, _ := hashType.GetMarklIdForString(input)
 	return id
