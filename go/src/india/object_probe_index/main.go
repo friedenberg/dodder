@@ -13,17 +13,11 @@ import (
 
 type (
 	// TODO add support for different digests
-	commonInterface interface {
+	pageInterface interface {
 		// TODO rename to AddDigest and enforce digest type
 		AddMarklId(interfaces.MarklId, Loc) error
 		ReadOne(id interfaces.MarklId) (loc Loc, err error)
 		ReadMany(id interfaces.MarklId, locs *[]Loc) (err error)
-	}
-
-	Index interface {
-		commonInterface
-		PrintAll(env_ui.Env) error
-		errors.Flusher
 	}
 )
 
@@ -34,7 +28,7 @@ const (
 	PageCount  = 1 << (DigitWidth * 4)
 )
 
-type index struct {
+type Index struct {
 	hashType markl.HashType
 	rowWidth int
 	pages    [PageCount]page
@@ -44,8 +38,8 @@ func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
 	hashType markl.HashType,
-) (indecks *index, err error) {
-	indecks = &index{hashType: hashType}
+) (indecks *Index, err error) {
+	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerComplete{}, envRepo, path)
 	return
 }
@@ -54,13 +48,13 @@ func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
 	hashType markl.HashType,
-) (indecks *index, err error) {
-	indecks = &index{hashType: hashType}
+) (indecks *Index, err error) {
+	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerShaOnly{}, envRepo, dir)
 	return
 }
 
-func (index *index) initialize(
+func (index *Index) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	dir string,
@@ -81,18 +75,14 @@ func (index *index) initialize(
 	return
 }
 
-func (index *index) GetObjectProbeIndex() Index {
-	return index
-}
-
-func (index *index) AddMarklId(
+func (index *Index) AddMarklId(
 	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
 	return index.addBlobId(blobId, loc)
 }
 
-func (index *index) addBlobId(
+func (index *Index) addBlobId(
 	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
@@ -113,7 +103,7 @@ func (index *index) addBlobId(
 	return index.pages[pageIndex].AddMarklId(blobId, loc)
 }
 
-func (index *index) ReadOne(
+func (index *Index) ReadOne(
 	blobId interfaces.MarklId,
 ) (loc Loc, err error) {
 	var pageIndex uint8
@@ -129,7 +119,7 @@ func (index *index) ReadOne(
 	return index.pages[pageIndex].ReadOne(blobId)
 }
 
-func (index *index) ReadMany(
+func (index *Index) ReadMany(
 	blobId interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
@@ -146,7 +136,7 @@ func (index *index) ReadMany(
 	return index.pages[pageIndex].ReadMany(blobId, locations)
 }
 
-func (index *index) ReadOneKey(
+func (index *Index) ReadOneKey(
 	formatKey string,
 	metadata *object_metadata.Metadata,
 ) (loc Loc, err error) {
@@ -178,7 +168,7 @@ func (index *index) ReadOneKey(
 }
 
 // TODO remove formatKey and switch to setting formatter on init
-func (index *index) ReadManyKeys(
+func (index *Index) ReadManyKeys(
 	formatKey string,
 	metadata *object_metadata.Metadata,
 	locations *[]Loc,
@@ -205,7 +195,7 @@ func (index *index) ReadManyKeys(
 	return index.ReadMany(blobId, locations)
 }
 
-func (index *index) ReadAll(
+func (index *Index) ReadAll(
 	metadata *object_metadata.Metadata,
 	locations *[]Loc,
 ) (err error) {
@@ -240,7 +230,7 @@ func (index *index) ReadAll(
 	return wg.GetError()
 }
 
-func (index *index) PrintAll(env env_ui.Env) (err error) {
+func (index *Index) PrintAll(env env_ui.Env) (err error) {
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
 
@@ -253,7 +243,7 @@ func (index *index) PrintAll(env env_ui.Env) (err error) {
 	return
 }
 
-func (index *index) Flush() (err error) {
+func (index *Index) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
 	for pageIndex := range index.pages {

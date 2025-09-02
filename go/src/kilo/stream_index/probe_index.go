@@ -11,7 +11,7 @@ import (
 
 type probeIndex struct {
 	envRepo env_repo.Env
-	object_probe_index.Index
+	*object_probe_index.Index
 	hashType markl.HashType
 }
 

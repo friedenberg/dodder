@@ -30,7 +30,7 @@ type page struct {
 	id             page_id.PageId
 }
 
-var _ commonInterface = &page{}
+var _ pageInterface = &page{}
 
 func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
@@ -83,10 +83,6 @@ func (page *page) open() (err error) {
 	}
 
 	return
-}
-
-func (page *page) GetObjectProbeIndexPage() pageInterface {
-	return page
 }
 
 func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
