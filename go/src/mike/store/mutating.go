@@ -75,6 +75,7 @@ func (store *Store) tryPrecommit(
 		return
 	}
 
+	// TODO determine if this is necessary
 	if err = object.CalculateObjectDigestSelfWithoutTai(
 		object_inventory_format.GetDigestForContext,
 	); err != nil {

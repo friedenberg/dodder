@@ -78,7 +78,10 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 		}
 	}
 
-	if err = transacted.finalize(false, true); err != nil {
+	if err = transacted.finalize(
+		false,
+		transacted.getDigestWriteMapWithMerkle(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,7 +91,10 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 
 // TODO remove / rename
 func (transacted *Transacted) CalculateObjectDigests() (err error) {
-	return transacted.finalize(false, false)
+	return transacted.finalize(
+		false,
+		transacted.getDigestWriteMapWithoutMerkle(),
+	)
 }
 
 func (transacted *Transacted) FinalizeAndSignIfNecessary(

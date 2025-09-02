@@ -9,10 +9,25 @@ import (
 
 type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.MarklId, error)
 
+type digestWriteMap map[string]interfaces.MutableMarklId
+
+func (transacted *Transacted) getDigestWriteMapWithMerkle() digestWriteMap {
+	return digestWriteMap{
+		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
+		markl.FormatIdObjectDigestSha256V1:       transacted.Metadata.GetObjectDigestMutable(),
+	}
+}
+
+func (transacted *Transacted) getDigestWriteMapWithoutMerkle() digestWriteMap {
+	return digestWriteMap{
+		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
+	}
+}
+
 // calculates the respective digests
 func (transacted *Transacted) finalize(
 	debug bool,
-	includeMerkle bool,
+	formats digestWriteMap,
 ) (err error) {
 	funcCalcDigest := object_inventory_format.GetDigestForContext
 
@@ -20,27 +35,19 @@ func (transacted *Transacted) finalize(
 		funcCalcDigest = object_inventory_format.GetDigestForContextDebug
 	}
 
-	wg := errors.MakeWaitGroupParallel()
+	waitGroup := errors.MakeWaitGroupParallel()
 
-	wg.Do(
-		transacted.makeDigestCalcFunc(
-			funcCalcDigest,
-			markl.FormatIdV5MetadataDigestWithoutTai,
-			&transacted.Metadata.SelfWithoutTai,
-		),
-	)
-
-	if includeMerkle {
-		wg.Do(func() error {
-			// TODO do not hardcode markl type id
-			return transacted.calculateObjectDigestMerkle(
-				markl.FormatIdObjectDigestSha256V1,
+	for formatId, id := range formats {
+		waitGroup.Do(
+			transacted.makeDigestCalcFunc(
 				funcCalcDigest,
-			)
-		})
+				formatId,
+				id,
+			),
+		)
 	}
 
-	if err = wg.GetError(); err != nil {
+	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -100,45 +107,6 @@ func (transacted *Transacted) CalculateObjectDigestSelfWithoutTai(
 		markl.FormatIdV5MetadataDigestWithoutTai,
 		&transacted.Metadata.SelfWithoutTai,
 	)(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (transacted *Transacted) calculateObjectDigestMerkle(
-	marklFormatId string,
-	funcCalcDigest funcCalcDigest,
-) (err error) {
-	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetRepoPubKey(),
-		"repo-pubkey",
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = markl.AssertIdIsNull(
-		transacted.Metadata.GetObjectDigest(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = transacted.makeDigestCalcFunc(
-		funcCalcDigest,
-		marklFormatId,
-		transacted.Metadata.GetObjectDigestMutable(),
-	)(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest(),
-		"object-digest",
-	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
