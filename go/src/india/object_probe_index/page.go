@@ -30,6 +30,8 @@ type page struct {
 	id             page_id.PageId
 }
 
+var _ commonInterface = &page{}
+
 func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,

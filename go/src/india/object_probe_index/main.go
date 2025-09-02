@@ -20,13 +20,6 @@ type (
 		ReadMany(id interfaces.MarklId, locs *[]Loc) (err error)
 	}
 
-	pageInterface interface {
-		GetObjectProbeIndexPage() pageInterface
-		commonInterface
-		PrintAll(env_ui.Env) error
-		errors.Flusher
-	}
-
 	Index interface {
 		commonInterface
 		PrintAll(env_ui.Env) error
