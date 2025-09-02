@@ -28,7 +28,6 @@ type (
 	}
 
 	Index interface {
-		GetObjectProbeIndex() Index
 		commonInterface
 		PrintAll(env_ui.Env) error
 		errors.Flusher
@@ -42,7 +41,7 @@ const (
 	PageCount  = 1 << (DigitWidth * 4)
 )
 
-type object_probe_index struct {
+type index struct {
 	hashType markl.HashType
 	rowWidth int
 	pages    [PageCount]page
@@ -52,9 +51,9 @@ func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
 	hashType markl.HashType,
-) (index *object_probe_index, err error) {
-	index = &object_probe_index{hashType: hashType}
-	err = index.initialize(rowEqualerComplete{}, envRepo, path)
+) (indecks *index, err error) {
+	indecks = &index{hashType: hashType}
+	err = indecks.initialize(rowEqualerComplete{}, envRepo, path)
 	return
 }
 
@@ -62,13 +61,13 @@ func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
 	hashType markl.HashType,
-) (index *object_probe_index, err error) {
-	index = &object_probe_index{hashType: hashType}
-	err = index.initialize(rowEqualerShaOnly{}, envRepo, dir)
+) (indecks *index, err error) {
+	indecks = &index{hashType: hashType}
+	err = indecks.initialize(rowEqualerShaOnly{}, envRepo, dir)
 	return
 }
 
-func (index *object_probe_index) initialize(
+func (index *index) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	dir string,
@@ -89,36 +88,18 @@ func (index *object_probe_index) initialize(
 	return
 }
 
-func (index *object_probe_index) GetObjectProbeIndex() Index {
+func (index *index) GetObjectProbeIndex() Index {
 	return index
 }
 
-func (index *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
-	var blobIds map[string]interfaces.MarklId
-
-	if blobIds, err = object_inventory_format.GetDigestsForMetadata(m); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, blobId := range blobIds {
-		if err = index.addBlobId(blobId, loc); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (index *object_probe_index) AddMarklId(
+func (index *index) AddMarklId(
 	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
 	return index.addBlobId(blobId, loc)
 }
 
-func (index *object_probe_index) addBlobId(
+func (index *index) addBlobId(
 	blobId interfaces.MarklId,
 	loc Loc,
 ) (err error) {
@@ -139,7 +120,7 @@ func (index *object_probe_index) addBlobId(
 	return index.pages[pageIndex].AddMarklId(blobId, loc)
 }
 
-func (index *object_probe_index) ReadOne(
+func (index *index) ReadOne(
 	blobId interfaces.MarklId,
 ) (loc Loc, err error) {
 	var pageIndex uint8
@@ -155,7 +136,7 @@ func (index *object_probe_index) ReadOne(
 	return index.pages[pageIndex].ReadOne(blobId)
 }
 
-func (index *object_probe_index) ReadMany(
+func (index *index) ReadMany(
 	blobId interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
@@ -172,7 +153,7 @@ func (index *object_probe_index) ReadMany(
 	return index.pages[pageIndex].ReadMany(blobId, locations)
 }
 
-func (index *object_probe_index) ReadOneKey(
+func (index *index) ReadOneKey(
 	formatKey string,
 	metadata *object_metadata.Metadata,
 ) (loc Loc, err error) {
@@ -204,7 +185,7 @@ func (index *object_probe_index) ReadOneKey(
 }
 
 // TODO remove formatKey and switch to setting formatter on init
-func (index *object_probe_index) ReadManyKeys(
+func (index *index) ReadManyKeys(
 	formatKey string,
 	metadata *object_metadata.Metadata,
 	locations *[]Loc,
@@ -231,7 +212,7 @@ func (index *object_probe_index) ReadManyKeys(
 	return index.ReadMany(blobId, locations)
 }
 
-func (index *object_probe_index) ReadAll(
+func (index *index) ReadAll(
 	metadata *object_metadata.Metadata,
 	locations *[]Loc,
 ) (err error) {
@@ -266,7 +247,7 @@ func (index *object_probe_index) ReadAll(
 	return wg.GetError()
 }
 
-func (index *object_probe_index) PrintAll(env env_ui.Env) (err error) {
+func (index *index) PrintAll(env env_ui.Env) (err error) {
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
 
@@ -279,7 +260,7 @@ func (index *object_probe_index) PrintAll(env env_ui.Env) (err error) {
 	return
 }
 
-func (index *object_probe_index) Flush() (err error) {
+func (index *index) Flush() (err error) {
 	wg := errors.MakeWaitGroupParallel()
 
 	for pageIndex := range index.pages {
