@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 type PrivateKeyGenerator interface {
@@ -13,65 +12,40 @@ type PrivateKeyGenerator interface {
 }
 
 type (
-	PublicKey = Data
-	Sig       = Data
+	// TODO remove
+	PublicKey = Id
 )
 
-func NewKeyFromSeed(seed []byte) PrivateKey {
-	return PrivateKey(ed25519.NewKeyFromSeed(seed))
-}
+func Sign(
+	key interfaces.MarklId,
+	message interfaces.MarklId,
+	format string,
+	tipe string,
+	dst interfaces.MutableMarklId,
+) (err error) {
+	switch key.GetMarklType().GetMarklTypeId() {
+	default:
+		err = errors.Errorf("not a private key: %q", key.StringWithFormat())
+		return
 
-// TODO replace with Sign
-func SignBytes(key PrivateKey, message []byte) (sig []byte, err error) {
-	if sig, err = key.Sign(
+	case TypeIdEd25519Sec:
+	}
+
+	privateKey := ed25519.PrivateKey(key.GetBytes())
+
+	var sig []byte
+
+	if sig, err = privateKey.Sign(
 		nil,
-		message,
+		message.GetBytes(),
 		&ed25519.Options{},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-// TODO replace with Verify
-func VerifyBytes(
-	publicKey PublicKey,
-	message []byte,
-	sig []byte,
-) (err error) {
-	defer errors.DeferredRecover(&err)
-
-	if err = ed25519.VerifyWithOptions(
-		ed25519.PublicKey(publicKey),
-		message,
-		sig,
-		&ed25519.Options{},
-	); err != nil {
-		err = errors.Err422UnprocessableEntity.Errorf(
-			"invalid signature: %w. Signature: %x",
-			err,
-			sig,
-		)
-		return
-	}
-
-	return
-}
-
-func Sign(
-	key PrivateKey,
-	message interfaces.MarklId,
-	tipe string,
-	dst interfaces.MutableMarklId,
-) (err error) {
-	var sig []byte
-
-	if sig, err = key.Sign(
-		nil,
-		message.GetBytes(),
-		&ed25519.Options{},
+	if err = dst.SetFormat(
+		format,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -90,18 +64,29 @@ func Verify(
 ) (err error) {
 	defer errors.DeferredRecover(&err)
 
-	ui.Debug().Print(len(sig.GetBytes()))
+	switch publicKey.GetMarklType().GetMarklTypeId() {
+	default:
+		err = errors.Errorf(
+			"not a public key: %q",
+			publicKey.StringWithFormat(),
+		)
+		return
+
+	case TypeIdEd25519Pub:
+	}
+
+	pub := ed25519.PublicKey(publicKey.GetBytes())
 
 	if err = ed25519.VerifyWithOptions(
-		ed25519.PublicKey(publicKey.GetBytes()),
+		pub,
 		message.GetBytes(),
 		sig.GetBytes(),
 		&ed25519.Options{},
 	); err != nil {
 		err = errors.Err422UnprocessableEntity.Errorf(
-			"invalid signature: %w. Signature: %x",
+			"invalid signature: %w. Signature: %q",
 			err,
-			sig,
+			sig.StringWithFormat(),
 		)
 		return
 	}

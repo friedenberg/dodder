@@ -63,7 +63,12 @@ func (id Id) StringWithFormat() string {
 	} else {
 		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
 		errors.PanicIfError(err)
-		return fmt.Sprintf("%s@%s", id.format, bites)
+
+		if id.format != "" {
+			return fmt.Sprintf("%s@%s", id.format, bites)
+		} else {
+			return fmt.Sprintf("%s", bites)
+		}
 	}
 }
 

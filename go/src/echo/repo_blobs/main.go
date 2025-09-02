@@ -2,7 +2,6 @@ package repo_blobs
 
 import (
 	"bufio"
-	"crypto"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -22,7 +21,7 @@ type Blob interface {
 
 type BlobMutable interface {
 	Blob
-	SetPublicKey(crypto.PublicKey)
+	SetPublicKey(markl.Id)
 }
 
 type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]

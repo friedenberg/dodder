@@ -338,7 +338,15 @@ func ContextCancelWithErrorAndFormat(
 	values ...any,
 ) {
 	defer ContextContinueOrPanic(ctx)
-	ctx.Cancel(WrapSkip(1, fmt.Errorf(format, values...)))
+	ctx.Cancel(
+		WrapSkip(
+			1,
+			fmt.Errorf(
+				"%s: "+format,
+				append([]any{err.Error()}, values...)...,
+			),
+		),
+	)
 }
 
 func ContextCancelWithErrorf(

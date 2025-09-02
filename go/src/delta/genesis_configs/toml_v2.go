@@ -1,13 +1,11 @@
 package genesis_configs
 
 import (
-	"crypto/ed25519"
-
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -22,12 +20,12 @@ type TomlV2Common struct {
 }
 
 type TomlV2Private struct {
-	markl_toml.TomlPrivateKeyV0
+	PrivateKey markl.Id `toml:"private-key"`
 	TomlV2Common
 }
 
 type TomlV2Public struct {
-	markl_toml.TomlPublicKeyV0
+	PublicKey markl.Id `toml:"public-key"`
 	TomlV2Common
 }
 
@@ -86,19 +84,23 @@ func (config *TomlV2Private) GetGenesisConfig() ConfigPrivate {
 
 func (config *TomlV2Private) GetGenesisConfigPublic() ConfigPublic {
 	return &TomlV2Public{
-		TomlV2Common:    config.TomlV2Common,
-		TomlPublicKeyV0: config.TomlPrivateKeyV0.GetPublicKey(),
+		TomlV2Common: config.TomlV2Common,
+		PublicKey:    config.GetPublicKey(),
 	}
 }
 
-func (config *TomlV2Private) GetPrivateKey() markl.PrivateKey {
-	return markl.NewKeyFromSeed(config.PrivateKey.Data)
+func (config *TomlV2Private) GetPrivateKey() markl.Id {
+	return config.PrivateKey
+}
+
+func (config *TomlV2Private) GetPrivateKeyMutable() *markl.Id{
+	return &config.PrivateKey
 }
 
 func (config *TomlV2Private) GetPublicKey() markl.PublicKey {
-	return markl.PublicKey(
-		config.GetPrivateKey().Public().(ed25519.PublicKey),
-	)
+	public, err := markl.GetPublicKey(config.PrivateKey)
+	errors.PanicIfError(err)
+	return public
 }
 
 func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
@@ -106,7 +108,7 @@ func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
 }
 
 func (config TomlV2Public) GetPublicKey() markl.PublicKey {
-	return config.PublicKey.Data
+	return config.PublicKey
 }
 
 func (config *TomlV2Common) GetStoreVersion() store_version.Version {

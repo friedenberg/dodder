@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -62,14 +61,9 @@ func (coder doddishV1) DecodeFrom(
 		}
 	}
 
-	if err = markl.SetMerkleIdWithFormat(
-		object.Metadata.GetRepoPubKeyMutable(),
-		markl.FormatIdRepoPubKeyV1,
+	object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
 		coder.configGenesis.GetPublicKey(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	if err = object.FinalizeUsingObject(); err != nil {
 		err = errors.Wrap(err)

@@ -7,12 +7,8 @@ import (
 )
 
 type (
-	MarklTypeIdGetter interface {
-		GetMarklTypeId() string
-	}
-
 	MarklType interface {
-		MarklTypeIdGetter
+		GetMarklTypeId() string
 	}
 
 	HashType interface {

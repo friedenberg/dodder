@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -27,9 +28,18 @@ func (env *Env) Genesis(bigBang BigBang) {
 		)
 	}
 
-	if err := bigBang.GenesisConfig.Blob.GeneratePrivateKey(); err != nil {
-		env.Cancel(err)
-		return
+	{
+		privateKeyMutable := bigBang.GenesisConfig.Blob.GetPrivateKeyMutable()
+
+		if err := markl.GeneratePrivateKey(
+			nil,
+			markl.FormatIdRepoPrivateKeyV1,
+			markl.TypeIdEd25519Sec,
+			privateKeyMutable,
+		); err != nil {
+			env.Cancel(err)
+			return
+		}
 	}
 
 	bigBang.GenesisConfig.Blob.SetInventoryListTypeId(

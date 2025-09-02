@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -46,29 +47,30 @@ func (transacted *Transacted) FinalizeUsingObject() (err error) {
 	}
 
 	return transacted.FinalizeUsingRepoPubKey(
-		transacted.Metadata.GetRepoPubKey().GetBytes(),
+		transacted.Metadata.GetRepoPubKey(),
 	)
 }
 
 // calculates the object digests using the provided repo pubkey
 func (transacted *Transacted) FinalizeUsingRepoPubKey(
-	pubKey markl.PublicKey,
+	pubKey interfaces.MarklId,
 ) (err error) {
 	// TODO migrate this to config
 	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {
-		if err = markl.SetMerkleIdWithFormat(
-			transacted.Metadata.GetRepoPubKeyMutable(),
-			markl.FormatIdRepoPubKeyV1,
-			pubKey,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		pubKeyMutable.ResetWithMarklId(pubKey)
+		// if err = markl.SetMerkleIdWithFormat(
+		// 	transacted.Metadata.GetRepoPubKeyMutable(),
+		// 	markl.FormatIdRepoPubKeyV1,
+		// 	pubKey,
+		// ); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
 	} else {
 		if err = markl.MakeErrNotEqualBytes(
-			pubKey,
+			pubKey.GetBytes(),
 			pubKeyMutable.GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -142,14 +144,9 @@ func (transacted *Transacted) FinalizeAndSign(
 		return
 	}
 
-	if err = markl.SetMerkleIdWithFormat(
-		transacted.Metadata.GetRepoPubKeyMutable(),
-		markl.FormatIdRepoPubKeyV1,
+	transacted.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
 		config.GetPublicKey(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	if err = transacted.FinalizeUsingObject(); err != nil {
 		err = errors.Wrap(err)
@@ -166,20 +163,12 @@ func (transacted *Transacted) FinalizeAndSign(
 
 	privateKey := config.GetPrivateKey()
 
-	var bites []byte
-
-	if bites, err = markl.SignBytes(
+	if err = markl.Sign(
 		privateKey,
-		transacted.Metadata.GetObjectDigest().GetBytes(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = markl.SetMerkleIdWithFormat(
-		transacted.Metadata.GetObjectSigMutable(),
+		transacted.Metadata.GetObjectDigest(),
 		config.GetObjectSigMarklTypeId(),
-		bites,
+		markl.TypeIdEd25519Sig,
+		transacted.Metadata.GetObjectSigMutable(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -241,10 +230,10 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = markl.VerifyBytes(
-		pubKey.GetBytes(),
-		transacted.Metadata.GetObjectDigest().GetBytes(),
-		transacted.Metadata.GetObjectSig().GetBytes(),
+	if err = markl.Verify(
+		pubKey,
+		transacted.Metadata.GetObjectDigest(),
+		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrapf(err, "Object: %q", String(transacted))
 		return

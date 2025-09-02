@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -241,30 +240,31 @@ func (server *Server) addSignatureIfNecessary(
 		return
 	}
 
-	var nonce blech32.Value
+	var nonce markl.Id
 
-	if nonce, err = blech32.MakeValueWithExpectedHRP(
-		markl.FormatIdRequestAuthChallengeV1,
+	if err = nonce.Set(
 		nonceString,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	pubkey := blech32.Value{
-		HRP:  markl.FormatIdRepoPubKeyV1,
-		Data: server.Repo.GetImmutableConfigPublic().GetPublicKey(),
-	}
-
-	header.Set(headerRepoPublicKey, pubkey.String())
+	header.Set(
+		headerRepoPublicKey,
+		server.Repo.GetImmutableConfigPublic().GetPublicKey().String(),
+	)
 
 	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
-	sig := blech32.Value{
-		HRP: markl.FormatIdRequestAuthResponseV1,
-	}
+	var sig markl.Id
 
-	if sig.Data, err = markl.SignBytes(privateKey, nonce.Data); err != nil {
+	if err = markl.Sign(
+		privateKey,
+		nonce,
+		markl.FormatIdRequestAuthResponseV1,
+		markl.TypeIdEd25519Sig,
+		&sig,
+	); err != nil {
 		server.EnvLocal.Cancel(err)
 		return
 	}

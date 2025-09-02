@@ -2,6 +2,7 @@ package markl
 
 import (
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
@@ -11,7 +12,19 @@ func (id Id) MarshalText() (bites []byte, err error) {
 	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
 		bites = fmt.Appendf(nil, "%x", id.data)
 	} else {
-		if bites, err = blech32.Encode(id.tipe.GetMarklTypeId(), id.data); err != nil {
+		var hrp string
+
+		if format := id.GetFormat(); format != "" {
+			hrp = fmt.Sprintf(
+				"%s@%s",
+				id.GetFormat(),
+				id.tipe.GetMarklTypeId(),
+			)
+		} else {
+			hrp = id.tipe.GetMarklTypeId()
+		}
+
+		if bites, err = blech32.Encode(hrp, id.data); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -21,10 +34,22 @@ func (id Id) MarshalText() (bites []byte, err error) {
 }
 
 func (id *Id) UnmarshalText(bites []byte) (err error) {
-	var typeId string
-	if typeId, id.data, err = blech32.Decode(bites); err != nil {
+	var formatAndTypeId string
+
+	if formatAndTypeId, id.data, err = blech32.Decode(bites); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	formatId, typeId, ok := strings.Cut(formatAndTypeId, "@")
+
+	if ok {
+		if err = id.SetFormat(formatId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		typeId = formatAndTypeId
 	}
 
 	if id.tipe, err = GetMarklTypeOrError(typeId); err != nil {

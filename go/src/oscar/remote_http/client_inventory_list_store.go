@@ -2,7 +2,6 @@ package remote_http
 
 import (
 	"bufio"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -98,26 +96,26 @@ func (client client) ImportInventoryList(
 
 		request.Header.Add(
 			headerRepoPublicKey,
-			base64.URLEncoding.EncodeToString(pubKey),
+			pubKey.StringWithFormat(),
 		)
 	}
 
 	{
-		sig := blech32.Value{
-			HRP: markl.FormatIdObjectSigV1,
-		}
-
+		var sig markl.Id
 		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
-		if sig.Data, err = markl.SignBytes(
+		if err = markl.Sign(
 			key,
-			listSku.GetBlobDigest().GetBytes(),
+			listSku.GetBlobDigest(),
+			markl.FormatIdRequestRepoSigV1,
+			markl.FormatIdObjectSigV1,
+			&sig,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		request.Header.Add(headerRepoSig, sig.String())
+		request.Header.Add(headerRepoSig, sig.StringWithFormat())
 	}
 
 	// TODO ensure that conflicts were addressed prior to importing

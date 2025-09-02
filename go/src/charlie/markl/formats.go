@@ -22,6 +22,7 @@ const (
 	FormatIdObjectSigV0           = "dodder-repo-sig-v1"
 	FormatIdObjectSigV1           = "dodder-object-sig-v1"
 	FormatIdRequestAuthResponseV1 = "dodder-request_auth-response-v1"
+	FormatIdRequestRepoSigV1      = "dodder-request_auth-repo-sig-v1"
 
 	// PubKeys
 	FormatIdRepoPubKeyV1 = "dodder-repo-public_key-v1"

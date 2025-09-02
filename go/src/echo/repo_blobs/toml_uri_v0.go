@@ -2,16 +2,29 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 type TomlUriV0 struct {
-	markl_toml.TomlPublicKeyV0
-	Uri values.Uri `toml:"uri"`
+	PublicKey markl.Id   `toml:"public-key"`
+	Uri       values.Uri `toml:"uri"`
 }
+
+var (
+	_ Blob        = TomlUriV0{}
+	_ BlobMutable = &TomlUriV0{}
+)
 
 func (b TomlUriV0) GetRepoBlob() Blob {
 	return b
+}
+
+func (config TomlUriV0) GetPublicKey() markl.Id {
+	return config.PublicKey
+}
+
+func (config *TomlUriV0) SetPublicKey(id markl.Id) {
+	config.PublicKey.ResetWith(id)
 }
 
 func (b TomlUriV0) GetRepoType() {

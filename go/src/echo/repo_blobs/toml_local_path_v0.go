@@ -1,26 +1,39 @@
 package repo_blobs
 
-import "code.linenisgreat.com/dodder/go/src/delta/markl_toml"
+import "code.linenisgreat.com/dodder/go/src/charlie/markl"
 
 type TomlLocalPathV0 struct {
-	markl_toml.TomlPublicKeyV0
-	Path string `toml:"path"`
+	PublicKey markl.Id `toml:"public-key"`
+	Path      string   `toml:"path"`
 }
 
-func (b TomlLocalPathV0) GetRepoBlob() Blob {
-	return b
+var (
+	_ Blob        = TomlLocalPathV0{}
+	_ BlobMutable = &TomlLocalPathV0{}
+)
+
+func (config TomlLocalPathV0) GetRepoBlob() Blob {
+	return config
 }
 
-func (a *TomlLocalPathV0) Reset() {
-	a.Path = ""
+func (config TomlLocalPathV0) GetPublicKey() markl.Id {
+	return config.PublicKey
 }
 
-func (a *TomlLocalPathV0) ResetWith(b TomlLocalPathV0) {
-	a.Path = b.Path
+func (config *TomlLocalPathV0) SetPublicKey(id markl.Id) {
+	config.PublicKey.ResetWith(id)
 }
 
-func (a TomlLocalPathV0) Equals(b TomlLocalPathV0) bool {
-	if a.Path != b.Path {
+func (config *TomlLocalPathV0) Reset() {
+	config.Path = ""
+}
+
+func (config *TomlLocalPathV0) ResetWith(b TomlLocalPathV0) {
+	config.Path = b.Path
+}
+
+func (config TomlLocalPathV0) Equals(b TomlLocalPathV0) bool {
+	if config.Path != b.Path {
 		return false
 	}
 

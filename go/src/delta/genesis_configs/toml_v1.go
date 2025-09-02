@@ -1,15 +1,12 @@
 package genesis_configs
 
 import (
-	"crypto/ed25519"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/markl_toml"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -24,12 +21,12 @@ type TomlV1Common struct {
 }
 
 type TomlV1Private struct {
-	markl_toml.TomlPrivateKeyV0
+	PrivateKey markl.Id `toml:"private-key"`
 	TomlV1Common
 }
 
 type TomlV1Public struct {
-	markl_toml.TomlPublicKeyV0
+	PublicKey markl.Id `toml:"public-key"`
 	TomlV1Common
 }
 
@@ -83,19 +80,23 @@ func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
 
 func (config *TomlV1Private) GetGenesisConfigPublic() ConfigPublic {
 	return &TomlV1Public{
-		TomlV1Common:    config.TomlV1Common,
-		TomlPublicKeyV0: config.TomlPrivateKeyV0.GetPublicKey(),
+		TomlV1Common: config.TomlV1Common,
+		PublicKey:    config.GetPublicKey(),
 	}
 }
 
-func (config *TomlV1Private) GetPrivateKey() markl.PrivateKey {
-	return markl.NewKeyFromSeed(config.PrivateKey.Data)
+func (config *TomlV1Private) GetPrivateKey() markl.Id {
+	return config.PrivateKey
+}
+
+func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id{
+	return &config.PrivateKey
 }
 
 func (config *TomlV1Private) GetPublicKey() markl.PublicKey {
-	return markl.PublicKey(
-		config.GetPrivateKey().Public().(ed25519.PublicKey),
-	)
+	public, err := markl.GetPublicKey(config.PrivateKey)
+	errors.PanicIfError(err)
+	return public
 }
 
 func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
@@ -103,7 +104,7 @@ func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
 }
 
 func (config TomlV1Public) GetPublicKey() markl.PublicKey {
-	return config.PublicKey.Data
+	return config.PublicKey
 }
 
 func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {

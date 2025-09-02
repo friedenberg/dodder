@@ -6,6 +6,7 @@ type DirectoryLayout interface {
 
 	DirFirstBlobStoreBlobs() string
 	DirFirstBlobStoreInventoryLists() string
+
 	DirBlobStoreConfigs(p ...string) string
 	DirBlobStores(p ...string) string
 

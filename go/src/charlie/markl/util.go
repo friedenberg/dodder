@@ -3,6 +3,8 @@ package markl
 import (
 	"bufio"
 	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -11,6 +13,29 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
+
+func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
+	switch private.GetMarklType().GetMarklTypeId() {
+	default:
+		err = errors.Errorf("unsupported id: %q", private.StringWithFormat())
+		return
+
+	case TypeIdEd25519Sec:
+		if err = public.SetFormat(FormatIdRepoPubKeyV1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		pubKeyBytes := ed25519.PrivateKey(private.GetBytes()).Public().(ed25519.PublicKey)
+
+		if err = public.SetMerkleId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
 
 func SetHexStringFromPath(
 	id interfaces.MutableMarklId,
@@ -213,4 +238,65 @@ func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	} else {
 		return Format(merkleId)
 	}
+}
+
+func MakeNonce(bites []byte, format string) (nonce Id, err error) {
+	if format == "" {
+		format = FormatIdRequestAuthChallengeV1
+	}
+
+	if len(bites) == 0 {
+		bites = make([]byte, 32)
+
+		if _, err = rand.Read(bites); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = nonce.SetFormat(format); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = nonce.SetMerkleId(
+		TypeIdNonce,
+		bites,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func GeneratePrivateKey(
+	rand io.Reader,
+	format string,
+	tipe string,
+	dst interfaces.MutableMarklId,
+) (err error) {
+	if tipe != TypeIdEd25519Sec {
+		err = errors.Errorf("unsupported type: %q", tipe)
+		return
+	}
+
+	var src ed25519.PrivateKey
+
+	if _, src, err = ed25519.GenerateKey(rand); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = dst.SetFormat(format); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = dst.SetMerkleId(tipe, src); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

@@ -2,7 +2,6 @@ package log_remote_inventory_lists
 
 import (
 	"bufio"
-	"encoding/base64"
 	"encoding/gob"
 	"io"
 	"os"
@@ -120,7 +119,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 	digest, repool := markl.HashTypeSha256.FromStringFormat(
 		"%s%s%s%s",
 		entry.EntryType,
-		base64.URLEncoding.EncodeToString(entry.PublicKey),
+		entry.PublicKey.StringWithFormat(),
 		entry.GetObjectId(),
 		entry.GetBlobDigest(),
 	)

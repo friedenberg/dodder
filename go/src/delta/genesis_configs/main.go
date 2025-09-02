@@ -14,7 +14,7 @@ import (
 type (
 	Config interface {
 		GetStoreVersion() store_version.Version
-		GetPublicKey() markl.PublicKey
+		GetPublicKey() markl.Id
 		GetRepoType() repo_type.Type // TODO remove
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
@@ -31,7 +31,7 @@ type (
 		Config
 		GetGenesisConfigPublic() ConfigPublic
 		GetGenesisConfig() ConfigPrivate
-		GetPrivateKey() markl.PrivateKey
+		GetPrivateKey() markl.Id
 	}
 
 	ConfigPrivateMutable interface {
@@ -44,7 +44,7 @@ type (
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type) // TODO remove
 		SetRepoId(ids.RepoId)
-		markl.PrivateKeyGenerator
+		GetPrivateKeyMutable() *markl.Id
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

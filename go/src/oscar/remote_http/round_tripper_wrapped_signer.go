@@ -2,11 +2,9 @@ package remote_http
 
 import (
 	"bytes"
-	"crypto/rand"
 	"net/http"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
@@ -26,16 +24,14 @@ type RoundTripperBufioWrappedSigner struct {
 func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	request *http.Request,
 ) (response *http.Response, err error) {
-	nonceBytes := make([]byte, 32)
+	var nonce markl.Id
 
-	if _, err = rand.Read(nonceBytes); err != nil {
+	if nonce, err = markl.MakeNonce(
+		nil,
+		markl.FormatIdRequestAuthChallengeV1,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	nonce := blech32.Value{
-		HRP:  markl.FormatIdRequestAuthChallengeV1,
-		Data: nonceBytes,
 	}
 
 	request.Header.Add(headerChallengeNonce, nonce.String())
@@ -54,22 +50,18 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		return
 	}
 
-	var sig blech32.Value
+	var sig markl.Id
 
-	if sig, err = blech32.MakeValueWithExpectedHRP(
-		markl.FormatIdRequestAuthResponseV1,
-		sigString,
-	); err != nil {
+	if err = sig.Set(sigString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	pubkeyString := response.Header.Get(headerRepoPublicKey)
 
-	var pubkey blech32.Value
+	var pubkey markl.Id
 
-	if pubkey, err = blech32.MakeValueWithExpectedHRP(
-		markl.FormatIdRepoPubKeyV1,
+	if err = pubkey.Set(
 		pubkeyString,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -79,21 +71,21 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 	if roundTripper.PublicKey.IsEmpty() {
 		// TODO present prompt to user for TOFU
 	} else {
-		if !bytes.Equal(roundTripper.PublicKey.GetBytes(), pubkey.Data) {
+		if !bytes.Equal(roundTripper.PublicKey.GetBytes(), pubkey.GetBytes()) {
 			err = errors.Errorf(
 				"expected pubkey %q but got %q",
 				roundTripper.PublicKey.GetBytes(),
-				pubkey.Data,
+				pubkey.GetBytes(),
 			)
 
 			return
 		}
 	}
 
-	if err = markl.VerifyBytes(
-		pubkey.Data,
-		nonceBytes,
-		sig.Data,
+	if err = markl.Verify(
+		pubkey,
+		nonce,
+		sig,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

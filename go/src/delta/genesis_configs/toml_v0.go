@@ -61,11 +61,15 @@ func (config V0Common) GetRepoType() repo_type.Type {
 	return repo_type.TypeWorkingCopy
 }
 
-func (config V0Common) GetPrivateKey() markl.PrivateKey {
+func (config V0Common) GetPrivateKey() markl.Id {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config V0Common) GetPublicKey() markl.PublicKey {
+func (config *V0Common) GetPrivateKeyMutable() *markl.Id {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (config V0Common) GetPublicKey() markl.Id {
 	panic(errors.Err405MethodNotAllowed)
 }
 

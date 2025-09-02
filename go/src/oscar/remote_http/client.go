@@ -74,10 +74,9 @@ func (client *client) Initialize() {
 		var err error
 
 		if response, err = client.http.Do(request); err != nil {
-			errors.ContextCancelWithErrorAndFormat(
+			errors.ContextCancelWithError(
 				client.envUI,
 				err,
-				"failed to read response",
 			)
 		}
 	}

@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -102,18 +101,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			}
 
 		case "pubkey":
-			// TODO migrate this to config
-			var pubKey markl.Id
-
-			if err := markl.SetMerkleIdWithFormat(
-				&pubKey,
-				markl.FormatIdRepoPubKeyV1,
-				configBlob.GetPublicKey(),
-			); err != nil {
-				repo.Cancel(err)
-			}
-
-			repo.GetUI().Print(pubKey.StringWithFormat())
+			repo.GetUI().Print(configBlob.GetPublicKey().StringWithFormat())
 
 		case "xdg":
 			ecksDeeGee := repo.GetXDG()

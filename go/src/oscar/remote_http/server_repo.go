@@ -10,7 +10,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -55,7 +54,14 @@ func (server *Server) writeInventoryList(
 		{
 			var err error
 
-			if logEntry.PublicKey, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
+			var bites []byte
+
+			if bites, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
+				response.Error(err)
+				return
+			}
+
+			if err = logEntry.SetMerkleId(markl.TypeIdEd25519Pub, bites); err != nil {
 				response.Error(err)
 				return
 			}
@@ -64,24 +70,24 @@ func (server *Server) writeInventoryList(
 		logEntry.EntryType = log_remote_inventory_lists.EntryTypeReceived
 		logEntry.Transacted = listObject
 
-		var sig blech32.Value
+		var sig markl.Id
 
 		if err := sig.Set(request.request.Header.Get(headerRepoSig)); err != nil {
 			response.Error(err)
 			return
 		}
 
-		if err := markl.VerifyBytes(
+		if err := markl.Verify(
 			logEntry.PublicKey,
-			expected.GetBytes(),
-			sig.Data,
+			expected,
+			sig,
 		); err != nil {
 			response.Error(err)
 			return
 		}
 	}
 
-	if len(logEntry.PublicKey) > 0 {
+	if len(logEntry.PublicKey.GetBytes()) > 0 {
 		if err := logRemoteInventoryLists.Exists(
 			logEntry,
 		); collections.IsErrNotFound(err) && err != nil {
@@ -185,7 +191,7 @@ func (server *Server) writeInventoryList(
 		return
 	}
 
-	if len(logEntry.PublicKey) > 0 {
+	if len(logEntry.PublicKey.GetBytes()) > 0 {
 		if err := logRemoteInventoryLists.Append(
 			logEntry,
 		); err != nil {
