@@ -53,7 +53,7 @@ func (cmd Fsck) Run(req command.Request) {
 		req.PopArgs(),
 	)
 
-	ui.Out().Printf("Verification for %q objects in progress...", query)
+	ui.Out().Printf("verification for %q objects in progress...", query)
 
 	var count atomic.Uint32
 
@@ -130,7 +130,7 @@ func (cmd Fsck) Run(req command.Request) {
 		return
 	}
 
-	ui.Out().Printf("complete")
+	ui.Out().Printf("verification complete")
 	ui.Out().Printf("objects verified: %d", count.Load())
 	ui.Out().Printf("objects with errors: %d", len(objectErrors))
 

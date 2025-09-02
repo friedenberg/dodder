@@ -15,10 +15,19 @@ import (
 )
 
 func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
-	switch private.GetMarklType().GetMarklTypeId() {
+	marklTypeId := private.GetMarklType().GetMarklTypeId()
+	switch marklTypeId {
 	default:
-		err = errors.Errorf("unsupported id: %q", private.StringWithFormat())
+		err = errors.Errorf(
+			"unsupported id: %q. Type: %q",
+			private.StringWithFormat(),
+			marklTypeId,
+		)
 		return
+
+	case FormatIdRepoPrivateKeyV1:
+		// legacy
+		fallthrough
 
 	case TypeIdEd25519Sec:
 		if err = public.SetFormat(FormatIdRepoPubKeyV1); err != nil {
