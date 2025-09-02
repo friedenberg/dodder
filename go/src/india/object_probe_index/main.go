@@ -11,18 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
-type (
-	// TODO add support for different digests
-	pageInterface interface {
-		// TODO rename to AddDigest and enforce digest type
-		AddMarklId(interfaces.MarklId, Loc) error
-		ReadOne(id interfaces.MarklId) (loc Loc, err error)
-		ReadMany(id interfaces.MarklId, locs *[]Loc) (err error)
-	}
-)
-
-type Metadata = object_metadata.Metadata
-
 const (
 	DigitWidth = 1
 	PageCount  = 1 << (DigitWidth * 4)

@@ -199,7 +199,11 @@ type ProbeId struct {
 	Id    interfaces.MarklId
 }
 
-func (transacted *Transacted) AllProbeIds(
+func (transacted *Transacted) AllProbeIds() interfaces.Seq[ProbeId] {
+	return transacted.allProbeIds(markl.HashTypeSha256)
+}
+
+func (transacted *Transacted) allProbeIds(
 	hashType markl.HashType,
 ) interfaces.Seq[ProbeId] {
 	return func(yield func(ProbeId) bool) {

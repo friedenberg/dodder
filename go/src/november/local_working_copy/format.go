@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -938,7 +937,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for probeId := range object.AllProbeIds(markl.HashTypeSha256) {
+				for probeId := range object.AllProbeIds() {
 					if _, err = fmt.Fprintf(
 						writer,
 						"%s (%q): %q -> %q\n",

@@ -67,7 +67,7 @@ func (index *probeIndex) saveOneObjectLoc(
 	object *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
-	for probeId := range object.AllProbeIds(index.hashType) {
+	for probeId := range object.AllProbeIds() {
 		if err = index.Index.AddMarklId(probeId.Id, loc); err != nil {
 			err = errors.Wrap(err)
 			return
