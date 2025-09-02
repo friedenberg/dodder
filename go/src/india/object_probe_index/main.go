@@ -88,6 +88,13 @@ func (index *Index) addDigest(
 		return
 	}
 
+	actual := digest.GetMarklType().GetMarklTypeId()
+
+	if actual != index.hashType.GetMarklTypeId() {
+		err = errors.Errorf("unsupported hash type: %q", actual)
+		return
+	}
+
 	if err = index.pages[pageIndex].AddMarklId(digest, loc); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
@@ -97,36 +104,50 @@ func (index *Index) addDigest(
 }
 
 func (index *Index) ReadOne(
-	blobId interfaces.MarklId,
+	digest interfaces.MarklId,
 ) (loc Loc, err error) {
+	actual := digest.GetMarklType().GetMarklTypeId()
+
+	if actual != index.hashType.GetMarklTypeId() {
+		err = errors.Errorf("unsupported hash type: %q", actual)
+		return
+	}
+
 	var pageIndex uint8
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		blobId,
+		digest,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[pageIndex].ReadOne(blobId)
+	return index.pages[pageIndex].ReadOne(digest)
 }
 
 func (index *Index) ReadMany(
-	blobId interfaces.MarklId,
+	digest interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
+	actual := digest.GetMarklType().GetMarklTypeId()
+
+	if actual != index.hashType.GetMarklTypeId() {
+		err = errors.Errorf("unsupported hash type: %q", actual)
+		return
+	}
+
 	var pageIndex uint8
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		blobId,
+		digest,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[pageIndex].ReadMany(blobId, locations)
+	return index.pages[pageIndex].ReadMany(digest, locations)
 }
 
 func (index *Index) PrintAll(env env_ui.Env) (err error) {
