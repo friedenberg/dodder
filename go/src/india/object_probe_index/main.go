@@ -6,9 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 )
 
 const (
@@ -122,100 +120,6 @@ func (index *Index) ReadMany(
 	}
 
 	return index.pages[pageIndex].ReadMany(blobId, locations)
-}
-
-func (index *Index) ReadOneKey(
-	formatKey string,
-	metadata *object_metadata.Metadata,
-) (loc Loc, err error) {
-	var format object_inventory_format.Format
-
-	if format, err = object_inventory_format.FormatForMarklFormatIdError(formatKey); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var blobId interfaces.MarklId
-
-	if blobId, err = object_inventory_format.GetDigestForMetadata(
-		format,
-		metadata,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer markl.PutBlobId(blobId)
-
-	if loc, err = index.ReadOne(blobId); err != nil {
-		err = errors.Wrapf(err, "Key: %s", formatKey)
-		return
-	}
-
-	return
-}
-
-// TODO remove formatKey and switch to setting formatter on init
-func (index *Index) ReadManyKeys(
-	formatKey string,
-	metadata *object_metadata.Metadata,
-	locations *[]Loc,
-) (err error) {
-	var format object_inventory_format.Format
-
-	if format, err = object_inventory_format.FormatForMarklFormatIdError(
-		formatKey,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var blobId interfaces.MarklId
-
-	if blobId, err = object_inventory_format.GetDigestForMetadata(
-		format,
-		metadata,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return index.ReadMany(blobId, locations)
-}
-
-func (index *Index) ReadAll(
-	metadata *object_metadata.Metadata,
-	locations *[]Loc,
-) (err error) {
-	var blobIds map[string]interfaces.MarklId
-
-	if blobIds, err = object_inventory_format.GetDigestsForMetadata(
-		metadata,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	wg := errors.MakeWaitGroupParallel()
-
-	for key, blobId := range blobIds {
-		wg.Do(
-			func() (err error) {
-				var loc Loc
-
-				if loc, err = index.ReadOne(blobId); err != nil {
-					err = errors.Wrapf(err, "Key: %s", key)
-					return
-				}
-
-				*locations = append(*locations, loc)
-
-				return
-			},
-		)
-	}
-
-	return wg.GetError()
 }
 
 func (index *Index) PrintAll(env env_ui.Env) (err error) {

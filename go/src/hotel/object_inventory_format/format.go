@@ -13,11 +13,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings"
 	"code.linenisgreat.com/dodder/go/src/delta/key_strings_german"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
 func FormatForKey(k string) Format {
@@ -62,14 +60,6 @@ func writeMetadataKeyTo(
 	// 	err = errors.Errorf("unsupported key: %T", key)
 	// 	return
 	// }
-}
-
-func writeMetadataKeyByteTo(
-	writer io.Writer,
-	context FormatterContext,
-	key key_bytes.Binary,
-) (n int64, err error) {
-	return
 }
 
 func writeMetadataKeyStringTo(
@@ -334,31 +324,17 @@ func GetDigestForContext(
 ) (digest interfaces.MarklId, err error) {
 	m := context.GetMetadata()
 
-	switch format.marklFormatId {
-	case "Akte", "AkteTyp":
-		if m.GetBlobDigest().IsNull() {
-			return
-		}
-
-	case "AkteBez":
-		if m.GetBlobDigest().IsNull() && m.Description.IsEmpty() {
-			return
-		}
-	}
-
 	if m.GetTai().IsEmpty() {
 		err = ErrEmptyTai
 		return
 	}
 
-	return getDigestForContext(format, context)
-}
+	if digest, err = WriteMetadata(nil, format, context); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-func GetDigestForMetadata(
-	format Format,
-	metadata *object_metadata.Metadata,
-) (digest interfaces.MarklId, err error) {
-	return GetDigestForContext(format, nopFormatterContext{metadata})
+	return
 }
 
 func WriteMetadata(
@@ -379,18 +355,6 @@ func WriteMetadata(
 	}
 
 	blobDigest = marklWriter.GetMarklId()
-
-	return
-}
-
-func getDigestForContext(
-	format Format,
-	context FormatterContext,
-) (digest interfaces.MarklId, err error) {
-	if digest, err = WriteMetadata(nil, format, context); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }
@@ -417,32 +381,6 @@ func GetDigestForContextDebug(
 	value := sb.String()
 
 	ui.Debug().Printf("%q -> %s", value, markl.Format(digest))
-
-	return
-}
-
-// TODO switch to accepting objects
-func GetDigestsForMetadata(
-	metadata *object_metadata.Metadata,
-) (digests map[string]interfaces.MarklId, err error) {
-	digests = make(map[string]interfaces.MarklId, len(formatsList))
-
-	for _, format := range formatsList {
-		f := FormatForKey(format.marklFormatId)
-
-		var digest interfaces.MarklId
-
-		if digest, err = GetDigestForMetadata(f, metadata); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if digest == nil {
-			continue
-		}
-
-		digests[format.marklFormatId] = digest
-	}
 
 	return
 }

@@ -39,6 +39,10 @@ type Format struct {
 	keys          []keyType
 }
 
+func (format Format) GetMarklTypeId() string {
+	return format.marklFormatId
+}
+
 func FormatForMarklFormatIdError(
 	marklFormatId string,
 ) (format Format, err error) {
@@ -83,6 +87,17 @@ func init() {
 		key_strings_german.Etikett,
 		key_strings_german.Typ,
 	)
+
+	// registerFormat(
+	// 	markl.FormatIdObjectDigestObjectId,
+	// 	key_strings.ObjectId,
+	// )
+
+	// registerFormat(
+	// 	markl.FormatIdObjectDigestObjectIdTai,
+	// 	key_strings.ObjectId,
+	// 	key_strings.Tai,
+	// )
 
 	registerFormat(
 		markl.FormatIdObjectDigestSha256V1,

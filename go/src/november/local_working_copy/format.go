@@ -943,7 +943,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 						"%s (%q): %q -> %q\n",
 						object.GetObjectId(),
 						probeId.Key,
-						probeId.Value(),
+						"TODO value",
 						probeId.Id.StringWithFormat(),
 					); err != nil {
 						err = errors.Wrap(err)
