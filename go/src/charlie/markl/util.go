@@ -129,7 +129,12 @@ func SetHexBytes(
 
 	if id, ok := dst.(*Id); ok {
 		if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(
+				err,
+				"failed to SetHexBytes with type %s and bites %s",
+				tipe,
+				bites,
+			)
 			return
 		}
 

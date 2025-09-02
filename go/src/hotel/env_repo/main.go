@@ -93,7 +93,11 @@ func Make(
 			genesis_configs.CoderPrivate,
 			fileConfigPermanent,
 		); err != nil {
-			err = errors.Wrap(ErrNotInDodderDir{})
+			if errors.IsNotExist(err) {
+				err = errors.Wrap(ErrNotInDodderDir{})
+			} else {
+				err = errors.Wrap(err)
+			}
 			return
 		} else {
 			configLoaded = true

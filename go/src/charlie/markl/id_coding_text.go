@@ -53,7 +53,12 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 	}
 
 	if id.tipe, err = GetMarklTypeOrError(typeId); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(
+			err,
+			"failed to unmarshal %T with contents: %s",
+			id,
+			bites,
+		)
 		return
 	}
 

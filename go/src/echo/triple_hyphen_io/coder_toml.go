@@ -27,7 +27,7 @@ func (coder CoderToml[BLOB, BLOB_PTR]) DecodeFrom(
 		if err == io.EOF {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "%T", err)
 			return
 		}
 	}

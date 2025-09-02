@@ -23,6 +23,10 @@ func init() {
 }
 
 func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
+	if typeId == "zit-repo-private_key-v1" {
+		typeId = FormatIdRepoPrivateKeyV1
+	}
+
 	tipe, ok := types[typeId]
 
 	if !ok {

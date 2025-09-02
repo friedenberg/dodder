@@ -159,7 +159,12 @@ func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
 	}
 
 	if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(
+			err,
+			"failed to SetMerkleId on %T with contents: %s",
+			id,
+			bites,
+		)
 		return
 	}
 
