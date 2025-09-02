@@ -1,6 +1,8 @@
 package object_probe_index
 
 import (
+	"io"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
@@ -36,7 +38,7 @@ func MakeNoDuplicates(
 	hashType markl.HashType,
 ) (indecks *Index, err error) {
 	indecks = &Index{hashType: hashType}
-	err = indecks.initialize(rowEqualerShaOnly{}, envRepo, dir)
+	err = indecks.initialize(rowEqualerDigestOnly{}, envRepo, dir)
 	return
 }
 
@@ -61,18 +63,18 @@ func (index *Index) initialize(
 	return
 }
 
-func (index *Index) AddMarklId(
-	blobId interfaces.MarklId,
+func (index *Index) AddDigest(
+	digest interfaces.MarklId,
 	loc Loc,
 ) (err error) {
-	return index.addBlobId(blobId, loc)
+	return index.addDigest(digest, loc)
 }
 
-func (index *Index) addBlobId(
-	blobId interfaces.MarklId,
+func (index *Index) addDigest(
+	digest interfaces.MarklId,
 	loc Loc,
 ) (err error) {
-	if blobId.IsNull() {
+	if digest.IsNull() {
 		return
 	}
 
@@ -80,13 +82,18 @@ func (index *Index) addBlobId(
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		blobId,
+		digest,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return index.pages[pageIndex].AddMarklId(blobId, loc)
+	if err = index.pages[pageIndex].AddMarklId(digest, loc); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return
+	}
+
+	return
 }
 
 func (index *Index) ReadOne(

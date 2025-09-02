@@ -16,8 +16,9 @@ const (
 	// Digests
 	FormatIdObjectDigestSha256V1       = "dodder-object-digest-sha256-v1"
 	FormatIdV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
-	FormatIdObjectDigestObjectId       = "dodder-object-digest-objectId-v1"
-	FormatIdObjectDigestObjectIdTai    = "dodder-object-digest-objectId+tai-v1"
+	// FormatIdObjectDigestObjectId       = "dodder-object-digest-objectId-v1"
+	// FormatIdObjectDigestObjectIdTai    =
+	// "dodder-object-digest-objectId+tai-v1"
 
 	// Signatures
 	FormatIdObjectMotherSigV1     = "dodder-object-mother-sig-v1"

@@ -95,7 +95,7 @@ func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
 		Loc: loc,
 	}
 
-	if err = row.BlobId.SetDigest(id); err != nil {
+	if err = row.Digest.SetDigest(id); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -44,19 +44,19 @@ func (page *page) readFromRow(
 }
 
 type row struct {
-	BlobId markl.Id
+	Digest markl.Id
 	Loc
 }
 
 func (row *row) IsEmpty() bool {
-	return row.Loc.IsEmpty() && row.BlobId.IsNull()
+	return row.Loc.IsEmpty() && row.Digest.IsNull()
 }
 
 func (row *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
 		&row.Loc,
-		row.BlobId.String(),
+		row.Digest.String(),
 	)
 }
 
@@ -67,7 +67,7 @@ func (row *row) ReadFrom(
 	var n1 int
 	var n2 int64
 
-	n1, err = markl.ReadFrom(reader, &row.BlobId, hashType)
+	n1, err = markl.ReadFrom(reader, &row.Digest, hashType)
 	n += int64(n1)
 
 	if err != nil {
@@ -90,7 +90,7 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n1, err = writer.Write(row.BlobId.GetBytes())
+	n1, err = writer.Write(row.Digest.GetBytes())
 	n += int64(n1)
 
 	if err != nil {
@@ -112,29 +112,29 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return markl.Equals(&a.BlobId, &b.BlobId) &&
+	return markl.Equals(&a.Digest, &b.Digest) &&
 		a.Loc.Page == b.Loc.Page &&
 		a.Loc.Offset == b.Loc.Offset &&
 		a.Loc.ContentLength == b.Loc.ContentLength
 }
 
-type rowEqualerShaOnly struct{}
+type rowEqualerDigestOnly struct{}
 
-func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return markl.Equals(&a.BlobId, &b.BlobId)
+func (rowEqualerDigestOnly) Equals(a, b *row) bool {
+	return markl.Equals(&a.Digest, &b.Digest)
 }
 
 type rowResetter struct{}
 
 func (rowResetter) Reset(a *row) {
-	a.BlobId.Reset()
+	a.Digest.Reset()
 	a.Page = 0
 	a.Offset = 0
 	a.ContentLength = 0
 }
 
 func (rowResetter) ResetWith(a, b *row) {
-	a.BlobId.ResetWith(b.BlobId)
+	a.Digest.ResetWith(b.Digest)
 	a.Page = b.Page
 	a.Offset = b.Offset
 	a.ContentLength = b.ContentLength
@@ -143,7 +143,7 @@ func (rowResetter) ResetWith(a, b *row) {
 type rowLessor struct{}
 
 func (rowLessor) Less(a, b *row) bool {
-	cmp := bytes.Compare(a.BlobId.GetBytes(), b.BlobId.GetBytes())
+	cmp := bytes.Compare(a.Digest.GetBytes(), b.Digest.GetBytes())
 
 	if cmp != 0 {
 		return cmp == -1

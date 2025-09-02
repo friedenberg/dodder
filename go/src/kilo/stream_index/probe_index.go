@@ -68,7 +68,7 @@ func (index *probeIndex) saveOneObjectLoc(
 	loc object_probe_index.Loc,
 ) (err error) {
 	for probeId := range object.AllProbeIds() {
-		if err = index.Index.AddMarklId(probeId.Id, loc); err != nil {
+		if err = index.Index.AddDigest(probeId.Id, loc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -83,7 +83,7 @@ func (index *probeIndex) saveOneLocString(
 ) (err error) {
 	marklId := index.hashType.FromStringContent(str)
 
-	if err = index.Index.AddMarklId(marklId, loc); err != nil {
+	if err = index.Index.AddDigest(marklId, loc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

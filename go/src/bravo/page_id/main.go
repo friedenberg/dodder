@@ -61,7 +61,23 @@ func PageIndexForDigest(
 		panic(err)
 	}
 
-	digestString := markl.Format(digest)
+	if n, err = PageIndexForDigestString(
+		width,
+		markl.Format(digest),
+	); err != nil {
+		err = errors.ErrorWithStackf("page out of bounds: %d", n1)
+		return
+	}
+
+	return
+}
+
+func PageIndexForDigestString(
+	width uint8,
+	digestString string,
+) (n uint8, err error) {
+	var n1 int64
+
 	bucketIndexString := digestString[:width]
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
