@@ -4,14 +4,13 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type deduper struct {
-	format     object_inventory_format.Format
+	formatId   string
 	lookupLock *sync.RWMutex
 	lookup     map[string]struct{}
 }
@@ -21,17 +20,7 @@ func (deduper *deduper) initialize(
 	envRepo env_repo.Env,
 ) {
 	if options.DedupingFormatId != "" {
-		var err error
-		if deduper.format, err = object_inventory_format.FormatForMarklFormatIdError(
-			options.DedupingFormatId,
-		); err != nil {
-			errors.ContextCancelWithBadRequestf(
-				envRepo,
-				"format id for deduping not found: %q",
-				options.DedupingFormatId,
-			)
-		}
-
+		deduper.formatId = options.DedupingFormatId
 		deduper.lookupLock = &sync.RWMutex{}
 		deduper.lookup = make(map[string]struct{})
 	}
@@ -42,16 +31,21 @@ func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 		return
 	}
 
-	id, repool := markl.HashTypeSha256.GetBlobId()
-	defer repool()
+	objectDigestWriteMap := object.GetDigestWriteMapWithMerkle()
 
-	if err = object.CalculateDigest(
-		object_inventory_format.GetDigestForContext,
-		deduper.format,
-		id,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	var id interfaces.MutableMarklId
+
+	{
+		var hasDigest bool
+
+		if id, hasDigest = objectDigestWriteMap[deduper.formatId]; !hasDigest {
+			err = errors.Errorf(
+				"object does not have digest for format id: %q",
+				deduper.formatId,
+			)
+
+			return
+		}
 	}
 
 	bites := id.GetBytes()
