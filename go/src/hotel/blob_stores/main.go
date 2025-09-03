@@ -141,7 +141,7 @@ func MakeRemoteBlobStore(
 
 // TODO describe base path agnostically
 func MakeBlobStore(
-	ctx interfaces.ActiveContext,
+	context interfaces.ActiveContext,
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 	hashType markl.HashType,
@@ -167,7 +167,7 @@ func MakeBlobStore(
 			return
 
 		case blob_store_configs.ConfigSFTPUri:
-			if sshClient, err = MakeSSHClientFromSSHConfig(ctx, printer, config); err != nil {
+			if sshClient, err = MakeSSHClientFromSSHConfig(context, printer, config); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -175,7 +175,7 @@ func MakeBlobStore(
 			configSFTP = config
 
 		case blob_store_configs.ConfigSFTPConfigExplicit:
-			if sshClient, err = MakeSSHClientForExplicitConfig(ctx, printer, config); err != nil {
+			if sshClient, err = MakeSSHClientForExplicitConfig(context, printer, config); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -184,7 +184,7 @@ func MakeBlobStore(
 		}
 
 		return makeSftpStore(
-			ctx,
+			context,
 			printer,
 			configSFTP,
 			sshClient,
@@ -194,7 +194,7 @@ func MakeBlobStore(
 	case "local":
 		if configLocal, ok := config.Config.(blob_store_configs.ConfigLocalHashBucketed); ok {
 			return makeLocalHashBucketed(
-				ctx,
+				context,
 				config.BasePath,
 				// configLocal.GetBasePath(),
 				configLocal,

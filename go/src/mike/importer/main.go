@@ -23,10 +23,8 @@ var ErrNeedsMerge = errors.Err409Conflict.ErrorHiddenf(
 	"import failed with conflicts, merging required",
 )
 
-type ImporterOptions = sku.ImporterOptions
-
 func Make(
-	options ImporterOptions,
+	options sku.ImporterOptions,
 	storeOptions sku.StoreOptions,
 	envRepo env_repo.Env,
 	typedInventoryListBlobStore inventory_list_coders.Closet,
@@ -54,6 +52,8 @@ func Make(
 		storeOptions:                storeOptions,
 	}
 
+	importer.deduper.initialize(options, envRepo)
+
 	if importer.blobCopierDelegate == nil &&
 		importer.remoteBlobStore != nil &&
 		options.PrintCopies {
@@ -66,6 +66,8 @@ func Make(
 }
 
 type importer struct {
+	deduper deduper
+
 	typedInventoryListBlobStore inventory_list_coders.Closet
 	index                       sku.Index
 	storeExternal               store_workspace.MergeCheckedOut
@@ -274,6 +276,11 @@ func (importer importer) importLeaf(
 
 	commitOptions.Validate = false
 
+	if importer.deduper.shouldCommit(checkedOut.GetSkuExternal()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = importer.storeObject.Commit(
 		checkedOut.GetSkuExternal(),
 		commitOptions,
@@ -300,6 +307,11 @@ func (importer importer) importNewObject(
 	}
 
 	options.UpdateTai = false
+
+	if importer.deduper.shouldCommit(object); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = importer.storeObject.Commit(
 		object,

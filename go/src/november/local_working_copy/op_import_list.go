@@ -14,15 +14,15 @@ import (
 
 func (local *Repo) ImportSeq(
 	seq interfaces.SeqError[*sku.Transacted],
-	importerr sku.Importer,
+	importur sku.Importer,
 ) (err error) {
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	var hasConflicts bool
 
-	checkedOutPrinter := importerr.GetCheckedOutPrinter()
+	checkedOutPrinter := importur.GetCheckedOutPrinter()
 
-	importerr.SetCheckedOutPrinter(
+	importur.SetCheckedOutPrinter(
 		func(co *sku.CheckedOut) (err error) {
 			if co.GetState() == checked_out_state.Conflicted {
 				hasConflicts = true
@@ -44,11 +44,11 @@ func (local *Repo) ImportSeq(
 		var hasOneConflict bool
 
 		if hasOneConflict, err = local.importOne(
-			importerr,
+			importur,
 			object,
 			missingBlobs,
 		); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sku.String(object))
+			err = errors.Wrapf(err, "Object: %s", sku.String(object))
 			importErrors.Add(err)
 			err = nil
 		}
@@ -88,12 +88,12 @@ func (local *Repo) ImportSeq(
 }
 
 func (repo *Repo) importOne(
-	importerr sku.Importer,
+	importur sku.Importer,
 	object *sku.Transacted,
 	missingBlobs *sku.ListCheckedOut,
 ) (hasConflicts bool, err error) {
 	var checkedOut *sku.CheckedOut
-	checkedOut, err = importerr.Import(object)
+	checkedOut, err = importur.Import(object)
 	defer sku.GetCheckedOutPool().Put(checkedOut)
 
 	if err == nil {
@@ -107,19 +107,13 @@ func (repo *Repo) importOne(
 	if errors.Is(err, importer.ErrSkipped) {
 		err = nil
 		return
-	}
-
-	if errors.Is(err, collections.ErrExists) {
+	} else if errors.Is(err, collections.ErrExists) {
 		err = nil
 		return
-	}
-
-	if genres.IsErrUnsupportedGenre(err) {
+	} else if genres.IsErrUnsupportedGenre(err) {
 		err = nil
 		return
-	}
-
-	if env_dir.IsErrBlobMissing(err) {
+	} else if env_dir.IsErrBlobMissing(err) {
 		checkedOut := sku.GetCheckedOutPool().Get()
 		sku.TransactedResetter.ResetWith(
 			checkedOut.GetSkuExternal(),

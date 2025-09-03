@@ -75,6 +75,7 @@ type (
 	}
 
 	ImporterOptions struct {
+		DedupingFormatId    string
 		BlobGenres          ids.Genre
 		ExcludeObjects      bool
 		RemoteBlobStore     interfaces.BlobStore
