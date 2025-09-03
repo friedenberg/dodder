@@ -239,37 +239,41 @@ func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 	storeVersion := env.GetStoreVersion()
 
 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
-		blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
+		return env.getV10OrLessInventoryListBlobStore()
+	} else {
+		return env.GetDefaultBlobStore()
+	}
+}
 
-		var hashType markl.HashType
+func (env Env) getV10OrLessInventoryListBlobStore() interfaces.BlobStore {
+	blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
 
-		{
-			var err error
+	var hashType markl.HashType
 
-			if hashType, err = markl.GetHashTypeOrError(
-				env.GetConfigPublic().Blob.GetBlobHashTypeId(),
-			); err != nil {
-				env.Cancel(err)
-				return nil
-			}
-		}
+	{
+		var err error
 
-		if store, err := blob_stores.MakeBlobStore(
-			env,
-			blob_stores.BlobStoreConfigNamed{
-				BasePath: env.DirFirstBlobStoreInventoryLists(),
-				Config:   blob.GetBlobIOWrapper().(blob_store_configs.Config),
-			},
-			env.GetTempLocal(),
-			hashType,
+		if hashType, err = markl.GetHashTypeOrError(
+			env.GetConfigPublic().Blob.GetBlobHashTypeId(),
 		); err != nil {
 			env.Cancel(err)
 			return nil
-		} else {
-			return store
 		}
+	}
+
+	if store, err := blob_stores.MakeBlobStore(
+		env,
+		blob_stores.BlobStoreConfigNamed{
+			BasePath: env.DirFirstBlobStoreInventoryLists(),
+			Config:   blob.GetBlobIOWrapper().(blob_store_configs.Config),
+		},
+		env.GetTempLocal(),
+		hashType,
+	); err != nil {
+		env.Cancel(err)
+		return nil
 	} else {
-		return env.GetDefaultBlobStore()
+		return store
 	}
 }
 

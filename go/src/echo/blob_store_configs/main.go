@@ -31,9 +31,13 @@ type (
 		GetLockInternalFiles() bool
 	}
 
-	// TODO add config interface for local file stores
-	ConfigLocalHashBucketed interface {
+	ConfigLocal interface {
 		Config
+		GetBasePath() string
+	}
+
+	ConfigLocalHashBucketed interface {
+		ConfigLocal
 		interfaces.BlobIOWrapper
 		GetHashBuckets() []int
 		GetLockInternalFiles() bool

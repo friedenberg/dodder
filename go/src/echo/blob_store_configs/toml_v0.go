@@ -9,15 +9,17 @@ import (
 
 type TomlV0 struct {
 	// TODO add hasher option
-	// TODO add path option
 	// TODO uncomment when bumping to V1
 	// HashBuckets       []int                            `toml:"hash-buckets"`
+	BasePath          string                           `toml:"base-path"` // can include env vars
 	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }
 
-func (*TomlV0) GetBlobStoreType() string {
+var _ ConfigLocalHashBucketed = TomlV0{}
+
+func (TomlV0) GetBlobStoreType() string {
 	return "local"
 }
 
@@ -38,18 +40,22 @@ func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flags.FlagSet) {
 	)
 }
 
-func (blobStoreConfig *TomlV0) GetHashBuckets() []int {
+func (blobStoreConfig TomlV0) GetBasePath() string {
+	return blobStoreConfig.BasePath
+}
+
+func (blobStoreConfig TomlV0) GetHashBuckets() []int {
 	return []int{2}
 }
 
-func (blobStoreConfig *TomlV0) GetBlobCompression() interfaces.BlobCompression {
+func (blobStoreConfig TomlV0) GetBlobCompression() interfaces.BlobCompression {
 	return &blobStoreConfig.CompressionType
 }
 
-func (blobStoreConfig *TomlV0) GetBlobEncryption() interfaces.BlobEncryption {
+func (blobStoreConfig TomlV0) GetBlobEncryption() interfaces.BlobEncryption {
 	return &blobStoreConfig.AgeEncryption
 }
 
-func (blobStoreConfig *TomlV0) GetLockInternalFiles() bool {
+func (blobStoreConfig TomlV0) GetLockInternalFiles() bool {
 	return blobStoreConfig.LockInternalFiles
 }

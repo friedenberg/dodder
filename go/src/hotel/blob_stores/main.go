@@ -196,6 +196,7 @@ func MakeBlobStore(
 			return makeLocalHashBucketed(
 				ctx,
 				config.BasePath,
+				// configLocal.GetBasePath(),
 				configLocal,
 				tempFS,
 				hashType,
