@@ -280,10 +280,19 @@ func (transacted *Transacted) CalculateDigests(
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for formatId, id := range formats {
+		var format object_inventory_format.Format
+
+		if format, err = object_inventory_format.FormatForMarklFormatIdError(
+			formatId,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		waitGroup.Do(
-			transacted.makeDigestCalcFunc(
+			transacted.MakeDigestCalcFunc(
 				funcCalcDigest,
-				formatId,
+				format,
 				id,
 			),
 		)
@@ -297,46 +306,49 @@ func (transacted *Transacted) CalculateDigests(
 	return
 }
 
-func (transacted *Transacted) makeDigestCalcFunc(
+func (transacted *Transacted) MakeDigestCalcFunc(
 	funcCalcDigest funcCalcDigest,
-	formatTypeId string,
+	format object_inventory_format.Format,
 	digest interfaces.MutableMarklId,
 ) errors.FuncErr {
 	return func() (err error) {
-		if err = digest.SetFormat(formatTypeId); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		return transacted.CalculateDigest(
+			funcCalcDigest,
+			format,
+			digest,
+		)
+	}
+}
 
-		var objectFormat object_inventory_format.Format
-
-		if objectFormat, err = object_inventory_format.FormatForMarklFormatIdError(
-			digest.GetFormat(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		var actual interfaces.MarklId
-
-		if actual, err = funcCalcDigest(
-			objectFormat,
-			transacted,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer markl.PutBlobId(actual)
-
-		if err = digest.SetMerkleId(
-			actual.GetMarklType().GetMarklTypeId(),
-			actual.GetBytes(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+func (transacted *Transacted) CalculateDigest(
+	funcCalcDigest funcCalcDigest,
+	format object_inventory_format.Format,
+	digest interfaces.MutableMarklId,
+) (err error) {
+	if err = digest.SetFormat(format.GetMarklTypeId()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	var actual interfaces.MarklId
+
+	if actual, err = funcCalcDigest(
+		format,
+		transacted,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer markl.PutBlobId(actual)
+
+	if err = digest.SetMerkleId(
+		actual.GetMarklType().GetMarklTypeId(),
+		actual.GetBytes(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
