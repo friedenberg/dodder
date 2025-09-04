@@ -33,8 +33,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
 		return doddishV2{
-			box:           box,
-			genesisConfig: envRepo.GetConfigPrivate().Blob,
+			box:                   box,
+			genesisConfig:         envRepo.GetConfigPrivate().Blob,
+			objectDecodeFinalizer: (*sku.Transacted).FinalizeAndVerify,
 		}
 	},
 	ids.TypeInventoryListJsonV0: func(

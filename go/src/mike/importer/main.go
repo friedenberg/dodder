@@ -52,7 +52,7 @@ func Make(
 		storeOptions:                storeOptions,
 	}
 
-	importer.deduper.initialize(options, envRepo)
+	importer.committer.initialize(options, envRepo, storeObject)
 
 	if importer.blobCopierDelegate == nil &&
 		importer.remoteBlobStore != nil &&
@@ -66,7 +66,7 @@ func Make(
 }
 
 type importer struct {
-	deduper deduper
+	committer committer
 
 	typedInventoryListBlobStore inventory_list_coders.Closet
 	index                       sku.Index
@@ -276,12 +276,7 @@ func (importer importer) importLeaf(
 
 	commitOptions.Validate = false
 
-	if importer.deduper.shouldCommit(checkedOut.GetSkuExternal()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = importer.storeObject.Commit(
+	if err = importer.committer.Commit(
 		checkedOut.GetSkuExternal(),
 		commitOptions,
 	); err != nil {
@@ -308,12 +303,7 @@ func (importer importer) importNewObject(
 
 	options.UpdateTai = false
 
-	if importer.deduper.shouldCommit(object); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = importer.storeObject.Commit(
+	if err = importer.committer.Commit(
 		object,
 		options,
 	); err != nil {

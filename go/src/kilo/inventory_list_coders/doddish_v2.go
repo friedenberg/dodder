@@ -13,8 +13,9 @@ import (
 )
 
 type doddishV2 struct {
-	box           *box_format.BoxTransacted
-	genesisConfig genesis_configs.ConfigPrivate
+	box                   *box_format.BoxTransacted
+	genesisConfig         genesis_configs.ConfigPrivate
+	objectDecodeFinalizer func(*sku.Transacted) error
 }
 
 func (coder doddishV2) EncodeTo(
@@ -78,7 +79,7 @@ func (coder doddishV2) DecodeFrom(
 		}
 	}
 
-	if err = object.FinalizeAndVerify(); err != nil {
+	if err = coder.objectDecodeFinalizer(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -23,14 +23,17 @@ type Import struct {
 	command_components.LocalWorkingCopy
 	command_components.RemoteBlobStore
 
-	InventoryList string
-	PrintCopies   bool
+	InventoryList       string
+	PrintCopies         bool
+	OverwriteSignatures bool
+
 	sku.Proto
 }
 
 func (cmd *Import) SetFlagSet(flagSet *flags.FlagSet) {
 	flagSet.StringVar(&cmd.InventoryList, "inventory-list", "", "")
 	cmd.RemoteBlobStore.SetFlagSet(flagSet)
+
 	flagSet.BoolVar(
 		&cmd.PrintCopies,
 		"print-copies",
@@ -38,11 +41,18 @@ func (cmd *Import) SetFlagSet(flagSet *flags.FlagSet) {
 		"output when blobs are copied",
 	)
 
+	flagSet.BoolVar(
+		&cmd.OverwriteSignatures,
+		"overwrite-signatures",
+		false,
+		"ignore object pubkeys and signatures and generate new ones (causing this repo to create the objects as new instead of importing them)",
+	)
+
 	cmd.Proto.SetFlagSet(flagSet)
 }
 
 func (cmd Import) Run(req command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	repo := cmd.MakeLocalWorkingCopy(req)
 
 	if cmd.InventoryList == "" {
 		errors.ContextCancelWithBadRequestf(req, "empty inventory list")
@@ -63,23 +73,24 @@ func (cmd Import) Run(req command.Request) {
 			),
 			cmd.InventoryList,
 		); err != nil {
-			localWorkingCopy.Cancel(err)
+			repo.Cancel(err)
 		}
 
-		defer errors.ContextMustClose(localWorkingCopy, readCloser)
+		defer errors.ContextMustClose(repo, readCloser)
 	}
 
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
 	defer repoolBufferedReader()
 
-	inventoryListCoderCloset := localWorkingCopy.GetInventoryListCoderCloset()
+	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
 
 	seq := inventoryListCoderCloset.AllDecodedObjectsFromStream(
 		bufferedReader,
 	)
 
 	importerOptions := sku.ImporterOptions{
-		CheckedOutPrinter: localWorkingCopy.PrinterCheckedOutConflictsForRemoteTransfers(),
+		OverwriteSignatures: cmd.OverwriteSignatures,
+		CheckedOutPrinter:   repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
 	if cmd.BasePath != "" {
@@ -87,20 +98,20 @@ func (cmd Import) Run(req command.Request) {
 			var err error
 
 			if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
-				localWorkingCopy,
+				repo,
 			); err != nil {
-				localWorkingCopy.Cancel(err)
+				repo.Cancel(err)
 			}
 		}
 	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies
-	importerr := localWorkingCopy.MakeImporter(
+	importerr := repo.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
-	if err := localWorkingCopy.ImportSeq(
+	if err := repo.ImportSeq(
 		seq,
 		importerr,
 	); err != nil {
@@ -108,6 +119,6 @@ func (cmd Import) Run(req command.Request) {
 			err = errors.Wrap(err)
 		}
 
-		localWorkingCopy.Cancel(err)
+		repo.Cancel(err)
 	}
 }

@@ -22,9 +22,9 @@ function import { # @test
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
-  run_dodder info-repo pubkey
-  assert_success
-  # old_pubkey="$output"
+	run_dodder info-repo pubkey
+	assert_success
+	# old_pubkey="$output"
 
 	run_dodder export -print-time=true +z,e,t
 	assert_success
