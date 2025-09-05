@@ -12,8 +12,7 @@ import (
 )
 
 type doddish struct {
-	box                   *box_format.BoxTransacted
-	objectDecodeFinalizer func(*sku.Transacted) error
+	box *box_format.BoxTransacted
 }
 
 func (coder doddish) EncodeTo(
@@ -75,11 +74,6 @@ func (coder doddish) DecodeFrom(
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	if err = coder.objectDecodeFinalizer(object); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	if isEOF {

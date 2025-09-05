@@ -37,9 +37,19 @@ func (coder coder) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
+	var eof bool
+
 	if n, err = coder.ListCoder.DecodeFrom(object, bufferedReader); err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		if err == io.EOF {
+			eof = true
+
+			if n == 0 {
+				return
+			}
+		} else {
+			err = errors.WrapExceptSentinel(err, io.EOF)
+			return
+		}
 	}
 
 	if coder.afterDecoding != nil {
@@ -47,6 +57,10 @@ func (coder coder) DecodeFrom(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if eof {
+		err = io.EOF
 	}
 
 	return

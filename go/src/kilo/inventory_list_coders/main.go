@@ -27,7 +27,11 @@ var coderConstructors = map[string]funcListFormatConstructor{
 
 		doddishCoder := doddish{
 			box: box,
-			objectDecodeFinalizer: func(object *sku.Transacted) (err error) {
+		}
+
+		return coder{
+			ListCoder: doddishCoder,
+			afterDecoding: func(object *sku.Transacted) (err error) {
 				object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
 					configGenesis.GetPublicKey(),
 				)
@@ -40,22 +44,18 @@ var coderConstructors = map[string]funcListFormatConstructor{
 				return
 			},
 		}
-
-		return coder{
-			ListCoder: doddishCoder,
-		}
 	},
 	ids.TypeInventoryListV2: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
 		doddishCoder := doddish{
-			box:                   box,
-			objectDecodeFinalizer: (*sku.Transacted).FinalizeAndVerify,
+			box: box,
 		}
 
 		return coder{
-			ListCoder: doddishCoder,
+			ListCoder:     doddishCoder,
+			afterDecoding: (*sku.Transacted).FinalizeAndVerify,
 		}
 	},
 	ids.TypeInventoryListJsonV0: func(
