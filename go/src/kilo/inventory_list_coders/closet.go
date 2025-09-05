@@ -113,12 +113,12 @@ func MakeCloset(
 	return store
 }
 
-func (store Closet) GetBoxFormat() *box_format.BoxTransacted {
-	return store.boxFormat
+func (closet Closet) GetBoxFormat() *box_format.BoxTransacted {
+	return closet.boxFormat
 }
 
-func (store Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
-	format, ok := store.coders[tipe.String()]
+func (closet Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
+	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
 		panic(errors.Errorf("unsupported inventory list type: %q", tipe))
@@ -127,7 +127,7 @@ func (store Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
 	return format
 }
 
-func (store Closet) WriteObjectToWriter(
+func (closet Closet) WriteObjectToWriter(
 	tipe ids.Type,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
@@ -139,7 +139,7 @@ func (store Closet) WriteObjectToWriter(
 	}
 	sku.TransactedResetter.ResetWith(&typedBlob.Blob, object)
 
-	if n, err = store.objectCoders.EncodeTo(typedBlob, bufferedWriter); err != nil {
+	if n, err = closet.objectCoders.EncodeTo(typedBlob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,13 +148,13 @@ func (store Closet) WriteObjectToWriter(
 }
 
 // TODO consume interfaces.SeqError and expose as a coder instead
-func (store Closet) WriteBlobToWriter(
+func (closet Closet) WriteBlobToWriter(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	format, ok := store.coders[tipe.String()]
+	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
@@ -174,7 +174,7 @@ func (store Closet) WriteBlobToWriter(
 	return
 }
 
-func (store Closet) WriteTypedBlobToWriter(
+func (closet Closet) WriteTypedBlobToWriter(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	seq sku.Seq,
@@ -183,7 +183,7 @@ func (store Closet) WriteTypedBlobToWriter(
 	decoder := triple_hyphen_io.Encoder[*triple_hyphen_io.TypedBlob[sku.Seq]]{
 		Metadata: triple_hyphen_io.TypedMetadataCoder[sku.Seq]{},
 		Blob: triple_hyphen_io.EncoderTypeMapWithoutType[sku.Seq](
-			store.seqEncoders,
+			closet.seqEncoders,
 		),
 	}
 
@@ -204,7 +204,7 @@ func (store Closet) WriteTypedBlobToWriter(
 // TODO refactor all the below. Simplify the naming, and move away from the
 // stream coders, instead use a utility function like in triple_hyphen_io
 
-func (store Closet) StreamInventoryListBlobSkus(
+func (closet Closet) StreamInventoryListBlobSkus(
 	transactedGetter sku.TransactedGetter,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
@@ -221,7 +221,7 @@ func (store Closet) StreamInventoryListBlobSkus(
 		{
 			var err error
 
-			if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(
+			if readCloser, err = closet.envRepo.GetDefaultBlobStore().BlobReader(
 				blobDigest,
 			); err != nil {
 				yield(nil, errors.Wrap(err))
@@ -231,7 +231,7 @@ func (store Closet) StreamInventoryListBlobSkus(
 
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
-		iter := store.IterInventoryListBlobSkusFromReader(
+		iter := closet.IterInventoryListBlobSkusFromReader(
 			tipe,
 			readCloser,
 		)
@@ -274,7 +274,7 @@ func (store Closet) AllDecodedObjectsFromStream(
 	}
 }
 
-func (store Closet) IterInventoryListBlobSkusFromBlobStore(
+func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.Type,
 	blobStore interfaces.BlobStore,
 	blobId interfaces.MarklId,
@@ -294,7 +294,7 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
 		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
-			store.seqDecoders,
+			closet.seqDecoders,
 		)
 
 		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
@@ -317,13 +317,13 @@ func (store Closet) IterInventoryListBlobSkusFromBlobStore(
 	}
 }
 
-func (store Closet) IterInventoryListBlobSkusFromReader(
+func (closet Closet) IterInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
-			store.seqDecoders,
+			closet.seqDecoders,
 		)
 
 		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(reader)
@@ -344,12 +344,12 @@ func (store Closet) IterInventoryListBlobSkusFromReader(
 	}
 }
 
-func (store Closet) ReadInventoryListObject(
+func (closet Closet) ReadInventoryListObject(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
-	format, ok := store.coders[tipe.String()]
+	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
@@ -375,14 +375,14 @@ func (store Closet) ReadInventoryListObject(
 	return
 }
 
-func (store Closet) ReadInventoryListBlob(
+func (closet Closet) ReadInventoryListBlob(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
 ) (list *sku.ListTransacted, err error) {
 	list = sku.MakeListTransacted()
 
-	format, ok := store.coders[tipe.String()]
+	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
