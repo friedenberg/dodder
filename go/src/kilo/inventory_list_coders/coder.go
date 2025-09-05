@@ -9,7 +9,7 @@ import (
 )
 
 type coder struct {
-	sku.ListCoder
+	listCoder      sku.ListCoder
 	beforeEncoding func(*sku.Transacted) error
 	afterDecoding  func(*sku.Transacted) error
 }
@@ -25,7 +25,7 @@ func (coder coder) EncodeTo(
 		}
 	}
 
-	if n, err = coder.ListCoder.EncodeTo(object, bufferedWriter); err != nil {
+	if n, err = coder.listCoder.EncodeTo(object, bufferedWriter); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
@@ -39,7 +39,7 @@ func (coder coder) DecodeFrom(
 ) (n int64, err error) {
 	var eof bool
 
-	if n, err = coder.ListCoder.DecodeFrom(object, bufferedReader); err != nil {
+	if n, err = coder.listCoder.DecodeFrom(object, bufferedReader); err != nil {
 		if err == io.EOF {
 			eof = true
 
