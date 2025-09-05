@@ -69,7 +69,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		}
 
 		return coder{
-			ListCoder: jsonCoder,
+			ListCoder:      jsonCoder,
+			beforeEncoding: (*sku.Transacted).Verify,
+			afterDecoding:  (*sku.Transacted).FinalizeAndVerify,
 		}
 	},
 }

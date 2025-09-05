@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -20,16 +19,6 @@ func (coder jsonV0) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
-	if err = object.Verify(); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Sku: %s, Tags %s",
-			sku.String(object),
-			quiter.StringCommaSeparated(object.Metadata.GetTags()),
-		)
-		return
-	}
-
 	var objectJson sku_json_fmt.Transacted
 
 	if err = objectJson.FromTransacted(object, nil); err != nil {
@@ -66,11 +55,6 @@ func (coder jsonV0) DecodeFrom(
 	}
 
 	if err = objectJson.ToTransacted(object, nil); err != nil {
-		err = errors.Wrapf(err, "Line: %q", bites)
-		return
-	}
-
-	if err = object.FinalizeAndVerify(); err != nil {
 		err = errors.Wrapf(err, "Line: %q", bites)
 		return
 	}

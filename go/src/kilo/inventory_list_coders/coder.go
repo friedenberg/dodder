@@ -20,7 +20,7 @@ func (coder coder) EncodeTo(
 ) (n int64, err error) {
 	if coder.beforeEncoding != nil {
 		if err = coder.beforeEncoding(object); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Object: %s", sku.String(object))
 			return
 		}
 	}
