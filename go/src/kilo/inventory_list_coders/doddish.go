@@ -7,14 +7,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
 type doddish struct {
 	box                   *box_format.BoxTransacted
-	genesisConfig         genesis_configs.ConfigPrivate
 	objectDecodeFinalizer func(*sku.Transacted) error
 }
 

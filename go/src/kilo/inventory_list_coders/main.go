@@ -26,8 +26,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		configGenesis := envRepo.GetConfigPublic().Blob
 
 		doddishCoder := doddish{
-			genesisConfig: envRepo.GetConfigPrivate().Blob,
-			box:           box,
+			box: box,
 			objectDecodeFinalizer: func(object *sku.Transacted) (err error) {
 				object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
 					configGenesis.GetPublicKey(),
@@ -42,19 +41,22 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			},
 		}
 
-		return makeCoder(doddishCoder)
+		return coder{
+			ListCoder: doddishCoder,
+		}
 	},
 	ids.TypeInventoryListV2: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
-		coder := doddish{
+		doddishCoder := doddish{
 			box:                   box,
-			genesisConfig:         envRepo.GetConfigPrivate().Blob,
 			objectDecodeFinalizer: (*sku.Transacted).FinalizeAndVerify,
 		}
 
-		return makeCoder(coder)
+		return coder{
+			ListCoder: doddishCoder,
+		}
 	},
 	ids.TypeInventoryListJsonV0: func(
 		envRepo env_repo.Env,
@@ -64,7 +66,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 
-		return makeCoder(jsonCoder)
+		return coder{
+			ListCoder: jsonCoder,
+		}
 	},
 }
 
