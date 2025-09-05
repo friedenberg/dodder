@@ -3,6 +3,7 @@ package inventory_list_coders
 import (
 	"bufio"
 	"encoding/json"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -52,8 +53,10 @@ func (coder jsonV0) DecodeFrom(
 ) (n int64, err error) {
 	var objectJson sku_json_fmt.Transacted
 
-	bites, err := bufferedReader.ReadBytes('\n')
-	if err != nil {
+	var bites []byte
+
+	if bites, err = bufferedReader.ReadBytes('\n'); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
 		return
 	}
 

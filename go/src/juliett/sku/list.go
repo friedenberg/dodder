@@ -10,8 +10,10 @@ import (
 
 type (
 	Seq            = interfaces.SeqError[*Transacted]
-	ListCoder      = interfaces.CoderBufferedReadWriter[*Transacted]
 	ListTransacted = heap.Heap[Transacted, *Transacted]
+
+	// TODO move to inventory_list_coders
+	ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
 
 	InventoryListStore interface {
 		WriteInventoryListObject(*Transacted) (err error)

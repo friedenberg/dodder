@@ -23,9 +23,23 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
-		return doddishV1{
-			configGenesis: envRepo.GetConfigPrivate().Blob,
+		configGenesis := envRepo.GetConfigPublic().Blob
+
+		return doddishV2{
+			genesisConfig: envRepo.GetConfigPrivate().Blob,
 			box:           box,
+			objectDecodeFinalizer: func(object *sku.Transacted) (err error) {
+				object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
+					configGenesis.GetPublicKey(),
+				)
+
+				if err = object.FinalizeUsingObject(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
 		}
 	},
 	ids.TypeInventoryListV2: func(

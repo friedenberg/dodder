@@ -235,14 +235,15 @@ func (store Closet) StreamInventoryListBlobSkus(
 			readCloser,
 		)
 
-		for sk, err := range iter {
-			if !yield(sk, err) {
+		for object, err := range iter {
+			if !yield(object, err) {
 				return
 			}
 		}
 	}
 }
 
+// TODO pass objectDecodeFinalizer option
 func (store Closet) AllDecodedObjectsFromStream(
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
