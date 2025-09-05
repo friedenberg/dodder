@@ -16,13 +16,13 @@ import (
 type funcListFormatConstructor func(
 	env_repo.Env,
 	*box_format.BoxTransacted,
-) sku.ListCoder
+) coder
 
 var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListV1: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListCoder {
+	) coder {
 		configGenesis := envRepo.GetConfigPublic().Blob
 
 		doddishCoder := doddish{
@@ -49,7 +49,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListV2: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListCoder {
+	) coder {
 		doddishCoder := doddish{
 			box: box,
 		}
@@ -63,7 +63,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 	ids.TypeInventoryListJsonV0: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
-	) sku.ListCoder {
+	) coder {
 		jsonCoder := jsonV0{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
@@ -213,8 +213,8 @@ func writeInventoryListObject(
 }
 
 type SeqCoder struct {
-	ctx       interfaces.ActiveContext
-	listCoder sku.ListCoder
+	ctx   interfaces.ActiveContext
+	coder coder
 }
 
 func (coder SeqCoder) DecodeFrom(
@@ -228,7 +228,7 @@ func (coder SeqCoder) DecodeFrom(
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = coder.listCoder.DecodeFrom(object, bufferedReader); err != nil {
+		if _, err = coder.coder.DecodeFrom(object, bufferedReader); err != nil {
 			if err == io.EOF {
 				err = nil
 				break
@@ -247,8 +247,8 @@ func (coder SeqCoder) DecodeFrom(
 }
 
 type SeqErrorDecoder struct {
-	ctx       interfaces.ActiveContext
-	listCoder sku.ListCoder
+	ctx   interfaces.ActiveContext
+	coder coder
 }
 
 func (coder SeqErrorDecoder) DecodeFrom(
@@ -262,7 +262,7 @@ func (coder SeqErrorDecoder) DecodeFrom(
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)
 
-		if _, err = coder.listCoder.DecodeFrom(object, bufferedReader); err != nil {
+		if _, err = coder.coder.DecodeFrom(object, bufferedReader); err != nil {
 			if err == io.EOF {
 				err = nil
 				break
@@ -284,8 +284,8 @@ func (coder SeqErrorDecoder) DecodeFrom(
 }
 
 type SeqErrorEncoder struct {
-	ctx interfaces.ActiveContext
-	sku.ListCoder
+	ctx   interfaces.ActiveContext
+	coder coder
 }
 
 func (coder SeqErrorDecoder) EncodeTo(
@@ -300,7 +300,7 @@ func (coder SeqErrorDecoder) EncodeTo(
 			return
 		}
 
-		if _, err = coder.listCoder.EncodeTo(object, bufferedWriter); err != nil {
+		if _, err = coder.coder.EncodeTo(object, bufferedWriter); err != nil {
 			if err == io.EOF {
 				err = nil
 				break

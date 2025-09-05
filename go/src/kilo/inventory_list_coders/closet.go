@@ -3,7 +3,6 @@ package inventory_list_coders
 import (
 	"bufio"
 	"io"
-	"maps"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -24,7 +23,7 @@ type Closet struct {
 	envRepo   env_repo.Env
 	boxFormat *box_format.BoxTransacted
 
-	coders map[string]sku.ListCoder
+	coders map[string]coder
 
 	objectCoders triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted]
 
@@ -42,7 +41,7 @@ func MakeCloset(
 		boxFormat: box,
 	}
 
-	store.coders = make(map[string]sku.ListCoder, len(coderConstructors))
+	store.coders = make(map[string]coder, len(coderConstructors))
 
 	for tipe, coderConstructor := range coderConstructors {
 		store.coders[tipe] = coderConstructor(envRepo, box)
@@ -54,7 +53,9 @@ func MakeCloset(
 			len(store.coders),
 		)
 
-		maps.Copy(coders, store.coders)
+		for key, value := range store.coders {
+			coders[key] = value
+		}
 
 		store.objectCoders = triple_hyphen_io.CoderTypeMapWithoutType[sku.Transacted](
 			coders,
@@ -69,8 +70,8 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqCoder{
-				ctx:       envRepo,
-				listCoder: coder,
+				ctx:   envRepo,
+				coder: coder,
 			}
 		}
 
@@ -85,8 +86,8 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
-				ctx:       envRepo,
-				listCoder: coder,
+				ctx:   envRepo,
+				coder: coder,
 			}
 		}
 
@@ -101,8 +102,8 @@ func MakeCloset(
 
 		for tipe, coder := range store.coders {
 			coders[tipe] = SeqErrorDecoder{
-				ctx:       envRepo,
-				listCoder: coder,
+				ctx:   envRepo,
+				coder: coder,
 			}
 		}
 
