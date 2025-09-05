@@ -6,20 +6,38 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
-type doddishV1 struct {
-	configGenesis genesis_configs.ConfigPrivate
-	box           *box_format.BoxTransacted
+type doddish struct {
+	box                   *box_format.BoxTransacted
+	genesisConfig         genesis_configs.ConfigPrivate
+	objectDecodeFinalizer func(*sku.Transacted) error
 }
 
-func (coder doddishV1) EncodeTo(
+func (coder doddish) EncodeTo(
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
+	if err = markl.AssertIdIsNotNull(
+		object.Metadata.GetObjectDigest(),
+		"object-digest",
+	); err != nil {
+		err = errors.Wrapf(err, "Object: %q", sku.String(object))
+		return
+	}
+
+	if err = markl.AssertIdIsNotNull(
+		object.Metadata.GetObjectSig(),
+		"object-sig",
+	); err != nil {
+		err = errors.Wrapf(err, "Object: %q", sku.String(object))
+		return
+	}
+
 	var n1 int64
 	var n2 int
 
@@ -42,7 +60,7 @@ func (coder doddishV1) EncodeTo(
 	return
 }
 
-func (coder doddishV1) DecodeFrom(
+func (coder doddish) DecodeFrom(
 	object *sku.Transacted,
 	bufferedReader *bufio.Reader,
 ) (n int64, err error) {
@@ -61,11 +79,7 @@ func (coder doddishV1) DecodeFrom(
 		}
 	}
 
-	object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
-		coder.configGenesis.GetPublicKey(),
-	)
-
-	if err = object.FinalizeUsingObject(); err != nil {
+	if err = coder.objectDecodeFinalizer(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

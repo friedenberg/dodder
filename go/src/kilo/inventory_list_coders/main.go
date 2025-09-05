@@ -25,7 +25,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 	) sku.ListCoder {
 		configGenesis := envRepo.GetConfigPublic().Blob
 
-		return doddishV2{
+		doddishCoder := doddish{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 			box:           box,
 			objectDecodeFinalizer: func(object *sku.Transacted) (err error) {
@@ -41,30 +41,35 @@ var coderConstructors = map[string]funcListFormatConstructor{
 				return
 			},
 		}
+
+		return makeCoder(doddishCoder)
 	},
 	ids.TypeInventoryListV2: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
-		return doddishV2{
+		coder := doddish{
 			box:                   box,
 			genesisConfig:         envRepo.GetConfigPrivate().Blob,
 			objectDecodeFinalizer: (*sku.Transacted).FinalizeAndVerify,
 		}
+
+		return makeCoder(coder)
 	},
 	ids.TypeInventoryListJsonV0: func(
 		envRepo env_repo.Env,
 		box *box_format.BoxTransacted,
 	) sku.ListCoder {
-		return jsonV0{
+		jsonCoder := jsonV0{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
+
+		return makeCoder(jsonCoder)
 	},
 }
 
 var (
-	_ sku.ListCoder = doddishV1{}
-	_ sku.ListCoder = doddishV2{}
+	_ sku.ListCoder = doddish{}
 	_ sku.ListCoder = jsonV0{}
 )
 
@@ -73,16 +78,6 @@ func WriteObjectToOpenList(
 	object *sku.Transacted,
 	list *sku.OpenList,
 ) (n int64, err error) {
-	// if !list.LastTai.Less(object.GetTai()) {
-	// 	err = errors.Errorf(
-	// 		"object order incorrect. Last: %s, current: %s",
-	// 		list.LastTai,
-	// 		object.GetTai(),
-	// 	)
-
-	// 	return
-	// }
-
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
 	defer repoolBufferedWriter()
 
