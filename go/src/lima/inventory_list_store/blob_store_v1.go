@@ -139,6 +139,7 @@ func (blobStore *blobStoreV1) AllInventoryLists() sku.Seq {
 
 		seq := blobStore.inventoryListCoderCloset.AllDecodedObjectsFromStream(
 			file,
+			nil,
 		)
 
 		for object, err := range seq {

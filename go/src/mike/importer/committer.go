@@ -31,12 +31,6 @@ func (committer *committer) Commit(
 		return
 	}
 
-	if committer.options.OverwriteSignatures {
-		object.Metadata.GetObjectDigestMutable().Reset()
-		object.Metadata.GetObjectSigMutable().Reset()
-		object.Metadata.GetRepoPubKeyMutable().Reset()
-	}
-
 	if err = committer.storeObject.Commit(
 		object,
 		commitOptions,

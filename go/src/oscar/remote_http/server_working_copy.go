@@ -72,6 +72,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 
 	seq := listCoderCloset.AllDecodedObjectsFromStream(
 		bufio.NewReader(request.Body),
+		nil,
 	)
 
 	if err := server.Repo.ImportSeq(

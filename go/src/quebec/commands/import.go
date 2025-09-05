@@ -84,13 +84,33 @@ func (cmd Import) Run(req command.Request) {
 
 	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
 
+	var afterDecoding func(*sku.Transacted) error
+
+	if cmd.OverwriteSignatures {
+		afterDecoding = func(object *sku.Transacted) (err error) {
+			object.Metadata.GetObjectDigestMutable().Reset()
+			object.Metadata.GetObjectSigMutable().Reset()
+			object.Metadata.GetRepoPubKeyMutable().Reset()
+
+			if err = object.FinalizeAndSignOverwrite(
+				repo.GetEnvRepo().GetConfigPrivate().Blob,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
 	seq := inventoryListCoderCloset.AllDecodedObjectsFromStream(
 		bufferedReader,
+		afterDecoding,
 	)
 
 	importerOptions := sku.ImporterOptions{
-		OverwriteSignatures: cmd.OverwriteSignatures,
-		CheckedOutPrinter:   repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+		DedupingFormatId:  markl.FormatIdV5MetadataDigestWithoutTai,
+		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
 	if cmd.BasePath != "" {

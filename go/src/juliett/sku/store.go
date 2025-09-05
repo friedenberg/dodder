@@ -76,7 +76,6 @@ type (
 
 	ImporterOptions struct {
 		DedupingFormatId    string
-		OverwriteSignatures bool
 		BlobGenres          ids.Genre
 		ExcludeObjects      bool
 		RemoteBlobStore     interfaces.BlobStore

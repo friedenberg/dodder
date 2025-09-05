@@ -222,5 +222,6 @@ func (client client) AllInventoryLists() interfaces.SeqError[*sku.Transacted] {
 
 	return client.inventoryListCoderCloset.AllDecodedObjectsFromStream(
 		response.Body,
+		nil,
 	)
 }

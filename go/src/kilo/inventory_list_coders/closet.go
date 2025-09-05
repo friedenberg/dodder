@@ -244,15 +244,34 @@ func (closet Closet) StreamInventoryListBlobSkus(
 	}
 }
 
-// TODO pass objectDecodeFinalizer option
-func (store Closet) AllDecodedObjectsFromStream(
+func (closet Closet) AllDecodedObjectsFromStream(
 	reader io.Reader,
+	afterDecoding func(*sku.Transacted) error,
 ) interfaces.SeqError[*sku.Transacted] {
+	var coders map[string]interfaces.DecoderFromBufferedReader[funcIterSeq]
+
+	if afterDecoding == nil {
+		coders = closet.seqDecoders
+	} else {
+		coders = make(
+			map[string]interfaces.DecoderFromBufferedReader[funcIterSeq],
+			len(closet.coders),
+		)
+
+		for tipe, coder := range closet.coders {
+			coder.afterDecoding = afterDecoding
+			coders[tipe] = SeqCoder{
+				ctx:   closet.envRepo,
+				coder: coder,
+			}
+		}
+	}
+
 	return func(yield func(*sku.Transacted, error) bool) {
 		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[funcIterSeq]]{
 			Metadata: triple_hyphen_io.TypedMetadataCoder[funcIterSeq]{},
 			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
-				store.seqDecoders,
+				coders,
 			),
 		}
 
