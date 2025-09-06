@@ -1,8 +1,8 @@
 package options_print
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/equals"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
@@ -222,7 +222,7 @@ func makeFlagSetFuncBoolVar(valuePtr **bool) func(value string) (err error) {
 	}
 }
 
-func (overlay *Overlay) AddToFlags(flagSet *flags.FlagSet) {
+func (overlay *Overlay) AddToFlags(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Func(
 		"print-types",
 		"",

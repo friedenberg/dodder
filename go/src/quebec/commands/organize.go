@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/vim_cli_options_builder"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -45,7 +45,7 @@ type Organize struct {
 	Filter script_value.ScriptValue
 }
 
-func (c *Organize) SetFlagSet(f *flags.FlagSet) {
+func (c *Organize) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	c.Query.SetFlagSet(f)
 
 	c.Flags.SetFlagSet(f)

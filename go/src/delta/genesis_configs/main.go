@@ -1,8 +1,8 @@
 package genesis_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -40,7 +40,7 @@ type (
 		SetObjectSigMarklTypeId(string)
 
 		// TODO separate into non-method function that uses properties
-		flags.CommandComponentWriter
+		interfaces.CommandComponentWriter
 		SetRepoType(repo_type.Type) // TODO remove
 		SetRepoId(ids.RepoId)
 		GetPrivateKeyMutable() *markl.Id

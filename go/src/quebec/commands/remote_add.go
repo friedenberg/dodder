@@ -2,7 +2,7 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -27,7 +27,7 @@ type RemoteAdd struct {
 	proto sku.Proto
 }
 
-func (cmd *RemoteAdd) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *RemoteAdd) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.RemoteTransfer.SetFlagSet(flagSet)
 
 	flagSet.Var(

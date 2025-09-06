@@ -1,8 +1,8 @@
 package commands
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -32,7 +32,7 @@ type Edit struct {
 	CheckoutMode checkout_mode.Mode
 }
 
-func (cmd *Edit) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Edit) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
 
 	cmd.Checkout.SetFlagSet(flagSet)

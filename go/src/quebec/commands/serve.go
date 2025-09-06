@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -24,7 +25,7 @@ type Serve struct {
 	TailscaleTLS bool
 }
 
-func (cmd *Serve) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Serve) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 
 	flags.BoolVar(

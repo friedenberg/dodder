@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
@@ -31,7 +30,7 @@ type BlobStoreWrite struct {
 	UtilityAfter  script_value.Utility
 }
 
-func (cmd *BlobStoreWrite) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *BlobStoreWrite) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.BoolVar(
 		&cmd.Check,
 		"check",

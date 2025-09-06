@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -26,7 +25,7 @@ func init() {
 	)
 }
 
-func (cmd Info) SetFlagSet(flagSet *flags.FlagSet) {}
+func (cmd Info) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {}
 
 func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(

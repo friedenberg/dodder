@@ -2,8 +2,8 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -28,7 +28,7 @@ type TomlV2Public struct {
 	TomlV2Common
 }
 
-func (config *TomlV2Common) SetFlagSet(flagSet *flags.FlagSet) {
+func (config *TomlV2Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	config.RepoType = repo_type.TypeWorkingCopy
 	flagSet.Var(&config.RepoType, "repo-type", "")
 }

@@ -3,7 +3,6 @@ package commands
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -32,7 +31,7 @@ type CheckinBlob struct {
 	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
-func (cmd *CheckinBlob) SetFlagSet(f *flags.FlagSet) {
+func (cmd *CheckinBlob) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(&cmd.Delete, "delete", false, "the checked-out file")
 	f.Var(
 		cmd.NewTags,

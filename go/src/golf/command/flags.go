@@ -1,6 +1,6 @@
 package command
 
-import "code.linenisgreat.com/dodder/go/src/bravo/flags"
+import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 
 type CommandComponentReader interface {
 	GetCLIFlags() []string
@@ -8,5 +8,5 @@ type CommandComponentReader interface {
 
 type CommandComponent interface {
 	CommandComponentReader
-	flags.CommandComponentWriter
+	interfaces.CommandComponentWriter
 }

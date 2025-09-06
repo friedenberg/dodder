@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -26,7 +26,7 @@ type Deinit struct {
 	Force bool
 }
 
-func (cmd *Deinit) SetFlagSet(f *flags.FlagSet) {
+func (cmd *Deinit) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Force,
 		"force",

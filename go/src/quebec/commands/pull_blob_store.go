@@ -2,7 +2,7 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -21,7 +21,7 @@ type PullBlobStore struct {
 	command_components.RemoteBlobStore
 }
 
-func (cmd *PullBlobStore) SetFlagSet(f *flags.FlagSet) {
+func (cmd *PullBlobStore) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 	cmd.RemoteBlobStore.SetFlagSet(f)
 }

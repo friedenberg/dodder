@@ -2,7 +2,7 @@ package repo_config_cli
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cli"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
@@ -36,7 +36,7 @@ func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
 
 // TODO add support for all flags
 // TODO move to store_config
-func (config *Config) SetFlagSet(flagSet *flags.FlagSet) {
+func (config *Config) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
 	cli.FlagSetVarWithCompletion(

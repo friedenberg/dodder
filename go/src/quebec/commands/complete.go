@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -34,7 +35,7 @@ func (cmd Complete) GetDescription() command.Description {
 	}
 }
 
-func (cmd *Complete) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Complete) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.BoolVar(&cmd.bashStyle, "bash-style", false, "")
 	flagSet.StringVar(&cmd.inProgress, "in-progress", "", "")
 }
@@ -77,7 +78,7 @@ func (cmd Complete) Run(req command.Request) {
 	flagSet.SetOutput(io.Discard)
 	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
 
-	if subcmd, ok := subcmd.(flags.CommandComponentWriter); ok {
+	if subcmd, ok := subcmd.(interfaces.CommandComponentWriter); ok {
 		subcmd.SetFlagSet(flagSet)
 	}
 
@@ -154,8 +155,7 @@ func (cmd Complete) completeSubcommandFlags(
 	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Command,
-	flagSet *flags.FlagSet,
-	commandLine command.CommandLine,
+	flagSet *flags.FlagSet, commandLine command.CommandLine,
 	lastArg string,
 ) (shouldNotCompleteArgs bool) {
 	if subcmd == nil {

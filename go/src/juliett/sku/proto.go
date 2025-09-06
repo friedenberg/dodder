@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -32,7 +31,7 @@ type Proto struct {
 	object_metadata.Metadata
 }
 
-func (pz *Proto) SetFlagSet(f *flags.FlagSet) {
+func (pz *Proto) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	pz.Metadata.SetFlagSet(f)
 }
 

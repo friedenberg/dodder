@@ -1,6 +1,6 @@
 package command_components
 
-import "code.linenisgreat.com/dodder/go/src/bravo/flags"
+import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 
 type Checkout struct {
 	Delete   bool
@@ -8,7 +8,7 @@ type Checkout struct {
 	Edit     bool
 }
 
-func (c *Checkout) SetFlagSet(f *flags.FlagSet) {
+func (c *Checkout) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(
 		&c.Delete,
 		"delete",

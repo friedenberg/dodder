@@ -42,7 +42,7 @@ func (parser textParser) ParseMetadata(
 
 	parser2 := &textParser2{
 		BlobWriter:        parser.blobWriter,
-		hashType:    parser.hashType,
+		hashType:          parser.hashType,
 		TextParserContext: context,
 	}
 

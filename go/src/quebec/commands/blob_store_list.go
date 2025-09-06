@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -18,7 +18,7 @@ type BlobList struct {
 	command_components.EnvRepo
 }
 
-func (cmd *BlobList) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *BlobList) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd BlobList) Run(req command.Request) {

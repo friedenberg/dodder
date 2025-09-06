@@ -1,7 +1,7 @@
 package command_components
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -15,7 +15,7 @@ type RemoteBlobStore struct {
 	Config   blob_store_configs.TomlV0
 }
 
-func (cmd *RemoteBlobStore) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *RemoteBlobStore) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.Config.CompressionType = compression_type.CompressionTypeDefault
 	cmd.Config.CompressionType.SetFlagSet(flagSet)
 	flagSet.StringVar(&cmd.BasePath, "blobs", "", "")

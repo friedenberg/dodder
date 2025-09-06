@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -30,7 +29,7 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (config *TomlV1Common) SetFlagSet(flagSet *flags.FlagSet) {
+func (config *TomlV1Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		config.BlobStore.SetFlagSet(flagSet)
 	}

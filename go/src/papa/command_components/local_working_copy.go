@@ -1,7 +1,7 @@
 package command_components
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -12,7 +12,7 @@ type LocalWorkingCopy struct {
 	Env
 }
 
-func (cmd *LocalWorkingCopy) SetFlagSet(f *flags.FlagSet) {
+func (cmd *LocalWorkingCopy) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopy(

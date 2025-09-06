@@ -2,7 +2,6 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -27,7 +26,7 @@ func (TomlV1) GetBlobStoreType() string {
 	return "local"
 }
 
-func (blobStoreConfig *TomlV1) SetFlagSet(flagSet *flags.FlagSet) {
+func (blobStoreConfig *TomlV1) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 
 	flagSet.Var(

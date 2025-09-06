@@ -2,7 +2,7 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -39,7 +39,7 @@ type Show struct {
 	RemoteRepo ids.RepoId
 }
 
-func (cmd *Show) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Show) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
 

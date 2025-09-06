@@ -2,7 +2,6 @@ package command_components
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -14,7 +13,7 @@ import (
 // TODO remove and replace with BlobStore
 type BlobStoreLocal struct{}
 
-func (cmd *BlobStoreLocal) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *BlobStoreLocal) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 type BlobStoreWithEnv struct {

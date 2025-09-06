@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -40,7 +39,7 @@ type Last struct {
 	Format   local_working_copy.FormatFlag
 }
 
-func (cmd *Last) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Last) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 
 	// TODO remove

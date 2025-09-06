@@ -2,7 +2,7 @@ package command_components
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 )
@@ -12,7 +12,7 @@ type RemoteTransfer struct {
 	repo.RemoteTransferOptions
 }
 
-func (cmd *RemoteTransfer) SetFlagSet(f *flags.FlagSet) {
+func (cmd *RemoteTransfer) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.Remote.SetFlagSet(f)
 	cmd.RemoteTransferOptions.SetFlagSet(f)
 }

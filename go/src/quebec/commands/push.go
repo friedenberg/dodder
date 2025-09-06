@@ -2,8 +2,8 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -23,7 +23,7 @@ type Push struct {
 	command_components.Query
 }
 
-func (cmd *Push) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Push) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.RemoteTransfer.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)

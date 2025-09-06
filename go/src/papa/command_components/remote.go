@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cli"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -30,7 +29,7 @@ type Remote struct {
 	RemoteConnectionType repo.RemoteConnectionType
 }
 
-func (cmd *Remote) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Remote) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	// TODO remove and replace with repo builtin type options
 	cli.FlagSetVarWithCompletion(
 		flagSet,

@@ -23,4 +23,10 @@ type CommandLineFlagDefinitions interface {
 	BoolVar(variable *bool, name string, defaultValue bool, usage string)
 	StringVar(variable *string, name string, defaultValue string, usage string)
 	Var(value FlagValue, name string, usage string)
+	Func(name, usage string, funk func(string) error)
+	IntVar(variable *int, name string, defaultValue int, usage string)
+}
+
+type CommandComponentWriter interface {
+	SetFlagSet(CommandLineFlagDefinitions)
 }

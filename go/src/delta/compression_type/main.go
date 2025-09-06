@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"github.com/DataDog/zstd"
 )
@@ -40,7 +39,7 @@ func (compressionType *CompressionType) GetBlobCompression() interfaces.CommandL
 	return compressionType
 }
 
-func (compressionType *CompressionType) SetFlagSet(flagSet *flags.FlagSet) {
+func (compressionType *CompressionType) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(compressionType, "compression-type", "")
 }
 

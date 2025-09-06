@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -35,7 +35,7 @@ type Export struct {
 	CompressionType compression_type.CompressionType
 }
 
-func (cmd *Export) SetFlagSet(f *flags.FlagSet) {
+func (cmd *Export) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 
 	f.Var(&cmd.AgeIdentity, "age-identity", "")

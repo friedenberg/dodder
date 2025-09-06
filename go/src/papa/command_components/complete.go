@@ -2,7 +2,6 @@ package command_components
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -84,8 +83,7 @@ func (cmd Complete) GetFlagValueMetadataType(
 
 func (cmd Complete) SetFlagsProto(
 	proto *sku.Proto,
-	flagSet *flags.FlagSet,
-	descriptionUsage string,
+	flagSet interfaces.CommandLineFlagDefinitions, descriptionUsage string,
 	tagUsage string,
 	typeUsage string,
 ) {

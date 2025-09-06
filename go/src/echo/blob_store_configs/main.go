@@ -2,7 +2,6 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -14,7 +13,7 @@ type (
 	Config        = interfaces.BlobStoreConfig
 	ConfigMutable interface {
 		Config
-		flags.CommandComponentWriter
+		interfaces.CommandComponentWriter
 	}
 
 	ConfigHashType interface {

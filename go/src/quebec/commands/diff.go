@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -26,7 +26,7 @@ type Diff struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
 
-func (cmd *Diff) SetFlagSet(f *flags.FlagSet) {
+func (cmd *Diff) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
 }
 

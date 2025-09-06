@@ -1,7 +1,7 @@
 package command_components
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
@@ -12,7 +12,7 @@ type LocalWorkingCopyWithQueryGroup struct {
 	Query
 }
 
-func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagSet(f *flags.FlagSet) {
+func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagSet(f)
 	cmd.Query.SetFlagSet(f)
 }

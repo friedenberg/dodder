@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -28,7 +27,7 @@ type V0Private struct {
 	V0Common
 }
 
-func (config *V0Common) SetFlagSet(flagSet *flags.FlagSet) {
+func (config *V0Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	panic(errors.Err405MethodNotAllowed)
 }
 

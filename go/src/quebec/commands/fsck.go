@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -31,7 +30,7 @@ type Fsck struct {
 	command_components.Query
 }
 
-func (cmd *Fsck) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Fsck) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
 }
 

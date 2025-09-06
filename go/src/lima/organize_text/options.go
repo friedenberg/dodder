@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -81,7 +80,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 	}
 }
 
-func (o *Flags) SetFlagSet(f *flags.FlagSet) {
+func (o *Flags) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
 
 	f.Var(

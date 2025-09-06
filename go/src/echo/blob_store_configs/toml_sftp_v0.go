@@ -1,7 +1,7 @@
 package blob_store_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
@@ -24,7 +24,7 @@ func (*TomlSFTPV0) GetBlobStoreType() string {
 	return "sftp"
 }
 
-func (blobStoreConfig *TomlSFTPV0) SetFlagSet(flagSet *flags.FlagSet) {
+func (blobStoreConfig *TomlSFTPV0) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.StringVar(
 		&blobStoreConfig.Host,
 		"host",

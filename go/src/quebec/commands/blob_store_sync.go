@@ -3,7 +3,6 @@ package commands
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -25,7 +24,7 @@ type BlobStoreSync struct {
 	limit int
 }
 
-func (cmd BlobStoreSync) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd BlobStoreSync) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.IntVar(
 		&cmd.limit,
 		"limit",

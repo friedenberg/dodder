@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -30,7 +30,7 @@ type Import struct {
 	sku.Proto
 }
 
-func (cmd *Import) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *Import) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.StringVar(&cmd.InventoryList, "inventory-list", "", "")
 	cmd.RemoteBlobStore.SetFlagSet(flagSet)
 

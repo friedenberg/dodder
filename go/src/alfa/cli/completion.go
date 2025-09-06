@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 // TODO add support for comma-separated values
@@ -20,8 +19,7 @@ type FlagValueWithCompetion interface {
 }
 
 func FlagSetVarWithCompletion(
-	flagSet *flags.FlagSet,
-	value FlagValueWithCompetion,
+	flagSet interfaces.CommandLineFlagDefinitions, value FlagValueWithCompetion,
 	key string,
 ) {
 	flagSet.Var(

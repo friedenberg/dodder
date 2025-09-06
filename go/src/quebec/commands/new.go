@@ -2,8 +2,8 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -37,7 +37,7 @@ type New struct {
 	sku.Proto
 }
 
-func (cmd *New) SetFlagSet(flagSet *flags.FlagSet) {
+func (cmd *New) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 
 	flagSet.BoolVar(
