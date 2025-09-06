@@ -53,7 +53,7 @@ func (blob V0) GetPrintOptionsOverlay() Overlay {
 			ExcludeFields:           blob.ExcludeFields,
 		},
 		PrintMatchedDormant: blob.PrintMatchedDormant,
-		PrintBlobDigests:       blob.PrintShas,
+		PrintBlobDigests:    blob.PrintShas,
 		PrintFlush:          blob.PrintFlush,
 		PrintUnchanged:      blob.PrintUnchanged,
 		PrintColors:         blob.PrintColors,

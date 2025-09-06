@@ -5,19 +5,9 @@ import (
 )
 
 type (
-	BlobCompression interface {
-		CommandLineIOWrapper
-		GetBlobCompression() BlobCompression
-	}
-
-	BlobEncryption interface {
-		CommandLineIOWrapper
-		GetBlobEncryption() BlobEncryption
-	}
-
 	BlobIOWrapper interface {
-		GetBlobEncryption() BlobEncryption
-		GetBlobCompression() BlobCompression
+		GetBlobEncryption() CommandLineIOWrapper
+		GetBlobCompression() CommandLineIOWrapper
 	}
 
 	BlobIOWrapperGetter interface {

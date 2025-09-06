@@ -1,6 +1,9 @@
 package blob_store_configs
 
-import "code.linenisgreat.com/dodder/go/src/bravo/flags"
+import (
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+)
 
 type TomlSFTPV0 struct {
 	// TODO replace the below with a url scheme
@@ -11,6 +14,11 @@ type TomlSFTPV0 struct {
 	PrivateKeyPath string `toml:"private-key-path,omitempty"`
 	RemotePath     string `toml:"remote-path"`
 }
+
+var (
+	_ ConfigSFTPRemotePath = &TomlSFTPV0{}
+	_ ConfigMutable        = &TomlSFTPV0{}
+)
 
 func (*TomlSFTPV0) GetBlobStoreType() string {
 	return "sftp"
@@ -85,4 +93,12 @@ func (blobStoreConfig *TomlSFTPV0) GetPrivateKeyPath() string {
 
 func (blobStoreConfig *TomlSFTPV0) GetRemotePath() string {
 	return blobStoreConfig.RemotePath
+}
+
+func (blobStoreConfig *TomlSFTPV0) SupportsMultiHash() bool {
+	return false
+}
+
+func (blobStoreConfig *TomlSFTPV0) GetDefaultHashTypeId() string {
+	return markl.HashTypeIdSha256
 }

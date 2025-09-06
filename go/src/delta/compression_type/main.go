@@ -36,7 +36,7 @@ const (
 
 type CompressionType string
 
-func (compressionType *CompressionType) GetBlobCompression() interfaces.BlobCompression {
+func (compressionType *CompressionType) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	return compressionType
 }
 

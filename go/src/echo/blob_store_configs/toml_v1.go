@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
-type TomlV0 struct {
+type TomlV1 struct {
 	// TODO add hasher option
 	// TODO uncomment when bumping to V1
 	// HashBuckets       []int                            `toml:"hash-buckets"`
@@ -19,15 +19,15 @@ type TomlV0 struct {
 }
 
 var (
-	_ ConfigLocalHashBucketed = TomlV0{}
-	_ ConfigMutable           = &TomlV0{}
+	_ ConfigLocalHashBucketed = TomlV1{}
+	_ ConfigMutable           = &TomlV1{}
 )
 
-func (TomlV0) GetBlobStoreType() string {
+func (TomlV1) GetBlobStoreType() string {
 	return "local"
 }
 
-func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flags.FlagSet) {
+func (blobStoreConfig *TomlV1) SetFlagSet(flagSet *flags.FlagSet) {
 	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 
 	flagSet.BoolVar(
@@ -44,30 +44,30 @@ func (blobStoreConfig *TomlV0) SetFlagSet(flagSet *flags.FlagSet) {
 	)
 }
 
-func (blobStoreConfig TomlV0) GetBasePath() string {
+func (blobStoreConfig TomlV1) GetBasePath() string {
 	return blobStoreConfig.BasePath
 }
 
-func (blobStoreConfig TomlV0) GetHashBuckets() []int {
+func (blobStoreConfig TomlV1) GetHashBuckets() []int {
 	return []int{2}
 }
 
-func (blobStoreConfig TomlV0) GetBlobCompression() interfaces.CommandLineIOWrapper {
+func (blobStoreConfig TomlV1) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	return &blobStoreConfig.CompressionType
 }
 
-func (blobStoreConfig TomlV0) GetBlobEncryption() interfaces.CommandLineIOWrapper {
+func (blobStoreConfig TomlV1) GetBlobEncryption() interfaces.CommandLineIOWrapper {
 	return &blobStoreConfig.AgeEncryption
 }
 
-func (blobStoreConfig TomlV0) GetLockInternalFiles() bool {
+func (blobStoreConfig TomlV1) GetLockInternalFiles() bool {
 	return blobStoreConfig.LockInternalFiles
 }
 
-func (blobStoreConfig TomlV0) SupportsMultiHash() bool {
-	return false
+func (blobStoreConfig TomlV1) SupportsMultiHash() bool {
+	return true
 }
 
-func (blobStoreConfig TomlV0) GetDefaultHashTypeId() string {
+func (blobStoreConfig TomlV1) GetDefaultHashTypeId() string {
 	return markl.HashTypeIdSha256
 }

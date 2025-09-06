@@ -12,8 +12,8 @@ import (
 func MakeConfig(
 	hashType markl.HashType,
 	funcJoin func(string, ...string) string,
-	compression interfaces.BlobCompression,
-	encryption interfaces.BlobEncryption,
+	compression interfaces.CommandLineIOWrapper,
+	encryption interfaces.CommandLineIOWrapper,
 ) Config {
 	return Config{
 		hashType:    hashType,
@@ -39,11 +39,11 @@ type Config struct {
 	hashType markl.HashType
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
-	compression interfaces.BlobCompression
-	encryption  interfaces.BlobEncryption
+	compression interfaces.CommandLineIOWrapper
+	encryption  interfaces.CommandLineIOWrapper
 }
 
-func (config Config) GetBlobCompression() interfaces.BlobCompression {
+func (config Config) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	if config.compression == nil {
 		return &defaultCompressionTypeValue
 	} else {
@@ -51,7 +51,7 @@ func (config Config) GetBlobCompression() interfaces.BlobCompression {
 	}
 }
 
-func (config Config) GetBlobEncryption() interfaces.BlobEncryption {
+func (config Config) GetBlobEncryption() interfaces.CommandLineIOWrapper {
 	if config.encryption == nil {
 		return &defaultEncryptionType
 	} else {

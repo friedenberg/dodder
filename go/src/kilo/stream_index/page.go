@@ -246,7 +246,7 @@ func (page *Page) MakeFlush(
 ) func() error {
 	return func() (err error) {
 		pw := &writer{
-			Page:        page,
+			Page:       page,
 			probeIndex: page.probeIndex,
 		}
 

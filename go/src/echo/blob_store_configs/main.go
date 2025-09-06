@@ -16,19 +16,9 @@ type (
 		flags.CommandComponentWriter
 	}
 
-	ConfigLocalSingleHashBucketed interface {
-		Config
-		interfaces.BlobIOWrapper
-		GetHashBuckets() []int
-		GetLockInternalFiles() bool
-		GetHashTypeId() string
-	}
-
-	ConfigLocalMultiHashBucketed interface {
-		Config
-		interfaces.BlobIOWrapper
-		GetHashBuckets() []int
-		GetLockInternalFiles() bool
+	ConfigHashType interface {
+		SupportsMultiHash() bool
+		GetDefaultHashTypeId() string
 	}
 
 	ConfigLocal interface {
@@ -38,6 +28,7 @@ type (
 
 	ConfigLocalHashBucketed interface {
 		ConfigLocal
+		ConfigHashType
 		interfaces.BlobIOWrapper
 		GetHashBuckets() []int
 		GetLockInternalFiles() bool
@@ -69,11 +60,10 @@ type (
 )
 
 var (
-	_ ConfigLocalHashBucketed = &TomlV0{}
-	_ ConfigSFTPRemotePath    = &TomlSFTPV0{}
-	_ ConfigSFTPRemotePath    = &TomlSFTPViaSSHConfigV0{}
-	_ ConfigMutable           = &TomlV0{}
-	_ ConfigMutable           = &TomlSFTPV0{}
+	_ ConfigSFTPRemotePath = &TomlSFTPV0{}
+	_ ConfigSFTPRemotePath = &TomlSFTPViaSSHConfigV0{}
+	_ ConfigMutable        = &TomlV0{}
+	_ ConfigMutable        = &TomlSFTPV0{}
 )
 
 func Default() *TypedMutableConfig {

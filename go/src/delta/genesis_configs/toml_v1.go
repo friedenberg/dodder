@@ -89,7 +89,7 @@ func (config *TomlV1Private) GetPrivateKey() markl.Id {
 	return config.PrivateKey
 }
 
-func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id{
+func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id {
 	return &config.PrivateKey
 }
 

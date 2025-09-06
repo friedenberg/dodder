@@ -81,11 +81,11 @@ func (config *V0Common) GetAgeEncryption() *age.Age {
 	return &age.Age{}
 }
 
-func (config *V0Common) GetBlobCompression() interfaces.BlobCompression {
+func (config *V0Common) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	return &config.CompressionType
 }
 
-func (config *V0Common) GetBlobEncryption() interfaces.BlobEncryption {
+func (config *V0Common) GetBlobEncryption() interfaces.CommandLineIOWrapper {
 	return config.GetAgeEncryption()
 }
 

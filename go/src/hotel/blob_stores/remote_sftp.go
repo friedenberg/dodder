@@ -30,7 +30,8 @@ type remoteSftp struct {
 
 	config blob_store_configs.ConfigSFTPRemotePath
 
-	hashType markl.HashType
+	multiHash       bool
+	defaultHashType markl.HashType
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -38,6 +39,7 @@ type remoteSftp struct {
 	sshClient     *ssh.Client
 	sftpClient    *sftp.Client
 
+	// TODO extract below into separate struct
 	blobCacheLock sync.RWMutex
 	blobCache     map[string]struct{}
 }
@@ -47,15 +49,23 @@ func makeSftpStore(
 	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
-	hashType markl.HashType,
 ) (blobStore *remoteSftp, err error) {
+	var defaultHashType markl.HashType
+
+	if defaultHashType, err = markl.GetHashTypeOrError(
+		defaultHashTypeId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	blobStore = &remoteSftp{
-		hashType:  hashType,
-		uiPrinter: uiPrinter,
-		buckets:   defaultBuckets,
-		config:    config,
-		sshClient: sshClient,
-		blobCache: make(map[string]struct{}),
+		defaultHashType: defaultHashType,
+		uiPrinter:       uiPrinter,
+		buckets:         defaultBuckets,
+		config:          config,
+		sshClient:       sshClient,
+		blobCache:       make(map[string]struct{}),
 	}
 
 	ui.Log().Print("creating sftp client")
@@ -67,7 +77,7 @@ func makeSftpStore(
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(blobStore.close))
 
-	if err = blobStore.ensureRemotePath(); err != nil {
+	if err = blobStore.initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -90,7 +100,7 @@ func (blobStore *remoteSftp) close() (err error) {
 	return nil
 }
 
-func (blobStore *remoteSftp) ensureRemotePath() (err error) {
+func (blobStore *remoteSftp) initialize() (err error) {
 	remotePath := blobStore.config.GetRemotePath()
 	// TODO read remote blob store config (including hash buckets)
 
@@ -189,7 +199,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 		// Walk through the two-level directory structure (Git-like bucketing)
 		walker := blobStore.sftpClient.Walk(basePath)
 
-		digest, repool := blobStore.hashType.GetBlobId()
+		digest, repool := blobStore.defaultHashType.GetBlobId()
 		defer repool()
 
 		for walker.Step() {
@@ -229,13 +239,15 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 	}
 }
 
-func (blobStore *remoteSftp) BlobWriter(marklHashTypeId string) (w interfaces.WriteCloseMarklIdGetter, err error) {
+func (blobStore *remoteSftp) BlobWriter(
+	marklHashTypeId string,
+) (w interfaces.WriteCloseMarklIdGetter, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
 	}
 
-	if err = mover.initialize(blobStore.hashType.Get()); err != nil {
+	if err = mover.initialize(blobStore.defaultHashType.Get()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -253,7 +265,7 @@ func (blobStore *remoteSftp) BlobReader(
 ) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
-			blobStore.hashType.Get(),
+			blobStore.defaultHashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
 		return
@@ -287,7 +299,7 @@ func (blobStore *remoteSftp) BlobReader(
 	}
 
 	if readCloser, err = streamingReader.createReader(
-		blobStore.hashType.Get(),
+		blobStore.defaultHashType.Get(),
 	); err != nil {
 		remoteFile.Close()
 		err = errors.Wrap(err)

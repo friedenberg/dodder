@@ -19,7 +19,7 @@ type Age struct {
 	Identities []*Identity `toml:"identities,omitempty"`
 }
 
-func (a *Age) GetBlobEncryption() interfaces.BlobEncryption {
+func (a *Age) GetBlobEncryption() interfaces.CommandLineIOWrapper {
 	return a
 }
 

@@ -23,6 +23,8 @@ import (
 
 var defaultBuckets = []int{2}
 
+const defaultHashTypeId = markl.HashTypeIdSha256
+
 var (
 	_ interfaces.BlobStore = localHashBucketed{}
 	_ interfaces.BlobStore = &remoteSftp{}
@@ -46,17 +48,6 @@ func MakeBlobStores(
 	config genesis_configs.ConfigPrivate,
 	directoryLayout interfaces.DirectoryLayout,
 ) (blobStores []BlobStoreInitialized) {
-	var hashType markl.HashType
-
-	{
-		var err error
-
-		if hashType, err = markl.GetHashTypeOrError(config.GetBlobHashTypeId()); err != nil {
-			ctx.Cancel(err)
-			return
-		}
-	}
-
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
@@ -103,7 +94,6 @@ func MakeBlobStores(
 			ctx,
 			blobStore.BlobStoreConfigNamed,
 			envDir.GetTempLocal(),
-			hashType,
 		); err != nil {
 			ctx.Cancel(err)
 			return
@@ -129,7 +119,6 @@ func MakeRemoteBlobStore(
 			ctx,
 			config,
 			tempFS,
-			hashType,
 		); err != nil {
 			ctx.Cancel(err)
 			return
@@ -144,7 +133,6 @@ func MakeBlobStore(
 	context interfaces.ActiveContext,
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
-	hashType markl.HashType,
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
@@ -188,7 +176,6 @@ func MakeBlobStore(
 			printer,
 			configSFTP,
 			sshClient,
-			hashType,
 		)
 
 	case "local":
@@ -199,7 +186,6 @@ func MakeBlobStore(
 				// configLocal.GetBasePath(),
 				configLocal,
 				tempFS,
-				hashType,
 			)
 		} else {
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
