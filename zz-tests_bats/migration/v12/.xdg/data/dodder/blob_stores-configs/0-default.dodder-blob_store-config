@@ -2,6 +2,8 @@
 ! toml-blob_store_config-v0
 ---
 
+hash-buckets = [2]
 base-path = ''
+hash_type-id = 'sha256'
 compression-type = 'zstd'
 lock-internal-files = false
