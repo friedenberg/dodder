@@ -25,11 +25,6 @@ var defaultBuckets = []int{2}
 
 const defaultHashTypeId = markl.HashTypeIdSha256
 
-var (
-	_ interfaces.BlobStore = localHashBucketed{}
-	_ interfaces.BlobStore = &remoteSftp{}
-)
-
 type BlobStoreConfigNamed struct {
 	Name     string
 	BasePath string

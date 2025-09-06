@@ -25,6 +25,8 @@ type localHashBucketed struct {
 	tempFS          env_dir.TemporaryFS
 }
 
+var _ interfaces.BlobStore = localHashBucketed{}
+
 func makeLocalHashBucketed(
 	ctx interfaces.ActiveContext,
 	basePath string,
@@ -55,6 +57,10 @@ func (blobStore localHashBucketed) GetBlobStoreDescription() string {
 
 func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return blobStore.config
+}
+
+func (blobStore localHashBucketed) GetDefaultHashType() interfaces.HashType {
+	return blobStore.defaultHashType
 }
 
 func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {

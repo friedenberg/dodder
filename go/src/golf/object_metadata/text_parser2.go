@@ -16,8 +16,8 @@ import (
 type textParser2 struct {
 	interfaces.BlobWriter
 	TextParserContext
-	blobDigestType string
-	Blob           fd.FD
+	hashType interfaces.HashType
+	Blob     fd.FD
 }
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
@@ -142,7 +142,7 @@ func (parser *textParser2) setBlobSha(
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetHexBytes(
-		parser.blobDigestType,
+		parser.hashType.GetMarklTypeId(),
 		metadata.GetBlobDigestMutable(),
 		[]byte(maybeSha),
 	); err != nil {

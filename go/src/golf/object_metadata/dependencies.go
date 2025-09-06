@@ -21,42 +21,42 @@ import (
 )
 
 type Dependencies struct {
-	EnvDir         env_dir.Env
-	BlobStore      interfaces.BlobStore
-	BlobFormatter  script_config.RemoteScript
-	BlobDigestType string
+	EnvDir        env_dir.Env
+	BlobStore     interfaces.BlobStore
+	BlobFormatter script_config.RemoteScript
 }
 
-func (f Dependencies) GetBlobDigestType() string {
-	if f.BlobDigestType == "" {
-		return markl.HashTypeIdSha256
+func (deps Dependencies) GetBlobDigestType() interfaces.HashType {
+	hashType := deps.BlobStore.GetDefaultHashType()
+	if hashType == nil {
+		return markl.HashTypeSha256
 	} else {
-		return f.BlobDigestType
+		return hashType
 	}
 }
 
-func (f Dependencies) writeComments(
-	w1 io.Writer,
-	c TextFormatterContext,
+func (deps Dependencies) writeComments(
+	writer io.Writer,
+	context TextFormatterContext,
 ) (n int64, err error) {
 	n1 := 0
 
-	for _, c := range c.GetMetadata().Comments {
-		n1, err = io.WriteString(w1, "% ")
+	for _, c := range context.GetMetadata().Comments {
+		n1, err = io.WriteString(writer, "% ")
 		n += int64(n1)
 
 		if err != nil {
 			return
 		}
 
-		n1, err = io.WriteString(w1, c)
+		n1, err = io.WriteString(writer, c)
 		n += int64(n1)
 
 		if err != nil {
 			return
 		}
 
-		n1, err = io.WriteString(w1, "\n")
+		n1, err = io.WriteString(writer, "\n")
 		n += int64(n1)
 
 		if err != nil {
@@ -67,21 +67,21 @@ func (f Dependencies) writeComments(
 	return
 }
 
-func (f Dependencies) writeBoundary(
+func (deps Dependencies) writeBoundary(
 	w1 io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(w1, triple_hyphen_io.Boundary)
 }
 
-func (f Dependencies) writeNewLine(
+func (deps Dependencies) writeNewLine(
 	w1 io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(w1, "")
 }
 
-func (f Dependencies) writeCommonMetadataFormat(
+func (deps Dependencies) writeCommonMetadataFormat(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -129,7 +129,7 @@ func (f Dependencies) writeCommonMetadataFormat(
 	return
 }
 
-func (f Dependencies) writeTyp(
+func (deps Dependencies) writeTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -142,7 +142,7 @@ func (f Dependencies) writeTyp(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type.StringSansOp()))
 }
 
-func (f Dependencies) writeBlobDigestAndType(
+func (deps Dependencies) writeBlobDigestAndType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -157,7 +157,7 @@ func (f Dependencies) writeBlobDigestAndType(
 	)
 }
 
-func (f Dependencies) writePathType(
+func (deps Dependencies) writePathType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -171,7 +171,7 @@ func (f Dependencies) writePathType(
 	}
 
 	if ap != "" {
-		ap = f.EnvDir.RelToCwdOrSame(ap)
+		ap = deps.EnvDir.RelToCwdOrSame(ap)
 	} else {
 		err = errors.ErrorWithStackf("path not found in fields")
 		return
@@ -180,14 +180,14 @@ func (f Dependencies) writePathType(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", ap))
 }
 
-func (f Dependencies) writeBlob(
+func (deps Dependencies) writeBlob(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.BlobStore.BlobReader(&m.DigBlob); err != nil {
+	if ar, err = deps.BlobStore.BlobReader(&m.DigBlob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -199,12 +199,12 @@ func (f Dependencies) writeBlob(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if f.BlobFormatter != nil {
+	if deps.BlobFormatter != nil {
 		var wt io.WriterTo
 
 		if wt, err = script_config.MakeWriterToWithStdin(
-			f.BlobFormatter,
-			f.EnvDir.MakeCommonEnv(),
+			deps.BlobFormatter,
+			deps.EnvDir.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)

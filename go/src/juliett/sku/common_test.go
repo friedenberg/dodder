@@ -192,9 +192,8 @@ func makeTestTextFormat(
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			EnvDir:         envDir,
-			BlobStore:      blobStore,
-			BlobDigestType: markl.HashTypeIdSha256,
+			EnvDir:    envDir,
+			BlobStore: blobStore,
 		},
 	)
 }
@@ -422,8 +421,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.Dependencies{
-			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: markl.HashTypeIdSha256,
+			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
 
@@ -473,8 +471,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.Dependencies{
-			BlobStore:      envRepo.GetDefaultBlobStore(),
-			BlobDigestType: markl.HashTypeIdSha256,
+			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
 

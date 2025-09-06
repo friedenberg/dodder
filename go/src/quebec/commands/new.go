@@ -97,9 +97,8 @@ func (cmd *New) Run(req command.Request) {
 
 	f := object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			EnvDir:         repo.GetEnvRepo(),
-			BlobStore:      repo.GetEnvRepo().GetDefaultBlobStore(),
-			BlobDigestType: repo.GetEnvRepo().GetConfigPublic().Blob.GetBlobHashTypeId(),
+			EnvDir:    repo.GetEnvRepo(),
+			BlobStore: repo.GetEnvRepo().GetDefaultBlobStore(),
 		},
 	)
 

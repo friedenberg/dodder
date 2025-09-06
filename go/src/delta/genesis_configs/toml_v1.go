@@ -66,14 +66,6 @@ func (config *TomlV1Common) SetObjectSigMarklTypeId(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *TomlV1Common) GetBlobHashTypeId() string {
-	return markl.HashTypeIdSha256
-}
-
-func (config *TomlV1Common) SetBlobHashTypeId(string) {
-	panic(errors.Err405MethodNotAllowed)
-}
-
 func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
 	return config
 }

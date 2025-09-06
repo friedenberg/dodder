@@ -19,7 +19,6 @@ type (
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
 		GetObjectSigMarklTypeId() string
-		GetBlobHashTypeId() string
 	}
 
 	ConfigPublic interface {
@@ -39,7 +38,7 @@ type (
 
 		SetInventoryListTypeId(string)
 		SetObjectSigMarklTypeId(string)
-		SetBlobHashTypeId(string)
+
 		// TODO separate into non-method function that uses properties
 		flags.CommandComponentWriter
 		SetRepoType(repo_type.Type) // TODO remove
@@ -91,7 +90,6 @@ func DefaultWithVersion(
 					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
 					ObjectSigType:     markl.FormatIdObjectSigV1,
-					BlobDigestType:    markl.HashTypeIdSha256,
 				},
 			},
 		}

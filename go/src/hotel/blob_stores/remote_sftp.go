@@ -44,6 +44,8 @@ type remoteSftp struct {
 	blobCache     map[string]struct{}
 }
 
+var _ interfaces.BlobStore = &remoteSftp{}
+
 func makeSftpStore(
 	ctx interfaces.ActiveContext,
 	uiPrinter ui.Printer,
@@ -87,6 +89,10 @@ func makeSftpStore(
 
 func (blobStore *remoteSftp) GetBlobStoreConfig() interfaces.BlobStoreConfig {
 	return blobStore.config
+}
+
+func (blobStore *remoteSftp) GetDefaultHashType() interfaces.HashType {
+	return blobStore.defaultHashType
 }
 
 func (blobStore *remoteSftp) close() (err error) {

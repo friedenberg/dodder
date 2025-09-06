@@ -32,8 +32,10 @@ func Make(
 	deletedPrinter interfaces.FuncIter[*fd.FD],
 	fileExtensions file_extensions.Config,
 	envRepo env_repo.Env,
-) (fs *Store, err error) {
-	fs = &Store{
+) (store *Store, err error) {
+	blobStore := envRepo.GetDefaultBlobStore()
+
+	store = &Store{
 		config:         config,
 		deletedPrinter: deletedPrinter,
 		envRepo:        envRepo,
@@ -52,9 +54,8 @@ func Make(
 		),
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				EnvDir:         envRepo,
-				BlobStore:      envRepo.GetDefaultBlobStore(),
-				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
+				EnvDir:    envRepo,
+				BlobStore: blobStore,
 			},
 		),
 	}

@@ -40,10 +40,9 @@ func MakeTextFormatterWithBlobFormatter(
 		InlineTypeChecker: inlineTypeChecker,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir:         envRepo,
-				BlobStore:      envRepo.GetDefaultBlobStore(),
-				BlobFormatter:  formatter,
-				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
+				EnvDir:        envRepo,
+				BlobStore:     envRepo.GetDefaultBlobStore(),
+				BlobFormatter: formatter,
 			},
 		),
 		checkoutMode: checkoutMode,

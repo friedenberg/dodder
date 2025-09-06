@@ -16,7 +16,6 @@ type TomlV2Common struct {
 	RepoId            ids.RepoId            `toml:"id"`
 	InventoryListType string                `toml:"inventory_list-type"`
 	ObjectSigType     string                `toml:"object-sig-type"`
-	BlobDigestType    string                `toml:"blob-digest-type"`
 }
 
 type TomlV2Private struct {
@@ -58,24 +57,12 @@ func (config *TomlV2Common) GetObjectSigMarklTypeId() string {
 	}
 }
 
-func (config *TomlV2Common) GetBlobHashTypeId() string {
-	if config.BlobDigestType == "" {
-		return markl.HashTypeIdSha256
-	} else {
-		return config.BlobDigestType
-	}
-}
-
 func (config *TomlV2Common) SetInventoryListTypeId(value string) {
 	config.InventoryListType = value
 }
 
 func (config *TomlV2Common) SetObjectSigMarklTypeId(value string) {
 	config.ObjectSigType = value
-}
-
-func (config *TomlV2Common) SetBlobHashTypeId(value string) {
-	config.BlobDigestType = value
 }
 
 func (config *TomlV2Private) GetGenesisConfig() ConfigPrivate {

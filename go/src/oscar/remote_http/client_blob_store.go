@@ -31,6 +31,10 @@ func (client *client) GetBlobStoreConfig() interfaces.BlobStoreConfig {
 	panic(errors.Err501NotImplemented)
 }
 
+func (client *client) GetDefaultHashType() interfaces.HashType {
+	panic(errors.Err501NotImplemented)
+}
+
 func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
 	var request *http.Request
 
@@ -218,6 +222,8 @@ func (client *client) Mover() (interfaces.Mover, error) {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) BlobWriter(marklHashTypeId string) (interfaces.WriteCloseMarklIdGetter, error) {
+func (client *client) BlobWriter(
+	marklHashTypeId string,
+) (interfaces.WriteCloseMarklIdGetter, error) {
 	panic(errors.Err501NotImplemented)
 }

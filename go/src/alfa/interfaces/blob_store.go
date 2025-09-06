@@ -32,14 +32,22 @@ type (
 		GetBlobStoreType() string
 	}
 
-	BlobStore interface {
-		GetBlobStoreConfig() BlobStoreConfig
-		GetBlobStoreDescription() string
+	BlobAccess interface {
 		HasBlob(MarklId) bool
 		BlobReader
 		BlobWriter
 		AllBlobs() SeqError[MarklId]
+	}
+
+	BlobStore interface {
+		BlobAccess
+
+		GetBlobStoreConfig() BlobStoreConfig
+		GetBlobStoreDescription() string
+		GetDefaultHashType() HashType
+
 		GetBlobIOWrapper() BlobIOWrapper
+		// TODO rename to MakeMover
 		Mover() (Mover, error)
 	}
 

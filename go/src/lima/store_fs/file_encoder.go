@@ -16,48 +16,50 @@ import (
 
 type FileEncoder interface {
 	Encode(
-		options checkout_options.TextFormatterOptions,
-		z *sku.Transacted,
-		i *sku.FSItem) (err error)
+		checkout_options.TextFormatterOptions,
+		*sku.Transacted,
+		*sku.FSItem,
+	) error
 }
 
 type fileEncoder struct {
-	mode    int
-	perm    os.FileMode
-	envRepo env_repo.Env
-	ic      ids.InlineTypeChecker
+	mode              int
+	perm              os.FileMode
+	envRepo           env_repo.Env
+	inlineTypeChecker ids.InlineTypeChecker
 
 	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
 	envRepo env_repo.Env,
-	ic ids.InlineTypeChecker,
+	inlineTypeChecker ids.InlineTypeChecker,
 ) *fileEncoder {
+	blobStore := envRepo.GetDefaultBlobStore()
+
 	return &fileEncoder{
-		mode:    os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
-		perm:    0o666,
-		envRepo: envRepo,
-		ic:      ic,
+		mode:              os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
+		perm:              0o666,
+		envRepo:           envRepo,
+		inlineTypeChecker: inlineTypeChecker,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				EnvDir:         envRepo,
-				BlobStore:      envRepo.GetDefaultBlobStore(),
-				BlobDigestType: envRepo.GetConfigPublic().Blob.GetBlobHashTypeId(),
+				EnvDir:    envRepo,
+				BlobStore: blobStore,
 			},
 		),
 	}
 }
 
-func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
-	if f, err = files.OpenFile(p, e.mode, e.perm); err != nil {
+func (encoder *fileEncoder) openOrCreate(p string) (file *os.File, err error) {
+	if file, err = files.OpenFile(p, encoder.mode, encoder.perm); err != nil {
 		err = errors.Wrap(err)
 
 		if errors.IsExist(err) {
 			// err = nil
 			var err2 error
 
-			if f, err2 = files.OpenExclusiveReadOnly(p); err2 != nil {
+			if file, err2 = files.OpenExclusiveReadOnly(p); err2 != nil {
 				err = errors.Wrap(err2)
 			}
 		} else {
@@ -70,22 +72,22 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 	return
 }
 
-func (e *fileEncoder) EncodeObject(
+func (encoder *fileEncoder) EncodeObject(
 	options checkout_options.TextFormatterOptions,
-	z *sku.Transacted,
+	object *sku.Transacted,
 	objectPath string,
 	blobPath string,
 ) (err error) {
 	ctx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: z.GetSku(),
+		PersistentFormatterContext: object.GetSku(),
 		TextFormatterOptions:       options,
 	}
 
-	inline := e.ic.IsInlineType(z.GetType())
+	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
 
 	var ar interfaces.ReadCloseMarklIdGetter
 
-	if ar, err = e.envRepo.GetDefaultBlobStore().BlobReader(z.GetBlobDigest()); err != nil {
+	if ar, err = encoder.envRepo.GetDefaultBlobStore().BlobReader(object.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -94,23 +96,23 @@ func (e *fileEncoder) EncodeObject(
 
 	switch {
 	case blobPath != "" && objectPath != "":
-		var fBlob, fZettel *os.File
+		var fileBlob, fileObject *os.File
 
 		{
-			if fBlob, err = e.openOrCreate(
+			if fileBlob, err = encoder.openOrCreate(
 				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
 					var aw interfaces.WriteCloseMarklIdGetter
 
-					if aw, err = e.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
+					if aw, err = encoder.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
 					defer errors.DeferredCloser(&err, aw)
 
-					if _, err = io.Copy(aw, fBlob); err != nil {
+					if _, err = io.Copy(aw, fileBlob); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -121,24 +123,24 @@ func (e *fileEncoder) EncodeObject(
 				}
 			}
 
-			defer errors.DeferredCloser(&err, fBlob)
+			defer errors.DeferredCloser(&err, fileBlob)
 
-			if _, err = io.Copy(fBlob, ar); err != nil {
+			if _, err = io.Copy(fileBlob, ar); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		if fZettel, err = e.openOrCreate(
+		if fileObject, err = encoder.openOrCreate(
 			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, fZettel)
+		defer errors.DeferredCloser(&err, fileObject)
 
-		if _, err = e.BlobPath.FormatMetadata(fZettel, ctx); err != nil {
+		if _, err = encoder.BlobPath.FormatMetadata(fileObject, ctx); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -146,7 +148,7 @@ func (e *fileEncoder) EncodeObject(
 	case blobPath != "":
 		var fBlob *os.File
 
-		if fBlob, err = e.openOrCreate(
+		if fBlob, err = encoder.openOrCreate(
 			blobPath,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -164,14 +166,14 @@ func (e *fileEncoder) EncodeObject(
 		var mtw object_metadata.TextFormatter
 
 		if inline {
-			mtw = e.InlineBlob
+			mtw = encoder.InlineBlob
 		} else {
-			mtw = e.MetadataOnly
+			mtw = encoder.MetadataOnly
 		}
 
 		var fZettel *os.File
 
-		if fZettel, err = e.openOrCreate(
+		if fZettel, err = encoder.openOrCreate(
 			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -189,15 +191,15 @@ func (e *fileEncoder) EncodeObject(
 	return
 }
 
-func (e *fileEncoder) Encode(
+func (encoder *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
-	z *sku.Transacted,
-	i *sku.FSItem,
+	object *sku.Transacted,
+	fsItem *sku.FSItem,
 ) (err error) {
-	return e.EncodeObject(
+	return encoder.EncodeObject(
 		options,
-		z,
-		i.Object.GetPath(),
-		i.Blob.GetPath(),
+		object,
+		fsItem.Object.GetPath(),
+		fsItem.Blob.GetPath(),
 	)
 }

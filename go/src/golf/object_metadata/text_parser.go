@@ -12,9 +12,9 @@ import (
 )
 
 type textParser struct {
-	blobDigestType string
-	blobWriter     interfaces.BlobWriter
-	blobFormatter  script_config.RemoteScript
+	hashType      interfaces.HashType
+	blobWriter    interfaces.BlobWriter
+	blobFormatter script_config.RemoteScript
 }
 
 func MakeTextParser(
@@ -25,9 +25,9 @@ func MakeTextParser(
 	}
 
 	return textParser{
-		blobDigestType: dependencies.GetBlobDigestType(),
-		blobWriter:     dependencies.BlobStore,
-		blobFormatter:  dependencies.BlobFormatter,
+		hashType:      dependencies.GetBlobDigestType(),
+		blobWriter:    dependencies.BlobStore,
+		blobFormatter: dependencies.BlobFormatter,
 	}
 }
 
@@ -42,7 +42,7 @@ func (parser textParser) ParseMetadata(
 
 	parser2 := &textParser2{
 		BlobWriter:        parser.blobWriter,
-		blobDigestType:    parser.blobDigestType,
+		hashType:    parser.hashType,
 		TextParserContext: context,
 	}
 

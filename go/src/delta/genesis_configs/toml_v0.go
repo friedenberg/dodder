@@ -101,10 +101,6 @@ func (config V0Common) GetObjectSigMarklTypeId() string {
 	return markl.FormatIdObjectSigV0
 }
 
-func (config V0Common) GetBlobHashTypeId() string {
-	return markl.HashTypeIdSha256
-}
-
 func (config V0Common) SetInventoryListTypeString(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
