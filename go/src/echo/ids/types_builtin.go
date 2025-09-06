@@ -21,6 +21,7 @@ const (
 	TypeTomlBlobStoreConfigSftpExplicitV0     = "!toml-blob_store_config_sftp-explicit-v0"
 	TypeTomlBlobStoreConfigSftpViaSSHConfigV0 = "!toml-blob_store_config_sftp-ssh_config-v0"
 	TypeTomlBlobStoreConfigV0                 = "!toml-blob_store_config-v0"
+	TypeTomlBlobStoreConfigV1                 = "!toml-blob_store_config-v1"
 	TypeTomlConfigImmutableV1                 = "!toml-config-immutable-v1" // Deprecated
 	TypeTomlConfigImmutableV2                 = "!toml-config-immutable-v2"
 	TypeTomlConfigV0                          = "!toml-config-v0" // Deprecated

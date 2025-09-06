@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
@@ -12,7 +13,7 @@ import (
 type (
 	Config        = interfaces.BlobStoreConfig
 	ConfigMutable interface {
-		interfaces.BlobStoreConfig
+		Config
 		flags.CommandComponentWriter
 	}
 
@@ -69,7 +70,9 @@ var (
 func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
 		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV0).Type,
-		Blob: &TomlV0{
+		Blob: &TomlV1{
+			HashBuckets:       []int{2},
+			HashTypeId:        markl.HashTypeIdSha256,
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,
 		},

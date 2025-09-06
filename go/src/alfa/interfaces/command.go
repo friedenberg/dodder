@@ -11,11 +11,16 @@ package interfaces
 // The flag package may call the [String] method with a zero-valued receiver,
 // such as a nil pointer.
 type FlagValue interface {
-	String() string
-	Set(string) error
+	StringerSetter
 }
 
 type CommandLineIOWrapper interface {
 	FlagValue
 	IOWrapper
+}
+
+type CommandLineFlagDefinitions interface {
+	BoolVar(variable *bool, name string, defaultValue bool, usage string)
+	StringVar(variable *string, name string, defaultValue string, usage string)
+	Var(value FlagValue, name string, usage string)
 }
