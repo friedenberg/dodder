@@ -34,7 +34,9 @@ func makeLocalHashBucketed(
 	tempFS env_dir.TemporaryFS,
 ) (store localHashBucketed, err error) {
 	// TODO read default hash type from config
-	if store.defaultHashType, err = markl.GetHashTypeOrError(config.GetDefaultHashTypeId()); err != nil {
+	if store.defaultHashType, err = markl.GetHashTypeOrError(
+		config.GetDefaultHashTypeId(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
