@@ -28,10 +28,6 @@ type (
 		MarklIdGetter
 	}
 
-	BlobStoreConfig interface {
-		GetBlobStoreType() string
-	}
-
 	BlobAccess interface {
 		HasBlob(MarklId) bool
 		BlobReader
@@ -42,7 +38,6 @@ type (
 	BlobStore interface {
 		BlobAccess
 
-		GetBlobStoreConfig() BlobStoreConfig
 		GetBlobStoreDescription() string
 		GetDefaultHashType() HashType
 

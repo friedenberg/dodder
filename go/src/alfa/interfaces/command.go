@@ -19,6 +19,7 @@ type CommandLineIOWrapper interface {
 	IOWrapper
 }
 
+// TODO rename to CLIFlagDefinitions
 type CommandLineFlagDefinitions interface {
 	BoolVar(variable *bool, name string, defaultValue bool, usage string)
 	StringVar(variable *string, name string, defaultValue string, usage string)

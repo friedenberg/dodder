@@ -28,10 +28,12 @@ const (
 	FormatIdRequestRepoSigV1      = "dodder-request_auth-repo-sig-v1"
 
 	// PubKeys
-	FormatIdRepoPubKeyV1 = "dodder-repo-public_key-v1"
+	FormatIdRepoPubKeyV1   = "dodder-repo-public_key-v1"
+	FormatIdMadderPubKeyV1 = "madder-public_key-v1"
 
 	// PrivateKeys
-	FormatIdRepoPrivateKeyV1 = "dodder-repo-private_key-v1"
+	FormatIdRepoPrivateKeyV1   = "dodder-repo-private_key-v1"
+	FormatIdMadderPrivateKeyV1 = "madder-private_key-v1"
 
 	// Arbitrary
 	FormatIdRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
@@ -41,10 +43,15 @@ func init() {
 	makeType(FormatIdObjectMotherSigV1)
 	makeType(FormatIdObjectSigV0)
 	makeType(FormatIdObjectSigV1)
+
 	makeType(FormatIdRepoPrivateKeyV1)
 	makeType(FormatIdRepoPubKeyV1)
+
 	makeType(FormatIdRequestAuthChallengeV1)
 	makeType(FormatIdRequestAuthResponseV1)
+
+	makeType(FormatIdMadderPubKeyV1)
+	makeType(FormatIdMadderPrivateKeyV1)
 }
 
 type tipe struct {

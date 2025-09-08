@@ -49,7 +49,7 @@ func makeLocalHashBucketed(
 	return
 }
 
-func (blobStore localHashBucketed) GetBlobStoreConfig() interfaces.BlobStoreConfig {
+func (blobStore localHashBucketed) GetBlobStoreConfig() blob_store_configs.Config {
 	return blobStore.config
 }
 

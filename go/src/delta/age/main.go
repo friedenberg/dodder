@@ -19,9 +19,7 @@ type Age struct {
 	Identities []*Identity `toml:"identities,omitempty"`
 }
 
-func (a *Age) GetBlobEncryption() interfaces.CommandLineIOWrapper {
-	return a
-}
+var _ interfaces.CommandLineIOWrapper = &Age{}
 
 func (a *Age) String() string {
 	return fmt.Sprintf("%s", a.Identities)

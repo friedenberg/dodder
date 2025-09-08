@@ -10,7 +10,10 @@ import (
 )
 
 type (
-	Config        = interfaces.BlobStoreConfig
+	Config = interface {
+		GetBlobStoreType() string
+	}
+
 	ConfigMutable interface {
 		Config
 		interfaces.CommandComponentWriter

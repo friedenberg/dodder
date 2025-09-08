@@ -11,7 +11,8 @@ type TomlV0 struct {
 	// TODO add hasher option
 	// TODO uncomment when bumping to V1
 	// HashBuckets       []int                            `toml:"hash-buckets"`
-	BasePath          string                           `toml:"base-path"` // can include env vars
+	BasePath string `toml:"base-path"` // can include env vars
+	// TODO transform into markl type
 	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
@@ -26,7 +27,9 @@ func (TomlV0) GetBlobStoreType() string {
 	return "local"
 }
 
-func (blobStoreConfig *TomlV0) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (blobStoreConfig *TomlV0) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 
 	flagSet.BoolVar(

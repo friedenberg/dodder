@@ -87,7 +87,7 @@ func makeSftpStore(
 	return
 }
 
-func (blobStore *remoteSftp) GetBlobStoreConfig() interfaces.BlobStoreConfig {
+func (blobStore *remoteSftp) GetBlobStoreConfig() blob_store_configs.Config {
 	return blobStore.config
 }
 
