@@ -1,14 +1,12 @@
 package commands
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -58,22 +56,11 @@ func (cmd Pull) Run(req command.Request) {
 		req.PopArgs(),
 	)
 
-	switch remote := remote.(type) {
-	case repo.WorkingCopy:
-		if err := localWorkingCopy.PullQueryGroupFromRemote(
-			remote,
-			qg,
-			cmd.WithPrintCopies(true),
-		); err != nil {
-			localWorkingCopy.Cancel(err)
-		}
-
-	case repo.Repo:
-		errors.ContextCancelWithBadRequestf(
-			localWorkingCopy,
-			"unsupported repo type: %s (%T)",
-			remote.GetImmutableConfigPublic().GetRepoType(),
-			remote,
-		)
+	if err := localWorkingCopy.PullQueryGroupFromRemote(
+		remote,
+		qg,
+		cmd.WithPrintCopies(true),
+	); err != nil {
+		localWorkingCopy.Cancel(err)
 	}
 }

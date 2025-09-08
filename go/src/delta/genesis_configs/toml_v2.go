@@ -3,7 +3,6 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -12,7 +11,7 @@ import (
 // must be public for toml coding to function
 type TomlV2Common struct {
 	StoreVersion      store_version.Version `toml:"store-version"`
-	RepoType          repo_type.Type        `toml:"repo-type"` // TODO remove
+	_                 string                `toml:"repo-type"`
 	RepoId            ids.RepoId            `toml:"id"`
 	InventoryListType string                `toml:"inventory_list-type"`
 	ObjectSigType     string                `toml:"object-sig-type"`
@@ -28,13 +27,9 @@ type TomlV2Public struct {
 	TomlV2Common
 }
 
-func (config *TomlV2Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	config.RepoType = repo_type.TypeWorkingCopy
-	flagSet.Var(&config.RepoType, "repo-type", "")
-}
-
-func (config *TomlV2Common) SetRepoType(tipe repo_type.Type) {
-	config.RepoType = tipe
+func (config *TomlV2Common) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 }
 
 func (config *TomlV2Common) SetRepoId(id ids.RepoId) {
@@ -100,10 +95,6 @@ func (config TomlV2Public) GetPublicKey() markl.PublicKey {
 
 func (config *TomlV2Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
-}
-
-func (config TomlV2Common) GetRepoType() repo_type.Type {
-	return config.RepoType
 }
 
 func (config TomlV2Common) GetRepoId() ids.RepoId {

@@ -215,50 +215,6 @@ function clone_history_default_allow_conflicts { # @test
 	try_add_new_after_clone
 }
 
-function clone_archive_history_default_allow_conflicts { # @test
-	them="them"
-	bootstrap "$them"
-	assert_success
-
-	export BATS_TEST_BODY=true
-
-	us="us"
-	set_xdg "$us"
-	run_clone_default_with \
-		-repo-type archive \
-		-remote-type native-dotenv-xdg \
-		test-repo-id-us \
-		<(print_their_xdg them)
-
-	assert_success
-	assert_output_unsorted --regexp - <<-'EOM'
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		copied Blob [0-9a-f]+ \([.0-9]+ \w+)
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[konfig @[0-9a-f]+ !toml-config-v2]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-	EOM
-
-	run_dodder show :z,b,t,e,konfig
-	assert_success
-	assert_output_unsorted --regexp - <<-'EOM'
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[konfig @[0-9a-f]+ !toml-config-v2]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
-	EOM
-}
-
 # TODO fix issue with start_server spawning dodder processes that do not get cleaned up later
 function clone_history_zettel_type_tag_port { # @test
 	skip

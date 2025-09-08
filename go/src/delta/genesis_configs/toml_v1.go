@@ -3,7 +3,6 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -13,7 +12,7 @@ import (
 // must be public for toml coding to function
 type TomlV1Common struct {
 	StoreVersion      store_version.Version     `toml:"store-version"`
-	RepoType          repo_type.Type            `toml:"repo-type"`
+	_                 string                    `toml:"repo-type"`
 	RepoId            ids.RepoId                `toml:"id"`
 	BlobStore         blob_store_configs.TomlV0 `toml:"blob-store"`
 	InventoryListType string                    `toml:"inventory_list-type"`
@@ -29,16 +28,12 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (config *TomlV1Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (config *TomlV1Common) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		config.BlobStore.SetFlagSet(flagSet)
 	}
-	config.RepoType = repo_type.TypeWorkingCopy
-	flagSet.Var(&config.RepoType, "repo-type", "")
-}
-
-func (config *TomlV1Common) SetRepoType(tipe repo_type.Type) {
-	config.RepoType = tipe
 }
 
 func (config *TomlV1Common) SetRepoId(id ids.RepoId) {
@@ -104,10 +99,6 @@ func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 
 func (config *TomlV1Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
-}
-
-func (config TomlV1Common) GetRepoType() repo_type.Type {
-	return config.RepoType
 }
 
 func (config TomlV1Common) GetRepoId() ids.RepoId {

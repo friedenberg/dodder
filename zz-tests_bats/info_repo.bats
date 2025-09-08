@@ -52,9 +52,9 @@ function info_config_immutable { # @test
 
 			public-key = 'dodder-repo-public_key-v1.*'
 			store-version = $storeVersionCurrent
-			repo-type = 'working-copy'
 			id = 'test-repo-id'
 			inventory_list-type = '!inventory_list-v2'
+			object-sig-type = 'dodder-object-sig-v1'
 		EOM
 	fi
 }

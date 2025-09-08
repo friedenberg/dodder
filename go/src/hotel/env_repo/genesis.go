@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -69,24 +68,22 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.writeConfig(bigBang)
 	env.writeBlobStoreConfig(bigBang)
 
-	if env.config.Blob.GetRepoType() == repo_type.TypeWorkingCopy {
-		if err := ohio.CopyFileLines(
-			bigBang.Yin,
-			filepath.Join(env.DirObjectId(), "Yin"),
-		); err != nil {
-			env.Cancel(err)
-		}
-
-		if err := ohio.CopyFileLines(
-			bigBang.Yang,
-			filepath.Join(env.DirObjectId(), "Yang"),
-		); err != nil {
-			env.Cancel(err)
-		}
-
-		env.writeFile(env.FileConfigMutable(), "")
-		env.writeFile(env.FileCacheDormant(), "")
+	if err := ohio.CopyFileLines(
+		bigBang.Yin,
+		filepath.Join(env.DirObjectId(), "Yin"),
+	); err != nil {
+		env.Cancel(err)
 	}
+
+	if err := ohio.CopyFileLines(
+		bigBang.Yang,
+		filepath.Join(env.DirObjectId(), "Yang"),
+	); err != nil {
+		env.Cancel(err)
+	}
+
+	env.writeFile(env.FileConfigMutable(), "")
+	env.writeFile(env.FileCacheDormant(), "")
 
 	env.setupStores()
 }

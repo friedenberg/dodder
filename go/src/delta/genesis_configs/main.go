@@ -2,7 +2,6 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -15,7 +14,6 @@ type (
 	Config interface {
 		GetStoreVersion() store_version.Version
 		GetPublicKey() markl.Id
-		GetRepoType() repo_type.Type // TODO remove
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
 		GetObjectSigMarklTypeId() string
@@ -41,7 +39,6 @@ type (
 
 		// TODO separate into non-method function that uses properties
 		interfaces.CommandComponentWriter
-		SetRepoType(repo_type.Type) // TODO remove
 		SetRepoId(ids.RepoId)
 		GetPrivateKeyMutable() *markl.Id
 	}
@@ -70,7 +67,6 @@ func DefaultWithVersion(
 			Blob: &TomlV1Private{
 				TomlV1Common: TomlV1Common{
 					StoreVersion: storeVersion,
-					RepoType:     repo_type.TypeWorkingCopy,
 					BlobStore: blob_store_configs.TomlV0{
 						CompressionType:   compression_type.CompressionTypeDefault,
 						LockInternalFiles: true,
@@ -87,7 +83,6 @@ func DefaultWithVersion(
 			Blob: &TomlV2Private{
 				TomlV2Common: TomlV2Common{
 					StoreVersion:      storeVersion,
-					RepoType:          repo_type.TypeWorkingCopy,
 					InventoryListType: inventoryListTypeString,
 					ObjectSigType:     markl.FormatIdObjectSigV1,
 				},

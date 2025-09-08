@@ -1,9 +1,7 @@
 package commands
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -46,40 +44,24 @@ func (cmd Push) Run(req command.Request) {
 
 	remote := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
 
-	repoType := remote.GetImmutableConfigPublic().GetRepoType()
-
-	switch repoType {
-	case repo_type.TypeWorkingCopy:
-		queryGroup := cmd.MakeQueryIncludingWorkspace(
-			req,
-			query.BuilderOptions(
-				query.BuilderOptionDefaultSigil(
-					ids.SigilHistory,
-					ids.SigilHidden,
-				),
-				query.BuilderOptionDefaultGenres(genres.InventoryList),
+	queryGroup := cmd.MakeQueryIncludingWorkspace(
+		req,
+		query.BuilderOptions(
+			query.BuilderOptionDefaultSigil(
+				ids.SigilHistory,
+				ids.SigilHidden,
 			),
-			localWorkingCopy,
-			req.PopArgs(),
-		)
+			query.BuilderOptionDefaultGenres(genres.InventoryList),
+		),
+		localWorkingCopy,
+		req.PopArgs(),
+	)
 
-		if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
-			localWorkingCopy,
-			queryGroup,
-			cmd.WithPrintCopies(true),
-		); err != nil {
-			localWorkingCopy.Cancel(err)
-		}
-
-	case repo_type.TypeArchive:
-		req.AssertNoMoreArgs()
-		cmd.PushAllToArchive(req, localWorkingCopy, remote)
-
-	default:
-		errors.ContextCancelWithBadRequestf(
-			req,
-			"unsupported repo type: %q",
-			repoType,
-		)
+	if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
+		localWorkingCopy,
+		queryGroup,
+		cmd.WithPrintCopies(true),
+	); err != nil {
+		localWorkingCopy.Cancel(err)
 	}
 }

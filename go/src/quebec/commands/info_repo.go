@@ -56,9 +56,6 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "store-version":
 			repo.GetUI().Print(configBlob.GetStoreVersion())
 
-		case "type":
-			repo.GetUI().Print(configBlob.GetRepoType())
-
 		case "id":
 			repo.GetUI().Print(configBlob.GetRepoId())
 

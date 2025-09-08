@@ -3,7 +3,6 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
@@ -27,7 +26,9 @@ type V0Private struct {
 	V0Common
 }
 
-func (config *V0Common) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (config *V0Common) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
@@ -54,10 +55,6 @@ func (config *V0Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 
 func (config V0Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
-}
-
-func (config V0Common) GetRepoType() repo_type.Type {
-	return repo_type.TypeWorkingCopy
 }
 
 func (config V0Common) GetPrivateKey() markl.Id {

@@ -120,7 +120,7 @@ func (cmd Remote) MakeRemote(
 	req command.Request,
 	repo *local_working_copy.Repo,
 	object *sku.Transacted,
-) (remote repo.Repo) {
+) (remote repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	typedRepoBlobStore := typed_blob_store.MakeRepoStore(envRepo)
 
@@ -146,7 +146,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 	req command.Request,
 	repo *local_working_copy.Repo,
 	blob repo_blobs.Blob,
-) (remote repo.Repo) {
+) (remote repo.WorkingCopy) {
 	env := cmd.MakeEnv(req)
 
 	switch blob := blob.(type) {

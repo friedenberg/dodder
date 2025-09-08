@@ -122,7 +122,6 @@ function complete_subcmd { # @test
 		info-repo
 		info-workspace
 		init
-		init-archive
 		init-workspace
 		last
 		merge-tool

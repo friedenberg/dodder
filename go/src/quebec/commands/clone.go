@@ -2,7 +2,6 @@ package commands
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/repo_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -34,9 +33,6 @@ func (cmd *Clone) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 	cmd.Genesis.SetFlagSet(flagSet)
 	cmd.RemoteTransfer.SetFlagSet(flagSet)
 	cmd.Query.SetFlagSet(flagSet)
-
-	// must happen after genesis set flag set as cmd.Config is nil until then
-	cmd.GenesisConfig.Blob.SetRepoType(repo_type.TypeWorkingCopy)
 }
 
 func (cmd Clone) Run(req command.Request) {
