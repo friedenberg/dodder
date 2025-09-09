@@ -28,7 +28,7 @@ func (parseSaver nopBlobParseSaver[OBJECT, OBJECT_PTR]) ParseBlob(
 	reader io.Reader,
 	object OBJECT_PTR,
 ) (n int64, err error) {
-	var blobWriter interfaces.WriteCloseMarklIdGetter
+	var blobWriter interfaces.BlobWriter
 
 	if blobWriter, err = parseSaver.blobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)

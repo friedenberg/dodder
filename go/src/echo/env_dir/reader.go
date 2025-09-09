@@ -9,29 +9,37 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
+// TODO fold into markl_io
 type reader struct {
-	digester  interfaces.WriteMarklIdGetter
+	digester  interfaces.BlobWriter
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
 }
 
-func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
-	r = &reader{}
+func NewReader(
+	config Config,
+	readSeeker io.ReadSeeker,
+) (reeder *reader, err error) {
+	reeder = &reader{}
 
-	if r.decrypter, err = config.GetBlobEncryption().WrapReader(readSeeker); err != nil {
+	if reeder.decrypter, err = config.GetBlobEncryption().WrapReader(
+		readSeeker,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if r.expander, err = config.GetBlobCompression().WrapReader(r.decrypter); err != nil {
+	if reeder.expander, err = config.GetBlobCompression().WrapReader(
+		reeder.decrypter,
+	); err != nil {
 		// TODO remove this when compression / encryption issues are resolved
 		if _, err = readSeeker.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if r.expander, err = compression_type.CompressionTypeNone.WrapReader(
+		if reeder.expander, err = compression_type.CompressionTypeNone.WrapReader(
 			readSeeker,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -39,8 +47,8 @@ func NewReader(config Config, readSeeker io.ReadSeeker) (r *reader, err error) {
 		}
 	}
 
-	r.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
-	r.tee = io.TeeReader(r.expander, r.digester)
+	reeder.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
+	reeder.tee = io.TeeReader(reeder.expander, reeder.digester)
 
 	return
 }

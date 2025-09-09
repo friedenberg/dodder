@@ -126,7 +126,7 @@ func (store *Store) Flush() (err error) {
 
 // TODO limit this to being used only by *Item.ReadFromExternal
 func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
-	var r interfaces.ReadCloseMarklIdGetter
+	var r interfaces.BlobReader
 
 	if r, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
@@ -268,7 +268,7 @@ func (store *Store) QueryCheckedOut(
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
 func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
-	var blobWriter interfaces.WriteCloseMarklIdGetter
+	var blobWriter interfaces.BlobWriter
 
 	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)

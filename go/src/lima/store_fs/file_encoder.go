@@ -85,7 +85,7 @@ func (encoder *fileEncoder) EncodeObject(
 
 	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
 
-	var ar interfaces.ReadCloseMarklIdGetter
+	var ar interfaces.BlobReader
 
 	if ar, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobReader(object.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
@@ -103,7 +103,7 @@ func (encoder *fileEncoder) EncodeObject(
 				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
-					var aw interfaces.WriteCloseMarklIdGetter
+					var aw interfaces.BlobWriter
 
 					if aw, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 						err = errors.Wrap(err)

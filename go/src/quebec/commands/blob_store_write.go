@@ -148,7 +148,7 @@ func (cmd BlobStoreWrite) doOne(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	var writeCloser interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.BlobWriter
 
 	if cmd.Check {
 		{

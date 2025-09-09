@@ -132,7 +132,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Mar
 
 func (blobStore localHashBucketed) MakeBlobWriter(
 	marklHashTypeId string,
-) (w interfaces.WriteCloseMarklIdGetter, err error) {
+) (w interfaces.BlobWriter, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -143,7 +143,7 @@ func (blobStore localHashBucketed) MakeBlobWriter(
 
 func (blobStore localHashBucketed) MakeBlobReader(
 	digest interfaces.MarklId,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashType.Get(),
@@ -168,7 +168,7 @@ func (blobStore localHashBucketed) MakeBlobReader(
 
 func (blobStore localHashBucketed) blobWriterTo(
 	path string,
-) (mover interfaces.WriteCloseMarklIdGetter, err error) {
+) (mover interfaces.BlobWriter, err error) {
 	if mover, err = env_dir.NewMover(
 		blobStore.makeEnvDirConfig(),
 		env_dir.MoveOptions{
@@ -187,7 +187,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 func (blobStore localHashBucketed) blobReaderFrom(
 	digest interfaces.MarklId,
 	path string,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashType.Get(),

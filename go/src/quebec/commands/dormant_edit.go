@@ -148,7 +148,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writeCloser interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.BlobWriter
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)

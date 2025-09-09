@@ -118,7 +118,7 @@ func (store Tag) GetBlob(
 	case ids.TypeLuaTagV1:
 		// TODO try to repool things here
 
-		var readCloser interfaces.ReadCloseMarklIdGetter
+		var readCloser interfaces.BlobReader
 
 		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
 			blobDigest,
@@ -149,7 +149,7 @@ func (store Tag) GetBlob(
 	case ids.TypeLuaTagV2:
 		// TODO try to repool things here
 
-		var readCloser interfaces.ReadCloseMarklIdGetter
+		var readCloser interfaces.BlobReader
 
 		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobDigest); err != nil {
 			err = errors.Wrap(err)

@@ -9,10 +9,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
+// TODO fold into markl_io
 func NewFileReader(
 	config Config,
 	path string,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	objectReader := objectReader{}
 
 	if path == "-" {
@@ -25,7 +26,7 @@ func NewFileReader(
 	}
 
 	// try the existing options. if they fail, try without encryption
-	if objectReader.ReadCloseMarklIdGetter, err = NewReader(
+	if objectReader.BlobReader, err = NewReader(
 		config,
 		objectReader.file,
 	); err != nil {
@@ -41,7 +42,7 @@ func NewFileReader(
 			nil,
 		)
 
-		if objectReader.ReadCloseMarklIdGetter, err = NewReader(config, objectReader.file); err != nil {
+		if objectReader.BlobReader, err = NewReader(config, objectReader.file); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -54,7 +55,7 @@ func NewFileReader(
 
 type objectReader struct {
 	file *os.File
-	interfaces.ReadCloseMarklIdGetter
+	interfaces.BlobReader
 }
 
 func (r objectReader) String() string {
@@ -67,12 +68,12 @@ func (ar objectReader) Close() (err error) {
 		return
 	}
 
-	if ar.ReadCloseMarklIdGetter == nil {
+	if ar.BlobReader == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = ar.ReadCloseMarklIdGetter.Close(); err != nil {
+	if err = ar.BlobReader.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

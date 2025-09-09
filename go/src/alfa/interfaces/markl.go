@@ -3,7 +3,6 @@ package interfaces
 import (
 	"encoding"
 	"hash"
-	"io"
 )
 
 type (
@@ -58,27 +57,5 @@ type (
 
 	MarklIdGetter interface {
 		GetMarklId() MarklId
-	}
-
-	WriteMarklIdGetter interface {
-		io.Writer
-		MarklIdGetter
-	}
-
-	ReadMarklIdGetter interface {
-		io.Reader
-		MarklIdGetter
-	}
-
-	ReadCloseMarklIdGetter interface {
-		io.WriterTo
-		io.ReadCloser
-		MarklIdGetter
-	}
-
-	WriteCloseMarklIdGetter interface {
-		io.ReaderFrom
-		io.WriteCloser
-		MarklIdGetter
 	}
 )

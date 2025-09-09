@@ -337,7 +337,7 @@ type blobReaderFactory struct {
 
 func (arf blobReaderFactory) BlobReader(
 	digest interfaces.MarklId,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	var v string
 	var ok bool
 

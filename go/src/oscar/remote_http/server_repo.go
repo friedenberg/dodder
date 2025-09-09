@@ -103,7 +103,7 @@ func (server *Server) writeInventoryList(
 
 	typedInventoryListStore := server.Repo.GetInventoryListCoderCloset()
 
-	var blobWriter interfaces.WriteCloseMarklIdGetter
+	var blobWriter interfaces.BlobWriter
 
 	{
 		var err error

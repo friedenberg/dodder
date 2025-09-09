@@ -14,7 +14,7 @@ type readCloser struct {
 	hash   interfaces.Hash
 }
 
-var _ interfaces.ReadCloseMarklIdGetter = readCloser{}
+var _ interfaces.BlobReader = readCloser{}
 
 func MakeReadCloser(
 	hash interfaces.Hash,
@@ -130,12 +130,12 @@ type nopReadCloser struct {
 	io.ReadCloser
 }
 
-var _ interfaces.ReadCloseMarklIdGetter = nopReadCloser{}
+var _ interfaces.BlobReader = nopReadCloser{}
 
 func MakeNopReadCloser(
 	hash interfaces.Hash,
 	readCloser io.ReadCloser,
-) interfaces.ReadCloseMarklIdGetter {
+) interfaces.BlobReader {
 	return nopReadCloser{
 		hash:       hash,
 		ReadCloser: readCloser,

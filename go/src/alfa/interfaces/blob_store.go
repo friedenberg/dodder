@@ -1,5 +1,7 @@
 package interfaces
 
+import "io"
+
 type (
 	BlobIOWrapper interface {
 		GetBlobEncryption() MarklId
@@ -10,12 +12,24 @@ type (
 		GetBlobIOWrapper() BlobIOWrapper
 	}
 
+	BlobReader interface {
+		io.WriterTo
+		io.ReadCloser
+		MarklIdGetter
+	}
+
+	BlobWriter interface {
+		io.ReaderFrom
+		io.WriteCloser
+		MarklIdGetter
+	}
+
 	BlobReaderFactory interface {
-		MakeBlobReader(MarklId) (ReadCloseMarklIdGetter, error)
+		MakeBlobReader(MarklId) (BlobReader, error)
 	}
 
 	BlobWriterFactory interface {
-		MakeBlobWriter(marklHashTypeId string) (WriteCloseMarklIdGetter, error)
+		MakeBlobWriter(marklHashTypeId string) (BlobWriter, error)
 	}
 
 	BlobAccess interface {

@@ -63,7 +63,7 @@ func MakeTestingWithBigBang(
 	}
 
 	for expectedDigestString, content := range contents {
-		var writeCloser interfaces.WriteCloseMarklIdGetter
+		var writeCloser interfaces.BlobWriter
 
 		writeCloser, err := envRepo.GetDefaultBlobStore().MakeBlobWriter("")
 		if err != nil {

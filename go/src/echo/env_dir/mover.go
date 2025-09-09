@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
+// TODO fold into markl_io
 type MoveOptions struct {
 	TemporaryFS
 	ErrorOnAttemptedOverwrite bool
@@ -19,7 +20,7 @@ type MoveOptions struct {
 type localFileMover struct {
 	funcJoin func(string, ...string) string
 	file     *os.File
-	interfaces.WriteCloseMarklIdGetter
+	interfaces.BlobWriter
 
 	basePath                  string
 	objectPath                string
@@ -30,7 +31,7 @@ type localFileMover struct {
 func NewMover(
 	config Config,
 	moveOptions MoveOptions,
-) (interfaces.WriteCloseMarklIdGetter, error) {
+) (interfaces.BlobWriter, error) {
 	// TODO make MoveOptions an interface and add support for localFileShaMover
 	// and localFinalPathMover
 	return newMover(config, moveOptions)
@@ -59,7 +60,7 @@ func newMover(
 		return
 	}
 
-	if mover.WriteCloseMarklIdGetter, err = NewWriter(
+	if mover.BlobWriter, err = NewWriter(
 		config,
 		mover.file,
 	); err != nil {
@@ -76,12 +77,12 @@ func (mover *localFileMover) Close() (err error) {
 		return
 	}
 
-	if mover.WriteCloseMarklIdGetter == nil {
+	if mover.BlobWriter == nil {
 		err = errors.ErrorWithStackf("nil object reader")
 		return
 	}
 
-	if err = mover.WriteCloseMarklIdGetter.Close(); err != nil {
+	if err = mover.BlobWriter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

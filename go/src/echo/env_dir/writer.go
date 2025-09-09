@@ -6,76 +6,52 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 )
 
-type Writer interface {
-	interfaces.WriteCloseMarklIdGetter
-	interfaces.MarklIdGetter
-}
-
+// TODO fold into markl_io
 type writer struct {
-	digester              interfaces.WriteMarklIdGetter
+	repoolBufferedWriter  interfaces.FuncRepool
+	digester              interfaces.BlobWriter
 	tee                   io.Writer
 	compressor, encrypter io.WriteCloser
-	buffer                *bufio.Writer
+	bufferedWriter        *bufio.Writer
 }
 
 func NewWriter(
 	config Config,
 	ioWriter io.Writer,
-) (w *writer, err error) {
-	w = &writer{}
+) (wrighter *writer, err error) {
+	wrighter = &writer{}
 
-	// TODO use pool
-	w.buffer = bufio.NewWriter(ioWriter)
+	wrighter.bufferedWriter, wrighter.repoolBufferedWriter = pool.GetBufferedWriter(
+		ioWriter,
+	)
 
-	if w.encrypter, err = config.GetBlobEncryption().WrapWriter(w.buffer); err != nil {
+	if wrighter.encrypter, err = config.GetBlobEncryption().WrapWriter(
+		wrighter.bufferedWriter,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
+	wrighter.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
 
-	if w.compressor, err = config.GetBlobCompression().WrapWriter(w.encrypter); err != nil {
+	if wrighter.compressor, err = config.GetBlobCompression().WrapWriter(
+		wrighter.encrypter,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	w.tee = io.MultiWriter(w.digester, w.compressor)
+	wrighter.tee = io.MultiWriter(wrighter.digester, wrighter.compressor)
 
 	return
 }
 
-func (w *writer) ReadFrom(r io.Reader) (n int64, err error) {
-	if n, err = io.Copy(w.tee, r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (w *writer) Write(p []byte) (n int, err error) {
-	return w.tee.Write(p)
-}
-
-func (w *writer) WriteString(s string) (n int, err error) {
-	return io.WriteString(w.tee, s)
-}
-
-func (w *writer) Close() (err error) {
-	if err = w.compressor.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = w.encrypter.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = w.buffer.Flush(); err != nil {
+func (writer *writer) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = io.Copy(writer.tee, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -83,6 +59,36 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) GetMarklId() interfaces.MarklId {
-	return w.digester.GetMarklId()
+func (writer *writer) Write(p []byte) (n int, err error) {
+	return writer.tee.Write(p)
+}
+
+func (writer *writer) WriteString(s string) (n int, err error) {
+	return io.WriteString(writer.tee, s)
+}
+
+func (writer *writer) Close() (err error) {
+	if err = writer.compressor.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = writer.encrypter.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = writer.bufferedWriter.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	writer.bufferedWriter = nil
+	writer.repoolBufferedWriter()
+
+	return
+}
+
+func (writer *writer) GetMarklId() interfaces.MarklId {
+	return writer.digester.GetMarklId()
 }

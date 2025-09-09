@@ -247,7 +247,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 
 func (blobStore *remoteSftp) MakeBlobWriter(
 	marklHashTypeId string,
-) (w interfaces.WriteCloseMarklIdGetter, err error) {
+) (w interfaces.BlobWriter, err error) {
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -264,7 +264,7 @@ func (blobStore *remoteSftp) MakeBlobWriter(
 
 func (blobStore *remoteSftp) MakeBlobReader(
 	digest interfaces.MarklId,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashType.Get(),
@@ -539,7 +539,7 @@ type sftpStreamingReader struct {
 
 func (reader *sftpStreamingReader) createReader(
 	hash interfaces.Hash,
-) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
+) (readCloser interfaces.BlobReader, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,

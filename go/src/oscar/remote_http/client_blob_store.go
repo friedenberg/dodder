@@ -68,7 +68,7 @@ func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
 
 func (client *client) MakeBlobReader(
 	blobId interfaces.MarklId,
-) (reader interfaces.ReadCloseMarklIdGetter, err error) {
+) (reader interfaces.BlobReader, err error) {
 	var request *http.Request
 
 	if request, err = client.newRequest(
@@ -123,7 +123,7 @@ func (client *client) WriteBlobToRemote(
 
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.ReadCloseMarklIdGetter
+	var reader interfaces.BlobReader
 
 	if reader, err = localBlobStore.MakeBlobReader(
 		expected,
@@ -221,6 +221,6 @@ func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 
 func (client *client) MakeBlobWriter(
 	marklHashTypeId string,
-) (interfaces.WriteCloseMarklIdGetter, error) {
+) (interfaces.BlobWriter, error) {
 	panic(errors.Err501NotImplemented)
 }

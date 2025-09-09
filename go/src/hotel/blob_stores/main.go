@@ -235,7 +235,7 @@ func CopyBlob(
 
 	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest, ""))
 
-	var readCloser interfaces.ReadCloseMarklIdGetter
+	var readCloser interfaces.BlobReader
 
 	if readCloser, err = src.MakeBlobReader(expectedDigest); err != nil {
 		err = errors.Wrap(err)
@@ -244,7 +244,7 @@ func CopyBlob(
 
 	defer errors.ContextMustClose(env, readCloser)
 
-	var writeCloser interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.BlobWriter
 
 	if writeCloser, err = dst.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
@@ -294,7 +294,7 @@ func VerifyBlob(
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.ReadCloseMarklIdGetter
+	var readCloser interfaces.BlobReader
 
 	if readCloser, err = blobStore.MakeBlobReader(expected); err != nil {
 		err = errors.Wrap(err)

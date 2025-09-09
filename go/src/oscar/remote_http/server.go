@@ -533,7 +533,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			response.StatusCode = http.StatusNotFound
 		}
 	} else {
-		var rc interfaces.ReadCloseMarklIdGetter
+		var rc interfaces.BlobReader
 
 		{
 			var err error
@@ -619,7 +619,7 @@ func (server *Server) copyBlob(
 	expected interfaces.MarklId,
 ) (result interfaces.MarklId, err error) {
 	var progressWriter env_ui.ProgressWriter
-	var writeCloser interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.BlobWriter
 
 	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)

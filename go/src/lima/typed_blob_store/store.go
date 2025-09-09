@@ -39,7 +39,7 @@ func MakeBlobStore[
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 	blobId interfaces.MarklId,
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
-	var readCloser interfaces.ReadCloseMarklIdGetter
+	var readCloser interfaces.BlobReader
 
 	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		blobId,
@@ -79,7 +79,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) PutBlob(a BLOB_PTR) {
 func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 	o BLOB_PTR,
 ) (sh interfaces.MarklId, n int64, err error) {
-	var writeCloser interfaces.WriteCloseMarklIdGetter
+	var writeCloser interfaces.BlobWriter
 
 	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
