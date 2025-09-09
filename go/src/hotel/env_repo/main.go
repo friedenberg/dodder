@@ -133,11 +133,9 @@ func Make(
 
 	envVars := env_vars.Make(env)
 
-	for key, value := range envVars {
-		if err = os.Setenv(key, value); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = envVars.Setenv(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if configLoaded {

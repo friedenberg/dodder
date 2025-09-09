@@ -8,12 +8,8 @@ import (
 )
 
 type TomlV0 struct {
-	// TODO add hasher option
-	// TODO uncomment when bumping to V1
-	// HashBuckets       []int                            `toml:"hash-buckets"`
-	BasePath string `toml:"base-path"` // can include env vars
-	// TODO transform into markl type
-	AgeEncryption     markl_age_id.Id                 `toml:"age-encryption,omitempty"`
+	BasePath          string                           `toml:"base-path"` // can include env vars
+	AgeEncryption     markl_age_id.Id                  `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }

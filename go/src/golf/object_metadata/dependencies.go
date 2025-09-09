@@ -187,7 +187,7 @@ func (deps Dependencies) writeBlob(
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = deps.BlobStore.BlobReader(&m.DigBlob); err != nil {
+	if ar, err = deps.BlobStore.MakeBlobReader(&m.DigBlob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -47,7 +47,7 @@ func (json *JSON) FromStringAndMetadata(
 	if blobStore != nil {
 		var readCloser interfaces.ReadCloseMarklIdGetter
 
-		if readCloser, err = blobStore.BlobReader(
+		if readCloser, err = blobStore.MakeBlobReader(
 			metadata.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -125,7 +125,7 @@ func (json *JSON) ToTransacted(
 	if blobStore != nil {
 		var writeCloser interfaces.WriteCloseMarklIdGetter
 
-		if writeCloser, err = blobStore.BlobWriter(""); err != nil {
+		if writeCloser, err = blobStore.MakeBlobWriter(""); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

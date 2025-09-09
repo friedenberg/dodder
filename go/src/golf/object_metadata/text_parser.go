@@ -13,7 +13,7 @@ import (
 
 type textParser struct {
 	hashType      interfaces.HashType
-	blobWriter    interfaces.BlobWriter
+	blobWriter    interfaces.BlobWriterFactory
 	blobFormatter script_config.RemoteScript
 }
 
@@ -41,14 +41,14 @@ func (parser textParser) ParseMetadata(
 	var n1 int64
 
 	parser2 := &textParser2{
-		BlobWriter:        parser.blobWriter,
+		BlobWriterFactory: parser.blobWriter,
 		hashType:          parser.hashType,
 		TextParserContext: context,
 	}
 
 	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if blobWriter, err = parser.blobWriter.BlobWriter(""); err != nil {
+	if blobWriter, err = parser.blobWriter.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

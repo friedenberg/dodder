@@ -117,7 +117,7 @@ func (cmd DormantEdit) makeTempKonfigFile(
 
 	var readCloser io.ReadCloser
 
-	if readCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobReader(
+	if readCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 		object.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -150,7 +150,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().BlobWriter(""); err != nil {
+	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

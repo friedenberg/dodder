@@ -8,11 +8,11 @@ import (
 )
 
 type savedBlobFormatter struct {
-	arf interfaces.BlobReader
+	arf interfaces.BlobReaderFactory
 }
 
 func MakeSavedBlobFormatter(
-	blobReaderFactory interfaces.BlobReader,
+	blobReaderFactory interfaces.BlobReaderFactory,
 ) savedBlobFormatter {
 	return savedBlobFormatter{
 		arf: blobReaderFactory,
@@ -25,7 +25,7 @@ func (f savedBlobFormatter) FormatSavedBlob(
 ) (n int64, err error) {
 	var ar interfaces.ReadCloseMarklIdGetter
 
-	if ar, err = f.arf.BlobReader(sh); err != nil {
+	if ar, err = f.arf.MakeBlobReader(sh); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

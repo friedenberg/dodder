@@ -130,7 +130,7 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Mar
 	}
 }
 
-func (blobStore localHashBucketed) BlobWriter(
+func (blobStore localHashBucketed) MakeBlobWriter(
 	marklHashTypeId string,
 ) (w interfaces.WriteCloseMarklIdGetter, err error) {
 	if w, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
@@ -141,16 +141,7 @@ func (blobStore localHashBucketed) BlobWriter(
 	return
 }
 
-func (blobStore localHashBucketed) Mover() (mover interfaces.Mover, err error) {
-	if mover, err = blobStore.blobWriterTo(blobStore.basePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (blobStore localHashBucketed) BlobReader(
+func (blobStore localHashBucketed) MakeBlobReader(
 	digest interfaces.MarklId,
 ) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {
@@ -177,7 +168,7 @@ func (blobStore localHashBucketed) BlobReader(
 
 func (blobStore localHashBucketed) blobWriterTo(
 	path string,
-) (mover interfaces.Mover, err error) {
+) (mover interfaces.WriteCloseMarklIdGetter, err error) {
 	if mover, err = env_dir.NewMover(
 		blobStore.makeEnvDirConfig(),
 		env_dir.MoveOptions{

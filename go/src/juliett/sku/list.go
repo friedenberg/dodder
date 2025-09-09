@@ -24,7 +24,7 @@ type (
 
 	OpenList struct {
 		Tipe        ids.Type
-		Mover       interfaces.Mover
+		Mover       interfaces.WriteCloseMarklIdGetter
 		Description descriptions.Description
 		LastTai     ids.Tai
 		Len         int

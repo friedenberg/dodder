@@ -10,10 +10,9 @@ import (
 )
 
 type TomlV1 struct {
-	HashBuckets values.IntSlice `toml:"hash-buckets"`
-	BasePath    string          `toml:"base-path"` // can include env vars
-	HashTypeId  string          `toml:"hash_type-id"`
-	// TODO transform into markl type
+	HashBuckets       values.IntSlice                  `toml:"hash-buckets"`
+	BasePath          string                           `toml:"base-path"` // can include env vars
+	HashTypeId        string                           `toml:"hash_type-id"`
 	Encryption        markl.Id                         `toml:"encryption"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`

@@ -138,7 +138,7 @@ func (store *Store) readOneExternalBlob(
 	{
 		var writeCloser interfaces.WriteCloseMarklIdGetter
 
-		if writeCloser, err = store.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
+		if writeCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

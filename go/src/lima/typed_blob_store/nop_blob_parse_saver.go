@@ -11,13 +11,13 @@ type nopBlobParseSaver[
 	OBJECT any,
 	OBJECT_PTR interfaces.Ptr[OBJECT],
 ] struct {
-	blobStore interfaces.BlobWriter
+	blobStore interfaces.BlobWriterFactory
 }
 
 func MakeNopBlobParseSaver[
 	OBJECT any,
 	OBJECT_PTR interfaces.Ptr[OBJECT],
-](awf interfaces.BlobWriter,
+](awf interfaces.BlobWriterFactory,
 ) nopBlobParseSaver[OBJECT, OBJECT_PTR] {
 	return nopBlobParseSaver[OBJECT, OBJECT_PTR]{
 		blobStore: awf,
@@ -30,7 +30,7 @@ func (parseSaver nopBlobParseSaver[OBJECT, OBJECT_PTR]) ParseBlob(
 ) (n int64, err error) {
 	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if blobWriter, err = parseSaver.blobStore.BlobWriter(""); err != nil {
+	if blobWriter, err = parseSaver.blobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

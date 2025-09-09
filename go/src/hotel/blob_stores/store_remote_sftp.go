@@ -245,7 +245,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 	}
 }
 
-func (blobStore *remoteSftp) BlobWriter(
+func (blobStore *remoteSftp) MakeBlobWriter(
 	marklHashTypeId string,
 ) (w interfaces.WriteCloseMarklIdGetter, err error) {
 	mover := &sftpMover{
@@ -262,11 +262,7 @@ func (blobStore *remoteSftp) BlobWriter(
 	return
 }
 
-func (blobStore *remoteSftp) Mover() (mover interfaces.Mover, err error) {
-	return blobStore.BlobWriter("")
-}
-
-func (blobStore *remoteSftp) BlobReader(
+func (blobStore *remoteSftp) MakeBlobReader(
 	digest interfaces.MarklId,
 ) (readCloser interfaces.ReadCloseMarklIdGetter, err error) {
 	if digest.IsNull() {

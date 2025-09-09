@@ -14,7 +14,7 @@ import (
 )
 
 type textParser2 struct {
-	interfaces.BlobWriter
+	interfaces.BlobWriterFactory
 	TextParserContext
 	hashType interfaces.HashType
 	Blob     fd.FD
@@ -99,7 +99,7 @@ func (parser *textParser2) readTyp(
 			return
 		}
 
-		if err = parser.Blob.SetWithBlobWriterFactory(desc, parser.BlobWriter); err != nil {
+		if err = parser.Blob.SetWithBlobWriterFactory(desc, parser.BlobWriterFactory); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

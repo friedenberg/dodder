@@ -222,7 +222,7 @@ func (c Diff) makeDo(
 
 func (c Diff) makeDoBlob(
 	w io.WriteCloser,
-	arf interfaces.BlobReader,
+	arf interfaces.BlobReaderFactory,
 	sh interfaces.MarklId,
 ) errors.FuncErr {
 	return func() (err error) {
@@ -230,7 +230,7 @@ func (c Diff) makeDoBlob(
 
 		var ar interfaces.ReadCloseMarklIdGetter
 
-		if ar, err = arf.BlobReader(sh); err != nil {
+		if ar, err = arf.MakeBlobReader(sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -41,7 +41,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
 	var readCloser interfaces.ReadCloseMarklIdGetter
 
-	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobReader(
+	if readCloser, err = blobStore.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		blobId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -81,7 +81,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) SaveBlobText(
 ) (sh interfaces.MarklId, n int64, err error) {
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
+	if writeCloser, err = blobStore.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -538,7 +538,7 @@ func (server *Server) handleBlobsHeadOrGet(
 		{
 			var err error
 
-			if rc, err = server.Repo.GetBlobStore().BlobReader(blobDigest); err != nil {
+			if rc, err = server.Repo.GetBlobStore().MakeBlobReader(blobDigest); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					response.StatusCode = http.StatusNotFound
 				} else {
@@ -621,7 +621,7 @@ func (server *Server) copyBlob(
 	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = server.Repo.GetBlobStore().BlobWriter(""); err != nil {
+	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

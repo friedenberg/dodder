@@ -69,7 +69,7 @@ func (a *FD) Equals(b *FD) bool {
 func (fd *FD) SetFromPath(
 	baseDir string,
 	path string,
-	blobStore interfaces.BlobWriter,
+	blobStore interfaces.BlobWriterFactory,
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -107,7 +107,7 @@ func (fd *FD) SetFromPath(
 func (fd *FD) SetFromFileInfoWithDir(
 	fileInfo os.FileInfo,
 	dir string,
-	blobStore interfaces.BlobWriter,
+	blobStore interfaces.BlobWriterFactory,
 ) (err error) {
 	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
 		err = errors.Wrap(err)
@@ -134,7 +134,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	var writer interfaces.WriteCloseMarklIdGetter
 
-	if writer, err = blobStore.BlobWriter(""); err != nil {
+	if writer, err = blobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -154,7 +154,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 func (fd *FD) SetWithBlobWriterFactory(
 	path string,
-	blobStore interfaces.BlobWriter,
+	blobStore interfaces.BlobWriterFactory,
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("empty path")
@@ -176,7 +176,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if blobWriter, err = blobStore.BlobWriter(""); err != nil {
+	if blobWriter, err = blobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

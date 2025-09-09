@@ -263,7 +263,7 @@ func (store *store) loadMutableConfigBlob(
 ) (err error) {
 	var readCloser io.ReadCloser
 
-	if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(
+	if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		blobSha,
 	); err != nil {
 		err = errors.Wrap(err)

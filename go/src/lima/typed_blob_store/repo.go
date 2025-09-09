@@ -27,7 +27,7 @@ func (store RepoStore) ReadTypedBlob(
 ) (common repo_blobs.Blob, n int64, err error) {
 	var reader interfaces.ReadCloseMarklIdGetter
 
-	if reader, err = store.envRepo.GetDefaultBlobStore().BlobReader(blobSha); err != nil {
+	if reader, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -60,7 +60,7 @@ func (store RepoStore) WriteTypedBlob(
 ) (sh interfaces.MarklId, n int64, err error) {
 	var writer interfaces.WriteCloseMarklIdGetter
 
-	if writer, err = store.envRepo.GetDefaultBlobStore().BlobWriter(""); err != nil {
+	if writer, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

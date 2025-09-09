@@ -22,7 +22,7 @@ func MakeBlobFormat[
 ](
 	decoder interfaces.DecoderFromReader[OPtr],
 	encoder interfaces.EncoderToWriter[OPtr],
-	blobReader interfaces.BlobReader,
+	blobReader interfaces.BlobReaderFactory,
 ) Format[O, OPtr] {
 	return format[O, OPtr]{
 		DecoderFromReader:  decoder,

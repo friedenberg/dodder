@@ -42,7 +42,7 @@ func (blobStore *blobStoreV1) ReadOneBlobId(
 ) (object *sku.Transacted, err error) {
 	var readCloser interfaces.ReadCloseMarklIdGetter
 
-	if readCloser, err = blobStore.BlobStore.BlobReader(blobId); err != nil {
+	if readCloser, err = blobStore.BlobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,7 +69,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 ) (err error) {
 	var blobStoreWriteCloser interfaces.WriteCloseMarklIdGetter
 
-	if blobStoreWriteCloser, err = blobStore.BlobStore.BlobWriter(""); err != nil {
+	if blobStoreWriteCloser, err = blobStore.BlobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

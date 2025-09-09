@@ -237,7 +237,7 @@ func CopyBlob(
 
 	var readCloser interfaces.ReadCloseMarklIdGetter
 
-	if readCloser, err = src.BlobReader(expectedDigest); err != nil {
+	if readCloser, err = src.MakeBlobReader(expectedDigest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -246,7 +246,7 @@ func CopyBlob(
 
 	var writeCloser interfaces.WriteCloseMarklIdGetter
 
-	if writeCloser, err = dst.BlobWriter(""); err != nil {
+	if writeCloser, err = dst.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -296,7 +296,7 @@ func VerifyBlob(
 
 	var readCloser interfaces.ReadCloseMarklIdGetter
 
-	if readCloser, err = blobStore.BlobReader(expected); err != nil {
+	if readCloser, err = blobStore.MakeBlobReader(expected); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

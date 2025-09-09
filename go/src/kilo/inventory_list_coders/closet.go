@@ -221,7 +221,7 @@ func (closet Closet) StreamInventoryListBlobSkus(
 		{
 			var err error
 
-			if readCloser, err = closet.envRepo.GetDefaultBlobStore().BlobReader(
+			if readCloser, err = closet.envRepo.GetDefaultBlobStore().MakeBlobReader(
 				blobDigest,
 			); err != nil {
 				yield(nil, errors.Wrap(err))
@@ -304,7 +304,7 @@ func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 		{
 			var err error
 
-			if readCloser, err = blobStore.BlobReader(blobId); err != nil {
+			if readCloser, err = blobStore.MakeBlobReader(blobId); err != nil {
 				yield(nil, errors.Wrap(err))
 				return
 			}

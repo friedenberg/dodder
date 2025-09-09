@@ -30,7 +30,7 @@ type localFileMover struct {
 func NewMover(
 	config Config,
 	moveOptions MoveOptions,
-) (interfaces.Mover, error) {
+) (interfaces.WriteCloseMarklIdGetter, error) {
 	// TODO make MoveOptions an interface and add support for localFileShaMover
 	// and localFinalPathMover
 	return newMover(config, moveOptions)

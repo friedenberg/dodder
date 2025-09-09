@@ -71,7 +71,7 @@ func (client client) ImportInventoryList(
 
 	var listBlobReader io.ReadCloser
 
-	if listBlobReader, err = blobStore.BlobReader(listSku.GetBlobDigest()); err != nil {
+	if listBlobReader, err = blobStore.MakeBlobReader(listSku.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

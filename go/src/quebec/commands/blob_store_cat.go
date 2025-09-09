@@ -160,7 +160,7 @@ func (cmd BlobStoreCat) blob(
 ) (err error) {
 	var r interfaces.ReadCloseMarklIdGetter
 
-	if r, err = blobStore.BlobReader(blobId); err != nil {
+	if r, err = blobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

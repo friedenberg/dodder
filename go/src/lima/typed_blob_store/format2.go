@@ -17,7 +17,7 @@ func MakeBlobFormat2[
 ](
 	decoder interfaces.DecoderFromReader[O],
 	encoder interfaces.EncoderToWriter[O],
-	blobReader interfaces.BlobReader,
+	blobReader interfaces.BlobReaderFactory,
 ) interfaces.Format[O] {
 	return format2[O]{
 		DecoderFromReader:  decoder,

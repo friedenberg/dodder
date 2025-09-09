@@ -25,7 +25,7 @@ func MakeFromDirPath(
 func MakeFromPathAndDirEntry(
 	path string,
 	dirEntry fs.DirEntry,
-	blobWriter interfaces.BlobWriter,
+	blobWriter interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -55,7 +55,7 @@ func MakeFromPathAndDirEntry(
 func MakeFromPath(
 	baseDir string,
 	path string,
-	blobWriter interfaces.BlobWriter,
+	blobWriter interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -93,7 +93,7 @@ func MakeFromPath(
 func MakeFromFileInfoWithDir(
 	fileInfo os.FileInfo,
 	dir string,
-	blobStore interfaces.BlobWriter,
+	blobStore interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	// TODO use pool
 	fd = &FD{}
@@ -123,7 +123,7 @@ func MakeFromFileInfoWithDir(
 
 	var writer interfaces.WriteCloseMarklIdGetter
 
-	if writer, err = blobStore.BlobWriter(""); err != nil {
+	if writer, err = blobStore.MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -66,7 +66,7 @@ func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
 	return
 }
 
-func (client *client) BlobReader(
+func (client *client) MakeBlobReader(
 	blobId interfaces.MarklId,
 ) (reader interfaces.ReadCloseMarklIdGetter, err error) {
 	var request *http.Request
@@ -125,7 +125,7 @@ func (client *client) WriteBlobToRemote(
 	// request.Write)
 	var reader interfaces.ReadCloseMarklIdGetter
 
-	if reader, err = localBlobStore.BlobReader(
+	if reader, err = localBlobStore.MakeBlobReader(
 		expected,
 	); err != nil {
 		if env_dir.IsErrBlobMissing(err) {
@@ -219,11 +219,7 @@ func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) Mover() (interfaces.Mover, error) {
-	panic(errors.Err501NotImplemented)
-}
-
-func (client *client) BlobWriter(
+func (client *client) MakeBlobWriter(
 	marklHashTypeId string,
 ) (interfaces.WriteCloseMarklIdGetter, error) {
 	panic(errors.Err501NotImplemented)

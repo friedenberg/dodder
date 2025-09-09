@@ -128,7 +128,7 @@ func (store *Store) Flush() (err error) {
 func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r interfaces.ReadCloseMarklIdGetter
 
-	if r, err = store.externalStoreInfo.GetDefaultBlobStore().BlobReader(sk.GetBlobDigest()); err != nil {
+	if r, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -270,7 +270,7 @@ func (store *Store) QueryCheckedOut(
 func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 	var blobWriter interfaces.WriteCloseMarklIdGetter
 
-	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().BlobWriter(""); err != nil {
+	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

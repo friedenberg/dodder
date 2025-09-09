@@ -13,7 +13,7 @@ type tomlBlobDecoder[
 	O any,
 	OPtr interfaces.Ptr[O],
 ] struct {
-	awf              interfaces.BlobWriter
+	awf              interfaces.BlobWriterFactory
 	ignoreTomlErrors bool
 }
 
@@ -21,7 +21,7 @@ func MakeTomlBlobDecoderSaver[
 	O any,
 	OPtr interfaces.Ptr[O],
 ](
-	blobWriter interfaces.BlobWriter,
+	blobWriter interfaces.BlobWriterFactory,
 ) tomlBlobDecoder[O, OPtr] {
 	return tomlBlobDecoder[O, OPtr]{
 		awf: blobWriter,
@@ -31,7 +31,7 @@ func MakeTomlBlobDecoderSaver[
 func MakeTomlDecoderIgnoreTomlErrors[
 	O any,
 	OPtr interfaces.Ptr[O],
-](awf interfaces.BlobWriter,
+](awf interfaces.BlobWriterFactory,
 ) tomlBlobDecoder[O, OPtr] {
 	return tomlBlobDecoder[O, OPtr]{
 		awf:              awf,

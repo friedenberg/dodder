@@ -1,9 +1,5 @@
 package interfaces
 
-import (
-	"io"
-)
-
 type (
 	BlobIOWrapper interface {
 		GetBlobEncryption() MarklId
@@ -14,36 +10,27 @@ type (
 		GetBlobIOWrapper() BlobIOWrapper
 	}
 
-	BlobReader interface {
-		BlobReader(MarklId) (ReadCloseMarklIdGetter, error)
+	BlobReaderFactory interface {
+		MakeBlobReader(MarklId) (ReadCloseMarklIdGetter, error)
 	}
 
-	BlobWriter interface {
-		BlobWriter(marklHashTypeId string) (WriteCloseMarklIdGetter, error)
-	}
-
-	Mover interface {
-		io.WriteCloser
-		io.ReaderFrom
-		MarklIdGetter
+	BlobWriterFactory interface {
+		MakeBlobWriter(marklHashTypeId string) (WriteCloseMarklIdGetter, error)
 	}
 
 	BlobAccess interface {
 		HasBlob(MarklId) bool
-		BlobReader
-		BlobWriter
+		BlobReaderFactory
+		BlobWriterFactory
 		AllBlobs() SeqError[MarklId]
 	}
 
 	BlobStore interface {
 		BlobAccess
+		BlobIOWrapperGetter
 
 		GetBlobStoreDescription() string
 		GetDefaultHashType() HashType
-
-		GetBlobIOWrapper() BlobIOWrapper
-		// TODO rename to MakeMover
-		Mover() (Mover, error)
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by

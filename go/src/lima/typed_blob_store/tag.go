@@ -120,7 +120,7 @@ func (store Tag) GetBlob(
 
 		var readCloser interfaces.ReadCloseMarklIdGetter
 
-		if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(
+		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
 			blobDigest,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -151,7 +151,7 @@ func (store Tag) GetBlob(
 
 		var readCloser interfaces.ReadCloseMarklIdGetter
 
-		if readCloser, err = store.envRepo.GetDefaultBlobStore().BlobReader(blobDigest); err != nil {
+		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobDigest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

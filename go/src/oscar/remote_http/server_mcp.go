@@ -416,7 +416,7 @@ func (server *Server) readMCPResourceBlobs(
 
 	defer repool()
 
-	readCloser, err := server.Repo.GetEnvRepo().GetDefaultBlobStore().BlobReader(
+	readCloser, err := server.Repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 		digest,
 	)
 	if err != nil {
