@@ -71,7 +71,7 @@ var (
 
 func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
-		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV0).Type,
+		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
 		Blob: &TomlV1{
 			HashBuckets:       []int{2},
 			HashTypeId:        markl.HashTypeIdSha256,

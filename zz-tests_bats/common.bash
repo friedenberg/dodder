@@ -199,7 +199,7 @@ function run_dodder_init_disable_age {
   run_dodder init \
     -yin <(cat_yin) \
     -yang <(cat_yang) \
-    -age-identity none \
+    -encryption none \
     -lock-internal-files=false \
     "${args[@]}"
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"slices"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -62,12 +63,13 @@ func (id Id) StringWithFormat() string {
 		return ""
 	} else {
 		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
+		bitesString := string(bites)
 		errors.PanicIfError(err)
 
 		if id.format != "" {
-			return fmt.Sprintf("%s@%s", id.format, bites)
+			return fmt.Sprintf("%s@%s", id.format, bitesString)
 		} else {
-			return fmt.Sprintf("%s", bites)
+			return bitesString
 		}
 	}
 }
@@ -120,6 +122,38 @@ func (id Id) IsNull() bool {
 }
 
 func (id *Id) Set(value string) (err error) {
+	format, body, ok := strings.Cut(value, "@")
+
+	if ok {
+		if err = id.setWithFormat(format, body); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = id.setWithoutFormat(value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (id *Id) setWithFormat(format, body string) (err error) {
+	if err = id.SetFormat(format); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = id.Set(body); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (id *Id) setWithoutFormat(value string) (err error) {
 	var typeId string
 
 	if typeId, id.data, err = blech32.DecodeString(value); err != nil {

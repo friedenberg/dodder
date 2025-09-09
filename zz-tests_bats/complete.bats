@@ -14,7 +14,7 @@ teardown() {
 }
 
 function complete_show { # @test
-	skip # TODO add back support
+	skip                    # TODO add back support
 	run_dodder complete show --
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -53,7 +53,7 @@ function complete_show_all { # @test
 }
 
 function complete_show_zettels { # @test
-	skip # TODO add back support
+	skip                            # TODO add back support
 	run_dodder complete show :z
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -63,7 +63,7 @@ function complete_show_zettels { # @test
 }
 
 function complete_show_types { # @test
-	skip # TODO add back support
+	skip                          # TODO add back support
 	run_dodder complete show :t
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -72,7 +72,7 @@ function complete_show_types { # @test
 }
 
 function complete_show_tags { # @test
-	skip # TODO add back support
+	skip                         # TODO add back support
 	run_dodder complete show :e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -117,6 +117,7 @@ function complete_subcmd { # @test
 		format-object
 		format-organize
 		fsck
+		gen
 		import
 		info
 		info-repo

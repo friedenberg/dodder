@@ -9,7 +9,7 @@ import (
 type Group []error
 
 func (group Group) Error() string {
-	return fmt.Sprintf("%d errors", group.Len())
+	return fmt.Sprintf("error group: %d errors", group.Len())
 }
 
 func (group Group) Unwrap() []error {

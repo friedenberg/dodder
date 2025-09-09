@@ -9,6 +9,10 @@ import (
 )
 
 func (id Id) MarshalText() (bites []byte, err error) {
+	if id.tipe == nil {
+		return
+	}
+
 	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
 		bites = fmt.Appendf(nil, "%x", id.data)
 	} else {
@@ -34,6 +38,11 @@ func (id Id) MarshalText() (bites []byte, err error) {
 }
 
 func (id *Id) UnmarshalText(bites []byte) (err error) {
+	if len(bites) == 0 {
+		id.Reset()
+		return
+	}
+
 	var formatAndTypeId string
 
 	if formatAndTypeId, id.data, err = blech32.Decode(bites); err != nil {

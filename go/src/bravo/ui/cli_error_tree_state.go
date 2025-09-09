@@ -61,17 +61,17 @@ func (state *cliTreeState) prefixWithPipesForDepthChild() string {
 	var pipe string
 
 	if state.stack.getLast().isLastChild() {
-		pipe = pipeTopRight
+		pipe = elbowTopRight
 	} else {
-		pipe = pipeTeeRight
+		pipe = teeRight
 	}
 
 	return fmt.Sprintf(
 		"%s%s%s%s ",
 		leftPadding,
 		pipe,
-		pipeLeftRight,
-		pipeLeftRight,
+		pipeHorizontal,
+		pipeHorizontal,
 	)
 }
 
@@ -93,7 +93,7 @@ func (state *cliTreeState) prefixWithoutPipesForDepthChild() string {
 	return fmt.Sprintf(
 		"%s%s     ",
 		leftPadding,
-		pipeTopBottom,
+		pipeVertical,
 	)
 }
 
@@ -216,7 +216,8 @@ func (state *cliTreeState) encodeStack() {
 
 		state.writeOneErrorMessage(
 			input,
-			fmt.Sprintf("%T: %s", input, input.Error()),
+			// fmt.Sprintf("%T: %s", input, input.Error()),
+			fmt.Sprintf("%s", input.Error()),
 		)
 
 		childStackItem := state.stack.push(input, nil)
@@ -257,7 +258,8 @@ func (state cliTreeState) printErrorOneUnwrapperWithChild(
 
 	state.writeOneErrorMessage(
 		err,
-		fmt.Sprintf("%T: %s", err, err.Error()),
+		// fmt.Sprintf("%T: %s", err, err.Error()),
+		fmt.Sprintf("%s", err.Error()),
 	)
 
 	childStackItem := state.stack.push(err, child)

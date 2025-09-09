@@ -33,6 +33,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 )
 
+const separator = '-'
+
 var (
 	charsetString = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 	charset       = []byte(charsetString)
@@ -278,21 +280,22 @@ type bytesOrString interface {
 	~[]byte | ~string
 }
 
+const dataPortionMinWidth = 7
+
 func validateSeparatorPosition[INPUT bytesOrString](
 	input INPUT,
 	pos int,
 ) error {
-	if pos < 1 || pos+7 > len(input) {
-		if pos < 1 {
-			return ErrSeparatorMissing
-		} else {
-			// TODO turn into error type
-			return fmt.Errorf(
-				"separator '-' at invalid position: pos=%d, len=%d",
-				pos,
-				len(input),
-			)
-		}
+	if pos < 1 {
+		return ErrSeparatorMissing
+	} else if pos+dataPortionMinWidth > len(input) {
+		// TODO turn into error type
+		return fmt.Errorf(
+			"separator `-` at invalid position because data+checksum portion is too short. Should be at least %d but was %d (%q)",
+			dataPortionMinWidth,
+			len(input)-(pos+1),
+			input[pos+1:],
+		)
 	}
 
 	return nil
@@ -323,12 +326,10 @@ func DecodeString(input string) (hrp string, data []byte, err error) {
 	for p, c := range input[pos+1:] {
 		d := strings.IndexRune(charsetString, c)
 		if d == -1 {
-			// TODO turn into error type
-			return "", nil, fmt.Errorf(
-				"invalid character data part: s[%d]=%v",
-				p,
-				c,
-			)
+			return "", nil, errInvalidCharacterInData{
+				pos:  p + pos + 1,
+				char: rune(c),
+			}
 		}
 		data = append(data, byte(d))
 	}
@@ -382,15 +383,14 @@ func decode(hrp string, bites []byte) (data []byte, err error) {
 	unicorn.ToLower(bites)
 
 	for p, c := range bites {
+		// TODO make more performance with a lookup map
 		d := bytes.IndexRune(charset, rune(c))
 
 		if d == -1 {
-			// TODO turn into error type
-			return nil, fmt.Errorf(
-				"invalid character data part: s[%d]=%v",
-				p,
-				c,
-			)
+			return nil, errInvalidCharacterInData{
+				pos:  p,
+				char: rune(c),
+			}
 		}
 
 		data = append(data, byte(d))

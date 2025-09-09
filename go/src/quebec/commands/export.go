@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -66,7 +67,7 @@ func (cmd Export) Run(req command.Request) {
 		}
 	}
 
-	var ag age.Age
+	var ag markl_age_id.Id
 
 	if err := ag.AddIdentity(cmd.AgeIdentity); err != nil {
 		errors.ContextCancelWithErrorAndFormat(

@@ -6,8 +6,8 @@ import (
 
 type (
 	BlobIOWrapper interface {
-		GetBlobEncryption() CommandLineIOWrapper
-		GetBlobCompression() CommandLineIOWrapper
+		GetBlobEncryption() MarklId
+		GetBlobCompression() IOWrapper
 	}
 
 	BlobIOWrapperGetter interface {

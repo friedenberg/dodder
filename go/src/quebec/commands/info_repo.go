@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -67,12 +66,10 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 			// TODO switch to `blob_stores.N.age_encryption`
-			// TODO switch to encryption interface
 		case "blob_stores-0-encryption":
-			// TODO read default blob store and expose config
-			for _, i := range blobIOWrapper.GetBlobEncryption().(*age.Age).Identities {
-				repo.GetUI().Print(i)
-			}
+			repo.GetUI().Print(
+				blobIOWrapper.GetBlobEncryption().StringWithFormat(),
+			)
 
 		case "dir-blob_stores":
 			repo.GetUI().Print(

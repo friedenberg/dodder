@@ -14,14 +14,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
+// todo extract into box_chars package
 const (
-	pipeTopRight    = "└"
-	pipeBottomRight = "┌"
-	pipeLeftBottom  = "┐"
-	pipeLeftRight   = "─"
-	pipeTeeRight    = "├"
-	pipeTeeBottom   = "┬"
-	pipeTopBottom   = "│"
+	// elbows
+	elbowTopRight    = "└"
+	elbowBottomRight = "┌"
+	elbowLeftBottom  = "┐"
+
+	// tees
+	teeRight  = "├"
+	teeBottom = "┬"
+
+	// pipes
+	pipeVertical   = "│"
+	pipeHorizontal = "─"
 )
 
 type encoder struct{}
@@ -56,7 +62,7 @@ func (encoder encoder) prefixForDepthChild(
 	if continuation {
 		return fmt.Sprintf(
 			"%s%s ",
-			pipeTopBottom,
+			pipeVertical,
 			strings.Repeat(" ", depth*2),
 		)
 
@@ -71,15 +77,15 @@ func (encoder encoder) prefixForDepthChild(
 	var firstChar string
 
 	if !lastChild {
-		firstChar = pipeTeeRight
+		firstChar = teeRight
 	} else {
-		firstChar = pipeBottomRight
+		firstChar = elbowBottomRight
 	}
 
 	return fmt.Sprintf(
 		"%s%s ",
 		firstChar,
-		strings.Repeat(pipeLeftRight, depth*2),
+		strings.Repeat(pipeHorizontal, depth*2),
 	)
 	// return fmt.Sprintf(
 	// 	"%s%s %T ",

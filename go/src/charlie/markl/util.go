@@ -6,10 +6,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
 func SetHexStringFromPath(
@@ -218,4 +222,71 @@ func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	} else {
 		return Format(merkleId)
 	}
+}
+
+func SetFromPath(id interfaces.MutableMarklId, path string) (err error) {
+	var file *os.File
+
+	if file, err = files.Open(path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, file)
+
+	bufferedReader, repool := pool.GetBufferedReader(file)
+	defer repool()
+
+	var isEOF bool
+	var key string
+
+	for !isEOF {
+		var line string
+		line, err = bufferedReader.ReadString('\n')
+
+		if err == io.EOF {
+			isEOF = true
+			err = nil
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if len(line) > 0 {
+			key = strings.TrimSpace(line)
+		}
+	}
+
+	// if !strings.HasPrefix(maybeBech32String, "AGE-SECRET-KEY-1") {
+	// 	value = maybeBech32String
+	// }
+
+	// var data []byte
+
+	// if _, data, err = bech32.Decode(maybeBech32String); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// if err = blobStoreConfig.Encryption.SetFormat(
+	// 	markl.FormatIdMadderPrivateKeyV0,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// if err = blobStoreConfig.Encryption.SetMerkleId(
+	// 	markl.TypeIdAgeX25519Sec,
+	// 	data,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	if err = id.Set(key); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

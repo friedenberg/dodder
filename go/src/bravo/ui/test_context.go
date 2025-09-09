@@ -49,11 +49,7 @@ func makeTestContext(
 
 	t.Cleanup(
 		func() {
-			defer func() {
-				recover()
-			}()
-
-			testContext.Context.Cancel(nil)
+			close(done)
 		},
 	)
 

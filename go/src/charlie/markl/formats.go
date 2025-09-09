@@ -33,6 +33,7 @@ const (
 
 	// PrivateKeys
 	FormatIdRepoPrivateKeyV1   = "dodder-repo-private_key-v1"
+	FormatIdMadderPrivateKeyV0 = "madder-private_key-v0"
 	FormatIdMadderPrivateKeyV1 = "madder-private_key-v1"
 
 	// Arbitrary

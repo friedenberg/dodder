@@ -1137,7 +1137,7 @@ func (f *FlagSet) parseOne() (bool, error) {
 				errInvalidValue.Name = name
 				return false, errInvalidValue
 			} else {
-				return false, errors.Wrapf(err, "invalid value %q for flag -%s: %v", value, name)
+				return false, errors.Wrapf(err, "invalid value %q for flag -%s", value, name)
 			}
 		}
 	}
@@ -1152,6 +1152,7 @@ func (f *FlagSet) parseOne() (bool, error) {
 // include the command name. Must be called after all flags in the [FlagSet]
 // are defined and before flags are accessed by the program.
 // The return value will be [ErrHelp] if -help or -h were set but not defined.
+// TODO add support for errors.Context
 func (f *FlagSet) Parse(arguments []string) error {
 	f.parsed = true
 	f.args = arguments
@@ -1165,7 +1166,9 @@ func (f *FlagSet) Parse(arguments []string) error {
 		}
 		switch f.errorHandling {
 		case ContinueOnError:
-			return err
+			return errors.Wrap(err)
+
+			// TODO remove
 		case ExitOnError:
 			if err == ErrHelp {
 				os.Exit(0)

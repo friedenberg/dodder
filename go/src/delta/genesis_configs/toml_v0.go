@@ -3,10 +3,11 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
@@ -73,16 +74,25 @@ func (config V0Common) GetRepoId() ids.RepoId {
 	return ids.RepoId{}
 }
 
-func (config *V0Common) GetAgeEncryption() *age.Age {
-	return &age.Age{}
+func (config *V0Common) GetAgeEncryption() *markl_age_id.Id {
+	return &markl_age_id.Id{}
 }
 
 func (config *V0Common) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	return &config.CompressionType
 }
 
-func (config *V0Common) GetBlobEncryption() interfaces.CommandLineIOWrapper {
-	return config.GetAgeEncryption()
+func (config *V0Common) GetBlobEncryption() interfaces.IOWrapper {
+	var ioWrapper interfaces.IOWrapper = files.NopeIOWrapper{}
+	encryption := config.GetAgeEncryption()
+
+	if encryption != nil {
+		var err error
+		ioWrapper, err = markl.GetIOWrapper(encryption)
+		errors.PanicIfError(err)
+	}
+
+	return ioWrapper
 }
 
 func (config V0Common) GetLockInternalFiles() bool {

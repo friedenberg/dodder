@@ -60,7 +60,7 @@ function print_their_xdg() {
 
 function run_clone_default_with() {
 	run_dodder clone \
-		-age-identity none \
+		-encryption none \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
 		-lock-internal-files=false \

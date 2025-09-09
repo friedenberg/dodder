@@ -5,25 +5,25 @@ func WithoutStack(err error) error {
 		panic("wrapping empty error")
 	}
 
-	return errorWithoutStack{underlying: err}
+	return errWithoutStack{underlying: err}
 }
 
-type errorWithoutStack struct {
+type errWithoutStack struct {
 	underlying error
 }
 
-func (err errorWithoutStack) Error() string {
+func (err errWithoutStack) Error() string {
 	return err.underlying.Error()
 }
 
-func (err errorWithoutStack) Unwrap() error {
+func (err errWithoutStack) Unwrap() error {
 	return err.underlying
 }
 
-func (err errorWithoutStack) ShouldShowStackTrace() bool {
+func (err errWithoutStack) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (err errorWithoutStack) ShouldHideUnwrap() bool {
+func (err errWithoutStack) ShouldHideUnwrap() bool {
 	return true
 }

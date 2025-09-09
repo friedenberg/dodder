@@ -43,7 +43,7 @@ func Run(ctx interfaces.Context, args ...string) {
 	configCli.SetFlagSet(flagSet)
 
 	if err := flagSet.Parse(args); err != nil {
-		ctx.Cancel(errors.BadRequest(err))
+		ctx.Cancel(err)
 	}
 
 	req := command.MakeRequest(

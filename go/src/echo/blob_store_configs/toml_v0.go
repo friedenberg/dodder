@@ -3,8 +3,8 @@ package blob_store_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
 )
 
 type TomlV0 struct {
@@ -13,7 +13,7 @@ type TomlV0 struct {
 	// HashBuckets       []int                            `toml:"hash-buckets"`
 	BasePath string `toml:"base-path"` // can include env vars
 	// TODO transform into markl type
-	AgeEncryption     age.Age                          `toml:"age-encryption,omitempty"`
+	AgeEncryption     markl_age_id.Id                 `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }
@@ -54,11 +54,11 @@ func (blobStoreConfig TomlV0) GetHashBuckets() []int {
 	return []int{2}
 }
 
-func (blobStoreConfig TomlV0) GetBlobCompression() interfaces.CommandLineIOWrapper {
+func (blobStoreConfig TomlV0) GetBlobCompression() interfaces.IOWrapper {
 	return &blobStoreConfig.CompressionType
 }
 
-func (blobStoreConfig TomlV0) GetBlobEncryption() interfaces.CommandLineIOWrapper {
+func (blobStoreConfig TomlV0) GetBlobEncryption() interfaces.MarklId {
 	return &blobStoreConfig.AgeEncryption
 }
 

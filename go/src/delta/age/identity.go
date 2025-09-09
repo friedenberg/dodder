@@ -27,8 +27,10 @@ type Identity struct {
 	disabled bool
 }
 
-func (i Identity) Unwrap(stanzas []*age.Stanza) (fileKey []byte, err error) {
-	if fileKey, err = i.identity.Unwrap(stanzas); err != nil {
+func (identity Identity) Unwrap(
+	stanzas []*age.Stanza,
+) (fileKey []byte, err error) {
+	if fileKey, err = identity.identity.Unwrap(stanzas); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -36,29 +38,29 @@ func (i Identity) Unwrap(stanzas []*age.Stanza) (fileKey []byte, err error) {
 	return
 }
 
-func (i *Identity) IsDisabled() bool {
-	return i.disabled
+func (identity *Identity) IsDisabled() bool {
+	return identity.disabled
 }
 
-func (i *Identity) IsEmpty() bool {
-	return i.identity == nil
+func (identity *Identity) IsEmpty() bool {
+	return identity.identity == nil
 }
 
-func (i *Identity) String() string {
-	if i.identity == nil {
+func (identity *Identity) String() string {
+	if identity.identity == nil {
 		return ""
 	} else {
-		return i.identity.String()
+		return identity.identity.String()
 	}
 }
 
-func (i *Identity) MarshalText() (b []byte, err error) {
-	b = []byte(i.String())
+func (identity *Identity) MarshalText() (b []byte, err error) {
+	b = []byte(identity.String())
 	return
 }
 
-func (i *Identity) UnmarshalText(b []byte) (err error) {
-	if err = i.SetFromX25519Identity(string(b)); err != nil {
+func (identity *Identity) UnmarshalText(b []byte) (err error) {
+	if err = identity.SetFromX25519Identity(string(b)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,26 +68,28 @@ func (i *Identity) UnmarshalText(b []byte) (err error) {
 	return
 }
 
-func (i *Identity) SetFromX25519Identity(identity string) (err error) {
-	var x *X25519Identity
+func (identity *Identity) SetFromX25519Identity(
+	identityString string,
+) (err error) {
+	var x *age.X25519Identity
 
-	if x, err = age.ParseX25519Identity(identity); err != nil {
-		err = errors.Wrapf(err, "Identity: %s", identity)
+	if x, err = age.ParseX25519Identity(identityString); err != nil {
+		err = errors.Wrapf(err, "Identity: %s", identityString)
 		return
 	}
 
-	i.SetX25519Identity(x)
+	identity.SetX25519Identity(x)
 
 	return
 }
 
-func (i *Identity) SetX25519Identity(x *age.X25519Identity) {
-	i.disabled = false
-	i.identity = x
-	i.Recipient = x.Recipient()
+func (identity *Identity) SetX25519Identity(x *age.X25519Identity) {
+	identity.disabled = false
+	identity.identity = x
+	identity.Recipient = x.Recipient()
 }
 
-func (i *Identity) SetFromPath(path string) (err error) {
+func (identity *Identity) SetFromPath(path string) (err error) {
 	var f *os.File
 
 	if f, err = files.Open(path); err != nil {
@@ -116,7 +120,7 @@ func (i *Identity) SetFromPath(path string) (err error) {
 		}
 	}
 
-	if err = i.SetFromX25519Identity(key); err != nil {
+	if err = identity.SetFromX25519Identity(key); err != nil {
 		err = errors.Wrapf(err, "Key: %q", key)
 		return
 	}
@@ -124,28 +128,28 @@ func (i *Identity) SetFromPath(path string) (err error) {
 	return
 }
 
-func (i *Identity) Set(path_or_identity string) (err error) {
+func (identity *Identity) Set(path_or_identity string) (err error) {
 	switch {
 	case path_or_identity == "":
 
 	case path_or_identity == "disabled" || path_or_identity == "none":
-		i.disabled = true
+		identity.disabled = true
 		// no-op
 
 	case files.Exists(path_or_identity):
-		if err = i.SetFromPath(path_or_identity); err != nil {
+		if err = identity.SetFromPath(path_or_identity); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case path_or_identity == "generate":
-		if err = i.GenerateIfNecessary(); err != nil {
+		if err = identity.GenerateIfNecessary(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		if err = i.SetFromX25519Identity(path_or_identity); err != nil {
+		if err = identity.SetFromX25519Identity(path_or_identity); err != nil {
 			err = errors.Wrapf(err, "Identity: %q", path_or_identity)
 			return
 		}
@@ -154,19 +158,43 @@ func (i *Identity) Set(path_or_identity string) (err error) {
 	return
 }
 
-func (i *Identity) GenerateIfNecessary() (err error) {
-	if i.IsDisabled() || !i.IsEmpty() {
+func (identity *Identity) GenerateIfNecessary() (err error) {
+	if identity.IsDisabled() || !identity.IsEmpty() {
 		return
 	}
 
-	var x *X25519Identity
+	var x *age.X25519Identity
 
 	if x, err = age.GenerateX25519Identity(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	i.SetX25519Identity(x)
+	identity.SetX25519Identity(x)
+
+	return
+}
+
+func (identity *Identity) WrapReader(
+	src io.Reader,
+) (out io.ReadCloser, err error) {
+	if src, err = age.Decrypt(src, identity); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out = io.NopCloser(src)
+
+	return
+}
+
+func (identity *Identity) WrapWriter(
+	dst io.Writer,
+) (out io.WriteCloser, err error) {
+	if out, err = age.Encrypt(dst, identity.Recipient); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

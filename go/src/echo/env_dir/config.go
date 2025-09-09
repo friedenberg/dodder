@@ -1,49 +1,56 @@
 package env_dir
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
-// TODO move to own package
+// TODO move to own blob store configs package
 
 func MakeConfig(
 	hashType markl.HashType,
 	funcJoin func(string, ...string) string,
-	compression interfaces.CommandLineIOWrapper,
-	encryption interfaces.CommandLineIOWrapper,
+	compression interfaces.IOWrapper,
+	encryption interfaces.MarklId,
 ) Config {
+	var ioWrapper interfaces.IOWrapper = defaultEncryptionIOWrapper
+
+	if encryption != nil {
+		var err error
+		ioWrapper, err = markl.GetIOWrapper(encryption)
+		errors.PanicIfError(err)
+	}
+
 	return Config{
 		hashType:    hashType,
 		funcJoin:    funcJoin,
 		compression: compression,
-		encryption:  encryption,
+		encryption:  ioWrapper,
 	}
 }
 
 var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
-	defaultEncryptionType       = age.Age{}
+	defaultEncryptionIOWrapper  = files.NopeIOWrapper{}
 	DefaultConfig               = Config{
 		hashType:    markl.HashTypeSha256,
 		compression: &defaultCompressionTypeValue,
-		encryption:  &defaultEncryptionType,
+		encryption:  &defaultEncryptionIOWrapper,
 	}
-
-	_ interfaces.BlobIOWrapper = Config{}
 )
 
 type Config struct {
 	hashType markl.HashType
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
-	compression interfaces.CommandLineIOWrapper
-	encryption  interfaces.CommandLineIOWrapper
+	compression interfaces.IOWrapper
+	encryption  interfaces.IOWrapper
 }
 
-func (config Config) GetBlobCompression() interfaces.CommandLineIOWrapper {
+func (config Config) GetBlobCompression() interfaces.IOWrapper {
 	if config.compression == nil {
 		return &defaultCompressionTypeValue
 	} else {
@@ -51,9 +58,9 @@ func (config Config) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	}
 }
 
-func (config Config) GetBlobEncryption() interfaces.CommandLineIOWrapper {
+func (config Config) GetBlobEncryption() interfaces.IOWrapper {
 	if config.encryption == nil {
-		return &defaultEncryptionType
+		return defaultEncryptionIOWrapper
 	} else {
 		return config.encryption
 	}

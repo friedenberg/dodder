@@ -538,7 +538,7 @@ func (writer *sftpWriter) GetDigest() interfaces.MarklId {
 // TODO combine with sftpReader
 type sftpStreamingReader struct {
 	file   *sftp.File
-	config interfaces.BlobIOWrapper
+	config env_dir.Config
 }
 
 func (reader *sftpStreamingReader) createReader(
@@ -563,7 +563,7 @@ func (reader *sftpStreamingReader) createReader(
 // sftpReader implements streaming decompression/decryption for SFTP
 type sftpReader struct {
 	file      *sftp.File
-	config    interfaces.BlobIOWrapper
+	config    env_dir.Config
 	hash      interfaces.Hash
 	decrypter io.Reader
 	expander  io.ReadCloser

@@ -66,6 +66,7 @@ func init() {
 	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
 	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigV1, genres.None, false)
 	registerBuiltinTypeString(
 		TypeTomlBlobStoreConfigSftpExplicitV0,
 		genres.None,

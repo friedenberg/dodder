@@ -73,9 +73,11 @@ function info_age_none { # @test
 
 # bats test_tags=user_story:age_encryption
 function info_age_some { # @test
-	age-keygen --output age-key >/dev/null 2>&1
-	key="$(tail -n1 age-key)"
-	run_dodder_init -override-xdg-with-cwd -age-identity age-key test-repo-id
+  run_dodder gen madder-private_key-v1
+  assert_output --regexp 'madder-private_key-v1@age_x25519_sec-'
+  key="$output"
+  echo "$key" > age-key
+	run_dodder_init -override-xdg-with-cwd -encryption age-key test-repo-id
 	run_dodder info-repo blob_stores-0-encryption
 	assert_output "$key"
 }

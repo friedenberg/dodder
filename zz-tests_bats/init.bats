@@ -134,13 +134,13 @@ function init_and_deinit { # @test
 function init_and_with_another_age { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init
-	age_id="$("$DODDER_BIN" info-repo blob_stores-0-encryption)"
+	age_id="$("$DODDER_BIN" gen madder-private_key-v1)"
 
 	mkdir inner
 	pushd inner || exit 1
 
 	set_xdg "$(pwd)"
-	run_dodder init -yin <(cat_yin) -yang <(cat_yang) -age-identity "$age_id" test-repo-id
+	run_dodder init -yin <(cat_yin) -yang <(cat_yang) -encryption "$age_id" test-repo-id
 	assert_success
 
 	run_dodder info-repo blob_stores-0-encryption
@@ -225,7 +225,7 @@ function init_with_age { # @test
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
-		-age-identity generate \
+		-encryption generate \
 		test-repo-id
 
 	assert_success
@@ -245,7 +245,7 @@ function init_with_json_inventory_list_type { # @test
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
-		-age-identity generate \
+		-encryption generate \
 		-inventory_list-type inventory_list-json-v0 \
 		test-repo-id
 

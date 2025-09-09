@@ -27,7 +27,7 @@ func TestCLITreeForwards(t *testing.T) {
 				errors.New("two"),
 				errors.New("three"),
 			},
-			expected: `errors.Group: 3 errors
+			expected: `error group: 3 errors
 ├── one
 ├── two
 └── three
@@ -44,7 +44,7 @@ func TestCLITreeForwards(t *testing.T) {
 					errors.New("three"),
 				},
 			},
-			expected: `errors.Group: 3 errors
+			expected: `error group: 3 errors
 ├── one
 ├── two
 └── three
@@ -61,7 +61,7 @@ func TestCLITreeForwards(t *testing.T) {
 					errors.Err501NotImplemented.Wrap(errors.New("inner")),
 				},
 			},
-			expected: `errors.Group: 3 errors
+			expected: `error group: 3 errors
 ├── one
 ├── two
 └── errors.HTTP: 501 Not Implemented

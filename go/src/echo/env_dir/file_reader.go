@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
 )
 
 func NewFileReader(
@@ -39,7 +38,7 @@ func NewFileReader(
 			config.hashType,
 			config.funcJoin,
 			config.GetBlobCompression(),
-			&age.Age{},
+			nil,
 		)
 
 		if objectReader.ReadCloseMarklIdGetter, err = NewReader(config, objectReader.file); err != nil {
