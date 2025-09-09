@@ -65,7 +65,7 @@ func MakeTestingWithBigBang(
 	for expectedDigestString, content := range contents {
 		var writeCloser interfaces.BlobWriter
 
-		writeCloser, err := envRepo.GetDefaultBlobStore().MakeBlobWriter("")
+		writeCloser, err := envRepo.GetDefaultBlobStore().MakeBlobWriter(nil)
 		if err != nil {
 			errors.ContextCancelWithErrorAndFormat(
 				t.Context,

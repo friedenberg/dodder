@@ -165,6 +165,7 @@ func (blobStore *remoteSftp) remotePathForMerkleId(
 	return env_dir.MakeHashBucketPathFromMerkleId(
 		merkleId,
 		blobStore.buckets,
+		blobStore.multiHash,
 		strings.TrimPrefix(blobStore.config.GetRemotePath(), "/"),
 	)
 }
@@ -223,10 +224,11 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 				continue
 			}
 
-			relPath := strings.TrimPrefix(walker.Path(), basePath)
-			relPath = strings.TrimPrefix(relPath, "/")
-
-			if err := markl.SetHexStringFromPath(digest, relPath); err != nil {
+			if err := markl.SetHexStringFromPath(
+				digest,
+				walker.Path(),
+				basePath,
+			); err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return
 				}
@@ -246,8 +248,9 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 }
 
 func (blobStore *remoteSftp) MakeBlobWriter(
-	marklHashTypeId string,
-) (w interfaces.BlobWriter, err error) {
+	marklHashType interfaces.HashType,
+) (blobWriter interfaces.BlobWriter, err error) {
+	// TODO use hash type
 	mover := &sftpMover{
 		store:  blobStore,
 		config: blobStore.makeEnvDirConfig(),
@@ -258,7 +261,8 @@ func (blobStore *remoteSftp) MakeBlobWriter(
 		return
 	}
 
-	w = mover
+	blobWriter = mover
+
 	return
 }
 

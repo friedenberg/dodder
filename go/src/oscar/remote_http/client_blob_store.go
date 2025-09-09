@@ -220,7 +220,7 @@ func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 }
 
 func (client *client) MakeBlobWriter(
-	marklHashTypeId string,
+	marklHashType interfaces.HashType,
 ) (interfaces.BlobWriter, error) {
 	panic(errors.Err501NotImplemented)
 }

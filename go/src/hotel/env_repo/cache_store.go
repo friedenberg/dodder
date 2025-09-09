@@ -15,8 +15,8 @@ func (env Env) WriteCloserCache(
 	return env_dir.NewMover(
 		env_dir.DefaultConfig,
 		env_dir.MoveOptions{
-			FinalPath:   path,
-			TemporaryFS: env.GetTempLocal(),
+			FinalPathOrDir: path,
+			TemporaryFS:    env.GetTempLocal(),
 		},
 	)
 }

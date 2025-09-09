@@ -9,21 +9,21 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-cat-shas", &BlobStoreCatShas{})
+	command.Register("blob_store-cat-ids", &BlobStoreCatIds{})
 }
 
-type BlobStoreCatShas struct {
+type BlobStoreCatIds struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 }
 
-func (cmd BlobStoreCatShas) CompletionGenres() ids.Genre {
+func (cmd BlobStoreCatIds) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Blob,
 	)
 }
 
-func (cmd BlobStoreCatShas) Run(req command.Request) {
+func (cmd BlobStoreCatIds) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	var blobStoreIndexOrConfigPath string
 
@@ -37,13 +37,14 @@ func (cmd BlobStoreCatShas) Run(req command.Request) {
 
 	blobStore := cmd.MakeBlobStore(envRepo, blobStoreIndexOrConfigPath)
 
-	for sh, err := range blobStore.AllBlobs() {
+	for id, err := range blobStore.AllBlobs() {
 		errors.ContextContinueOrPanic(envRepo)
 
 		if err != nil {
+			// ui.CLIErrorTreeEncoder.EncodeTo(err, envRepo.GetErr())
 			envRepo.GetErr().Print(err)
 		} else {
-			envRepo.GetUI().Print(sh)
+			envRepo.GetUI().Print(id)
 		}
 	}
 }

@@ -108,7 +108,7 @@ func (server *Server) writeInventoryList(
 	{
 		var err error
 
-		if blobWriter, err = blobStore.MakeBlobWriter(""); err != nil {
+		if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 			response.Error(err)
 			return
 		}

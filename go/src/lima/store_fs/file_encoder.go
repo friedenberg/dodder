@@ -105,7 +105,7 @@ func (encoder *fileEncoder) EncodeObject(
 				if errors.IsExist(err) {
 					var aw interfaces.BlobWriter
 
-					if aw, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
+					if aw, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

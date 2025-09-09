@@ -58,7 +58,7 @@ func (ReadBlob) readOneBlob(
 ) (digest interfaces.MarklId, err error) {
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
+	if writeCloser, err = envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

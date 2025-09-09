@@ -2,7 +2,6 @@ package command_components
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -15,7 +14,9 @@ type RemoteBlobStore struct {
 	Config   blob_store_configs.TomlV0
 }
 
-func (cmd *RemoteBlobStore) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *RemoteBlobStore) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	cmd.Config.CompressionType = compression_type.CompressionTypeDefault
 	cmd.Config.CompressionType.SetFlagSet(flagSet)
 	flagSet.StringVar(&cmd.BasePath, "blobs", "", "")
@@ -35,8 +36,6 @@ func (cmd *RemoteBlobStore) MakeRemoteBlobStore(
 		envLocal,
 		cmd.GetBlobStoreConfigNamed(),
 		envLocal.GetTempLocal(),
-		// TODO inject instead of hardcode
-		markl.HashTypeSha256,
 	)
 
 	return

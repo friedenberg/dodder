@@ -123,7 +123,7 @@ func MakeFromFileInfoWithDir(
 
 	var writer interfaces.BlobWriter
 
-	if writer, err = blobStore.MakeBlobWriter(""); err != nil {
+	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

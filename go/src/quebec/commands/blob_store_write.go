@@ -160,7 +160,7 @@ func (cmd BlobStoreWrite) doOne(
 			defer repool()
 		}
 	} else {
-		if writeCloser, err = blobStore.MakeBlobWriter(""); err != nil {
+		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

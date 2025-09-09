@@ -173,7 +173,7 @@ func writeDefaultMutableConfig(
 
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
+	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

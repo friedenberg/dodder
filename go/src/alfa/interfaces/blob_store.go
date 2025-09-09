@@ -29,14 +29,13 @@ type (
 	}
 
 	BlobWriterFactory interface {
-		MakeBlobWriter(marklHashTypeId string) (BlobWriter, error)
+		MakeBlobWriter(HashType) (BlobWriter, error)
 	}
 
 	BlobAccess interface {
 		HasBlob(MarklId) bool
 		BlobReaderFactory
 		BlobWriterFactory
-		AllBlobs() SeqError[MarklId]
 	}
 
 	BlobStore interface {
@@ -45,6 +44,7 @@ type (
 
 		GetBlobStoreDescription() string
 		GetDefaultHashType() HashType
+		AllBlobs() SeqError[MarklId]
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by

@@ -69,7 +69,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 ) (err error) {
 	var blobStoreWriteCloser interfaces.BlobWriter
 
-	if blobStoreWriteCloser, err = blobStore.BlobStore.MakeBlobWriter(""); err != nil {
+	if blobStoreWriteCloser, err = blobStore.BlobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

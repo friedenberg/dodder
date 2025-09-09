@@ -51,14 +51,14 @@ func MakeConfigStore(
 
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
-	blobSha interfaces.MarklId,
+	blobId interfaces.MarklId,
 ) (common repo_configs.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
 		store := a.toml_v0
 		var blob *repo_configs.V0
 
-		if blob, repool, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -69,7 +69,7 @@ func (a Config) ParseTypedBlob(
 		store := a.toml_v1
 		var blob *repo_configs.V1
 
-		if blob, repool, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

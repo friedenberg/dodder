@@ -48,7 +48,7 @@ func MakeTypeStore(
 
 func (store Type) ParseTypedBlob(
 	tipe interfaces.ObjectId,
-	blobSha interfaces.MarklId,
+	blobId interfaces.MarklId,
 ) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	default:
@@ -59,7 +59,7 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v0
 		var blob *type_blobs.TomlV0
 
-		if blob, repool, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -70,7 +70,7 @@ func (store Type) ParseTypedBlob(
 		store := store.toml_v1
 		var blob *type_blobs.TomlV1
 
-		if blob, repool, err = store.GetBlob(blobSha); err != nil {
+		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

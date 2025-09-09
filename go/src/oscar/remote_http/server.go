@@ -621,7 +621,7 @@ func (server *Server) copyBlob(
 	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(""); err != nil {
+	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -19,26 +19,33 @@ import (
 func SetHexStringFromPath(
 	id interfaces.MutableMarklId,
 	path string,
+	base string,
 ) (err error) {
-	tail := filepath.Base(path)
-	head := filepath.Base(filepath.Dir(path))
+	// if filepath.IsAbs(path) {
+	// 	panic(fmt.Sprintf("absolute paths not supported: %q", path))
+	// 	err = errors.Err405MethodNotAllowed.ErrorHiddenf(
+	// 		"absolute paths not supported",
+	// 	)
+	// 	return
+	// }
 
-	switch {
-	case tail == string(filepath.Separator) || head == string(filepath.Separator):
-		fallthrough
-
-	case tail == "." || head == ".":
-		err = errors.ErrorWithStackf(
-			"path cannot be turned into a head/tail pair: '%s/%s'",
-			head,
-			tail,
-		)
-
+	if path, err = filepath.Rel(base, path); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if err = SetHexBytes(id.GetMarklType().GetMarklTypeId(), id, []byte(head+tail)); err != nil {
-		err = errors.Wrap(err)
+	if err = SetHexBytes(
+		id.GetMarklType().GetMarklTypeId(),
+		id,
+		[]byte(strings.ReplaceAll(path, string(filepath.Separator), "")),
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"could not transform path into hex. Path: %q, Base: %q",
+			path,
+			base,
+		)
+
 		return
 	}
 

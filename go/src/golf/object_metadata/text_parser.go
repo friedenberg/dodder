@@ -48,7 +48,7 @@ func (parser textParser) ParseMetadata(
 
 	var blobWriter interfaces.BlobWriter
 
-	if blobWriter, err = parser.blobWriter.MakeBlobWriter(""); err != nil {
+	if blobWriter, err = parser.blobWriter.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

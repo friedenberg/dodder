@@ -14,14 +14,22 @@ import (
 )
 
 func MakeHashBucketPathFromMerkleId(
-	merkleId interfaces.MarklId,
+	id interfaces.MarklId,
 	buckets []int,
+	multiHash bool,
 	pathComponents ...string,
 ) string {
+	if multiHash {
+		pathComponents = append(
+			pathComponents,
+			id.GetMarklType().GetMarklTypeId(),
+		)
+	}
+
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(markl.Format(merkleId)),
+		[]byte(markl.Format(id)),
 		buckets,
 		pathComponents...,
 	)
@@ -99,7 +107,8 @@ func MakeHashBucketPathJoinFunc(
 		return MakeHashBucketPath(
 			[]byte(initial),
 			buckets,
-			pathComponents...)
+			pathComponents...,
+		)
 	}
 }
 

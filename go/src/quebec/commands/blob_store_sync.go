@@ -24,7 +24,9 @@ type BlobStoreSync struct {
 	limit int
 }
 
-func (cmd BlobStoreSync) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd BlobStoreSync) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.IntVar(
 		&cmd.limit,
 		"limit",
@@ -93,6 +95,7 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 	)
 
 	for blobId := range primary.AllBlobs() {
+		ui.Debug().Print(blobId)
 		if err := blobImporter.ImportBlobIfNecessary(blobId, nil); err != nil {
 			req.Cancel(err)
 			return

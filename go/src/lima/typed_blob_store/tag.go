@@ -82,11 +82,11 @@ func (store Tag) GetBlob(
 	object *sku.Transacted,
 ) (blobGeneric tag_blobs.Blob, repool interfaces.FuncRepool, err error) {
 	tipe := object.GetType()
-	blobDigest := object.GetBlobDigest()
+	blobId := object.GetBlobDigest()
 
 	switch tipe.String() {
 	case "", ids.TypeTomlTagV0:
-		if blobGeneric, repool, err = store.toml_v0.GetBlob(blobDigest); err != nil {
+		if blobGeneric, repool, err = store.toml_v0.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -94,7 +94,7 @@ func (store Tag) GetBlob(
 	case ids.TypeTomlTagV1:
 		var blob *tag_blobs.TomlV1
 
-		if blob, repool, err = store.toml_v1.GetBlob(blobDigest); err != nil {
+		if blob, repool, err = store.toml_v1.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -121,7 +121,7 @@ func (store Tag) GetBlob(
 		var readCloser interfaces.BlobReader
 
 		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
-			blobDigest,
+			blobId,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -151,7 +151,7 @@ func (store Tag) GetBlob(
 
 		var readCloser interfaces.BlobReader
 
-		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobDigest); err != nil {
+		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -134,7 +134,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	var writer interfaces.BlobWriter
 
-	if writer, err = blobStore.MakeBlobWriter(""); err != nil {
+	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,7 +176,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	var blobWriter interfaces.BlobWriter
 
-	if blobWriter, err = blobStore.MakeBlobWriter(""); err != nil {
+	if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

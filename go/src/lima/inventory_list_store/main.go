@@ -142,7 +142,9 @@ func (store *Store) GetEnvRepo() env_repo.Env {
 func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
 	openList = &sku.OpenList{}
 
-	if openList.Mover, err = store.blobBlobStore.MakeBlobWriter(""); err != nil {
+	if openList.Mover, err = store.blobBlobStore.MakeBlobWriter(
+		nil,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -271,7 +273,9 @@ func (store *Store) WriteInventoryListBlob(
 
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(""); err != nil {
+	if writeCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(
+		nil,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

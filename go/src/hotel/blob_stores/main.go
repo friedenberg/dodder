@@ -102,7 +102,6 @@ func MakeRemoteBlobStore(
 	ctx interfaces.ActiveContext,
 	config BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
-	hashType markl.HashType,
 ) (blobStore BlobStoreInitialized) {
 	blobStore.BlobStoreConfigNamed = config
 
@@ -246,7 +245,7 @@ func CopyBlob(
 
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = dst.MakeBlobWriter(""); err != nil {
+	if writeCloser, err = dst.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -125,7 +125,7 @@ func (json *JSON) ToTransacted(
 	if blobStore != nil {
 		var writeCloser interfaces.BlobWriter
 
-		if writeCloser, err = blobStore.MakeBlobWriter(""); err != nil {
+		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

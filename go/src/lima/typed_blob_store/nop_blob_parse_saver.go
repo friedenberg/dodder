@@ -30,7 +30,7 @@ func (parseSaver nopBlobParseSaver[OBJECT, OBJECT_PTR]) ParseBlob(
 ) (n int64, err error) {
 	var blobWriter interfaces.BlobWriter
 
-	if blobWriter, err = parseSaver.blobStore.MakeBlobWriter(""); err != nil {
+	if blobWriter, err = parseSaver.blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

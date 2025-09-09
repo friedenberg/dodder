@@ -12,9 +12,9 @@ import (
 // TODO fold into markl_io
 type MoveOptions struct {
 	TemporaryFS
-	ErrorOnAttemptedOverwrite bool
-	FinalPath                 string
-	GenerateFinalPathFromSha  bool
+	ErrorOnAttemptedOverwrite   bool
+	FinalPathOrDir              string
+	GenerateFinalPathFromDigest bool
 }
 
 type localFileMover struct {
@@ -23,7 +23,7 @@ type localFileMover struct {
 	interfaces.BlobWriter
 
 	basePath                  string
-	objectPath                string
+	blobPath                  string
 	lockFile                  bool
 	errorOnAttemptedOverwrite bool
 }
@@ -49,10 +49,15 @@ func newMover(
 		errorOnAttemptedOverwrite: moveOptions.ErrorOnAttemptedOverwrite,
 	}
 
-	if moveOptions.GenerateFinalPathFromSha {
-		mover.basePath = moveOptions.FinalPath
+	if moveOptions.GenerateFinalPathFromDigest {
+		mover.basePath = moveOptions.FinalPathOrDir
+
+		if mover.basePath == "" {
+			err = errors.ErrorWithStackf("basepath is nil")
+			return
+		}
 	} else {
-		mover.objectPath = moveOptions.FinalPath
+		mover.blobPath = moveOptions.FinalPathOrDir
 	}
 
 	if mover.file, err = moveOptions.FileTemp(); err != nil {
@@ -122,14 +127,9 @@ func (mover *localFileMover) Close() (err error) {
 	// 	sh,
 	// )
 
-	if mover.objectPath == "" {
+	if mover.blobPath == "" {
 		// TODO-P3 move this validation to options
-		if mover.basePath == "" {
-			err = errors.ErrorWithStackf("basepath is nil")
-			return
-		}
-
-		if mover.objectPath, err = MakeDirIfNecessary(
+		if mover.blobPath, err = MakeDirIfNecessary(
 			markl.Format(digest),
 			mover.funcJoin,
 			mover.basePath,
@@ -141,10 +141,10 @@ func (mover *localFileMover) Close() (err error) {
 
 	path := mover.file.Name()
 
-	if err = os.Rename(path, mover.objectPath); err != nil {
-		if files.Exists(mover.objectPath) {
+	if err = os.Rename(path, mover.blobPath); err != nil {
+		if files.Exists(mover.blobPath) {
 			if mover.errorOnAttemptedOverwrite {
-				err = MakeErrBlobAlreadyExists(digest, mover.objectPath)
+				err = MakeErrBlobAlreadyExists(digest, mover.blobPath)
 			} else {
 				err = nil
 			}
@@ -159,7 +159,7 @@ func (mover *localFileMover) Close() (err error) {
 	// log.Log().Printf("moved %s to %s", p, m.objectPath)
 
 	if mover.lockFile {
-		if err = files.SetDisallowUserChanges(mover.objectPath); err != nil {
+		if err = files.SetDisallowUserChanges(mover.blobPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
