@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
+// TODO move to madder
 func init() {
 	command.Register("blob_store-init", &BlobStoreInit{
 		tipe: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,

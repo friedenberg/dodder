@@ -224,7 +224,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 				continue
 			}
 
-			if err := markl.SetHexStringFromPath(
+			if err := markl.SetHexStringFromAbsolutePath(
 				digest,
 				walker.Path(),
 				basePath,

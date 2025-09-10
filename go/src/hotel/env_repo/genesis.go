@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -131,17 +132,26 @@ func (env *Env) writeConfig(bigBang BigBang) {
 	}
 }
 
+// TODO extract this into madder
 func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		// the immutable config contains the only blob stores's config
 		return
 	}
 
+	blobStoreConfig := bigBang.TypedBlobStoreConfig
+
+	if configLocalMutable, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
+		configLocalMutable.SetBasePath(
+			env.DirBlobStores(strconv.Itoa(0)),
+		)
+	}
+
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		&blob_store_configs.TypedConfig{
-			Type: bigBang.TypedBlobStoreConfig.Type,
-			Blob: bigBang.TypedBlobStoreConfig.Blob,
+			Type: blobStoreConfig.Type,
+			Blob: blobStoreConfig.Blob,
 		},
 		env.DirBlobStoreConfigs(
 			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),

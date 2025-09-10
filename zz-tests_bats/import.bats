@@ -28,10 +28,10 @@ function import { # @test
 
 	run_dodder export -print-time=true +z,e,t
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -41,8 +41,8 @@ function import { # @test
 	new_pubkey="$output"
 
 	run_dodder import \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 	assert_success
 
@@ -76,7 +76,7 @@ function import_with_overwrite_sig { # @test
 	# old_pubkey="$output"
 
 	# run_dodder export -print-time=true +z,e,t
-	zstd >list <<-EOM
+	cat >list <<-EOM
 		---
 		! inventory_list-v2
 		---
@@ -89,7 +89,7 @@ function import_with_overwrite_sig { # @test
 	EOM
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -100,8 +100,8 @@ function import_with_overwrite_sig { # @test
 
 	run_dodder import \
 		-overwrite-signatures=true \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 	assert_success
 
@@ -135,7 +135,7 @@ function import_with_dupes_in_list { # @test
 	# old_pubkey="$output"
 
 	# run_dodder export -print-time=true +z,e,t
-	zstd >list <<-EOM
+	cat >list <<-EOM
 		---
 		! inventory_list-v2
 		---
@@ -148,7 +148,7 @@ function import_with_dupes_in_list { # @test
 	EOM
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -159,8 +159,8 @@ function import_with_dupes_in_list { # @test
 
 	run_dodder import \
 		-overwrite-signatures=true \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 	assert_success
 	assert_output - <<-EOM
@@ -201,19 +201,17 @@ function import_one_tai_same { # @test
 
 	run_dodder export -print-time=true one/uno [tag ^tag-1 ^tag-2]:e
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
 
-	echo "$blobs"
-
 	run_dodder import \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 
 	assert_success
@@ -243,15 +241,15 @@ function import_twice_no_dupes_one_zettel { # @test
 
 	run_dodder export -print-time=true one/uno+
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
 
-	run_dodder import -inventory-list "$list" -blobs "$blobs" -compression-type zstd
+	run_dodder import "$list" "$blobs" -compression-type zstd
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -260,7 +258,7 @@ function import_twice_no_dupes_one_zettel { # @test
 		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
 	EOM
 
-	run_dodder import -inventory-list "$list" -blobs "$blobs" -compression-type zstd
+	run_dodder import "$list" "$blobs" -compression-type zstd
 	assert_success
 	assert_output - <<-EOM
 	EOM
@@ -284,10 +282,10 @@ function import_conflict { # @test
 
 	run_dodder export -print-time=true one/uno+
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
@@ -306,7 +304,7 @@ function import_conflict { # @test
 		[one/uno @81c3b19e19b4dd2d8e69f413cd253c67c861ec0066e30f90be23ff62fb7b0cf5 !md "get out of here!" scary]
 	EOM
 
-	run_dodder import -print-copies=false -inventory-list "$list" -blobs "$blobs" -compression-type zstd
+	run_dodder import -print-copies=false "$list" "$blobs" -compression-type zstd
 	assert_failure
 	assert_output --partial - <<-EOM
 		       conflicted [one/uno]
@@ -329,17 +327,17 @@ function import_twice_no_dupes { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder export -print-time=true +z,e,t
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
 
 	run_dodder import \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -361,8 +359,8 @@ function import_twice_no_dupes { # @test
 	EOM
 
 	run_dodder import \
-		-inventory-list "$list" \
-		-blobs "$blobs" \
+		"$list" \
+		"$blobs" \
 		-compression-type zstd
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -397,18 +395,18 @@ function import_inventory_lists { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder export -print-time=true
 	assert_success
-	echo "$output" | zstd >list
+	echo "$output" >list
 
 	list="$(realpath list)"
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
+	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
 	set_xdg "$(pwd)"
 
 	export BATS_TEST_BODY=true
 	run_dodder import \
-		-inventory-list "$list" \
-		-blobs "$blobs"
+		"$list" \
+		"$blobs"
 
 	assert_success
 

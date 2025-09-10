@@ -41,17 +41,22 @@ func (cmd *BlobStore) MakeBlobStore(
 			}
 		}
 
-		blobStore.Config = typedConfig.Blob
+		blobStore.Config = typedConfig
+
+		configNamed := blob_stores.BlobStoreConfigNamed{
+			Config: typedConfig,
+		}
+
+		if configLocal, ok := typedConfig.Blob.(blob_store_configs.ConfigLocal); ok {
+			configNamed.BasePath = configLocal.GetBasePath()
+		}
 
 		{
 			var err error
 
 			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
 				envRepo,
-				blob_stores.BlobStoreConfigNamed{
-					// TODO get base path
-					Config: typedConfig.Blob,
-				},
+				configNamed,
 				envRepo.GetTempLocal(),
 			); err != nil {
 				envRepo.Cancel(err)

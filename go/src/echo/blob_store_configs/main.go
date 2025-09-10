@@ -29,6 +29,11 @@ type (
 		GetBasePath() string
 	}
 
+	ConfigLocalMutable interface {
+		ConfigLocal
+		SetBasePath(string)
+	}
+
 	ConfigLocalHashBucketed interface {
 		ConfigLocal
 		ConfigHashType

@@ -21,9 +21,8 @@ func init() {
 // Switch to External store
 type Import struct {
 	command_components.LocalWorkingCopy
-	command_components.RemoteBlobStore
+	command_components.BlobStore
 
-	InventoryList       string
 	PrintCopies         bool
 	OverwriteSignatures bool
 
@@ -31,9 +30,6 @@ type Import struct {
 }
 
 func (cmd *Import) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	flagSet.StringVar(&cmd.InventoryList, "inventory-list", "", "")
-	cmd.RemoteBlobStore.SetFlagSet(flagSet)
-
 	flagSet.BoolVar(
 		&cmd.PrintCopies,
 		"print-copies",
@@ -52,9 +48,12 @@ func (cmd *Import) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd Import) Run(req command.Request) {
+	inventoryListPath := req.PopArg("inventory_list-path")
+	blobStoreConfigPath := req.PopArg("blob_store-config-path")
+
 	repo := cmd.MakeLocalWorkingCopy(req)
 
-	if cmd.InventoryList == "" {
+	if inventoryListPath == "" {
 		errors.ContextCancelWithBadRequestf(req, "empty inventory list")
 	}
 
@@ -67,11 +66,11 @@ func (cmd Import) Run(req command.Request) {
 		if readCloser, err = env_dir.NewFileReader(
 			env_dir.MakeConfig(
 				markl.HashTypeSha256,
-				env_dir.MakeHashBucketPathJoinFunc(cmd.Config.GetHashBuckets()),
-				cmd.Config.GetBlobCompression(),
-				cmd.Config.GetBlobEncryption(),
+				nil,
+				nil,
+				nil,
 			),
-			cmd.InventoryList,
+			inventoryListPath,
 		); err != nil {
 			repo.Cancel(err)
 		}
@@ -113,16 +112,11 @@ func (cmd Import) Run(req command.Request) {
 		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
-	if cmd.BasePath != "" {
-		{
-			var err error
-
-			if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
-				repo,
-			); err != nil {
-				repo.Cancel(err)
-			}
-		}
+	if blobStoreConfigPath != "" {
+		importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
+			repo.GetEnvRepo(),
+			blobStoreConfigPath,
+		)
 	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies

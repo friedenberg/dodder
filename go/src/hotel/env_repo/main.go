@@ -249,7 +249,9 @@ func (env Env) getV10OrLessInventoryListBlobStore() interfaces.BlobStore {
 		env,
 		blob_stores.BlobStoreConfigNamed{
 			BasePath: env.DirFirstBlobStoreInventoryLists(),
-			Config:   blob.GetBlobIOWrapper().(blob_store_configs.Config),
+			Config: blob_store_configs.TypedConfig{
+				Blob: blob.GetBlobIOWrapper().(blob_store_configs.Config),
+			},
 		},
 		env.GetTempLocal(),
 	); err != nil {

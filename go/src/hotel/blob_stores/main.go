@@ -28,7 +28,7 @@ const defaultHashTypeId = markl.HashTypeIdSha256
 type BlobStoreConfigNamed struct {
 	Name     string
 	BasePath string
-	blob_store_configs.Config
+	Config   blob_store_configs.TypedConfig
 }
 
 type BlobStoreInitialized struct {
@@ -47,7 +47,7 @@ func MakeBlobStores(
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
 		blobStores[0].Name = "0-default"
-		blobStores[0].Config = blob.GetBlobIOWrapper().(blob_store_configs.Config)
+		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		blobStores[0].BasePath = directoryLayout.DirBlobStores("blobs")
 	} else {
 		var configPaths []string
@@ -76,7 +76,7 @@ func MakeBlobStores(
 				ctx.Cancel(err)
 				return
 			} else {
-				blobStores[i].Config = typedConfig.Blob
+				blobStores[i].Config = typedConfig
 			}
 		}
 	}
@@ -134,7 +134,7 @@ func MakeBlobStore(
 	)
 
 	// TODO don't use tipe, use interfaces on the config
-	switch tipe := config.GetBlobStoreType(); tipe {
+	switch tipe := config.Config.Blob.GetBlobStoreType(); tipe {
 	default:
 		err = errors.BadRequestf("unsupported blob store type %q", tipe)
 		return
@@ -143,7 +143,7 @@ func MakeBlobStore(
 		var sshClient *ssh.Client
 		var configSFTP blob_store_configs.ConfigSFTPRemotePath
 
-		switch config := config.Config.(type) {
+		switch config := config.Config.Blob.(type) {
 		default:
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
 			return
@@ -173,7 +173,7 @@ func MakeBlobStore(
 		)
 
 	case "local":
-		if configLocal, ok := config.Config.(blob_store_configs.ConfigLocalHashBucketed); ok {
+		if configLocal, ok := config.Config.Blob.(blob_store_configs.ConfigLocalHashBucketed); ok {
 			return makeLocalHashBucketed(
 				context,
 				config.BasePath,

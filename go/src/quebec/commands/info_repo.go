@@ -1,13 +1,16 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -70,6 +73,38 @@ func (cmd InfoRepo) Run(req command.Request) {
 			repo.GetUI().Print(
 				blobIOWrapper.GetBlobEncryption().StringWithFormat(),
 			)
+
+		case "blob_stores-0-config-path":
+			repo.GetUI().Print(
+				repo.DirBlobStoreConfigs(
+					fmt.Sprintf(
+						"%d-default.%s",
+						0,
+						env_repo.FileNameBlobStoreConfig,
+					),
+				),
+			)
+
+		case "blob_stores-0-config":
+			// TODO this is gross, fix it
+			blobStoreConfig := blobStore.BlobStoreConfigNamed.Config
+
+			if configLocalMutable, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
+				configLocalMutable.SetBasePath(
+					blobStore.BlobStoreConfigNamed.BasePath,
+				)
+			}
+
+			if _, err := blob_store_configs.Coder.EncodeTo(
+				&blob_store_configs.TypedConfig{
+					Type: blobStoreConfig.Type,
+					Blob: blobStoreConfig.Blob,
+				},
+				repo.GetUI().GetFile(),
+			); err != nil {
+				repo.Cancel(err)
+				return
+			}
 
 		case "dir-blob_stores":
 			repo.GetUI().Print(

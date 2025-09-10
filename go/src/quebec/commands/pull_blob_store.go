@@ -18,19 +18,20 @@ func init() {
 
 type PullBlobStore struct {
 	command_components.LocalWorkingCopyWithQueryGroup
-	command_components.RemoteBlobStore
+	command_components.BlobStore
 }
 
 func (cmd *PullBlobStore) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
-	cmd.RemoteBlobStore.SetFlagSet(f)
 }
 
 func (cmd *PullBlobStore) Run(
-	dep command.Request,
+	req command.Request,
 ) {
+	blobStoreConfigPath := req.PopArg("blob_store-config-path")
+
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
-		dep,
+		req,
 		query.BuilderOptions(
 			query.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
@@ -45,15 +46,10 @@ func (cmd *PullBlobStore) Run(
 		PrintCopies:    true,
 	}
 
-	{
-		var err error
-
-		if importerOptions.RemoteBlobStore, err = cmd.MakeRemoteBlobStore(
-			localWorkingCopy,
-		); err != nil {
-			dep.Cancel(err)
-		}
-	}
+	importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
+		localWorkingCopy.GetEnvRepo(),
+		blobStoreConfigPath,
+	)
 
 	importer := localWorkingCopy.MakeImporter(
 		importerOptions,
@@ -77,6 +73,6 @@ func (cmd *PullBlobStore) Run(
 			return
 		},
 	); err != nil {
-		dep.Cancel(err)
+		req.Cancel(err)
 	}
 }

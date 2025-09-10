@@ -16,34 +16,57 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
-func SetHexStringFromPath(
+func SetHexStringFromAbsolutePath(
 	id interfaces.MutableMarklId,
-	path string,
+	absOrRelPath string,
 	base string,
 ) (err error) {
-	// if filepath.IsAbs(path) {
-	// 	panic(fmt.Sprintf("absolute paths not supported: %q", path))
-	// 	err = errors.Err405MethodNotAllowed.ErrorHiddenf(
-	// 		"absolute paths not supported",
-	// 	)
-	// 	return
-	// }
+	if !filepath.IsAbs(absOrRelPath) {
+		return SetHexStringFromRelPath(id, absOrRelPath)
+	}
 
-	if path, err = filepath.Rel(base, path); err != nil {
+	if absOrRelPath, err = filepath.Rel(base, absOrRelPath); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if err = SetHexStringFromRelPath(
+		id,
+		absOrRelPath,
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Base: %q",
+			absOrRelPath,
+			base,
+		)
+
+		return
+	}
+
+	return
+}
+
+func SetHexStringFromRelPath(
+	id interfaces.MutableMarklId,
+	relPath string,
+) (err error) {
+	if filepath.IsAbs(relPath) {
+		err = errors.Err405MethodNotAllowed.ErrorHiddenf(
+			"absolute paths not supported",
+		)
 		return
 	}
 
 	if err = SetHexBytes(
 		id.GetMarklType().GetMarklTypeId(),
 		id,
-		[]byte(strings.ReplaceAll(path, string(filepath.Separator), "")),
+		[]byte(strings.ReplaceAll(relPath, string(filepath.Separator), "")),
 	); err != nil {
 		err = errors.Wrapf(
 			err,
-			"could not transform path into hex. Path: %q, Base: %q",
-			path,
-			base,
+			"could not transform path into hex. Path: %q",
+			relPath,
 		)
 
 		return

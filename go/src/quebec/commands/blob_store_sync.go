@@ -94,8 +94,12 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 		},
 	)
 
-	for blobId := range primary.AllBlobs() {
-		ui.Debug().Print(blobId)
+	for blobId, errIter := range primary.AllBlobs() {
+		if errIter != nil {
+			ui.Err().Print(errIter)
+			continue
+		}
+
 		if err := blobImporter.ImportBlobIfNecessary(blobId, nil); err != nil {
 			req.Cancel(err)
 			return

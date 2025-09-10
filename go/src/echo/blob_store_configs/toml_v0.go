@@ -16,7 +16,7 @@ type TomlV0 struct {
 
 var (
 	_ ConfigLocalHashBucketed = TomlV0{}
-	_ ConfigMutable           = &TomlV0{}
+	_ ConfigLocalMutable      = &TomlV0{}
 )
 
 func (TomlV0) GetBlobStoreType() string {
@@ -68,4 +68,8 @@ func (blobStoreConfig TomlV0) SupportsMultiHash() bool {
 
 func (blobStoreConfig TomlV0) GetDefaultHashTypeId() string {
 	return markl.HashTypeIdSha256
+}
+
+func (blobStoreConfig *TomlV0) SetBasePath(value string) {
+	blobStoreConfig.BasePath = value
 }
