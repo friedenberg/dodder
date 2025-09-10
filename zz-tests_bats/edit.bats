@@ -23,8 +23,8 @@ function edit_and_change_workspace { # @test
 	run_dodder edit one/uno
 	assert_success
 	assert_output - <<-EOM
-		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @85eb98a5c8f7ccc354f35b846bb24adc1764e88cb907f63293f6902aa105af58]
+		      checked out [one/uno.zettel @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-5sxcr2vpy33y4m72vfn9ya49jjrzrx0wulls880dv66jxfksjsfs5p6pg7]
 	EOM
 
 	run_dodder show -format blob one/uno
@@ -42,7 +42,7 @@ function edit_and_dont_change_workspace { # @test
 	run_dodder edit one/uno
 	assert_success
 	assert_output - <<-EOM
-		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		      checked out [one/uno.zettel @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 
 	run_dodder show -format blob one/uno
@@ -60,7 +60,7 @@ function edit_and_change_no_workspace { # @test
 	run_dodder edit one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @85eb98a5c8f7ccc354f35b846bb24adc1764e88cb907f63293f6902aa105af58]
+		[one/uno @blake2b256-5sxcr2vpy33y4m72vfn9ya49jjrzrx0wulls880dv66jxfksjsfs5p6pg7]
 	EOM
 
 	run_dodder show -format blob one/uno
@@ -100,7 +100,7 @@ function edit_and_format_no_workspace { # @test
 	run_dodder edit one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd]
 	EOM
 
 	run_dodder show -format blob one/uno

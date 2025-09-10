@@ -27,7 +27,7 @@ function new_empty_edit { # @test
 	assert_success
 	assert_output - <<-EOM
 		[two/uno !md]
-		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
+		[two/uno @blake2b256-w2uv3ams8736hqllgvzgf7563m34ycem40nf8sg3mkefnrd9m75s083p85]
 	EOM
 }
 
@@ -47,13 +47,13 @@ function can_duplicate_zettel_content { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
+		[two/uno @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1 et2]
 	EOM
 
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[one/tres @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
+		[one/tres @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1 et2]
 	EOM
 
 	# when
@@ -71,15 +71,15 @@ function use_blob_shas { # @test
 		  the blob
 	EOM
 	assert_success
-	assert_output '6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 - (checked in)'
+	assert_output 'blake2b256-t9kaw07x3c89sft5axwjhe8z76p6d2642qr5xc62j5a4zq49pmvqypsla0 - (checked in)'
 
-	run_dodder new -edit=false -shas 6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0
+	run_dodder new -edit=false -shas blake2b256-t9kaw07x3c89sft5axwjhe8z76p6d2642qr5xc62j5a4zq49pmvqypsla0
 	assert_success
 	assert_output - <<-EOM
-		[two/uno @6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 !md]
+		[two/uno @blake2b256-t9kaw07x3c89sft5axwjhe8z76p6d2642qr5xc62j5a4zq49pmvqypsla0 !md]
 	EOM
 
-	the_blob2_sha="ad100d00763b333c0c8af3c89dbcc1f52f9c4a8a208476c35eb9d364121301b6"
+	the_blob2_sha="blake2b256-65lys7dm4vfkag9y5j2hqhnah45qnc0kqvpdc46dw2cw63974a5q40q7xg"
 	run_dodder write-blob - <<-EOM
 		  the blob2
 	EOM
@@ -96,7 +96,7 @@ function use_blob_shas { # @test
 	run_dodder_stderr_unified new -edit=false -shas "$the_blob2_sha"
 	assert_success
 	assert_output --partial - <<-EOM
-		ad100d00763b333c0c8af3c89dbcc1f52f9c4a8a208476c35eb9d364121301b6 appears in object already checked in (["one/tres"]). Ignoring
+		blake2b256-65lys7dm4vfkag9y5j2hqhnah45qnc0kqvpdc46dw2cw63974a5q40q7xg appears in object already checked in (["one/tres"]). Ignoring
 	EOM
 }
 
@@ -123,13 +123,13 @@ function new_empty_edit_workspace { # @test
 	assert_output - <<-EOM
 		[two/uno !md workspace-tags]
 		      checked out [two/uno.zettel !md workspace-tags]
-		[two/uno @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
+		[two/uno @blake2b256-w2uv3ams8736hqllgvzgf7563m34ycem40nf8sg3mkefnrd9m75s083p85]
 	EOM
 
 	run_dodder status .
 	assert_success
 	assert_output - <<-EOM
-		             same [two/uno.zettel @0c6bc7d37881384c2c0a727359b4900d1ebc039b5830cddc75d21963bd921a5c]
+		             same [two/uno.zettel @blake2b256-w2uv3ams8736hqllgvzgf7563m34ycem40nf8sg3mkefnrd9m75s083p85]
 	EOM
 }
 

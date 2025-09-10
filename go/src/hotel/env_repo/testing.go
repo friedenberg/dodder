@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
+//go:noinline
 func MakeTesting(
 	t *ui.TestContext,
 	contents map[string]string,
@@ -23,15 +24,16 @@ func MakeTesting(
 	var bigBang BigBang
 	bigBang.SetDefaults()
 
-	return MakeTestingWithBigBang(t, contents, bigBang)
+	return makeTestingWithBigBang(t, contents, bigBang)
 }
 
-func MakeTestingWithBigBang(
+//go:noinline
+func makeTestingWithBigBang(
 	t *ui.TestContext,
 	contents map[string]string,
 	bigBang BigBang,
 ) (envRepo Env) {
-	t = t.Skip(1)
+	t = t.Skip(2)
 
 	dirTemp := t.TempDir()
 
@@ -94,11 +96,10 @@ func MakeTestingWithBigBang(
 		}
 
 		actual := writeCloser.GetMarklId()
-		expected, _ := markl.HashTypeSha256.GetBlobIdForHexString(
-			expectedDigestString,
-		)
-
-		t.AssertNoError(markl.MakeErrNotEqual(expected, actual))
+		t.Logf("actual blob digest: %q", actual)
+		var expectedBlobDigest markl.Id
+		t.AssertNoError(expectedBlobDigest.Set(expectedDigestString))
+		t.AssertNoError(markl.MakeErrNotEqual(expectedBlobDigest, actual))
 	}
 
 	return

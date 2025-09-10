@@ -310,9 +310,9 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		bufferedReader := bufio.NewReader(response.Body)
 
-		var listMissingSkus *sku.ListTransacted
+		var listMissingObjects *sku.ListTransacted
 
-		if listMissingSkus, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
+		if listMissingObjects, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
 			client.GetEnv(),
 			ids.GetOrPanic(
 				client.configImmutable.Blob.GetInventoryListTypeId(),
@@ -330,11 +330,11 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		ui.Log().Print(
 			"received missing blob list: %d",
-			listMissingSkus.Len(),
+			listMissingObjects.Len(),
 		)
 
 		// if options.IncludeBlobs {
-		for expected := range listMissingSkus.All() {
+		for expected := range listMissingObjects.All() {
 			errors.ContextContinueOrPanic(client.envUI)
 
 			if err = client.WriteBlobToRemote(

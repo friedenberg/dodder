@@ -55,12 +55,12 @@ func (err ErrBlobMissing) Error() string {
 	if err.Path == "" {
 		return fmt.Sprintf(
 			"Blob with id %q does not exist locally",
-			markl.Format(err.BlobId),
+			err.BlobId,
 		)
 	} else {
 		return fmt.Sprintf(
 			"Blob with id %q does not exist locally: %q",
-			markl.Format(err.BlobId),
+			err.BlobId,
 			err.Path,
 		)
 	}

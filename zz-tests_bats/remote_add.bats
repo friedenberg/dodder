@@ -30,13 +30,13 @@ function remote_add_dotenv_xdg { # @test
 	run_dodder remote-add -remote-type native-dotenv-xdg <(print_their_xdg them) test-repo-id-them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-dotenv_xdg-v0]
+		\[/test-repo-id-them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
 	run_dodder show /test-repo-id-them:k
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-dotenv_xdg-v0]
+		\[/test-repo-id-them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
 	run_dodder show -format text /test-repo-id-them:k
@@ -68,13 +68,13 @@ function remote_add_local_path { # @test
 	run_dodder remote-add -remote-type stdio-local them test-repo-id-them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-local_path-v0]
+		\[/test-repo-id-them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
 	run_dodder show /test-repo-id-them:k
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/test-repo-id-them @[0-9a-f]+ !toml-repo-local_path-v0]
+		\[/test-repo-id-them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
 	run_dodder show -format text /test-repo-id-them:k

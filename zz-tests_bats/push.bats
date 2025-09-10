@@ -32,7 +32,7 @@ function bootstrap_with_content {
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
 	EOM
 
 	run_dodder new -edit=false - <<-EOM
@@ -48,7 +48,7 @@ function bootstrap_with_content {
 
 	assert_success
 	assert_output - <<-EOM
-		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/dos @blake2b256-fm7kce7793j3npevpm29spk04r6ycxv38dvx3hjxlzl8tcm5m3qq2mml86 !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 }
 
@@ -107,19 +107,19 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
 	run_dodder push /them:k +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
-		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
-		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
+		copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
+		copied Blob blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd (16 B)
+		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
 	EOM
 
 	set_xdg "$them"
@@ -127,9 +127,9 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v2]
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
@@ -157,9 +157,9 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 		       conflicted [one/dos]
 		       conflicted [one/uno]
 		       conflicted [one/uno]
-		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
-		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
-		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 B)
+		copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
+		copied Blob blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd (16 B)
+		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
 		import failed with conflicts, merging required
 	EOM
 
@@ -167,16 +167,16 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 	assert_output_unsorted - <<-EOM
 		       conflicted [one/dos]
 		       conflicted [one/uno]
-		        untracked [to_add @05b22ebd6705f9ac35e6e4736371df50b03d0e50f85865861fd1f377c4c76e23]
+		        untracked [to_add @blake2b256-45lpe4rm9mjvdx8pt04kp5gh04uy77h0m0xtw2fhr0q7vl98g0vqls6hxe]
 	EOM
 
 	run_dodder show +zettel,typ,konfig,etikett
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v2]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
@@ -196,7 +196,7 @@ function push_history_default { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
 	run_dodder push /them
@@ -205,20 +205,20 @@ function push_history_default { # @test
 
 	run_dodder show +?z,e,t
 	assert_output_unsorted - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
 	set_xdg them
 	run_dodder show +zettel,typ,konfig,etikett #,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v2]
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
@@ -238,7 +238,7 @@ function push_history_default_only_blobs { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
 	run_dodder push -include-objects=false /them
@@ -256,10 +256,10 @@ function push_history_default_only_blobs { # @test
 
 	run_dodder show +?z,e,t
 	assert_output_unsorted - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
 	set_xdg them
@@ -280,7 +280,7 @@ function push_default_stdio_local_once { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
 	export BATS_TEST_BODY=true
@@ -292,8 +292,8 @@ function push_default_stdio_local_once { # @test
 	run_dodder show :zettel
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 	popd || exit 1
 }
@@ -308,24 +308,24 @@ function push_history_default_stdio_local_twice { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
 	run_dodder push /them :z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
-		(remote) [one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4] wow ok again
-		(remote) [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4] wow the first
-		(remote) copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 B)
-		(remote) copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 B)
+		(remote) [one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md tag-3 tag-4] wow ok again
+		(remote) [one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md tag-3 tag-4] wow the first
+		(remote) copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
+		(remote) copied Blob blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd (16 B)
 	EOM
 
 	pushd them || exit 1
 	run_dodder show :zettel
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 	popd || exit 1
 
@@ -346,38 +346,38 @@ function push_history_default_stdio_twice { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @[0-9a-z]+ !toml-repo-local_path-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
 	run_dodder push /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\(remote) \[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\(remote) copied Blob [0-9a-f]+ \(.*)
-		\(remote) copied Blob [0-9a-f]+ \(.*)
-		\(remote) copied Blob [0-9a-f]+ \(.*)
-		\(remote) copied Blob [0-9a-f]+ \(.*)
-		\(remote) copied Blob [0-9a-f]+ \(.*)
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\(remote) copied Blob blake2b256-.+ \(.*)
+		\(remote) copied Blob blake2b256-.+ \(.*)
+		\(remote) copied Blob blake2b256-.+ \(.*)
+		\(remote) copied Blob blake2b256-.+ \(.*)
+		\(remote) copied Blob blake2b256-.+ \(.*)
 	EOM
 
 	pushd them || exit 1
 	run_dodder show +z,e,t,b
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-v2]
-		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		\[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		\[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
+		\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
+		\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
+		\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 	popd || exit 1
 

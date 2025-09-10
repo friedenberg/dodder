@@ -23,8 +23,6 @@ import (
 
 var defaultBuckets = []int{2}
 
-const defaultHashTypeId = markl.HashTypeIdSha256
-
 type BlobStoreConfigNamed struct {
 	Name     string
 	BasePath string
@@ -245,12 +243,21 @@ func CopyBlob(
 
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = dst.MakeBlobWriter(nil); err != nil {
+	var hashType markl.HashType
+
+	if hashType, err = markl.GetHashTypeOrError(
+		expectedDigest.GetMarklType().GetMarklTypeId(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	// TODO should this be closed with an error when the shas don't match to
+	if writeCloser, err = dst.MakeBlobWriter(hashType); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO should this be closed with an error when the digests don't match to
 	// prevent a garbage object in the store?
 	defer errors.ContextMustClose(env, writeCloser)
 
@@ -271,7 +278,7 @@ func CopyBlob(
 	if !markl.Equals(readerDigest, expectedDigest) ||
 		!markl.Equals(writerDigest, expectedDigest) {
 		err = errors.Errorf(
-			"lookup sha was %s, read sha was %s, but written sha was %s",
+			"lookup digest was %s, read digest was %s, but written digest was %s",
 			expectedDigest,
 			readerDigest,
 			writerDigest,

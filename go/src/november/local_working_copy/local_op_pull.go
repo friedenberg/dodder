@@ -46,7 +46,8 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	}
 
 	if options.IncludeBlobs {
-		importerOptions.RemoteBlobStore = remote.GetBlobStore()
+		remoteBlobStore := remote.GetBlobStore()
+		importerOptions.RemoteBlobStore = remoteBlobStore
 	}
 
 	importerOptions.ParentNegotiator = ParentNegotiatorFirstAncestor{

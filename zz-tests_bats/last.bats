@@ -33,7 +33,7 @@ function last_after_type_mutate { # @test
 	run_dodder checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
+		[!md @blake2b256-473260as3d3pd4uramcc60877srvpkxs4krlap45dkl3mfvq2npq2duvvq !toml-type-v1]
 	EOM
 
   # TODO use switch to using the inventory list log
@@ -46,7 +46,7 @@ function last_after_type_mutate { # @test
 	run_dodder last -format inventory_list-sans-tai
 	assert_success
 	assert_output --regexp - <<-EOM
-		\\[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 .* !toml-type-v1]
+		\\[!md @blake2b256-473260as3d3pd4uramcc60877srvpkxs4krlap45dkl3mfvq2npq2duvvq .* !toml-type-v1]
 	EOM
 }
 
@@ -61,7 +61,7 @@ function last_organize { # @test
 	run_dodder checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @1c62d833a8ba10d4d272c29b849c4ab2e1e4fed1c6576709940453d5370832cf !toml-type-v1]
+		[!md @blake2b256-tugmx90k7ajv6atknze43ptgphz08x4f929c0f0n4y394nh5gh7qmau4w9 !toml-type-v1]
 	EOM
 
 	function editor() {
@@ -79,6 +79,6 @@ function last_organize { # @test
 	run_dodder last -organize
 	assert_success
 	assert_output - <<-EOM
-		[!md @1c62d833a8ba10d4d272c29b849c4ab2e1e4fed1c6576709940453d5370832cf !toml-type-v1 added-tag]
+		[!md @blake2b256-tugmx90k7ajv6atknze43ptgphz08x4f929c0f0n4y394nh5gh7qmau4w9 !toml-type-v1 added-tag]
 	EOM
 }

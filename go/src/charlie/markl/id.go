@@ -43,9 +43,7 @@ func (id Id) String() string {
 		return ""
 	}
 
-	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
-		return fmt.Sprintf("%x", id.data)
-	} else if len(id.data) == 0 {
+	if len(id.data) == 0 {
 		return ""
 	} else {
 		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)

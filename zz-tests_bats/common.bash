@@ -177,12 +177,14 @@ function get_konfig_sha() {
   if [[ $storeVersionCurrent -le 10 ]]; then
     echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
   else
-    echo -n "ef4d1dba0b64aaf20a9af062a9af714c6a4e8af0e749ad12cdee5269f72aa7b7"
+    echo -n "blake2b256-qesavjkvgxhmrczpn962s2yl94nrg4gk0sxsm9hk32mdjpth24rstf724q"
+    # echo -n "ef4d1dba0b64aaf20a9af062a9af714c6a4e8af0e749ad12cdee5269f72aa7b7"
   fi
 }
 
 function get_type_blob_sha() {
-  echo -n "b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16"
+  # echo -n "b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16"
+  echo -n "blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m"
 }
 
 run_find() {
@@ -205,9 +207,9 @@ function run_dodder_init_disable_age {
 
   assert_success
   # assert_output - <<-EOM
-# [!md @$(get_type_blob_sha) !toml-type-v1]
-# [konfig @$(get_konfig_sha) !toml-config-v2]
-# EOM
+  # [!md @$(get_type_blob_sha) !toml-type-v1]
+  # [konfig @$(get_konfig_sha) !toml-config-v2]
+  # EOM
 
   run_dodder blob_store-cat "$(get_konfig_sha)"
   assert_success

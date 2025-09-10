@@ -141,10 +141,9 @@ func (parser *textParser2) setBlobSha(
 	metadata *Metadata,
 	maybeSha string,
 ) (err error) {
-	if err = markl.SetHexBytes(
-		parser.hashType.GetMarklTypeId(),
+	if err = markl.SetMaybeSha256(
 		metadata.GetBlobDigestMutable(),
-		[]byte(maybeSha),
+		maybeSha,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

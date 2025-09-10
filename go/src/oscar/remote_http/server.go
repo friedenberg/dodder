@@ -500,9 +500,9 @@ func (server *Server) handleBlobsHeadOrGet(
 	request Request,
 ) (response Response) {
 	// TODO rename to blob id
-	shString := request.Vars()["sha"]
+	blobIdString := request.Vars()["sha"]
 
-	if shString == "" {
+	if blobIdString == "" {
 		response.ErrorWithStatus(
 			http.StatusBadRequest,
 			errors.ErrorWithStackf("empty sha"),
@@ -510,24 +510,23 @@ func (server *Server) handleBlobsHeadOrGet(
 		return
 	}
 
-	var blobDigest markl.Id
+	var blobId markl.Id
 
 	{
 		var err error
 
-		if err = markl.SetMaybeSha256(
-			&blobDigest,
-			shString,
+		if err = blobId.Set(
+			blobIdString,
 		); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}
 	}
 
-	ui.Log().Printf("blob requested: %q", blobDigest)
+	ui.Log().Printf("blob requested: %q", blobId)
 
 	if request.Method == "HEAD" {
-		if server.Repo.GetBlobStore().HasBlob(blobDigest) {
+		if server.Repo.GetBlobStore().HasBlob(blobId) {
 			response.StatusCode = http.StatusNoContent
 		} else {
 			response.StatusCode = http.StatusNotFound
@@ -538,7 +537,7 @@ func (server *Server) handleBlobsHeadOrGet(
 		{
 			var err error
 
-			if rc, err = server.Repo.GetBlobStore().MakeBlobReader(blobDigest); err != nil {
+			if rc, err = server.Repo.GetBlobStore().MakeBlobReader(blobId); err != nil {
 				if env_dir.IsErrBlobMissing(err) {
 					response.StatusCode = http.StatusNotFound
 				} else {
@@ -569,7 +568,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(markl.Format(result)),
+			strings.NewReader(result.String()),
 		)
 
 		return
@@ -577,8 +576,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	var blobDigest markl.Id
 
-	if err := markl.SetMaybeSha256(
-		&blobDigest,
+	if err := blobDigest.Set(
 		digestString,
 	); err != nil {
 		response.Error(err)
@@ -608,7 +606,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(markl.Format(result)),
+		strings.NewReader(result.String()),
 	)
 
 	return

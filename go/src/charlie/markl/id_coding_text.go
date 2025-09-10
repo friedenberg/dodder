@@ -13,25 +13,21 @@ func (id Id) MarshalText() (bites []byte, err error) {
 		return
 	}
 
-	if id.tipe.GetMarklTypeId() == HashTypeIdSha256 {
-		bites = fmt.Appendf(nil, "%x", id.data)
+	var hrp string
+
+	if format := id.GetFormat(); format != "" {
+		hrp = fmt.Sprintf(
+			"%s@%s",
+			id.GetFormat(),
+			id.tipe.GetMarklTypeId(),
+		)
 	} else {
-		var hrp string
+		hrp = id.tipe.GetMarklTypeId()
+	}
 
-		if format := id.GetFormat(); format != "" {
-			hrp = fmt.Sprintf(
-				"%s@%s",
-				id.GetFormat(),
-				id.tipe.GetMarklTypeId(),
-			)
-		} else {
-			hrp = id.tipe.GetMarklTypeId()
-		}
-
-		if bites, err = blech32.Encode(hrp, id.data); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if bites, err = blech32.Encode(hrp, id.data); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

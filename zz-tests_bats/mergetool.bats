@@ -30,7 +30,7 @@ function mergetool_conflict_base {
 	run_dodder checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
-		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		      checked out [one/dos.zettel @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 	EOM
 
 	cat - >one/dos.zettel <<-EOM
@@ -56,13 +56,13 @@ function mergetool_conflict_base {
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!txt2 !toml-type-v1]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
 	run_dodder show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
 	# TODO add better conflict printing output
@@ -81,9 +81,9 @@ function mergetool_conflict_one_local { # @test
 
 	run cat one/dos.conflict
 	assert_output --regexp - <<-'EOM'
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
-		\[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-sig-v1@.* !md "wow ok again" tag-3 tag-4]
-		\[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* dodder-object-sig-v1@.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-sig-v1@.* !md "wow ok again" tag-3 tag-4]
+		\[one/dos @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv [0-9]+\.[0-9]+ dodder-repo-public_key-v1@.* dodder-object-mother-sig-v1@.* dodder-object-sig-v1@.* !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 
 	# TODO add `-delete` option to `merge-tool`
@@ -108,7 +108,7 @@ function mergetool_conflict_one_local { # @test
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[!txt2 !toml-type-v1]
 	EOM
 }
@@ -122,7 +122,7 @@ function mergetool_conflict_one_remote { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!txt !toml-type-v1]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		[one/dos @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
 		          deleted [one/]
@@ -137,14 +137,14 @@ function mergetool_conflict_one_remote { # @test
 	# run_dodder status .
 	# assert_success
 	# assert_output - <<-EOM
-	# 	          changed [one/dos.zettel @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+	# 	          changed [one/dos.zettel @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	# EOM
 
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!txt !toml-type-v1]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		[one/dos @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 }
 
@@ -170,7 +170,7 @@ function mergetool_conflict_one_merged { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!txt !toml-type-v1]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		[one/dos @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
 		          deleted [one/]
@@ -185,14 +185,14 @@ function mergetool_conflict_one_merged { # @test
 	# run_dodder status .
 	# assert_success
 	# assert_output - <<-EOM
-	# 	          changed [one/dos.zettel @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+	# 	          changed [one/dos.zettel @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	# EOM
 
 	run_dodder last
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!txt !toml-type-v1]
-		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
+		[one/dos @blake2b256-k680x8tenq3j3ts88ydzga2ghjyg75czkfhzr4g3xxc8f33tykjs47n7xv !txt "wow ok again" get_this_shit_merged tag-3 tag-4]
 	EOM
 }
 

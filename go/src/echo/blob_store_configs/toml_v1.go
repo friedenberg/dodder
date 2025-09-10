@@ -20,7 +20,7 @@ type TomlV1 struct {
 
 var (
 	_ ConfigLocalHashBucketed = TomlV1{}
-	_ ConfigLocalMutable           = &TomlV1{}
+	_ ConfigLocalMutable      = &TomlV1{}
 )
 
 func (TomlV1) GetBlobStoreType() string {
@@ -41,7 +41,7 @@ func (blobStoreConfig *TomlV1) SetFlagSet(
 	flagSet.StringVar(
 		&blobStoreConfig.HashTypeId,
 		"hash_type-id",
-		markl.HashTypeIdSha256,
+		markl.HashTypeIdBlake2b256,
 		"determines the hash type used for new blobs written to the store",
 	)
 
@@ -120,7 +120,7 @@ func (blobStoreConfig TomlV1) SupportsMultiHash() bool {
 }
 
 func (blobStoreConfig TomlV1) GetDefaultHashTypeId() string {
-	return markl.HashTypeIdSha256
+	return blobStoreConfig.HashTypeId
 }
 
 func (blobStoreConfig *TomlV1) SetBasePath(value string) {

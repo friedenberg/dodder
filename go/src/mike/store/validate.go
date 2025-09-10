@@ -8,23 +8,23 @@ import (
 )
 
 func (store *Store) validate(
-	object sku.ExternalLike,
-	motherObject *sku.Transacted,
+	daughter sku.ExternalLike,
+	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	if !options.Validate {
 		return
 	}
 
-	switch object.GetSku().GetGenre() {
+	switch daughter.GetSku().GetGenre() {
 	case genres.Type:
-		tipe := object.GetSku().GetType()
+		tipe := daughter.GetSku().GetType()
 
 		var repool interfaces.FuncRepool
 
 		if _, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
 			tipe,
-			object.GetSku().GetBlobDigest(),
+			daughter.GetSku().GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

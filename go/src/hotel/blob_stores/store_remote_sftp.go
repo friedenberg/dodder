@@ -55,7 +55,7 @@ func makeSftpStore(
 	var defaultHashType markl.HashType
 
 	if defaultHashType, err = markl.GetHashTypeOrError(
-		defaultHashTypeId,
+		blob_store_configs.DefaultHashTypeId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

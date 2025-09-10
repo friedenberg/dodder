@@ -2,7 +2,6 @@ package sku
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -300,16 +299,17 @@ func TestReadWithBlob(t1 *testing.T) {
 the body`,
 	)
 
-	expectedSha, _ := markl.HashTypeSha256.GetBlobIdForHexString(
-		"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e",
-	)
+	var expectedBlobDigest markl.Id
+	t.AssertNoError(expectedBlobDigest.Set(
+		"blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz",
+	))
 
 	expected := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.GetBlobDigestMutable().ResetWithMarklId(expectedSha)
+	expected.GetBlobDigestMutable().ResetWithMarklId(expectedBlobDigest)
 
 	expected.SetTags(makeTagSet(t,
 		"tag1",
@@ -322,32 +322,29 @@ the body`,
 	}
 }
 
-type noopCloser struct {
-	*strings.Reader
-}
-
-func (c noopCloser) Close() error {
-	return nil
-}
-
 type blobReaderFactory struct {
 	t     *ui.TestContext
 	blobs map[string]string
 }
 
-func (arf blobReaderFactory) BlobReader(
+func (blobStore blobReaderFactory) BlobReader(
 	digest interfaces.MarklId,
 ) (readCloser interfaces.BlobReader, err error) {
-	var v string
+	var value string
 	var ok bool
 
-	if v, ok = arf.blobs[digest.String()]; !ok {
-		arf.t.Fatalf("request for non-existent blob: %s", digest)
+	if value, ok = blobStore.blobs[digest.String()]; !ok {
+		blobStore.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
+	hashType, err := markl.GetHashTypeOrError(
+		digest.GetMarklType().GetMarklTypeId(),
+	)
+	blobStore.t.AssertNoError(err)
+
 	readCloser = markl_io.MakeNopReadCloser(
-		markl.HashTypeSha256.Get(),
-		io.NopCloser(strings.NewReader(v)),
+		hashType.Get(),
+		io.NopCloser(strings.NewReader(value)),
 	)
 
 	return
@@ -355,11 +352,12 @@ func (arf blobReaderFactory) BlobReader(
 
 func writeFormat(
 	t *ui.TestContext,
-	m *object_metadata.Metadata,
-	f object_metadata.TextFormatter,
+	metadata *object_metadata.Metadata,
+	formatter object_metadata.TextFormatter,
 	includeBlob bool,
 	blobBody string,
 	options object_metadata.TextFormatterOptions,
+	hashType interfaces.HashType,
 ) (out string) {
 	hash := sha256.New()
 	reader, repool := pool.GetStringReader(blobBody)
@@ -369,31 +367,23 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	blobDigestRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var blobDigest markl.Id
+	blobDigest, _ := hashType.GetMarklIdForString(blobBody)
 
-	if err := markl.SetMaybeSha256(
-		&blobDigest,
-		blobDigestRaw,
-	); err != nil {
-		t.Fatalf("%s", err)
-	}
+	metadata.GetBlobDigestMutable().ResetWithMarklId(blobDigest)
 
-	m.GetBlobDigestMutable().ResetWithMarklId(&blobDigest)
+	stringBuilder := &strings.Builder{}
 
-	sb := &strings.Builder{}
-
-	if _, err := f.FormatMetadata(
-		sb,
+	if _, err := formatter.FormatMetadata(
+		stringBuilder,
 		object_metadata.TextFormatterContext{
-			PersistentFormatterContext: m,
+			PersistentFormatterContext: metadata,
 			TextFormatterOptions:       options,
 		},
 	); err != nil {
 		t.Errorf("%s", err)
 	}
 
-	out = sb.String()
+	out = stringBuilder.String()
 
 	return
 }
@@ -401,12 +391,12 @@ func writeFormat(
 func TestWriteWithoutBlob(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	z := &object_metadata.Metadata{
+	object := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	z.SetTags(makeTagSet(t,
+	object.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -415,7 +405,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	envRepo := env_repo.MakeTesting(
 		t,
 		map[string]string{
-			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
+			"blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz": "the body",
 		},
 	)
 
@@ -427,11 +417,12 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	actual := writeFormat(
 		t,
-		z,
+		object,
 		format,
 		false,
 		"the body",
 		object_metadata.TextFormatterOptions{},
+		envRepo.GetDefaultBlobStore().GetDefaultHashType(),
 	)
 
 	expected := `---
@@ -439,7 +430,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 - tag1
 - tag2
 - tag3
-! fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e.md
+! blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz.md
 ---
 `
 
@@ -451,12 +442,12 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 func TestWriteWithInlineBlob(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	z := &object_metadata.Metadata{
+	object := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	z.SetTags(makeTagSet(t,
+	object.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -465,7 +456,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	envRepo := env_repo.MakeTesting(
 		t,
 		map[string]string{
-			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
+			"blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz": "the body",
 		},
 	)
 
@@ -475,8 +466,14 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		},
 	)
 
-	actual := writeFormat(t, z, format, true, "the body",
+	actual := writeFormat(
+		t,
+		object,
+		format,
+		true,
+		"the body",
 		object_metadata.TextFormatterOptions{},
+		envRepo.GetDefaultBlobStore().GetDefaultHashType(),
 	)
 
 	expected := `---

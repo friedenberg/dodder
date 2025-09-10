@@ -19,8 +19,8 @@ function edit_config_and_change { # @test
 	export EDITOR="/bin/bash -c 'echo \"# this is the body 2\" >> \"\$0\"'"
 	run_dodder edit-config
 	assert_success
-	assert_output --regexp - <<-EOM
-		[konfig @(?!$(get_konfig_sha))[a-f0-9]{64} !toml-config-v2]
+	assert_output - <<-EOM
+		[konfig @blake2b256-a5ee92llsjkq63g7426llaaagvj63elnw5uczqdmu4lmfr3y3ujsgx0n4y !toml-config-v2]
 	EOM
 }
 

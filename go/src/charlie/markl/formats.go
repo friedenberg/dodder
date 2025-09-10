@@ -192,7 +192,20 @@ func SetMerkleIdWithFormatBlech32(
 		}
 
 	case HashTypeIdBlake2b256:
-		fallthrough
+		switch formatId {
+		case FormatIdObjectDigestSha256V1,
+			FormatIdV5MetadataDigestWithoutTai,
+			"":
+			break
+
+		default:
+			err = errors.Errorf(
+				"unsupported format: %q. Value: %q",
+				formatId,
+				blechValue,
+			)
+			return
+		}
 
 	default:
 		err = errors.Errorf(

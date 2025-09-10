@@ -29,7 +29,7 @@ function format_mother_one { # @test
 	run_dodder show -format mother one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
@@ -37,6 +37,6 @@ function format_mother_all { # @test
 	run_dodder show -format mother :
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 }

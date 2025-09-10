@@ -63,6 +63,7 @@ func SetBlechCombinedHRPAndData(
 	return
 }
 
+// TODO remove
 func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 	switch len(value) {
 	case 65:
@@ -90,6 +91,7 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 	return
 }
 
+// TODO remove
 func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 	var decodedBytes []byte
 

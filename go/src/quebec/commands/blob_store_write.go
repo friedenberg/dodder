@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -98,20 +97,20 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 			if cmd.Check {
 				blobStore.GetUI().Printf(
 					"%s %s (already checked in)",
-					markl.Format(result.MarklId),
+					result.MarklId,
 					result.Path,
 				)
 			} else {
 				blobStore.GetUI().Printf(
 					"%s %s (checked in)",
-					markl.Format(result.MarklId),
+					result.MarklId,
 					result.Path,
 				)
 			}
 		} else {
 			ui.Err().Printf(
 				"%s %s (untracked)",
-				markl.Format(result.MarklId),
+				result.MarklId,
 				result.Path,
 			)
 

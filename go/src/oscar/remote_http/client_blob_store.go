@@ -36,7 +36,7 @@ func (client *client) GetDefaultHashType() interfaces.HashType {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
+func (client *client) HasBlob(blobId interfaces.MarklId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -44,8 +44,8 @@ func (client *client) HasBlob(merkleId interfaces.MarklId) (ok bool) {
 
 		if request, err = client.newRequest(
 			"HEAD",
-			"/blobs",
-			strings.NewReader(markl.Format(merkleId)),
+			fmt.Sprintf("/blobs/%s", blobId),
+			nil,
 		); err != nil {
 			client.GetEnv().Cancel(err)
 		}
@@ -73,7 +73,7 @@ func (client *client) MakeBlobReader(
 
 	if request, err = client.newRequest(
 		"GET",
-		fmt.Sprintf("/blobs/%s", markl.Format(blobId)),
+		fmt.Sprintf("/blobs/%s", blobId),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -119,8 +119,6 @@ func (client *client) WriteBlobToRemote(
 	localBlobStore interfaces.BlobStore,
 	expected interfaces.MarklId,
 ) (err error) {
-	var actual markl.Id
-
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
 	var reader interfaces.BlobReader
@@ -178,8 +176,9 @@ func (client *client) WriteBlobToRemote(
 		return
 	}
 
-	if err = markl.SetMaybeSha256(
-		&actual,
+	var actual markl.Id
+
+	if err = actual.Set(
 		strings.TrimSpace(digestString.String()),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -187,7 +186,7 @@ func (client *client) WriteBlobToRemote(
 	}
 
 	if err = markl.MakeErrNotEqual(expected, &actual); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Raw Blob Id: %q", digestString.String())
 		return
 	}
 

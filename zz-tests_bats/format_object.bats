@@ -32,7 +32,7 @@ function format_simple { # @test
 	run_dodder checkin -delete .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @21759bebd1a7937005f692b9394c0d2629361286b9fe837617e166c3ded687eb !toml-type-v1]
+		[!md @blake2b256-ghtjyld0g0hhdntnx4xlkd9xt3yj74xer69rklenws6txve3k7pq567f47 !toml-type-v1]
 		          deleted [md.type]
 	EOM
 
@@ -86,7 +86,7 @@ function show_simple_one_zettel_binary { # @test
 	assert_output_unsorted - <<-EOM
 		          deleted [file.bin]
 		[!bin !toml-type-v1]
-		[two/uno @b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
+		[two/uno @blake2b256-w9l3z9c2w8lhr42fwekmhrxeqtmzw40s9p46vt88ydgwux4rxxuqnfqsmk !bin "file"]
 	EOM
 
 	run_dodder checkout !bin:t
@@ -107,7 +107,7 @@ function show_simple_one_zettel_binary { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [bin.type]
-		[!bin @e07d72a74e0a01c23ddeb871751f6fcb43afec5fb81108c157537db96c6c1da0 !toml-type-v1]
+		[!bin @blake2b256-zhvux7vmpch9f44kvnua7n69f8jzgk5s7p9k2s3kuvkrcpjh07lse493jl !toml-type-v1]
 	EOM
 
 	run_dodder format-object -mode both two/uno
@@ -115,7 +115,7 @@ function show_simple_one_zettel_binary { # @test
 	assert_output - <<-EOM
 		---
 		# file
-		! b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627.bin
+		! blake2b256-w9l3z9c2w8lhr42fwekmhrxeqtmzw40s9p46vt88ydgwux4rxxuqnfqsmk.bin
 		---
 	EOM
 }

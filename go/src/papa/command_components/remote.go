@@ -98,12 +98,12 @@ func (cmd Remote) CreateRemoteObject(
 	remoteConfig := remote.GetImmutableConfigPublic()
 	blob.SetPublicKey(remoteConfig.GetPublicKey())
 
-	var blobSha interfaces.MarklId
+	var blobId interfaces.MarklId
 
 	{
 		var err error
 
-		if blobSha, _, err = remoteTypedRepoBlobStore.WriteTypedBlob(
+		if blobId, _, err = remoteTypedRepoBlobStore.WriteTypedBlob(
 			remoteObject.Metadata.Type,
 			blob,
 		); err != nil {
@@ -111,7 +111,7 @@ func (cmd Remote) CreateRemoteObject(
 		}
 	}
 
-	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMarklId(blobSha)
+	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMarklId(blobId)
 
 	return
 }

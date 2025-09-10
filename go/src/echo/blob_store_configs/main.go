@@ -9,6 +9,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
+const DefaultHashTypeId = markl.HashTypeIdSha256
+
+var DefaultHashType markl.HashType = markl.HashTypeSha256
+
 type (
 	Config = interface {
 		GetBlobStoreType() string
@@ -79,7 +83,7 @@ func Default() *TypedMutableConfig {
 		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
 		Blob: &TomlV1{
 			HashBuckets:       []int{2},
-			HashTypeId:        markl.HashTypeIdSha256,
+			HashTypeId:        markl.HashTypeIdBlake2b256,
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,
 		},

@@ -28,16 +28,16 @@ func MakeTextFormatterMetadataBlobPath(
 }
 
 func MakeTextFormatterMetadataOnly(
-	common Dependencies,
+	deps Dependencies,
 ) textFormatter {
 	return textFormatter{
-		Dependencies: common,
+		Dependencies: deps,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
-			common.writeBoundary,
-			common.writeCommonMetadataFormat,
-			common.writeBlobDigestAndType,
-			common.writeComments,
-			common.writeBoundary,
+			deps.writeBoundary,
+			deps.writeCommonMetadataFormat,
+			deps.writeBlobDigestAndType,
+			deps.writeComments,
+			deps.writeBoundary,
 		},
 	}
 }

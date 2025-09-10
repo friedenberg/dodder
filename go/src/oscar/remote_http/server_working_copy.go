@@ -39,7 +39,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 		importerOptions.AllowMergeConflicts = true
 	}
 
-	listMissingSkus := sku.MakeListTransacted()
+	listMissingObjects := sku.MakeListTransacted()
 	var requestRetry bool
 
 	importerOptions.BlobCopierDelegate = func(
@@ -60,7 +60,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 			sku.String(result.Transacted),
 		)
 
-		listMissingSkus.Add(result.Transacted.CloneTransacted())
+		listMissingObjects.Add(result.Transacted.CloneTransacted())
 
 		return
 	}
@@ -101,7 +101,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 	if _, err := inventoryListCoderCloset.WriteBlobToWriter(
 		repo,
 		listType,
-		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
+		quiter.MakeSeqErrorFromSeq(listMissingObjects.All()),
 		bufferedWriter,
 	); err != nil {
 		response.Error(err)

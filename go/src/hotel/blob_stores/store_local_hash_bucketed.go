@@ -168,7 +168,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 
 func (blobStore localHashBucketed) blobReaderFrom(
 	digest interfaces.MarklId,
-	path string,
+	basePath string,
 ) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
@@ -190,27 +190,27 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		return
 	}
 
-	path = env_dir.MakeHashBucketPathFromMerkleId(
+	basePath = env_dir.MakeHashBucketPathFromMerkleId(
 		digest,
 		blobStore.buckets,
 		blobStore.multiHash,
-		path,
+		basePath,
 	)
 
 	if readCloser, err = env_dir.NewFileReader(
 		blobStore.makeEnvDirConfig(),
-		path,
+		basePath,
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = env_dir.ErrBlobMissing{
 				BlobId: markl.Clone(digest),
-				Path:   path,
+				Path:   basePath,
 			}
 		} else {
 			err = errors.Wrapf(
 				err,
 				"Path: %q, Compression: %q",
-				path,
+				basePath,
 				blobStore.config.GetBlobCompression(),
 			)
 		}

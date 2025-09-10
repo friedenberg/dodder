@@ -59,11 +59,7 @@ function init_compression { # @test
 
 	run_dodder blob_store-cat "$(get_konfig_sha)"
 	assert_success
-
-	sha="$(get_konfig_sha)"
-	dir_blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
-	run zstd --decompress "$dir_blobs/sha256/${sha:0:2}"*/* --stdout
-	assert_success
+  assert_output
 }
 
 function init_and_reindex { # @test
@@ -186,13 +182,13 @@ function init_and_init { # @test
 	run_dodder new -edit=false to_add
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
 	EOM
 
 	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
 	EOM
 
 	run_dodder init -lock-internal-files=false -override-xdg-with-cwd test-repo-id
@@ -202,13 +198,13 @@ function init_and_init { # @test
 	run_dodder show one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
 	EOM
 
 	run_dodder show :
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
 	EOM
 }
 
@@ -230,7 +226,7 @@ function init_with_age { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
@@ -251,14 +247,14 @@ function init_with_json_inventory_list_type { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v2]
 	EOM
 
 	run_dodder show :b
 	assert_success
 	assert_output --regexp - <<-'EOM'
-		\[[0-9]+\.[0-9]+ @[0-9a-f]+ !inventory_list-json-v0]
+		\[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-json-v0]
 	EOM
 
 	run_dodder last

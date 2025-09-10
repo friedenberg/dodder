@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 )
 
 // TODO move to own blob store configs package
@@ -36,7 +37,7 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionIOWrapper  = files.NopeIOWrapper{}
 	DefaultConfig               = Config{
-		hashType:    markl.HashTypeSha256,
+		hashType:    blob_store_configs.DefaultHashType,
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionIOWrapper,
 	}

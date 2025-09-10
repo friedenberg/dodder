@@ -52,7 +52,7 @@ function can_checkout_and_checkin { # @test
 	run_dodder checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @434728a410a78f56fc1b5899c3593436e61ab0c731e9072d95e96db290205e53 "wow" ok]
+		[one/uno @blake2b256-lenzq4f690e7qealpgk53cxl68ym7xcx0vxl9hj6q2kqud8v265sqehvrn "wow" ok]
 	EOM
 }
 
@@ -131,7 +131,7 @@ function indexes_are_implicitly_correct { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
+		[one/uno @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1 et2]
 	EOM
 
 	{
@@ -149,7 +149,7 @@ function indexes_are_implicitly_correct { # @test
 	run_dodder checkin -delete "one/uno.zettel"
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1]
+		[one/uno @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1]
 		          deleted [one/uno.zettel]
 		          deleted [one/]
 	EOM
@@ -191,13 +191,13 @@ function checkouts_dont_overwrite { # @test
 	run_dodder new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[one/uno @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
+		[one/uno @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1 et2]
 	EOM
 
 	run_dodder checkout one/uno
 	assert_success
 	assert_output - <<-EOM
-		      checked out [one/uno.zettel @036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
+		      checked out [one/uno.zettel @blake2b256-vl6ghtv2jsxppshflt86ardlx55ctn8jswx8j59tnv8r99uhs63syxsruy !md "bez" et1 et2]
 	EOM
 
 	run cat one/uno.zettel
@@ -220,7 +220,7 @@ function checkouts_dont_overwrite { # @test
 	run_dodder checkout one/uno:z
 	assert_success
 	assert_output - <<-EOM
-		          changed [one/uno.zettel @65bdb8b57dfc8b0365a68c71b8a465dd2ff7d26ed07602ffe1a1b39367f42228 !md "bez" et1 et2]
+		          changed [one/uno.zettel @blake2b256-7dzz0dhlp77yccl0m2yn983azxuhd28pgsk5h3kplndhf2rg5gds8cqdyf !md "bez" et1 et2]
 	EOM
 
 	run cat one/uno.zettel
