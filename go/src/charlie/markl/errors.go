@@ -78,7 +78,7 @@ type ErrNotEqual struct {
 	Expected, Actual interfaces.MarklId
 }
 
-func MakeErrNotEqual(expected, actual interfaces.MarklId) (err error) {
+func AssertEqual(expected, actual interfaces.MarklId) (err error) {
 	if Equals(expected, actual) {
 		return
 	}

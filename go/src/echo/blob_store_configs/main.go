@@ -78,11 +78,13 @@ var (
 	_ ConfigMutable        = &TomlSFTPV0{}
 )
 
+var DefaultHashBuckets []int = []int{2}
+
 func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
 		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
 		Blob: &TomlV1{
-			HashBuckets:       []int{2},
+			HashBuckets:       DefaultHashBuckets,
 			HashTypeId:        markl.HashTypeIdBlake2b256,
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,

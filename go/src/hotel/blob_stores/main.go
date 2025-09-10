@@ -186,31 +186,38 @@ func MakeBlobStore(
 	}
 }
 
+// TODO offer option to decide which hash type
 func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
 	src interfaces.BlobStore,
-	blobId interfaces.MarklId,
+	expected interfaces.MarklId,
 	extraWriter io.Writer,
 ) (n int64, err error) {
 	if src == nil {
 		return
 	}
 
-	if err = markl.AssertIdIsNotNull(blobId, ""); err != nil {
+	if err = markl.AssertIdIsNotNull(expected, ""); err != nil {
 		return
 	}
 
-	if dst.HasBlob(blobId) {
+	if dst.HasBlob(expected) {
 		err = env_dir.MakeErrBlobAlreadyExists(
-			blobId,
+			expected,
 			"",
 		)
 
 		return
 	}
 
-	if n, err = CopyBlob(env, dst, src, blobId, extraWriter); err != nil {
+	if n, err = CopyBlob(
+		env,
+		dst,
+		src,
+		expected,
+		extraWriter,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -273,16 +280,21 @@ func CopyBlob(
 	}
 
 	readerDigest := readCloser.GetMarklId()
+
 	writerDigest := writeCloser.GetMarklId()
 
-	if !markl.Equals(readerDigest, expectedDigest) ||
-		!markl.Equals(writerDigest, expectedDigest) {
+	if !markl.Equals(readerDigest, expectedDigest) {
 		err = errors.Errorf(
-			"lookup digest was %s, read digest was %s, but written digest was %s",
+			"lookup digest was %s while read digest was %s",
 			expectedDigest,
 			readerDigest,
-			writerDigest,
 		)
+
+		return
+	}
+
+	if err = markl.AssertEqual(expectedDigest, writerDigest); err != nil {
+		return
 	}
 
 	return
@@ -312,7 +324,7 @@ func VerifyBlob(
 		return
 	}
 
-	if err = markl.MakeErrNotEqual(
+	if err = markl.AssertEqual(
 		expected,
 		readCloser.GetMarklId(),
 	); err != nil {

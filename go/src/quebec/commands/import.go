@@ -77,13 +77,48 @@ func (cmd Import) Run(req command.Request) {
 
 	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
 
+	importerOptions := sku.ImporterOptions{
+		DedupingFormatId:  markl.FormatIdV5MetadataDigestWithoutTai,
+		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+	}
+
+	if blobStoreConfigPath != "" {
+		importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
+			repo.GetEnvRepo(),
+			blobStoreConfigPath,
+		)
+	}
+
 	var afterDecoding func(*sku.Transacted) error
 
+	// 	blobImporter := importer.MakeBlobImporter(
+	// 		repo.GetEnvRepo(),
+	// 		importerOptions.RemoteBlobStore,
+	// 		repo.GetBlobStore(),
+	// 	)
+
+	// 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
+	// 		repo.GetUI(),
+	// 	)
+
+	// TODO move this to the importer directly
 	if cmd.OverwriteSignatures {
 		afterDecoding = func(object *sku.Transacted) (err error) {
 			object.Metadata.GetObjectDigestMutable().Reset()
 			object.Metadata.GetObjectSigMutable().Reset()
 			object.Metadata.GetRepoPubKeyMutable().Reset()
+
+			// if err = blobImporter.ImportBlobIfNecessary(
+			// 	object.Metadata.GetBlobDigest(),
+			// 	object,
+			// ); err != nil { // TODO rewrite blob
+			// 	if env_dir.IsErrBlobAlreadyExists(err) {
+			// 		err = nil
+			// 	} else {
+			// 		err = errors.Wrap(err)
+			// 		return
+			// 	}
+			// }
 
 			if err = object.FinalizeAndSignOverwrite(
 				repo.GetEnvRepo().GetConfigPrivate().Blob,
@@ -100,18 +135,6 @@ func (cmd Import) Run(req command.Request) {
 		bufferedReader,
 		afterDecoding,
 	)
-
-	importerOptions := sku.ImporterOptions{
-		DedupingFormatId:  markl.FormatIdV5MetadataDigestWithoutTai,
-		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
-	}
-
-	if blobStoreConfigPath != "" {
-		importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
-			repo.GetEnvRepo(),
-			blobStoreConfigPath,
-		)
-	}
 
 	importerOptions.PrintCopies = cmd.PrintCopies
 	importerr := repo.MakeImporter(

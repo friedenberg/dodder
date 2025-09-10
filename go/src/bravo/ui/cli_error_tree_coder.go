@@ -8,26 +8,11 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/box_chars"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-)
-
-// todo extract into box_chars package
-const (
-	// elbows
-	elbowTopRight    = "└"
-	elbowBottomRight = "┌"
-	elbowLeftBottom  = "┐"
-
-	// tees
-	teeRight  = "├"
-	teeBottom = "┬"
-
-	// pipes
-	pipeVertical   = "│"
-	pipeHorizontal = "─"
 )
 
 type encoder struct{}
@@ -62,7 +47,7 @@ func (encoder encoder) prefixForDepthChild(
 	if continuation {
 		return fmt.Sprintf(
 			"%s%s ",
-			pipeVertical,
+			box_chars.PipeVertical,
 			strings.Repeat(" ", depth*2),
 		)
 
@@ -77,15 +62,15 @@ func (encoder encoder) prefixForDepthChild(
 	var firstChar string
 
 	if !lastChild {
-		firstChar = teeRight
+		firstChar = box_chars.TeeRight
 	} else {
-		firstChar = elbowBottomRight
+		firstChar = box_chars.ElbowBottomRight
 	}
 
 	return fmt.Sprintf(
 		"%s%s ",
 		firstChar,
-		strings.Repeat(pipeHorizontal, depth*2),
+		strings.Repeat(box_chars.PipeHorizontal, depth*2),
 	)
 	// return fmt.Sprintf(
 	// 	"%s%s %T ",

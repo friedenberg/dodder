@@ -599,7 +599,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 
-	if err := markl.MakeErrNotEqual(&blobDigest, result); err != nil {
+	if err := markl.AssertEqual(&blobDigest, result); err != nil {
 		response.Error(err)
 		return
 	}

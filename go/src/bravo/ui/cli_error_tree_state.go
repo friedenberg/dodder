@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/box_chars"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
@@ -61,17 +62,17 @@ func (state *cliTreeState) prefixWithPipesForDepthChild() string {
 	var pipe string
 
 	if state.stack.getLast().isLastChild() {
-		pipe = elbowTopRight
+		pipe = box_chars.ElbowTopRight
 	} else {
-		pipe = teeRight
+		pipe = box_chars.TeeRight
 	}
 
 	return fmt.Sprintf(
 		"%s%s%s%s ",
 		leftPadding,
 		pipe,
-		pipeHorizontal,
-		pipeHorizontal,
+		box_chars.PipeHorizontal,
+		box_chars.PipeHorizontal,
 	)
 }
 
@@ -93,7 +94,7 @@ func (state *cliTreeState) prefixWithoutPipesForDepthChild() string {
 	return fmt.Sprintf(
 		"%s%s     ",
 		leftPadding,
-		pipeVertical,
+		box_chars.PipeVertical,
 	)
 }
 

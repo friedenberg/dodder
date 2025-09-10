@@ -59,7 +59,7 @@ func (blobStore *BlobStore[BLOB, BLOB_PTR]) GetBlob(
 
 	actual := readCloser.GetMarklId()
 
-	if err = markl.MakeErrNotEqual(blobId, actual); err != nil {
+	if err = markl.AssertEqual(blobId, actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -32,6 +32,8 @@ func (blobStoreConfig *TomlV1) SetFlagSet(
 ) {
 	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
 
+	blobStoreConfig.HashBuckets = DefaultHashBuckets
+
 	flagSet.Var(
 		&blobStoreConfig.HashBuckets,
 		"hash_buckets",

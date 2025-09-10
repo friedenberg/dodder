@@ -4,6 +4,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/importer"
@@ -21,17 +23,17 @@ type BlobStoreSync struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 
-	limit int
+	Limit int
 }
 
-func (cmd BlobStoreSync) SetFlagSet(
+func (cmd *BlobStoreSync) SetFlagSet(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.IntVar(
-		&cmd.limit,
+		&cmd.Limit,
 		"limit",
 		0,
-		"number of blobs to sync before stopping. 0 means don't stop",
+		"number of blobs to sync before stopping. 0 means don't stop (full consent)",
 	)
 }
 
@@ -101,12 +103,21 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 		}
 
 		if err := blobImporter.ImportBlobIfNecessary(blobId, nil); err != nil {
-			req.Cancel(err)
-			return
+			var errNotEqual markl.ErrNotEqual
+
+			if errors.As(err, &errNotEqual) {
+				ui.Err().Printf(
+					"%q -> %q",
+					errNotEqual.Expected,
+					errNotEqual.Actual,
+				)
+			} else if !env_dir.IsErrBlobAlreadyExists(err) {
+				ui.Err().Print(err)
+			}
 		}
 
-		if cmd.limit > 0 &&
-			(blobImporter.Counts.Succeeded+blobImporter.Counts.Failed) > cmd.limit {
+		if cmd.Limit > 0 &&
+			(blobImporter.Counts.Succeeded+blobImporter.Counts.Failed) > cmd.Limit {
 			ui.Err().Print("limit hit, stopping")
 			break
 		}

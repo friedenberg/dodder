@@ -165,7 +165,7 @@ func (server *Server) writeInventoryList(
 
 	actual := blobWriter.GetMarklId()
 
-	if err := markl.MakeErrNotEqual(expected, actual); err != nil {
+	if err := markl.AssertEqual(expected, actual); err != nil {
 		ui.Err().Printf(
 			"received list has different sha: expected: %s, actual: %s",
 			expected,

@@ -99,7 +99,7 @@ func makeTestingWithBigBang(
 		t.Logf("actual blob digest: %q", actual)
 		var expectedBlobDigest markl.Id
 		t.AssertNoError(expectedBlobDigest.Set(expectedDigestString))
-		t.AssertNoError(markl.MakeErrNotEqual(expectedBlobDigest, actual))
+		t.AssertNoError(markl.AssertEqual(expectedBlobDigest, actual))
 	}
 
 	return

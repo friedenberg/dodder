@@ -105,7 +105,7 @@ func (parentWriter multiStoreBlobWriter) GetMarklId() (first interfaces.MarklId)
 
 		if first == nil {
 			first = next
-		} else if err := markl.MakeErrNotEqual(first, next); err != nil {
+		} else if err := markl.AssertEqual(first, next); err != nil {
 			panic(err)
 		}
 	}

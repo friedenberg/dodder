@@ -231,7 +231,7 @@ func (store *Store) Create(
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = markl.MakeErrNotEqual(expected, actual); err != nil {
+		if err = markl.AssertEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -308,7 +308,7 @@ func (store *Store) WriteInventoryListBlob(
 	if expected.IsNull() {
 		object.SetBlobDigest(actual)
 	} else {
-		if err = markl.MakeErrNotEqual(expected, actual); err != nil {
+		if err = markl.AssertEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

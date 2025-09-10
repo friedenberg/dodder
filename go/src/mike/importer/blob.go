@@ -107,6 +107,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 
 			blobImporter.Counts.Total++
 
+			// TODO the written blob digest should be determined by an option
 			if n, err = blob_stores.CopyBlobIfNecessary(
 				blobImporter.EnvRepo,
 				dst,
@@ -124,11 +125,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 					err = nil
 				} else {
 					blobImporter.Counts.Failed++
-					// TODO add context that this could not be copied from the
-					// remote blob
-					// store
-					err = errors.Wrap(err)
-					return
+					ctx.Cancel(err)
 				}
 			} else {
 				blobImporter.Counts.Succeeded++
