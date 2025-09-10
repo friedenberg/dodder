@@ -30,7 +30,9 @@ type BlobStoreWrite struct {
 	UtilityAfter  script_value.Utility
 }
 
-func (cmd *BlobStoreWrite) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *BlobStoreWrite) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.BoolVar(
 		&cmd.Check,
 		"check",
@@ -154,7 +156,7 @@ func (cmd BlobStoreWrite) doOne(
 		{
 			var repool func()
 			writeCloser, repool = markl_io.MakeWriterWithRepool(
-				markl.HashTypeSha256.Get(),
+				blobStore.GetDefaultHashType().GetHash(),
 				nil,
 			)
 			defer repool()

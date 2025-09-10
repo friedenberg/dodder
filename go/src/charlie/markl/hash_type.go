@@ -14,7 +14,22 @@ type HashType struct {
 	null Id
 }
 
-var _ interfaces.MarklType = HashType{}
+var (
+	_ interfaces.MarklType = HashType{}
+	_ interfaces.HashType  = HashType{}
+)
+
+func (hashType HashType) GetHash() interfaces.Hash {
+	return hashType.Get()
+}
+
+func (hashType HashType) PutHash(hash interfaces.Hash) {
+	if correctHashType, ok := hash.(*Hash); ok {
+		hashType.Put(correctHashType)
+	} else {
+		panic(errors.Errorf("expected type %T but got %T", correctHashType, hash))
+	}
+}
 
 func (hashType *HashType) Get() *Hash {
 	hash := hashType.pool.Get()

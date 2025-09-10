@@ -390,12 +390,12 @@ func (index *Index) ReadOneObjectId(
 }
 
 func (index *Index) ReadManyObjectId(
-	id interfaces.ObjectId,
-) (skus []*sku.Transacted, err error) {
-	sh := markl.HashTypeSha256.FromStringContent(id.String())
-	defer markl.PutBlobId(sh)
+	objectId interfaces.ObjectId,
+) (objects []*sku.Transacted, err error) {
+	digest := markl.HashTypeSha256.FromStringContent(objectId.String())
+	defer markl.PutBlobId(digest)
 
-	if skus, err = index.ReadManySha(sh); err != nil {
+	if objects, err = index.ReadManySha(digest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -405,20 +405,22 @@ func (index *Index) ReadManyObjectId(
 
 // TODO switch to empty=not found semantics instead of error
 func (index *Index) ReadOneObjectIdTai(
-	k interfaces.ObjectId,
-	t ids.Tai,
-) (sk *sku.Transacted, err error) {
-	if t.IsEmpty() {
-		err = collections.MakeErrNotFoundString(t.String())
+	objectId interfaces.ObjectId,
+	tai ids.Tai,
+) (object *sku.Transacted, err error) {
+	if tai.IsEmpty() {
+		err = collections.MakeErrNotFoundString(tai.String())
 		return
 	}
 
-	sh := markl.HashTypeSha256.FromStringContent(k.String() + t.String())
-	defer markl.PutBlobId(sh)
+	digest := markl.HashTypeSha256.FromStringContent(
+		objectId.String() + tai.String(),
+	)
+	defer markl.PutBlobId(digest)
 
-	sk = sku.GetTransactedPool().Get()
+	object = sku.GetTransactedPool().Get()
 
-	if err = index.ReadOneSha(sh, sk); err != nil {
+	if err = index.ReadOneSha(digest, object); err != nil {
 		return
 	}
 
@@ -427,11 +429,11 @@ func (index *Index) ReadOneObjectIdTai(
 
 func (index *Index) readOneLoc(
 	loc object_probe_index.Loc,
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (err error) {
-	p := index.pages[loc.Page]
+	page := index.pages[loc.Page]
 
-	if err = p.readOneRange(loc.Range, sk); err != nil {
+	if err = page.readOneRange(loc.Range, object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -441,10 +443,10 @@ func (index *Index) readOneLoc(
 
 // TODO add support for *errors.Context closure
 func (index *Index) ReadPrimitiveQuery(
-	qg sku.PrimitiveQueryGroup,
+	queryGroup sku.PrimitiveQueryGroup,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	ui.Log().Printf("starting query: %q", qg)
+	ui.Log().Printf("starting query: %q", queryGroup)
 	waitGroup := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 	groupBuilder := errors.MakeGroupBuilder()
@@ -469,7 +471,11 @@ func (index *Index) ReadPrimitiveQuery(
 		waitGroup.Add(1)
 
 		go func(p *Page, openFileCh chan struct{}) {
-			ui.Log().Printf("starting query on page %d: %q", p.PageId.Index, qg)
+			ui.Log().Printf(
+				"starting query on page %d: %q",
+				p.PageId.Index,
+				queryGroup,
+			)
 			defer waitGroup.Done()
 			defer func() {
 				openFileCh <- struct{}{}
@@ -479,7 +485,7 @@ func (index *Index) ReadPrimitiveQuery(
 				var err1 error
 
 				if err1 = p.copyHistoryAndMaybeLatest(
-					qg,
+					queryGroup,
 					funcIter,
 					false,
 					false,

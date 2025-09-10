@@ -12,6 +12,8 @@ type (
 
 	HashType interface {
 		MarklType
+		GetHash() Hash
+		PutHash(Hash)
 		GetMarklIdForString(input string) (MarklId, FuncRepool)
 		// TODO rename
 		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)

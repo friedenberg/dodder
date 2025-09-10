@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -28,11 +27,12 @@ type Dependencies struct {
 
 func (deps Dependencies) GetBlobDigestType() interfaces.HashType {
 	hashType := deps.BlobStore.GetDefaultHashType()
+
 	if hashType == nil {
-		return markl.HashTypeSha256
-	} else {
-		return hashType
+		panic("no hash type set")
 	}
+
+	return hashType
 }
 
 func (deps Dependencies) writeComments(
