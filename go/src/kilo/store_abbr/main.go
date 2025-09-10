@@ -19,9 +19,9 @@ import (
 )
 
 type indexCodable struct {
-	SeenIds    map[genres.Genre]interfaces.MutableTridex
-	BlobDigest indexNotZettelId[markl.Id, *markl.Id]
-	ZettelId   indexZettelId
+	SeenIds  map[genres.Genre]interfaces.MutableTridex
+	MarklIds indexNotZettelId[markl.Id, *markl.Id]
+	ZettelId indexZettelId
 }
 
 type indexAbbr struct {
@@ -58,7 +58,7 @@ func NewIndex(
 				genres.Type:   tridex.Make(),
 				genres.Zettel: tridex.Make(),
 			},
-			BlobDigest: indexNotZettelId[markl.Id, *markl.Id]{
+			MarklIds: indexNotZettelId[markl.Id, *markl.Id]{
 				ObjectIds: tridex.Make(),
 			},
 			ZettelId: indexZettelId{
@@ -69,7 +69,7 @@ func NewIndex(
 	}
 
 	index.ZettelId.readFunc = index.readIfNecessary
-	index.BlobDigest.readFunc = index.readIfNecessary
+	index.MarklIds.readFunc = index.readIfNecessary
 
 	return
 }
@@ -213,9 +213,9 @@ func (index *indexAbbr) AddObjectToIdIndex(
 		index.SeenIds[genres.Tag].Add(tag.String())
 	}
 
-	// TODO add indexes based on hash types
-	index.BlobDigest.ObjectIds.Add(
-		markl.Format(object.GetBlobDigest()),
+	// TODO add other markl ids
+	index.MarklIds.ObjectIds.Add(
+		object.GetBlobDigest().String(),
 	)
 
 	index.SeenIds[genres.Type].Add(object.GetType().String())
@@ -229,7 +229,7 @@ func (index *indexAbbr) GetZettelIds() sku.IdAbbrIndexGeneric[ids.ZettelId, *ids
 }
 
 func (index *indexAbbr) GetBlobIds() sku.IdAbbrIndexGeneric[markl.Id, *markl.Id] {
-	return &index.BlobDigest
+	return &index.MarklIds
 }
 
 func (index *indexAbbr) GetSeenIds() map[genres.Genre]interfaces.Collection[string] {
