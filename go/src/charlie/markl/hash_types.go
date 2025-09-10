@@ -20,6 +20,7 @@ var (
 	types     map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
 	hashTypes map[string]HashType             = map[string]HashType{}
 
+	// TODO remove unnecessary references
 	HashTypeSha256     HashType
 	HashTypeBlake2b256 HashType
 )

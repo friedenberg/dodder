@@ -7,12 +7,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -78,23 +77,7 @@ func (cmd Export) Run(req command.Request) {
 		)
 	}
 
-	var writeCloser io.WriteCloser
-
-	{
-		var err error
-
-		if writeCloser, err = env_dir.NewWriter(
-			env_dir.MakeConfig(
-				markl.HashTypeSha256,
-				env_dir.MakeHashBucketPathJoinFunc([]int{2}),
-				&cmd.CompressionType,
-				&ag,
-			),
-			localWorkingCopy.GetUIFile(),
-		); err != nil {
-			localWorkingCopy.Cancel(err)
-		}
-	}
+	var writeCloser io.WriteCloser = files.NopWriteCloser(localWorkingCopy.GetUIFile())
 
 	defer errors.ContextMustClose(localWorkingCopy, writeCloser)
 

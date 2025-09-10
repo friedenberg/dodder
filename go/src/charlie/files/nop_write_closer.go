@@ -2,10 +2,14 @@ package files
 
 import "io"
 
-type NopWriteCloser struct {
+type nopWriteCloser struct {
 	io.Writer
 }
 
-func (_ NopWriteCloser) Close() error {
+func NopWriteCloser(writer io.Writer) nopWriteCloser {
+	return nopWriteCloser{Writer: writer}
+}
+
+func (nopWriteCloser) Close() error {
 	return nil
 }

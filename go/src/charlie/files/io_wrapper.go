@@ -13,5 +13,5 @@ func (NopeIOWrapper) WrapReader(
 func (NopeIOWrapper) WrapWriter(
 	writerIn io.Writer,
 ) (io.WriteCloser, error) {
-	return NopWriteCloser{Writer: writerIn}, nil
+	return NopWriteCloser(writerIn), nil
 }

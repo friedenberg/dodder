@@ -62,7 +62,7 @@ function init_compression { # @test
 
 	sha="$(get_konfig_sha)"
 	dir_blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
-	run zstd --decompress "$dir_blobs/${sha:0:2}"*/* --stdout
+	run zstd --decompress "$dir_blobs/sha256/${sha:0:2}"*/* --stdout
 	assert_success
 }
 

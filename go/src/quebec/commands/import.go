@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/importer"
@@ -63,13 +63,7 @@ func (cmd Import) Run(req command.Request) {
 	{
 		var err error
 
-		if readCloser, err = env_dir.NewFileReader(
-			env_dir.MakeConfig(
-				markl.HashTypeSha256,
-				nil,
-				nil,
-				nil,
-			),
+		if readCloser, err = files.Open(
 			inventoryListPath,
 		); err != nil {
 			repo.Cancel(err)

@@ -39,7 +39,9 @@ func (compressionType *CompressionType) GetBlobCompression() interfaces.CommandL
 	return compressionType
 }
 
-func (compressionType *CompressionType) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (compressionType *CompressionType) SetFlagSet(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.Var(compressionType, "compression-type", "")
 }
 
@@ -99,6 +101,6 @@ func (compressionType CompressionType) WrapWriter(
 		return zstd.NewWriter(writerIn), nil
 
 	default:
-		return files.NopWriteCloser{Writer: writerIn}, nil
+		return files.NopWriteCloser(writerIn), nil
 	}
 }

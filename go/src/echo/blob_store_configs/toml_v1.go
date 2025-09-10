@@ -116,7 +116,7 @@ func (blobStoreConfig TomlV1) GetLockInternalFiles() bool {
 }
 
 func (blobStoreConfig TomlV1) SupportsMultiHash() bool {
-	return false
+	return true
 }
 
 func (blobStoreConfig TomlV1) GetDefaultHashTypeId() string {
