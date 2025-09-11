@@ -47,20 +47,20 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 	) (err error) {
 		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
-		if result.N != -1 {
+		if !result.IsMissing() {
 			return
 		}
 
-		if result.Transacted.GetGenre() == genres.InventoryList {
+		if result.ObjectOrNil.GetGenre() == genres.InventoryList {
 			requestRetry = true
 		}
 
 		ui.Log().Print(
 			"missing blob for list: %s",
-			sku.String(result.Transacted),
+			sku.String(result.ObjectOrNil),
 		)
 
-		listMissingObjects.Add(result.Transacted.CloneTransacted())
+		listMissingObjects.Add(result.ObjectOrNil.CloneTransacted())
 
 		return
 	}
@@ -202,20 +202,26 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	) (err error) {
 		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
-		if result.N != -1 {
+		ui.Debug().Print(result.CopyResult)
+		if result.ObjectOrNil != nil {
+			ui.Debug().Print(sku.String(result.ObjectOrNil))
+		}
+
+		if !result.IsMissing() {
 			return
 		}
 
-		if result.Transacted.GetGenre() == genres.InventoryList {
+		if result.ObjectOrNil.GetGenre() == genres.InventoryList {
 			requestRetry = true
 		}
 
 		ui.Log().Print(
 			"missing blob for list: %s",
-			sku.String(result.Transacted),
+			sku.String(result.ObjectOrNil),
 		)
 
-		listMissingSkus.Add(result.Transacted.CloneTransacted())
+		// TODO switch to outputing object signatures
+		listMissingSkus.Add(result.ObjectOrNil.CloneTransacted())
 
 		return
 	}

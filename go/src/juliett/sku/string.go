@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -63,6 +64,18 @@ func StringMetadataTaiMerkle(object *Transacted) (str string) {
 	)
 }
 
+func writeMarklIdWithFormatIfNecessary(
+	stringBuilder *strings.Builder,
+	id interfaces.MarklId,
+) {
+	if id.IsNull() {
+		return
+	}
+
+	stringBuilder.WriteString(" ")
+	stringBuilder.WriteString(id.StringWithFormat())
+}
+
 func StringMetadataSansTai(object *Transacted) (str string) {
 	sb := &strings.Builder{}
 
@@ -74,8 +87,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 	sb.WriteString(" ")
 	sb.WriteString(object.GetExternalObjectId().String())
 
-	sb.WriteString(" ")
-	sb.WriteString(object.GetBlobDigest().String())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
 	m := object.GetMetadata()
 
@@ -125,20 +137,11 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb.WriteString(" ")
 	sb.WriteString(object.GetExternalObjectId().String())
 
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.Metadata.GetRepoPubKey())
-
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectSig())
-
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.Metadata.GetMotherObjectSig())
-
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.Metadata.GetObjectDigest())
-
-	sb.WriteString(" ")
-	sb.WriteString(object.GetBlobDigest().String())
+	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetRepoPubKey())
+	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetObjectSig())
+	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetMotherObjectSig())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
 	m := object.GetMetadata()
 
@@ -181,47 +184,40 @@ func StringMetadataSansTaiMerkle2(
 ) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.GetRepoPubKey())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetRepoPubKey())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectSig())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.GetObjectSig())
+	metadata := object.GetMetadata()
 
-	sb.WriteString(" ")
-	fmt.Fprintf(sb, "%s", object.GetObjectDigest())
+	tipe := metadata.GetType()
 
-	sb.WriteString(" ")
-	sb.WriteString(object.GetBlobDigest().String())
-
-	m := object.GetMetadata()
-
-	t := m.GetType()
-
-	if !t.IsEmpty() {
+	if !tipe.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType()))
 	}
 
-	es := m.GetTags()
+	es := metadata.GetTags()
 
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
 			quiter.StringDelimiterSeparated(
 				" ",
-				m.GetTags(),
+				metadata.GetTags(),
 			),
 		)
 	}
 
-	b := m.Description
+	b := metadata.Description
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for _, field := range m.Fields {
+	for _, field := range metadata.Fields {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}

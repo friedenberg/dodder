@@ -272,7 +272,6 @@ function push_history_default_only_blobs { # @test
 
 function push_default_stdio_local_once { # @test
 	bootstrap_without_content
-	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
@@ -283,10 +282,17 @@ function push_default_stdio_local_once { # @test
 		\[/them @blake2b256-.+ !toml-repo-local_path-v0]
 	EOM
 
-	export BATS_TEST_BODY=true
+	# 	run_dodder show -format text /them
+	# 	assert_success
+	# 	assert_output ''
+
 	run_dodder push /them
 	assert_success
-	# TODO-P4 assert output of push
+	assert_output --regexp - <<-'EOM'
+		\(remote) \[/them @blake2b256-.+ !toml-repo-local_path-v0]
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+		\(remote) \[[0-9]+\.[0-9]+ @blake2b256-.+ !inventory_list-v2]
+	EOM
 
 	pushd them || exit 1
 	run_dodder show :zettel
@@ -295,7 +301,6 @@ function push_default_stdio_local_once { # @test
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
-	popd || exit 1
 }
 
 function push_history_default_stdio_local_twice { # @test

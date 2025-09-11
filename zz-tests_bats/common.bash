@@ -167,6 +167,29 @@ EOM
   run_dodder_init_workspace
 }
 
+function run_dodder_init_cwd {
+  if [[ $# -eq 0 ]]; then
+    args=("test")
+  else
+    args=("$@")
+  fi
+
+  run_dodder init \
+    -yin <(cat_yin) \
+    -yang <(cat_yang) \
+    -lock-internal-files=false \
+    -override-xdg-with-cwd \
+    "${args[@]}"
+
+  assert_success
+  assert_output - <<-EOM
+[!md @$(get_type_blob_sha) !toml-type-v1]
+[konfig @$(get_konfig_sha) !toml-config-v2]
+EOM
+
+  run_dodder_init_workspace
+}
+
 function run_dodder_init_workspace {
   run_dodder init-workspace
 }

@@ -80,6 +80,7 @@ func (cmd BlobStoreSync) runAllStores(req command.Request) {
 
 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
 		envRepo.GetUI(),
+		false,
 	)
 
 	defer req.Must(

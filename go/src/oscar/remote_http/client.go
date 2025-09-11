@@ -333,8 +333,12 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			listMissingObjects.Len(),
 		)
 
-		// if options.IncludeBlobs {
 		for expected := range listMissingObjects.All() {
+			ui.Err().Printf(
+				"(requested) %q, sending blob",
+				sku.String(expected),
+			)
+
 			errors.ContextContinueOrPanic(client.envUI)
 
 			if err = client.WriteBlobToRemote(
@@ -345,7 +349,6 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 				return
 			}
 		}
-		// }
 
 		if response.StatusCode == http.StatusCreated {
 			ui.Log().Print("done")

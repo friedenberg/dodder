@@ -3,10 +3,8 @@ package sku
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -64,16 +62,6 @@ type (
 		) (e ExternalLike, err error)
 	}
 
-	BlobCopyResult struct {
-		*Transacted        // may be nil
-		interfaces.MarklId // may not be nil
-
-		// -1: no remote blob store and the blob doesn't exist locally
-		// -2: no remote blob store and the blob exists locally
-		// -3: blob exists locally and remotely
-		N int64
-	}
-
 	ImporterOptions struct {
 		DedupingFormatId    string
 		BlobGenres          ids.Genre
@@ -102,22 +90,3 @@ type (
 		) (co *CheckedOut, err error)
 	}
 )
-
-func MakeBlobCopierDelegate(fd fd.Std) func(BlobCopyResult) error {
-	return func(result BlobCopyResult) error {
-		switch result.N {
-		case -3:
-			return fd.Printf(
-				"Blob %s already exists",
-				result.MarklId,
-			)
-
-		default:
-			return fd.Printf(
-				"copied Blob %s (%s)",
-				result.MarklId,
-				ui.GetHumanBytesString(uint64(result.N)),
-			)
-		}
-	}
-}

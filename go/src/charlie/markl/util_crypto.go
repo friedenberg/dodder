@@ -77,6 +77,7 @@ func GeneratePrivateKey(
 
 func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 	marklTypeId := private.GetMarklType().GetMarklTypeId()
+
 	switch marklTypeId {
 	default:
 		err = errors.Errorf(
@@ -96,7 +97,26 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 			return
 		}
 
-		pubKeyBytes := ed25519.PrivateKey(private.GetBytes()).Public().(ed25519.PublicKey)
+		privateBytes := private.GetBytes()
+		var privateKey ed25519.PrivateKey
+
+		switch len(privateBytes) {
+		case ed25519.SeedSize:
+			// TODO emit error
+			err = errors.Errorf("private key is just seed, not full go ed25519 private key")
+			return
+			privateKey = ed25519.NewKeyFromSeed(privateBytes)
+
+		case ed25519.PrivateKeySize:
+			privateKey = ed25519.PrivateKey(privateBytes)
+
+		default:
+			err = errors.Errorf("unsupported key size: %d", len(privateBytes))
+			return
+		}
+
+		pubKey := privateKey.Public()
+		pubKeyBytes := pubKey.(ed25519.PublicKey)
 
 		if err = public.SetMerkleId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
@@ -109,7 +129,10 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 			return
 		}
 
-		pubKeyBytes := ed25519.PrivateKey(private.GetBytes()).Public().(ed25519.PublicKey)
+		// the ed25519 package includes a public key suffix, so we need to
+		// reconstruct their version of a private key for a public key value
+		privateKey := ed25519.PrivateKey(private.GetBytes())
+		pubKeyBytes := privateKey.Public().(ed25519.PublicKey)
 
 		if err = public.SetMerkleId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)

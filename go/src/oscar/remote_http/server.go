@@ -28,6 +28,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -169,7 +170,7 @@ func (server *Server) makeRouter(
 
 	{
 		router.HandleFunc(
-			"/blobs/{sha}",
+			"/blobs/{blob_id}",
 			makeHandler(server.handleBlobsHeadOrGet),
 		).
 			Methods(
@@ -177,8 +178,13 @@ func (server *Server) makeRouter(
 				"GET",
 			)
 
-		router.HandleFunc("/blobs/{sha}", makeHandler(server.handleBlobsPost)).
-			Methods("POST")
+		router.HandleFunc(
+			"/blobs/{blob_id}",
+			makeHandler(server.handleBlobsPost),
+		).
+			Methods(
+				"POST",
+			)
 
 		router.HandleFunc("/blobs", makeHandler(server.handleBlobsPost)).
 			Methods("POST")
@@ -500,12 +506,12 @@ func (server *Server) handleBlobsHeadOrGet(
 	request Request,
 ) (response Response) {
 	// TODO rename to blob id
-	blobIdString := request.Vars()["sha"]
+	blobIdString := request.Vars()["blob_id"]
 
 	if blobIdString == "" {
 		response.ErrorWithStatus(
 			http.StatusBadRequest,
-			errors.ErrorWithStackf("empty sha"),
+			errors.ErrorWithStackf("empty blob id"),
 		)
 		return
 	}
@@ -555,20 +561,20 @@ func (server *Server) handleBlobsHeadOrGet(
 }
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
-	digestString := request.Vars()["sha"]
-	var result interfaces.MarklId
+	blobId := request.Vars()["blob_id"]
+	var copyResult blob_stores.CopyResult
 
-	if digestString == "" {
+	if blobId == "" {
 		var err error
 
-		if result, err = server.copyBlob(request.Body, nil); err != nil {
+		if copyResult, err = server.copyBlob(request.Body, nil); err != nil {
 			response.Error(err)
 			return
 		}
 
 		response.StatusCode = http.StatusCreated
 		response.Body = io.NopCloser(
-			strings.NewReader(result.String()),
+			strings.NewReader(copyResult.BlobId.String()),
 		)
 
 		return
@@ -577,7 +583,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	var blobDigest markl.Id
 
 	if err := blobDigest.Set(
-		digestString,
+		blobId,
 	); err != nil {
 		response.Error(err)
 		return
@@ -591,7 +597,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	{
 		var err error
 
-		if result, err = server.copyBlob(request.Body, &blobDigest); err != nil {
+		if copyResult, err = server.copyBlob(request.Body, &blobDigest); err != nil {
 			response.Error(err)
 			return
 		}
@@ -599,14 +605,14 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	response.StatusCode = http.StatusCreated
 
-	if err := markl.AssertEqual(&blobDigest, result); err != nil {
+	if err := markl.AssertEqual(&blobDigest, copyResult.BlobId); err != nil {
 		response.Error(err)
 		return
 	}
 
 	response.StatusCode = http.StatusCreated
 	response.Body = io.NopCloser(
-		strings.NewReader(result.String()),
+		strings.NewReader(copyResult.BlobId.String()),
 	)
 
 	return
@@ -615,56 +621,50 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
 	expected interfaces.MarklId,
-) (result interfaces.MarklId, err error) {
+) (copyResult blob_stores.CopyResult, err error) {
 	var progressWriter env_ui.ProgressWriter
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(nil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	blobExpectedShaString := "blob with unknown sha"
-
-	if expected != nil {
-		blobExpectedShaString = expected.String()
-	}
-
-	if err = errors.RunChildContextWithPrintTicker(
-		server.EnvLocal,
-		func(ctx interfaces.Context) {
-			if _, err := io.Copy(io.MultiWriter(writeCloser, &progressWriter), reader); err != nil {
-				ctx.Cancel(err)
-			}
-		},
-		func(time time.Time) {
-			ui.Err().Printf(
-				"Copying %s... (%s written)",
-				blobExpectedShaString,
-				progressWriter.GetWrittenHumanString(),
-			)
-		},
-		3*time.Second,
+	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(
+		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = writeCloser.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
+	blobExpectedIdString := "blob with unknown blob id"
+
+	if expected != nil {
+		blobExpectedIdString = expected.String()
 	}
 
-	result = writeCloser.GetMarklId()
+	copyResult = blob_stores.CopyReaderToWriter(
+		server.EnvLocal,
+		writeCloser,
+		reader,
+		expected,
+		&progressWriter,
+		func(time time.Time) {
+			ui.Err().Printf(
+				"Copying %s... (%s written)",
+				blobExpectedIdString,
+				progressWriter.GetWrittenHumanString(),
+			)
+		},
+		3*time.Second,
+	)
 
+	// ui.Debug().Print(expected, copyResult.BlobId)
+
+	// TODO cache this
 	blobCopierDelegate := sku.MakeBlobCopierDelegate(
 		server.Repo.GetEnv().GetUI(),
+		false,
 	)
 
 	if err = blobCopierDelegate(
 		sku.BlobCopyResult{
-			MarklId: result,
-			N:       progressWriter.GetWritten(),
+			CopyResult: copyResult,
 		},
 	); err != nil {
 		err = errors.Wrap(err)

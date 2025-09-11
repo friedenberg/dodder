@@ -1,8 +1,6 @@
 package importer
 
 import (
-	"time"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -11,8 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
@@ -59,14 +55,25 @@ func Make(
 		options.PrintCopies {
 		importer.blobCopierDelegate = sku.MakeBlobCopierDelegate(
 			envRepo.GetUI(),
+			false,
 		)
 	}
+
+	importer.blobImporter = MakeBlobImporter(
+		envRepo,
+		importer.remoteBlobStore,
+		envRepo.GetDefaultBlobStore(),
+	)
+
+	importer.blobImporter.CopierDelegate = importer.blobCopierDelegate
 
 	return importer
 }
 
 type importer struct {
 	committer committer
+
+	blobImporter BlobImporter
 
 	typedInventoryListBlobStore inventory_list_coders.Closet
 	index                       sku.Index
@@ -317,86 +324,10 @@ func (importer importer) importNewObject(
 func (importer importer) ImportBlobIfNecessary(
 	object *sku.Transacted,
 ) (err error) {
-	blobId := object.GetBlobDigest()
-
-	if importer.remoteBlobStore == nil {
-		// when this is a dumb HTTP remote, we expect local to push the missing
-		// objects to us after the import call
-
-		n := int64(-1)
-
-		if importer.envRepo.GetDefaultBlobStore().HasBlob(blobId) {
-			n = -2
-		}
-
-		if importer.blobCopierDelegate != nil {
-			if err = importer.blobCopierDelegate(
-				sku.BlobCopyResult{
-					Transacted: object,
-					MarklId:    blobId,
-					N:          n,
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		return
-	}
-
-	if !importer.blobGenres.Contains(object.GetGenre()) {
-		return
-	}
-
-	var progressWriter env_ui.ProgressWriter
-
-	if err = errors.RunChildContextWithPrintTicker(
-		importer.envRepo,
-		func(ctx interfaces.Context) {
-			var n int64
-
-			if n, err = blob_stores.CopyBlobIfNecessary(
-				importer.envRepo,
-				importer.envRepo.GetDefaultBlobStore(),
-				importer.remoteBlobStore,
-				blobId,
-				&progressWriter,
-			); err != nil {
-				if env_dir.IsErrBlobAlreadyExists(err) {
-					err = nil
-				} else {
-					// TODO add context that this could not be copied from the
-					// remote blob
-					// store
-					ctx.Cancel(err)
-					return
-				}
-
-				return
-			}
-
-			if importer.blobCopierDelegate != nil {
-				if err = importer.blobCopierDelegate(
-					sku.BlobCopyResult{
-						Transacted: object,
-						MarklId:    blobId,
-						N:          n,
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		},
-		func(time time.Time) {
-			ui.Err().Printf(
-				"Copying %s... (%s written)",
-				blobId,
-				progressWriter.GetWrittenHumanString(),
-			)
-		},
-		3*time.Second,
+	if err = importer.blobImporter.importBlobIfNecessary(
+		importer.envRepo.GetDefaultBlobStore(),
+		object.Metadata.GetBlobDigest(),
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

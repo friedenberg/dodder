@@ -2,6 +2,7 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -51,7 +52,15 @@ func (local *Repo) GetObjectFromObjectId(
 	if object, err = local.GetStore().QueryExactlyOneExternal(
 		queryGroup,
 	); err != nil {
-		err = errors.Wrapf(err, "ObjectIdString: %q", objectIdString)
+		if collections.IsErrNotFound(err) {
+			err = errors.BadRequestf(
+				"object with id %q not found",
+				objectIdString,
+			)
+		} else {
+			err = errors.Wrapf(err, "ObjectIdString: %q", objectIdString)
+		}
+
 		return
 	}
 

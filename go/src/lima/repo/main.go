@@ -51,6 +51,7 @@ type WorkingCopy interface {
 		qg *query.Query,
 	) (list *sku.ListTransacted, err error)
 
+	// TODO replace with WorkingCopy
 	PullQueryGroupFromRemote(
 		remote Repo,
 		qg *query.Query,

@@ -14,6 +14,10 @@ func BadRequestf(format string, args ...any) error {
 	return WithoutStack(Err400BadRequest.ErrorHiddenf(format, args...))
 }
 
+func BadRequestWrapf(format string, args ...any) error {
+	return WithoutStack(Err400BadRequest.ErrorHiddenf(format, args...))
+}
+
 func Is400BadRequest(err error) bool {
 	return IsHTTPError(err, hs.Code400BadRequest)
 }

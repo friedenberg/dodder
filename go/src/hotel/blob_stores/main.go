@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -184,120 +183,6 @@ func MakeBlobStore(
 			return
 		}
 	}
-}
-
-// TODO offer option to decide which hash type
-func CopyBlobIfNecessary(
-	env env_ui.Env,
-	dst interfaces.BlobStore,
-	src interfaces.BlobStore,
-	expected interfaces.MarklId,
-	extraWriter io.Writer,
-) (n int64, err error) {
-	if src == nil {
-		return
-	}
-
-	if err = markl.AssertIdIsNotNull(expected, ""); err != nil {
-		return
-	}
-
-	if dst.HasBlob(expected) {
-		err = env_dir.MakeErrBlobAlreadyExists(
-			expected,
-			"",
-		)
-
-		return
-	}
-
-	if n, err = CopyBlob(
-		env,
-		dst,
-		src,
-		expected,
-		extraWriter,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO make this honor context closure and abort early
-func CopyBlob(
-	env env_ui.Env,
-	dst interfaces.BlobStore,
-	src interfaces.BlobStore,
-	expectedDigest interfaces.MarklId,
-	extraWriter io.Writer,
-) (n int64, err error) {
-	if src == nil {
-		return
-	}
-
-	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest, ""))
-
-	var readCloser interfaces.BlobReader
-
-	if readCloser, err = src.MakeBlobReader(expectedDigest); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.ContextMustClose(env, readCloser)
-
-	var writeCloser interfaces.BlobWriter
-
-	var hashType markl.HashType
-
-	if hashType, err = markl.GetHashTypeOrError(
-		expectedDigest.GetMarklType().GetMarklTypeId(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if writeCloser, err = dst.MakeBlobWriter(hashType); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO should this be closed with an error when the digests don't match to
-	// prevent a garbage object in the store?
-	defer errors.ContextMustClose(env, writeCloser)
-
-	outputWriter := io.Writer(writeCloser)
-
-	if extraWriter != nil {
-		outputWriter = io.MultiWriter(outputWriter, extraWriter)
-	}
-
-	if n, err = io.Copy(outputWriter, readCloser); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	readerDigest := readCloser.GetMarklId()
-
-	writerDigest := writeCloser.GetMarklId()
-
-	if !markl.Equals(readerDigest, expectedDigest) {
-		err = errors.Errorf(
-			"lookup digest was %s while read digest was %s",
-			expectedDigest,
-			readerDigest,
-		)
-
-		return
-	}
-
-	if err = markl.AssertEqual(expectedDigest, writerDigest); err != nil {
-		return
-	}
-
-	return
 }
 
 // TODO offer options like just checking the existence of the blob, getting its

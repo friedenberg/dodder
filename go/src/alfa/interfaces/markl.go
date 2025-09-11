@@ -31,8 +31,11 @@ type (
 
 	MarklId interface {
 		// TODO consider removing Stringer and Setter
+
+		// TODO add WriteString and WriteStringWithFormat
 		Stringer
 		StringWithFormat() string
+
 		encoding.BinaryMarshaler
 		// encoding.TextMarshaler
 		// io.WriterTo
@@ -42,6 +45,8 @@ type (
 		GetSize() int
 		MarklTypeGetter
 		IsNull() bool
+
+		// TODO rename to purpose
 		GetFormat() string
 	}
 

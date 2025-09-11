@@ -6,8 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -68,26 +66,40 @@ func (blobImporter *BlobImporter) emitMissingBlob(
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
+	blobCopyResult := sku.BlobCopyResult{
+		ObjectOrNil: object,
+		CopyResult: blob_stores.CopyResult{
+			BlobId: blobId,
+		},
+	}
+
 	// when this is a dumb HTTP remote, we expect local to push the missing
 	// objects to us after the import call
 
-	n := int64(-1)
+	blobCopyResult.SetBlobMissingLocally()
 
 	if blobImporter.Src.HasBlob(blobId) {
-		n = -2
+		blobCopyResult.SetBlobExistsLocally()
 	}
 
-	if blobImporter.CopierDelegate != nil {
-		if err = blobImporter.CopierDelegate(
-			sku.BlobCopyResult{
-				Transacted: object,
-				MarklId:    blobId,
-				N:          n,
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = blobImporter.emitCopyResultIfNecessary(blobCopyResult); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (blobImporter *BlobImporter) emitCopyResultIfNecessary(
+	copyResult sku.BlobCopyResult,
+) (err error) {
+	if blobImporter.CopierDelegate == nil {
+		return
+	}
+
+	if err = blobImporter.CopierDelegate(copyResult); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -103,45 +115,37 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 	if err = errors.RunChildContextWithPrintTicker(
 		blobImporter.EnvRepo,
 		func(ctx interfaces.Context) {
-			var n int64
+			copyResult := sku.BlobCopyResult{
+				ObjectOrNil: object,
+			}
 
 			blobImporter.Counts.Total++
 
 			// TODO the written blob digest should be determined by an option
-			if n, err = blob_stores.CopyBlobIfNecessary(
+			copyResult.CopyResult = blob_stores.CopyBlobIfNecessary(
 				blobImporter.EnvRepo,
 				dst,
 				blobImporter.Src,
 				blobId,
 				&progressWriter,
-			); err != nil {
-				if errors.Is(err, env_dir.ErrBlobAlreadyExists{}) {
-					blobImporter.Counts.Ignored++
-					n = -3
-					err = nil
-				} else if markl.IsErrNull(err) {
-					blobImporter.Counts.Ignored++
-					n = -3
-					err = nil
-				} else {
-					blobImporter.Counts.Failed++
-					ctx.Cancel(err)
-				}
+			)
+
+			if copyResult.IsError() {
+				blobImporter.Counts.Failed++
+				ctx.Cancel(err)
+			} else if copyResult.IsMissing() {
+				blobImporter.Counts.Failed++
+			} else if copyResult.Exists() {
+				blobImporter.Counts.Ignored++
 			} else {
 				blobImporter.Counts.Succeeded++
 			}
 
-			if blobImporter.CopierDelegate != nil {
-				if err = blobImporter.CopierDelegate(
-					sku.BlobCopyResult{
-						Transacted: object,
-						MarklId:    blobId,
-						N:          n,
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if err = blobImporter.emitCopyResultIfNecessary(
+				copyResult,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 		},
 		func(time time.Time) {

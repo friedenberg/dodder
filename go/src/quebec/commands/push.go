@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -28,21 +27,21 @@ func (cmd *Push) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd Push) Run(req command.Request) {
-	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
+	local := cmd.MakeLocalWorkingCopy(req)
 
 	var remoteObject *sku.Transacted
 
 	{
 		var err error
 
-		if remoteObject, err = localWorkingCopy.GetObjectFromObjectId(
+		if remoteObject, err = local.GetObjectFromObjectId(
 			req.PopArg("repo-id"),
 		); err != nil {
-			localWorkingCopy.Cancel(err)
+			local.Cancel(err)
 		}
 	}
 
-	remote := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
+	remote := cmd.MakeRemote(req, local, remoteObject)
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
@@ -53,15 +52,15 @@ func (cmd Push) Run(req command.Request) {
 			),
 			query.BuilderOptionDefaultGenres(genres.InventoryList),
 		),
-		localWorkingCopy,
+		local,
 		req.PopArgs(),
 	)
 
-	if err := remote.(repo.WorkingCopy).PullQueryGroupFromRemote(
-		localWorkingCopy,
+	if err := remote.PullQueryGroupFromRemote(
+		local,
 		queryGroup,
 		cmd.WithPrintCopies(true),
 	); err != nil {
-		localWorkingCopy.Cancel(err)
+		local.Cancel(err)
 	}
 }

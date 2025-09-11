@@ -10,10 +10,14 @@ import (
 )
 
 type TomlV1 struct {
-	HashBuckets       values.IntSlice                  `toml:"hash-buckets"`
-	BasePath          string                           `toml:"base-path"` // can include env vars
-	HashTypeId        string                           `toml:"hash_type-id"`
-	Encryption        markl.Id                         `toml:"encryption"`
+	HashBuckets values.IntSlice `toml:"hash-buckets"`
+	BasePath    string          `toml:"base-path"` // can include env vars
+	HashTypeId  string          `toml:"hash_type-id"`
+
+	// cannot use `omitempty`, as markl.Id's empty value equals its non-empty
+	// value due to unexported fields
+	Encryption markl.Id `toml:"encryption"`
+
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
 }

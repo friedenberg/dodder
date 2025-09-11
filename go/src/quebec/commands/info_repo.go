@@ -28,9 +28,13 @@ func (cmd InfoRepo) Run(req command.Request) {
 	repo := cmd.MakeEnvRepo(req, false)
 
 	// TODO should this be the private config flavor?
-	configTypedBlob := repo.GetConfigPublic()
-	configBlob := configTypedBlob.Blob
-	storeVersion := configBlob.GetStoreVersion()
+	configPublicTypedBlob := repo.GetConfigPublic()
+	configPublicBlob := configPublicTypedBlob.Blob
+
+	configPrivateTypedBlob := repo.GetConfigPrivate()
+	configPrivateBlob := configPrivateTypedBlob.Blob
+
+	storeVersion := configPublicBlob.GetStoreVersion()
 	blobStore := repo.GetDefaultBlobStore()
 	blobIOWrapper := blobStore.GetBlobIOWrapper()
 
@@ -49,17 +53,17 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 		case "config-immutable":
 			if _, err := genesis_configs.CoderPublic.EncodeTo(
-				&configTypedBlob,
+				&configPublicTypedBlob,
 				repo.GetUIFile(),
 			); err != nil {
 				repo.Cancel(err)
 			}
 
 		case "store-version":
-			repo.GetUI().Print(configBlob.GetStoreVersion())
+			repo.GetUI().Print(configPublicBlob.GetStoreVersion())
 
 		case "id":
-			repo.GetUI().Print(configBlob.GetRepoId())
+			repo.GetUI().Print(configPublicBlob.GetRepoId())
 
 			// TODO switch to `blob_stores.N.compression_type`
 		case "compression-type":
@@ -130,7 +134,16 @@ func (cmd InfoRepo) Run(req command.Request) {
 			}
 
 		case "pubkey":
-			repo.GetUI().Print(configBlob.GetPublicKey().StringWithFormat())
+			repo.GetUI().Print(
+				configPublicBlob.GetPublicKey().StringWithFormat(),
+			)
+
+		case "seckey":
+			repo.Cancel(errors.Err405MethodNotAllowed)
+
+			repo.GetUI().Print(
+				configPrivateBlob.GetPrivateKey().StringWithFormat(),
+			)
 
 		case "xdg":
 			ecksDeeGee := repo.GetXDG()

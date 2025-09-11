@@ -186,6 +186,7 @@ func (client *client) WriteBlobToRemote(
 	}
 
 	if err = markl.AssertEqual(expected, &actual); err != nil {
+		ui.Debug().Print(err)
 		err = errors.Wrapf(err, "Raw Blob Id: %q", digestString.String())
 		return
 	}
