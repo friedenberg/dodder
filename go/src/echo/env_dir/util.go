@@ -29,7 +29,7 @@ func MakeHashBucketPathFromMerkleId(
 	return MakeHashBucketPath(
 		// TODO must be a way to make this more performant instead of a double
 		// copy
-		[]byte(markl.Format(id)),
+		[]byte(markl.FormatBytesAsHext(id)),
 		buckets,
 		pathComponents...,
 	)

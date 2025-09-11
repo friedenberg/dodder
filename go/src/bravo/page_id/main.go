@@ -63,7 +63,7 @@ func PageIndexForDigest(
 
 	if n, err = PageIndexForDigestString(
 		width,
-		markl.Format(digest),
+		markl.FormatBytesAsHext(digest),
 	); err != nil {
 		err = errors.ErrorWithStackf("page out of bounds: %d", n1)
 		return

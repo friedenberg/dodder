@@ -56,7 +56,7 @@ func (json *Transacted) FromStringAndMetadata(
 		json.BlobString = blobStringBuilder.String()
 	}
 
-	json.BlobId = markl.Format(metadata.GetBlobDigest())
+	json.BlobId = metadata.GetBlobDigest().String()
 	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.Description.String()
 	json.ObjectId = objectId
@@ -115,10 +115,8 @@ func (json *Transacted) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = markl.SetHexBytes(
-			markl.HashTypeIdSha256,
-			object.Metadata.GetBlobDigestMutable(),
-			[]byte(json.BlobId),
+		if err = object.Metadata.GetBlobDigestMutable().Set(
+			json.BlobId,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

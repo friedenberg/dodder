@@ -363,13 +363,13 @@ func (importer importer) ImportBlobIfNecessary(
 				blobId,
 				&progressWriter,
 			); err != nil {
-				if errors.Is(err, &env_dir.ErrBlobAlreadyExists{}) {
+				if env_dir.IsErrBlobAlreadyExists(err) {
 					err = nil
 				} else {
 					// TODO add context that this could not be copied from the
 					// remote blob
 					// store
-					err = errors.Wrap(err)
+					ctx.Cancel(err)
 					return
 				}
 

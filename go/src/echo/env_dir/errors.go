@@ -32,7 +32,7 @@ type ErrBlobAlreadyExists struct {
 func (err ErrBlobAlreadyExists) Error() string {
 	return fmt.Sprintf(
 		"File with blob_id %s already exists: %s",
-		markl.Format(err.BlobId),
+		err.BlobId,
 		err.Path,
 	)
 }

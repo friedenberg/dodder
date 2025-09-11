@@ -133,25 +133,25 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			blobSha := sk.GetBlobDigest()
+			blobDigest := sk.GetBlobDigest()
 
 			var ok bool
-			ok, err = server.blobCache.HasBlob(blobSha)
+			ok, err = server.blobCache.HasBlob(blobDigest)
 			if err != nil {
 				response.Error(err)
 				return
 			}
 
-			blobShaString := markl.Format(blobSha)
+			blobDigestString := blobDigest.String()
 
-			if ok || writtenNeededBlobs.ContainsExpansion(blobShaString) {
+			if ok || writtenNeededBlobs.ContainsExpansion(blobDigestString) {
 				continue
 			}
 
-			ui.Log().Printf("missing blob: %s", blobSha)
+			ui.Log().Printf("missing blob: %s", blobDigest)
 
-			fmt.Fprintf(b, "%s\n", blobSha)
-			writtenNeededBlobs.Add(blobShaString)
+			fmt.Fprintf(b, "%s\n", blobDigest)
+			writtenNeededBlobs.Add(blobDigestString)
 			count++
 		}
 

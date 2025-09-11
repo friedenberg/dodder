@@ -21,7 +21,7 @@ func (page *page) seekToFirstBinarySearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + markl.Format(expected),
+			"fd nil: " + markl.FormatBytesAsHext(expected),
 		)
 		return
 	}
@@ -71,7 +71,7 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, markl.Format(expected)),
+		fmt.Sprintf("%d: %s", loops, markl.FormatBytesAsHext(expected)),
 	)
 
 	return
@@ -89,7 +89,7 @@ func (page *page) seekToFirstLinearSearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + markl.Format(expected),
+			"fd nil: " + markl.FormatBytesAsHext(expected),
 		)
 		return
 	}
@@ -111,7 +111,7 @@ func (page *page) seekToFirstLinearSearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(markl.Format(expected))
+	err = collections.MakeErrNotFoundString(markl.FormatBytesAsHext(expected))
 
 	return
 }

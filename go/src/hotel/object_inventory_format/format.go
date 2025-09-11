@@ -296,7 +296,7 @@ func writeMerkleIdKey(
 	n, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		key.String(),
-		markl.Format(merkleId),
+		markl.FormatBytesAsHext(merkleId),
 	)
 	if err != nil {
 		err = errors.Wrap(err)
@@ -380,7 +380,7 @@ func GetDigestForContextDebug(
 
 	value := sb.String()
 
-	ui.Debug().Printf("%q -> %s", value, markl.Format(digest))
+	ui.Debug().Printf("%q -> %s", value, markl.FormatBytesAsHext(digest))
 
 	return
 }

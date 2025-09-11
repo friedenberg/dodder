@@ -116,6 +116,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 		return
 	}
 
+	// TODO determine via config
 	digest, repool := markl.HashTypeSha256.FromStringFormat(
 		"%s%s%s%s",
 		entry.EntryType,
@@ -126,7 +127,8 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 
 	defer repool()
 
-	key = markl.Format(digest)
+	// TODO determine via config, and switch to digest.String()
+	key = markl.FormatBytesAsHext(digest)
 
 	return
 }

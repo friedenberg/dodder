@@ -30,7 +30,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 				return
 			}
 
-			serverBlobCache.shas.Add(markl.Format(sh))
+			serverBlobCache.shas.Add(markl.FormatBytesAsHext(sh))
 			count++
 		}
 
@@ -56,7 +56,7 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 	}
 
 	if serverBlobCache.shas.ContainsExpansion(
-		markl.Format(blobSha),
+		markl.FormatBytesAsHext(blobSha),
 	) {
 		ok = true
 		return
