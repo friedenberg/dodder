@@ -7,6 +7,7 @@ import (
 	"maps"
 	"slices"
 	"strings"
+	"time"
 
 	"code.linenisgreat.com/chrest/go/src/bravo/client"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -1056,6 +1057,26 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(writer, object.GetType().String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			}
+		},
+	},
+	"object_id-date": {
+		FormatFuncConstructor: func(
+			repo *Repo,
+			writer interfaces.WriterAndStringWriter,
+		) interfaces.FuncIter[*sku.Transacted] {
+			return func(object *sku.Transacted) (err error) {
+				if _, err = fmt.Fprintf(
+					writer,
+					"%s: %s\n",
+					object.GetObjectId(),
+					object.GetTai().Format(time.RFC3339Nano),
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

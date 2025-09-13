@@ -23,14 +23,15 @@ import (
 // Makes hard assumptions about the availability of the blobs associated with
 // the *sku.CheckedOut.
 func (store *Store) MergeCheckedOut(
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 	parentNegotiator sku.ParentNegotiator,
 	allowMergeConflicts bool,
 ) (commitOptions sku.CommitOptions, err error) {
 	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
 
 	// TODO determine why the internal can ever be null
-	if co.GetSku().Metadata.GetObjectDigest().IsNull() || allowMergeConflicts {
+	if checkedOut.GetSku().Metadata.GetObjectDigest().IsNull() ||
+		allowMergeConflicts {
 		return
 	}
 
@@ -38,18 +39,18 @@ func (store *Store) MergeCheckedOut(
 
 	// TODO add checkout_mode.BlobOnly
 	if markl.Equals(
-		co.GetSku().Metadata.GetObjectDigest(),
-		co.GetSkuExternal().Metadata.GetObjectDigest(),
+		checkedOut.GetSku().Metadata.GetObjectDigest(),
+		checkedOut.GetSkuExternal().Metadata.GetObjectDigest(),
 	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return
-	} else if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().Metadata) {
-		if !co.GetSku().Metadata.Tai.Less(co.GetSkuExternal().Metadata.Tai) {
+	} else if checkedOut.GetSku().Metadata.EqualsSansTai(&checkedOut.GetSkuExternal().Metadata) {
+		if !checkedOut.GetSku().Metadata.Tai.Less(checkedOut.GetSkuExternal().Metadata.Tai) {
 			// TODO implement retroactive change
 		}
 
 		return
-	} else if markl.Equals(co.GetSku().Metadata.GetBlobDigest(), co.GetSkuExternal().Metadata.GetBlobDigest()) {
+	} else if markl.Equals(checkedOut.GetSku().Metadata.GetBlobDigest(), checkedOut.GetSkuExternal().Metadata.GetBlobDigest()) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob
@@ -64,9 +65,9 @@ func (store *Store) MergeCheckedOut(
 	}
 
 	conflicted := sku.Conflicted{
-		CheckedOut: co,
-		Local:      co.GetSku(),
-		Remote:     co.GetSkuExternal(),
+		CheckedOut: checkedOut,
+		Local:      checkedOut.GetSku(),
+		Remote:     checkedOut.GetSkuExternal(),
 	}
 
 	if err = conflicted.FindBestCommonAncestor(parentNegotiator); err != nil {
@@ -98,7 +99,7 @@ func (store *Store) MergeCheckedOut(
 				}
 			}
 
-			co.SetState(checked_out_state.Conflicted)
+			checkedOut.SetState(checked_out_state.Conflicted)
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -106,7 +107,10 @@ func (store *Store) MergeCheckedOut(
 		return
 	}
 
-	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), skuReplacement)
+	sku.TransactedResetter.ResetWith(
+		checkedOut.GetSkuExternal(),
+		skuReplacement,
+	)
 
 	return
 }

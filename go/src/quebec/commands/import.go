@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/importer"
@@ -91,16 +92,20 @@ func (cmd Import) Run(req command.Request) {
 
 	var afterDecoding func(*sku.Transacted) error
 
-	// 	blobImporter := importer.MakeBlobImporter(
-	// 		repo.GetEnvRepo(),
-	// 		importerOptions.RemoteBlobStore,
-	// 		repo.GetBlobStore(),
-	// 	)
+	blobImporter := importer.MakeBlobImporter(
+		repo.GetEnvRepo(),
+		importerOptions.RemoteBlobStore,
+		repo.GetBlobStore(),
+	)
 
-	// 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
-	// 		repo.GetUI(),
-	// 	)
+	blobImporter.UseDestinationHashType = true
 
+	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
+		repo.GetUI(),
+		false,
+	)
+
+	// TODO traverse object graph and rewrite all signature in topological order
 	// TODO move this to the importer directly
 	if cmd.OverwriteSignatures {
 		afterDecoding = func(object *sku.Transacted) (err error) {
@@ -108,18 +113,32 @@ func (cmd Import) Run(req command.Request) {
 			object.Metadata.GetObjectSigMutable().Reset()
 			object.Metadata.GetRepoPubKeyMutable().Reset()
 
-			// if err = blobImporter.ImportBlobIfNecessary(
-			// 	object.Metadata.GetBlobDigest(),
-			// 	object,
-			// ); err != nil { // TODO rewrite blob
-			// 	if env_dir.IsErrBlobAlreadyExists(err) {
-			// 		err = nil
-			// 	} else {
-			// 		err = errors.Wrap(err)
-			// 		return
-			// 	}
-			// }
+			if err = blobImporter.ImportBlobIfNecessary(
+				object.Metadata.GetBlobDigest(),
+				object,
+			); err != nil { // TODO rewrite blob
+				var errNotEqual markl.ErrNotEqual
 
+				if errors.As(err, &errNotEqual) {
+					if errNotEqual.IsDifferentHashTypes() {
+						err = nil
+						object.Metadata.GetBlobDigestMutable().ResetWithMarklId(
+							errNotEqual.Actual,
+						)
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				} else if env_dir.IsErrBlobAlreadyExists(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			// TODO add mother?
+			// TODO rewrite time?
 			if err = object.FinalizeAndSignOverwrite(
 				repo.GetEnvRepo().GetConfigPrivate().Blob,
 			); err != nil {

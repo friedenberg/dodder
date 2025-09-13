@@ -324,11 +324,13 @@ func (importer importer) importNewObject(
 func (importer importer) ImportBlobIfNecessary(
 	object *sku.Transacted,
 ) (err error) {
-	if err = importer.blobImporter.importBlobIfNecessary(
+	copyResult := importer.blobImporter.importBlobIfNecessary(
 		importer.envRepo.GetDefaultBlobStore(),
 		object.Metadata.GetBlobDigest(),
 		object,
-	); err != nil {
+	)
+
+	if err = copyResult.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

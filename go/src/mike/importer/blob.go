@@ -1,3 +1,4 @@
+// TODO rename to remote_transfer
 package importer
 
 import (
@@ -25,10 +26,11 @@ func MakeBlobImporter(
 }
 
 type BlobImporter struct {
-	EnvRepo        env_repo.Env
-	CopierDelegate interfaces.FuncIter[sku.BlobCopyResult]
-	Src            interfaces.BlobStore
-	Dsts           []interfaces.BlobStore
+	EnvRepo                env_repo.Env
+	CopierDelegate         interfaces.FuncIter[sku.BlobCopyResult]
+	Src                    interfaces.BlobStore
+	Dsts                   []interfaces.BlobStore
+	UseDestinationHashType bool
 
 	Counts Counts
 }
@@ -49,11 +51,13 @@ func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 	}
 
 	for _, blobStore := range blobImporter.Dsts {
-		if err = blobImporter.importBlobIfNecessary(
+		copyResult := blobImporter.importBlobIfNecessary(
 			blobStore,
 			blobId,
 			object,
-		); err != nil {
+		)
+
+		if err = copyResult.GetError(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -109,30 +113,34 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 	dst interfaces.BlobStore,
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
-) (err error) {
+) (copyResult sku.BlobCopyResult) {
+	copyResult.ObjectOrNil = object
+
 	var progressWriter env_ui.ProgressWriter
 
-	if err = errors.RunChildContextWithPrintTicker(
+	if err := errors.RunChildContextWithPrintTicker(
 		blobImporter.EnvRepo,
 		func(ctx interfaces.Context) {
-			copyResult := sku.BlobCopyResult{
-				ObjectOrNil: object,
-			}
-
 			blobImporter.Counts.Total++
 
-			// TODO the written blob digest should be determined by an option
+			var hashType interfaces.HashType
+
+			if blobImporter.UseDestinationHashType {
+				hashType = dst.GetDefaultHashType()
+			}
+
 			copyResult.CopyResult = blob_stores.CopyBlobIfNecessary(
 				blobImporter.EnvRepo,
 				dst,
 				blobImporter.Src,
 				blobId,
 				&progressWriter,
+				hashType,
 			)
 
 			if copyResult.IsError() {
 				blobImporter.Counts.Failed++
-				ctx.Cancel(err)
+				ctx.Cancel(copyResult.GetError())
 			} else if copyResult.IsMissing() {
 				blobImporter.Counts.Failed++
 			} else if copyResult.Exists() {
@@ -141,10 +149,10 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 				blobImporter.Counts.Succeeded++
 			}
 
-			if err = blobImporter.emitCopyResultIfNecessary(
+			if err := blobImporter.emitCopyResultIfNecessary(
 				copyResult,
 			); err != nil {
-				err = errors.Wrap(err)
+				copyResult.SetError(err)
 				return
 			}
 		},
@@ -157,7 +165,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 		},
 		3*time.Second,
 	); err != nil {
-		err = errors.Wrap(err)
+		copyResult.SetError(err)
 		return
 	}
 

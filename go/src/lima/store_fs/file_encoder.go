@@ -85,14 +85,16 @@ func (encoder *fileEncoder) EncodeObject(
 
 	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
 
-	var ar interfaces.BlobReader
+	var blobReader interfaces.BlobReader
 
-	if ar, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobReader(object.GetBlobDigest()); err != nil {
+	if blobReader, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobReader(
+		object.GetBlobDigest(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.DeferredCloser(&err, blobReader)
 
 	switch {
 	case blobPath != "" && objectPath != "":
@@ -125,7 +127,7 @@ func (encoder *fileEncoder) EncodeObject(
 
 			defer errors.DeferredCloser(&err, fileBlob)
 
-			if _, err = io.Copy(fileBlob, ar); err != nil {
+			if _, err = io.Copy(fileBlob, blobReader); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -157,7 +159,7 @@ func (encoder *fileEncoder) EncodeObject(
 
 		defer errors.DeferredCloser(&err, fBlob)
 
-		if _, err = io.Copy(fBlob, ar); err != nil {
+		if _, err = io.Copy(fBlob, blobReader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

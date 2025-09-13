@@ -190,6 +190,28 @@ EOM
   run_dodder_init_workspace
 }
 
+function run_dodder_init_sha256 {
+  if [[ $# -eq 0 ]]; then
+    args=("test")
+  else
+    args=("$@")
+  fi
+
+	run_dodder init \
+		-yin <(cat_yin) \
+		-yang <(cat_yang) \
+		-lock-internal-files=false \
+		-override-xdg-with-cwd \
+		-hash_type-id sha256 \
+		"${args[@]}"
+
+	assert_success
+	assert_output --regexp - <<-EOM
+		\[!md @sha256-.+ !toml-type-v1]
+		\[konfig @sha256-.+ !toml-config-v2]
+	EOM
+}
+
 function run_dodder_init_workspace {
   run_dodder init-workspace
 }

@@ -104,6 +104,10 @@ func (err ErrNotEqual) Is(target error) bool {
 	return ok
 }
 
+func (err ErrNotEqual) IsDifferentHashTypes() bool {
+	return err.Expected.GetMarklType() != err.Actual.GetMarklType()
+}
+
 type ErrNotEqualBytes struct {
 	Expected, Actual []byte
 }

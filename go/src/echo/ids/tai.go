@@ -115,6 +115,10 @@ func (tai Tai) StringDefaultFormat() string {
 	return tai.Format(f)
 }
 
+func (tai Tai) StringBoxFormat() string {
+	return tai.Format(string_format_writer.StringFormatDateTime)
+}
+
 func (tai Tai) Format(v string) string {
 	return tai.AsTime().Format(v)
 }
