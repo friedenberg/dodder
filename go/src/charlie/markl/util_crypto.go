@@ -36,7 +36,7 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetMerkleId(tipe, src); err != nil {
+		if err = dst.SetMarklId(tipe, src); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -63,7 +63,7 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetMerkleId(
+		if err = dst.SetMarklId(
 			TypeIdAgeX25519Sec,
 			data,
 		); err != nil {
@@ -118,7 +118,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		pubKey := privateKey.Public()
 		pubKeyBytes := pubKey.(ed25519.PublicKey)
 
-		if err = public.SetMerkleId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -134,7 +134,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		privateKey := ed25519.PrivateKey(private.GetBytes())
 		pubKeyBytes := privateKey.Public().(ed25519.PublicKey)
 
-		if err = public.SetMerkleId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -162,7 +162,7 @@ func MakeNonce(bites []byte, format string) (nonce Id, err error) {
 		return
 	}
 
-	if err = nonce.SetMerkleId(
+	if err = nonce.SetMarklId(
 		TypeIdNonce,
 		bites,
 	); err != nil {

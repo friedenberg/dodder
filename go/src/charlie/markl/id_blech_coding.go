@@ -55,7 +55,7 @@ func SetBlechCombinedHRPAndData(
 
 	data := typeIdAndData[len(typeId):]
 
-	if err = id.SetMerkleId(typeId, data); err != nil {
+	if err = id.SetMarklId(typeId, data); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -100,7 +100,7 @@ func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 		return
 	}
 
-	if err = id.SetMerkleId(
+	if err = id.SetMarklId(
 		HashTypeIdSha256,
 		decodedBytes,
 	); err != nil {

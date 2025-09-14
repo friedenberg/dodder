@@ -56,7 +56,7 @@ type (
 		encoding.BinaryUnmarshaler
 		// encoding.TextUnmarshaler
 		// io.ReaderFrom
-		SetMerkleId(typeId string, bites []byte) error
+		SetMarklId(typeId string, bites []byte) error
 		Reset()
 		ResetWithMarklId(MarklId)
 		SetFormat(string) error

@@ -171,7 +171,7 @@ func (transacted *Transacted) GetBlobDigest() interfaces.MarklId {
 func (transacted *Transacted) SetBlobDigest(
 	merkleId interfaces.MarklId,
 ) (err error) {
-	if err = transacted.Metadata.GetBlobDigestMutable().SetMerkleId(
+	if err = transacted.Metadata.GetBlobDigestMutable().SetMarklId(
 		merkleId.GetMarklType().GetMarklTypeId(),
 		merkleId.GetBytes(),
 	); err != nil {

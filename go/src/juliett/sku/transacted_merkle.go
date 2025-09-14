@@ -19,7 +19,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 		return
 	}
 
-	if err = motherSig.SetMerkleId(
+	if err = motherSig.SetMarklId(
 		markl.TypeIdEd25519Sig,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
@@ -362,7 +362,7 @@ func (transacted *Transacted) CalculateDigest(
 
 	defer markl.PutBlobId(actual)
 
-	if err = digest.SetMerkleId(
+	if err = digest.SetMarklId(
 		actual.GetMarklType().GetMarklTypeId(),
 		actual.GetBytes(),
 	); err != nil {

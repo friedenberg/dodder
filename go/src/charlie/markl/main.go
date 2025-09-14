@@ -11,11 +11,6 @@ type PrivateKeyGenerator interface {
 	GeneratePrivateKey() (err error)
 }
 
-type (
-	// TODO remove
-	PublicKey = Id
-)
-
 func Sign(
 	key interfaces.MarklId,
 	message interfaces.MarklId,
@@ -51,7 +46,7 @@ func Sign(
 		return
 	}
 
-	if err = dst.SetMerkleId(tipe, sig); err != nil {
+	if err = dst.SetMarklId(tipe, sig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

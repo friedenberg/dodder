@@ -16,7 +16,7 @@ const (
 )
 
 type RoundTripperBufioWrappedSigner struct {
-	markl.PublicKey
+	PublicKey markl.Id
 	roundTripperBufio
 }
 

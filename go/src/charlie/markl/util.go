@@ -163,7 +163,7 @@ func SetHexBytes(
 			return
 		}
 
-		if err = dst.SetMerkleId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
+		if err = dst.SetMarklId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -178,7 +178,7 @@ func SetDigester(
 ) {
 	digest := src.GetMarklId()
 	errors.PanicIfError(
-		dst.SetMerkleId(
+		dst.SetMarklId(
 			digest.GetMarklType().GetMarklTypeId(),
 			digest.GetBytes(),
 		),

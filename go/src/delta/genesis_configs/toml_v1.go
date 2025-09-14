@@ -79,7 +79,7 @@ func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id {
 	return &config.PrivateKey
 }
 
-func (config *TomlV1Private) GetPublicKey() markl.PublicKey {
+func (config *TomlV1Private) GetPublicKey() markl.Id {
 	public, err := markl.GetPublicKey(config.PrivateKey)
 	errors.PanicIfError(err)
 	return public
@@ -89,7 +89,7 @@ func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV1Public) GetPublicKey() markl.PublicKey {
+func (config TomlV1Public) GetPublicKey() markl.Id {
 	return config.PublicKey
 }
 

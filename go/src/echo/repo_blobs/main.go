@@ -14,7 +14,7 @@ import (
 
 type Blob interface {
 	GetRepoBlob() Blob
-	GetPublicKey() markl.PublicKey
+	GetPublicKey() markl.Id
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
 }

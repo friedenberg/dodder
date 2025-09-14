@@ -50,7 +50,7 @@ func CopyBlobIfNecessary(
 		var err error
 
 		if readCloser, err = src.MakeBlobReader(expectedDigest); err != nil {
-			copyResult.SetError( err)
+			copyResult.SetError(err)
 			return
 		}
 	}

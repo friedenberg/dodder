@@ -219,7 +219,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 	xdgDotenvPath string,
 	options env_ui.Options,
 	repo *local_working_copy.Repo,
-	pubkey markl.PublicKey,
+	pubkey markl.Id,
 ) (remoteHTTP repo.WorkingCopy) {
 	envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
 		req,
@@ -291,7 +291,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	env env_local.Env,
 	dir string,
 	repo *local_working_copy.Repo,
-	pubkey markl.PublicKey,
+	pubkey markl.Id,
 ) (remoteHTTP repo.WorkingCopy) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 

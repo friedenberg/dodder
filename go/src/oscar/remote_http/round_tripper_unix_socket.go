@@ -18,7 +18,7 @@ type RoundTripperUnixSocket struct {
 // TODO add public key
 func (roundTripper *RoundTripperUnixSocket) Initialize(
 	remote *Server,
-	pubkey markl.PublicKey,
+	pubkey markl.Id,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

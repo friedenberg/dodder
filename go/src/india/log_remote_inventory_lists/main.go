@@ -25,7 +25,7 @@ const (
 
 type Entry struct {
 	EntryType
-	markl.PublicKey
+	PublicKey markl.Id
 	*sku.Transacted
 }
 

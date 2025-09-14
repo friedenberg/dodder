@@ -26,7 +26,7 @@ type RoundTripperStdio struct {
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envRepo env_repo.Env,
 	config store_config.Config,
-	pubkey markl.PublicKey,
+	pubkey markl.Id,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

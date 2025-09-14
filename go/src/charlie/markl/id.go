@@ -159,7 +159,7 @@ func (id *Id) setWithoutFormat(value string) (err error) {
 		return
 	}
 
-	if err = id.SetMerkleId(typeId, id.data); err != nil {
+	if err = id.SetMarklId(typeId, id.data); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,7 +173,7 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 		return
 	}
 
-	if err = id.SetMerkleId(
+	if err = id.SetMarklId(
 		digest.GetMarklType().GetMarklTypeId(),
 		digest.GetBytes(),
 	); err != nil {
@@ -184,7 +184,7 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	return
 }
 
-func (id *Id) SetMerkleId(tipe string, bites []byte) (err error) {
+func (id *Id) SetMarklId(tipe string, bites []byte) (err error) {
 	if tipe == "" && len(bites) == 0 {
 		id.Reset()
 		return
@@ -255,7 +255,7 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	)
 
 	errors.PanicIfError(
-		id.SetMerkleId(marklTypeId, bites),
+		id.SetMarklId(marklTypeId, bites),
 	)
 }
 

@@ -25,7 +25,7 @@ func (id IdBinaryDecodingTypeData) UnmarshalBinary(
 		return
 	}
 
-	if err = id.SetMerkleId(string(tipeBytes), bytesAfterTipe); err != nil {
+	if err = id.SetMarklId(string(tipeBytes), bytesAfterTipe); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,7 +63,7 @@ func (id *Id) UnmarshalBinary(
 		return
 	}
 
-	if err = id.SetMerkleId(string(tipeBytes), bytesAfterTipe); err != nil {
+	if err = id.SetMarklId(string(tipeBytes), bytesAfterTipe); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

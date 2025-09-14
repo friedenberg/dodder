@@ -104,7 +104,7 @@ func SetMerkleIdWithFormat(
 		return
 	}
 
-	if err = id.SetMerkleId(
+	if err = id.SetMarklId(
 		marklTypeId,
 		data,
 	); err != nil {
