@@ -62,7 +62,7 @@ func (server *Server) writeInventoryList(
 			}
 
 			if err = logEntry.PublicKey.SetMarklId(
-				markl.TypeIdEd25519Pub,
+				markl.FormatIdEd25519Pub,
 				bites,
 			); err != nil {
 				response.Error(err)

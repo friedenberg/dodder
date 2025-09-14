@@ -15,7 +15,7 @@ func (id Id) MarshalText() (bites []byte, err error) {
 
 	var hrp string
 
-	if format := id.GetPurpose(); format != "" {
+	if prupose := id.GetPurpose(); prupose != "" {
 		hrp = fmt.Sprintf(
 			"%s@%s",
 			id.GetPurpose(),
@@ -46,18 +46,18 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 		return
 	}
 
-	formatId, typeId, ok := strings.Cut(formatAndTypeId, "@")
+	purpose, formatId, ok := strings.Cut(formatAndTypeId, "@")
 
 	if ok {
-		if err = id.SetPurpose(formatId); err != nil {
+		if err = id.SetPurpose(purpose); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		typeId = formatAndTypeId
+		formatId = formatAndTypeId
 	}
 
-	if id.format, err = GetMarklTypeOrError(typeId); err != nil {
+	if id.format, err = GetFormatOrError(formatId); err != nil {
 		err = errors.Wrapf(
 			err,
 			"failed to unmarshal %T with contents: %s",

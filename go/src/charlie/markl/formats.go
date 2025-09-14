@@ -5,55 +5,47 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
+// actual formats
 const (
-	// TODO move to ids' builtin types
-	// and then add registration
 	// keep sorted
+	FormatIdEd25519Pub = "ed25519_pub"
+	FormatIdEd25519Sec = "ed25519_sec"
+	FormatIdEd25519Sig = "ed25519_sig"
 
-	// Digests
-	PurposeObjectDigestV1             = "dodder-object-digest-sha256-v1"
-	PurposeObjectDigestV2             = "dodder-object-digest-v2"
-	PurposeV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
-	// FormatIdObjectDigestObjectId       = "dodder-object-digest-objectId-v1"
-	// FormatIdObjectDigestObjectIdTai    =
-	// "dodder-object-digest-objectId+tai-v1"
+	FormatIdAgeX25519Pub = "age_x25519_pub"
+	FormatIdAgeX25519Sec = "age_x25519_sec"
 
-	// Signatures
-	PurposeObjectMotherSigV1     = "dodder-object-mother-sig-v1"
-	PurposeObjectSigV0           = "dodder-repo-sig-v1"
-	PurposeObjectSigV1           = "dodder-object-sig-v1"
-	PurposeRequestAuthResponseV1 = "dodder-request_auth-response-v1"
-	PurposeRequestRepoSigV1      = "dodder-request_auth-repo-sig-v1"
-
-	// PubKeys
-	PurposeRepoPubKeyV1   = "dodder-repo-public_key-v1"
-	PurposeMadderPubKeyV1 = "madder-public_key-v1"
-
-	// PrivateKeys
-	PurposeRepoPrivateKeyV1   = "dodder-repo-private_key-v1"
-	PurposeMadderPrivateKeyV0 = "madder-private_key-v0"
-	PurposeMadderPrivateKeyV1 = "madder-private_key-v1"
-
-	// Arbitrary
-	PurposeRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
+	FormatIdNonce = "nonce"
 )
 
 func init() {
-	makeType(PurposeObjectMotherSigV1)
-	makeType(PurposeObjectSigV0)
-	makeType(PurposeObjectSigV1)
+	makeFormat(FormatIdEd25519Pub)
+	makeFormat(FormatIdEd25519Sec)
+	makeFormat(FormatIdEd25519Sig)
 
-	makeType(PurposeRepoPrivateKeyV1)
-	makeType(PurposeRepoPubKeyV1)
+	makeFormat(FormatIdAgeX25519Pub)
+	makeFormat(FormatIdAgeX25519Sec)
 
-	makeType(PurposeRequestAuthChallengeV1)
-	makeType(PurposeRequestAuthResponseV1)
+	makeFormat(FormatIdNonce)
+}
 
-	makeType(PurposeMadderPubKeyV1)
-	makeType(PurposeMadderPrivateKeyV1)
+var formats map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
+
+func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
+	if formatId == "zit-repo-private_key-v1" {
+		formatId = PurposeRepoPrivateKeyV1
+	}
+
+	format, ok := formats[formatId]
+
+	if !ok {
+		err := errors.Errorf("unknown format: %q", formatId)
+		return nil, err
+	}
+
+	return format, nil
 }
 
 type format struct {
@@ -66,119 +58,14 @@ func (format format) GetMarklFormatId() string {
 	return format.id
 }
 
-func makeType(formatId string) {
-	_, alreadyExists := types[formatId]
+func makeFormat(formatId string) {
+	_, alreadyExists := formats[formatId]
 
 	if alreadyExists {
 		panic(fmt.Sprintf("hash type already registered: %q", formatId))
 	}
 
-	types[formatId] = format{
+	formats[formatId] = format{
 		id: formatId,
 	}
-}
-
-// TODO use type and format registrations
-func SetMarklIdWithFormatBlech32(
-	id interfaces.MutableMarklId,
-	purpose string,
-	blechValue string,
-) (err error) {
-	if err = id.SetPurpose(purpose); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = id.Set(
-		blechValue,
-	); err != nil {
-		if errors.Is(err, blech32.ErrSeparatorMissing) {
-			if err = SetSha256(
-				id,
-				blechValue,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	marklTypeId := id.GetMarklFormat()
-
-	switch marklTypeId.GetMarklFormatId() {
-	case TypeIdEd25519Sig:
-		switch purpose {
-		case PurposeObjectMotherSigV1,
-			PurposeObjectSigV0,
-			PurposeObjectSigV1:
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return
-		}
-
-	case TypeIdEd25519Pub:
-		switch purpose {
-		case PurposeRepoPubKeyV1:
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return
-		}
-
-	case HashTypeIdSha256:
-		switch purpose {
-		case PurposeObjectDigestV1,
-			PurposeV5MetadataDigestWithoutTai,
-			"":
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return
-		}
-
-	case HashTypeIdBlake2b256:
-		switch purpose {
-		case PurposeObjectDigestV1,
-			PurposeV5MetadataDigestWithoutTai,
-			"":
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return
-		}
-
-	default:
-		err = errors.Errorf(
-			"unsupported format: %q. Value: %q",
-			purpose,
-			blechValue,
-		)
-		return
-	}
-
-	return
 }

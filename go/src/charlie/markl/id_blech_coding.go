@@ -11,20 +11,20 @@ import (
 )
 
 func StringHRPCombined(id interfaces.MarklId) string {
-	tipe := id.GetMarklFormat()
+	format := id.GetMarklFormat()
 	data := id.GetBytes()
 
-	if tipe == nil && len(data) == 0 {
+	if format == nil && len(data) == 0 {
 		return ""
 	}
 
 	if len(data) == 0 {
 		return ""
 	} else {
-		typeId := tipe.GetMarklFormatId()
-		combined := make([]byte, len(typeId)+len(data))
-		copy(combined, []byte(typeId))
-		copy(combined[len(typeId):], data)
+		formatId := format.GetMarklFormatId()
+		combined := make([]byte, len(formatId)+len(data))
+		copy(combined, []byte(formatId))
+		copy(combined[len(formatId):], data)
 		bites, err := blech32.EncodeDataOnly(combined)
 		errors.PanicIfError(err)
 		return string(bites)
@@ -35,27 +35,27 @@ func SetBlechCombinedHRPAndData(
 	id interfaces.MutableMarklId,
 	value string,
 ) (err error) {
-	var typeId string
+	var formatId string
 
-	var typeIdAndData []byte
+	var formatIdAndData []byte
 
-	if typeIdAndData, err = blech32.DecodeDataOnly([]byte(value)); err != nil {
+	if formatIdAndData, err = blech32.DecodeDataOnly([]byte(value)); err != nil {
 		err = errors.Wrapf(err, "Value: %q", value)
 		return
 	}
 
-	if bytes.HasPrefix(typeIdAndData, []byte(HashTypeIdSha256)) {
-		typeId = HashTypeIdSha256
-	} else if bytes.HasPrefix(typeIdAndData, []byte(HashTypeIdBlake2b256)) {
-		typeId = HashTypeIdBlake2b256
+	if bytes.HasPrefix(formatIdAndData, []byte(HashTypeIdSha256)) {
+		formatId = HashTypeIdSha256
+	} else if bytes.HasPrefix(formatIdAndData, []byte(HashTypeIdBlake2b256)) {
+		formatId = HashTypeIdBlake2b256
 	} else {
-		err = errors.Errorf("unsupported format: %x", typeIdAndData)
+		err = errors.Errorf("unsupported format: %x", formatIdAndData)
 		return
 	}
 
-	data := typeIdAndData[len(typeId):]
+	data := formatIdAndData[len(formatId):]
 
-	if err = id.SetMarklId(typeId, data); err != nil {
+	if err = id.SetMarklId(formatId, data); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,6 +105,111 @@ func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 		decodedBytes,
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO use type and format registrations
+func SetMarklIdWithFormatBlech32(
+	id interfaces.MutableMarklId,
+	purpose string,
+	blechValue string,
+) (err error) {
+	if err = id.SetPurpose(purpose); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = id.Set(
+		blechValue,
+	); err != nil {
+		if errors.Is(err, blech32.ErrSeparatorMissing) {
+			if err = SetSha256(
+				id,
+				blechValue,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	marklTypeId := id.GetMarklFormat()
+
+	switch marklTypeId.GetMarklFormatId() {
+	case FormatIdEd25519Sig:
+		switch purpose {
+		case PurposeObjectMotherSigV1,
+			PurposeObjectSigV0,
+			PurposeObjectSigV1:
+			break
+
+		default:
+			err = errors.Errorf(
+				"unsupported format: %q. Value: %q",
+				purpose,
+				blechValue,
+			)
+			return
+		}
+
+	case FormatIdEd25519Pub:
+		switch purpose {
+		case PurposeRepoPubKeyV1:
+			break
+
+		default:
+			err = errors.Errorf(
+				"unsupported format: %q. Value: %q",
+				purpose,
+				blechValue,
+			)
+			return
+		}
+
+	case HashTypeIdSha256:
+		switch purpose {
+		case PurposeObjectDigestV1,
+			PurposeV5MetadataDigestWithoutTai,
+			"":
+			break
+
+		default:
+			err = errors.Errorf(
+				"unsupported format: %q. Value: %q",
+				purpose,
+				blechValue,
+			)
+			return
+		}
+
+	case HashTypeIdBlake2b256:
+		switch purpose {
+		case PurposeObjectDigestV1,
+			PurposeV5MetadataDigestWithoutTai,
+			"":
+			break
+
+		default:
+			err = errors.Errorf(
+				"unsupported format: %q. Value: %q",
+				purpose,
+				blechValue,
+			)
+			return
+		}
+
+	default:
+		err = errors.Errorf(
+			"unsupported format: %q. Value: %q",
+			purpose,
+			blechValue,
+		)
 		return
 	}
 

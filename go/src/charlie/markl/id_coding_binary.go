@@ -18,14 +18,14 @@ func (id IdBinaryDecodingTypeData) UnmarshalBinary(
 		return
 	}
 
-	tipeBytes, bytesAfterTipe, ok := bytes.Cut(bites, []byte{'\x00'})
+	formatIdBytes, bytesAfterFormatId, ok := bytes.Cut(bites, []byte{'\x00'})
 
 	if !ok {
 		err = errors.Errorf("expected empty byte, but none found")
 		return
 	}
 
-	if err = id.SetMarklId(string(tipeBytes), bytesAfterTipe); err != nil {
+	if err = id.SetMarklId(string(formatIdBytes), bytesAfterFormatId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -56,14 +56,17 @@ func (id *Id) UnmarshalBinary(
 		return
 	}
 
-	tipeBytes, bytesAfterTipe, ok := bytes.Cut(bytesAfterFormat, []byte{'\x00'})
+	formatIdBytes, bytesAfterFormatId, ok := bytes.Cut(
+		bytesAfterFormat,
+		[]byte{'\x00'},
+	)
 
 	if !ok {
 		err = errors.Errorf("expected empty byte, but none found")
 		return
 	}
 
-	if err = id.SetMarklId(string(tipeBytes), bytesAfterTipe); err != nil {
+	if err = id.SetMarklId(string(formatIdBytes), bytesAfterFormatId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,17 +85,17 @@ type IdBinaryEncodingTypeData struct {
 func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	tipe := id.GetMarklFormat()
+	format := id.GetMarklFormat()
 	bites := id.GetBytes()
 
-	if tipe == nil && len(bites) == 0 {
+	if format == nil && len(bites) == 0 {
 		return
-	} else if tipe == nil {
+	} else if format == nil {
 		err = errors.Errorf("empty type")
 		return
 	}
 
-	bytes = append(bytes, []byte(tipe.GetMarklFormatId())...)
+	bytes = append(bytes, []byte(format.GetMarklFormatId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 
@@ -110,20 +113,20 @@ type IdBinaryEncodingFormatTypeData struct {
 func (id Id) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	format := id.GetPurpose()
-	tipe := id.GetMarklFormat()
+	purpose := id.GetPurpose()
+	format := id.GetMarklFormat()
 	bites := id.GetBytes()
 
-	if tipe == nil && len(bites) == 0 && format == "" {
+	if format == nil && len(bites) == 0 && purpose == "" {
 		return
-	} else if tipe == nil {
+	} else if format == nil {
 		err = errors.Errorf("empty type")
 		return
 	}
 
-	bytes = append(bytes, []byte(format)...)
+	bytes = append(bytes, []byte(purpose)...)
 	bytes = append(bytes, '\x00')
-	bytes = append(bytes, []byte(tipe.GetMarklFormatId())...)
+	bytes = append(bytes, []byte(format.GetMarklFormatId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 

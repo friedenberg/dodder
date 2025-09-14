@@ -190,7 +190,7 @@ func (id *Id) SetMarklId(formatId string, bites []byte) (err error) {
 		return
 	}
 
-	if id.format, err = GetMarklTypeOrError(formatId); err != nil {
+	if id.format, err = GetFormatOrError(formatId); err != nil {
 		err = errors.Wrapf(
 			err,
 			"failed to SetMerkleId on %T with contents: %s",

@@ -14,16 +14,16 @@ import (
 
 func GeneratePrivateKey(
 	rand io.Reader,
-	format string,
-	tipe string,
+	purpose string,
+	formatId string,
 	dst interfaces.MutableMarklId,
 ) (err error) {
-	switch tipe {
+	switch formatId {
 	default:
-		err = errors.Errorf("unsupported type: %q", tipe)
+		err = errors.Errorf("unsupported format: %q", formatId)
 		return
 
-	case TypeIdEd25519Sec:
+	case FormatIdEd25519Sec:
 		var src ed25519.PrivateKey
 
 		if _, src, err = ed25519.GenerateKey(rand); err != nil {
@@ -31,17 +31,17 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetPurpose(format); err != nil {
+		if err = dst.SetPurpose(purpose); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = dst.SetMarklId(tipe, src); err != nil {
+		if err = dst.SetMarklId(formatId, src); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case TypeIdAgeX25519Sec:
+	case FormatIdAgeX25519Sec:
 		var ageId age.Identity
 
 		if err = ageId.GenerateIfNecessary(); err != nil {
@@ -58,13 +58,13 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetPurpose(format); err != nil {
+		if err = dst.SetPurpose(purpose); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = dst.SetMarklId(
-			TypeIdAgeX25519Sec,
+			FormatIdAgeX25519Sec,
 			data,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -91,7 +91,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		// legacy
 		fallthrough
 
-	case TypeIdEd25519Sec:
+	case FormatIdEd25519Sec:
 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -118,12 +118,12 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		pubKey := privateKey.Public()
 		pubKeyBytes := pubKey.(ed25519.PublicKey)
 
-		if err = public.SetMarklId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(FormatIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case TypeIdAgeX25519Sec:
+	case FormatIdAgeX25519Sec:
 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -134,7 +134,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		privateKey := ed25519.PrivateKey(private.GetBytes())
 		pubKeyBytes := privateKey.Public().(ed25519.PublicKey)
 
-		if err = public.SetMarklId(TypeIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(FormatIdEd25519Pub, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -163,7 +163,7 @@ func MakeNonce(bites []byte, format string) (nonce Id, err error) {
 	}
 
 	if err = nonce.SetMarklId(
-		TypeIdNonce,
+		FormatIdNonce,
 		bites,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -195,7 +195,7 @@ func GetIOWrapper(
 
 		return
 
-	case TypeIdAgeX25519Sec:
+	case FormatIdAgeX25519Sec:
 		var ageId age.Identity
 
 		var bech32String []byte

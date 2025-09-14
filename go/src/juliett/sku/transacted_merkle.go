@@ -20,7 +20,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMarklId(
-		markl.TypeIdEd25519Sig,
+		markl.FormatIdEd25519Sig,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -194,7 +194,7 @@ func (transacted *Transacted) FinalizeAndSign(
 		privateKey,
 		transacted.Metadata.GetObjectDigest(),
 		config.GetObjectSigMarklTypeId(),
-		markl.TypeIdEd25519Sig,
+		markl.FormatIdEd25519Sig,
 		transacted.Metadata.GetObjectSigMutable(),
 	); err != nil {
 		err = errors.Wrap(err)

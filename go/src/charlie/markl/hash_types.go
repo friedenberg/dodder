@@ -6,7 +6,6 @@ import (
 	"hash"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"golang.org/x/crypto/blake2b"
 )
@@ -17,8 +16,7 @@ const (
 )
 
 var (
-	types     map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
-	hashTypes map[string]HashType               = map[string]HashType{}
+	hashTypes map[string]HashType = map[string]HashType{}
 
 	// TODO remove unnecessary references
 	HashTypeSha256     HashType
@@ -44,13 +42,13 @@ func init() {
 
 func makeHashType(
 	constructor func() hash.Hash,
-	formatId string,
+	id string,
 	self *HashType,
 ) HashType {
-	_, alreadyExists := types[formatId]
+	_, alreadyExists := formats[id]
 
 	if alreadyExists {
-		panic(fmt.Sprintf("hash type already registered: %q", formatId))
+		panic(fmt.Sprintf("hash type already registered: %q", id))
 	}
 
 	hashType := HashType{
@@ -65,7 +63,7 @@ func makeHashType(
 				hash.Reset()
 			},
 		),
-		formatId: formatId,
+		id: id,
 	}
 
 	hash := constructor()
@@ -73,8 +71,8 @@ func makeHashType(
 	hashType.null.allocDataIfNecessary(hash.Size())
 	hashType.null.data = hash.Sum(hashType.null.data)
 
-	types[formatId] = hashType
-	hashTypes[formatId] = hashType
+	formats[id] = hashType
+	hashTypes[id] = hashType
 
 	return hashType
 }

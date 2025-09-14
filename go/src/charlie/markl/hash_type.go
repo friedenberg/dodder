@@ -10,7 +10,7 @@ import (
 
 type HashType struct {
 	pool interfaces.PoolValue[Hash]
-	formatId string
+	id string
 	null Id
 }
 
@@ -39,13 +39,13 @@ func (hashType *HashType) Get() *Hash {
 
 func (hashType HashType) Put(hash *Hash) {
 	errors.PanicIfError(
-		MakeErrWrongType(hashType.formatId, hash.GetMarklFormat().GetMarklFormatId()),
+		MakeErrWrongType(hashType.id, hash.GetMarklFormat().GetMarklFormatId()),
 	)
 	hashType.pool.Put(*hash)
 }
 
 func (hashType HashType) GetMarklFormatId() string {
-	return hashType.formatId
+	return hashType.id
 }
 
 func (hashType HashType) GetSize() int {
@@ -112,7 +112,7 @@ func (hashType HashType) GetBlobIdForHexString(
 
 	id, repool := hash.GetMarklId()
 
-	errors.PanicIfError(SetHexBytes(hashType.formatId, id, []byte(input)))
+	errors.PanicIfError(SetHexBytes(hashType.id, id, []byte(input)))
 
 	return id, repool
 }

@@ -121,18 +121,18 @@ func CompareToReaderAt(
 }
 
 func SetHexBytes(
-	tipe string,
+	formatId string,
 	dst interfaces.MutableMarklId,
 	bites []byte,
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
 
 	if id, ok := dst.(*Id); ok {
-		if id.format, err = GetMarklTypeOrError(tipe); err != nil {
+		if id.format, err = GetFormatOrError(formatId); err != nil {
 			err = errors.Wrapf(
 				err,
 				"failed to SetHexBytes with type %s and bites %s",
-				tipe,
+				formatId,
 				bites,
 			)
 			return
@@ -163,7 +163,7 @@ func SetHexBytes(
 			return
 		}
 
-		if err = dst.SetMarklId(tipe, bytesDecoded[:numberOfBytesDecoded]); err != nil {
+		if err = dst.SetMarklId(formatId, bytesDecoded[:numberOfBytesDecoded]); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

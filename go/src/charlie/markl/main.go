@@ -14,8 +14,8 @@ type PrivateKeyGenerator interface {
 func Sign(
 	key interfaces.MarklId,
 	message interfaces.MarklId,
-	format string,
-	tipe string,
+	purpose string,
+	formatId string,
 	dst interfaces.MutableMarklId,
 ) (err error) {
 	switch key.GetMarklFormat().GetMarklFormatId() {
@@ -23,7 +23,7 @@ func Sign(
 		err = errors.Errorf("not a private key: %q", key.StringWithFormat())
 		return
 
-	case TypeIdEd25519Sec:
+	case FormatIdEd25519Sec:
 	}
 
 	privateKey := ed25519.PrivateKey(key.GetBytes())
@@ -40,13 +40,13 @@ func Sign(
 	}
 
 	if err = dst.SetPurpose(
-		format,
+		purpose,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = dst.SetMarklId(tipe, sig); err != nil {
+	if err = dst.SetMarklId(formatId, sig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +67,7 @@ func Verify(
 		)
 		return
 
-	case TypeIdEd25519Pub:
+	case FormatIdEd25519Pub:
 	}
 
 	pub := ed25519.PublicKey(publicKey.GetBytes())

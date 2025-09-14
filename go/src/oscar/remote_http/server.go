@@ -268,7 +268,7 @@ func (server *Server) addSignatureIfNecessary(
 		privateKey,
 		nonce,
 		markl.PurposeRequestAuthResponseV1,
-		markl.TypeIdEd25519Sig,
+		markl.FormatIdEd25519Sig,
 		&sig,
 	); err != nil {
 		server.EnvLocal.Cancel(err)
