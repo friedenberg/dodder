@@ -12,7 +12,7 @@ import (
 
 func localAllBlobs(
 	basePath string,
-	defaultHashType markl.HashType,
+	defaultHashType markl.FormatHash,
 ) interfaces.SeqError[interfaces.MarklId] {
 	return func(yield func(interfaces.MarklId, error) bool) {
 		id, repool := defaultHashType.GetBlobId()
@@ -79,7 +79,7 @@ func localAllBlobsMultihash(
 				continue
 			}
 
-			hashType, err := markl.GetHashTypeOrError(hashTypeId)
+			hashType, err := markl.GetFormatHashOrError(hashTypeId)
 			if err != nil {
 				if !yield(nil, errors.Wrap(err)) {
 					return

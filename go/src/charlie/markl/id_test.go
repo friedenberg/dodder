@@ -10,22 +10,25 @@ import (
 func TestIdNullAndEqual(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	for _, hashType := range hashTypes {
-		testIdNullAndEqual(t, hashType)
+	for _, formatHash := range formatHashes {
+		testIdNullAndEqual(t, formatHash)
 	}
 }
 
-func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
+func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 	{
-		t.AssertError(AssertIdIsNotNull(hashType.null, ""))
-		t.AssertNoError(AssertIdIsNull(hashType.null))
+		t.AssertError(AssertIdIsNotNull(formatHash.null, ""))
+		t.AssertNoError(AssertIdIsNull(formatHash.null))
 		t.AssertNoError(
-			MakeErrLength(hashType.GetSize(), len(hashType.null.GetBytes())),
+			MakeErrLength(
+				formatHash.GetSize(),
+				len(formatHash.null.GetBytes()),
+			),
 		)
 	}
 
 	var idZero Id
-	hash := hashType.Get()
+	hash := formatHash.Get()
 
 	{
 		idNull, _ := hash.GetMarklId()
@@ -39,7 +42,7 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	}
 
 	{
-		idNull, _ := hashType.GetMarklIdForString("")
+		idNull, _ := formatHash.GetMarklIdForString("")
 
 		t.AssertNoError(AssertIdIsNull(idZero))
 		t.AssertNoError(AssertIdIsNull(idNull))
@@ -50,8 +53,8 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	}
 
 	{
-		idNull, _ := hashType.GetBlobIdForHexString(
-			fmt.Sprintf("%x", hashType.null.GetBytes()),
+		idNull, _ := formatHash.GetBlobIdForHexString(
+			fmt.Sprintf("%x", formatHash.null.GetBytes()),
 		)
 
 		t.AssertNoError(AssertIdIsNull(idZero))
@@ -63,7 +66,7 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 	}
 
 	{
-		idNonZero, _ := hashType.GetMarklIdForString("nonZero")
+		idNonZero, _ := formatHash.GetMarklIdForString("nonZero")
 		t.AssertNoError(AssertIdIsNotNull(idNonZero, ""))
 		t.AssertError(AssertIdIsNull(idNonZero))
 		t.AssertError(AssertEqual(idNonZero, idZero))
@@ -74,8 +77,8 @@ func testIdNullAndEqual(t *ui.TestContext, hashType HashType) {
 func TestIdEncodeDecode(t1 *testing.T) {
 	t := ui.MakeTestContext(t1)
 
-	for _, hashType := range hashTypes {
-		hash := hashType.Get()
+	for _, formatHash := range formatHashes {
+		hash := formatHash.Get()
 
 		{
 			id, _ := hash.GetMarklId()
@@ -94,18 +97,18 @@ func FuzzIdStringLen(f *testing.F) {
 	f.Add("testing")
 	f.Add("holidays")
 
-	hashType := HashTypeBlake2b256
+	formatHash := FormatHashBlake2b256
 
 	f.Fuzz(
 		func(t1 *testing.T, input string) {
-			id, repool := hashType.GetMarklIdForString(input)
+			id, repool := formatHash.GetMarklIdForString(input)
 			defer repool()
 
 			if input == "" {
 				return
 			}
 
-			actual := len(id.String()) - len(hashType.GetMarklFormatId())
+			actual := len(id.String()) - len(formatHash.GetMarklFormatId())
 			expected := 59
 
 			if actual != expected {

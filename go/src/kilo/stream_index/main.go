@@ -28,7 +28,7 @@ const (
 )
 
 type Index struct {
-	hashType markl.HashType
+	hashType markl.FormatHash
 	envRepo  env_repo.Env
 	sunrise  ids.Tai
 	preWrite interfaces.FuncIter[*sku.Transacted]
@@ -46,7 +46,7 @@ func MakeIndex(
 	sunrise ids.Tai,
 ) (index *Index, err error) {
 	index = &Index{
-		hashType:       markl.HashTypeSha256,
+		hashType:       markl.FormatHashSha256,
 		envRepo:        envRepo,
 		sunrise:        sunrise,
 		preWrite:       preWrite,
@@ -233,7 +233,7 @@ func (index *Index) flushEverything(
 func PageIndexForObject(
 	width uint8,
 	object *sku.Transacted,
-	hashType interfaces.HashType,
+	hashType interfaces.FormatHash,
 ) (n uint8, err error) {
 	if n, err = PageIndexForObjectId(
 		width,
@@ -250,7 +250,7 @@ func PageIndexForObject(
 func PageIndexForObjectId(
 	width uint8,
 	oid *ids.ObjectId,
-	hashType interfaces.HashType,
+	hashType interfaces.FormatHash,
 ) (n uint8, err error) {
 	if n, err = page_id.PageIndexForString(
 		width,
@@ -356,7 +356,7 @@ func (index *Index) ObjectExists(
 		return
 	}
 
-	digest := markl.HashTypeSha256.FromStringContent(objectIdString)
+	digest := markl.FormatHashSha256.FromStringContent(objectIdString)
 	defer markl.PutBlobId(digest)
 
 	if _, err = index.readOneMarklIdLoc(digest); err != nil {
@@ -377,7 +377,7 @@ func (index *Index) ReadOneObjectId(
 		panic("empty object id")
 	}
 
-	digest, repool := markl.HashTypeSha256.GetMarklIdForString(
+	digest, repool := markl.FormatHashSha256.GetMarklIdForString(
 		objectIdString,
 	)
 	defer repool()
@@ -392,7 +392,7 @@ func (index *Index) ReadOneObjectId(
 func (index *Index) ReadManyObjectId(
 	objectId interfaces.ObjectId,
 ) (objects []*sku.Transacted, err error) {
-	digest := markl.HashTypeSha256.FromStringContent(objectId.String())
+	digest := markl.FormatHashSha256.FromStringContent(objectId.String())
 	defer markl.PutBlobId(digest)
 
 	if objects, err = index.ReadManySha(digest); err != nil {
@@ -413,7 +413,7 @@ func (index *Index) ReadOneObjectIdTai(
 		return
 	}
 
-	digest := markl.HashTypeSha256.FromStringContent(
+	digest := markl.FormatHashSha256.FromStringContent(
 		objectId.String() + tai.String(),
 	)
 	defer markl.PutBlobId(digest)

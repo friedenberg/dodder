@@ -25,7 +25,7 @@ type Dependencies struct {
 	BlobFormatter script_config.RemoteScript
 }
 
-func (deps Dependencies) GetBlobDigestType() interfaces.HashType {
+func (deps Dependencies) GetBlobDigestType() interfaces.FormatHash {
 	hashType := deps.BlobStore.GetDefaultHashType()
 
 	if hashType == nil {

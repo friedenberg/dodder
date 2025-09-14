@@ -337,7 +337,7 @@ func (blobStore blobReaderFactory) BlobReader(
 		blobStore.t.Fatalf("request for non-existent blob: %s", digest)
 	}
 
-	hashType, err := markl.GetHashTypeOrError(
+	hashType, err := markl.GetFormatHashOrError(
 		digest.GetMarklFormat().GetMarklFormatId(),
 	)
 	blobStore.t.AssertNoError(err)
@@ -357,7 +357,7 @@ func writeFormat(
 	includeBlob bool,
 	blobBody string,
 	options object_metadata.TextFormatterOptions,
-	hashType interfaces.HashType,
+	hashType interfaces.FormatHash,
 ) (out string) {
 	hash := sha256.New()
 	reader, repool := pool.GetStringReader(blobBody)

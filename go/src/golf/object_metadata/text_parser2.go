@@ -16,7 +16,7 @@ import (
 type textParser2 struct {
 	interfaces.BlobWriterFactory
 	TextParserContext
-	hashType interfaces.HashType
+	hashType interfaces.FormatHash
 	Blob     fd.FD
 }
 

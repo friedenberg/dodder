@@ -12,12 +12,12 @@ import (
 type probeIndex struct {
 	envRepo env_repo.Env
 	*object_probe_index.Index
-	hashType markl.HashType
+	hashType markl.FormatHash
 }
 
 func (index *probeIndex) Initialize(
 	envRepo env_repo.Env,
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 ) (err error) {
 	index.envRepo = envRepo
 	index.hashType = hashType

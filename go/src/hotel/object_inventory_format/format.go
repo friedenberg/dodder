@@ -343,7 +343,7 @@ func WriteMetadata(
 	context FormatterContext,
 ) (blobDigest interfaces.MarklId, err error) {
 	marklWriter, repool := markl_io.MakeWriterWithRepool(
-		markl.HashTypeSha256.Get(),
+		markl.FormatHashSha256.Get(),
 		writer,
 	)
 	defer repool()
@@ -365,7 +365,7 @@ func GetDigestForContextDebug(
 ) (digest interfaces.MarklId, err error) {
 	var sb strings.Builder
 	writer, repool := markl_io.MakeWriterWithRepool(
-		markl.HashTypeSha256.Get(),
+		markl.FormatHashSha256.Get(),
 		&sb,
 	)
 	defer repool()

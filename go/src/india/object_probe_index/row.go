@@ -62,7 +62,7 @@ func (row *row) String() string {
 
 func (row *row) ReadFrom(
 	reader io.Reader,
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 ) (n int64, err error) {
 	var n1 int
 	var n2 int64

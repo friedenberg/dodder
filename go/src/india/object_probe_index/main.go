@@ -17,7 +17,7 @@ const (
 )
 
 type Index struct {
-	hashType markl.HashType
+	hashType markl.FormatHash
 	rowSize  int
 	pages    [PageCount]page
 }
@@ -25,7 +25,7 @@ type Index struct {
 func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 ) (indecks *Index, err error) {
 	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerComplete{}, envRepo, path)
@@ -35,7 +35,7 @@ func MakePermitDuplicates(
 func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 ) (indecks *Index, err error) {
 	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerDigestOnly{}, envRepo, dir)

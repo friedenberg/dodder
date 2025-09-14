@@ -12,7 +12,7 @@ import (
 // TODO move to own blob store configs package
 
 func MakeConfig(
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 	funcJoin func(string, ...string) string,
 	compression interfaces.IOWrapper,
 	encryption interfaces.MarklId,
@@ -44,7 +44,7 @@ var (
 )
 
 type Config struct {
-	hashType markl.HashType
+	hashType markl.FormatHash
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.IOWrapper

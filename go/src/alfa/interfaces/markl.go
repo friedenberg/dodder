@@ -10,7 +10,7 @@ type (
 		GetMarklFormatId() string
 	}
 
-	HashType interface {
+	FormatHash interface {
 		MarklFormat
 
 		GetHash() Hash

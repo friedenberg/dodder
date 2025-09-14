@@ -17,7 +17,7 @@ func CopyBlobIfNecessary(
 	src interfaces.BlobStore,
 	expectedDigest interfaces.MarklId,
 	extraWriter io.Writer,
-	hashType interfaces.HashType,
+	hashType interfaces.FormatHash,
 ) (copyResult CopyResult) {
 	copyResult.BlobId = expectedDigest
 
@@ -62,7 +62,7 @@ func CopyBlobIfNecessary(
 	if hashType == nil {
 		var err error
 
-		if hashType, err = markl.GetHashTypeOrError(
+		if hashType, err = markl.GetFormatHashOrError(
 			expectedDigest.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			copyResult.SetError(err)

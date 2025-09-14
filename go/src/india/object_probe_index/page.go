@@ -20,7 +20,7 @@ import (
 
 type page struct {
 	sync.Mutex     // for the buffered reader
-	hashType       markl.HashType
+	hashType       markl.FormatHash
 	rowWidth       int
 	file           *os.File
 	bufferedReader bufio.Reader
@@ -34,7 +34,7 @@ func (page *page) initialize(
 	equaler interfaces.Equaler[*row],
 	envRepo env_repo.Env,
 	pageId page_id.PageId,
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 	rowWidth int,
 ) (err error) {
 	page.added = heap.Make(

@@ -67,7 +67,7 @@ func (blobStoreConfig TomlV0) SupportsMultiHash() bool {
 }
 
 func (blobStoreConfig TomlV0) GetDefaultHashTypeId() string {
-	return markl.HashTypeIdSha256
+	return markl.FormatIdHashSha256
 }
 
 func (blobStoreConfig *TomlV0) SetBasePath(value string) {

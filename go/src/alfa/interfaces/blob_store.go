@@ -29,7 +29,7 @@ type (
 	}
 
 	BlobWriterFactory interface {
-		MakeBlobWriter(HashType) (BlobWriter, error)
+		MakeBlobWriter(FormatHash) (BlobWriter, error)
 	}
 
 	BlobAccess interface {
@@ -43,7 +43,7 @@ type (
 		BlobIOWrapperGetter
 
 		GetBlobStoreDescription() string
-		GetDefaultHashType() HashType
+		GetDefaultHashType() FormatHash
 		AllBlobs() SeqError[MarklId]
 	}
 

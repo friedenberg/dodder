@@ -17,6 +17,9 @@ const (
 	FormatIdAgeX25519Pub = "age_x25519_pub"
 	FormatIdAgeX25519Sec = "age_x25519_sec"
 
+	FormatIdHashSha256     = "sha256"
+	FormatIdHashBlake2b256 = "blake2b256"
+
 	FormatIdNonce = "nonce"
 )
 
@@ -48,13 +51,13 @@ func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
 	return format, nil
 }
 
-type format struct {
+type Format struct {
 	id string
 }
 
-var _ interfaces.MarklFormat = format{}
+var _ interfaces.MarklFormat = Format{}
 
-func (format format) GetMarklFormatId() string {
+func (format Format) GetMarklFormatId() string {
 	return format.id
 }
 
@@ -65,7 +68,7 @@ func makeFormat(formatId string) {
 		panic(fmt.Sprintf("hash type already registered: %q", formatId))
 	}
 
-	formats[formatId] = format{
+	formats[formatId] = Format{
 		id: formatId,
 	}
 }

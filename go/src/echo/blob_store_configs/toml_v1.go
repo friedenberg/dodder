@@ -47,7 +47,7 @@ func (blobStoreConfig *TomlV1) SetFlagSet(
 	flagSet.StringVar(
 		&blobStoreConfig.HashTypeId,
 		"hash_type-id",
-		markl.HashTypeIdBlake2b256,
+		markl.FormatIdHashBlake2b256,
 		"determines the hash type used for new blobs written to the store",
 	)
 

@@ -75,9 +75,13 @@ func SetHexStringFromRelPath(
 	return
 }
 
-func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
-	id.format = hashType
-	id.allocDataAndSetToCapIfNecessary(hashType.GetSize())
+func ReadFrom(
+	reader io.Reader,
+	id *Id,
+	formatHash FormatHash,
+) (n int, err error) {
+	id.format = formatHash
+	id.allocDataAndSetToCapIfNecessary(formatHash.GetSize())
 
 	if n, err = io.ReadFull(reader, id.data); err != nil {
 		errors.WrapExceptSentinel(err, io.EOF)

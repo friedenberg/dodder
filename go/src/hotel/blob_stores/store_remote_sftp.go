@@ -31,7 +31,7 @@ type remoteSftp struct {
 	config blob_store_configs.ConfigSFTPRemotePath
 
 	multiHash       bool
-	defaultHashType markl.HashType
+	defaultHashType markl.FormatHash
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
@@ -52,9 +52,9 @@ func makeSftpStore(
 	config blob_store_configs.ConfigSFTPRemotePath,
 	sshClient *ssh.Client,
 ) (blobStore *remoteSftp, err error) {
-	var defaultHashType markl.HashType
+	var defaultHashType markl.FormatHash
 
-	if defaultHashType, err = markl.GetHashTypeOrError(
+	if defaultHashType, err = markl.GetFormatHashOrError(
 		blob_store_configs.DefaultHashTypeId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -91,7 +91,7 @@ func (blobStore *remoteSftp) GetBlobStoreConfig() blob_store_configs.Config {
 	return blobStore.config
 }
 
-func (blobStore *remoteSftp) GetDefaultHashType() interfaces.HashType {
+func (blobStore *remoteSftp) GetDefaultHashType() interfaces.FormatHash {
 	return blobStore.defaultHashType
 }
 
@@ -248,7 +248,7 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 }
 
 func (blobStore *remoteSftp) MakeBlobWriter(
-	marklHashType interfaces.HashType,
+	marklHashType interfaces.FormatHash,
 ) (blobWriter interfaces.BlobWriter, err error) {
 	// TODO use hash type
 	mover := &sftpMover{

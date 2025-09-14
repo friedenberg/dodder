@@ -19,7 +19,7 @@ type localHashBucketed struct {
 	config blob_store_configs.ConfigLocalHashBucketed
 
 	multiHash       bool
-	defaultHashType markl.HashType
+	defaultHashType markl.FormatHash
 	buckets         []int
 
 	basePath string
@@ -35,7 +35,7 @@ func makeLocalHashBucketed(
 	tempFS env_dir.TemporaryFS,
 ) (store localHashBucketed, err error) {
 	// TODO read default hash type from config
-	if store.defaultHashType, err = markl.GetHashTypeOrError(
+	if store.defaultHashType, err = markl.GetFormatHashOrError(
 		config.GetDefaultHashTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -63,7 +63,7 @@ func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 	return blobStore.config
 }
 
-func (blobStore localHashBucketed) GetDefaultHashType() interfaces.HashType {
+func (blobStore localHashBucketed) GetDefaultHashType() interfaces.FormatHash {
 	return blobStore.defaultHashType
 }
 
@@ -130,7 +130,7 @@ func (blobStore localHashBucketed) MakeBlobReader(
 }
 
 func (blobStore localHashBucketed) MakeBlobWriter(
-	marklHashType interfaces.HashType,
+	marklHashType interfaces.FormatHash,
 ) (blobWriter interfaces.BlobWriter, err error) {
 	if blobWriter, err = blobStore.blobWriterTo(
 		blobStore.basePath,
@@ -145,7 +145,7 @@ func (blobStore localHashBucketed) MakeBlobWriter(
 
 func (blobStore localHashBucketed) blobWriterTo(
 	path string,
-	marklHashType interfaces.HashType,
+	marklHashType interfaces.FormatHash,
 ) (mover interfaces.BlobWriter, err error) {
 	if blobStore.multiHash {
 		path = filepath.Join(path, blobStore.defaultHashType.GetMarklFormatId())

@@ -199,11 +199,11 @@ type ProbeId struct {
 }
 
 func (transacted *Transacted) AllProbeIds() interfaces.Seq[ProbeId] {
-	return transacted.allProbeIds(markl.HashTypeSha256)
+	return transacted.allProbeIds(markl.FormatHashSha256)
 }
 
 func (transacted *Transacted) allProbeIds(
-	hashType markl.HashType,
+	hashType markl.FormatHash,
 ) interfaces.Seq[ProbeId] {
 	return func(yield func(ProbeId) bool) {
 		for key, value := range transacted.GetProbeKeys() {

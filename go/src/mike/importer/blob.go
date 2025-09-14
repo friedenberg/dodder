@@ -123,7 +123,7 @@ func (blobImporter *BlobImporter) importBlobIfNecessary(
 		func(ctx interfaces.Context) {
 			blobImporter.Counts.Total++
 
-			var hashType interfaces.HashType
+			var hashType interfaces.FormatHash
 
 			if blobImporter.UseDestinationHashType {
 				hashType = dst.GetDefaultHashType()

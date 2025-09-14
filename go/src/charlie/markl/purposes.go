@@ -53,18 +53,19 @@ func init() {
 	makePurpose(PurposeRequestAuthResponseV1)
 
 	makePurpose(PurposeMadderPubKeyV1)
+	makePurpose(PurposeMadderPrivateKeyV0)
 	makePurpose(PurposeMadderPrivateKeyV1)
 }
 
 var purposes map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
 
-type purpose struct {
+type Purpose struct {
 	id string
 }
 
-var _ interfaces.MarklFormat = purpose{}
+var _ interfaces.MarklFormat = Purpose{}
 
-func (purpose purpose) GetMarklFormatId() string {
+func (purpose Purpose) GetMarklFormatId() string {
 	return purpose.id
 }
 
@@ -75,7 +76,7 @@ func makePurpose(purposeId string) {
 		panic(fmt.Sprintf("hash type already registered: %q", purposeId))
 	}
 
-	purposes[purposeId] = purpose{
+	purposes[purposeId] = Purpose{
 		id: purposeId,
 	}
 }

@@ -104,7 +104,7 @@ func (id Id) IsNull() bool {
 		panic("empty type")
 	}
 
-	hashType, ok := hashTypes[id.format.GetMarklFormatId()]
+	formatHash, ok := formatHashes[id.format.GetMarklFormatId()]
 
 	// this is not an Id for a hash, so it can never be null with non-zero data
 	// contents
@@ -112,7 +112,7 @@ func (id Id) IsNull() bool {
 		return false
 	}
 
-	if bytes.Equal(id.data, hashType.null.GetBytes()) {
+	if bytes.Equal(id.data, formatHash.null.GetBytes()) {
 		return true
 	}
 

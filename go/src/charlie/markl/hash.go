@@ -9,9 +9,9 @@ import (
 )
 
 type Hash struct {
-	hash     hash.Hash
-	hashType *HashType
-	written  int64
+	hash       hash.Hash
+	formatHash *FormatHash
+	written    int64
 }
 
 var _ interfaces.Hash = &Hash{}
@@ -40,7 +40,7 @@ func (hash *Hash) BlockSize() int {
 }
 
 func (hash *Hash) GetMarklFormat() interfaces.MarklFormat {
-	return hash.hashType
+	return hash.formatHash
 }
 
 func (hash *Hash) GetMarklId() (interfaces.MutableMarklId, interfaces.FuncRepool) {

@@ -38,7 +38,7 @@ func (id *PageId) Path() string {
 func PageIndexForString(
 	width uint8,
 	value string,
-	hashType interfaces.HashType,
+	hashType interfaces.FormatHash,
 ) (n uint8, err error) {
 	digest, repool := hashType.GetMarklIdForString(value)
 	defer repool()

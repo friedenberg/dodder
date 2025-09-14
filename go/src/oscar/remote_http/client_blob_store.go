@@ -32,7 +32,7 @@ func (client *client) GetBlobStoreConfig() blob_store_configs.Config {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) GetDefaultHashType() interfaces.HashType {
+func (client *client) GetDefaultHashType() interfaces.FormatHash {
 	panic(errors.Err501NotImplemented)
 }
 
@@ -97,9 +97,9 @@ func (client *client) MakeBlobReader(
 		err = ReadErrorFromBody(response)
 
 	default:
-		var hashType markl.HashType
+		var hashType markl.FormatHash
 
-		if hashType, err = markl.GetHashTypeOrError(
+		if hashType, err = markl.GetFormatHashOrError(
 			blobId.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -220,7 +220,7 @@ func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 }
 
 func (client *client) MakeBlobWriter(
-	marklHashType interfaces.HashType,
+	marklHashType interfaces.FormatHash,
 ) (interfaces.BlobWriter, error) {
 	panic(errors.Err501NotImplemented)
 }

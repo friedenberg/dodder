@@ -12,7 +12,7 @@ import (
 )
 
 type textParser struct {
-	hashType      interfaces.HashType
+	hashType      interfaces.FormatHash
 	blobWriter    interfaces.BlobWriterFactory
 	blobFormatter script_config.RemoteScript
 }

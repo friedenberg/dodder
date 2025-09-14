@@ -41,7 +41,7 @@ func (parentStore Multi) MakeBlobReader(
 }
 
 func (parentStore Multi) MakeBlobWriter(
-	marklHashType interfaces.HashType,
+	marklHashType interfaces.FormatHash,
 ) (interfaces.BlobWriter, error) {
 	writers := make([]io.Writer, len(parentStore.childStores))
 

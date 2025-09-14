@@ -44,10 +44,10 @@ func SetBlechCombinedHRPAndData(
 		return
 	}
 
-	if bytes.HasPrefix(formatIdAndData, []byte(HashTypeIdSha256)) {
-		formatId = HashTypeIdSha256
-	} else if bytes.HasPrefix(formatIdAndData, []byte(HashTypeIdBlake2b256)) {
-		formatId = HashTypeIdBlake2b256
+	if bytes.HasPrefix(formatIdAndData, []byte(FormatIdHashSha256)) {
+		formatId = FormatIdHashSha256
+	} else if bytes.HasPrefix(formatIdAndData, []byte(FormatIdHashBlake2b256)) {
+		formatId = FormatIdHashBlake2b256
 	} else {
 		err = errors.Errorf("unsupported format: %x", formatIdAndData)
 		return
@@ -101,7 +101,7 @@ func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 	}
 
 	if err = id.SetMarklId(
-		HashTypeIdSha256,
+		FormatIdHashSha256,
 		decodedBytes,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -172,7 +172,7 @@ func SetMarklIdWithFormatBlech32(
 			return
 		}
 
-	case HashTypeIdSha256:
+	case FormatIdHashSha256:
 		switch purpose {
 		case PurposeObjectDigestV1,
 			PurposeV5MetadataDigestWithoutTai,
@@ -188,7 +188,7 @@ func SetMarklIdWithFormatBlech32(
 			return
 		}
 
-	case HashTypeIdBlake2b256:
+	case FormatIdHashBlake2b256:
 		switch purpose {
 		case PurposeObjectDigestV1,
 			PurposeV5MetadataDigestWithoutTai,
