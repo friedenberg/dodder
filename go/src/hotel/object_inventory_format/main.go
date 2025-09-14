@@ -82,7 +82,7 @@ func registerFormat(marklFormatId string, keys ...keyType) {
 
 func init() {
 	registerFormat(
-		markl.FormatIdV5MetadataDigestWithoutTai,
+		markl.PurposeV5MetadataDigestWithoutTai,
 		key_strings_german.Akte,
 		key_strings_german.Bezeichnung,
 		key_strings_german.Etikett,
@@ -101,7 +101,7 @@ func init() {
 	// )
 
 	registerFormat(
-		markl.FormatIdObjectDigestSha256V1,
+		markl.PurposeObjectDigestV1,
 		key_strings.Blob,
 		key_strings.Description,
 		key_strings.ObjectId,

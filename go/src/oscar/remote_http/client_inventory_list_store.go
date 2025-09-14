@@ -107,8 +107,8 @@ func (client client) ImportInventoryList(
 		if err = markl.Sign(
 			key,
 			listSku.GetBlobDigest(),
-			markl.FormatIdRequestRepoSigV1,
-			markl.FormatIdObjectSigV1,
+			markl.PurposeRequestRepoSigV1,
+			markl.PurposeObjectSigV1,
 			&sig,
 		); err != nil {
 			err = errors.Wrap(err)

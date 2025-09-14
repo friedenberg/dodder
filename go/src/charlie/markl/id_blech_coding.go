@@ -11,7 +11,7 @@ import (
 )
 
 func StringHRPCombined(id interfaces.MarklId) string {
-	tipe := id.GetMarklType()
+	tipe := id.GetMarklFormat()
 	data := id.GetBytes()
 
 	if tipe == nil && len(data) == 0 {
@@ -21,7 +21,7 @@ func StringHRPCombined(id interfaces.MarklId) string {
 	if len(data) == 0 {
 		return ""
 	} else {
-		typeId := tipe.GetMarklTypeId()
+		typeId := tipe.GetMarklFormatId()
 		combined := make([]byte, len(typeId)+len(data))
 		copy(combined, []byte(typeId))
 		copy(combined[len(typeId):], data)

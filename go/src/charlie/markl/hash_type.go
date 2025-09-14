@@ -10,12 +10,12 @@ import (
 
 type HashType struct {
 	pool interfaces.PoolValue[Hash]
-	tipe string
+	formatId string
 	null Id
 }
 
 var (
-	_ interfaces.MarklType = HashType{}
+	_ interfaces.MarklFormat = HashType{}
 	_ interfaces.HashType  = HashType{}
 )
 
@@ -39,13 +39,13 @@ func (hashType *HashType) Get() *Hash {
 
 func (hashType HashType) Put(hash *Hash) {
 	errors.PanicIfError(
-		MakeErrWrongType(hashType.tipe, hash.GetMarklType().GetMarklTypeId()),
+		MakeErrWrongType(hashType.formatId, hash.GetMarklFormat().GetMarklFormatId()),
 	)
 	hashType.pool.Put(*hash)
 }
 
-func (hashType HashType) GetMarklTypeId() string {
-	return hashType.tipe
+func (hashType HashType) GetMarklFormatId() string {
+	return hashType.formatId
 }
 
 func (hashType HashType) GetSize() int {
@@ -90,7 +90,7 @@ func (hashType HashType) FromStringContent(input string) interfaces.MarklId {
 	return id
 }
 
-func (hashType HashType) FromStringFormat(
+func (hashType HashType) GetMarklIdFromStringFormat(
 	format string,
 	args ...any,
 ) (interfaces.MarklId, interfaces.FuncRepool) {
@@ -112,7 +112,7 @@ func (hashType HashType) GetBlobIdForHexString(
 
 	id, repool := hash.GetMarklId()
 
-	errors.PanicIfError(SetHexBytes(hashType.tipe, id, []byte(input)))
+	errors.PanicIfError(SetHexBytes(hashType.formatId, id, []byte(input)))
 
 	return id, repool
 }

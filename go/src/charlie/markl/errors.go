@@ -12,7 +12,7 @@ import (
 var ErrEmptyType = errors.New("type is empty")
 
 func MakeErrEmptyType(id interfaces.MarklId) error {
-	if id.GetMarklType() == nil {
+	if id.GetMarklFormat() == nil {
 		return errors.WrapSkip(1, ErrEmptyType)
 	}
 
@@ -44,7 +44,7 @@ func (err errIsNotNull) Is(target error) bool {
 
 // TODO remove key
 func AssertIdIsNotNull(id interfaces.MarklId, key string) error {
-	format := id.GetFormat()
+	format := id.GetPurpose()
 
 	if format != "" {
 		key = format
@@ -105,7 +105,7 @@ func (err ErrNotEqual) Is(target error) bool {
 }
 
 func (err ErrNotEqual) IsDifferentHashTypes() bool {
-	return err.Expected.GetMarklType() != err.Actual.GetMarklType()
+	return err.Expected.GetMarklFormat() != err.Actual.GetMarklFormat()
 }
 
 type ErrNotEqualBytes struct {

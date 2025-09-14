@@ -31,7 +31,7 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetFormat(format); err != nil {
+		if err = dst.SetPurpose(format); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -58,7 +58,7 @@ func GeneratePrivateKey(
 			return
 		}
 
-		if err = dst.SetFormat(format); err != nil {
+		if err = dst.SetPurpose(format); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -76,7 +76,7 @@ func GeneratePrivateKey(
 }
 
 func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
-	marklTypeId := private.GetMarklType().GetMarklTypeId()
+	marklTypeId := private.GetMarklFormat().GetMarklFormatId()
 
 	switch marklTypeId {
 	default:
@@ -87,12 +87,12 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		)
 		return
 
-	case FormatIdRepoPrivateKeyV1:
+	case PurposeRepoPrivateKeyV1:
 		// legacy
 		fallthrough
 
 	case TypeIdEd25519Sec:
-		if err = public.SetFormat(FormatIdRepoPubKeyV1); err != nil {
+		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -124,7 +124,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		}
 
 	case TypeIdAgeX25519Sec:
-		if err = public.SetFormat(FormatIdRepoPubKeyV1); err != nil {
+		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -145,7 +145,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 
 func MakeNonce(bites []byte, format string) (nonce Id, err error) {
 	if format == "" {
-		format = FormatIdRequestAuthChallengeV1
+		format = PurposeRequestAuthChallengeV1
 	}
 
 	if len(bites) == 0 {
@@ -157,7 +157,7 @@ func MakeNonce(bites []byte, format string) (nonce Id, err error) {
 		}
 	}
 
-	if err = nonce.SetFormat(format); err != nil {
+	if err = nonce.SetPurpose(format); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,14 +176,14 @@ func MakeNonce(bites []byte, format string) (nonce Id, err error) {
 func GetIOWrapper(
 	private interfaces.MarklId,
 ) (ioWrapper interfaces.IOWrapper, err error) {
-	marklType := private.GetMarklType()
+	marklType := private.GetMarklFormat()
 
 	if marklType == nil {
 		ioWrapper = files.NopeIOWrapper{}
 		return
 	}
 
-	marklTypeId := marklType.GetMarklTypeId()
+	marklTypeId := marklType.GetMarklFormatId()
 
 	switch marklTypeId {
 	default:

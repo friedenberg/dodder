@@ -30,9 +30,9 @@ func init() {
 	makeType(TypeIdNonce)
 }
 
-func GetMarklTypeOrError(typeId string) (interfaces.MarklType, error) {
+func GetMarklTypeOrError(typeId string) (interfaces.MarklFormat, error) {
 	if typeId == "zit-repo-private_key-v1" {
-		typeId = FormatIdRepoPrivateKeyV1
+		typeId = PurposeRepoPrivateKeyV1
 	}
 
 	tipe, ok := types[typeId]

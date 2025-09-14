@@ -105,7 +105,7 @@ func FuzzIdStringLen(f *testing.F) {
 				return
 			}
 
-			actual := len(id.String()) - len(hashType.GetMarklTypeId())
+			actual := len(id.String()) - len(hashType.GetMarklFormatId())
 			expected := 59
 
 			if actual != expected {

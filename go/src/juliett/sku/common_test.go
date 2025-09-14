@@ -338,7 +338,7 @@ func (blobStore blobReaderFactory) BlobReader(
 	}
 
 	hashType, err := markl.GetHashTypeOrError(
-		digest.GetMarklType().GetMarklTypeId(),
+		digest.GetMarklFormat().GetMarklFormatId(),
 	)
 	blobStore.t.AssertNoError(err)
 

@@ -65,7 +65,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 			t.AssertNoError(markl.GeneratePrivateKey(
 				nil,
-				markl.FormatIdRepoPrivateKeyV1,
+				markl.PurposeRepoPrivateKeyV1,
 				markl.TypeIdEd25519Sec,
 				config.GetPrivateKeyMutable(),
 			))

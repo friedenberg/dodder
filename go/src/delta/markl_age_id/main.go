@@ -178,7 +178,7 @@ func (id Id) GetSize() int {
 	return 0
 }
 
-func (id Id) GetMarklType() interfaces.MarklType {
+func (id Id) GetMarklFormat() interfaces.MarklFormat {
 	if id.IsNull() {
 		return nil
 	} else {
@@ -190,6 +190,6 @@ func (id Id) IsNull() bool {
 	return len(id.Identities) == 0
 }
 
-func (id Id) GetFormat() string {
-	return markl.FormatIdMadderPrivateKeyV1
+func (id Id) GetPurpose() string {
+	return markl.PurposeMadderPrivateKeyV1
 }

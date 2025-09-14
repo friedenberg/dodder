@@ -18,7 +18,7 @@ func Sign(
 	tipe string,
 	dst interfaces.MutableMarklId,
 ) (err error) {
-	switch key.GetMarklType().GetMarklTypeId() {
+	switch key.GetMarklFormat().GetMarklFormatId() {
 	default:
 		err = errors.Errorf("not a private key: %q", key.StringWithFormat())
 		return
@@ -39,7 +39,7 @@ func Sign(
 		return
 	}
 
-	if err = dst.SetFormat(
+	if err = dst.SetPurpose(
 		format,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func Verify(
 ) (err error) {
 	defer errors.DeferredRecover(&err)
 
-	switch publicKey.GetMarklType().GetMarklTypeId() {
+	switch publicKey.GetMarklFormat().GetMarklFormatId() {
 	default:
 		err = errors.Errorf(
 			"not a public key: %q",

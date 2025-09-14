@@ -9,20 +9,20 @@ import (
 )
 
 func (id Id) MarshalText() (bites []byte, err error) {
-	if id.tipe == nil {
+	if id.format == nil {
 		return
 	}
 
 	var hrp string
 
-	if format := id.GetFormat(); format != "" {
+	if format := id.GetPurpose(); format != "" {
 		hrp = fmt.Sprintf(
 			"%s@%s",
-			id.GetFormat(),
-			id.tipe.GetMarklTypeId(),
+			id.GetPurpose(),
+			id.format.GetMarklFormatId(),
 		)
 	} else {
-		hrp = id.tipe.GetMarklTypeId()
+		hrp = id.format.GetMarklFormatId()
 	}
 
 	if bites, err = blech32.Encode(hrp, id.data); err != nil {
@@ -49,7 +49,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 	formatId, typeId, ok := strings.Cut(formatAndTypeId, "@")
 
 	if ok {
-		if err = id.SetFormat(formatId); err != nil {
+		if err = id.SetPurpose(formatId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -57,7 +57,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 		typeId = formatAndTypeId
 	}
 
-	if id.tipe, err = GetMarklTypeOrError(typeId); err != nil {
+	if id.format, err = GetMarklTypeOrError(typeId); err != nil {
 		err = errors.Wrapf(
 			err,
 			"failed to unmarshal %T with contents: %s",

@@ -97,12 +97,12 @@ func addMarklId(
 func makeMarklIdField(
 	id interfaces.MarklId,
 ) string_format_writer.Field {
-	if id.GetFormat() == "" {
+	if id.GetPurpose() == "" {
 		panic(fmt.Sprintf("empty format for markl id: %q", id))
 	}
 
 	return string_format_writer.Field{
-		Key:        id.GetFormat(),
+		Key:        id.GetPurpose(),
 		Separator:  '@',
 		Value:      id.String(),
 		NoTruncate: true,

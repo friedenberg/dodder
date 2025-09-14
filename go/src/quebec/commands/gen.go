@@ -34,7 +34,7 @@ func (cmd Gen) Run(req command.Request) {
 		arg = strings.ToLower(arg)
 
 		switch arg {
-		case markl.FormatIdMadderPrivateKeyV0:
+		case markl.PurposeMadderPrivateKeyV0:
 			var id markl.Id
 
 			if err := markl.GeneratePrivateKey(
@@ -49,7 +49,7 @@ func (cmd Gen) Run(req command.Request) {
 
 			envUI.GetUI().Print(id.StringWithFormat())
 
-		case markl.FormatIdMadderPrivateKeyV1:
+		case markl.PurposeMadderPrivateKeyV1:
 			var id markl.Id
 
 			if err := markl.GeneratePrivateKey(
@@ -64,7 +64,7 @@ func (cmd Gen) Run(req command.Request) {
 
 			envUI.GetUI().Print(id.StringWithFormat())
 
-		case markl.FormatIdRepoPrivateKeyV1:
+		case markl.PurposeRepoPrivateKeyV1:
 			var id markl.Id
 
 			if err := markl.GeneratePrivateKey(

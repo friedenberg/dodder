@@ -79,7 +79,7 @@ func (cmd Import) Run(req command.Request) {
 	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
 
 	importerOptions := sku.ImporterOptions{
-		DedupingFormatId:  markl.FormatIdV5MetadataDigestWithoutTai,
+		DedupingFormatId:  markl.PurposeV5MetadataDigestWithoutTai,
 		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 

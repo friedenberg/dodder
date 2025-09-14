@@ -172,7 +172,7 @@ func (transacted *Transacted) SetBlobDigest(
 	merkleId interfaces.MarklId,
 ) (err error) {
 	if err = transacted.Metadata.GetBlobDigestMutable().SetMarklId(
-		merkleId.GetMarklType().GetMarklTypeId(),
+		merkleId.GetMarklFormat().GetMarklFormatId(),
 		merkleId.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -228,7 +228,7 @@ func (transacted *Transacted) allProbeIds(
 			)
 
 			probeId := ProbeId{
-				Key: markl.FormatIdObjectDigestSha256V1,
+				Key: markl.PurposeObjectDigestV1,
 				Id:  id,
 			}
 
@@ -245,7 +245,7 @@ func (transacted *Transacted) allProbeIds(
 			)
 
 			probeId := ProbeId{
-				Key: markl.FormatIdV5MetadataDigestWithoutTai,
+				Key: markl.PurposeV5MetadataDigestWithoutTai,
 				Id:  id,
 			}
 

@@ -51,7 +51,7 @@ func (id *Id) UnmarshalBinary(
 		return
 	}
 
-	if err = id.SetFormat(string(formatBytes)); err != nil {
+	if err = id.SetPurpose(string(formatBytes)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,7 +82,7 @@ type IdBinaryEncodingTypeData struct {
 func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	tipe := id.GetMarklType()
+	tipe := id.GetMarklFormat()
 	bites := id.GetBytes()
 
 	if tipe == nil && len(bites) == 0 {
@@ -92,7 +92,7 @@ func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 		return
 	}
 
-	bytes = append(bytes, []byte(tipe.GetMarklTypeId())...)
+	bytes = append(bytes, []byte(tipe.GetMarklFormatId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 
@@ -110,8 +110,8 @@ type IdBinaryEncodingFormatTypeData struct {
 func (id Id) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	format := id.GetFormat()
-	tipe := id.GetMarklType()
+	format := id.GetPurpose()
+	tipe := id.GetMarklFormat()
 	bites := id.GetBytes()
 
 	if tipe == nil && len(bites) == 0 && format == "" {
@@ -123,7 +123,7 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 
 	bytes = append(bytes, []byte(format)...)
 	bytes = append(bytes, '\x00')
-	bytes = append(bytes, []byte(tipe.GetMarklTypeId())...)
+	bytes = append(bytes, []byte(tipe.GetMarklFormatId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 

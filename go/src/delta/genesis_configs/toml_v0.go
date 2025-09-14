@@ -104,7 +104,7 @@ func (config V0Common) GetInventoryListTypeId() string {
 }
 
 func (config V0Common) GetObjectSigMarklTypeId() string {
-	return markl.FormatIdObjectSigV0
+	return markl.PurposeObjectSigV0
 }
 
 func (config V0Common) SetInventoryListTypeString(string) {

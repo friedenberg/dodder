@@ -14,8 +14,8 @@ func (page *page) seekToFirstBinarySearch(
 ) (mid int64, err error) {
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
-			page.hashType.GetMarklTypeId(),
-			expected.GetMarklType().GetMarklTypeId(),
+			page.hashType.GetMarklFormatId(),
+			expected.GetMarklFormat().GetMarklFormatId(),
 		),
 	)
 
@@ -82,8 +82,8 @@ func (page *page) seekToFirstLinearSearch(
 ) (loc int64, err error) {
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
-			page.hashType.GetMarklTypeId(),
-			expected.GetMarklType().GetMarklTypeId(),
+			page.hashType.GetMarklFormatId(),
+			expected.GetMarklFormat().GetMarklFormatId(),
 		),
 	)
 

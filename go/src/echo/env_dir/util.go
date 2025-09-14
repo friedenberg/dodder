@@ -22,7 +22,7 @@ func MakeHashBucketPathFromMerkleId(
 	if multiHash {
 		pathComponents = append(
 			pathComponents,
-			id.GetMarklType().GetMarklTypeId(),
+			id.GetMarklFormat().GetMarklFormatId(),
 		)
 	}
 

@@ -7,8 +7,8 @@ import (
 
 type tipe struct{}
 
-var _ interfaces.MarklType = tipe{}
+var _ interfaces.MarklFormat = tipe{}
 
-func (tipe tipe) GetMarklTypeId() string {
+func (tipe tipe) GetMarklFormatId() string {
 	return markl.TypeIdAgeX25519Sec
 }

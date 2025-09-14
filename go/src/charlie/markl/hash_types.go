@@ -17,8 +17,8 @@ const (
 )
 
 var (
-	types     map[string]interfaces.MarklType = map[string]interfaces.MarklType{}
-	hashTypes map[string]HashType             = map[string]HashType{}
+	types     map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
+	hashTypes map[string]HashType               = map[string]HashType{}
 
 	// TODO remove unnecessary references
 	HashTypeSha256     HashType
@@ -44,13 +44,13 @@ func init() {
 
 func makeHashType(
 	constructor func() hash.Hash,
-	tipe string,
+	formatId string,
 	self *HashType,
 ) HashType {
-	_, alreadyExists := types[tipe]
+	_, alreadyExists := types[formatId]
 
 	if alreadyExists {
-		panic(fmt.Sprintf("hash type already registered: %q", tipe))
+		panic(fmt.Sprintf("hash type already registered: %q", formatId))
 	}
 
 	hashType := HashType{
@@ -65,16 +65,16 @@ func makeHashType(
 				hash.Reset()
 			},
 		),
-		tipe: tipe,
+		formatId: formatId,
 	}
 
 	hash := constructor()
-	hashType.null.tipe = self
+	hashType.null.format = self
 	hashType.null.allocDataIfNecessary(hash.Size())
 	hashType.null.data = hash.Sum(hashType.null.data)
 
-	types[tipe] = hashType
-	hashTypes[tipe] = hashType
+	types[formatId] = hashType
+	hashTypes[formatId] = hashType
 
 	return hashType
 }

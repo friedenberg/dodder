@@ -100,7 +100,7 @@ func (client *client) MakeBlobReader(
 		var hashType markl.HashType
 
 		if hashType, err = markl.GetHashTypeOrError(
-			blobId.GetMarklType().GetMarklTypeId(),
+			blobId.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

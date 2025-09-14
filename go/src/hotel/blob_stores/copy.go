@@ -63,7 +63,7 @@ func CopyBlobIfNecessary(
 		var err error
 
 		if hashType, err = markl.GetHashTypeOrError(
-			expectedDigest.GetMarklType().GetMarklTypeId(),
+			expectedDigest.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			copyResult.SetError(err)
 			return

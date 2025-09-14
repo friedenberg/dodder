@@ -117,7 +117,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 	}
 
 	// TODO determine via config
-	digest, repool := markl.HashTypeSha256.FromStringFormat(
+	digest, repool := markl.HashTypeSha256.GetMarklIdFromStringFormat(
 		"%s%s%s%s",
 		entry.EntryType,
 		entry.PublicKey.StringWithFormat(),

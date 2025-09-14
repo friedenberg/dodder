@@ -88,9 +88,9 @@ func (index *Index) addDigest(
 		return
 	}
 
-	actual := digest.GetMarklType().GetMarklTypeId()
+	actual := digest.GetMarklFormat().GetMarklFormatId()
 
-	if actual != index.hashType.GetMarklTypeId() {
+	if actual != index.hashType.GetMarklFormatId() {
 		err = errors.Errorf("unsupported hash type: %q", actual)
 		return
 	}
@@ -106,9 +106,9 @@ func (index *Index) addDigest(
 func (index *Index) ReadOne(
 	digest interfaces.MarklId,
 ) (loc Loc, err error) {
-	actual := digest.GetMarklType().GetMarklTypeId()
+	actual := digest.GetMarklFormat().GetMarklFormatId()
 
-	if actual != index.hashType.GetMarklTypeId() {
+	if actual != index.hashType.GetMarklFormatId() {
 		err = errors.Errorf("unsupported hash type: %q", actual)
 		return
 	}
@@ -130,9 +130,9 @@ func (index *Index) ReadMany(
 	digest interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
-	actual := digest.GetMarklType().GetMarklTypeId()
+	actual := digest.GetMarklFormat().GetMarklFormatId()
 
-	if actual != index.hashType.GetMarklTypeId() {
+	if actual != index.hashType.GetMarklFormatId() {
 		err = errors.Errorf("unsupported hash type: %q", actual)
 		return
 	}

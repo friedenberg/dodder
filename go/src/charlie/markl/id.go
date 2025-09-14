@@ -33,51 +33,51 @@ var (
 )
 
 type Id struct {
-	format string
-	tipe   interfaces.MarklType
-	data   []byte
+	purpose string
+	format  interfaces.MarklFormat
+	data    []byte
 }
 
 func (id Id) String() string {
-	if id.tipe == nil && len(id.data) == 0 {
+	if id.format == nil && len(id.data) == 0 {
 		return ""
 	}
 
 	if len(id.data) == 0 {
 		return ""
 	} else {
-		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
+		bites, err := blech32.Encode(id.format.GetMarklFormatId(), id.data)
 		errors.PanicIfError(err)
 		return string(bites)
 	}
 }
 
 func (id Id) StringWithFormat() string {
-	if id.tipe == nil && len(id.data) == 0 {
+	if id.format == nil && len(id.data) == 0 {
 		return ""
 	}
 
 	if len(id.data) == 0 {
 		return ""
 	} else {
-		bites, err := blech32.Encode(id.tipe.GetMarklTypeId(), id.data)
+		bites, err := blech32.Encode(id.format.GetMarklFormatId(), id.data)
 		bitesString := string(bites)
 		errors.PanicIfError(err)
 
-		if id.format != "" {
-			return fmt.Sprintf("%s@%s", id.format, bitesString)
+		if id.purpose != "" {
+			return fmt.Sprintf("%s@%s", id.purpose, bitesString)
 		} else {
 			return bitesString
 		}
 	}
 }
 
-func (id Id) GetFormat() string {
-	return id.format
+func (id Id) GetPurpose() string {
+	return id.purpose
 }
 
-func (id *Id) SetFormat(value string) error {
-	id.format = value
+func (id *Id) SetPurpose(value string) error {
+	id.purpose = value
 	return nil
 }
 
@@ -93,18 +93,18 @@ func (id Id) GetBytes() []byte {
 	return id.data
 }
 
-func (id Id) GetMarklType() interfaces.MarklType {
-	return id.tipe
+func (id Id) GetMarklFormat() interfaces.MarklFormat {
+	return id.format
 }
 
 func (id Id) IsNull() bool {
 	if len(id.data) == 0 {
 		return true
-	} else if id.tipe == nil {
+	} else if id.format == nil {
 		panic("empty type")
 	}
 
-	hashType, ok := hashTypes[id.tipe.GetMarklTypeId()]
+	hashType, ok := hashTypes[id.format.GetMarklFormatId()]
 
 	// this is not an Id for a hash, so it can never be null with non-zero data
 	// contents
@@ -138,7 +138,7 @@ func (id *Id) Set(value string) (err error) {
 }
 
 func (id *Id) setWithFormat(format, body string) (err error) {
-	if err = id.SetFormat(format); err != nil {
+	if err = id.SetPurpose(format); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -168,13 +168,13 @@ func (id *Id) setWithoutFormat(value string) (err error) {
 }
 
 func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
-	if err = id.SetFormat(digest.GetFormat()); err != nil {
+	if err = id.SetPurpose(digest.GetPurpose()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = id.SetMarklId(
-		digest.GetMarklType().GetMarklTypeId(),
+		digest.GetMarklFormat().GetMarklFormatId(),
 		digest.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -184,13 +184,13 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	return
 }
 
-func (id *Id) SetMarklId(tipe string, bites []byte) (err error) {
-	if tipe == "" && len(bites) == 0 {
+func (id *Id) SetMarklId(formatId string, bites []byte) (err error) {
+	if formatId == "" && len(bites) == 0 {
 		id.Reset()
 		return
 	}
 
-	if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
+	if id.format, err = GetMarklTypeOrError(formatId); err != nil {
 		err = errors.Wrapf(
 			err,
 			"failed to SetMerkleId on %T with contents: %s",
@@ -222,19 +222,19 @@ func (id *Id) setData(data []byte) {
 }
 
 func (id *Id) Reset() {
-	id.tipe = nil
+	id.format = nil
 	id.data = id.data[:0]
-	id.format = ""
+	id.purpose = ""
 }
 
 func (id *Id) ResetWith(src Id) {
+	id.purpose = src.purpose
 	id.format = src.format
-	id.tipe = src.tipe
 	id.setData(src.data)
 }
 
 func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
-	marklType := src.GetMarklType()
+	marklType := src.GetMarklFormat()
 	bites := src.GetBytes()
 
 	var marklTypeId string
@@ -242,16 +242,16 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	if marklType == nil && len(bites) > 0 {
 		panic(
 			fmt.Sprintf(
-				"markl id with empty tipe but populated bytes: (bites: %x)",
+				"markl id with empty format but populated bytes: (bites: %x)",
 				bites,
 			),
 		)
 	} else if marklType != nil {
-		marklTypeId = marklType.GetMarklTypeId()
+		marklTypeId = marklType.GetMarklFormatId()
 	}
 
 	errors.PanicIfError(
-		id.SetFormat(src.GetFormat()),
+		id.SetPurpose(src.GetPurpose()),
 	)
 
 	errors.PanicIfError(

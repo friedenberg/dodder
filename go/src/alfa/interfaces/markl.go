@@ -6,26 +6,30 @@ import (
 )
 
 type (
-	MarklType interface {
-		GetMarklTypeId() string
+	MarklFormat interface {
+		GetMarklFormatId() string
 	}
 
 	HashType interface {
-		MarklType
+		MarklFormat
+
 		GetHash() Hash
 		PutHash(Hash)
+
 		GetMarklIdForString(input string) (MarklId, FuncRepool)
-		// TODO rename
-		FromStringFormat(format string, args ...any) (MarklId, FuncRepool)
+		GetMarklIdFromStringFormat(
+			format string,
+			args ...any,
+		) (MarklId, FuncRepool)
 	}
 
-	MarklTypeGetter interface {
-		GetMarklType() MarklType
+	MarklFormatGetter interface {
+		GetMarklFormat() MarklFormat
 	}
 
 	Hash interface {
 		hash.Hash
-		MarklTypeGetter
+		MarklFormatGetter
 		GetMarklId() (MutableMarklId, FuncRepool)
 	}
 
@@ -43,11 +47,10 @@ type (
 		// TODO rethink size as it works completely different between sha and
 		// merkle
 		GetSize() int
-		MarklTypeGetter
+		MarklFormatGetter
 		IsNull() bool
 
-		// TODO rename to purpose
-		GetFormat() string
+		GetPurpose() string
 	}
 
 	MutableMarklId interface {
@@ -56,10 +59,10 @@ type (
 		encoding.BinaryUnmarshaler
 		// encoding.TextUnmarshaler
 		// io.ReaderFrom
-		SetMarklId(typeId string, bites []byte) error
+		SetMarklId(formatId string, bites []byte) error
 		Reset()
 		ResetWithMarklId(MarklId)
-		SetFormat(string) error
+		SetPurpose(string) error
 	}
 
 	MarklIdGetter interface {

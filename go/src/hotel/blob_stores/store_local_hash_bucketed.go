@@ -148,7 +148,7 @@ func (blobStore localHashBucketed) blobWriterTo(
 	marklHashType interfaces.HashType,
 ) (mover interfaces.BlobWriter, err error) {
 	if blobStore.multiHash {
-		path = filepath.Join(path, blobStore.defaultHashType.GetMarklTypeId())
+		path = filepath.Join(path, blobStore.defaultHashType.GetMarklFormatId())
 	}
 
 	if mover, err = env_dir.NewMover(
@@ -178,14 +178,14 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		return
 	}
 
-	marklType := digest.GetMarklType()
+	marklType := digest.GetMarklFormat()
 
 	if marklType == nil {
 		err = errors.Errorf("empty markl type")
 		return
 	}
 
-	if marklType.GetMarklTypeId() == "" {
+	if marklType.GetMarklFormatId() == "" {
 		err = errors.Errorf("empty markl type id")
 		return
 	}

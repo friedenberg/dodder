@@ -329,10 +329,10 @@ func (format *BoxTransacted) parseOldBlobIdTag(
 
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
 	"":                              (*object_metadata.Metadata).GetBlobDigestMutable,
-	markl.FormatIdRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
-	markl.FormatIdObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.FormatIdObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.FormatIdObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
+	markl.PurposeRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
+	markl.PurposeObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.PurposeObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
+	markl.PurposeObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
 }
 
 // expects `seq` to include `@` as the first token
@@ -353,7 +353,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[marklFormatId]; ok {
 		id := getMutableMerkleIdMethod(&object.Metadata)
 
-		if err = markl.SetMerkleIdWithFormatBlech32(
+		if err = markl.SetMarklIdWithFormatBlech32(
 			id,
 			marklFormatId,
 			string(value),

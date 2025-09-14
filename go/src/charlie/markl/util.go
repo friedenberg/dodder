@@ -59,7 +59,7 @@ func SetHexStringFromRelPath(
 	}
 
 	if err = SetHexBytes(
-		id.GetMarklType().GetMarklTypeId(),
+		id.GetMarklFormat().GetMarklFormatId(),
 		id,
 		[]byte(strings.ReplaceAll(relPath, string(filepath.Separator), "")),
 	); err != nil {
@@ -76,7 +76,7 @@ func SetHexStringFromRelPath(
 }
 
 func ReadFrom(reader io.Reader, id *Id, hashType HashType) (n int, err error) {
-	id.tipe = hashType
+	id.format = hashType
 	id.allocDataAndSetToCapIfNecessary(hashType.GetSize())
 
 	if n, err = io.ReadFull(reader, id.data); err != nil {
@@ -128,7 +128,7 @@ func SetHexBytes(
 	bites = bytes.TrimSpace(bites)
 
 	if id, ok := dst.(*Id); ok {
-		if id.tipe, err = GetMarklTypeOrError(tipe); err != nil {
+		if id.format, err = GetMarklTypeOrError(tipe); err != nil {
 			err = errors.Wrapf(
 				err,
 				"failed to SetHexBytes with type %s and bites %s",
@@ -179,7 +179,7 @@ func SetDigester(
 	digest := src.GetMarklId()
 	errors.PanicIfError(
 		dst.SetMarklId(
-			digest.GetMarklType().GetMarklTypeId(),
+			digest.GetMarklFormat().GetMarklFormatId(),
 			digest.GetBytes(),
 		),
 	)
@@ -214,12 +214,12 @@ func Equals(a, b interfaces.MarklId) bool {
 
 	var aType, bType string
 
-	if a.GetMarklType() != nil {
-		aType = a.GetMarklType().GetMarklTypeId()
+	if a.GetMarklFormat() != nil {
+		aType = a.GetMarklFormat().GetMarklFormatId()
 	}
 
-	if b.GetMarklType() != nil {
-		bType = b.GetMarklType().GetMarklTypeId()
+	if b.GetMarklFormat() != nil {
+		bType = b.GetMarklFormat().GetMarklFormatId()
 	}
 
 	return aType == bType && bytes.Equal(a.GetBytes(), b.GetBytes())
@@ -230,7 +230,7 @@ func Clone(src interfaces.MarklId) interfaces.MarklId {
 		errors.PanicIfError(MakeErrEmptyType(src))
 	}
 
-	if src.GetMarklType() == nil {
+	if src.GetMarklFormat() == nil {
 		panic("empty markl type")
 	}
 

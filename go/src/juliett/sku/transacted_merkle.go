@@ -27,8 +27,8 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 		return
 	}
 
-	if err = motherSig.SetFormat(
-		markl.FormatIdObjectMotherSigV1,
+	if err = motherSig.SetPurpose(
+		markl.PurposeObjectMotherSigV1,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -130,7 +130,7 @@ func (transacted *Transacted) FinalizeAndSignIfNecessary(
 		return
 	}
 
-	if transacted.Metadata.GetRepoPubKey().GetFormat() == "" {
+	if transacted.Metadata.GetRepoPubKey().GetPurpose() == "" {
 		panic("empty pbukey format")
 	}
 
@@ -275,14 +275,14 @@ type ObjectDigestWriteMap map[string]interfaces.MutableMarklId
 
 func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
-		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
-		markl.FormatIdObjectDigestSha256V1:       transacted.Metadata.GetObjectDigestMutable(),
+		markl.PurposeV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
+		markl.PurposeObjectDigestV1:       transacted.Metadata.GetObjectDigestMutable(),
 	}
 }
 
 func (transacted *Transacted) GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
-		markl.FormatIdV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
+		markl.PurposeV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
 	}
 }
 
@@ -345,7 +345,7 @@ func (transacted *Transacted) CalculateDigest(
 	format object_inventory_format.Format,
 	digest interfaces.MutableMarklId,
 ) (err error) {
-	if err = digest.SetFormat(format.GetMarklTypeId()); err != nil {
+	if err = digest.SetPurpose(format.GetMarklTypeId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -363,7 +363,7 @@ func (transacted *Transacted) CalculateDigest(
 	defer markl.PutBlobId(actual)
 
 	if err = digest.SetMarklId(
-		actual.GetMarklType().GetMarklTypeId(),
+		actual.GetMarklFormat().GetMarklFormatId(),
 		actual.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
