@@ -23,7 +23,7 @@ func Sign(
 		err = errors.Errorf("not a private key: %q", key.StringWithFormat())
 		return
 
-	case FormatIdEd25519Sec:
+	case FormatIdSecEd25519:
 	}
 
 	privateKey := ed25519.PrivateKey(key.GetBytes())
@@ -67,7 +67,7 @@ func Verify(
 		)
 		return
 
-	case FormatIdEd25519Pub:
+	case FormatIdPubEd25519:
 	}
 
 	pub := ed25519.PublicKey(publicKey.GetBytes())

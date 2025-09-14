@@ -26,9 +26,11 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 ) (response *http.Response, err error) {
 	var nonce markl.Id
 
-	if nonce, err = markl.MakeNonce(
+	if err = markl.GeneratePrivateKey(
 		nil,
 		markl.PurposeRequestAuthChallengeV1,
+		markl.FormatIdSecNonce,
+		&nonce,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

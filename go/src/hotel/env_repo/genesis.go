@@ -34,7 +34,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		if err := markl.GeneratePrivateKey(
 			nil,
 			markl.PurposeRepoPrivateKeyV1,
-			markl.FormatIdEd25519Sec,
+			markl.FormatIdSecEd25519,
 			privateKeyMutable,
 		); err != nil {
 			env.Cancel(err)

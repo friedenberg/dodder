@@ -1,37 +1,83 @@
 package markl
 
 import (
+	"crypto/ed25519"
 	"fmt"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 )
 
 // actual formats
 const (
 	// keep sorted
-	FormatIdEd25519Pub = "ed25519_pub"
-	FormatIdEd25519Sec = "ed25519_sec"
-	FormatIdEd25519Sig = "ed25519_sig"
+	FormatIdPubEd25519 = "ed25519_pub"
+	FormatIdSecEd25519 = "ed25519_sec"
+	FormatIdSigEd25519 = "ed25519_sig"
 
-	FormatIdAgeX25519Pub = "age_x25519_pub"
-	FormatIdAgeX25519Sec = "age_x25519_sec"
+	FormatIdPubAgeX25519 = "age_x25519_pub"
+	FormatIdSecAgeX25519 = "age_x25519_sec"
 
 	FormatIdHashSha256     = "sha256"
 	FormatIdHashBlake2b256 = "blake2b256"
 
-	FormatIdNonce = "nonce"
+	FormatIdSecNonce = "nonce"
 )
 
 func init() {
-	makeFormat(FormatIdEd25519Pub)
-	makeFormat(FormatIdEd25519Sec)
-	makeFormat(FormatIdEd25519Sig)
+	makeFormat(FormatIdPubEd25519, nil)
+	makeFormatSec(
+		FormatIdSecEd25519,
+		func(rand io.Reader) (bites []byte, err error) {
+			if _, bites, err = ed25519.GenerateKey(rand); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-	makeFormat(FormatIdAgeX25519Pub)
-	makeFormat(FormatIdAgeX25519Sec)
+			return
+		},
+	)
 
-	makeFormat(FormatIdNonce)
+	makeFormat(FormatIdSigEd25519, nil)
+
+	makeFormat(FormatIdPubAgeX25519, nil)
+	makeFormatSec(
+		FormatIdSecAgeX25519,
+		func(_ io.Reader) (bites []byte, err error) {
+			var ageId age.Identity
+
+			if err = ageId.GenerateIfNecessary(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			bech32String := ageId.String()
+
+			if _, bites, err = bech32.Decode(bech32String); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
+
+	makeFormatSec(
+		FormatIdSecNonce,
+		func(rand io.Reader) (bites []byte, err error) {
+			bites = make([]byte, 32)
+
+			if _, err = rand.Read(bites); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
 }
 
 var formats map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
@@ -61,14 +107,24 @@ func (format Format) GetMarklFormatId() string {
 	return format.id
 }
 
-func makeFormat(formatId string) {
-	_, alreadyExists := formats[formatId]
+func makeFormat(formatId string, format interfaces.MarklFormat) {
+	existing, alreadyExists := formats[formatId]
 
 	if alreadyExists {
-		panic(fmt.Sprintf("hash type already registered: %q", formatId))
+		panic(
+			fmt.Sprintf(
+				"format already registered: %q (%T)",
+				formatId,
+				existing,
+			),
+		)
 	}
 
-	formats[formatId] = Format{
-		id: formatId,
+	if format == nil {
+		format = Format{
+			id: formatId,
+		}
 	}
+
+	formats[formatId] = format
 }

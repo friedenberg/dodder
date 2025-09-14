@@ -2,7 +2,6 @@ package markl
 
 import (
 	"crypto/ed25519"
-	"crypto/rand"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -18,58 +17,20 @@ func GeneratePrivateKey(
 	formatId string,
 	dst interfaces.MutableMarklId,
 ) (err error) {
-	switch formatId {
-	default:
-		err = errors.Errorf("unsupported format: %q", formatId)
+	var formatSec FormatSec
+
+	if formatSec, err = GetFormatSecOrError(formatId); err != nil {
+		err = errors.Wrap(err)
 		return
+	}
 
-	case FormatIdEd25519Sec:
-		var src ed25519.PrivateKey
-
-		if _, src, err = ed25519.GenerateKey(rand); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = dst.SetPurpose(purpose); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = dst.SetMarklId(formatId, src); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case FormatIdAgeX25519Sec:
-		var ageId age.Identity
-
-		if err = ageId.GenerateIfNecessary(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		bech32String := ageId.String()
-
-		var data []byte
-
-		if _, data, err = bech32.Decode(bech32String); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = dst.SetPurpose(purpose); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = dst.SetMarklId(
-			FormatIdAgeX25519Sec,
-			data,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = formatSec.Generate(
+		rand,
+		purpose,
+		dst,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -91,7 +52,7 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		// legacy
 		fallthrough
 
-	case FormatIdEd25519Sec:
+	case FormatIdSecEd25519:
 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -103,7 +64,9 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		switch len(privateBytes) {
 		case ed25519.SeedSize:
 			// TODO emit error
-			err = errors.Errorf("private key is just seed, not full go ed25519 private key")
+			err = errors.Errorf(
+				"private key is just seed, not full go ed25519 private key",
+			)
 			return
 			privateKey = ed25519.NewKeyFromSeed(privateBytes)
 
@@ -118,12 +81,12 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		pubKey := privateKey.Public()
 		pubKeyBytes := pubKey.(ed25519.PublicKey)
 
-		if err = public.SetMarklId(FormatIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(FormatIdPubEd25519, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case FormatIdAgeX25519Sec:
+	case FormatIdSecAgeX25519:
 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -134,40 +97,10 @@ func GetPublicKey(private interfaces.MarklId) (public Id, err error) {
 		privateKey := ed25519.PrivateKey(private.GetBytes())
 		pubKeyBytes := privateKey.Public().(ed25519.PublicKey)
 
-		if err = public.SetMarklId(FormatIdEd25519Pub, pubKeyBytes); err != nil {
+		if err = public.SetMarklId(FormatIdPubEd25519, pubKeyBytes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	return
-}
-
-func MakeNonce(bites []byte, format string) (nonce Id, err error) {
-	if format == "" {
-		format = PurposeRequestAuthChallengeV1
-	}
-
-	if len(bites) == 0 {
-		bites = make([]byte, 32)
-
-		if _, err = rand.Read(bites); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = nonce.SetPurpose(format); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = nonce.SetMarklId(
-		FormatIdNonce,
-		bites,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -195,7 +128,7 @@ func GetIOWrapper(
 
 		return
 
-	case FormatIdAgeX25519Sec:
+	case FormatIdSecAgeX25519:
 		var ageId age.Identity
 
 		var bech32String []byte
