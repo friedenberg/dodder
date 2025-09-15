@@ -51,6 +51,8 @@ type (
 		IsNull() bool
 
 		GetPurpose() string
+		GetIOWrapper() (IOWrapper, error)
+		Verify(mes, sig MarklId) error
 	}
 
 	MutableMarklId interface {

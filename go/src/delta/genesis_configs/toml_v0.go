@@ -88,7 +88,7 @@ func (config *V0Common) GetBlobEncryption() interfaces.IOWrapper {
 
 	if encryption != nil {
 		var err error
-		ioWrapper, err = markl.GetIOWrapper(encryption)
+		ioWrapper, err = encryption.GetIOWrapper()
 		errors.PanicIfError(err)
 	}
 

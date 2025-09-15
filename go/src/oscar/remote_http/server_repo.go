@@ -80,8 +80,7 @@ func (server *Server) writeInventoryList(
 			return
 		}
 
-		if err := markl.Verify(
-			logEntry.PublicKey,
+		if err := logEntry.PublicKey.Verify(
 			expected,
 			sig,
 		); err != nil {

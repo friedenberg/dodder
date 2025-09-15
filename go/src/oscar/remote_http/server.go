@@ -264,8 +264,7 @@ func (server *Server) addSignatureIfNecessary(
 
 	var sig markl.Id
 
-	if err = markl.Sign(
-		sec,
+	if err = sec.Sign(
 		nonce,
 		&sig,
 		markl.PurposeRequestAuthResponseV1,

@@ -83,8 +83,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		}
 	}
 
-	if err = markl.Verify(
-		pubkey,
+	if err = pubkey.Verify(
 		nonce,
 		sig,
 	); err != nil {

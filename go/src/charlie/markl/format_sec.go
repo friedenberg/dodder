@@ -3,7 +3,6 @@ package markl
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
@@ -14,108 +13,22 @@ type (
 	FuncFormatSecSign         func(sec, mes interfaces.MarklId, readerRand io.Reader) ([]byte, error)
 
 	FormatSec struct {
-		id           string
-		funcGenerate FuncFormatSecGenerate
+		Id string
 
-		pubkeyFormatId   string
-		funcGetPublicKey FuncFormatSecGetPublicKey
+		Generate FuncFormatSecGenerate
 
-		funcGetIOWrapper FuncFormatSecGetIOWrapper
+		PubFormatId  string
+		GetPublicKey FuncFormatSecGetPublicKey
 
-		sigFormatId string
-		funcSign    FuncFormatSecSign
+		GetIOWrapper FuncFormatSecGetIOWrapper
+
+		SigFormatId string
+		Sign        FuncFormatSecSign
 	}
 )
 
 var _ interfaces.MarklFormat = FormatSec{}
 
 func (format FormatSec) GetMarklFormatId() string {
-	return format.id
-}
-
-func (format FormatSec) GetPublicKey(
-	private interfaces.MarklId,
-	purpose string,
-) (public Id, err error) {
-	if format.funcGetPublicKey == nil {
-		err = errors.Errorf(
-			"format does not support getting public key: %q",
-			format.id,
-		)
-		return
-	}
-
-	var bites []byte
-
-	if bites, err = format.funcGetPublicKey(private); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = public.SetMarklId(format.pubkeyFormatId, bites); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (format FormatSec) GetIOWrapper(
-	private interfaces.MarklId,
-) (ioWrapper interfaces.IOWrapper, err error) {
-	if format.funcGetIOWrapper == nil {
-		err = errors.Errorf(
-			"format does not support getting io wrapper key: %q",
-			format.id,
-		)
-		return
-	}
-
-	if ioWrapper, err = format.funcGetIOWrapper(private); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (format FormatSec) Sign(
-	sec interfaces.MarklId,
-	mes interfaces.MarklId,
-	sigDst interfaces.MutableMarklId,
-	purpose string,
-) (err error) {
-	if format.funcSign == nil {
-		err = errors.Errorf(
-			"format does not support getting signing: %q",
-			format.id,
-		)
-		return
-	}
-
-	var sigBites []byte
-
-	if sigBites, err = format.funcSign(sec, mes, nil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = sigDst.SetPurpose(
-		purpose,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = sigDst.SetMarklId(format.sigFormatId, sigBites); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return format.Id
 }

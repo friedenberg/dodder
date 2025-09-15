@@ -190,8 +190,7 @@ func (transacted *Transacted) FinalizeAndSign(
 
 	privateKey := config.GetPrivateKey()
 
-	if err = markl.Sign(
-		privateKey,
+	if err = privateKey.Sign(
 		transacted.Metadata.GetObjectDigest(),
 		transacted.Metadata.GetObjectSigMutable(),
 		config.GetObjectSigMarklTypeId(),
@@ -256,8 +255,7 @@ func (transacted *Transacted) Verify() (err error) {
 		return
 	}
 
-	if err = markl.Verify(
-		pubKey,
+	if err = pubKey.Verify(
 		transacted.Metadata.GetObjectDigest(),
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {

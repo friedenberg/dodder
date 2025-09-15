@@ -105,8 +105,7 @@ func (client client) ImportInventoryList(
 
 		var sig markl.Id
 
-		if err = markl.Sign(
-			sec,
+		if err = sec.Sign(
 			listSku.GetBlobDigest(),
 			&sig,
 			markl.PurposeRequestRepoSigV1,

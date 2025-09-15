@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
@@ -192,4 +193,39 @@ func (id Id) IsNull() bool {
 
 func (id Id) GetPurpose() string {
 	return markl.PurposeMadderPrivateKeyV1
+}
+
+func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
+	if id.IsNull() {
+		ioWrapper = files.NopeIOWrapper{}
+		return
+	}
+
+	var formatSec markl.FormatSec
+
+	if formatSec, err = markl.GetFormatSecOrError(
+		markl.FormatId(markl.FormatIdSecAgeX25519),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if formatSec.GetIOWrapper == nil {
+		err = errors.Errorf(
+			"format does not support getting io wrapper key: %q",
+			formatSec.GetMarklFormatId(),
+		)
+		return
+	}
+
+	if ioWrapper, err = formatSec.GetIOWrapper(id); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (id Id) Verify(_, _ interfaces.MarklId) (err error) {
+	return errors.Err405MethodNotAllowed
 }

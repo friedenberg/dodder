@@ -27,21 +27,21 @@ const (
 func init() {
 	// Ed22519
 	makeFormat(FormatPub{
-		id:         FormatIdPubEd25519,
-		funcVerify: Ed25519Verify,
+		Id:     FormatIdPubEd25519,
+		Verify: Ed25519Verify,
 	})
 
 	makeFormat(
 		FormatSec{
-			id: FormatIdSecEd25519,
+			Id: FormatIdSecEd25519,
 
-			funcGenerate: Ed25519GeneratePrivateKey,
+			Generate: Ed25519GeneratePrivateKey,
 
-			pubkeyFormatId:   FormatIdPubEd25519,
-			funcGetPublicKey: Ed25519GetPublicKey,
+			PubFormatId:  FormatIdPubEd25519,
+			GetPublicKey: Ed25519GetPublicKey,
 
-			sigFormatId: FormatIdSigEd25519,
-			funcSign:    Ed25519Sign,
+			SigFormatId: FormatIdSigEd25519,
+			Sign:        Ed25519Sign,
 		},
 	)
 
@@ -51,17 +51,17 @@ func init() {
 	makeFormat(Format{id: FormatIdPubAgeX25519})
 	makeFormat(
 		FormatSec{
-			id:               FormatIdSecAgeX25519,
-			funcGenerate:     AgeX25519Generate,
-			funcGetIOWrapper: AgeX25519GetIOWrapper,
+			Id:           FormatIdSecAgeX25519,
+			Generate:     AgeX25519Generate,
+			GetIOWrapper: AgeX25519GetIOWrapper,
 		},
 	)
 
 	// Nonce
 	makeFormat(
 		FormatSec{
-			id:           FormatIdSecNonce,
-			funcGenerate: NonceGenerate,
+			Id:       FormatIdSecNonce,
+			Generate: NonceGenerate,
 		},
 	)
 }
@@ -107,38 +107,6 @@ func GetFormatSecOrError(
 		err = errors.Errorf(
 			"requested format is not FormatSec, but %T:%s",
 			formatSec,
-			formatId,
-		)
-		return
-	}
-
-	return
-}
-
-// move to Id
-func GetFormatPubOrError(
-	formatIdGetter interfaces.MarklFormatGetter,
-) (formatPub FormatPub, err error) {
-	format := formatIdGetter.GetMarklFormat()
-
-	if format == nil {
-		err = errors.Errorf("empty format for getter: %s", formatIdGetter)
-		return
-	}
-
-	formatId := formatIdGetter.GetMarklFormat().GetMarklFormatId()
-
-	if format, err = GetFormatOrError(formatId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var ok bool
-
-	if formatPub, ok = format.(FormatPub); !ok {
-		err = errors.Errorf(
-			"requested format is not FormatPub, but %T:%s",
-			formatPub,
 			formatId,
 		)
 		return
