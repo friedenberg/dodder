@@ -1,8 +1,6 @@
 package markl
 
 import (
-	"io"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -13,7 +11,6 @@ import (
 type PrivateKeyGenerator interface {
 	GeneratePrivateKey() (err error)
 }
-
 
 func GetPublicKey(
 	private interfaces.MarklId,
