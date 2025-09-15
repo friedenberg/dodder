@@ -193,9 +193,8 @@ func (transacted *Transacted) FinalizeAndSign(
 	if err = markl.Sign(
 		privateKey,
 		transacted.Metadata.GetObjectDigest(),
-		config.GetObjectSigMarklTypeId(),
-		markl.FormatIdSigEd25519,
 		transacted.Metadata.GetObjectSigMutable(),
+		config.GetObjectSigMarklTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -276,7 +275,7 @@ type ObjectDigestWriteMap map[string]interfaces.MutableMarklId
 func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
 		markl.PurposeV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
-		markl.PurposeObjectDigestV1:       transacted.Metadata.GetObjectDigestMutable(),
+		markl.PurposeObjectDigestV1:             transacted.Metadata.GetObjectDigestMutable(),
 	}
 }
 

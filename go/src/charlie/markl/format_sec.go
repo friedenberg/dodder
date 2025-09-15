@@ -8,48 +8,27 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-type FuncFormatSecGenerate func(io.Reader) ([]byte, error)
+type (
+	FuncFormatSecGenerate     func(io.Reader) ([]byte, error)
+	FuncFormatSecGetPublicKey func(private interfaces.MarklId) ([]byte, error)
+	FuncFormatSecGetIOWrapper func(private interfaces.MarklId) (interfaces.IOWrapper, error)
+	FuncFormatSecSign         func(sec, mes interfaces.MarklId, readerRand io.Reader) ([]byte, error)
 
-type FormatSec struct {
-	id           string
-	funcGenerate FuncFormatSecGenerate
-}
+	FormatSec struct {
+		id           string
+		funcGenerate FuncFormatSecGenerate
+
+		pubkeyFormatId   string
+		funcGetPublicKey FuncFormatSecGetPublicKey
+
+		funcGetIOWrapper FuncFormatSecGetIOWrapper
+
+		sigFormatId string
+		funcSign    FuncFormatSecSign
+	}
+)
 
 var _ interfaces.MarklFormat = FormatSec{}
-
-func GetFormatSecOrError(formatId string) (formatSec FormatSec, err error) {
-	var format interfaces.MarklFormat
-	if format, err = GetFormatOrError(formatId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var ok bool
-
-	if formatSec, ok = format.(FormatSec); !ok {
-		err = errors.Errorf(
-			"requested format is not FormatSec, but %T:%s",
-			formatSec,
-			formatId,
-		)
-		return
-	}
-
-	return
-}
-
-func makeFormatSec(
-	formatId string,
-	funcGenerate func(io.Reader) ([]byte, error),
-) {
-	makeFormat(
-		formatId,
-		FormatSec{
-			id:           formatId,
-			funcGenerate: funcGenerate,
-		},
-	)
-}
 
 func (format FormatSec) GetMarklFormatId() string {
 	return format.id
@@ -60,6 +39,11 @@ func (format FormatSec) Generate(
 	purpose string,
 	dst interfaces.MutableMarklId,
 ) (err error) {
+	if format.funcGenerate == nil {
+		err = errors.Errorf("format does not support generation: %q", format.id)
+		return
+	}
+
 	if readerRand == nil {
 		readerRand = rand.Reader
 	}
@@ -84,73 +68,89 @@ func (format FormatSec) Generate(
 	return
 }
 
-// func (format FormatSec) GetPublicKey(private interfaces.MarklId) (public Id,
-// err error) {
-// 	marklTypeId := private.GetMarklFormat().GetMarklFormatId()
+func (format FormatSec) GetPublicKey(
+	private interfaces.MarklId,
+	purpose string,
+) (public Id, err error) {
+	if format.funcGetPublicKey == nil {
+		err = errors.Errorf(
+			"format does not support getting public key: %q",
+			format.id,
+		)
+		return
+	}
 
-// 	switch marklTypeId {
-// 	default:
-// 		err = errors.Errorf(
-// 			"unsupported id: %q. Type: %q",
-// 			private.StringWithFormat(),
-// 			marklTypeId,
-// 		)
-// 		return
+	var bites []byte
 
-// 	case PurposeRepoPrivateKeyV1:
-// 		// legacy
-// 		fallthrough
+	if bites, err = format.funcGetPublicKey(private); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	case FormatIdSecEd25519:
-// 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
+	if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 		privateBytes := private.GetBytes()
-// 		var privateKey ed25519.PrivateKey
+	if err = public.SetMarklId(format.pubkeyFormatId, bites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 		switch len(privateBytes) {
-// 		case ed25519.SeedSize:
-// 			// TODO emit error
-// 			err = errors.Errorf(
-// 				"private key is just seed, not full go ed25519 private key",
-// 			)
-// 			return
-// 			privateKey = ed25519.NewKeyFromSeed(privateBytes)
+	return
+}
 
-// 		case ed25519.PrivateKeySize:
-// 			privateKey = ed25519.PrivateKey(privateBytes)
+func (format FormatSec) GetIOWrapper(
+	private interfaces.MarklId,
+) (ioWrapper interfaces.IOWrapper, err error) {
+	if format.funcGetIOWrapper == nil {
+		err = errors.Errorf(
+			"format does not support getting io wrapper key: %q",
+			format.id,
+		)
+		return
+	}
 
-// 		default:
-// 			err = errors.Errorf("unsupported key size: %d", len(privateBytes))
-// 			return
-// 		}
+	if ioWrapper, err = format.funcGetIOWrapper(private); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 		pubKey := privateKey.Public()
-// 		pubKeyBytes := pubKey.(ed25519.PublicKey)
+	return
+}
 
-// 		if err = public.SetMarklId(FormatIdPubEd25519, pubKeyBytes); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
+func (format FormatSec) Sign(
+	sec interfaces.MarklId,
+	mes interfaces.MarklId,
+	sigDst interfaces.MutableMarklId,
+	purpose string,
+) (err error) {
+	if format.funcSign == nil {
+		err = errors.Errorf(
+			"format does not support getting signing: %q",
+			format.id,
+		)
+		return
+	}
 
-// 	case FormatIdSecAgeX25519:
-// 		if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
+	var sigBites []byte
 
-// 		// the ed25519 package includes a public key suffix, so we need to
-// 		// reconstruct their version of a private key for a public key value
-// 		privateKey := ed25519.PrivateKey(private.GetBytes())
-// 		pubKeyBytes := privateKey.Public().(ed25519.PublicKey)
+	if sigBites, err = format.funcSign(sec, mes, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 		if err = public.SetMarklId(FormatIdPubEd25519, pubKeyBytes); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-// 	}
+	if err = sigDst.SetPurpose(
+		purpose,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	return
-// }
+	if err = sigDst.SetMarklId(format.sigFormatId, sigBites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

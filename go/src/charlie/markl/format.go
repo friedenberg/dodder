@@ -1,18 +1,15 @@
 package markl
 
 import (
-	"crypto/ed25519"
 	"fmt"
-	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 )
 
 // actual formats
 const (
+	// TODO maybe switch to type-prefixed
 	// keep sorted
 	FormatIdPubEd25519 = "ed25519_pub"
 	FormatIdSecEd25519 = "ed25519_sec"
@@ -28,54 +25,43 @@ const (
 )
 
 func init() {
-	makeFormat(FormatIdPubEd25519, nil)
-	makeFormatSec(
-		FormatIdSecEd25519,
-		func(rand io.Reader) (bites []byte, err error) {
-			if _, bites, err = ed25519.GenerateKey(rand); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	// Ed22519
+	makeFormat(FormatPub{
+		id:         FormatIdPubEd25519,
+		funcVerify: Ed25519Verify,
+	})
 
-			return
+	makeFormat(
+		FormatSec{
+			id: FormatIdSecEd25519,
+
+			funcGenerate: Ed25519GeneratePrivateKey,
+
+			pubkeyFormatId:   FormatIdPubEd25519,
+			funcGetPublicKey: Ed25519GetPublicKey,
+
+			sigFormatId: FormatIdSigEd25519,
+			funcSign:    Ed25519Sign,
 		},
 	)
 
-	makeFormat(FormatIdSigEd25519, nil)
+	makeFormat(Format{id: FormatIdSigEd25519})
 
-	makeFormat(FormatIdPubAgeX25519, nil)
-	makeFormatSec(
-		FormatIdSecAgeX25519,
-		func(_ io.Reader) (bites []byte, err error) {
-			var ageId age.Identity
-
-			if err = ageId.GenerateIfNecessary(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			bech32String := ageId.String()
-
-			if _, bites, err = bech32.Decode(bech32String); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
+	// AgeX25519
+	makeFormat(Format{id: FormatIdPubAgeX25519})
+	makeFormat(
+		FormatSec{
+			id:               FormatIdSecAgeX25519,
+			funcGenerate:     AgeX25519Generate,
+			funcGetIOWrapper: AgeX25519GetIOWrapper,
 		},
 	)
 
-	makeFormatSec(
-		FormatIdSecNonce,
-		func(rand io.Reader) (bites []byte, err error) {
-			bites = make([]byte, 32)
-
-			if _, err = rand.Read(bites); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
+	// Nonce
+	makeFormat(
+		FormatSec{
+			id:           FormatIdSecNonce,
+			funcGenerate: NonceGenerate,
 		},
 	)
 }
@@ -97,6 +83,78 @@ func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
 	return format, nil
 }
 
+// move to Id
+func GetFormatSecOrError(
+	formatIdGetter interfaces.MarklFormatGetter,
+) (formatSec FormatSec, err error) {
+	format := formatIdGetter.GetMarklFormat()
+
+	if format == nil {
+		err = errors.Errorf("empty format for getter: %s", formatIdGetter)
+		return
+	}
+
+	formatId := formatIdGetter.GetMarklFormat().GetMarklFormatId()
+
+	if format, err = GetFormatOrError(formatId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ok bool
+
+	if formatSec, ok = format.(FormatSec); !ok {
+		err = errors.Errorf(
+			"requested format is not FormatSec, but %T:%s",
+			formatSec,
+			formatId,
+		)
+		return
+	}
+
+	return
+}
+
+// move to Id
+func GetFormatPubOrError(
+	formatIdGetter interfaces.MarklFormatGetter,
+) (formatPub FormatPub, err error) {
+	format := formatIdGetter.GetMarklFormat()
+
+	if format == nil {
+		err = errors.Errorf("empty format for getter: %s", formatIdGetter)
+		return
+	}
+
+	formatId := formatIdGetter.GetMarklFormat().GetMarklFormatId()
+
+	if format, err = GetFormatOrError(formatId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ok bool
+
+	if formatPub, ok = format.(FormatPub); !ok {
+		err = errors.Errorf(
+			"requested format is not FormatPub, but %T:%s",
+			formatPub,
+			formatId,
+		)
+		return
+	}
+
+	return
+}
+
+type FormatId string
+
+func (formatId FormatId) GetMarklFormat() interfaces.MarklFormat {
+	format, err := GetFormatOrError(string(formatId))
+	errors.PanicIfError(err)
+	return format
+}
+
 type Format struct {
 	id string
 }
@@ -107,7 +165,17 @@ func (format Format) GetMarklFormatId() string {
 	return format.id
 }
 
-func makeFormat(formatId string, format interfaces.MarklFormat) {
+func makeFormat(format interfaces.MarklFormat) {
+	if format == nil {
+		panic("nil format")
+	}
+
+	formatId := format.GetMarklFormatId()
+
+	if formatId == "" {
+		panic("empty formatId")
+	}
+
 	existing, alreadyExists := formats[formatId]
 
 	if alreadyExists {
@@ -118,12 +186,6 @@ func makeFormat(formatId string, format interfaces.MarklFormat) {
 				existing,
 			),
 		)
-	}
-
-	if format == nil {
-		format = Format{
-			id: formatId,
-		}
 	}
 
 	formats[formatId] = format

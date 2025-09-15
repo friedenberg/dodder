@@ -260,16 +260,15 @@ func (server *Server) addSignatureIfNecessary(
 		server.Repo.GetImmutableConfigPublic().GetPublicKey().String(),
 	)
 
-	privateKey := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
+	sec := server.Repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 	var sig markl.Id
 
 	if err = markl.Sign(
-		privateKey,
+		sec,
 		nonce,
-		markl.PurposeRequestAuthResponseV1,
-		markl.FormatIdSigEd25519,
 		&sig,
+		markl.PurposeRequestAuthResponseV1,
 	); err != nil {
 		server.EnvLocal.Cancel(err)
 		return

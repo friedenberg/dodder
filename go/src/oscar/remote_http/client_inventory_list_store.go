@@ -101,15 +101,15 @@ func (client client) ImportInventoryList(
 	}
 
 	{
+		sec := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
+
 		var sig markl.Id
-		key := client.repo.GetImmutableConfigPrivate().Blob.GetPrivateKey()
 
 		if err = markl.Sign(
-			key,
+			sec,
 			listSku.GetBlobDigest(),
-			markl.PurposeRequestRepoSigV1,
-			markl.PurposeObjectSigV1,
 			&sig,
+			markl.PurposeRequestRepoSigV1,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

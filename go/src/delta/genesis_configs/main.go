@@ -16,6 +16,7 @@ type (
 		GetPublicKey() markl.Id
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
+		// TODO rename to purpose
 		GetObjectSigMarklTypeId() string
 	}
 
