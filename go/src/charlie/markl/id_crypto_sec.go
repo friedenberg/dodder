@@ -125,7 +125,7 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 
 		if formatSec, ok = id.format.(FormatSec); !ok {
 			err = errors.Errorf(
-				"id format does not support sec operation: %T",
+				"id format does not support sec operations: %T",
 				id.format,
 			)
 			return

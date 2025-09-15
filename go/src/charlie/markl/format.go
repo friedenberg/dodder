@@ -1,10 +1,12 @@
 package markl
 
 import (
+	"crypto/ed25519"
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"golang.org/x/crypto/curve25519"
 )
 
 // actual formats
@@ -26,14 +28,18 @@ const (
 
 func init() {
 	// Ed22519
-	makeFormat(FormatPub{
-		Id:     FormatIdPubEd25519,
-		Verify: Ed25519Verify,
-	})
+	makeFormat(
+		FormatPub{
+			Id:     FormatIdPubEd25519,
+			Size:   ed25519.PublicKeySize,
+			Verify: Ed25519Verify,
+		},
+	)
 
 	makeFormat(
 		FormatSec{
-			Id: FormatIdSecEd25519,
+			Id:   FormatIdSecEd25519,
+			Size: ed25519.PrivateKeySize,
 
 			Generate: Ed25519GeneratePrivateKey,
 
@@ -45,13 +51,24 @@ func init() {
 		},
 	)
 
-	makeFormat(Format{id: FormatIdSigEd25519})
+	makeFormat(
+		Format{
+			Id:   FormatIdSigEd25519,
+			Size: ed25519.SignatureSize,
+		},
+	)
 
 	// AgeX25519
-	makeFormat(Format{id: FormatIdPubAgeX25519})
+	makeFormat(
+		Format{
+			Id:   FormatIdPubAgeX25519,
+			Size: curve25519.ScalarSize,
+		},
+	)
 	makeFormat(
 		FormatSec{
 			Id:           FormatIdSecAgeX25519,
+			Size:         curve25519.ScalarSize,
 			Generate:     AgeX25519Generate,
 			GetIOWrapper: AgeX25519GetIOWrapper,
 		},
@@ -61,7 +78,8 @@ func init() {
 	makeFormat(
 		FormatSec{
 			Id:       FormatIdSecNonce,
-			Generate: NonceGenerate,
+			Size:     32,
+			Generate: NonceGenerate32,
 		},
 	)
 }
@@ -124,13 +142,18 @@ func (formatId FormatId) GetMarklFormat() interfaces.MarklFormat {
 }
 
 type Format struct {
-	id string
+	Id   string
+	Size int
 }
 
 var _ interfaces.MarklFormat = Format{}
 
 func (format Format) GetMarklFormatId() string {
-	return format.id
+	return format.Id
+}
+
+func (format Format) GetSize() int {
+	return format.Size
 }
 
 func makeFormat(format interfaces.MarklFormat) {

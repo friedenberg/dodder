@@ -299,7 +299,7 @@ func (transacted *Transacted) CalculateDigests(
 	for formatId, id := range formats {
 		var format object_inventory_format.Format
 
-		if format, err = object_inventory_format.FormatForMarklFormatIdError(
+		if format, err = object_inventory_format.FormatForPurposeOrError(
 			formatId,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -342,17 +342,17 @@ func (transacted *Transacted) CalculateDigest(
 	format object_inventory_format.Format,
 	digest interfaces.MutableMarklId,
 ) (err error) {
-	if err = digest.SetPurpose(format.GetMarklTypeId()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var actual interfaces.MarklId
 
 	if actual, err = funcCalcDigest(
 		format,
 		transacted,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = digest.SetPurpose(format.GetPurpose()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

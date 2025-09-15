@@ -36,20 +36,20 @@ func (nopFormatterContext) GetObjectId() *ids.ObjectId {
 type keyType = *catgut.String
 
 type Format struct {
-	marklFormatId string
-	keys          []keyType
+	purpose string
+	keys    []keyType
 }
 
-func (format Format) GetMarklTypeId() string {
-	return format.marklFormatId
+func (format Format) GetPurpose() string {
+	return format.purpose
 }
 
-func FormatForMarklFormatIdError(
-	marklFormatId string,
+func FormatForPurposeOrError(
+	purpose string,
 ) (format Format, err error) {
 	var found bool
-	if format, found = formatsMap[marklFormatId]; !found {
-		err = errUnknownFormatKey(marklFormatId)
+	if format, found = formatsMap[purpose]; !found {
+		err = errUnknownFormatKey(purpose)
 		return
 	}
 
@@ -61,23 +61,23 @@ var (
 	formatsMap  = map[string]Format{}
 )
 
-func registerFormat(marklFormatId string, keys ...keyType) {
-	format, alreadyExists := formatsMap[marklFormatId]
+func registerFormat(purpose string, keys ...keyType) {
+	format, alreadyExists := formatsMap[purpose]
 
 	if alreadyExists {
 		panic(
 			fmt.Sprintf(
-				"format for markl format id %q already registered",
-				marklFormatId,
+				"format for purpose %q already registered",
+				purpose,
 			),
 		)
 	}
 
-	format.marklFormatId = marklFormatId
+	format.purpose = purpose
 	format.keys = keys
 
 	formatsList = append(formatsList, format)
-	formatsMap[marklFormatId] = format
+	formatsMap[purpose] = format
 }
 
 func init() {

@@ -7,6 +7,7 @@ import (
 
 type (
 	MarklFormat interface {
+		GetSize() int
 		GetMarklFormatId() string
 	}
 
@@ -51,6 +52,8 @@ type (
 		IsNull() bool
 
 		GetPurpose() string
+
+		// Optional methods
 		GetIOWrapper() (IOWrapper, error)
 		Verify(mes, sig MarklId) error
 	}

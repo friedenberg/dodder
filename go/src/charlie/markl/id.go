@@ -9,23 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
-
-var idPool interfaces.Pool[Id, *Id] = pool.MakeWithResetable[Id]()
-
-func PutBlobId(digest interfaces.MarklId) {
-	switch id := digest.(type) {
-	case Id:
-		idPool.Put(&id)
-
-	case *Id:
-		idPool.Put(id)
-
-	default:
-		panic(errors.Errorf("unsupported id type: %T", digest))
-	}
-}
 
 var (
 	_ interfaces.MarklId        = Id{}
@@ -204,7 +188,10 @@ func (id *Id) SetMarklId(formatId string, bites []byte) (err error) {
 		return
 	}
 
-	id.setData(bites)
+	if err = id.setData(bites); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -219,10 +206,32 @@ func (id *Id) allocDataAndSetToCapIfNecessary(size int) {
 	id.data = id.data[:size]
 }
 
-func (id *Id) setData(data []byte) {
-	// TODO validate against type
-	id.allocDataAndSetToCapIfNecessary(len(data))
-	copy(id.data, data)
+func (id *Id) setData(bites []byte) (err error) {
+	// empty is permitted
+	if len(bites) == 0 {
+		return
+	}
+
+	// TODO enforce non-nil formats
+	if id.format != nil {
+		expected := id.format.GetSize()
+		actual := len(bites)
+
+		if actual != expected {
+			err = errors.Errorf(
+				"wrong size for bytes: expected %d, but got %d",
+				expected,
+				actual,
+			)
+
+			return
+		}
+	}
+
+	id.allocDataAndSetToCapIfNecessary(len(bites))
+	copy(id.data, bites)
+
+	return
 }
 
 func (id *Id) Reset() {
@@ -234,7 +243,7 @@ func (id *Id) Reset() {
 func (id *Id) ResetWith(src Id) {
 	id.purpose = src.purpose
 	id.format = src.format
-	id.setData(src.data)
+	errors.PanicIfError(id.setData(src.data))
 }
 
 func (id *Id) ResetWithMarklId(src interfaces.MarklId) {

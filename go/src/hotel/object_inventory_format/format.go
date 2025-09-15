@@ -19,7 +19,7 @@ import (
 )
 
 func FormatForKey(k string) Format {
-	format, err := FormatForMarklFormatIdError(k)
+	format, err := FormatForPurposeOrError(k)
 	errors.PanicIfError(err)
 	return format
 }

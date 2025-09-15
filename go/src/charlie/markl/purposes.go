@@ -2,8 +2,6 @@ package markl
 
 import (
 	"fmt"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 // purposes currently treated as formats
@@ -57,16 +55,10 @@ func init() {
 	makePurpose(PurposeMadderPrivateKeyV1)
 }
 
-var purposes map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
+var purposes = map[string]Purpose{}
 
 type Purpose struct {
 	id string
-}
-
-var _ interfaces.MarklFormat = Purpose{}
-
-func (purpose Purpose) GetMarklFormatId() string {
-	return purpose.id
 }
 
 func makePurpose(purposeId string) {
