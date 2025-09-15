@@ -1,6 +1,7 @@
 package markl
 
 import (
+	"crypto/rand"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -8,24 +9,61 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
-func GeneratePrivateKey(
-	rand io.Reader,
-	purpose string,
+type PrivateKeyGenerator interface {
+	GeneratePrivateKey() (err error)
+}
+
+func (id *Id) GeneratePrivateKey(
+	readerRand io.Reader,
 	formatId string,
-	dst interfaces.MutableMarklId,
+	purpose string,
 ) (err error) {
+	if formatId != "" {
+		if err = id.setFormatId(formatId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	var formatSec FormatSec
 
-	if formatSec, err = GetFormatSecOrError(FormatId(formatId)); err != nil {
+	{
+		var ok bool
+
+		if formatSec, ok = id.format.(FormatSec); !ok {
+			err = errors.Errorf(
+				"id format does not support sec operation: %T",
+				id.format,
+			)
+			return
+		}
+	}
+
+	if formatSec.funcGenerate == nil {
+		err = errors.Errorf(
+			"format does not support generation: %q",
+			formatSec.id,
+		)
+		return
+	}
+
+	if readerRand == nil {
+		readerRand = rand.Reader
+	}
+
+	var bites []byte
+
+	if bites, err = formatSec.funcGenerate(readerRand); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = formatSec.Generate(
-		rand,
-		purpose,
-		dst,
-	); err != nil {
+	if err = id.SetPurpose(purpose); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = id.SetMarklId(formatSec.id, bites); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -33,25 +71,44 @@ func GeneratePrivateKey(
 	return
 }
 
-type PrivateKeyGenerator interface {
-	GeneratePrivateKey() (err error)
-}
-
-func GetPublicKey(
-	private interfaces.MarklId,
+func (id Id) GetPublicKey(
 	purpose string,
 ) (public Id, err error) {
 	var formatSec FormatSec
 
-	if formatSec, err = GetFormatSecOrError(private); err != nil {
+	{
+		var ok bool
+
+		if formatSec, ok = id.format.(FormatSec); !ok {
+			err = errors.Errorf(
+				"id format does not support sec operation: %T",
+				id.format,
+			)
+			return
+		}
+	}
+
+	if formatSec.funcGetPublicKey == nil {
+		err = errors.Errorf(
+			"format does not support getting public key: %q",
+			formatSec.id,
+		)
+		return
+	}
+
+	var bites []byte
+
+	if bites, err = formatSec.funcGetPublicKey(id); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if public, err = formatSec.GetPublicKey(
-		private,
-		purpose,
-	); err != nil {
+	if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = public.SetMarklId(formatSec.pubkeyFormatId, bites); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

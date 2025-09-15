@@ -63,11 +63,10 @@ func TestBinaryOne(t1 *testing.T) {
 		{
 			config := genesis_configs.Default().Blob
 
-			t.AssertNoError(markl.GeneratePrivateKey(
+			t.AssertNoError(config.GetPrivateKeyMutable().GeneratePrivateKey(
 				nil,
-				markl.PurposeRepoPrivateKeyV1,
 				markl.FormatIdSecEd25519,
-				config.GetPrivateKeyMutable(),
+				markl.PurposeRepoPrivateKeyV1,
 			))
 			t.AssertNoError(expected.FinalizeAndSignOverwrite(config))
 		}

@@ -31,11 +31,10 @@ func (env *Env) Genesis(bigBang BigBang) {
 	{
 		privateKeyMutable := bigBang.GenesisConfig.Blob.GetPrivateKeyMutable()
 
-		if err := markl.GeneratePrivateKey(
+		if err := privateKeyMutable.GeneratePrivateKey(
 			nil,
-			markl.PurposeRepoPrivateKeyV1,
 			markl.FormatIdSecEd25519,
-			privateKeyMutable,
+			markl.PurposeRepoPrivateKeyV1,
 		); err != nil {
 			env.Cancel(err)
 			return

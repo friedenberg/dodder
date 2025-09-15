@@ -184,19 +184,23 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	return
 }
 
+func (id *Id) setFormatId(formatId string) (err error) {
+	if id.format, err = GetFormatOrError(formatId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (id *Id) SetMarklId(formatId string, bites []byte) (err error) {
 	if formatId == "" && len(bites) == 0 {
 		id.Reset()
 		return
 	}
 
-	if id.format, err = GetFormatOrError(formatId); err != nil {
-		err = errors.Wrapf(
-			err,
-			"failed to SetMerkleId on %T with contents: %s",
-			id,
-			bites,
-		)
+	if err = id.setFormatId(formatId); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

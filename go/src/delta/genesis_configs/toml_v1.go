@@ -80,10 +80,7 @@ func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id {
 }
 
 func (config *TomlV1Private) GetPublicKey() markl.Id {
-	public, err := markl.GetPublicKey(
-		config.PrivateKey,
-		markl.PurposeRepoPrivateKeyV1,
-	)
+	public, err := config.PrivateKey.GetPublicKey(markl.PurposeRepoPrivateKeyV1)
 	errors.PanicIfError(err)
 	return public
 }

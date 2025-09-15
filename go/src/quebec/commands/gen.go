@@ -37,11 +37,10 @@ func (cmd Gen) Run(req command.Request) {
 		case markl.PurposeMadderPrivateKeyV0:
 			var id markl.Id
 
-			if err := markl.GeneratePrivateKey(
+			if err := id.GeneratePrivateKey(
 				nil,
-				arg,
 				markl.FormatIdSecAgeX25519,
-				&id,
+				arg,
 			); err != nil {
 				ui.Err().Print(err)
 				continue
@@ -52,11 +51,10 @@ func (cmd Gen) Run(req command.Request) {
 		case markl.PurposeMadderPrivateKeyV1:
 			var id markl.Id
 
-			if err := markl.GeneratePrivateKey(
+			if err := id.GeneratePrivateKey(
 				nil,
-				arg,
 				markl.FormatIdSecAgeX25519,
-				&id,
+				arg,
 			); err != nil {
 				ui.Err().Print(err)
 				continue
@@ -67,11 +65,10 @@ func (cmd Gen) Run(req command.Request) {
 		case markl.PurposeRepoPrivateKeyV1:
 			var id markl.Id
 
-			if err := markl.GeneratePrivateKey(
+			if err := id.GeneratePrivateKey(
 				nil,
-				arg,
 				markl.FormatIdSecEd25519,
-				&id,
+				arg,
 			); err != nil {
 				ui.Err().Print(err)
 				continue

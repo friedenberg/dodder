@@ -1,7 +1,6 @@
 package markl
 
 import (
-	"crypto/rand"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -32,40 +31,6 @@ var _ interfaces.MarklFormat = FormatSec{}
 
 func (format FormatSec) GetMarklFormatId() string {
 	return format.id
-}
-
-func (format FormatSec) Generate(
-	readerRand io.Reader,
-	purpose string,
-	dst interfaces.MutableMarklId,
-) (err error) {
-	if format.funcGenerate == nil {
-		err = errors.Errorf("format does not support generation: %q", format.id)
-		return
-	}
-
-	if readerRand == nil {
-		readerRand = rand.Reader
-	}
-
-	var bites []byte
-
-	if bites, err = format.funcGenerate(readerRand); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = dst.SetPurpose(purpose); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = dst.SetMarklId(format.id, bites); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (format FormatSec) GetPublicKey(
