@@ -7,7 +7,7 @@ import (
 )
 
 type ParentNegotiatorFirstAncestor struct {
-	Local, Remote repo.WorkingCopy
+	Local, Remote repo.Repo
 }
 
 func (parentNegotiator ParentNegotiatorFirstAncestor) GetParentNegotiator() sku.ParentNegotiator {

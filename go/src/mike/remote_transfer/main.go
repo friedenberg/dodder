@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
@@ -20,14 +21,14 @@ var ErrNeedsMerge = errors.Err409Conflict.Errorf(
 )
 
 func Make(
-	options sku.ImporterOptions,
+	options repo.ImporterOptions,
 	storeOptions sku.StoreOptions,
 	envRepo env_repo.Env,
 	typedInventoryListBlobStore inventory_list_coders.Closet,
 	indexObject sku.Index,
 	storeExternalMergeCheckedOut store_workspace.MergeCheckedOut,
 	storeObject sku.RepoStore,
-) sku.Importer {
+) repo.Importer {
 	if options.BlobGenres.IsEmpty() {
 		options.BlobGenres = ids.MakeGenreAll()
 	}

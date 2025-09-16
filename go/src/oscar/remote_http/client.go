@@ -123,15 +123,15 @@ func (client *client) GetObjectStore() sku.RepoStore {
 }
 
 func (client *client) MakeImporter(
-	options sku.ImporterOptions,
+	options repo.ImporterOptions,
 	storeOptions sku.StoreOptions,
-) sku.Importer {
+) repo.Importer {
 	panic(comments.Implement())
 }
 
 func (client *client) ImportSeq(
 	seq sku.Seq,
-	importer sku.Importer,
+	importer repo.Importer,
 ) (err error) {
 	return comments.Implement()
 }
@@ -219,14 +219,14 @@ func (client *client) PullQueryGroupFromRemote(
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	return client.pullQueryGroupFromWorkingCopy(
-		remote.(repo.WorkingCopy),
+		remote.(repo.Repo),
 		queryGroup,
 		options,
 	)
 }
 
 func (client *client) pullQueryGroupFromWorkingCopy(
-	remote repo.WorkingCopy,
+	remote repo.Repo,
 	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {

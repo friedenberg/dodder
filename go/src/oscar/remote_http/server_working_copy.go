@@ -15,11 +15,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
-	repo *local_working_copy.Repo,
+	local *local_working_copy.Repo,
 	request Request,
 ) (response Response) {
 	listCoderCloset := server.Repo.GetInventoryListCoderCloset()
@@ -28,9 +29,9 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 
 	// TODO make option to read from headers
 	// TODO add remote blob store
-	importerOptions := sku.ImporterOptions{
+	importerOptions := repo.ImporterOptions{
 		// TODO
-		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
 	if request.Headers.Get(
@@ -93,13 +94,13 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 	defer repoolBufferedWriter()
 
 	listType := ids.GetOrPanic(
-		repo.GetImmutableConfigPublic().GetInventoryListTypeId(),
+		local.GetImmutableConfigPublic().GetInventoryListTypeId(),
 	).Type
 
 	inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
 	if _, err := inventoryListCoderCloset.WriteBlobToWriter(
-		repo,
+		local,
 		listType,
 		quiter.MakeSeqErrorFromSeq(listMissingObjects.All()),
 		bufferedWriter,
@@ -125,7 +126,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 }
 
 func (server *Server) writeInventoryListLocalWorkingCopy(
-	repo *local_working_copy.Repo,
+	local *local_working_copy.Repo,
 	request Request,
 	listSku *sku.Transacted,
 ) (response Response) {
@@ -168,7 +169,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		var err error
 
 		if list, err = listCoderCloset.ReadInventoryListBlob(
-			repo,
+			local,
 			listSkuType,
 			bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 		); err != nil {
@@ -183,9 +184,9 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 	// TODO make option to read from headers
 	// TODO add remote blob store
-	importerOptions := sku.ImporterOptions{
+	importerOptions := repo.ImporterOptions{
 		// TODO
-		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
 	if request.Headers.Get(
@@ -248,11 +249,11 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	)
 	defer repoolBufferedWriter()
 
-	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
+	inventoryListCoderCloset := local.GetInventoryListCoderCloset()
 
 	if _, err := inventoryListCoderCloset.WriteTypedBlobToWriter(
-		repo,
-		ids.GetOrPanic(repo.GetImmutableConfigPublic().GetInventoryListTypeId()).Type,
+		local,
+		ids.GetOrPanic(local.GetImmutableConfigPublic().GetInventoryListTypeId()).Type,
 		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,
 	); err != nil {

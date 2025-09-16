@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
@@ -52,7 +53,7 @@ func (cmd Import) Run(req command.Request) {
 	inventoryListPath := req.PopArg("inventory_list-path")
 	blobStoreConfigPath := req.PopArg("blob_store-config-path")
 
-	repo := cmd.MakeLocalWorkingCopy(req)
+	local := cmd.MakeLocalWorkingCopy(req)
 
 	if inventoryListPath == "" {
 		errors.ContextCancelWithBadRequestf(req, "empty inventory list")
@@ -67,25 +68,25 @@ func (cmd Import) Run(req command.Request) {
 		if readCloser, err = files.Open(
 			inventoryListPath,
 		); err != nil {
-			repo.Cancel(err)
+			local.Cancel(err)
 		}
 
-		defer errors.ContextMustClose(repo, readCloser)
+		defer errors.ContextMustClose(local, readCloser)
 	}
 
 	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
 	defer repoolBufferedReader()
 
-	inventoryListCoderCloset := repo.GetInventoryListCoderCloset()
+	inventoryListCoderCloset := local.GetInventoryListCoderCloset()
 
-	importerOptions := sku.ImporterOptions{
+	importerOptions := repo.ImporterOptions{
 		DedupingFormatId:  markl.PurposeV5MetadataDigestWithoutTai,
-		CheckedOutPrinter: repo.PrinterCheckedOutConflictsForRemoteTransfers(),
+		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
 	}
 
 	if blobStoreConfigPath != "" {
 		importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
-			repo.GetEnvRepo(),
+			local.GetEnvRepo(),
 			blobStoreConfigPath,
 		)
 	}
@@ -93,15 +94,15 @@ func (cmd Import) Run(req command.Request) {
 	var afterDecoding func(*sku.Transacted) error
 
 	blobImporter := remote_transfer.MakeBlobImporter(
-		repo.GetEnvRepo(),
+		local.GetEnvRepo(),
 		importerOptions.RemoteBlobStore,
-		repo.GetBlobStore(),
+		local.GetBlobStore(),
 	)
 
 	blobImporter.UseDestinationHashType = true
 
 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
-		repo.GetUI(),
+		local.GetUI(),
 		false,
 	)
 
@@ -140,7 +141,7 @@ func (cmd Import) Run(req command.Request) {
 			// TODO add mother?
 			// TODO rewrite time?
 			if err = object.FinalizeAndSignOverwrite(
-				repo.GetEnvRepo().GetConfigPrivate().Blob,
+				local.GetEnvRepo().GetConfigPrivate().Blob,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -156,12 +157,12 @@ func (cmd Import) Run(req command.Request) {
 	)
 
 	importerOptions.PrintCopies = cmd.PrintCopies
-	importerr := repo.MakeImporter(
+	importerr := local.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
-	if err := repo.ImportSeq(
+	if err := local.ImportSeq(
 		seq,
 		importerr,
 	); err != nil {
@@ -169,6 +170,6 @@ func (cmd Import) Run(req command.Request) {
 			err = errors.Wrap(err)
 		}
 
-		repo.Cancel(err)
+		local.Cancel(err)
 	}
 }

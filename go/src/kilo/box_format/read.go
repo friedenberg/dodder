@@ -328,7 +328,7 @@ func (format *BoxTransacted) parseOldBlobIdTag(
 }
 
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
-	"":                              (*object_metadata.Metadata).GetBlobDigestMutable,
+	"":                             (*object_metadata.Metadata).GetBlobDigestMutable,
 	markl.PurposeRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
 	markl.PurposeObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
 	markl.PurposeObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,

@@ -7,6 +7,5 @@ type UIStorePrinters struct {
 	TransactedUpdated   interfaces.FuncIter[*Transacted]
 	TransactedUnchanged interfaces.FuncIter[*Transacted]
 
-	CheckedOutCheckedOut interfaces.FuncIter[SkuType]
-	CheckedOutChanged    interfaces.FuncIter[SkuType]
+	CheckedOut interfaces.FuncIter[SkuType] // for when objects are checked out
 }

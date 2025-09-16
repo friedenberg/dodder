@@ -98,7 +98,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	query *pkg_query.Query,
 ) {
 	var remoteObject *sku.Transacted
-	var remoteWorkingCopy repo.WorkingCopy
+	var remoteWorkingCopy repo.Repo
 
 	if !cmd.RemoteRepo.IsEmpty() {
 		var err error
@@ -110,7 +110,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 		}
 
 		remoteRepo := cmd.MakeRemote(req, localWorkingCopy, remoteObject)
-		remoteWorkingCopy, _ = remoteRepo.(repo.WorkingCopy)
+		remoteWorkingCopy, _ = remoteRepo.(repo.Repo)
 	}
 
 	if cmd.Format.GetName() == "" && pkg_query.IsExactlyOneObjectId(query) {

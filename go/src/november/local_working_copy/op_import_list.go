@@ -9,26 +9,28 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 )
 
+// TODO consider moving this directly into the remote transfer package
 func (local *Repo) ImportSeq(
 	seq interfaces.SeqError[*sku.Transacted],
-	importur sku.Importer,
+	importer repo.Importer,
 ) (err error) {
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 
 	var hasConflicts bool
 
-	checkedOutPrinter := importur.GetCheckedOutPrinter()
+	checkedOutPrinter := importer.GetCheckedOutPrinter()
 
-	importur.SetCheckedOutPrinter(
-		func(co *sku.CheckedOut) (err error) {
-			if co.GetState() == checked_out_state.Conflicted {
+	importer.SetCheckedOutPrinter(
+		func(checkedOut *sku.CheckedOut) (err error) {
+			if checkedOut.GetState() == checked_out_state.Conflicted {
 				hasConflicts = true
 			}
 
-			return checkedOutPrinter(co)
+			return checkedOutPrinter(checkedOut)
 		},
 	)
 
@@ -44,7 +46,7 @@ func (local *Repo) ImportSeq(
 		var hasOneConflict bool
 
 		if hasOneConflict, err = local.importOne(
-			importur,
+			importer,
 			object,
 			missingBlobs,
 		); err != nil {
@@ -58,7 +60,7 @@ func (local *Repo) ImportSeq(
 		}
 	}
 
-	checkedOutPrinter = local.GetUIStorePrinters().CheckedOutCheckedOut
+	checkedOutPrinter = local.GetUIStorePrinters().CheckedOut
 
 	if missingBlobs.Len() > 0 {
 		ui.Err().Printf(
@@ -88,7 +90,7 @@ func (local *Repo) ImportSeq(
 }
 
 func (repo *Repo) importOne(
-	importur sku.Importer,
+	importur repo.Importer,
 	object *sku.Transacted,
 	missingBlobs *sku.ListCheckedOut,
 ) (hasConflicts bool, err error) {

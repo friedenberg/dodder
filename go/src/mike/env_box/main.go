@@ -205,7 +205,7 @@ func (env *env) GetUIStorePrinters() sku.UIStorePrinters {
 
 			return printerTransacted(sk)
 		},
-		CheckedOutCheckedOut: env.PrinterCheckedOut(
+		CheckedOut: env.PrinterCheckedOut(
 			box_format.CheckedOutHeaderState{},
 		),
 	}

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -41,7 +42,7 @@ func (cmd *PullBlobStore) Run(
 		),
 	)
 
-	importerOptions := sku.ImporterOptions{
+	importerOptions := repo.ImporterOptions{
 		ExcludeObjects: true,
 		PrintCopies:    true,
 	}

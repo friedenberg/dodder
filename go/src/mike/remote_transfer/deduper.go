@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/repo"
 )
 
 type deduper struct {
@@ -16,7 +17,7 @@ type deduper struct {
 }
 
 func (deduper *deduper) initialize(
-	options sku.ImporterOptions,
+	options repo.ImporterOptions,
 	envRepo env_repo.Env,
 ) {
 	if options.DedupingFormatId != "" {

@@ -42,7 +42,7 @@ func (cmd Query) MakeQueryIncludingWorkspace(
 func (cmd Query) MakeQuery(
 	req command.Request,
 	options pkg_query.BuilderOption,
-	workingCopy repo.WorkingCopy,
+	workingCopy repo.Repo,
 	args []string,
 ) (query *pkg_query.Query) {
 	var err error

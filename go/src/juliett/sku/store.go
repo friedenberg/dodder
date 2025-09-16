@@ -61,32 +61,4 @@ type (
 			t *Transacted,
 		) (e ExternalLike, err error)
 	}
-
-	ImporterOptions struct {
-		DedupingFormatId    string
-		BlobGenres          ids.Genre
-		ExcludeObjects      bool
-		RemoteBlobStore     interfaces.BlobStore
-		PrintCopies         bool
-		AllowMergeConflicts bool
-		BlobCopierDelegate  interfaces.FuncIter[BlobCopyResult]
-		ParentNegotiator    ParentNegotiator
-		CheckedOutPrinter   interfaces.FuncIter[*CheckedOut]
-	}
-
-	Importer interface {
-		GetCheckedOutPrinter() interfaces.FuncIter[*CheckedOut]
-
-		SetCheckedOutPrinter(
-			p interfaces.FuncIter[*CheckedOut],
-		)
-
-		ImportBlobIfNecessary(
-			sk *Transacted,
-		) (err error)
-
-		Import(
-			external *Transacted,
-		) (co *CheckedOut, err error)
-	}
 )

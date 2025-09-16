@@ -62,7 +62,7 @@ func (store *Store) CheckoutQuery(
 		}
 
 		if !store.envWorkspace.IsTemporary() {
-			if err = store.ui.CheckedOutCheckedOut(co); err != nil {
+			if err = store.ui.CheckedOut(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

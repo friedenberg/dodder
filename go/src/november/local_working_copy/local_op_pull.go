@@ -15,7 +15,7 @@ func (local *Repo) PullQueryGroupFromRemote(
 	options repo.RemoteTransferOptions,
 ) (err error) {
 	if err = local.pullQueryGroupFromWorkingCopy(
-		remote.(repo.WorkingCopy),
+		remote.(repo.Repo),
 		qg,
 		options,
 	); err != nil {
@@ -27,7 +27,7 @@ func (local *Repo) PullQueryGroupFromRemote(
 }
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(
-	remote repo.WorkingCopy,
+	remote repo.Repo,
 	queryGroup *query.Query,
 	options repo.RemoteTransferOptions,
 ) (err error) {
@@ -38,7 +38,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		return
 	}
 
-	importerOptions := sku.ImporterOptions{
+	importerOptions := repo.ImporterOptions{
 		CheckedOutPrinter:   local.PrinterCheckedOutConflictsForRemoteTransfers(),
 		AllowMergeConflicts: options.AllowMergeConflicts,
 		BlobGenres:          options.BlobGenres,

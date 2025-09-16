@@ -6,7 +6,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 )
@@ -23,23 +25,14 @@ type Repo interface {
 	GetInventoryListStore() sku.InventoryListStore
 
 	MakeImporter(
-		options sku.ImporterOptions,
+		options ImporterOptions,
 		storeOptions sku.StoreOptions,
-	) sku.Importer
+	) Importer
 
 	ImportSeq(
 		interfaces.SeqError[*sku.Transacted],
-		sku.Importer,
+		Importer,
 	) error
-}
-
-type WorkingCopy interface {
-	Repo
-
-	// MakeQueryGroup(
-	// 	builderOptions query.BuilderOptions,
-	// 	args ...string,
-	// ) (qg *query.Group, err error)
 
 	MakeExternalQueryGroup(
 		builderOptions query.BuilderOption,
@@ -61,4 +54,16 @@ type WorkingCopy interface {
 	ReadObjectHistory(
 		oid *ids.ObjectId,
 	) (skus []*sku.Transacted, err error)
+}
+
+type LocalRepo interface {
+	Repo
+
+	GetEnvRepo() env_repo.Env
+	GetImmutableConfigPrivate() genesis_configs.TypedConfigPrivate
+
+	Lock() error
+	Unlock() error
+
+	GetEnvWorkspace() env_workspace.Env
 }
