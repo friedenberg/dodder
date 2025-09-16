@@ -241,7 +241,7 @@ function push_history_default_only_blobs { # @test
 		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
-	run_dodder push -include-objects=false /them
+	run_dodder push -exclude-objects /them
 
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'

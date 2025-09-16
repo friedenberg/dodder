@@ -7,12 +7,12 @@ import (
 
 type RemoteTransfer struct {
 	Remote
-	repo.RemoteTransferOptions
+	repo.ImporterOptions
 }
 
 func (cmd *RemoteTransfer) SetFlagSet(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
 	cmd.Remote.SetFlagSet(flagDefinitions)
-	cmd.RemoteTransferOptions.SetFlagSet(flagDefinitions)
+	cmd.ImporterOptions.SetFlagSet(flagDefinitions)
 }

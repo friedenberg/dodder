@@ -216,7 +216,7 @@ func (client *client) MakeInventoryList(
 func (client *client) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	queryGroup *query.Query,
-	options repo.RemoteTransferOptions,
+	options repo.ImporterOptions,
 ) (err error) {
 	return client.pullQueryGroupFromWorkingCopy(
 		remote.(repo.Repo),
@@ -228,7 +228,7 @@ func (client *client) PullQueryGroupFromRemote(
 func (client *client) pullQueryGroupFromWorkingCopy(
 	remote repo.Repo,
 	queryGroup *query.Query,
-	options repo.RemoteTransferOptions,
+	options repo.ImporterOptions,
 ) (err error) {
 	var list *sku.ListTransacted
 

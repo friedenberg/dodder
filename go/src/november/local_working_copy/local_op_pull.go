@@ -12,10 +12,10 @@ import (
 func (local *Repo) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Query,
-	options repo.RemoteTransferOptions,
+	options repo.ImporterOptions,
 ) (err error) {
 	if err = local.pullQueryGroupFromWorkingCopy(
-		remote.(repo.Repo),
+		remote,
 		qg,
 		options,
 	); err != nil {
@@ -29,7 +29,7 @@ func (local *Repo) PullQueryGroupFromRemote(
 func (local *Repo) pullQueryGroupFromWorkingCopy(
 	remote repo.Repo,
 	queryGroup *query.Query,
-	options repo.RemoteTransferOptions,
+	importerOptions repo.ImporterOptions,
 ) (err error) {
 	var list *sku.ListTransacted
 
@@ -38,14 +38,9 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		return
 	}
 
-	importerOptions := repo.ImporterOptions{
-		CheckedOutPrinter:   local.PrinterCheckedOutConflictsForRemoteTransfers(),
-		AllowMergeConflicts: options.AllowMergeConflicts,
-		BlobGenres:          options.BlobGenres,
-		ExcludeObjects:      !options.IncludeObjects,
-	}
+	importerOptions.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
 
-	if options.IncludeBlobs {
+	if !importerOptions.ExcludeBlobs {
 		remoteBlobStore := remote.GetBlobStore()
 		importerOptions.RemoteBlobStore = remoteBlobStore
 	}
@@ -55,15 +50,14 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		Remote: remote,
 	}
 
-	importerOptions.PrintCopies = options.PrintCopies
-	importerr := local.MakeImporter(
+	importer := local.MakeImporter(
 		importerOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
 	if err = local.ImportSeq(
 		quiter.MakeSeqErrorFromSeq(list.All()),
-		importerr,
+		importer,
 	); err != nil {
 		if errors.Is(err, remote_transfer.ErrNeedsMerge) {
 			err = errors.WithoutStack(err)

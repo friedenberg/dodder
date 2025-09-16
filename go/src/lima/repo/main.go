@@ -48,7 +48,7 @@ type Repo interface {
 	PullQueryGroupFromRemote(
 		remote Repo,
 		qg *query.Query,
-		options RemoteTransferOptions,
+		options ImporterOptions,
 	) (err error)
 
 	ReadObjectHistory(

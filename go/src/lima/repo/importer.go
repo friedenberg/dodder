@@ -24,42 +24,36 @@ type (
 	}
 
 	ImporterOptions struct {
-		DedupingFormatId    string
 		BlobGenres          ids.Genre
-		ExcludeObjects      bool
-		RemoteBlobStore     interfaces.BlobStore
 		PrintCopies         bool
+		ExcludeObjects      bool
+		ExcludeBlobs        bool
 		AllowMergeConflicts bool
-		BlobCopierDelegate  interfaces.FuncIter[sku.BlobCopyResult]
-		ParentNegotiator    sku.ParentNegotiator
-		CheckedOutPrinter   interfaces.FuncIter[*sku.CheckedOut]
+
+		DedupingFormatId   string
+		RemoteBlobStore    interfaces.BlobStore
+		BlobCopierDelegate interfaces.FuncIter[sku.BlobCopyResult]
+		ParentNegotiator   sku.ParentNegotiator
+		CheckedOutPrinter  interfaces.FuncIter[*sku.CheckedOut]
 	}
 )
 
 // TODO add HTTP header options for these flags
-type RemoteTransferOptions struct {
-	PrintCopies         bool
-	BlobGenres          ids.Genre
-	IncludeObjects      bool
-	IncludeBlobs        bool
-	AllowMergeConflicts bool
-}
-
-func (options *RemoteTransferOptions) SetFlagSet(
+func (options *ImporterOptions) SetFlagSet(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
 	flagDefinitions.BoolVar(
-		&options.IncludeObjects,
-		"include-objects",
-		true,
-		"imports the object during transfer",
+		&options.ExcludeObjects,
+		"exclude-objects",
+		false,
+		"excludes objects during transfer",
 	)
 
 	flagDefinitions.BoolVar(
-		&options.IncludeBlobs,
-		"include-blobs",
-		true,
-		"copy the blob when performing the object transfer",
+		&options.ExcludeBlobs,
+		"exclude-blobs",
+		false,
+		"excludes blobs during the remote transfer",
 	)
 
 	flagDefinitions.BoolVar(
@@ -76,9 +70,9 @@ func (options *RemoteTransferOptions) SetFlagSet(
 	)
 }
 
-func (options RemoteTransferOptions) WithPrintCopies(
+func (options ImporterOptions) WithPrintCopies(
 	value bool,
-) RemoteTransferOptions {
+) ImporterOptions {
 	options.PrintCopies = value
 	return options
 }

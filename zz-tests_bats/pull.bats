@@ -561,7 +561,7 @@ function pull_history_zettels_no_conflict_no_blobs { # @test
 		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
 	EOM
 
-	run_dodder pull -include-blobs=false /them +zettel
+	run_dodder pull -exclude-blobs /them +zettel
 
 	assert_success
 	assert_output_unsorted - <<-EOM
