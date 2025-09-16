@@ -15,9 +15,9 @@ func (TomlSFTPViaSSHConfigV0) GetBlobStoreType() string {
 	return "sftp"
 }
 
-func (config *TomlSFTPViaSSHConfigV0) SetFlagSet(
+func (config *TomlSFTPViaSSHConfigV0) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions) {
-	config.TomlUriV0.SetFlagSet(flagSet)
+	config.TomlUriV0.SetFlagDefinitions(flagSet)
 }
 
 func (config TomlSFTPViaSSHConfigV0) GetRemotePath() string {

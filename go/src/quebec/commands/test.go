@@ -7,10 +7,12 @@ import (
 
 type Test struct{}
 
+var _ interfaces.CommandComponentWriter = (*Test)(nil)
+
 func init() {
 	command.Register("test", &Test{})
 }
 
-func (*Test) SetFlagSet(interfaces.CommandLineFlagDefinitions) {}
+func (*Test) SetFlagDefinitions(interfaces.CommandLineFlagDefinitions) {}
 
 func (c Test) Run(dep command.Request) {}

@@ -25,8 +25,9 @@ type BlobStoreSync struct {
 
 	Limit int
 }
+var _ interfaces.CommandComponentWriter = (*BlobStoreSync)(nil)
 
-func (cmd *BlobStoreSync) SetFlagSet(
+func (cmd *BlobStoreSync) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.IntVar(

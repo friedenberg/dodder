@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
@@ -40,6 +41,8 @@ type Metadata struct {
 	blob
 	Cache Index
 }
+
+var _ interfaces.CommandComponentWriter = (*Metadata)(nil)
 
 func (metadata *Metadata) GetMetadata() *Metadata {
 	return metadata

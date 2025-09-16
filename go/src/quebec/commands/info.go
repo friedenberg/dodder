@@ -18,6 +18,8 @@ import (
 
 type Info struct{}
 
+var _ interfaces.CommandComponentWriter = (*Info)(nil)
+
 func init() {
 	command.Register(
 		"info",
@@ -25,7 +27,7 @@ func init() {
 	)
 }
 
-func (cmd Info) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {}
+func (cmd Info) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {}
 
 func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(

@@ -23,7 +23,7 @@ func (*TomlSFTPV0) GetBlobStoreType() string {
 	return "sftp"
 }
 
-func (blobStoreConfig *TomlSFTPV0) SetFlagSet(
+func (blobStoreConfig *TomlSFTPV0) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.StringVar(

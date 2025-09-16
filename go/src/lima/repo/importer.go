@@ -39,8 +39,10 @@ type (
 	}
 )
 
+var _ interfaces.CommandComponentWriter = (*ImporterOptions)(nil)
+
 // TODO add HTTP header options for these flags
-func (options *ImporterOptions) SetFlagSet(
+func (options *ImporterOptions) SetFlagDefinitions(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
 	flagDefinitions.BoolVar(

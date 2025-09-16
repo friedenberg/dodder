@@ -31,8 +31,9 @@ type FormatBlob struct {
 	Stdin    bool
 	UTIGroup string
 }
+var _ interfaces.CommandComponentWriter = (*FormatBlob)(nil)
 
-func (cmd *FormatBlob) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *FormatBlob) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Stdin,
 		"stdin",

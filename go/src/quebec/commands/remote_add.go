@@ -26,9 +26,10 @@ type RemoteAdd struct {
 
 	proto sku.Proto
 }
+var _ interfaces.CommandComponentWriter = (*RemoteAdd)(nil)
 
-func (cmd *RemoteAdd) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.RemoteTransfer.SetFlagSet(flagSet)
+func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.RemoteTransfer.SetFlagDefinitions(flagSet)
 
 	flagSet.Var(
 		cmd.complete.GetFlagValueMetadataTags(&cmd.proto.Metadata),

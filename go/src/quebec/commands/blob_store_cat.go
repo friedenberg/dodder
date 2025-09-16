@@ -30,8 +30,9 @@ type BlobStoreCat struct {
 	Utility   script_value.Utility
 	PrefixSha bool
 }
+var _ interfaces.CommandComponentWriter = (*BlobStoreCat)(nil)
 
-func (cmd *BlobStoreCat) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *BlobStoreCat) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(&cmd.Utility, "utility", "")
 	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")

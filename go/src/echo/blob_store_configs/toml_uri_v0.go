@@ -9,8 +9,9 @@ import (
 type TomlUriV0 struct {
 	Uri values.Uri `toml:"uri"`
 }
+var _ interfaces.CommandComponentWriter = (*TomlUriV0)(nil)
 
-func (config *TomlUriV0) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (config *TomlUriV0) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(
 		&config.Uri,
 		"uri",

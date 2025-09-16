@@ -27,7 +27,7 @@ type TomlV2Public struct {
 	TomlV2Common
 }
 
-func (config *TomlV2Common) SetFlagSet(
+func (config *TomlV2Common) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 }

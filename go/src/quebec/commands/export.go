@@ -34,12 +34,13 @@ type Export struct {
 	AgeIdentity     age.Identity
 	CompressionType compression_type.CompressionType
 }
+var _ interfaces.CommandComponentWriter = (*Export)(nil)
 
-func (cmd *Export) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *Export) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 
 	f.Var(&cmd.AgeIdentity, "age-identity", "")
-	cmd.CompressionType.SetFlagSet(f)
+	cmd.CompressionType.SetFlagDefinitions(f)
 }
 
 func (cmd Export) Run(req command.Request) {

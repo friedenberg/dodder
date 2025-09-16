@@ -22,9 +22,10 @@ type Revert struct {
 
 	Last bool
 }
+var _ interfaces.CommandComponentWriter = (*Revert)(nil)
 
-func (md *Revert) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	md.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (md *Revert) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	md.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 	f.BoolVar(&md.Last, "last", false, "revert the last changes")
 }
 

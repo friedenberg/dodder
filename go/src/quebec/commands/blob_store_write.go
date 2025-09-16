@@ -28,8 +28,9 @@ type BlobStoreWrite struct {
 	UtilityBefore script_value.Utility
 	UtilityAfter  script_value.Utility
 }
+var _ interfaces.CommandComponentWriter = (*BlobStoreWrite)(nil)
 
-func (cmd *BlobStoreWrite) SetFlagSet(
+func (cmd *BlobStoreWrite) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.BoolVar(

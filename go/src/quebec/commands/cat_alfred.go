@@ -25,9 +25,10 @@ type CatAlfred struct {
 
 	genres.Genre
 }
+var _ interfaces.CommandComponentWriter = (*CatAlfred)(nil)
 
-func (cmd *CatAlfred) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *CatAlfred) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 	f.Var(&cmd.Genre, "genre", "extract this element from all matching objects")
 }
 

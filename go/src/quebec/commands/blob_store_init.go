@@ -46,9 +46,10 @@ type BlobStoreInit struct {
 
 	command_components.EnvRepo
 }
+var _ interfaces.CommandComponentWriter = (*BlobStoreInit)(nil)
 
-func (cmd *BlobStoreInit) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.blobStoreConfig.SetFlagSet(flagSet)
+func (cmd *BlobStoreInit) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.blobStoreConfig.SetFlagDefinitions(flagSet)
 }
 
 func (cmd *BlobStoreInit) Run(req command.Request) {

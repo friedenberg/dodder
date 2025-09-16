@@ -38,9 +38,10 @@ type Last struct {
 	Organize bool
 	Format   local_working_copy.FormatFlag
 }
+var _ interfaces.CommandComponentWriter = (*Last)(nil)
 
-func (cmd *Last) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
+func (cmd *Last) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 
 	// TODO remove
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")

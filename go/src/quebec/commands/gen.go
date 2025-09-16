@@ -12,6 +12,8 @@ import (
 
 type Gen struct{}
 
+var _ interfaces.CommandComponentWriter = (*Gen)(nil)
+
 func init() {
 	command.Register(
 		"gen",
@@ -19,7 +21,7 @@ func init() {
 	)
 }
 
-func (cmd Gen) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {}
+func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {}
 
 func (cmd Gen) Run(req command.Request) {
 	envUI := env_ui.Make(

@@ -35,11 +35,13 @@ const (
 
 type CompressionType string
 
+var _ interfaces.CommandComponentWriter = (*CompressionType)(nil)
+
 func (compressionType *CompressionType) GetBlobCompression() interfaces.CommandLineIOWrapper {
 	return compressionType
 }
 
-func (compressionType *CompressionType) SetFlagSet(
+func (compressionType *CompressionType) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.Var(compressionType, "compression-type", "")

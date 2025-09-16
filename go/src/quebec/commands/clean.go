@@ -29,9 +29,10 @@ type Clean struct {
 	includeParent            bool
 	organize                 bool
 }
+var _ interfaces.CommandComponentWriter = (*Clean)(nil)
 
-func (c *Clean) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	c.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (c *Clean) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	c.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 
 	f.BoolVar(
 		&c.force,

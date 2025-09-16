@@ -29,9 +29,10 @@ type Fsck struct {
 	command_components.LocalWorkingCopy
 	command_components.Query
 }
+var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
 
-func (cmd *Fsck) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
+func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 }
 
 func (cmd Fsck) Run(req command.Request) {

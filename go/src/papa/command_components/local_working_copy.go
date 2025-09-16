@@ -11,8 +11,9 @@ import (
 type LocalWorkingCopy struct {
 	Env
 }
+var _ interfaces.CommandComponentWriter = (*LocalWorkingCopy)(nil)
 
-func (cmd *LocalWorkingCopy) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *LocalWorkingCopy) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopy(

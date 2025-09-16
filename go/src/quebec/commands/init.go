@@ -21,9 +21,10 @@ func init() {
 type Init struct {
 	command_components.Genesis
 }
+var _ interfaces.CommandComponentWriter = (*Init)(nil)
 
-func (cmd *Init) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.Genesis.SetFlagSet(flagSet)
+func (cmd *Init) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.Genesis.SetFlagDefinitions(flagSet)
 }
 
 func (cmd *Init) Run(req command.Request) {

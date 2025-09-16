@@ -16,7 +16,11 @@ type OptionsWithoutMode struct {
 	StoreSpecificOptions any
 }
 
-func (c *Options) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+var _ interfaces.CommandComponentWriter = (*Options)(nil)
+
+func (c *Options) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 	flagSet.BoolVar(
 		&c.Force,

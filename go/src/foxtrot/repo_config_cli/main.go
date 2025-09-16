@@ -30,13 +30,15 @@ type Config struct {
 	descriptions.Description
 }
 
+var _ interfaces.CommandComponentWriter = (*Config)(nil)
+
 func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
 	return config.printOptionsOverlay
 }
 
 // TODO add support for all flags
 // TODO move to store_config
-func (config *Config) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (config *Config) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
 	cli.FlagSetVarWithCompletion(
@@ -72,7 +74,7 @@ func (config *Config) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) 
 	)
 
 	config.printOptionsOverlay.AddToFlags(flagSet)
-	config.ToolOptions.SetFlagSet(flagSet)
+	config.ToolOptions.SetFlagDefinitions(flagSet)
 
 	flagSet.BoolVar(
 		&config.IgnoreHookErrors,

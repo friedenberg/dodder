@@ -29,13 +29,15 @@ type Complete struct {
 	inProgress string
 }
 
+var _ interfaces.CommandComponentWriter = (*Complete)(nil)
+
 func (cmd Complete) GetDescription() command.Description {
 	return command.Description{
 		Short: "complete a command-line",
 	}
 }
 
-func (cmd *Complete) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Complete) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.BoolVar(&cmd.bashStyle, "bash-style", false, "")
 	flagSet.StringVar(&cmd.inProgress, "in-progress", "", "")
 }
@@ -76,10 +78,10 @@ func (cmd Complete) Run(req command.Request) {
 
 	flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
-	(&repo_config_cli.Config{}).SetFlagSet(flagSet)
+	(&repo_config_cli.Config{}).SetFlagDefinitions(flagSet)
 
 	if subcmd, ok := subcmd.(interfaces.CommandComponentWriter); ok {
-		subcmd.SetFlagSet(flagSet)
+		subcmd.SetFlagDefinitions(flagSet)
 	}
 
 	var containsDoubleHyphen bool

@@ -19,11 +19,12 @@ type Pull struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+var _ interfaces.CommandComponentWriter = (*Pull)(nil)
 
-func (cmd *Pull) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.RemoteTransfer.SetFlagSet(f)
-	cmd.Query.SetFlagSet(f)
-	cmd.LocalWorkingCopy.SetFlagSet(f)
+func (cmd *Pull) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.RemoteTransfer.SetFlagDefinitions(f)
+	cmd.Query.SetFlagDefinitions(f)
+	cmd.LocalWorkingCopy.SetFlagDefinitions(f)
 }
 
 func (cmd Pull) Run(req command.Request) {

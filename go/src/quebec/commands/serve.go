@@ -24,9 +24,10 @@ type Serve struct {
 
 	TailscaleTLS bool
 }
+var _ interfaces.CommandComponentWriter = (*Serve)(nil)
 
-func (cmd *Serve) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
+func (cmd *Serve) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 
 	flags.BoolVar(
 		&cmd.TailscaleTLS,

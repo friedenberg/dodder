@@ -34,13 +34,13 @@ func Run(ctx interfaces.Context, args ...string) {
 	flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 
 	if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
-		cmd.SetFlagSet(flagSet)
+		cmd.SetFlagDefinitions(flagSet)
 	}
 
 	args = args[2:]
 
 	configCli := repo_config_cli.Default()
-	configCli.SetFlagSet(flagSet)
+	configCli.SetFlagDefinitions(flagSet)
 
 	if err := flagSet.Parse(args); err != nil {
 		ctx.Cancel(err)

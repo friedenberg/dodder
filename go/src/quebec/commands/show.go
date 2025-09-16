@@ -39,9 +39,11 @@ type Show struct {
 	RemoteRepo ids.RepoId
 }
 
-func (cmd *Show) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
-	cmd.Query.SetFlagSet(flagSet)
+var _ interfaces.CommandComponentWriter = (*Show)(nil)
+
+func (cmd *Show) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
+	cmd.Query.SetFlagDefinitions(flagSet)
 
 	flagSet.Var(
 		&cmd.Format,

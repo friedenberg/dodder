@@ -9,10 +9,11 @@ type RemoteTransfer struct {
 	Remote
 	repo.ImporterOptions
 }
+var _ interfaces.CommandComponentWriter = (*RemoteTransfer)(nil)
 
-func (cmd *RemoteTransfer) SetFlagSet(
+func (cmd *RemoteTransfer) SetFlagDefinitions(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
-	cmd.Remote.SetFlagSet(flagDefinitions)
-	cmd.ImporterOptions.SetFlagSet(flagDefinitions)
+	cmd.Remote.SetFlagDefinitions(flagDefinitions)
+	cmd.ImporterOptions.SetFlagDefinitions(flagDefinitions)
 }

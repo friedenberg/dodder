@@ -45,10 +45,12 @@ type Organize struct {
 	Filter script_value.ScriptValue
 }
 
-func (c *Organize) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	c.Query.SetFlagSet(f)
+var _ interfaces.CommandComponentWriter = (*Organize)(nil)
 
-	c.Flags.SetFlagSet(f)
+func (c *Organize) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	c.Query.SetFlagDefinitions(f)
+
+	c.Flags.SetFlagDefinitions(f)
 
 	f.Var(
 		&c.Filter,

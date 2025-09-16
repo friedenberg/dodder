@@ -25,9 +25,10 @@ func init() {
 type Diff struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
+var _ interfaces.CommandComponentWriter = (*Diff)(nil)
 
-func (cmd *Diff) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *Diff) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 }
 
 // TODO filter to checked out objects, tags, and types

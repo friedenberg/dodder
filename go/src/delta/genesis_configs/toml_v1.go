@@ -28,11 +28,11 @@ type TomlV1Public struct {
 	TomlV1Common
 }
 
-func (config *TomlV1Common) SetFlagSet(
+func (config *TomlV1Common) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		config.BlobStore.SetFlagSet(flagSet)
+		config.BlobStore.SetFlagDefinitions(flagSet)
 	}
 }
 

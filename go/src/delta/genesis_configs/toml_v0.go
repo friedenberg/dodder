@@ -26,8 +26,9 @@ type V0Public struct {
 type V0Private struct {
 	V0Common
 }
+var _ interfaces.CommandComponentWriter = (*V0Private)(nil)
 
-func (config *V0Common) SetFlagSet(
+func (config *V0Common) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	panic(errors.Err405MethodNotAllowed)

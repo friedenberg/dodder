@@ -28,11 +28,12 @@ type Clone struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+var _ interfaces.CommandComponentWriter = (*Clone)(nil)
 
-func (cmd *Clone) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.Genesis.SetFlagSet(flagSet)
-	cmd.RemoteTransfer.SetFlagSet(flagSet)
-	cmd.Query.SetFlagSet(flagSet)
+func (cmd *Clone) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.Genesis.SetFlagDefinitions(flagSet)
+	cmd.RemoteTransfer.SetFlagDefinitions(flagSet)
+	cmd.Query.SetFlagDefinitions(flagSet)
 }
 
 func (cmd Clone) Run(req command.Request) {

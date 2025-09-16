@@ -22,6 +22,8 @@ type BigBang struct {
 	OverrideXDGWithCwd   bool
 }
 
+var _ interfaces.CommandComponentWriter = (*BigBang)(nil)
+
 func (bigBang *BigBang) SetDefaults() {
 	bigBang.GenesisConfig = genesis_configs.Default()
 	bigBang.InventoryListType = ids.GetOrPanic(
@@ -34,7 +36,7 @@ func (bigBang *BigBang) SetDefaults() {
 }
 
 // TODO switch to flagset wrapper that enforces non-empty descriptions
-func (bigBang *BigBang) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (bigBang *BigBang) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(
 		&bigBang.InventoryListType,
 		"inventory_list-type",
@@ -64,9 +66,9 @@ func (bigBang *BigBang) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions
 
 	bigBang.SetDefaults()
 
-	bigBang.GenesisConfig.Blob.SetFlagSet(flagSet)
+	bigBang.GenesisConfig.Blob.SetFlagDefinitions(flagSet)
 
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.TypedBlobStoreConfig.Blob.SetFlagSet(flagSet)
+		bigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
 	}
 }

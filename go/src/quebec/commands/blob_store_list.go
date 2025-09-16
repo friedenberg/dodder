@@ -17,8 +17,9 @@ func init() {
 type BlobList struct {
 	command_components.EnvRepo
 }
+var _ interfaces.CommandComponentWriter = (*BlobList)(nil)
 
-func (cmd *BlobList) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *BlobList) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 func (cmd BlobList) Run(req command.Request) {

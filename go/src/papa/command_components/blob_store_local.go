@@ -13,7 +13,9 @@ import (
 // TODO remove and replace with BlobStore
 type BlobStoreLocal struct{}
 
-func (cmd *BlobStoreLocal) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+var _ interfaces.CommandComponentWriter = (*BlobStoreLocal)(nil)
+
+func (cmd *BlobStoreLocal) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
 type BlobStoreWithEnv struct {

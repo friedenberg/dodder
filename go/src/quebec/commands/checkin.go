@@ -39,8 +39,10 @@ type Checkin struct {
 	OpenBlob           bool
 }
 
-func (cmd *Checkin) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
+var _ interfaces.CommandComponentWriter = (*Checkin)(nil)
+
+func (cmd *Checkin) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(flagSet)
 
 	flagSet.BoolVar(
 		&cmd.IgnoreBlob,
@@ -64,7 +66,7 @@ func (cmd *Checkin) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 		"type used for new zettels",
 	)
 
-	cmd.Checkout.SetFlagSet(flagSet)
+	cmd.Checkout.SetFlagDefinitions(flagSet)
 }
 
 // TODO refactor into common

@@ -26,7 +26,7 @@ func PrintUsage(ctx interfaces.Context, err error) {
 		flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 
 		if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
-			cmd.SetFlagSet(flagSet)
+			cmd.SetFlagDefinitions(flagSet)
 		}
 
 		flagSets = append(flagSets, flagSet)

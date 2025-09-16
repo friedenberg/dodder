@@ -31,10 +31,10 @@ func (TomlV1) GetBlobStoreType() string {
 	return "local"
 }
 
-func (blobStoreConfig *TomlV1) SetFlagSet(
+func (blobStoreConfig *TomlV1) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
-	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
+	blobStoreConfig.CompressionType.SetFlagDefinitions(flagSet)
 
 	blobStoreConfig.HashBuckets = DefaultHashBuckets
 

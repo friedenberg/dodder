@@ -28,12 +28,13 @@ type Import struct {
 
 	sku.Proto
 }
+var _ interfaces.CommandComponentWriter = (*Import)(nil)
 
-func (cmd *Import) SetFlagSet(
+func (cmd *Import) SetFlagDefinitions(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
-	cmd.ImporterOptions.SetFlagSet(flagDefinitions)
-	cmd.Proto.SetFlagSet(flagDefinitions)
+	cmd.ImporterOptions.SetFlagDefinitions(flagDefinitions)
+	cmd.Proto.SetFlagDefinitions(flagDefinitions)
 }
 
 func (cmd Import) Run(req command.Request) {

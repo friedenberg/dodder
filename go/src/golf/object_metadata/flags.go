@@ -10,7 +10,7 @@ import (
 )
 
 // TODO replace with command_components.ObjectMetadata
-func (metadata *Metadata) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (metadata *Metadata) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	metadata.SetFlagSetDescription(
 		flagSet,
 		"the description to use for created or updated Zettels",

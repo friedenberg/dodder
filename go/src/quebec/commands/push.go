@@ -19,11 +19,12 @@ type Push struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+var _ interfaces.CommandComponentWriter = (*Push)(nil)
 
-func (cmd *Push) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.RemoteTransfer.SetFlagSet(flagSet)
-	cmd.Query.SetFlagSet(flagSet)
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
+func (cmd *Push) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.RemoteTransfer.SetFlagDefinitions(flagSet)
+	cmd.Query.SetFlagDefinitions(flagSet)
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 }
 
 func (cmd Push) Run(req command.Request) {

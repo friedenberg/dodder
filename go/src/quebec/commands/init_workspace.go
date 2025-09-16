@@ -32,9 +32,10 @@ type InitWorkspace struct {
 	DefaultQueryGroup values.String
 	Proto             sku.Proto
 }
+var _ interfaces.CommandComponentWriter = (*InitWorkspace)(nil)
 
-func (cmd *InitWorkspace) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopy.SetFlagSet(flagSet)
+func (cmd *InitWorkspace) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 	// TODO add command.Completer variants of tags, type, and query flags
 
 	flagSet.Var(

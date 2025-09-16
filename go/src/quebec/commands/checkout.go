@@ -29,11 +29,12 @@ type Checkout struct {
 	CheckoutOptions checkout_options.Options
 	Organize        bool
 }
+var _ interfaces.CommandComponentWriter = (*Checkout)(nil)
 
-func (cmd *Checkout) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *Checkout) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 	f.BoolVar(&cmd.Organize, "organize", false, "")
-	cmd.CheckoutOptions.SetFlagSet(f)
+	cmd.CheckoutOptions.SetFlagDefinitions(f)
 }
 
 func (cmd Checkout) Run(req command.Request) {

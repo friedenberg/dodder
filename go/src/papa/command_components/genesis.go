@@ -16,9 +16,10 @@ type Genesis struct {
 	env_repo.BigBang
 	LocalWorkingCopy
 }
+var _ interfaces.CommandComponentWriter = (*Genesis)(nil)
 
-func (cmd *Genesis) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.BigBang.SetFlagSet(flagSet)
+func (cmd *Genesis) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.BigBang.SetFlagDefinitions(flagSet)
 }
 
 func (cmd Genesis) OnTheFirstDay(

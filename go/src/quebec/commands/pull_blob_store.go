@@ -21,9 +21,10 @@ type PullBlobStore struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 	command_components.BlobStore
 }
+var _ interfaces.CommandComponentWriter = (*PullBlobStore)(nil)
 
-func (cmd *PullBlobStore) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(f)
+func (cmd *PullBlobStore) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 }
 
 func (cmd *PullBlobStore) Run(

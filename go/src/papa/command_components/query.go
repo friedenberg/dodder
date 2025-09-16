@@ -12,8 +12,9 @@ import (
 type Query struct {
 	sku.ExternalQueryOptions
 }
+var _ interfaces.CommandComponentWriter = (*Query)(nil)
 
-func (cmd *Query) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Query) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	// TODO switch to repo
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 	flagSet.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")

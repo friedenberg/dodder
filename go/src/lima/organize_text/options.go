@@ -19,6 +19,8 @@ type Flags struct {
 	ExtraTags collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
+var _ interfaces.CommandComponentWriter = (*Flags)(nil)
+
 type Options struct {
 	wasMade bool
 
@@ -80,7 +82,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 	}
 }
 
-func (o *Flags) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (o *Flags) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
 
 	f.Var(

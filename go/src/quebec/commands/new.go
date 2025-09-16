@@ -37,7 +37,9 @@ type New struct {
 	sku.Proto
 }
 
-func (cmd *New) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+var _ interfaces.CommandComponentWriter = (*New)(nil)
+
+func (cmd *New) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 
 	flagSet.BoolVar(
@@ -68,7 +70,7 @@ func (cmd *New) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
 		"type used for new zettels",
 	)
 
-	cmd.Checkout.SetFlagSet(flagSet)
+	cmd.Checkout.SetFlagDefinitions(flagSet)
 }
 
 func (cmd New) ValidateFlagsAndArgs(

@@ -9,8 +9,9 @@ import (
 type Options struct {
 	Merge []string `toml:"merge"`
 }
+var _ interfaces.CommandComponentWriter = (*Options)(nil)
 
-func (options *Options) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (options *Options) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Func(
 		"merge-tool",
 		"utility to launch for merge conflict resolution",

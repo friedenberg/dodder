@@ -29,5 +29,5 @@ type CommandLineFlagDefinitions interface {
 }
 
 type CommandComponentWriter interface {
-	SetFlagSet(CommandLineFlagDefinitions)
+	SetFlagDefinitions(CommandLineFlagDefinitions)
 }

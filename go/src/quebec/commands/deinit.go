@@ -25,8 +25,9 @@ type Deinit struct {
 
 	Force bool
 }
+var _ interfaces.CommandComponentWriter = (*Deinit)(nil)
 
-func (cmd *Deinit) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *Deinit) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Force,
 		"force",

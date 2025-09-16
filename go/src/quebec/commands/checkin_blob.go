@@ -30,8 +30,9 @@ type CheckinBlob struct {
 	Delete  bool
 	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
+var _ interfaces.CommandComponentWriter = (*CheckinBlob)(nil)
 
-func (cmd *CheckinBlob) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *CheckinBlob) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(&cmd.Delete, "delete", false, "the checked-out file")
 	f.Var(
 		cmd.NewTags,

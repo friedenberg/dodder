@@ -34,8 +34,9 @@ type FormatObject struct {
 	ids.RepoId
 	UTIGroup string
 }
+var _ interfaces.CommandComponentWriter = (*FormatObject)(nil)
 
-func (cmd *FormatObject) SetFlagSet(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *FormatObject) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Stdin,
 		"stdin",

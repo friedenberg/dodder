@@ -28,8 +28,9 @@ type Remote struct {
 
 	RemoteConnectionType repo.RemoteConnectionType
 }
+var _ interfaces.CommandComponentWriter = (*Remote)(nil)
 
-func (cmd *Remote) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Remote) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	// TODO remove and replace with repo builtin type options
 	cli.FlagSetVarWithCompletion(
 		flagSet,

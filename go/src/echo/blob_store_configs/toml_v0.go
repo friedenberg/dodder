@@ -23,10 +23,10 @@ func (TomlV0) GetBlobStoreType() string {
 	return "local"
 }
 
-func (blobStoreConfig *TomlV0) SetFlagSet(
+func (blobStoreConfig *TomlV0) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
-	blobStoreConfig.CompressionType.SetFlagSet(flagSet)
+	blobStoreConfig.CompressionType.SetFlagDefinitions(flagSet)
 
 	flagSet.BoolVar(
 		&blobStoreConfig.LockInternalFiles,

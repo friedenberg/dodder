@@ -31,11 +31,12 @@ type Edit struct {
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
+var _ interfaces.CommandComponentWriter = (*Edit)(nil)
 
-func (cmd *Edit) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagSet(flagSet)
+func (cmd *Edit) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(flagSet)
 
-	cmd.Checkout.SetFlagSet(flagSet)
+	cmd.Checkout.SetFlagDefinitions(flagSet)
 
 	flagSet.Var(&cmd.CheckoutMode, "mode", "mode for checking out the object")
 }
