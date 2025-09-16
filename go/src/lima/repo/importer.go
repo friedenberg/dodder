@@ -29,6 +29,7 @@ type (
 		ExcludeObjects      bool
 		ExcludeBlobs        bool
 		AllowMergeConflicts bool
+		OverwriteSignatures bool
 
 		DedupingFormatId   string
 		RemoteBlobStore    interfaces.BlobStore
@@ -42,6 +43,13 @@ type (
 func (options *ImporterOptions) SetFlagSet(
 	flagDefinitions interfaces.CommandLineFlagDefinitions,
 ) {
+	flagDefinitions.BoolVar(
+		&options.PrintCopies,
+		"print-copies",
+		true,
+		"output when blobs are copied",
+	)
+
 	flagDefinitions.BoolVar(
 		&options.ExcludeObjects,
 		"exclude-objects",
@@ -66,7 +74,14 @@ func (options *ImporterOptions) SetFlagSet(
 	flagDefinitions.Var(
 		&options.BlobGenres,
 		"blob-genres",
-		"which blob genres should have their blobs copied",
+		"which object genres should have their blobs copied",
+	)
+
+	flagDefinitions.BoolVar(
+		&options.OverwriteSignatures,
+		"overwrite-signatures",
+		false,
+		"ignore object pubkeys and signatures and generate new ones (causing this repo to create the objects as new instead of importing them)",
 	)
 }
 

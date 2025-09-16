@@ -20,33 +20,20 @@ func init() {
 	command.Register("import", &Import{})
 }
 
-// Switch to External store
 type Import struct {
 	command_components.LocalWorkingCopy
 	command_components.BlobStore
 
-	PrintCopies         bool
-	OverwriteSignatures bool
+	repo.ImporterOptions
 
 	sku.Proto
 }
 
-func (cmd *Import) SetFlagSet(flagSet interfaces.CommandLineFlagDefinitions) {
-	flagSet.BoolVar(
-		&cmd.PrintCopies,
-		"print-copies",
-		true,
-		"output when blobs are copied",
-	)
-
-	flagSet.BoolVar(
-		&cmd.OverwriteSignatures,
-		"overwrite-signatures",
-		false,
-		"ignore object pubkeys and signatures and generate new ones (causing this repo to create the objects as new instead of importing them)",
-	)
-
-	cmd.Proto.SetFlagSet(flagSet)
+func (cmd *Import) SetFlagSet(
+	flagDefinitions interfaces.CommandLineFlagDefinitions,
+) {
+	cmd.ImporterOptions.SetFlagSet(flagDefinitions)
+	cmd.Proto.SetFlagSet(flagDefinitions)
 }
 
 func (cmd Import) Run(req command.Request) {
@@ -79,13 +66,11 @@ func (cmd Import) Run(req command.Request) {
 
 	inventoryListCoderCloset := local.GetInventoryListCoderCloset()
 
-	importerOptions := repo.ImporterOptions{
-		DedupingFormatId:  markl.PurposeV5MetadataDigestWithoutTai,
-		CheckedOutPrinter: local.PrinterCheckedOutConflictsForRemoteTransfers(),
-	}
+	cmd.DedupingFormatId = markl.PurposeV5MetadataDigestWithoutTai
+	cmd.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
 
 	if blobStoreConfigPath != "" {
-		importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
+		cmd.RemoteBlobStore = cmd.MakeBlobStore(
 			local.GetEnvRepo(),
 			blobStoreConfigPath,
 		)
@@ -95,7 +80,7 @@ func (cmd Import) Run(req command.Request) {
 
 	blobImporter := remote_transfer.MakeBlobImporter(
 		local.GetEnvRepo(),
-		importerOptions.RemoteBlobStore,
+		cmd.RemoteBlobStore,
 		local.GetBlobStore(),
 	)
 
@@ -156,15 +141,14 @@ func (cmd Import) Run(req command.Request) {
 		afterDecoding,
 	)
 
-	importerOptions.PrintCopies = cmd.PrintCopies
-	importerr := local.MakeImporter(
-		importerOptions,
+	importer := local.MakeImporter(
+		cmd.ImporterOptions,
 		sku.GetStoreOptionsImport(),
 	)
 
 	if err := local.ImportSeq(
 		seq,
-		importerr,
+		importer,
 	); err != nil {
 		if !errors.Is(err, remote_transfer.ErrNeedsMerge) {
 			err = errors.Wrap(err)
