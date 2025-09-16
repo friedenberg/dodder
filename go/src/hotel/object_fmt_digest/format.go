@@ -1,7 +1,6 @@
-package object_inventory_format
+package object_fmt_digest
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
@@ -30,8 +29,8 @@ func (format Format) WriteMetadataTo(
 ) (n int64, err error) {
 	var n1 int64
 
-	for _, k := range format.keys {
-		n1, err = writeMetadataKeyTo(writer, context, k)
+	for _, key := range format.keys {
+		n1, err = writeMetadataKeyTo(writer, context, key)
 		n += n1
 
 		if err != nil {
@@ -67,16 +66,16 @@ func writeMetadataKeyStringTo(
 	context FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
-	m := context.GetMetadata()
+	metadata := context.GetMetadata()
 
 	var n1 int
 
 	switch key {
 	case key_strings_german.Akte, key_strings.Blob:
-		n1, err = writeMerkleIdKeyIfNotNull(
+		n1, err = writeMarklIdKeyIfNotNull(
 			writer,
 			key,
-			m.GetBlobDigestMutable(),
+			metadata.GetBlobDigestMutable(),
 		)
 
 		n += int64(n1)
@@ -87,7 +86,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.Bezeichnung, key_strings.Description:
-		lines := strings.Split(m.Description.String(), "\n")
+		lines := strings.Split(metadata.Description.String(), "\n")
 
 		for _, line := range lines {
 			if line == "" {
@@ -108,7 +107,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.Etikett, key_strings.Tag:
-		tags := m.GetTags()
+		tags := metadata.GetTags()
 
 		if tags == nil {
 			break
@@ -193,10 +192,10 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = writeMerkleIdKeyIfNotNull(
+		n1, err = writeMarklIdKeyIfNotNull(
 			writer,
 			key_strings_german.ShasMutterMetadateiKennungMutter,
-			m.GetMotherObjectSig(),
+			metadata.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -207,10 +206,10 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.ZZRepoPub:
-		n1, err = writeMerkleIdKey(
+		n1, err = writeMarklIdKey(
 			writer,
 			key,
-			m.GetRepoPubKey(),
+			metadata.GetRepoPubKey(),
 		)
 
 		n += int64(n1)
@@ -221,10 +220,10 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.ZZSigMother:
-		n1, err = writeMerkleIdKeyIfNotNull(
+		n1, err = writeMarklIdKeyIfNotNull(
 			writer,
 			key,
-			m.GetMotherObjectSig(),
+			metadata.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -235,10 +234,10 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = writeMerkleIdKeyIfNotNull(
+		n1, err = writeMarklIdKeyIfNotNull(
 			writer,
 			key,
-			m.GetMotherObjectSig(),
+			metadata.GetMotherObjectSig(),
 		)
 
 		n += int64(n1)
@@ -252,7 +251,7 @@ func writeMetadataKeyStringTo(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
 			key_strings.Tai.String(),
-			m.Tai.String(),
+			metadata.Tai.String(),
 		)
 		n += int64(n1)
 
@@ -262,11 +261,11 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.Typ, key_strings.Type:
-		if !m.Type.IsEmpty() {
+		if !metadata.Type.IsEmpty() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				writer,
 				key.String(),
-				m.GetType().String(),
+				metadata.GetType().String(),
 			)
 			n += int64(n1)
 
@@ -277,26 +276,27 @@ func writeMetadataKeyStringTo(
 		}
 
 	default:
-		panic(fmt.Sprintf("unsupported key: %s", key))
+		err = errors.Errorf("unsupported key: %s", key)
+		return
 	}
 
 	return
 }
 
-func writeMerkleIdKey(
-	w io.Writer,
+func writeMarklIdKey(
+	writer io.Writer,
 	key *catgut.String,
-	merkleId interfaces.MarklId,
+	id interfaces.MarklId,
 ) (n int, err error) {
-	if err = markl.AssertIdIsNotNull(merkleId, key.String()); err != nil {
+	if err = markl.AssertIdIsNotNull(id, key.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	n, err = ohio.WriteKeySpaceValueNewlineString(
-		w,
+		writer,
 		key.String(),
-		markl.FormatBytesAsHext(merkleId),
+		markl.FormatBytesAsHext(id),
 	)
 	if err != nil {
 		err = errors.Wrap(err)
@@ -306,25 +306,25 @@ func writeMerkleIdKey(
 	return
 }
 
-func writeMerkleIdKeyIfNotNull(
-	w io.Writer,
+func writeMarklIdKeyIfNotNull(
+	writer io.Writer,
 	key *catgut.String,
-	merkleId interfaces.MarklId,
+	id interfaces.MarklId,
 ) (n int, err error) {
-	if merkleId.IsNull() {
+	if id.IsNull() {
 		return
 	}
 
-	return writeMerkleIdKey(w, key, merkleId)
+	return writeMarklIdKey(writer, key, id)
 }
 
 func GetDigestForContext(
 	format Format,
 	context FormatterContext,
 ) (digest interfaces.MarklId, err error) {
-	m := context.GetMetadata()
+	metadata := context.GetMetadata()
 
-	if m.GetTai().IsEmpty() {
+	if metadata.GetTai().IsEmpty() {
 		err = ErrEmptyTai
 		return
 	}

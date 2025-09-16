@@ -22,7 +22,7 @@ var (
 
 type http struct {
 	StatusCode hs.Code
-	hideUnwrap bool
+	exposeHTTP bool
 	underlying error
 }
 
@@ -47,24 +47,19 @@ func (err http) WithStack() error {
 	return WrapSkip(1, err)
 }
 
+func (err http) WrapIncludingHTTP(underlying error) http {
+	return http{
+		StatusCode: err.StatusCode,
+		underlying: underlying,
+		exposeHTTP: true,
+	}
+}
+
 func (err http) Wrap(underlying error) http {
 	return http{
 		StatusCode: err.StatusCode,
 		underlying: underlying,
 	}
-}
-
-func (err http) WrapHidden(underlying error) http {
-	return http{
-		StatusCode: err.StatusCode,
-		underlying: underlying,
-		hideUnwrap: true,
-	}
-}
-
-func (err http) Errorf(format string, args ...any) http {
-	err = err.WrapHidden(fmt.Errorf(format, args...))
-	return err
 }
 
 // Creates a new error from `format` and `args` a returns a new HTTP error that
@@ -73,11 +68,11 @@ func (err http) Errorf(format string, args ...any) http {
 // The returned error will satisfy the appropriate `IsHTTPError(err, status)`
 // call, but when using `error_coders` to print it, but it won't show the HTTP
 // error
-func (err http) ErrorHiddenf(format string, args ...any) http {
-	err = err.WrapHidden(fmt.Errorf(format, args...))
+func (err http) Errorf(format string, args ...any) http {
+	err = err.Wrap(fmt.Errorf(format, args...))
 	return err
 }
 
 func (err http) ShouldHideUnwrap() bool {
-	return err.hideUnwrap
+	return !err.exposeHTTP
 }

@@ -1,4 +1,4 @@
-package object_inventory_format
+package object_fmt_digest
 
 import (
 	"fmt"

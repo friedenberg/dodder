@@ -1,5 +1,5 @@
 // TODO rename to remote_transfer
-package importer
+package remote_transfer
 
 import (
 	"time"

@@ -1,4 +1,4 @@
-package importer
+package remote_transfer
 
 import (
 	"sync"

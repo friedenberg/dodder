@@ -2,7 +2,7 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/importer"
+	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 )
 
 func (local *Repo) MakeImporter(
@@ -11,7 +11,7 @@ func (local *Repo) MakeImporter(
 ) sku.Importer {
 	store := local.GetStore()
 
-	return importer.Make(
+	return remote_transfer.Make(
 		options,
 		storeOptions,
 		store.GetEnvRepo(),

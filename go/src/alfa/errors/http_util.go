@@ -7,15 +7,15 @@ func BadRequest(err error) error {
 		return err
 	}
 
-	return WithoutStack(Err400BadRequest.WrapHidden(err))
+	return WithoutStack(Err400BadRequest.Wrap(err))
 }
 
 func BadRequestf(format string, args ...any) error {
-	return WithoutStack(Err400BadRequest.ErrorHiddenf(format, args...))
+	return WithoutStack(Err400BadRequest.Errorf(format, args...))
 }
 
 func BadRequestWrapf(format string, args ...any) error {
-	return WithoutStack(Err400BadRequest.ErrorHiddenf(format, args...))
+	return WithoutStack(Err400BadRequest.Errorf(format, args...))
 }
 
 func Is400BadRequest(err error) bool {

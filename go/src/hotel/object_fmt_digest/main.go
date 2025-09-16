@@ -1,5 +1,4 @@
-// TODO rename
-package object_inventory_format
+package object_fmt_digest
 
 import (
 	"fmt"
@@ -23,15 +22,7 @@ type (
 		object_metadata.PersistentParserContext
 		SetObjectIdLike(interfaces.ObjectId) error
 	}
-
-	nopFormatterContext struct {
-		object_metadata.PersistentFormatterContext
-	}
 )
-
-func (nopFormatterContext) GetObjectId() *ids.ObjectId {
-	return nil
-}
 
 type keyType = *catgut.String
 

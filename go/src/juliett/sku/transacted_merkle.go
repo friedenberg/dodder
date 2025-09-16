@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_inventory_format"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_fmt_digest"
 )
 
 func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
@@ -266,7 +266,7 @@ func (transacted *Transacted) Verify() (err error) {
 	return
 }
 
-type funcCalcDigest func(object_inventory_format.Format, object_inventory_format.FormatterContext) (interfaces.MarklId, error)
+type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterContext) (interfaces.MarklId, error)
 
 type ObjectDigestWriteMap map[string]interfaces.MutableMarklId
 
@@ -288,18 +288,18 @@ func (transacted *Transacted) CalculateDigests(
 	debug bool,
 	formats ObjectDigestWriteMap,
 ) (err error) {
-	funcCalcDigest := object_inventory_format.GetDigestForContext
+	funcCalcDigest := object_fmt_digest.GetDigestForContext
 
 	if debug {
-		funcCalcDigest = object_inventory_format.GetDigestForContextDebug
+		funcCalcDigest = object_fmt_digest.GetDigestForContextDebug
 	}
 
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for formatId, id := range formats {
-		var format object_inventory_format.Format
+		var format object_fmt_digest.Format
 
-		if format, err = object_inventory_format.FormatForPurposeOrError(
+		if format, err = object_fmt_digest.FormatForPurposeOrError(
 			formatId,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -325,7 +325,7 @@ func (transacted *Transacted) CalculateDigests(
 
 func (transacted *Transacted) MakeDigestCalcFunc(
 	funcCalcDigest funcCalcDigest,
-	format object_inventory_format.Format,
+	format object_fmt_digest.Format,
 	digest interfaces.MutableMarklId,
 ) errors.FuncErr {
 	return func() (err error) {
@@ -339,7 +339,7 @@ func (transacted *Transacted) MakeDigestCalcFunc(
 
 func (transacted *Transacted) CalculateDigest(
 	funcCalcDigest funcCalcDigest,
-	format object_inventory_format.Format,
+	format object_fmt_digest.Format,
 	digest interfaces.MutableMarklId,
 ) (err error) {
 	var actual interfaces.MarklId

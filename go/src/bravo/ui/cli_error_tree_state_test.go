@@ -58,7 +58,7 @@ func TestCLITreeForwards(t *testing.T) {
 				errors.New("one"),
 				errors.New("two"),
 				errors.Group{
-					errors.Err501NotImplemented.Wrap(errors.New("inner")),
+					errors.Err501NotImplemented.WrapIncludingHTTP(errors.New("inner")),
 				},
 			},
 			expected: `error group: 3 errors

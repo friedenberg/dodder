@@ -1,4 +1,4 @@
-package importer
+package remote_transfer
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
-var ErrNeedsMerge = errors.Err409Conflict.ErrorHiddenf(
+var ErrNeedsMerge = errors.Err409Conflict.Errorf(
 	"import failed with conflicts, merging required",
 )
 

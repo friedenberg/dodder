@@ -152,7 +152,7 @@ func (id Id) StringWithFormat() string {
 }
 
 func (id Id) MarshalBinary() ([]byte, error) {
-	return nil, errors.Err405MethodNotAllowed.WithStack()
+	return nil, errors.Err405MethodNotAllowed
 }
 
 func (id Id) GetBytes() []byte {
@@ -175,8 +175,7 @@ func (id Id) GetBytes() []byte {
 }
 
 func (id Id) GetSize() int {
-	errors.PanicIfError(errors.Err405MethodNotAllowed)
-	return 0
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (id Id) GetMarklFormat() interfaces.MarklFormat {

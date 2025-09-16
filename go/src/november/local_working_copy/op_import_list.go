@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/importer"
+	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 )
 
 func (local *Repo) ImportSeq(
@@ -75,7 +75,7 @@ func (local *Repo) ImportSeq(
 	}
 
 	if hasConflicts {
-		importErrors.Add(importer.ErrNeedsMerge)
+		importErrors.Add(remote_transfer.ErrNeedsMerge)
 	}
 
 	if importErrors.Len() > 0 {
@@ -104,7 +104,7 @@ func (repo *Repo) importOne(
 		return
 	}
 
-	if errors.Is(err, importer.ErrSkipped) {
+	if errors.Is(err, remote_transfer.ErrSkipped) {
 		err = nil
 		return
 	} else if errors.Is(err, collections.ErrExists) {

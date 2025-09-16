@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/importer"
+	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
@@ -92,7 +92,7 @@ func (cmd Import) Run(req command.Request) {
 
 	var afterDecoding func(*sku.Transacted) error
 
-	blobImporter := importer.MakeBlobImporter(
+	blobImporter := remote_transfer.MakeBlobImporter(
 		repo.GetEnvRepo(),
 		importerOptions.RemoteBlobStore,
 		repo.GetBlobStore(),
@@ -165,7 +165,7 @@ func (cmd Import) Run(req command.Request) {
 		seq,
 		importerr,
 	); err != nil {
-		if !errors.Is(err, importer.ErrNeedsMerge) {
+		if !errors.Is(err, remote_transfer.ErrNeedsMerge) {
 			err = errors.Wrap(err)
 		}
 

@@ -52,7 +52,7 @@ func SetHexStringFromRelPath(
 	relPath string,
 ) (err error) {
 	if filepath.IsAbs(relPath) {
-		err = errors.Err405MethodNotAllowed.ErrorHiddenf(
+		err = errors.Err405MethodNotAllowed.Errorf(
 			"absolute paths not supported",
 		)
 		return

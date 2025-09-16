@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
-	"code.linenisgreat.com/dodder/go/src/mike/importer"
+	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
@@ -65,7 +65,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		importerr,
 	); err != nil {
-		if errors.Is(err, importer.ErrNeedsMerge) {
+		if errors.Is(err, remote_transfer.ErrNeedsMerge) {
 			err = errors.WithoutStack(err)
 		} else {
 			err = errors.Wrap(err)
