@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -26,7 +27,7 @@ func init() {
 }
 
 type Show struct {
-	command_components.EnvRepo
+	command_components_madder.EnvRepo
 	command_components.LocalWorkingCopy
 	command_components.Query
 	command_components.RemoteTransfer

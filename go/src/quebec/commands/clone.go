@@ -28,6 +28,7 @@ type Clone struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+
 var _ interfaces.CommandComponentWriter = (*Clone)(nil)
 
 func (cmd *Clone) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

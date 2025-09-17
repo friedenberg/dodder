@@ -12,6 +12,7 @@ import (
 type Query struct {
 	sku.ExternalQueryOptions
 }
+
 var _ interfaces.CommandComponentWriter = (*Query)(nil)
 
 func (cmd *Query) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

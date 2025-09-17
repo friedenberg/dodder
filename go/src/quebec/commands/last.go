@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -30,17 +31,21 @@ func init() {
 }
 
 type Last struct {
-	command_components.EnvRepo
+	command_components.InventoryLists
 	command_components.LocalWorkingCopy
+	command_components_madder.EnvRepo
 
 	RepoId   ids.RepoId
 	Edit     bool
 	Organize bool
 	Format   local_working_copy.FormatFlag
 }
+
 var _ interfaces.CommandComponentWriter = (*Last)(nil)
 
-func (cmd *Last) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Last) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 
 	// TODO remove

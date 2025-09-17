@@ -19,6 +19,7 @@ type Push struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+
 var _ interfaces.CommandComponentWriter = (*Push)(nil)
 
 func (cmd *Push) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

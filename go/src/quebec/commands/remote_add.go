@@ -26,6 +26,7 @@ type RemoteAdd struct {
 
 	proto sku.Proto
 }
+
 var _ interfaces.CommandComponentWriter = (*RemoteAdd)(nil)
 
 func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

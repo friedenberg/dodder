@@ -19,6 +19,7 @@ type Pull struct {
 	command_components.RemoteTransfer
 	command_components.Query
 }
+
 var _ interfaces.CommandComponentWriter = (*Pull)(nil)
 
 func (cmd *Pull) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components"
@@ -20,8 +21,8 @@ func init() {
 
 type RepoFsck struct {
 	command_components.LocalWorkingCopy
-	command_components.EnvRepo
-	command_components.BlobStore
+	command_components_madder.EnvRepo
+	command_components_madder.BlobStore
 }
 
 // TODO add completion for blob store id's

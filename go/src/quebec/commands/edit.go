@@ -31,6 +31,7 @@ type Edit struct {
 	command_components.Checkout
 	CheckoutMode checkout_mode.Mode
 }
+
 var _ interfaces.CommandComponentWriter = (*Edit)(nil)
 
 func (cmd *Edit) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

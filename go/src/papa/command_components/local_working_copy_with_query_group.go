@@ -11,6 +11,7 @@ type LocalWorkingCopyWithQueryGroup struct {
 	LocalWorkingCopy
 	Query
 }
+
 var _ interfaces.CommandComponentWriter = (*LocalWorkingCopyWithQueryGroup)(nil)
 
 func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

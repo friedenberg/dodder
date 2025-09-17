@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -19,8 +20,9 @@ func init() {
 
 type PullBlobStore struct {
 	command_components.LocalWorkingCopyWithQueryGroup
-	command_components.BlobStore
+	command_components_madder.BlobStore
 }
+
 var _ interfaces.CommandComponentWriter = (*PullBlobStore)(nil)
 
 func (cmd *PullBlobStore) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

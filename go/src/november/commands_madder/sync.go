@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
 func init() {
@@ -20,11 +20,12 @@ func init() {
 }
 
 type Sync struct {
-	command_components.EnvRepo
-	command_components.BlobStore
+	command_components_madder.EnvRepo
+	command_components_madder.BlobStore
 
 	Limit int
 }
+
 var _ interfaces.CommandComponentWriter = (*Sync)(nil)
 
 func (cmd *Sync) SetFlagDefinitions(

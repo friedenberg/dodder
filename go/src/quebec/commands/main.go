@@ -4,9 +4,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	_ "code.linenisgreat.com/dodder/go/src/commands_madder"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	_ "code.linenisgreat.com/dodder/go/src/november/commands_madder"
 )
 
 // TODO switch to commands.Request

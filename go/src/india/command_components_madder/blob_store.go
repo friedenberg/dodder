@@ -1,4 +1,4 @@
-package command_components
+package command_components_madder
 
 import (
 	"strconv"

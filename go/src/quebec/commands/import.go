@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
@@ -22,12 +23,13 @@ func init() {
 
 type Import struct {
 	command_components.LocalWorkingCopy
-	command_components.BlobStore
+	command_components_madder.BlobStore
 
 	repo.ImporterOptions
 
 	sku.Proto
 }
+
 var _ interfaces.CommandComponentWriter = (*Import)(nil)
 
 func (cmd *Import) SetFlagDefinitions(

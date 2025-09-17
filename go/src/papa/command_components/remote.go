@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
@@ -23,14 +24,19 @@ import (
 
 type Remote struct {
 	Env
-	EnvRepo
+
+	InventoryLists
 	LocalWorkingCopy
+	command_components_madder.EnvRepo
 
 	RemoteConnectionType repo.RemoteConnectionType
 }
+
 var _ interfaces.CommandComponentWriter = (*Remote)(nil)
 
-func (cmd *Remote) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Remote) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	// TODO remove and replace with repo builtin type options
 	cli.FlagSetVarWithCompletion(
 		flagSet,

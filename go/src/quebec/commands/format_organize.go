@@ -30,6 +30,7 @@ type FormatOrganize struct {
 
 	Flags organize_text.Flags
 }
+
 var _ interfaces.CommandComponentWriter = (*FormatOrganize)(nil)
 
 func (cmd *FormatOrganize) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

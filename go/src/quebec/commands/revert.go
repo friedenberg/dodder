@@ -22,6 +22,7 @@ type Revert struct {
 
 	Last bool
 }
+
 var _ interfaces.CommandComponentWriter = (*Revert)(nil)
 
 func (md *Revert) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

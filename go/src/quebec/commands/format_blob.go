@@ -31,6 +31,7 @@ type FormatBlob struct {
 	Stdin    bool
 	UTIGroup string
 }
+
 var _ interfaces.CommandComponentWriter = (*FormatBlob)(nil)
 
 func (cmd *FormatBlob) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

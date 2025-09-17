@@ -21,6 +21,7 @@ func init() {
 type Init struct {
 	command_components.Genesis
 }
+
 var _ interfaces.CommandComponentWriter = (*Init)(nil)
 
 func (cmd *Init) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 }
 
 type ReadBlob struct {
-	command_components.EnvRepo
+	command_components_madder.EnvRepo
 }
 
 type readBlobEntry struct {

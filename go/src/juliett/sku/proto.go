@@ -30,6 +30,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 type Proto struct {
 	object_metadata.Metadata
 }
+
 var _ interfaces.CommandComponentWriter = (*Proto)(nil)
 
 func (pz *Proto) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

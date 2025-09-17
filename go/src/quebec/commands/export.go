@@ -34,6 +34,7 @@ type Export struct {
 	AgeIdentity     age.Identity
 	CompressionType compression_type.CompressionType
 }
+
 var _ interfaces.CommandComponentWriter = (*Export)(nil)
 
 func (cmd *Export) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

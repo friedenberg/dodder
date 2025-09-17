@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
 func init() {
@@ -22,14 +22,15 @@ func init() {
 }
 
 type Cat struct {
-	command_components.EnvRepo
-	command_components.BlobStore
+	command_components_madder.EnvRepo
+	command_components_madder.BlobStore
 
 	BlobStoreIndexOrConfigPath string
 
 	Utility   script_value.Utility
 	PrefixSha bool
 }
+
 var _ interfaces.CommandComponentWriter = (*Cat)(nil)
 
 func (cmd *Cat) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

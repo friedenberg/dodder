@@ -32,6 +32,7 @@ type InitWorkspace struct {
 	DefaultQueryGroup values.String
 	Proto             sku.Proto
 }
+
 var _ interfaces.CommandComponentWriter = (*InitWorkspace)(nil)
 
 func (cmd *InitWorkspace) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

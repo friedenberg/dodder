@@ -9,6 +9,7 @@ type RemoteTransfer struct {
 	Remote
 	repo.ImporterOptions
 }
+
 var _ interfaces.CommandComponentWriter = (*RemoteTransfer)(nil)
 
 func (cmd *RemoteTransfer) SetFlagDefinitions(

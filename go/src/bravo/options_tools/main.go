@@ -9,6 +9,7 @@ import (
 type Options struct {
 	Merge []string `toml:"merge"`
 }
+
 var _ interfaces.CommandComponentWriter = (*Options)(nil)
 
 func (options *Options) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

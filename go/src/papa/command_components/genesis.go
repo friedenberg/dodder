@@ -16,6 +16,7 @@ type Genesis struct {
 	env_repo.BigBang
 	LocalWorkingCopy
 }
+
 var _ interfaces.CommandComponentWriter = (*Genesis)(nil)
 
 func (cmd *Genesis) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {

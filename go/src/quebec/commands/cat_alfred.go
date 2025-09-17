@@ -25,6 +25,7 @@ type CatAlfred struct {
 
 	genres.Genre
 }
+
 var _ interfaces.CommandComponentWriter = (*CatAlfred)(nil)
 
 func (cmd *CatAlfred) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

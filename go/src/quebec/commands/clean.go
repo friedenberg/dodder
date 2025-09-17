@@ -29,6 +29,7 @@ type Clean struct {
 	includeParent            bool
 	organize                 bool
 }
+
 var _ interfaces.CommandComponentWriter = (*Clean)(nil)
 
 func (c *Clean) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
 // TODO move to madder
@@ -44,11 +44,14 @@ type Init struct {
 	tipe            ids.Type
 	blobStoreConfig blob_store_configs.ConfigMutable
 
-	command_components.EnvRepo
+	command_components_madder.EnvRepo
 }
+
 var _ interfaces.CommandComponentWriter = (*Init)(nil)
 
-func (cmd *Init) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Init) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	cmd.blobStoreConfig.SetFlagDefinitions(flagSet)
 }
 

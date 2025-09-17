@@ -25,6 +25,7 @@ type Deinit struct {
 
 	Force bool
 }
+
 var _ interfaces.CommandComponentWriter = (*Deinit)(nil)
 
 func (cmd *Deinit) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

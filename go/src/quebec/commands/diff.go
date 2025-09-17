@@ -25,6 +25,7 @@ func init() {
 type Diff struct {
 	command_components.LocalWorkingCopyWithQueryGroup
 }
+
 var _ interfaces.CommandComponentWriter = (*Diff)(nil)
 
 func (cmd *Diff) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {

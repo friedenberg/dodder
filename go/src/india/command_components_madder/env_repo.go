@@ -1,14 +1,11 @@
-package command_components
+package command_components_madder
 
 import (
-	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
 
 type EnvRepo struct{}
@@ -72,16 +69,4 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	return envRepo
 }
 
-func (EnvRepo) MakeInventoryListCoderCloset(
-	envRepo env_repo.Env,
-) inventory_list_coders.Closet {
-	boxFormat := box_format.MakeBoxTransactedArchive(
-		envRepo,
-		options_print.Options{}.WithPrintTai(true),
-	)
-
-	return inventory_list_coders.MakeCloset(
-		envRepo,
-		boxFormat,
-	)
-}
+// TODO move to command_components

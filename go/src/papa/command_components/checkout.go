@@ -7,6 +7,7 @@ type Checkout struct {
 	Organize bool
 	Edit     bool
 }
+
 var _ interfaces.CommandComponentWriter = (*Checkout)(nil)
 
 func (c *Checkout) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
