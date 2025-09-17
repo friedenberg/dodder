@@ -87,8 +87,9 @@ func init() {
 var formats map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
 
 func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
-	if formatId == "zit-repo-private_key-v1" {
-		formatId = PurposeRepoPrivateKeyV1
+	switch formatId {
+	case "zit-repo-private_key-v1", "dodder-repo-private_key-v1":
+		formatId = FormatIdSecEd25519
 	}
 
 	format, ok := formats[formatId]

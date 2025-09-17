@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"io"
@@ -8,29 +8,29 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
+	"code.linenisgreat.com/dodder/go/src/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
 )
 
 func init() {
-	command.Register("write-blob", &BlobStoreWrite{})
-	command.Register("blob_store-write", &BlobStoreWrite{})
+	command.Register("write-blob", &Write{})
+	command.Register("blob_store-write", &Write{})
 }
 
-type BlobStoreWrite struct {
-	command_components.BlobStoreLocal
+type Write struct {
+	command_components_madder.BlobStoreLocal
 
 	Check         bool
 	UtilityBefore script_value.Utility
 	UtilityAfter  script_value.Utility
 }
-var _ interfaces.CommandComponentWriter = (*BlobStoreWrite)(nil)
 
-func (cmd *BlobStoreWrite) SetFlagDefinitions(
+var _ interfaces.CommandComponentWriter = (*Write)(nil)
+
+func (cmd *Write) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.BoolVar(
@@ -51,12 +51,11 @@ type blobWriteResult struct {
 }
 
 // TODO add support for blob store ids
-func (cmd BlobStoreWrite) Run(req command.Request) {
+func (cmd Write) Run(req command.Request) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		req,
 		req.Config,
 		env_ui.Options{},
-		local_working_copy.OptionsEmpty,
 	)
 
 	var failCount atomic.Uint32
@@ -134,8 +133,8 @@ func (cmd BlobStoreWrite) Run(req command.Request) {
 }
 
 // TODO rewrite to just return blobWriteResult
-func (cmd BlobStoreWrite) doOne(
-	blobStore command_components.BlobStoreWithEnv,
+func (cmd Write) doOne(
+	blobStore command_components_madder.BlobStoreWithEnv,
 	path string,
 ) (blobId interfaces.MarklId, err error) {
 	var readCloser io.ReadCloser

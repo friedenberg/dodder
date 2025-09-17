@@ -13,16 +13,24 @@ type CommandWithDescription interface {
 	GetDescription() Description
 }
 
-var commands = map[string]Command{}
+var commands = map[string]map[string]Command{
+	"dodder": {},
+	"madder": {},
+}
 
-func Commands() map[string]Command {
-	return commands
+func CommandsFor(util string) map[string]Command {
+	return commands[util]
 }
 
 func Register(name string, cmd Command) {
-	if _, ok := commands[name]; ok {
+	RegisterFor("dodder", name, cmd)
+	RegisterFor("madder", name, cmd)
+}
+
+func RegisterFor(util string, name string, cmd Command) {
+	if _, ok := commands[util][name]; ok {
 		panic("command added more than once: " + name)
 	}
 
-	commands[name] = cmd
+	commands[util][name] = cmd
 }

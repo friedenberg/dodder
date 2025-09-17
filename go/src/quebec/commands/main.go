@@ -4,20 +4,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
+	_ "code.linenisgreat.com/dodder/go/src/commands_madder"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
-// TODO switch to activecontext
-func Run(ctx interfaces.Context, args ...string) {
+// TODO switch to commands.Request
+func Run(util string, ctx interfaces.Context, args ...string) {
 	if len(args) <= 1 {
 		PrintUsage(
+			util,
 			ctx,
 			errors.BadRequestf("No subcommand provided."),
 		)
 	}
 
-	cmds := command.Commands()
+	cmds := command.CommandsFor(util)
 
 	var cmd command.Command
 	var ok bool
@@ -26,6 +28,7 @@ func Run(ctx interfaces.Context, args ...string) {
 
 	if cmd, ok = cmds[name]; !ok {
 		PrintUsage(
+			util,
 			ctx,
 			errors.BadRequestf("No subcommand %q", name),
 		)
@@ -47,6 +50,7 @@ func Run(ctx interfaces.Context, args ...string) {
 	}
 
 	req := command.MakeRequest(
+		util,
 		ctx,
 		configCli,
 		flagSet,

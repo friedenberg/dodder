@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -9,21 +9,21 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-cat-ids", &BlobStoreCatIds{})
+	command.Register("blob_store-cat-ids", &CatIds{})
 }
 
-type BlobStoreCatIds struct {
+type CatIds struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 }
 
-func (cmd BlobStoreCatIds) CompletionGenres() ids.Genre {
+func (cmd CatIds) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Blob,
 	)
 }
 
-func (cmd BlobStoreCatIds) Run(req command.Request) {
+func (cmd CatIds) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	var blobStoreIndexOrConfigPath string
 

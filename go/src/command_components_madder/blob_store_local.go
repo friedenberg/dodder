@@ -1,4 +1,4 @@
-package command_components
+package command_components_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 // TODO remove and replace with BlobStore
@@ -15,7 +14,9 @@ type BlobStoreLocal struct{}
 
 var _ interfaces.CommandComponentWriter = (*BlobStoreLocal)(nil)
 
-func (cmd *BlobStoreLocal) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *BlobStoreLocal) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 }
 
 type BlobStoreWithEnv struct {
@@ -27,7 +28,6 @@ func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 	context interfaces.Context,
 	config repo_config_cli.Config,
 	envOptions env_ui.Options,
-	repoOptions local_working_copy.Options,
 ) BlobStoreWithEnv {
 	dir := env_dir.MakeDefault(
 		context,

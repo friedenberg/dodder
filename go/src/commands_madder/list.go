@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -10,19 +10,19 @@ import (
 func init() {
 	command.Register(
 		"blob_store-list",
-		&BlobList{},
+		&List{},
 	)
 }
 
-type BlobList struct {
+type List struct {
 	command_components.EnvRepo
 }
-var _ interfaces.CommandComponentWriter = (*BlobList)(nil)
+var _ interfaces.CommandComponentWriter = (*List)(nil)
 
-func (cmd *BlobList) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *List) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 }
 
-func (cmd BlobList) Run(req command.Request) {
+func (cmd List) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	blobStoresAll := envRepo.GetBlobStores()
 

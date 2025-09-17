@@ -25,10 +25,10 @@ func Ed25519GetPublicKey(private interfaces.MarklId) (bites []byte, err error) {
 	switch len(privateBytes) {
 	case ed25519.SeedSize:
 		// TODO emit error
-		err = errors.Errorf(
-			"private key is just seed, not full go ed25519 private key",
-		)
-		return
+		// err = errors.Errorf(
+		// 	"private key is just seed, not full go ed25519 private key",
+		// )
+		// return
 		privateKey = ed25519.NewKeyFromSeed(privateBytes)
 
 	case ed25519.PrivateKeySize:

@@ -11,14 +11,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 )
 
-func PrintUsage(ctx interfaces.Context, err error) {
+func PrintUsage(util string, ctx interfaces.Context, err error) {
 	if err != nil {
 		defer ctx.Cancel(err)
 	}
 
 	ui.Err().Print("Usage for dodder:")
 
-	commands := command.Commands()
+	commands := command.CommandsFor(util)
 
 	flagSets := make([]*flags.FlagSet, 0, len(commands))
 

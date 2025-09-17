@@ -37,13 +37,15 @@ func (cmd Complete) GetDescription() command.Description {
 	}
 }
 
-func (cmd *Complete) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Complete) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.BoolVar(&cmd.bashStyle, "bash-style", false, "")
 	flagSet.StringVar(&cmd.inProgress, "in-progress", "", "")
 }
 
 func (cmd Complete) Run(req command.Request) {
-	cmds := command.Commands()
+	cmds := command.CommandsFor(req.Util)
 	envLocal := cmd.MakeEnv(req)
 
 	// TODO extract into constructor

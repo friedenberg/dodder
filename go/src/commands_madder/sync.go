@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -15,19 +15,19 @@ import (
 func init() {
 	command.Register(
 		"blob_store-sync",
-		&BlobStoreSync{},
+		&Sync{},
 	)
 }
 
-type BlobStoreSync struct {
+type Sync struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 
 	Limit int
 }
-var _ interfaces.CommandComponentWriter = (*BlobStoreSync)(nil)
+var _ interfaces.CommandComponentWriter = (*Sync)(nil)
 
-func (cmd *BlobStoreSync) SetFlagDefinitions(
+func (cmd *Sync) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
 ) {
 	flagSet.IntVar(
@@ -40,12 +40,12 @@ func (cmd *BlobStoreSync) SetFlagDefinitions(
 
 // TODO add completion for blob store id's
 
-func (cmd BlobStoreSync) Run(req command.Request) {
+func (cmd Sync) Run(req command.Request) {
 	// blobStoreIds := req.PopArgs()
 	cmd.runAllStores(req)
 }
 
-func (cmd BlobStoreSync) runAllStores(req command.Request) {
+func (cmd Sync) runAllStores(req command.Request) {
 	req.AssertNoMoreArgs()
 	envRepo := cmd.MakeEnvRepo(req, false)
 	blobStoresInitialized := envRepo.GetBlobStores()

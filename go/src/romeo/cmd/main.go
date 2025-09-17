@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
 
-func Run(name string) {
-	name = extendNameIfNecessary(name)
+func Run(util string) {
+	util = extendNameIfNecessary(util)
 	ctx := errors.MakeContextDefault()
 
 	ctx.SetCancelOnSignals(
@@ -24,10 +24,10 @@ func Run(name string) {
 
 	if err := ctx.Run(
 		func(ctx interfaces.Context) {
-			commands.Run(ctx, os.Args...)
+			commands.Run(util, ctx, os.Args...)
 		},
 	); err != nil {
-		os.Exit(handleMainErrors(ctx, name, err))
+		os.Exit(handleMainErrors(ctx, util, err))
 	}
 }
 

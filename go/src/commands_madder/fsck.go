@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"time"
@@ -15,18 +15,18 @@ import (
 func init() {
 	command.Register(
 		"blob_store-fsck",
-		&BlobFsck{},
+		&Fsck{},
 	)
 }
 
-type BlobFsck struct {
+type Fsck struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 }
 
 // TODO add completion for blob store id's
 
-func (cmd BlobFsck) Run(req command.Request) {
+func (cmd Fsck) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 
 	blobStoreIds := req.PopArgs()
@@ -53,7 +53,6 @@ func (cmd BlobFsck) Run(req command.Request) {
 		)
 
 		var count int
-		var bytesVerified int64
 		var progressWriter env_ui.ProgressWriter
 
 		countSuccessPtr := &count
@@ -116,7 +115,10 @@ func (cmd BlobFsck) Run(req command.Request) {
 		}
 
 		ui.Out().Printf("blobs verified: %d", count)
-		ui.Out().Printf("blob bytes verified: %d", bytesVerified)
+		ui.Out().Printf(
+			"blob bytes verified: %d",
+			progressWriter.GetWrittenHumanString(),
+		)
 		ui.Out().Printf("blobs with errors: %d", len(blobErrors))
 
 		for _, errorBlob := range blobErrors {

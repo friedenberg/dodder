@@ -12,6 +12,8 @@ import (
 )
 
 type Request struct {
+	Util string
+
 	interfaces.Context
 	repo_config_cli.Config
 	*flags.FlagSet
@@ -40,11 +42,13 @@ type Args struct {
 }
 
 func MakeRequest(
+	util string,
 	ctx interfaces.Context,
 	config repo_config_cli.Config,
 	flagSet *flags.FlagSet,
 ) Request {
 	return Request{
+		Util:    util,
 		Context: ctx,
 		Config:  config,
 		FlagSet: flagSet,

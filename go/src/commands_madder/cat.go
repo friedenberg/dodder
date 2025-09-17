@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"io"
@@ -18,10 +18,10 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-cat", &BlobStoreCat{})
+	command.Register("blob_store-cat", &Cat{})
 }
 
-type BlobStoreCat struct {
+type Cat struct {
 	command_components.EnvRepo
 	command_components.BlobStore
 
@@ -30,9 +30,9 @@ type BlobStoreCat struct {
 	Utility   script_value.Utility
 	PrefixSha bool
 }
-var _ interfaces.CommandComponentWriter = (*BlobStoreCat)(nil)
+var _ interfaces.CommandComponentWriter = (*Cat)(nil)
 
-func (cmd *BlobStoreCat) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Cat) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
 	flagSet.Var(&cmd.Utility, "utility", "")
 	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")
@@ -43,7 +43,7 @@ type blobIdWithReadCloser struct {
 	ReadCloser io.ReadCloser
 }
 
-func (cmd BlobStoreCat) makeBlobWriter(
+func (cmd Cat) makeBlobWriter(
 	envRepo env_repo.Env,
 	blobStore blob_stores.BlobStoreInitialized,
 ) interfaces.FuncIter[blobIdWithReadCloser] {
@@ -101,7 +101,7 @@ func (cmd BlobStoreCat) makeBlobWriter(
 	}
 }
 
-func (cmd BlobStoreCat) Run(req command.Request) {
+func (cmd Cat) Run(req command.Request) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 	blobStore := cmd.MakeBlobStore(
 		envRepo,
@@ -126,7 +126,7 @@ func (cmd BlobStoreCat) Run(req command.Request) {
 	}
 }
 
-func (cmd BlobStoreCat) copy(
+func (cmd Cat) copy(
 	envRepo env_repo.Env,
 	blobStore blob_stores.BlobStoreInitialized,
 	readCloser blobIdWithReadCloser,
@@ -154,7 +154,7 @@ func (cmd BlobStoreCat) copy(
 	return
 }
 
-func (cmd BlobStoreCat) blob(
+func (cmd Cat) blob(
 	blobStore blob_stores.BlobStoreInitialized,
 	blobId interfaces.MarklId,
 	blobWriter interfaces.FuncIter[blobIdWithReadCloser],
