@@ -1,5 +1,4 @@
-// TODO rename to remote_transfer
-package remote_transfer
+package blob_transfers
 
 import (
 	"time"
@@ -51,7 +50,7 @@ func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 	}
 
 	for _, blobStore := range blobImporter.Dsts {
-		copyResult := blobImporter.importBlobIfNecessary(
+		copyResult := blobImporter.ImportBlobToStoreIfNecessary(
 			blobStore,
 			blobId,
 			object,
@@ -109,7 +108,7 @@ func (blobImporter *BlobImporter) emitCopyResultIfNecessary(
 	return
 }
 
-func (blobImporter *BlobImporter) importBlobIfNecessary(
+func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 	dst interfaces.BlobStore,
 	blobId interfaces.MarklId,
 	object *sku.Transacted,

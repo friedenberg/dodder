@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
+	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
 )
 
 func init() {
@@ -74,7 +74,7 @@ func (cmd Sync) runAllStores(req command.Request) {
 	primary := blobStoresInitialized[0]
 	blobStores = blobStores[1:]
 
-	blobImporter := remote_transfer.MakeBlobImporter(
+	blobImporter := blob_transfers.MakeBlobImporter(
 		envRepo,
 		primary,
 		blobStores...,

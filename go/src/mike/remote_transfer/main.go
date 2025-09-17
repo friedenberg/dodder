@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
@@ -60,7 +61,7 @@ func Make(
 		)
 	}
 
-	importer.blobImporter = MakeBlobImporter(
+	importer.blobImporter = blob_transfers.MakeBlobImporter(
 		envRepo,
 		importer.remoteBlobStore,
 		envRepo.GetDefaultBlobStore(),
@@ -74,7 +75,7 @@ func Make(
 type importer struct {
 	committer committer
 
-	blobImporter BlobImporter
+	blobImporter blob_transfers.BlobImporter
 
 	typedInventoryListBlobStore inventory_list_coders.Closet
 	index                       sku.Index
@@ -325,7 +326,7 @@ func (importer importer) importNewObject(
 func (importer importer) ImportBlobIfNecessary(
 	object *sku.Transacted,
 ) (err error) {
-	copyResult := importer.blobImporter.importBlobIfNecessary(
+	copyResult := importer.blobImporter.ImportBlobToStoreIfNecessary(
 		importer.envRepo.GetDefaultBlobStore(),
 		object.Metadata.GetBlobDigest(),
 		object,

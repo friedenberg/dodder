@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	_ "code.linenisgreat.com/dodder/go/src/november/commands_madder"
+	_ "code.linenisgreat.com/dodder/go/src/lima/commands_madder"
 )
 
 // TODO switch to commands.Request
