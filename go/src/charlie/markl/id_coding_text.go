@@ -39,14 +39,14 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 		return
 	}
 
-	var formatAndTypeId string
+	var purposeAndFormatId string
 
-	if formatAndTypeId, id.data, err = blech32.Decode(bites); err != nil {
-		err = errors.Wrap(err)
+	if purposeAndFormatId, id.data, err = blech32.Decode(bites); err != nil {
+		err = errors.Wrapf(err, "Raw: %q", string(bites))
 		return
 	}
 
-	purpose, formatId, ok := strings.Cut(formatAndTypeId, "@")
+	purpose, formatId, ok := strings.Cut(purposeAndFormatId, "@")
 
 	if ok {
 		if err = id.SetPurpose(purpose); err != nil {
@@ -54,7 +54,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 			return
 		}
 	} else {
-		formatId = formatAndTypeId
+		formatId = purposeAndFormatId
 	}
 
 	if id.format, err = GetFormatOrError(formatId); err != nil {

@@ -228,3 +228,11 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 func (id Id) Verify(_, _ interfaces.MarklId) (err error) {
 	return errors.Err405MethodNotAllowed
 }
+
+func (id Id) Sign(
+	mes interfaces.MarklId,
+	sigDst interfaces.MutableMarklId,
+	sigPurpose string,
+) (err error) {
+	return errors.Err405MethodNotAllowed
+}

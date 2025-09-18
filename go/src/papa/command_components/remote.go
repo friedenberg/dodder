@@ -298,7 +298,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	env env_local.Env,
 	dir string,
 	repo *local_working_copy.Repo,
-	pubkey markl.Id,
+	pubkey interfaces.MarklId,
 ) (remoteHTTP repo.Repo) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 

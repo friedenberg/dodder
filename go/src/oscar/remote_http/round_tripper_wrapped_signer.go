@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
@@ -16,7 +17,7 @@ const (
 )
 
 type RoundTripperBufioWrappedSigner struct {
-	PublicKey markl.Id
+	PublicKey interfaces.MarklId
 	roundTripperBufio
 }
 
@@ -69,7 +70,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		return
 	}
 
-	if roundTripper.PublicKey.IsEmpty() {
+	if roundTripper.PublicKey.IsNull() {
 		// TODO present prompt to user for TOFU
 	} else {
 		if !bytes.Equal(roundTripper.PublicKey.GetBytes(), pubkey.GetBytes()) {

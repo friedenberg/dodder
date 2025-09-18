@@ -7,21 +7,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
 
 type Blob interface {
 	GetRepoBlob() Blob
-	GetPublicKey() markl.Id
+	GetPublicKey() interfaces.MarklId
 	// TODO
 	// GetSupportedConnectionTypes() []connection_type.Type
 }
 
 type BlobMutable interface {
 	Blob
-	SetPublicKey(markl.Id)
+	SetPublicKey(interfaces.MarklId)
 }
 
 type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]

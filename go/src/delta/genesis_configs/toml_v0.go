@@ -19,13 +19,17 @@ type V0Common struct {
 	LockInternalFiles bool
 }
 
+type V0Private struct {
+	V0Common
+}
+
+var _ ConfigPrivate = &V0Private{}
+
 type V0Public struct {
 	V0Common
 }
 
-type V0Private struct {
-	V0Common
-}
+var _ ConfigPublic = &V0Public{}
 
 var _ interfaces.CommandComponentWriter = (*V0Private)(nil)
 
@@ -60,15 +64,15 @@ func (config V0Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
 }
 
-func (config V0Common) GetPrivateKey() markl.Id {
+func (config V0Common) GetPrivateKey() interfaces.MarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *V0Common) GetPrivateKeyMutable() *markl.Id {
+func (config *V0Common) GetPrivateKeyMutable() interfaces.MutableMarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config V0Common) GetPublicKey() markl.Id {
+func (config V0Common) GetPublicKey() interfaces.MarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 

@@ -13,7 +13,7 @@ import (
 type (
 	Config interface {
 		GetStoreVersion() store_version.Version
-		GetPublicKey() markl.Id
+		GetPublicKey() interfaces.MarklId
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
 		// TODO rename to purpose
@@ -29,7 +29,7 @@ type (
 		Config
 		GetGenesisConfigPublic() ConfigPublic
 		GetGenesisConfig() ConfigPrivate
-		GetPrivateKey() markl.Id
+		GetPrivateKey() interfaces.MarklId
 	}
 
 	ConfigPrivateMutable interface {
@@ -41,7 +41,7 @@ type (
 		// TODO separate into non-method function that uses properties
 		interfaces.CommandComponentWriter
 		SetRepoId(ids.RepoId)
-		GetPrivateKeyMutable() *markl.Id
+		GetPrivateKeyMutable() interfaces.MutableMarklId
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

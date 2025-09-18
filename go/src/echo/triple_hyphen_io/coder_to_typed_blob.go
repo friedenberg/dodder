@@ -34,7 +34,7 @@ func (coder CoderToTypedBlob[O]) DecodeFrom(
 	n += n1
 
 	if err != nil {
-		err = errors.Wrapf(err, "blob read failed")
+		err = errors.Wrapf(err, "blob read failed for type: %q", typedBlob.Type)
 		return
 	}
 

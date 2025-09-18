@@ -13,7 +13,7 @@ import (
 )
 
 func Run(util string) {
-	util = extendNameIfNecessary(util)
+	utilWithExtension := extendNameIfNecessary(util)
 	ctx := errors.MakeContextDefault()
 
 	ctx.SetCancelOnSignals(
@@ -27,7 +27,7 @@ func Run(util string) {
 			commands.Run(util, ctx, os.Args...)
 		},
 	); err != nil {
-		os.Exit(handleMainErrors(ctx, util, err))
+		os.Exit(handleMainErrors(ctx, utilWithExtension, err))
 	}
 }
 

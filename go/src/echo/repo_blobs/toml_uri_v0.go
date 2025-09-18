@@ -1,6 +1,7 @@
 package repo_blobs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
@@ -19,12 +20,12 @@ func (b TomlUriV0) GetRepoBlob() Blob {
 	return b
 }
 
-func (config TomlUriV0) GetPublicKey() markl.Id {
+func (config TomlUriV0) GetPublicKey() interfaces.MarklId {
 	return config.PublicKey
 }
 
-func (config *TomlUriV0) SetPublicKey(id markl.Id) {
-	config.PublicKey.ResetWith(id)
+func (config *TomlUriV0) SetPublicKey(id interfaces.MarklId) {
+	config.PublicKey.ResetWithMarklId(id)
 }
 
 func (b TomlUriV0) GetRepoType() {

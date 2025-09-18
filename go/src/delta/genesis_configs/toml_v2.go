@@ -22,10 +22,14 @@ type TomlV2Private struct {
 	TomlV2Common
 }
 
+var _ ConfigPrivate = &TomlV2Private{}
+
 type TomlV2Public struct {
 	PublicKey markl.Id `toml:"public-key"`
 	TomlV2Common
 }
+
+var _ ConfigPublic = &TomlV2Public{}
 
 func (config *TomlV2Common) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
@@ -65,21 +69,24 @@ func (config *TomlV2Private) GetGenesisConfig() ConfigPrivate {
 }
 
 func (config *TomlV2Private) GetGenesisConfigPublic() ConfigPublic {
+	public, err := config.PrivateKey.GetPublicKey(markl.PurposeRepoPrivateKeyV1)
+	errors.PanicIfError(err)
+
 	return &TomlV2Public{
 		TomlV2Common: config.TomlV2Common,
-		PublicKey:    config.GetPublicKey(),
+		PublicKey:    public,
 	}
 }
 
-func (config *TomlV2Private) GetPrivateKey() markl.Id {
+func (config *TomlV2Private) GetPrivateKey() interfaces.MarklId {
 	return config.PrivateKey
 }
 
-func (config *TomlV2Private) GetPrivateKeyMutable() *markl.Id {
+func (config *TomlV2Private) GetPrivateKeyMutable() interfaces.MutableMarklId {
 	return &config.PrivateKey
 }
 
-func (config *TomlV2Private) GetPublicKey() markl.Id {
+func (config *TomlV2Private) GetPublicKey() interfaces.MarklId {
 	public, err := config.PrivateKey.GetPublicKey(markl.PurposeRepoPrivateKeyV1)
 	errors.PanicIfError(err)
 	return public
@@ -89,7 +96,7 @@ func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV2Public) GetPublicKey() markl.Id {
+func (config TomlV2Public) GetPublicKey() interfaces.MarklId {
 	return config.PublicKey
 }
 

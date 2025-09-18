@@ -61,13 +61,17 @@ func (server *Server) writeInventoryList(
 				return
 			}
 
-			if err = logEntry.PublicKey.SetMarklId(
+			var pubkey markl.Id
+
+			if err = pubkey.SetMarklId(
 				markl.FormatIdPubEd25519,
 				bites,
 			); err != nil {
 				response.Error(err)
 				return
 			}
+
+			logEntry.PublicKey = pubkey
 		}
 
 		logEntry.EntryType = log_remote_inventory_lists.EntryTypeReceived

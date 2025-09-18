@@ -3,6 +3,7 @@ package interfaces
 import (
 	"encoding"
 	"hash"
+	"io"
 )
 
 type (
@@ -56,6 +57,11 @@ type (
 		// Optional methods
 		GetIOWrapper() (IOWrapper, error)
 		Verify(mes, sig MarklId) error
+		Sign(
+			mes MarklId,
+			sigDst MutableMarklId,
+			sigPurpose string,
+		) (err error)
 	}
 
 	MutableMarklId interface {
@@ -68,6 +74,13 @@ type (
 		Reset()
 		ResetWithMarklId(MarklId)
 		SetPurpose(string) error
+
+		// Optional methods
+		GeneratePrivateKey(
+			readerRand io.Reader,
+			formatId string,
+			purpose string,
+		) (err error)
 	}
 
 	MarklIdGetter interface {

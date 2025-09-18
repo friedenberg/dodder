@@ -19,14 +19,18 @@ type TomlV1Common struct {
 }
 
 type TomlV1Private struct {
-	PrivateKey markl.Id `toml:"private-key"`
+	PrivateKey markl.IdBroken `toml:"private-key"`
 	TomlV1Common
 }
 
+var _ ConfigPrivate = &TomlV1Private{}
+
 type TomlV1Public struct {
-	PublicKey markl.Id `toml:"public-key"`
+	PublicKey markl.IdBroken `toml:"public-key"`
 	TomlV1Common
 }
+
+var _ ConfigPublic = &TomlV1Public{}
 
 func (config *TomlV1Common) SetFlagDefinitions(
 	flagSet interfaces.CommandLineFlagDefinitions,
@@ -65,22 +69,33 @@ func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
 }
 
 func (config *TomlV1Private) GetGenesisConfigPublic() ConfigPublic {
+	public, err := markl.Id(
+		config.PrivateKey,
+	).GetPublicKey(
+		markl.PurposeRepoPrivateKeyV1,
+	)
+	errors.PanicIfError(err)
+
 	return &TomlV1Public{
 		TomlV1Common: config.TomlV1Common,
-		PublicKey:    config.GetPublicKey(),
+		PublicKey:    markl.IdBroken(public),
 	}
 }
 
-func (config *TomlV1Private) GetPrivateKey() markl.Id {
-	return config.PrivateKey
+func (config *TomlV1Private) GetPrivateKey() interfaces.MarklId {
+	return markl.Id(config.PrivateKey)
 }
 
-func (config *TomlV1Private) GetPrivateKeyMutable() *markl.Id {
-	return &config.PrivateKey
+func (config *TomlV1Private) GetPrivateKeyMutable() interfaces.MutableMarklId {
+	return (*markl.Id)(&config.PrivateKey)
 }
 
-func (config *TomlV1Private) GetPublicKey() markl.Id {
-	public, err := config.PrivateKey.GetPublicKey(markl.PurposeRepoPrivateKeyV1)
+func (config *TomlV1Private) GetPublicKey() interfaces.MarklId {
+	public, err := (markl.Id)(
+		config.PrivateKey,
+	).GetPublicKey(
+		markl.PurposeRepoPrivateKeyV1,
+	)
 	errors.PanicIfError(err)
 	return public
 }
@@ -89,8 +104,8 @@ func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV1Public) GetPublicKey() markl.Id {
-	return config.PublicKey
+func (config TomlV1Public) GetPublicKey() interfaces.MarklId {
+	return (markl.Id)(config.PublicKey)
 }
 
 func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {

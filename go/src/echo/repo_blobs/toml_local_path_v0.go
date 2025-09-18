@@ -1,6 +1,9 @@
 package repo_blobs
 
-import "code.linenisgreat.com/dodder/go/src/charlie/markl"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+)
 
 type TomlLocalPathV0 struct {
 	PublicKey markl.Id `toml:"public-key"`
@@ -16,12 +19,12 @@ func (config TomlLocalPathV0) GetRepoBlob() Blob {
 	return config
 }
 
-func (config TomlLocalPathV0) GetPublicKey() markl.Id {
+func (config TomlLocalPathV0) GetPublicKey() interfaces.MarklId {
 	return config.PublicKey
 }
 
-func (config *TomlLocalPathV0) SetPublicKey(id markl.Id) {
-	config.PublicKey.ResetWith(id)
+func (config *TomlLocalPathV0) SetPublicKey(id interfaces.MarklId) {
+	config.PublicKey.ResetWithMarklId(id)
 }
 
 func (config *TomlLocalPathV0) Reset() {

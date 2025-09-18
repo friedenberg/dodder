@@ -8,9 +8,9 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
@@ -26,7 +26,7 @@ type RoundTripperStdio struct {
 func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 	envRepo env_repo.Env,
 	config store_config.Config,
-	pubkey markl.Id,
+	pubkey interfaces.MarklId,
 ) (err error) {
 	roundTripper.PublicKey = pubkey
 

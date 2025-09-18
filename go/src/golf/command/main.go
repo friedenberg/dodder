@@ -13,24 +13,30 @@ type CommandWithDescription interface {
 	GetDescription() Description
 }
 
-var commands = map[string]map[string]Command{
+var utilsToCommands = map[string]map[string]Command{
 	"dodder": {},
 	"madder": {},
 }
 
 func CommandsFor(util string) map[string]Command {
-	return commands[util]
+	switch util {
+	case "der":
+		util = "dodder"
+	}
+
+	return utilsToCommands[util]
 }
 
+// TODO switch to registering on default command
 func Register(name string, cmd Command) {
 	RegisterFor("dodder", name, cmd)
 	RegisterFor("madder", name, cmd)
 }
 
 func RegisterFor(util string, name string, cmd Command) {
-	if _, ok := commands[util][name]; ok {
+	if _, ok := utilsToCommands[util][name]; ok {
 		panic("command added more than once: " + name)
 	}
 
-	commands[util][name] = cmd
+	utilsToCommands[util][name] = cmd
 }
