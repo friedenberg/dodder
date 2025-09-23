@@ -88,11 +88,11 @@ func (index *Index) addDigest(
 		return err
 	}
 
-	actual := digest.GetMarklFormat().GetMarklFormatId()
+	if digest.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
+		replacementId, repool := index.hashType.GetMarklIdForMarklId(digest)
+		defer repool()
 
-	if actual != index.hashType.GetMarklFormatId() {
-		err = errors.Errorf("unsupported hash type: %q", actual)
-		return
+		digest = replacementId
 	}
 
 	if err = index.pages[pageIndex].AddMarklId(digest, loc); err != nil {
