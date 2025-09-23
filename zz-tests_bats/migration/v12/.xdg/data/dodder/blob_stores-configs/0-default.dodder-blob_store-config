@@ -3,7 +3,7 @@
 ---
 
 hash-buckets = [2]
-base-path = '/tmp/bats-run-iht32D/test/1/.xdg/data/dodder/blob_stores/0'
+base-path = '/tmp/bats-run-TT7Aoh/test/1/.xdg/data/dodder/blob_stores/0'
 hash_type-id = 'blake2b256'
 encryption = ''
 compression-type = 'zstd'
