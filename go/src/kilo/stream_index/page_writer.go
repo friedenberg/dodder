@@ -54,7 +54,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 	// If the cache file does not exist and we have nothing to add, short
 	// circuit the flush. This condition occurs on the initial init when the
-	// konfig is changed but there are no zettels yet.
+	// konfig is changed but there are no objects yet.
 	if !files.Exists(pageWriter.path) &&
 		pageWriter.writtenPage.waitingToAddLen() == 0 {
 		return err
