@@ -28,39 +28,39 @@ func (index *probeIndex) Initialize(
 		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *probeIndex) Flush() (err error) {
 	if err = index.Index.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *probeIndex) readOneMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.Index.ReadOne(blobId); err != nil {
-		return
+		return loc, err
 	}
 
-	return
+	return loc, err
 }
 
 func (index *probeIndex) readManyMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.Index.ReadMany(blobId, &locs); err != nil {
-		return
+		return locs, err
 	}
 
-	return
+	return locs, err
 }
 
 func (index *probeIndex) saveOneObjectLoc(
@@ -70,23 +70,9 @@ func (index *probeIndex) saveOneObjectLoc(
 	for probeId := range object.AllProbeIds() {
 		if err = index.Index.AddDigest(probeId.Id, loc); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
-}
-
-func (index *probeIndex) saveOneLocString(
-	str string,
-	loc object_probe_index.Loc,
-) (err error) {
-	marklId := index.hashType.FromStringContent(str)
-
-	if err = index.Index.AddDigest(marklId, loc); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return err
 }

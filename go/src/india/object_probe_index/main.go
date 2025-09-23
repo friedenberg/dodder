@@ -29,7 +29,7 @@ func MakePermitDuplicates(
 ) (indecks *Index, err error) {
 	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerComplete{}, envRepo, path)
-	return
+	return indecks, err
 }
 
 func MakeNoDuplicates(
@@ -39,7 +39,7 @@ func MakeNoDuplicates(
 ) (indecks *Index, err error) {
 	indecks = &Index{hashType: hashType}
 	err = indecks.initialize(rowEqualerDigestOnly{}, envRepo, dir)
-	return
+	return indecks, err
 }
 
 func (index *Index) initialize(
@@ -60,7 +60,7 @@ func (index *Index) initialize(
 		)
 	}
 
-	return
+	return err
 }
 
 func (index *Index) AddDigest(
@@ -75,7 +75,7 @@ func (index *Index) addDigest(
 	loc Loc,
 ) (err error) {
 	if digest.IsNull() {
-		return
+		return err
 	}
 
 	var pageIndex uint8
@@ -85,7 +85,7 @@ func (index *Index) addDigest(
 		digest,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	actual := digest.GetMarklFormat().GetMarklFormatId()
@@ -97,10 +97,10 @@ func (index *Index) addDigest(
 
 	if err = index.pages[pageIndex].AddMarklId(digest, loc); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *Index) ReadOne(
@@ -110,7 +110,7 @@ func (index *Index) ReadOne(
 
 	if actual != index.hashType.GetMarklFormatId() {
 		err = errors.Errorf("unsupported hash type: %q", actual)
-		return
+		return loc, err
 	}
 
 	var pageIndex uint8
@@ -120,7 +120,7 @@ func (index *Index) ReadOne(
 		digest,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return loc, err
 	}
 
 	return index.pages[pageIndex].ReadOne(digest)
@@ -134,7 +134,7 @@ func (index *Index) ReadMany(
 
 	if actual != index.hashType.GetMarklFormatId() {
 		err = errors.Errorf("unsupported hash type: %q", actual)
-		return
+		return err
 	}
 
 	var pageIndex uint8
@@ -144,7 +144,7 @@ func (index *Index) ReadMany(
 		digest,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return index.pages[pageIndex].ReadMany(digest, locations)
@@ -156,11 +156,11 @@ func (index *Index) PrintAll(env env_ui.Env) (err error) {
 
 		if err = page.PrintAll(env); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (index *Index) Flush() (err error) {

@@ -128,7 +128,7 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 	defer repool()
 
 	// TODO determine via config, and switch to digest.String()
-	key = markl.FormatBytesAsHext(digest)
+	key = markl.FormatBytesAsHex(digest)
 
 	return
 }

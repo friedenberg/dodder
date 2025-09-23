@@ -12,6 +12,8 @@ import (
 func (page *page) seekToFirstBinarySearch(
 	expected interfaces.MarklId,
 ) (mid int64, err error) {
+	errors.PanicIfError(markl.AssertIdIsNotNull(expected))
+
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
 			page.hashType.GetMarklFormatId(),
@@ -21,9 +23,9 @@ func (page *page) seekToFirstBinarySearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + markl.FormatBytesAsHext(expected),
+			"fd nil: " + expected.StringWithFormat(),
 		)
-		return
+		return mid, err
 	}
 
 	var low, hi int64
@@ -32,7 +34,7 @@ func (page *page) seekToFirstBinarySearch(
 
 	if rowCount, err = page.GetRowCount(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return mid, err
 	}
 
 	hi = rowCount
@@ -60,7 +62,7 @@ func (page *page) seekToFirstBinarySearch(
 
 		case 0:
 			// found
-			return
+			return mid, err
 
 		case 1:
 			low = mid + 1
@@ -71,15 +73,17 @@ func (page *page) seekToFirstBinarySearch(
 	}
 
 	err = collections.MakeErrNotFoundString(
-		fmt.Sprintf("%d: %s", loops, markl.FormatBytesAsHext(expected)),
+		fmt.Sprintf("%d: %s", loops, expected.StringWithFormat()),
 	)
 
-	return
+	return mid, err
 }
 
 func (page *page) seekToFirstLinearSearch(
 	expected interfaces.MarklId,
 ) (loc int64, err error) {
+	errors.PanicIfError(markl.AssertIdIsNotNull(expected))
+
 	errors.PanicIfError(
 		markl.MakeErrWrongType(
 			page.hashType.GetMarklFormatId(),
@@ -89,16 +93,16 @@ func (page *page) seekToFirstLinearSearch(
 
 	if page.file == nil {
 		err = collections.MakeErrNotFoundString(
-			"fd nil: " + markl.FormatBytesAsHext(expected),
+			"fd nil: " + expected.StringWithFormat(),
 		)
-		return
+		return loc, err
 	}
 
 	var rowCount int64
 
 	if rowCount, err = page.GetRowCount(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return loc, err
 	}
 
 	page.bufferedReader.Reset(page.file)
@@ -107,11 +111,11 @@ func (page *page) seekToFirstLinearSearch(
 		// var loc int64
 
 		if markl.CompareToReader(&page.bufferedReader, expected) == 0 {
-			return
+			return loc, err
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(markl.FormatBytesAsHext(expected))
+	err = collections.MakeErrNotFoundString(expected.StringWithFormat())
 
-	return
+	return loc, err
 }

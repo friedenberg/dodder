@@ -44,7 +44,7 @@ func (transacted *Transacted) GetExternalState() external_state.State {
 func (transacted *Transacted) CloneTransacted() (cloned *Transacted) {
 	cloned = GetTransactedPool().Get()
 	TransactedResetter.ResetWith(cloned, transacted)
-	return
+	return cloned
 }
 
 func (transacted *Transacted) GetSku() *Transacted {
@@ -54,7 +54,7 @@ func (transacted *Transacted) GetSku() *Transacted {
 func (transacted *Transacted) SetFromTransacted(other *Transacted) (err error) {
 	TransactedResetter.ResetWith(transacted, other)
 
-	return
+	return err
 }
 
 func (transacted *Transacted) Less(other *Transacted) bool {
@@ -70,30 +70,30 @@ func (transacted *Transacted) GetTags() ids.TagSet {
 func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 	if transacted.ObjectId.GetGenre() == genres.Tag &&
 		strings.HasPrefix(transacted.ObjectId.String(), tag.String()) {
-		return
+		return err
 	}
 
 	tagKey := transacted.Metadata.Cache.GetImplicitTags().KeyPtr(tag)
 
 	if transacted.Metadata.Cache.GetImplicitTags().ContainsKey(tagKey) {
-		return
+		return err
 	}
 
 	if err = transacted.GetMetadata().AddTagPtr(tag); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) AddTagPtrFast(tag *ids.Tag) (err error) {
 	if err = transacted.GetMetadata().AddTagPtrFast(tag); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) GetType() ids.Type {
@@ -121,10 +121,10 @@ func (transacted *Transacted) SetObjectIdLike(
 ) (err error) {
 	if err = transacted.ObjectId.SetWithIdLike(objectIdLike); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) EqualsAny(other any) (ok bool) {
@@ -133,7 +133,7 @@ func (transacted *Transacted) EqualsAny(other any) (ok bool) {
 
 func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	if transacted.GetObjectId().String() != other.GetObjectId().String() {
-		return
+		return ok
 	}
 
 	// TODO-P2 determine why object shas in import test differed
@@ -142,7 +142,7 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	// }
 
 	if !transacted.Metadata.Equals(&other.Metadata) {
-		return
+		return ok
 	}
 
 	return true
@@ -176,10 +176,10 @@ func (transacted *Transacted) SetBlobDigest(
 		merkleId.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) GetKey() string {

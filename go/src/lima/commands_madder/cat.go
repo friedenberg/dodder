@@ -139,7 +139,7 @@ func (cmd Cat) copy(
 	if cmd.PrefixSha {
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			markl.FormatBytesAsHext(readCloser.BlobId),
+			markl.FormatBytesAsHex(readCloser.BlobId),
 			envRepo.GetUI(),
 			readCloser.ReadCloser,
 			true,

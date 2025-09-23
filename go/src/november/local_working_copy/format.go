@@ -103,14 +103,14 @@ func (formatFlag *FormatFlag) Set(value string) (err error) {
 			Expected: slices.Sorted(maps.Keys(formatters)),
 		}
 
-		return
+		return err
 	}
 
 	formatFlag.wasSet = true
 	entry.Name = value
 	formatFlag.formatter = entry
 
-	return
+	return err
 }
 
 func (formatFlag *FormatFlag) MakeFormatFunc(
@@ -162,10 +162,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					&object.Metadata.Cache.TagPaths,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -181,10 +181,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					&object.Metadata.Cache.TagPaths,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -200,10 +200,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.Cache.QueryPath,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -217,15 +217,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = p.EncodeStringTo(object, writer); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if _, err = fmt.Fprintln(writer); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -242,10 +242,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if err = p(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -260,10 +260,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.GetRepoPubKey().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -278,10 +278,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.GetObjectDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -298,10 +298,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.GetMotherObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -314,18 +314,18 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				for _, es := range object.Metadata.Cache.TagPaths.Paths {
 					if _, err = fmt.Fprintf(writer, "%s: %s\n", object.GetObjectId(), es); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
 				for _, es := range object.Metadata.Cache.TagPaths.All {
 					if _, err = fmt.Fprintf(writer, "%s: %s -> %s\n", object.GetObjectId(), es.Tag, es.Parents); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -342,10 +342,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					quiter.StringCommaSeparated(esImp),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -362,10 +362,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					quiter.StringCommaSeparated(esImp),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -382,10 +382,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -398,11 +398,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				for e := range object.Metadata.GetTags().AllPtr() {
 					if _, err = fmt.Fprintln(writer, e); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -414,10 +414,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(writer, object.GetMetadata().Description); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -437,7 +437,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 			return func(object *sku.Transacted) (err error) {
 				_, err = formatter.EncodeStringTo(object, writer)
-				return
+				return err
 			}
 		},
 	},
@@ -457,7 +457,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 			return func(object *sku.Transacted) (err error) {
 				_, err = formatter.EncodeStringTo(object, writer)
-				return
+				return err
 			}
 		},
 	},
@@ -474,10 +474,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.Cache.ParentTai,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -494,10 +494,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetObjectDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -512,7 +512,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				digest := object.GetBlobDigest()
 
 				if digest.IsNull() {
-					return
+					return err
 				}
 
 				if _, err = fmt.Fprintf(
@@ -522,10 +522,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					digest.StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -540,10 +540,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					&object.ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -558,10 +558,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					&object.ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -572,7 +572,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(writer, object.StringObjectIdTai())
-				return
+				return err
 			}
 		},
 	},
@@ -586,7 +586,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					sku_fmt.StringMetadataSansTai(object),
 				)
-				return
+				return err
 			}
 		},
 	},
@@ -601,7 +601,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					"%s",
 					object.GetObjectId().GetGenre(),
 				)
-				return
+				return err
 			}
 		},
 	},
@@ -612,7 +612,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintf(writer, "%#v\n", object)
-				return
+				return err
 			}
 		},
 	},
@@ -639,15 +639,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					repo.GetStore().GetEnvRepo().GetDefaultBlobStore(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = enc.Encode(jsonRep); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -671,7 +671,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					repo.GetStore().GetEnvRepo().GetDefaultBlobStore(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = toml.Unmarshal([]byte(
@@ -682,18 +682,18 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 					if err = enc.Encode(jsonRep.Transacted); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 
-					return
+					return err
 				}
 
 				if err = enc.Encode(jsonRep); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -734,15 +734,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					tabs,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = enc.Encode(objectJSON); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -753,7 +753,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				fmt.Fprintln(writer, object.GetTai())
-				return
+				return err
 			}
 		},
 	},
@@ -769,17 +769,17 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer errors.DeferredCloser(&err, readCloser)
 
 				if _, err = io.Copy(writer, readCloser); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -795,7 +795,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 				if _, err = cliFmt.EncodeStringTo(object, sb); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if repo.GetConfig().IsInlineType(object.GetType()) {
@@ -805,7 +805,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 						object.GetBlobDigest(),
 					); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 
 					defer errors.DeferredCloser(&err, readCloser)
@@ -818,16 +818,16 @@ var formatters = map[string]FormatFuncConstructorEntry{
 						true,
 					); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				} else {
 					if _, err = io.WriteString(writer, sb.String()); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -845,7 +845,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer errors.DeferredCloser(&err, readCloser)
@@ -854,7 +854,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 				if _, err = cliFmt.EncodeStringTo(object, sb); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if _, err = delim_io.CopyWithPrefixOnDelim(
@@ -865,10 +865,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					true,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -880,7 +880,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			// TODO
 			return func(object *sku.Transacted) (err error) {
 				_, err = fmt.Fprintln(writer, &object.Metadata)
-				return
+				return err
 			}
 		},
 	},
@@ -895,7 +895,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					"%x\n",
 					object.Metadata.GetObjectSig().GetBytes(),
 				)
-				return
+				return err
 			}
 		},
 	},
@@ -910,7 +910,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					"%x\n",
 					object.Metadata.GetMotherObjectSig().GetBytes(),
 				)
-				return
+				return err
 			}
 		},
 	},
@@ -925,10 +925,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.GetMotherObjectSig(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -948,11 +948,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 						probeId.Id.StringWithFormat(),
 					); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -961,11 +961,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			p := repo.PrinterTransacted()
+			printer := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
 				if object.Metadata.GetMotherObjectSig().IsNull() {
-					return
+					return err
 				}
 
 				if object, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
@@ -974,10 +974,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				); err != nil {
 					fmt.Fprintln(writer, err)
 					err = nil
-					return
+					return err
 				}
 
-				return p(object)
+				return printer(object)
 			}
 		},
 	},
@@ -991,10 +991,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if err = funcPrint(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1008,10 +1008,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if err = funcPrint(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1026,9 +1026,9 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.Metadata.GetObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
-				return
+				return err
 			}
 		},
 	},
@@ -1043,10 +1043,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetBlobDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1058,10 +1058,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(writer, object.GetType().String()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1078,10 +1078,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetTai().Format(time.RFC3339Nano),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1101,15 +1101,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					indexObject,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = p(indexObject); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1129,7 +1129,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer errors.Deferred(&err, readCloser.Close)
@@ -1139,7 +1139,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if err = d.Decode(&a); err != nil {
 					ui.Err().Printf("%s: %s", object, err)
 					err = nil
-					return
+					return err
 				}
 
 				a["description"] = object.Metadata.Description.String()
@@ -1147,10 +1147,10 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 				if err = e.Encode(&a); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1169,7 +1169,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer errors.DeferredCloser(&err, readCloser)
@@ -1179,7 +1179,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if err = d.Decode(&a); err != nil {
 					ui.Err().Printf("%s: %s", object, err)
 					err = nil
-					return
+					return err
 				}
 
 				a["description"] = object.Metadata.Description.String()
@@ -1189,15 +1189,15 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 				if err = e.Encode(&a); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if _, err = writer.Write([]byte("\x00")); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -1211,7 +1211,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					sku.StringMetadataTaiMerkle(object),
 				)
-				return
+				return err
 			}
 		},
 	},
@@ -1225,7 +1225,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					sku.StringTaiGenreObjectIdObjectDigestBlobDigest(object),
 				)
-				return
+				return err
 			}
 		},
 	},

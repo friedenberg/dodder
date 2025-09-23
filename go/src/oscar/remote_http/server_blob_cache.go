@@ -27,17 +27,17 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 		for sh, errIter := range serverBlobCache.localBlobStore.AllBlobs() {
 			if errIter != nil {
 				err = errors.Wrap(errIter)
-				return
+				return err
 			}
 
-			serverBlobCache.shas.Add(markl.FormatBytesAsHext(sh))
+			serverBlobCache.shas.Add(markl.FormatBytesAsHex(sh))
 			count++
 		}
 
 		ui.Log().Printf("have blobs: %d", count)
 	}
 
-	return
+	return err
 }
 
 func (serverBlobCache *serverBlobCache) HasBlob(
@@ -52,15 +52,15 @@ func (serverBlobCache *serverBlobCache) HasBlob(
 	)
 
 	if err != nil {
-		return
+		return ok, err
 	}
 
 	if serverBlobCache.shas.ContainsExpansion(
-		markl.FormatBytesAsHext(blobSha),
+		markl.FormatBytesAsHex(blobSha),
 	) {
 		ok = true
-		return
+		return ok, err
 	}
 
-	return
+	return ok, err
 }

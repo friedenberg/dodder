@@ -274,7 +274,7 @@ func Clone(src interfaces.MarklId) interfaces.MarklId {
 
 // Creates a human-readable string representation of a digest.
 // TODO add type information
-func FormatBytesAsHext(merkleId interfaces.MarklId) string {
+func FormatBytesAsHex(merkleId interfaces.MarklId) string {
 	return fmt.Sprintf("%x", merkleId.GetBytes())
 }
 
@@ -282,7 +282,7 @@ func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	if merkleId.IsNull() {
 		return ""
 	} else {
-		return FormatBytesAsHext(merkleId)
+		return FormatBytesAsHex(merkleId)
 	}
 }
 

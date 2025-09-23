@@ -130,7 +130,7 @@ func (mover *localFileMover) Close() (err error) {
 	if mover.blobPath == "" {
 		// TODO-P3 move this validation to options
 		if mover.blobPath, err = MakeDirIfNecessary(
-			markl.FormatBytesAsHext(digest),
+			markl.FormatBytesAsHex(digest),
 			mover.funcJoin,
 			mover.basePath,
 		); err != nil {

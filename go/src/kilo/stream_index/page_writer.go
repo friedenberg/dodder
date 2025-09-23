@@ -30,8 +30,6 @@ type pageWriter struct {
 
 	file *os.File
 
-	bufferedReader bufio.Reader
-
 	changesAreHistorical bool
 
 	probeIndex *probeIndex
@@ -99,8 +97,6 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(pageWriter.file)
 		defer repoolBufferedWriter()
-
-		pageWriter.bufferedReader.Reset(pageWriter.file)
 
 		return pageWriter.flushBoth(bufferedWriter)
 	}
