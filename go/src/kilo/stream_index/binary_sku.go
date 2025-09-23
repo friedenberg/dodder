@@ -6,12 +6,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type skuWithSigil struct {
+type objectWithSigil struct {
 	*sku.Transacted
 	ids.Sigil
 }
 
-type skuWithRangeAndSigil struct {
-	skuWithSigil
+type objectWithCursorAndSigil struct {
+	objectWithSigil
 	object_probe_index.Cursor
 }

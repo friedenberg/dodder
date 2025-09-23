@@ -50,7 +50,7 @@ func (encoder *binaryEncoder) updateSigil(
 
 func (encoder *binaryEncoder) writeFormat(
 	writer io.Writer,
-	object skuWithSigil,
+	object objectWithSigil,
 ) (n int64, err error) {
 	encoder.Buffer.Reset()
 
@@ -96,7 +96,7 @@ func (encoder *binaryEncoder) writeFormat(
 }
 
 func (encoder *binaryEncoder) writeFieldKey(
-	object skuWithSigil,
+	object objectWithSigil,
 ) (n int64, err error) {
 	switch encoder.Binary {
 	case key_bytes.Sigil:

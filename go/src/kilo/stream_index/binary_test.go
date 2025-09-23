@@ -75,13 +75,13 @@ func TestBinaryOne(t1 *testing.T) {
 
 		expectedN, err = coder.writeFormat(
 			buffer,
-			skuWithSigil{Transacted: expected},
+			objectWithSigil{Transacted: expected},
 		)
 		t.AssertNoError(err)
 	}
 
-	actual := skuWithRangeAndSigil{
-		skuWithSigil: skuWithSigil{
+	actual := objectWithCursorAndSigil{
+		objectWithSigil: objectWithSigil{
 			Transacted: &sku.Transacted{},
 		},
 	}

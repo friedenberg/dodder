@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type ObjectIdToObject map[string]skuWithRangeAndSigil
+type ObjectIdToObject map[string]objectWithCursorAndSigil
 
 type pageWriter struct {
 	envRepo     env_repo.Env
@@ -38,7 +38,7 @@ type pageWriter struct {
 
 	cursor object_probe_index.Cursor
 
-	ObjectIdToObjectMap ObjectIdToObject
+	latestObjects ObjectIdToObject
 }
 
 func (pageWriter *pageWriter) Flush() (err error) {
@@ -50,14 +50,13 @@ func (pageWriter *pageWriter) Flush() (err error) {
 	defer pageWriter.writtenPage.added.Reset()
 	defer pageWriter.writtenPage.addedLatest.Reset()
 
-	pageWriter.ObjectIdToObjectMap = make(ObjectIdToObject)
-
-	path := pageWriter.writtenPage.Path()
+	pageWriter.latestObjects = make(ObjectIdToObject)
 
 	// If the cache file does not exist and we have nothing to add, short
 	// circuit the flush. This condition occurs on the initial init when the
 	// konfig is changed but there are no zettels yet.
-	if !files.Exists(path) && pageWriter.writtenPage.waitingToAddLen() == 0 {
+	if !files.Exists(pageWriter.path) &&
+		pageWriter.writtenPage.waitingToAddLen() == 0 {
 		return err
 	}
 
@@ -67,7 +66,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 	if pageWriter.writtenPage.added.Len() == 0 &&
 		!pageWriter.changesAreHistorical {
-		if pageWriter.file, err = files.OpenReadWrite(path); err != nil {
+		if pageWriter.file, err = files.OpenReadWrite(pageWriter.path); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -88,7 +87,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 			&err,
 			pageWriter.file,
 			pageWriter.file.Name(),
-			path,
+			pageWriter.path,
 		)
 
 		pageWriter.bufferedReader.Reset(pageWriter.file)
@@ -132,7 +131,7 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 		return err
 	}
 
-	for _, object := range pageWriter.ObjectIdToObjectMap {
+	for _, object := range pageWriter.latestObjects {
 		if err = pageWriter.updateSigilWithLatest(object); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -143,7 +142,7 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 }
 
 func (pageWriter *pageWriter) updateSigilWithLatest(
-	object skuWithRangeAndSigil,
+	object objectWithCursorAndSigil,
 ) (err error) {
 	object.Add(ids.SigilLatest)
 
@@ -165,7 +164,7 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 	if err = pageWriter.writtenPage.copyJustHistoryFrom(
 		&pageWriter.bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
-		func(sk skuWithRangeAndSigil) (err error) {
+		func(sk objectWithCursorAndSigil) (err error) {
 			pageWriter.cursor = sk.Cursor
 			pageWriter.saveToLatestMap(sk.Transacted, sk.Sigil)
 			return err
@@ -199,8 +198,8 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 		return err
 	}
 
-	for _, st := range pageWriter.ObjectIdToObjectMap {
-		if err = pageWriter.updateSigilWithLatest(st); err != nil {
+	for _, object := range pageWriter.latestObjects {
+		if err = pageWriter.updateSigilWithLatest(object); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -224,7 +223,7 @@ func (pageWriter *pageWriter) writeOne(
 	// }()
 	pageWriter.cursor.Offset += pageWriter.cursor.ContentLength
 
-	previous := pageWriter.ObjectIdToObjectMap[object.GetObjectId().String()]
+	previous := pageWriter.latestObjects[object.GetObjectId().String()]
 
 	if previous.Transacted != nil {
 		object.Metadata.Cache.ParentTai = previous.GetTai()
@@ -232,7 +231,7 @@ func (pageWriter *pageWriter) writeOne(
 
 	if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
 		&pageWriter.bufferedWriter,
-		skuWithSigil{Transacted: object},
+		objectWithSigil{Transacted: object},
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -264,7 +263,7 @@ func (pageWriter *pageWriter) saveToLatestMap(
 	objectId := object.GetObjectId()
 	objectIdString := objectId.String()
 
-	record := pageWriter.ObjectIdToObjectMap[objectIdString]
+	record := pageWriter.latestObjects[objectIdString]
 	record.Cursor = pageWriter.cursor
 
 	if record.Transacted == nil {
@@ -281,7 +280,7 @@ func (pageWriter *pageWriter) saveToLatestMap(
 		record.Del(ids.SigilHidden)
 	}
 
-	pageWriter.ObjectIdToObjectMap[objectIdString] = record
+	pageWriter.latestObjects[objectIdString] = record
 
 	return err
 }
@@ -290,7 +289,7 @@ func (pageWriter *pageWriter) removeOldLatest(
 	objectLatest *sku.Transacted,
 ) (err error) {
 	objectIdString := objectLatest.ObjectId.String()
-	objectOld, ok := pageWriter.ObjectIdToObjectMap[objectIdString]
+	objectOld, ok := pageWriter.latestObjects[objectIdString]
 
 	if !ok {
 		return err

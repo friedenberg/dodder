@@ -68,8 +68,8 @@ func (page *writtenPage) readOneRange(
 
 	dec := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
 
-	skWR := skuWithRangeAndSigil{
-		skuWithSigil: skuWithSigil{
+	skWR := objectWithCursorAndSigil{
+		objectWithSigil: objectWithSigil{
 			Transacted: object,
 		},
 		Cursor: raynge,
@@ -116,11 +116,11 @@ func (page *writtenPage) waitingToAddLen() int {
 func (page *writtenPage) copyJustHistoryFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
-	output interfaces.FuncIter[skuWithRangeAndSigil],
+	output interfaces.FuncIter[objectWithCursorAndSigil],
 ) (err error) {
 	dec := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
-	var sk skuWithRangeAndSigil
+	var sk objectWithCursorAndSigil
 
 	for {
 		sk.Offset += sk.ContentLength
@@ -177,7 +177,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 		if err = page.copyJustHistoryFrom(
 			bufferedReader,
 			query,
-			func(object skuWithRangeAndSigil) (err error) {
+			func(object objectWithCursorAndSigil) (err error) {
 				if err = output(object.Transacted); err != nil {
 					err = errors.Wrapf(err, "%s", object.Transacted)
 					return err
@@ -198,7 +198,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 	ui.TodoP3("determine performance of this")
 	added := page.added.Copy()
 
-	var object skuWithRangeAndSigil
+	var object objectWithCursorAndSigil
 
 	if err = heap.MergeStream(
 		&added,
