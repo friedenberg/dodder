@@ -40,7 +40,7 @@ func (local *Repo) ImportSeq(
 	for object, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return err
 		}
 
 		var hasOneConflict bool
@@ -71,7 +71,7 @@ func (local *Repo) ImportSeq(
 		for missing := range missingBlobs.All() {
 			if err = checkedOutPrinter(missing); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -86,7 +86,7 @@ func (local *Repo) ImportSeq(
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
-	return
+	return err
 }
 
 func (repo *Repo) importOne(
@@ -103,18 +103,18 @@ func (repo *Repo) importOne(
 			hasConflicts = true
 		}
 
-		return
+		return hasConflicts, err
 	}
 
 	if errors.Is(err, remote_transfer.ErrSkipped) {
 		err = nil
-		return
+		return hasConflicts, err
 	} else if errors.Is(err, collections.ErrExists) {
 		err = nil
-		return
+		return hasConflicts, err
 	} else if genres.IsErrUnsupportedGenre(err) {
 		err = nil
-		return
+		return hasConflicts, err
 	} else if env_dir.IsErrBlobMissing(err) {
 		checkedOut := sku.GetCheckedOutPool().Get()
 		sku.TransactedResetter.ResetWith(
@@ -125,8 +125,8 @@ func (repo *Repo) importOne(
 
 		missingBlobs.Add(checkedOut)
 
-		return
+		return hasConflicts, err
 	}
 
-	return
+	return hasConflicts, err
 }

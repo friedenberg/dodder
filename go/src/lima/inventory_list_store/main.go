@@ -100,7 +100,7 @@ func (store *Store) Initialize(
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {
@@ -146,10 +146,10 @@ func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return openList, err
 	}
 
-	return
+	return openList, err
 }
 
 func (store *Store) AddObjectToOpenList(
@@ -160,7 +160,7 @@ func (store *Store) AddObjectToOpenList(
 		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = inventory_list_coders.WriteObjectToOpenList(
@@ -175,10 +175,10 @@ func (store *Store) AddObjectToOpenList(
 			store.getType(),
 		)
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) Create(
@@ -186,7 +186,7 @@ func (store *Store) Create(
 ) (object *sku.Transacted, err error) {
 	if openList.Len == 0 {
 		err = errors.Wrap(ErrEmptyInventoryList)
-		return
+		return object, err
 	}
 
 	if !store.lockSmith.IsAcquired() {
@@ -194,7 +194,7 @@ func (store *Store) Create(
 			Operation: "create inventory list",
 		}
 
-		return
+		return object, err
 	}
 
 	object = sku.GetTransactedPool().Get()
@@ -206,14 +206,14 @@ func (store *Store) Create(
 
 	if err = object.ObjectId.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	object.SetTai(tai)
 
 	if err = openList.Mover.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	actual := openList.Mover.GetMarklId()
@@ -233,7 +233,7 @@ func (store *Store) Create(
 	} else {
 		if err = markl.AssertEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
-			return
+			return object, err
 		}
 	}
 
@@ -247,10 +247,10 @@ func (store *Store) Create(
 
 	if err = store.WriteInventoryListObject(object); err != nil {
 		err = errors.Wrapf(err, "OpenList: %d", openList.Len)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 func (store *Store) WriteInventoryListBlob(
@@ -265,10 +265,10 @@ func (store *Store) WriteInventoryListBlob(
 				sku.String(object),
 			)
 
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	var writeCloser interfaces.BlobWriter
@@ -277,7 +277,7 @@ func (store *Store) WriteInventoryListBlob(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, writeCloser)
@@ -292,12 +292,12 @@ func (store *Store) WriteInventoryListBlob(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	actual := writeCloser.GetMarklId()
@@ -310,7 +310,7 @@ func (store *Store) WriteInventoryListBlob(
 	} else {
 		if err = markl.AssertEqual(expected, actual); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -332,7 +332,7 @@ func (store *Store) WriteInventoryListBlob(
 	// 	return
 	// }
 
-	return
+	return err
 }
 
 func (store *Store) AllInventoryListContents(
@@ -373,6 +373,8 @@ func (store *Store) AllInventoryListObjectsAndContents() interfaces.SeqError[sku
 				if !yield(objectWithList, iterErr) {
 					return
 				}
+
+				continue
 			}
 
 			if !yield(objectWithList, nil) {

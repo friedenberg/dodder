@@ -69,16 +69,9 @@ func (config *TomlV1Private) GetGenesisConfig() ConfigPrivate {
 }
 
 func (config *TomlV1Private) GetGenesisConfigPublic() ConfigPublic {
-	public, err := markl.Id(
-		config.PrivateKey,
-	).GetPublicKey(
-		markl.PurposeRepoPrivateKeyV1,
-	)
-	errors.PanicIfError(err)
-
 	return &TomlV1Public{
 		TomlV1Common: config.TomlV1Common,
-		PublicKey:    markl.IdBroken(public),
+		PublicKey:    markl.IdBroken(markl.Id{}),
 	}
 }
 
@@ -91,13 +84,7 @@ func (config *TomlV1Private) GetPrivateKeyMutable() interfaces.MutableMarklId {
 }
 
 func (config *TomlV1Private) GetPublicKey() interfaces.MarklId {
-	public, err := (markl.Id)(
-		config.PrivateKey,
-	).GetPublicKey(
-		markl.PurposeRepoPrivateKeyV1,
-	)
-	errors.PanicIfError(err)
-	return public
+	return markl.Id{}
 }
 
 func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {

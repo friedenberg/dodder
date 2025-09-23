@@ -18,9 +18,9 @@ import (
 type localHashBucketed struct {
 	config blob_store_configs.ConfigLocalHashBucketed
 
-	multiHash       bool
-	defaultHashType markl.FormatHash
-	buckets         []int
+	multiHash         bool
+	defaultHashFormat markl.FormatHash
+	buckets           []int
 
 	basePath string
 	tempFS   env_dir.TemporaryFS
@@ -35,11 +35,11 @@ func makeLocalHashBucketed(
 	tempFS env_dir.TemporaryFS,
 ) (store localHashBucketed, err error) {
 	// TODO read default hash type from config
-	if store.defaultHashType, err = markl.GetFormatHashOrError(
+	if store.defaultHashFormat, err = markl.GetFormatHashOrError(
 		config.GetDefaultHashTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return store, err
 	}
 
 	store.multiHash = config.SupportsMultiHash()
@@ -48,7 +48,7 @@ func makeLocalHashBucketed(
 	store.basePath = basePath
 	store.tempFS = tempFS
 
-	return
+	return store, err
 }
 
 func (blobStore localHashBucketed) GetBlobStoreConfig() blob_store_configs.Config {
@@ -64,12 +64,18 @@ func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
 }
 
 func (blobStore localHashBucketed) GetDefaultHashType() interfaces.FormatHash {
-	return blobStore.defaultHashType
+	return blobStore.defaultHashFormat
 }
 
-func (blobStore localHashBucketed) makeEnvDirConfig() env_dir.Config {
+func (blobStore localHashBucketed) makeEnvDirConfig(
+	hashFormat interfaces.FormatHash,
+) env_dir.Config {
+	if hashFormat == nil {
+		hashFormat = blobStore.defaultHashFormat
+	}
+
 	return env_dir.MakeConfig(
-		blobStore.defaultHashType,
+		hashFormat,
 		env_dir.MakeHashBucketPathJoinFunc(blobStore.buckets),
 		blobStore.config.GetBlobCompression(),
 		blobStore.config.GetBlobEncryption(),
@@ -81,7 +87,7 @@ func (blobStore localHashBucketed) HasBlob(
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
-		return
+		return ok
 	}
 
 	path := env_dir.MakeHashBucketPathFromMerkleId(
@@ -93,14 +99,14 @@ func (blobStore localHashBucketed) HasBlob(
 
 	ok = files.Exists(path)
 
-	return
+	return ok
 }
 
 func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
 	if blobStore.multiHash {
 		return localAllBlobsMultihash(blobStore.basePath)
 	} else {
-		return localAllBlobs(blobStore.basePath, blobStore.defaultHashType)
+		return localAllBlobs(blobStore.basePath, blobStore.defaultHashFormat)
 	}
 }
 
@@ -109,10 +115,10 @@ func (blobStore localHashBucketed) MakeBlobReader(
 ) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
-			blobStore.defaultHashType.Get(),
+			blobStore.defaultHashFormat.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
-		return
+		return readCloser, err
 	}
 
 	if readCloser, err = blobStore.blobReaderFrom(
@@ -123,10 +129,10 @@ func (blobStore localHashBucketed) MakeBlobReader(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return readCloser, err
 	}
 
-	return
+	return readCloser, err
 }
 
 func (blobStore localHashBucketed) MakeBlobWriter(
@@ -137,22 +143,29 @@ func (blobStore localHashBucketed) MakeBlobWriter(
 		marklHashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobWriter, err
 	}
 
-	return
+	return blobWriter, err
 }
 
 func (blobStore localHashBucketed) blobWriterTo(
 	path string,
-	marklHashType interfaces.FormatHash,
+	hashFormat interfaces.FormatHash,
 ) (mover interfaces.BlobWriter, err error) {
+	if hashFormat == nil {
+		hashFormat = blobStore.defaultHashFormat
+	}
+
 	if blobStore.multiHash {
-		path = filepath.Join(path, blobStore.defaultHashType.GetMarklFormatId())
+		path = filepath.Join(
+			path,
+			hashFormat.GetMarklFormatId(),
+		)
 	}
 
 	if mover, err = env_dir.NewMover(
-		blobStore.makeEnvDirConfig(),
+		blobStore.makeEnvDirConfig(hashFormat),
 		env_dir.MoveOptions{
 			FinalPathOrDir:              path,
 			GenerateFinalPathFromDigest: true,
@@ -160,10 +173,10 @@ func (blobStore localHashBucketed) blobWriterTo(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return mover, err
 	}
 
-	return
+	return mover, err
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
@@ -172,22 +185,22 @@ func (blobStore localHashBucketed) blobReaderFrom(
 ) (readCloser interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
-			blobStore.defaultHashType.Get(),
+			blobStore.defaultHashFormat.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
-		return
+		return readCloser, err
 	}
 
 	marklType := digest.GetMarklFormat()
 
 	if marklType == nil {
 		err = errors.Errorf("empty markl type")
-		return
+		return readCloser, err
 	}
 
 	if marklType.GetMarklFormatId() == "" {
 		err = errors.Errorf("empty markl type id")
-		return
+		return readCloser, err
 	}
 
 	basePath = env_dir.MakeHashBucketPathFromMerkleId(
@@ -198,7 +211,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	)
 
 	if readCloser, err = env_dir.NewFileReader(
-		blobStore.makeEnvDirConfig(),
+		blobStore.makeEnvDirConfig(nil),
 		basePath,
 	); err != nil {
 		if errors.IsNotExist(err) {
@@ -215,8 +228,8 @@ func (blobStore localHashBucketed) blobReaderFrom(
 			)
 		}
 
-		return
+		return readCloser, err
 	}
 
-	return
+	return readCloser, err
 }

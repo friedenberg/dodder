@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
@@ -27,7 +28,7 @@ func SetHexStringFromAbsolutePath(
 
 	if absOrRelPath, err = filepath.Rel(base, absOrRelPath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = SetHexStringFromRelPath(
@@ -41,10 +42,10 @@ func SetHexStringFromAbsolutePath(
 			base,
 		)
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func SetHexStringFromRelPath(
@@ -55,7 +56,7 @@ func SetHexStringFromRelPath(
 		err = errors.Err405MethodNotAllowed.Errorf(
 			"absolute paths not supported",
 		)
-		return
+		return err
 	}
 
 	if err = SetHexBytes(
@@ -69,10 +70,10 @@ func SetHexStringFromRelPath(
 			relPath,
 		)
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func ReadFrom(
@@ -85,10 +86,10 @@ func ReadFrom(
 
 	if n, err = io.ReadFull(reader, id.data); err != nil {
 		errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func CompareToReader(
@@ -139,7 +140,7 @@ func SetHexBytes(
 				formatId,
 				bites,
 			)
-			return
+			return err
 		}
 
 		id.allocDataAndSetToCapIfNecessary(hex.DecodedLen(len(bites)))
@@ -156,7 +157,7 @@ func SetHexBytes(
 				numberOfBytesDecoded,
 				bites,
 			)
-			return
+			return err
 		}
 	} else {
 		var numberOfBytesDecoded int
@@ -164,16 +165,16 @@ func SetHexBytes(
 
 		if numberOfBytesDecoded, err = hex.Decode(bytesDecoded, bites); err != nil {
 			err = errors.Wrapf(err, "N: %d, Data: %q", numberOfBytesDecoded, bites)
-			return
+			return err
 		}
 
 		if err = dst.SetMarklId(formatId, bytesDecoded[:numberOfBytesDecoded]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func SetDigester(
@@ -198,35 +199,62 @@ func EqualsReader(
 
 	if actualBytes, err = bufferedReader.Peek(bytesRead); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return ok, err
 	}
 
 	ok = bytes.Equal(expectedBlobId.GetBytes(), actualBytes)
 
 	if _, err = bufferedReader.Discard(bytesRead); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return ok, err
 	}
 
-	return
+	return ok, err
 }
 
-func Equals(a, b interfaces.MarklId) bool {
-	if a.IsNull() && b.IsNull() {
+func IsNull(id interfaces.MarklId) (ok bool) {
+	if id == nil {
 		return true
 	}
 
-	var aType, bType string
+	defer func() {
+		if r := recover(); r == nil {
+			return
+		}
+
+		ui.Debug().Printf("checking null for id resulted in panic: %q", id)
+		ok = true
+	}()
+
+	ok = id.IsNull()
+
+	return ok
+}
+
+func Equals(a, b interfaces.MarklId) (ok bool) {
+	aIsNull := IsNull(a)
+	bIsNull := IsNull(b)
+
+	switch {
+	case aIsNull && bIsNull:
+		return true
+
+	case aIsNull || bIsNull:
+		return false
+	}
+
+	var aFormatId, bFormatId string
 
 	if a.GetMarklFormat() != nil {
-		aType = a.GetMarklFormat().GetMarklFormatId()
+		aFormatId = a.GetMarklFormat().GetMarklFormatId()
 	}
 
 	if b.GetMarklFormat() != nil {
-		bType = b.GetMarklFormat().GetMarklFormatId()
+		bFormatId = b.GetMarklFormat().GetMarklFormatId()
 	}
 
-	return aType == bType && bytes.Equal(a.GetBytes(), b.GetBytes())
+	ok = aFormatId == bFormatId && bytes.Equal(a.GetBytes(), b.GetBytes())
+	return ok
 }
 
 func Clone(src interfaces.MarklId) interfaces.MarklId {
@@ -263,7 +291,7 @@ func SetFromPath(id interfaces.MutableMarklId, path string) (err error) {
 
 	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -283,7 +311,7 @@ func SetFromPath(id interfaces.MutableMarklId, path string) (err error) {
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if len(line) > 0 {
@@ -319,8 +347,8 @@ func SetFromPath(id interfaces.MutableMarklId, path string) (err error) {
 
 	if err = id.Set(key); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

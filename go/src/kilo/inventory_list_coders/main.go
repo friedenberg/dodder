@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -36,12 +37,22 @@ var coderConstructors = map[string]funcListFormatConstructor{
 					configGenesis.GetPublicKey(),
 				)
 
-				if err = object.FinalizeUsingObject(); err != nil {
-					err = errors.Wrap(err)
-					return
+				if store_version.LessOrEqual(
+					envRepo.GetStoreVersion(),
+					store_version.V8,
+				) {
+					if err = object.FinalizeWithoutPubKey(); err != nil {
+						err = errors.Wrap(err)
+						return err
+					}
+				} else {
+					if err = object.FinalizeUsingObject(); err != nil {
+						err = errors.Wrap(err)
+						return err
+					}
 				}
 
-				return
+				return err
 			},
 		}
 	},
@@ -58,10 +69,10 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			beforeEncoding: func(object *sku.Transacted) (err error) {
 				if err = (*sku.Transacted).AssertObjectDigestAndObjectSigNotNull(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			},
 			afterDecoding: (*sku.Transacted).FinalizeAndVerify,
 		}
@@ -100,18 +111,18 @@ func WriteObjectToOpenList(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	list.LastTai = object.GetTai()
 	list.Len += 1
 
-	return
+	return n, err
 }
 
 func WriteInventoryList(
@@ -129,7 +140,7 @@ func WriteInventoryList(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = format.EncodeTo(object, bufferedWriter)
@@ -137,11 +148,11 @@ func WriteInventoryList(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 // TODO also return a repool func
@@ -156,16 +167,16 @@ func CollectSkuList(
 	for sk, iterErr := range iter {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return err
 		}
 
 		if err = list.Add(sk); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func streamInventoryList(
@@ -212,10 +223,10 @@ func writeInventoryListObject(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type SeqCoder struct {
@@ -240,16 +251,16 @@ func (coder SeqCoder) DecodeFrom(
 				break
 			} else {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
 		if !yield(object) {
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 type SeqErrorDecoder struct {
@@ -276,17 +287,17 @@ func (coder SeqErrorDecoder) DecodeFrom(
 				err = errors.Wrap(err)
 
 				if !yield(nil, err) {
-					return
+					return n, err
 				}
 			}
 		}
 
 		if !yield(object, nil) {
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 type SeqErrorEncoder struct {
@@ -303,7 +314,7 @@ func (coder SeqErrorDecoder) EncodeTo(
 
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return n, err
 		}
 
 		if _, err = coder.coder.EncodeTo(object, bufferedWriter); err != nil {
@@ -312,10 +323,10 @@ func (coder SeqErrorDecoder) EncodeTo(
 				break
 			} else {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 	}
 
-	return
+	return n, err
 }

@@ -27,7 +27,7 @@ func NewReader(
 		readSeeker,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return reeder, err
 	}
 
 	if reeder.expander, err = config.GetBlobCompression().WrapReader(
@@ -36,21 +36,21 @@ func NewReader(
 		// TODO remove this when compression / encryption issues are resolved
 		if _, err = readSeeker.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
-			return
+			return reeder, err
 		}
 
 		if reeder.expander, err = compression_type.CompressionTypeNone.WrapReader(
 			readSeeker,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return reeder, err
 		}
 	}
 
-	reeder.digester = markl_io.MakeWriter(config.hashType.Get(), nil)
+	reeder.digester = markl_io.MakeWriter(config.hashFormat.GetHash(), nil)
 	reeder.tee = io.TeeReader(reeder.expander, reeder.digester)
 
-	return
+	return reeder, err
 }
 
 func (reader *reader) Seek(offset int64, whence int) (actual int64, err error) {
@@ -58,7 +58,7 @@ func (reader *reader) Seek(offset int64, whence int) (actual int64, err error) {
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
-		return
+		return actual, err
 	}
 
 	return seeker.Seek(offset, whence)
@@ -75,10 +75,10 @@ func (reader *reader) Read(p []byte) (n int, err error) {
 func (reader *reader) Close() (err error) {
 	if err = reader.expander.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (reader *reader) GetMarklId() interfaces.MarklId {

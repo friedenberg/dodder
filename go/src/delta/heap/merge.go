@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
+// TODO make compatible with iterators
 func MergeStream[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	heap *Heap[ELEMENT, ELEMENT_PTR],
 	read func() (ELEMENT_PTR, error),
@@ -19,12 +20,13 @@ func MergeStream[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 		heap.h.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
+// TODO make compatible with iterators
 func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	heap *Heap[T, TPtr],
 	read func() (TPtr, error),
@@ -46,7 +48,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			var t T
 			last = &t
 		} else if equaler.Equals(e, last) {
-			return
+			return err
 		} else if lessor.Less(e, last) {
 			err = errors.ErrorWithStackf(
 				"last is greater than current! last:\n%v\ncurrent: %v",
@@ -54,7 +56,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 				e,
 			)
 
-			return
+			return err
 		}
 
 		resetter.ResetWith(last, e)
@@ -71,7 +73,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 				break
 			} else {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -103,7 +105,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 					peeked,
 				)
 
-				return
+				return err
 			}
 
 			if popped == nil {
@@ -117,7 +119,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 					err = errors.Wrap(err)
 				}
 
-				return
+				return err
 			}
 		}
 
@@ -128,7 +130,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
@@ -146,9 +148,9 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

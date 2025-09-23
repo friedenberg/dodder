@@ -59,15 +59,15 @@ func MakeIndex(
 		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return index, err
 	}
 
 	if err = index.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return index, err
 	}
 
-	return
+	return index, err
 }
 
 func (index *Index) Initialize() (err error) {
@@ -82,12 +82,12 @@ func (index *Index) Initialize() (err error) {
 		)
 	}
 
-	return
+	return err
 }
 
 func (index *Index) GetPage(n uint8) (p *Page) {
 	p = &index.pages[n]
-	return
+	return p
 }
 
 func (index *Index) GetProbeIndex() *probeIndex {
@@ -104,16 +104,16 @@ func (index *Index) Flush(
 	if len(index.historicalChanges) > 0 {
 		if err = index.flushEverything(printerHeader); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if err = index.flushAdded(printerHeader); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (index *Index) flushAdded(
@@ -142,7 +142,7 @@ func (index *Index) flushAdded(
 			),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -150,7 +150,7 @@ func (index *Index) flushAdded(
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if actualFlushCount > 0 {
@@ -162,11 +162,11 @@ func (index *Index) flushAdded(
 			),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (index *Index) flushEverything(
@@ -186,13 +186,13 @@ func (index *Index) flushEverything(
 		),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for n, change := range index.historicalChanges {
 		if err = printerHeader(fmt.Sprintf("change: %s", change)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if n == 99 {
@@ -203,7 +203,7 @@ func (index *Index) flushEverything(
 				),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			break
@@ -214,7 +214,7 @@ func (index *Index) flushEverything(
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = printerHeader(
@@ -224,10 +224,10 @@ func (index *Index) flushEverything(
 		),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func PageIndexForObject(
@@ -241,10 +241,10 @@ func PageIndexForObject(
 		hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func PageIndexForObjectId(
@@ -258,10 +258,10 @@ func PageIndexForObjectId(
 		hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (index *Index) Add(
@@ -276,48 +276,48 @@ func (index *Index) Add(
 		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	p := index.GetPage(n)
 
 	if err = p.add(object, options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO rename
-func (index *Index) ReadOneSha(
+func (index *Index) ReadOneMarklId(
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
-	errors.PanicIfError(markl.AssertIdIsNotNull(blobId, "index lookup"))
+	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
 
 	var loc object_probe_index.Loc
 
 	if loc, err = index.readOneMarklIdLoc(blobId); err != nil {
-		return
+		return err
 	}
 
 	if err = index.readOneLoc(loc, object); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO rename
-func (index *Index) ReadManySha(
+func (index *Index) ReadManyMarklId(
 	blobId interfaces.MarklId,
 ) (objects []*sku.Transacted, err error) {
 	var locs []object_probe_index.Loc
 
 	if locs, err = index.readManyMarklIdLoc(blobId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return objects, err
 	}
 
 	for _, loc := range locs {
@@ -325,46 +325,46 @@ func (index *Index) ReadManySha(
 
 		if err = index.readOneLoc(loc, sk); err != nil {
 			err = errors.Wrapf(err, "Loc: %s", loc)
-			return
+			return objects, err
 		}
 
 		objects = append(objects, sk)
 	}
 
-	return
+	return objects, err
 }
 
 func (index *Index) ObjectExists(
 	objectId *ids.ObjectId,
 ) (err error) {
-	var n uint8
+	var pageIndex uint8
 
 	objectIdString := objectId.String()
 
-	if n, err = page_id.PageIndexForString(
+	if pageIndex, err = page_id.PageIndexForString(
 		DigitWidth,
 		objectIdString,
 		index.hashType,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	p := index.GetPage(n)
+	page := index.GetPage(pageIndex)
 
-	if _, ok := p.addedObjectIdLookup[objectIdString]; ok {
-		return
+	if _, ok := page.addedObjectIdLookup[objectIdString]; ok {
+		return err
 	}
 
-	digest := markl.FormatHashSha256.FromStringContent(objectIdString)
+	digest := index.hashType.FromStringContent(objectIdString)
 	defer markl.PutBlobId(digest)
 
 	if _, err = index.readOneMarklIdLoc(digest); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *Index) ReadOneObjectId(
@@ -382,11 +382,11 @@ func (index *Index) ReadOneObjectId(
 	)
 	defer repool()
 
-	if err = index.ReadOneSha(digest, object); err != nil {
-		return
+	if err = index.ReadOneMarklId(digest, object); err != nil {
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *Index) ReadManyObjectId(
@@ -395,12 +395,12 @@ func (index *Index) ReadManyObjectId(
 	digest := markl.FormatHashSha256.FromStringContent(objectId.String())
 	defer markl.PutBlobId(digest)
 
-	if objects, err = index.ReadManySha(digest); err != nil {
+	if objects, err = index.ReadManyMarklId(digest); err != nil {
 		err = errors.Wrap(err)
-		return
+		return objects, err
 	}
 
-	return
+	return objects, err
 }
 
 // TODO switch to empty=not found semantics instead of error
@@ -410,7 +410,7 @@ func (index *Index) ReadOneObjectIdTai(
 ) (object *sku.Transacted, err error) {
 	if tai.IsEmpty() {
 		err = collections.MakeErrNotFoundString(tai.String())
-		return
+		return object, err
 	}
 
 	digest := markl.FormatHashSha256.FromStringContent(
@@ -420,11 +420,11 @@ func (index *Index) ReadOneObjectIdTai(
 
 	object = sku.GetTransactedPool().Get()
 
-	if err = index.ReadOneSha(digest, object); err != nil {
-		return
+	if err = index.ReadOneMarklId(digest, object); err != nil {
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 func (index *Index) readOneLoc(
@@ -435,10 +435,10 @@ func (index *Index) readOneLoc(
 
 	if err = page.readOneRange(loc.Range, object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO add support for *errors.Context closure
@@ -517,5 +517,5 @@ func (index *Index) ReadPrimitiveQuery(
 		err = groupBuilder.GetError()
 	}
 
-	return
+	return err
 }

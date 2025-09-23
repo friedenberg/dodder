@@ -58,7 +58,7 @@ func (oid *ObjectIdStringerWithRepo) String() string {
 		sb.WriteRune('/')
 	}
 
-	switch oid.g {
+	switch oid.genre {
 	case genres.Zettel:
 		sb.Write(oid.left.Bytes())
 

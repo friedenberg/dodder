@@ -57,7 +57,7 @@ func PageIndexForDigest(
 ) (n uint8, err error) {
 	var n1 int64
 
-	if err = markl.AssertIdIsNotNull(digest, "page id"); err != nil {
+	if err = markl.AssertIdIsNotNull(digest); err != nil {
 		panic(err)
 	}
 

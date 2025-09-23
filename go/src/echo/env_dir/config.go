@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 )
@@ -12,7 +11,7 @@ import (
 // TODO move to own blob store configs package
 
 func MakeConfig(
-	hashType markl.FormatHash,
+	hashFormat interfaces.FormatHash,
 	funcJoin func(string, ...string) string,
 	compression interfaces.IOWrapper,
 	encryption interfaces.MarklId,
@@ -26,7 +25,7 @@ func MakeConfig(
 	}
 
 	return Config{
-		hashType:    hashType,
+		hashFormat:  hashFormat,
 		funcJoin:    funcJoin,
 		compression: compression,
 		encryption:  ioWrapper,
@@ -37,14 +36,14 @@ var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
 	defaultEncryptionIOWrapper  = files.NopeIOWrapper{}
 	DefaultConfig               = Config{
-		hashType:    blob_store_configs.DefaultHashType,
+		hashFormat:  blob_store_configs.DefaultHashType,
 		compression: &defaultCompressionTypeValue,
 		encryption:  &defaultEncryptionIOWrapper,
 	}
 )
 
 type Config struct {
-	hashType markl.FormatHash
+	hashFormat interfaces.FormatHash
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.IOWrapper

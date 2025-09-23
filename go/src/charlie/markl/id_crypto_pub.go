@@ -14,19 +14,21 @@ func (id Id) Verify(
 		var ok bool
 
 		if formatPub, ok = id.format.(FormatPub); !ok {
-			err = errors.Errorf(
-				"id format does not support pub operation: %T",
-				id.format,
-			)
+			err = errors.Wrap(ErrFormatOperationNotSupported{
+				Format:        id.format,
+				OperationName: "Verify",
+			})
+
 			return
 		}
 	}
 
 	if formatPub.Verify == nil {
-		err = errors.Errorf(
-			"format does not support verification: %q",
-			formatPub.Id,
-		)
+		err = errors.Wrap(ErrFormatOperationNotSupported{
+			Format:        id.format,
+			OperationName: "Verify",
+		})
+
 		return
 	}
 

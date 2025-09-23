@@ -27,19 +27,22 @@ func (id *Id) GeneratePrivateKey(
 		var ok bool
 
 		if formatSec, ok = id.format.(FormatSec); !ok {
-			err = errors.Errorf(
-				"id format does not support sec operation: %T",
-				id.format,
-			)
+			err = errors.Wrap(ErrFormatOperationNotSupported{
+				Format:        id.format,
+				FormatId:      formatId,
+				OperationName: "GeneratePrivateKey",
+			})
+
 			return
 		}
 	}
 
 	if formatSec.Generate == nil {
-		err = errors.Errorf(
-			"format does not support generation: %q",
-			formatSec.Id,
-		)
+		err = errors.Wrap(ErrFormatOperationNotSupported{
+			Format:        id.format,
+			OperationName: "GeneratePrivateKey",
+		})
+
 		return
 	}
 
@@ -76,19 +79,21 @@ func (id Id) GetPublicKey(
 		var ok bool
 
 		if formatSec, ok = id.format.(FormatSec); !ok {
-			err = errors.Errorf(
-				"id format does not support sec operation: %T",
-				id.format,
-			)
+			err = errors.Wrap(ErrFormatOperationNotSupported{
+				Format:        id.format,
+				OperationName: "GetPublicKey",
+			})
+
 			return
 		}
 	}
 
 	if formatSec.GetPublicKey == nil {
-		err = errors.Errorf(
-			"format does not support getting public key: %q",
-			formatSec.Id,
-		)
+		err = errors.Wrap(ErrFormatOperationNotSupported{
+			Format:        id.format,
+			OperationName: "GetPublicKey",
+		})
+
 		return
 	}
 
@@ -124,19 +129,21 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 		var ok bool
 
 		if formatSec, ok = id.format.(FormatSec); !ok {
-			err = errors.Errorf(
-				"id format does not support sec operations: %T",
-				id.format,
-			)
+			err = errors.Wrap(ErrFormatOperationNotSupported{
+				Format:        id.format,
+				OperationName: "GetIOWrapper",
+			})
+
 			return
 		}
 	}
 
 	if formatSec.GetIOWrapper == nil {
-		err = errors.Errorf(
-			"format does not support getting io wrapper key: %q",
-			formatSec.Id,
-		)
+		err = errors.Wrap(ErrFormatOperationNotSupported{
+			Format:        id.format,
+			OperationName: "GetIOWrapper",
+		})
+
 		return
 	}
 
@@ -159,19 +166,21 @@ func (id Id) Sign(
 		var ok bool
 
 		if formatSec, ok = id.format.(FormatSec); !ok {
-			err = errors.Errorf(
-				"id format does not support sec operation: %T",
-				id.format,
-			)
+			err = errors.Wrap(ErrFormatOperationNotSupported{
+				Format:        id.format,
+				OperationName: "Sign",
+			})
+
 			return
 		}
 	}
 
 	if formatSec.Sign == nil {
-		err = errors.Errorf(
-			"format does not support signing: %q",
-			formatSec.Id,
-		)
+		err = errors.Wrap(ErrFormatOperationNotSupported{
+			Format:        id.format,
+			OperationName: "Sign",
+		})
+
 		return
 	}
 

@@ -206,7 +206,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.ZZRepoPub:
-		n1, err = writeMarklIdKey(
+		n1, err = writeMarklIdKeyIfNotNull(
 			writer,
 			key,
 			metadata.GetRepoPubKey(),
@@ -288,7 +288,7 @@ func writeMarklIdKey(
 	key *catgut.String,
 	id interfaces.MarklId,
 ) (n int, err error) {
-	if err = markl.AssertIdIsNotNull(id, key.String()); err != nil {
+	if err = markl.AssertIdIsNotNull(id); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

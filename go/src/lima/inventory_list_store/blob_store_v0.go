@@ -42,7 +42,7 @@ func (blobStore *blobStoreV0) ReadOneBlobId(
 
 	if readCloser, err = blobStore.BlobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	defer errors.DeferredCloser(&err, readCloser)
@@ -56,10 +56,10 @@ func (blobStore *blobStoreV0) ReadOneBlobId(
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 func (blobStore *blobStoreV0) WriteInventoryListObject(
@@ -72,7 +72,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 	if blobStoreWriteCloser, err = blobStore.BlobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, blobStoreWriteCloser)
@@ -86,7 +86,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 	if err = object.CalculateObjectDigests(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = blobStore.inventoryListCoderCloset.WriteObjectToWriter(
@@ -95,12 +95,12 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	ui.Log().Printf(
@@ -108,7 +108,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 		sku.String(object),
 	)
 
-	return
+	return err
 }
 
 func (blobStore *blobStoreV0) AllInventoryLists() sku.Seq {
@@ -131,6 +131,8 @@ func (blobStore *blobStoreV0) AllInventoryLists() sku.Seq {
 				if !yield(nil, errors.Wrapf(err, "BlobId: %q", blobId)) {
 					return
 				}
+
+				continue
 			}
 
 			if !yield(list, nil) {

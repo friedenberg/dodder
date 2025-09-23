@@ -165,7 +165,7 @@ func (ctx *context) runRetry() (shouldRetry bool) {
 
 	ctx.funcRun(ctx)
 
-	return
+	return shouldRetry
 }
 
 func (ctx *context) runAfter() {
@@ -410,10 +410,10 @@ func RunContextWithPrintTicker(
 			runFunc(ctx)
 		},
 	); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func RunChildContextWithPrintTicker(

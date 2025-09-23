@@ -58,11 +58,11 @@ func (blobImporter *BlobImporter) ImportBlobIfNecessary(
 
 		if err = copyResult.GetError(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (blobImporter *BlobImporter) emitMissingBlob(
@@ -87,25 +87,25 @@ func (blobImporter *BlobImporter) emitMissingBlob(
 
 	if err = blobImporter.emitCopyResultIfNecessary(blobCopyResult); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (blobImporter *BlobImporter) emitCopyResultIfNecessary(
 	copyResult sku.BlobCopyResult,
 ) (err error) {
 	if blobImporter.CopierDelegate == nil {
-		return
+		return err
 	}
 
 	if err = blobImporter.CopierDelegate(copyResult); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
@@ -165,8 +165,8 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 		3*time.Second,
 	); err != nil {
 		copyResult.SetError(err)
-		return
+		return copyResult
 	}
 
-	return
+	return copyResult
 }

@@ -16,7 +16,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 	if mother == nil {
 		motherSig.Reset()
-		return
+		return err
 	}
 
 	if err = motherSig.SetMarklId(
@@ -24,52 +24,52 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = motherSig.SetPurpose(
 		markl.PurposeObjectMotherSigV1,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) AssertObjectDigestAndObjectSigNotNull() (err error) {
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest(),
-		"object-digest",
-	); err != nil {
+		transacted.Metadata.GetObjectDigest()); err != nil {
 		err = errors.Wrapf(err, "Object: %q", String(transacted))
-		return
+		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectSig(),
-		"object-sig",
-	); err != nil {
+		transacted.Metadata.GetObjectSig()); err != nil {
 		err = errors.Wrapf(err, "Object: %q", String(transacted))
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // calculates the object digests using the object's repo pubkey
 func (transacted *Transacted) FinalizeUsingObject() (err error) {
 	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetRepoPubKey(),
-		"repo-pubkey",
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return transacted.FinalizeUsingRepoPubKey(
+	if err = transacted.FinalizeUsingRepoPubKey(
 		transacted.Metadata.GetRepoPubKey(),
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }
 
 // calculates the object digests using the provided repo pubkey
@@ -95,7 +95,7 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 			pubKeyMutable.GetBytes(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -104,10 +104,24 @@ func (transacted *Transacted) FinalizeUsingRepoPubKey(
 		transacted.GetDigestWriteMapWithMerkle(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
+}
+
+func (transacted *Transacted) FinalizeWithoutPubKey() (err error) {
+	transacted.Metadata.GetRepoPubKeyMutable().Reset()
+
+	if err = transacted.CalculateDigests(
+		false,
+		transacted.GetDigestWriteMapWithMerkle(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }
 
 // TODO remove / rename
@@ -122,19 +136,19 @@ func (transacted *Transacted) FinalizeAndSignIfNecessary(
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	if !transacted.Metadata.GetObjectSig().IsNull() {
-		return
+		return err
 	}
 
 	if err = transacted.FinalizeAndSign(config); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if transacted.Metadata.GetRepoPubKey().GetPurpose() == "" {
 		panic("empty pbukey format")
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) FinalizeAndSignOverwrite(
@@ -148,10 +162,10 @@ func (transacted *Transacted) FinalizeAndSignOverwrite(
 		config,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) FinalizeAndSign(
@@ -161,14 +175,14 @@ func (transacted *Transacted) FinalizeAndSign(
 		transacted.Metadata.GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertIdIsNull(
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	transacted.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
@@ -177,15 +191,13 @@ func (transacted *Transacted) FinalizeAndSign(
 
 	if err = transacted.FinalizeUsingObject(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest(),
-		"object-digest",
-	); err != nil {
+		transacted.Metadata.GetObjectDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	privateKey := config.GetPrivateKey()
@@ -196,63 +208,57 @@ func (transacted *Transacted) FinalizeAndSign(
 		config.GetObjectSigMarklTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = transacted.Verify(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) FinalizeAndVerify() (err error) {
 	if err = transacted.FinalizeUsingObject(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if slices.Contains(
 		[]string{ids.TypeInventoryListV1},
 		transacted.GetType().String(),
 	) {
-		return
+		return err
 	}
 
 	if err = transacted.Verify(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) Verify() (err error) {
 	pubKey := transacted.Metadata.GetRepoPubKey()
 
 	if err = markl.AssertIdIsNotNull(
-		pubKey,
-		"repo-pubkey",
-	); err != nil {
+		pubKey); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest(),
-		"object-digest",
-	); err != nil {
+		transacted.Metadata.GetObjectDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectSig(),
-		"object-sig",
-	); err != nil {
+		transacted.Metadata.GetObjectSig()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = pubKey.Verify(
@@ -260,10 +266,10 @@ func (transacted *Transacted) Verify() (err error) {
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
 		err = errors.Wrapf(err, "Object: %q", String(transacted))
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterContext) (interfaces.MarklId, error)
@@ -303,7 +309,7 @@ func (transacted *Transacted) CalculateDigests(
 			formatId,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		waitGroup.Do(
@@ -317,10 +323,10 @@ func (transacted *Transacted) CalculateDigests(
 
 	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) MakeDigestCalcFunc(
@@ -349,12 +355,12 @@ func (transacted *Transacted) CalculateDigest(
 		transacted,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = digest.SetPurpose(format.GetPurpose()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer markl.PutBlobId(actual)
@@ -364,8 +370,8 @@ func (transacted *Transacted) CalculateDigest(
 		actual.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

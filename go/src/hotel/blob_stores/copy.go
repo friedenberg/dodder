@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 )
 
-// TODO offer option to decide which hash type
 func CopyBlobIfNecessary(
 	env env_ui.Env,
 	dst interfaces.BlobStore,
@@ -27,22 +26,22 @@ func CopyBlobIfNecessary(
 	if dst.HasBlob(expectedDigest) {
 		copyResult.bytesWritten = -1
 		copyResult.state = CopyResultStateExistsLocally
-		return
+		return copyResult
 	}
 
 	if src == nil {
 		copyResult.bytesWritten = -1
 		copyResult.state = CopyResultStateMissingLocally
-		return
+		return copyResult
 	}
 
-	if err := markl.AssertIdIsNotNull(expectedDigest, ""); err != nil {
+	if err := markl.AssertIdIsNotNull(expectedDigest); err != nil {
 		copyResult.bytesWritten = -1
 		copyResult.state = CopyResultStateExistsLocallyAndRemotely
-		return
+		return copyResult
 	}
 
-	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest, ""))
+	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest))
 
 	var readCloser interfaces.BlobReader
 
@@ -51,7 +50,7 @@ func CopyBlobIfNecessary(
 
 		if readCloser, err = src.MakeBlobReader(expectedDigest); err != nil {
 			copyResult.SetError(err)
-			return
+			return copyResult
 		}
 	}
 
@@ -66,7 +65,7 @@ func CopyBlobIfNecessary(
 			expectedDigest.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			copyResult.SetError(err)
-			return
+			return copyResult
 		}
 	}
 
@@ -75,7 +74,7 @@ func CopyBlobIfNecessary(
 
 		if writeCloser, err = dst.MakeBlobWriter(hashType); err != nil {
 			copyResult.SetError(err)
-			return
+			return copyResult
 		}
 	}
 
@@ -96,7 +95,7 @@ func CopyBlobIfNecessary(
 		)
 		if err != nil {
 			copyResult.setErrorAfterCopy(copyResult.bytesWritten, err)
-			return
+			return copyResult
 		} else {
 			copyResult.state = CopyResultStateSuccess
 		}
@@ -116,7 +115,7 @@ func CopyBlobIfNecessary(
 			),
 		)
 
-		return
+		return copyResult
 	}
 
 	if err := markl.AssertEqual(expectedDigest, writerDigest); err != nil {
@@ -125,10 +124,10 @@ func CopyBlobIfNecessary(
 			err,
 		)
 
-		return
+		return copyResult
 	}
 
-	return
+	return copyResult
 }
 
 func CopyReaderToWriter(
@@ -159,14 +158,14 @@ func CopyReaderToWriter(
 		pulse,
 	); err != nil {
 		copyResult.setErrorAfterCopy(copyResult.bytesWritten, err)
-		return
+		return copyResult
 	} else {
 		copyResult.state = CopyResultStateSuccess
 	}
 
 	if err := dst.Close(); err != nil {
 		copyResult.setErrorAfterCopy(copyResult.bytesWritten, err)
-		return
+		return copyResult
 	}
 
 	copyResult.BlobId = dst.GetMarklId()
@@ -174,9 +173,9 @@ func CopyReaderToWriter(
 	if expected != nil {
 		if err := markl.AssertEqual(expected, copyResult.BlobId); err != nil {
 			copyResult.setErrorAfterCopy(copyResult.bytesWritten, err)
-			return
+			return copyResult
 		}
 	}
 
-	return
+	return copyResult
 }

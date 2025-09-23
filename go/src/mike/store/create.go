@@ -20,22 +20,22 @@ func (store *Store) Reindex() (err error) {
 			Operation: "reindex",
 		}
 
-		return
+		return err
 	}
 
 	if err = store.ResetIndexes(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.GetEnvRepo().ResetCache(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.GetStreamIndex().Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	type objectWithError struct {
@@ -62,6 +62,10 @@ func (store *Store) Reindex() (err error) {
 			}
 
 			continue
+		}
+
+		if objectWithList.Object == nil {
+			panic("empty object")
 		}
 
 		if err = store.reindexOne(objectWithList); err != nil {
@@ -106,7 +110,7 @@ func (store *Store) Reindex() (err error) {
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CreateOrUpdateDefaultProto(
@@ -120,10 +124,10 @@ func (store *Store) CreateOrUpdateDefaultProto(
 
 	if err = store.CreateOrUpdate(external, options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CreateOrUpdate(
@@ -140,10 +144,10 @@ func (store *Store) CreateOrUpdate(
 		options,
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CreateOrUpdateBlobDigest(
@@ -158,14 +162,14 @@ func (store *Store) CreateOrUpdateBlobDigest(
 			),
 		}
 
-		return
+		return object, err
 	}
 
 	object = sku.GetTransactedPool().Get()
 
 	if err = object.ObjectId.SetWithIdLike(objectId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	if err = store.ReadOneInto(objectId, object); err != nil {
@@ -173,7 +177,7 @@ func (store *Store) CreateOrUpdateBlobDigest(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return object, err
 		}
 	}
 
@@ -184,10 +188,10 @@ func (store *Store) CreateOrUpdateBlobDigest(
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 type RevertId struct {
@@ -199,7 +203,7 @@ func (store *Store) RevertTo(
 	revertId RevertId,
 ) (err error) {
 	if revertId.Tai.IsEmpty() {
-		return
+		return err
 	}
 
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
@@ -207,7 +211,7 @@ func (store *Store) RevertTo(
 			Operation: "update many metadata",
 		}
 
-		return
+		return err
 	}
 
 	var mother *sku.Transacted
@@ -217,7 +221,7 @@ func (store *Store) RevertTo(
 		revertId.Tai,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer sku.GetTransactedPool().Put(mother)
@@ -227,10 +231,10 @@ func (store *Store) RevertTo(
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CreateOrUpdateCheckedOut(
@@ -248,7 +252,7 @@ func (store *Store) CreateOrUpdateCheckedOut(
 			),
 		}
 
-		return
+		return err
 	}
 
 	if err = store.Commit(
@@ -256,11 +260,11 @@ func (store *Store) CreateOrUpdateCheckedOut(
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsCreate()},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !updateCheckout {
-		return
+		return err
 	}
 
 	if err = store.UpdateCheckoutFromCheckedOut(
@@ -268,8 +272,8 @@ func (store *Store) CreateOrUpdateCheckedOut(
 		col,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

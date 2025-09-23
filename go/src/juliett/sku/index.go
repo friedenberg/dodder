@@ -25,11 +25,11 @@ type (
 			id *ids.ObjectId,
 		) (err error)
 
-		ReadManySha(
+		ReadManyMarklId(
 			sh interfaces.MarklId,
 		) (skus []*Transacted, err error)
 
-		ReadOneSha(
+		ReadOneMarklId(
 			sh interfaces.MarklId,
 			sk *Transacted,
 		) (err error)

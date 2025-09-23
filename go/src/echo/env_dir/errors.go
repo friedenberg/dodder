@@ -16,7 +16,7 @@ func MakeErrBlobAlreadyExists(
 	blobId interfaces.MarklId,
 	path string,
 ) ErrBlobAlreadyExists {
-	errors.PanicIfError(markl.AssertIdIsNotNull(blobId, ""))
+	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
 
 	return ErrBlobAlreadyExists{
 		Path:   path,
@@ -46,7 +46,9 @@ func IsErrBlobMissing(err error) bool {
 	return errors.Is(err, ErrBlobMissing{})
 }
 
+// TODO create a constructor function to enable debugging
 type ErrBlobMissing struct {
+	// TODO add blob store
 	BlobId interfaces.MarklId
 	Path   string
 }
@@ -75,7 +77,7 @@ func MakeErrTempAlreadyExists(
 	path string,
 ) (err ErrTempAlreadyExists) {
 	err = ErrTempAlreadyExists{Path: path}
-	return
+	return err
 }
 
 var _ interfaces.ErrorHelpful = ErrTempAlreadyExists{}

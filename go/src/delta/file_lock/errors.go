@@ -31,6 +31,8 @@ type ErrUnableToAcquireLock struct {
 	description string
 }
 
+var _ interfaces.ErrorRetryable = ErrUnableToAcquireLock{}
+
 func (err ErrUnableToAcquireLock) Error() string {
 	return fmt.Sprintf("%s is currently locked", err.description)
 }
@@ -57,7 +59,7 @@ func (err ErrUnableToAcquireLock) GetErrorRecovery() []string {
 }
 
 func (err ErrUnableToAcquireLock) Recover(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	retry interfaces.FuncRetry,
 	abort interfaces.FuncRetryAborted,
 ) {

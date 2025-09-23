@@ -58,7 +58,7 @@ func (src *buildState) copy() (dst *buildState) {
 
 	copy(dst.pinnedExternalObjectIds, src.pinnedExternalObjectIds)
 
-	return
+	return dst
 }
 
 func (buildState *buildState) makeGroup() *Query {
@@ -106,7 +106,7 @@ func (buildState *buildState) build(
 			for _, externalObjectId := range externalObjectIds {
 				if externalObjectId.GetGenre() == genres.None {
 					err = errors.ErrorWithStackf("id with empty genre: %q", externalObjectId)
-					return
+					return err, latent
 				}
 
 				buildState.pinnedExternalObjectIds = append(
@@ -133,19 +133,19 @@ func (buildState *buildState) build(
 	for buildState.scanner.CanScan() {
 		if err = buildState.parseTokens(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err, latent
 		}
 	}
 
 	for _, k := range buildState.pinnedExternalObjectIds {
 		if k.GetGenre() == genres.None {
 			err = errors.ErrorWithStackf("id with empty genre: %q", k)
-			return
+			return err, latent
 		}
 
 		if err = buildState.group.addExactExternalObjectId(buildState, k); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err, latent
 		}
 	}
 
@@ -154,12 +154,12 @@ func (buildState *buildState) build(
 
 		if err = q.addPinnedObjectId(buildState, k); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err, latent
 		}
 
 		if err = buildState.group.add(q); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err, latent
 		}
 	}
 
@@ -167,10 +167,10 @@ func (buildState *buildState) build(
 
 	if err = buildState.group.reduce(buildState); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err, latent
 	}
 
-	return
+	return err, latent
 }
 
 func (buildState *buildState) addDefaultsIfNecessary() {
@@ -257,14 +257,14 @@ LOOP:
 			case ':', '+', '?':
 				if len(stack) > 1 {
 					err = errors.ErrorWithStackf("sigil before end")
-					return
+					return err
 				}
 
 				buildState.scanner.Unscan()
 
 				if err = buildState.parseSigilsAndGenres(query); err != nil {
 					err = errors.Wrapf(err, "Seq: %q", seq)
-					return
+					return err
 				}
 
 				continue LOOP
@@ -282,7 +282,7 @@ LOOP:
 					} else {
 						if err = buildState.addSigilFromOp(query, partition.Contents[0]); err != nil {
 							err = errors.Wrap(err)
-							return
+							return err
 						}
 
 						seq = left
@@ -307,19 +307,14 @@ LOOP:
 			// external object ID. And if that fails, try to remove the last two
 			// elements as per the above and read that and force the genre and
 			// sigils
-			if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
-				if errors.Is(err, doddish.ErrUnsupportedSeq{}) {
-					err = errors.BadRequest(err)
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
+			if err = objectId.ReadFromSeq(seq); err != nil {
+				err = errors.Wrap(err)
+				return err
 			}
 
 			if err = objectId.reduce(buildState); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			pid := pinnedObjectId{
@@ -336,7 +331,7 @@ LOOP:
 
 				if err = query.addPinnedObjectId(buildState, pid); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 			case genres.Tag:
@@ -344,7 +339,7 @@ LOOP:
 
 				if et, err = buildState.makeTagExp(&objectId); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				exp := buildState.makeExp(isNegated, isExact, et)
@@ -355,13 +350,13 @@ LOOP:
 
 				if err = t.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if !isNegated {
 					if err = buildState.group.types.Add(t); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
@@ -376,11 +371,11 @@ LOOP:
 
 	if err = buildState.scanner.Error(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if query.IsEmpty() {
-		return
+		return err
 	}
 
 	if query.Genre.IsEmpty() && !buildState.builder.requireNonEmptyQuery {
@@ -393,10 +388,10 @@ LOOP:
 
 	if err = buildState.group.add(query); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (buildState *buildState) addSigilFromOp(
@@ -407,18 +402,18 @@ func (buildState *buildState) addSigilFromOp(
 
 	if err = s.SetByte(op); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !buildState.permittedSigil.IsEmpty() &&
 		!buildState.permittedSigil.ContainsOneOf(s) {
 		err = errors.BadRequestf("this query cannot contain the %q sigil", s)
-		return
+		return err
 	}
 
 	q.Sigil.Add(s)
 
-	return
+	return err
 }
 
 func (buildState *buildState) parseSigilsAndGenres(
@@ -433,10 +428,10 @@ func (buildState *buildState) parseSigilsAndGenres(
 			switch op {
 			default:
 				err = errors.ErrorWithStackf("unexpected operator %q", seq)
-				return
+				return err
 
 			case ' ':
-				return
+				return err
 
 			case '.':
 				buildState.group.dotOperatorActive = true
@@ -445,7 +440,7 @@ func (buildState *buildState) parseSigilsAndGenres(
 			case ':', '+', '?':
 				if err = buildState.addSigilFromOp(q, op); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 		} else if seq.MatchAll(doddish.TokenTypeIdentifier) {
@@ -453,21 +448,21 @@ func (buildState *buildState) parseSigilsAndGenres(
 			break
 		} else {
 			err = errors.ErrorWithStackf("expected operator but got %q", seq)
-			return
+			return err
 		}
 	}
 
 	if err = buildState.scanner.Error(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = q.ReadFromBoxScanner(&buildState.scanner); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO use new generic and typed blobs
@@ -477,7 +472,7 @@ func (buildState *buildState) makeTagOrLuaTag(
 	exp = objectId
 
 	if buildState.builder.objectProbeIndex == nil {
-		return
+		return exp, err
 	}
 
 	object := sku.GetTransactedPool().Get()
@@ -493,7 +488,7 @@ func (buildState *buildState) makeTagOrLuaTag(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return exp, err
 	}
 
 	var tagBlob tag_blobs.Blob
@@ -502,7 +497,7 @@ func (buildState *buildState) makeTagOrLuaTag(
 		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return exp, err
 	}
 
 	var matcherBlob sku.Queryable
@@ -511,13 +506,13 @@ func (buildState *buildState) makeTagOrLuaTag(
 		var ok bool
 
 		if matcherBlob, ok = tagBlob.(sku.Queryable); !ok {
-			return
+			return exp, err
 		}
 	}
 
 	exp = &CompoundMatch{Queryable: matcherBlob, ObjectId: objectId}
 
-	return
+	return exp, err
 }
 
 func (buildState *buildState) makeTagExp(
@@ -528,15 +523,15 @@ func (buildState *buildState) makeTagExp(
 
 	if err = e.TodoSetFromObjectId(k.GetObjectId()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return exp, err
 	}
 
 	if exp, err = buildState.makeTagOrLuaTag(k); err != nil {
 		err = errors.Wrap(err)
-		return
+		return exp, err
 	}
 
-	return
+	return exp, err
 }
 
 func (buildState *buildState) makeExp(

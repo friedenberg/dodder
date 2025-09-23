@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
-	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
@@ -70,9 +69,7 @@ func (op CreateFromPaths) Run(
 		}
 
 		if err = markl.AssertIdIsNotNull(
-			digestWithoutTai,
-			key_bytes.DigestMetadataWithoutTai.String(),
-		); err != nil {
+			digestWithoutTai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

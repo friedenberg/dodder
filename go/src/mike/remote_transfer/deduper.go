@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -14,6 +15,7 @@ type deduper struct {
 	formatId   string
 	lookupLock *sync.RWMutex
 	lookup     map[string]struct{}
+	id         markl.Id
 }
 
 func (deduper *deduper) initialize(
@@ -29,7 +31,7 @@ func (deduper *deduper) initialize(
 
 func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 	if deduper.lookup == nil {
-		return
+		return err
 	}
 
 	objectDigestWriteMap := object.GetDigestWriteMapWithMerkle()
@@ -45,7 +47,7 @@ func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 				deduper.formatId,
 			)
 
-			return
+			return err
 		}
 	}
 
@@ -63,5 +65,5 @@ func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 	deduper.lookup[string(bites)] = struct{}{}
 	deduper.lookupLock.Unlock()
 
-	return
+	return err
 }

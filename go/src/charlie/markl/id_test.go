@@ -17,7 +17,7 @@ func TestIdNullAndEqual(t1 *testing.T) {
 
 func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 	{
-		t.AssertError(AssertIdIsNotNull(formatHash.null, ""))
+		t.AssertError(AssertIdIsNotNull(formatHash.null))
 		t.AssertNoError(AssertIdIsNull(formatHash.null))
 		t.AssertNoError(
 			MakeErrLength(
@@ -35,8 +35,8 @@ func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 
 		t.AssertNoError(AssertIdIsNull(idZero))
 		t.AssertNoError(AssertIdIsNull(idNull))
-		t.AssertError(AssertIdIsNotNull(idZero, ""))
-		t.AssertError(AssertIdIsNotNull(idNull, ""))
+		t.AssertError(AssertIdIsNotNull(idZero))
+		t.AssertError(AssertIdIsNotNull(idNull))
 		t.AssertNoError(AssertEqual(idZero, idNull))
 		t.AssertNoError(AssertEqual(idNull, idZero))
 	}
@@ -46,8 +46,8 @@ func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 
 		t.AssertNoError(AssertIdIsNull(idZero))
 		t.AssertNoError(AssertIdIsNull(idNull))
-		t.AssertError(AssertIdIsNotNull(idZero, ""))
-		t.AssertError(AssertIdIsNotNull(idNull, ""))
+		t.AssertError(AssertIdIsNotNull(idZero))
+		t.AssertError(AssertIdIsNotNull(idNull))
 		t.AssertNoError(AssertEqual(idZero, idNull))
 		t.AssertNoError(AssertEqual(idNull, idZero))
 	}
@@ -59,15 +59,15 @@ func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 
 		t.AssertNoError(AssertIdIsNull(idZero))
 		t.AssertNoError(AssertIdIsNull(idNull))
-		t.AssertError(AssertIdIsNotNull(idZero, ""))
-		t.AssertError(AssertIdIsNotNull(idNull, ""))
+		t.AssertError(AssertIdIsNotNull(idZero))
+		t.AssertError(AssertIdIsNotNull(idNull))
 		t.AssertNoError(AssertEqual(idZero, idNull))
 		t.AssertNoError(AssertEqual(idNull, idZero))
 	}
 
 	{
 		idNonZero, _ := formatHash.GetMarklIdForString("nonZero")
-		t.AssertNoError(AssertIdIsNotNull(idNonZero, ""))
+		t.AssertNoError(AssertIdIsNotNull(idNonZero))
 		t.AssertError(AssertIdIsNull(idNonZero))
 		t.AssertError(AssertEqual(idNonZero, idZero))
 		t.AssertError(AssertEqual(idZero, idNonZero))

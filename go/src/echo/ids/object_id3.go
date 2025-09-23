@@ -13,52 +13,52 @@ import (
 // /browser/bookmark-1
 // /browser/!md
 // /browser/!md
-func (oid *objectId2) ReadFromSeq(
+func (objectId *objectId2) ReadFromSeq(
 	seq doddish.Seq,
 ) (err error) {
 	switch {
 	case seq.Len() == 0:
 		err = errors.Wrap(doddish.ErrEmptySeq)
-		return
+		return err
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
-		oid.g = genres.Tag
-		oid.right.WriteLower(seq.At(0).Contents)
+		objectId.genre = genres.Tag
+		objectId.right.WriteLower(seq.At(0).Contents)
 
-		if oid.right.EqualsBytes(configBytes) {
-			oid.g = genres.Config
+		if objectId.right.EqualsBytes(configBytes) {
+			objectId.genre = genres.Config
 		}
 
-		return
+		return err
 
 		// !type
 	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpType), doddish.TokenTypeIdentifier):
-		oid.g = genres.Type
-		oid.middle = doddish.OpType
-		oid.right.Write(seq.At(1).Contents)
-		return
+		objectId.genre = genres.Type
+		objectId.middle = doddish.OpType
+		objectId.right.Write(seq.At(1).Contents)
+		return err
 
 		// %tag
 	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpVirtual), doddish.TokenTypeIdentifier):
-		oid.g = genres.Tag
-		oid.middle = doddish.OpVirtual
-		oid.right.Write(seq.At(1).Contents)
-		return
+		objectId.genre = genres.Tag
+		objectId.middle = doddish.OpVirtual
+		objectId.right.Write(seq.At(1).Contents)
+		return err
 
 		// /repo
 	case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpPathSeparator), doddish.TokenTypeIdentifier):
-		oid.g = genres.Repo
-		oid.middle = doddish.OpPathSeparator
-		oid.right.Write(seq.At(1).Contents)
-		return
+		objectId.genre = genres.Repo
+		objectId.middle = doddish.OpPathSeparator
+		objectId.right.Write(seq.At(1).Contents)
+		return err
 
 		// @sha
 	case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
-		oid.g = genres.Blob
-		oid.middle = '@'
-		oid.right.Write(seq.At(1).Contents)
-		return
+		objectId.genre = genres.Blob
+		objectId.middle = '@'
+		objectId.right.Write(seq.At(1).Contents)
+		return err
 
 		// zettel/id
 	case seq.MatchAll(
@@ -66,11 +66,11 @@ func (oid *objectId2) ReadFromSeq(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		oid.g = genres.Zettel
-		oid.left.Write(seq.At(0).Contents)
-		oid.middle = doddish.OpPathSeparator
-		oid.right.Write(seq.At(2).Contents)
-		return
+		objectId.genre = genres.Zettel
+		objectId.left.Write(seq.At(0).Contents)
+		objectId.middle = doddish.OpPathSeparator
+		objectId.right.Write(seq.At(2).Contents)
+		return err
 
 		// sec.asec
 	case seq.MatchAll(
@@ -82,17 +82,17 @@ func (oid *objectId2) ReadFromSeq(
 
 		if err = tai.Set(seq.String()); err != nil {
 			err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
-			return
+			return err
 		}
 
-		oid.g = genres.InventoryList
-		oid.left.Write(seq.At(0).Contents)
-		oid.middle = doddish.OpSigilExternal
-		oid.right.Write(seq.At(2).Contents)
-		return
+		objectId.genre = genres.InventoryList
+		objectId.left.Write(seq.At(0).Contents)
+		objectId.middle = doddish.OpSigilExternal
+		objectId.right.Write(seq.At(2).Contents)
+		return err
 
 	default:
 		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
-		return
+		return err
 	}
 }

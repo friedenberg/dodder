@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type ObjectIdShaMap map[string]skuWithRangeAndSigil
+type ObjectIdToObject map[string]skuWithRangeAndSigil
 
 type writer struct {
 	*Page
@@ -27,81 +27,81 @@ type writer struct {
 
 	*probeIndex
 	object_probe_index.Range
-	offsetLast     int64
-	ObjectIdShaMap ObjectIdShaMap
+	offsetLast          int64
+	ObjectIdToObjectMap ObjectIdToObject
 }
 
-func (pw *writer) Flush() (err error) {
-	if !pw.hasChanges {
+func (pageWriter *writer) Flush() (err error) {
+	if !pageWriter.hasChanges {
 		ui.Log().Print("not flushing, no changes")
-		return
+		return err
 	}
 
-	defer pw.added.Reset()
-	defer pw.addedLatest.Reset()
+	defer pageWriter.added.Reset()
+	defer pageWriter.addedLatest.Reset()
 
-	pw.ObjectIdShaMap = make(ObjectIdShaMap)
-	pw.binaryDecoder = makeBinary(ids.SigilHistory)
-	pw.binaryDecoder.sigil = ids.SigilHistory
+	pageWriter.ObjectIdToObjectMap = make(ObjectIdToObject)
+	pageWriter.binaryDecoder = makeBinary(ids.SigilHistory)
+	pageWriter.binaryDecoder.sigil = ids.SigilHistory
 
-	path := pw.Path()
+	path := pageWriter.Path()
 
 	// If the cache file does not exist and we have nothing to add, short
 	// circuit the flush. This condition occurs on the initial init when the
 	// konfig is changed but there are no zettels yet.
-	if !files.Exists(path) && pw.waitingToAddLen() == 0 {
-		return
+	if !files.Exists(path) && pageWriter.waitingToAddLen() == 0 {
+		return err
 	}
 
-	ui.Log().Print("changesAreHistorical", pw.changesAreHistorical)
-	ui.Log().Print("added", pw.added.Len())
-	ui.Log().Print("addedtail", pw.addedLatest.Len())
+	ui.Log().Print("changesAreHistorical", pageWriter.changesAreHistorical)
+	ui.Log().Print("added", pageWriter.added.Len())
+	ui.Log().Print("addedtail", pageWriter.addedLatest.Len())
 
-	if pw.added.Len() == 0 && !pw.changesAreHistorical {
-		if pw.File, err = files.OpenReadWrite(path); err != nil {
+	if pageWriter.added.Len() == 0 && !pageWriter.changesAreHistorical {
+		if pageWriter.File, err = files.OpenReadWrite(path); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		defer errors.DeferredCloser(&err, pw.File)
+		defer errors.DeferredCloser(&err, pageWriter.File)
 
-		pw.Reader.Reset(pw.File)
-		pw.Writer.Reset(pw.File)
+		pageWriter.Reader.Reset(pageWriter.File)
+		pageWriter.Writer.Reset(pageWriter.File)
 
-		return pw.flushJustLatest()
+		return pageWriter.flushJustLatest()
 	} else {
-		if pw.File, err = pw.Page.envRepo.GetTempLocal().FileTemp(); err != nil {
+		if pageWriter.File, err = pageWriter.Page.envRepo.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		defer errors.DeferredCloseAndRename(&err, pw.File, pw.Name(), path)
+		defer errors.DeferredCloseAndRename(&err, pageWriter.File, pageWriter.Name(), path)
 
-		pw.Reader.Reset(pw.File)
-		pw.Writer.Reset(pw.File)
+		pageWriter.Reader.Reset(pageWriter.File)
+		pageWriter.Writer.Reset(pageWriter.File)
 
-		return pw.flushBoth()
+		return pageWriter.flushBoth()
 	}
 }
 
-func (pw *writer) flushBoth() (err error) {
-	ui.Log().Printf("flushing both: %s", pw.Path())
+func (pageWriter *writer) flushBoth() (err error) {
+	ui.Log().Printf("flushing both: %s", pageWriter.Path())
 
 	chain := quiter.MakeChain(
-		pw.preWrite,
-		pw.writeOne,
+		pageWriter.preWrite,
+		pageWriter.writeOne,
 	)
 
-	if err = pw.copyJustHistoryAndAdded(
+	if err = pageWriter.copyJustHistoryAndAdded(
 		sku.MakePrimitiveQueryGroup(),
 		chain,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for {
-		popped, ok := pw.addedLatest.Pop()
+		popped, ok := pageWriter.addedLatest.Pop()
 
 		if !ok {
 			break
@@ -109,60 +109,62 @@ func (pw *writer) flushBoth() (err error) {
 
 		if err = chain(popped); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	if err = pw.Writer.Flush(); err != nil {
+	if err = pageWriter.Writer.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	for _, st := range pw.ObjectIdShaMap {
-		if err = pw.updateSigilWithLatest(st); err != nil {
+	for _, st := range pageWriter.ObjectIdToObjectMap {
+		if err = pageWriter.updateSigilWithLatest(st); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
-func (pw *writer) updateSigilWithLatest(st skuWithRangeAndSigil) (err error) {
+func (pageWriter *writer) updateSigilWithLatest(
+	st skuWithRangeAndSigil,
+) (err error) {
 	st.Add(ids.SigilLatest)
 
-	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
+	if err = pageWriter.updateSigil(pageWriter, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
-func (pw *writer) flushJustLatest() (err error) {
-	ui.Log().Printf("flushing just tail: %s", pw.Path())
+func (pageWriter *writer) flushJustLatest() (err error) {
+	ui.Log().Printf("flushing just tail: %s", pageWriter.Path())
 
-	if err = pw.copyJustHistoryFrom(
-		&pw.Reader,
+	if err = pageWriter.copyJustHistoryFrom(
+		&pageWriter.Reader,
 		sku.MakePrimitiveQueryGroup(),
 		func(sk skuWithRangeAndSigil) (err error) {
-			pw.Range = sk.Range
-			pw.saveToLatestMap(sk.Transacted, sk.Sigil)
-			return
+			pageWriter.Range = sk.Range
+			pageWriter.saveToLatestMap(sk.Transacted, sk.Sigil)
+			return err
 		},
 	); err != nil {
-		err = errors.Wrapf(err, "Page: %s", pw.PageId)
-		return
+		err = errors.Wrapf(err, "Page: %s", pageWriter.PageId)
+		return err
 	}
 
 	chain := quiter.MakeChain(
-		pw.preWrite,
-		pw.removeOldLatest,
-		pw.writeOne,
+		pageWriter.preWrite,
+		pageWriter.removeOldLatest,
+		pageWriter.writeOne,
 	)
 
 	for {
-		popped, ok := pw.addedLatest.Pop()
+		popped, ok := pageWriter.addedLatest.Pop()
 
 		if !ok {
 			break
@@ -170,27 +172,27 @@ func (pw *writer) flushJustLatest() (err error) {
 
 		if err = chain(popped); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	if err = pw.Writer.Flush(); err != nil {
+	if err = pageWriter.Writer.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	for _, st := range pw.ObjectIdShaMap {
-		if err = pw.updateSigilWithLatest(st); err != nil {
+	for _, st := range pageWriter.ObjectIdToObjectMap {
+		if err = pageWriter.updateSigilWithLatest(st); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
-func (pw *writer) writeOne(
-	z *sku.Transacted,
+func (pageWriter *writer) writeOne(
+	object *sku.Transacted,
 ) (err error) {
 	// defer func() {
 	// 	r := recover()
@@ -202,50 +204,50 @@ func (pw *writer) writeOne(
 	// 	ui.Debug().Print(z)
 	// 	panic(r)
 	// }()
-	pw.Offset += pw.ContentLength
+	pageWriter.Offset += pageWriter.ContentLength
 
-	previous := pw.ObjectIdShaMap[z.GetObjectId().String()]
+	previous := pageWriter.ObjectIdToObjectMap[object.GetObjectId().String()]
 
 	if previous.Transacted != nil {
-		z.Metadata.Cache.ParentTai = previous.GetTai()
+		object.Metadata.Cache.ParentTai = previous.GetTai()
 	}
 
-	if pw.ContentLength, err = pw.writeFormat(
-		&pw.Writer,
-		skuWithSigil{Transacted: z},
+	if pageWriter.ContentLength, err = pageWriter.writeFormat(
+		&pageWriter.Writer,
+		skuWithSigil{Transacted: object},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	if err = pw.saveToLatestMap(z, ids.SigilHistory); err != nil {
+	if err = pageWriter.saveToLatestMap(object, ids.SigilHistory); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	if err = pw.probeIndex.saveOneObjectLoc(
-		z,
+	if err = pageWriter.probeIndex.saveOneObjectLoc(
+		object,
 		object_probe_index.Loc{
-			Page:  pw.PageId.Index,
-			Range: pw.Range,
+			Page:  pageWriter.PageId.Index,
+			Range: pageWriter.Range,
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
-func (pw *writer) saveToLatestMap(
+func (pageWriter *writer) saveToLatestMap(
 	z *sku.Transacted,
 	sigil ids.Sigil,
 ) (err error) {
 	k := z.GetObjectId()
 	ks := k.String()
 
-	record := pw.ObjectIdShaMap[ks]
-	record.Range = pw.Range
+	record := pageWriter.ObjectIdToObjectMap[ks]
+	record.Range = pageWriter.Range
 
 	if record.Transacted == nil {
 		record.Transacted = sku.GetTransactedPool().Get()
@@ -261,25 +263,25 @@ func (pw *writer) saveToLatestMap(
 		record.Del(ids.SigilHidden)
 	}
 
-	pw.ObjectIdShaMap[ks] = record
+	pageWriter.ObjectIdToObjectMap[ks] = record
 
-	return
+	return err
 }
 
-func (pw *writer) removeOldLatest(sk *sku.Transacted) (err error) {
+func (pageWriter *writer) removeOldLatest(sk *sku.Transacted) (err error) {
 	ks := sk.ObjectId.String()
-	st, ok := pw.ObjectIdShaMap[ks]
+	st, ok := pageWriter.ObjectIdToObjectMap[ks]
 
 	if !ok {
-		return
+		return err
 	}
 
 	st.Del(ids.SigilLatest)
 
-	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
+	if err = pageWriter.updateSigil(pageWriter, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

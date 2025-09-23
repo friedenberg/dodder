@@ -1,7 +1,6 @@
 package stream_index
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"os"
@@ -9,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
@@ -23,12 +23,13 @@ type Page struct {
 	page_id.PageId
 	sunrise ids.Tai
 	*probeIndex
-	added, addedLatest  *sku.ListTransacted
 	hasChanges          bool
 	envRepo             env_repo.Env
 	preWrite            interfaces.FuncIter[*sku.Transacted]
 	config              store_config.Store
 	addedObjectIdLookup map[string]struct{}
+
+	added, addedLatest *sku.ListTransacted
 }
 
 func (page *Page) initialize(
@@ -53,7 +54,7 @@ func (page *Page) readOneRange(
 
 	if file, err = files.Open(page.Path()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -62,7 +63,7 @@ func (page *Page) readOneRange(
 
 	if _, err = file.ReadAt(bites, raynge.Offset); err != nil {
 		err = errors.Wrapf(err, "Range: %q, Page: %q", raynge, page.PageId)
-		return
+		return err
 	}
 
 	dec := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
@@ -81,12 +82,14 @@ func (page *Page) readOneRange(
 			raynge,
 			page.PageId.Path(),
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
+// TODO write binary representation to file-backed buffered writer and then
+// merge streams using raw binary data
 func (page *Page) add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
@@ -103,7 +106,7 @@ func (page *Page) add(
 
 	page.hasChanges = true
 
-	return
+	return err
 }
 
 func (page *Page) waitingToAddLen() int {
@@ -130,78 +133,80 @@ func (page *Page) copyJustHistoryFrom(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 
 		if err = output(sk); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 }
 
 func (page *Page) copyJustHistoryAndAdded(
-	s sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[*sku.Transacted],
+	query sku.PrimitiveQueryGroup,
+	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return page.copyHistoryAndMaybeLatest(s, w, true, false)
+	return page.copyHistoryAndMaybeLatest(query, output, true, false)
 }
 
 func (page *Page) copyHistoryAndMaybeLatest(
-	qg sku.PrimitiveQueryGroup,
-	w interfaces.FuncIter[*sku.Transacted],
+	query sku.PrimitiveQueryGroup,
+	output interfaces.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedLatest bool,
 ) (err error) {
-	var r io.ReadCloser
+	var reader io.ReadCloser
 
-	if r, err = page.envRepo.ReadCloserCache(page.Path()); err != nil {
+	if reader, err = page.envRepo.ReadCloserCache(page.Path()); err != nil {
 		if errors.IsNotExist(err) {
-			r = io.NopCloser(bytes.NewReader(nil))
+			reader = io.NopCloser(bytes.NewReader(nil))
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	defer errors.DeferredCloser(&err, r)
+	defer errors.DeferredCloser(&err, reader)
 
-	br := bufio.NewReader(r)
+	bufferedReader, repool := pool.GetBufferedReader(reader)
+	defer repool()
 
 	if !includeAdded && !includeAddedLatest {
 		if err = page.copyJustHistoryFrom(
-			br,
-			qg,
-			func(sk skuWithRangeAndSigil) (err error) {
-				if err = w(sk.Transacted); err != nil {
-					err = errors.Wrapf(err, "%s", sk.Transacted)
-					return
+			bufferedReader,
+			query,
+			func(object skuWithRangeAndSigil) (err error) {
+				if err = output(object.Transacted); err != nil {
+					err = errors.Wrapf(err, "%s", object.Transacted)
+					return err
 				}
 
-				return
+				return err
 			},
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
-	dec := makeBinaryWithQueryGroup(qg, ids.SigilHistory)
+	dec := makeBinaryWithQueryGroup(query, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
 	added := page.added.Copy()
 
-	var sk skuWithRangeAndSigil
+	var object skuWithRangeAndSigil
 
 	if err = heap.MergeStream(
 		&added,
-		func() (tz *sku.Transacted, err error) {
-			tz = sku.GetTransactedPool().Get()
-			sk.Transacted = tz
-			_, err = dec.readFormatAndMatchSigil(br, &sk)
+		func() (transacted *sku.Transacted, err error) {
+			transacted = sku.GetTransactedPool().Get()
+			object.Transacted = transacted
+
+			_, err = dec.readFormatAndMatchSigil(bufferedReader, &object)
 			if err != nil {
 				if errors.IsEOF(err) {
 					err = errors.MakeErrStopIteration()
@@ -209,19 +214,19 @@ func (page *Page) copyHistoryAndMaybeLatest(
 					err = errors.Wrap(err)
 				}
 
-				return
+				return transacted, err
 			}
 
-			return
+			return transacted, err
 		},
-		w,
+		output,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !includeAddedLatest {
-		return
+		return err
 	}
 
 	addedLatest := page.addedLatest.Copy()
@@ -230,15 +235,15 @@ func (page *Page) copyHistoryAndMaybeLatest(
 		&addedLatest,
 		func() (tz *sku.Transacted, err error) {
 			err = errors.MakeErrStopIteration()
-			return
+			return tz, err
 		},
-		w,
+		output,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (page *Page) MakeFlush(
@@ -257,11 +262,11 @@ func (page *Page) MakeFlush(
 
 		if err = pw.Flush(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		page.hasChanges = false
 
-		return
+		return err
 	}
 }

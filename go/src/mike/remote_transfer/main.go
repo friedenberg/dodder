@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -15,10 +16,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
-)
-
-var ErrNeedsMerge = errors.Err409Conflict.Errorf(
-	"import failed with conflicts, merging required",
 )
 
 func Make(
@@ -109,22 +106,22 @@ func (importer importer) Import(
 
 	if err = importer.ImportBlobIfNecessary(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
 	if external.GetGenre() == genres.InventoryList {
 		if checkedOut, err = importer.importInventoryList(external); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	} else {
 		if checkedOut, err = importer.importLeaf(external); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (importer importer) importInventoryList(
@@ -132,17 +129,17 @@ func (importer importer) importInventoryList(
 ) (checkedOut *sku.CheckedOut, err error) {
 	if err = genres.InventoryList.AssertGenre(list.GetGenre()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
 	blobDigest := list.GetBlobDigest()
 
 	if !importer.envRepo.GetDefaultBlobStore().HasBlob(blobDigest) {
 		err = env_dir.ErrBlobMissing{
-			BlobId: blobDigest,
+			BlobId: markl.Clone(blobDigest),
 		}
 
-		return
+		return checkedOut, err
 	}
 
 	seq := importer.typedInventoryListBlobStore.StreamInventoryListBlobSkus(
@@ -152,14 +149,14 @@ func (importer importer) importInventoryList(
 	for object, errIter := range seq {
 		if errIter != nil {
 			err = errors.Wrap(errIter)
-			return
+			return checkedOut, err
 		}
 
 		if _, err = importer.Import(
 			object,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
@@ -176,10 +173,10 @@ func (importer importer) importInventoryList(
 		list,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (importer importer) importLeaf(
@@ -187,14 +184,14 @@ func (importer importer) importLeaf(
 ) (checkedOut *sku.CheckedOut, err error) {
 	if importer.excludeObjects {
 		err = ErrSkipped
-		return
+		return checkedOut, err
 	}
 
 	// TODO address this terrible hack? How should config objects be handled by
 	// remotes?
 	if external.GetGenre() == genres.Config {
 		err = genres.MakeErrUnsupportedGenre(external.GetGenre())
-		return
+		return checkedOut, err
 	}
 
 	checkedOut = sku.GetCheckedOutPool().Get()
@@ -211,12 +208,12 @@ func (importer importer) importLeaf(
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	} else {
 		if err = checkedOut.GetSkuExternal().FinalizeUsingObject(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
@@ -228,12 +225,12 @@ func (importer importer) importLeaf(
 
 		if err == nil {
 			err = collections.ErrExists
-			return
+			return checkedOut, err
 		} else if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
@@ -247,15 +244,15 @@ func (importer importer) importLeaf(
 				checkedOut.GetSkuExternal(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return checkedOut, err
 			}
 
-			return
+			return checkedOut, err
 		} else {
 			err = errors.Wrapf(err, "ObjectId: %s", external.GetObjectId())
 		}
 
-		return
+		return checkedOut, err
 	}
 
 	var commitOptions sku.CommitOptions
@@ -268,17 +265,17 @@ func (importer importer) importLeaf(
 			importer.allowMergeConflicts,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 
 		if checkedOut.GetState() == checked_out_state.Conflicted {
 			if !importer.allowMergeConflicts {
 				if err = importer.checkedOutPrinter(checkedOut); err != nil {
 					err = errors.Wrap(err)
-					return
+					return checkedOut, err
 				}
 
-				return
+				return checkedOut, err
 			}
 		}
 	}
@@ -290,15 +287,15 @@ func (importer importer) importLeaf(
 		commitOptions,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
 	if err = importer.checkedOutPrinter(checkedOut); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (importer importer) importNewObject(
@@ -317,10 +314,10 @@ func (importer importer) importNewObject(
 		options,
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (importer importer) ImportBlobIfNecessary(
@@ -334,8 +331,8 @@ func (importer importer) ImportBlobIfNecessary(
 
 	if err = copyResult.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

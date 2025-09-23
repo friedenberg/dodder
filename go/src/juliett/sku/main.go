@@ -30,12 +30,6 @@ type (
 		Object, List *Transacted
 	}
 
-	// TODO examine removing this
-	TransactedWithBlob[T any] struct {
-		*Transacted
-		Blob T
-	}
-
 	ExternalLike interface {
 		ids.ObjectIdGetter
 		interfaces.Stringer

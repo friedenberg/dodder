@@ -227,7 +227,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 	case key_bytes.DigestMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(
 			object.Metadata.GetObjectDigest(),
-			false,
+			true,
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -289,7 +289,7 @@ func (encoder *binaryEncoder) writeMerkleId(
 	key string,
 ) (n int64, err error) {
 	if !allowNull {
-		if err = markl.AssertIdIsNotNull(merkleId, key); err != nil {
+		if err = markl.AssertIdIsNotNull(merkleId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -328,7 +328,7 @@ func (encoder *binaryEncoder) writeFieldMerkleId(
 ) (n int64, err error) {
 	if merkleId.IsNull() {
 		if !allowNull {
-			err = markl.AssertIdIsNotNull(merkleId, key)
+			err = markl.AssertIdIsNotNull(merkleId)
 		}
 
 		return

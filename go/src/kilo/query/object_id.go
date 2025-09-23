@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -17,17 +18,38 @@ type ObjectId struct {
 	*ids.ObjectId
 }
 
-func (expObjectId ObjectId) reduce(b *buildState) (err error) {
-	if err = expObjectId.GetObjectId().Expand(b.builder.expanders); err != nil {
+func (objectId ObjectId) reduce(b *buildState) (err error) {
+	if err = objectId.GetObjectId().Expand(b.builder.expanders); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
+}
+
+func (objectId *ObjectId) ReadFromSeq(seq doddish.Seq) (err error) {
+	ok, left, _ := seq.MatchEnd(doddish.TokenMatcherOp(doddish.OpExact))
+
+	if ok {
+		objectId.Exact = true
+		seq = left
+	}
+
+	if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
+		if errors.Is(err, doddish.ErrUnsupportedSeq{}) {
+			err = errors.BadRequest(err)
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return err
+	}
+
+	return err
 }
 
 // TODO support exact
-func (expObjectId ObjectId) ContainsSku(
+func (objectId ObjectId) ContainsSku(
 	objectGetter sku.TransactedGetter,
 ) (ok bool) {
 	object := objectGetter.GetSku()
@@ -36,65 +58,65 @@ func (expObjectId ObjectId) ContainsSku(
 
 	method := ids.Contains
 
-	if expObjectId.Exact {
+	if objectId.Exact {
 		method = ids.ContainsExactly
 	}
 
-	switch expObjectId.GetGenre() {
+	switch objectId.GetGenre() {
 	case genres.Tag:
-		if expObjectId.Exact {
+		if objectId.Exact {
 			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTagExact(
-				expObjectId.GetObjectId(),
+				objectId.GetObjectId(),
 			)
 		} else {
 			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTag(
-				expObjectId.GetObjectId(),
+				objectId.GetObjectId(),
 			)
 		}
 
 		if ok {
-			return
+			return ok
 		}
 
-		return
+		return ok
 
 	case genres.Type:
-		if method(metadata.GetType(), expObjectId.GetObjectId()) {
+		if method(metadata.GetType(), objectId.GetObjectId()) {
 			ok = true
-			return
+			return ok
 		}
 
 		if e, isExternal := objectGetter.(*sku.Transacted); isExternal {
-			if method(e.ExternalType, expObjectId.GetObjectId()) {
+			if method(e.ExternalType, objectId.GetObjectId()) {
 				ok = true
-				return
+				return ok
 			}
 		}
 	}
 
 	idl := &object.ObjectId
 
-	if !method(idl, expObjectId.GetObjectId()) {
-		return
+	if !method(idl, objectId.GetObjectId()) {
+		return ok
 	}
 
 	ok = true
 
-	return
+	return ok
 }
 
-func (expObjectId ObjectId) String() string {
+func (objectId ObjectId) String() string {
 	var sb strings.Builder
 
-	if expObjectId.Exact {
+	if objectId.Exact {
 		sb.WriteRune('=')
 	}
 
-	if expObjectId.Virtual {
+	if objectId.Virtual {
 		sb.WriteRune('%')
 	}
 
-	sb.WriteString(ids.FormattedString(expObjectId.GetObjectId()))
+	sb.WriteString(ids.FormattedString(objectId.GetObjectId()))
 
 	return sb.String()
 }

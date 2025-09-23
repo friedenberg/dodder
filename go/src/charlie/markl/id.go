@@ -23,14 +23,27 @@ type Id struct {
 }
 
 func (id Id) String() string {
-	if id.format == nil && len(id.data) == 0 {
-		return ""
-	}
+	emptyFormat := id.format == nil
+	emptyData := len(id.data) == 0
+	var hrp string
 
-	if len(id.data) == 0 {
+	switch {
+	case emptyFormat && emptyData:
 		return ""
-	} else {
-		bites, err := blech32.Encode(id.format.GetMarklFormatId(), id.data)
+
+	case emptyData:
+		return ""
+
+	case emptyFormat:
+		hrp = "!error-empty_format"
+		fallthrough
+
+	default:
+		if hrp == "" {
+			hrp = id.format.GetMarklFormatId()
+		}
+
+		bites, err := blech32.Encode(hrp, id.data)
 		errors.PanicIfError(err)
 		return string(bites)
 	}
@@ -109,30 +122,30 @@ func (id *Id) Set(value string) (err error) {
 	if ok {
 		if err = id.setWithFormat(format, body); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if err = id.setWithoutFormat(value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (id *Id) setWithFormat(format, body string) (err error) {
 	if err = id.SetPurpose(format); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.Set(body); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) setWithoutFormat(value string) (err error) {
@@ -140,21 +153,21 @@ func (id *Id) setWithoutFormat(value string) (err error) {
 
 	if typeId, id.data, err = blech32.DecodeString(value); err != nil {
 		err = errors.Wrapf(err, "Value: %q", value)
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(typeId, id.data); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 	if err = id.SetPurpose(digest.GetPurpose()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(
@@ -162,38 +175,38 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 		digest.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) setFormatId(formatId string) (err error) {
 	if id.format, err = GetFormatOrError(formatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) SetMarklId(formatId string, bites []byte) (err error) {
 	if formatId == "" && len(bites) == 0 {
 		id.Reset()
-		return
+		return err
 	}
 
 	if err = id.setFormatId(formatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.setData(bites); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) allocDataIfNecessary(size int) {
@@ -209,7 +222,7 @@ func (id *Id) allocDataAndSetToCapIfNecessary(size int) {
 func (id *Id) setData(bites []byte) (err error) {
 	// empty is permitted
 	if len(bites) == 0 {
-		return
+		return err
 	}
 
 	// TODO enforce non-nil formats
@@ -224,14 +237,14 @@ func (id *Id) setData(bites []byte) (err error) {
 				actual,
 			)
 
-			return
+			return err
 		}
 	}
 
 	id.allocDataAndSetToCapIfNecessary(len(bites))
 	copy(id.data, bites)
 
-	return
+	return err
 }
 
 func (id *Id) Reset() {

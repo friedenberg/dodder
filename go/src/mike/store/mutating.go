@@ -25,7 +25,7 @@ func (store *Store) tryPrecommit(
 ) (err error) {
 	if err = store.SaveBlob(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	object := external.GetSku()
@@ -53,7 +53,7 @@ func (store *Store) tryPrecommit(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -64,17 +64,17 @@ func (store *Store) tryPrecommit(
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
 
 	if err = store.validate(object, mother, options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO add RealizeAndOrStore result
@@ -84,6 +84,10 @@ func (store *Store) Commit(
 	options sku.CommitOptions,
 ) (err error) {
 	daughter := external.GetSku()
+
+	if daughter == nil {
+		panic("empty daughter")
+	}
 
 	ui.Log().Printf("%s -> %s", options, daughter)
 
@@ -95,7 +99,7 @@ func (store *Store) Commit(
 			Operation: "commit",
 		})
 
-		return
+		return err
 	}
 
 	// TAI must be set before calculating object sha
@@ -115,12 +119,12 @@ func (store *Store) Commit(
 
 		if zettelId, err = store.zettelIdIndex.CreateZettelId(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = daughter.ObjectId.SetWithIdLike(zettelId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -128,7 +132,7 @@ func (store *Store) Commit(
 
 	if mother, err = store.fetchMotherIfNecessary(daughter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if mother != nil {
@@ -138,14 +142,14 @@ func (store *Store) Commit(
 
 	if err = store.tryPrecommit(external, mother, options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	{
 		if options.AddToInventoryList {
 			if err = store.addMissingTypes(options, daughter); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -155,7 +159,7 @@ func (store *Store) Commit(
 				daughter,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -171,18 +175,18 @@ func (store *Store) Commit(
 			if store.sunrise.Less(daughter.GetTai()) {
 				if err = store.handleUnchanged(daughter); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		}
 
 		if err = store.applyDormantAndRealizeTags(
 			daughter,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if daughter.GetGenre() == genres.Zettel {
@@ -192,7 +196,7 @@ func (store *Store) Commit(
 					err = nil
 				} else {
 					err = errors.Wrapf(err, "failed to write zettel to index: %s", daughter)
-					return
+					return err
 				}
 			}
 		}
@@ -204,7 +208,7 @@ func (store *Store) Commit(
 
 		if err = store.commitTransacted(daughter, mother); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(daughter))
-			return
+			return err
 		}
 	}
 
@@ -215,11 +219,9 @@ func (store *Store) Commit(
 			store_version.V11,
 		) {
 			if err = markl.AssertIdIsNotNull(
-				daughter.Metadata.GetObjectSig(),
-				"object-sig",
-			); err != nil {
+				daughter.Metadata.GetObjectSig()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -228,7 +230,7 @@ func (store *Store) Commit(
 			mother,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = store.GetStreamIndex().Add(
@@ -236,7 +238,7 @@ func (store *Store) Commit(
 			options,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if mother == nil {
@@ -252,7 +254,7 @@ func (store *Store) Commit(
 
 			if err = store.ui.TransactedNew(daughter); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			// [are/kabuto !task project-2021-zit-features zz-inbox] add delta
@@ -264,7 +266,7 @@ func (store *Store) Commit(
 
 			if err = store.ui.TransactedUpdated(daughter); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -277,20 +279,24 @@ func (store *Store) Commit(
 			options,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) fetchMotherIfNecessary(
 	daughter *sku.Transacted,
 ) (mother *sku.Transacted, err error) {
+	if daughter == nil {
+		panic("empty daughter")
+	}
+
 	objectId := daughter.GetObjectId()
 
 	if objectId.IsEmpty() {
-		return
+		return mother, err
 	}
 
 	mother = sku.GetTransactedPool().Get()
@@ -308,15 +314,15 @@ func (store *Store) fetchMotherIfNecessary(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return mother, err
 	}
 
 	if err = daughter.SetMother(mother); err != nil {
 		err = errors.Wrap(err)
-		return
+		return mother, err
 	}
 
-	return
+	return mother, err
 }
 
 // TODO add results for which stores had which change types
@@ -329,10 +335,10 @@ func (store *Store) commitTransacted(
 		daughter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) handleUnchanged(
@@ -357,7 +363,7 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 	switch typeId.GetGenre() {
 	default:
 		err = genres.MakeErrUnsupportedGenre(typeId.GetGenre())
-		return
+		return err
 
 	case genres.Type:
 		typeObject.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
@@ -365,7 +371,7 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 
 	if err = typeObject.ObjectId.SetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.Commit(
@@ -375,10 +381,10 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) addTypeIfNecessary(
@@ -386,18 +392,18 @@ func (store *Store) addTypeIfNecessary(
 ) (err error) {
 	if typeId.IsEmpty() {
 		err = errors.ErrorWithStackf("attempting to add empty type")
-		return
+		return err
 	}
 
 	var objectId ids.ObjectId
 
 	if err = objectId.ResetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.GetStreamIndex().ObjectExists(&objectId); err == nil {
-		return
+		return err
 	}
 
 	err = nil
@@ -406,26 +412,26 @@ func (store *Store) addTypeIfNecessary(
 
 	if err = typeObjectId.SetWithIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.createType(&typeObjectId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) addTypeAndExpandedIfNecessary(
 	rootTipe ids.Type,
 ) (err error) {
 	if rootTipe.IsEmpty() {
-		return
+		return err
 	}
 
 	if ids.IsBuiltin(rootTipe) {
-		return
+		return err
 	}
 
 	typesExpanded := ids.ExpandOneSlice(
@@ -437,11 +443,11 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	for _, tipe := range typesExpanded {
 		if err = store.addTypeIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) addMissingTypes(
@@ -453,13 +459,13 @@ func (store *Store) addMissingTypes(
 	if !commitOptions.DontAddMissingType {
 		if err = store.addTypeAndExpandedIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		// TODO enforce that object has signature
 	}
 
-	return
+	return err
 }
 
 func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
@@ -469,15 +475,15 @@ func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
 
 	if err = store.Commit(object.Object, options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.GetAbbrStore().AddObjectToIdIndex(
 		object.Object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

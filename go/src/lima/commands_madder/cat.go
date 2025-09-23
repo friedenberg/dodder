@@ -33,7 +33,9 @@ type Cat struct {
 
 var _ interfaces.CommandComponentWriter = (*Cat)(nil)
 
-func (cmd *Cat) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Cat) SetFlagDefinitions(
+	flagSet interfaces.CommandLineFlagDefinitions,
+) {
 	flagSet.Var(&cmd.Utility, "utility", "")
 	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")
@@ -53,10 +55,10 @@ func (cmd Cat) makeBlobWriter(
 			func(readCloser blobIdWithReadCloser) (err error) {
 				if err = cmd.copy(envRepo, blobStore, readCloser); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			},
 		)
 	} else {
@@ -71,12 +73,12 @@ func (cmd Cat) makeBlobWriter(
 
 				if out, err = utility.StdoutPipe(); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = utility.Start(); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = cmd.copy(
@@ -88,15 +90,15 @@ func (cmd Cat) makeBlobWriter(
 					},
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = utility.Wait(); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			},
 		)
 	}
@@ -111,12 +113,12 @@ func (cmd Cat) Run(req command.Request) {
 
 	blobWriter := cmd.makeBlobWriter(envRepo, blobStore)
 
-	for _, v := range req.PopArgs() {
+	for _, blobIdString := range req.PopArgs() {
 		var blobId markl.Id
 
 		if err := markl.SetMaybeSha256(
 			&blobId,
-			v,
+			blobIdString,
 		); err != nil {
 			envRepo.Cancel(err)
 		}
@@ -143,16 +145,16 @@ func (cmd Cat) copy(
 			true,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if _, err = io.Copy(envRepo.GetUIFile(), readCloser.ReadCloser); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (cmd Cat) blob(
@@ -164,13 +166,13 @@ func (cmd Cat) blob(
 
 	if r, err = blobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = blobWriter(blobIdWithReadCloser{BlobId: blobId, ReadCloser: r}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

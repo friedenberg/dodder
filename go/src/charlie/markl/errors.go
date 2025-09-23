@@ -21,20 +21,18 @@ func MakeErrEmptyType(id interfaces.MarklId) error {
 
 func AssertIdIsNull(id interfaces.MarklId) error {
 	if !id.IsNull() {
-		// TODO clone
-		return errors.WrapSkip(1, errIsNotNull{id: id, value: id.String()})
+		return errors.WrapSkip(1, errIsNotNull{id: Clone(id)})
 	}
 
 	return nil
 }
 
 type errIsNotNull struct {
-	value string
-	id    interfaces.MarklId
+	id interfaces.MarklId
 }
 
 func (err errIsNotNull) Error() string {
-	return fmt.Sprintf("blob id is not null %q", err.value)
+	return fmt.Sprintf("blob id is not null %q", err.id)
 }
 
 func (err errIsNotNull) Is(target error) bool {
@@ -42,16 +40,9 @@ func (err errIsNotNull) Is(target error) bool {
 	return ok
 }
 
-// TODO remove key
-func AssertIdIsNotNull(id interfaces.MarklId, key string) error {
-	format := id.GetPurpose()
-
-	if format != "" {
-		key = format
-	}
-
+func AssertIdIsNotNull(id interfaces.MarklId) error {
 	if id.IsNull() {
-		return errors.WrapSkip(1, errIsNull{key: key})
+		return errors.WrapSkip(1, errIsNull{purpose: id.GetPurpose()})
 	}
 
 	return nil
@@ -62,11 +53,11 @@ func IsErrNull(target error) bool {
 }
 
 type errIsNull struct {
-	key string
+	purpose string
 }
 
 func (err errIsNull) Error() string {
-	return fmt.Sprintf("blob id is null for key %q", err.key)
+	return fmt.Sprintf("blob id is null for purpose %q", err.purpose)
 }
 
 func (err errIsNull) Is(target error) bool {
@@ -80,7 +71,7 @@ type ErrNotEqual struct {
 
 func AssertEqual(expected, actual interfaces.MarklId) (err error) {
 	if Equals(expected, actual) {
-		return
+		return err
 	}
 
 	err = ErrNotEqual{
@@ -88,7 +79,7 @@ func AssertEqual(expected, actual interfaces.MarklId) (err error) {
 		Actual:   actual,
 	}
 
-	return
+	return err
 }
 
 func (err ErrNotEqual) Error() string {
@@ -114,7 +105,7 @@ type ErrNotEqualBytes struct {
 
 func MakeErrNotEqualBytes(expected, actual []byte) (err error) {
 	if bytes.Equal(expected, actual) {
-		return
+		return err
 	}
 
 	err = ErrNotEqualBytes{
@@ -122,7 +113,7 @@ func MakeErrNotEqualBytes(expected, actual []byte) (err error) {
 		Actual:   actual,
 	}
 
-	return
+	return err
 }
 
 func (err ErrNotEqualBytes) Error() string {
@@ -181,5 +172,33 @@ func (err errWrongType) Error() string {
 
 func (err errWrongType) Is(target error) bool {
 	_, ok := target.(errWrongType)
+	return ok
+}
+
+type ErrFormatOperationNotSupported struct {
+	Format        interfaces.MarklFormat
+	FormatId      string
+	OperationName string
+}
+
+func (err ErrFormatOperationNotSupported) Error() string {
+	if err.Format == nil {
+		return fmt.Sprintf(
+			"nil format with id %q does not support operation %q",
+			err.FormatId,
+			err.OperationName,
+		)
+	} else {
+		return fmt.Sprintf(
+			"format (%T) with id %q does not support operation %q",
+			err.Format,
+			err.Format.GetMarklFormatId(),
+			err.OperationName,
+		)
+	}
+}
+
+func (err ErrFormatOperationNotSupported) Is(target error) bool {
+	_, ok := target.(ErrFormatOperationNotSupported)
 	return ok
 }

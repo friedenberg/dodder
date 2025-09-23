@@ -73,9 +73,7 @@ func (cmd Fsck) Run(req command.Request) {
 				query,
 				func(object *sku.Transacted) (err error) {
 					if err = markl.AssertIdIsNotNull(
-						object.GetObjectDigest(),
-						"object-dig",
-					); err != nil {
+						object.GetObjectDigest()); err != nil {
 						objectErrorsLock.Lock()
 
 						objectErrors = append(

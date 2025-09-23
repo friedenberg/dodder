@@ -21,7 +21,7 @@ func NewFileReader(
 	} else {
 		if objectReader.file, err = files.Open(path); err != nil {
 			err = errors.Wrap(err)
-			return
+			return readCloser, err
 		}
 	}
 
@@ -32,11 +32,11 @@ func NewFileReader(
 	); err != nil {
 		if _, err = objectReader.file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
-			return
+			return readCloser, err
 		}
 
 		config = MakeConfig(
-			config.hashType,
+			config.hashFormat,
 			config.funcJoin,
 			config.GetBlobCompression(),
 			nil,
@@ -44,13 +44,13 @@ func NewFileReader(
 
 		if objectReader.BlobReader, err = NewReader(config, objectReader.file); err != nil {
 			err = errors.Wrap(err)
-			return
+			return readCloser, err
 		}
 	}
 
 	readCloser = objectReader
 
-	return
+	return readCloser, err
 }
 
 type objectReader struct {
@@ -58,30 +58,30 @@ type objectReader struct {
 	interfaces.BlobReader
 }
 
-func (r objectReader) String() string {
-	return r.file.Name()
+func (reader objectReader) String() string {
+	return reader.file.Name()
 }
 
-func (ar objectReader) Close() (err error) {
-	if ar.file == nil {
+func (reader objectReader) Close() (err error) {
+	if reader.file == nil {
 		err = errors.ErrorWithStackf("nil file")
-		return
+		return err
 	}
 
-	if ar.BlobReader == nil {
+	if reader.BlobReader == nil {
 		err = errors.ErrorWithStackf("nil object reader")
-		return
+		return err
 	}
 
-	if err = ar.BlobReader.Close(); err != nil {
+	if err = reader.BlobReader.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	if err = files.Close(ar.file); err != nil {
+	if err = files.Close(reader.file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
