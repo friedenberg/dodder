@@ -92,6 +92,12 @@ func (index *Index) addDigest(
 		replacementId, repool := index.hashType.GetMarklIdForMarklId(digest)
 		defer repool()
 
+		// ui.Debug().Print(
+		// 	digest.StringWithFormat(),
+		// 	"->",
+		// 	replacementId.StringWithFormat(),
+		// )
+
 		digest = replacementId
 	}
 

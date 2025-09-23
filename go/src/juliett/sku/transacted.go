@@ -186,7 +186,7 @@ func (transacted *Transacted) GetKey() string {
 	return ids.FormattedString(transacted.GetObjectId())
 }
 
-func (transacted *Transacted) GetProbeKeys() map[string]string {
+func (transacted *Transacted) GetStringProbeKeys() map[string]string {
 	return map[string]string{
 		"objectId":     transacted.GetObjectId().String(),
 		"objectId+tai": transacted.GetObjectId().String() + transacted.GetTai().String(),
@@ -198,15 +198,11 @@ type ProbeId struct {
 	Id  interfaces.MarklId
 }
 
-func (transacted *Transacted) AllProbeIds() interfaces.Seq[ProbeId] {
-	return transacted.allProbeIds(markl.FormatHashSha256)
-}
-
-func (transacted *Transacted) allProbeIds(
+func (transacted *Transacted) AllProbeIds(
 	hashType markl.FormatHash,
 ) interfaces.Seq[ProbeId] {
 	return func(yield func(ProbeId) bool) {
-		for key, value := range transacted.GetProbeKeys() {
+		for key, value := range transacted.GetStringProbeKeys() {
 			id, repool := hashType.GetMarklIdForString(value)
 
 			probeId := ProbeId{
