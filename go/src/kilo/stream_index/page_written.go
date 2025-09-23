@@ -253,6 +253,7 @@ func (page *writtenPage) MakeFlush(
 		pw := &pageWriter{
 			writtenPage: page,
 			probeIndex:  page.probeIndex,
+			path:        page.Path(),
 		}
 
 		if changesAreHistorical {
