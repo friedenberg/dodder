@@ -225,7 +225,7 @@ func (bf *binaryDecoder) readSigil(
 	r io.Reader,
 ) (n int64, err error) {
 	if n, err = bf.binaryField.ReadFrom(r); err != nil {
-		err = errors.Wrapf(err, "Range: %q", sk.Range)
+		err = errors.Wrapf(err, "Range: %q", sk.Cursor)
 		return
 	}
 

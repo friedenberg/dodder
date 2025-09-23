@@ -47,7 +47,7 @@ func (page *virtualPage) initialize(
 }
 
 func (page *virtualPage) readOneRange(
-	raynge object_probe_index.Range,
+	raynge object_probe_index.Cursor,
 	object *sku.Transacted,
 ) (err error) {
 	var file *os.File
@@ -72,7 +72,7 @@ func (page *virtualPage) readOneRange(
 		skuWithSigil: skuWithSigil{
 			Transacted: object,
 		},
-		Range: raynge,
+		Cursor: raynge,
 	}
 
 	if _, err = dec.readFormatExactly(file, &skWR); err != nil {

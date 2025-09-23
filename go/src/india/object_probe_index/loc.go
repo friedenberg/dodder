@@ -10,7 +10,7 @@ import (
 
 type Loc struct {
 	Page uint8
-	Range
+	Cursor
 }
 
 func (loc Loc) IsEmpty() bool {
@@ -18,7 +18,7 @@ func (loc Loc) IsEmpty() bool {
 }
 
 func (loc Loc) String() string {
-	return fmt.Sprintf("%02d@%s", loc.Page, loc.Range)
+	return fmt.Sprintf("%02d@%s", loc.Page, loc.Cursor)
 }
 
 func (loc *Loc) ReadFrom(r io.Reader) (n int64, err error) {
@@ -32,7 +32,7 @@ func (loc *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	var n2 int64
-	n2, err = loc.Range.ReadFrom(r)
+	n2, err = loc.Cursor.ReadFrom(r)
 	n += n2
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (loc *Loc) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	var n2 int64
-	n2, err = loc.Range.WriteTo(w)
+	n2, err = loc.Cursor.WriteTo(w)
 	n += n2
 
 	if err != nil {

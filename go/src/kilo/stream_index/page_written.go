@@ -47,7 +47,7 @@ func (page *writtenPage) initialize(
 }
 
 func (page *writtenPage) readOneRange(
-	raynge object_probe_index.Range,
+	raynge object_probe_index.Cursor,
 	object *sku.Transacted,
 ) (err error) {
 	var file *os.File
@@ -72,7 +72,7 @@ func (page *writtenPage) readOneRange(
 		skuWithSigil: skuWithSigil{
 			Transacted: object,
 		},
-		Range: raynge,
+		Cursor: raynge,
 	}
 
 	if _, err = dec.readFormatExactly(file, &skWR); err != nil {
@@ -250,18 +250,21 @@ func (page *writtenPage) MakeFlush(
 	changesAreHistorical bool,
 ) func() error {
 	return func() (err error) {
-		pw := &pageWriter{
+		pageWriter := &pageWriter{
+			pageId:      page.PageId,
 			writtenPage: page,
+			preWrite:    page.preWrite,
+			envRepo:     page.envRepo,
 			probeIndex:  page.probeIndex,
 			path:        page.Path(),
 		}
 
 		if changesAreHistorical {
-			pw.changesAreHistorical = true
-			pw.writtenPage.hasChanges = true
+			pageWriter.changesAreHistorical = true
+			pageWriter.writtenPage.hasChanges = true
 		}
 
-		if err = pw.Flush(); err != nil {
+		if err = pageWriter.Flush(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

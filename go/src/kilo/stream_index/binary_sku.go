@@ -13,5 +13,5 @@ type skuWithSigil struct {
 
 type skuWithRangeAndSigil struct {
 	skuWithSigil
-	object_probe_index.Range
+	object_probe_index.Cursor
 }

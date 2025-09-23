@@ -5,10 +5,13 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -16,6 +19,9 @@ import (
 type ObjectIdToObject map[string]skuWithRangeAndSigil
 
 type pageWriter struct {
+	envRepo     env_repo.Env
+	pageId      page_id.PageId
+	preWrite    interfaces.FuncIter[*sku.Transacted]
 	writtenPage *writtenPage
 	path        string
 
@@ -30,7 +36,7 @@ type pageWriter struct {
 
 	probeIndex *probeIndex
 
-	cursor object_probe_index.Range
+	cursor object_probe_index.Cursor
 
 	ObjectIdToObjectMap ObjectIdToObject
 }
@@ -73,7 +79,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 		return pageWriter.flushJustLatest()
 	} else {
-		if pageWriter.file, err = pageWriter.writtenPage.envRepo.GetTempLocal().FileTemp(); err != nil {
+		if pageWriter.file, err = pageWriter.envRepo.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -96,7 +102,7 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 	ui.Log().Printf("flushing both: %s", pageWriter.path)
 
 	chain := quiter.MakeChain(
-		pageWriter.writtenPage.preWrite,
+		pageWriter.preWrite,
 		pageWriter.writeOne,
 	)
 
@@ -126,8 +132,8 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 		return err
 	}
 
-	for _, st := range pageWriter.ObjectIdToObjectMap {
-		if err = pageWriter.updateSigilWithLatest(st); err != nil {
+	for _, object := range pageWriter.ObjectIdToObjectMap {
+		if err = pageWriter.updateSigilWithLatest(object); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -160,17 +166,17 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 		&pageWriter.bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
 		func(sk skuWithRangeAndSigil) (err error) {
-			pageWriter.cursor = sk.Range
+			pageWriter.cursor = sk.Cursor
 			pageWriter.saveToLatestMap(sk.Transacted, sk.Sigil)
 			return err
 		},
 	); err != nil {
-		err = errors.Wrapf(err, "Page: %s", pageWriter.writtenPage.PageId)
+		err = errors.Wrapf(err, "Page: %s", pageWriter.pageId)
 		return err
 	}
 
 	chain := quiter.MakeChain(
-		pageWriter.writtenPage.preWrite,
+		pageWriter.preWrite,
 		pageWriter.removeOldLatest,
 		pageWriter.writeOne,
 	)
@@ -240,8 +246,8 @@ func (pageWriter *pageWriter) writeOne(
 	if err = pageWriter.probeIndex.saveOneObjectLoc(
 		object,
 		object_probe_index.Loc{
-			Page:  pageWriter.writtenPage.PageId.Index,
-			Range: pageWriter.cursor,
+			Page:   pageWriter.pageId.Index,
+			Cursor: pageWriter.cursor,
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -259,7 +265,7 @@ func (pageWriter *pageWriter) saveToLatestMap(
 	objectIdString := objectId.String()
 
 	record := pageWriter.ObjectIdToObjectMap[objectIdString]
-	record.Range = pageWriter.cursor
+	record.Cursor = pageWriter.cursor
 
 	if record.Transacted == nil {
 		record.Transacted = sku.GetTransactedPool().Get()
