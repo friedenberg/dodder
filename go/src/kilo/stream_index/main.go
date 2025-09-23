@@ -34,7 +34,11 @@ type Index struct {
 	preWrite interfaces.FuncIter[*sku.Transacted]
 	path     string
 	interfaces.CacheIOFactory
-	pages             [PageCount]Page
+
+	pages            [PageCount]writtenPage
+	pagesAdded       [PageCount]writtenPage
+	pagesAddedLatest [PageCount]writtenPage
+
 	historicalChanges []string
 	probeIndex
 }
@@ -85,7 +89,7 @@ func (index *Index) Initialize() (err error) {
 	return err
 }
 
-func (index *Index) GetPage(n uint8) (p *Page) {
+func (index *Index) GetPage(n uint8) (p *writtenPage) {
 	p = &index.pages[n]
 	return p
 }
@@ -279,9 +283,9 @@ func (index *Index) Add(
 		return err
 	}
 
-	p := index.GetPage(n)
+	page := index.GetPage(n)
 
-	if err = p.add(object, options); err != nil {
+	if err = page.add(object, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -309,7 +313,6 @@ func (index *Index) ReadOneMarklId(
 	return err
 }
 
-// TODO rename
 func (index *Index) ReadManyMarklId(
 	blobId interfaces.MarklId,
 ) (objects []*sku.Transacted, err error) {
@@ -470,7 +473,7 @@ func (index *Index) ReadPrimitiveQuery(
 	for n := range index.pages {
 		waitGroup.Add(1)
 
-		go func(p *Page, openFileCh chan struct{}) {
+		go func(p *writtenPage, openFileCh chan struct{}) {
 			ui.Log().Printf(
 				"starting query on page %d: %q",
 				p.PageId.Index,

@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
 
-type Page struct {
+type virtualPage struct {
 	page_id.PageId
 	sunrise ids.Tai
 	*probeIndex
@@ -32,7 +32,7 @@ type Page struct {
 	added, addedLatest *sku.ListTransacted
 }
 
-func (page *Page) initialize(
+func (page *virtualPage) initialize(
 	pid page_id.PageId,
 	index *Index,
 ) {
@@ -46,7 +46,7 @@ func (page *Page) initialize(
 	page.addedObjectIdLookup = make(map[string]struct{})
 }
 
-func (page *Page) readOneRange(
+func (page *virtualPage) readOneRange(
 	raynge object_probe_index.Range,
 	object *sku.Transacted,
 ) (err error) {
@@ -90,7 +90,7 @@ func (page *Page) readOneRange(
 
 // TODO write binary representation to file-backed buffered writer and then
 // merge streams using raw binary data
-func (page *Page) add(
+func (page *virtualPage) add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
@@ -109,11 +109,11 @@ func (page *Page) add(
 	return err
 }
 
-func (page *Page) waitingToAddLen() int {
+func (page *virtualPage) waitingToAddLen() int {
 	return page.added.Len() + page.addedLatest.Len()
 }
 
-func (page *Page) copyJustHistoryFrom(
+func (page *virtualPage) copyJustHistoryFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[skuWithRangeAndSigil],
@@ -143,14 +143,14 @@ func (page *Page) copyJustHistoryFrom(
 	}
 }
 
-func (page *Page) copyJustHistoryAndAdded(
+func (page *virtualPage) copyJustHistoryAndAdded(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	return page.copyHistoryAndMaybeLatest(query, output, true, false)
 }
 
-func (page *Page) copyHistoryAndMaybeLatest(
+func (page *virtualPage) copyHistoryAndMaybeLatest(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 	includeAdded bool,
@@ -246,27 +246,27 @@ func (page *Page) copyHistoryAndMaybeLatest(
 	return err
 }
 
-func (page *Page) MakeFlush(
-	changesAreHistorical bool,
-) func() error {
-	return func() (err error) {
-		pw := &writer{
-			Page:       page,
-			probeIndex: page.probeIndex,
-		}
+// func (page *virtualPage) MakeFlush(
+// 	changesAreHistorical bool,
+// ) func() error {
+// 	return func() (err error) {
+// 		pw := &pageWriter{
+// 			virtualPage: page,
+// 			probeIndex:  page.probeIndex,
+// 		}
 
-		if changesAreHistorical {
-			pw.changesAreHistorical = true
-			pw.hasChanges = true
-		}
+// 		if changesAreHistorical {
+// 			pw.changesAreHistorical = true
+// 			pw.hasChanges = true
+// 		}
 
-		if err = pw.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+// 		if err = pw.Flush(); err != nil {
+// 			err = errors.Wrap(err)
+// 			return err
+// 		}
 
-		page.hasChanges = false
+// 		page.hasChanges = false
 
-		return err
-	}
-}
+// 		return err
+// 	}
+// }
