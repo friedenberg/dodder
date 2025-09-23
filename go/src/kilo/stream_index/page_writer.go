@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -30,7 +31,6 @@ type pageWriter struct {
 	file *os.File
 
 	bufferedReader bufio.Reader
-	bufferedWriter bufio.Writer
 
 	changesAreHistorical bool
 
@@ -71,12 +71,16 @@ func (pageWriter *pageWriter) Flush() (err error) {
 			return err
 		}
 
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
+			pageWriter.file,
+		)
+		defer repoolBufferedWriter()
+
 		defer errors.DeferredCloser(&err, pageWriter.file)
 
 		pageWriter.bufferedReader.Reset(pageWriter.file)
-		pageWriter.bufferedWriter.Reset(pageWriter.file)
 
-		return pageWriter.flushJustLatest()
+		return pageWriter.flushJustLatest(bufferedWriter)
 	} else {
 		if pageWriter.file, err = pageWriter.envRepo.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
@@ -90,19 +94,23 @@ func (pageWriter *pageWriter) Flush() (err error) {
 			pageWriter.path,
 		)
 
-		pageWriter.bufferedReader.Reset(pageWriter.file)
-		pageWriter.bufferedWriter.Reset(pageWriter.file)
+		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(pageWriter.file)
+		defer repoolBufferedWriter()
 
-		return pageWriter.flushBoth()
+		pageWriter.bufferedReader.Reset(pageWriter.file)
+
+		return pageWriter.flushBoth(bufferedWriter)
 	}
 }
 
-func (pageWriter *pageWriter) flushBoth() (err error) {
+func (pageWriter *pageWriter) flushBoth(
+	bufferedWriter *bufio.Writer,
+) (err error) {
 	ui.Log().Printf("flushing both: %s", pageWriter.path)
 
 	chain := quiter.MakeChain(
 		pageWriter.preWrite,
-		pageWriter.writeOne,
+		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
 	if err = pageWriter.writtenPage.copyJustHistoryAndAdded(
@@ -126,7 +134,7 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 		}
 	}
 
-	if err = pageWriter.bufferedWriter.Flush(); err != nil {
+	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -158,15 +166,17 @@ func (pageWriter *pageWriter) updateSigilWithLatest(
 	return err
 }
 
-func (pageWriter *pageWriter) flushJustLatest() (err error) {
+func (pageWriter *pageWriter) flushJustLatest(
+	bufferedWriter *bufio.Writer,
+) (err error) {
 	ui.Log().Printf("flushing just tail: %s", pageWriter.path)
 
 	if err = pageWriter.writtenPage.copyJustHistoryFrom(
 		&pageWriter.bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
-		func(sk objectWithCursorAndSigil) (err error) {
-			pageWriter.cursor = sk.Cursor
-			pageWriter.saveToLatestMap(sk.Transacted, sk.Sigil)
+		func(object objectWithCursorAndSigil) (err error) {
+			pageWriter.cursor = object.Cursor
+			pageWriter.saveToLatestMap(object.Transacted, object.Sigil)
 			return err
 		},
 	); err != nil {
@@ -177,7 +187,7 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 	chain := quiter.MakeChain(
 		pageWriter.preWrite,
 		pageWriter.removeOldLatest,
-		pageWriter.writeOne,
+		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
 	for {
@@ -193,7 +203,7 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 		}
 	}
 
-	if err = pageWriter.bufferedWriter.Flush(); err != nil {
+	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -208,52 +218,54 @@ func (pageWriter *pageWriter) flushJustLatest() (err error) {
 	return err
 }
 
-func (pageWriter *pageWriter) writeOne(
-	object *sku.Transacted,
-) (err error) {
-	// defer func() {
-	// 	r := recover()
+func (pageWriter *pageWriter) makeWriteOne(
+	bufferedWriter *bufio.Writer,
+) interfaces.FuncIter[*sku.Transacted] {
+	return func(object *sku.Transacted) (err error) {
+		// defer func() {
+		// 	r := recover()
 
-	// 	if r == nil {
-	// 		return
-	// 	}
+		// 	if r == nil {
+		// 		return
+		// 	}
 
-	// 	ui.Debug().Print(z)
-	// 	panic(r)
-	// }()
-	pageWriter.cursor.Offset += pageWriter.cursor.ContentLength
+		// 	ui.Debug().Print(z)
+		// 	panic(r)
+		// }()
+		pageWriter.cursor.Offset += pageWriter.cursor.ContentLength
 
-	previous := pageWriter.latestObjects[object.GetObjectId().String()]
+		previous := pageWriter.latestObjects[object.GetObjectId().String()]
 
-	if previous.Transacted != nil {
-		object.Metadata.Cache.ParentTai = previous.GetTai()
-	}
+		if previous.Transacted != nil {
+			object.Metadata.Cache.ParentTai = previous.GetTai()
+		}
 
-	if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
-		&pageWriter.bufferedWriter,
-		objectWithSigil{Transacted: object},
-	); err != nil {
-		err = errors.Wrap(err)
+		if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
+			bufferedWriter,
+			objectWithSigil{Transacted: object},
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if err = pageWriter.saveToLatestMap(object, ids.SigilHistory); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if err = pageWriter.probeIndex.saveOneObjectLoc(
+			object,
+			object_probe_index.Loc{
+				Page:   pageWriter.pageId.Index,
+				Cursor: pageWriter.cursor,
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
 		return err
 	}
-
-	if err = pageWriter.saveToLatestMap(object, ids.SigilHistory); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = pageWriter.probeIndex.saveOneObjectLoc(
-		object,
-		object_probe_index.Loc{
-			Page:   pageWriter.pageId.Index,
-			Cursor: pageWriter.cursor,
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
 }
 
 func (pageWriter *pageWriter) saveToLatestMap(
