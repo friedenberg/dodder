@@ -2,7 +2,7 @@
 ! toml-config-immutable-v2
 ---
 
-private-key = 'dodder-repo-private_key-v1@ed25519_sec-fvkajpduau2taln6d4fy88a6mzyctfa7e5lrup4lxc6w3kt7yv0q35qrqe8hv26ucf258p5x5tzcx7zetx9n38sxeghuzx2kh2tu5dqe5p8m3'
+private-key = 'dodder-repo-private_key-v1@ed25519_sec-08sl307qpsealvwedt0h6xxylzmz3q9matjd32vl6rfx9dycpr4txenp2ncmjqj3uhe2t4jd07jlzh42ym0q4q77xv667rateeynmagkq27fc'
 store-version = 12
 id = 'test-repo-id'
 inventory_list-type = '!inventory_list-v2'
