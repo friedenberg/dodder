@@ -134,11 +134,15 @@ func (pageWriter *pageWriter) flushBoth() (err error) {
 }
 
 func (pageWriter *pageWriter) updateSigilWithLatest(
-	st skuWithRangeAndSigil,
+	object skuWithRangeAndSigil,
 ) (err error) {
-	st.Add(ids.SigilLatest)
+	object.Add(ids.SigilLatest)
 
-	if err = pageWriter.updateSigil(pageWriter, st.Sigil, st.Offset); err != nil {
+	if err = pageWriter.updateSigil(
+		pageWriter,
+		object.Sigil,
+		object.Offset,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -245,45 +249,51 @@ func (pageWriter *pageWriter) writeOne(
 }
 
 func (pageWriter *pageWriter) saveToLatestMap(
-	z *sku.Transacted,
+	object *sku.Transacted,
 	sigil ids.Sigil,
 ) (err error) {
-	k := z.GetObjectId()
-	ks := k.String()
+	objectId := object.GetObjectId()
+	objectIdString := objectId.String()
 
-	record := pageWriter.ObjectIdToObjectMap[ks]
+	record := pageWriter.ObjectIdToObjectMap[objectIdString]
 	record.Range = pageWriter.Range
 
 	if record.Transacted == nil {
 		record.Transacted = sku.GetTransactedPool().Get()
 	}
 
-	sku.TransactedResetter.ResetWith(record.Transacted, z)
+	sku.TransactedResetter.ResetWith(record.Transacted, object)
 
 	record.Sigil = sigil
 
-	if z.Metadata.Cache.Dormant.Bool() {
+	if object.Metadata.Cache.Dormant.Bool() {
 		record.Add(ids.SigilHidden)
 	} else {
 		record.Del(ids.SigilHidden)
 	}
 
-	pageWriter.ObjectIdToObjectMap[ks] = record
+	pageWriter.ObjectIdToObjectMap[objectIdString] = record
 
 	return err
 }
 
-func (pageWriter *pageWriter) removeOldLatest(sk *sku.Transacted) (err error) {
-	ks := sk.ObjectId.String()
-	st, ok := pageWriter.ObjectIdToObjectMap[ks]
+func (pageWriter *pageWriter) removeOldLatest(
+	objectLatest *sku.Transacted,
+) (err error) {
+	objectIdString := objectLatest.ObjectId.String()
+	objectOld, ok := pageWriter.ObjectIdToObjectMap[objectIdString]
 
 	if !ok {
 		return err
 	}
 
-	st.Del(ids.SigilLatest)
+	objectOld.Del(ids.SigilLatest)
 
-	if err = pageWriter.updateSigil(pageWriter, st.Sigil, st.Offset); err != nil {
+	if err = pageWriter.updateSigil(
+		pageWriter,
+		objectOld.Sigil,
+		objectOld.Offset,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
