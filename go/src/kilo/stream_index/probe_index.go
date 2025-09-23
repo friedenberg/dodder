@@ -10,8 +10,8 @@ import (
 )
 
 type probeIndex struct {
-	envRepo env_repo.Env
-	*object_probe_index.Index
+	envRepo  env_repo.Env
+	index    *object_probe_index.Index
 	hashType markl.FormatHash
 }
 
@@ -22,7 +22,7 @@ func (index *probeIndex) Initialize(
 	index.envRepo = envRepo
 	index.hashType = hashType
 
-	if index.Index, err = object_probe_index.MakeNoDuplicates(
+	if index.index, err = object_probe_index.MakeNoDuplicates(
 		index.envRepo,
 		index.envRepo.DirCacheObjectPointers(),
 		index.hashType,
@@ -35,7 +35,7 @@ func (index *probeIndex) Initialize(
 }
 
 func (index *probeIndex) Flush() (err error) {
-	if err = index.Index.Flush(); err != nil {
+	if err = index.index.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -46,7 +46,7 @@ func (index *probeIndex) Flush() (err error) {
 func (index *probeIndex) readOneMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
-	if loc, err = index.Index.ReadOne(blobId); err != nil {
+	if loc, err = index.index.ReadOne(blobId); err != nil {
 		return loc, err
 	}
 
@@ -56,7 +56,7 @@ func (index *probeIndex) readOneMarklIdLoc(
 func (index *probeIndex) readManyMarklIdLoc(
 	blobId interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
-	if err = index.Index.ReadMany(blobId, &locs); err != nil {
+	if err = index.index.ReadMany(blobId, &locs); err != nil {
 		return locs, err
 	}
 
@@ -68,7 +68,7 @@ func (index *probeIndex) saveOneObjectLoc(
 	loc object_probe_index.Loc,
 ) (err error) {
 	for probeId := range object.AllProbeIds() {
-		if err = index.Index.AddDigest(probeId.Id, loc); err != nil {
+		if err = index.index.AddDigest(probeId.Id, loc); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

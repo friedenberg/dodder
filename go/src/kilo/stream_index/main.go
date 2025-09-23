@@ -293,12 +293,18 @@ func (index *Index) Add(
 	return err
 }
 
-// TODO rename
 func (index *Index) ReadOneMarklId(
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
+
+	if blobId.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
+		replacementId, repool := index.hashType.GetMarklIdForMarklId(blobId)
+		defer repool()
+
+		blobId = replacementId
+	}
 
 	var loc object_probe_index.Loc
 
