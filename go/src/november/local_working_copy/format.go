@@ -872,14 +872,19 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"merkle": {
+	"sig": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			// TODO
 			return func(object *sku.Transacted) (err error) {
-				_, err = fmt.Fprintln(writer, &object.Metadata)
+				if _, err = fmt.Fprintln(
+					writer,
+					object.Metadata.GetObjectSig().StringWithFormat(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return err
+				}
 				return err
 			}
 		},
@@ -932,7 +937,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			}
 		},
 	},
-	"merkle-probe": {
+	"merkle-probes": {
 		FormatFuncConstructor: func(
 			repo *Repo,
 			writer interfaces.WriterAndStringWriter,
@@ -941,10 +946,9 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				for probeId := range object.AllProbeIds() {
 					if _, err = fmt.Fprintf(
 						writer,
-						"%s (%q): %q -> %q\n",
+						"%s %s -> %s\n",
 						object.GetObjectId(),
 						probeId.Key,
-						"TODO value",
 						probeId.Id.StringWithFormat(),
 					); err != nil {
 						err = errors.Wrap(err)
