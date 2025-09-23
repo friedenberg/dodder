@@ -78,9 +78,12 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 		defer errors.DeferredCloser(&err, pageWriter.file)
 
-		pageWriter.bufferedReader.Reset(pageWriter.file)
+		bufferedReader, repoolBufferedReader := pool.GetBufferedReader(
+			pageWriter.file,
+		)
+		defer repoolBufferedReader()
 
-		return pageWriter.flushJustLatest(bufferedWriter)
+		return pageWriter.flushJustLatest(bufferedReader, bufferedWriter)
 	} else {
 		if pageWriter.file, err = pageWriter.envRepo.GetTempLocal().FileTemp(); err != nil {
 			err = errors.Wrap(err)
@@ -167,12 +170,13 @@ func (pageWriter *pageWriter) updateSigilWithLatest(
 }
 
 func (pageWriter *pageWriter) flushJustLatest(
+	bufferedReader *bufio.Reader,
 	bufferedWriter *bufio.Writer,
 ) (err error) {
 	ui.Log().Printf("flushing just tail: %s", pageWriter.path)
 
 	if err = pageWriter.writtenPage.copyJustHistoryFrom(
-		&pageWriter.bufferedReader,
+		bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
 		func(object objectWithCursorAndSigil) (err error) {
 			pageWriter.cursor = object.Cursor
