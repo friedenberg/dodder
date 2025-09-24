@@ -13,22 +13,26 @@ import (
 )
 
 type probeIndex struct {
-	envRepo  env_repo.Env
-	index    *object_probe_index.Index
-	hashType markl.FormatHash
+	index *object_probe_index.Index
+}
+
+func (index *Index) PrintAllProbes() (err error) {
+	if index.probeIndex.index.PrintAll(index.envRepo); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }
 
 func (index *probeIndex) Initialize(
 	envRepo env_repo.Env,
 	hashType markl.FormatHash,
 ) (err error) {
-	index.envRepo = envRepo
-	index.hashType = hashType
-
 	if index.index, err = object_probe_index.MakeNoDuplicates(
-		index.envRepo,
-		index.envRepo.DirCacheObjectPointers(),
-		index.hashType,
+		envRepo,
+		envRepo.DirCacheObjectPointers(),
+		hashType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -70,13 +74,14 @@ func (index *probeIndex) saveOneObjectLoc(
 	object *sku.Transacted,
 	loc object_probe_index.Loc,
 ) (err error) {
-	for probeId := range object.AllProbeIds(index.hashType) {
-		// ui.Debug().Print(
-		// 	probeId.Key,
-		// 	probeId.Id.StringWithFormat(),
-		// 	sku.String(object),
-		// )
-		if err = index.index.AddDigest(probeId.Id, loc); err != nil {
+	for probeId := range object.AllProbeIds(index.index.GetHashType()) {
+		if err = index.index.AddDigest(
+			ids.ProbeIdWithObjectId{
+				ObjectId: object.GetObjectId(),
+				ProbeId:  probeId,
+			},
+			loc,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

@@ -161,7 +161,7 @@ func WrapExceptSentinelAsNil(in error, except ...error) (err error) {
 	}
 
 	if slices.Contains(except, in) {
-		return in
+		return nil
 	}
 
 	err = WrapSkip(thisSkip, in)

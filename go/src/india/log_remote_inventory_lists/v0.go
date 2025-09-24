@@ -30,7 +30,7 @@ type v0 struct {
 func (log *v0) Flush() (err error) {
 	if _, err = log.file.Seek(0, io.SeekStart); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	bufferedWriter := bufio.NewWriter(log.file)
@@ -39,22 +39,22 @@ func (log *v0) Flush() (err error) {
 
 	if err = enc.Encode(log.values); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = log.file.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = log.lockSmith.Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return nil
@@ -95,25 +95,25 @@ func (log *v0) initialize(ctx interfaces.Context, env env_repo.Env) {
 func (log *v0) Append(entry Entry) (err error) {
 	if err = log.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var key string
 
 	if key, err = log.Key(entry); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	log.values.Add(key)
 
-	return
+	return err
 }
 
 func (log *v0) Key(entry Entry) (key string, err error) {
 	if entry.EntryType == nil {
 		err = errors.ErrorWithStackf("nil entry type")
-		return
+		return key, err
 	}
 
 	// TODO determine via config
@@ -130,27 +130,27 @@ func (log *v0) Key(entry Entry) (key string, err error) {
 	// TODO determine via config, and switch to digest.String()
 	key = markl.FormatBytesAsHex(digest)
 
-	return
+	return key, err
 }
 
 func (log *v0) Exists(entry Entry) (err error) {
 	if err = log.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var key string
 
 	if key, err = log.Key(entry); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !log.values.ContainsExpansion(key) {
-		return collections.ErrNotFound
+		return collections.MakeErrNotFoundString(key)
 	}
 
-	return
+	return err
 }
 
 func (log *v0) readIfNecessary() (err error) {
@@ -172,5 +172,5 @@ func (log *v0) readIfNecessary() (err error) {
 		},
 	)
 
-	return
+	return err
 }

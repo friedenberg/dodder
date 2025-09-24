@@ -103,6 +103,7 @@ function complete_subcmd { # @test
 		clean
 		clone
 		complete.*complete a command-line
+		debug-print-probe-index
 		deinit
 		diff
 		dormant-add
@@ -141,7 +142,6 @@ function complete_subcmd { # @test
 		serve
 		show
 		status
-		test
 	EOM
 }
 

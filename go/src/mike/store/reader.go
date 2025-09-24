@@ -22,10 +22,10 @@ func (store *Store) ReadTransactedFromObjectId(
 		}
 
 		err = errors.Wrap(err)
-		return
+		return sk1, err
 	}
 
-	return
+	return sk1, err
 }
 
 // TODO transition to a context-based panic / cancel semantic
@@ -33,17 +33,20 @@ func (store *Store) ReadOneObjectId(
 	objectId interfaces.ObjectId,
 ) (object *sku.Transacted, err error) {
 	if objectId.IsEmpty() {
-		return
+		return object, err
 	}
 
 	object = sku.GetTransactedPool().Get()
 
 	if err = store.GetStreamIndex().ReadOneObjectId(objectId, object); err != nil {
-		err = errors.WrapExceptSentinel(err, collections.ErrNotFound)
-		return
+		if !collections.IsErrNotFound(err) {
+			err = errors.Wrap(err)
+		}
+
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 // TODO add support for cwd and sigil
@@ -68,13 +71,13 @@ func (store *Store) ReadOneInto(
 
 		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case genres.Type, genres.Tag, genres.Repo, genres.InventoryList:
 		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case genres.Config:
@@ -89,27 +92,27 @@ func (store *Store) ReadOneInto(
 
 		if err = oid.SetWithIdLike(objectId); err != nil {
 			err = collections.MakeErrNotFound(objectId)
-			return
+			return err
 		}
 
 		if sk, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
 		err = genres.MakeErrUnsupportedGenre(objectId)
-		return
+		return err
 	}
 
 	if sk == nil {
 		err = collections.MakeErrNotFound(objectId)
-		return
+		return err
 	}
 
 	sku.TransactedResetter.ResetWith(out, sk)
 
-	return
+	return err
 }
 
 func (store *Store) ReadPrimitiveQuery(

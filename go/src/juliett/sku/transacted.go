@@ -193,19 +193,14 @@ func (transacted *Transacted) GetStringProbeKeys() map[string]string {
 	}
 }
 
-type ProbeId struct {
-	Key string
-	Id  interfaces.MarklId
-}
-
 func (transacted *Transacted) AllProbeIds(
 	hashType markl.FormatHash,
-) interfaces.Seq[ProbeId] {
-	return func(yield func(ProbeId) bool) {
+) interfaces.Seq[ids.ProbeId] {
+	return func(yield func(ids.ProbeId) bool) {
 		for key, value := range transacted.GetStringProbeKeys() {
 			id, repool := hashType.GetMarklIdForString(value)
 
-			probeId := ProbeId{
+			probeId := ids.ProbeId{
 				Key: key,
 				Id:  id,
 			}
@@ -219,7 +214,7 @@ func (transacted *Transacted) AllProbeIds(
 		}
 
 		{
-			probeId := ProbeId{
+			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectDigestV1,
 				Id:  transacted.Metadata.GetObjectDigest(),
 			}
@@ -230,7 +225,7 @@ func (transacted *Transacted) AllProbeIds(
 		}
 
 		{
-			probeId := ProbeId{
+			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectDigestV2,
 				Id:  transacted.Metadata.GetObjectDigest(),
 			}
@@ -241,7 +236,7 @@ func (transacted *Transacted) AllProbeIds(
 		}
 
 		{
-			probeId := ProbeId{
+			probeId := ids.ProbeId{
 				Key: markl.PurposeV5MetadataDigestWithoutTai,
 				Id:  transacted.Metadata.SelfWithoutTai,
 			}
@@ -252,7 +247,7 @@ func (transacted *Transacted) AllProbeIds(
 		}
 
 		{
-			probeId := ProbeId{
+			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectSigV1,
 				Id:  transacted.Metadata.GetObjectSig(),
 			}

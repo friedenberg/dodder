@@ -56,7 +56,7 @@ func (row *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
 		&row.Loc,
-		row.Digest.String(),
+		row.Digest.StringWithFormat(),
 	)
 }
 

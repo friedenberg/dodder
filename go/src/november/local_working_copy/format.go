@@ -150,6 +150,7 @@ func GetFormatFuncConstructorEntry(name string) FormatFuncConstructorEntry {
 	return entry
 }
 
+// TODO restructure and rename keys
 var formatters = map[string]FormatFuncConstructorEntry{
 	"tags-path": {
 		FormatFuncConstructor: func(
@@ -675,8 +676,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return err
 				}
 
-				if err = toml.Unmarshal([]byte(
-					jsonRep.Transacted.BlobString),
+				if err = toml.Unmarshal(
+					[]byte(jsonRep.Transacted.BlobString),
 					&jsonRep.Blob,
 				); err != nil {
 					err = nil
@@ -928,7 +929,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetMotherObjectSig(),
+					object.Metadata.GetMotherObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -956,6 +957,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 						return err
 					}
 				}
+
+				fmt.Fprintln(writer)
 
 				return err
 			}

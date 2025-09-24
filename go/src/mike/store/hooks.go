@@ -15,7 +15,7 @@ func (store *Store) tryNewHook(
 	options sku.CommitOptions,
 ) (err error) {
 	if !options.RunHooks {
-		return
+		return err
 	}
 
 	var typeObject *sku.Transacted
@@ -27,9 +27,9 @@ func (store *Store) tryNewHook(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	} else if typeObject == nil {
-		return
+		return err
 	}
 
 	var blob type_blobs.Blob
@@ -40,7 +40,7 @@ func (store *Store) tryNewHook(
 		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer repool()
@@ -48,7 +48,7 @@ func (store *Store) tryNewHook(
 	script := blob.GetStringLuaHooks()
 
 	if script == "" {
-		return
+		return err
 	}
 
 	if err = store.tryHookWithName(
@@ -60,10 +60,10 @@ func (store *Store) tryNewHook(
 		"on_new",
 	); err != nil {
 		err = errors.Wrapf(err, "Hook: %#v", script)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) TryFormatHook(
@@ -72,22 +72,22 @@ func (store *Store) TryFormatHook(
 	var objectMother *sku.Transacted
 
 	if objectMother, err = store.ReadOneObjectId(object.GetObjectId()); err != nil {
-		if errors.Is(err, collections.ErrNotFound) {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	var objectType *sku.Transacted
 
 	if objectType, err = store.ReadOneObjectId(object.GetType()); err != nil {
-		if errors.Is(err, collections.ErrNotFound) {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -99,7 +99,7 @@ func (store *Store) TryFormatHook(
 		objectType.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer repool()
@@ -107,7 +107,7 @@ func (store *Store) TryFormatHook(
 	script := blob.GetStringLuaHooks()
 
 	if script == "" {
-		return
+		return err
 	}
 
 	if err = store.tryHookWithName(
@@ -119,10 +119,10 @@ func (store *Store) TryFormatHook(
 		"on_format",
 	); err != nil {
 		err = errors.Wrapf(err, "Hook: %#v", script)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) tryPreCommitHooks(
@@ -131,7 +131,7 @@ func (store *Store) tryPreCommitHooks(
 	options sku.CommitOptions,
 ) (err error) {
 	if !options.RunHooks {
-		return
+		return err
 	}
 
 	type hook struct {
@@ -150,9 +150,9 @@ func (store *Store) tryPreCommitHooks(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	} else if typeObject == nil {
-		return
+		return err
 	}
 
 	var blob type_blobs.Blob
@@ -163,7 +163,7 @@ func (store *Store) tryPreCommitHooks(
 		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer repool()
@@ -203,12 +203,12 @@ func (store *Store) tryPreCommitHooks(
 				// TODO fix this to properly continue past the failure
 				err = nil
 			} else {
-				return
+				return err
 			}
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) tryPreCommitHook(
@@ -219,21 +219,21 @@ func (store *Store) tryPreCommitHook(
 	script string,
 ) (err error) {
 	if !storeOptions.RunHooks || !storeOptions.AddToInventoryList {
-		return
+		return err
 	}
 
 	var vp sku_lua.LuaVMPoolV1
 
 	if vp, err = store.MakeLuaVMPoolV1(selbst, script); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var vm *sku_lua.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer vp.Put(vm)
@@ -242,13 +242,13 @@ func (store *Store) tryPreCommitHook(
 
 	if tt, err = vm.GetTopTableOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	f := vm.GetField(tt, "on_pre_commit")
 
 	if f.Type() != lua.LTFunction {
-		return
+		return err
 	}
 
 	tableKinder := vm.TablePool.Get()
@@ -279,7 +279,7 @@ func (store *Store) tryPreCommitHook(
 
 	if err = vm.PCall(2, 1, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	retval := vm.LState.Get(1)
@@ -287,15 +287,15 @@ func (store *Store) tryPreCommitHook(
 
 	if retval.Type() != lua.LTNil {
 		err = errors.ErrorWithStackf("lua error: %s", retval)
-		return
+		return err
 	}
 
 	if err = sku_lua.FromLuaTableV1(child, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO add method with hook with reader
@@ -311,18 +311,18 @@ func (store *Store) tryHookWithName(
 
 	if vp, err = store.MakeLuaVMPoolV1(self, script); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var vm *sku_lua.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err != nil {
-		return
+		return err
 	}
 
 	defer vp.Put(vm)
@@ -331,13 +331,13 @@ func (store *Store) tryHookWithName(
 
 	if tt, err = vm.GetTopTableOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	f := vm.GetField(tt, name)
 
 	if f.Type() != lua.LTFunction {
-		return
+		return err
 	}
 
 	tableKinder := vm.TablePool.Get()
@@ -373,7 +373,7 @@ func (store *Store) tryHookWithName(
 
 	if err = vm.PCall(2, 1, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	retval := vm.LState.Get(1)
@@ -381,13 +381,13 @@ func (store *Store) tryHookWithName(
 
 	if retval.Type() != lua.LTNil {
 		err = errors.ErrorWithStackf("lua error: %s", retval)
-		return
+		return err
 	}
 
 	if err = sku_lua.FromLuaTableV1(child, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

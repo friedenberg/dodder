@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
@@ -63,45 +64,38 @@ func (index *Index) initialize(
 	return err
 }
 
-func (index *Index) AddDigest(
-	digest interfaces.MarklId,
-	loc Loc,
-) (err error) {
-	return index.addDigest(digest, loc)
+func (index *Index) GetHashType() markl.FormatHash {
+	return index.hashType
 }
 
-func (index *Index) addDigest(
-	digest interfaces.MarklId,
+func (index *Index) AddDigest(
+	probeId ids.ProbeIdWithObjectId,
 	loc Loc,
 ) (err error) {
-	if digest.IsNull() {
+	if probeId.Id.IsNull() {
 		return err
+	}
+
+	id := probeId.Id
+
+	if probeId.Id.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
+		replacementId, repool := index.hashType.GetMarklIdForMarklId(probeId.Id)
+		defer repool()
+
+		id = replacementId
 	}
 
 	var pageIndex uint8
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		digest,
+		id,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if digest.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
-		replacementId, repool := index.hashType.GetMarklIdForMarklId(digest)
-		defer repool()
-
-		// ui.Debug().Print(
-		// 	digest.StringWithFormat(),
-		// 	"->",
-		// 	replacementId.StringWithFormat(),
-		// )
-
-		digest = replacementId
-	}
-
-	if err = index.pages[pageIndex].AddMarklId(digest, loc); err != nil {
+	if err = index.pages[pageIndex].AddMarklId(id, loc); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return err
 	}
@@ -110,26 +104,31 @@ func (index *Index) addDigest(
 }
 
 func (index *Index) ReadOne(
-	digest interfaces.MarklId,
+	originalId interfaces.MarklId,
 ) (loc Loc, err error) {
-	actual := digest.GetMarklFormat().GetMarklFormatId()
+	id := originalId
 
-	if actual != index.hashType.GetMarklFormatId() {
-		err = errors.Errorf("unsupported hash type: %q", actual)
-		return loc, err
+	if id.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
+		replacementId, repool := index.hashType.GetMarklIdForMarklId(id)
+		defer repool()
+
+		id = replacementId
 	}
 
 	var pageIndex uint8
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		digest,
+		id,
 	); err != nil {
-		err = errors.Wrap(err)
 		return loc, err
 	}
 
-	return index.pages[pageIndex].ReadOne(digest)
+	if loc, err = index.pages[pageIndex].ReadOne(id); err != nil {
+		return loc, err
+	}
+
+	return loc, err
 }
 
 func (index *Index) ReadMany(

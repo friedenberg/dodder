@@ -52,17 +52,17 @@ func (page *page) initialize(
 
 	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (page *page) open() (err error) {
 	if page.file != nil {
 		if err = page.file.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -77,15 +77,15 @@ func (page *page) open() (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
 	if id.IsNull() {
-		return
+		return err
 	}
 
 	page.Lock()
@@ -97,12 +97,12 @@ func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
 
 	if err = row.Digest.SetDigest(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	page.added.Push(row)
 
-	return
+	return err
 }
 
 func (page *page) GetRowCount() (n int64, err error) {
@@ -110,12 +110,12 @@ func (page *page) GetRowCount() (n int64, err error) {
 
 	if fileInfo, err = page.file.Stat(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n = fileInfo.Size()/int64(page.rowWidth) - 1
 
-	return
+	return n, err
 }
 
 func (page *page) ReadOne(id interfaces.MarklId) (loc Loc, err error) {
@@ -129,20 +129,20 @@ func (page *page) ReadOne(id interfaces.MarklId) (loc Loc, err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return loc, err
 	}
 
 	if err = page.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
-		return
+		return loc, err
 	}
 
 	if loc, _, err = page.readCurrentLoc(id, &page.bufferedReader); err != nil {
 		err = errors.Wrapf(err, "Start: %d", start)
-		return
+		return loc, err
 	}
 
-	return
+	return loc, err
 }
 
 func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
@@ -153,12 +153,12 @@ func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
 
 	if start, err = page.searchFunc(sh); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = page.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	isEOF := false
@@ -174,7 +174,7 @@ func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
 			isEOF = true
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if found {
@@ -182,7 +182,7 @@ func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
 		}
 	}
 
-	return
+	return err
 }
 
 func (page *page) readCurrentLoc(
@@ -191,15 +191,15 @@ func (page *page) readCurrentLoc(
 ) (out Loc, found bool, err error) {
 	if expectedBlobId.IsNull() {
 		err = errors.ErrorWithStackf("empty sha")
-		return
+		return out, found, err
 	}
 
 	if found, err = markl.EqualsReader(expectedBlobId, bufferedReader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return out, found, err
 	} else if !found {
 		err = io.EOF
-		return
+		return out, found, err
 	}
 
 	var n int64
@@ -211,10 +211,10 @@ func (page *page) readCurrentLoc(
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return out, found, err
 	}
 
-	return
+	return out, found, err
 }
 
 func (page *page) seekAndResetTo(loc int64) (err error) {
@@ -223,12 +223,12 @@ func (page *page) seekAndResetTo(loc int64) (err error) {
 		io.SeekStart,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	page.bufferedReader.Reset(page.file)
 
-	return
+	return err
 }
 
 func (page *page) PrintAll(env env_ui.Env) (err error) {
@@ -236,12 +236,12 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 	defer page.Unlock()
 
 	if page.file == nil {
-		return
+		return err
 	}
 
 	if err = page.seekAndResetTo(0); err != nil {
-		err = errors.Wrap(err)
-		return
+		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
+		return err
 	}
 
 	for {
@@ -252,7 +252,7 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 			&page.bufferedReader,
 		); err != nil {
 			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-			return
+			return err
 		}
 
 		env.GetUI().Printf("%s", &current)
@@ -264,13 +264,13 @@ func (page *page) Flush() (err error) {
 	defer page.Unlock()
 
 	if page.added.Len() == 0 {
-		return
+		return err
 	}
 
 	if page.file != nil {
 		if err = page.seekAndResetTo(0); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -278,7 +278,7 @@ func (page *page) Flush() (err error) {
 
 	if temporaryFile, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, temporaryFile)
@@ -294,7 +294,7 @@ func (page *page) Flush() (err error) {
 	getOne := func() (row *row, err error) {
 		if page.file == nil {
 			err = io.EOF
-			return
+			return row, err
 		}
 
 		var n int64
@@ -308,12 +308,12 @@ func (page *page) Flush() (err error) {
 			}
 
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return row, err
 		}
 
 		row = &current
 
-		return
+		return row, err
 	}
 
 	if err = heap.MergeStream(
@@ -325,15 +325,15 @@ func (page *page) Flush() (err error) {
 				err = errors.MakeErrStopIteration()
 			}
 
-			return
+			return row, err
 		},
 		func(row *row) (err error) {
 			_, err = page.readFromRow(row, bufferedWriter)
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = os.Rename(
@@ -341,15 +341,15 @@ func (page *page) Flush() (err error) {
 		page.id.Path(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	page.added.Reset()
 
 	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
