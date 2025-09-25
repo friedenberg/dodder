@@ -132,7 +132,7 @@ func (index *Index) flushAdded(
 			actualFlushCount++
 		}
 
-		waitGroup.Do(index.pages[n].MakeFlush(false, index.preWrite))
+		waitGroup.Do(index.MakeFlush(n, false))
 	}
 
 	if actualFlushCount > 0 {
@@ -178,7 +178,7 @@ func (index *Index) flushEverything(
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for n := range index.pages {
-		waitGroup.Do(index.pages[n].MakeFlush(true, index.preWrite))
+		waitGroup.Do(index.MakeFlush(n, true))
 	}
 
 	if err = printerHeader(

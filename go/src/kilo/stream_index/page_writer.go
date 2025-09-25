@@ -39,6 +39,38 @@ type pageWriter struct {
 	latestObjects ObjectIdToObject
 }
 
+func (index *Index) MakeFlush(
+	pageIndex int,
+	changesAreHistorical bool,
+) func() error {
+	page := &index.pages[pageIndex]
+
+	return func() (err error) {
+		pageWriter := &pageWriter{
+			pageId:      page.pageId,
+			writtenPage: page,
+			preWrite:    index.preWrite,
+			envRepo:     page.envRepo,
+			probeIndex:  page.probeIndex,
+			path:        page.pageId.Path(),
+		}
+
+		if changesAreHistorical {
+			pageWriter.changesAreHistorical = true
+			pageWriter.writtenPage.hasChanges = true
+		}
+
+		if err = pageWriter.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		page.hasChanges = false
+
+		return err
+	}
+}
+
 func (pageWriter *pageWriter) Flush() (err error) {
 	if !pageWriter.writtenPage.hasChanges {
 		ui.Log().Print("not flushing, no changes")
