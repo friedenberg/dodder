@@ -21,6 +21,7 @@ func (page *writtenPage) initialize(
 	index *Index,
 ) {
 	page.pageId = pageId
+	page.additions.initialize()
 }
 
 func (pageAdditions *pageAdditions) initialize() {
