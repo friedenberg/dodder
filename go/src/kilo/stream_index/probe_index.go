@@ -152,7 +152,7 @@ func (index *Index) ObjectExists(
 
 	page := index.GetPage(pageIndex)
 
-	if _, ok := page.addedObjectIdLookup[objectIdString]; ok {
+	if _, ok := page.additions.addedObjectIdLookup[objectIdString]; ok {
 		return err
 	}
 

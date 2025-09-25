@@ -130,7 +130,7 @@ func (index *Index) flushAdded(
 	actualFlushCount := 0
 
 	for n := range index.pages {
-		if index.pages[n].hasChanges {
+		if index.pages[n].additions.hasChanges {
 			ui.Log().Printf("actual flush for %d", n)
 			actualFlushCount++
 		}

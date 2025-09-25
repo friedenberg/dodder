@@ -59,7 +59,7 @@ func (index *Index) makePageFlush(
 
 		if changesAreHistorical {
 			pageWriter.changesAreHistorical = true
-			pageWriter.writtenPage.hasChanges = true
+			pageWriter.writtenPage.additions.hasChanges = true
 		}
 
 		if err = pageWriter.Flush(); err != nil {
@@ -67,20 +67,20 @@ func (index *Index) makePageFlush(
 			return err
 		}
 
-		page.hasChanges = false
+		page.additions.hasChanges = false
 
 		return err
 	}
 }
 
 func (pageWriter *pageWriter) Flush() (err error) {
-	if !pageWriter.writtenPage.hasChanges {
+	if !pageWriter.writtenPage.additions.hasChanges {
 		ui.Log().Print("not flushing, no changes")
 		return err
 	}
 
-	defer pageWriter.writtenPage.added.Reset()
-	defer pageWriter.writtenPage.addedLatest.Reset()
+	defer pageWriter.writtenPage.additions.added.Reset()
+	defer pageWriter.writtenPage.additions.addedLatest.Reset()
 
 	pageWriter.latestObjects = make(ObjectIdToObject)
 
@@ -88,15 +88,18 @@ func (pageWriter *pageWriter) Flush() (err error) {
 	// circuit the flush. This condition occurs on the initial init when the
 	// konfig is changed but there are no objects yet.
 	if !files.Exists(pageWriter.path) &&
-		pageWriter.writtenPage.waitingToAddLen() == 0 {
+		pageWriter.writtenPage.additions.waitingToAddLen() == 0 {
 		return err
 	}
 
 	ui.Log().Print("changesAreHistorical", pageWriter.changesAreHistorical)
-	ui.Log().Print("added", pageWriter.writtenPage.added.Len())
-	ui.Log().Print("addedtail", pageWriter.writtenPage.addedLatest.Len())
+	ui.Log().Print("added", pageWriter.writtenPage.additions.added.Len())
+	ui.Log().Print(
+		"addedtail",
+		pageWriter.writtenPage.additions.addedLatest.Len(),
+	)
 
-	if pageWriter.writtenPage.added.Len() == 0 &&
+	if pageWriter.writtenPage.additions.added.Len() == 0 &&
 		!pageWriter.changesAreHistorical {
 		if pageWriter.file, err = files.OpenReadWrite(pageWriter.path); err != nil {
 			err = errors.Wrap(err)
@@ -155,7 +158,7 @@ func (pageWriter *pageWriter) flushBoth(
 	}
 
 	for {
-		popped, ok := pageWriter.writtenPage.addedLatest.Pop()
+		popped, ok := pageWriter.writtenPage.additions.addedLatest.Pop()
 
 		if !ok {
 			break
@@ -225,7 +228,7 @@ func (pageWriter *pageWriter) flushJustLatest(
 	)
 
 	for {
-		popped, ok := pageWriter.writtenPage.addedLatest.Pop()
+		popped, ok := pageWriter.writtenPage.additions.addedLatest.Pop()
 
 		if !ok {
 			break
