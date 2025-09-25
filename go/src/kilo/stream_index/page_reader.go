@@ -113,14 +113,25 @@ func (pageReader *pageReader) copyJustHistoryAndAdded(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return pageReader.copyHistoryAndMaybeLatest(query, output, true, false)
+	return pageReader.copyHistoryAndMaybeLatest(
+		query,
+		output,
+		pageReadOptions{
+			includeAdded:       true,
+			includeAddedLatest: false,
+		},
+	)
+}
+
+type pageReadOptions struct {
+	includeAdded       bool
+	includeAddedLatest bool
 }
 
 func (pageReader *pageReader) copyHistoryAndMaybeLatest(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
-	includeAdded bool,
-	includeAddedLatest bool,
+	pageReadOptions pageReadOptions,
 ) (err error) {
 	var namedBlobReader io.ReadCloser
 
@@ -141,7 +152,7 @@ func (pageReader *pageReader) copyHistoryAndMaybeLatest(
 	bufferedReader, repool := pool.GetBufferedReader(namedBlobReader)
 	defer repool()
 
-	if !includeAdded && !includeAddedLatest {
+	if !pageReadOptions.includeAdded && !pageReadOptions.includeAddedLatest {
 		if err = pageReader.copyJustHistoryFrom(
 			bufferedReader,
 			query,
@@ -193,7 +204,7 @@ func (pageReader *pageReader) copyHistoryAndMaybeLatest(
 		return err
 	}
 
-	if !includeAddedLatest {
+	if !pageReadOptions.includeAddedLatest {
 		return err
 	}
 

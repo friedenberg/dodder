@@ -341,8 +341,10 @@ func (index *Index) ReadPrimitiveQuery(
 				if err1 = pageReader.copyHistoryAndMaybeLatest(
 					queryGroup,
 					funcIter,
-					false,
-					false,
+					pageReadOptions{
+						includeAdded:       false,
+						includeAddedLatest: false,
+					},
 				); err1 != nil {
 					if isDone() {
 						break
