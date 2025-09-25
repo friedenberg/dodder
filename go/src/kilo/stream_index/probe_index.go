@@ -233,7 +233,7 @@ func (index *Index) readOneLoc(
 ) (err error) {
 	page := index.pages[loc.Page]
 
-	if err = page.readOneRange(loc.Cursor, object); err != nil {
+	if err = page.readOneCursor(loc.Cursor, object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -24,7 +24,7 @@ func MakeIndex(
 	config genesis_configs.ConfigPublic,
 	configCli repo_config_cli.Config,
 	directory interfaces.Directory,
-	cacheIOFactory interfaces.CacheIOFactory,
+	cacheIOFactory interfaces.NamedBlobAccess,
 ) (i Index, err error) {
 	if store_version.GreaterOrEqual(
 		config.GetStoreVersion(),

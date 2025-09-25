@@ -38,6 +38,11 @@ type (
 		BlobWriterFactory
 	}
 
+	NamedBlobAccess interface {
+		MakeNamedBlobReader(string) (BlobReader, error)
+		MakeNamedBlobWriter(string) (BlobWriter, error)
+	}
+
 	BlobStore interface {
 		BlobAccess
 		BlobIOWrapperGetter

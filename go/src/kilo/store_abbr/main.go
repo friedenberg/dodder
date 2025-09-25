@@ -83,16 +83,18 @@ func (index *indexAbbr) Flush() (err error) {
 		return err
 	}
 
-	var writer io.WriteCloser
+	var namedBlobWriter interfaces.BlobWriter
 
-	if writer, err = index.envRepo.WriteCloserCache(index.path); err != nil {
+	if namedBlobWriter, err = index.envRepo.MakeNamedBlobWriter(
+		index.path,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, writer)
+	defer errors.DeferredCloser(&err, namedBlobWriter)
 
-	bufferedWriter, repool := pool.GetBufferedWriter(writer)
+	bufferedWriter, repool := pool.GetBufferedWriter(namedBlobWriter)
 	defer repool()
 
 	defer errors.DeferredFlusher(&err, bufferedWriter)
@@ -118,9 +120,9 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 
 			index.didRead = true
 
-			var reader io.ReadCloser
+			var namedBlobReader io.ReadCloser
 
-			if reader, err = index.envRepo.ReadCloserCache(index.path); err != nil {
+			if namedBlobReader, err = index.envRepo.MakeNamedBlobReader(index.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -130,9 +132,9 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 				return
 			}
 
-			defer errors.DeferredCloser(&err, reader)
+			defer errors.DeferredCloser(&err, namedBlobReader)
 
-			bufferedReader, repool := pool.GetBufferedReader(reader)
+			bufferedReader, repool := pool.GetBufferedReader(namedBlobReader)
 			defer repool()
 
 			dec := gob.NewDecoder(bufferedReader)

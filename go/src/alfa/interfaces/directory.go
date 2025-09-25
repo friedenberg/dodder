@@ -35,8 +35,3 @@ type Directory interface {
 	DirectoryLayout
 	Delete(...string) error
 }
-
-type CacheIOFactory interface {
-	ReadCloserCache(string) (BlobReader, error)
-	WriteCloserCache(string) (BlobWriter, error)
-}

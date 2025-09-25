@@ -33,12 +33,12 @@ type writtenPage struct {
 }
 
 func (page *writtenPage) initialize(
-	pid page_id.PageId,
+	pageId page_id.PageId,
 	index *Index,
 ) {
 	page.envRepo = index.envRepo
 	page.sunrise = index.sunrise
-	page.PageId = pid
+	page.PageId = pageId
 	page.added = sku.MakeListTransacted()
 	page.addedLatest = sku.MakeListTransacted()
 	page.preWrite = index.preWrite
@@ -46,8 +46,8 @@ func (page *writtenPage) initialize(
 	page.addedObjectIdLookup = make(map[string]struct{})
 }
 
-func (page *writtenPage) readOneRange(
-	raynge object_probe_index.Cursor,
+func (page *writtenPage) readOneCursor(
+	cursor object_probe_index.Cursor,
 	object *sku.Transacted,
 ) (err error) {
 	var file *os.File
@@ -59,27 +59,27 @@ func (page *writtenPage) readOneRange(
 
 	defer errors.DeferredCloser(&err, file)
 
-	bites := make([]byte, raynge.ContentLength)
+	bites := make([]byte, cursor.ContentLength)
 
-	if _, err = file.ReadAt(bites, raynge.Offset); err != nil {
-		err = errors.Wrapf(err, "Range: %q, Page: %q", raynge, page.PageId)
+	if _, err = file.ReadAt(bites, cursor.Offset); err != nil {
+		err = errors.Wrapf(err, "Range: %q, Page: %q", cursor, page.PageId)
 		return err
 	}
 
-	dec := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
+	decoder := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
 
-	skWR := objectWithCursorAndSigil{
+	objectPlus := objectWithCursorAndSigil{
 		objectWithSigil: objectWithSigil{
 			Transacted: object,
 		},
-		Cursor: raynge,
+		Cursor: cursor,
 	}
 
-	if _, err = dec.readFormatExactly(file, &skWR); err != nil {
+	if _, err = decoder.readFormatExactly(file, &objectPlus); err != nil {
 		err = errors.Wrapf(
 			err,
 			"Range: %q, Page: %q",
-			raynge,
+			cursor,
 			page.PageId.Path(),
 		)
 		return err
@@ -118,14 +118,17 @@ func (page *writtenPage) copyJustHistoryFrom(
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[objectWithCursorAndSigil],
 ) (err error) {
-	dec := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
+	decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
-	var sk objectWithCursorAndSigil
+	var object objectWithCursorAndSigil
 
 	for {
-		sk.Offset += sk.ContentLength
-		sk.Transacted = sku.GetTransactedPool().Get()
-		sk.ContentLength, err = dec.readFormatAndMatchSigil(reader, &sk)
+		object.Offset += object.ContentLength
+		object.Transacted = sku.GetTransactedPool().Get()
+		object.ContentLength, err = decoder.readFormatAndMatchSigil(
+			reader,
+			&object,
+		)
 		if err != nil {
 			if errors.IsEOF(err) {
 				err = nil
@@ -136,7 +139,7 @@ func (page *writtenPage) copyJustHistoryFrom(
 			return err
 		}
 
-		if err = output(sk); err != nil {
+		if err = output(object); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -156,11 +159,13 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 	includeAdded bool,
 	includeAddedLatest bool,
 ) (err error) {
-	var reader io.ReadCloser
+	var namedBlobReader io.ReadCloser
 
-	if reader, err = page.envRepo.ReadCloserCache(page.Path()); err != nil {
+	if namedBlobReader, err = page.envRepo.MakeNamedBlobReader(
+		page.Path(),
+	); err != nil {
 		if errors.IsNotExist(err) {
-			reader = io.NopCloser(bytes.NewReader(nil))
+			namedBlobReader = io.NopCloser(bytes.NewReader(nil))
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -168,9 +173,9 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 		}
 	}
 
-	defer errors.DeferredCloser(&err, reader)
+	defer errors.DeferredCloser(&err, namedBlobReader)
 
-	bufferedReader, repool := pool.GetBufferedReader(reader)
+	bufferedReader, repool := pool.GetBufferedReader(namedBlobReader)
 	defer repool()
 
 	if !includeAdded && !includeAddedLatest {
@@ -193,7 +198,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 		return err
 	}
 
-	dec := makeBinaryWithQueryGroup(query, ids.SigilHistory)
+	decoder := makeBinaryWithQueryGroup(query, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
 	added := page.added.Copy()
@@ -206,7 +211,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 			transacted = sku.GetTransactedPool().Get()
 			object.Transacted = transacted
 
-			_, err = dec.readFormatAndMatchSigil(bufferedReader, &object)
+			_, err = decoder.readFormatAndMatchSigil(bufferedReader, &object)
 			if err != nil {
 				if errors.IsEOF(err) {
 					err = errors.MakeErrStopIteration()
@@ -233,9 +238,9 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 
 	if err = heap.MergeStream(
 		&addedLatest,
-		func() (tz *sku.Transacted, err error) {
+		func() (object *sku.Transacted, err error) {
 			err = errors.MakeErrStopIteration()
-			return tz, err
+			return object, err
 		},
 		output,
 	); err != nil {

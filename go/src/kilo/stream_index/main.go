@@ -31,7 +31,7 @@ type Index struct {
 	sunrise  ids.Tai
 	preWrite interfaces.FuncIter[*sku.Transacted]
 	path     string
-	interfaces.CacheIOFactory
+	interfaces.NamedBlobAccess
 
 	pages            [PageCount]writtenPage
 	pagesAdded       [PageCount]writtenPage
@@ -53,7 +53,7 @@ func MakeIndex(
 		sunrise:        sunrise,
 		preWrite:       preWrite,
 		path:           dir,
-		CacheIOFactory: envRepo,
+		NamedBlobAccess: envRepo,
 	}
 
 	if err = index.probeIndex.Initialize(

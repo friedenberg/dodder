@@ -3,7 +3,6 @@ package zettel_id_index
 import (
 	"bufio"
 	"encoding/gob"
-	"io"
 	"math/rand"
 	"sync"
 
@@ -22,7 +21,7 @@ type encodedIds struct {
 }
 
 type index struct {
-	cacheFactory interfaces.CacheIOFactory
+	namedBlobAccess interfaces.NamedBlobAccess
 
 	lock sync.Mutex
 	path string
@@ -40,12 +39,12 @@ type index struct {
 func MakeIndex(
 	configCli repo_config_cli.Config,
 	dir interfaces.Directory,
-	cacheFactory interfaces.CacheIOFactory,
+	namedBlobAccess interfaces.NamedBlobAccess,
 ) (i *index, err error) {
 	i = &index{
 		path:               dir.FileCacheObjectId(),
 		nonRandomSelection: configCli.UsePredictableZettelIds(),
-		cacheFactory:       cacheFactory,
+		namedBlobAccess:    namedBlobAccess,
 		encodedIds: encodedIds{
 			AvailableIds: make(map[int]bool),
 		},
@@ -64,31 +63,33 @@ func MakeIndex(
 	return i, err
 }
 
-func (i *index) Flush() (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+func (index *index) Flush() (err error) {
+	index.lock.Lock()
+	defer index.lock.Unlock()
 
-	if !i.hasChanges {
+	if !index.hasChanges {
 		ui.Log().Print("no changes")
 		return err
 	}
 
-	var w1 io.WriteCloser
+	var namedBlobWriter interfaces.BlobWriter
 
-	if w1, err = i.cacheFactory.WriteCloserCache(i.path); err != nil {
+	if namedBlobWriter, err = index.namedBlobAccess.MakeNamedBlobWriter(
+		index.path,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, w1)
+	defer errors.DeferredCloser(&err, namedBlobWriter)
 
-	w := bufio.NewWriter(w1)
+	w := bufio.NewWriter(namedBlobWriter)
 
 	defer errors.DeferredFlusher(&err, w)
 
 	enc := gob.NewEncoder(w)
 
-	if err = enc.Encode(i.encodedIds); err != nil {
+	if err = enc.Encode(index.encodedIds); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded object id")
 		return err
 	}
@@ -96,21 +97,23 @@ func (i *index) Flush() (err error) {
 	return err
 }
 
-func (i *index) readIfNecessary() (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+func (index *index) readIfNecessary() (err error) {
+	index.lock.Lock()
+	defer index.lock.Unlock()
 
-	if i.didRead {
+	if index.didRead {
 		return err
 	}
 
 	ui.Log().Print("reading")
 
-	i.didRead = true
+	index.didRead = true
 
-	var r1 io.ReadCloser
+	var namedBlobReader interfaces.BlobReader
 
-	if r1, err = i.cacheFactory.ReadCloserCache(i.path); err != nil {
+	if namedBlobReader, err = index.namedBlobAccess.MakeNamedBlobReader(
+		index.path,
+	); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -120,13 +123,13 @@ func (i *index) readIfNecessary() (err error) {
 		return err
 	}
 
-	defer r1.Close()
+	defer namedBlobReader.Close()
 
-	r := bufio.NewReader(r1)
+	r := bufio.NewReader(namedBlobReader)
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(&i.encodedIds); err != nil {
+	if err = dec.Decode(&index.encodedIds); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -134,12 +137,12 @@ func (i *index) readIfNecessary() (err error) {
 	return err
 }
 
-func (i *index) Reset() (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+func (index *index) Reset() (err error) {
+	index.lock.Lock()
+	defer index.lock.Unlock()
 
-	lMax := i.oldZettelIdStore.Left().Len() - 1
-	rMax := i.oldZettelIdStore.Right().Len() - 1
+	lMax := index.oldZettelIdStore.Left().Len() - 1
+	rMax := index.oldZettelIdStore.Right().Len() - 1
 
 	if lMax == 0 {
 		err = errors.ErrorWithStackf("left object id are empty")
@@ -151,7 +154,7 @@ func (i *index) Reset() (err error) {
 		return err
 	}
 
-	i.AvailableIds = make(map[int]bool, lMax*rMax)
+	index.AvailableIds = make(map[int]bool, lMax*rMax)
 
 	for l := 0; l <= lMax; l++ {
 		for r := 0; r <= rMax; r++ {
@@ -163,16 +166,16 @@ func (i *index) Reset() (err error) {
 			ui.Log().Print(k)
 
 			n := int(k.Id())
-			i.AvailableIds[n] = true
+			index.AvailableIds[n] = true
 		}
 	}
 
-	i.hasChanges = true
+	index.hasChanges = true
 
 	return err
 }
 
-func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
+func (index *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return err
@@ -185,19 +188,19 @@ func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 		return err
 	}
 
-	if err = i.readIfNecessary(); err != nil {
+	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	var left, right int
 
-	if left, err = i.oldZettelIdStore.Left().ZettelId(h.GetHead()); err != nil {
+	if left, err = index.oldZettelIdStore.Left().ZettelId(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if right, err = i.oldZettelIdStore.Right().ZettelId(h.GetTail()); err != nil {
+	if right, err = index.oldZettelIdStore.Right().ZettelId(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -210,38 +213,38 @@ func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 	n := k.Id()
 	ui.Log().Printf("deleting %d, %s", n, h)
 
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	index.lock.Lock()
+	defer index.lock.Unlock()
 
-	delete(i.AvailableIds, int(n))
+	delete(index.AvailableIds, int(n))
 
-	i.hasChanges = true
+	index.hasChanges = true
 
 	return err
 }
 
-func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
-	if err = i.readIfNecessary(); err != nil {
+func (index *index) CreateZettelId() (h *ids.ZettelId, err error) {
+	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return h, err
 	}
 
-	if len(i.AvailableIds) == 0 {
+	if len(index.AvailableIds) == 0 {
 		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
 		return h, err
 	}
 
 	ri := 0
 
-	if len(i.AvailableIds) > 1 {
-		ri = rand.Intn(len(i.AvailableIds) - 1)
+	if len(index.AvailableIds) > 1 {
+		ri = rand.Intn(len(index.AvailableIds) - 1)
 	}
 
 	m := 0
 	j := 0
 
-	for n := range i.AvailableIds {
-		if i.nonRandomSelection {
+	for n := range index.AvailableIds {
+		if index.nonRandomSelection {
 			if m == 0 {
 				m = n
 				continue
@@ -262,14 +265,14 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 		}
 	}
 
-	delete(i.AvailableIds, int(m))
+	delete(index.AvailableIds, int(m))
 
-	i.hasChanges = true
+	index.hasChanges = true
 
-	return i.makeZettelIdButDontStore(m)
+	return index.makeZettelIdButDontStore(m)
 }
 
-func (i *index) makeZettelIdButDontStore(
+func (index *index) makeZettelIdButDontStore(
 	j int,
 ) (h *ids.ZettelId, err error) {
 	k := &coordinates.ZettelIdCoordinate{}
@@ -277,8 +280,8 @@ func (i *index) makeZettelIdButDontStore(
 
 	h, err = ids.MakeZettelIdFromProvidersAndCoordinates(
 		k.Id(),
-		i.oldZettelIdStore.Left(),
-		i.oldZettelIdStore.Right(),
+		index.oldZettelIdStore.Left(),
+		index.oldZettelIdStore.Right(),
 	)
 	if err != nil {
 		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
@@ -288,26 +291,26 @@ func (i *index) makeZettelIdButDontStore(
 	return h, err
 }
 
-func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
-	if err = i.readIfNecessary(); err != nil {
+func (index *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
+	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return hs, err
 	}
 
-	if m > len(i.AvailableIds) || m == 0 {
-		m = len(i.AvailableIds)
+	if m > len(index.AvailableIds) || m == 0 {
+		m = len(index.AvailableIds)
 	}
 
 	hs = make([]*ids.ZettelId, 0, m)
 	j := 0
 
-	for n := range i.AvailableIds {
+	for n := range index.AvailableIds {
 		k := &coordinates.ZettelIdCoordinate{}
 		k.SetInt(coordinates.Int(n))
 
 		var h *ids.ZettelId
 
-		if h, err = i.makeZettelIdButDontStore(n); err != nil {
+		if h, err = index.makeZettelIdButDontStore(n); err != nil {
 			err = errors.Wrap(err)
 			return hs, err
 		}

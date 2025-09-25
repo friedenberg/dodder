@@ -5,11 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
 
-func (env Env) ReadCloserCache(path string) (interfaces.BlobReader, error) {
+var _ interfaces.NamedBlobAccess = Env{}
+
+func (env Env) MakeNamedBlobReader(path string) (interfaces.BlobReader, error) {
+	// TODO return empty bytes reader on empty
 	return env_dir.NewFileReader(env_dir.DefaultConfig, path)
 }
 
-func (env Env) WriteCloserCache(
+func (env Env) MakeNamedBlobWriter(
 	path string,
 ) (interfaces.BlobWriter, error) {
 	return env_dir.NewMover(
