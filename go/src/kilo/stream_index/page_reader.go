@@ -1,6 +1,7 @@
 package stream_index
 
 import (
+	"bufio"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -16,8 +17,9 @@ import (
 
 type pageReader struct {
 	*writtenPage
-	blobReader interfaces.BlobReader
-	envRepo    env_repo.Env
+	blobReader     interfaces.BlobReader
+	bufferedReader *bufio.Reader
+	envRepo        env_repo.Env
 }
 
 func (index *Index) makePageReader(
@@ -36,7 +38,16 @@ func (index *Index) makePageReader(
 		panic(err)
 	}
 
-	return pageReader, pageReader.blobReader.Close
+	var repool interfaces.FuncRepool
+
+	pageReader.bufferedReader, repool = pool.GetBufferedReader(
+		pageReader.blobReader,
+	)
+
+	return pageReader, func() error {
+		repool()
+		return pageReader.blobReader.Close()
+	}
 }
 
 func (pageReader *pageReader) readOneCursor(
@@ -118,23 +129,9 @@ func (pageReader *pageReader) readFull(
 	output interfaces.FuncIter[*sku.Transacted],
 	pageReadOptions pageReadOptions,
 ) (err error) {
-	var namedBlobReader interfaces.BlobReader
-
-	if namedBlobReader, err = pageReader.envRepo.MakeNamedBlobReader(
-		pageReader.pageId.Path(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	defer errors.DeferredCloser(&err, namedBlobReader)
-
-	bufferedReader, repool := pool.GetBufferedReader(namedBlobReader)
-	defer repool()
-
 	if !pageReadOptions.includeAdded && !pageReadOptions.includeAddedLatest {
 		if err = pageReader.readFrom(
-			bufferedReader,
+			pageReader.bufferedReader,
 			query,
 			func(object objectWithCursorAndSigil) (err error) {
 				if err = output(object.Transacted); err != nil {
@@ -165,7 +162,10 @@ func (pageReader *pageReader) readFull(
 			transacted = sku.GetTransactedPool().Get()
 			object.Transacted = transacted
 
-			_, err = decoder.readFormatAndMatchSigil(bufferedReader, &object)
+			_, err = decoder.readFormatAndMatchSigil(
+				pageReader.bufferedReader,
+				&object,
+			)
 			if err != nil {
 				if errors.IsEOF(err) {
 					err = errors.MakeErrStopIteration()
