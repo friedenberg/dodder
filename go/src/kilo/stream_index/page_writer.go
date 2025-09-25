@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type ObjectIdToObject map[string]objectWithCursorAndSigil
+type ObjectIdToObject map[string]objectMetaWithCursorAndSigil
 
 type pageWriter struct {
 	envRepo     env_repo.Env
@@ -149,14 +149,14 @@ func (pageWriter *pageWriter) flushBoth(
 }
 
 func (pageWriter *pageWriter) updateSigilWithLatest(
-	object objectWithCursorAndSigil,
+	objectMeta objectMetaWithCursorAndSigil,
 ) (err error) {
-	object.Add(ids.SigilLatest)
+	objectMeta.Add(ids.SigilLatest)
 
 	if err = pageWriter.binaryEncoder.updateSigil(
 		pageWriter.file,
-		object.Sigil,
-		object.Offset,
+		objectMeta.Sigil,
+		objectMeta.Offset,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -234,11 +234,9 @@ func (pageWriter *pageWriter) makeWriteOne(
 		// }()
 		pageWriter.cursor.Offset += pageWriter.cursor.ContentLength
 
-		previous := pageWriter.latestObjects[object.GetObjectId().String()]
+		objectOld := pageWriter.latestObjects[object.GetObjectId().String()]
 
-		if previous.Transacted != nil {
-			object.Metadata.Cache.ParentTai = previous.GetTai()
-		}
+		object.Metadata.Cache.ParentTai = objectOld.Tai
 
 		if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
 			bufferedWriter,
@@ -275,24 +273,18 @@ func (pageWriter *pageWriter) saveToLatestMap(
 	objectId := object.GetObjectId()
 	objectIdString := objectId.String()
 
-	record := pageWriter.latestObjects[objectIdString]
-	record.Cursor = pageWriter.cursor
-
-	if record.Transacted == nil {
-		record.Transacted = sku.GetTransactedPool().Get()
-	}
-
-	sku.TransactedResetter.ResetWith(record.Transacted, object)
-
-	record.Sigil = sigil
+	objectOld := pageWriter.latestObjects[objectIdString]
+	objectOld.Cursor = pageWriter.cursor
+	objectOld.Tai = object.GetTai()
+	objectOld.Sigil = sigil
 
 	if object.Metadata.Cache.Dormant.Bool() {
-		record.Add(ids.SigilHidden)
+		objectOld.Add(ids.SigilHidden)
 	} else {
-		record.Del(ids.SigilHidden)
+		objectOld.Del(ids.SigilHidden)
 	}
 
-	pageWriter.latestObjects[objectIdString] = record
+	pageWriter.latestObjects[objectIdString] = objectOld
 
 	return err
 }

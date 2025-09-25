@@ -15,3 +15,9 @@ type objectWithCursorAndSigil struct {
 	objectWithSigil
 	object_probe_index.Cursor
 }
+
+type objectMetaWithCursorAndSigil struct {
+	ids.Sigil
+	object_probe_index.Cursor
+	Tai ids.Tai
+}
