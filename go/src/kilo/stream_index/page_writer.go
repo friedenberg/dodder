@@ -53,7 +53,7 @@ func (index *Index) makePageFlush(
 			writtenPage: page,
 			pageReader:  index.makePageReader(pageIndex),
 			preWrite:    index.preWrite,
-			probeIndex:  page.probeIndex,
+			probeIndex:  &index.probeIndex,
 			path:        page.pageId.Path(),
 		}
 

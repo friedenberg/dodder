@@ -81,7 +81,7 @@ func (index *Index) Initialize() (err error) {
 			page_id.PageId{
 				Prefix: "Page",
 				Dir:    index.path,
-				Index:  uint8(n),
+				Index:  PageIndex(n),
 			},
 			index,
 		)
@@ -90,7 +90,7 @@ func (index *Index) Initialize() (err error) {
 	return err
 }
 
-func (index *Index) GetPage(n uint8) (p *writtenPage) {
+func (index *Index) GetPage(n PageIndex) (p *writtenPage) {
 	p = &index.pages[n]
 	return p
 }
@@ -236,10 +236,10 @@ func (index *Index) flushEverything(
 }
 
 func PageIndexForObject(
-	width uint8,
+	width PageIndex,
 	object *sku.Transacted,
 	hashType interfaces.FormatHash,
-) (n uint8, err error) {
+) (n PageIndex, err error) {
 	if n, err = PageIndexForObjectId(
 		width,
 		object.GetObjectId(),
@@ -253,10 +253,10 @@ func PageIndexForObject(
 }
 
 func PageIndexForObjectId(
-	width uint8,
+	width PageIndex,
 	oid *ids.ObjectId,
 	hashType interfaces.FormatHash,
-) (n uint8, err error) {
+) (n PageIndex, err error) {
 	if n, err = page_id.PageIndexForString(
 		width,
 		oid.String(),
@@ -273,9 +273,9 @@ func (index *Index) Add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	var n uint8
+	var pageIndex PageIndex
 
-	if n, err = PageIndexForObject(
+	if pageIndex, err = PageIndexForObject(
 		DigitWidth,
 		object,
 		index.hashType,
@@ -284,9 +284,7 @@ func (index *Index) Add(
 		return err
 	}
 
-	page := index.GetPage(n)
-
-	if err = page.add(object, options); err != nil {
+	if err = index.add(pageIndex, object, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
