@@ -48,11 +48,11 @@ func MakeIndex(
 	sunrise ids.Tai,
 ) (index *Index, err error) {
 	index = &Index{
-		hashType:       markl.FormatHashSha256,
-		envRepo:        envRepo,
-		sunrise:        sunrise,
-		preWrite:       preWrite,
-		path:           dir,
+		hashType:        markl.FormatHashSha256,
+		envRepo:         envRepo,
+		sunrise:         sunrise,
+		preWrite:        preWrite,
+		path:            dir,
 		NamedBlobAccess: envRepo,
 	}
 
