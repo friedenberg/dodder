@@ -28,7 +28,7 @@ func (m *Mode) Set(v string) (err error) {
 		err = errors.ErrorWithStackf("unsupported mode: %s", v)
 	}
 
-	return
+	return err
 }
 
 func (m Mode) String() string {

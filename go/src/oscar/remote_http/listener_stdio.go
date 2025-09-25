@@ -36,7 +36,7 @@ func (listener *StdioListener) Accept() (conn net.Conn, err error) {
 		conn = &StdioConn{acceptNext: listener.accept}
 	}
 
-	return
+	return conn, err
 }
 
 func (listener *StdioListener) Close() error {

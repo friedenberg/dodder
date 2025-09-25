@@ -20,15 +20,15 @@ func (cmd CreateOrganizeFile) RunAndWrite(
 ) (results *organize_text.Text, err error) {
 	if results, err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
 	if _, err = results.WriteTo(writer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
-	return
+	return results, err
 }
 
 func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
@@ -42,14 +42,14 @@ func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
 			),
 		) {
 			err = errors.Err499ClientClosedRequest
-			return
+			return results, err
 		}
 	}
 
 	if results, err = organize_text.New(cmd.Options); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
-	return
+	return results, err
 }

@@ -15,22 +15,22 @@ func (id IdBinaryDecodingTypeData) UnmarshalBinary(
 	bites []byte,
 ) (err error) {
 	if len(bites) == 0 {
-		return
+		return err
 	}
 
 	formatIdBytes, bytesAfterFormatId, ok := bytes.Cut(bites, []byte{'\x00'})
 
 	if !ok {
 		err = errors.Errorf("expected empty byte, but none found")
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(string(formatIdBytes), bytesAfterFormatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 type IdBinaryDecodingFormatTypeData struct {
@@ -41,19 +41,19 @@ func (id *Id) UnmarshalBinary(
 	bites []byte,
 ) (err error) {
 	if len(bites) == 0 {
-		return
+		return err
 	}
 
 	formatBytes, bytesAfterFormat, ok := bytes.Cut(bites, []byte{'\x00'})
 
 	if !ok {
 		err = errors.Errorf("expected empty byte, but none found")
-		return
+		return err
 	}
 
 	if err = id.SetPurpose(string(formatBytes)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	formatIdBytes, bytesAfterFormatId, ok := bytes.Cut(
@@ -63,15 +63,15 @@ func (id *Id) UnmarshalBinary(
 
 	if !ok {
 		err = errors.Errorf("expected empty byte, but none found")
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(string(formatIdBytes), bytesAfterFormatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 type IdBinaryEncodingTypeData struct {
@@ -89,17 +89,17 @@ func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 	bites := id.GetBytes()
 
 	if format == nil && len(bites) == 0 {
-		return
+		return bytes, err
 	} else if format == nil {
 		err = errors.Errorf("empty type")
-		return
+		return bytes, err
 	}
 
 	bytes = append(bytes, []byte(format.GetMarklFormatId())...)
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 
-	return
+	return bytes, err
 }
 
 type IdBinaryEncodingFormatTypeData struct {
@@ -118,10 +118,10 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 	bites := id.GetBytes()
 
 	if format == nil && len(bites) == 0 && purpose == "" {
-		return
+		return bytes, err
 	} else if format == nil {
 		err = errors.Errorf("empty type")
-		return
+		return bytes, err
 	}
 
 	bytes = append(bytes, []byte(purpose)...)
@@ -130,5 +130,5 @@ func (id Id) MarshalBinary() (bytes []byte, err error) {
 	bytes = append(bytes, '\x00')
 	bytes = append(bytes, bites...)
 
-	return
+	return bytes, err
 }

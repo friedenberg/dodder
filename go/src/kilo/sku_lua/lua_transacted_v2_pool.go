@@ -21,7 +21,7 @@ func PushTopFuncV2(
 ) (vm *LuaVMV2, argsOut []string, err error) {
 	if vm, err = luaVMPool.Get(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return vm, argsOut, err
 	}
 
 	vm.LValue = vm.Top
@@ -32,12 +32,12 @@ func PushTopFuncV2(
 		args,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return vm, argsOut, err
 	}
 
 	vm.Push(luaFunction)
 
-	return
+	return vm, argsOut, err
 }
 
 type (
@@ -52,7 +52,7 @@ func MakeLuaVMPoolV2(luaVMPool *lua.VMPool, self *sku.Transacted) LuaVMPoolV2 {
 
 			if vm, err = luaVMPool.PoolWithErrorsPtr.Get(); err != nil {
 				err = errors.Wrap(err)
-				return
+				return out, err
 			}
 
 			out = &LuaVMV2{
@@ -61,7 +61,7 @@ func MakeLuaVMPoolV2(luaVMPool *lua.VMPool, self *sku.Transacted) LuaVMPoolV2 {
 				Selbst:    self,
 			}
 
-			return
+			return out, err
 		},
 		nil,
 	)
@@ -79,7 +79,7 @@ func MakeLuaTablePoolV2(vm *lua.VM) LuaTablePoolV2 {
 			vm.SetField(t.Transacted, "Tags", t.Tags)
 			vm.SetField(t.Transacted, "TagsImplicit", t.TagsImplicit)
 
-			return
+			return t
 		},
 		func(t *LuaTableV2) {
 			lua.ClearTable(vm.LState, t.Tags)

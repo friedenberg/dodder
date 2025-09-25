@@ -74,7 +74,7 @@ func (a Slice) Slice(left, right int) (b Slice) {
 		b.data[1] = a.data[1][:right-lenFirst]
 	}
 
-	return
+	return b
 }
 
 func (rs Slice) Overlap() (o [6]byte, first, second int) {
@@ -93,7 +93,7 @@ func (rs Slice) Overlap() (o [6]byte, first, second int) {
 	first = copy(o[:3], firstEnd)
 	second = copy(o[first:], secondEnd)
 
-	return
+	return o, first, second
 }
 
 func (rs Slice) ReadFrom(r io.Reader) (n int64, err error) {
@@ -103,7 +103,7 @@ func (rs Slice) ReadFrom(r io.Reader) (n int64, err error) {
 		loc, err = r.Read(rs.First()[n:])
 		n += int64(loc)
 		if err != nil {
-			return
+			return n, err
 		}
 	}
 
@@ -111,11 +111,11 @@ func (rs Slice) ReadFrom(r io.Reader) (n int64, err error) {
 		loc, err = r.Read(rs.Second()[n-int64(rs.LenFirst()):])
 		n += int64(loc)
 		if err != nil {
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (rs Slice) WriteTo(w io.Writer) (n int64, err error) {
@@ -125,13 +125,13 @@ func (rs Slice) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		return
+		return n, err
 	}
 
 	n1, err = w.Write(rs.Second())
 	n += int64(n1)
 
-	return
+	return n, err
 }
 
 func (rs Slice) BytesBetween(left, right int) []byte {
@@ -216,7 +216,7 @@ func (rs Slice) Compare(b []byte) (c int) {
 		c = bytes.Compare(b[len(rs.First()):], rs.Second())
 	}
 
-	return
+	return c
 }
 
 func (rs Slice) Start() int64 {
@@ -268,7 +268,7 @@ func (rs Slice) Cut(b byte) (before, after Slice, ok bool) {
 
 			ok = true
 
-			return
+			return before, after, ok
 		}
 	}
 
@@ -292,11 +292,11 @@ func (rs Slice) Cut(b byte) (before, after Slice, ok bool) {
 
 			ok = true
 
-			return
+			return before, after, ok
 		}
 	}
 
-	return
+	return before, after, ok
 }
 
 func (rs Slice) SliceUptoButExcluding(b byte) (s Slice, ok bool) {
@@ -312,7 +312,7 @@ func (rs Slice) SliceUptoButExcluding(b byte) (s Slice, ok bool) {
 
 			ok = true
 
-			return
+			return s, ok
 		}
 	}
 
@@ -328,11 +328,11 @@ func (rs Slice) SliceUptoButExcluding(b byte) (s Slice, ok bool) {
 
 			ok = true
 
-			return
+			return s, ok
 		}
 	}
 
-	return
+	return s, ok
 }
 
 func (rs Slice) SliceUptoAndIncluding(b byte) (s Slice, ok bool) {
@@ -348,7 +348,7 @@ func (rs Slice) SliceUptoAndIncluding(b byte) (s Slice, ok bool) {
 
 			ok = true
 
-			return
+			return s, ok
 		}
 	}
 
@@ -364,9 +364,9 @@ func (rs Slice) SliceUptoAndIncluding(b byte) (s Slice, ok bool) {
 
 			ok = true
 
-			return
+			return s, ok
 		}
 	}
 
-	return
+	return s, ok
 }

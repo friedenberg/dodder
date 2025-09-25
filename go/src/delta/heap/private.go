@@ -37,7 +37,7 @@ func (h heapPrivate[T, TPtr]) Len() int {
 
 func (h heapPrivate[T, TPtr]) Less(i, j int) (ok bool) {
 	ok = h.Lessor.Less(h.Elements[i], h.Elements[j])
-	return
+	return ok
 }
 
 func (h heapPrivate[T, TPtr]) Swap(i, j int) {
@@ -88,11 +88,11 @@ func (a heapPrivate[T, TPtr]) Copy() (b heapPrivate[T, TPtr]) {
 
 	copy(b.Elements, a.Elements)
 
-	return
+	return b
 }
 
 func (a heapPrivate[T, TPtr]) Sorted() (b heapPrivate[T, TPtr]) {
 	b = a.Copy()
 	sort.Sort(b)
-	return
+	return b
 }

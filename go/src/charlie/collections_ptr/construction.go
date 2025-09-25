@@ -27,13 +27,13 @@ func MakeValueSetString[
 
 		if err = e1.Set(v); err != nil {
 			err = errors.Wrap(err)
-			return
+			return s, err
 		}
 
 		s.E[s.K.GetKeyPtr(e1)] = e1
 	}
 
-	return
+	return s, err
 }
 
 func MakeValueSetValue[
@@ -56,7 +56,7 @@ func MakeValueSetValue[
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeValueSet[
@@ -79,7 +79,7 @@ func MakeValueSet[
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeSetValue[T any, TPtr interfaces.Ptr[T]](
@@ -99,7 +99,7 @@ func MakeSetValue[T any, TPtr interfaces.Ptr[T]](
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeSet[T any, TPtr interfaces.Ptr[T]](
@@ -119,7 +119,7 @@ func MakeSet[T any, TPtr interfaces.Ptr[T]](
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableValueSetValue[
@@ -142,7 +142,7 @@ func MakeMutableValueSetValue[
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableValueSet[
@@ -165,7 +165,7 @@ func MakeMutableValueSet[
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableSetValue[
@@ -188,7 +188,7 @@ func MakeMutableSetValue[
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableSet[T any, TPtr interfaces.Ptr[T]](
@@ -208,5 +208,5 @@ func MakeMutableSet[T any, TPtr interfaces.Ptr[T]](
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
-	return
+	return s
 }

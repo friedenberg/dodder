@@ -15,7 +15,7 @@ func (a ApproximatedType) ActualOrNil() (actual *sku.Transacted) {
 		actual = a.Type
 	}
 
-	return
+	return actual
 }
 
 func (a ApproximatedType) ApproximatedOrActual() *sku.Transacted {

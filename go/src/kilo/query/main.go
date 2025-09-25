@@ -49,23 +49,23 @@ func (query *Query) reduce(b *buildState) (err error) {
 	for _, q := range query.userQueries {
 		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = query.addOptimized(b, q); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	for _, q := range query.optimizedQueries {
 		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (query *Query) addExactExternalObjectId(
@@ -74,7 +74,7 @@ func (query *Query) addExactExternalObjectId(
 ) (err error) {
 	if k == nil {
 		err = errors.ErrorWithStackf("nil object id")
-		return
+		return err
 	}
 
 	q := b.makeQuery()
@@ -86,12 +86,12 @@ func (query *Query) addExactExternalObjectId(
 
 	if err = query.add(q); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	query.dotOperatorActive = true
 
-	return
+	return err
 }
 
 func (query *Query) add(q *expSigilAndGenre) (err error) {
@@ -111,12 +111,12 @@ func (query *Query) add(q *expSigilAndGenre) (err error) {
 
 	if err = existing.Add(q); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	query.userQueries[q.Genre] = existing
 
-	return
+	return err
 }
 
 func (query *Query) addOptimized(
@@ -140,13 +140,13 @@ func (query *Query) addOptimized(
 
 		if err = existing.Merge(q); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		query.optimizedQueries[g] = existing
 	}
 
-	return
+	return err
 }
 
 func (query *Query) isEmpty() bool {
@@ -162,7 +162,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 			len(queryGroup.optimizedQueries),
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	var query *expSigilAndGenre
@@ -177,7 +177,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 			query.Sigil,
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	oids := query.expObjectIds.internal
@@ -207,12 +207,12 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 			permitInternal,
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	sigil = query.GetSigil()
 
-	return
+	return objectId, sigil, err
 }
 
 func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
@@ -222,7 +222,7 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 			len(queryGroup.optimizedQueries),
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	var query *expSigilAndGenre
@@ -237,7 +237,7 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 			query.Sigil,
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	oids := query.expObjectIds.internal
@@ -259,12 +259,12 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 			eoidsLen,
 		)
 
-		return
+		return objectId, sigil, err
 	}
 
 	sigil = query.GetSigil()
 
-	return
+	return objectId, sigil, err
 }
 
 func (query *Query) sortedUserQueries() []*expSigilAndGenre {
@@ -294,14 +294,14 @@ func (query *Query) sortedUserQueries() []*expSigilAndGenre {
 func (query *Query) containsSku(objectGetter sku.TransactedGetter) (ok bool) {
 	if query.defaultQuery != nil &&
 		!query.defaultQuery.containsSku(objectGetter) {
-		return
+		return ok
 	}
 
 	object := objectGetter.GetSku()
 
 	if len(query.optimizedQueries) == 0 && query.matchOnEmpty {
 		ok = true
-		return
+		return ok
 	}
 
 	genre := object.GetGenre()
@@ -310,10 +310,10 @@ func (query *Query) containsSku(objectGetter sku.TransactedGetter) (ok bool) {
 
 	if !ok || !expSigilAndGenre.ContainsSku(objectGetter) {
 		ok = false
-		return
+		return ok
 	}
 
 	ok = true
 
-	return
+	return ok
 }

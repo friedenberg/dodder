@@ -30,7 +30,7 @@ func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = writer.Metadata.WriteTo(bufferedWriter)
@@ -38,7 +38,7 @@ func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		bufferedWriter.WriteString(Boundary + "\n")
@@ -46,7 +46,7 @@ func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if writer.Blob != nil {
@@ -55,7 +55,7 @@ func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 	}
@@ -66,9 +66,9 @@ func (writer Writer) WriteTo(ioWriter io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

@@ -99,10 +99,10 @@ func (cmd Diff) Run(dep command.Request) {
 		func(co sku.SkuType) (err error) {
 			if err = opDiffFS.Run(co, o); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		localWorkingCopy.Cancel(err)

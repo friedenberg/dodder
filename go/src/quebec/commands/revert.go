@@ -88,17 +88,17 @@ func (md Revert) runRevertFromQuery(
 
 			if err = u.GetStore().RevertTo(rt); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (md Revert) runRevertFromLast(
@@ -110,7 +110,7 @@ func (md Revert) runRevertFromLast(
 
 	if listObject, err = stoar.GetInventoryListStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	seq := stoar.GetInventoryListStore().AllInventoryListContents(
@@ -120,7 +120,7 @@ func (md Revert) runRevertFromLast(
 	for object, errIter := range seq {
 		if errIter != nil {
 			err = errors.Wrap(errIter)
-			return
+			return err
 		}
 
 		var cachedSku *sku.Transacted
@@ -130,7 +130,7 @@ func (md Revert) runRevertFromLast(
 			object.GetTai(),
 		); err != nil {
 			err = errors.Wrap(errIter)
-			return
+			return err
 		}
 
 		defer sku.GetTransactedPool().Put(cachedSku)
@@ -142,9 +142,9 @@ func (md Revert) runRevertFromLast(
 
 		if err = repo.GetStore().RevertTo(rt); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

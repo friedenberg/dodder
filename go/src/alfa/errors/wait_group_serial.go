@@ -43,7 +43,7 @@ func (wg *waitGroupSerial) GetError() (err error) {
 
 	err = me.GetError()
 
-	return
+	return err
 }
 
 func (wg *waitGroupSerial) Do(f FuncErr) (d bool) {

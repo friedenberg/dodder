@@ -89,7 +89,7 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 		case *expTagsOrTypes:
 			if err = mt.reduce(b); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			if len(mt.Children) == 0 {
@@ -104,7 +104,7 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 		case reducer:
 			if err = mt.reduce(b); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -113,7 +113,7 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 
 	tagsOrTypes.Children = chillen
 
-	return
+	return err
 }
 
 func (tagsOrTypes *expTagsOrTypes) Add(m sku.Query) (err error) {
@@ -126,7 +126,7 @@ func (tagsOrTypes *expTagsOrTypes) Add(m sku.Query) (err error) {
 
 	tagsOrTypes.Children = append(tagsOrTypes.Children, m)
 
-	return
+	return err
 }
 
 func (tagsOrTypes *expTagsOrTypes) Operator() rune {
@@ -215,7 +215,7 @@ func (tagsOrTypes *expTagsOrTypes) ContainsSku(
 ) (ok bool) {
 	if len(tagsOrTypes.Children) == 0 {
 		ok = tagsOrTypes.negateIfNecessary(true)
-		return
+		return ok
 	}
 
 	if tagsOrTypes.Or {
@@ -224,7 +224,7 @@ func (tagsOrTypes *expTagsOrTypes) ContainsSku(
 		ok = tagsOrTypes.containsMatchableAnd(objectGetter)
 	}
 
-	return
+	return ok
 }
 
 func (tagsOrTypes *expTagsOrTypes) containsMatchableAnd(
@@ -257,9 +257,9 @@ func (tagsOrTypes *expTagsOrTypes) Each(
 	for _, m := range tagsOrTypes.Children {
 		if err = f(m); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

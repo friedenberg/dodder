@@ -34,7 +34,7 @@ func (tee teeRuneReader) ReadRune() (r rune, size int, err error) {
 			errors.Errorf("read rune size does not match encoded size. expected %d, but got %d", size, n),
 		)
 
-		return
+		return r, size, err
 	}
 
 	if err != nil {
@@ -43,8 +43,8 @@ func (tee teeRuneReader) ReadRune() (r rune, size int, err error) {
 
 	if _, errWrite := tee.writer.Write(b[:n]); errWrite != nil {
 		err = errors.Join(err, errors.Wrap(errWrite))
-		return
+		return r, size, err
 	}
 
-	return
+	return r, size, err
 }

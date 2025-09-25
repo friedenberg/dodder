@@ -85,7 +85,7 @@ func Make(
 			workspaceFile,
 		); err != nil {
 			err = errors.BadRequestf("failed to decode `%s`: %w", workspaceFile, err)
-			return
+			return outputEnv, err
 		}
 
 		outputEnv.blob = object.Blob
@@ -118,7 +118,7 @@ func Make(
 			"workspace-*",
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return outputEnv, err
 		}
 	} else {
 		// TODO determine this based on the blob
@@ -132,12 +132,12 @@ func Make(
 		envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return outputEnv, err
 	}
 
 	outputEnv.store.StoreLike = outputEnv.storeFS
 
-	return
+	return outputEnv, err
 }
 
 type env struct {
@@ -173,7 +173,7 @@ func (env *env) findWorkspaceFile(
 
 		if files.Exists(expectedWorkspaceConfigFilePath) {
 			found = expectedWorkspaceConfigFilePath
-			return
+			return found
 		}
 
 		// if we hit the root, reset to empty so that we trigger the isTemporary
@@ -188,7 +188,7 @@ func (env *env) findWorkspaceFile(
 			continue
 		}
 
-		return
+		return found
 	}
 }
 
@@ -255,13 +255,13 @@ func (env *env) CreateWorkspace(
 		env.GetWorkspaceConfigFilePath(),
 	); errors.IsExist(err) {
 		err = errors.BadRequestf("workspace already exists")
-		return
+		return err
 	} else if err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
@@ -269,17 +269,17 @@ func (env *env) SetSupplies(supplies store_workspace.Supplies) (err error) {
 
 	if err = env.store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO persist store types and bootstrap based on workspace config
 func (env *env) SetWorkspaceTypes(
 	stores map[string]*Store,
 ) (err error) {
-	return
+	return err
 }
 
 func (env *env) Flush() (err error) {
@@ -289,8 +289,8 @@ func (env *env) Flush() (err error) {
 
 	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

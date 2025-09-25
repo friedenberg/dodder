@@ -50,7 +50,7 @@ func (c *constructor2) collectExplicitAndImplicitFor(
 		}
 	}
 
-	return
+	return explicitCount, implicitCount, err
 }
 
 func (c *constructor2) preparePrefixSetsAndRootsAndExtras() (err error) {
@@ -65,7 +65,7 @@ func (c *constructor2) preparePrefixSetsAndRootsAndExtras() (err error) {
 			re,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
@@ -74,12 +74,12 @@ func (c *constructor2) preparePrefixSetsAndRootsAndExtras() (err error) {
 		if explicitCount == c.Options.Skus.Len() {
 			if err = anchored.Add(re); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else if explicitCount > 0 {
 			if err = extras.Add(re); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -87,7 +87,7 @@ func (c *constructor2) preparePrefixSetsAndRootsAndExtras() (err error) {
 	c.TagSet = anchored
 	c.ExtraTags = extras
 
-	return
+	return err
 }
 
 func (c *constructor2) populate() (err error) {
@@ -105,7 +105,7 @@ func (c *constructor2) populate() (err error) {
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = c.makeChildrenWithoutGroups(
@@ -121,7 +121,7 @@ func (c *constructor2) populate() (err error) {
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -134,10 +134,10 @@ func (c *constructor2) populate() (err error) {
 		allUsed,
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *constructor2) makeChildrenWithoutGroups(
@@ -147,15 +147,15 @@ func (c *constructor2) makeChildrenWithoutGroups(
 ) (err error) {
 	if err = fi(used.Add); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.makeAndAddUngrouped(parent, fi); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *constructor2) makeChildrenWithPossibleGroups(
@@ -170,18 +170,18 @@ func (c *constructor2) makeChildrenWithPossibleGroups(
 
 			if z, err = c.cloneObj(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			parent.AddObject(z)
 
 			if err = used.Add(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
-		return
+		return err
 	}
 
 	segments := prefixSet.Subset(groupingTags[0])
@@ -195,7 +195,7 @@ func (c *constructor2) makeChildrenWithPossibleGroups(
 		return nil
 	}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.addGroupedChildren(
@@ -205,12 +205,12 @@ func (c *constructor2) makeChildrenWithPossibleGroups(
 		used,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	parent.SortChildren()
 
-	return
+	return err
 }
 
 func (c *constructor2) addGroupedChildren(
@@ -235,13 +235,13 @@ func (c *constructor2) addGroupedChildren(
 				return nil
 			}); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			for element := range zs.All() {
 				if err = used.Add(element); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
@@ -261,13 +261,13 @@ func (c *constructor2) addGroupedChildren(
 			used,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		parent.addChild(child)
 	}
 
-	return
+	return err
 }
 
 func (c *constructor2) makeAndAddUngrouped(
@@ -280,18 +280,18 @@ func (c *constructor2) makeAndAddUngrouped(
 
 			if z, err = c.cloneObj(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			parent.AddObject(z)
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
-	return
+	return err
 }
 
 func (c *constructor2) cloneObj(
@@ -311,5 +311,5 @@ func (c *constructor2) cloneObj(
 	// 	panic("empty sha")
 	// }
 
-	return
+	return z, err
 }

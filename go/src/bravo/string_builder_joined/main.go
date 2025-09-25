@@ -17,7 +17,7 @@ func Make(joinString string) (b *builder) {
 		joinString: joinString,
 	}
 
-	return
+	return b
 }
 
 func (b *builder) setDidWrite() {
@@ -31,7 +31,7 @@ func (b *builder) WriteString(v string) (n int, err error) {
 	if b.didWrite {
 		if n1, err = b.builder.WriteString(b.joinString); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n += n1
@@ -39,12 +39,12 @@ func (b *builder) WriteString(v string) (n int, err error) {
 
 	if n1, err = b.builder.WriteString(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n += n1
 
-	return
+	return n, err
 }
 
 func (b *builder) String() string {

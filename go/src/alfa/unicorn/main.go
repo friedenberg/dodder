@@ -19,14 +19,14 @@ func CountRune(b []byte, r rune) (c int) {
 		runeValue, width := utf8.DecodeRune(b[i:])
 
 		if runeValue != r {
-			return
+			return c
 		}
 
 		c++
 		w = width
 	}
 
-	return
+	return c
 }
 
 func CutNCharacters(data []byte, n int) ([]byte, []byte) {

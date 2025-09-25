@@ -21,7 +21,7 @@ func (local *Repo) GetBlobFormatter(
 ) (blobFormatter script_config.RemoteScript, err error) {
 	if tipe.GetType().IsEmpty() {
 		err = errors.ErrorWithStackf("empty type")
-		return
+		return blobFormatter, err
 	}
 
 	var typeObject *sku.Transacted
@@ -30,7 +30,7 @@ func (local *Repo) GetBlobFormatter(
 		tipe.GetType(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobFormatter, err
 	}
 
 	var typeBlob type_blobs.Blob
@@ -41,7 +41,7 @@ func (local *Repo) GetBlobFormatter(
 		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobFormatter, err
 	}
 
 	defer repool()
@@ -71,7 +71,7 @@ func (local *Repo) GetBlobFormatter(
 
 		blobFormatter = getBlobFormatter(formatId)
 
-		return
+		return blobFormatter, err
 	}
 
 	var g type_blobs.UTIGroup
@@ -83,7 +83,7 @@ func (local *Repo) GetBlobFormatter(
 			utiGroup,
 			slices.Collect(maps.Keys(typeBlob.GetFormatterUTIGroups())),
 		)
-		return
+		return blobFormatter, err
 	}
 
 	ft, ok := g.Map()[formatId]
@@ -96,7 +96,7 @@ func (local *Repo) GetBlobFormatter(
 			slices.Collect(maps.Keys(g.Map())),
 		)
 
-		return
+		return blobFormatter, err
 	}
 
 	formatId = ft
@@ -110,8 +110,8 @@ func (local *Repo) GetBlobFormatter(
 		// err = errors.Normalf("no format id %q", actualFormatId)
 		// return
 
-		return
+		return blobFormatter, err
 	}
 
-	return
+	return blobFormatter, err
 }

@@ -56,7 +56,7 @@ LOOP:
 
 		if err != nil && err != io.EOF {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		r.AdvanceRead(offsetPlusMatch)
@@ -72,7 +72,7 @@ LOOP:
 			case '#':
 				if err = ar.readOneHeading(r, sb); err != nil {
 					err = errors.Wrap(err)
-					return
+					return n, err
 				}
 
 			case '%':
@@ -81,7 +81,7 @@ LOOP:
 						err = nil
 					} else {
 						err = errors.Wrap(err)
-						return
+						return n, err
 					}
 				}
 
@@ -91,13 +91,13 @@ LOOP:
 						err = nil
 					} else {
 						err = errors.Wrap(err)
-						return
+						return n, err
 					}
 				}
 
 			default:
 				err = errors.ErrorWithStackf("unsupported verb: %c. slice: %q", pr, sl)
-				return
+				return n, err
 			}
 		}
 
@@ -111,7 +111,7 @@ LOOP:
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (ar *reader) readOneHeading(
@@ -126,7 +126,7 @@ func (ar *reader) readOneHeading(
 
 	if _, err = reader.ReadStringFormat(currentTags, rb); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var newAssignment *Assignment
@@ -150,17 +150,17 @@ func (ar *reader) readOneHeading(
 			column: 2,
 		}
 
-		return
+		return err
 	}
 
 	if newAssignment == nil {
 		err = errors.ErrorWithStackf("read heading function return nil new assignment")
-		return
+		return err
 	}
 
 	ar.currentAssignment = newAssignment
 
-	return
+	return err
 }
 
 func (ar *reader) readOneHeadingLesserDepth(
@@ -171,7 +171,7 @@ func (ar *reader) readOneHeadingLesserDepth(
 
 	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return newCurrent, err
 	}
 
 	if e.Len() == 0 {
@@ -195,7 +195,7 @@ func (ar *reader) readOneHeadingLesserDepth(
 		newCurrent = assignment
 	}
 
-	return
+	return newCurrent, err
 }
 
 func (ar *reader) readOneHeadingEqualDepth(
@@ -206,7 +206,7 @@ func (ar *reader) readOneHeadingEqualDepth(
 
 	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return newCurrent, err
 	}
 
 	if e.Len() == 0 {
@@ -230,7 +230,7 @@ func (ar *reader) readOneHeadingEqualDepth(
 		newCurrent = assignment
 	}
 
-	return
+	return newCurrent, err
 }
 
 func (ar *reader) readOneHeadingGreaterDepth(
@@ -266,7 +266,7 @@ func (ar *reader) readOneHeadingGreaterDepth(
 		newCurrent = assignment
 	}
 
-	return
+	return newCurrent, err
 }
 
 func (ar *reader) readOneObj(
@@ -289,7 +289,7 @@ func (ar *reader) readOneObj(
 			column: 2,
 		}
 
-		return
+		return err
 	}
 
 	// z.External.GetSkuExternal().Metadata.Tai = ids.NowTai()
@@ -305,19 +305,19 @@ func (ar *reader) readOneObj(
 		// set empty zettel id to ensure middle is '/'
 		if err = z.GetSkuExternal().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		z.sku.SetState(checked_out_state.CheckedOut)
 
 		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.GetSkuExternal().ObjectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	sku.TransactedResetter.ResetWith(z.GetSku(), z.GetSkuExternal())
 	ar.currentAssignment.AddObject(&z)
 
-	return
+	return err
 }

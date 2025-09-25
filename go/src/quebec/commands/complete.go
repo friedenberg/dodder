@@ -163,7 +163,7 @@ func (cmd Complete) completeSubcommandFlags(
 	lastArg string,
 ) (shouldNotCompleteArgs bool) {
 	if subcmd == nil {
-		return
+		return shouldNotCompleteArgs
 	}
 
 	if strings.HasPrefix(lastArg, "-") && commandLine.InProgress != "" {
@@ -193,7 +193,7 @@ func (cmd Complete) completeSubcommandFlags(
 		})
 	}
 
-	return
+	return shouldNotCompleteArgs
 }
 
 func (cmd Complete) completeSubcommandFlagOnParseError(

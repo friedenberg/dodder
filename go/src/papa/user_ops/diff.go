@@ -46,7 +46,7 @@ func (op Diff) Run(
 			remoteCheckedOut.GetSku(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.Deferred(&err, func() (err error) {
@@ -54,10 +54,10 @@ func (op Diff) Run(
 				localCheckedOut,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		})
 	}
 
@@ -81,21 +81,21 @@ func (op Diff) Run(
 		remote,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var rLeft, wLeft *os.File
 
 	if rLeft, wLeft, err = os.Pipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var rRight, wRight *os.File
 
 	if rRight, wRight, err = os.Pipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// sameTyp := il.GetTyp().Equals(el.GetTyp())
@@ -106,7 +106,7 @@ func (op Diff) Run(
 
 	if fds, err = op.GetEnvWorkspace().GetStoreFS().ReadFSItemFromExternal(remote); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var externalFD *fd.FD
@@ -183,19 +183,19 @@ func (op Diff) Run(
 					err = errors.Wrap(err)
 				}
 
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c Diff) makeDo(
@@ -213,10 +213,10 @@ func (c Diff) makeDo(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
@@ -232,7 +232,7 @@ func (c Diff) makeDoBlob(
 
 		if ar, err = arf.MakeBlobReader(sh); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, ar)
@@ -244,10 +244,10 @@ func (c Diff) makeDoBlob(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
@@ -262,7 +262,7 @@ func (c Diff) makeDoFD(
 
 		if f, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, f)
@@ -274,9 +274,9 @@ func (c Diff) makeDoFD(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }

@@ -45,13 +45,13 @@ func (op Checkin) Run(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if op.Organize {
 		if err = op.runOrganize(repo, q, results); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		object_metadata.Resetter.Reset(&op.Proto.Metadata)
@@ -66,15 +66,15 @@ func (op Checkin) Run(
 		op.RefreshCheckout,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = op.openBlobIfNecessary(repo, processed); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (op Checkin) runOrganize(
@@ -114,7 +114,7 @@ func (op Checkin) runOrganize(
 
 	if organizeResults, err = opOrganize.Run(results); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var changes organize_text.Changes
@@ -124,24 +124,24 @@ func (op Checkin) runOrganize(
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, co := range changes.After.AllSkuAndIndex() {
 		if err = results.Add(co.Clone()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	for _, co := range changes.Removed.AllSkuAndIndex() {
 		if err = results.Del(co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (c Checkin) openBlobIfNecessary(
@@ -149,7 +149,7 @@ func (c Checkin) openBlobIfNecessary(
 	objects sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
-		return
+		return err
 	}
 
 	opCheckout := Checkout{
@@ -162,8 +162,8 @@ func (c Checkin) openBlobIfNecessary(
 
 	if _, err = opCheckout.Run(objects); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

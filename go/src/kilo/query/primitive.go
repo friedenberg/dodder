@@ -25,5 +25,5 @@ func (qg primitive) GetSigil() (s ids.Sigil) {
 		s.Add(q.Sigil)
 	}
 
-	return
+	return s
 }

@@ -62,7 +62,7 @@ func (s Set[T, TPtr]) KeyPtr(e TPtr) string {
 func (s Set[T, TPtr]) GetPtr(k string) (e TPtr, ok bool) {
 	e, ok = s.E[k]
 
-	return
+	return e, ok
 }
 
 func (s Set[T, TPtr]) Get(k string) (e T, ok bool) {
@@ -72,7 +72,7 @@ func (s Set[T, TPtr]) Get(k string) (e T, ok bool) {
 		e = *e1
 	}
 
-	return
+	return e, ok
 }
 
 func (s Set[T, TPtr]) Any() (e T) {
@@ -80,17 +80,17 @@ func (s Set[T, TPtr]) Any() (e T) {
 		return *e1
 	}
 
-	return
+	return e
 }
 
 func (s Set[T, TPtr]) ContainsKey(k string) (ok bool) {
 	if k == "" {
-		return
+		return ok
 	}
 
 	_, ok = s.E[k]
 
-	return
+	return ok
 }
 
 func (s Set[T, TPtr]) Contains(e T) (ok bool) {
@@ -106,21 +106,21 @@ func (s Set[T, TPtr]) EachKey(wf interfaces.FuncIterKey) (err error) {
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (s Set[T, TPtr]) Add(v T) (err error) {
 	s.E[s.Key(v)] = TPtr(&v)
-	return
+	return err
 }
 
 func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 	s.E[s.K.GetKeyPtr(v)] = v
-	return
+	return err
 }
 
 func (a Set[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {

@@ -309,7 +309,7 @@ func (c Organize) readFromVim(
 
 	if err = openVimOp.Run(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
@@ -324,11 +324,11 @@ func (c Organize) readFromVim(
 			ot, err = c.readFromVim(repo, path, results, queryGroup)
 		} else {
 			ui.Err().Printf("aborting organize")
-			return
+			return ot, err
 		}
 	}
 
-	return
+	return ot, err
 }
 
 // TODO migrate to using errors.Retryable
@@ -341,10 +341,10 @@ func (cmd Organize) handleReadChangesError(
 	if err != nil && !errors.As(err, &errorRead) {
 		ui.Err().Printf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
-		return
+		return tryAgain
 	}
 
 	tryAgain = envUI.Retry("reading changes failed", "edit and retry?", err)
 
-	return
+	return tryAgain
 }

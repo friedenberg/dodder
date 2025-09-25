@@ -15,12 +15,12 @@ func (store *Store) GetCheckoutMode(
 
 	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return m, err
 	}
 
 	m = fds.GetCheckoutMode()
 
-	return
+	return m, err
 }
 
 func (store *Store) GetCheckoutModeOrError(
@@ -30,15 +30,15 @@ func (store *Store) GetCheckoutModeOrError(
 
 	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return m, err
 	}
 
 	if m, err = fds.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return m, err
 	}
 
-	return
+	return m, err
 }
 
 func (store *Store) GetConflictOrError(
@@ -48,12 +48,12 @@ func (store *Store) GetConflictOrError(
 
 	if fds, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
 	f = &fds.Conflict
 
-	return
+	return f, err
 }
 
 func (store *Store) GetObjectOrError(
@@ -63,12 +63,12 @@ func (store *Store) GetObjectOrError(
 
 	if item, err = store.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
 	f = &item.Object
 
-	return
+	return f, err
 }
 
 func (store *Store) UpdateTransactedFromBlobs(
@@ -80,7 +80,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 
 	if item, err = store.ReadFSItemFromExternal(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if sk.Metadata.Description.IsEmpty() {
@@ -96,7 +96,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 
 			if err = sk.Metadata.Description.Set(desc); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -113,15 +113,15 @@ func (store *Store) UpdateTransactedFromBlobs(
 		if typFromExtension != "" {
 			if err = sk.Metadata.Type.Set(typFromExtension); err != nil {
 				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
-				return
+				return err
 			}
 		}
 	}
 
 	if err = store.WriteFSItemToExternal(item, sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

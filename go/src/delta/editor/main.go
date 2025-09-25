@@ -61,7 +61,7 @@ func MakeEditor(
 
 	if utility, err = shlex.Split(editor.utility); err != nil {
 		err = errors.Wrap(err)
-		return
+		return editor, err
 	}
 
 	if len(utility) < 1 {
@@ -69,7 +69,7 @@ func MakeEditor(
 			"utility has no valid path: %q",
 			editor.utility,
 		)
-		return
+		return editor, err
 	}
 
 	editor.path = utility[0]
@@ -86,7 +86,7 @@ func MakeEditor(
 
 	editor.options = append(editor.options, options[editor.tipe]...)
 
-	return
+	return editor, err
 }
 
 func (editor Editor) Run(
@@ -94,26 +94,26 @@ func (editor Editor) Run(
 ) (err error) {
 	if err = editor.ui(fmt.Sprintf("editor (%s) started", editor.name)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = editor.openWithArgs(files...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = editor.ui(fmt.Sprintf("editor (%s) closed", editor.name)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (editor Editor) openWithArgs(fs ...string) (err error) {
 	if len(fs) == 0 {
 		err = errors.Wrap(files.ErrEmptyFileList)
-		return
+		return err
 	}
 
 	allArgs := append(editor.options, fs...)
@@ -132,8 +132,8 @@ func (editor Editor) openWithArgs(fs ...string) (err error) {
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrapf(err, "Cmd: %s", cmd)
-		return
+		return err
 	}
 
-	return
+	return err
 }

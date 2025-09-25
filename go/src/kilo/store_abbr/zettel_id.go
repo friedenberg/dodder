@@ -19,26 +19,26 @@ type indexZettelId struct {
 func (ih *indexZettelId) Add(h *ids.ZettelId) (err error) {
 	ih.Heads.Add(h.GetHead())
 	ih.Tails.Add(h.GetTail())
-	return
+	return err
 }
 
 func (ih *indexZettelId) Exists(parts [3]string) (err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !ih.Heads.ContainsExpansion(parts[0]) {
 		err = collections.MakeErrNotFoundString(parts[0])
-		return
+		return err
 	}
 
 	if !ih.Tails.ContainsExpansion(parts[2]) {
 		err = collections.MakeErrNotFoundString(parts[2])
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (ih *indexZettelId) ExpandStringString(in string) (out string, err error) {
@@ -46,33 +46,33 @@ func (ih *indexZettelId) ExpandStringString(in string) (out string, err error) {
 
 	if h, err = ih.ExpandString(in); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
 	out = h.String()
 
-	return
+	return out, err
 }
 
 func (ih *indexZettelId) ExpandString(s string) (h *ids.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	var ha *ids.ZettelId
 
 	if ha, err = ids.MakeZettelId(s); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	if h, err = ih.Expand(ha); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func (ih *indexZettelId) Expand(
@@ -80,7 +80,7 @@ func (ih *indexZettelId) Expand(
 ) (h *ids.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	head := ih.Heads.Expand(hAbbr.GetHead())
@@ -88,10 +88,10 @@ func (ih *indexZettelId) Expand(
 
 	if h, err = ids.MakeZettelIdFromHeadAndTail(head, tail); err != nil {
 		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func (ih *indexZettelId) Abbreviate(
@@ -106,22 +106,22 @@ func (ih *indexZettelId) Abbreviate(
 	case *ids.ObjectId:
 		if idt.GetGenre() != genres.Zettel {
 			err = genres.MakeErrUnsupportedGenre(idt)
-			return
+			return v, err
 		}
 
 		if err = h.Set(idt.String()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return v, err
 		}
 
 	default:
 		err = errors.ErrorWithStackf("unsupported type %T: %q", idt, idt)
-		return
+		return v, err
 	}
 
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return v, err
 	}
 
 	head := ih.Heads.Abbreviate(h.GetHead())
@@ -129,15 +129,15 @@ func (ih *indexZettelId) Abbreviate(
 
 	if head == "" {
 		v = h.String()
-		return
+		return v, err
 	}
 
 	if tail == "" {
 		v = h.String()
-		return
+		return v, err
 	}
 
 	v = fmt.Sprintf("%s/%s", head, tail)
 
-	return
+	return v, err
 }

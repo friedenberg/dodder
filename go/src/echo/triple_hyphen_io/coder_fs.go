@@ -23,17 +23,17 @@ func DecodeFromFileInto[
 		path,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
 
 	if _, err = coders.DecodeFrom(typedBlob, file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func DecodeFromFile[
@@ -45,10 +45,10 @@ func DecodeFromFile[
 ) (typedBlob TypedBlob[BLOB], err error) {
 	if err = DecodeFromFileInto(&typedBlob, coders, path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return typedBlob, err
 	}
 
-	return
+	return typedBlob, err
 }
 
 // For decodes where typedBlob.Blob should be populated with an empty struct
@@ -64,15 +64,15 @@ func DecodeFromFileOrEmptyBuffer[
 	typedBlob, err = DecodeFromFile(coders, path)
 
 	if err == nil {
-		return
+		return typedBlob, err
 	}
 
 	if _, err = coders.DecodeFrom(&typedBlob, bytes.NewBuffer(nil)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return typedBlob, err
 	}
 
-	return
+	return typedBlob, err
 }
 
 func EncodeToFile[
@@ -89,15 +89,15 @@ func EncodeToFile[
 		path,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
 
 	if _, err = coders.EncodeTo(typedBlob, file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

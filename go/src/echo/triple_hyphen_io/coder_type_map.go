@@ -27,15 +27,15 @@ func (coderTypeMap CoderTypeMap[BLOB]) DecodeFrom(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = coder.DecodeFrom(typedBlob, bufferedReader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coderTypeMap CoderTypeMap[BLOB]) EncodeTo(
@@ -47,15 +47,15 @@ func (coderTypeMap CoderTypeMap[BLOB]) EncodeTo(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = coder.EncodeTo(typedBlob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type DecoderTypeMapWithoutType[BLOB any] map[string]interfaces.DecoderFromBufferedReader[BLOB]
@@ -69,7 +69,7 @@ func (decoderTypeMap DecoderTypeMapWithoutType[BLOB]) DecodeFrom(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = decoder.DecodeFrom(
@@ -77,10 +77,10 @@ func (decoderTypeMap DecoderTypeMapWithoutType[BLOB]) DecodeFrom(
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type CoderTypeMapWithoutType[BLOB any] map[string]interfaces.CoderBufferedReadWriter[*BLOB]
@@ -94,15 +94,15 @@ func (coderTypeMap CoderTypeMapWithoutType[BLOB]) DecodeFrom(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = coder.DecodeFrom(&typedBlob.Blob, bufferedReader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coderTypeMap CoderTypeMapWithoutType[BLOB]) EncodeTo(
@@ -114,13 +114,13 @@ func (coderTypeMap CoderTypeMapWithoutType[BLOB]) EncodeTo(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = coder.EncodeTo(&typedBlob.Blob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

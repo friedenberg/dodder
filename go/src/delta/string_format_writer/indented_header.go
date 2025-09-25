@@ -33,8 +33,8 @@ func (f indentedHeader) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

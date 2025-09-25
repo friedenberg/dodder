@@ -54,10 +54,10 @@ func (env *env) initializeXDG(xdg xdg.XDG) (err error) {
 
 	if err = env.MakeDir(env.GetTempLocal().BasePath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (env env) GetDebug() debug.Options {
@@ -103,7 +103,7 @@ func (env env) AbsFromCwdOrSame(p string) (p1 string) {
 		p1 = p
 	}
 
-	return
+	return p1
 }
 
 func (env env) RelToCwdOrSame(p string) (p1 string) {
@@ -113,7 +113,7 @@ func (env env) RelToCwdOrSame(p string) (p1 string) {
 		p1 = p
 	}
 
-	return
+	return p1
 }
 
 func (env env) Rel(
@@ -127,7 +127,7 @@ func (env env) Rel(
 		out = p1
 	}
 
-	return
+	return out
 }
 
 func (env env) MakeCommonEnv() map[string]string {
@@ -146,9 +146,9 @@ func (env env) MakeDirPerms(perms os.FileMode, ds ...string) (err error) {
 	for _, d := range ds {
 		if err = os.MkdirAll(d, os.ModeDir|perms); err != nil {
 			err = errors.Wrapf(err, "Dir: %q", d)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

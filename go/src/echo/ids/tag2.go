@@ -103,12 +103,12 @@ func (e *tag2) Set(v string) (err error) {
 
 	if err = ErrOnConfig(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !Tag2Regex.MatchString(v) {
 		err = errors.ErrorWithStackf("not a valid tag: %q", v1)
-		return
+		return err
 	}
 
 	e.virtual = strings.HasPrefix(v, "%")
@@ -123,36 +123,36 @@ func (e *tag2) Set(v string) (err error) {
 
 	if err = e.value.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t tag2) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *tag2) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t tag2) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *tag2) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -36,7 +36,7 @@ func New(
 		ItemPool:     itemPool,
 	}
 
-	return
+	return w, err
 }
 
 func (writer *Writer) SetWriter(alfredWriter alfred.Writer) {
@@ -56,7 +56,7 @@ func (writer *Writer) PrintOne(object *sku.Transacted) (err error) {
 
 		if err = tag.Set(object.ObjectId.String()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		item = writer.emitTag(object, &tag)
@@ -69,13 +69,13 @@ func (writer *Writer) PrintOne(object *sku.Transacted) (err error) {
 
 	writer.alfredWriter.WriteItem(item)
 
-	return
+	return err
 }
 
 func (writer *Writer) WriteZettelId(e ids.ZettelId) (n int64, err error) {
 	item := writer.zettelIdToItem(e)
 	writer.alfredWriter.WriteItem(item)
-	return
+	return n, err
 }
 
 func (writer *Writer) WriteError(in error) (n int64, out error) {
@@ -95,7 +95,7 @@ func (writer *Writer) WriteError(in error) (n int64, out error) {
 		writer.alfredWriter.WriteItem(item)
 	}
 
-	return
+	return n, out
 }
 
 func (writer Writer) Close() (err error) {
@@ -130,7 +130,7 @@ func (writer *Writer) addCommonMatches(
 		expansion.ExpanderAll.Expand(
 			func(v string) (err error) {
 				matchBuilder.AddMatches(v)
-				return
+				return err
 			},
 			e.String(),
 		)
@@ -141,7 +141,7 @@ func (writer *Writer) addCommonMatches(
 	expansion.ExpanderAll.Expand(
 		func(v string) (err error) {
 			matchBuilder.AddMatches(v)
-			return
+			return err
 		},
 		t.String(),
 	)
@@ -183,7 +183,7 @@ func (writer *Writer) zettelToItem(
 
 		if _, err := writer.organizeFmt.EncodeStringTo(object, &sb); err != nil {
 			item = writer.errorToItem(err)
-			return
+			return item
 		}
 
 		item.Mods["alt"] = alfred.Mod{
@@ -193,7 +193,7 @@ func (writer *Writer) zettelToItem(
 		}
 	}
 
-	return
+	return item
 }
 
 func (writer *Writer) emitTag(
@@ -211,7 +211,7 @@ func (writer *Writer) emitTag(
 	item.Text.Copy = tag.String()
 	item.Uid = "dodder://" + tag.String()
 
-	return
+	return item
 }
 
 func (writer *Writer) errorToItem(err error) (a *alfred.Item) {
@@ -219,7 +219,7 @@ func (writer *Writer) errorToItem(err error) (a *alfred.Item) {
 
 	a.Title = errors.Unwrap(err).Error()
 
-	return
+	return a
 }
 
 func (writer *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
@@ -241,5 +241,5 @@ func (writer *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
 	a.Text.Copy = e.String()
 	a.Uid = "dodder://" + e.String()
 
-	return
+	return a
 }

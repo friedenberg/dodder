@@ -24,7 +24,7 @@ type errUnsupportedGenre struct {
 
 func (e errUnsupportedGenre) Is(target error) (ok bool) {
 	_, ok = target.(errUnsupportedGenre)
-	return
+	return ok
 }
 
 func (e errUnsupportedGenre) Error() string {
@@ -43,7 +43,7 @@ type errUnrecognizedGenre string
 
 func (e errUnrecognizedGenre) Is(target error) (ok bool) {
 	_, ok = target.(errUnrecognizedGenre)
-	return
+	return ok
 }
 
 func (e errUnrecognizedGenre) Error() string {
@@ -60,7 +60,7 @@ type ErrWrongType struct {
 
 func (e ErrWrongType) Is(target error) (ok bool) {
 	_, ok = target.(ErrWrongType)
-	return
+	return ok
 }
 
 func (e ErrWrongType) Error() string {
@@ -75,7 +75,7 @@ type ErrEmptyObjectId struct{}
 
 func (e ErrEmptyObjectId) Is(target error) (ok bool) {
 	_, ok = target.(ErrEmptyObjectId)
-	return
+	return ok
 }
 
 func (e ErrEmptyObjectId) Error() string {

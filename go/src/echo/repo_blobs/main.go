@@ -51,14 +51,14 @@ func (coder coderToml[T]) DecodeFrom(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
 	blob := Blob(coder.Blob)
 	subject.Blob = &blob
 
-	return
+	return n, err
 }
 
 func (coderToml[_]) EncodeTo(
@@ -72,9 +72,9 @@ func (coderToml[_]) EncodeTo(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

@@ -28,7 +28,7 @@ func MakeErrLength(expected, actual int64, err error) error {
 
 func (a errLength) Is(b error) (ok bool) {
 	_, ok = b.(errLength)
-	return
+	return ok
 }
 
 func (e errLength) Error() string {
@@ -39,7 +39,7 @@ type errInvalidSliceRange [2]int
 
 func (a errInvalidSliceRange) Is(b error) (ok bool) {
 	_, ok = b.(errInvalidSliceRange)
-	return
+	return ok
 }
 
 func (e errInvalidSliceRange) Error() string {

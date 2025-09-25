@@ -63,8 +63,8 @@ func (tipe *RemoteConnectionType) Set(value string) (err error) {
 
 	default:
 		err = errors.ErrorWithStackf("unsupported remote type: %q", value)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -35,7 +35,7 @@ func MakePrefixSetFrom(
 	for element := range ts.All() {
 		s.Add(element)
 	}
-	return
+	return s
 }
 
 func (prefixSet PrefixSet) Len() int {
@@ -49,7 +49,7 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 			object.GetState(),
 		)
 		err = errors.Wrapf(err, "Sku: %s", sku.String(object.GetSku()))
-		return
+		return err
 	}
 
 	o := obj{
@@ -58,10 +58,10 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 
 	if err = prefixSet.Add(&o); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // this splits on right-expanded
@@ -74,20 +74,20 @@ func (prefixSet *PrefixSet) Add(z *obj) (err error) {
 	for e := range z.GetSkuExternal().GetMetadata().Cache.GetExpandedTags().AllPtr() {
 		if err = es.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if es.Len() == 0 {
 		prefixSet.addPair("", z)
-		return
+		return err
 	}
 
 	for e := range es.All() {
 		prefixSet.addPair(e.String(), z)
 	}
 
-	return
+	return err
 }
 
 func (prefixSet PrefixSet) Subtract(
@@ -103,7 +103,7 @@ func (prefixSet PrefixSet) Subtract(
 		}
 	}
 
-	return
+	return c
 }
 
 func (prefixSet *PrefixSet) addPair(
@@ -187,7 +187,7 @@ func (prefixSet PrefixSet) Match(
 		}
 	}
 
-	return
+	return out
 }
 
 func (prefixSet PrefixSet) Subset(
@@ -245,5 +245,5 @@ func (prefixSet PrefixSet) Subset(
 		}
 	}
 
-	return
+	return out
 }

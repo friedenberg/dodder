@@ -36,7 +36,7 @@ func (cmd *BlobStore) MakeBlobStore(
 					goto tryBlobStoreIndex
 				} else {
 					envRepo.Cancel(err)
-					return
+					return blobStore
 				}
 			}
 		}
@@ -60,11 +60,11 @@ func (cmd *BlobStore) MakeBlobStore(
 				envRepo.GetTempLocal(),
 			); err != nil {
 				envRepo.Cancel(err)
-				return
+				return blobStore
 			}
 		}
 
-		return
+		return blobStore
 	}
 
 tryBlobStoreIndex:
@@ -76,7 +76,7 @@ tryBlobStoreIndex:
 
 			if blobStoreIndex, err = strconv.Atoi(blobStoreIndexOrConfigPath); err != nil {
 				envRepo.Cancel(err)
-				return
+				return blobStore
 			}
 		}
 
@@ -90,12 +90,12 @@ tryBlobStoreIndex:
 				len(blobStores)-1,
 			)
 
-			return
+			return blobStore
 		}
 
 		blobStore = envRepo.GetBlobStores()[blobStoreIndex]
 
-		return
+		return blobStore
 	}
 
 tryDefaultBlobStore:

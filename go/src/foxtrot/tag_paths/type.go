@@ -47,12 +47,12 @@ func (tipe *Type) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	*tipe = Type(b[0])
 
-	return
+	return n, err
 }
 
 func (tipe Type) WriteTo(w io.Writer) (n int64, err error) {
@@ -60,7 +60,7 @@ func (tipe Type) WriteTo(w io.Writer) (n int64, err error) {
 
 	if b, err = tipe.ReadByte(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var n1 int
@@ -69,8 +69,8 @@ func (tipe Type) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

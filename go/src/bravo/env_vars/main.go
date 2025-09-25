@@ -27,9 +27,9 @@ func (envVars EnvVars) Setenv() (err error) {
 	for key, value := range envVars {
 		if err = os.Setenv(key, value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

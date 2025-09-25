@@ -27,7 +27,7 @@ func (s ScriptValue) IsEmpty() bool {
 func (s *ScriptValue) Set(v string) (err error) {
 	s.script = v
 
-	return
+	return err
 }
 
 func (s ScriptValue) Cmd() *exec.Cmd {
@@ -37,22 +37,22 @@ func (s ScriptValue) Cmd() *exec.Cmd {
 func (s *ScriptValue) RunWithInput() (w io.WriteCloser, r io.Reader, err error) {
 	if s.IsEmpty() {
 		err = errors.ErrorWithStackf("empty script")
-		return
+		return w, r, err
 	}
 
 	s.cmd = exec.Command(s.script)
 
 	if w, err = s.cmd.StdinPipe(); err != nil {
 		errors.Wrap(err)
-		return
+		return w, r, err
 	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
 		errors.Wrap(err)
-		return
+		return w, r, err
 	}
 
-	return
+	return w, r, err
 }
 
 func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
@@ -62,13 +62,13 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 		} else {
 			if s.file, err = files.Open(input); err != nil {
 				err = errors.Wrap(err)
-				return
+				return r, err
 			}
 
 			r = s.file
 		}
 
-		return
+		return r, err
 	}
 
 	if input == "" || input == "-" {
@@ -80,13 +80,13 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
 		errors.Wrap(err)
-		return
+		return r, err
 	}
 
 	ui.Log().Print("starting")
 	s.cmd.Start()
 
-	return
+	return r, err
 }
 
 func (s *ScriptValue) Close() (err error) {
@@ -103,5 +103,5 @@ func (s *ScriptValue) Close() (err error) {
 		err = s.cmd.Wait()
 	}
 
-	return
+	return err
 }

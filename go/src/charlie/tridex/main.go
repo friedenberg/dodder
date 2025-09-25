@@ -42,7 +42,7 @@ func Make(vs ...string) (t interfaces.MutableTridex) {
 		t.Add(v)
 	}
 
-	return
+	return t
 }
 
 func (tridex *Tridex) MutableClone() (b interfaces.MutableTridex) {
@@ -58,7 +58,7 @@ func (tridex *Tridex) MutableClone() (b interfaces.MutableTridex) {
 		Root: tridex.Root.Copy(),
 	}
 
-	return
+	return b
 }
 
 func (tridex *Tridex) Len() int {

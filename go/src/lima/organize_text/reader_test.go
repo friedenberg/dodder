@@ -42,7 +42,7 @@ func makeDescription(t *ui.T, v string) (b descriptions.Description) {
 		t.Fatalf("%s", err)
 	}
 
-	return
+	return b
 }
 
 func makeObjWithZettelIdAndDescription(
@@ -68,7 +68,7 @@ func makeObjWithZettelIdAndDescription(
 	// 	t.AssertNoError(object.sku.GetSku().Sign(config))
 	// }
 
-	return
+	return object
 }
 
 func makeAssignmentLineReader() reader {

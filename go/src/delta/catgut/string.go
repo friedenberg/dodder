@@ -24,16 +24,16 @@ func MakeFromReader(r io.Reader, limit int) (s *String, err error) {
 
 	if _, err = s.ReadNFrom(r, limit); err != nil {
 		err = errors.Wrap(err)
-		return
+		return s, err
 	}
 
-	return
+	return s, err
 }
 
 func MakeFromString(v string) (s *String) {
 	s = GetPool().Get()
 	errors.PanicIfError(s.Set(v))
-	return
+	return s
 }
 
 func MakeFromBytes(b []byte) (s *String) {
@@ -45,7 +45,7 @@ func MakeFromBytes(b []byte) (s *String) {
 func Make(b *String) (a *String) {
 	a = GetPool().Get()
 	errors.PanicIfError(a.SetBytes(b.Bytes()))
-	return
+	return a
 }
 
 // noescape hides a pointer from escape analysis. It is the identity function
@@ -196,11 +196,11 @@ func (str *String) Append(vs ...*String) (n int, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (str *String) Grow(n int) {
@@ -243,7 +243,7 @@ func (dst *String) SetBytes(src []byte) (err error) {
 		panic(fmt.Sprintf("tried to write %d but only wrote %d", len(src), n))
 	}
 
-	return
+	return err
 }
 
 func (dst *String) Set(src string) (err error) {
@@ -254,7 +254,7 @@ func (dst *String) Set(src string) (err error) {
 	b := append(dst.AvailableBuffer(), src...)
 	dst.Write(b)
 
-	return
+	return err
 }
 
 func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
@@ -281,16 +281,16 @@ func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 			err = nil
 		} else {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return read, err
 		}
 	}
 
 	if _, err = dst.data.Write(b); err != nil {
 		err = errors.Wrap(err)
-		return
+		return read, err
 	}
 
-	return
+	return read, err
 }
 
 func (src *String) Clone() (dst *String, err error) {
@@ -298,10 +298,10 @@ func (src *String) Clone() (dst *String, err error) {
 
 	if err = src.CopyTo(dst); err != nil {
 		err = errors.Wrap(err)
-		return
+		return dst, err
 	}
 
-	return
+	return dst, err
 }
 
 func (src *String) CopyTo(dst *String) (err error) {
@@ -319,7 +319,7 @@ func (src *String) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 	n1, err = w.Write(src.Bytes())
 	n = int64(n1)
-	return
+	return n, err
 }
 
 func (src *String) WriteToStringWriter(

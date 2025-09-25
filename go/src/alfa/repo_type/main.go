@@ -25,10 +25,10 @@ func (tipe *Type) Set(v string) (err error) {
 
 	default:
 		err = errors.Wrapf(ErrUnsupportedRepoType{}, "Value: %q", v)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tipe Type) String() string {
@@ -46,14 +46,14 @@ func (tipe Type) String() string {
 
 func (tipe Type) MarshalText() (b []byte, err error) {
 	b = []byte(tipe.String())
-	return
+	return b, err
 }
 
 func (tipe *Type) UnmarshalText(b []byte) (err error) {
 	if err = tipe.Set(string(b)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

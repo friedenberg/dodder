@@ -41,7 +41,7 @@ func SetBlechCombinedHRPAndData(
 
 	if formatIdAndData, err = blech32.DecodeDataOnly([]byte(value)); err != nil {
 		err = errors.Wrapf(err, "Value: %q", value)
-		return
+		return err
 	}
 
 	if bytes.HasPrefix(formatIdAndData, []byte(FormatIdHashSha256)) {
@@ -50,17 +50,17 @@ func SetBlechCombinedHRPAndData(
 		formatId = FormatIdHashBlake2b256
 	} else {
 		err = errors.Errorf("unsupported format: %x", formatIdAndData)
-		return
+		return err
 	}
 
 	data := formatIdAndData[len(formatId):]
 
 	if err = id.SetMarklId(formatId, data); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO remove
@@ -69,7 +69,7 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 	case 65:
 		if value[0] != '@' {
 			err = errors.Errorf("unknown format: %q", value)
-			return
+			return err
 		}
 
 		value = strings.TrimPrefix(value, "@")
@@ -78,17 +78,17 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 	case 64:
 		if err = SetSha256(id, value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
 		if err = id.Set(value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 // TODO remove
@@ -97,7 +97,7 @@ func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 
 	if decodedBytes, err = hex.DecodeString(value); err != nil {
 		err = errors.Wrapf(err, "%q", value)
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(
@@ -105,10 +105,10 @@ func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
 		decodedBytes,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO use type and format registrations
@@ -119,7 +119,7 @@ func SetMarklIdWithFormatBlech32(
 ) (err error) {
 	if err = id.SetPurpose(purpose); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.Set(
@@ -131,11 +131,11 @@ func SetMarklIdWithFormatBlech32(
 				blechValue,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -155,7 +155,7 @@ func SetMarklIdWithFormatBlech32(
 				purpose,
 				blechValue,
 			)
-			return
+			return err
 		}
 
 	case FormatIdPubEd25519:
@@ -169,7 +169,7 @@ func SetMarklIdWithFormatBlech32(
 				purpose,
 				blechValue,
 			)
-			return
+			return err
 		}
 
 	case FormatIdHashSha256:
@@ -185,7 +185,7 @@ func SetMarklIdWithFormatBlech32(
 				purpose,
 				blechValue,
 			)
-			return
+			return err
 		}
 
 	case FormatIdHashBlake2b256:
@@ -201,7 +201,7 @@ func SetMarklIdWithFormatBlech32(
 				purpose,
 				blechValue,
 			)
-			return
+			return err
 		}
 
 	default:
@@ -210,8 +210,8 @@ func SetMarklIdWithFormatBlech32(
 			purpose,
 			blechValue,
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }

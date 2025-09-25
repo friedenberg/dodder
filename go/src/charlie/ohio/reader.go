@@ -34,7 +34,7 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 		err = errors.Wrap(err)
 	}
 
-	return
+	return n, err
 }
 
 func ReadUint8(r io.Reader) (n uint8, read int, err error) {
@@ -43,19 +43,19 @@ func ReadUint8(r io.Reader) (n uint8, read int, err error) {
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	clInt, clIntErr := binary.Uvarint(cl[:])
 
 	if clIntErr <= 0 {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	n = uint8(clInt)
 
-	return
+	return n, read, err
 }
 
 func ReadFixedUint8(r io.Reader) (n uint8, read int, err error) {
@@ -64,12 +64,12 @@ func ReadFixedUint8(r io.Reader) (n uint8, read int, err error) {
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	n = cl[0]
 
-	return
+	return n, read, err
 }
 
 func ReadInt8(r io.Reader) (n int8, read int, err error) {
@@ -78,19 +78,19 @@ func ReadInt8(r io.Reader) (n int8, read int, err error) {
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	clInt, clIntErr := binary.Uvarint(cl[:])
 
 	if clIntErr <= 0 {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	n = int8(clInt)
 
-	return
+	return n, read, err
 }
 
 func ReadUint16(r io.ByteReader) (v uint16, n int64, err error) {
@@ -98,13 +98,13 @@ func ReadUint16(r io.ByteReader) (v uint16, n int64, err error) {
 
 	if clInt, err = binary.ReadUvarint(r); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return v, n, err
 	}
 
 	v = uint16(clInt)
 	n = int64(binary.Size(v))
 
-	return
+	return v, n, err
 }
 
 func ReadInt64(r io.Reader) (n int64, read int, err error) {
@@ -113,17 +113,17 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 	read, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
 	n, clIntErr := binary.Varint(cl[:])
 
 	if clIntErr <= 0 {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, read, err
 	}
 
-	return
+	return n, read, err
 }
 
 func ReadFixedUInt16(r io.Reader) (n int, val uint16, err error) {
@@ -132,12 +132,12 @@ func ReadFixedUInt16(r io.Reader) (n int, val uint16, err error) {
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, val, err
 	}
 
 	val = ByteArrayToUInt16(cl)
 
-	return
+	return n, val, err
 }
 
 func ReadFixedInt32(r io.Reader) (n int, val int32, err error) {
@@ -146,12 +146,12 @@ func ReadFixedInt32(r io.Reader) (n int, val int32, err error) {
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, val, err
 	}
 
 	val = ByteArrayToInt32(cl)
 
-	return
+	return n, val, err
 }
 
 func ReadFixedInt64(r io.Reader) (n int, val int64, err error) {
@@ -160,10 +160,10 @@ func ReadFixedInt64(r io.Reader) (n int, val int64, err error) {
 	n, err = ReadAllOrDieTrying(r, cl[:])
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, val, err
 	}
 
 	val = ByteArrayToInt64(cl)
 
-	return
+	return n, val, err
 }

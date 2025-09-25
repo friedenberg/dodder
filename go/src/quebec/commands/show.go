@@ -133,15 +133,15 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 
 		output = func(sk *sku.Transacted) (err error) {
 			if !sk.GetTai().Before(cmd.Before) {
-				return
+				return err
 			}
 
 			if err = old(sk); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		}
 	}
 
@@ -150,15 +150,15 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 
 		output = func(sk *sku.Transacted) (err error) {
 			if !sk.GetTai().After(cmd.After) {
-				return
+				return err
 			}
 
 			if err = old(sk); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		}
 	}
 

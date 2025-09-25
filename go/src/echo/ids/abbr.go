@@ -49,39 +49,39 @@ func (a Abbr) LenHeadAndTail(
 ) (head, tail int, err error) {
 	if in.GetGenre() != genres.Zettel || a.ZettelId.Abbreviate == nil {
 		head, tail = in.LenHeadAndTail()
-		return
+		return head, tail, err
 	}
 
 	var h ZettelId
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
-		return
+		return head, tail, err
 	}
 
 	var abbr string
 
 	if abbr, err = a.ZettelId.Abbreviate(h); err != nil {
 		err = errors.Wrap(err)
-		return
+		return head, tail, err
 	}
 
 	if err = h.Set(abbr); err != nil {
 		err = errors.Wrap(err)
-		return
+		return head, tail, err
 	}
 
 	head = len(h.GetHead())
 	tail = len(h.GetTail())
 
-	return
+	return head, tail, err
 }
 
 func (a Abbr) AbbreviateZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != genres.Zettel || in.IsVirtual() {
-		return
+		return err
 	}
 
 	var getAbbr FuncAbbreviateString
@@ -90,7 +90,7 @@ func (a Abbr) AbbreviateZettelIdOnly(
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
-		return
+		return err
 	}
 
 	getAbbr = a.ZettelId.Abbreviate
@@ -99,44 +99,44 @@ func (a Abbr) AbbreviateZettelIdOnly(
 
 	if abbr, err = getAbbr(h); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = in.SetWithGenre(abbr, h); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (a Abbr) ExpandZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != genres.Zettel || a.ZettelId.Expand == nil {
-		return
+		return err
 	}
 
 	var h ZettelId
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
-		return
+		return err
 	}
 
 	var ex string
 
 	if ex, err = a.ZettelId.Expand(h.String()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = in.SetWithGenre(ex, h); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (a Abbr) AbbreviateObjectId(
@@ -154,11 +154,11 @@ func (a Abbr) AbbreviateObjectId(
 
 	case genres.Config:
 		out.ResetWith(in)
-		return
+		return err
 
 	default:
 		err = errors.ErrorWithStackf("unsupported object id: %q, %T", in, in)
-		return
+		return err
 	}
 
 	var abbr string
@@ -167,13 +167,13 @@ func (a Abbr) AbbreviateObjectId(
 		err = nil
 		out.ResetWith(in)
 		// err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = out.SetWithGenre(abbr, in); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

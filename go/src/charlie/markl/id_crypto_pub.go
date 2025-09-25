@@ -19,7 +19,7 @@ func (id Id) Verify(
 				OperationName: "Verify",
 			})
 
-			return
+			return err
 		}
 	}
 
@@ -29,15 +29,15 @@ func (id Id) Verify(
 			OperationName: "Verify",
 		})
 
-		return
+		return err
 	}
 
 	defer errors.DeferredRecover(&err)
 
 	if err = formatPub.Verify(id, mes, sig); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

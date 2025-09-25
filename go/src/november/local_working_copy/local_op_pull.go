@@ -20,10 +20,10 @@ func (local *Repo) PullQueryGroupFromRemote(
 		options,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(
@@ -35,7 +35,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	importerOptions.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
@@ -65,8 +65,8 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }

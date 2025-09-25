@@ -60,17 +60,17 @@ func (ReadBlob) readOneBlob(
 
 	if writeCloser, err = envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return digest, err
 	}
 
 	defer errors.DeferredCloser(&err, writeCloser)
 
 	if _, err = io.Copy(writeCloser, strings.NewReader(entry.Blob)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return digest, err
 	}
 
 	digest = writeCloser.GetMarklId()
 
-	return
+	return digest, err
 }

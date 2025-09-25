@@ -17,12 +17,12 @@ func (roundTripper *roundTripperBufio) RoundTrip(
 ) (response *http.Response, err error) {
 	if err = request.Write(roundTripper.Writer); err != nil {
 		err = errors.ErrorWithStackf("failed to write to socket: %w", err)
-		return
+		return response, err
 	}
 
 	if err = roundTripper.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
 	if response, err = http.ReadResponse(
@@ -30,8 +30,8 @@ func (roundTripper *roundTripperBufio) RoundTrip(
 		request,
 	); err != nil {
 		err = errors.ErrorWithStackf("failed to read response: %w", err)
-		return
+		return response, err
 	}
 
-	return
+	return response, err
 }

@@ -21,7 +21,7 @@ func (op CreateFromShas) Run(
 
 	if lookupStored, err = op.GetStore().MakeBlobDigestObjectIdsMap(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
 	toCreate := make(map[string]*sku.Transacted)
@@ -34,7 +34,7 @@ func (op CreateFromShas) Run(
 			arg,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		digestBytes := digest.GetBytes()
@@ -70,7 +70,7 @@ func (op CreateFromShas) Run(
 
 	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
 	for _, object := range toCreate {
@@ -81,7 +81,7 @@ func (op CreateFromShas) Run(
 			},
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		results.Add(object)
@@ -89,8 +89,8 @@ func (op CreateFromShas) Run(
 
 	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
-	return
+	return results, err
 }

@@ -37,15 +37,15 @@ func (encoder *binaryEncoder) updateSigil(
 
 	if n, err = writerAt.WriteAt([]byte{sigil.Byte()}, offset); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if n != 1 {
 		err = catgut.MakeErrLength(1, int64(n), nil)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (encoder *binaryEncoder) writeFormat(
@@ -65,7 +65,7 @@ func (encoder *binaryEncoder) writeFormat(
 				encoder.Binary,
 				sku.String(object.Transacted),
 			)
-			return
+			return n, err
 		}
 	}
 
@@ -74,7 +74,7 @@ func (encoder *binaryEncoder) writeFormat(
 
 	if rawContentLength > math.MaxUint16 {
 		err = errContentLengthTooLarge
-		return
+		return n, err
 	}
 
 	encoder.ContentLength = uint16(rawContentLength)
@@ -85,14 +85,14 @@ func (encoder *binaryEncoder) writeFormat(
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	var n2 int64
 	n2, err = encoder.Buffer.WriteTo(writer)
 	n += n2
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldKey(
@@ -109,7 +109,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 		if n, err = encoder.writeFieldByteReader(s); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Blob:
@@ -119,7 +119,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.RepoPubKey:
@@ -127,7 +127,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			object.Metadata.GetRepoPubKey(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.RepoSig:
@@ -140,23 +140,23 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Description:
 		if object.Metadata.Description.IsEmpty() {
-			return
+			return n, err
 		}
 
 		if n, err = encoder.writeFieldBinaryMarshaler(&object.Metadata.Description); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.CacheParentTai:
 		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Cache.ParentTai); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Tag:
@@ -169,7 +169,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 			if e.String() == "" {
 				err = errors.ErrorWithStackf("empty tag in %q", es)
-				return
+				return n, err
 			}
 
 			var n1 int64
@@ -178,30 +178,30 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
 	case key_bytes.ObjectId:
 		if n, err = encoder.writeFieldWriterTo(&object.ObjectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Tai:
 		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Tai); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Type:
 		if object.Metadata.Type.IsEmpty() {
-			return
+			return n, err
 		}
 
 		if n, err = encoder.writeFieldBinaryMarshaler(&object.Metadata.Type); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
@@ -211,7 +211,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
@@ -221,7 +221,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.DigestMetadataParentObjectId:
@@ -231,7 +231,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Binary.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.CacheTagImplicit:
@@ -244,7 +244,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
@@ -258,7 +258,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
@@ -272,7 +272,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
@@ -280,7 +280,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		panic(fmt.Sprintf("unsupported key: %s", encoder.Binary))
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeMerkleId(
@@ -291,7 +291,7 @@ func (encoder *binaryEncoder) writeMerkleId(
 	if !allowNull {
 		if err = markl.AssertIdIsNotNull(merkleId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -299,10 +299,10 @@ func (encoder *binaryEncoder) writeMerkleId(
 		merkleId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldWriterTo(
@@ -310,15 +310,15 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 ) (n int64, err error) {
 	_, err = wt.WriteTo(&encoder.Content)
 	if err != nil {
-		return
+		return n, err
 	}
 
 	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldMerkleId(
@@ -331,15 +331,15 @@ func (encoder *binaryEncoder) writeFieldMerkleId(
 			err = markl.AssertIdIsNotNull(merkleId)
 		}
 
-		return
+		return n, err
 	}
 
 	if n, err = encoder.writeFieldBinaryMarshaler(merkleId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldBinaryMarshaler(
@@ -350,20 +350,20 @@ func (encoder *binaryEncoder) writeFieldBinaryMarshaler(
 	bites, err = binaryMarshaler.MarshalBinary()
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, bites); err != nil {
 		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-		return
+		return n, err
 	}
 
 	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldByteReader(
@@ -373,18 +373,18 @@ func (encoder *binaryEncoder) writeFieldByteReader(
 
 	bite, err = byteReader.ReadByte()
 	if err != nil {
-		return
+		return n, err
 	}
 
 	err = encoder.Content.WriteByte(bite)
 	if err != nil {
-		return
+		return n, err
 	}
 
 	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

@@ -49,5 +49,5 @@ func Make(ctx interfaces.Context, envRepo env_repo.Env) (log Log) {
 	log.initialize(ctx, envRepo)
 	ctx.After(errors.MakeFuncContextFromFuncErr(log.Flush))
 
-	return
+	return log
 }

@@ -123,10 +123,10 @@ func MakeDirIfNecessary(
 
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
-	return
+	return path, err
 }
 
 // TODO migrate to using Env and accepting path generation function
@@ -139,8 +139,8 @@ func MakeDirIfNecessaryForStringerWithHeadAndTail(
 
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
-	return
+	return path, err
 }

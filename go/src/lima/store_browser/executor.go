@@ -29,7 +29,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 
 	if uSku, err = c.store.getUrl(internal); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
@@ -45,10 +45,10 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *executor) tryToEmitOneRecognized(
@@ -58,7 +58,7 @@ func (c *executor) tryToEmitOneRecognized(
 	c.co.SetState(checked_out_state.Recognized)
 
 	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
-		return
+		return err
 	}
 
 	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
@@ -74,10 +74,10 @@ func (c *executor) tryToEmitOneRecognized(
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *executor) tryToEmitOneUntracked(
@@ -86,7 +86,7 @@ func (c *executor) tryToEmitOneUntracked(
 	c.co.SetState(checked_out_state.Untracked)
 
 	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
-		return
+		return err
 	}
 
 	sku.TransactedResetter.Reset(c.co.GetSkuExternal().GetSku())
@@ -94,15 +94,15 @@ func (c *executor) tryToEmitOneUntracked(
 
 	if err = c.co.GetSkuExternal().Metadata.Description.Set(item.Title); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *executor) tryToEmitOneCommon(
@@ -112,22 +112,22 @@ func (c *executor) tryToEmitOneCommon(
 
 	if err = i.WriteToExternal(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	external.ObjectId.SetGenre(genres.Zettel)
 	external.ExternalObjectId.SetGenre(genres.Zettel)
 
 	if !query.ContainsExternalSku(c.qg, external, c.co.GetState()) {
-		return
+		return err
 	}
 
 	c.co.GetSkuExternal().RepoId = c.store.externalStoreInfo.RepoId
 
 	if err = c.out(&c.co); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

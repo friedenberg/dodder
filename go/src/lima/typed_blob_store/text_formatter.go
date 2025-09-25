@@ -79,7 +79,7 @@ func (formatter textFormatter) EncodeStringTo(
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (tf textFormatter) WriteStringFormatWithMode(
@@ -101,5 +101,5 @@ func (tf textFormatter) WriteStringFormatWithMode(
 		n, err = tf.MetadataOnly.FormatMetadata(w, ctx)
 	}
 
-	return
+	return n, err
 }

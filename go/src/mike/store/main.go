@@ -75,12 +75,12 @@ func (store *Store) Initialize(
 		typedBlobStore.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if store.zettelIdIndex, err = zettel_id_index.MakeIndex(
@@ -90,7 +90,7 @@ func (store *Store) Initialize(
 		store.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if store.streamIndex, err = stream_index.MakeIndex(
@@ -100,7 +100,7 @@ func (store *Store) Initialize(
 		store.sunrise,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.protoZettel = sku.MakeProto(
@@ -109,7 +109,7 @@ func (store *Store) Initialize(
 
 	store.configBlobCoder = repo_configs.Coder
 
-	return
+	return err
 }
 
 func (store *Store) MakeSupplies(
@@ -126,16 +126,16 @@ func (store *Store) MakeSupplies(
 		repoId.GetRepoIdString(),
 	)
 
-	return
+	return supplies
 }
 
 func (store *Store) ResetIndexes() (err error) {
 	if err = store.zettelIdIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index object id index")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {

@@ -17,7 +17,7 @@ func (id *Id) GeneratePrivateKey(
 	if formatId != "" {
 		if err = id.setFormatId(formatId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -33,7 +33,7 @@ func (id *Id) GeneratePrivateKey(
 				OperationName: "GeneratePrivateKey",
 			})
 
-			return
+			return err
 		}
 	}
 
@@ -43,7 +43,7 @@ func (id *Id) GeneratePrivateKey(
 			OperationName: "GeneratePrivateKey",
 		})
 
-		return
+		return err
 	}
 
 	if readerRand == nil {
@@ -54,20 +54,20 @@ func (id *Id) GeneratePrivateKey(
 
 	if bites, err = formatSec.Generate(readerRand); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.SetPurpose(purpose); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.SetMarklId(formatSec.Id, bites); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id Id) GetPublicKey(
@@ -84,7 +84,7 @@ func (id Id) GetPublicKey(
 				OperationName: "GetPublicKey",
 			})
 
-			return
+			return public, err
 		}
 	}
 
@@ -94,33 +94,33 @@ func (id Id) GetPublicKey(
 			OperationName: "GetPublicKey",
 		})
 
-		return
+		return public, err
 	}
 
 	var bites []byte
 
 	if bites, err = formatSec.GetPublicKey(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return public, err
 	}
 
 	if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return public, err
 	}
 
 	if err = public.SetMarklId(formatSec.PubFormatId, bites); err != nil {
 		err = errors.Wrap(err)
-		return
+		return public, err
 	}
 
-	return
+	return public, err
 }
 
 func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 	if id.IsNull() {
 		ioWrapper = files.NopeIOWrapper{}
-		return
+		return ioWrapper, err
 	}
 
 	var formatSec FormatSec
@@ -134,7 +134,7 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 				OperationName: "GetIOWrapper",
 			})
 
-			return
+			return ioWrapper, err
 		}
 	}
 
@@ -144,15 +144,15 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 			OperationName: "GetIOWrapper",
 		})
 
-		return
+		return ioWrapper, err
 	}
 
 	if ioWrapper, err = formatSec.GetIOWrapper(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ioWrapper, err
 	}
 
-	return
+	return ioWrapper, err
 }
 
 func (id Id) Sign(
@@ -171,7 +171,7 @@ func (id Id) Sign(
 				OperationName: "Sign",
 			})
 
-			return
+			return err
 		}
 	}
 
@@ -181,27 +181,27 @@ func (id Id) Sign(
 			OperationName: "Sign",
 		})
 
-		return
+		return err
 	}
 
 	var sigBites []byte
 
 	if sigBites, err = formatSec.Sign(id, mes, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = sigDst.SetPurpose(
 		sigPurpose,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = sigDst.SetMarklId(formatSec.SigFormatId, sigBites); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -41,5 +41,5 @@ func (af format[O, OPtr]) EncodeTo(
 		n, err = af.EncoderToWriter.EncodeTo(object, writer)
 	}
 
-	return
+	return n, err
 }

@@ -41,7 +41,7 @@ func (format formatterTypFormatterUTIGroups) Format(
 
 	if skuTyp, err = format.ReadTransactedFromObjectId(object.Metadata.GetType()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var blob type_blobs.Blob
@@ -52,7 +52,7 @@ func (format formatterTypFormatterUTIGroups) Format(
 		skuTyp.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	defer repool()
@@ -73,9 +73,9 @@ func (format formatterTypFormatterUTIGroups) Format(
 
 		if n, err = io.Copy(writer, sb); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

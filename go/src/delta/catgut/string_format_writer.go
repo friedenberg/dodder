@@ -16,8 +16,8 @@ func (stringFormatWriter) EncodeStringTo(
 	n, err = e.WriteTo(sw)
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

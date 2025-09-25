@@ -18,7 +18,7 @@ func CountCase(bites []byte) (lower, neither, upper int) {
 		}
 	}
 
-	return
+	return lower, neither, upper
 }
 
 func AllRunes(bites []byte) interfaces.Seq[rune] {

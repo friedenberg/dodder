@@ -29,5 +29,5 @@ func (f CheckedOutHeaderState) WriteBoxHeader(
 		header.Value = stateString
 	}
 
-	return
+	return err
 }

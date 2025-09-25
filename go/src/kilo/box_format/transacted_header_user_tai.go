@@ -15,5 +15,5 @@ func (f TransactedHeaderUserTai) WriteBoxHeader(
 	header.RightAligned = true
 	header.Value = tai.Format(string_format_writer.StringFormatDateTime)
 
-	return
+	return err
 }

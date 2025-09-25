@@ -37,7 +37,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 			break
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		trimmed := strings.TrimSpace(line)
@@ -73,11 +73,11 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 				key,
 				remainder,
 			)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (parser *textParser2) readTyp(
@@ -85,7 +85,7 @@ func (parser *textParser2) readTyp(
 	desc string,
 ) (err error) {
 	if desc == "" {
-		return
+		return err
 	}
 
 	tail := path.Ext(desc)
@@ -96,30 +96,30 @@ func (parser *textParser2) readTyp(
 	case files.Exists(desc):
 		if err = metadata.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = parser.Blob.SetWithBlobWriterFactory(desc, parser.BlobWriterFactory); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	//! <sha>.<typ ext>
 	case tail != "":
 		if err = parser.setBlobSha(metadata, head); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = metadata.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	//! <sha>
 	case tail == "":
 		if err = parser.setBlobSha(metadata, head); err == nil {
-			return
+			return err
 		}
 
 		err = nil
@@ -130,11 +130,11 @@ func (parser *textParser2) readTyp(
 	default:
 		if err = metadata.Type.Set(head); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (parser *textParser2) setBlobSha(
@@ -146,8 +146,8 @@ func (parser *textParser2) setBlobSha(
 		maybeSha,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

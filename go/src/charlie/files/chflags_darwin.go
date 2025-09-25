@@ -40,8 +40,8 @@ func setUserChanges(paths []string, options userChangesOptions) (err error) {
 			err = errors.Errorf("failed to run chflags: %q", msg)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }

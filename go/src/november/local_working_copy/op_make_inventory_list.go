@@ -23,12 +23,12 @@ func (local *Repo) MakeInventoryList(
 
 			list.Add(sk.CloneTransacted())
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return list, err
 	}
 
-	return
+	return list, err
 }

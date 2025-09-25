@@ -10,21 +10,21 @@ import (
 // TODO decide how this should behave
 func (store *Store) UpdateTransacted(sk *sku.Transacted) (err error) {
 	if !sk.GetType().Equals(store.typ) {
-		return
+		return err
 	}
 
 	var uSku *url.URL
 
 	if uSku, err = store.getUrl(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	_, ok := store.urls[*uSku]
 
 	if !ok {
-		return
+		return err
 	}
 
-	return
+	return err
 }

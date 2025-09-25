@@ -57,5 +57,5 @@ func (cmd Query) MakeQuery(
 		req.Cancel(err)
 	}
 
-	return
+	return query
 }

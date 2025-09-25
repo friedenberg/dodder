@@ -43,7 +43,7 @@ func MakeFrameFromRuntimeFrame(runtimeFrame runtime.Frame) (frame Frame) {
 	frame.RelFilename, _ = filepath.Rel(cwd, frame.Filename)
 	frame.nonZero = true
 
-	return
+	return frame
 }
 
 //go:noinline
@@ -63,7 +63,7 @@ func MakeFrames(skip, count int) (frames []Frame) {
 	writtenCounters := runtime.Callers(skip+1, programCounters) // 0 is self
 
 	if writtenCounters == 0 {
-		return
+		return frames
 	}
 
 	programCounters = programCounters[:writtenCounters]
@@ -81,7 +81,7 @@ func MakeFrames(skip, count int) (frames []Frame) {
 		}
 	}
 
-	return
+	return frames
 }
 
 //go:noinline
@@ -90,7 +90,7 @@ func MakeFrame(skip int) (frame Frame, ok bool) {
 	programCounter, _, _, ok = runtime.Caller(skip + 1) // 0 is self
 
 	if !ok {
-		return
+		return frame, ok
 	}
 
 	runtimeFrames := runtime.CallersFrames([]uintptr{programCounter})
@@ -103,7 +103,7 @@ func MakeFrame(skip int) (frame Frame, ok bool) {
 		panic(fmt.Sprintf("Parent Wrap included in stack. Skip: %d", skip))
 	}
 
-	return
+	return frame, ok
 }
 
 func (frame Frame) IsEmpty() bool {
@@ -116,7 +116,7 @@ func getPackageAndFunctionName(v string) (p string, f string) {
 	idx := strings.Index(f, ".")
 
 	if idx == -1 {
-		return
+		return p, f
 	}
 
 	p += f[:idx]
@@ -125,7 +125,7 @@ func getPackageAndFunctionName(v string) (p string, f string) {
 		f = f[idx+1:]
 	}
 
-	return
+	return p, f
 }
 
 func (frame Frame) FileNameLine() string {

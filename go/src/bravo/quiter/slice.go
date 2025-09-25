@@ -17,7 +17,7 @@ func (s Slice[E]) Any() (e E) {
 		e = s[0]
 	}
 
-	return
+	return e
 }
 
 func (s Slice[E]) Each(f interfaces.FuncIter[E]) error {

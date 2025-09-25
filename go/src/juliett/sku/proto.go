@@ -24,7 +24,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 	proto.Metadata.Type = tipe
 	proto.Metadata.SetTags(tags)
 
-	return
+	return proto
 }
 
 type Proto struct {
@@ -51,7 +51,7 @@ func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 
 	ok = okTyp && okMet
 
-	return
+	return ok
 }
 
 func (pz Proto) Make() (z *Transacted) {
@@ -61,7 +61,7 @@ func (pz Proto) Make() (z *Transacted) {
 
 	pz.Apply(z, genres.Zettel)
 
-	return
+	return z
 }
 
 func (proto Proto) ApplyType(
@@ -83,7 +83,7 @@ func (proto Proto) ApplyType(
 		}
 	}
 
-	return
+	return ok
 }
 
 func (proto Proto) Apply(
@@ -110,7 +110,7 @@ func (proto Proto) Apply(
 		errors.PanicIfError(metadata.AddTagPtr(e))
 	}
 
-	return
+	return changed
 }
 
 func (pz Proto) ApplyWithBlobFD(
@@ -130,7 +130,7 @@ func (pz Proto) ApplyWithBlobFD(
 		if ext != "" {
 			if err = z.Type.Set(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -144,12 +144,12 @@ func (pz Proto) ApplyWithBlobFD(
 
 	if err = z.Description.Set(desc); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for e := range pz.Metadata.GetTags().AllPtr() {
 		errors.PanicIfError(z.AddTagPtr(e))
 	}
 
-	return
+	return err
 }

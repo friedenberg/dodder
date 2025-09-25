@@ -65,7 +65,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			permitInternal,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return object, err
 		}
 
 		object = sku.GetTransactedPool().Get()
@@ -83,7 +83,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			object,
 		); err != nil {
 			err = errors.Wrapf(err, "ExternalObjectId: %q", externalObjectId)
-			return
+			return object, err
 		}
 
 		if external != nil {
@@ -94,7 +94,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 
 		if objectId, _, err = executor.Query.getExactlyOneObjectId(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return object, err
 		}
 
 		object = sku.GetTransactedPool().Get()
@@ -104,11 +104,11 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			object,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return object, err
 		}
 	}
 
-	return
+	return object, err
 }
 
 func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
@@ -117,18 +117,18 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 
 	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	sk = sku.GetTransactedPool().Get()
 
 	if err = executor.ExecutionInfo.FuncReadOneInto(objectId, sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	if !sigil.IncludesExternal() {
-		return
+		return sk, err
 	}
 
 	var external sku.ExternalLike
@@ -143,14 +143,14 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	if external != nil {
 		sku.TransactedResetter.ResetWith(sk, external.GetSku())
 	}
 
-	return
+	return sk, err
 }
 
 func (executor *Executor) ExecuteSkuType(
@@ -159,21 +159,21 @@ func (executor *Executor) ExecuteSkuType(
 	if executor.WorkspaceStore != nil {
 		if err = executor.applyDotOperatorIfNecessary(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = executor.executeExternalQueryCheckedOut(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if err = executor.executeInternalQuerySkuType(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) ExecuteTransacted(
@@ -181,23 +181,23 @@ func (e *Executor) ExecuteTransacted(
 ) (err error) {
 	if err = e.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// TODO tease apart the reliance on dotOperatorActive here
 	if e.dotOperatorActive && e.WorkspaceStore != nil {
 		if err = e.executeExternalQuery(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if err = e.executeInternalQuery(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) ExecuteTransactedAsSkuType(
@@ -205,22 +205,22 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 ) (err error) {
 	if err = e.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if e.isDotOperatorActive() && e.WorkspaceStore != nil {
 		if err = e.executeExternalQueryCheckedOut(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		if err = e.executeInternalQuerySkuType(out); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) executeExternalQueryCheckedOut(
@@ -231,10 +231,10 @@ func (e *Executor) executeExternalQueryCheckedOut(
 		out,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) executeExternalQuery(
@@ -246,17 +246,17 @@ func (e *Executor) executeExternalQuery(
 
 			if err = out(z); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) executeInternalQuerySkuType(
@@ -267,10 +267,10 @@ func (e *Executor) executeInternalQuerySkuType(
 		e.makeEmitSkuSigilLatestSkuType(out),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) executeInternalQuery(
@@ -281,10 +281,10 @@ func (e *Executor) executeInternalQuery(
 		e.makeEmitSkuSigilLatest(out),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *Executor) makeEmitSkuSigilLatest(
@@ -294,29 +294,29 @@ func (e *Executor) makeEmitSkuSigilLatest(
 		g := genres.Must(object.GetGenre())
 
 		if !e.containsSku(object) {
-			return
+			return err
 		}
 
 		// TODO cache query with sigil and object id
 		genreQuery, ok := e.Get(g)
 
 		if !ok {
-			return
+			return err
 		}
 
 		if genreQuery.GetSigil().IncludesExternal() && e.WorkspaceStore != nil {
 			if err = e.UpdateTransacted(object); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if err = out(object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
@@ -327,20 +327,20 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 		g := genres.Must(internal.GetGenre())
 
 		if !e.containsSku(internal) {
-			return
+			return err
 		}
 
 		m, ok := e.Get(g)
 
 		if !ok {
-			return
+			return err
 		}
 
 		if m.GetSigil().IncludesExternal() {
 			// TODO update External
 			if err = e.UpdateTransacted(internal); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -353,35 +353,35 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 
 		if err = out(co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
 func (executor *Executor) applyDotOperatorIfNecessary() (err error) {
 	if !executor.isDotOperatorActive() {
-		return
+		return err
 	}
 
 	if err = executor.readAllItemsIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (executor *Executor) readAllItemsIfNecessary() (err error) {
 	if executor.WorkspaceStore == nil {
-		return
+		return err
 	}
 
 	if err = executor.WorkspaceStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -33,12 +33,12 @@ func MakeWriterTo(
 
 	if rs == nil {
 		err = errors.ErrorWithStackf("empty remote script")
-		return
+		return wt, err
 	}
 
 	if wt.cmd, err = rs.Cmd(args...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return wt, err
 	}
 
 	ui.Log().Print(wt.cmd)
@@ -59,7 +59,7 @@ func MakeWriterTo(
 	// wt.cmd.Stderr = os.Stderr
 	wt.cmd.Env = envCollapsed
 
-	return
+	return wt, err
 }
 
 func MakeWriterToWithStdin(
@@ -70,12 +70,12 @@ func MakeWriterToWithStdin(
 ) (writerTo *writerTo, err error) {
 	if writerTo, err = MakeWriterTo(script, env, args...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return writerTo, err
 	}
 
 	writerTo.cmd.Stdin = reader
 
-	return
+	return writerTo, err
 }
 
 func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
@@ -83,19 +83,19 @@ func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
 
 	if pipeOut, err = wt.cmd.StdoutPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var pipeErr io.ReadCloser
 
 	if pipeErr, err = wt.cmd.StderrPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if err = wt.cmd.Start(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var bufErr bytes.Buffer
@@ -108,7 +108,7 @@ func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
 
 	if n, err = io.Copy(w, pipeOut); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	<-chErrDone
@@ -122,8 +122,8 @@ func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
 
 		err = errors.Wrapf(err, "Command: '%s'", wt.cmd.String())
 
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

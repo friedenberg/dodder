@@ -11,7 +11,7 @@ func (store *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 	item, ok := store.Get(&internal.ObjectId)
 
 	if !ok {
-		return
+		return err
 	}
 
 	var external *sku.Transacted
@@ -26,13 +26,13 @@ func (store *Store) UpdateTransacted(internal *sku.Transacted) (err error) {
 		internal,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	sku.Resetter.ResetWith(internal, external)
 	sku.GetTransactedPool().Put(external)
 
-	return
+	return err
 }
 
 func (store *Store) ReadOneExternalObjectReader(
@@ -44,8 +44,8 @@ func (store *Store) ReadOneExternalObjectReader(
 		external,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

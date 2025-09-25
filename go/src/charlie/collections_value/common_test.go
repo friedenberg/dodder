@@ -17,7 +17,7 @@ func makeStringValues(vs ...string) (out []values.String) {
 		out[i] = values.MakeString(v)
 	}
 
-	return
+	return out
 }
 
 func assertSet(

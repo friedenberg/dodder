@@ -30,29 +30,29 @@ func Extrema(n Int) ZettelIdCoordinate {
 func (p *ZettelIdCoordinate) SetCoordinates(left, right string) (err error) {
 	l, err := strconv.ParseUint(left, 10, 32)
 	if err != nil {
-		return
+		return err
 	}
 
 	r, err := strconv.ParseUint(right, 10, 64)
 	if err != nil {
-		return
+		return err
 	}
 
 	p.Left = Int(l)
 	p.Right = Int(r)
 
-	return
+	return err
 }
 
 func (p *ZettelIdCoordinate) Set(id string) (err error) {
 	i, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		return
+		return err
 	}
 
 	p.SetInt(Int(i))
 
-	return
+	return err
 }
 
 func (p *ZettelIdCoordinate) SetInt(id Int) {

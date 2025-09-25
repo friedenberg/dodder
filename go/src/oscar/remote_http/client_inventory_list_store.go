@@ -39,9 +39,9 @@ func (client client) ImportInventoryList(
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	} else {
-		return
+		return err
 	}
 
 	ui.Log().Printf("importing list: %s", sku.String(listSku))
@@ -60,12 +60,12 @@ func (client client) ImportInventoryList(
 			bufferedWriter,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = bufferedWriter.Flush(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -73,7 +73,7 @@ func (client client) ImportInventoryList(
 
 	if listBlobReader, err = blobStore.MakeBlobReader(listSku.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var request *http.Request
@@ -88,7 +88,7 @@ func (client client) ImportInventoryList(
 		listBlobReader,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	{
@@ -111,7 +111,7 @@ func (client client) ImportInventoryList(
 			markl.PurposeRequestRepoSigV1,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		request.Header.Add(headerRepoSig, sig.StringWithFormat())
@@ -127,7 +127,7 @@ func (client client) ImportInventoryList(
 
 	if response, err = client.http.Do(request); err != nil {
 		err = errors.ErrorWithStackf("failed to read response: %w", err)
-		return
+		return err
 	}
 
 	if err = ReadErrorFromBodyOnNot(
@@ -136,14 +136,14 @@ func (client client) ImportInventoryList(
 		http.StatusFound,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var digests markl.Slice
 
 	if _, err = digests.ReadFrom(bufio.NewReader(response.Body)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if len(digests) > 0 {
@@ -153,23 +153,23 @@ func (client client) ImportInventoryList(
 	for _, digest := range digests {
 		if err = client.WriteBlobToRemote(blobStore, digest); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if err = response.Body.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = client.logRemoteInventoryLists.Append(
 		logEntry,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (client client) ReadLast() (max *sku.Transacted, err error) {

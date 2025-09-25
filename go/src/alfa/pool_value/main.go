@@ -32,5 +32,5 @@ func (pool poolValue[SWIMMER]) Put(swimmer SWIMMER) (err error) {
 	pool.reset(swimmer)
 	pool.inner.Put(swimmer)
 
-	return
+	return err
 }

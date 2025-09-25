@@ -14,19 +14,19 @@ func (env env) Delete(paths ...string) (err error) {
 
 		if path == "." {
 			err = errors.ErrorWithStackf("invalid delete request: %q", path)
-			return
+			return err
 		}
 
 		if env.IsDryRun() {
 			ui.Err().Print("would delete:", path)
-			return
+			return err
 		}
 
 		if err = os.RemoveAll(path); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

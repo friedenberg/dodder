@@ -57,18 +57,18 @@ func handleMainErrors(
 			)
 		}
 
-		return
+		return exitStatus
 	}
 
 	var helpful interfaces.ErrorHelpful
 
 	if errors.As(err, &helpful) {
 		errors.PrintHelpful(ui.Err(), helpful)
-		return
+		return exitStatus
 	}
 
 	if errors.Is499ClientClosedRequest(err) {
-		return
+		return exitStatus
 	}
 
 	_, frames := ctx.CauseWithStackFrames()
@@ -76,5 +76,5 @@ func handleMainErrors(
 
 	ui.CLIErrorTreeEncoder.EncodeTo(err, ui.Err())
 
-	return
+	return exitStatus
 }

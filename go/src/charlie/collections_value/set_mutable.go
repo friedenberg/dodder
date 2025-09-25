@@ -47,17 +47,17 @@ func (s MutableSet[T]) Key(e T) string {
 func (s MutableSet[T]) Get(k string) (e T, ok bool) {
 	e, ok = s.E[k]
 
-	return
+	return e, ok
 }
 
 func (s MutableSet[T]) ContainsKey(k string) (ok bool) {
 	if k == "" {
-		return
+		return ok
 	}
 
 	_, ok = s.E[k]
 
-	return
+	return ok
 }
 
 func (s MutableSet[T]) Contains(e T) (ok bool) {
@@ -70,7 +70,7 @@ func (s MutableSet[T]) Any() (v T) {
 		break
 	}
 
-	return
+	return v
 }
 
 func (s MutableSet[T]) Del(v T) (err error) {
@@ -79,12 +79,12 @@ func (s MutableSet[T]) Del(v T) (err error) {
 
 func (s MutableSet[T]) DelKey(k string) (err error) {
 	delete(s.E, k)
-	return
+	return err
 }
 
 func (s MutableSet[T]) Add(v T) (err error) {
 	s.E[s.Key(v)] = v
-	return
+	return err
 }
 
 func (s MutableSet[T]) EachKey(
@@ -98,11 +98,11 @@ func (s MutableSet[T]) EachKey(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (a MutableSet[T]) Reset() {

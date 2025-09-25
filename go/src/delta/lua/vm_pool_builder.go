@@ -68,18 +68,18 @@ func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
 
 	if vpb.scriptReader == nil && vpb.compiled == nil {
 		err = errors.ErrorWithStackf("no script, reader, or compiled set")
-		return
+		return vmp, err
 	}
 
 	if vpb.compiled != nil {
 		if err = vmp.SetCompiled(vpb.compiled, vpb.apply); err != nil {
 			err = errors.Wrap(err)
-			return
+			return vmp, err
 		}
 	} else if vpb.scriptReader != nil {
 		if err = vmp.SetReader(vpb.scriptReader, vpb.apply); err != nil {
 			err = errors.Wrap(err)
-			return
+			return vmp, err
 		}
 	}
 
@@ -87,17 +87,17 @@ func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
 	vm, err := vmp.Get()
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return vmp, err
 	}
 
 	if _, err = vm.GetTopTableOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return vmp, err
 	}
 
 	vmp.Put(vm)
 
-	return
+	return vmp, err
 }
 
 func MakeVMPoolWithSearcher(
@@ -109,10 +109,10 @@ func MakeVMPoolWithSearcher(
 
 	if ml, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ml, err
 	}
 
-	return
+	return ml, err
 }
 
 func MakeVMPoolWithRequire(
@@ -124,8 +124,8 @@ func MakeVMPoolWithRequire(
 
 	if ml, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ml, err
 	}
 
-	return
+	return ml, err
 }

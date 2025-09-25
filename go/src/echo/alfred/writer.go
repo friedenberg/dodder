@@ -32,10 +32,10 @@ func NewWriter(out io.Writer, itemPool ItemPool) (w *writer, err error) {
 
 	if err = w.open(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return w, err
 	}
 
-	return
+	return w, err
 }
 
 func (w *writer) open() (err error) {
@@ -44,7 +44,7 @@ func (w *writer) open() (err error) {
 	); err != nil {
 		close(w.chDone)
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = w.wBuf.WriteString(
@@ -52,7 +52,7 @@ func (w *writer) open() (err error) {
 	); err != nil {
 		close(w.chDone)
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = w.wBuf.WriteString(
@@ -60,7 +60,7 @@ func (w *writer) open() (err error) {
 	); err != nil {
 		close(w.chDone)
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	go func() {
@@ -76,7 +76,7 @@ func (w *writer) open() (err error) {
 		close(w.chDone)
 	}()
 
-	return
+	return err
 }
 
 func (w *writer) WriteItem(i *Item) {
@@ -97,18 +97,18 @@ func (w *writer) writeItem(i *Item) (err error) {
 	if w.afterFirstWrite {
 		if _, err = io.WriteString(w.wBuf, ","); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if err = w.jsonEncoder.Encode(i); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	w.Put(i)
 
-	return
+	return err
 }
 
 func (w *writer) Close() (err error) {
@@ -117,13 +117,13 @@ func (w *writer) Close() (err error) {
 
 	if _, err = w.wBuf.WriteString("]}\n"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = w.wBuf.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

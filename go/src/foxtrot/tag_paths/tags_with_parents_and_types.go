@@ -113,20 +113,20 @@ func (s TagsWithParentsAndTypes) GetMatching(
 	i, ok := s.ContainsTag(e)
 
 	if !ok {
-		return
+		return matching
 	}
 
 	for _, ewp := range s[i:] {
 		cmp := ewp.ComparePartial(e)
 
 		if cmp != 0 {
-			return
+			return matching
 		}
 
 		matching = append(matching, ewp)
 	}
 
-	return
+	return matching
 }
 
 // TODO return success
@@ -138,7 +138,7 @@ func (s *TagsWithParentsAndTypes) Add(
 
 	if e, err = e1.Clone(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	idx, ok := s.ContainsTag(e)
@@ -160,7 +160,7 @@ func (s *TagsWithParentsAndTypes) Add(
 		}
 	}
 
-	return
+	return err
 }
 
 // TODO return success
@@ -169,18 +169,18 @@ func (s *TagsWithParentsAndTypes) Remove(e1 *Tag) (err error) {
 
 	if e, err = e1.Clone(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	idx, ok := s.ContainsTag(e)
 
 	if !ok {
-		return
+		return err
 	}
 
 	*s = slices.Delete(*s, idx, idx+1)
 
-	return
+	return err
 }
 
 func (s TagsWithParentsAndTypes) StringCommaSeparatedExplicit() string {

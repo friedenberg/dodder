@@ -32,10 +32,10 @@ func (e *ExecutorPrimitive) ExecuteExternalLike(
 ) (err error) {
 	if err = e.executeInternalQueryExternalLike(out); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *ExecutorPrimitive) ExecuteTransacted(
@@ -46,18 +46,18 @@ func (e *ExecutorPrimitive) ExecuteTransacted(
 
 		if err = out(sk); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = e.executeInternalQueryExternalLike(out1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *ExecutorPrimitive) executeInternalQueryExternalLike(
@@ -68,10 +68,10 @@ func (e *ExecutorPrimitive) executeInternalQueryExternalLike(
 		e.makeEmitSkuSigilLatest(out),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *ExecutorPrimitive) makeEmitSkuSigilLatest(
@@ -82,25 +82,25 @@ func (e *ExecutorPrimitive) makeEmitSkuSigilLatest(
 		m, ok := e.pqg.Get(g)
 
 		if !ok {
-			return
+			return err
 		}
 
 		if m.GetSigil().IncludesExternal() {
 			if err = e.ei.UpdateTransacted(z); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if !m.ContainsSku(z) {
-			return
+			return err
 		}
 
 		if err = out(z); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }

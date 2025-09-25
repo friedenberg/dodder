@@ -94,15 +94,15 @@ func (cmd Clean) Run(req command.Request) {
 		queryGroup,
 		func(co sku.SkuType) (err error) {
 			if !cmd.shouldClean(localWorkingCopy, co, queryGroup) {
-				return
+				return err
 			}
 
 			if err = localWorkingCopy.GetStore().DeleteCheckedOut(co); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		localWorkingCopy.Cancel(err)
@@ -139,7 +139,7 @@ func (c Clean) runOrganize(
 		qg,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var changes organize_text.Changes
@@ -149,7 +149,7 @@ func (c Clean) runOrganize(
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	u.Must(errors.MakeFuncContextFromFuncErr(u.Lock))
@@ -159,13 +159,13 @@ func (c Clean) runOrganize(
 			el,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	u.Must(errors.MakeFuncContextFromFuncErr(u.Unlock))
 
-	return
+	return err
 }
 
 func (c Clean) shouldClean(

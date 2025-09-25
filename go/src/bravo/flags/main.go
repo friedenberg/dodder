@@ -497,7 +497,7 @@ func UnquoteUsage(flag *Flag) (name string, usage string) {
 	case *uintValue, *uint64Value:
 		name = "uint"
 	}
-	return
+	return name, usage
 }
 
 // PrintDefaults prints, to standard error unless configured otherwise, the

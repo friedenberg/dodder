@@ -61,10 +61,10 @@ func (blobStoreConfig *TomlV1) SetFlagDefinitions(
 					value,
 				); err != nil {
 					err = errors.Wrapf(err, "Value: %q", value)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 
 			switch value {
@@ -78,17 +78,17 @@ func (blobStoreConfig *TomlV1) SetFlagDefinitions(
 					markl.PurposeMadderPrivateKeyV1,
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 			default:
 				if err = blobStoreConfig.Encryption.Set(value); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		},
 	)
 

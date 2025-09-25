@@ -241,7 +241,7 @@ func validateHRP(hrp string) (err error) {
 		}
 	}
 
-	return
+	return err
 }
 
 func validateCaseString(s string) (lower bool, err error) {
@@ -251,12 +251,12 @@ func validateCaseString(s string) (lower bool, err error) {
 	if toLower != s && toUpper != s {
 		// TODO turn into error type
 		err = fmt.Errorf("mixed case")
-		return
+		return lower, err
 	} else {
 		lower = toLower == s
 	}
 
-	return
+	return lower, err
 }
 
 func validateCase(bites []byte) (lower bool, err error) {
@@ -268,12 +268,12 @@ func validateCase(bites []byte) (lower bool, err error) {
 			lowerCount,
 			upperCount,
 		)
-		return
+		return lower, err
 	}
 
 	lower = upperCount == 0
 
-	return
+	return lower, err
 }
 
 type bytesOrString interface {
@@ -306,19 +306,19 @@ func validateSeparatorPosition[INPUT bytesOrString](
 // uppercase.
 func DecodeString(input string) (hrp string, data []byte, err error) {
 	if _, err = validateCaseString(input); err != nil {
-		return
+		return hrp, data, err
 	}
 
 	pos := strings.LastIndex(input, "-")
 
 	if err = validateSeparatorPosition(input, pos); err != nil {
-		return
+		return hrp, data, err
 	}
 
 	hrp = input[:pos]
 
 	if err = validateHRP(hrp); err != nil {
-		return
+		return hrp, data, err
 	}
 
 	input = strings.ToLower(input)
@@ -350,34 +350,34 @@ func Decode(bites []byte) (hrp string, data []byte, err error) {
 	pos := bytes.LastIndex(bites, []byte("-"))
 
 	if err = validateSeparatorPosition(bites, pos); err != nil {
-		return
+		return hrp, data, err
 	}
 
 	hrp = string(bites[:pos])
 	bites = bites[pos+1:]
 
 	if data, err = decode(hrp, bites); err != nil {
-		return
+		return hrp, data, err
 	}
 
-	return
+	return hrp, data, err
 }
 
 // Decode decodes a Blech32 string. If the string is uppercase, the HRP
 // will be uppercase.
 func DecodeDataOnly(bites []byte) (data []byte, err error) {
 	if data, err = decode("", bites); err != nil {
-		return
+		return data, err
 	}
 
-	return
+	return data, err
 }
 
 // Decode decodes a Blech32 string. If the string is uppercase, the HRP
 // will be uppercase.
 func decode(hrp string, bites []byte) (data []byte, err error) {
 	if _, err = validateCase(bites); err != nil {
-		return
+		return data, err
 	}
 
 	unicorn.ToLower(bites)

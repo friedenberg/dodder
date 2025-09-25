@@ -20,13 +20,13 @@ func AssertDir(path string) (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	if !fi.IsDir() {
 		err = ErrNotDirectory(path)
-		return
+		return err
 	}
 
-	return
+	return err
 }

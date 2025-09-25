@@ -95,7 +95,7 @@ func (format *BoxTransacted) EncodeStringTo(
 	if format.headerWriter != nil {
 		if err = format.headerWriter.WriteBoxHeader(&box.Header, object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -106,7 +106,7 @@ func (format *BoxTransacted) EncodeStringTo(
 		&box,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if err = format.addFieldsMetadata(
@@ -116,7 +116,7 @@ func (format *BoxTransacted) EncodeStringTo(
 		&box,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	b := &object.Metadata.Description
@@ -134,10 +134,10 @@ func (format *BoxTransacted) EncodeStringTo(
 
 	if n, err = format.boxStringEncoder.EncodeStringTo(box, writer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (format *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
@@ -153,7 +153,7 @@ func (format *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 		field.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
 	}
 
-	return
+	return field, err
 }
 
 func (format *BoxTransacted) makeFieldObjectId(
@@ -171,7 +171,7 @@ func (format *BoxTransacted) makeFieldObjectId(
 
 		if objectIdString, err = format.abbr.ZettelId.Abbreviate(objectId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return field, empty, err
 		}
 	}
 
@@ -181,7 +181,7 @@ func (format *BoxTransacted) makeFieldObjectId(
 		ColorType:          string_format_writer.ColorTypeId,
 	}
 
-	return
+	return field, empty, err
 }
 
 func (format *BoxTransacted) addFieldsObjectIds(
@@ -194,7 +194,7 @@ func (format *BoxTransacted) addFieldsObjectIds(
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var internal string_format_writer.Field
@@ -202,7 +202,7 @@ func (format *BoxTransacted) addFieldsObjectIds(
 
 	if internal, externalEmpty, err = format.makeFieldObjectId(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	switch {
@@ -225,10 +225,10 @@ func (format *BoxTransacted) addFieldsObjectIds(
 
 	default:
 		err = errors.ErrorWithStackf("empty id")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (format *BoxTransacted) addFieldsMetadata(
@@ -297,5 +297,5 @@ func (format *BoxTransacted) addFieldsMetadata(
 		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 
-	return
+	return err
 }

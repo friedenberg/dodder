@@ -29,15 +29,15 @@ func (store *store) recompile(
 ) (err error) {
 	if err = store.recompileTags(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.recompileTypes(blobStore); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *store) recompileTags() (err error) {
@@ -52,16 +52,16 @@ func (store *store) recompileTags() (err error) {
 				"Sku: %s",
 				sku.StringTaiGenreObjectIdObjectDigestBlobDigest(&ke.Transacted),
 			)
-			return
+			return err
 		}
 
 		if err = store.config.AccumulateImplicitTags(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *store) recompileTypes(
@@ -83,7 +83,7 @@ func (store *store) recompileTypes(
 			ct.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer repool()
@@ -94,7 +94,7 @@ func (store *store) recompileTypes(
 				tipe,
 				ct,
 			)
-			return
+			return err
 		}
 
 		fe := commonBlob.GetFileExtension()
@@ -113,7 +113,7 @@ func (store *store) recompileTypes(
 		}
 
 	}
-	return
+	return err
 }
 
 func (store *store) HasChanges() (ok bool) {
@@ -126,7 +126,7 @@ func (store *store) HasChanges() (ok bool) {
 		ui.Log().Print(store.config.compiled.changes)
 	}
 
-	return
+	return ok
 }
 
 func (store *store) GetChanges() (out []string) {
@@ -136,7 +136,7 @@ func (store *store) GetChanges() (out []string) {
 	out = make([]string, len(store.config.changes))
 	copy(out, store.config.changes)
 
-	return
+	return out
 }
 
 func (compiled *compiled) SetNeedsRecompile(reason string) {
@@ -159,7 +159,7 @@ func (store *store) loadMutableConfig(
 
 	if file, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -173,7 +173,7 @@ func (store *store) loadMutableConfig(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	if err = store.loadMutableConfigBlob(
@@ -181,10 +181,10 @@ func (store *store) loadMutableConfig(
 		store.config.Sku.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *store) Flush(
@@ -193,27 +193,27 @@ func (store *store) Flush(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !store.HasChanges() || store.config.IsDryRun() {
-		return
+		return err
 	}
 
 	waitGroup := errors.MakeWaitGroupParallel()
 	waitGroup.Do(func() (err error) {
 		if err = store.flushMutableConfig(envRepo, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	})
 
 	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.config.changes = store.config.changes[:0]
 
-	return
+	return err
 }
 
 func (store *store) flushMutableConfig(
@@ -223,12 +223,12 @@ func (store *store) flushMutableConfig(
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.recompile(blobStore); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	path := envRepo.FileConfigMutable()
@@ -237,7 +237,7 @@ func (store *store) flushMutableConfig(
 
 	if file, err = files.OpenCreateWriteOnlyTruncate(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -246,15 +246,15 @@ func (store *store) flushMutableConfig(
 
 	if err = enc.Encode(&store.config.compiled); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = printerHeader("recompiled konfig"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *store) loadMutableConfigBlob(
@@ -267,7 +267,7 @@ func (store *store) loadMutableConfigBlob(
 		blobSha,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, readCloser)
@@ -281,10 +281,10 @@ func (store *store) loadMutableConfigBlob(
 		readCloser,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.config.configRepo = typedBlob.Blob
 
-	return
+	return err
 }

@@ -42,5 +42,5 @@ func GetCheckoutOptionsFromOptionsWithoutMode(
 		panic(fmt.Sprintf("expected %T or nil but got %T", fsOptions, t))
 	}
 
-	return
+	return fsOptions
 }

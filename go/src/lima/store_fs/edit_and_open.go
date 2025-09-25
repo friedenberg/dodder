@@ -30,10 +30,10 @@ func (store *Store) Open(
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) openZettels(
@@ -44,7 +44,7 @@ func (store *Store) openZettels(
 
 	if filesZettels, err = store.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var e editor.Editor
@@ -58,15 +58,15 @@ func (store *Store) openZettels(
 			Build(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = e.Run(filesZettels); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) openBlob(
@@ -77,15 +77,15 @@ func (store *Store) openBlob(
 
 	if filesBlobs, err = store.ToSliceFilesBlobs(zsc); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	opOpenFiles := OpenFiles{}
 
 	if err = opOpenFiles.Run(ph, filesBlobs...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

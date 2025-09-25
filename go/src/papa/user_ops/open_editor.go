@@ -21,13 +21,13 @@ func (c OpenEditor) Run(
 		c.VimOptions,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = e.Run(args); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

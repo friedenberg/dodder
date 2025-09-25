@@ -21,26 +21,26 @@ func (config Config) GetFileExtensions() file_extensions.Config {
 
 func (compiled *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
-		return
+		return ct
 	}
 
 	if ct1, ok := compiled.Types.Get(k.String()); ok {
 		ct = ct1.CloneTransacted()
 	}
 
-	return
+	return ct
 }
 
 func (compiled *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
-		return
+		return ct
 	}
 
 	if ct1, ok := compiled.Repos.Get(k.String()); ok {
 		ct = ct1.CloneTransacted()
 	}
 
-	return
+	return ct
 }
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
@@ -49,7 +49,7 @@ func (compiled *compiled) GetApproximatedType(
 	k interfaces.ObjectId,
 ) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
-		return
+		return ct
 	}
 
 	expandedActual := compiled.getSortedTypesExpanded(k.String())
@@ -62,7 +62,7 @@ func (compiled *compiled) GetApproximatedType(
 		}
 	}
 
-	return
+	return ct
 }
 
 func (compiled *compiled) GetTagOrRepoIdOrType(
@@ -72,7 +72,7 @@ func (compiled *compiled) GetTagOrRepoIdOrType(
 
 	if err = k.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	switch k.GetGenre() {
@@ -85,17 +85,17 @@ func (compiled *compiled) GetTagOrRepoIdOrType(
 
 	default:
 		err = genres.MakeErrUnsupportedGenre(&k)
-		return
+		return sk, err
 	}
 
-	return
+	return sk, err
 }
 
 func (compiled *compiled) getTag(
 	k interfaces.ObjectId,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != genres.Tag {
-		return
+		return ct, ok
 	}
 
 	v := k.String()
@@ -135,7 +135,7 @@ func (compiled *compiled) getTag(
 		sku.Resetter.ResetWith(ct, &cursor.Transacted)
 	}
 
-	return
+	return ct, ok
 }
 
 // TODO-P3 merge all the below
@@ -167,7 +167,7 @@ func (compiled *compiled) getSortedTypesExpanded(
 		)
 	})
 
-	return
+	return expandedActual
 }
 
 func (compiled *compiled) getSortedTagsExpanded(
@@ -205,7 +205,7 @@ func (compiled *compiled) getSortedTagsExpanded(
 		)
 	})
 
-	return
+	return expandedActual
 }
 
 func (compiled *compiled) GetImplicitTags(

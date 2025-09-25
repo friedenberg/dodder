@@ -40,7 +40,7 @@ func (printer printer) GetPrinter() Printer {
 func (printer printer) Write(b []byte) (n int, err error) {
 	if !printer.on {
 		n = len(b)
-		return
+		return n, err
 	}
 
 	return printer.file.Write(b)
@@ -70,7 +70,7 @@ func (printer printer) Caller(skip int) Printer {
 
 func (printer printer) PrintDebug(args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	_, err = fmt.Fprintf(
@@ -79,12 +79,12 @@ func (printer printer) PrintDebug(args ...any) (err error) {
 		args...,
 	)
 
-	return
+	return err
 }
 
 func (printer printer) Print(args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	_, err = fmt.Fprintln(
@@ -92,7 +92,7 @@ func (printer printer) Print(args ...any) (err error) {
 		args...,
 	)
 
-	return
+	return err
 }
 
 //go:noinline
@@ -102,7 +102,7 @@ func (printer printer) printfStack(
 	args ...any,
 ) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	stackFrame, _ := stack_frame.MakeFrame(1 + depth)
@@ -114,12 +114,12 @@ func (printer printer) printfStack(
 		fmt.Sprintf(format, args...),
 	)
 
-	return
+	return err
 }
 
 func (printer printer) Printf(format string, args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	_, err = fmt.Fprintln(
@@ -127,5 +127,5 @@ func (printer printer) Printf(format string, args ...any) (err error) {
 		fmt.Sprintf(format, args...),
 	)
 
-	return
+	return err
 }

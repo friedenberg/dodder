@@ -82,18 +82,18 @@ func (f tomlBlobDecoder[O, OPtr]) DecodeFrom(
 
 	if n, err = io.Copy(pw, r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if err = pw.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if err = <-chDone; err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

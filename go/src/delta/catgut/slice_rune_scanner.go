@@ -11,7 +11,7 @@ func MakeSliceRuneScanner(slice Slice) (s *SliceRuneScanner) {
 	s = &SliceRuneScanner{}
 	s.ResetWith(slice)
 
-	return
+	return s
 }
 
 type SliceRuneScanner struct {
@@ -61,18 +61,18 @@ func (s *SliceRuneScanner) ResetWith(slice Slice) {
 func (s *SliceRuneScanner) UnreadRune() (err error) {
 	if s.locFirst <= 0 && s.locSecond <= 0 {
 		err = errors.ErrorWithStackf("nothing to unread")
-		return
+		return err
 	}
 
 	if s.lastLocFirst == s.locFirst && s.lastLocSecond == s.locSecond {
 		err = errors.New("already unread")
-		return
+		return err
 	}
 
 	s.locFirst = s.lastLocFirst
 	s.locSecond = s.lastLocSecond
 
-	return
+	return err
 }
 
 var errInvalidRune = errors.New("invalid rune")
@@ -88,10 +88,10 @@ func (s *SliceRuneScanner) ReadRune() (r rune, size int, err error) {
 
 		err = s.err
 
-		return
+		return r, size, err
 	}
 
-	return
+	return r, size, err
 }
 
 func (s *SliceRuneScanner) Error() error {
@@ -100,7 +100,7 @@ func (s *SliceRuneScanner) Error() error {
 
 func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 	if s.err != nil {
-		return
+		return r, width, ok
 	}
 
 	firstRemaining := len(s.slice.First()) - s.locFirst
@@ -133,12 +133,12 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 
 	default:
 		s.err = io.EOF
-		return
+		return r, width, ok
 	}
 
 	if r == utf8.RuneError {
 		s.err = errInvalidRune
-		return
+		return r, width, ok
 	}
 
 	if idxChanged {
@@ -148,5 +148,5 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 
 	ok = idxChanged
 
-	return
+	return r, width, ok
 }

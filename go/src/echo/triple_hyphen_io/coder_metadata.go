@@ -28,10 +28,10 @@ func (TypedMetadataCoder[BLOB]) DecodeFrom(
 		),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (TypedMetadataCoder[BLOB]) EncodeTo(
@@ -48,8 +48,8 @@ func (TypedMetadataCoder[BLOB]) EncodeTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

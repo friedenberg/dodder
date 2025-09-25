@@ -31,7 +31,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	stringReader2, repool2 := pool.GetStringReader(" ")
@@ -42,7 +42,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	byteReader = bytes.NewReader(value)
@@ -52,7 +52,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	stringReader3, repool3 := pool.GetStringReader("\n")
@@ -63,10 +63,10 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func WriteStrings(
@@ -81,9 +81,9 @@ func WriteStrings(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

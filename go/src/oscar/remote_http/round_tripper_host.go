@@ -47,8 +47,8 @@ func (roundTripper *RoundTripperHost) RoundTrip(
 
 	if response, err = roundTripper.RoundTripper.RoundTrip(request); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
-	return
+	return response, err
 }

@@ -45,10 +45,10 @@ func (i *Item) GetObjectId() *ids.ObjectId {
 func (i *Item) GetType() (t ids.Type, err error) {
 	if err = t.Set("browser-" + i.Id.Type); err != nil {
 		err = errors.Wrap(err)
-		return
+		return t, err
 	}
 
-	return
+	return t, err
 }
 
 // TODO move below to !toml-bookmark type
@@ -65,28 +65,28 @@ func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
 
 	if len(host) == 0 {
 		err = errors.ErrorWithStackf("empty host: %q", els)
-		return
+		return e, err
 	}
 
 	if err = e.Set("%zz-site-" + host); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
-	return
+	return e, err
 }
 
 func (i Item) GetTai() (t ids.Tai, err error) {
 	if i.Date == "" {
-		return
+		return t, err
 	}
 
 	if err = t.SetFromRFC3339(i.Date); err != nil {
 		err = errors.Wrap(err)
-		return
+		return t, err
 	}
 
-	return
+	return t, err
 }
 
 var errEmptyUrl = errors.New("empty url")
@@ -94,17 +94,17 @@ var errEmptyUrl = errors.New("empty url")
 func (i Item) GetDescription() (b descriptions.Description, err error) {
 	if err = b.Set(i.Title); err != nil {
 		err = errors.Wrap(err)
-		return
+		return b, err
 	}
 
-	return
+	return b, err
 }
 
 func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 	if !i.Id.IsEmpty() {
 		if err = e.ExternalObjectId.Set(i.Id.String()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -114,18 +114,18 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 
 	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if e.ExternalType, err = i.GetType(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if e.Metadata.Description.IsEmpty() {
 		if err = e.Metadata.Description.Set(i.Title); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else if i.Title != "" && e.Metadata.Description.String() != i.Title {
 		e.Metadata.Fields = append(
@@ -153,13 +153,13 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 	if t, err = i.GetUrlPathTag(); err == nil {
 		if err = m.AddTagPtr(&t); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	err = nil
 
-	return
+	return err
 }
 
 func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
@@ -170,7 +170,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 		),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, field := range e.Metadata.Fields {
@@ -182,7 +182,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 
 			if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 		case "", "title":
@@ -191,7 +191,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 		case "url":
 			if err = i.Url.Set(field.Value); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 		default:
@@ -202,10 +202,10 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 				e.Metadata.Fields,
 			)
 
-			return
+			return err
 		}
 	}
 
 	// err = todo.Implement()
-	return
+	return err
 }

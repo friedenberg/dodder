@@ -9,6 +9,6 @@ type EncoderLike[T any] interface {
 func EncoderToWriter[T any](el EncoderLike[T]) interfaces.FuncIter[*T] {
 	return func(e *T) (err error) {
 		_, err = el.Encode(e)
-		return
+		return err
 	}
 }

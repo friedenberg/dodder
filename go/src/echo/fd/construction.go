@@ -19,7 +19,7 @@ func MakeFromDirPath(
 	fd.isDir = true
 	fd.path = path
 
-	return
+	return fd, err
 }
 
 func MakeFromPathAndDirEntry(
@@ -29,27 +29,27 @@ func MakeFromPathAndDirEntry(
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
-		return
+		return fd, err
 	}
 
 	if path == "." {
 		err = errors.ErrorWithStackf("'.' not supported")
-		return
+		return fd, err
 	}
 
 	var fi os.FileInfo
 
 	if fi, err = dirEntry.Info(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	if fd, err = MakeFromFileInfoWithDir(fi, filepath.Dir(path), blobWriter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
-	return
+	return fd, err
 }
 
 func MakeFromPath(
@@ -59,12 +59,12 @@ func MakeFromPath(
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
-		return
+		return fd, err
 	}
 
 	if path == "." {
 		err = errors.ErrorWithStackf("'.' not supported")
-		return
+		return fd, err
 	}
 
 	if !filepath.IsAbs(path) {
@@ -75,7 +75,7 @@ func MakeFromPath(
 
 	if fi, err = os.Stat(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	if fd, err = MakeFromFileInfoWithDir(
@@ -84,10 +84,10 @@ func MakeFromPath(
 		blobWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
-	return
+	return fd, err
 }
 
 func MakeFromFileInfoWithDir(
@@ -100,23 +100,23 @@ func MakeFromFileInfoWithDir(
 
 	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	if fileInfo.IsDir() {
-		return
+		return fd, err
 	}
 
 	// TODO eventually enforce requirement of blob writer factory
 	if blobStore == nil {
-		return
+		return fd, err
 	}
 
 	var file *os.File
 
 	if file, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -125,18 +125,18 @@ func MakeFromFileInfoWithDir(
 
 	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	defer errors.DeferredCloser(&err, writer)
 
 	if _, err = io.Copy(writer, file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fd, err
 	}
 
 	markl.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
-	return
+	return fd, err
 }

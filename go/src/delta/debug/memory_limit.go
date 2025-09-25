@@ -65,7 +65,7 @@ func (ml *memoryLimit) Start(ctx interfaces.Context) (err error) {
 		}
 	}()
 
-	return
+	return err
 }
 
 func (ml *memoryLimit) Terminate() {

@@ -33,7 +33,7 @@ func MapTo(
 
 	n, _ = buffer.Write(available)
 
-	return
+	return n
 }
 
 func WriteLower(buffer *bytes.Buffer, s []byte) (n int) {
@@ -57,7 +57,7 @@ func WriteLower(buffer *bytes.Buffer, s []byte) (n int) {
 
 		if !hasUpper {
 			n, _ = buffer.Write(append(b, s...))
-			return
+			return n
 		}
 
 		for i := 0; i < len(s); i++ {
@@ -72,7 +72,7 @@ func WriteLower(buffer *bytes.Buffer, s []byte) (n int) {
 
 		n, _ = buffer.Write(b)
 
-		return
+		return n
 	}
 
 	return MapTo(buffer, s, unicode.ToLower)

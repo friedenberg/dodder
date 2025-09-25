@@ -23,7 +23,7 @@ func (sp *VMPool) PrepareVM(
 	vm.Pool = pool.Make(
 		func() (t *lua.LTable) {
 			t = vm.NewTable()
-			return
+			return t
 		},
 		func(t *lua.LTable) {
 			ClearTable(vm.LState, t)
@@ -88,7 +88,7 @@ func (sp *VMPool) PrepareVM(
 	if apply != nil {
 		if err = apply(vm); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -97,13 +97,13 @@ func (sp *VMPool) PrepareVM(
 
 	if err = vm.PCall(0, 1, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	vm.Top = vm.LState.Get(1)
 	vm.Pop(1)
 
-	return
+	return err
 }
 
 func (sp *VMPool) SetReader(
@@ -114,15 +114,15 @@ func (sp *VMPool) SetReader(
 
 	if compiled, err = CompileReader(reader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = sp.SetCompiled(compiled, apply); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sp *VMPool) SetCompiled(
@@ -139,15 +139,15 @@ func (sp *VMPool) SetCompiled(
 
 			if err = sp.PrepareVM(vm, apply); err != nil {
 				err = errors.Wrap(err)
-				return
+				return vm, err
 			}
 
-			return
+			return vm, err
 		},
 		func(vm *VM) {
 			vm.SetTop(0)
 		},
 	)
 
-	return
+	return err
 }

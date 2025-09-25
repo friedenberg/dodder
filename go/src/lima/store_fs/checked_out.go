@@ -16,17 +16,17 @@ func (store *Store) ToSliceFilesZettelen(
 
 			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return e, err
 			}
 
 			e = fds.Object.GetPath()
 
 			if e == "" {
 				err = errors.MakeErrStopIteration()
-				return
+				return e, err
 			}
 
-			return
+			return e, err
 		},
 	)
 }
@@ -41,17 +41,17 @@ func (store *Store) ToSliceFilesBlobs(
 
 			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return e, err
 			}
 
 			e = fds.Blob.GetPath()
 
 			if e == "" {
 				err = errors.MakeErrStopIteration()
-				return
+				return e, err
 			}
 
-			return
+			return e, err
 		},
 	)
 }

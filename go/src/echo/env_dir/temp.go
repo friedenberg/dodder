@@ -16,11 +16,11 @@ func (env env) resetTempOnExit(ctx interfaces.Context) (err error) {
 	} else {
 		if err = os.RemoveAll(env.GetTempLocal().BasePath); err != nil {
 			err = errors.Wrapf(err, "failed to remove temp local")
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 type TemporaryFS struct {
@@ -36,19 +36,19 @@ func (fs TemporaryFS) DirTempWithTemplate(
 ) (dir string, err error) {
 	if dir, err = os.MkdirTemp(fs.BasePath, template); err != nil {
 		err = errors.Wrap(err)
-		return
+		return dir, err
 	}
 
-	return
+	return dir, err
 }
 
 func (fs TemporaryFS) FileTemp() (file *os.File, err error) {
 	if file, err = fs.FileTempWithTemplate(""); err != nil {
 		err = errors.Wrap(err)
-		return
+		return file, err
 	}
 
-	return
+	return file, err
 }
 
 func (fs TemporaryFS) FileTempWithTemplate(
@@ -56,8 +56,8 @@ func (fs TemporaryFS) FileTempWithTemplate(
 ) (file *os.File, err error) {
 	if file, err = os.CreateTemp(fs.BasePath, template); err != nil {
 		err = errors.Wrap(err)
-		return
+		return file, err
 	}
 
-	return
+	return file, err
 }

@@ -10,7 +10,7 @@ func (env *env) Confirm(message string) (success bool) {
 			"stdin is not a tty, unable to get permission to continue",
 		)
 
-		return
+		return success
 	}
 
 	var err error
@@ -26,17 +26,17 @@ func (env *env) Confirm(message string) (success bool) {
 	// TODO add support for context cancellation
 	if n, err = fmt.Fscanf(env.GetInFile(), "%c\n", &answer); err != nil {
 		env.GetErr().Printf("failed to read answer: %s", err)
-		return
+		return success
 	}
 
 	if n != 1 {
 		env.GetErr().Printf("failed to read at exactly 1 answer: %s", err)
-		return
+		return success
 	}
 
 	if answer == 'y' || answer == 'Y' {
 		success = true
 	}
 
-	return
+	return success
 }

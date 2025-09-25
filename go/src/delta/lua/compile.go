@@ -14,13 +14,13 @@ func CompileReader(reader io.Reader) (compiled *FunctionProto, err error) {
 
 	if chunks, err = lua_parse.Parse(reader, ""); err != nil {
 		err = errors.Wrap(err)
-		return
+		return compiled, err
 	}
 
 	if compiled, err = lua.Compile(chunks, ""); err != nil {
 		err = errors.Wrap(err)
-		return
+		return compiled, err
 	}
 
-	return
+	return compiled, err
 }

@@ -46,7 +46,7 @@ func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 		sku:  sku.CloneSkuType(a.sku),
 	}
 
-	return
+	return b
 }
 
 func (a *obj) GetExternalObjectId() sku.ExternalObjectId {
@@ -62,7 +62,7 @@ func sortObjSet(
 ) (out Objects) {
 	out = quiter.Elements(s)
 	out.Sort()
-	return
+	return out
 }
 
 func (objects Objects) Sort() {

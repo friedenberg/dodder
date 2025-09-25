@@ -36,7 +36,7 @@ func makeTagSet(t *ui.TestContext, vs ...string) (es ids.TagSet) {
 		t.Fatalf("%s", err)
 	}
 
-	return
+	return es
 }
 
 func makeBlobExt(t *ui.TestContext, v string) (es ids.Type) {
@@ -44,7 +44,7 @@ func makeBlobExt(t *ui.TestContext, v string) (es ids.Type) {
 		t.Fatalf("%s", err)
 	}
 
-	return
+	return es
 }
 
 func readFormat(
@@ -70,7 +70,7 @@ func readFormat(
 
 	metadata = object.GetMetadata()
 
-	return
+	return metadata
 }
 
 func TestMakeTags(t1 *testing.T) {
@@ -347,7 +347,7 @@ func (blobStore blobReaderFactory) BlobReader(
 		io.NopCloser(strings.NewReader(value)),
 	)
 
-	return
+	return readCloser, err
 }
 
 func writeFormat(
@@ -385,7 +385,7 @@ func writeFormat(
 
 	out = stringBuilder.String()
 
-	return
+	return out
 }
 
 func TestWriteWithoutBlob(t1 *testing.T) {

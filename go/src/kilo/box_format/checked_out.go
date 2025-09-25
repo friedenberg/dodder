@@ -53,7 +53,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 	if format.headerWriter != nil {
 		if err = format.headerWriter.WriteBoxHeader(&box.Header, co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -77,12 +77,12 @@ func (format *BoxCheckedOut) EncodeStringTo(
 			fds,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	} else {
 		if err = format.addFieldsFS(co, &box, fds); err != nil {
 			err = errors.Wrapf(err, "CheckedOut: %s", co)
-			return
+			return n, err
 		}
 	}
 
@@ -101,10 +101,10 @@ func (format *BoxCheckedOut) EncodeStringTo(
 
 	if n, err = format.boxStringEncoder.EncodeStringTo(box, sw); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (format *BoxCheckedOut) addFieldsExternalWithFSItem(
@@ -119,7 +119,7 @@ func (format *BoxCheckedOut) addFieldsExternalWithFSItem(
 		true,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = format.addFieldsMetadataWithFSItem(
@@ -130,10 +130,10 @@ func (format *BoxCheckedOut) addFieldsExternalWithFSItem(
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
@@ -176,7 +176,7 @@ func (format *BoxCheckedOut) makeFieldObjectId(
 		oid.GetGenre() == genres.Zettel {
 		if oidString, err = format.abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
-			return
+			return field, empty, err
 		}
 	}
 
@@ -185,7 +185,7 @@ func (format *BoxCheckedOut) makeFieldObjectId(
 		ColorType: string_format_writer.ColorTypeId,
 	}
 
-	return
+	return field, empty, err
 }
 
 func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
@@ -199,7 +199,7 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var internal string_format_writer.Field
@@ -207,7 +207,7 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 
 	if internal, internalEmpty, err = format.makeFieldObjectId(object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	switch {
@@ -222,10 +222,10 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 
 	default:
 		err = errors.Errorf("empty id")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
@@ -279,7 +279,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		box.Contents = append(box.Contents, metadata.Fields...)
 	}
 
-	return
+	return err
 }
 
 func (format *BoxCheckedOut) addFieldsFS(
@@ -297,23 +297,23 @@ func (format *BoxCheckedOut) addFieldsFS(
 	switch co.GetState() {
 	case checked_out_state.Unknown:
 		err = errors.ErrorWithStackf("invalid state unknown")
-		return
+		return err
 
 	case checked_out_state.Untracked:
 		if err = format.addFieldsUntracked(co, box, item, op); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 
 	case checked_out_state.Recognized:
 		if err = format.addFieldsRecognized(co, box, item, op); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	var id string_format_writer.Field
@@ -331,7 +331,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 			co.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -348,7 +348,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 			box,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if m == checkout_mode.BlobRecognized ||
@@ -359,12 +359,12 @@ func (format *BoxCheckedOut) addFieldsFS(
 				box,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
 
-	return
+	return err
 }
 
 func (format *BoxTransacted) addFieldsFSBlobExcept(
@@ -374,7 +374,7 @@ func (format *BoxTransacted) addFieldsFSBlobExcept(
 ) (err error) {
 	if fds.FDs == nil {
 		err = errors.ErrorWithStackf("FDSet.MutableSetLike was nil")
-		return
+		return err
 	}
 
 	for fd := range fds.FDs.All() {
@@ -384,11 +384,11 @@ func (format *BoxTransacted) addFieldsFSBlobExcept(
 
 		if err = format.addFieldFSBlob(fd, box); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (format *BoxTransacted) addFieldFSBlob(
@@ -404,7 +404,7 @@ func (format *BoxTransacted) addFieldFSBlob(
 		},
 	)
 
-	return
+	return err
 }
 
 func (format *BoxTransacted) addFieldsUntracked(
@@ -433,7 +433,7 @@ func (format *BoxTransacted) addFieldsUntracked(
 		true,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = format.addFieldsMetadata(
@@ -443,10 +443,10 @@ func (format *BoxTransacted) addFieldsUntracked(
 		box,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (format *BoxTransacted) addFieldsRecognized(
@@ -461,7 +461,7 @@ func (format *BoxTransacted) addFieldsRecognized(
 		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	id.ColorType = string_format_writer.ColorTypeId
@@ -474,7 +474,7 @@ func (format *BoxTransacted) addFieldsRecognized(
 		box,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = format.addFieldsFSBlobExcept(
@@ -483,8 +483,8 @@ func (format *BoxTransacted) addFieldsRecognized(
 		box,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

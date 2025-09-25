@@ -26,16 +26,16 @@ func (str *String) Set(v string) (err error) {
 		string: v,
 	}
 
-	return
+	return err
 }
 
 func (str String) Match(v string) (err error) {
 	if str.string != v {
 		err = errors.BadRequestf("expected %q but got %q", str.string, v)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (str String) String() string {
@@ -71,13 +71,13 @@ func (a *String) ResetWith(b String) {
 func (s String) MarshalBinary() (text []byte, err error) {
 	text = []byte(s.String())
 
-	return
+	return text, err
 }
 
 func (s *String) UnmarshalBinary(text []byte) (err error) {
 	if err = s.Set(string(text)); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }

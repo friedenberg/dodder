@@ -141,10 +141,10 @@ func (closet Closet) WriteObjectToWriter(
 
 	if n, err = closet.objectCoders.EncodeTo(typedBlob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 // TODO consume interfaces.SeqError and expose as a coder instead
@@ -158,7 +158,7 @@ func (closet Closet) WriteBlobToWriter(
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = WriteInventoryList(
@@ -168,10 +168,10 @@ func (closet Closet) WriteBlobToWriter(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (closet Closet) WriteTypedBlobToWriter(
@@ -195,10 +195,10 @@ func (closet Closet) WriteTypedBlobToWriter(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 // TODO refactor all the below. Simplify the naming, and move away from the
@@ -372,7 +372,7 @@ func (closet Closet) ReadInventoryListObject(
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
-		return
+		return out, err
 	}
 
 	iter := streamInventoryList(ctx, format, reader)
@@ -380,18 +380,18 @@ func (closet Closet) ReadInventoryListObject(
 	for object, iterErr := range iter {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return out, err
 		}
 
 		if out == nil {
 			out = object.CloneTransacted()
 		} else {
 			err = errors.ErrorWithStackf("expected only one sku.Transacted, but read more than one")
-			return
+			return out, err
 		}
 	}
 
-	return
+	return out, err
 }
 
 func (closet Closet) ReadInventoryListBlob(
@@ -405,7 +405,7 @@ func (closet Closet) ReadInventoryListBlob(
 
 	if !ok {
 		err = errors.Errorf("unsupported inventory list type: %q", tipe)
-		return
+		return list, err
 	}
 
 	iter := streamInventoryList(ctx, format, reader)
@@ -413,14 +413,14 @@ func (closet Closet) ReadInventoryListBlob(
 	for object, iterErr := range iter {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return list, err
 		}
 
 		if err = list.Add(object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return list, err
 		}
 	}
 
-	return
+	return list, err
 }

@@ -18,13 +18,13 @@ func (coderTypeMap EncoderTypeMapWithoutType[BLOB]) EncodeTo(
 
 	if !ok {
 		err = errors.ErrorWithStackf("no coders available for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	if n, err = coder.EncodeTo(typedBlob.Blob, bufferedWriter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

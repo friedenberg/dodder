@@ -13,7 +13,7 @@ func (store *Store) validate(
 	options sku.CommitOptions,
 ) (err error) {
 	if !options.Validate {
-		return
+		return err
 	}
 
 	switch daughter.GetSku().GetGenre() {
@@ -27,11 +27,11 @@ func (store *Store) validate(
 			daughter.GetSku().GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer repool()
 	}
 
-	return
+	return err
 }

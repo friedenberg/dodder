@@ -64,7 +64,7 @@ func Make(
 	if options.BasePath == "" {
 		if options.BasePath, err = os.Getwd(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return env, err
 		}
 	}
 
@@ -82,7 +82,7 @@ func Make(
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return env, err
 			}
 		} else {
 			configLoaded = true
@@ -97,7 +97,7 @@ func Make(
 			} else {
 				err = errors.Wrap(err)
 			}
-			return
+			return env, err
 		} else {
 			configLoaded = true
 		}
@@ -111,7 +111,7 @@ func Make(
 
 	if err = env.initDirectoryLayout(xdg); err != nil {
 		err = errors.Wrap(err)
-		return
+		return env, err
 	}
 
 	// TODO fail on pre-existing temp local
@@ -126,7 +126,7 @@ func Make(
 
 	if err = env.MakeDirPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return env, err
 	}
 
 	env.lockSmith = file_lock.New(envLocal, env.FileLock(), "repo")
@@ -135,14 +135,14 @@ func Make(
 
 	if err = envVars.Setenv(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return env, err
 	}
 
 	if configLoaded {
 		env.setupStores()
 	}
 
-	return
+	return env, err
 }
 
 func (env *Env) setupStores() {
@@ -180,30 +180,30 @@ func stringSliceJoin(s string, vs []string) []string {
 func (env Env) ResetCache() (err error) {
 	if err = files.SetAllowUserChangesRecursive(env.DirCache()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = os.RemoveAll(env.DirCache()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
-		return
+		return err
 	}
 
 	if err = env.MakeDir(env.DirCache()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = env.MakeDir(env.DirCacheObjects()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = env.MakeDir(env.DirCacheObjectPointers()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (env Env) DataFileStoreVersion() string {

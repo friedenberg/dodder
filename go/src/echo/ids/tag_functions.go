@@ -9,12 +9,12 @@ import (
 
 func IsDependentLeaf(a Tag) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
-	return
+	return has
 }
 
 func HasParentPrefix(a, b Tag) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
-	return
+	return has
 }
 
 func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
@@ -28,7 +28,7 @@ func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
 
 	s3 = s4.CloneSetPtrLike()
 
-	return
+	return s3
 }
 
 func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
@@ -46,7 +46,7 @@ func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 
 	s2 = s3.CloneSetPtrLike()
 
-	return
+	return s2
 }
 
 func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
@@ -76,7 +76,7 @@ func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
 
 	s2 = MakeTagSet(es...)
 
-	return
+	return s2
 }
 
 func AddNormalizedTag(es TagMutableSet, e *Tag) {

@@ -30,7 +30,7 @@ func (coder *BufferedCoderDotenv) DecodeFrom(
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		line = strings.TrimSpace(line)
@@ -43,13 +43,13 @@ func (coder *BufferedCoderDotenv) DecodeFrom(
 
 		if !ok {
 			err = errors.ErrorWithStackf("malformed env var entry: %q", line)
-			return
+			return n, err
 		}
 
 		envVars[left] = right
 	}
 
-	return
+	return n, err
 }
 
 func (coder BufferedCoderDotenv) EncodeTo(
@@ -72,14 +72,14 @@ func (coder BufferedCoderDotenv) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

@@ -12,7 +12,7 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 
 	if err = item.ReadFromExternal(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	item.ExternalId = external.GetSkuExternal().GetExternalObjectId().String()
@@ -22,5 +22,5 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 		Item:       item,
 	})
 
-	return
+	return err
 }

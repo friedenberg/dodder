@@ -16,11 +16,11 @@ func Write(
 
 		if n1, err = wf(w); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n += n1
 	}
 
-	return
+	return n, err
 }

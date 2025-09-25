@@ -30,7 +30,7 @@ func MustObjectId(kp interfaces.ObjectId) (k *ObjectId) {
 	k = &ObjectId{}
 	err := k.SetWithIdLike(kp)
 	errors.PanicIfError(err)
-	return
+	return k
 }
 
 type ObjectIdStringerSansRepo struct {

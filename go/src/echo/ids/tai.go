@@ -45,14 +45,14 @@ func NowTai() Tai {
 
 func TaiFromTime(t1 thyme.Time) (t2 Tai) {
 	t2 = TaiFromTimeWithIndex(t1, 0)
-	return
+	return t2
 }
 
 func TaiFromTime1(t1 time.Time) (t2 Tai) {
 	t2.wasSet = true
 	t2.tai = chai.FromTime(t1)
 
-	return
+	return t2
 }
 
 func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
@@ -60,12 +60,12 @@ func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
 	t2.tai = chai.FromTime(t1.GetTime())
 	t2.Asec += int64(n * chai.Attosecond)
 
-	return
+	return t2
 }
 
 func (tai Tai) AsTime() (t1 thyme.Time) {
 	t1 = thyme.Tyme(tai.tai.AsTime().Local())
-	return
+	return t1
 }
 
 func (tai Tai) Before(b Tai) bool {
@@ -107,7 +107,7 @@ func (tai Tai) String() (v string) {
 	// 	panic("empty tai")
 	// }
 
-	return
+	return v
 }
 
 func (tai Tai) StringDefaultFormat() string {
@@ -130,12 +130,12 @@ func (tai *Tai) SetFromRFC3339(v string) (err error) {
 
 	if t1, err = thyme.Parse(thyme.RFC3339, v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	*tai = TaiFromTime1(t1)
 
-	return
+	return err
 }
 
 func (tai *Tai) Set(value string) (err error) {
@@ -160,7 +160,7 @@ func (tai *Tai) Set(value string) (err error) {
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		switch idx {
@@ -173,7 +173,7 @@ func (tai *Tai) Set(value string) (err error) {
 
 			if tai.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
 				err = errors.Wrapf(err, "failed to parse Sec time: %s", value)
-				return
+				return err
 			}
 
 		case 1:
@@ -188,7 +188,7 @@ func (tai *Tai) Set(value string) (err error) {
 
 			if pre, err = strconv.ParseInt(val, 10, 64); err != nil {
 				err = errors.Wrapf(err, "failed to parse Asec time: %s", val)
-				return
+				return err
 			}
 
 			tai.Asec = pre * int64(math.Pow10(18-len(val)))
@@ -198,23 +198,23 @@ func (tai *Tai) Set(value string) (err error) {
 				"expected no more elements but got %s",
 				val,
 			)
-			return
+			return err
 		}
 
 		idx++
 	}
 
-	return
+	return err
 }
 
 func (tai Tai) IsZero() (ok bool) {
 	ok = (tai.Sec == 0 && tai.Asec == 0) || !tai.wasSet
-	return
+	return ok
 }
 
 func (tai Tai) IsEmpty() (ok bool) {
 	ok = tai.IsZero()
-	return
+	return ok
 }
 
 func (tai Tai) GetTai() Tai {
@@ -240,7 +240,7 @@ func (tai Tai) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 	n1, err = ohio.WriteAllOrDieTrying(w, b)
 	n += int64(n1)
-	return
+	return n, err
 }
 
 func (tai *Tai) ReadFrom(r io.Reader) (n int64, err error) {
@@ -252,43 +252,43 @@ func (tai *Tai) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	tai.wasSet = true
 	tai.Sec, _ = binary.Varint(b[:binary.MaxVarintLen64])
 	tai.Asec, _ = binary.Varint(b[binary.MaxVarintLen64:])
 
-	return
+	return n, err
 }
 
 func (tai Tai) MarshalText() (text []byte, err error) {
 	ui.Err().Printf(tai.String())
 	text = []byte(tai.String())
 
-	return
+	return text, err
 }
 
 func (tai *Tai) UnmarshalText(text []byte) (err error) {
 	if err = tai.Set(string(text)); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tai Tai) MarshalBinary() (text []byte, err error) {
 	text = []byte(tai.String())
 
-	return
+	return text, err
 }
 
 func (tai *Tai) UnmarshalBinary(text []byte) (err error) {
 	if err = tai.Set(string(text)); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tai Tai) EqualsAny(b any) bool {
@@ -331,12 +331,12 @@ func (t *TaiRFC3339Value) Set(v string) (err error) {
 
 	if t1, err = thyme.Parse(thyme.RFC3339, v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	*t = TaiRFC3339Value(TaiFromTime1(t1))
 
-	return
+	return err
 }
 
 func (t *TaiRFC3339Value) String() string {

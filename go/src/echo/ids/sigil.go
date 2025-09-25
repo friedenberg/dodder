@@ -42,7 +42,7 @@ var (
 
 func SigilFieldFunc(c rune) (ok bool) {
 	_, ok = mapRuneToSigil[c]
-	return
+	return ok
 }
 
 func MakeSigil(vs ...Sigil) (s Sigil) {
@@ -50,7 +50,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 		s.Add(v)
 	}
 
-	return
+	return s
 }
 
 func (sigil Sigil) GetGenre() interfaces.Genre {
@@ -140,10 +140,10 @@ func (sigil *Sigil) SetByte(r byte) (err error) {
 		sigil.Add(v)
 	} else {
 		err = errors.Wrap(errInvalidSigil(r))
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sigil *Sigil) Set(v string) (err error) {
@@ -157,11 +157,11 @@ func (sigil *Sigil) Set(v string) (err error) {
 			sigil.Add(mapRuneToSigil[v1])
 		} else {
 			err = errors.Wrap(errInvalidSigil(v))
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (sigil Sigil) Byte() byte {
@@ -185,12 +185,12 @@ func (sigil *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	*sigil = Sigil(b[0])
 
-	return
+	return n, err
 }
 
 func (sigil *Sigil) WriteTo(w io.Writer) (n int64, err error) {
@@ -198,7 +198,7 @@ func (sigil *Sigil) WriteTo(w io.Writer) (n int64, err error) {
 
 	if b, err = sigil.ReadByte(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var n1 int
@@ -207,8 +207,8 @@ func (sigil *Sigil) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

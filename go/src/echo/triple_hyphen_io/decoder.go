@@ -25,7 +25,7 @@ func (decoder *Decoder[BLOB]) DecodeFrom(
 
 	if err != nil {
 		err = errors.Wrapf(err, "metadata read failed")
-		return
+		return n, err
 	}
 
 	n1, err = decoder.Blob.DecodeFrom(blob, bufferedReader)
@@ -33,10 +33,10 @@ func (decoder *Decoder[BLOB]) DecodeFrom(
 
 	if err != nil {
 		err = errors.Wrapf(err, "blob read failed")
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (decoder *Decoder[BLOB]) readMetadataFrom(
@@ -47,12 +47,12 @@ func (decoder *Decoder[BLOB]) readMetadataFrom(
 
 	if decoder.RequireMetadata && decoder.Metadata == nil {
 		err = errors.ErrorWithStackf("metadata reader is nil")
-		return
+		return n, err
 	}
 
 	if decoder.Blob == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
-		return
+		return n, err
 	}
 
 	var metadataPipe ohio.PipedReader
@@ -65,7 +65,7 @@ func (decoder *Decoder[BLOB]) readMetadataFrom(
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		} else {
 			isBoundary = true
@@ -75,7 +75,7 @@ func (decoder *Decoder[BLOB]) readMetadataFrom(
 		case decoder.RequireMetadata && !isBoundary:
 			// TODO add context
 			err = errors.Wrap(errBoundaryInvalid)
-			return
+			return n, err
 
 		case !isBoundary:
 			state = readerStateSecondBoundary
@@ -100,7 +100,7 @@ LINE_READ_LOOP:
 			isEOF = true
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		line = strings.TrimSuffix(rawLine, "\n")
@@ -113,7 +113,7 @@ LINE_READ_LOOP:
 			if line == Boundary {
 				if _, err = metadataPipe.Close(); err != nil {
 					err = errors.Wrapf(err, "metadata read failed")
-					return
+					return n, err
 				}
 
 				state += 1
@@ -122,7 +122,7 @@ LINE_READ_LOOP:
 
 			if _, err = metadataPipe.Write([]byte(rawLine)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 
 		case readerStateSecondBoundary:
@@ -130,9 +130,9 @@ LINE_READ_LOOP:
 
 		default:
 			err = errors.ErrorWithStackf("impossible state %d", state)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

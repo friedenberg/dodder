@@ -16,7 +16,7 @@ func (store *Store) Initialize(esi store_workspace.Supplies) (err error) {
 
 	if err = store.browser.Read(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	wg := errors.MakeWaitGroupParallel()
@@ -26,10 +26,10 @@ func (store *Store) Initialize(esi store_workspace.Supplies) (err error) {
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) initializeUrls() (err error) {
@@ -54,7 +54,7 @@ func (store *Store) initializeUrls() (err error) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -64,7 +64,7 @@ func (store *Store) initializeUrls() (err error) {
 
 	if err = store.resetCacheIfNecessary(resp.Response); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, item := range resp.RequestPayloadGet {
@@ -76,5 +76,5 @@ func (store *Store) initializeUrls() (err error) {
 		store.itemsById[i.GetObjectId().String()] = i
 	}
 
-	return
+	return err
 }

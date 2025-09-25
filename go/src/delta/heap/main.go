@@ -70,12 +70,12 @@ func (h *Heap[T, TPtr]) Peek() (sk TPtr, ok bool) {
 		ok = true
 	}
 
-	return
+	return sk, ok
 }
 
 func (h *Heap[T, TPtr]) Add(sk TPtr) (err error) {
 	h.Push(sk)
-	return
+	return err
 }
 
 func (h *Heap[T, TPtr]) Push(sk TPtr) {
@@ -104,7 +104,7 @@ func (h *Heap[T, TPtr]) popAndSave() (sk TPtr, ok bool) {
 	// h.h.discardDupes()
 
 	if h.h.Len() == 0 {
-		return
+		return sk, ok
 	}
 
 	sk = h.h.GetPool().Get()
@@ -116,7 +116,7 @@ func (h *Heap[T, TPtr]) popAndSave() (sk TPtr, ok bool) {
 	faked[h.h.Len()] = e
 	h.h.saveLastPopped(sk)
 
-	return
+	return sk, ok
 }
 
 func (h *Heap[T, TPtr]) Restore() {
@@ -144,7 +144,7 @@ func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
 		err = errors.MakeErrStopIteration()
 	}
 
-	return
+	return sk, err
 }
 
 func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
@@ -154,7 +154,7 @@ func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
 	// h.h.discardDupes()
 
 	if h.h.Len() == 0 {
-		return
+		return sk, ok
 	}
 
 	sk = h.h.GetPool().Get()
@@ -162,7 +162,7 @@ func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
 	ok = true
 	h.h.saveLastPopped(sk)
 
-	return
+	return sk, ok
 }
 
 func (h *Heap[T, TPtr]) Len() int {
@@ -211,7 +211,7 @@ func (a *Heap[T, TPtr]) Sorted() (b []TPtr) {
 
 	b = a.h.Sorted().Elements
 
-	return
+	return b
 }
 
 func (a *Heap[T, TPtr]) Reset() {

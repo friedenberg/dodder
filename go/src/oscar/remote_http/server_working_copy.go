@@ -49,7 +49,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
 		if !result.IsMissing() {
-			return
+			return err
 		}
 
 		if result.ObjectOrNil.GetGenre() == genres.InventoryList {
@@ -63,7 +63,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 
 		listMissingObjects.Add(result.ObjectOrNil.CloneTransacted())
 
-		return
+		return err
 	}
 
 	importer := server.Repo.MakeImporter(
@@ -84,7 +84,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 			requestRetry = true
 		} else {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -106,12 +106,12 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 		bufferedWriter,
 	); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if err := bufferedWriter.Flush(); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if requestRetry {
@@ -122,7 +122,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 
 	response.Body = io.NopCloser(responseBuffer)
 
-	return
+	return response
 }
 
 func (server *Server) writeInventoryListLocalWorkingCopy(
@@ -139,12 +139,12 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 	if listSku != nil {
 		if listSku.GetGenre() != genres.InventoryList {
 			response.Error(genres.MakeErrUnsupportedGenre(listSku.GetGenre()))
-			return
+			return response
 		}
 
 		if blobStore.HasBlob(listSku.GetBlobDigest()) {
 			response.StatusCode = http.StatusFound
-			return
+			return response
 		}
 
 		listSkuType = listSku.GetType()
@@ -159,7 +159,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 		if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -174,7 +174,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -209,7 +209,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 
 		if !result.IsMissing() {
-			return
+			return err
 		}
 
 		if result.ObjectOrNil.GetGenre() == genres.InventoryList {
@@ -224,7 +224,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		// TODO switch to outputing object signatures
 		listMissingSkus.Add(result.ObjectOrNil.CloneTransacted())
 
-		return
+		return err
 	}
 
 	importer := server.Repo.MakeImporter(
@@ -240,7 +240,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			requestRetry = true
 		} else {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -258,12 +258,12 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		bufferedWriter,
 	); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if err := bufferedWriter.Flush(); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if requestRetry {
@@ -274,5 +274,5 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 	response.Body = io.NopCloser(responseBuffer)
 
-	return
+	return response
 }

@@ -21,5 +21,5 @@ func (config Config) GetCLIFlags() (flags []string) {
 		flags = append(flags, "-verbose")
 	}
 
-	return
+	return flags
 }

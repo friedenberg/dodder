@@ -30,7 +30,7 @@ func Make(vs ...string) (t *Trie) {
 		t.Add(v)
 	}
 
-	return
+	return t
 }
 
 func (t *Trie) Contains(v string) bool {
@@ -133,7 +133,7 @@ func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
 		return child.Expand(rem, sb)
 	}
 
-	return
+	return ok
 }
 
 func (n node) Abbreviate(v string, loc int) string {
@@ -169,7 +169,7 @@ func (t Trie) GobEncode() (by []byte, err error) {
 	enc := gob.NewEncoder(bu)
 	err = enc.Encode(t.root)
 	by = bu.Bytes()
-	return
+	return by, err
 }
 
 func (t *Trie) GobDecode(b []byte) error {

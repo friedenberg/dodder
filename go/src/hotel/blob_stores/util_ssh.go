@@ -31,12 +31,12 @@ func MakeSSHClientForExplicitConfig(
 
 		if keyBytes, err = os.ReadFile(config.GetPrivateKeyPath()); err != nil {
 			err = errors.Wrapf(err, "failed to read private key")
-			return
+			return sshClient, err
 		}
 
 		if key, err = ssh.ParsePrivateKey(keyBytes); err != nil {
 			err = errors.Wrapf(err, "failed to parse private key")
-			return
+			return sshClient, err
 		}
 
 		clientConfig.Auth = []ssh.AuthMethod{ssh.PublicKeys(key)}
@@ -44,7 +44,7 @@ func MakeSSHClientForExplicitConfig(
 		clientConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
 	} else {
 		err = errors.Errorf("no authentication method configured")
-		return
+		return sshClient, err
 	}
 
 	addr := fmt.Sprintf(
@@ -55,10 +55,10 @@ func MakeSSHClientForExplicitConfig(
 
 	if sshClient, err = sshDial(ctx, uiPrinter, clientConfig, addr); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sshClient, err
 	}
 
-	return
+	return sshClient, err
 }
 
 func MakeSSHClientFromSSHConfig(
@@ -70,7 +70,7 @@ func MakeSSHClientFromSSHConfig(
 
 	if socket == "" {
 		err = errors.Errorf("SSH_AUTH_SOCK empty or unset")
-		return
+		return sshClient, err
 	}
 
 	var connSshSock net.Conn
@@ -78,7 +78,7 @@ func MakeSSHClientFromSSHConfig(
 	ui.Log().Print("connecting to SSH_AUTH_SOCK: %s", socket)
 	if connSshSock, err = net.Dial("unix", socket); err != nil {
 		err = errors.Wrapf(err, "failed to connect to SSH_AUTH_SOCK")
-		return
+		return sshClient, err
 	}
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(connSshSock.Close))
@@ -105,10 +105,10 @@ func MakeSSHClientFromSSHConfig(
 
 	if sshClient, err = sshDial(ctx, uiPrinter, clientConfig, addr); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sshClient, err
 	}
 
-	return
+	return sshClient, err
 }
 
 func sshDial(
@@ -120,11 +120,11 @@ func sshDial(
 	uiPrinter.Printf("dialing %q...", addr)
 	if sshClient, err = ssh.Dial("tcp", addr, configClient); err != nil {
 		err = errors.Wrapf(err, "failed to connect to SSH server")
-		return
+		return sshClient, err
 	}
 	uiPrinter.Printf("connected to %q...", addr)
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(sshClient.Close))
 
-	return
+	return sshClient, err
 }

@@ -103,12 +103,12 @@ func (store *Store) GetObjectIdsForString(
 
 	if !ok {
 		err = errors.ErrorWithStackf("not a browser item id")
-		return
+		return k, err
 	}
 
 	k = append(k, item.GetExternalObjectId())
 
-	return
+	return k, err
 }
 
 func (store *Store) Flush() (err error) {
@@ -118,10 +118,10 @@ func (store *Store) Flush() (err error) {
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO limit this to being used only by *Item.ReadFromExternal
@@ -130,7 +130,7 @@ func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 
 	if r, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return u, err
 	}
 
 	defer errors.DeferredCloser(&err, r)
@@ -146,15 +146,15 @@ func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 			sk.GetBlobDigest(),
 			sk.GetObjectId(),
 		)
-		return
+		return u, err
 	}
 
 	if u, err = url.Parse(tomlBookmark.Url); err != nil {
 		err = errors.Wrap(err)
-		return
+		return u, err
 	}
 
-	return
+	return u, err
 }
 
 func (store *Store) CheckoutOne(
@@ -165,14 +165,14 @@ func (store *Store) CheckoutOne(
 
 	if !sz.Metadata.Type.Equals(store.typ) {
 		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.Metadata.Type))
-		return
+		return cz, err
 	}
 
 	var u *url.URL
 
 	if u, err = store.getUrl(sz); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
 	co := GetCheckedOutPool().Get()
@@ -181,7 +181,7 @@ func (store *Store) CheckoutOne(
 
 	if err = item.Url.Set(u.String()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
 	item.ExternalId = sz.ObjectId.String()
@@ -194,7 +194,7 @@ func (store *Store) CheckoutOne(
 
 	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
 	co.GetSkuExternal().RepoId = store.externalStoreInfo.RepoId
@@ -208,7 +208,7 @@ func (store *Store) CheckoutOne(
 		Item:       item,
 	})
 
-	return
+	return cz, err
 }
 
 func (store *Store) QueryCheckedOut(
@@ -241,12 +241,12 @@ func (store *Store) QueryCheckedOut(
 					item,
 				); err != nil {
 					err = errors.Wrapf(err, "Item: %#v", item)
-					return
+					return err
 				}
 			} else if !exactIndexURLMatch {
 				if err = ex.tryToEmitOneUntracked(item); err != nil {
 					err = errors.Wrapf(err, "Item: %#v", item)
-					return
+					return err
 				}
 			} else if exactIndexURLMatch {
 				for matching := range matchingUrls.All() {
@@ -255,14 +255,14 @@ func (store *Store) QueryCheckedOut(
 						item,
 					); err != nil {
 						err = errors.Wrapf(err, "Item: %#v", item)
-						return
+						return err
 					}
 				}
 			}
 		}
 	}
 
-	return
+	return err
 }
 
 // TODO support updating bookmarks without overwriting. Maybe move to
@@ -274,7 +274,7 @@ func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, blobWriter)
@@ -283,7 +283,7 @@ func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 
 	if err = item.ReadFromExternal(object.GetSku()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	tomlBookmark := sku_json_fmt.TomlBookmark{
@@ -307,7 +307,7 @@ func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 		blobWriter,
 	)
 
-	return
+	return err
 }
 
 func (store *Store) asBlobSaver() sku.BlobSaver {
@@ -318,5 +318,5 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	return
+	return err
 }

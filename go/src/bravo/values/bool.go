@@ -30,7 +30,7 @@ func (sv *Bool) Set(v string) (err error) {
 
 	sv.SetBool(v1)
 
-	return
+	return err
 }
 
 func (sv *Bool) SetBool(v bool) {
@@ -77,7 +77,7 @@ func (a *Bool) MarshalBinary() ([]byte, error) {
 func (a *Bool) UnmarshalBinary(b []byte) (err error) {
 	if len(b) != 1 {
 		err = errors.ErrorWithStackf("expected exactly 1 byte but got %d", b)
-		return
+		return err
 	}
 
 	b1 := b[0]
@@ -91,8 +91,8 @@ func (a *Bool) UnmarshalBinary(b []byte) (err error) {
 
 	default:
 		err = errors.ErrorWithStackf("unexpected value: %d", b1)
-		return
+		return err
 	}
 
-	return
+	return err
 }

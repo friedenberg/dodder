@@ -42,15 +42,15 @@ func (cmd Mergetool) Run(req command.Request) {
 		queryGroup,
 		func(co sku.SkuType) (err error) {
 			if co.GetState() != checked_out_state.Conflicted {
-				return
+				return err
 			}
 
 			if err = conflicted.Add(co.Clone()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		localWorkingCopy.Cancel(err)

@@ -21,17 +21,17 @@ func MakeJsonTomlBookmark(
 ) (json JsonWithUrl, err error) {
 	if err = json.FromTransacted(object, envRepo.GetDefaultBlobStore()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return json, err
 	}
 
 	if err = toml.Unmarshal([]byte(json.BlobString), &json.TomlBookmark); err != nil {
 		err = errors.Wrapf(err, "%q", json.BlobString)
-		return
+		return json, err
 	}
 
 	if _, err = url.Parse(json.Url); err != nil {
 		err = errors.Wrap(err)
-		return
+		return json, err
 	}
 
 	for _, tabRaw := range tabs {
@@ -39,9 +39,9 @@ func MakeJsonTomlBookmark(
 
 		if _, err = url.Parse(tab["url"].(string)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return json, err
 		}
 	}
 
-	return
+	return json, err
 }

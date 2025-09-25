@@ -26,7 +26,7 @@ func (coder doddish) EncodeTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n2, err = fmt.Fprintf(bufferedWriter, "\n")
@@ -34,10 +34,10 @@ func (coder doddish) EncodeTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coder doddish) DecodeFrom(
@@ -46,8 +46,8 @@ func (coder doddish) DecodeFrom(
 ) (n int64, err error) {
 	if n, err = coder.box.ReadStringFormat(object, bufferedReader); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

@@ -155,14 +155,14 @@ func (c *FormatObject) FormatFromStdin(
 	case 1:
 		if err = tipe.Set(args[0]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case 2:
 		formatId = args[0]
 		if err = tipe.Set(args[1]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
@@ -170,7 +170,7 @@ func (c *FormatObject) FormatFromStdin(
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
-		return
+		return err
 	}
 
 	if blobFormatter, err = u.GetBlobFormatter(
@@ -179,7 +179,7 @@ func (c *FormatObject) FormatFromStdin(
 		c.UTIGroup,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var wt io.WriterTo
@@ -190,13 +190,13 @@ func (c *FormatObject) FormatFromStdin(
 		u.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = wt.WriteTo(u.GetUIFile()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -72,10 +72,10 @@ func (a *tag) Equals(b *tag) bool {
 func (e *tag) Set(v string) (err error) {
 	if err = e.Transacted.ObjectId.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (e *tag) String() string {
@@ -88,7 +88,7 @@ func (compiled *compiled) AccumulateImplicitTags(
 	ek, ok := compiled.Tags.Get(e.String())
 
 	if !ok {
-		return
+		return err
 	}
 
 	ees := ids.MakeTagMutableSet()
@@ -107,13 +107,13 @@ func (compiled *compiled) AccumulateImplicitTags(
 
 		if err = compiled.AccumulateImplicitTags(e1); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		for e2 := range compiled.GetImplicitTags(&e1).All() {
 			if err = compiled.ImplicitTags.Set(e, e2); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -125,16 +125,16 @@ func (compiled *compiled) AccumulateImplicitTags(
 
 		if err = compiled.ImplicitTags.Set(e, e1); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = compiled.AccumulateImplicitTags(e1); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (compiled *compiled) addTag(
@@ -150,8 +150,8 @@ func (compiled *compiled) addTag(
 
 	if didChange, err = quiter.AddOrReplaceIfGreater(compiled.Tags, &b); err != nil {
 		err = errors.Wrap(err)
-		return
+		return didChange, err
 	}
 
-	return
+	return didChange, err
 }

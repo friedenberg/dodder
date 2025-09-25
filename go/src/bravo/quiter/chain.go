@@ -21,14 +21,14 @@ func Chain[T any](e T, wfs ...interfaces.FuncIter[T]) (err error) {
 
 		case errors.IsStopIteration(err):
 			err = nil
-			return
+			return err
 
 		default:
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func MakeChainDebug[T any](
@@ -41,7 +41,7 @@ func MakeChainDebug[T any](
 				panic(err)
 			}
 
-			return
+			return err
 		}
 	}
 
@@ -63,14 +63,14 @@ func MakeChain[T any](wfs ...interfaces.FuncIter[T]) interfaces.FuncIter[T] {
 
 			case errors.IsStopIteration(err):
 				err = nil
-				return
+				return err
 
 			default:
-				return
+				return err
 			}
 		}
 
-		return
+		return err
 	}
 }
 
@@ -111,5 +111,5 @@ func Multiplex[T any](
 
 	err = groupBuilder.GetError()
 
-	return
+	return err
 }

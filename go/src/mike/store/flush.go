@@ -16,11 +16,11 @@ func (store *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if store.GetConfigStore().GetConfig().IsDryRun() {
-		return
+		return err
 	}
 
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
-		return
+		return err
 	}
 
 	ui.Log().Printf("saving inventory list")
@@ -37,7 +37,7 @@ func (store *Store) FlushInventoryList(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		defer sku.GetTransactedPool().Put(inventoryListSku)
@@ -51,30 +51,30 @@ func (store *Store) FlushInventoryList(
 			},
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if store.GetConfigStore().GetConfig().GetPrintOptions().PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
 
 	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.GetInventoryListStore().Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	ui.Log().Printf("done saving inventory list")
 
-	return
+	return err
 }
 
 func (store *Store) Flush(
@@ -82,7 +82,7 @@ func (store *Store) Flush(
 ) (err error) {
 	// TODO handle flushes with dry run
 	if store.GetConfigStore().GetConfig().IsDryRun() {
-		return
+		return err
 	}
 
 	wg := errors.MakeWaitGroupParallel()
@@ -99,8 +99,8 @@ func (store *Store) Flush(
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

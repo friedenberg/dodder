@@ -50,12 +50,12 @@ func (parser textParser) ParseMetadata(
 
 	if blobWriter, err = parser.blobWriter.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if blobWriter == nil {
 		err = errors.ErrorWithStackf("blob writer is nil")
-		return
+		return n, err
 	}
 
 	defer errors.DeferredCloser(&err, blobWriter)
@@ -68,7 +68,7 @@ func (parser textParser) ParseMetadata(
 	if n, err = metadataReader.ReadFrom(reader); err != nil {
 		n += n1
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n += n1
@@ -83,7 +83,7 @@ func (parser textParser) ParseMetadata(
 			),
 		)
 
-		return
+		return n, err
 	} else if !parser2.Blob.GetDigest().IsNull() {
 		metadata.Fields = append(
 			metadata.Fields,
@@ -113,8 +113,8 @@ func (parser textParser) ParseMetadata(
 			),
 		)
 
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

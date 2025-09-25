@@ -12,7 +12,7 @@ import (
 func (store *Store) initializeIndex() (err error) {
 	if err = store.initializeCache(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var l sync.Mutex
@@ -21,14 +21,14 @@ func (store *Store) initializeIndex() (err error) {
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			if !sk.GetType().Equals(store.typ) {
-				return
+				return err
 			}
 
 			var u *url.URL
 
 			if u, err = store.getUrl(sk); err != nil {
 				err = nil
-				return
+				return err
 			}
 
 			cl := sku.GetTransactedPool().Get()
@@ -47,7 +47,7 @@ func (store *Store) initializeIndex() (err error) {
 
 				if err = existing.Add(cl); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
@@ -59,12 +59,12 @@ func (store *Store) initializeIndex() (err error) {
 				}
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

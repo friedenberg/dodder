@@ -10,7 +10,7 @@ import (
 
 func (id Id) MarshalText() (bites []byte, err error) {
 	if id.format == nil {
-		return
+		return bites, err
 	}
 
 	var hrp string
@@ -27,23 +27,23 @@ func (id Id) MarshalText() (bites []byte, err error) {
 
 	if bites, err = blech32.Encode(hrp, id.data); err != nil {
 		err = errors.Wrap(err)
-		return
+		return bites, err
 	}
 
-	return
+	return bites, err
 }
 
 func (id *Id) UnmarshalText(bites []byte) (err error) {
 	if len(bites) == 0 {
 		id.Reset()
-		return
+		return err
 	}
 
 	var purposeAndFormatId string
 
 	if purposeAndFormatId, id.data, err = blech32.Decode(bites); err != nil {
 		err = errors.Wrapf(err, "Raw: %q", string(bites))
-		return
+		return err
 	}
 
 	purpose, formatId, ok := strings.Cut(purposeAndFormatId, "@")
@@ -51,7 +51,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 	if ok {
 		if err = id.SetPurpose(purpose); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		formatId = purposeAndFormatId
@@ -64,8 +64,8 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 			id,
 			bites,
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }

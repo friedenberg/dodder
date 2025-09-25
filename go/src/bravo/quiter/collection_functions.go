@@ -34,7 +34,7 @@ func Len(cs ...interfaces.Lenner) (n int) {
 		n += c.Len()
 	}
 
-	return
+	return n
 }
 
 func DerivedValues[E any, F any](
@@ -53,11 +53,11 @@ func DerivedValues[E any, F any](
 				err = errors.Wrap(err)
 			}
 
-			return
+			return out, err
 		}
 
 		out = append(out, e1)
 	}
 
-	return
+	return out, err
 }

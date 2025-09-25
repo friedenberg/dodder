@@ -42,7 +42,7 @@ func (a *Assignment) AddObject(v *obj) (err error) {
 	_, ok := a.objects[k]
 
 	if ok {
-		return
+		return err
 	}
 
 	a.objects[k] = struct{}{}
@@ -69,7 +69,7 @@ func (a Assignment) MaxDepth() (d int) {
 		}
 	}
 
-	return
+	return d
 }
 
 func (a Assignment) AlignmentSpacing() int {
@@ -99,7 +99,7 @@ func (a Assignment) MaxLen() (m int) {
 		}
 	}
 
-	return
+	return m
 }
 
 func (a Assignment) String() (s string) {
@@ -114,14 +114,14 @@ func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
 	b.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
 	a.addChild(b)
-	return
+	return b
 }
 
 func (a *Assignment) makeChildWithSet(es ids.TagMutableSet) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
 	b.Transacted.Metadata.Tags = es
 	a.addChild(b)
-	return
+	return b
 }
 
 func (a *Assignment) addChild(c *Assignment) {
@@ -158,12 +158,12 @@ func (a *Assignment) nthParent(n int) (p *Assignment, err error) {
 
 	if n == 0 {
 		p = a
-		return
+		return p, err
 	}
 
 	if a.Parent == nil {
 		err = errors.ErrorWithStackf("cannot get nth parent as parent is nil")
-		return
+		return p, err
 	}
 
 	return a.Parent.nthParent(n - 1)
@@ -176,14 +176,14 @@ func (a *Assignment) removeFromParent() (err error) {
 func (a *Assignment) removeChild(c *Assignment) (err error) {
 	if c.Parent != a {
 		err = errors.ErrorWithStackf("attempting to remove child from wrong parent")
-		return
+		return err
 	}
 
 	if len(a.Children) == 0 {
 		err = errors.ErrorWithStackf(
 			"attempting to remove child when there are no children",
 		)
-		return
+		return err
 	}
 
 	cap1 := 0
@@ -206,14 +206,14 @@ func (a *Assignment) removeChild(c *Assignment) (err error) {
 	c.Parent = nil
 	a.Children = nc
 
-	return
+	return err
 }
 
 func (a *Assignment) consume(b *Assignment) (err error) {
 	for _, c := range b.Children {
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		a.addChild(c)
@@ -228,37 +228,37 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 	if a == nil {
-		return
+		return err
 	}
 
 	var es ids.TagSet
 
 	if es, err = a.expandedTags(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for e := range es.AllPtr() {
 		if err = mes.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if err = a.Parent.AllTags(mes); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
@@ -270,7 +270,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 
 	if a.Transacted.Metadata.Tags.Len() != 1 || a.Parent == nil {
 		es = a.Transacted.Metadata.Tags.CloneSetPtrLike()
-		return
+		return es, err
 	} else {
 		e := a.Transacted.Metadata.Tags.Any()
 
@@ -279,7 +279,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 
 			if pe, err = a.Parent.expandedTags(); err != nil {
 				err = errors.Wrap(err)
-				return
+				return es, err
 			}
 
 			if pe.Len() > 1 {
@@ -288,26 +288,26 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 					a.Parent.Transacted.Metadata.Tags,
 				)
 
-				return
+				return es, err
 			}
 
 			e1 := pe.Any()
 
 			if ids.IsEmpty(e1) {
 				err = errors.ErrorWithStackf("parent tag is empty")
-				return
+				return es, err
 			}
 
 			if err = e.Set(fmt.Sprintf("%s%s", e1, e)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return es, err
 			}
 		}
 
 		es = ids.MakeTagSet(e)
 	}
 
-	return
+	return es, err
 }
 
 func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
@@ -316,19 +316,19 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 			if ids.ContainsExactly(e1, e) {
 				if err = es.DelPtr(e1); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 		}
 
 		if err = es.DelPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if a.Parent == nil {
-		return
+		return err
 	}
 
 	return a.Parent.SubtractFromSet(es)

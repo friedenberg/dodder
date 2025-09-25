@@ -27,7 +27,7 @@ func (sch *Index) GetChanges() (out []string) {
 	out = make([]string, len(sch.changes))
 	copy(out, sch.changes)
 
-	return
+	return out
 }
 
 func (sch *Index) HasChanges() bool {
@@ -39,10 +39,10 @@ func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
 
 	if err = sch.tags.Add(e, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
@@ -50,10 +50,10 @@ func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 
 	if err = sch.tags.Remove(e); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
@@ -97,7 +97,7 @@ func (sch *Index) Load(s env_repo.Env) (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -106,10 +106,10 @@ func (sch *Index) Load(s env_repo.Env) (err error) {
 
 	if _, err = sch.ReadFrom(br); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Index) Flush(
@@ -119,17 +119,17 @@ func (sch *Index) Flush(
 ) (err error) {
 	if len(sch.changes) == 0 {
 		ui.Log().Print("no dormant changes")
-		return
+		return err
 	}
 
 	if dryRun {
 		ui.Log().Print("no dormant flush, dry run")
-		return
+		return err
 	}
 
 	if err = printerHeader("writing dormant"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	p := s.FileCacheDormant()
@@ -138,7 +138,7 @@ func (sch *Index) Flush(
 
 	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -148,15 +148,15 @@ func (sch *Index) Flush(
 
 	if _, err = sch.WriteTo(bw); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = printerHeader("wrote dormant"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
@@ -174,7 +174,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return n, err
 	}
 
 	s.tags = slices.Grow(s.tags, int(count))
@@ -188,14 +188,14 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		var cs *catgut.String
 
 		if cs, err = catgut.MakeFromReader(r, int(l)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		s.tags = append(s.tags, tag_paths.TagWithParentsAndTypes{
@@ -203,7 +203,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		})
 	}
 
-	return
+	return n, err
 }
 
 func (s Index) WriteTo(w io.Writer) (n int64, err error) {
@@ -216,7 +216,7 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	for _, e := range s.tags {
@@ -228,7 +228,7 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n2, err = e.WriteTo(w)
@@ -236,9 +236,9 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

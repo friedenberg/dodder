@@ -96,7 +96,7 @@ func MakeWithEnvRepo(
 
 	repo.After(errors.MakeFuncContextFromFuncErr(repo.Flush))
 
-	return
+	return repo
 }
 
 // TODO investigate removing unnecessary resets like from organize
@@ -109,7 +109,7 @@ func (local *Repo) initialize(
 ) (err error) {
 	if err = local.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// ui.Debug().Print(repo.layout.GetConfig().GetBlobStoreImmutableConfig().GetCompressionType())
@@ -119,7 +119,7 @@ func (local *Repo) initialize(
 		local.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	boxFormatArchive := box_format.MakeBoxTransactedArchive(
@@ -135,7 +135,7 @@ func (local *Repo) initialize(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -146,7 +146,7 @@ func (local *Repo) initialize(
 		local.GetEnvRepo(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if local.indexIds, err = index_ids.NewIndex(
@@ -154,7 +154,7 @@ func (local *Repo) initialize(
 		local.envRepo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
-		return
+		return err
 	}
 
 	local.envBox = env_box.Make(
@@ -197,7 +197,7 @@ func (local *Repo) initialize(
 		local.indexIds,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
-		return
+		return err
 	}
 
 	ui.Log().Printf(
@@ -217,14 +217,14 @@ func (local *Repo) initialize(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = local.envWorkspace.SetSupplies(
 		local.store.MakeSupplies(ids.RepoId{}),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	ui.Log().Print("done initing checkout store")
@@ -233,7 +233,7 @@ func (local *Repo) initialize(
 
 	local.storesInitialized = true
 
-	return
+	return err
 }
 
 func (local *Repo) Flush() (err error) {
@@ -245,10 +245,10 @@ func (local *Repo) Flush() (err error) {
 
 	if err = waitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (local *Repo) PrintMatchedDormantIfNecessary() {

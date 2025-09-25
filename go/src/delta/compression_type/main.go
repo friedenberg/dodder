@@ -20,7 +20,7 @@ func (err ErrUnsupportedCompression) Error() string {
 
 func (ErrUnsupportedCompression) Is(target error) (ok bool) {
 	_, ok = target.(ErrUnsupportedCompression)
-	return
+	return ok
 }
 
 const (
@@ -66,7 +66,7 @@ func (compressionType *CompressionType) Set(value string) (err error) {
 		err = ErrUnsupportedCompression(value)
 	}
 
-	return
+	return err
 }
 
 func (compressionType CompressionType) WrapReader(
@@ -86,7 +86,7 @@ func (compressionType CompressionType) WrapReader(
 		readerOut = io.NopCloser(readerIn)
 	}
 
-	return
+	return readerOut, err
 }
 
 func (compressionType CompressionType) WrapWriter(

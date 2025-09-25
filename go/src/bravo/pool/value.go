@@ -26,7 +26,7 @@ func MakeValue[SWIMMER any](
 					swimmer = New()
 				}
 
-				return
+				return swimmer
 			},
 		},
 	}
@@ -42,11 +42,11 @@ func (pool value[SWIMMER]) PutMany(
 	for _, i := range swimmers {
 		if err = pool.Put(i); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (pool value[SWIMMER]) Put(swimmer SWIMMER) (err error) {
@@ -56,5 +56,5 @@ func (pool value[SWIMMER]) Put(swimmer SWIMMER) (err error) {
 
 	pool.inner.Put(swimmer)
 
-	return
+	return err
 }

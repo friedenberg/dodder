@@ -86,17 +86,17 @@ func (version *Version) Set(p string) (err error) {
 
 	if i, err = strconv.ParseUint(p, 10, 16); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	*version = Version(i)
 
 	if VCurrent.Less(version) {
 		err = errors.Wrap(ErrFutureStoreVersion{StoreVersion: version})
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO remove callers and self

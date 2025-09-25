@@ -25,7 +25,7 @@ func NewDebouncingWriter(out io.Writer) (w *debouncingWriter, err error) {
 		out:   out,
 	}
 
-	return
+	return w, err
 }
 
 func (w *debouncingWriter) WriteItem(i *Item) {
@@ -46,7 +46,7 @@ func (w *debouncingWriter) Close() (err error) {
 
 	if writer, err = NewWriter(w.out, MakeItemPool()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, i := range w.items {
@@ -61,8 +61,8 @@ func (w *debouncingWriter) Close() (err error) {
 
 	if err = writer.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

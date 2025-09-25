@@ -27,7 +27,7 @@ func (json *MCP) FromStringAndMetadata(
 		blobStore,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	json.URI = fmt.Sprintf("dodder:///objects/%s", objectId)
@@ -53,7 +53,7 @@ func (json *MCP) FromStringAndMetadata(
 	// 	json.RepoSig,
 	// )
 
-	return
+	return err
 }
 
 func (json *MCP) FromTransacted(
@@ -73,8 +73,8 @@ func (json *MCP) ToTransacted(
 ) (err error) {
 	if err = json.Transacted.ToTransacted(object, blobStore); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

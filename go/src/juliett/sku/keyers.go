@@ -35,29 +35,29 @@ type ObjectIdKeyer[T ids.ObjectIdGetter] struct{}
 
 func (sk ObjectIdKeyer[T]) GetKey(e T) (key string) {
 	if e.GetObjectId().IsEmpty() {
-		return
+		return key
 	}
 
 	key = e.GetObjectId().String()
 
-	return
+	return key
 }
 
 type ExternalObjectIdKeyer[T ExternalObjectIdGetter] struct{}
 
 func (ExternalObjectIdKeyer[T]) GetKey(e T) (key string) {
 	if e.GetExternalObjectId().IsEmpty() {
-		return
+		return key
 	}
 
 	key = e.GetExternalObjectId().String()
 
-	return
+	return key
 }
 
 type DescriptionKeyer[T ExternalLikeGetter] struct{}
 
 func (DescriptionKeyer[T]) GetKey(el T) (key string) {
 	key = el.GetSkuExternal().Metadata.Description.String()
-	return
+	return key
 }

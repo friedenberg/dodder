@@ -25,8 +25,8 @@ func (e *exp) IsEmpty() bool {
 func (e *exp) reduce(b *buildState) (err error) {
 	if err = e.expTagsOrTypes.reduce(b); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

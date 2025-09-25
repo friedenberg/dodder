@@ -105,8 +105,8 @@ func (c Exec) runBash(
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

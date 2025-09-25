@@ -28,5 +28,5 @@ func (pool poolSlice[_, SWIMMER_SLICE]) Put(
 ) (err error) {
 	swimmer = swimmer[:0]
 	pool.inner.Put(swimmer)
-	return
+	return err
 }

@@ -80,7 +80,7 @@ func (printer todoPrinter) printf(
 	args ...any,
 ) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	if printer.includesStack {
@@ -94,5 +94,5 @@ func (printer todoPrinter) printf(
 		fmt.Sprintf(format, args...),
 	)
 
-	return
+	return err
 }

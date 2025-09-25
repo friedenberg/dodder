@@ -25,7 +25,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 	if vm.Top.Type() == LTTable {
 		if funcName == "" {
 			err = errors.ErrorWithStackf("needs function name because top is table")
-			return
+			return t, argsOut, err
 		}
 
 		tt := vm.Top.(*LTable)
@@ -34,7 +34,7 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 
 		if tv.Type() != LTFunction {
 			err = errors.ErrorWithStackf("expected %v but got %v", LTFunction, tv.Type())
-			return
+			return t, argsOut, err
 		}
 
 		argsOut = argsOut[1:]
@@ -48,30 +48,30 @@ func (vm *VM) GetTopFunctionOrFunctionNamedError(
 			vm.Top.Type(),
 		)
 
-		return
+		return t, argsOut, err
 	}
 
-	return
+	return t, argsOut, err
 }
 
 func (vm *VM) GetTopTableOrError() (t *LTable, err error) {
 	if vm.Top.Type() != LTTable {
 		err = errors.ErrorWithStackf("expected %v but got %v", LTTable, vm.Top.Type())
-		return
+		return t, err
 	}
 
 	t = vm.Top.(*LTable)
 
-	return
+	return t, err
 }
 
 func (vm *VM) GetTopFunctionOrError() (t *LFunction, err error) {
 	if vm.Top.Type() != LTFunction {
 		err = errors.ErrorWithStackf("expected %v but got %v", LTFunction, vm.Top.Type())
-		return
+		return t, err
 	}
 
 	t = vm.Top.(*LFunction)
 
-	return
+	return t, err
 }

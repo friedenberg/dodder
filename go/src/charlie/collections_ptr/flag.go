@@ -89,7 +89,7 @@ func (f flagCommas[T, TPtr]) GetMutableSetPtrLike() (s interfaces.MutableSetPtrL
 
 func (f flagCommas[T, TPtr]) String() (out string) {
 	if f.MutableSetPtrLike == nil {
-		return
+		return out
 	}
 
 	sorted := quiter.SortedStrings[T](f)
@@ -109,17 +109,17 @@ func (f flagCommas[T, TPtr]) String() (out string) {
 
 	out = sb.String()
 
-	return
+	return out
 }
 
 func (f *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 	for _, v := range vs {
 		if err = f.Set(v); err != nil {
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
@@ -136,9 +136,9 @@ func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
 		// TODO-P2 use iter.AddStringPtr
 		if err = quiter.AddString[T, TPtr](f, e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

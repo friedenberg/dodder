@@ -72,10 +72,10 @@ func (m *Mode) Set(v string) (err error) {
 			AvailableModes,
 		)
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (m Mode) IncludesBlob() bool {

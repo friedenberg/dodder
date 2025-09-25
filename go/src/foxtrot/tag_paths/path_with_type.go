@@ -24,7 +24,7 @@ func (path *PathWithType) Clone() (clone *PathWithType) {
 	clone = MakePathWithType(path.Path...)
 	clone.Type = path.Type
 
-	return
+	return clone
 }
 
 func (path *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
@@ -34,7 +34,7 @@ func (path *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = path.Path.ReadFrom(r)
@@ -42,10 +42,10 @@ func (path *PathWithType) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (path *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
@@ -55,7 +55,7 @@ func (path *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = path.Path.WriteTo(w)
@@ -63,8 +63,8 @@ func (path *PathWithType) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

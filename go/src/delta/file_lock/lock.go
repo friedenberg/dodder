@@ -42,20 +42,20 @@ func (lock *Lock) IsAcquired() (acquired bool) {
 
 	acquired = lock.file != nil
 
-	return
+	return acquired
 }
 
 func (lock *Lock) Lock() (err error) {
 	if !lock.mutex.TryLock() {
 		err = errors.ErrorWithStackf("attempting concurrent locks")
-		return
+		return err
 	}
 
 	defer lock.mutex.Unlock()
 
 	if lock.file != nil {
 		err = errors.ErrorWithStackf("already locked")
-		return
+		return err
 	}
 
 	createLock := func(path string) (*os.File, error) {
@@ -87,31 +87,31 @@ func (lock *Lock) Lock() (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (lock *Lock) Unlock() (err error) {
 	if !lock.mutex.TryLock() {
 		err = errors.ErrorWithStackf("attempting concurrent locks")
-		return
+		return err
 	}
 
 	defer lock.mutex.Unlock()
 
 	if err = lock.file.Close(); err != nil {
 		err = errors.Wrapf(err, "File: %v", lock.file)
-		return
+		return err
 	}
 
 	lock.file = nil
 
 	if err = os.Remove(lock.Path()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

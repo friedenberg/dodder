@@ -43,7 +43,7 @@ func MakeErrHasInlineBlobAndFilePath(
 	err = &ErrHasInlineBlobAndFilePath{}
 	err.BlobFD.ResetWith(blobFD)
 	err.InlineDigest.SetDigest(inlineBlobDigest)
-	return
+	return err
 }
 
 type ErrHasInlineBlobAndFilePath struct {
@@ -66,7 +66,7 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 	err = &ErrHasInlineBlobAndMetadataDigest{}
 	err.Metadata = markl.Clone(metadata)
 	err.Inline = markl.Clone(inline)
-	return
+	return err
 }
 
 type ErrHasInlineBlobAndMetadataDigest struct {

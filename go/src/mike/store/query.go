@@ -23,10 +23,10 @@ func (store *Store) QueryPrimitive(
 
 	if err = executor.ExecuteTransacted(funcIter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO make iterator
@@ -38,7 +38,7 @@ func (store *Store) QueryTransacted(
 
 	if executor, err = store.makeQueryExecutor(group); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var object *sku.Transacted
@@ -53,18 +53,18 @@ func (store *Store) QueryTransacted(
 
 		if err = funcIter(object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = executor.ExecuteTransacted(funcIter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO make iterator
@@ -76,15 +76,15 @@ func (store *Store) QueryTransactedAsSkuType(
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = executor.ExecuteTransactedAsSkuType(funcIter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO make iterator
@@ -96,15 +96,15 @@ func (store *Store) QuerySkuType(
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = executor.ExecuteSkuType(output); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) QueryExactlyOneExternal(
@@ -114,15 +114,15 @@ func (store *Store) QueryExactlyOneExternal(
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	if object, err = executor.ExecuteExactlyOneExternalObject(true); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 func (store *Store) QueryExactlyOne(
@@ -132,15 +132,15 @@ func (store *Store) QueryExactlyOne(
 
 	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	if object, err = executor.ExecuteExactlyOne(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string][]string, err error) {
@@ -159,7 +159,7 @@ func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string
 			loc, found := slices.BinarySearch(objectIds, oid)
 
 			if found {
-				return
+				return err
 			}
 
 			objectIds = slices.Insert(objectIds, loc, oid)
@@ -167,12 +167,12 @@ func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string
 			bites := object.Metadata.GetBlobDigest().GetBytes()
 			blobDigestObjectIds[string(bites)] = objectIds
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobDigestObjectIds, err
 	}
 
-	return
+	return blobDigestObjectIds, err
 }

@@ -43,10 +43,10 @@ func (cmd Status) Run(req command.Request) {
 		func(co sku.SkuType) (err error) {
 			if err = printer(co); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		localWorkingCopy.Cancel(err)

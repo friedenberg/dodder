@@ -120,7 +120,7 @@ func (cmd Remote) CreateRemoteObject(
 
 	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMarklId(blobId)
 
-	return
+	return remote, remoteObject
 }
 
 func (cmd Remote) MakeRemote(
@@ -146,7 +146,7 @@ func (cmd Remote) MakeRemote(
 
 	remote = cmd.MakeRemoteFromBlob(req, repo, blob)
 
-	return
+	return remote
 }
 
 func (cmd Remote) MakeRemoteFromBlob(
@@ -218,7 +218,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 		errors.ContextCancelWithErrorf(req, "unsupported repo blob type: %T", blob)
 	}
 
-	return
+	return remote
 }
 
 func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
@@ -263,7 +263,7 @@ func (cmd *Remote) MakeRemoteHTTPFromXDGDotenvPath(
 		cmd.MakeInventoryListCoderCloset(repo.GetEnvRepo()),
 	)
 
-	return
+	return remoteHTTP
 }
 
 func (cmd *Remote) MakeRemoteStdioSSH(
@@ -290,7 +290,7 @@ func (cmd *Remote) MakeRemoteStdioSSH(
 		cmd.MakeInventoryListCoderCloset(envRepo),
 	)
 
-	return
+	return remoteHTTP
 }
 
 func (cmd *Remote) MakeRemoteStdioLocal(
@@ -329,7 +329,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 		cmd.MakeInventoryListCoderCloset(envRepo),
 	)
 
-	return
+	return remoteHTTP
 }
 
 func (cmd *Remote) MakeRemoteUrl(
@@ -350,5 +350,5 @@ func (cmd *Remote) MakeRemoteUrl(
 		cmd.MakeInventoryListCoderCloset(envRepo),
 	)
 
-	return
+	return remoteHTTP
 }

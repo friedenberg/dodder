@@ -21,7 +21,7 @@ func MakeLuaSelfApplyV2(
 		selfTable := sku_lua.MakeLuaTablePoolV2(vm).Get()
 		sku_lua.ToLuaTableV2(self, vm.LState, selfTable)
 		vm.SetGlobal("Self", selfTable.Transacted)
-		return
+		return err
 	}
 }
 

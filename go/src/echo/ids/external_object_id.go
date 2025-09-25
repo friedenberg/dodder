@@ -36,7 +36,7 @@ func (eoid *ExternalObjectId) String() string {
 
 func (eoid *ExternalObjectId) SetGenre(genre interfaces.Genre) (err error) {
 	eoid.genre = genres.Must(genre)
-	return
+	return err
 }
 
 func (eoid *ExternalObjectId) SetBlob(v string) (err error) {
@@ -44,26 +44,26 @@ func (eoid *ExternalObjectId) SetBlob(v string) (err error) {
 
 	if err = eoid.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (eoid *ExternalObjectId) Set(value string) (err error) {
 	if value == "/" {
 		eoid.Reset()
-		return
+		return err
 	}
 
 	if len(value) <= 1 {
 		err = errors.ErrorWithStackf("external object id must be at least two characters, but got %q", value)
-		return
+		return err
 	}
 
 	eoid.value = value
 
-	return
+	return err
 }
 
 func (eoid *ExternalObjectId) SetWithGenre(
@@ -72,11 +72,11 @@ func (eoid *ExternalObjectId) SetWithGenre(
 ) (err error) {
 	if err = eoid.Set(value); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	eoid.genre = genres.Must(genre)
-	return
+	return err
 }
 
 func (eoid *ExternalObjectId) Reset() {
@@ -92,7 +92,7 @@ func (dst *ExternalObjectId) ResetWith(src *ExternalObjectId) {
 func (dst *ExternalObjectId) SetObjectIdLike(src ObjectIdLike) (err error) {
 	if src.IsEmpty() {
 		dst.Reset()
-		return
+		return err
 	}
 
 	var value string
@@ -108,32 +108,32 @@ func (dst *ExternalObjectId) SetObjectIdLike(src ObjectIdLike) (err error) {
 		genres.Must(src.GetGenre()),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (eoid *ExternalObjectId) MarshalBinary() (b []byte, err error) {
 	if b, err = eoid.genre.MarshalBinary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return b, err
 	}
 
 	b = append(b, []byte(eoid.value)...)
 
-	return
+	return b, err
 }
 
 func (eoid *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
 	if err = eoid.genre.UnmarshalBinary(b[:1]); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if len(b) > 1 {
 		eoid.value = string(b[1:])
 	}
 
-	return
+	return err
 }

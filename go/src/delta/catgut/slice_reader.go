@@ -28,7 +28,7 @@ func (sr *SliceReader) Read(p []byte) (n int, err error) {
 		sr.offset += n1
 
 		if n == len(p) || len(p) <= sr.slice.LenFirst() {
-			return
+			return n, err
 		}
 
 		fallthrough
@@ -41,8 +41,8 @@ func (sr *SliceReader) Read(p []byte) (n int, err error) {
 
 	if sr.offset == sr.slice.Len() {
 		err = io.EOF
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

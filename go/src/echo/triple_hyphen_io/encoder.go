@@ -34,7 +34,7 @@ func (coder Encoder[BLOB]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = coder.Metadata.EncodeTo(object, bufferedWriter)
@@ -42,7 +42,7 @@ func (coder Encoder[BLOB]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		bufferedWriter.WriteString(Boundary + "\n")
@@ -50,7 +50,7 @@ func (coder Encoder[BLOB]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		bufferedWriter.WriteString("\n")
@@ -58,7 +58,7 @@ func (coder Encoder[BLOB]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -68,9 +68,9 @@ func (coder Encoder[BLOB]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

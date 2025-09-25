@@ -140,7 +140,7 @@ func MakeWithHome(
 	}
 
 	if !initialize {
-		return
+		return env
 	}
 
 	addedPath := XDGUtilityName
@@ -169,7 +169,7 @@ func MakeWithHome(
 
 	env.After(env.resetTempOnExit)
 
-	return
+	return env
 }
 
 func MakeWithXDGRootOverrideHomeAndInitialize(
@@ -205,7 +205,7 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 
 	env.After(env.resetTempOnExit)
 
-	return
+	return env
 }
 
 func MakeWithHomeAndInitialize(
@@ -233,7 +233,7 @@ func MakeWithHomeAndInitialize(
 
 	env.After(env.resetTempOnExit)
 
-	return
+	return env
 }
 
 func MakeWithXDG(
@@ -251,5 +251,5 @@ func MakeWithXDG(
 		env.Cancel(err)
 	}
 
-	return
+	return env
 }

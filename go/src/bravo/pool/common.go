@@ -36,7 +36,7 @@ func GetStringReader(
 		stringReaders.Put(stringReader)
 	}
 
-	return
+	return stringReader, repool
 }
 
 func GetByteReader(
@@ -49,7 +49,7 @@ func GetByteReader(
 		byteReaders.Put(byteReader)
 	}
 
-	return
+	return byteReader, repool
 }
 
 func GetSha256Hash() (hash hash.Hash, repool func()) {
@@ -59,7 +59,7 @@ func GetSha256Hash() (hash hash.Hash, repool func()) {
 		sha256Hash.Put(hash)
 	}
 
-	return
+	return hash, repool
 }
 
 func GetBufferedWriter(
@@ -72,7 +72,7 @@ func GetBufferedWriter(
 		bufioWriter.Put(bufferedWriter)
 	}
 
-	return
+	return bufferedWriter, repool
 }
 
 func GetBufferedReader(
@@ -85,5 +85,5 @@ func GetBufferedReader(
 		bufioReader.Put(bufferedReader)
 	}
 
-	return
+	return bufferedReader, repool
 }

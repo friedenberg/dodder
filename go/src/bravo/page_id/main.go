@@ -45,10 +45,10 @@ func PageIndexForString(
 
 	if n, err = PageIndexForDigest(width, digest); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func PageIndexForDigest(
@@ -66,10 +66,10 @@ func PageIndexForDigest(
 		markl.FormatBytesAsHex(digest),
 	); err != nil {
 		err = errors.ErrorWithStackf("page out of bounds: %d", n1)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func PageIndexForDigestString(
@@ -82,15 +82,15 @@ func PageIndexForDigestString(
 
 	if n1, err = strconv.ParseInt(bucketIndexString, 16, 64); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if n1 > math.MaxUint8 {
 		err = errors.ErrorWithStackf("page out of bounds: %d", n1)
-		return
+		return n, err
 	}
 
 	n = uint8(n1)
 
-	return
+	return n, err
 }

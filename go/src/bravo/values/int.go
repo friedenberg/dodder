@@ -46,12 +46,12 @@ func MakeInt(i int) *Int {
 func (a Int) Equals(b Int) (ok bool) {
 	ok = a.Int() == b.Int()
 
-	return
+	return ok
 }
 
 func (a Int) Less(b Int) (ok bool) {
 	ok = a.Int() < b.Int()
-	return
+	return ok
 }
 
 func (iv *Int) Reset() {
@@ -71,12 +71,12 @@ func (iv *Int) Set(v string) (err error) {
 
 	if i, err = strconv.Atoi(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	iv.SetInt(i)
 
-	return
+	return err
 }
 
 func (iv Int) String() string {

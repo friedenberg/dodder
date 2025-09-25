@@ -44,7 +44,7 @@ func (f *fdDeletedStringWriterFormat) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = sw.WriteString("[")
@@ -52,7 +52,7 @@ func (f *fdDeletedStringWriterFormat) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n2, err = f.fdStringFormatWriter.EncodeStringTo(
@@ -63,7 +63,7 @@ func (f *fdDeletedStringWriterFormat) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = sw.WriteString("]")
@@ -71,8 +71,8 @@ func (f *fdDeletedStringWriterFormat) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

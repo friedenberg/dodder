@@ -53,7 +53,7 @@ func (store Type) ParseTypedBlob(
 	switch tipe.String() {
 	default:
 		err = errors.Errorf("unsupported type: %q", tipe)
-		return
+		return common, repool, n, err
 
 	case "", ids.TypeTomlTypeV0:
 		store := store.toml_v0
@@ -61,7 +61,7 @@ func (store Type) ParseTypedBlob(
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return common, repool, n, err
 		}
 
 		common = blob
@@ -72,11 +72,11 @@ func (store Type) ParseTypedBlob(
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return common, repool, n, err
 		}
 
 		common = blob
 	}
 
-	return
+	return common, repool, n, err
 }

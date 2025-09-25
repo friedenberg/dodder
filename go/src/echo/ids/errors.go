@@ -14,7 +14,7 @@ func (e ErrInvalidId) Error() string {
 
 func (e ErrInvalidId) Is(err error) (ok bool) {
 	_, ok = err.(ErrInvalidId)
-	return
+	return ok
 }
 
 func IsErrInvalid(err error) bool {
@@ -29,7 +29,7 @@ func (e errInvalidSigil) Error() string {
 
 func (e errInvalidSigil) Is(err error) (ok bool) {
 	_, ok = err.(errInvalidSigil)
-	return
+	return ok
 }
 
 func IsErrInvalidSigil(err error) bool {

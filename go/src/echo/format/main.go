@@ -51,12 +51,12 @@ func MakeFormatString(
 		if n1, err = io.WriteString(w, fmt.Sprintf(f, vs...)); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n = int64(n1)
 
-		return
+		return n, err
 	}
 }
 
@@ -69,12 +69,12 @@ func MakeStringer(
 		if n1, err = io.WriteString(w, v.String()); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n = int64(n1)
 
-		return
+		return n, err
 	}
 }
 
@@ -87,11 +87,11 @@ func MakeFormatStringer[T interfaces.ValueLike](
 		if n1, err = io.WriteString(w, sf(e)); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n = int64(n1)
 
-		return
+		return n, err
 	}
 }

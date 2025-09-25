@@ -31,7 +31,7 @@ func (f rightAligned) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = w.WriteString(" ")
@@ -39,10 +39,10 @@ func (f rightAligned) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type rightAligned2 struct {
@@ -61,7 +61,7 @@ func (w rightAligned2) Write(b []byte) (n int, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -70,7 +70,7 @@ func (w rightAligned2) Write(b []byte) (n int, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = w.WriterAndStringWriter.WriteString(" ")
@@ -78,10 +78,10 @@ func (w rightAligned2) Write(b []byte) (n int, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (w rightAligned2) WriteString(v string) (n int, err error) {
@@ -96,7 +96,7 @@ func (w rightAligned2) WriteString(v string) (n int, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -105,7 +105,7 @@ func (w rightAligned2) WriteString(v string) (n int, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = w.WriterAndStringWriter.WriteString(" ")
@@ -113,8 +113,8 @@ func (w rightAligned2) WriteString(v string) (n int, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

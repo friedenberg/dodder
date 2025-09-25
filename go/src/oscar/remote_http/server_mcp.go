@@ -37,7 +37,7 @@ func (server *Server) handleMCP(request Request) (response Response) {
 			nil, -32700, "Parse error", nil,
 		)
 
-		return
+		return response
 	}
 
 	if mcpRequest.JSONRPC != "2.0" {
@@ -49,7 +49,7 @@ func (server *Server) handleMCP(request Request) (response Response) {
 			nil,
 		)
 
-		return
+		return response
 	}
 
 	mcpResponse := mcp.Response{
@@ -125,13 +125,13 @@ func (server *Server) handleMCP(request Request) (response Response) {
 			nil,
 		)
 
-		return
+		return response
 	}
 
 	response.StatusCode = http.StatusOK
 	response.Body = io.NopCloser(bytes.NewReader(responseBytes))
 
-	return
+	return response
 }
 
 func (server *Server) getMCPResources() []mcp.Resource {
@@ -227,12 +227,12 @@ func (server *Server) readMCPResourceTypes(
 			objectResources, err := server.readMCPResourceObject(object)
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			results = append(results, objectResources...)
 
-			return
+			return err
 		},
 	); err != nil {
 		return nil, errors.Wrap(err)

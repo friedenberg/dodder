@@ -33,7 +33,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		markl.PurposeRequestAuthChallengeV1,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
 	request.Header.Add(headerChallengeNonce, nonce.String())
@@ -42,21 +42,21 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		request,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
 	sigString := response.Header.Get(headerChallengeResponse)
 
 	if sigString == "" {
 		err = errors.Errorf("signature empty or not provided")
-		return
+		return response, err
 	}
 
 	var sig markl.Id
 
 	if err = sig.Set(sigString); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
 	pubkeyString := response.Header.Get(headerRepoPublicKey)
@@ -67,7 +67,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		pubkeyString,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
 	if roundTripper.PublicKey.IsNull() {
@@ -80,7 +80,7 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 				pubkey.GetBytes(),
 			)
 
-			return
+			return response, err
 		}
 	}
 
@@ -89,8 +89,8 @@ func (roundTripper *RoundTripperBufioWrappedSigner) RoundTrip(
 		sig,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return response, err
 	}
 
-	return
+	return response, err
 }

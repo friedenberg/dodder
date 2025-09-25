@@ -96,7 +96,7 @@ func (ocs *OptionCommentSet) Set(v string) (err error) {
 
 	if err = oc.Set(tail); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	ocs.OptionComments = append(
@@ -104,7 +104,7 @@ func (ocs *OptionCommentSet) Set(v string) (err error) {
 		oc,
 	)
 
-	return
+	return err
 }
 
 // TODO add support for ApplyTo*
@@ -120,10 +120,10 @@ func (ocf OptionCommentWithKey) CloneOptionComment() OptionComment {
 func (ocf OptionCommentWithKey) Set(v string) (err error) {
 	if err = ocf.OptionComment.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (ocf OptionCommentWithKey) String() string {
@@ -145,21 +145,21 @@ func (ocf optionCommentHide) String() string {
 }
 
 func (ocf optionCommentHide) ApplyToText(Options, *Assignment) (err error) {
-	return
+	return err
 }
 
 func (ocf optionCommentHide) ApplyToReader(
 	Options,
 	*reader,
 ) (err error) {
-	return
+	return err
 }
 
 func (ocf optionCommentHide) ApplyToWriter(
 	f Options,
 	aw *writer,
 ) (err error) {
-	return
+	return err
 }
 
 type OptionCommentDryRun struct {
@@ -175,12 +175,12 @@ func (ocf *OptionCommentDryRun) Set(v string) (err error) {
 
 	if err = boolValue.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	ocf.SetDryRun(boolValue.Bool())
 
-	return
+	return err
 }
 
 func (ocf *OptionCommentDryRun) String() string {
@@ -197,7 +197,7 @@ func (ocf OptionCommentUnknown) CloneOptionComment() OptionComment {
 
 func (ocf *OptionCommentUnknown) Set(v string) (err error) {
 	ocf.Value = v
-	return
+	return err
 }
 
 func (ocf OptionCommentUnknown) String() string {
@@ -220,14 +220,14 @@ func (ocf OptionCommentBooleanFlag) Set(v string) (err error) {
 
 	if err = b.Set(head); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	*ocf.Value = b.Bool()
 
 	ocf.Comment = tail
 
-	return
+	return err
 }
 
 func (ocf OptionCommentBooleanFlag) String() string {

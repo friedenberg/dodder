@@ -51,7 +51,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = sw.WriteString("[")
@@ -59,7 +59,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n2, err = f.fieldsFormatWriter.EncodeStringTo(
@@ -70,7 +70,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = sw.WriteString("]")
@@ -78,8 +78,8 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

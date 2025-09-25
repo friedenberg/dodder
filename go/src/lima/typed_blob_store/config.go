@@ -60,7 +60,7 @@ func (a Config) ParseTypedBlob(
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return common, repool, n, err
 		}
 
 		common = blob
@@ -71,13 +71,13 @@ func (a Config) ParseTypedBlob(
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return common, repool, n, err
 		}
 
 		common = blob
 	}
 
-	return
+	return common, repool, n, err
 }
 
 func (a Config) FormatTypedBlob(
@@ -100,8 +100,8 @@ func (a Config) FormatTypedBlob(
 
 	if n, err = store.FormatSavedBlob(writer, blobSha); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

@@ -52,7 +52,7 @@ func TimeWithIndex(t1 Time, n int) (t2 Time) {
 	t2 = t1
 	t2.Add(tyme.Nanosecond * tyme.Duration(n))
 
-	return
+	return t2
 }
 
 func (t Time) GetTime() time {
@@ -68,41 +68,41 @@ func (t *Time) Set(v string) (err error) {
 
 	if n, err = strconv.ParseInt(v, 10, 64); err != nil {
 		err = errors.Wrapf(err, "failed to parse time: %s", v)
-		return
+		return err
 	}
 
 	t.time = tyme.Unix(n, 0)
 
-	return
+	return err
 }
 
 func (t Time) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
 
-	return
+	return text, err
 }
 
 func (t *Time) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t Time) MarshalText() (text []byte, err error) {
 	ui.Err().Printf(t.String())
 	text = []byte(t.String())
 
-	return
+	return text, err
 }
 
 func (t *Time) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t Time) EqualsAny(t1 any) bool {

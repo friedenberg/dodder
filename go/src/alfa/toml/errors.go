@@ -20,5 +20,5 @@ func MakeError(err error) Error {
 
 func (err Error) Is(target error) (ok bool) {
 	_, ok = target.(Error)
-	return
+	return ok
 }

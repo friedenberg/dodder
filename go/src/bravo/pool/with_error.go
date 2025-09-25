@@ -32,7 +32,7 @@ func MakeWithError[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]](
 					}
 				}
 
-				return
+				return swimmer
 			},
 		},
 	}
@@ -60,18 +60,18 @@ func (pool poolWithError[SWIMMER, SWIMMER_PTR]) PutMany(
 	for _, swimmer := range swimmers {
 		if err = pool.Put(swimmer); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (pool poolWithError[SWIMMER, SWIMMER_PTR]) Put(
 	swimmer SWIMMER_PTR,
 ) (err error) {
 	if swimmer == nil {
-		return
+		return err
 	}
 
 	if pool.reset != nil {
@@ -80,5 +80,5 @@ func (pool poolWithError[SWIMMER, SWIMMER_PTR]) Put(
 
 	pool.inner.Put(swimmer)
 
-	return
+	return err
 }

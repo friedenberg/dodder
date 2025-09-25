@@ -29,7 +29,7 @@ func (scanner *SeqRuneScanner) IsFull() bool {
 func (scanner *SeqRuneScanner) ReadRune() (r rune, size int, err error) {
 	if scanner.token_index == scanner.Len() {
 		err = io.EOF
-		return
+		return r, size, err
 	}
 
 	token := scanner.At(scanner.token_index)
@@ -39,11 +39,11 @@ func (scanner *SeqRuneScanner) ReadRune() (r rune, size int, err error) {
 
 	if r == utf8.RuneError && size > 0 {
 		err = errors.ErrorWithStackf("invalid utf8 byte sequence: %q", contents)
-		return
+		return r, size, err
 	} else if r == utf8.RuneError {
 		// should never happen
 		err = errors.ErrorWithStackf("tried to read past end of tokens: %q", contents)
-		return
+		return r, size, err
 	}
 
 	scanner.byte_index += size
@@ -53,13 +53,13 @@ func (scanner *SeqRuneScanner) ReadRune() (r rune, size int, err error) {
 		scanner.token_index += 1
 	}
 
-	return
+	return r, size, err
 }
 
 func (scanner *SeqRuneScanner) UnreadRune() (err error) {
 	if scanner.token_index == 0 && scanner.byte_index == 0 {
 		err = errors.ErrorWithStackf("seq rune scanner fully unread")
-		return
+		return err
 	}
 
 	token := scanner.At(scanner.token_index - 1)
@@ -73,5 +73,5 @@ func (scanner *SeqRuneScanner) UnreadRune() (err error) {
 		scanner.byte_index = len(scanner.At(scanner.token_index).Contents) - 1
 	}
 
-	return
+	return err
 }

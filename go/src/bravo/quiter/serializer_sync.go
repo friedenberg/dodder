@@ -18,9 +18,9 @@ func MakeSyncSerializer[T any](
 
 		if err = wf(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }

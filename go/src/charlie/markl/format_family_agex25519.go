@@ -16,17 +16,17 @@ func AgeX25519Generate(_ io.Reader) (bites []byte, err error) {
 	// TODO add support for injecting rand reader
 	if err = ageId.GenerateIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return bites, err
 	}
 
 	bech32String := ageId.String()
 
 	if _, bites, err = bech32.Decode(bech32String); err != nil {
 		err = errors.Wrap(err)
-		return
+		return bites, err
 	}
 
-	return
+	return bites, err
 }
 
 // TODO verify if this is correct
@@ -38,7 +38,7 @@ func AgeX25519GetPublicKey(
 	privateKey := ed25519.PrivateKey(private.GetBytes())
 	bites = privateKey.Public().(ed25519.PublicKey)
 
-	return
+	return bites, err
 }
 
 func AgeX25519GetIOWrapper(
@@ -53,15 +53,15 @@ func AgeX25519GetIOWrapper(
 		private.GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ioWrapper, err
 	}
 
 	if err = ageId.Set(string(bech32String)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ioWrapper, err
 	}
 
 	ioWrapper = &ageId
 
-	return
+	return ioWrapper, err
 }

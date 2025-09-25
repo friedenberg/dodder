@@ -133,12 +133,12 @@ func (store *store) Initialize(
 			}
 		}
 
-		return
+		return err
 	})
 
 	if err = errorWaitGroup.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.config.FileExtensions = file_extensions.MakeDefaultConfig(
@@ -150,7 +150,7 @@ func (store *store) Initialize(
 		store.config.CLI,
 	)
 
-	return
+	return err
 }
 
 func (store *store) AddTransacted(
@@ -174,7 +174,7 @@ func (store *store) AddTransacted(
 	case genres.Type:
 		if didChange, err = store.config.addType(daughter); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if didChange {
@@ -183,19 +183,19 @@ func (store *store) AddTransacted(
 			)
 		}
 
-		return
+		return err
 
 	case genres.Tag:
 		if didChange, err = store.config.addTag(daughter, mother); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		var tag ids.Tag
 
 		if err = tag.TodoSetFromObjectId(daughter.GetObjectId()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if daughter.Metadata.GetTags().Len() > 0 {
@@ -211,42 +211,42 @@ func (store *store) AddTransacted(
 	case genres.Repo:
 		if didChange, err = store.config.addRepo(daughter); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case genres.Config:
 		if didChange, err = store.setTransacted(daughter); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if genre != genres.Tag {
-		return
+		return err
 	}
 
 	if !didChange {
-		return
+		return err
 	}
 
 	if mother == nil {
-		return
+		return err
 	}
 
 	if quiter.SetEquals(daughter.Metadata.Tags, mother.Metadata.Tags) {
-		return
+		return err
 	}
 
 	store.config.SetNeedsRecompile(fmt.Sprintf("modified: %s", daughter))
 
-	return
+	return err
 }
 
 func (store *store) setTransacted(
 	object *sku.Transacted,
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&store.config.Sku, object) {
-		return
+		return didChange, err
 	}
 
 	store.config.lock.Lock()
@@ -265,8 +265,8 @@ func (store *store) setTransacted(
 		store.config.Sku.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return didChange, err
 	}
 
-	return
+	return didChange, err
 }

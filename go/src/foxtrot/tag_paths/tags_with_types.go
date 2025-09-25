@@ -62,11 +62,11 @@ func (tags *Tags) AddSuperFrom(
 
 		if err = tags.AddPath(c); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (tags *Tags) AddTagOld(e ids.Tag) (err error) {
@@ -75,22 +75,22 @@ func (tags *Tags) AddTagOld(e ids.Tag) (err error) {
 
 func (tags *Tags) AddTag(e *Tag) (err error) {
 	if e.IsEmpty() {
-		return
+		return err
 	}
 
 	path := MakePathWithType(e)
 
 	if err = tags.AddPathWithType(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tags *Tags) AddSelf(e *Tag) (err error) {
 	if e.IsEmpty() {
-		return
+		return err
 	}
 
 	p := MakePathWithType(e)
@@ -98,36 +98,36 @@ func (tags *Tags) AddSelf(e *Tag) (err error) {
 
 	if err = tags.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tags *Tags) AddPathWithType(pwt *PathWithType) (err error) {
 	_, alreadyExists := tags.Paths.AddPath(pwt)
 
 	if alreadyExists {
-		return
+		return err
 	}
 
 	for _, e := range pwt.Path {
 		if err = tags.All.Add(e, pwt); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (tags *Tags) AddPath(p *PathWithType) (err error) {
 	if err = tags.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tags *Tags) Set(v string) (err error) {
@@ -138,16 +138,16 @@ func (tags *Tags) Set(v string) (err error) {
 
 		if err = e.Set(v); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		es := catgut.MakeFromString(e.String())
 
 		if err = tags.AddTag(es); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

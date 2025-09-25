@@ -26,5 +26,5 @@ func (writer *ProgressWriter) Reset() {
 func (writer *ProgressWriter) Write(p []byte) (n int, err error) {
 	n = len(p)
 	writer.written.Add(int64(n))
-	return
+	return n, err
 }

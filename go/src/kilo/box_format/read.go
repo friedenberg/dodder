@@ -27,31 +27,31 @@ func (format *BoxTransacted) ReadStringFormat(
 			err = nil
 		} else {
 			err = errors.WrapExceptSentinel(err, io.EOF, ErrBoxReadSeq{})
-			return
+			return n, err
 		}
 	}
 
 	if scanner.Error() != nil {
 		err = errors.Wrap(scanner.Error())
-		return
+		return n, err
 	}
 
 	n = scanner.N()
 
 	if format.optionsPrint.BoxDescriptionInBox {
-		return
+		return n, err
 	}
 
 	// TODO extract into dedicated parser and make incompatible with
 	// BoxTransactedWithSignature
 	if err = object.Metadata.Description.ReadFromBoxScanner(scanner); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n = scanner.N()
 
-	return
+	return n, err
 }
 
 func (format *BoxTransacted) openBox(
@@ -64,7 +64,7 @@ func (format *BoxTransacted) openBox(
 			err = io.EOF
 		}
 
-		return
+		return err
 	}
 
 	seq := scanner.GetSeq()
@@ -73,7 +73,7 @@ func (format *BoxTransacted) openBox(
 		err = ErrNotABox
 		scanner.Unscan()
 
-		return
+		return err
 	}
 
 	if !scanner.ConsumeSpacesOrErrorOnFalse() {
@@ -83,10 +83,10 @@ func (format *BoxTransacted) openBox(
 			err = io.ErrUnexpectedEOF
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO switch to returning ErrBoxParse
@@ -96,7 +96,7 @@ func (format *BoxTransacted) readStringFormatBox(
 ) (err error) {
 	if err = format.openBox(scanner); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF, ErrNotABox)
-		return
+		return err
 	}
 
 	{
@@ -107,7 +107,7 @@ func (format *BoxTransacted) readStringFormatBox(
 				err = io.ErrUnexpectedEOF
 			}
 
-			return
+			return err
 		}
 
 		seq := scanner.GetSeq()
@@ -119,14 +119,14 @@ func (format *BoxTransacted) readStringFormatBox(
 			if seq.MatchAll(doddish.TokenTypeLiteral) {
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			} else if ok, left, _, _ := seq.PartitionFavoringLeft(
 				doddish.TokenMatcherOp(doddish.OpPathSeparator),
 			); ok && left.Len() == 0 {
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			} else if ok, left, right := seq.MatchEnd(
 				doddish.TokenMatcherOp(doddish.OpSigilExternal),
@@ -141,25 +141,25 @@ func (format *BoxTransacted) readStringFormatBox(
 					if err = object.ObjectId.SetWithGenre(left.String(), g); err != nil {
 						object.ObjectId.Reset()
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 			} else {
 				err = errors.ErrorWithStackf("unsupported seq: %q", seq)
-				return
+				return err
 			}
 		}
 
 		if object.ObjectId.GetGenre() == genres.InventoryList {
 			if err = object.Metadata.Tai.Set(object.ObjectId.String()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -191,7 +191,7 @@ LOOP_AFTER_OID:
 				seq.String(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			continue
@@ -204,7 +204,7 @@ LOOP_AFTER_OID:
 		case seq.MatchAll(doddish.TokenTypeIdentifier, doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			continue
@@ -215,7 +215,7 @@ LOOP_AFTER_OID:
 		):
 			if err = object.Metadata.Description.Set(seq.String()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			continue
@@ -246,7 +246,7 @@ LOOP_AFTER_OID:
 		if err = objectId.ReadFromSeq(seq); err != nil {
 			err = nil
 			scanner.Unscan()
-			return
+			return err
 		}
 
 		// if strings.Contains(objectId.String(), "dodder") {
@@ -264,13 +264,13 @@ LOOP_AFTER_OID:
 			// TODO make more performant
 			if err = object.Metadata.Tai.Set(objectId.String()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 		case genres.Type:
 			if err = object.Metadata.Type.TodoSetFromObjectId(&objectId); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 		case genres.Tag:
@@ -278,7 +278,7 @@ LOOP_AFTER_OID:
 
 			if err = tag.TodoSetFromObjectId(&objectId); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			if tag.IsDodderTag() {
@@ -288,14 +288,14 @@ LOOP_AFTER_OID:
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
 		default:
 			err = genres.MakeErrUnsupportedGenre(objectId.GetGenre())
 			err = errors.Wrapf(err, "Seq: %q", seq)
-			return
+			return err
 		}
 
 		objectId.Reset()
@@ -303,10 +303,10 @@ LOOP_AFTER_OID:
 
 	if scanner.Error() != nil {
 		err = errors.Wrap(scanner.Error())
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // expects `seq` to include `@` as the first token
@@ -321,10 +321,10 @@ func (format *BoxTransacted) parseOldBlobIdTag(
 		seq.At(1).Contents,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
@@ -359,12 +359,12 @@ func (format *BoxTransacted) parseMarklIdTag(
 			string(value),
 		); err != nil {
 			err = errors.Wrapf(err, "Seq: %q", seq)
-			return
+			return err
 		}
 	} else {
 		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -73,12 +73,12 @@ func (fd *FD) SetFromPath(
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
-		return
+		return err
 	}
 
 	if path == "." {
 		err = errors.ErrorWithStackf("'.' not supported")
-		return
+		return err
 	}
 
 	if !filepath.IsAbs(path) {
@@ -89,7 +89,7 @@ func (fd *FD) SetFromPath(
 
 	if fileInfo, err = os.Stat(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = fd.SetFromFileInfoWithDir(
@@ -98,10 +98,10 @@ func (fd *FD) SetFromPath(
 		blobStore,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (fd *FD) SetFromFileInfoWithDir(
@@ -111,23 +111,23 @@ func (fd *FD) SetFromFileInfoWithDir(
 ) (err error) {
 	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if fileInfo.IsDir() {
-		return
+		return err
 	}
 
 	// TODO eventually enforce requirement of blob writer factory
 	if blobStore == nil {
-		return
+		return err
 	}
 
 	var file *os.File
 
 	if file, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -136,20 +136,20 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, writer)
 
 	if _, err = io.Copy(writer, file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	markl.SetDigester(&fd.digest, writer)
 	fd.state = StateStored
 
-	return
+	return err
 }
 
 func (fd *FD) SetWithBlobWriterFactory(
@@ -158,7 +158,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("empty path")
-		return
+		return err
 	}
 
 	if blobStore == nil {
@@ -169,7 +169,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	if f, err = files.OpenExclusiveReadOnly(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -178,33 +178,33 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, blobWriter)
 
 	if _, err = io.Copy(blobWriter, f); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var fi os.FileInfo
 
 	if fi, err = f.Stat(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = fd.SetFileInfoWithDir(fi, filepath.Dir(path)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	fd.path = path
 	markl.SetDigester(&fd.digest, blobWriter)
 	fd.state = StateStored
 
-	return
+	return err
 }
 
 func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
@@ -220,12 +220,12 @@ func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 
 	if f.path, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	f.state = StateFileInfo
 
-	return
+	return err
 }
 
 func (fd *FD) SetIgnoreNotExists(v string) (err error) {
@@ -235,18 +235,18 @@ func (fd *FD) SetIgnoreNotExists(v string) (err error) {
 		fd.path = v
 		fd.modTime = thyme.Now()
 		fd.isDir = false
-		return
+		return err
 	}
 
 	if v == "." {
 		err = errors.ErrorWithStackf("'.' not supported")
-		return
+		return err
 	}
 
 	fd.path = filepath.Clean(v)
 	fd.state = StateFileInfo
 
-	return
+	return err
 }
 
 func (fd *FD) Set(v string) (err error) {
@@ -256,27 +256,27 @@ func (fd *FD) Set(v string) (err error) {
 		fd.path = v
 		fd.modTime = thyme.Now()
 		fd.isDir = false
-		return
+		return err
 	}
 
 	if v == "." {
 		err = errors.ErrorWithStackf("'.' not supported")
-		return
+		return err
 	}
 
 	var fi os.FileInfo
 
 	if fi, err = os.Stat(v); err != nil {
 		err = errors.Wrapf(err, "Value: %q", v)
-		return
+		return err
 	}
 
 	if err = fd.SetFileInfoWithDir(fi, filepath.Dir(v)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (f *FD) String() string {
@@ -362,21 +362,21 @@ func (fd *FD) GetPath() string {
 
 func (fd *FD) SetPath(p string) (err error) {
 	fd.path = p
-	return
+	return err
 }
 
 func (fd *FD) SetPathRel(p, dir string) (err error) {
 	if p, err = filepath.Rel(dir, p); err != nil {
 		err = errors.Wrapf(err, "Name: %q, Dir: %q", p, dir)
-		return
+		return err
 	}
 
 	if err = fd.SetPath(p); err != nil {
 		err = errors.Wrapf(err, "Name: %q, Dir: %q", p, dir)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (fd *FD) IsDir() bool {
@@ -405,7 +405,7 @@ func (fd *FD) Exists() bool {
 
 func (fd *FD) Remove(s interfaces.Directory) (err error) {
 	if fd.path == "" {
-		return
+		return err
 	}
 
 	if err = s.Delete(fd.path); err != nil {
@@ -415,10 +415,10 @@ func (fd *FD) Remove(s interfaces.Directory) (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (fd *FD) Reset() {
@@ -444,5 +444,5 @@ func (src *FD) Clone() (dst *FD) {
 	dst.path = src.path
 	dst.modTime = src.modTime
 	dst.digest.ResetWith(src.digest)
-	return
+	return dst
 }

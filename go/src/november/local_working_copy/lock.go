@@ -8,10 +8,10 @@ import (
 func (local *Repo) Lock() (err error) {
 	if err = local.envRepo.GetLockSmith().Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO print organize files that were created if dry run or make it possible to
@@ -37,7 +37,7 @@ func (local *Repo) Unlock() (err error) {
 		ui.Log().Print("will flush inventory list")
 		if err = local.store.FlushInventoryList(ptl); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print("will flush store")
@@ -45,7 +45,7 @@ func (local *Repo) Unlock() (err error) {
 			local.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print("will flush konfig")
@@ -55,7 +55,7 @@ func (local *Repo) Unlock() (err error) {
 			local.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print("will flush dormant")
@@ -65,7 +65,7 @@ func (local *Repo) Unlock() (err error) {
 			local.config.GetConfig().IsDryRun(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		local.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
@@ -83,7 +83,7 @@ func (local *Repo) Unlock() (err error) {
 
 		if err = wg.GetError(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -92,8 +92,8 @@ func (local *Repo) Unlock() (err error) {
 	// and manual recovery
 	if err = local.envRepo.GetLockSmith().Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

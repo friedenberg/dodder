@@ -11,7 +11,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 	options sku.CommitOptions,
 ) (err error) {
 	if mother == nil {
-		return
+		return err
 	}
 
 	var co *sku.CheckedOut
@@ -21,7 +21,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 		mother,
 	); err != nil {
 		err = nil
-		return
+		return err
 	}
 
 	defer store.PutCheckedOutLike(co)
@@ -43,15 +43,15 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 			co,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = right.SetMother(mother); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	conflicted := sku.Conflicted{
@@ -63,8 +63,8 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 
 	if err = store.MergeConflicted(conflicted); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

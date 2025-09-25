@@ -73,7 +73,7 @@ func (env *env) GetAbbr() (abbr ids.Abbr) {
 		abbr = env.abbr.GetAbbr()
 	}
 
-	return
+	return abbr
 }
 
 func (env *env) StringFormatWriterSkuBoxTransacted(
@@ -200,7 +200,7 @@ func (env *env) GetUIStorePrinters() sku.UIStorePrinters {
 		TransactedUpdated: printerTransacted,
 		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
 			if !env.config.GetPrintOptions().PrintUnchanged {
-				return
+				return err
 			}
 
 			return printerTransacted(sk)

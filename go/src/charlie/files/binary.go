@@ -31,14 +31,14 @@ func GetFileTypeForPath(path string) (tipe FileType, err error) {
 			err = fs.ErrNotExist
 		}
 
-		return
+		return tipe, err
 	}
 
 	_, tail, ok := bytes.Cut(msg, []byte{':'})
 
 	if !ok {
 		err = errors.ErrorWithStackf("`file` output invalid, expected `:`: %s", msg)
-		return
+		return tipe, err
 	}
 
 	switch {
@@ -54,8 +54,8 @@ func GetFileTypeForPath(path string) (tipe FileType, err error) {
 	default:
 		// TODO consider not making this an error?
 		err = errors.ErrorWithStackf("`file` output unknown: %s", msg)
-		return
+		return tipe, err
 	}
 
-	return
+	return tipe, err
 }

@@ -36,7 +36,7 @@ func Genesis(
 	repo.Must(errors.MakeFuncContextFromFuncErr(repo.GetStore().ResetIndexes))
 	repo.Must(errors.MakeFuncContextFromFuncErr(repo.Unlock))
 
-	return
+	return repo
 }
 
 func (local *Repo) initDefaultTypeAndConfig(
@@ -45,7 +45,7 @@ func (local *Repo) initDefaultTypeAndConfig(
 	// TODO determine if this lock/unlock is necessary
 	if err = local.Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.Deferred(&err, local.Unlock)
@@ -56,7 +56,7 @@ func (local *Repo) initDefaultTypeAndConfig(
 		bigBang,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = local.initDefaultConfigIfNecessaryAfterLock(
@@ -64,17 +64,17 @@ func (local *Repo) initDefaultTypeAndConfig(
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
 ) (defaultTypeObjectId ids.Type, err error) {
 	if bigBang.ExcludeDefaultType {
-		return
+		return defaultTypeObjectId, err
 	}
 
 	defaultTypeObjectId = ids.MustType("md")
@@ -84,7 +84,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 
 	if err = objectId.SetWithIdLike(defaultTypeObjectId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return defaultTypeObjectId, err
 	}
 
 	var sh interfaces.MarklId
@@ -94,7 +94,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		&defaultTypeBlob,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return defaultTypeObjectId, err
 	}
 
 	object := sku.GetTransactedPool().Get()
@@ -102,7 +102,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 
 	if err = object.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return defaultTypeObjectId, err
 	}
 
 	object.Metadata.GetBlobDigestMutable().ResetWithMarklId(sh)
@@ -113,10 +113,10 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return defaultTypeObjectId, err
 	}
 
-	return
+	return defaultTypeObjectId, err
 }
 
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
@@ -124,7 +124,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bigBang.ExcludeDefaultConfig {
-		return
+		return err
 	}
 
 	var blobId interfaces.MarklId
@@ -135,19 +135,19 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	newConfig := sku.GetTransactedPool().Get()
 
 	if err = newConfig.ObjectId.SetWithIdLike(ids.Config{}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = newConfig.SetBlobDigest(blobId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	newConfig.Metadata.Type.ResetWith(typedBlob.Type)
@@ -157,10 +157,10 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func writeDefaultMutableConfig(
@@ -175,7 +175,7 @@ func writeDefaultMutableConfig(
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobId, typedBlob, err
 	}
 
 	defer errors.DeferredCloser(&err, writeCloser)
@@ -185,10 +185,10 @@ func writeDefaultMutableConfig(
 		writeCloser,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobId, typedBlob, err
 	}
 
 	blobId = writeCloser.GetMarklId()
 
-	return
+	return blobId, typedBlob, err
 }

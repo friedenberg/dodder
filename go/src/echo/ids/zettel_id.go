@@ -27,7 +27,7 @@ type Provider interface {
 func NewZettelIdEmpty() (h ZettelId) {
 	h = ZettelId{}
 
-	return
+	return h
 }
 
 // TODO-P3 is this really necessary?;w
@@ -43,12 +43,12 @@ func MakeZettelIdFromProvidersAndCoordinates(
 
 	if l, err = pl.MakeZettelIdFromCoordinates(k.Left); err != nil {
 		err = errors.ErrorWithStackf("failed to make left zettel id: %s", err)
-		return
+		return h, err
 	}
 
 	if r, err = pr.MakeZettelIdFromCoordinates(k.Right); err != nil {
 		err = errors.ErrorWithStackf("failed to make right zettel id: %s", err)
-		return
+		return h, err
 	}
 
 	return MakeZettelIdFromHeadAndTail(l, r)
@@ -65,7 +65,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 			head,
 			tail,
 		)
-		return
+		return h, err
 
 	case tail == "":
 		err = errors.ErrorWithStackf(
@@ -73,7 +73,7 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 			head,
 			tail,
 		)
-		return
+		return h, err
 	}
 
 	hs := fmt.Sprintf("%s/%s", head, tail)
@@ -82,10 +82,10 @@ func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
 
 	if err = h.Set(hs); err != nil {
 		err = errors.ErrorWithStackf("failed to set zettel id: %s", err)
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func MustZettelId(v string) (h *ZettelId) {
@@ -94,17 +94,17 @@ func MustZettelId(v string) (h *ZettelId) {
 
 	errors.PanicIfError(err)
 
-	return
+	return h
 }
 
 func MakeZettelId(v string) (h *ZettelId, err error) {
 	h = &ZettelId{}
 
 	if err = h.Set(v); err != nil {
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func (a ZettelId) IsEmpty() bool {
@@ -155,7 +155,7 @@ func (i ZettelId) Less(j ZettelId) bool {
 func (h *ZettelId) SetFromIdParts(parts [3]string) (err error) {
 	h.left = parts[0]
 	h.right = parts[2]
-	return
+	return err
 }
 
 func (h *ZettelId) Set(v string) (err error) {
@@ -192,7 +192,7 @@ func (h *ZettelId) Set(v string) (err error) {
 			err = groupBuilder.GetError()
 		}
 
-		return
+		return err
 	}
 
 	parts := strings.Split(v, "/")
@@ -218,7 +218,7 @@ func (h *ZettelId) Set(v string) (err error) {
 
 	err = groupBuilder.GetError()
 
-	return
+	return err
 }
 
 func (h *ZettelId) Reset() {
@@ -237,28 +237,28 @@ func (h ZettelId) GetGenre() interfaces.Genre {
 
 func (t ZettelId) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *ZettelId) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t ZettelId) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *ZettelId) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

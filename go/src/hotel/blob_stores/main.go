@@ -56,7 +56,7 @@ func MakeBlobStores(
 				filepath.Join(directoryLayout.DirBlobStoreConfigs()),
 			); err != nil {
 				ctx.Cancel(err)
-				return
+				return blobStores
 			}
 		}
 
@@ -71,7 +71,7 @@ func MakeBlobStores(
 				configPath,
 			); err != nil {
 				ctx.Cancel(err)
-				return
+				return blobStores
 			} else {
 				blobStores[i].Config = typedConfig
 			}
@@ -88,11 +88,11 @@ func MakeBlobStores(
 			envDir.GetTempLocal(),
 		); err != nil {
 			ctx.Cancel(err)
-			return
+			return blobStores
 		}
 	}
 
-	return
+	return blobStores
 }
 
 func MakeRemoteBlobStore(
@@ -112,11 +112,11 @@ func MakeRemoteBlobStore(
 			tempFS,
 		); err != nil {
 			ctx.Cancel(err)
-			return
+			return blobStore
 		}
 	}
 
-	return
+	return blobStore
 }
 
 // TODO describe base path agnostically
@@ -134,7 +134,7 @@ func MakeBlobStore(
 	switch tipe := config.Config.Blob.GetBlobStoreType(); tipe {
 	default:
 		err = errors.BadRequestf("unsupported blob store type %q", tipe)
-		return
+		return store, err
 
 	case "sftp":
 		var sshClient *ssh.Client
@@ -143,12 +143,12 @@ func MakeBlobStore(
 		switch config := config.Config.Blob.(type) {
 		default:
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
-			return
+			return store, err
 
 		case blob_store_configs.ConfigSFTPUri:
 			if sshClient, err = MakeSSHClientFromSSHConfig(context, printer, config); err != nil {
 				err = errors.Wrap(err)
-				return
+				return store, err
 			}
 
 			configSFTP = config
@@ -156,7 +156,7 @@ func MakeBlobStore(
 		case blob_store_configs.ConfigSFTPConfigExplicit:
 			if sshClient, err = MakeSSHClientForExplicitConfig(context, printer, config); err != nil {
 				err = errors.Wrap(err)
-				return
+				return store, err
 			}
 
 			configSFTP = config
@@ -180,7 +180,7 @@ func MakeBlobStore(
 			)
 		} else {
 			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
-			return
+			return store, err
 		}
 	}
 }
@@ -201,12 +201,12 @@ func VerifyBlob(
 
 	if readCloser, err = blobStore.MakeBlobReader(expected); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if _, err = io.Copy(progressWriter, readCloser); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertEqual(
@@ -214,13 +214,13 @@ func VerifyBlob(
 		readCloser.GetMarklId(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = readCloser.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

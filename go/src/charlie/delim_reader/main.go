@@ -50,7 +50,7 @@ func MakeDelimReader(
 	reader.Reader.Reset(ioReader)
 	reader.delim = delim
 
-	return
+	return reader
 }
 
 func (reader *delimReader) N() int64 {
@@ -81,7 +81,7 @@ func (reader *delimReader) Reset() {
 func (reader *delimReader) ReadOneBytes() (str []byte, err error) {
 	if reader.eof {
 		err = io.EOF
-		return
+		return str, err
 	}
 
 	var rawLine []byte
@@ -95,21 +95,21 @@ func (reader *delimReader) ReadOneBytes() (str []byte, err error) {
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
-		return
+		return str, err
 	}
 
 	str = bytes.TrimSuffix(rawLine, []byte{reader.delim})
 
 	reader.segments++
 
-	return
+	return str, err
 }
 
 // Not safe for parallel use
 func (reader *delimReader) ReadOneString() (str string, err error) {
 	if reader.eof {
 		err = io.EOF
-		return
+		return str, err
 	}
 
 	var rawLine string
@@ -123,14 +123,14 @@ func (reader *delimReader) ReadOneString() (str string, err error) {
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)
-		return
+		return str, err
 	}
 
 	str = strings.TrimSuffix(rawLine, string([]byte{reader.delim}))
 
 	reader.segments++
 
-	return
+	return str, err
 }
 
 // Not safe for parallel use
@@ -139,7 +139,7 @@ func (reader *delimReader) ReadOneKeyValue(
 ) (key, val string, err error) {
 	if reader.eof {
 		err = io.EOF
-		return
+		return key, val, err
 	}
 
 	str, err := reader.ReadOneString()
@@ -150,7 +150,7 @@ func (reader *delimReader) ReadOneKeyValue(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return key, val, err
 	}
 
 	loc := strings.Index(str, sep)
@@ -161,13 +161,13 @@ func (reader *delimReader) ReadOneKeyValue(
 			sep,
 			str,
 		)
-		return
+		return key, val, err
 	}
 
 	key = str[:loc]
 	val = str[loc+1:]
 
-	return
+	return key, val, err
 }
 
 func (reader *delimReader) ReadOneKeyValueBytes(
@@ -175,7 +175,7 @@ func (reader *delimReader) ReadOneKeyValueBytes(
 ) (key, val []byte, err error) {
 	if reader.eof {
 		err = io.EOF
-		return
+		return key, val, err
 	}
 
 	str, err := reader.ReadOneBytes()
@@ -186,7 +186,7 @@ func (reader *delimReader) ReadOneKeyValueBytes(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return key, val, err
 	}
 
 	loc := bytes.IndexByte(str, sep)
@@ -197,11 +197,11 @@ func (reader *delimReader) ReadOneKeyValueBytes(
 			sep,
 			str,
 		)
-		return
+		return key, val, err
 	}
 
 	key = str[:loc]
 	val = str[loc+1:]
 
-	return
+	return key, val, err
 }

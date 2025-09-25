@@ -16,7 +16,7 @@ func (layout *directoryLayoutV2) initDirectoryLayout(
 	xdg xdg.XDG,
 ) (err error) {
 	layout.xdg = xdg
-	return
+	return err
 }
 
 func (layout directoryLayoutV2) GetDirectoryPaths() interfaces.DirectoryLayout {

@@ -35,7 +35,7 @@ func (d Dotenv) setDefaultOrEnvFromMap(
 		})
 	}
 
-	return
+	return err
 }
 
 func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
@@ -54,7 +54,7 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		line = strings.TrimSpace(line)
@@ -67,7 +67,7 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 
 		if !ok {
 			err = errors.ErrorWithStackf("malformed env var entry: %q", line)
-			return
+			return n, err
 		}
 
 		env[left] = right
@@ -83,11 +83,11 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 			env,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
@@ -102,14 +102,14 @@ func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
 	if err = bw.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

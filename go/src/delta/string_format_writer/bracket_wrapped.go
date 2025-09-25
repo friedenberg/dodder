@@ -31,7 +31,7 @@ func (f bracketWrapped[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n2, err = f.stringFormatWriter.EncodeStringTo(e, w)
@@ -39,7 +39,7 @@ func (f bracketWrapped[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = w.WriteString("]")
@@ -47,8 +47,8 @@ func (f bracketWrapped[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

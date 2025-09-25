@@ -61,7 +61,6 @@ func TestGob(t1 *testing.T) {
 	enc := gob.NewEncoder(b)
 
 	err = enc.Encode(sut)
-
 	if err != nil {
 		t.Errorf("expected no error but got: '%s'", err)
 	}

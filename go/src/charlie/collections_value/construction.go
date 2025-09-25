@@ -30,13 +30,13 @@ func MakeValueSetString[
 
 		if err = e1.Set(v); err != nil {
 			err = errors.Wrap(err)
-			return
+			return s, err
 		}
 
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s, err
 }
 
 func MakeValueSetValue[T interfaces.Stringer](
@@ -57,7 +57,7 @@ func MakeValueSetValue[T interfaces.Stringer](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeValueSet[T interfaces.Stringer](
@@ -78,7 +78,7 @@ func MakeValueSet[T interfaces.Stringer](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeSetValue[T interfaces.Stringer](
@@ -99,7 +99,7 @@ func MakeSetValue[T interfaces.Stringer](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeSet[T any](
@@ -120,7 +120,7 @@ func MakeSet[T any](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableValueSetValue[T interfaces.Stringer](
@@ -141,7 +141,7 @@ func MakeMutableValueSetValue[T interfaces.Stringer](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableValueSet[T interfaces.Stringer](
@@ -162,7 +162,7 @@ func MakeMutableValueSet[T interfaces.Stringer](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableSetValue[T any](
@@ -183,7 +183,7 @@ func MakeMutableSetValue[T any](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }
 
 func MakeMutableSet[T any](
@@ -204,5 +204,5 @@ func MakeMutableSet[T any](
 		s.E[s.K.GetKey(e)] = e
 	}
 
-	return
+	return s
 }

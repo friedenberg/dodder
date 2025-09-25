@@ -28,13 +28,13 @@ func (coder CoderGob[BLOB, BLOB_PTR]) DecodeFrom(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
 	*blob = clone
 
-	return
+	return n, err
 }
 
 func (coder CoderGob[BLOB, BLOB_PTR]) EncodeTo(
@@ -48,9 +48,9 @@ func (coder CoderGob[BLOB, BLOB_PTR]) EncodeTo(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

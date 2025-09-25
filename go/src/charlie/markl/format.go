@@ -110,14 +110,14 @@ func GetFormatSecOrError(
 
 	if format == nil {
 		err = errors.Errorf("empty format for getter: %s", formatIdGetter)
-		return
+		return formatSec, err
 	}
 
 	formatId := formatIdGetter.GetMarklFormat().GetMarklFormatId()
 
 	if format, err = GetFormatOrError(formatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return formatSec, err
 	}
 
 	var ok bool
@@ -128,10 +128,10 @@ func GetFormatSecOrError(
 			formatSec,
 			formatId,
 		)
-		return
+		return formatSec, err
 	}
 
-	return
+	return formatSec, err
 }
 
 type FormatId string

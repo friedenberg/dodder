@@ -81,10 +81,10 @@ func (cmd New) ValidateFlagsAndArgs(
 		err = errors.ErrorWithStackf(
 			"when -dry-run is set, paths to existing zettels must be provided",
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (cmd *New) Run(req command.Request) {

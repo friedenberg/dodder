@@ -46,25 +46,25 @@ func (deps Dependencies) writeComments(
 		n += int64(n1)
 
 		if err != nil {
-			return
+			return n, err
 		}
 
 		n1, err = io.WriteString(writer, c)
 		n += int64(n1)
 
 		if err != nil {
-			return
+			return n, err
 		}
 
 		n1, err = io.WriteString(writer, "\n")
 		n += int64(n1)
 
 		if err != nil {
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (deps Dependencies) writeBoundary(
@@ -100,7 +100,7 @@ func (deps Dependencies) writeCommonMetadataFormat(
 
 			if err != nil && !isEOF {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 
 			w.WriteLines(
@@ -123,10 +123,10 @@ func (deps Dependencies) writeCommonMetadataFormat(
 
 	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (deps Dependencies) writeTyp(
@@ -136,7 +136,7 @@ func (deps Dependencies) writeTyp(
 	m := c.GetMetadata()
 
 	if m.Type.IsEmpty() {
-		return
+		return n, err
 	}
 
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type.StringSansOp()))
@@ -174,7 +174,7 @@ func (deps Dependencies) writePathType(
 		ap = deps.EnvDir.RelToCwdOrSame(ap)
 	} else {
 		err = errors.ErrorWithStackf("path not found in fields")
-		return
+		return n, err
 	}
 
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", ap))
@@ -189,12 +189,12 @@ func (deps Dependencies) writeBlob(
 
 	if ar, err = deps.BlobStore.MakeBlobReader(&m.DigBlob); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if ar == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
-		return
+		return n, err
 	}
 
 	defer errors.DeferredCloser(&err, ar)
@@ -208,7 +208,7 @@ func (deps Dependencies) writeBlob(
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if n, err = wt.WriteTo(w1); err != nil {
@@ -220,14 +220,14 @@ func (deps Dependencies) writeBlob(
 
 			err = errors.Wrap(err)
 
-			return
+			return n, err
 		}
 	} else {
 		if n, err = io.Copy(w1, ar); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

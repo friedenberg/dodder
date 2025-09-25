@@ -57,11 +57,11 @@ func MakeIndex(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return i, err
 		}
 	}
 
-	return
+	return i, err
 }
 
 func (i *index) Flush() (err error) {
@@ -70,14 +70,14 @@ func (i *index) Flush() (err error) {
 
 	if !i.hasChanges {
 		ui.Log().Print("no changes")
-		return
+		return err
 	}
 
 	var w1 io.WriteCloser
 
 	if w1, err = i.cacheFactory.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, w1)
@@ -90,10 +90,10 @@ func (i *index) Flush() (err error) {
 
 	if err = enc.Encode(i.encodedIds); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded object id")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (i *index) readIfNecessary() (err error) {
@@ -101,7 +101,7 @@ func (i *index) readIfNecessary() (err error) {
 	defer i.lock.Unlock()
 
 	if i.didRead {
-		return
+		return err
 	}
 
 	ui.Log().Print("reading")
@@ -117,7 +117,7 @@ func (i *index) readIfNecessary() (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	defer r1.Close()
@@ -128,10 +128,10 @@ func (i *index) readIfNecessary() (err error) {
 
 	if err = dec.Decode(&i.encodedIds); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (i *index) Reset() (err error) {
@@ -143,12 +143,12 @@ func (i *index) Reset() (err error) {
 
 	if lMax == 0 {
 		err = errors.ErrorWithStackf("left object id are empty")
-		return
+		return err
 	}
 
 	if rMax == 0 {
 		err = errors.ErrorWithStackf("right object id are empty")
-		return
+		return err
 	}
 
 	i.AvailableIds = make(map[int]bool, lMax*rMax)
@@ -169,37 +169,37 @@ func (i *index) Reset() (err error) {
 
 	i.hasChanges = true
 
-	return
+	return err
 }
 
 func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
-		return
+		return err
 	}
 
 	var h ids.ZettelId
 
 	if err = h.SetFromIdParts(k1.Parts()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var left, right int
 
 	if left, err = i.oldZettelIdStore.Left().ZettelId(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if right, err = i.oldZettelIdStore.Right().ZettelId(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	k := coordinates.ZettelIdCoordinate{
@@ -217,18 +217,18 @@ func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 
 	i.hasChanges = true
 
-	return
+	return err
 }
 
 func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	if len(i.AvailableIds) == 0 {
 		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
-		return
+		return h, err
 	}
 
 	ri := 0
@@ -282,16 +282,16 @@ func (i *index) makeZettelIdButDontStore(
 	)
 	if err != nil {
 		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return hs, err
 	}
 
 	if m > len(i.AvailableIds) || m == 0 {
@@ -309,7 +309,7 @@ func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 
 		if h, err = i.makeZettelIdButDontStore(n); err != nil {
 			err = errors.Wrap(err)
-			return
+			return hs, err
 		}
 
 		hs = append(hs, h)
@@ -321,5 +321,5 @@ func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 		}
 	}
 
-	return
+	return hs, err
 }

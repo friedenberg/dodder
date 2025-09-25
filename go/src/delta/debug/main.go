@@ -106,7 +106,7 @@ func MakeContext(
 	if options.PProfCPU {
 		if c.filePprofCpu, err = files.Create("cpu.pprof"); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 
 		pprof.StartCPUProfile(c.filePprofCpu)
@@ -115,7 +115,7 @@ func MakeContext(
 	if options.PProfHeap {
 		if c.filePprofHeap, err = files.Create("heap.pprof"); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 
 		pprof.StartCPUProfile(c.filePprofCpu)
@@ -124,7 +124,7 @@ func MakeContext(
 	if options.Trace {
 		if c.fileTrace, err = files.Create("trace"); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 
 		c.bufferedWriterTrace = bufio.NewWriter(c.fileTrace)
@@ -137,7 +137,7 @@ func MakeContext(
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(c.Close))
 
-	return
+	return c, err
 }
 
 func (c *Context) Close() error {

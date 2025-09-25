@@ -29,7 +29,7 @@ func (store RepoStore) ReadTypedBlob(
 
 	if reader, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
-		return
+		return common, n, err
 	}
 
 	defer errors.DeferredCloser(&err, reader)
@@ -46,12 +46,12 @@ func (store RepoStore) ReadTypedBlob(
 		bufferedReader,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return common, n, err
 	}
 
 	common = *typedBlob.Blob
 
-	return
+	return common, n, err
 }
 
 func (store RepoStore) WriteTypedBlob(
@@ -62,7 +62,7 @@ func (store RepoStore) WriteTypedBlob(
 
 	if writer, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, n, err
 	}
 
 	defer errors.DeferredCloser(&err, writer)
@@ -78,15 +78,15 @@ func (store RepoStore) WriteTypedBlob(
 		bufferedWriter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, n, err
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, n, err
 	}
 
 	sh = writer.GetMarklId()
 
-	return
+	return sh, n, err
 }

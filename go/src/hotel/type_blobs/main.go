@@ -11,7 +11,7 @@ func Default() (t TomlV1) {
 		VimSyntaxType: "markdown",
 	}
 
-	return
+	return t
 }
 
 type Blob interface {

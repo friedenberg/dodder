@@ -37,7 +37,7 @@ func (mrr *MultiRuneReader) ReadRune() (r rune, n int, err error) {
 			continue
 		}
 
-		return
+		return r, n, err
 	}
 }
 

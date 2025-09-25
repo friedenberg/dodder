@@ -59,5 +59,5 @@ func (roundTripper RoundTripperRetry) RoundTrip(
 		}
 	}
 
-	return
+	return response, err
 }

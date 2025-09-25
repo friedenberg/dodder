@@ -30,33 +30,33 @@ func (store *Store) HydrateExternalFromItem(
 		store.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var m checkout_mode.Mode
 
 	if m, err = item.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	switch m {
 	case checkout_mode.BlobOnly:
 		if err = store.readOneExternalBlob(external, internal, item); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
 		if item.Object.IsStdin() {
 			if err = store.ReadOneExternalObjectReader(os.Stdin, external); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			if err = store.readOneExternalObject(external, internal, item); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -68,7 +68,7 @@ func (store *Store) HydrateExternalFromItem(
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutModeMode(m)
-		return
+		return err
 	}
 
 	if options.Clock == nil {
@@ -77,7 +77,7 @@ func (store *Store) HydrateExternalFromItem(
 
 	if err = store.WriteFSItemToExternal(item, external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Don't apply the proto object as that would artificially create deltas
@@ -88,10 +88,10 @@ func (store *Store) HydrateExternalFromItem(
 		options,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // Internal can be nil which means that no overlaying is done.
@@ -111,17 +111,17 @@ func (store *Store) readOneExternalObject(
 
 	if f, err = files.Open(item.Object.GetPath()); err != nil {
 		err = errors.Wrapf(err, "Item: %s", item.Debug())
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
 
 	if err = store.ReadOneExternalObjectReader(f, external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) readOneExternalBlob(
@@ -140,7 +140,7 @@ func (store *Store) readOneExternalBlob(
 
 		if writeCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, writeCloser)
@@ -151,14 +151,14 @@ func (store *Store) readOneExternalBlob(
 			item.Blob.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, file)
 
 		if _, err = io.Copy(writeCloser, file); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		markl.SetDigester(
@@ -167,5 +167,5 @@ func (store *Store) readOneExternalBlob(
 		)
 	}
 
-	return
+	return err
 }

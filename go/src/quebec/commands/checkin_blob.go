@@ -136,7 +136,7 @@ func (pair *externalBlobPair) SetArgs(
 
 	if pair.ZettelId, err = ids.MakeZettelId(pair.objectIdString); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = pair.BlobFD.SetFromPath(
@@ -150,15 +150,15 @@ func (pair *externalBlobPair) SetArgs(
 				pair.pathOrDigest,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (pair *externalBlobPair) GetDigest() interfaces.MarklId {
@@ -172,8 +172,8 @@ func (pair *externalBlobPair) GetDigest() interfaces.MarklId {
 func (pair *externalBlobPair) PopulateBlobDigest() (err error) {
 	if err = pair.object.SetBlobDigest(pair.GetDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

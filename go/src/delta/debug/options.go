@@ -106,9 +106,9 @@ func (options *Options) Set(v string) (err error) {
 
 		default:
 			err = errors.ErrorWithStackf("unsupported debug option: %s", p)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

@@ -63,7 +63,7 @@ func (client *client) HasBlob(blobId interfaces.MarklId) (ok bool) {
 
 	ok = response.StatusCode == http.StatusNoContent
 
-	return
+	return ok
 }
 
 func (client *client) MakeBlobReader(
@@ -77,14 +77,14 @@ func (client *client) MakeBlobReader(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return reader, err
 	}
 
 	var response *http.Response
 
 	if response, err = client.http.Do(request); err != nil {
 		err = errors.Wrap(err)
-		return
+		return reader, err
 	}
 
 	switch {
@@ -103,7 +103,7 @@ func (client *client) MakeBlobReader(
 			blobId.GetMarklFormat().GetMarklFormatId(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return reader, err
 		}
 
 		reader = markl_io.MakeReadCloser(
@@ -112,7 +112,7 @@ func (client *client) MakeBlobReader(
 		)
 	}
 
-	return
+	return reader, err
 }
 
 func (client *client) WriteBlobToRemote(
@@ -136,7 +136,7 @@ func (client *client) WriteBlobToRemote(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	var request *http.Request
@@ -147,7 +147,7 @@ func (client *client) WriteBlobToRemote(
 		reader,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	request.TransferEncoding = []string{"chunked"}
@@ -156,24 +156,24 @@ func (client *client) WriteBlobToRemote(
 
 	if response, err = client.http.Do(request); err != nil {
 		err = errors.ErrorWithStackf("failed to read response: %w", err)
-		return
+		return err
 	}
 
 	if err = ReadErrorFromBodyOnNot(response, http.StatusCreated); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var digestString strings.Builder
 
 	if _, err = io.Copy(&digestString, response.Body); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = response.Body.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var actual markl.Id
@@ -182,16 +182,16 @@ func (client *client) WriteBlobToRemote(
 		strings.TrimSpace(digestString.String()),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = markl.AssertEqual(expected, &actual); err != nil {
 		ui.Debug().Print(err)
 		err = errors.Wrapf(err, "Raw Blob Id: %q", digestString.String())
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 //   _   _       _

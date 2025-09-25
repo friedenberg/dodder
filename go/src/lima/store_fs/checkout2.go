@@ -20,13 +20,13 @@ func (store *Store) checkoutOneIfNecessary(
 
 	if item, alreadyCheckedOut, err = store.prepareFSItemForCheckOut(options, co); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, item, err
 	}
 
 	if alreadyCheckedOut && !store.shouldCheckOut(options, co, true) {
 		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return co, item, err
 		}
 
 		// FSItem does not have the object ID for certain so we need to add it to the
@@ -34,7 +34,7 @@ func (store *Store) checkoutOneIfNecessary(
 		co.GetSkuExternal().GetObjectId().ResetWith(co.GetSku().GetObjectId())
 		co.SetState(checked_out_state.CheckedOut)
 
-		return
+		return co, item, err
 	}
 
 	// ui.DebugBatsTestBody().Print(sku_fmt_debug.String(co.GetSku()))
@@ -45,14 +45,14 @@ func (store *Store) checkoutOneIfNecessary(
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, item, err
 	}
 
 	// FSItem does not have the object ID for certain so we need to add it to the
 	// external on checkout
 	co.GetSkuExternal().GetObjectId().ResetWith(co.GetSku().GetObjectId())
 
-	return
+	return co, item, err
 }
 
 func (store *Store) prepareFSItemForCheckOut(
@@ -65,7 +65,7 @@ func (store *Store) prepareFSItemForCheckOut(
 		fsOptions.Path == PathOptionTempLocal {
 		item = &sku.FSItem{}
 		item.Reset()
-		return
+		return item, alreadyCheckedOut, err
 	}
 
 	if item, alreadyCheckedOut = store.Get(co.GetSku().GetObjectId()); alreadyCheckedOut {
@@ -81,17 +81,17 @@ func (store *Store) prepareFSItemForCheckOut(
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return item, alreadyCheckedOut, err
 			}
 		}
 	} else {
 		if item, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return item, alreadyCheckedOut, err
 		}
 	}
 
 	// sku.DetermineState(co, true)
 
-	return
+	return item, alreadyCheckedOut, err
 }

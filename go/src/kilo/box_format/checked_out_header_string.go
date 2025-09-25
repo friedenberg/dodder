@@ -14,5 +14,5 @@ func (f CheckedOutHeaderString) WriteBoxHeader(
 	header.RightAligned = true
 	header.Value = string(f)
 
-	return
+	return err
 }

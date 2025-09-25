@@ -32,10 +32,10 @@ func (op Checkout) Run(
 
 	if zsc, err = op.RunWithKasten(k, skus); err != nil {
 		err = errors.Wrap(err)
-		return
+		return zsc, err
 	}
 
-	return
+	return zsc, err
 }
 
 func (op Checkout) RunWithKasten(
@@ -54,17 +54,17 @@ func (op Checkout) RunWithKasten(
 
 	if qg, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return zsc, err
 	}
 
 	if zsc, err = op.RunQuery(
 		qg,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return zsc, err
 	}
 
-	return
+	return zsc, err
 }
 
 func (op Checkout) RunQuery(
@@ -81,16 +81,16 @@ func (op Checkout) RunQuery(
 
 		if err = checkedOut.Add(cl); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if op.Organize {
 		if qg, err = op.runOrganize(qg, onCheckedOut); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
@@ -100,7 +100,7 @@ func (op Checkout) RunQuery(
 		onCheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
 	if op.Utility != "" {
@@ -111,7 +111,7 @@ func (op Checkout) RunQuery(
 
 		if err = eachBlobOp.Run(checkedOut); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
@@ -123,14 +123,14 @@ func (op Checkout) RunQuery(
 			checkedOut,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
 	if op.Edit {
 		if err = op.Reset(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 
 		if _, err = op.Checkin(
@@ -140,11 +140,11 @@ func (op Checkout) RunQuery(
 			op.RefreshCheckout,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, err
 		}
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (op Checkout) runOrganize(
@@ -177,7 +177,7 @@ func (op Checkout) runOrganize(
 		qgOriginal,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return qgModified, err
 	}
 
 	var changeResults organize_text.Changes
@@ -187,7 +187,7 @@ func (op Checkout) runOrganize(
 		organizeResults,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return qgModified, err
 	}
 
 	b := op.MakeQueryBuilder(
@@ -200,10 +200,10 @@ func (op Checkout) runOrganize(
 
 	if qgModified, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return qgModified, err
 	}
 
 	qgModified.RepoId = originalRepoId
 
-	return
+	return qgModified, err
 }

@@ -32,15 +32,15 @@ func (parseSaver nopBlobParseSaver[OBJECT, OBJECT_PTR]) ParseBlob(
 
 	if blobWriter, err = parseSaver.blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	defer errors.DeferredCloser(&err, blobWriter)
 
 	if n, err = io.Copy(blobWriter, reader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

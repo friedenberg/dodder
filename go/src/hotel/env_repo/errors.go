@@ -20,5 +20,5 @@ func (err ErrNotInDodderDir) ShouldShowStackTrace() bool {
 
 func (err ErrNotInDodderDir) Is(target error) (ok bool) {
 	_, ok = target.(ErrNotInDodderDir)
-	return
+	return ok
 }

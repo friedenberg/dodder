@@ -24,7 +24,7 @@ func TomlBookmarkUrl(
 
 	if reader, err = envRepo.GetDefaultBlobStore().MakeBlobReader(object.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ur, err
 	}
 
 	defer errors.DeferredCloser(&err, reader)
@@ -33,20 +33,20 @@ func TomlBookmarkUrl(
 
 	if _, err = io.Copy(&buffer, reader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ur, err
 	}
 
 	var tb TomlBookmark
 
 	if err = toml.Unmarshal(buffer.Bytes(), &tb); err != nil {
 		err = errors.Wrapf(err, "%q", buffer.String())
-		return
+		return ur, err
 	}
 
 	if ur, err = url.Parse(tb.Url); err != nil {
 		err = errors.Wrapf(err, "%q", tb.Url)
-		return
+		return ur, err
 	}
 
-	return
+	return ur, err
 }

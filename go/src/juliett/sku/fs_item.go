@@ -36,10 +36,10 @@ func (item *FSItem) WriteToSku(
 		dirLayout,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (item *FSItem) WriteToExternalObjectId(
@@ -65,21 +65,21 @@ func (item *FSItem) WriteToExternalObjectId(
 		// [int/tanz @0a9d !task project-2021-zit-bugs zz-inbox] fix nil pointer
 		// during organize in workspace
 		ui.Err().Printf("item has no anchor FDs. %q", item.Debug())
-		return
+		return err
 	}
 
 	relPath = dirLayout.RelToCwdOrSame(anchorFD.GetPath())
 
 	if relPath == "-" {
-		return
+		return err
 	}
 
 	if err = eoid.Set(relPath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (item *FSItem) String() string {
@@ -186,7 +186,7 @@ func (item *FSItem) Equals(b *FSItem) (ok bool, why string) {
 		return false, "set"
 	}
 
-	return
+	return ok, why
 }
 
 func (item *FSItem) GenerateConflictFD() (err error) {
@@ -194,15 +194,15 @@ func (item *FSItem) GenerateConflictFD() (err error) {
 		err = errors.ErrorWithStackf(
 			"cannot generate conflict FD for empty external object id",
 		)
-		return
+		return err
 	}
 
 	if err = item.Conflict.SetPath(item.ExternalObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
@@ -225,7 +225,7 @@ func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		)
 	}
 
-	return
+	return m, err
 }
 
 func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
@@ -240,5 +240,5 @@ func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
 		m = checkout_mode.MetadataOnly
 	}
 
-	return
+	return m
 }

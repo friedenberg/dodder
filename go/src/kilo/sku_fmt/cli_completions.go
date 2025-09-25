@@ -52,10 +52,10 @@ func OutputCliCompletions(
 
 					bufferedWriter.WriteString("\n")
 
-					return
+					return err
 				}
 
-				return
+				return err
 			},
 		)
 	}

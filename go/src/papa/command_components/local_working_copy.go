@@ -54,7 +54,7 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromConfigAndXDGDotenvPath(
 		local_working_copy.OptionsEmpty,
 	)
 
-	return
+	return local
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromEnvLocal(
@@ -65,5 +65,5 @@ func (cmd LocalWorkingCopy) MakeLocalWorkingCopyFromEnvLocal(
 		local_working_copy.OptionsEmpty,
 	)
 
-	return
+	return local
 }

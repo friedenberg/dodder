@@ -36,10 +36,10 @@ func (expSigilAndGenre *expSigilAndGenre) addPinnedObjectId(
 ) (err error) {
 	if err = expSigilAndGenre.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (expSigilAndGenre *expSigilAndGenre) addExactObjectId(
@@ -49,14 +49,14 @@ func (expSigilAndGenre *expSigilAndGenre) addExactObjectId(
 ) (err error) {
 	if k.ObjectId == nil {
 		err = errors.ErrorWithStackf("nil object id")
-		return
+		return err
 	}
 
 	expSigilAndGenre.Sigil.Add(sigil)
 	expSigilAndGenre.expObjectIds.internal[k.GetObjectId().String()] = k
 	expSigilAndGenre.Genre.Add(genres.Must(k))
 
-	return
+	return err
 }
 
 func (expSigilAndGenre *expSigilAndGenre) ContainsObjectId(
@@ -129,15 +129,15 @@ func (q *expSigilAndGenre) Add(m sku.Query) (err error) {
 			q1.Genre,
 		)
 
-		return
+		return err
 	}
 
 	if err = q.Merge(q1); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (expSigilAndGenre *expSigilAndGenre) Merge(
@@ -171,7 +171,7 @@ func (expSigilAndGenre *expSigilAndGenre) Merge(
 		expSigilAndGenre.expTagsOrTypes.Children,
 		b.expTagsOrTypes.Children...)
 
-	return
+	return err
 }
 
 func (expSigilAndGenre *expSigilAndGenre) StringDebug() string {
@@ -297,27 +297,27 @@ func (expSigilAndGenre *expSigilAndGenre) ContainsSku(
 	genre := genres.Must(object)
 
 	if expSigilAndGenre.ShouldHide(object, objectIdString) {
-		return
+		return ok
 	}
 
 	if !expSigilAndGenre.Genre.ContainsOneOf(genre) {
-		return
+		return ok
 	}
 
 	if _, ok = expSigilAndGenre.expObjectIds.internal[objectIdString]; ok {
-		return
+		return ok
 	}
 
 	if len(expSigilAndGenre.expTagsOrTypes.Children) == 0 {
 		ok = len(expSigilAndGenre.expObjectIds.internal) == 0
-		return
+		return ok
 	} else if !expSigilAndGenre.expTagsOrTypes.ContainsSku(objectGetter) {
-		return
+		return ok
 	}
 
 	ok = true
 
-	return
+	return ok
 }
 
 func (expSigilAndGenre *expSigilAndGenre) ContainsExternalSku(
@@ -328,13 +328,13 @@ func (expSigilAndGenre *expSigilAndGenre) ContainsExternalSku(
 	g := genres.Must(sk)
 
 	if !expSigilAndGenre.Genre.ContainsOneOf(g) {
-		return
+		return ok
 	}
 
 	k := sk.ObjectId.String()
 
 	if expSigilAndGenre.ShouldHide(el, k) {
-		return
+		return ok
 	}
 
 	eoid := el.GetExternalObjectId().String()
@@ -345,25 +345,25 @@ func (expSigilAndGenre *expSigilAndGenre) ContainsExternalSku(
 	)
 
 	if _, ok = expSigilAndGenre.expObjectIds.external[eoid]; ok {
-		return
+		return ok
 	}
 
 	if _, ok = expSigilAndGenre.expObjectIds.external[k]; ok {
-		return
+		return ok
 	}
 
 	if _, ok = expSigilAndGenre.expObjectIds.internal[k]; ok {
-		return
+		return ok
 	}
 
 	if len(expSigilAndGenre.expTagsOrTypes.Children) == 0 {
 		ok = expSigilAndGenre.expObjectIds.IsEmpty()
-		return
+		return ok
 	} else if !expSigilAndGenre.expTagsOrTypes.ContainsSku(el) {
-		return
+		return ok
 	}
 
 	ok = true
 
-	return
+	return ok
 }

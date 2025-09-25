@@ -29,10 +29,10 @@ type (
 func MakeType(v string) (t Type, err error) {
 	if err = t.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return t, err
 	}
 
-	return
+	return t, err
 }
 
 func MustType(v string) (t Type) {
@@ -40,7 +40,7 @@ func MustType(v string) (t Type) {
 		errors.PanicIfError(err)
 	}
 
-	return
+	return t
 }
 
 func (tipe Type) IsEmpty() bool {
@@ -108,43 +108,43 @@ func (tipe *Type) Set(v string) (err error) {
 
 	if err = ErrOnConfig(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !TagRegex.Match([]byte(v)) {
 		err = errors.ErrorWithStackf("not a valid Typ: '%s'", v)
-		return
+		return err
 	}
 
 	tipe.Value = v
 
-	return
+	return err
 }
 
 func (tipe Type) MarshalText() (text []byte, err error) {
 	text = []byte(tipe.String())
-	return
+	return text, err
 }
 
 func (tipe *Type) UnmarshalText(text []byte) (err error) {
 	if err = tipe.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tipe Type) MarshalBinary() (text []byte, err error) {
 	text = []byte(tipe.String())
-	return
+	return text, err
 }
 
 func (tipe *Type) UnmarshalBinary(text []byte) (err error) {
 	if err = tipe.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

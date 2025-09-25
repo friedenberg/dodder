@@ -87,7 +87,7 @@ func (cmd Fsck) Run(req command.Request) {
 						objectErrorsLock.Unlock()
 
 						err = nil
-						return
+						return err
 					}
 
 					if err = object.Verify(); err != nil {
@@ -104,12 +104,12 @@ func (cmd Fsck) Run(req command.Request) {
 						objectErrorsLock.Unlock()
 
 						err = nil
-						return
+						return err
 					}
 
 					count.Add(1)
 
-					return
+					return err
 				},
 			); err != nil {
 				ui.Err().Print(err)

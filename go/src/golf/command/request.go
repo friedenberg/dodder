@@ -154,5 +154,5 @@ func (req *Args) LastArg() (arg string, ok bool) {
 		arg = req.PopArgs()[req.RemainingArgCount()-1]
 	}
 
-	return
+	return arg, ok
 }

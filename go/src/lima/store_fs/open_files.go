@@ -13,20 +13,20 @@ func (c OpenFiles) Run(
 	args ...string,
 ) (err error) {
 	if len(args) == 0 {
-		return
+		return err
 	}
 
 	if err = files.OpenFiles(args...); err != nil {
 		err = errors.Wrapf(err, "%q", args)
-		return
+		return err
 	}
 
 	v := "opening files"
 
 	if err = ph(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

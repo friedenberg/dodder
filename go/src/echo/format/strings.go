@@ -31,11 +31,11 @@ func MakeFormatStringRightAligned(
 		if n1, err = io.WriteString(w, f); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n = int64(n1)
 
-		return
+		return n, err
 	}
 }

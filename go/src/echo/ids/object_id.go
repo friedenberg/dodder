@@ -38,7 +38,7 @@ type objectId struct {
 func (a *objectId) Clone() (b *objectId) {
 	b = getObjectIdPool().Get()
 	b.ResetWithIdLike(a)
-	return
+	return b
 }
 
 func (a *objectId) IsVirtual() bool {
@@ -82,7 +82,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 			math.MaxUint8,
 		)
 
-		return
+		return n, err
 	}
 
 	var n1 int64
@@ -91,7 +91,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	b := [2]uint8{uint8(k2.Len()), uint8(k2.left.Len())}
@@ -102,7 +102,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = k2.left.WriteTo(w)
@@ -110,7 +110,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	bMid := [1]byte{k2.middle}
@@ -120,7 +120,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = k2.right.WriteTo(w)
@@ -128,10 +128,10 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
@@ -141,7 +141,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var b [2]uint8
@@ -152,7 +152,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	contentLength := b[0]
@@ -164,12 +164,12 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 			middlePos,
 			contentLength,
 		)
-		return
+		return n, err
 	}
 
 	if _, err = k2.left.ReadNFrom(r, int(middlePos)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var bMiddle [1]uint8
@@ -179,17 +179,17 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	k2.middle = bMiddle[0]
 
 	if _, err = k2.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (k2 *objectId) SetGenre(g interfaces.GenreGetter) {
@@ -251,7 +251,7 @@ func (k2 *objectId) GetHeadAndTail() (head, tail string) {
 	head = k2.left.String()
 	tail = k2.right.String()
 
-	return
+	return head, tail
 }
 
 func (k2 *objectId) LenHeadAndTail() (int, int) {
@@ -305,28 +305,28 @@ func (k2 *objectId) Expand(
 	ex := a.ExpanderFor(k2.g)
 
 	if ex == nil {
-		return
+		return err
 	}
 
 	v := k2.String()
 
 	if v, err = ex(v); err != nil {
 		err = nil
-		return
+		return err
 	}
 
 	if err = k2.SetWithGenre(v, k2.g); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (k2 *objectId) Abbreviate(
 	a Abbr,
 ) (err error) {
-	return
+	return err
 }
 
 func (h *objectId) SetWithIdLike(
@@ -336,14 +336,14 @@ func (h *objectId) SetWithIdLike(
 	case *objectId:
 		if err = kt.left.CopyTo(&h.left); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		h.middle = kt.middle
 
 		if err = kt.right.CopyTo(&h.right); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
@@ -351,7 +351,7 @@ func (h *objectId) SetWithIdLike(
 
 		if err = h.left.Set(p[0]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		mid := []byte(p[1])
@@ -362,13 +362,13 @@ func (h *objectId) SetWithIdLike(
 
 		if err = h.right.Set(p[2]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	h.SetGenre(k)
 
-	return
+	return err
 }
 
 func (h *objectId) SetWithGenre(
@@ -379,10 +379,10 @@ func (h *objectId) SetWithGenre(
 
 	if err = h.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (h *objectId) TodoSetBytes(v *catgut.String) (err error) {
@@ -394,10 +394,10 @@ func (h *objectId) SetRaw(v string) (err error) {
 
 	if err = h.left.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (h *objectId) Set(v string) (err error) {
@@ -443,15 +443,15 @@ func (h *objectId) Set(v string) (err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "String: %q", v)
-		return
+		return err
 	}
 
 	if err = h.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (a *objectId) ResetWith(b *objectId) {
@@ -467,28 +467,28 @@ func (a *objectId) ResetWithIdLike(b interfaces.ObjectId) (err error) {
 
 func (t *objectId) MarshalText() (text []byte, err error) {
 	text = []byte(FormattedString(t))
-	return
+	return text, err
 }
 
 func (t *objectId) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t *objectId) MarshalBinary() (text []byte, err error) {
 	text = []byte(FormattedString(t))
-	return
+	return text, err
 }
 
 func (t *objectId) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

@@ -45,7 +45,7 @@ func (store *Store) applyDormantAndRealizeTags(
 
 		if err = tag.Set(objectIdString); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		object.Metadata.Cache.TagPaths.AddSelf(
@@ -62,17 +62,17 @@ func (store *Store) applyDormantAndRealizeTags(
 
 	if err = store.addSuperTags(object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.addImplicitTags(object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	object.SetDormant(store.dormantIndex.ContainsSku(object))
 
-	return
+	return err
 }
 
 func (store *Store) addSuperTags(
@@ -90,13 +90,13 @@ func (store *Store) addSuperTags(
 		expansion.ExpanderRight.Expand(
 			func(v string) (err error) {
 				expanded = append(expanded, v)
-				return
+				return err
 			},
 			objectIdString,
 		)
 
 	default:
-		return
+		return err
 	}
 
 	for _, expandedObjectIdComponent := range expanded {
@@ -158,7 +158,7 @@ func (store *Store) addSuperTags(
 		}()
 	}
 
-	return
+	return err
 }
 
 func (store *Store) addImplicitTags(
@@ -176,7 +176,7 @@ func (store *Store) addImplicitTags(
 
 		if implicitTags.Len() == 0 {
 			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithType)
-			return
+			return err
 		}
 
 		for implicitTag := range implicitTags.All() {
@@ -187,13 +187,13 @@ func (store *Store) addImplicitTags(
 			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithTypeClone)
 		}
 
-		return
+		return err
 	}
 
 	for tag := range metadata.GetTags().AllPtr() {
 		if err = addImplicitTags(tag); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -205,19 +205,19 @@ func (store *Store) addImplicitTags(
 		for tag := range typeObject.GetTags().AllPtr() {
 			if err = tagSet.AddPtr(tag); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		for tag := range typeObject.GetTags().AllPtr() {
 			if err = addImplicitTags(tag); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
 
 	metadata.Cache.SetImplicitTags(tagSet)
 
-	return
+	return err
 }

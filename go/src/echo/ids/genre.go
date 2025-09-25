@@ -20,7 +20,7 @@ func MakeGenreAll() Genre {
 
 func MakeGenre(vs ...genres.Genre) (s Genre) {
 	s.Add(vs...)
-	return
+	return s
 }
 
 func (genre Genre) IsEmpty() bool {
@@ -104,12 +104,12 @@ func (genre *Genre) AddString(v string) (err error) {
 
 	if err = g.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	genre.Add(g)
 
-	return
+	return err
 }
 
 func (genre *Genre) Set(v string) (err error) {
@@ -119,11 +119,11 @@ func (genre *Genre) Set(v string) (err error) {
 	for _, g := range strings.Split(v, ",") {
 		if err = genre.AddString(g); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (genre *Genre) ReadFromBoxScanner(
@@ -137,7 +137,7 @@ func (genre *Genre) ReadFromBoxScanner(
 			// etikett type zettel kasten konfig
 			if err = genre.AddString(string(seq.At(0).Contents)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 		case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpOr)):
@@ -147,7 +147,7 @@ func (genre *Genre) ReadFromBoxScanner(
 		case seq.MatchAll(doddish.TokenMatcherOp(doddish.OpAnd)):
 			// " "
 			scanner.Unscan()
-			return
+			return err
 
 		default:
 			err = errors.ErrorWithStackf(
@@ -155,16 +155,16 @@ func (genre *Genre) ReadFromBoxScanner(
 				seq,
 				seq,
 			)
-			return
+			return err
 		}
 	}
 
 	if err = scanner.Error(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (genre Genre) Byte() byte {
@@ -184,12 +184,12 @@ func (genre *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	*genre = Genre(b[0])
 
-	return
+	return n, err
 }
 
 func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
@@ -197,7 +197,7 @@ func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
 
 	if b, err = genre.ReadByte(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var n1 int
@@ -206,8 +206,8 @@ func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

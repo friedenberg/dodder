@@ -8,5 +8,5 @@ type writeCloser struct {
 }
 
 func (w writeCloser) Close() (err error) {
-	return
+	return err
 }

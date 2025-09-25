@@ -21,7 +21,7 @@ func (reader *Reader) ReadFrom(ioReader io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "metadata read failed")
-		return
+		return n, err
 	}
 
 	n1, err = reader.Blob.ReadFrom(bufio.NewReader(ioReader))
@@ -29,10 +29,10 @@ func (reader *Reader) ReadFrom(ioReader io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "blob read failed")
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (reader *Reader) readMetadataFrom(ioReader *io.Reader) (n int64, err error) {
@@ -41,12 +41,12 @@ func (reader *Reader) readMetadataFrom(ioReader *io.Reader) (n int64, err error)
 
 	if reader.RequireMetadata && reader.Metadata == nil {
 		err = errors.ErrorWithStackf("metadata reader is nil")
-		return
+		return n, err
 	}
 
 	if reader.Blob == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
-		return
+		return n, err
 	}
 
 	var object_metadata ohio.PipedReader
@@ -62,7 +62,7 @@ LINE_READ_LOOP:
 
 		if err != nil && err != io.EOF {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if errors.IsEOF(err) {
@@ -77,7 +77,7 @@ LINE_READ_LOOP:
 			switch {
 			case reader.RequireMetadata && line != Boundary:
 				err = errors.ErrorWithStackf("expected %q but got %q", Boundary, line)
-				return
+				return n, err
 
 			case line != Boundary:
 				*ioReader = io.MultiReader(
@@ -96,7 +96,7 @@ LINE_READ_LOOP:
 			if line == Boundary {
 				if _, err = object_metadata.Close(); err != nil {
 					err = errors.Wrapf(err, "metadata read failed")
-					return
+					return n, err
 				}
 
 				state += 1
@@ -105,7 +105,7 @@ LINE_READ_LOOP:
 
 			if _, err = object_metadata.Write([]byte(rawLine)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 
 		case readerStateSecondBoundary:
@@ -114,9 +114,9 @@ LINE_READ_LOOP:
 
 		default:
 			err = errors.ErrorWithStackf("impossible state %d", state)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

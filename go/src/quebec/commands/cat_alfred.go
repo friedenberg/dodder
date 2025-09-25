@@ -117,13 +117,13 @@ func (cmd CatAlfred) Run(dep command.Request) {
 							tagObject.ObjectId.ResetWithIdLike(tag)
 						} else {
 							err = errors.Wrap(err)
-							return
+							return err
 						}
 					}
 
 					if err = aw.PrintOne(tagObject); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
@@ -131,29 +131,29 @@ func (cmd CatAlfred) Run(dep command.Request) {
 				tipe := object.GetType()
 
 				if tipe.GetType().IsEmpty() {
-					return
+					return err
 				}
 
 				if object, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 					tipe.GetType(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				if err = aw.PrintOne(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 			default:
 				if err = aw.PrintOne(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		aw.WriteError(err)

@@ -84,10 +84,10 @@ func (compiled *compiled) addRepo(
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return didChange, err
 	}
 
-	return
+	return didChange, err
 }
 
 func (compiled *compiled) addType(
@@ -95,7 +95,7 @@ func (compiled *compiled) addType(
 ) (didChange bool, err error) {
 	if err = genres.Type.AssertGenre(object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return didChange, err
 	}
 
 	b := sku.GetTransactedPool().Get()
@@ -110,10 +110,10 @@ func (compiled *compiled) addType(
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return didChange, err
 	}
 
-	return
+	return didChange, err
 }
 
 func (config Config) GetTypeStringFromExtension(t string) string {
@@ -133,5 +133,5 @@ func (config Config) IsInlineType(tipe ids.Type) (isInline bool) {
 	isInline = config.InlineTypes.ContainsKey(tipe.String()) ||
 		ids.IsBuiltin(tipe)
 
-	return
+	return isInline
 }

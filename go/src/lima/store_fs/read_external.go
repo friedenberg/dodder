@@ -27,7 +27,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 		true,
 	); err != nil {
 		err = errors.Wrapf(err, "ObjectIdString: %q", oidString)
-		return
+		return external, err
 	}
 
 	switch len(items) {
@@ -39,7 +39,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 
 			if err = objectId.Set(oidString); err != nil {
 				err = errors.Wrap(err)
-				return
+				return external, err
 			}
 
 			if err = store.storeSupplies.ReadOneInto(
@@ -47,11 +47,11 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 				external.GetSku(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return external, err
 			}
 		}
 
-		return
+		return external, err
 
 	case 1:
 		break
@@ -63,7 +63,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 			objectIdMaybeExternal,
 		)
 
-		return
+		return external, err
 	}
 
 	item := items[0]
@@ -74,10 +74,10 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 		internal,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return external, err
 	}
 
-	return
+	return external, err
 }
 
 // Given a sku and an FSItem, return the overlayed external variant. Internal
@@ -91,8 +91,8 @@ func (store *Store) ReadExternalFromItem(
 
 	if err = store.HydrateExternalFromItem(o, item, internal, external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return external, err
 	}
 
-	return
+	return external, err
 }

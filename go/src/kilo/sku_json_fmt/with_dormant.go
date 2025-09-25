@@ -24,12 +24,12 @@ func (json *WithDormant) FromStringAndMetadata(
 		blobStore,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	json.Dormant = metadata.Cache.Dormant.Bool()
 
-	return
+	return err
 }
 
 func (json *WithDormant) FromTransacted(
@@ -49,10 +49,10 @@ func (json *WithDormant) ToTransacted(
 ) (err error) {
 	if err = json.Transacted.ToTransacted(object, blobStore); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	object.Metadata.Cache.Dormant.SetBool(json.Dormant)
 
-	return
+	return err
 }

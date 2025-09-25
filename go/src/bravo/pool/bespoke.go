@@ -19,5 +19,5 @@ func (ip Bespoke[T]) Get() T {
 
 func (ip Bespoke[T]) Put(i T) (err error) {
 	ip.FuncPut(i)
-	return
+	return err
 }

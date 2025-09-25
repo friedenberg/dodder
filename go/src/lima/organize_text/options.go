@@ -195,30 +195,30 @@ func (o Options) Make() (ot *Text, err error) {
 
 		if err = c.all.AddSku(obj.sku); err != nil {
 			err = errors.Wrap(err)
-			return
+			return ot, err
 		}
 	}
 
 	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	if err = c.populate(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	c.Metadata.Type = c.Options.Type
 
 	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	ot.SortChildren()
 
-	return
+	return ot, err
 }
 
 func (o Options) refiner() *Refiner {

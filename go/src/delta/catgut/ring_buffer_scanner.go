@@ -26,7 +26,7 @@ func (s *RingBufferScanner) FirstMatch(
 
 	if s.rb.PeekReadable().Len() == 0 {
 		err = ErrBufferEmpty
-		return
+		return match, offsetPlusMatch, err
 	}
 
 	startMatchOffset := -1
@@ -67,10 +67,10 @@ LOOP:
 	if startMatchOffset == -1 {
 		s.rb.AdvanceRead(offsetPlusMatch)
 		err = ErrNoMatch
-		return
+		return match, offsetPlusMatch, err
 	}
 
 	match = s.rb.PeekReadable().Slice(startMatchOffset, offsetPlusMatch)
 
-	return
+	return match, offsetPlusMatch, err
 }

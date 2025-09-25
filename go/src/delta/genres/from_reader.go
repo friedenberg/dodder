@@ -11,7 +11,7 @@ func ConfirmTypeFromReader(t Genre, r *bufio.Reader) (err error) {
 
 	if t1, err = FromReader(r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if t1 != t {
@@ -23,7 +23,7 @@ func ConfirmTypeFromReader(t Genre, r *bufio.Reader) (err error) {
 		)
 	}
 
-	return
+	return err
 }
 
 func FromReader(r *bufio.Reader) (t Genre, err error) {
@@ -31,13 +31,13 @@ func FromReader(r *bufio.Reader) (t Genre, err error) {
 
 	if line, err = r.ReadString('\n'); err != nil {
 		err = errors.Wrap(err)
-		return
+		return t, err
 	}
 
 	if err = t.Set(line); err != nil {
 		err = errors.Wrap(err)
-		return
+		return t, err
 	}
 
-	return
+	return t, err
 }

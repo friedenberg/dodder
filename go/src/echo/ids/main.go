@@ -43,29 +43,29 @@ func MakeObjectId(v string) (objectId *ObjectId, err error) {
 	objectId = &ObjectId{}
 
 	if v == "" {
-		return
+		return objectId, err
 	}
 
 	if !boxScanner.ScanDotAllowedInIdentifiers() {
-		return
+		return objectId, err
 	}
 
 	seq := boxScanner.GetSeq()
 
 	if err = objectId.ReadFromSeq(seq); err != nil {
-		return
+		return objectId, err
 	}
 
-	return
+	return objectId, err
 }
 
 func Equals(a, b interfaces.ObjectId) (ok bool) {
 	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
-		return
+		return ok
 	}
 
 	if a.String() != b.String() {
-		return
+		return ok
 	}
 
 	return true
@@ -114,10 +114,10 @@ func LeftSubtract[
 ) (c T, err error) {
 	if err = TPtr(&c).Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
 		err = errors.Wrapf(err, "'%s' - '%s'", a, b)
-		return
+		return c, err
 	}
 
-	return
+	return c, err
 }
 
 func Contains(a, b interfaces.ObjectId) bool {

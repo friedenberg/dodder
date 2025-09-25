@@ -25,7 +25,7 @@ func (commandLine CommandLine) LastArg() (arg string, ok bool) {
 		arg = commandLine.FlagsOrArgs[argc-1]
 	}
 
-	return
+	return arg, ok
 }
 
 func (commandLine CommandLine) LastCompleteArg() (arg string, ok bool) {
@@ -40,7 +40,7 @@ func (commandLine CommandLine) LastCompleteArg() (arg string, ok bool) {
 		arg = commandLine.FlagsOrArgs[argc-1]
 	}
 
-	return
+	return arg, ok
 }
 
 type Completion struct {

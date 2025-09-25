@@ -50,9 +50,9 @@ func (ts *Scanner) ReadRune() (r rune, n int, err error) {
 			// pass
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return r, n, err
 		} else {
-			return
+			return r, n, err
 		}
 	}
 
@@ -67,10 +67,10 @@ func (ts *Scanner) UnreadRune() (err error) {
 	if ts.unscan != nil {
 		if err = ts.unscan.UnreadRune(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	err = ts.RuneScanner.UnreadRune()
@@ -79,7 +79,7 @@ func (ts *Scanner) UnreadRune() (err error) {
 		ts.n -= int64(utf8.RuneLen(ts.lastRune))
 	}
 
-	return
+	return err
 }
 
 func (ts *Scanner) Unscan() {
@@ -196,12 +196,12 @@ func (scanner *Scanner) resetBeforeNextScan() {
 
 func (ts *Scanner) ScanSkipSpace() (ok bool) {
 	if !ts.ConsumeSpacesOrErrorOnFalse() {
-		return
+		return ok
 	}
 
 	ok = ts.Scan()
 
-	return
+	return ok
 }
 
 func (ts *Scanner) Scan() (ok bool) {
@@ -223,11 +223,11 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 	if scanner.unscan.IsFull() {
 		ok = true
 		scanner.unscan = nil
-		return
+		return ok
 	}
 
 	if scanner.err == io.EOF {
-		return
+		return ok
 	}
 
 	afterFirst := false
@@ -246,7 +246,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 				scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 			}
 
-			return
+			return ok
 		}
 
 		isOperator := IsOperator(r, !dotOperatorAsSplit)
@@ -260,10 +260,10 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 				TokenTypeLiteral,
 			) {
 				ok = false
-				return
+				return ok
 			}
 
-			return
+			return ok
 
 		case !afterFirst && isOperator:
 			scanner.scanned.WriteRune(r)
@@ -272,11 +272,11 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			if isSpace {
 				if !scanner.ConsumeSpacesOrErrorOnFalse() {
 					ok = false
-					return
+					return ok
 				}
 			}
 
-			return
+			return ok
 
 		case !isOperator && !isSequenceOperator:
 			scanner.tokenTypeProbably = TokenTypeIdentifier
@@ -297,10 +297,10 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			if r == '=' {
 				if !scanner.consumeField(r) {
 					ok = false
-					return
+					return ok
 				}
 
-				return
+				return ok
 			}
 
 			if scanner.err = scanner.UnreadRune(); scanner.err != nil {
@@ -308,7 +308,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 				ok = false
 			}
 
-			return
+			return ok
 		}
 	}
 }
@@ -326,7 +326,7 @@ func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 
 		if ts.err != nil {
 			ok = false
-			return
+			return ok
 		}
 
 		if unicode.IsSpace(r) {
@@ -338,7 +338,7 @@ func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 			ts.err = errors.Wrapf(ts.err, "%c", r)
 		}
 
-		return
+		return ok
 	}
 }
 
@@ -358,7 +358,7 @@ func (scanner *Scanner) consumeLiteralOrFieldValue(
 
 		if scanner.err != nil {
 			ok = false
-			return
+			return ok
 		}
 
 		currentIsBackslash := r == '\\'
@@ -377,7 +377,7 @@ func (scanner *Scanner) consumeLiteralOrFieldValue(
 
 		scanner.appendTokenWithTypeToSeq(tt)
 
-		return
+		return ok
 	}
 }
 
@@ -405,7 +405,7 @@ func (ts *Scanner) consumeIdentifierLike(
 				ok = ts.scanned.Len() > 0
 			}
 
-			return
+			return ok
 		}
 
 		isOperator := IsOperator(r, true)
@@ -414,10 +414,10 @@ func (ts *Scanner) consumeIdentifierLike(
 		case r == '"' || r == '\'':
 			if !ts.consumeLiteralOrFieldValue(r, tt) {
 				ok = false
-				return
+				return ok
 			}
 
-			return
+			return ok
 
 		case !isOperator:
 			ts.scanned.WriteRune(r)
@@ -434,7 +434,7 @@ func (ts *Scanner) consumeIdentifierLike(
 				ok = false
 			}
 
-			return
+			return ok
 		}
 	}
 }

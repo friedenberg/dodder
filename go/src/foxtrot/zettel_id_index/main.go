@@ -37,7 +37,7 @@ func MakeIndex(
 			cacheIOFactory,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return i, err
 		}
 
 	} else {
@@ -47,9 +47,9 @@ func MakeIndex(
 			cacheIOFactory,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return i, err
 		}
 	}
 
-	return
+	return i, err
 }

@@ -27,7 +27,7 @@ func (e ErrExhaustedFuncSetStringersLine) Error() string {
 
 func (e ErrExhaustedFuncSetStringersLine) Is(target error) (ok bool) {
 	_, ok = target.(ErrExhaustedFuncSetStringersLine)
-	return
+	return ok
 }
 
 func IsErrExhaustedFuncSetStringers(err error) bool {
@@ -41,7 +41,7 @@ func ErrExhaustedFuncSetStringersGetString(in error) (ok bool, v string) {
 		v = err.string
 	}
 
-	return
+	return ok, v
 }
 
 func ErrExhaustedFuncSetStringersWithDelim(in error, delim byte) (out error) {
@@ -54,5 +54,5 @@ func ErrExhaustedFuncSetStringersWithDelim(in error, delim byte) (out error) {
 
 	out = in
 
-	return
+	return out
 }

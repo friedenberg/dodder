@@ -22,5 +22,5 @@ func (f CheckedOutHeaderDeleted) WriteBoxHeader(
 		header.Value = "deleted"
 	}
 
-	return
+	return err
 }

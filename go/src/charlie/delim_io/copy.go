@@ -44,7 +44,7 @@ func CopyWithPrefixOnDelim(
 
 		if err != nil && !errors.IsEOF(err) {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if errors.IsEOF(err) {
@@ -70,5 +70,5 @@ func CopyWithPrefixOnDelim(
 		lineNumber++
 	}
 
-	return
+	return n, err
 }

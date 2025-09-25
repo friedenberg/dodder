@@ -17,5 +17,5 @@ func MakeEncoderJson[T any](out io.Writer) EncoderJson[T] {
 
 func (e EncoderJson[T]) Encode(o *T) (n int64, err error) {
 	err = e.enc.Encode(o)
-	return
+	return n, err
 }

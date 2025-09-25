@@ -92,7 +92,7 @@ func Default() (config Config) {
 	// config.printOptionsOverlay =
 	// options_print.DefaultOverlay().GetPrintOptionsOverlay()
 
-	return
+	return config
 }
 
 // func (config Config) GetPrintOptions() options_print.Options {

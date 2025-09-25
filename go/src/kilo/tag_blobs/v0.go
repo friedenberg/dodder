@@ -11,5 +11,5 @@ func (a *V0) ResetWith(b V0) {
 }
 
 func (a *V0) GetFilterReader() (rc io.ReadCloser, err error) {
-	return
+	return rc, err
 }

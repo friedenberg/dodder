@@ -20,24 +20,24 @@ func (store *Store) MakeLuaVMPoolV1WithSku(
 			sk.GetType(),
 			sk,
 		)
-		return
+		return lvp, err
 	}
 
 	var readCloser interfaces.BlobReader
 
 	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return lvp, err
 	}
 
 	defer errors.DeferredCloser(&err, readCloser)
 
 	if lvp, err = store.MakeLuaVMPoolWithReader(sk, readCloser); err != nil {
 		err = errors.Wrap(err)
-		return
+		return lvp, err
 	}
 
-	return
+	return lvp, err
 }
 
 func (store *Store) MakeLuaVMPoolV1(
@@ -52,12 +52,12 @@ func (store *Store) MakeLuaVMPoolV1(
 
 	if lvmp, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return vp, err
 	}
 
 	vp = sku_lua.MakeLuaVMPoolV1(lvmp, self)
 
-	return
+	return vp, err
 }
 
 func (store *Store) MakeLuaVMPoolWithReader(
@@ -72,10 +72,10 @@ func (store *Store) MakeLuaVMPoolWithReader(
 
 	if lvmp, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return vp, err
 	}
 
 	vp = sku_lua.MakeLuaVMPoolV1(lvmp, selbst)
 
-	return
+	return vp, err
 }

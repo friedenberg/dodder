@@ -14,11 +14,11 @@ func WriteAllOrDieTrying(w io.Writer, b []byte) (n int, err error) {
 		acc, err = w.Write(b[n:])
 		n += acc
 		if err != nil {
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func WriteInt8(w io.Writer, n int8) (written int, err error) {
@@ -27,10 +27,10 @@ func WriteInt8(w io.Writer, n int8) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteUint8(w io.Writer, n uint8) (written int, err error) {
@@ -39,10 +39,10 @@ func WriteUint8(w io.Writer, n uint8) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteUint16(w io.Writer, n uint16) (written int, err error) {
@@ -53,16 +53,16 @@ func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 
 	if intErr != 1 {
 		err = errors.ErrorWithStackf("expected to write %d but wrote %d", 2, intErr)
-		return
+		return written, err
 	}
 
 	written, err = WriteAllOrDieTrying(w, b[:intErr])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteUint32(w io.Writer, n uint32) (written int, err error) {
@@ -73,16 +73,16 @@ func WriteUint32(w io.Writer, n uint32) (written int, err error) {
 
 	if intErr != 1 {
 		err = errors.ErrorWithStackf("expected to write %d but wrote %d", 2, intErr)
-		return
+		return written, err
 	}
 
 	written, err = WriteAllOrDieTrying(w, b[:intErr])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteInt64(w io.Writer, n int64) (written int, err error) {
@@ -94,10 +94,10 @@ func WriteInt64(w io.Writer, n int64) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:intErr])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteFixedUInt16(w io.Writer, n uint16) (written int, err error) {
@@ -106,10 +106,10 @@ func WriteFixedUInt16(w io.Writer, n uint16) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteFixedInt32(w io.Writer, n int32) (written int, err error) {
@@ -118,10 +118,10 @@ func WriteFixedInt32(w io.Writer, n int32) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func WriteFixedInt64(w io.Writer, n int64) (written int, err error) {
@@ -130,8 +130,8 @@ func WriteFixedInt64(w io.Writer, n int64) (written int, err error) {
 	written, err = WriteAllOrDieTrying(w, b[:])
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }

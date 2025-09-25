@@ -17,21 +17,21 @@ type indexNotZettelId[
 
 func (index *indexNotZettelId[ID, ID_PTR]) Add(k ID_PTR) (err error) {
 	index.ObjectIds.Add(k.String())
-	return
+	return err
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) Exists(parts [3]string) (err error) {
 	if err = index.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !index.ObjectIds.ContainsExpansion(parts[2]) {
 		err = collections.MakeErrNotFoundString(parts[2])
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) ExpandStringString(
@@ -41,12 +41,12 @@ func (index *indexNotZettelId[ID, ID_PTR]) ExpandStringString(
 
 	if k, err = index.ExpandString(in); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
 	out = k.String()
 
-	return
+	return out, err
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) ExpandString(
@@ -54,7 +54,7 @@ func (index *indexNotZettelId[ID, ID_PTR]) ExpandString(
 ) (id ID_PTR, err error) {
 	if err = index.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return id, err
 	}
 
 	var k1 ID
@@ -62,15 +62,15 @@ func (index *indexNotZettelId[ID, ID_PTR]) ExpandString(
 
 	if err = id.Set(value); err != nil {
 		err = errors.Wrap(err)
-		return
+		return id, err
 	}
 
 	if id, err = index.Expand(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return id, err
 	}
 
-	return
+	return id, err
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) Expand(
@@ -78,7 +78,7 @@ func (index *indexNotZettelId[ID, ID_PTR]) Expand(
 ) (exp ID_PTR, err error) {
 	if err = index.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return exp, err
 	}
 
 	ex := index.ObjectIds.Expand(abbr.String())
@@ -93,10 +93,10 @@ func (index *indexNotZettelId[ID, ID_PTR]) Expand(
 
 	if err = exp.Set(ex); err != nil {
 		err = errors.Wrap(err)
-		return
+		return exp, err
 	}
 
-	return
+	return exp, err
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) Abbreviate(
@@ -104,10 +104,10 @@ func (index *indexNotZettelId[ID, ID_PTR]) Abbreviate(
 ) (v string, err error) {
 	if err = index.readFunc(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return v, err
 	}
 
 	v = index.ObjectIds.Abbreviate(k.String())
 
-	return
+	return v, err
 }

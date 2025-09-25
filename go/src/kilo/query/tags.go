@@ -28,7 +28,7 @@ func (sch *Tags) GetChanges() (out []string) {
 	out = make([]string, len(sch.changes))
 	copy(out, sch.changes)
 
-	return
+	return out
 }
 
 func (sch *Tags) HasChanges() bool {
@@ -40,10 +40,10 @@ func (sch *Tags) AddTag(e *tag_paths.Tag) (err error) {
 
 	if err = sch.tags.Add(e, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Tags) RemoveDormantTag(e *tag_paths.Tag) (err error) {
@@ -51,10 +51,10 @@ func (sch *Tags) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 
 	if err = sch.tags.Remove(e); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
@@ -98,7 +98,7 @@ func (sch *Tags) Load(s env_repo.Env) (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -107,10 +107,10 @@ func (sch *Tags) Load(s env_repo.Env) (err error) {
 
 	if _, err = sch.ReadFrom(br); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (sch *Tags) Flush(
@@ -120,17 +120,17 @@ func (sch *Tags) Flush(
 ) (err error) {
 	if len(sch.changes) == 0 {
 		ui.Log().Print("no tags changes")
-		return
+		return err
 	}
 
 	if dryRun {
 		ui.Log().Print("no tags flush, dry run")
-		return
+		return err
 	}
 
 	if err = printerHeader("writing dormant tags"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	p := s.FileTags()
@@ -139,7 +139,7 @@ func (sch *Tags) Flush(
 
 	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -149,15 +149,15 @@ func (sch *Tags) Flush(
 
 	if _, err = sch.WriteTo(bw); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = printerHeader("wrote dormant"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
@@ -175,7 +175,7 @@ func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return n, err
 	}
 
 	s.tags = slices.Grow(s.tags, int(count))
@@ -189,14 +189,14 @@ func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		var cs *catgut.String
 
 		if cs, err = catgut.MakeFromReader(r, int(l)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		s.tags = append(s.tags, tag_paths.TagWithParentsAndTypes{
@@ -204,7 +204,7 @@ func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		})
 	}
 
-	return
+	return n, err
 }
 
 func (s Tags) WriteTo(w io.Writer) (n int64, err error) {
@@ -217,7 +217,7 @@ func (s Tags) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	for _, e := range s.tags {
@@ -229,7 +229,7 @@ func (s Tags) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n2, err = e.WriteTo(w)
@@ -237,9 +237,9 @@ func (s Tags) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

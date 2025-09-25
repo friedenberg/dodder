@@ -18,10 +18,10 @@ func CreateExclusiveReadOnly(path string) (file *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return file, err
 	}
 
-	return
+	return file, err
 }
 
 func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
@@ -31,10 +31,10 @@ func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func TryOrTimeout(
@@ -87,41 +87,41 @@ func TryOrMakeDirIfNecessary(
 
 			if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 				err = errors.Wrap(err)
-				return
+				return file, err
 			}
 
 			return apply(path)
 		}
 	}
 
-	return
+	return file, err
 }
 
 func Create(s string) (f *os.File, err error) {
 	if f, err = os.Create(s); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenFile(name string, flag int, perm os.FileMode) (f *os.File, err error) {
 	if f, err = os.OpenFile(name, flag, perm); err != nil {
 		err = errors.Wrapf(err, "Mode: %d, Perm: %d", flag, perm)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func Open(s string) (f *os.File, err error) {
 	if f, err = os.Open(s); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenReadWrite(s string) (f *os.File, err error) {
@@ -131,10 +131,10 @@ func OpenReadWrite(s string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenCreate(s string) (f *os.File, err error) {
@@ -144,10 +144,10 @@ func OpenCreate(s string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
@@ -157,10 +157,10 @@ func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
@@ -170,10 +170,10 @@ func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
@@ -183,46 +183,46 @@ func OpenExclusiveWriteOnlyAppend(s string) (f *os.File, err error) {
 		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenReadOnly(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDONLY, 0o666); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenExclusive(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDWR|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func OpenExclusiveWriteOnly(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(s, os.O_WRONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func Close(f *os.File) error {
@@ -237,7 +237,7 @@ func ReadAllString(s ...string) (o string, err error) {
 	var f *os.File
 
 	if f, err = Open(path.Join(s...)); err != nil {
-		return
+		return o, err
 	}
 
 	defer Close(f)
@@ -245,10 +245,10 @@ func ReadAllString(s ...string) (o string, err error) {
 	var b []byte
 
 	if b, err = io.ReadAll(f); err != nil {
-		return
+		return o, err
 	}
 
 	o = string(b)
 
-	return
+	return o, err
 }

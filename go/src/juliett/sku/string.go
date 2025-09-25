@@ -30,7 +30,7 @@ func StringTaiGenreObjectIdObjectDigestBlobDigest(
 		object.GetBlobDigest(),
 	)
 
-	return
+	return str
 }
 
 func StringObjectIdBlobMetadataSansTai(object *Transacted) (str string) {
@@ -45,7 +45,7 @@ func StringObjectIdBlobMetadataSansTai(object *Transacted) (str string) {
 		StringMetadataSansTai(object),
 	)
 
-	return
+	return str
 }
 
 func StringMetadataTaiMerkle(object *Transacted) (str string) {

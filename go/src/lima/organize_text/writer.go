@@ -35,7 +35,7 @@ func (av writer) write(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	} else if a.GetDepth() < 0 {
 		err = errors.ErrorWithStackf("negative depth: %d", a.GetDepth())
-		return
+		return err
 	}
 
 	if a.Transacted.Metadata.Tags != nil && a.Transacted.Metadata.Tags.Len() > 0 {
@@ -70,7 +70,7 @@ func (av writer) write(a *Assignment) (err error) {
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		cursorExternal.Metadata.SetTags(mes)
@@ -80,12 +80,12 @@ func (av writer) write(a *Assignment) (err error) {
 			&sb,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		av.WriteStringers(&sb)
 
-		return
+		return err
 	}
 
 	a.Objects.Sort()
@@ -93,7 +93,7 @@ func (av writer) write(a *Assignment) (err error) {
 	for _, z := range a.Objects {
 		if err = write(z); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -107,5 +107,5 @@ func (av writer) write(a *Assignment) (err error) {
 
 	av.WriteExactlyOneEmpty()
 
-	return
+	return err
 }

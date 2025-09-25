@@ -51,10 +51,10 @@ func (roundTripper *RoundTripperStdio) InitializeWithLocal(
 
 	if err = roundTripper.initialize(envRepo); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (roundTripper *RoundTripperStdio) InitializeWithSSH(
@@ -63,7 +63,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("ssh"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	roundTripper.Args = []string{
@@ -81,10 +81,10 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 
 	if err = roundTripper.initialize(envUI); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (roundTripper *RoundTripperStdio) initialize(
@@ -95,7 +95,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 
 	if stderrReadCloser, err = roundTripper.StderrPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	remotePrinterDone := make(chan struct{})
@@ -113,22 +113,22 @@ func (roundTripper *RoundTripperStdio) initialize(
 			false,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}()
 
 	if roundTripper.WriteCloser, err = roundTripper.StdinPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	roundTripper.Writer = bufio.NewWriter(roundTripper.WriteCloser)
 
 	if roundTripper.ReadCloser, err = roundTripper.StdoutPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	roundTripper.Reader = bufio.NewReader(roundTripper.ReadCloser)
@@ -137,7 +137,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 
 	if err = roundTripper.Start(); err != nil {
 		err = errors.Wrapf(err, "%#v", roundTripper.Cmd)
-		return
+		return err
 	}
 
 	envUI.After(
@@ -146,7 +146,7 @@ func (roundTripper *RoundTripperStdio) initialize(
 		),
 	)
 
-	return
+	return err
 }
 
 func (roundTripper *RoundTripperStdio) makeCancel(
@@ -163,12 +163,12 @@ func (roundTripper *RoundTripperStdio) cancel(
 	if roundTripper.Process != nil {
 		if err = roundTripper.WriteCloser.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = roundTripper.Process.Signal(syscall.SIGHUP); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -179,9 +179,9 @@ func (roundTripper *RoundTripperStdio) cancel(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

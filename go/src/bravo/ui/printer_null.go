@@ -24,7 +24,7 @@ var _ Printer = null{}
 
 func (null) Write(b []byte) (n int, err error) {
 	n = len(b)
-	return
+	return n, err
 }
 
 func (printer null) GetFile() *os.File {
@@ -40,13 +40,13 @@ func (printer null) Caller(_ int) Printer {
 }
 
 func (null) PrintDebug(_ ...any) (err error) {
-	return
+	return err
 }
 
 func (null) Print(_ ...any) (err error) {
-	return
+	return err
 }
 
 func (null) Printf(_ string, _ ...any) (err error) {
-	return
+	return err
 }

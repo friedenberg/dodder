@@ -26,7 +26,7 @@ func MustRepoId(v string) (e *RepoId) {
 		errors.PanicIfError(err)
 	}
 
-	return
+	return e
 }
 
 func MakeRepoId(v string) (e *RepoId, err error) {
@@ -34,10 +34,10 @@ func MakeRepoId(v string) (e *RepoId, err error) {
 
 	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
-	return
+	return e, err
 }
 
 type RepoId struct {
@@ -107,47 +107,47 @@ func (e *RepoId) Set(v string) (err error) {
 
 	if err = ErrOnConfig(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if v == "" {
-		return
+		return err
 	}
 
 	if !RepoIdRegex.Match([]byte(v)) {
 		err = errors.ErrorWithStackf("not a valid Kasten: '%s'", v)
-		return
+		return err
 	}
 
 	e.id = v
 
-	return
+	return err
 }
 
 func (t RepoId) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *RepoId) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t RepoId) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *RepoId) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

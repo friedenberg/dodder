@@ -40,7 +40,7 @@ func (s AsyncSerializer[T]) Do(e T) (err error) {
 	case s.chE <- e:
 	}
 
-	return
+	return err
 }
 
 func (s AsyncSerializer[T]) Wait() (err error) {
@@ -49,5 +49,5 @@ func (s AsyncSerializer[T]) Wait() (err error) {
 	close(s.chE)
 	<-s.chDone
 
-	return
+	return err
 }

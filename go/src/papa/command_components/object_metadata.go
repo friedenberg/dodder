@@ -27,11 +27,11 @@ func (cmd ObjectMetadata) GetFlagValueMetadataTags(
 			for _, v := range vs {
 				if err = metadata.AddTagString(v); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		},
 		func() {
 			metadata.ResetTags()

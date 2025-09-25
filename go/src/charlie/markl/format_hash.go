@@ -91,10 +91,10 @@ func GetFormatHashOrError(
 
 	if !ok {
 		err = errors.Errorf("unknown hash format: %q", formatHashId)
-		return
+		return formatHash, err
 	}
 
-	return
+	return formatHash, err
 }
 
 func (formatHash FormatHash) GetHash() interfaces.Hash {

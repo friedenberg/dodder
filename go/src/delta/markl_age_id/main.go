@@ -37,28 +37,28 @@ func (id *Id) Set(v string) (err error) {
 
 	if err = identity.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.AddIdentity(identity); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (id *Id) AddIdentity(
 	identity age.Identity,
 ) (err error) {
 	if identity.IsDisabled() || identity.IsEmpty() {
-		return
+		return err
 	}
 
 	// a.Recipients = append(a.Recipients, identity)
 	id.Identities = append(id.Identities, &identity)
 
-	return
+	return err
 }
 
 func (id *Id) AddIdentityOrGenerateIfNecessary(
@@ -66,21 +66,21 @@ func (id *Id) AddIdentityOrGenerateIfNecessary(
 ) (err error) {
 	if err = identity.GenerateIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.AddIdentity(identity); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func MakeFromIdentity(identity age.Identity) (a *Id, err error) {
 	a = &Id{}
 	err = a.AddIdentityOrGenerateIfNecessary(identity)
-	return
+	return a, err
 }
 
 func MakeFromIdentityPathOrString(path_or_identity string) (a *Id, err error) {
@@ -88,7 +88,7 @@ func MakeFromIdentityPathOrString(path_or_identity string) (a *Id, err error) {
 
 	if err = i.Set(path_or_identity); err != nil {
 		err = errors.Wrap(err)
-		return
+		return a, err
 	}
 
 	return MakeFromIdentity(i)
@@ -99,7 +99,7 @@ func MakeFromIdentityFile(basePath string) (a *Id, err error) {
 
 	if err = i.SetFromPath(basePath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return a, err
 	}
 
 	return MakeFromIdentity(i)
@@ -110,7 +110,7 @@ func MakeFromIdentityString(contents string) (a *Id, err error) {
 
 	if err = i.SetFromX25519Identity(contents); err != nil {
 		err = errors.Wrap(err)
-		return
+		return a, err
 	}
 
 	return MakeFromIdentity(i)
@@ -197,7 +197,7 @@ func (id Id) GetPurpose() string {
 func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 	if id.IsNull() {
 		ioWrapper = files.NopeIOWrapper{}
-		return
+		return ioWrapper, err
 	}
 
 	var formatSec markl.FormatSec
@@ -206,7 +206,7 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 		markl.FormatId(markl.FormatIdSecAgeX25519),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ioWrapper, err
 	}
 
 	if formatSec.GetIOWrapper == nil {
@@ -214,15 +214,15 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 			"format does not support getting io wrapper key: %q",
 			formatSec.GetMarklFormatId(),
 		)
-		return
+		return ioWrapper, err
 	}
 
 	if ioWrapper, err = formatSec.GetIOWrapper(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ioWrapper, err
 	}
 
-	return
+	return ioWrapper, err
 }
 
 func (id Id) Verify(_, _ interfaces.MarklId) (err error) {

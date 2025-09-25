@@ -43,15 +43,15 @@ func ExpandOneInto[T interfaces.ObjectId](
 
 			if e, err = mf(v); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			if err = acc.Add(e); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 		k.String(),
 	)
@@ -79,7 +79,7 @@ func ExpandOneSlice[T interfaces.ObjectId](
 		},
 	)
 
-	return
+	return out
 }
 
 func ExpandMany[T idExpandable[T], TPtr idExpandablePtr[T]](
@@ -94,7 +94,7 @@ func ExpandMany[T idExpandable[T], TPtr idExpandablePtr[T]](
 
 	out = s1.CloneSetPtrLike()
 
-	return
+	return out
 }
 
 func Expanded(s TagSet, ex expansion.Expander) (out TagSet) {

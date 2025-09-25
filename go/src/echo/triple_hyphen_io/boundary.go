@@ -27,7 +27,7 @@ type Peeker interface {
 func ReadBoundaryFromPeeker(peeker Peeker) (err error) {
 	if err = PeekBoundaryFromPeeker(peeker); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF, errBoundaryInvalid)
-		return
+		return err
 	}
 
 	if _, err = io.CopyN(
@@ -36,10 +36,10 @@ func ReadBoundaryFromPeeker(peeker Peeker) (err error) {
 		int64(BoundaryStringValue.Len()+1),
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func PeekBoundaryFromPeeker(peeker Peeker) (err error) {
@@ -47,7 +47,7 @@ func PeekBoundaryFromPeeker(peeker Peeker) (err error) {
 
 	if peeked, err = peeker.Peek(BoundaryStringValue.Len() + 1); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return err
 	}
 
 	boundaryOnly := peeked[:BoundaryStringValue.Len()]
@@ -55,15 +55,15 @@ func PeekBoundaryFromPeeker(peeker Peeker) (err error) {
 
 	if !BoundaryStringValue.EqualsBytes(boundaryOnly) {
 		err = errBoundaryInvalid
-		return
+		return err
 	}
 
 	if newline != '\n' {
 		err = errBoundaryInvalid
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func ReadBoundaryFromRingBuffer(
@@ -74,9 +74,9 @@ func ReadBoundaryFromRingBuffer(
 	readable, err = ringBuffer.PeekUpto('\n')
 
 	if errors.IsNotNilAndNotEOF(err) {
-		return
+		return err
 	} else if readable.Len() == 0 && err == io.EOF {
-		return
+		return err
 	}
 
 	if readable.Len() != BoundaryStringValue.Len() {
@@ -88,7 +88,7 @@ func ReadBoundaryFromRingBuffer(
 			readable,
 		)
 
-		return
+		return err
 	}
 
 	if !readable.Equal(BoundaryStringValue.Bytes()) {
@@ -98,7 +98,7 @@ func ReadBoundaryFromRingBuffer(
 			BoundaryStringValue.String(),
 			readable.String(),
 		)
-		return
+		return err
 	}
 
 	// boundary and newline
@@ -109,5 +109,5 @@ func ReadBoundaryFromRingBuffer(
 		err = nil
 	}
 
-	return
+	return err
 }

@@ -12,7 +12,7 @@ func MakeErrMergeConflict(item *FSItem) (err *ErrMergeConflict) {
 		err.ResetWith(item)
 	}
 
-	return
+	return err
 }
 
 type ErrMergeConflict struct {

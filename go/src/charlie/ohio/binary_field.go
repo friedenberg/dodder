@@ -32,17 +32,17 @@ func (bf *BinaryField) GetContentLength() (contentLength int, contentLength64 in
 
 	if n <= 0 {
 		err = errors.ErrorWithStackf("error in content length: %d", n)
-		return
+		return contentLength, contentLength64, err
 	}
 
 	if contentLength64 > math.MaxUint16 {
 		err = errContentLengthTooLarge
-		return
+		return contentLength, contentLength64, err
 	}
 
 	if contentLength64 < 0 {
 		err = errContentLengthNegative
-		return
+		return contentLength, contentLength64, err
 	}
 
 	return int(contentLength64), contentLength64, nil
@@ -75,13 +75,13 @@ func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	contentLength, contentLength64, err := bf.GetContentLength()
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	bf.Content.Grow(contentLength)
@@ -92,10 +92,10 @@ func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 var errContentLengthDoesNotMatchContent = errors.New(
@@ -105,7 +105,7 @@ var errContentLengthDoesNotMatchContent = errors.New(
 func (bf *BinaryField) WriteTo(w io.Writer) (n int64, err error) {
 	if bf.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge
-		return
+		return n, err
 	}
 
 	bf.SetContentLength(bf.Content.Len())
@@ -118,7 +118,7 @@ func (bf *BinaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n2, err = io.Copy(w, &bf.Content)
@@ -126,8 +126,8 @@ func (bf *BinaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

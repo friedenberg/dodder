@@ -41,15 +41,15 @@ func (op Organize) RunWithQueryGroup(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
 	if organizeResults, err = op.RunWithSkuType(qg, skus); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
-	return
+	return organizeResults, err
 }
 
 // TODO remove
@@ -70,10 +70,10 @@ func (op Organize) RunWithTransacted(
 
 	if organizeResults, err = op.RunWithSkuType(qg, skus); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
-	return
+	return organizeResults, err
 }
 
 func (op Organize) RunWithSkuType(
@@ -100,7 +100,7 @@ func (op Organize) RunWithSkuType(
 
 		if organizeResults.QueryGroup, err = b.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return organizeResults, err
 		}
 	}
 
@@ -130,7 +130,7 @@ func (op Organize) RunWithSkuType(
 		"*." + op.GetConfig().GetFileExtensions().Organize,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -139,7 +139,7 @@ func (op Organize) RunWithSkuType(
 		f,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
 	// TODO refactor into common vim processing loop
@@ -152,7 +152,7 @@ func (op Organize) RunWithSkuType(
 
 		if err = openVimOp.Run(op.Repo, f.Name()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return organizeResults, err
 		}
 
 		// if err = op.Reset(); err != nil {
@@ -164,7 +164,7 @@ func (op Organize) RunWithSkuType(
 
 		if _, err = f.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
-			return
+			return organizeResults, err
 		}
 
 		if organizeResults.After, err = readOrganizeTextOp.Run(
@@ -180,14 +180,14 @@ func (op Organize) RunWithSkuType(
 				continue
 			} else {
 				ui.Err().Printf("aborting organize")
-				return
+				return organizeResults, err
 			}
 		}
 
 		break
 	}
 
-	return
+	return organizeResults, err
 }
 
 func (cmd Organize) handleReadChangesError(
@@ -199,7 +199,7 @@ func (cmd Organize) handleReadChangesError(
 	if err != nil && !errors.As(err, &errorRead) {
 		ui.Err().Printf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
-		return
+		return tryAgain
 	}
 
 	return envUI.Retry(

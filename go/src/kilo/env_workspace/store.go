@@ -30,20 +30,20 @@ func (store *Store) Initialize() (err error) {
 
 	err = store.initError
 
-	return
+	return err
 }
 
 func (store *Store) Flush() (err error) {
 	if !store.didInit {
-		return
+		return err
 	}
 
 	if err = store.StoreLike.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) QueryCheckedOut(
@@ -54,12 +54,12 @@ func (store *Store) QueryCheckedOut(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.QueryCheckedOut(
@@ -67,10 +67,10 @@ func (store *Store) QueryCheckedOut(
 		f,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadAllExternalItems() (err error) {
@@ -78,20 +78,20 @@ func (store *Store) ReadAllExternalItems() (err error) {
 
 	if !ok {
 		err = errors.ErrorWithStackf("store does not support %T", &esado)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = esado.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadTransactedFromObjectId(
@@ -103,12 +103,12 @@ func (store *Store) ReadTransactedFromObjectId(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return e, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
 	if e, err = es.ReadExternalLikeFromObjectIdLike(
@@ -117,10 +117,10 @@ func (store *Store) ReadTransactedFromObjectId(
 		t,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
-	return
+	return e, err
 }
 
 func (store *Store) ReadExternalLikeFromObjectIdLike(
@@ -132,12 +132,12 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return e, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
 	if e, err = es.ReadExternalLikeFromObjectIdLike(
@@ -146,10 +146,10 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 		t,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
-	return
+	return e, err
 }
 
 func (store *Store) CheckoutOne(
@@ -160,12 +160,12 @@ func (store *Store) CheckoutOne(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return cz, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
 	if cz, err = es.CheckoutOne(
@@ -173,10 +173,10 @@ func (store *Store) CheckoutOne(
 		sz,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
-	return
+	return cz, err
 }
 
 func (store *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
@@ -184,20 +184,20 @@ func (store *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.DeleteCheckedOut(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // Takes a given sku.Transacted (internal) and updates it with the state of its
@@ -207,20 +207,20 @@ func (store *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.UpdateTransacted(z); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
@@ -228,20 +228,20 @@ func (store *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &es)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.UpdateTransactedFromBlobs(z); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) GetObjectIdsForString(
@@ -249,20 +249,20 @@ func (store *Store) GetObjectIdsForString(
 ) (k []sku.ExternalObjectId, err error) {
 	if store == nil {
 		err = collections.MakeErrNotFoundString(v)
-		return
+		return k, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return k, err
 	}
 
 	if k, err = store.StoreLike.GetObjectIdsForString(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return k, err
 	}
 
-	return
+	return k, err
 }
 
 func (store *Store) Open(
@@ -274,20 +274,20 @@ func (store *Store) Open(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &es)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {
@@ -295,20 +295,20 @@ func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &es)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.SaveBlob(el); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) UpdateCheckoutFromCheckedOut(
@@ -319,20 +319,20 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = es.UpdateCheckoutFromCheckedOut(options, col); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadCheckedOutFromTransacted(
@@ -342,20 +342,20 @@ func (store *Store) ReadCheckedOutFromTransacted(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return co, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, err
 	}
 
 	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, err
 	}
 
-	return
+	return co, err
 }
 
 func (store *Store) Merge(
@@ -365,22 +365,22 @@ func (store *Store) Merge(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = storeLike.Merge(
 		conflicted,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) MergeCheckedOut(
@@ -392,12 +392,12 @@ func (store *Store) MergeCheckedOut(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return commitOptions, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return commitOptions, err
 	}
 
 	if commitOptions, err = es.MergeCheckedOut(
@@ -406,8 +406,8 @@ func (store *Store) MergeCheckedOut(
 		allowMergeConflicts,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return commitOptions, err
 	}
 
-	return
+	return commitOptions, err
 }

@@ -36,10 +36,10 @@ func (state *cliTreeState) encode(
 
 	if err = state.bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO write instead of return string

@@ -24,7 +24,7 @@ func makeFSItemData() fsItemData {
 func (src *fsItemData) Clone() (dst fsItemData) {
 	dst.MutableSetLike = src.MutableSetLike.CloneMutableSetLike()
 	dst.digests = maps.Clone(src.digests)
-	return
+	return dst
 }
 
 func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
@@ -56,5 +56,5 @@ func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
 	// TODO make less leaky
 	data.MutableSetLike = replacement
 
-	return
+	return err
 }

@@ -11,25 +11,25 @@ func New() Builder {
 func (in Builder) WithFileType(ft string) (out Builder) {
 	out = append(in, "-c", fmt.Sprintf("set ft=%s", ft))
 
-	return
+	return out
 }
 
 func (in Builder) WithSourcedFile(p string) (out Builder) {
 	out = append(in, "-c", fmt.Sprintf("source %s", p))
 
-	return
+	return out
 }
 
 func (in Builder) WithCursorLocation(row, col int) (out Builder) {
 	out = append(in, "-c", fmt.Sprintf("call cursor(%d, %d)", row, col))
 
-	return
+	return out
 }
 
 func (in Builder) WithInsertMode() (out Builder) {
 	out = append(in, "-c", "startinsert!")
 
-	return
+	return out
 }
 
 func (b Builder) Build() []string {

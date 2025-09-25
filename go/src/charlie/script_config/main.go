@@ -89,7 +89,7 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 	switch {
 	case s.Script == "" && len(s.Shell) == 0:
 		err = errors.ErrorWithStackf("no script or shell set")
-		return
+		return c, err
 
 	case s.Script != "" && len(s.Shell) > 0:
 		all := append(s.Shell, s.Script)
@@ -126,5 +126,5 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 
 	c.Env = envCollapsed
 
-	return
+	return c, err
 }

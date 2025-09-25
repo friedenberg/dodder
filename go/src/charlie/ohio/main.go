@@ -47,7 +47,7 @@ func MakePipedReaderFrom(r io.ReaderFrom) PipedReader {
 
 func (p pipedReaderFrom) Close() (n int64, err error) {
 	if p.PipeWriter == nil {
-		return
+		return n, err
 	}
 
 	p.PipeWriter.Close()
@@ -55,7 +55,7 @@ func (p pipedReaderFrom) Close() (n int64, err error) {
 	n = out.n
 	err = out.err
 
-	return
+	return n, err
 }
 
 type pipedDecoderFrom struct {
@@ -96,7 +96,7 @@ func MakePipedDecoder[O any](
 
 func (p pipedDecoderFrom) Close() (n int64, err error) {
 	if p.PipeWriter == nil {
-		return
+		return n, err
 	}
 
 	p.PipeWriter.Close()
@@ -104,5 +104,5 @@ func (p pipedDecoderFrom) Close() (n int64, err error) {
 	n = out.n
 	err = out.err
 
-	return
+	return n, err
 }

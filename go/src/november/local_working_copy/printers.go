@@ -84,15 +84,15 @@ func (local *Repo) PrinterCheckedOutConflictsForRemoteTransfers() interfaces.Fun
 
 	return func(co *sku.CheckedOut) (err error) {
 		if co.GetState() != checked_out_state.Conflicted {
-			return
+			return err
 		}
 
 		if err = p(co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 

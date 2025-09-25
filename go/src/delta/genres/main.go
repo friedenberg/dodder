@@ -62,7 +62,7 @@ func All() (out quiter.Slice[Genre]) {
 		out = append(out, g)
 	}
 
-	return
+	return out
 }
 
 func Must(g interfaces.GenreGetter) Genre {
@@ -78,7 +78,7 @@ func MakeOrUnknown(v string) (g Genre) {
 		g = None
 	}
 
-	return
+	return g
 }
 
 func (genre Genre) GetGenre() interfaces.Genre {
@@ -121,10 +121,10 @@ func (genre Genre) EqualsGenre(b interfaces.GenreGetter) bool {
 func (genre Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 	if genre.GetGenreString() != b.GetGenre().GetGenreString() {
 		err = MakeErrUnsupportedGenre(b)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (genre Genre) GetGenreString() string {
@@ -309,10 +309,10 @@ func (genre *Genre) Set(v string) (err error) {
 
 	default:
 		err = errors.Wrap(MakeErrUnrecognizedGenre(v))
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (genre *Genre) Reset() {
@@ -329,12 +329,12 @@ func (genre *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		return
+		return n, err
 	}
 
 	*genre = Genre(b[0])
 
-	return
+	return n, err
 }
 
 func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
@@ -345,26 +345,26 @@ func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (genre Genre) MarshalBinary() (b []byte, err error) {
 	b = []byte{genre.Byte()}
-	return
+	return b, err
 }
 
 func (genre *Genre) UnmarshalBinary(b []byte) (err error) {
 	if len(b) != 1 {
 		err = errors.ErrorWithStackf("expected exactly one byte but got %q", b)
-		return
+		return err
 	}
 
 	*genre = Genre(b[0])
 
-	return
+	return err
 }
 
 func (genre Genre) Byte() byte {

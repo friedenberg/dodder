@@ -11,10 +11,10 @@ func NonceGenerate(rand io.Reader, size int) (bites []byte, err error) {
 
 	if _, err = rand.Read(bites); err != nil {
 		err = errors.Wrap(err)
-		return
+		return bites, err
 	}
 
-	return
+	return bites, err
 }
 
 func NonceGenerate32(rand io.Reader) (bites []byte, err error) {

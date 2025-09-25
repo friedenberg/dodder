@@ -17,8 +17,8 @@ func (local *Repo) DeleteFiles(fs interfaces.Collection[*fd.FD]) (err error) {
 		fs,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

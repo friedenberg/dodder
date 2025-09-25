@@ -34,20 +34,20 @@ func (w *LineWriter) WriteTo(out io.Writer) (n int64, err error) {
 	for _, l := range w.elements {
 		if n1, err = l(w1); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n += n1
 
 		if n2, err = io.WriteString(w1, "\n"); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n += int64(n2)
 	}
 
-	return
+	return n, err
 }
 
 func (w *LineWriter) WriteExactlyOneEmpty() {

@@ -63,7 +63,7 @@ func (exdg *XDG) setDefaultOrEnv(
 		out = filepath.Join(out, exdg.AddedPath)
 	}
 
-	return
+	return out, err
 }
 
 func (exdg *XDG) InitializeOverridden(
@@ -80,11 +80,11 @@ func (exdg *XDG) InitializeOverridden(
 			"",
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (exdg *XDG) InitializeStandardFromEnv(
@@ -101,9 +101,9 @@ func (exdg *XDG) InitializeStandardFromEnv(
 			ie.envKey,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

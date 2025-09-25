@@ -20,10 +20,10 @@ func CopyBuffered(dst io.Writer, src io.Reader) (written int64, err error) {
 
 	if written, err = io.Copy(bufferedWriter, bufferedReader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return written, err
 	}
 
-	return
+	return written, err
 }
 
 func CopyFileLines(
@@ -45,21 +45,21 @@ func CopyFileWithTransform(
 	transform func(string) string,
 ) (err error) {
 	if src == "" {
-		return
+		return err
 	}
 
 	var fileSrc, fileDst *os.File
 
 	if fileSrc, err = files.Open(src); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.Deferred(&err, fileSrc.Close)
 
 	if fileDst, err = files.CreateExclusiveWriteOnly(dst); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.Deferred(&err, fileDst.Close)
@@ -80,12 +80,12 @@ func CopyFileWithTransform(
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		// TODO-P2 sterilize line
 		bufferedWriter.WriteString(transform(line))
 	}
 
-	return
+	return err
 }

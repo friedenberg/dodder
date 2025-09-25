@@ -20,7 +20,7 @@ func (c EachBlob) Run(
 	skus sku.SkuTypeSet,
 ) (err error) {
 	if skus.Len() == 0 {
-		return
+		return err
 	}
 
 	var blobPaths []string
@@ -32,7 +32,7 @@ func (c EachBlob) Run(
 			checkedOut.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		blobPaths = append(blobPaths, fds.Blob.GetPath())
@@ -42,14 +42,14 @@ func (c EachBlob) Run(
 
 	if err = c.PrinterHeader()(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var args []string
 
 	if args, err = shlex.Split(c.Utility); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	args = append(args, blobPaths...)
@@ -61,8 +61,8 @@ func (c EachBlob) Run(
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

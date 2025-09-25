@@ -88,7 +88,7 @@ func (store Tag) GetBlob(
 	case "", ids.TypeTomlTagV0:
 		if blobGeneric, repool, err = store.toml_v0.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 	case ids.TypeTomlTagV1:
@@ -96,7 +96,7 @@ func (store Tag) GetBlob(
 
 		if blob, repool, err = store.toml_v1.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		luaVMPoolBuilder := store.envLua.MakeLuaVMPoolBuilder().WithApply(
@@ -109,7 +109,7 @@ func (store Tag) GetBlob(
 
 		if luaVMPool, err = luaVMPoolBuilder.Build(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		blob.LuaVMPoolV1 = sku_lua.MakeLuaVMPoolV1(luaVMPool, nil)
@@ -124,7 +124,7 @@ func (store Tag) GetBlob(
 			blobId,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		defer errors.DeferredCloser(&err, readCloser)
@@ -139,7 +139,7 @@ func (store Tag) GetBlob(
 
 		if luaVMPool, err = luaVMPoolBuilder.Build(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		blobGeneric = &tag_blobs.LuaV1{
@@ -153,7 +153,7 @@ func (store Tag) GetBlob(
 
 		if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobId); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		defer errors.DeferredCloser(&err, readCloser)
@@ -168,7 +168,7 @@ func (store Tag) GetBlob(
 
 		if luaVMPool, err = luaVMPoolBUilder.Build(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobGeneric, repool, err
 		}
 
 		blobGeneric = &tag_blobs.LuaV2{
@@ -176,5 +176,5 @@ func (store Tag) GetBlob(
 		}
 	}
 
-	return
+	return blobGeneric, repool, err
 }

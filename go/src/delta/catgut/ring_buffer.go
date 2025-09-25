@@ -35,12 +35,12 @@ func (rb *RingBuffer) Seek(offset int64, whence int) (actual int64, err error) {
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
-		return
+		return actual, err
 	}
 
 	if actual, err = seeker.Seek(offset, whence); err != nil {
 		err = errors.Wrap(err)
-		return
+		return actual, err
 	}
 
 	rb.dataLength = 0
@@ -56,10 +56,10 @@ func (rb *RingBuffer) Seek(offset int64, whence int) (actual int64, err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return actual, err
 	}
 
-	return
+	return actual, err
 }
 
 func (rb *RingBuffer) Reset(r io.Reader) {
@@ -82,7 +82,7 @@ func (rb *RingBuffer) ReadLength() int64 {
 func (ringBuffer *RingBuffer) Peek(n int) (bytes []byte, err error) {
 	if n < 0 {
 		err = bufio.ErrNegativeCount
-		return
+		return bytes, err
 	}
 
 	var filled int64
@@ -95,7 +95,7 @@ func (ringBuffer *RingBuffer) Peek(n int) (bytes []byte, err error) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return bytes, err
 			}
 		}
 	}
@@ -109,17 +109,17 @@ func (ringBuffer *RingBuffer) Peek(n int) (bytes []byte, err error) {
 			err = bufio.ErrBufferFull
 		}
 
-		return
+		return bytes, err
 	}
 
 	bytes = readable.Bytes()[:n]
 
-	return
+	return bytes, err
 }
 
 func (rb *RingBuffer) PeekWriteable() (rs Slice) {
 	if rb.Len() == len(rb.data) {
-		return
+		return rs
 	}
 
 	rs.start = rb.writeLength
@@ -143,12 +143,12 @@ func (rb *RingBuffer) PeekWriteable() (rs Slice) {
 		)
 	}
 
-	return
+	return rs
 }
 
 func (rb *RingBuffer) PeekReadable() (rs Slice) {
 	if rb.Len() == 0 {
-		return
+		return rs
 	}
 
 	rs.start = rb.readLength
@@ -176,7 +176,7 @@ func (rb *RingBuffer) PeekReadable() (rs Slice) {
 		)
 	}
 
-	return
+	return rs
 }
 
 func (rb *RingBuffer) PeekUnreadable() (rs Slice) {
@@ -189,7 +189,7 @@ func (rb *RingBuffer) PeekUnreadable() (rs Slice) {
 		rs.data[1] = rb.data[rb.wIdx:]
 	}
 
-	return
+	return rs
 }
 
 func (rb *RingBuffer) Cap() int {
@@ -199,7 +199,7 @@ func (rb *RingBuffer) Cap() int {
 func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 	if rb.Len() == len(rb.data) {
 		err = io.EOF
-		return
+		return n, err
 	}
 
 	rs := rb.PeekWriteable()
@@ -214,11 +214,11 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 	if rb.Len() == len(rb.data) {
 		err = io.EOF
-		return
+		return n, err
 	}
 
 	if n == len(p) {
-		return
+		return n, err
 	}
 
 	n1 = copy(rs.data[1], p[n:])
@@ -232,10 +232,10 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 	if rb.Len() == len(rb.data) {
 		err = io.EOF
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (rb *RingBuffer) Read(p []byte) (n int, err error) {
@@ -246,10 +246,10 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 
 		switch {
 		case err == io.EOF && f == 0:
-			return
+			return n, err
 
 		case err != nil && err != io.EOF:
-			return
+			return n, err
 		}
 	}
 
@@ -265,11 +265,11 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 
 	if rb.Len() == 0 {
 		err = io.EOF
-		return
+		return n, err
 	}
 
 	if n == len(p) {
-		return
+		return n, err
 	}
 
 	n1 = copy(p[n:], rs.data[1])
@@ -283,10 +283,10 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 
 	if rb.Len() == 0 {
 		err = io.EOF
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (rb *RingBuffer) Fill() (n int64, err error) {
@@ -308,13 +308,13 @@ func (rb *RingBuffer) Fill() (n int64, err error) {
 		}
 
 		if err != nil || n > 0 {
-			return
+			return n, err
 		}
 	}
 
 	err = io.ErrNoProgress
 
-	return
+	return n, err
 }
 
 // func (rb *RingBuffer) SlideAndFill() (n int64, err error) {
@@ -360,7 +360,7 @@ func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
 	rb.readLength -= int64(actuallyUnread)
 	rb.dataLength += actuallyUnread
 
-	return
+	return actuallyUnread
 }
 
 func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
@@ -368,13 +368,13 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
 
 	if ok {
-		return
+		return readable, err
 	}
 
 	_, err = rb.Fill()
 
 	if errors.IsNotNilAndNotEOF(err) {
-		return
+		return readable, err
 	}
 
 	err = nil
@@ -382,10 +382,10 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 
 	if !ok {
 		err = collections.MakeErrNotFoundString(string(b))
-		return
+		return readable, err
 	}
 
-	return
+	return readable, err
 }
 
 func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
@@ -393,18 +393,18 @@ func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
 	readable, ok = rb.PeekReadable().SliceUptoButExcluding(b)
 
 	if ok {
-		return
+		return readable, err
 	}
 
 	_, err = rb.Fill()
 
 	if err != io.EOF && err != nil {
-		return
+		return readable, err
 	}
 
 	readable, _ = rb.PeekReadable().SliceUptoButExcluding(b)
 
-	return
+	return readable, err
 }
 
 func (rb *RingBuffer) Len() int {

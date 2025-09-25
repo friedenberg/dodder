@@ -62,7 +62,7 @@ func MakeTagSlice(tags ...Tag) (slice TagSlice) {
 		slice[index] = tag
 	}
 
-	return
+	return slice
 }
 
 func NewSliceFromStrings(tagStrings ...string) (slice TagSlice, err error) {
@@ -71,11 +71,11 @@ func NewSliceFromStrings(tagStrings ...string) (slice TagSlice, err error) {
 	for index, tagString := range tagStrings {
 		if err = slice[index].Set(tagString); err != nil {
 			err = errors.Wrap(err)
-			return
+			return slice, err
 		}
 	}
 
-	return
+	return slice, err
 }
 
 func (s *TagSlice) DropFirst() {
@@ -93,12 +93,12 @@ func (tags *TagSlice) AddString(value string) (err error) {
 
 	if err = tag.Set(value); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	tags.Add(tag)
 
-	return
+	return err
 }
 
 func (es *TagSlice) Add(e Tag) {
@@ -111,11 +111,11 @@ func (s *TagSlice) Set(v string) (err error) {
 	for _, e := range es {
 		if err = s.AddString(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (es TagSlice) SortedString() (out []string) {
@@ -135,7 +135,7 @@ func (es TagSlice) SortedString() (out []string) {
 		},
 	)
 
-	return
+	return out
 }
 
 func (s TagSlice) String() string {

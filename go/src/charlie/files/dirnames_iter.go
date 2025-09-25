@@ -39,7 +39,7 @@ func WalkDir(
 			func(path string, dirEntry os.DirEntry, in error) (out error) {
 				if in != nil {
 					out = in
-					return
+					return out
 				}
 
 				entry := WalkDirEntry{
@@ -49,19 +49,19 @@ func WalkDir(
 
 				if entry.RelPath, out = filepath.Rel(base, path); out != nil {
 					out = errors.Wrap(out)
-					return
+					return out
 				}
 
 				if entry.RelPath == "." {
-					return
+					return out
 				}
 
 				if !yield(entry, nil) {
 					out = fs.SkipAll
-					return
+					return out
 				}
 
-				return
+				return out
 			},
 		); err != nil {
 			yield(WalkDirEntry{}, errors.Wrap(err))
@@ -96,14 +96,14 @@ func DirNames(dirPath string) (slice quiter.Slice[string], err error) {
 
 	if names, err = ReadDir(dirPath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return slice, err
 	}
 
 	for _, dirEntry := range names {
 		slice.Append(path.Join(dirPath, dirEntry.Name()))
 	}
 
-	return
+	return slice, err
 }
 
 func DirNameWriterIgnoringHidden(

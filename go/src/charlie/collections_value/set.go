@@ -47,7 +47,7 @@ func (s Set[T]) Key(e T) string {
 func (s Set[T]) Get(k string) (e T, ok bool) {
 	e, ok = s.E[k]
 
-	return
+	return e, ok
 }
 
 func (s Set[T]) Any() (e T) {
@@ -55,17 +55,17 @@ func (s Set[T]) Any() (e T) {
 		return e1
 	}
 
-	return
+	return e
 }
 
 func (s Set[T]) ContainsKey(k string) (ok bool) {
 	if k == "" {
-		return
+		return ok
 	}
 
 	_, ok = s.E[k]
 
-	return
+	return ok
 }
 
 func (s Set[T]) Contains(e T) (ok bool) {
@@ -82,16 +82,16 @@ func (s Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (s Set[T]) Add(v T) (err error) {
 	s.E[s.Key(v)] = v
-	return
+	return err
 }
 
 func (a Set[T]) CloneSetLike() interfaces.SetLike[T] {

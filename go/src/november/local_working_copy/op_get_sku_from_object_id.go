@@ -22,15 +22,15 @@ func (local *Repo) GetZettelFromObjectId(
 		objectIdString,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	if object, err = local.GetStore().QueryExactlyOneExternal(query); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }
 
 // TODO add to repo.Repo interface
@@ -46,7 +46,7 @@ func (local *Repo) GetObjectFromObjectId(
 		objectIdString,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
 	if object, err = local.GetStore().QueryExactlyOneExternal(
@@ -61,8 +61,8 @@ func (local *Repo) GetObjectFromObjectId(
 			err = errors.Wrapf(err, "ObjectIdString: %q", objectIdString)
 		}
 
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }

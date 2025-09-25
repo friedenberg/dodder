@@ -18,7 +18,7 @@ type devPrinter struct {
 //go:noinline
 func (printer devPrinter) PrintDebug(args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	var sb strings.Builder
@@ -44,13 +44,13 @@ func (printer devPrinter) PrintDebug(args ...any) (err error) {
 		args...,
 	)
 
-	return
+	return err
 }
 
 //go:noinline
 func (printer devPrinter) Print(args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	if printer.includesTime {
@@ -68,7 +68,7 @@ func (printer devPrinter) Print(args ...any) (err error) {
 //go:noinline
 func (printer devPrinter) Printf(format string, args ...any) (err error) {
 	if !printer.on {
-		return
+		return err
 	}
 
 	if printer.includesTime {

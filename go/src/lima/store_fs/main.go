@@ -60,7 +60,7 @@ func Make(
 		),
 	}
 
-	return
+	return store, err
 }
 
 type Store struct {
@@ -92,7 +92,7 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 
 	if item, err = store.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.deleteLock.Lock()
@@ -102,7 +102,7 @@ func (store *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 		store.deleted.Add(fd)
 	}
 
-	return
+	return err
 }
 
 // Deletions of "transient" internal objects that should not be exposed to the
@@ -114,7 +114,7 @@ func (store *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 
 	if i, err = store.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.deleteLock.Lock()
@@ -124,7 +124,7 @@ func (store *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
 		store.deletedInternal.Add(fd)
 	}
 
-	return
+	return err
 }
 
 func (store *Store) Flush() (err error) {
@@ -137,7 +137,7 @@ func (store *Store) Flush() (err error) {
 		store.deleted,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = deleteOp.Run(
@@ -147,13 +147,13 @@ func (store *Store) Flush() (err error) {
 		store.deletedInternal,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	store.deleted.Reset()
 	store.deletedInternal.Reset()
 
-	return
+	return err
 }
 
 func (store *Store) String() (out string) {
@@ -161,7 +161,7 @@ func (store *Store) String() (out string) {
 		store.dirInfo.probablyCheckedOut,
 		store.definitelyNotCheckedOut,
 	) == 0 {
-		return
+		return out
 	}
 
 	sb := &strings.Builder{}
@@ -178,7 +178,7 @@ func (store *Store) String() (out string) {
 
 		hasOne = true
 
-		return
+		return err
 	}
 
 	for z := range store.dirInfo.probablyCheckedOut.All() {
@@ -192,13 +192,13 @@ func (store *Store) String() (out string) {
 	sb.WriteRune(doddish.OpGroupClose)
 
 	out = sb.String()
-	return
+	return out
 }
 
 func (store *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
 	if err = store.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ks, err
 	}
 
 	ks = make([]*sku.FSItem, 0)
@@ -211,14 +211,14 @@ func (store *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
 
 			ks = append(ks, kfp)
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ks, err
 	}
 
-	return
+	return ks, err
 }
 
 func (store *Store) GetFSItemsForDir(
@@ -226,15 +226,15 @@ func (store *Store) GetFSItemsForDir(
 ) (items []*sku.FSItem, err error) {
 	if !fd.IsDir() {
 		err = errors.ErrorWithStackf("not a directory: %q", fd)
-		return
+		return items, err
 	}
 
 	if items, err = store.dirInfo.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return items, err
 	}
 
-	return
+	return items, err
 }
 
 // TODO confirm against actual Object Id
@@ -246,10 +246,10 @@ func (store *Store) GetFSItemsForString(
 	if value == "." {
 		if items, err = store.GetExternalObjectIds(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return items, err
 		}
 
-		return
+		return items, err
 	}
 
 	var fdee *fd.FD
@@ -266,28 +266,28 @@ func (store *Store) GetFSItemsForString(
 				store.dir,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return items, err
 			}
 		} else {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return items, err
 	}
 
 	if fdee.IsDir() {
 		if items, err = store.GetFSItemsForDir(fdee); err != nil {
 			err = errors.Wrap(err)
-			return
+			return items, err
 		}
 	} else {
 		if _, items, err = store.dirInfo.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
-			return
+			return items, err
 		}
 	}
 
-	return
+	return items, err
 }
 
 func (store *Store) GetObjectIdsForString(
@@ -301,7 +301,7 @@ func (store *Store) GetObjectIdsForString(
 		false,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return objectIds, err
 	}
 
 	for _, item := range items {
@@ -312,13 +312,13 @@ func (store *Store) GetObjectIdsForString(
 			store.envRepo,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return objectIds, err
 		}
 
 		objectIds = append(objectIds, &eoid)
 	}
 
-	return
+	return objectIds, err
 }
 
 func (store *Store) Get(
@@ -332,16 +332,16 @@ func (store *Store) Initialize(
 ) (err error) {
 	store.root = storeSupplies.WorkspaceDir
 	store.storeSupplies = storeSupplies
-	return
+	return err
 }
 
 func (store *Store) ReadAllExternalItems() (err error) {
 	if err = store.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadFSItemFromExternal(
@@ -368,7 +368,7 @@ func (store *Store) ReadFSItemFromExternal(
 
 		default:
 			err = errors.ErrorWithStackf("unexpected field: %#v", field)
-			return
+			return item, err
 		}
 
 		// if we've already set one of object, blob, or conflict, don't set it
@@ -380,12 +380,12 @@ func (store *Store) ReadFSItemFromExternal(
 
 		if err = fdee.SetIgnoreNotExists(field.Value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return item, err
 		}
 
 		if err = item.FDs.Add(fdee); err != nil {
 			err = errors.Wrap(err)
-			return
+			return item, err
 		}
 	}
 
@@ -393,7 +393,7 @@ func (store *Store) ReadFSItemFromExternal(
 		&sk.ObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return item, err
 	}
 
 	// external.ObjectId.ResetWith(conflicted.GetSkuExternal().GetObjectId())
@@ -403,11 +403,11 @@ func (store *Store) ReadFSItemFromExternal(
 			&item.ExternalObjectId,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return item, err
 		}
 	}
 
-	return
+	return item, err
 }
 
 func (store *Store) WriteFSItemToExternal(
@@ -427,7 +427,7 @@ func (store *Store) WriteFSItemToExternal(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -438,7 +438,7 @@ func (store *Store) WriteFSItemToExternal(
 
 		if err = external.ExternalObjectId.SetBlob(after); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
@@ -446,14 +446,14 @@ func (store *Store) WriteFSItemToExternal(
 
 		if err = external.ObjectId.SetObjectIdLike(k); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = external.ExternalObjectId.SetObjectIdLike(
 			&item.ExternalObjectId,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if external.ExternalObjectId.String() != k.String() {
@@ -464,7 +464,7 @@ func (store *Store) WriteFSItemToExternal(
 				item.Debug(),
 			)
 
-			return
+			return err
 		}
 	}
 
@@ -473,7 +473,7 @@ func (store *Store) WriteFSItemToExternal(
 		store.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	fdees := quiter.SortedValues(item.FDs)
@@ -501,5 +501,5 @@ func (store *Store) WriteFSItemToExternal(
 		external.Metadata.Fields = append(external.Metadata.Fields, field)
 	}
 
-	return
+	return err
 }

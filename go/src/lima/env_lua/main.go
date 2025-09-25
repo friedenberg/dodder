@@ -75,7 +75,7 @@ func (s *env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 	}()
 
 	if err = sk.ObjectId.SetOnlyNotUnknownGenre(lv); err == nil {
-		return
+		return sk, err
 	}
 
 	rb := catgut.MakeRingBuffer(strings.NewReader(lv), 0)
@@ -84,10 +84,10 @@ func (s *env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 		sk,
 		catgut.MakeRingBufferRuneScanner(rb),
 	); err == nil {
-		return
+		return sk, err
 	}
 
-	return
+	return sk, err
 }
 
 // TODO modify `package.loaded` to include variations of object id

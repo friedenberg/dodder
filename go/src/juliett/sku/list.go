@@ -64,13 +64,13 @@ func CollectList(
 	for sk, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return list, err
 		}
 
 		list.Add(sk)
 	}
 
-	return
+	return list, err
 }
 
 type ListCheckedOut = heap.Heap[CheckedOut, *CheckedOut]
@@ -107,13 +107,13 @@ func CollectListCheckedOut(
 	for checkedOut, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return list, err
 		}
 
 		list.Add(checkedOut)
 	}
 
-	return
+	return list, err
 }
 
 type genericLessorTaiOnly[T ids.Clock] struct{}

@@ -22,7 +22,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = stringSpace.WriteTo(w)
@@ -30,7 +30,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = value.WriteTo(w)
@@ -38,7 +38,7 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = stringNewline.WriteTo(w)
@@ -46,8 +46,8 @@ func WriteKeySpaceValueNewline(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

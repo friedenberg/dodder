@@ -47,7 +47,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 		results,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return changeResults, err
 	}
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
@@ -63,7 +63,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 		) {
 			// TODO output organize file used
 			errors.ContextCancelWith499ClientClosedRequest(local)
-			return
+			return changeResults, err
 		}
 	}
 
@@ -85,13 +85,13 @@ func (local *Repo) LockAndCommitOrganizeResults(
 			},
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return changeResults, err
 		}
 	}
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
-	return
+	return changeResults, err
 }
 
 func (local *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {

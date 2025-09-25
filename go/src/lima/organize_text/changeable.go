@@ -22,10 +22,10 @@ func (ot *Text) GetSkus(
 		original,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
-	return
+	return out, err
 }
 
 func (a *Assignment) addToSet(
@@ -37,7 +37,7 @@ func (a *Assignment) addToSet(
 
 	if err = a.AllTags(expanded); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, organizeObject := range a.All() {
@@ -128,7 +128,7 @@ func (a *Assignment) addToSet(
 			organizeObject.GetSkuExternal().Metadata.Description.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if !organizeObject.GetSkuExternal().Metadata.Type.IsEmpty() {
@@ -136,12 +136,12 @@ func (a *Assignment) addToSet(
 				organizeObject.GetSkuExternal().Metadata.Type.String(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if !organizeObject.tipe.IsDirectOrSelf() {
-			return
+			return err
 		}
 
 		outputObject.GetSkuExternal().Metadata.Comments = append(
@@ -152,7 +152,7 @@ func (a *Assignment) addToSet(
 		for e := range organizeObject.GetSkuExternal().Metadata.GetTags().AllPtr() {
 			if err = outputObject.GetSkuExternal().AddTagPtr(e); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -164,9 +164,9 @@ func (a *Assignment) addToSet(
 	for _, c := range a.Children {
 		if err = c.addToSet(ot, output, objectsFromBefore); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

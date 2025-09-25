@@ -8,7 +8,7 @@ import (
 )
 
 func setUserChanges(paths []string, options userChangesOptions) (err error) {
-	return
+	return err
 	var args []string
 
 	if options.recursive {
@@ -41,8 +41,8 @@ func setUserChanges(paths []string, options userChangesOptions) (err error) {
 			err = errors.ErrorWithStackf("failed to run chflags: %q, %#v", msg, options)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }

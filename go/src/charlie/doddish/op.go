@@ -34,11 +34,11 @@ var mapOperators = map[rune]bool{
 
 func IsOperator(r rune, dotAllowed bool) (ok bool) {
 	if dotAllowed && r == '.' {
-		return
+		return ok
 	}
 
 	_, ok = mapOperators[r]
-	return
+	return ok
 }
 
 var mapSequenceOperators = map[rune]bool{
@@ -52,5 +52,5 @@ var mapSequenceOperators = map[rune]bool{
 
 func IsSequenceOperator(r rune) (ok bool) {
 	_, ok = mapSequenceOperators[r]
-	return
+	return ok
 }

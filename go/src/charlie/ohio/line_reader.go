@@ -21,17 +21,17 @@ func MakeLineReaderIterateStrict(
 				string: v,
 			})
 
-			return
+			return err
 		}
 
 		if err = rffs[i](v); err != nil {
 			err = si.Wrapf(err, "Value: %s", v)
-			return
+			return err
 		}
 
 		i++
 
-		return
+		return err
 	}
 }
 
@@ -49,7 +49,7 @@ func MakeLineReaderIterate(
 					string: v,
 				})
 
-				return
+				return err
 			}
 
 			if err = rffs[i](v); err != nil {
@@ -58,7 +58,7 @@ func MakeLineReaderIterate(
 				continue
 			}
 
-			return
+			return err
 		}
 	}
 }
@@ -76,7 +76,7 @@ func MakeLineReaderKeyValues(
 				"expected at least one space, but found none: %q",
 				line,
 			)
-			return
+			return err
 		}
 
 		key := line[:loc]
@@ -87,15 +87,15 @@ func MakeLineReaderKeyValues(
 
 		if reader, ok = dict[key]; !ok {
 			err = si.Errorf("key not supported: %q", key)
-			return
+			return err
 		}
 
 		if err = reader(value); err != nil {
 			err = si.Errorf("%s: %q", err, value)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
@@ -109,10 +109,10 @@ func MakeLineReaderRepeat(
 				string: line,
 			})
 
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 }
 
@@ -122,6 +122,6 @@ func MakeLineReaderIgnoreErrors(
 	return func(line string) (err error) {
 		in(line)
 
-		return
+		return err
 	}
 }

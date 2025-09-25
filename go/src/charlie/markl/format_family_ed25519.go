@@ -12,10 +12,10 @@ import (
 func Ed25519GeneratePrivateKey(rand io.Reader) (bites []byte, err error) {
 	if _, bites, err = ed25519.GenerateKey(rand); err != nil {
 		err = errors.Wrap(err)
-		return
+		return bites, err
 	}
 
-	return
+	return bites, err
 }
 
 func Ed25519GetPublicKey(private interfaces.MarklId) (bites []byte, err error) {
@@ -39,13 +39,13 @@ func Ed25519GetPublicKey(private interfaces.MarklId) (bites []byte, err error) {
 			"unsupported key size: %d",
 			len(privateBytes),
 		)
-		return
+		return bites, err
 	}
 
 	pubKey := privateKey.Public()
 	bites = pubKey.(ed25519.PublicKey)
 
-	return
+	return bites, err
 }
 
 func Ed25519Verify(pub, message, sig interfaces.MarklId) (err error) {
@@ -62,10 +62,10 @@ func Ed25519Verify(pub, message, sig interfaces.MarklId) (err error) {
 			err,
 			sig.StringWithFormat(),
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func Ed25519Sign(
@@ -85,8 +85,8 @@ func Ed25519Sign(
 		&ed25519.Options{},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sigBites, err
 	}
 
-	return
+	return sigBites, err
 }

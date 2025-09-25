@@ -74,19 +74,19 @@ func (cmd EditConfig) editInVim(
 		fmt.Sprintf("*.%s", repo.GetConfig().GetFileExtensions().Config),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	path := file.Name()
 
 	if err = file.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	if err = cmd.makeTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	openVimOp := user_ops.OpenEditor{
@@ -97,15 +97,15 @@ func (cmd EditConfig) editInVim(
 
 	if err = openVimOp.Run(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	if sk, err = cmd.readTempConfigFile(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
-	return
+	return sk, err
 }
 
 func (cmd EditConfig) makeTempConfigFile(
@@ -116,7 +116,7 @@ func (cmd EditConfig) makeTempConfigFile(
 
 	if k, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var i sku.FSItem
@@ -124,7 +124,7 @@ func (cmd EditConfig) makeTempConfigFile(
 
 	if err = i.Object.Set(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	i.FDs.Add(&i.Object)
@@ -135,10 +135,10 @@ func (cmd EditConfig) makeTempConfigFile(
 		&i,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (cmd EditConfig) readTempConfigFile(
@@ -149,14 +149,14 @@ func (cmd EditConfig) readTempConfigFile(
 
 	if sk.ObjectId.Set("konfig"); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -166,8 +166,8 @@ func (cmd EditConfig) readTempConfigFile(
 		sk,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sk, err
 	}
 
-	return
+	return sk, err
 }

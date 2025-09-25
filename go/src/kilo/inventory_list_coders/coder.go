@@ -21,16 +21,16 @@ func (coder coder) EncodeTo(
 	if coder.beforeEncoding != nil {
 		if err = coder.beforeEncoding(object); err != nil {
 			err = errors.Wrapf(err, "Object: %s", sku.String(object))
-			return
+			return n, err
 		}
 	}
 
 	if n, err = coder.listCoder.EncodeTo(object, bufferedWriter); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coder coder) DecodeFrom(
@@ -44,18 +44,18 @@ func (coder coder) DecodeFrom(
 			eof = true
 
 			if n == 0 {
-				return
+				return n, err
 			}
 		} else {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return n, err
 		}
 	}
 
 	if coder.afterDecoding != nil {
 		if err = coder.afterDecoding(object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -63,5 +63,5 @@ func (coder coder) DecodeFrom(
 		err = io.EOF
 	}
 
-	return
+	return n, err
 }

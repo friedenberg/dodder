@@ -23,7 +23,7 @@ func (store *Store) CheckoutOne(
 	sz sku.TransactedGetter,
 ) (col sku.SkuType, err error) {
 	col, _, err = store.checkoutOneIfNecessary(options, sz)
-	return
+	return col, err
 }
 
 func (store *Store) checkoutOneForReal(
@@ -32,7 +32,7 @@ func (store *Store) checkoutOneForReal(
 	item *sku.FSItem,
 ) (err error) {
 	if store.config.IsDryRun() {
-		return
+		return err
 	}
 
 	fsOptions := GetCheckoutOptionsFromOptions(options)
@@ -41,7 +41,7 @@ func (store *Store) checkoutOneForReal(
 	if fsOptions.Path == PathOptionDefault {
 		if err = store.RemoveItem(item); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -53,12 +53,12 @@ func (store *Store) checkoutOneForReal(
 		&info,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.setObjectIfNecessary(options, item, info); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.setBlobIfNecessary(
@@ -67,7 +67,7 @@ func (store *Store) checkoutOneForReal(
 		info,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// This is necessary otherwise External is an empty sku
@@ -75,7 +75,7 @@ func (store *Store) checkoutOneForReal(
 
 	if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.fileEncoder.Encode(
@@ -84,10 +84,10 @@ func (store *Store) checkoutOneForReal(
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) setObjectIfNecessary(
@@ -98,17 +98,17 @@ func (store *Store) setObjectIfNecessary(
 	if !options.CheckoutMode.IncludesMetadata() {
 		i.FDs.Del(&i.Object)
 		i.Object.Reset()
-		return
+		return err
 	}
 
 	if err = i.Object.SetPath(info.objectName); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	i.FDs.Add(&i.Object)
 
-	return
+	return err
 }
 
 func (store *Store) setBlobIfNecessary(
@@ -122,7 +122,7 @@ func (store *Store) setBlobIfNecessary(
 		!options.CheckoutMode.IncludesBlob() {
 		i.FDs.Del(&i.Blob)
 		i.Blob.Reset()
-		return
+		return err
 	}
 
 	fe := store.config.GetTypeExtension(info.tipe.String())
@@ -135,12 +135,12 @@ func (store *Store) setBlobIfNecessary(
 		info.basename + "." + fe,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	i.FDs.Add(&i.Blob)
 
-	return
+	return err
 }
 
 func (store *Store) shouldCheckOut(
@@ -200,7 +200,7 @@ func (store *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 ) (err error) {
 	if err = store.SetFilenameForTransacted(options, co.GetSku(), info); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	co.SetState(checked_out_state.JustCheckedOut)
@@ -208,7 +208,7 @@ func (store *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	info.tipe = co.GetSku().GetType()
 	info.inlineBlob = store.config.IsInlineType(info.tipe)
 
-	return
+	return err
 }
 
 func (store *Store) SetFilenameForTransacted(
@@ -230,7 +230,7 @@ func (store *Store) SetFilenameForTransacted(
 			),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, f)
@@ -238,7 +238,7 @@ func (store *Store) SetFilenameForTransacted(
 		info.basename = f.Name()
 		info.objectName = f.Name()
 
-		return
+		return err
 	}
 
 	if sk.GetGenre() == genres.Zettel {
@@ -246,7 +246,7 @@ func (store *Store) SetFilenameForTransacted(
 
 		if err = zettelId.Set(sk.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if info.basename, err = env_dir.MakeDirIfNecessaryForStringerWithHeadAndTail(
@@ -254,7 +254,7 @@ func (store *Store) SetFilenameForTransacted(
 			cwd,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		info.objectName = store.PathForTransacted(cwd, sk)
@@ -268,7 +268,7 @@ func (store *Store) SetFilenameForTransacted(
 			"contains illegal characters: %q",
 			info.basename,
 		)
-		return
+		return err
 	}
 
 	if strings.Contains(info.objectName, "!") {
@@ -276,10 +276,10 @@ func (store *Store) SetFilenameForTransacted(
 			"contains illegal characters: %q",
 			info.objectName,
 		)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) PathForTransacted(dir string, sk *sku.Transacted) string {
@@ -320,13 +320,13 @@ func (store *Store) RemoveItem(i *sku.FSItem) (err error) {
 	for fdItem := range i.FDs.All() {
 		if err = fdItem.Remove(store.envRepo); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	i.Reset()
 
-	return
+	return err
 }
 
 func (store *Store) UpdateCheckoutFromCheckedOut(
@@ -341,11 +341,11 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if o.CheckoutMode == checkout_mode.None {
-		return
+		return err
 	}
 
 	fsOptions := GetCheckoutOptionsFromOptionsWithoutMode(options)
@@ -357,7 +357,7 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 
 	if oldFDs, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if replacement, newFDs, err = store.checkoutOneIfNecessary(
@@ -365,7 +365,7 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer GetCheckedOutPool().Put(replacement)
@@ -378,7 +378,7 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 			oldFDs.Object.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -396,9 +396,9 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 				oldFDs.Blob.GetPath(),
 			)
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

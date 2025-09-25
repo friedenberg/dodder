@@ -54,11 +54,11 @@ func MakeIndex(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return i, err
 		}
 	}
 
-	return
+	return i, err
 }
 
 func (i *index) Flush() (err error) {
@@ -67,7 +67,7 @@ func (i *index) Flush() (err error) {
 	if !i.hasChanges {
 		ui.Log().Print("no changes")
 		i.lock.RUnlock()
-		return
+		return err
 	}
 
 	i.lock.RUnlock()
@@ -76,7 +76,7 @@ func (i *index) Flush() (err error) {
 
 	if w1, err = i.su.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.Deferred(&err, w1.Close)
@@ -89,10 +89,10 @@ func (i *index) Flush() (err error) {
 
 	if err = enc.Encode(i.bitset); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded zettel id")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (i *index) readIfNecessary() (err error) {
@@ -100,7 +100,7 @@ func (i *index) readIfNecessary() (err error) {
 
 	if i.didRead {
 		i.lock.RUnlock()
-		return
+		return err
 	}
 
 	i.lock.RUnlock()
@@ -121,7 +121,7 @@ func (i *index) readIfNecessary() (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	defer r1.Close()
@@ -132,10 +132,10 @@ func (i *index) readIfNecessary() (err error) {
 
 	if err = dec.Decode(i.bitset); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (i *index) Reset() (err error) {
@@ -144,49 +144,49 @@ func (i *index) Reset() (err error) {
 
 	if lMax == 0 {
 		err = errors.ErrorWithStackf("left zettel id are empty")
-		return
+		return err
 	}
 
 	if rMax == 0 {
 		err = errors.ErrorWithStackf("right zettel id are empty")
-		return
+		return err
 	}
 
 	i.bitset = collections.MakeBitsetOn(lMax * rMax)
 
 	i.hasChanges = true
 
-	return
+	return err
 }
 
 func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
-		return
+		return err
 	}
 
 	var h ids.ZettelId
 
 	if err = h.Set(k1.String()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var left, right int
 
 	if left, err = i.oldHinweisenStore.Left().ZettelId(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if right, err = i.oldHinweisenStore.Right().ZettelId(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	k := coordinates.ZettelIdCoordinate{
@@ -204,25 +204,25 @@ func (i *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
 
 	i.hasChanges = true
 
-	return
+	return err
 }
 
 func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	if i.bitset.CountOn() == 0 {
 		err = errors.ErrorWithStackf("no available zettel ids")
-		return
+		return h, err
 	}
 
 	rand.Seed(time.Now().UnixNano())
 
 	if i.bitset.CountOn() == 0 {
 		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
-		return
+		return h, err
 	}
 
 	ri := 0
@@ -239,11 +239,11 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 			if i.nonRandomSelection {
 				if m == 0 {
 					m = n
-					return
+					return err
 				}
 
 				if n > m {
-					return
+					return err
 				}
 
 				m = n
@@ -253,15 +253,15 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 
 				if j == ri {
 					err = errors.MakeErrStopIteration()
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return h, err
 	}
 
 	i.bitset.DelIfPresent(int(m))
@@ -283,16 +283,16 @@ func (i *index) makeHinweisButDontStore(
 		i.oldHinweisenStore.Right(),
 	); err != nil {
 		err = errors.Wrapf(err, "trying to make hinweis for %s, %d", k, j)
-		return
+		return h, err
 	}
 
-	return
+	return h, err
 }
 
 func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return hs, err
 	}
 
 	if m > i.bitset.CountOn() || m == 0 {
@@ -312,7 +312,7 @@ func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 
 			if h, err = i.makeHinweisButDontStore(n); err != nil {
 				err = errors.Wrapf(err, "# %d", n)
-				return
+				return err
 			}
 
 			hs = append(hs, h)
@@ -321,15 +321,15 @@ func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 
 			if j == m {
 				err = errors.MakeErrStopIteration()
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return hs, err
 	}
 
-	return
+	return hs, err
 }

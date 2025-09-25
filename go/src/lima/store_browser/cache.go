@@ -37,7 +37,7 @@ func (store *Store) initializeCache() (err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -48,17 +48,17 @@ func (store *Store) initializeCache() (err error) {
 	if err = dec.Decode(&store.tabCache); err != nil {
 		ui.Err().Printf("browser tab cache parse failed: %s", err)
 		err = nil
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) resetCacheIfNecessary(
 	resp *http.Response,
 ) (err error) {
 	if resp == nil {
-		return
+		return err
 	}
 
 	timeRaw := resp.Header.Get("X-Chrest-Startup-Time")
@@ -67,17 +67,17 @@ func (store *Store) resetCacheIfNecessary(
 
 	if err = newLaunchTime.SetFromRFC3339(timeRaw); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if newLaunchTime.Equals(store.tabCache.LaunchTime) {
-		return
+		return err
 	}
 
 	store.tabCache.LaunchTime = newLaunchTime
 	clear(store.tabCache.Rows)
 
-	return
+	return err
 }
 
 func (store *Store) flushCache() (err error) {
@@ -92,11 +92,11 @@ func (store *Store) flushCache() (err error) {
 				files.CreateExclusiveWriteOnly,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -109,8 +109,8 @@ func (store *Store) flushCache() (err error) {
 
 	if err = dec.Encode(&store.tabCache); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

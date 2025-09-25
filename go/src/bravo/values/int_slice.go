@@ -35,7 +35,7 @@ func (slice *IntSlice) Set(value string) (err error) {
 			"invalid format, expected at least one number but got: %q",
 			value,
 		)
-		return
+		return err
 	}
 
 	*slice = make([]int, len(elements))
@@ -45,11 +45,11 @@ func (slice *IntSlice) Set(value string) (err error) {
 
 		if n, err = strconv.Atoi(elements[i]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		(*slice)[i] = n
 	}
 
-	return
+	return err
 }

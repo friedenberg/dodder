@@ -40,8 +40,8 @@ func (u *Utility) String() string {
 func (u *Utility) Set(v string) (err error) {
 	if *u, err = shlex.Split(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

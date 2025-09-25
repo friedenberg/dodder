@@ -69,7 +69,7 @@ const thisSkip = 1
 //go:noinline
 func Errorf(format string, args ...any) (err error) {
 	err = fmt.Errorf(format, args...)
-	return
+	return err
 }
 
 //go:noinline
@@ -157,7 +157,7 @@ type funcGetNext func() (error, funcGetNext)
 //go:noinline
 func WrapExceptSentinelAsNil(in error, except ...error) (err error) {
 	if in == nil {
-		return
+		return err
 	}
 
 	if slices.Contains(except, in) {
@@ -166,7 +166,7 @@ func WrapExceptSentinelAsNil(in error, except ...error) (err error) {
 
 	err = WrapSkip(thisSkip, in)
 
-	return
+	return err
 }
 
 // Wrap the error with stack info unless it's one of the provided `except`
@@ -176,7 +176,7 @@ func WrapExceptSentinelAsNil(in error, except ...error) (err error) {
 //go:noinline
 func WrapExceptSentinel(in error, except ...error) (err error) {
 	if in == nil {
-		return
+		return err
 	}
 
 	if slices.Contains(except, in) {
@@ -185,5 +185,5 @@ func WrapExceptSentinel(in error, except ...error) (err error) {
 
 	err = WrapSkip(thisSkip, in)
 
-	return
+	return err
 }

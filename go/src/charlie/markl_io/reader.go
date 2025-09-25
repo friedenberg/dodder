@@ -34,7 +34,7 @@ func MakeReadCloser(
 
 	src.setupTee()
 
-	return
+	return src
 }
 
 func MakeReadCloserTee(
@@ -59,7 +59,7 @@ func MakeReadCloserTee(
 
 	src.setupTee()
 
-	return
+	return src
 }
 
 func (readCloser *readCloser) setupTee() {
@@ -84,7 +84,7 @@ func (readCloser readCloser) Seek(
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
-		return
+		return actual, err
 	}
 
 	return seeker.Seek(offset, whence)
@@ -97,11 +97,11 @@ func (readCloser readCloser) WriteTo(w io.Writer) (n int64, err error) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (readCloser readCloser) Read(b []byte) (n int, err error) {
@@ -117,7 +117,7 @@ func (readCloser readCloser) Close() (err error) {
 		defer errors.DeferredCloser(&err, c)
 	}
 
-	return
+	return err
 }
 
 func (readCloser readCloser) GetMarklId() interfaces.MarklId {
@@ -144,7 +144,7 @@ func MakeNopReadCloser(
 
 func (nopReadCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	err = errors.ErrorWithStackf("seeking not supported")
-	return
+	return actual, err
 }
 
 func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {

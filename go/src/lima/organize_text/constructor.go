@@ -50,7 +50,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 		}
 	}
 
-	return
+	return explicitCount, implicitCount, err
 }
 
 func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
@@ -65,7 +65,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 			re,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
@@ -73,7 +73,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 		// TODO [radi/du !task project-2021-zit-etiketten_and_organize zz-inbox] fix issue with `zit organize project-2021-zit` causing an extra tag…
 		if err = anchored.Add(re); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 		// if explicitCount == c.Options.Skus.Len() {
 		// 	if err = extras.Add(re); err != nil {
@@ -86,7 +86,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	c.TagSet = anchored
 	c.ExtraTags = extras
 
-	return
+	return err
 }
 
 func (c *constructor) populate() (err error) {
@@ -104,7 +104,7 @@ func (c *constructor) populate() (err error) {
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = c.makeChildrenWithoutGroups(
@@ -120,7 +120,7 @@ func (c *constructor) populate() (err error) {
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -133,10 +133,10 @@ func (c *constructor) populate() (err error) {
 		allUsed,
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *constructor) makeChildrenWithoutGroups(
@@ -146,15 +146,15 @@ func (c *constructor) makeChildrenWithoutGroups(
 ) (err error) {
 	if err = fi(used.Add); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.makeAndAddUngrouped(parent, fi); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (c *constructor) makeChildrenWithPossibleGroups(
@@ -169,18 +169,18 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 
 			if z, err = c.cloneObj(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			parent.AddObject(z)
 
 			if err = used.Add(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
-		return
+		return err
 	}
 
 	segments := prefixSet.Subset(groupingTags[0])
@@ -194,7 +194,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 		return nil
 	}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.addGroupedChildren(
@@ -204,12 +204,12 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 		used,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	parent.SortChildren()
 
-	return
+	return err
 }
 
 func (c *constructor) addGroupedChildren(
@@ -234,13 +234,13 @@ func (c *constructor) addGroupedChildren(
 				return nil
 			}); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			for element := range zs.All() {
 				if err = used.Add(element); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
@@ -260,13 +260,13 @@ func (c *constructor) addGroupedChildren(
 			used,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		parent.addChild(child)
 	}
 
-	return
+	return err
 }
 
 func (c *constructor) makeAndAddUngrouped(
@@ -279,18 +279,18 @@ func (c *constructor) makeAndAddUngrouped(
 
 			if z, err = c.cloneObj(tz); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			parent.AddObject(z)
 
-			return
+			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
-	return
+	return err
 }
 
 func (c *constructor) cloneObj(
@@ -310,5 +310,5 @@ func (c *constructor) cloneObj(
 	// 	panic("empty sha")
 	// }
 
-	return
+	return z, err
 }

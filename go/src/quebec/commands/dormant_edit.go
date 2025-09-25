@@ -74,7 +74,7 @@ func (cmd DormantEdit) editInVim(
 
 	if p, err = cmd.makeTempKonfigFile(u); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
 	openVimOp := user_ops.OpenEditor{
@@ -84,15 +84,15 @@ func (cmd DormantEdit) editInVim(
 
 	if err = openVimOp.Run(u, p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
 	if sh, err = cmd.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
-	return
+	return sh, err
 }
 
 // TODO refactor into common
@@ -103,14 +103,14 @@ func (cmd DormantEdit) makeTempKonfigFile(
 
 	if object, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
 	var file *os.File
 
 	if file, err = repo.GetEnvRepo().GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -121,17 +121,17 @@ func (cmd DormantEdit) makeTempKonfigFile(
 		object.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
 	path = file.Name()
 
 	if _, err = ohio.CopyBuffered(file, readCloser); err != nil {
 		err = errors.Wrap(err)
-		return
+		return path, err
 	}
 
-	return
+	return path, err
 }
 
 // TODO refactor into common
@@ -143,7 +143,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -152,7 +152,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
 	defer errors.DeferredCloser(&err, writeCloser)
@@ -167,12 +167,12 @@ func (cmd DormantEdit) readTempKonfigFile(
 		io.TeeReader(file, writeCloser),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sh, err
 	}
 
 	// TODO persist blob type
 
 	sh = writeCloser.GetMarklId()
 
-	return
+	return sh, err
 }

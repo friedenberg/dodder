@@ -32,15 +32,15 @@ func (f savedBlobFormatter) FormatSavedBlob(
 			err = errors.Wrap(err)
 		}
 
-		return
+		return n, err
 	}
 
 	defer errors.DeferredCloser(&err, ar)
 
 	if n, err = io.Copy(w, ar); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

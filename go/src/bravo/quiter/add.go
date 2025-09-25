@@ -15,7 +15,7 @@ func AddClone[E any, EPtr interface {
 		var e1 E
 		EPtr(&e1).ResetWithPtr((*E)(e))
 		c.Add(&e1)
-		return
+		return err
 	}
 }
 
@@ -52,7 +52,7 @@ func AddOrReplaceIfGreater[T interface {
 		err = c.Add(b)
 	}
 
-	return
+	return shouldAdd, err
 }
 
 func AddString[E any, EPtr interfaces.SetterPtr[E]](
@@ -63,13 +63,13 @@ func AddString[E any, EPtr interfaces.SetterPtr[E]](
 
 	if err = EPtr(&e).Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = c.Add(e); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

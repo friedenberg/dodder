@@ -15,15 +15,15 @@ func (page *page) writeIntoRow(
 ) (n int64, err error) {
 	if n, err = row.ReadFrom(reader, page.hashType); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	if err = markl.MakeErrLength(int64(page.rowWidth), n); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (page *page) readFromRow(
@@ -32,15 +32,15 @@ func (page *page) readFromRow(
 ) (n int64, err error) {
 	if n, err = row.WriteTo(writer); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	if err = markl.MakeErrLength(int64(page.rowWidth), n); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type row struct {
@@ -72,7 +72,7 @@ func (row *row) ReadFrom(
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n2, err = row.Loc.ReadFrom(reader)
@@ -80,10 +80,10 @@ func (row *row) ReadFrom(
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
@@ -95,7 +95,7 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n2, err = row.Loc.WriteTo(writer)
@@ -103,10 +103,10 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 type rowEqualerComplete struct{}

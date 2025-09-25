@@ -98,7 +98,7 @@ func ReadErrorFromBody(response *http.Response) (err error) {
 			err,
 		)
 
-		return
+		return err
 	}
 
 	body := sb.String()
@@ -129,7 +129,7 @@ func ReadErrorFromBody(response *http.Response) (err error) {
 		)
 	}
 
-	return
+	return err
 }
 
 func ReadErrorFromBodyOnGreaterOrEqual(
@@ -137,12 +137,12 @@ func ReadErrorFromBodyOnGreaterOrEqual(
 	status int,
 ) (err error) {
 	if response.StatusCode < status {
-		return
+		return err
 	}
 
 	err = ReadErrorFromBody(response)
 
-	return
+	return err
 }
 
 func ReadErrorFromBodyOnNot(
@@ -150,10 +150,10 @@ func ReadErrorFromBodyOnNot(
 	statuses ...int,
 ) (err error) {
 	if slices.Contains(statuses, response.StatusCode) {
-		return
+		return err
 	}
 
 	err = ReadErrorFromBody(response)
 
-	return
+	return err
 }

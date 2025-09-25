@@ -37,7 +37,7 @@ func makeTestSeq(tokens ...any) (ts testSeq) {
 		)
 	}
 
-	return
+	return ts
 }
 
 func makeTestSeqFromSeq(seq Seq) (ts testSeq) {
@@ -48,7 +48,7 @@ func makeTestSeqFromSeq(seq Seq) (ts testSeq) {
 		})
 	}
 
-	return
+	return ts
 }
 
 func makeSeqFromTestSeq(seq testSeq) (ts Seq) {
@@ -59,5 +59,5 @@ func makeSeqFromTestSeq(seq testSeq) (ts Seq) {
 		})
 	}
 
-	return
+	return ts
 }

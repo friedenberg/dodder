@@ -12,7 +12,7 @@ func (env *env) FormatOutputOptions(
 ) (o string_format_writer.OutputOptions) {
 	o.ColorOptionsOut = env.FormatColorOptionsOut(printOptions)
 	o.ColorOptionsErr = env.FormatColorOptionsErr(printOptions)
-	return
+	return o
 }
 
 func (env *env) shouldUseColorOutput(
@@ -30,14 +30,14 @@ func (env *env) FormatColorOptionsOut(
 	printOptions options_print.Options,
 ) (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !env.shouldUseColorOutput(printOptions, env.GetOut())
-	return
+	return o
 }
 
 func (env *env) FormatColorOptionsErr(
 	printOptions options_print.Options,
 ) (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !env.shouldUseColorOutput(printOptions, env.GetErr())
-	return
+	return o
 }
 
 func (env *env) StringFormatWriterFields(

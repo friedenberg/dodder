@@ -142,7 +142,7 @@ func TestBitset7Each(t1 *testing.T) {
 
 			i++
 
-			return
+			return err
 		},
 	); err != nil {
 		t.Errorf("expected no error but got %s", err)

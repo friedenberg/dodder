@@ -77,7 +77,7 @@ func makeBitset(n int) (bs *bitset) {
 		lock:  &sync.Mutex{},
 	}
 
-	return
+	return bs
 }
 
 func (b bitset) Cap() int {
@@ -143,11 +143,11 @@ func (b bitset) EachOff(f interfaces.FuncIter[int]) (err error) {
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (b bitset) EachOn(f interfaces.FuncIter[int]) (err error) {
@@ -168,11 +168,11 @@ func (b bitset) EachOn(f interfaces.FuncIter[int]) (err error) {
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (a bitset) Equals(b Bitset) bool {
@@ -279,7 +279,7 @@ func (b bitset) MarshalBinary() (bs []byte, err error) {
 		binary.BigEndian.PutUint32(bs[bytesPerInt*i:], v)
 	}
 
-	return
+	return bs, err
 }
 
 func (b *bitset) UnmarshalBinary(bs []byte) (err error) {
@@ -292,5 +292,5 @@ func (b *bitset) UnmarshalBinary(bs []byte) (err error) {
 		b.slice[i] = n
 	}
 
-	return
+	return err
 }

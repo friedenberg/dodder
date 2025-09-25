@@ -51,7 +51,7 @@ func (json *JSON) FromStringAndMetadata(
 			metadata.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, readCloser)
@@ -60,7 +60,7 @@ func (json *JSON) FromStringAndMetadata(
 
 		if _, err = io.Copy(&blobStringBuilder, readCloser); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		json.BlobString = blobStringBuilder.String()
@@ -103,7 +103,7 @@ func (json *JSON) FromStringAndMetadata(
 
 	// TODO add support for "preview"
 
-	return
+	return err
 }
 
 // TODO accept blob store instead of env
@@ -127,7 +127,7 @@ func (json *JSON) ToTransacted(
 
 		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, writeCloser)
@@ -137,7 +137,7 @@ func (json *JSON) ToTransacted(
 
 		if _, err = io.Copy(writeCloser, reader); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		// TODO just compare blob digests
@@ -151,30 +151,30 @@ func (json *JSON) ToTransacted(
 			json.BlobId,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if err = object.ObjectId.Set(json.ObjectId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = object.Metadata.Type.Set(json.Type); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = object.Metadata.Description.Set(json.Description); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var tagSet ids.TagSet
 
 	if tagSet, err = ids.MakeTagSetStrings(json.Tags...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	object.Metadata.SetTags(tagSet)
@@ -187,12 +187,12 @@ func (json *JSON) ToTransacted(
 	if json.Tai != "" {
 		if err = object.Metadata.Tai.Set(json.Tai); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else if json.Date != "" {
 		if err = object.Metadata.Tai.SetFromRFC3339(json.Date); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -200,12 +200,12 @@ func (json *JSON) ToTransacted(
 	if json.Sha != "" {
 		if err = object.Metadata.SelfWithoutTai.Set(json.Sha); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	// Set Dormant state
 	object.Metadata.Cache.Dormant.SetBool(json.Dormant)
 
-	return
+	return err
 }

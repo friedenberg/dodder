@@ -15,7 +15,7 @@ type tagsReader struct{}
 func MakeTagsReader() (f *tagsReader) {
 	f = &tagsReader{}
 
-	return
+	return f
 }
 
 func (f *tagsReader) ReadStringFormat(
@@ -31,11 +31,11 @@ func (f *tagsReader) ReadStringFormat(
 
 	if readable, err = rb.PeekUptoAndIncluding('\n'); err != nil && err != io.EOF {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if readable.Len() == 1 {
-		return
+		return n, err
 	}
 
 	tag := strings.TrimSpace(readable.String())
@@ -45,12 +45,12 @@ func (f *tagsReader) ReadStringFormat(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
 	n = int64(readable.Len())
 	rb.AdvanceRead(readable.Len())
 
-	return
+	return n, err
 }

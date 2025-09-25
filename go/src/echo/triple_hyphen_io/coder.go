@@ -22,7 +22,7 @@ func (coder *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "metadata read failed")
-		return
+		return n, err
 	}
 
 	n1, err = coder.Blob.DecodeFrom(object, bufio.NewReader(r))
@@ -30,10 +30,10 @@ func (coder *Coder[O]) DecodeFrom(object O, r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "blob read failed")
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coder *Coder[O]) readMetadataFrom(
@@ -45,12 +45,12 @@ func (coder *Coder[O]) readMetadataFrom(
 
 	if coder.RequireMetadata && coder.Metadata == nil {
 		err = errors.ErrorWithStackf("metadata reader is nil")
-		return
+		return n, err
 	}
 
 	if coder.Blob == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
-		return
+		return n, err
 	}
 
 	var metadataPipe ohio.PipedReader
@@ -66,7 +66,7 @@ LINE_READ_LOOP:
 
 		if err != nil && err != io.EOF {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if errors.IsEOF(err) {
@@ -81,7 +81,7 @@ LINE_READ_LOOP:
 			switch {
 			case coder.RequireMetadata && line != Boundary:
 				err = errors.ErrorWithStackf("expected %q but got %q", Boundary, line)
-				return
+				return n, err
 
 			case line != Boundary:
 				*bufferedReader = io.MultiReader(
@@ -100,7 +100,7 @@ LINE_READ_LOOP:
 			if line == Boundary {
 				if _, err = metadataPipe.Close(); err != nil {
 					err = errors.Wrapf(err, "metadata read failed")
-					return
+					return n, err
 				}
 
 				state += 1
@@ -109,7 +109,7 @@ LINE_READ_LOOP:
 
 			if _, err = metadataPipe.Write([]byte(rawLine)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 
 		case readerStateSecondBoundary:
@@ -118,11 +118,11 @@ LINE_READ_LOOP:
 
 		default:
 			err = errors.ErrorWithStackf("impossible state %d", state)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (coder Coder[O]) EncodeTo(
@@ -147,7 +147,7 @@ func (coder Coder[O]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = coder.Metadata.EncodeTo(object, bufferedWriter)
@@ -155,7 +155,7 @@ func (coder Coder[O]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		bufferedWriter.WriteString(Boundary + "\n")
@@ -163,7 +163,7 @@ func (coder Coder[O]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		bufferedWriter.WriteString("\n")
@@ -171,7 +171,7 @@ func (coder Coder[O]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -181,9 +181,9 @@ func (coder Coder[O]) EncodeTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

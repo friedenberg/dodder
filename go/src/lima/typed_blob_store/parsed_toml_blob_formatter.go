@@ -25,8 +25,8 @@ func (TomlBlobEncoder[O, OPtr]) EncodeTo(
 
 	if err = enc.Encode(t); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

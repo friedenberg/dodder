@@ -13,7 +13,7 @@ import (
 
 func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
 	out.m = make(map[string]skuTypeWithIndex, c)
-	return
+	return out
 }
 
 type skuTypeWithIndex struct {
@@ -103,7 +103,7 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.SkuType) {
 		}
 	})
 
-	return
+	return out
 }
 
 func (smwo *SkuMapWithOrder) AllSkuAndIndex() interfaces.Seq2[int, sku.SkuType] {
@@ -153,10 +153,10 @@ func ChangesFrom(
 			Original: original,
 		}); err != nil {
 		err = errors.Wrap(err)
-		return
+		return c, err
 	}
 
-	return
+	return c, err
 }
 
 func ChangesFromResults(
@@ -165,17 +165,17 @@ func ChangesFromResults(
 ) (c Changes, err error) {
 	if err = applyToText(po, results.Before); err != nil {
 		err = errors.Wrap(err)
-		return
+		return c, err
 	}
 
 	if c.Before, err = results.Before.GetSkus(results.Original); err != nil {
 		err = errors.Wrap(err)
-		return
+		return c, err
 	}
 
 	if c.After, err = results.After.GetSkus(results.Original); err != nil {
 		err = errors.Wrap(err)
-		return
+		return c, err
 	}
 
 	c.Changed = c.After.Clone()
@@ -184,23 +184,23 @@ func ChangesFromResults(
 	for _, sk := range c.After.m {
 		if err = c.Removed.Del(sk.sku); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 	}
 
 	for _, sk := range c.Removed.AllSkuAndIndex() {
 		if err = results.Before.RemoveFromTransacted(sk); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 
 		if err = c.Changed.Add(sk); err != nil {
 			err = errors.Wrap(err)
-			return
+			return c, err
 		}
 	}
 
-	return
+	return c, err
 }
 
 func applyToText(
@@ -208,7 +208,7 @@ func applyToText(
 	t *Text,
 ) (err error) {
 	if po.BoxPrintTagsAlways {
-		return
+		return err
 	}
 
 	for el := range t.Options.Skus.All() {
@@ -221,5 +221,5 @@ func applyToText(
 		sk.Metadata.ResetTags()
 	}
 
-	return
+	return err
 }

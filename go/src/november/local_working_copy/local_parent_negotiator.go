@@ -27,10 +27,10 @@ func (parentNegotiator ParentNegotiatorFirstAncestor) FindBestCommonAncestor(
 				conflicted.Local.GetObjectId(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	)
 
@@ -40,20 +40,20 @@ func (parentNegotiator ParentNegotiatorFirstAncestor) FindBestCommonAncestor(
 				conflicted.Local.GetObjectId(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ancestor, err
 	}
 
 	if len(ancestorsLocal) == 0 || len(ancestorsRemote) == 0 {
-		return
+		return ancestor, err
 	}
 
 	// TODO repool all skus except ancestor
@@ -65,5 +65,5 @@ func (parentNegotiator ParentNegotiatorFirstAncestor) FindBestCommonAncestor(
 		ancestor = ancestorLocal
 	}
 
-	return
+	return ancestor, err
 }

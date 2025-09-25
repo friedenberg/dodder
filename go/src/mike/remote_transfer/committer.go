@@ -29,7 +29,7 @@ func (committer *committer) Commit(
 ) (err error) {
 	if err = committer.deduper.shouldCommit(object); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = committer.storeObject.Commit(
@@ -37,7 +37,7 @@ func (committer *committer) Commit(
 		commitOptions,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
-	return
+	return err
 }

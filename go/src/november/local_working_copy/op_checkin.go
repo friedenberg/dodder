@@ -31,7 +31,7 @@ func (local *Repo) Checkin(
 				co,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return processed, err
 			}
 		}
 
@@ -51,7 +51,7 @@ func (local *Repo) Checkin(
 					err = nil
 				} else {
 					err = errors.Wrap(err)
-					return
+					return processed, err
 				}
 			}
 
@@ -66,7 +66,7 @@ func (local *Repo) Checkin(
 				},
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return processed, err
 			}
 		} else {
 			if err = local.GetStore().CreateOrUpdateCheckedOut(
@@ -74,7 +74,7 @@ func (local *Repo) Checkin(
 				!delete,
 			); err != nil {
 				err = errors.Wrapf(err, "CheckedOut: %s", co)
-				return
+				return processed, err
 			}
 		}
 
@@ -84,16 +84,16 @@ func (local *Repo) Checkin(
 
 		if err = local.GetStore().DeleteCheckedOut(co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return processed, err
 		}
 
 		if err = processed.Add(co.GetSkuExternal().CloneTransacted()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return processed, err
 		}
 	}
 
 	local.Must(errors.MakeFuncContextFromFuncErr(local.Unlock))
 
-	return
+	return processed, err
 }

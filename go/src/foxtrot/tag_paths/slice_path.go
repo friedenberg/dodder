@@ -44,7 +44,7 @@ func (s *SlicePaths) AddNonEmptyPath(p *Path) {
 
 func (s *SlicePaths) AddPath(p *Path) (idx int, alreadyExists bool) {
 	if p.IsEmpty() {
-		return
+		return idx, alreadyExists
 	}
 
 	// p = p.Clone()
@@ -52,10 +52,10 @@ func (s *SlicePaths) AddPath(p *Path) (idx int, alreadyExists bool) {
 	idx, alreadyExists = s.ContainsPath(p)
 
 	if alreadyExists {
-		return
+		return idx, alreadyExists
 	}
 
 	*s = slices.Insert(*s, idx, p)
 
-	return
+	return idx, alreadyExists
 }

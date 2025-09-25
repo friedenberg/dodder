@@ -30,7 +30,7 @@ func (encoder encoder) EncodeTo(
 	err = state.encode(input)
 	bytesWritten = int64(state.bytesWritten)
 
-	return
+	return bytesWritten, err
 }
 
 func (encoder encoder) prefixForDepthChild(
@@ -217,7 +217,7 @@ func (encoder encoder) encodeToBufferedWriter(
 			lastChild,
 		)
 
-		return
+		return err
 
 	default:
 	}
@@ -230,5 +230,5 @@ func (encoder encoder) encodeToBufferedWriter(
 		lastChild,
 	)
 
-	return
+	return err
 }

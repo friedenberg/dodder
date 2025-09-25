@@ -40,10 +40,10 @@ func (f Flag) Set(v string) (err error) {
 
 	if err = f.set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (f Flag) String() string {

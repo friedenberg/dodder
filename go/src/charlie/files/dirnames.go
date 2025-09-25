@@ -13,10 +13,10 @@ import (
 func ReadDir(ps ...string) (dirEntries []os.DirEntry, err error) {
 	if dirEntries, err = os.ReadDir(path.Join(ps...)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return dirEntries, err
 	}
 
-	return
+	return dirEntries, err
 }
 
 func ReadDirNamesTo(
@@ -27,17 +27,17 @@ func ReadDirNamesTo(
 
 	if names, err = ReadDir(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, n := range names {
 		if err = wf(path.Join(p, n.Name())); err != nil {
 			err = errors.Wrapf(err, "Path: %q, Name: %q", p, n.Name())
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func MakeDirNameWriterIgnoringHidden(
@@ -46,7 +46,7 @@ func MakeDirNameWriterIgnoringHidden(
 	return func(p string) (err error) {
 		b := filepath.Base(p)
 		if strings.HasPrefix(b, ".") {
-			return
+			return err
 		}
 
 		return wf(p)
@@ -70,10 +70,10 @@ func ReadDirNamesLevel2(
 			p1,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = ReadDirNamesTo(
@@ -81,8 +81,8 @@ func ReadDirNamesLevel2(
 		p,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

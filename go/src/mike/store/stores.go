@@ -20,11 +20,11 @@ func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {
 			err = nil
 		} else {
 			err = errors.Wrapf(err, "Sku: %s", el)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
@@ -32,10 +32,10 @@ func (store *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
 
 	if err = es.DeleteCheckedOut(col); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CheckoutQuery(
@@ -58,30 +58,30 @@ func (store *Store) CheckoutQuery(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 
 		if !store.envWorkspace.IsTemporary() {
 			if err = store.ui.CheckedOut(co); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if err = out(co); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = store.QueryTransacted(query, qf); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) CheckoutOne(
@@ -96,10 +96,10 @@ func (store *Store) CheckoutOne(
 		sz,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return cz, err
 	}
 
-	return
+	return cz, err
 }
 
 func (store *Store) UpdateCheckoutFromCheckedOut(
@@ -113,10 +113,10 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 		col,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) Open(
@@ -129,10 +129,10 @@ func (store *Store) Open(
 
 	if err = es.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) makeQueryExecutor(
@@ -141,7 +141,7 @@ func (store *Store) makeQueryExecutor(
 	if queryGroup == nil {
 		if queryGroup, err = store.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return executor, err
 		}
 	}
 
@@ -154,7 +154,7 @@ func (store *Store) makeQueryExecutor(
 		externalStore,
 	)
 
-	return
+	return executor, err
 }
 
 // TODO make this configgable
@@ -165,10 +165,10 @@ func (store *Store) MergeConflicted(
 
 	if err = es.Merge(conflicted); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) RunMergeTool(
@@ -188,18 +188,18 @@ func (store *Store) RunMergeTool(
 			conflicted,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer store.PutCheckedOutLike(checkedOut)
 
 		if err = store.CreateOrUpdateCheckedOut(checkedOut, false); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) UpdateTransactedWithExternal(
@@ -210,10 +210,10 @@ func (store *Store) UpdateTransactedWithExternal(
 
 	if err = es.UpdateTransacted(z); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadCheckedOutFromTransacted(
@@ -224,10 +224,10 @@ func (store *Store) ReadCheckedOutFromTransacted(
 
 	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, err
 	}
 
-	return
+	return co, err
 }
 
 func (store *Store) UpdateTransactedFromBlobs(
@@ -239,8 +239,8 @@ func (store *Store) UpdateTransactedFromBlobs(
 
 	if err = es.UpdateTransactedFromBlobs(external); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

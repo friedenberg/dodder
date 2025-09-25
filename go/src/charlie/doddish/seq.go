@@ -65,7 +65,7 @@ func (seq Seq) Clone() (dst Seq) {
 		dst[i] = seq[i].Clone()
 	}
 
-	return
+	return dst
 }
 
 func (seq *Seq) Reset() {
@@ -128,7 +128,7 @@ func (seq Seq) MatchStart(tokens ...TokenMatcher) bool {
 
 func (seq Seq) MatchEnd(tokens ...TokenMatcher) (ok bool, left, right Seq) {
 	if len(tokens) > seq.Len() {
-		return
+		return ok, left, right
 	}
 
 	for i := seq.Len() - 1; i >= 0; i-- {
@@ -142,7 +142,7 @@ func (seq Seq) MatchEnd(tokens ...TokenMatcher) (ok bool, left, right Seq) {
 		m := tokens[j]
 
 		if !m.Match(partition) {
-			return
+			return ok, left, right
 		}
 
 		left = seq[:i]
@@ -151,7 +151,7 @@ func (seq Seq) MatchEnd(tokens ...TokenMatcher) (ok bool, left, right Seq) {
 
 	ok = true
 
-	return
+	return ok, left, right
 }
 
 func (seq Seq) PartitionFavoringRight(
@@ -164,11 +164,11 @@ func (seq Seq) PartitionFavoringRight(
 			ok = true
 			left = seq[:i]
 			right = seq[i+1:]
-			return
+			return ok, left, right, partition
 		}
 	}
 
-	return
+	return ok, left, right, partition
 }
 
 func (seq Seq) PartitionFavoringLeft(
@@ -181,9 +181,9 @@ func (seq Seq) PartitionFavoringLeft(
 			ok = true
 			left = seq[:i]
 			right = seq[i+1:]
-			return
+			return ok, left, right, partition
 		}
 	}
 
-	return
+	return ok, left, right, partition
 }

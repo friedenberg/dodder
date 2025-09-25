@@ -7,5 +7,5 @@ type Field struct {
 }
 
 func (f *Field) SetCatgutString(v *catgut.String) (err error) {
-	return
+	return err
 }

@@ -17,7 +17,7 @@ func newProvider(path string) (p provider, err error) {
 
 	if f, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return p, err
 	}
 
 	defer errors.Deferred(&err, f.Close)
@@ -35,13 +35,13 @@ func newProvider(path string) (p provider, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return p, err
 		}
 
 		p = append(p, Clean(line))
 	}
 
-	return
+	return p, err
 }
 
 func (p provider) MakeZettelIdFromCoordinates(i coordinates.Int) (s string, err error) {
@@ -53,12 +53,12 @@ func (p provider) MakeZettelIdFromCoordinates(i coordinates.Int) (s string, err 
 			p[len(p)-1],
 		)
 
-		return
+		return s, err
 	}
 
 	s = p[i]
 
-	return
+	return s, err
 }
 
 func (p provider) Len() int {
@@ -72,7 +72,7 @@ func (p provider) ZettelId(v string) (i int, err error) {
 
 	for i, s = range p {
 		if s == v {
-			return
+			return i, err
 		}
 	}
 
@@ -80,5 +80,5 @@ func (p provider) ZettelId(v string) (i int, err error) {
 		Value: v,
 	}
 
-	return
+	return i, err
 }

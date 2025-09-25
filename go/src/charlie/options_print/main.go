@@ -211,14 +211,14 @@ func makeFlagSetFuncBoolVar(valuePtr **bool) func(value string) (err error) {
 		var boolValue values.Bool
 
 		if err = boolValue.Set(value); err != nil {
-			return
+			return err
 		}
 
 		booll := boolValue.Bool()
 
 		*valuePtr = &booll
 
-		return
+		return err
 	}
 }
 

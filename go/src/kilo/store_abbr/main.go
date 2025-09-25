@@ -71,7 +71,7 @@ func NewIndex(
 	index.ZettelId.readFunc = index.readIfNecessary
 	index.MarklIds.readFunc = index.readIfNecessary
 
-	return
+	return index, err
 }
 
 func (index *indexAbbr) Flush() (err error) {
@@ -80,14 +80,14 @@ func (index *indexAbbr) Flush() (err error) {
 
 	if !index.hasChanges {
 		ui.Log().Print("no changes")
-		return
+		return err
 	}
 
 	var writer io.WriteCloser
 
 	if writer, err = index.envRepo.WriteCloserCache(index.path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, writer)
@@ -101,10 +101,10 @@ func (index *indexAbbr) Flush() (err error) {
 
 	if err = enc.Encode(index.indexCodable); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded object id")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (index *indexAbbr) readIfNecessary() (err error) {
@@ -147,7 +147,7 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 		},
 	)
 
-	return
+	return err
 }
 
 func (index *indexAbbr) GetAbbr() (out ids.Abbr) {
@@ -162,7 +162,7 @@ func (index *indexAbbr) GetAbbr() (out ids.Abbr) {
 		out.BlobId.Abbreviate = index.GetBlobIds().Abbreviate
 	}
 
-	return
+	return out
 }
 
 func (index *indexAbbr) AddObjectToIdIndex(
@@ -172,10 +172,10 @@ func (index *indexAbbr) AddObjectToIdIndex(
 
 	switch genre {
 	case genres.Config:
-		return
+		return err
 
 	case genres.InventoryList:
-		return
+		return err
 
 	case genres.Zettel, genres.Type, genres.Tag, genres.Repo:
 
@@ -184,12 +184,12 @@ func (index *indexAbbr) AddObjectToIdIndex(
 			"unsupported object id: %qv",
 			object.GetObjectId(),
 		)
-		return
+		return err
 	}
 
 	if err = index.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	index.hasChanges = true
@@ -202,7 +202,7 @@ func (index *indexAbbr) AddObjectToIdIndex(
 
 		if err = zettelId.SetFromIdParts(object.GetObjectId().Parts()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		index.ZettelId.Heads.Add(zettelId.GetHead())
@@ -221,7 +221,7 @@ func (index *indexAbbr) AddObjectToIdIndex(
 	index.SeenIds[genres.Type].Add(object.GetType().String())
 	index.SeenIds[genres.Repo].Add(object.GetRepoId().String())
 
-	return
+	return err
 }
 
 func (index *indexAbbr) GetZettelIds() sku.IdAbbrIndexGeneric[ids.ZettelId, *ids.ZettelId] {

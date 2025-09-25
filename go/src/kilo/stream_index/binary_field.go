@@ -64,7 +64,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
@@ -72,7 +72,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	bf.Content.Grow(int(bf.ContentLength))
@@ -83,10 +83,10 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 var errContentLengthDoesNotMatchContent = errors.New(
@@ -107,7 +107,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if bf.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge
-		return
+		return n, err
 	}
 
 	bf.ContentLength = uint16(bf.Content.Len())
@@ -119,7 +119,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
@@ -127,7 +127,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n2, err = io.Copy(w, &bf.Content)
@@ -135,8 +135,8 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

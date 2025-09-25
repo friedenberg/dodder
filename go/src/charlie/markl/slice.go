@@ -25,7 +25,7 @@ func (slice *Slice) ReadFrom(reader io.Reader) (n int64, err error) {
 			isEOF = true
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if line == "" {
@@ -36,11 +36,11 @@ func (slice *Slice) ReadFrom(reader io.Reader) (n int64, err error) {
 
 		if err = id.Set(strings.TrimSpace(line)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		*slice = append(*slice, id)
 	}
 
-	return
+	return n, err
 }

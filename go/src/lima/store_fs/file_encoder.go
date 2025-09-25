@@ -66,10 +66,10 @@ func (encoder *fileEncoder) openOrCreate(p string) (file *os.File, err error) {
 			err = errors.Wrap(err)
 		}
 
-		return
+		return file, err
 	}
 
-	return
+	return file, err
 }
 
 func (encoder *fileEncoder) EncodeObject(
@@ -91,7 +91,7 @@ func (encoder *fileEncoder) EncodeObject(
 		object.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, blobReader)
@@ -109,19 +109,19 @@ func (encoder *fileEncoder) EncodeObject(
 
 					if aw, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 
 					defer errors.DeferredCloser(&err, aw)
 
 					if _, err = io.Copy(aw, fileBlob); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 
 				} else {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
@@ -129,7 +129,7 @@ func (encoder *fileEncoder) EncodeObject(
 
 			if _, err = io.Copy(fileBlob, blobReader); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
@@ -137,14 +137,14 @@ func (encoder *fileEncoder) EncodeObject(
 			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, fileObject)
 
 		if _, err = encoder.BlobPath.FormatMetadata(fileObject, ctx); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case blobPath != "":
@@ -154,14 +154,14 @@ func (encoder *fileEncoder) EncodeObject(
 			blobPath,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, fBlob)
 
 		if _, err = io.Copy(fBlob, blobReader); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case objectPath != "":
@@ -179,18 +179,18 @@ func (encoder *fileEncoder) EncodeObject(
 			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		defer errors.DeferredCloser(&err, fZettel)
 
 		if _, err = mtw.FormatMetadata(fZettel, ctx); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (encoder *fileEncoder) Encode(

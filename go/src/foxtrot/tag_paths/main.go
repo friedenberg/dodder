@@ -122,7 +122,7 @@ func (path *Path) Copy() (b *Path) {
 	*b = make([]*Tag, path.Len())
 
 	if path == nil {
-		return
+		return b
 	}
 
 	for i, s := range *path {
@@ -131,7 +131,7 @@ func (path *Path) Copy() (b *Path) {
 		(*b)[i] = sb
 	}
 
-	return
+	return b
 }
 
 func (path *Path) Len() int {
@@ -198,7 +198,7 @@ func (path *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 	if count, n1, err = ohio.ReadUint8(r); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	n += int64(n1)
@@ -214,7 +214,7 @@ func (path *Path) ReadFrom(r io.Reader) (n int64, err error) {
 
 		if cl, n1, err = ohio.ReadUint8(r); err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return n, err
 		}
 
 		n += int64(n1)
@@ -226,11 +226,11 @@ func (path *Path) ReadFrom(r io.Reader) (n int64, err error) {
 		_, err = (*path)[i].ReadNFrom(r, int(cl))
 		if err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (path *Path) WriteTo(w io.Writer) (n int64, err error) {
@@ -241,7 +241,7 @@ func (path *Path) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	for _, s := range *path {
@@ -254,7 +254,7 @@ func (path *Path) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return n, err
 		}
 
 		var n2 int64
@@ -263,9 +263,9 @@ func (path *Path) WriteTo(w io.Writer) (n int64, err error) {
 
 		if err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }

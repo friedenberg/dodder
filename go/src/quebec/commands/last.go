@@ -149,7 +149,7 @@ func (cmd Last) runWithInventoryList(
 
 	if listObject, err = inventoryListStore.ReadLast(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	inventoryListBlobStore := cmd.MakeInventoryListCoderCloset(
@@ -179,5 +179,5 @@ func (cmd Last) runWithInventoryList(
 		}()
 	}
 
-	return
+	return err
 }

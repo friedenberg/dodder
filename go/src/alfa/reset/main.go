@@ -13,7 +13,7 @@ func Map[K constraints.Ordered, V any](in map[K]V) (out map[K]V) {
 		out = in
 	}
 
-	return
+	return out
 }
 
 func Slice[V any](in []V) (out []V) {
@@ -23,5 +23,5 @@ func Slice[V any](in []V) (out []V) {
 		out = in[:0]
 	}
 
-	return
+	return out
 }

@@ -17,7 +17,7 @@ func (store *Store) RefreshCheckedOut(
 
 	if item, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = store.HydrateExternalFromItem(
@@ -37,15 +37,15 @@ func (store *Store) RefreshCheckedOut(
 				&co.GetSku().ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (store *Store) ReadCheckedOutFromTransacted(
@@ -55,10 +55,10 @@ func (store *Store) ReadCheckedOutFromTransacted(
 
 	if err = store.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
 		err = errors.Wrap(err)
-		return
+		return co, err
 	}
 
-	return
+	return co, err
 }
 
 func (store *Store) readIntoCheckedOutFromTransacted(
@@ -75,7 +75,7 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 
 	if kfp, ok = store.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
-		return
+		return err
 	}
 
 	if err = store.HydrateExternalFromItem(
@@ -97,14 +97,14 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 				&sk.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", kfp)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }

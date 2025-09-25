@@ -23,12 +23,12 @@ func (local *Repo) MakeExternalQueryGroup(
 		args...,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return queryGroup, err
 	}
 
 	queryGroup.ExternalQueryOptions = externalQueryOptions
 
-	return
+	return queryGroup, err
 }
 
 func (local *Repo) makeQueryBuilder() *query.Builder {

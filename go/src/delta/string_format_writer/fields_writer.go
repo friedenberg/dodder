@@ -73,7 +73,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 		if err != nil {
 			err = errors.Wrapf(err, "Headers: %#v", box.Header)
-			return
+			return n, err
 		}
 	}
 
@@ -88,7 +88,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	for i, field := range box.Contents {
@@ -99,7 +99,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 				if err != nil {
 					err = errors.Wrap(err)
-					return
+					return n, err
 				}
 			} else {
 				n2, err = fmt.Fprint(writer, separatorSameLine)
@@ -107,7 +107,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 				if err != nil {
 					err = errors.Wrap(err)
-					return
+					return n, err
 				}
 			}
 		}
@@ -117,7 +117,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -127,7 +127,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -148,7 +148,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	for _, field := range box.Trailer {
@@ -157,7 +157,7 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = encoder.writeStringFormatField(writer, field)
@@ -165,11 +165,11 @@ func (encoder *boxStringEncoder) EncodeStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func (f *boxStringEncoder) writeStringFormatField(
@@ -188,7 +188,7 @@ func (f *boxStringEncoder) writeStringFormatField(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -221,8 +221,8 @@ func (f *boxStringEncoder) writeStringFormatField(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

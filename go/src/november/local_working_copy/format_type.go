@@ -62,7 +62,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 						err = nil
 					} else {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				}
 
@@ -80,10 +80,10 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 					if _, err = fmt.Fprintln(writer, ty); err != nil {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 
-					return
+					return err
 				}
 
 				var typeBlob type_blobs.Blob
@@ -94,7 +94,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					typeObject.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer repool()
@@ -104,10 +104,10 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					typeBlob.GetVimSyntaxType(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -122,7 +122,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(object.GetType()); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				var typeBlob type_blobs.Blob
@@ -133,7 +133,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					typeObject.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer repool()
@@ -152,10 +152,10 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if _, err = lineWriter.WriteTo(writer); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -173,10 +173,10 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = format.Format(writer, object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
-				return
+				return err
 			}
 		},
 	},
@@ -195,7 +195,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 					object.GetBlobDigest(),
 				); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer repool()
@@ -203,7 +203,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 				script := blob.GetStringLuaHooks()
 
 				if script == "" {
-					return
+					return err
 				}
 
 				// TODO switch to typed variant
@@ -211,14 +211,14 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				if vp, err = repo.GetStore().MakeLuaVMPoolV1(object, script); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				var vm *sku_lua.LuaVMV1
 
 				if vm, err = vp.Get(); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				defer vp.Put(vm)
@@ -227,7 +227,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 
 				repo.GetUI().Print(f.String())
 
-				return
+				return err
 			}
 		},
 	},

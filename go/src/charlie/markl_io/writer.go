@@ -21,7 +21,7 @@ func MakeWriterWithRepool(
 		PutWriter(writer)
 	}
 
-	return
+	return writer, repool
 }
 
 func MakeWriter(
@@ -29,7 +29,7 @@ func MakeWriter(
 	in io.Writer,
 ) (writer *writer) {
 	writer, _ = MakeWriterWithRepool(hash, in)
-	return
+	return writer
 }
 
 func PutWriter(writer *writer) {
@@ -69,10 +69,10 @@ func (writer *writer) Reset(hash interfaces.Hash, in io.Writer) {
 func (writer *writer) ReadFrom(r io.Reader) (n int64, err error) {
 	if n, err = io.Copy(writer.writer, r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (writer *writer) Write(p []byte) (n int, err error) {
@@ -91,15 +91,15 @@ func (writer *writer) Close() (err error) {
 	writer.closed = true
 
 	if writer.closer == nil {
-		return
+		return err
 	}
 
 	if err = writer.closer.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (writer *writer) GetMarklId() interfaces.MarklId {

@@ -19,10 +19,10 @@ func (options *Options) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDef
 		func(value string) (err error) {
 			if options.Merge, err = shlex.Split(value); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	)
 }

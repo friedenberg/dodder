@@ -63,12 +63,12 @@ func IsNetTimeout(err error) (ok bool) {
 	var netError net.Error
 
 	if !As(err, &netError) {
-		return
+		return ok
 	}
 
 	ok = netError.Timeout()
 
-	return
+	return ok
 }
 
 func MakeIsErrno(targets ...syscall.Errno) FuncIs {

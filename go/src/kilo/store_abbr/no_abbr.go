@@ -14,5 +14,5 @@ type indexNoAbbr[
 
 func (ih indexNoAbbr[ID, ID_PTR]) Abbreviate(h ID) (v string, err error) {
 	v = h.String()
-	return
+	return v, err
 }

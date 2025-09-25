@@ -106,7 +106,7 @@ func (s *mutableSetExperimental[T, TPtr]) GetPtr(k string) (e TPtr, ok bool) {
 
 	e, ok = s.E[k]
 
-	return
+	return e, ok
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Get(k string) (e T, ok bool) {
@@ -120,7 +120,7 @@ func (s *mutableSetExperimental[T, TPtr]) Get(k string) (e T, ok bool) {
 		e = *e1
 	}
 
-	return
+	return e, ok
 }
 
 func (s *mutableSetExperimental[T, TPtr]) ContainsKey(k string) (ok bool) {
@@ -129,12 +129,12 @@ func (s *mutableSetExperimental[T, TPtr]) ContainsKey(k string) (ok bool) {
 	defer s.l.RUnlock()
 
 	if k == "" {
-		return
+		return ok
 	}
 
 	_, ok = s.E[k]
 
-	return
+	return ok
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Contains(e T) (ok bool) {
@@ -155,7 +155,7 @@ func (s *mutableSetExperimental[T, TPtr]) Any() (v T) {
 		break
 	}
 
-	return
+	return v
 }
 
 // If a read is taking place, this method will block until that read is done.
@@ -170,7 +170,7 @@ func (s *mutableSetExperimental[T, TPtr]) ProcessMutationsDuringReads() (err err
 // done.
 func (s *mutableSetExperimental[T, TPtr]) TryProcessMutationsDuringReads() (err error) {
 	if !s.l.TryLock() {
-		return
+		return err
 	}
 
 	defer s.l.Unlock()
@@ -180,7 +180,7 @@ func (s *mutableSetExperimental[T, TPtr]) TryProcessMutationsDuringReads() (err 
 
 func (s *mutableSetExperimental[T, TPtr]) processMutationsDuringReads() (err error) {
 	if !s.l.TryLock() {
-		return
+		return err
 	}
 
 	defer s.l.Unlock()
@@ -188,18 +188,18 @@ func (s *mutableSetExperimental[T, TPtr]) processMutationsDuringReads() (err err
 	for i := range s.addedDuringIter {
 		if err = s.addPtr(s.addedDuringIter[i]); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	for _, k := range s.deletedDuringIter {
 		if err = s.delKey(k); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Del(v T) (err error) {
@@ -218,7 +218,7 @@ func (s *mutableSetExperimental[T, TPtr]) DelPtr(v TPtr) (err error) {
 
 		s.deletedDuringIter = append(s.deletedDuringIter, k)
 
-		return
+		return err
 	}
 
 	s.l.Lock()
@@ -234,7 +234,7 @@ func (s *mutableSetExperimental[T, TPtr]) DelKey(k string) (err error) {
 
 		s.deletedDuringIter = append(s.deletedDuringIter, k)
 
-		return
+		return err
 	}
 
 	defer s.l.Unlock()
@@ -245,7 +245,7 @@ func (s *mutableSetExperimental[T, TPtr]) DelKey(k string) (err error) {
 func (s *mutableSetExperimental[T, TPtr]) delKey(k string) (err error) {
 	delete(s.E, k)
 
-	return
+	return err
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Add(v T) (err error) {
@@ -255,14 +255,14 @@ func (s *mutableSetExperimental[T, TPtr]) Add(v T) (err error) {
 
 		s.addedDuringIter = append(s.addedDuringIter, &v)
 
-		return
+		return err
 	}
 
 	defer s.l.Unlock()
 
 	s.E[s.key(v)] = TPtr(&v)
 
-	return
+	return err
 }
 
 func (s *mutableSetExperimental[T, TPtr]) AddPtr(v TPtr) (err error) {
@@ -272,7 +272,7 @@ func (s *mutableSetExperimental[T, TPtr]) AddPtr(v TPtr) (err error) {
 
 		s.addedDuringIter = append(s.addedDuringIter, v)
 
-		return
+		return err
 	}
 
 	defer s.l.Unlock()
@@ -283,7 +283,7 @@ func (s *mutableSetExperimental[T, TPtr]) AddPtr(v TPtr) (err error) {
 func (s *mutableSetExperimental[T, TPtr]) addPtr(v TPtr) (err error) {
 	s.E[s.K.GetKeyPtr(v)] = v
 
-	return
+	return err
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Elements() (out []T) {
@@ -297,7 +297,7 @@ func (s *mutableSetExperimental[T, TPtr]) Elements() (out []T) {
 		out = append(out, *v)
 	}
 
-	return
+	return out
 }
 
 func (s *mutableSetExperimental[T, TPtr]) EachKey(
@@ -315,11 +315,11 @@ func (s *mutableSetExperimental[T, TPtr]) EachKey(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (a *mutableSetExperimental[T, TPtr]) Reset() {

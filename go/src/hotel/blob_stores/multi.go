@@ -82,10 +82,10 @@ func (parentWriter multiStoreBlobWriter) ReadFrom(
 ) (n int64, err error) {
 	if n, err = io.Copy(parentWriter, reader); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (parentWriter multiStoreBlobWriter) Close() error {
@@ -110,5 +110,5 @@ func (parentWriter multiStoreBlobWriter) GetMarklId() (first interfaces.MarklId)
 		}
 	}
 
-	return
+	return first
 }

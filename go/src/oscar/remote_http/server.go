@@ -51,7 +51,7 @@ type Server struct {
 func (server *Server) init() (err error) {
 	server.blobCache.localBlobStore = server.Repo.GetEnvRepo().GetDefaultBlobStore()
 	server.blobCache.ui = server.Repo.GetEnv().GetUI()
-	return
+	return err
 }
 
 // TODO switch to not return error
@@ -64,7 +64,7 @@ func (server *Server) InitializeListener(
 	case "unix":
 		if listener, err = server.InitializeUnixSocket(config, address); err != nil {
 			err = errors.Wrap(err)
-			return
+			return listener, err
 		}
 
 	case "tcp":
@@ -74,7 +74,7 @@ func (server *Server) InitializeListener(
 			address,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return listener, err
 		}
 
 		addr := listener.Addr().(*net.TCPAddr)
@@ -91,11 +91,11 @@ func (server *Server) InitializeListener(
 			address,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return listener, err
 		}
 	}
 
-	return
+	return listener, err
 }
 
 func (server *Server) InitializeUnixSocket(
@@ -109,7 +109,7 @@ func (server *Server) InitializeUnixSocket(
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
-			return
+			return sock, err
 		}
 
 		sock.Path = fmt.Sprintf("%s/%d.sock", dir, os.Getpid())
@@ -123,10 +123,10 @@ func (server *Server) InitializeUnixSocket(
 		sock.Path,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return sock, err
 	}
 
-	return
+	return sock, err
 }
 
 type HTTPPort struct {
@@ -144,14 +144,14 @@ func (server *Server) InitializeHTTP(
 		fmt.Sprintf(":%d", port),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return httpPort, err
 	}
 
 	addr := httpPort.Addr().(*net.TCPAddr)
 
 	ui.Log().Printf("starting HTTP server on port: %q", strconv.Itoa(addr.Port))
 
-	return
+	return httpPort, err
 }
 
 func (server *Server) makeRouter(
@@ -243,7 +243,7 @@ func (server *Server) addSignatureIfNecessary(
 ) (err error) {
 	if nonceString == "" {
 		err = errors.Errorf("nonce empty or not provided")
-		return
+		return err
 	}
 
 	var nonce markl.Id
@@ -252,7 +252,7 @@ func (server *Server) addSignatureIfNecessary(
 		nonceString,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	header.Set(
@@ -270,12 +270,12 @@ func (server *Server) addSignatureIfNecessary(
 		markl.PurposeRequestAuthResponseV1,
 	); err != nil {
 		server.EnvLocal.Cancel(err)
-		return
+		return err
 	}
 
 	header.Set(headerChallengeResponse, sig.String())
 
-	return
+	return err
 }
 
 func (server *Server) sigMiddleware(next http.Handler) http.Handler {
@@ -343,7 +343,7 @@ func (server *Server) panicHandlingMiddleware(next http.Handler) http.Handler {
 func (server *Server) Serve(listener net.Listener) (err error) {
 	if err = server.init(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	httpServer := http.Server{
@@ -376,13 +376,13 @@ func (server *Server) Serve(listener net.Listener) (err error) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	ui.Log().Print("shutdown complete")
 
-	return
+	return err
 }
 
 func (server *Server) ServeStdio() {
@@ -511,7 +511,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			http.StatusBadRequest,
 			errors.ErrorWithStackf("empty blob id"),
 		)
-		return
+		return response
 	}
 
 	var blobId markl.Id
@@ -523,7 +523,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			blobIdString,
 		); err != nil {
 			response.ErrorWithStatus(http.StatusBadRequest, err)
-			return
+			return response
 		}
 	}
 
@@ -548,14 +548,14 @@ func (server *Server) handleBlobsHeadOrGet(
 					response.Error(err)
 				}
 
-				return
+				return response
 			}
 		}
 
 		response.Body = rc
 	}
 
-	return
+	return response
 }
 
 func (server *Server) handleBlobsPost(request Request) (response Response) {
@@ -567,7 +567,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		if copyResult, err = server.copyBlob(request.Body, nil); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 
 		response.StatusCode = http.StatusCreated
@@ -575,7 +575,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 			strings.NewReader(copyResult.BlobId.String()),
 		)
 
-		return
+		return response
 	}
 
 	var blobDigest markl.Id
@@ -584,12 +584,12 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		blobId,
 	); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if server.Repo.GetBlobStore().HasBlob(&blobDigest) {
 		response.StatusCode = http.StatusFound
-		return
+		return response
 	}
 
 	{
@@ -597,7 +597,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 		if copyResult, err = server.copyBlob(request.Body, &blobDigest); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -605,7 +605,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 	if err := markl.AssertEqual(&blobDigest, copyResult.BlobId); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	response.StatusCode = http.StatusCreated
@@ -613,7 +613,7 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		strings.NewReader(copyResult.BlobId.String()),
 	)
 
-	return
+	return response
 }
 
 func (server *Server) copyBlob(
@@ -627,7 +627,7 @@ func (server *Server) copyBlob(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return copyResult, err
 	}
 
 	blobExpectedIdString := "blob with unknown blob id"
@@ -666,10 +666,10 @@ func (server *Server) copyBlob(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return copyResult, err
 	}
 
-	return
+	return copyResult, err
 }
 
 func (server *Server) handleGetQuery(request Request) (response Response) {
@@ -682,7 +682,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			request.Vars()["list_type"],
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -695,7 +695,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			request.Vars()["query"],
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -710,7 +710,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 			queryGroupString,
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -721,7 +721,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 
 		if list, err = server.Repo.MakeInventoryList(queryGroup); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -748,7 +748,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 
 	response.Body = io.NopCloser(buffer)
 
-	return
+	return response
 }
 
 func (server *Server) handleGetInventoryList(
@@ -783,20 +783,20 @@ func (server *Server) handleGetInventoryList(
 	for sk, err := range iter {
 		if err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 
 		errors.ContextContinueOrPanic(server.Repo.GetEnv())
 
 		if err = printer(sk); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
 	response.Body = io.NopCloser(buffer)
 
-	return
+	return response
 }
 
 func (server *Server) handlePostInventoryList(
@@ -811,13 +811,13 @@ func (server *Server) handlePostInventoryList(
 				http.StatusBadRequest,
 				errors.BadRequestf("no list type provided"),
 			)
-			return
+			return response
 		} else if listObjectString != "" {
 			response.ErrorWithStatus(
 				http.StatusBadRequest,
 				errors.BadRequestf("no list object provided"),
 			)
-			return
+			return response
 		} else {
 			return server.handlePostInventoryListNew(request)
 		}
@@ -830,7 +830,7 @@ func (server *Server) handlePostInventoryList(
 
 		if listTypeString, err = url.QueryUnescape(listTypeString); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -839,7 +839,7 @@ func (server *Server) handlePostInventoryList(
 
 		if listObjectString, err = url.QueryUnescape(listObjectString); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -866,7 +866,7 @@ func (server *Server) handlePostInventoryList(
 				),
 			)
 
-			return
+			return response
 		}
 
 		defer sku.GetTransactedPool().Put(object)
@@ -878,7 +878,7 @@ func (server *Server) handlePostInventoryList(
 		object,
 	)
 
-	return
+	return response
 }
 
 func (server *Server) handlePostInventoryListNew(
@@ -889,7 +889,7 @@ func (server *Server) handlePostInventoryListNew(
 		request,
 	)
 
-	return
+	return response
 }
 
 func (server *Server) handleGetConfigImmutable(
@@ -909,5 +909,5 @@ func (server *Server) handleGetConfigImmutable(
 
 	response.Body = io.NopCloser(&buffer)
 
-	return
+	return response
 }

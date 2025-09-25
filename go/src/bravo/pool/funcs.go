@@ -20,22 +20,22 @@ func MakePooledChain[T any, TPtr interfaces.Ptr[T]](
 
 			case IsDoNotRepool(err):
 				err = nil
-				return
+				return err
 
 			case errors.IsStopIteration(err):
 				err = nil
 				pool.Put(element)
-				return
+				return err
 
 			default:
 				pool.Put(element)
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		pool.Put(element)
 
-		return
+		return err
 	}
 }

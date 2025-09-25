@@ -142,7 +142,7 @@ func (client *client) MakeExternalQueryGroup(
 	args ...string,
 ) (qg *query.Query, err error) {
 	err = comments.Implement()
-	return
+	return qg, err
 }
 
 func (client *client) MakeInventoryList(
@@ -160,19 +160,19 @@ func (client *client) MakeInventoryList(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return list, err
 	}
 
 	var response *http.Response
 
 	if response, err = client.http.Do(request); err != nil {
 		err = errors.ErrorWithStackf("failed to read response: %w", err)
-		return
+		return list, err
 	}
 
 	if err = ReadErrorFromBodyOnNot(response, 200); err != nil {
 		err = errors.Wrap(err)
-		return
+		return list, err
 	}
 
 	inventoryListCoderCloset := client.repo.GetInventoryListCoderCloset()
@@ -183,10 +183,10 @@ func (client *client) MakeInventoryList(
 		bufio.NewReader(response.Body),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return list, err
 	}
 
-	return
+	return list, err
 }
 
 // func (remoteHTTP *HTTP) PullQueryGroupFromRemote2(
@@ -234,7 +234,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// TODO local / remote version negotiation
@@ -263,14 +263,14 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			bufferedWriter,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		var response *http.Response
 
 		if err = bufferedWriter.Flush(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		{
@@ -282,7 +282,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 				buffer,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			if options.AllowMergeConflicts {
@@ -295,7 +295,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 			if response, err = client.http.Do(request); err != nil {
 				err = errors.ErrorWithStackf("failed to read response: %w", err)
-				return
+				return err
 			}
 		}
 
@@ -305,7 +305,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			http.StatusExpectationFailed,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		bufferedReader := bufio.NewReader(response.Body)
@@ -320,12 +320,12 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			bufferedReader,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = response.Body.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		ui.Log().Print(
@@ -346,13 +346,13 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 				expected.GetBlobDigest(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if response.StatusCode == http.StatusCreated {
 			ui.Log().Print("done")
-			return
+			return err
 		}
 
 		buffer.Reset()
@@ -364,5 +364,5 @@ func (client *client) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	err = comments.Implement()
-	return
+	return skus, err
 }

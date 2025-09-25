@@ -71,10 +71,10 @@ func (cmd *PullBlobStore) Run(
 					err = errors.Wrap(err)
 				}
 
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		req.Cancel(err)

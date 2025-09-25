@@ -223,7 +223,7 @@ func TestMerge(t1 *testing.T) {
 		otherStream.PopError,
 		func(v *values.Int) (err error) {
 			actual = append(actual, v)
-			return
+			return err
 		},
 	)
 	if err != nil {

@@ -23,12 +23,12 @@ func (uri *Uri) Set(v string) (err error) {
 
 	if u1, err = url.Parse(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	uri.url = *u1
 
-	return
+	return err
 }
 
 func (uri *Uri) String() string {
@@ -37,28 +37,28 @@ func (uri *Uri) String() string {
 
 func (uri Uri) MarshalText() (text []byte, err error) {
 	text = []byte(uri.String())
-	return
+	return text, err
 }
 
 func (uri *Uri) UnmarshalText(text []byte) (err error) {
 	if err = uri.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (uri Uri) MarshalBinary() (text []byte, err error) {
 	text = []byte(uri.String())
-	return
+	return text, err
 }
 
 func (uri *Uri) UnmarshalBinary(text []byte) (err error) {
 	if err = uri.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

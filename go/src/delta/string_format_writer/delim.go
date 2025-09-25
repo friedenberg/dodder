@@ -24,15 +24,15 @@ func MakeDelim[T any](
 
 			if _, err = f.EncodeStringTo(e, w); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			if _, err = io.WriteString(w, delim); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	)
 }

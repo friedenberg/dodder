@@ -11,7 +11,7 @@ func MakeRingBufferRuneScanner(rb *RingBuffer) (s *RingBufferRuneScanner) {
 	s = &RingBufferRuneScanner{}
 	s.ResetWith(rb)
 
-	return
+	return s
 }
 
 type RingBufferRuneScanner struct {
@@ -37,13 +37,13 @@ func (s *RingBufferRuneScanner) ReadRune() (r rune, width int, err error) {
 		if _, err = s.rb.Fill(); err != nil {
 			if err != io.EOF {
 				err = errors.Wrap(err)
-				return
+				return r, width, err
 			}
 
 			if s.rb.Len() >= 0 {
 				err = nil
 			} else {
-				return
+				return r, width, err
 			}
 		}
 
@@ -66,21 +66,21 @@ func (s *RingBufferRuneScanner) ReadRune() (r rune, width int, err error) {
 
 	default:
 		err = io.EOF
-		return
+		return r, width, err
 	}
 
 	s.lastRuneSize = width
 
 	if r == utf8.RuneError {
 		err = errInvalidRune
-		return
+		return r, width, err
 	}
 
 	if width > 0 {
 		s.rb.AdvanceRead(width)
 	}
 
-	return
+	return r, width, err
 }
 
 func (s *RingBufferRuneScanner) UnreadRune() (err error) {
@@ -88,8 +88,8 @@ func (s *RingBufferRuneScanner) UnreadRune() (err error) {
 
 	if actuallyUnread != s.lastRuneSize {
 		err = errors.ErrorWithStackf("tried to unread %d bytes but actually unread %d", s.lastRuneSize, actuallyUnread)
-		return
+		return err
 	}
 
-	return
+	return err
 }

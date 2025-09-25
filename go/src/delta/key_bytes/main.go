@@ -55,16 +55,16 @@ func (key Binary) WriteTo(w io.Writer) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (key *Binary) WriteByte(b byte) (err error) {
 	*key = Binary(b)
 
-	return
+	return err
 }
 
 func (key *Binary) ReadFrom(r io.Reader) (n int64, err error) {
@@ -75,10 +75,10 @@ func (key *Binary) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	err = key.WriteByte(bite[0])
 
-	return
+	return n, err
 }

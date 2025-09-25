@@ -85,12 +85,12 @@ func (noad *node) Remove(value string) {
 func (noad node) Contains(value string) (ok bool) {
 	if len(value) == 0 {
 		ok = true
-		return
+		return ok
 	}
 
 	if noad.Count == 1 && noad.Value != "" {
 		ok = strings.HasPrefix(noad.Value, value)
-		return
+		return ok
 	}
 
 	c := value[0]
@@ -103,18 +103,18 @@ func (noad node) Contains(value string) (ok bool) {
 		ok = child.Contains(value[1:])
 	}
 
-	return
+	return ok
 }
 
 func (noad node) ContainsExactly(value string) (ok bool) {
 	if len(value) == 0 {
 		ok = noad.IncludesTerminus
-		return
+		return ok
 	}
 
 	if noad.Value != "" {
 		ok = noad.Value == value
-		return
+		return ok
 	}
 
 	c := value[0]
@@ -127,7 +127,7 @@ func (noad node) ContainsExactly(value string) (ok bool) {
 		ok = child.ContainsExactly(value[1:])
 	}
 
-	return
+	return ok
 }
 
 func (noad node) Any() byte {
@@ -167,7 +167,7 @@ func (noad node) Expand(
 				stringBuilder.WriteString(noad.Value)
 			}
 
-			return
+			return ok
 
 		default:
 			rem = value[1:]
@@ -182,7 +182,7 @@ func (noad node) Expand(
 		return child.Expand(rem, stringBuilder)
 	}
 
-	return
+	return ok
 }
 
 func (noad node) Abbreviate(value string, loc int) string {
@@ -225,7 +225,7 @@ func (noad *node) Copy() (b node) {
 		b.Children[i] = c.Copy()
 	}
 
-	return
+	return b
 }
 
 func (noad *node) allWithAcc(acc string) interfaces.Seq[string] {

@@ -16,7 +16,7 @@ func (op WriteNewZettels) RunMany(
 ) (results sku.TransactedMutableSet, err error) {
 	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
 	results = sku.MakeTransactedMutableSet()
@@ -27,21 +27,21 @@ func (op WriteNewZettels) RunMany(
 
 		if zt, err = op.runOneAlreadyLocked(proto); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		if err = results.Add(zt); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 	}
 
 	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
-	return
+	return results, err
 }
 
 func (c WriteNewZettels) RunOne(
@@ -49,20 +49,20 @@ func (c WriteNewZettels) RunOne(
 ) (result *sku.Transacted, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return result, err
 	}
 
 	if result, err = c.runOneAlreadyLocked(z); err != nil {
 		err = errors.Wrap(err)
-		return
+		return result, err
 	}
 
 	if err = c.Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return result, err
 	}
 
-	return
+	return result, err
 }
 
 func (c WriteNewZettels) runOneAlreadyLocked(
@@ -77,8 +77,8 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return object, err
 	}
 
-	return
+	return object, err
 }

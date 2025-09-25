@@ -76,36 +76,36 @@ func (i Config) Set(v string) (err error) {
 
 	if v != "konfig" {
 		err = errors.Errorf("not konfig")
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t Config) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *Config) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t Config) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *Config) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

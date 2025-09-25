@@ -25,11 +25,11 @@ func WriteSeq[T any](
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 // TODO-P4 check performance of this
@@ -43,7 +43,7 @@ func WriteLine(w io.Writer, s string) (n int64, err error) {
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
@@ -53,8 +53,8 @@ func WriteLine(w io.Writer, s string) (n int64, err error) {
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

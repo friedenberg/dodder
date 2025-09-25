@@ -35,7 +35,7 @@ func (store *Store) runDiff3(
 
 	if out, err = cmd.StdoutPipe(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return merged, err
 	}
 
 	cmd.Stderr = os.Stderr
@@ -44,19 +44,19 @@ func (store *Store) runDiff3(
 
 	if f, err = store.envRepo.GetTempLocal().FileTemp(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return merged, err
 	}
 
 	defer errors.DeferredCloser(&err, f)
 
 	if err = cmd.Start(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return merged, err
 	}
 
 	if _, err = io.Copy(f, out); err != nil {
 		err = errors.Wrap(err)
-		return
+		return merged, err
 	}
 
 	merged = &sku.FSItem{}
@@ -72,7 +72,7 @@ func (store *Store) runDiff3(
 
 		if !errors.As(err, &errExit) {
 			err = errors.Wrap(err)
-			return
+			return merged, err
 		}
 
 		hasConflict = true
@@ -80,12 +80,12 @@ func (store *Store) runDiff3(
 
 	if err = merged.Object.SetPath(f.Name()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return merged, err
 	}
 
 	if hasConflict {
 		err = errors.Wrap(sku.MakeErrMergeConflict(merged))
 	}
 
-	return
+	return merged, err
 }

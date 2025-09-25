@@ -38,7 +38,7 @@ func (b *Description) TodoSetManyCatgutStrings(
 
 	if _, err = s.Append(vs...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return b.Set(s.String())
@@ -53,7 +53,7 @@ func (b *Description) readFromRuneScannerAfterNewline(
 	sb *strings.Builder,
 ) (err error) {
 	if !rs.ConsumeSpacesOrErrorOnFalse() {
-		return
+		return err
 	}
 
 	var r rune
@@ -63,31 +63,31 @@ func (b *Description) readFromRuneScannerAfterNewline(
 
 	if err != nil && !isEOF {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if r == '-' || r == '%' || r == '#' {
 		if err = rs.UnreadRune(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	sb.WriteRune(' ')
 	sb.WriteRune(r)
 
 	if !rs.ConsumeSpacesOrErrorOnFalse() {
-		return
+		return err
 	}
 
 	if err = b.readFromRuneScannerOrdinary(rs, sb); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (b *Description) readFromRuneScannerOrdinary(
@@ -102,13 +102,13 @@ func (b *Description) readFromRuneScannerOrdinary(
 
 		if err != nil && !isEOF {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if r == '\n' {
 			if err = b.readFromRuneScannerAfterNewline(rs, sb); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			break
@@ -126,7 +126,7 @@ func (b *Description) readFromRuneScannerOrdinary(
 		sb.WriteRune(r)
 	}
 
-	return
+	return err
 }
 
 func (b *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
@@ -134,15 +134,15 @@ func (b *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
 
 	if err = b.readFromRuneScannerOrdinary(rs, &sb); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = b.Set(sb.String()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (b *Description) Set(v string) (err error) {
@@ -156,7 +156,7 @@ func (b *Description) Set(v string) (err error) {
 		b.value = v1
 	}
 
-	return
+	return err
 }
 
 func (a Description) WasSet() bool {
@@ -186,22 +186,22 @@ func (a Description) Less(b Description) (ok bool) {
 
 func (a Description) MarshalBinary() (text []byte, err error) {
 	text = []byte(a.value)
-	return
+	return text, err
 }
 
 func (a *Description) UnmarshalBinary(text []byte) (err error) {
 	a.wasSet = true
 	a.value = string(text)
-	return
+	return err
 }
 
 func (a Description) MarshalText() (text []byte, err error) {
 	text = []byte(a.value)
-	return
+	return text, err
 }
 
 func (a *Description) UnmarshalText(text []byte) (err error) {
 	a.wasSet = true
 	a.value = string(text)
-	return
+	return err
 }

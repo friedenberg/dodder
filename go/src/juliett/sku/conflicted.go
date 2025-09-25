@@ -32,15 +32,15 @@ func (conflicted *Conflicted) FindBestCommonAncestor(
 	negotiator ParentNegotiator,
 ) (err error) {
 	if negotiator == nil {
-		return
+		return err
 	}
 
 	if conflicted.Base, err = negotiator.FindBestCommonAncestor(*conflicted); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (conflicted Conflicted) GetCollection() Collection {
@@ -104,7 +104,7 @@ func (conflicted Conflicted) IsAllInlineType(
 
 func (conflicted *Conflicted) MergeTags() (err error) {
 	if conflicted.Base == nil {
-		return
+		return err
 	}
 
 	left := conflicted.Local.GetTags().CloneMutableSetPtrLike()
@@ -120,25 +120,25 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	) (err error) {
 		if err = toAdd.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = left.DelPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = middle.DelPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = right.DelPtr(e); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	for tag := range middle.AllPtr() {
@@ -146,12 +146,12 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 			right.ContainsKey(right.KeyPtr(tag)) {
 			if err = removeFromAllButAddTo(tag, same); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else if left.ContainsKey(left.KeyPtr(tag)) || right.ContainsKey(right.KeyPtr(tag)) {
 			if err = removeFromAllButAddTo(tag, deleted); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -159,14 +159,14 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	for tag := range left.AllPtr() {
 		if err = same.AddPtr(tag); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	for tag := range right.AllPtr() {
 		if err = same.AddPtr(tag); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -176,7 +176,7 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	conflicted.Base.GetMetadata().SetTags(tags)
 	conflicted.Remote.GetMetadata().SetTags(tags)
 
-	return
+	return err
 }
 
 func (conflicted *Conflicted) ReadConflictMarker(
@@ -187,7 +187,7 @@ func (conflicted *Conflicted) ReadConflictMarker(
 	for object, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
-			return
+			return err
 		}
 
 		switch idx {
@@ -202,7 +202,7 @@ func (conflicted *Conflicted) ReadConflictMarker(
 
 		default:
 			err = errors.ErrorWithStackf("too many objects in conflict file")
-			return
+			return err
 		}
 
 		idx++
@@ -210,7 +210,7 @@ func (conflicted *Conflicted) ReadConflictMarker(
 
 	if idx == 0 {
 		err = errors.ErrorWithStackf("no objects in conflict file")
-		return
+		return err
 	}
 
 	// Conflicts can exist between objects without a base
@@ -219,5 +219,5 @@ func (conflicted *Conflicted) ReadConflictMarker(
 		conflicted.Base = nil
 	}
 
-	return
+	return err
 }

@@ -13,5 +13,5 @@ func (alo *AtLeastOnce[T]) WasAtLeastOnce() bool {
 
 func (alo *AtLeastOnce[T]) Do(_ T) (err error) {
 	alo.once.Do(func() { alo.atLeastOnce = true })
-	return
+	return err
 }

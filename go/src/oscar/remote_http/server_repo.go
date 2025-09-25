@@ -34,14 +34,14 @@ func (server *Server) writeInventoryList(
 
 	if listObject.GetGenre() != genres.InventoryList {
 		response.Error(genres.MakeErrUnsupportedGenre(listObject.GetGenre()))
-		return
+		return response
 	}
 
 	blobStore := server.Repo.GetBlobStore()
 
 	if blobStore.HasBlob(listObject.GetBlobDigest()) {
 		response.StatusCode = http.StatusFound
-		return
+		return response
 	}
 
 	expected := listObject.GetBlobDigest()
@@ -58,7 +58,7 @@ func (server *Server) writeInventoryList(
 
 			if bites, err = base64.URLEncoding.DecodeString(pubBase64); err != nil {
 				response.Error(err)
-				return
+				return response
 			}
 
 			var pubkey markl.Id
@@ -68,7 +68,7 @@ func (server *Server) writeInventoryList(
 				bites,
 			); err != nil {
 				response.Error(err)
-				return
+				return response
 			}
 
 			logEntry.PublicKey = pubkey
@@ -81,7 +81,7 @@ func (server *Server) writeInventoryList(
 
 		if err := sig.Set(request.request.Header.Get(headerRepoSig)); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 
 		if err := logEntry.PublicKey.Verify(
@@ -89,7 +89,7 @@ func (server *Server) writeInventoryList(
 			sig,
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -100,10 +100,10 @@ func (server *Server) writeInventoryList(
 			err = nil
 		} else if err != nil {
 			response.Error(err)
-			return
+			return response
 		} else {
 			response.StatusCode = http.StatusFound
-			return
+			return response
 		}
 	}
 
@@ -116,7 +116,7 @@ func (server *Server) writeInventoryList(
 
 		if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
@@ -136,7 +136,7 @@ func (server *Server) writeInventoryList(
 
 			if err != nil {
 				response.Error(err)
-				return
+				return response
 			}
 
 			blobDigest := sk.GetBlobDigest()
@@ -145,7 +145,7 @@ func (server *Server) writeInventoryList(
 			ok, err = server.blobCache.HasBlob(blobDigest)
 			if err != nil {
 				response.Error(err)
-				return
+				return response
 			}
 
 			blobDigestString := blobDigest.String()
@@ -166,7 +166,7 @@ func (server *Server) writeInventoryList(
 
 	if err := blobWriter.Close(); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	actual := blobWriter.GetMarklId()
@@ -194,7 +194,7 @@ func (server *Server) writeInventoryList(
 		sku.CommitOptions{},
 	); err != nil {
 		response.Error(err)
-		return
+		return response
 	}
 
 	if len(logEntry.PublicKey.GetBytes()) > 0 {
@@ -202,9 +202,9 @@ func (server *Server) writeInventoryList(
 			logEntry,
 		); err != nil {
 			response.Error(err)
-			return
+			return response
 		}
 	}
 
-	return
+	return response
 }

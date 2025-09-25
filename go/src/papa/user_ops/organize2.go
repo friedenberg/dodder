@@ -50,7 +50,7 @@ func (op Organize2) Run(
 		organizeFileTemplate,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
@@ -59,7 +59,7 @@ func (op Organize2) Run(
 		file,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return organizeResults, err
 	}
 
 	// TODO refactor into common vim processing loop
@@ -72,14 +72,14 @@ func (op Organize2) Run(
 
 		if err = openVimOp.Run(op.Repo, file.Name()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return organizeResults, err
 		}
 
 		readOrganizeTextOp := ReadOrganizeFile{}
 
 		if _, err = file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
-			return
+			return organizeResults, err
 		}
 
 		if organizeResults.After, err = readOrganizeTextOp.Run(
@@ -95,14 +95,14 @@ func (op Organize2) Run(
 				continue
 			} else {
 				ui.Err().Printf("aborting organize")
-				return
+				return organizeResults, err
 			}
 		}
 
 		break
 	}
 
-	return
+	return organizeResults, err
 }
 
 func (cmd Organize2) handleReadChangesError(
@@ -114,7 +114,7 @@ func (cmd Organize2) handleReadChangesError(
 	if err != nil && !errors.As(err, &errorRead) {
 		ui.Err().Printf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
-		return
+		return tryAgain
 	}
 
 	return envUI.Retry(

@@ -83,7 +83,7 @@ func (lr lineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		if err != nil && !errors.IsEOF(err) {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		if errors.IsEOF(err) {
@@ -103,11 +103,11 @@ func (lr lineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		if err = lr.reader(line); err != nil {
 			err = errors.Wrap(ohio.ErrExhaustedFuncSetStringersWithDelim(err, lr.delim))
-			return
+			return n, err
 		}
 
 		lineNo++
 	}
 
-	return
+	return n, err
 }

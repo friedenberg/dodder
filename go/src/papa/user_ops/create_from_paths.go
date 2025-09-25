@@ -40,12 +40,12 @@ func (op CreateFromPaths) Run(
 
 		if err = fsItem.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		if err = fsItem.FDs.Add(&fsItem.Object); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		if object, err = op.GetEnvWorkspace().GetStoreFS().ReadExternalFromItem(
@@ -58,20 +58,20 @@ func (op CreateFromPaths) Run(
 				"zettel text format error for path: %s: %s",
 				arg,
 			)
-			return
+			return results, err
 		}
 
 		digestWithoutTai := &object.Metadata.SelfWithoutTai
 
 		if err = object.CalculateDigests(false, object.GetDigestWriteMapWithoutMerkle()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		if err = markl.AssertIdIsNotNull(
 			digestWithoutTai); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		digestBytes := digestWithoutTai.GetBytes()
@@ -82,7 +82,7 @@ func (op CreateFromPaths) Run(
 				object.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return results, err
 			}
 		} else {
 			toCreate[string(digestBytes)] = object
@@ -94,7 +94,7 @@ func (op CreateFromPaths) Run(
 
 				if fdObject, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return results, err
 				}
 
 				toDelete.Add(fdObject)
@@ -105,7 +105,7 @@ func (op CreateFromPaths) Run(
 
 				if fdBlob, err = op.GetEnvWorkspace().GetStoreFS().GetObjectOrError(object); err != nil {
 					err = errors.Wrap(err)
-					return
+					return results, err
 				}
 
 				toDelete.Add(fdBlob)
@@ -117,12 +117,12 @@ func (op CreateFromPaths) Run(
 
 	if err = op.Lock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
 	for _, object := range toCreate {
 		if object.Metadata.IsEmpty() {
-			return
+			return results, err
 		}
 
 		op.Proto.Apply(object, genres.Zettel)
@@ -135,7 +135,7 @@ func (op CreateFromPaths) Run(
 		); err != nil {
 			// TODO-P2 add file for error handling
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		results.Add(object)
@@ -145,7 +145,7 @@ func (op CreateFromPaths) Run(
 		// TODO-P2 move to checkout store
 		if err = op.GetEnvRepo().Delete(fdToDelete.GetPath()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return results, err
 		}
 
 		pathRel := op.GetEnvRepo().RelToCwdOrSame(fdToDelete.GetPath())
@@ -156,8 +156,8 @@ func (op CreateFromPaths) Run(
 
 	if err = op.Unlock(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return results, err
 	}
 
-	return
+	return results, err
 }

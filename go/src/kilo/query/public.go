@@ -90,18 +90,18 @@ func ContainsExternalSku(
 ) (ok bool) {
 	if qg.defaultQuery != nil &&
 		!ContainsExternalSku(qg.defaultQuery, el, state) {
-		return
+		return ok
 	}
 
 	sk := el.GetSku()
 
 	if !ContainsSkuCheckedOutState(qg, state) {
-		return
+		return ok
 	}
 
 	if len(qg.optimizedQueries) == 0 && qg.matchOnEmpty {
 		ok = true
-		return
+		return ok
 	}
 
 	g := genres.Must(sk.GetGenre())
@@ -110,12 +110,12 @@ func ContainsExternalSku(
 
 	if !ok || !q.ContainsExternalSku(el) {
 		ok = false
-		return
+		return ok
 	}
 
 	ok = true
 
-	return
+	return ok
 }
 
 func ContainsSkuCheckedOutState(
@@ -124,7 +124,7 @@ func ContainsSkuCheckedOutState(
 ) (ok bool) {
 	if qg.defaultQuery != nil &&
 		!ContainsSkuCheckedOutState(qg.defaultQuery, state) {
-		return
+		return ok
 	}
 
 	switch state {
@@ -138,5 +138,5 @@ func ContainsSkuCheckedOutState(
 		ok = true
 	}
 
-	return
+	return ok
 }

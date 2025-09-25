@@ -23,17 +23,17 @@ func (coder jsonV0) EncodeTo(
 
 	if err = objectJson.FromTransacted(object, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	encoder := json.NewEncoder(bufferedWriter)
 
 	if err = encoder.Encode(objectJson); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (coder jsonV0) DecodeFrom(
@@ -46,18 +46,18 @@ func (coder jsonV0) DecodeFrom(
 
 	if bites, err = bufferedReader.ReadBytes('\n'); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
-		return
+		return n, err
 	}
 
 	if err = json.Unmarshal(bites, &objectJson); err != nil {
 		err = errors.Wrapf(err, "Line: %q", bites)
-		return
+		return n, err
 	}
 
 	if err = objectJson.ToTransacted(object, nil); err != nil {
 		err = errors.Wrapf(err, "Line: %q", bites)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

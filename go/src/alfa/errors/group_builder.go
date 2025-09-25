@@ -24,7 +24,7 @@ func MakeGroupBuilder(
 		}
 	}
 
-	return
+	return groupBuilder
 }
 
 func (groupBuilder *GroupBuilder) GetError() error {
@@ -53,7 +53,7 @@ func (groupBuilder *GroupBuilder) Len() int {
 
 func (groupBuilder *GroupBuilder) Empty() (ok bool) {
 	ok = groupBuilder.Len() == 0
-	return
+	return ok
 }
 
 func (groupBuilder *GroupBuilder) merge(group Group) {

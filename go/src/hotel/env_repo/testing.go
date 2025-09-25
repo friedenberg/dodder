@@ -54,14 +54,14 @@ func makeTestingWithBigBang(
 			},
 		); err != nil {
 			t.Errorf("failed to make repo: %s", err)
-			return
+			return envRepo
 		}
 	}
 
 	envRepo.Genesis(bigBang)
 
 	if contents == nil {
-		return
+		return envRepo
 	}
 
 	for expectedDigestString, content := range contents {
@@ -102,5 +102,5 @@ func makeTestingWithBigBang(
 		t.AssertNoError(markl.AssertEqual(expectedBlobDigest, actual))
 	}
 
-	return
+	return envRepo
 }

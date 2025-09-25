@@ -144,7 +144,7 @@ func (cmd Write) doOne(
 		path,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobId, err
 	}
 
 	defer errors.DeferredCloser(&err, readCloser)
@@ -163,7 +163,7 @@ func (cmd Write) doOne(
 	} else {
 		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)
-			return
+			return blobId, err
 		}
 	}
 
@@ -171,10 +171,10 @@ func (cmd Write) doOne(
 
 	if _, err = io.Copy(writeCloser, readCloser); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobId, err
 	}
 
 	blobId = writeCloser.GetMarklId()
 
-	return
+	return blobId, err
 }

@@ -17,14 +17,14 @@ func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
 
 	if lvp, err = u.GetStore().MakeLuaVMPoolV1WithSku(sk); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	var vm *sku_lua.LuaVMV1
 
 	if vm, args, err = sku_lua.PushTopFuncV1(lvp, args); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	for _, arg := range args {
@@ -33,15 +33,15 @@ func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
 
 	if err = vm.PCall(len(args), 0, nil); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	retval := vm.LState.Get(1)
 
 	if retval.Type() != lua.LTNil {
 		err = errors.ErrorWithStackf("lua error: %s", retval)
-		return
+		return err
 	}
 
-	return
+	return err
 }

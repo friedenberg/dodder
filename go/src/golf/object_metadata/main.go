@@ -100,27 +100,27 @@ func (metadata *Metadata) ResetTags() {
 
 func (metadata *Metadata) AddTagString(tagString string) (err error) {
 	if tagString == "" {
-		return
+		return err
 	}
 
 	var tag ids.Tag
 
 	if err = tag.Set(tagString); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = metadata.AddTagPtr(&tag); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	if e == nil || e.String() == "" {
-		return
+		return err
 	}
 
 	if metadata.Tags == nil {
@@ -131,7 +131,7 @@ func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	cs := catgut.MakeFromString(e.String())
 	metadata.Cache.TagPaths.AddTag(cs)
 
-	return
+	return err
 }
 
 func (metadata *Metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
@@ -141,17 +141,17 @@ func (metadata *Metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 
 	if err = metadata.Tags.Add(*tag); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	tagBytestring := catgut.MakeFromString(tag.String())
 
 	if err = metadata.Cache.TagPaths.AddTag(tagBytestring); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (metadata *Metadata) SetTags(tags ids.TagSet) {

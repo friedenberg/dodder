@@ -35,11 +35,11 @@ func (format Format) WriteMetadataTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 	}
 
-	return
+	return n, err
 }
 
 func writeMetadataKeyTo(
@@ -82,7 +82,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings_german.Bezeichnung, key_strings.Description:
@@ -102,7 +102,7 @@ func writeMetadataKeyStringTo(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
@@ -137,7 +137,7 @@ func writeMetadataKeyStringTo(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
@@ -151,7 +151,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -163,7 +163,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings_german.Kennung:
@@ -176,7 +176,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -188,7 +188,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
@@ -202,7 +202,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings.ZZRepoPub:
@@ -216,7 +216,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings.ZZSigMother:
@@ -230,7 +230,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
@@ -244,7 +244,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings.Tai:
@@ -257,7 +257,7 @@ func writeMetadataKeyStringTo(
 
 		if err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_strings_german.Typ, key_strings.Type:
@@ -271,16 +271,16 @@ func writeMetadataKeyStringTo(
 
 			if err != nil {
 				err = errors.Wrap(err)
-				return
+				return n, err
 			}
 		}
 
 	default:
 		err = errors.Errorf("unsupported key: %s", key)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func writeMarklIdKey(
@@ -290,7 +290,7 @@ func writeMarklIdKey(
 ) (n int, err error) {
 	if err = markl.AssertIdIsNotNull(id); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n, err = ohio.WriteKeySpaceValueNewlineString(
@@ -300,10 +300,10 @@ func writeMarklIdKey(
 	)
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func writeMarklIdKeyIfNotNull(
@@ -312,7 +312,7 @@ func writeMarklIdKeyIfNotNull(
 	id interfaces.MarklId,
 ) (n int, err error) {
 	if id.IsNull() {
-		return
+		return n, err
 	}
 
 	return writeMarklIdKey(writer, key, id)
@@ -326,15 +326,15 @@ func GetDigestForContext(
 
 	if metadata.GetTai().IsEmpty() {
 		err = ErrEmptyTai
-		return
+		return digest, err
 	}
 
 	if digest, err = WriteMetadata(nil, format, context); err != nil {
 		err = errors.Wrap(err)
-		return
+		return digest, err
 	}
 
-	return
+	return digest, err
 }
 
 func WriteMetadata(
@@ -351,12 +351,12 @@ func WriteMetadata(
 	_, err = format.WriteMetadataTo(marklWriter, context)
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobDigest, err
 	}
 
 	blobDigest = marklWriter.GetMarklId()
 
-	return
+	return blobDigest, err
 }
 
 func GetDigestForContextDebug(
@@ -373,7 +373,7 @@ func GetDigestForContextDebug(
 	_, err = format.WriteMetadataTo(writer, context)
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return digest, err
 	}
 
 	digest = writer.GetMarklId()
@@ -382,5 +382,5 @@ func GetDigestForContextDebug(
 
 	ui.Debug().Printf("%q -> %s", value, markl.FormatBytesAsHex(digest))
 
-	return
+	return digest, err
 }

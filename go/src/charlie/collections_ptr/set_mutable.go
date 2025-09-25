@@ -62,7 +62,7 @@ func (s MutableSet[T, TPtr]) KeyPtr(e TPtr) string {
 func (s MutableSet[T, TPtr]) GetPtr(k string) (e TPtr, ok bool) {
 	e, ok = s.E[k]
 
-	return
+	return e, ok
 }
 
 func (s MutableSet[T, TPtr]) Get(k string) (e T, ok bool) {
@@ -72,17 +72,17 @@ func (s MutableSet[T, TPtr]) Get(k string) (e T, ok bool) {
 		e = *e1
 	}
 
-	return
+	return e, ok
 }
 
 func (s MutableSet[T, TPtr]) ContainsKey(k string) (ok bool) {
 	if k == "" {
-		return
+		return ok
 	}
 
 	_, ok = s.E[k]
 
-	return
+	return ok
 }
 
 func (s MutableSet[T, TPtr]) Contains(e T) (ok bool) {
@@ -95,7 +95,7 @@ func (s MutableSet[T, TPtr]) Any() (v T) {
 		break
 	}
 
-	return
+	return v
 }
 
 func (s MutableSet[T, TPtr]) Del(v T) (err error) {
@@ -108,17 +108,17 @@ func (s MutableSet[T, TPtr]) DelPtr(v TPtr) (err error) {
 
 func (s MutableSet[T, TPtr]) DelKey(k string) (err error) {
 	delete(s.E, k)
-	return
+	return err
 }
 
 func (s MutableSet[T, TPtr]) Add(v T) (err error) {
 	s.E[s.Key(v)] = TPtr(&v)
-	return
+	return err
 }
 
 func (s MutableSet[T, TPtr]) AddPtr(v TPtr) (err error) {
 	s.E[s.K.GetKeyPtr(v)] = v
-	return
+	return err
 }
 
 func (s MutableSet[T, TPtr]) EachKey(
@@ -132,11 +132,11 @@ func (s MutableSet[T, TPtr]) EachKey(
 				err = errors.Wrap(err)
 			}
 
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (a MutableSet[T, TPtr]) Reset() {

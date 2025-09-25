@@ -59,7 +59,7 @@ func (a *CheckedOut) GetObjectId() *ids.ObjectId {
 
 func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 	c.state = v
-	return
+	return err
 }
 
 func (a *CheckedOut) String() string {

@@ -29,15 +29,15 @@ func New(ps interfaces.Directory) (f *Provider, err error) {
 
 	if f.yin, err = newProvider(providerPathYin); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
 	if f.yang, err = newProvider(providerPathYang); err != nil {
 		err = errors.Wrap(err)
-		return
+		return f, err
 	}
 
-	return
+	return f, err
 }
 
 func (hf *Provider) Left() provider {

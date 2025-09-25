@@ -27,7 +27,7 @@ func MakeValueWithExpectedHRP(
 ) (value Value, err error) {
 	if err = value.Set(input); err != nil {
 		err = errors.Wrap(err)
-		return
+		return value, err
 	}
 
 	if value.HRP != expectedHRP {
@@ -36,10 +36,10 @@ func MakeValueWithExpectedHRP(
 			expectedHRP,
 			value.HRP,
 		)
-		return
+		return value, err
 	}
 
-	return
+	return value, err
 }
 
 func (value Value) GetHRP() string {
@@ -63,41 +63,41 @@ func (value Value) String() string {
 
 func (value *Value) Set(text string) (err error) {
 	if len(text) == 0 {
-		return
+		return err
 	}
 
 	if value.HRP, value.Data, err = DecodeString(text); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (value Value) MarshalText() (text []byte, err error) {
 	if len(value.Data) == 0 {
-		return
+		return text, err
 	}
 
 	if text, err = Encode(value.HRP, value.Data); err != nil {
 		err = errors.Wrap(err)
-		return
+		return text, err
 	}
 
-	return
+	return text, err
 }
 
 func (value *Value) UnmarshalText(text []byte) (err error) {
 	if len(text) == 0 {
-		return
+		return err
 	}
 
 	if value.HRP, value.Data, err = DecodeString(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (value Value) WriteToMerkleId(
@@ -105,8 +105,8 @@ func (value Value) WriteToMerkleId(
 ) (err error) {
 	if err = merkleId.SetMarklId(value.HRP, value.Data); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

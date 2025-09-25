@@ -15,7 +15,7 @@ func SortedValuesBy[ELEMENT any](
 
 	sort.Slice(out, func(i, j int) bool { return sortFunc(out[i], out[j]) })
 
-	return
+	return out
 }
 
 func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
@@ -28,7 +28,7 @@ func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
 		func(i, j int) bool { return out[i].String() < out[j].String() },
 	)
 
-	return
+	return out
 }
 
 func Strings[ELEMENT interfaces.Stringer](
@@ -56,7 +56,7 @@ func Strings[ELEMENT interfaces.Stringer](
 		}
 	}
 
-	return
+	return out
 }
 
 func SortedStrings[ELEMENT interfaces.Stringer](
@@ -66,7 +66,7 @@ func SortedStrings[ELEMENT interfaces.Stringer](
 
 	sort.Strings(out)
 
-	return
+	return out
 }
 
 func StringDelimiterSeparated[ELEMENT interfaces.Stringer](

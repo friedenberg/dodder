@@ -8,7 +8,7 @@ import (
 
 func Elements[T any](s interfaces.Collection[T]) (out []T) {
 	if s == nil {
-		return
+		return out
 	}
 
 	out = make([]T, 0, s.Len())
@@ -17,7 +17,7 @@ func Elements[T any](s interfaces.Collection[T]) (out []T) {
 		out = append(out, v)
 	}
 
-	return
+	return out
 }
 
 func ElementsSorted[T any](
@@ -25,7 +25,7 @@ func ElementsSorted[T any](
 	sf func(T, T) bool,
 ) (out []T) {
 	if s == nil {
-		return
+		return out
 	}
 
 	out = make([]T, 0, s.Len())
@@ -38,5 +38,5 @@ func ElementsSorted[T any](
 		return sf(out[i], out[j])
 	})
 
-	return
+	return out
 }

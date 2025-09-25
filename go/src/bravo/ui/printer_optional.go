@@ -31,7 +31,7 @@ func (printer printerOptional) IsTty() bool {
 func (printer printerOptional) Write(b []byte) (n int, err error) {
 	if !printer.on {
 		n = len(b)
-		return
+		return n, err
 	}
 
 	return printer.printer.Write(b)

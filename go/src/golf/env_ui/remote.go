@@ -1,4 +1,3 @@
 package env_ui
 
-type Remote struct {
-}
+type Remote struct{}

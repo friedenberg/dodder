@@ -27,16 +27,16 @@ func (roundTripper *RoundTripperUnixSocket) Initialize(
 		"",
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if roundTripper.Conn, err = net.Dial("unix", roundTripper.Path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	roundTripper.Writer = bufio.NewWriter(roundTripper.Conn)
 	roundTripper.Reader = bufio.NewReader(roundTripper.Conn)
 
-	return
+	return err
 }

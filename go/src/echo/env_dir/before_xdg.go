@@ -22,7 +22,7 @@ func (env *beforeXDG) initialize(debugOptions debug.Options) (err error) {
 
 	if env.cwd, err = os.Getwd(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	env.pid = os.Getpid()
@@ -30,16 +30,16 @@ func (env *beforeXDG) initialize(debugOptions debug.Options) (err error) {
 
 	if env.execPath, err = os.Executable(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// TODO switch to useing MakeCommonEnv()
 	{
 		if err = os.Setenv(EnvBin, env.execPath); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

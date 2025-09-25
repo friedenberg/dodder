@@ -31,11 +31,11 @@ func (c DeleteCheckout) Run(
 		for _, f := range els {
 			if err = p(f); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
-		return
+		return err
 	}
 
 	dirs := make([]string, 0)
@@ -80,14 +80,14 @@ func (c DeleteCheckout) Run(
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "FD: %s", fd)
-				return
+				return err
 			}
 		}
 
 		if p != nil {
 			if err = p(fd); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
@@ -111,23 +111,23 @@ func (c DeleteCheckout) Run(
 
 		if err = s.Delete(d); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		var f *fd.FD
 
 		if f, err = fd.MakeFromDirPath(d); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if p != nil {
 			if err = p(f); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 	}
 
-	return
+	return err
 }

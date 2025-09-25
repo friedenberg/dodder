@@ -20,7 +20,7 @@ func New(options Options) (ot *Text, err error) {
 
 	ot, err = options.Make()
 
-	return
+	return ot, err
 }
 
 func (t *Text) Refine() (err error) {
@@ -30,10 +30,10 @@ func (t *Text) Refine() (err error) {
 
 	if err = t.Options.refiner().Refine(t.Assignment); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 type metadataReader struct {
@@ -44,7 +44,7 @@ type metadataReader struct {
 func (mr *metadataReader) ReadFrom(r io.Reader) (n int64, err error) {
 	if n, err = mr.Metadata.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	ocs := mr.OptionComments
@@ -53,11 +53,11 @@ func (mr *metadataReader) ReadFrom(r io.Reader) (n int64, err error) {
 		if ocwa, ok := oc.(OptionCommentWithApply); ok {
 			if err = ocwa.ApplyToReader(mr.Options, &mr.reader); err != nil {
 				err = errors.Wrapf(err, "OptionComment: %s", oc)
-				return
+				return n, err
 			}
 		}
 	}
-	return
+	return n, err
 }
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
@@ -79,12 +79,12 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 
 	if n, err = mr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	t.Assignment = r1.root
 
-	return
+	return n, err
 }
 
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
@@ -111,14 +111,14 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		if ocwa, ok := oc.(OptionCommentWithApply); ok {
 			if err = ocwa.ApplyToWriter(ot.Options, &aw); err != nil {
 				err = errors.Wrapf(err, "OptionComment: %s", oc)
-				return
+				return n, err
 			}
 		}
 	}
 
 	if err = aw.write(ot.Assignment); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	mw := triple_hyphen_io.Writer{
@@ -129,8 +129,8 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	if n, err = mw.WriteTo(out); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

@@ -68,7 +68,7 @@ func FromLuaTableV2(
 	if id != "" {
 		if err = object.ObjectId.Set(id); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -77,7 +77,7 @@ func FromLuaTableV2(
 
 	if !ok {
 		err = errors.ErrorWithStackf("expected table but got %T", tags)
-		return
+		return err
 	}
 
 	object.Metadata.SetTags(nil)
@@ -101,5 +101,5 @@ func FromLuaTableV2(
 	// TODO Blob
 	// TODO Cache
 
-	return
+	return err
 }

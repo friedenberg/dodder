@@ -41,10 +41,10 @@ func FormatForPurposeOrError(
 	var found bool
 	if format, found = formatsMap[purpose]; !found {
 		err = errUnknownFormatKey(purpose)
-		return
+		return format, err
 	}
 
-	return
+	return format, err
 }
 
 var (

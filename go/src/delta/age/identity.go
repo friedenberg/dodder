@@ -32,10 +32,10 @@ func (identity Identity) Unwrap(
 ) (fileKey []byte, err error) {
 	if fileKey, err = identity.identity.Unwrap(stanzas); err != nil {
 		err = errors.Wrap(err)
-		return
+		return fileKey, err
 	}
 
-	return
+	return fileKey, err
 }
 
 func (identity *Identity) IsDisabled() bool {
@@ -56,16 +56,16 @@ func (identity *Identity) String() string {
 
 func (identity *Identity) MarshalText() (b []byte, err error) {
 	b = []byte(identity.String())
-	return
+	return b, err
 }
 
 func (identity *Identity) UnmarshalText(b []byte) (err error) {
 	if err = identity.SetFromX25519Identity(string(b)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (identity *Identity) SetFromX25519Identity(
@@ -75,12 +75,12 @@ func (identity *Identity) SetFromX25519Identity(
 
 	if x, err = age.ParseX25519Identity(identityString); err != nil {
 		err = errors.Wrapf(err, "Identity: %s", identityString)
-		return
+		return err
 	}
 
 	identity.SetX25519Identity(x)
 
-	return
+	return err
 }
 
 func (identity *Identity) SetX25519Identity(x *age.X25519Identity) {
@@ -94,7 +94,7 @@ func (identity *Identity) SetFromPath(path string) (err error) {
 
 	if f, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -112,7 +112,7 @@ func (identity *Identity) SetFromPath(path string) (err error) {
 			err = nil
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if len(line) > 0 {
@@ -122,10 +122,10 @@ func (identity *Identity) SetFromPath(path string) (err error) {
 
 	if err = identity.SetFromX25519Identity(key); err != nil {
 		err = errors.Wrapf(err, "Key: %q", key)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (identity *Identity) Set(path_or_identity string) (err error) {
@@ -139,40 +139,40 @@ func (identity *Identity) Set(path_or_identity string) (err error) {
 	case files.Exists(path_or_identity):
 		if err = identity.SetFromPath(path_or_identity); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	case path_or_identity == "generate":
 		if err = identity.GenerateIfNecessary(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 	default:
 		if err = identity.SetFromX25519Identity(path_or_identity); err != nil {
 			err = errors.Wrapf(err, "Identity: %q", path_or_identity)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (identity *Identity) GenerateIfNecessary() (err error) {
 	if identity.IsDisabled() || !identity.IsEmpty() {
-		return
+		return err
 	}
 
 	var x *age.X25519Identity
 
 	if x, err = age.GenerateX25519Identity(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	identity.SetX25519Identity(x)
 
-	return
+	return err
 }
 
 func (identity *Identity) WrapReader(
@@ -180,12 +180,12 @@ func (identity *Identity) WrapReader(
 ) (out io.ReadCloser, err error) {
 	if src, err = age.Decrypt(src, identity); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
 	out = io.NopCloser(src)
 
-	return
+	return out, err
 }
 
 func (identity *Identity) WrapWriter(
@@ -193,8 +193,8 @@ func (identity *Identity) WrapWriter(
 ) (out io.WriteCloser, err error) {
 	if out, err = age.Encrypt(dst, identity.Recipient); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
-	return
+	return out, err
 }

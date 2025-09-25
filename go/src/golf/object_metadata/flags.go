@@ -48,11 +48,11 @@ func (metadata *Metadata) SetFlagSetTags(f interfaces.CommandLineFlagDefinitions
 			for tagString := range values {
 				if err = metadata.AddTagString(tagString); err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
-			return
+			return err
 		},
 		func() {
 			metadata.ResetTags()

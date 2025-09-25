@@ -23,7 +23,7 @@ func (c ReadOrganizeFile) RunWithPath(
 
 	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	defer errors.DeferredCloser(&err, f)
@@ -34,10 +34,10 @@ func (c ReadOrganizeFile) RunWithPath(
 		organize_text.NewMetadata(repoId),
 	); err != nil {
 		err = errors.Wrapf(err, "Path: %q", p)
-		return
+		return ot, err
 	}
 
-	return
+	return ot, err
 }
 
 func (c ReadOrganizeFile) Run(
@@ -58,13 +58,13 @@ func (c ReadOrganizeFile) Run(
 
 	if ot, err = organize_text.New(o); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
 	if _, err = ot.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return ot, err
 	}
 
-	return
+	return ot, err
 }

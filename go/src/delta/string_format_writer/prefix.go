@@ -27,7 +27,7 @@ func WriteStringPrefixFormat(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = w.WriteString(body)
@@ -35,8 +35,8 @@ func WriteStringPrefixFormat(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

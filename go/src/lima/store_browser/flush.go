@@ -12,7 +12,7 @@ import (
 
 func (store *Store) flushUrls() (err error) {
 	if len(store.deleted) == 0 && len(store.added) == 0 {
-		return
+		return err
 	}
 
 	var resp browser_items.HTTPResponseWithRequestPayloadPut
@@ -49,13 +49,13 @@ func (store *Store) flushUrls() (err error) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		}
 
 		if err = store.resetCacheIfNecessary(resp.Response); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	} else {
 		for _, is := range store.deleted {
@@ -88,14 +88,14 @@ func (store *Store) flushUrls() (err error) {
 				maps.Keys(deleted),
 			)
 
-			return
+			return err
 		}
 
 		if err = store.itemDeletedStringFormatWriter(
 			originalItem.CheckedOut,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -104,8 +104,8 @@ func (store *Store) flushUrls() (err error) {
 
 	if err = store.flushCache(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

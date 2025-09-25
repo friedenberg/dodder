@@ -54,7 +54,7 @@ func newMover(
 
 		if mover.basePath == "" {
 			err = errors.ErrorWithStackf("basepath is nil")
-			return
+			return mover, err
 		}
 	} else {
 		mover.blobPath = moveOptions.FinalPathOrDir
@@ -62,7 +62,7 @@ func newMover(
 
 	if mover.file, err = moveOptions.FileTemp(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return mover, err
 	}
 
 	if mover.BlobWriter, err = NewWriter(
@@ -70,26 +70,26 @@ func newMover(
 		mover.file,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return mover, err
 	}
 
-	return
+	return mover, err
 }
 
 func (mover *localFileMover) Close() (err error) {
 	if mover.file == nil {
 		err = errors.ErrorWithStackf("nil file")
-		return
+		return err
 	}
 
 	if mover.BlobWriter == nil {
 		err = errors.ErrorWithStackf("nil object reader")
-		return
+		return err
 	}
 
 	if err = mover.BlobWriter.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// var fi os.FileInfo
@@ -101,18 +101,18 @@ func (mover *localFileMover) Close() (err error) {
 
 	if err = mover.file.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	digest := mover.GetMarklId()
 
 	if err = markl.MakeErrEmptyType(digest); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if digest.IsNull() {
-		return
+		return err
 	}
 
 	// if err = merkle.MakeErrIsNull(digest, ""); err != nil {
@@ -135,7 +135,7 @@ func (mover *localFileMover) Close() (err error) {
 			mover.basePath,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -149,10 +149,10 @@ func (mover *localFileMover) Close() (err error) {
 				err = nil
 			}
 
-			return
+			return err
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -161,9 +161,9 @@ func (mover *localFileMover) Close() (err error) {
 	if mover.lockFile {
 		if err = files.SetDisallowUserChanges(mover.blobPath); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }

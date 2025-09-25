@@ -23,36 +23,36 @@ func localAllBlobs(
 			func(path string, dirEntry fs.DirEntry, in error) (err error) {
 				if in != nil {
 					err = errors.Wrap(in)
-					return
+					return err
 				}
 
 				if path == basePath {
-					return
+					return err
 				}
 
 				if dirEntry.IsDir() {
-					return
+					return err
 				}
 
 				if err = markl.SetHexStringFromAbsolutePath(id, path, basePath); err != nil {
 					if !yield(nil, errors.Wrap(err)) {
 						err = filepath.SkipAll
-						return
+						return err
 					}
 
-					return
+					return err
 				}
 
 				if id.IsNull() {
-					return
+					return err
 				}
 
 				if !yield(id, nil) {
 					err = filepath.SkipAll
-					return
+					return err
 				}
 
-				return
+				return err
 			},
 		); err != nil {
 			if !yield(nil, errors.Wrap(err)) {

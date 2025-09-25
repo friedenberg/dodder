@@ -28,7 +28,7 @@ func MakeBuilder(
 		workspaceStoreGetter: workspaceStoreGetter,
 	}
 
-	return
+	return b
 }
 
 type Builder struct {
@@ -238,18 +238,18 @@ func (builder *Builder) BuildQueryGroupWithRepoId(
 				"kasten not found: %q",
 				externalQueryOptions.RepoId,
 			)
-			return
+			return query, err
 		}
 	}
 
 	if err = builder.build(state, values...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return query, err
 	}
 
 	query = state.group
 
-	return
+	return query, err
 }
 
 func (builder *Builder) BuildQueryGroup(
@@ -259,12 +259,12 @@ func (builder *Builder) BuildQueryGroup(
 
 	if err = builder.build(state, args...); err != nil {
 		err = errors.Wrap(err)
-		return
+		return group, err
 	}
 
 	group = state.group
 
-	return
+	return group, err
 }
 
 func (builder *Builder) build(state *buildState, values ...string) (err error) {
@@ -278,7 +278,7 @@ func (builder *Builder) build(state *buildState, values ...string) (err error) {
 
 		errors.Wrap(err)
 
-		return
+		return err
 	}
 
 	if len(state.missingBlobs) > 0 {
@@ -290,11 +290,11 @@ func (builder *Builder) build(state *buildState, values ...string) (err error) {
 
 		err = groupBuilder.GetError()
 
-		return
+		return err
 	}
 
 	if builder.defaultQuery == "" {
-		return
+		return err
 	}
 
 	defaultQueryGroupState := state.copy()
@@ -303,12 +303,12 @@ func (builder *Builder) build(state *buildState, values ...string) (err error) {
 
 	if err, _ = defaultQueryGroupState.build(builder.defaultQuery); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	state.group.defaultQuery = defaultQueryGroupState.group
 
 	ui.Log().Print(state.group.StringDebug())
 
-	return
+	return err
 }

@@ -46,7 +46,7 @@ func (e errUnsupportedFormatter) Error() string {
 
 func (e errUnsupportedFormatter) Is(err error) (ok bool) {
 	_, ok = err.(errUnsupportedFormatter)
-	return
+	return ok
 }
 
 func (e errUnsupportedFormatter) GetFormatValue() string {

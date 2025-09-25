@@ -83,7 +83,7 @@ func (cb ComparerBytes) SliceFrom(start int) ComparerBytes {
 
 func (cb ComparerBytes) DecodeRune() (r rune, width int) {
 	r, width = utf8.DecodeRune(cb)
-	return
+	return r, width
 }
 
 type ComparerString string
@@ -104,5 +104,5 @@ func (cb ComparerString) DecodeRune() (r rune, width int) {
 
 	width = utf8.RuneLen(r)
 
-	return
+	return r, width
 }

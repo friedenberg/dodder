@@ -71,7 +71,7 @@ func (printer *PrinterComplete) PrintOne(
 ) (err error) {
 	if src.GetObjectId().String() == "/" {
 		err = errors.New("empty sku")
-		return
+		return err
 	}
 
 	dst := printer.pool.Get()
@@ -84,7 +84,7 @@ func (printer *PrinterComplete) PrintOne(
 	case printer.chObjects <- dst:
 	}
 
-	return
+	return err
 }
 
 func (printer *PrinterComplete) Close(context interfaces.Context) (err error) {
@@ -93,13 +93,13 @@ func (printer *PrinterComplete) Close(context interfaces.Context) (err error) {
 
 	if err = context.Cause(); err != nil {
 		err = nil
-		return
+		return err
 	}
 
 	if err = printer.bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

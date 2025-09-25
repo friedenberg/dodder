@@ -60,13 +60,13 @@ func (m *Metadata) SetFromObjectMetadata(
 	for _, c := range om.Comments {
 		if err = m.OptionCommentSet.Set(c); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	m.Type = om.Type
 
-	return
+	return err
 }
 
 func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
@@ -75,19 +75,19 @@ func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
 	for element := range m.All() {
 		if err = mes.Del(element); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	sk.GetSkuExternal().Metadata.SetTags(mes)
 
-	return
+	return err
 }
 
 func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
 	m1.Type = m.Type
 	m1.SetTags(m.TagSet)
-	return
+	return m1
 }
 
 func (m Metadata) GetMetadataWriterTo() triple_hyphen_io.MetadataWriterTo {
@@ -128,12 +128,12 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 		),
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	m.TagSet = mes.CloneSetPtrLike()
 
-	return
+	return n, err
 }
 
 func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {

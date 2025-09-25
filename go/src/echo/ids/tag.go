@@ -50,7 +50,7 @@ func MustTagPtr(v string) (e *Tag) {
 		errors.PanicIfError(err)
 	}
 
-	return
+	return e
 }
 
 func MustTag(v string) (e Tag) {
@@ -62,7 +62,7 @@ func MustTag(v string) (e Tag) {
 		errors.PanicIfError(err)
 	}
 
-	return
+	return e
 }
 
 func MakeTag(v string) (e Tag, err error) {
@@ -70,10 +70,10 @@ func MakeTag(v string) (e Tag, err error) {
 
 	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return e, err
 	}
 
-	return
+	return e, err
 }
 
 func (e tag) init() {
@@ -165,7 +165,7 @@ func (e *tag) Set(v string) (err error) {
 
 	if err = ErrOnConfig(v); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if !TagRegex.MatchString(v) {
@@ -175,7 +175,7 @@ func (e *tag) Set(v string) (err error) {
 			err = errors.ErrorWithStackf("not a valid tag: %q", v1)
 		}
 
-		return
+		return err
 	}
 
 	e.virtual = strings.HasPrefix(v, "%")
@@ -186,33 +186,33 @@ func (e *tag) Set(v string) (err error) {
 
 	e.value = v
 
-	return
+	return err
 }
 
 func (t tag) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *tag) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (t tag) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
-	return
+	return text, err
 }
 
 func (t *tag) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }

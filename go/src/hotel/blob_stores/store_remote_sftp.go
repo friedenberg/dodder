@@ -58,7 +58,7 @@ func makeSftpStore(
 		blob_store_configs.DefaultHashTypeId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobStore, err
 	}
 
 	blobStore = &remoteSftp{
@@ -74,17 +74,17 @@ func makeSftpStore(
 
 	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
 		err = errors.Wrapf(err, "failed to create SFTP client")
-		return
+		return blobStore, err
 	}
 
 	ctx.After(errors.MakeFuncContextFromFuncErr(blobStore.close))
 
 	if err = blobStore.initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobStore, err
 	}
 
-	return
+	return blobStore, err
 }
 
 func (blobStore *remoteSftp) GetBlobStoreConfig() blob_store_configs.Config {
@@ -99,7 +99,7 @@ func (blobStore *remoteSftp) close() (err error) {
 	if blobStore.sftpClient != nil {
 		if err = blobStore.sftpClient.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -136,7 +136,7 @@ func (blobStore *remoteSftp) initialize() (err error) {
 		}
 	}
 
-	return
+	return err
 }
 
 func (blobStore *remoteSftp) GetBlobStoreDescription() string {
@@ -175,14 +175,14 @@ func (blobStore *remoteSftp) HasBlob(
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
-		return
+		return ok
 	}
 
 	blobStore.blobCacheLock.RLock()
 
 	if _, ok = blobStore.blobCache[string(merkleId.GetBytes())]; ok {
 		blobStore.blobCacheLock.RUnlock()
-		return
+		return ok
 	}
 
 	blobStore.blobCacheLock.RUnlock()
@@ -196,7 +196,7 @@ func (blobStore *remoteSftp) HasBlob(
 		ok = true
 	}
 
-	return
+	return ok
 }
 
 func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
@@ -258,12 +258,12 @@ func (blobStore *remoteSftp) MakeBlobWriter(
 
 	if err = mover.initialize(blobStore.defaultHashType.Get()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return blobWriter, err
 	}
 
 	blobWriter = mover
 
-	return
+	return blobWriter, err
 }
 
 func (blobStore *remoteSftp) MakeBlobReader(
@@ -274,7 +274,7 @@ func (blobStore *remoteSftp) MakeBlobReader(
 			blobStore.defaultHashType.Get(),
 			io.NopCloser(bytes.NewReader(nil)),
 		)
-		return
+		return readCloser, err
 	}
 
 	remotePath := blobStore.remotePathForMerkleId(digest)
@@ -290,7 +290,7 @@ func (blobStore *remoteSftp) MakeBlobReader(
 		} else {
 			err = errors.Wrap(err)
 		}
-		return
+		return readCloser, err
 	}
 
 	blobStore.blobCacheLock.Lock()
@@ -309,10 +309,10 @@ func (blobStore *remoteSftp) MakeBlobReader(
 	); err != nil {
 		remoteFile.Close()
 		err = errors.Wrap(err)
-		return
+		return readCloser, err
 	}
 
-	return
+	return readCloser, err
 }
 
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
@@ -334,7 +334,7 @@ func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
 	var tempNameBytes [16]byte
 	if _, err = rand.Read(tempNameBytes[:]); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	tempName := fmt.Sprintf("tmp_%x", tempNameBytes)
@@ -342,7 +342,7 @@ func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
 
 	if mover.tempFile, err = mover.store.sftpClient.Create(mover.tempPath); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Create the streaming writer with compression/encryption
@@ -355,16 +355,16 @@ func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
 		mover.tempFile.Close()
 		mover.store.sftpClient.Remove(mover.tempPath)
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (mover *sftpMover) Write(p []byte) (n int, err error) {
 	if mover.writer == nil {
 		err = errors.ErrorWithStackf("writer not initialized")
-		return
+		return n, err
 	}
 
 	return mover.writer.Write(p)
@@ -373,7 +373,7 @@ func (mover *sftpMover) Write(p []byte) (n int, err error) {
 func (mover *sftpMover) ReadFrom(r io.Reader) (n int64, err error) {
 	if mover.writer == nil {
 		err = errors.ErrorWithStackf("writer not initialized")
-		return
+		return n, err
 	}
 
 	return mover.writer.ReadFrom(r)
@@ -406,13 +406,13 @@ func (mover *sftpMover) Close() (err error) {
 	// calculation
 	if err = mover.writer.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Close the temp file
 	if err = mover.tempFile.Close(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Get the calculated digest and determine final path
@@ -423,7 +423,7 @@ func (mover *sftpMover) Close() (err error) {
 	finalDir := path.Dir(finalPath)
 	if err = mover.store.sftpClient.MkdirAll(finalDir); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Atomically move temp file to final location
@@ -435,7 +435,7 @@ func (mover *sftpMover) Close() (err error) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -446,7 +446,7 @@ func (mover *sftpMover) Close() (err error) {
 	// Clear temp path so cleanup doesn't try to remove it
 	mover.tempPath = ""
 
-	return
+	return err
 }
 
 func (mover *sftpMover) GetMarklId() interfaces.MarklId {
@@ -476,28 +476,28 @@ func newSftpWriter(
 
 	if writer.wAge, err = config.GetBlobEncryption().WrapWriter(writer.wBuf); err != nil {
 		err = errors.Wrap(err)
-		return
+		return writer, err
 	}
 
 	writer.hash = hash
 
 	if writer.wCompress, err = config.GetBlobCompression().WrapWriter(writer.wAge); err != nil {
 		err = errors.Wrap(err)
-		return
+		return writer, err
 	}
 
 	writer.tee = io.MultiWriter(writer.hash, writer.wCompress)
 
-	return
+	return writer, err
 }
 
 func (writer *sftpWriter) ReadFrom(r io.Reader) (n int64, err error) {
 	if n, err = io.Copy(writer.tee, r); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (writer *sftpWriter) Write(p []byte) (n int, err error) {
@@ -508,25 +508,25 @@ func (writer *sftpWriter) Close() (err error) {
 	if writer.wCompress != nil {
 		if err = writer.wCompress.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if writer.wAge != nil {
 		if err = writer.wAge.Close(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
 	if writer.wBuf != nil {
 		if err = writer.wBuf.Flush(); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
 
 func (writer *sftpWriter) GetDigest() interfaces.MarklId {
@@ -552,12 +552,12 @@ func (reader *sftpStreamingReader) createReader(
 
 	if err = sftpReader.initialize(hash); err != nil {
 		err = errors.Wrap(err)
-		return
+		return readCloser, err
 	}
 
 	readCloser = sftpReader
 
-	return
+	return readCloser, err
 }
 
 // sftpReader implements streaming decompression/decryption for SFTP
@@ -574,19 +574,19 @@ func (reader *sftpReader) initialize(hash interfaces.Hash) (err error) {
 	// Set up decryption
 	if reader.decrypter, err = reader.config.GetBlobEncryption().WrapReader(reader.file); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	// Set up decompression
 	if reader.expander, err = reader.config.GetBlobCompression().WrapReader(reader.decrypter); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	reader.hash = hash
 	reader.tee = io.TeeReader(reader.expander, reader.hash)
 
-	return
+	return err
 }
 
 func (reader *sftpReader) Read(p []byte) (n int, err error) {
@@ -605,7 +605,7 @@ func (reader *sftpReader) Seek(
 
 	if !ok {
 		err = errors.ErrorWithStackf("seeking not supported")
-		return
+		return actual, err
 	}
 
 	return seeker.Seek(offset, whence)

@@ -23,13 +23,13 @@ func (s bobTest) GetValue() string {
 func (s bobTest) MarshalBinary() (bs []byte, err error) {
 	bs = []byte(s.v)
 
-	return
+	return bs, err
 }
 
 func (s *bobTest) UnmarshalBinary(bs []byte) (err error) {
 	s.v = string(bs)
 
-	return
+	return err
 }
 
 func TestBob(t1 *testing.T) {

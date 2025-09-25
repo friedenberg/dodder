@@ -41,7 +41,7 @@ func (f *color[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var n2 int64
@@ -50,7 +50,7 @@ func (f *color[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = sw.WriteString(string(colorReset))
@@ -58,8 +58,8 @@ func (f *color[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }

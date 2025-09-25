@@ -42,7 +42,7 @@ func (f *Date[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	n1, err = io.WriteString(w, " ")
@@ -50,7 +50,7 @@ func (f *Date[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	var n2 int64
@@ -60,8 +60,8 @@ func (f *Date[T]) EncodeStringTo(
 
 	if err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
