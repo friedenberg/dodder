@@ -20,12 +20,11 @@ import (
 )
 
 type writtenPage struct {
-	page_id.PageId
-	sunrise ids.Tai
-	*probeIndex
+	pageId              page_id.PageId
+	sunrise             ids.Tai
+	probeIndex          *probeIndex
 	hasChanges          bool
 	envRepo             env_repo.Env
-	preWrite            interfaces.FuncIter[*sku.Transacted]
 	config              store_config.Store
 	addedObjectIdLookup map[string]struct{}
 
@@ -38,10 +37,9 @@ func (page *writtenPage) initialize(
 ) {
 	page.envRepo = index.envRepo
 	page.sunrise = index.sunrise
-	page.PageId = pageId
+	page.pageId = pageId
 	page.added = sku.MakeListTransacted()
 	page.addedLatest = sku.MakeListTransacted()
-	page.preWrite = index.preWrite
 	page.probeIndex = &index.probeIndex
 	page.addedObjectIdLookup = make(map[string]struct{})
 }
@@ -52,7 +50,7 @@ func (page *writtenPage) readOneCursor(
 ) (err error) {
 	var file *os.File
 
-	if file, err = files.Open(page.Path()); err != nil {
+	if file, err = files.Open(page.pageId.Path()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -62,7 +60,7 @@ func (page *writtenPage) readOneCursor(
 	bites := make([]byte, cursor.ContentLength)
 
 	if _, err = file.ReadAt(bites, cursor.Offset); err != nil {
-		err = errors.Wrapf(err, "Range: %q, Page: %q", cursor, page.PageId)
+		err = errors.Wrapf(err, "Range: %q, Page: %q", cursor, page.pageId)
 		return err
 	}
 
@@ -80,7 +78,7 @@ func (page *writtenPage) readOneCursor(
 			err,
 			"Range: %q, Page: %q",
 			cursor,
-			page.PageId.Path(),
+			page.pageId.Path(),
 		)
 		return err
 	}
@@ -162,7 +160,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 	var namedBlobReader io.ReadCloser
 
 	if namedBlobReader, err = page.envRepo.MakeNamedBlobReader(
-		page.Path(),
+		page.pageId.Path(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			namedBlobReader = io.NopCloser(bytes.NewReader(nil))
@@ -253,15 +251,16 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 
 func (page *writtenPage) MakeFlush(
 	changesAreHistorical bool,
+	preWrite interfaces.FuncIter[*sku.Transacted],
 ) func() error {
 	return func() (err error) {
 		pageWriter := &pageWriter{
-			pageId:      page.PageId,
+			pageId:      page.pageId,
 			writtenPage: page,
-			preWrite:    page.preWrite,
+			preWrite:    preWrite,
 			envRepo:     page.envRepo,
 			probeIndex:  page.probeIndex,
-			path:        page.Path(),
+			path:        page.pageId.Path(),
 		}
 
 		if changesAreHistorical {
