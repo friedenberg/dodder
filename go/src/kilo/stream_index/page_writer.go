@@ -48,6 +48,17 @@ func (index *Index) makePageFlush(
 	page := &index.pages[pageIndex]
 
 	return func() (err error) {
+		if !page.writeLock.TryLock() {
+			err = errors.Errorf(
+				"failed to acquire write lock for page: %q",
+				page.pageId,
+			)
+
+			return err
+		}
+
+		defer page.writeLock.Unlock()
+
 		pageReader, pageReaderClose := index.makePageReader(pageIndex)
 		defer errors.Deferred(&err, pageReaderClose)
 
