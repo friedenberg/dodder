@@ -1,7 +1,6 @@
 package stream_index
 
 import (
-	"bytes"
 	"io"
 	"os"
 
@@ -76,7 +75,7 @@ func (pageReader *pageReader) readOneCursor(
 	return err
 }
 
-func (pageReader *pageReader) copyJustHistoryFrom(
+func (pageReader *pageReader) readFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[objectWithCursorAndSigil],
@@ -93,12 +92,7 @@ func (pageReader *pageReader) copyJustHistoryFrom(
 			&object,
 		)
 		if err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
+			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 			return err
 		}
 
@@ -109,42 +103,23 @@ func (pageReader *pageReader) copyJustHistoryFrom(
 	}
 }
 
-func (pageReader *pageReader) copyJustHistoryAndAdded(
-	query sku.PrimitiveQueryGroup,
-	output interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	return pageReader.copyHistoryAndMaybeLatest(
-		query,
-		output,
-		pageReadOptions{
-			includeAdded:       true,
-			includeAddedLatest: false,
-		},
-	)
-}
-
 type pageReadOptions struct {
 	includeAdded       bool
 	includeAddedLatest bool
 }
 
-func (pageReader *pageReader) copyHistoryAndMaybeLatest(
+func (pageReader *pageReader) readFull(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 	pageReadOptions pageReadOptions,
 ) (err error) {
-	var namedBlobReader io.ReadCloser
+	var namedBlobReader interfaces.BlobReader
 
 	if namedBlobReader, err = pageReader.envRepo.MakeNamedBlobReader(
 		pageReader.pageId.Path(),
 	); err != nil {
-		if errors.IsNotExist(err) {
-			namedBlobReader = io.NopCloser(bytes.NewReader(nil))
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return err
-		}
+		err = errors.Wrap(err)
+		return err
 	}
 
 	defer errors.DeferredCloser(&err, namedBlobReader)
@@ -153,7 +128,7 @@ func (pageReader *pageReader) copyHistoryAndMaybeLatest(
 	defer repool()
 
 	if !pageReadOptions.includeAdded && !pageReadOptions.includeAddedLatest {
-		if err = pageReader.copyJustHistoryFrom(
+		if err = pageReader.readFrom(
 			bufferedReader,
 			query,
 			func(object objectWithCursorAndSigil) (err error) {

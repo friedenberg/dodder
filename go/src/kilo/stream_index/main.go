@@ -338,7 +338,7 @@ func (index *Index) ReadPrimitiveQuery(
 			for !isDone() {
 				var err1 error
 
-				if err1 = pageReader.copyHistoryAndMaybeLatest(
+				if err1 = pageReader.readFull(
 					queryGroup,
 					funcIter,
 					pageReadOptions{

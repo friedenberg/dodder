@@ -149,9 +149,13 @@ func (pageWriter *pageWriter) flushBoth(
 		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
-	if err = pageWriter.pageReader.copyJustHistoryAndAdded(
+	if err = pageWriter.pageReader.readFull(
 		sku.MakePrimitiveQueryGroup(),
 		chain,
+		pageReadOptions{
+			includeAdded:       true,
+			includeAddedLatest: false,
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -208,7 +212,7 @@ func (pageWriter *pageWriter) flushJustLatest(
 ) (err error) {
 	ui.Log().Printf("flushing just tail: %s", pageWriter.path)
 
-	if err = pageWriter.pageReader.copyJustHistoryFrom(
+	if err = pageWriter.pageReader.readFrom(
 		bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
 		func(object objectWithCursorAndSigil) (err error) {
