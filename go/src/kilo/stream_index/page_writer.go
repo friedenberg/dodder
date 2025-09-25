@@ -20,11 +20,13 @@ import (
 type ObjectIdToObject map[string]objectMetaWithCursorAndSigil
 
 type pageWriter struct {
-	envRepo     env_repo.Env
-	pageId      page_id.PageId
-	preWrite    interfaces.FuncIter[*sku.Transacted]
 	writtenPage *writtenPage
-	path        string
+	pageReader  pageReader
+
+	envRepo  env_repo.Env
+	pageId   page_id.PageId
+	preWrite interfaces.FuncIter[*sku.Transacted]
+	path     string
 
 	binaryEncoder binaryEncoder
 
@@ -39,7 +41,7 @@ type pageWriter struct {
 	latestObjects ObjectIdToObject
 }
 
-func (index *Index) MakeFlush(
+func (index *Index) makePageFlush(
 	pageIndex int,
 	changesAreHistorical bool,
 ) func() error {
@@ -49,6 +51,7 @@ func (index *Index) MakeFlush(
 		pageWriter := &pageWriter{
 			pageId:      page.pageId,
 			writtenPage: page,
+			pageReader:  pageReader{writtenPage: page},
 			preWrite:    index.preWrite,
 			envRepo:     page.envRepo,
 			probeIndex:  page.probeIndex,
@@ -144,7 +147,7 @@ func (pageWriter *pageWriter) flushBoth(
 		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
-	if err = pageWriter.writtenPage.copyJustHistoryAndAdded(
+	if err = pageWriter.pageReader.copyJustHistoryAndAdded(
 		sku.MakePrimitiveQueryGroup(),
 		chain,
 	); err != nil {
@@ -203,7 +206,7 @@ func (pageWriter *pageWriter) flushJustLatest(
 ) (err error) {
 	ui.Log().Printf("flushing just tail: %s", pageWriter.path)
 
-	if err = pageWriter.writtenPage.copyJustHistoryFrom(
+	if err = pageWriter.pageReader.copyJustHistoryFrom(
 		bufferedReader,
 		sku.MakePrimitiveQueryGroup(),
 		func(object objectWithCursorAndSigil) (err error) {

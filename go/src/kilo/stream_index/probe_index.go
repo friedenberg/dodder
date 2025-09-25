@@ -231,9 +231,13 @@ func (index *Index) readOneLoc(
 	loc object_probe_index.Loc,
 	object *sku.Transacted,
 ) (err error) {
-	page := index.pages[loc.Page]
+	page := &index.pages[loc.Page]
 
-	if err = page.readOneCursor(loc.Cursor, object); err != nil {
+	pageReader := pageReader{
+		writtenPage: page,
+	}
+
+	if err = pageReader.readOneCursor(loc.Cursor, object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

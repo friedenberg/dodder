@@ -132,7 +132,7 @@ func (index *Index) flushAdded(
 			actualFlushCount++
 		}
 
-		waitGroup.Do(index.MakeFlush(n, false))
+		waitGroup.Do(index.makePageFlush(n, false))
 	}
 
 	if actualFlushCount > 0 {
@@ -178,7 +178,7 @@ func (index *Index) flushEverything(
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for n := range index.pages {
-		waitGroup.Do(index.MakeFlush(n, true))
+		waitGroup.Do(index.makePageFlush(n, true))
 	}
 
 	if err = printerHeader(
@@ -319,11 +319,14 @@ func (index *Index) ReadPrimitiveQuery(
 
 	for n := range index.pages {
 		waitGroup.Add(1)
+		paigeReader := pageReader{
+			writtenPage: &index.pages[n],
+		}
 
-		go func(p *writtenPage, openFileCh chan struct{}) {
+		go func(pageReader pageReader, openFileCh chan struct{}) {
 			ui.Log().Printf(
 				"starting query on page %d: %q",
-				p.pageId.Index,
+				pageReader.pageId.Index,
 				queryGroup,
 			)
 			defer waitGroup.Done()
@@ -334,7 +337,7 @@ func (index *Index) ReadPrimitiveQuery(
 			for !isDone() {
 				var err1 error
 
-				if err1 = p.copyHistoryAndMaybeLatest(
+				if err1 = pageReader.copyHistoryAndMaybeLatest(
 					queryGroup,
 					funcIter,
 					false,
@@ -358,7 +361,7 @@ func (index *Index) ReadPrimitiveQuery(
 
 				break
 			}
-		}(&index.pages[n], ch)
+		}(paigeReader, ch)
 	}
 
 	waitGroup.Wait()

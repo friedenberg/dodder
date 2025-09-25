@@ -16,15 +16,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type pageReader struct{}
+type pageReader struct {
+	*writtenPage
+}
 
-func (page *writtenPage) readOneCursor(
+func (pageReader *pageReader) readOneCursor(
 	cursor object_probe_index.Cursor,
 	object *sku.Transacted,
 ) (err error) {
 	var file *os.File
 
-	if file, err = files.Open(page.pageId.Path()); err != nil {
+	if file, err = files.Open(pageReader.pageId.Path()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -34,7 +36,12 @@ func (page *writtenPage) readOneCursor(
 	bites := make([]byte, cursor.ContentLength)
 
 	if _, err = file.ReadAt(bites, cursor.Offset); err != nil {
-		err = errors.Wrapf(err, "Range: %q, Page: %q", cursor, page.pageId)
+		err = errors.Wrapf(
+			err,
+			"Range: %q, Page: %q",
+			cursor,
+			pageReader.pageId,
+		)
 		return err
 	}
 
@@ -52,7 +59,7 @@ func (page *writtenPage) readOneCursor(
 			err,
 			"Range: %q, Page: %q",
 			cursor,
-			page.pageId.Path(),
+			pageReader.pageId.Path(),
 		)
 		return err
 	}
@@ -60,7 +67,7 @@ func (page *writtenPage) readOneCursor(
 	return err
 }
 
-func (page *writtenPage) copyJustHistoryFrom(
+func (pageReader *pageReader) copyJustHistoryFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[objectWithCursorAndSigil],
@@ -93,14 +100,14 @@ func (page *writtenPage) copyJustHistoryFrom(
 	}
 }
 
-func (page *writtenPage) copyJustHistoryAndAdded(
+func (pageReader *pageReader) copyJustHistoryAndAdded(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return page.copyHistoryAndMaybeLatest(query, output, true, false)
+	return pageReader.copyHistoryAndMaybeLatest(query, output, true, false)
 }
 
-func (page *writtenPage) copyHistoryAndMaybeLatest(
+func (pageReader *pageReader) copyHistoryAndMaybeLatest(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 	includeAdded bool,
@@ -108,8 +115,8 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 ) (err error) {
 	var namedBlobReader io.ReadCloser
 
-	if namedBlobReader, err = page.envRepo.MakeNamedBlobReader(
-		page.pageId.Path(),
+	if namedBlobReader, err = pageReader.envRepo.MakeNamedBlobReader(
+		pageReader.pageId.Path(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			namedBlobReader = io.NopCloser(bytes.NewReader(nil))
@@ -126,7 +133,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 	defer repool()
 
 	if !includeAdded && !includeAddedLatest {
-		if err = page.copyJustHistoryFrom(
+		if err = pageReader.copyJustHistoryFrom(
 			bufferedReader,
 			query,
 			func(object objectWithCursorAndSigil) (err error) {
@@ -148,7 +155,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 	decoder := makeBinaryWithQueryGroup(query, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
-	added := page.added.Copy()
+	added := pageReader.added.Copy()
 
 	var object objectWithCursorAndSigil
 
@@ -181,7 +188,7 @@ func (page *writtenPage) copyHistoryAndMaybeLatest(
 		return err
 	}
 
-	addedLatest := page.addedLatest.Copy()
+	addedLatest := pageReader.addedLatest.Copy()
 
 	if err = heap.MergeStream(
 		&addedLatest,
