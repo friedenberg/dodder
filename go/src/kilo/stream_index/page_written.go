@@ -3,7 +3,6 @@ package stream_index
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 )
@@ -13,7 +12,6 @@ type writtenPage struct {
 	sunrise             ids.Tai
 	probeIndex          *probeIndex
 	hasChanges          bool
-	envRepo             env_repo.Env
 	config              store_config.Store
 	addedObjectIdLookup map[string]struct{}
 
@@ -24,7 +22,6 @@ func (page *writtenPage) initialize(
 	pageId page_id.PageId,
 	index *Index,
 ) {
-	page.envRepo = index.envRepo
 	page.sunrise = index.sunrise
 	page.pageId = pageId
 	page.added = sku.MakeListTransacted()

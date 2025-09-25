@@ -15,7 +15,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type State int
+type (
+	State     int
+	PageIndex = uint8
+)
 
 const (
 	StateUnread = State(iota)
@@ -132,7 +135,7 @@ func (index *Index) flushAdded(
 			actualFlushCount++
 		}
 
-		waitGroup.Do(index.makePageFlush(n, false))
+		waitGroup.Do(index.makePageFlush(PageIndex(n), false))
 	}
 
 	if actualFlushCount > 0 {
@@ -178,7 +181,7 @@ func (index *Index) flushEverything(
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for n := range index.pages {
-		waitGroup.Do(index.makePageFlush(n, true))
+		waitGroup.Do(index.makePageFlush(PageIndex(n), true))
 	}
 
 	if err = printerHeader(
@@ -317,13 +320,13 @@ func (index *Index) ReadPrimitiveQuery(
 		funcIter,
 	)
 
+	// TODO switch to errors.MakeWaitGroupParallel()
 	for n := range index.pages {
 		waitGroup.Add(1)
-		paigeReader := pageReader{
-			writtenPage: &index.pages[n],
-		}
 
-		go func(pageReader pageReader, openFileCh chan struct{}) {
+		go func(pageIndex PageIndex, openFileCh chan struct{}) {
+			pageReader := index.makePageReader(pageIndex)
+
 			ui.Log().Printf(
 				"starting query on page %d: %q",
 				pageReader.pageId.Index,
@@ -361,7 +364,7 @@ func (index *Index) ReadPrimitiveQuery(
 
 				break
 			}
-		}(paigeReader, ch)
+		}(PageIndex(n), ch)
 	}
 
 	waitGroup.Wait()

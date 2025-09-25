@@ -42,7 +42,7 @@ type pageWriter struct {
 }
 
 func (index *Index) makePageFlush(
-	pageIndex int,
+	pageIndex PageIndex,
 	changesAreHistorical bool,
 ) func() error {
 	page := &index.pages[pageIndex]
@@ -51,9 +51,8 @@ func (index *Index) makePageFlush(
 		pageWriter := &pageWriter{
 			pageId:      page.pageId,
 			writtenPage: page,
-			pageReader:  pageReader{writtenPage: page},
+			pageReader:  index.makePageReader(pageIndex),
 			preWrite:    index.preWrite,
-			envRepo:     page.envRepo,
 			probeIndex:  page.probeIndex,
 			path:        page.pageId.Path(),
 		}

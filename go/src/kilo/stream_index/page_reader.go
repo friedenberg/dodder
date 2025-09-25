@@ -12,12 +12,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type pageReader struct {
 	*writtenPage
+	envRepo env_repo.Env
+}
+
+func (index *Index) makePageReader(pageIndex PageIndex) pageReader {
+	return pageReader{
+		writtenPage: &index.pages[pageIndex],
+		envRepo:     index.envRepo,
+	}
 }
 
 func (pageReader *pageReader) readOneCursor(
