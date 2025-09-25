@@ -59,7 +59,7 @@ func (index *Index) makePageFlush(
 
 		if changesAreHistorical {
 			pageWriter.changesAreHistorical = true
-			pageWriter.writtenPage.additions.hasChanges = true
+			pageWriter.writtenPage.additions.forceFullFlush = true
 		}
 
 		if err = pageWriter.Flush(); err != nil {
@@ -67,14 +67,14 @@ func (index *Index) makePageFlush(
 			return err
 		}
 
-		page.additions.hasChanges = false
+		page.additions.forceFullFlush = false
 
 		return err
 	}
 }
 
 func (pageWriter *pageWriter) Flush() (err error) {
-	if !pageWriter.writtenPage.additions.hasChanges {
+	if !pageWriter.writtenPage.additions.hasChanges() {
 		ui.Log().Print("not flushing, no changes")
 		return err
 	}

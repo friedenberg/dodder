@@ -5,13 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
+// TODO rename to ???
 type writtenPage struct {
 	pageId    page_id.PageId
 	additions pageAdditions
 }
 
 type pageAdditions struct {
-	hasChanges          bool
+	forceFullFlush      bool
 	addedObjectIdLookup map[string]struct{}
 	added, addedLatest  *sku.ListTransacted
 }
@@ -24,10 +25,10 @@ func (page *writtenPage) initialize(
 	page.additions.initialize()
 }
 
-func (pageAdditions *pageAdditions) initialize() {
-	pageAdditions.added = sku.MakeListTransacted()
-	pageAdditions.addedLatest = sku.MakeListTransacted()
-	pageAdditions.addedObjectIdLookup = make(map[string]struct{})
+func (additions *pageAdditions) initialize() {
+	additions.added = sku.MakeListTransacted()
+	additions.addedLatest = sku.MakeListTransacted()
+	additions.addedObjectIdLookup = make(map[string]struct{})
 }
 
 // TODO write binary representation to file-backed buffered writer and then
@@ -49,15 +50,13 @@ func (index *Index) add(
 		pageAdditions.added.Add(objectClone)
 	}
 
-	pageAdditions.hasChanges = true
-
 	return err
 }
 
-func (pageAdditions *pageAdditions) getHasChanges() bool {
-	return pageAdditions.hasChanges
+func (additions *pageAdditions) hasChanges() bool {
+	return additions.waitingToAddLen() > 0 || additions.forceFullFlush
 }
 
-func (pageAdditions *pageAdditions) waitingToAddLen() int {
-	return pageAdditions.added.Len() + pageAdditions.addedLatest.Len()
+func (additions *pageAdditions) waitingToAddLen() int {
+	return additions.added.Len() + additions.addedLatest.Len()
 }
