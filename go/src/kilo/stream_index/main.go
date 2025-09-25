@@ -323,7 +323,8 @@ func (index *Index) ReadPrimitiveQuery(
 		waitGroup.Add(1)
 
 		go func(pageIndex PageIndex, openFileCh chan struct{}) {
-			pageReader := index.makePageReader(pageIndex)
+			pageReader, pageReaderClose := index.makePageReader(pageIndex)
+			defer errors.Deferred(&err, pageReaderClose)
 
 			ui.Log().Printf(
 				"starting query on page %d: %q",

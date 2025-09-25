@@ -12,9 +12,16 @@ type (
 		GetBlobIOWrapper() BlobIOWrapper
 	}
 
+	ReadAtSeeker interface {
+		io.ReaderAt
+		io.Seeker
+	}
+
 	BlobReader interface {
 		io.WriterTo
 		io.ReadCloser
+
+		ReadAtSeeker
 		MarklIdGetter
 	}
 

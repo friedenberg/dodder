@@ -48,10 +48,13 @@ func (index *Index) makePageFlush(
 	page := &index.pages[pageIndex]
 
 	return func() (err error) {
+		pageReader, pageReaderClose := index.makePageReader(pageIndex)
+		defer errors.Deferred(&err, pageReaderClose)
+
 		pageWriter := &pageWriter{
 			pageId:      page.pageId,
 			writtenPage: page,
-			pageReader:  index.makePageReader(pageIndex),
+			pageReader:  pageReader,
 			preWrite:    index.preWrite,
 			probeIndex:  &index.probeIndex,
 			path:        page.pageId.Path(),

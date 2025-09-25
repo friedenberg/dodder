@@ -611,6 +611,17 @@ func (reader *sftpReader) Seek(
 	return seeker.Seek(offset, whence)
 }
 
+func (reader *sftpReader) ReadAt(p []byte, off int64) (n int, err error) {
+	readerAt, ok := reader.decrypter.(io.ReaderAt)
+
+	if !ok {
+		err = errors.ErrorWithStackf("reading at not supported")
+		return n, err
+	}
+
+	return readerAt.ReadAt(p, off)
+}
+
 func (reader *sftpReader) Close() error {
 	// TODO capture both errors using errors.Join
 	err1 := reader.expander.Close()

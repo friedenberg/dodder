@@ -2,13 +2,11 @@ package stream_index
 
 import (
 	"io"
-	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -18,32 +16,36 @@ import (
 
 type pageReader struct {
 	*writtenPage
-	envRepo env_repo.Env
+	blobReader interfaces.BlobReader
+	envRepo    env_repo.Env
 }
 
-func (index *Index) makePageReader(pageIndex PageIndex) pageReader {
-	return pageReader{
+func (index *Index) makePageReader(
+	pageIndex PageIndex,
+) (pageReader, errors.FuncErr) {
+	pageReader := pageReader{
 		writtenPage: &index.pages[pageIndex],
 		envRepo:     index.envRepo,
 	}
+
+	var err error
+
+	if pageReader.blobReader, err = pageReader.envRepo.MakeNamedBlobReader(
+		pageReader.pageId.Path(),
+	); err != nil {
+		panic(err)
+	}
+
+	return pageReader, pageReader.blobReader.Close
 }
 
 func (pageReader *pageReader) readOneCursor(
 	cursor object_probe_index.Cursor,
 	object *sku.Transacted,
 ) (err error) {
-	var file *os.File
-
-	if file, err = files.Open(pageReader.pageId.Path()); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	defer errors.DeferredCloser(&err, file)
-
 	bites := make([]byte, cursor.ContentLength)
 
-	if _, err = file.ReadAt(bites, cursor.Offset); err != nil {
+	if _, err = pageReader.blobReader.ReadAt(bites, cursor.Offset); err != nil {
 		err = errors.Wrapf(
 			err,
 			"Range: %q, Page: %q",
@@ -62,7 +64,10 @@ func (pageReader *pageReader) readOneCursor(
 		Cursor: cursor,
 	}
 
-	if _, err = decoder.readFormatExactly(file, &objectPlus); err != nil {
+	if _, err = decoder.readFormatExactly(
+		pageReader.blobReader,
+		&objectPlus,
+	); err != nil {
 		err = errors.Wrapf(
 			err,
 			"Range: %q, Page: %q",

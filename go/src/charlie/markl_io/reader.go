@@ -90,6 +90,17 @@ func (readCloser readCloser) Seek(
 	return seeker.Seek(offset, whence)
 }
 
+func (readCloser readCloser) ReadAt(p []byte, off int64) (n int, err error) {
+	readerAt, ok := readCloser.reader.(io.ReaderAt)
+
+	if !ok {
+		err = errors.ErrorWithStackf("reading at not supported")
+		return n, err
+	}
+
+	return readerAt.ReadAt(p, off)
+}
+
 func (readCloser readCloser) WriteTo(w io.Writer) (n int64, err error) {
 	// TODO-P3 determine why something in the copy returns an EOF
 	if n, err = io.Copy(w, readCloser.tee); err != nil {
@@ -145,6 +156,11 @@ func MakeNopReadCloser(
 func (nopReadCloser) Seek(offset int64, whence int) (actual int64, err error) {
 	err = errors.ErrorWithStackf("seeking not supported")
 	return actual, err
+}
+
+func (nopReadCloser) ReadAt(p []byte, off int64) (n int, err error) {
+	err = errors.ErrorWithStackf("reading at not supported")
+	return n, err
 }
 
 func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {

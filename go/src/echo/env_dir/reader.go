@@ -127,6 +127,17 @@ func (reader *blobReader) Seek(
 	return seeker.Seek(offset, whence)
 }
 
+func (reader *blobReader) ReadAt(p []byte, off int64) (n int, err error) {
+	readerAt, ok := reader.decrypter.(io.ReaderAt)
+
+	if !ok {
+		err = errors.ErrorWithStackf("reading at not supported")
+		return n, err
+	}
+
+	return readerAt.ReadAt(p, off)
+}
+
 func (reader *blobReader) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, reader.tee)
 }
