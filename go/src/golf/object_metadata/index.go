@@ -9,7 +9,7 @@ import (
 )
 
 type Index struct {
-	ParentTai    ids.Tai
+	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
 	ExpandedTags ids.TagMutableSet // public for gob, but should be private
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private

@@ -7,16 +7,16 @@ import (
 )
 
 func (local *Repo) ReadObjectHistory(
-	oid *ids.ObjectId,
-) (skus []*sku.Transacted, err error) {
+	objectId *ids.ObjectId,
+) (objects []*sku.Transacted, err error) {
 	streamIndex := local.GetStore().GetStreamIndex()
 
-	if skus, err = streamIndex.ReadManyObjectId(
-		oid,
+	if objects, err = streamIndex.ReadManyObjectId(
+		objectId,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return objects, err
 	}
 
-	return
+	return objects, err
 }

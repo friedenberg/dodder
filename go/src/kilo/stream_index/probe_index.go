@@ -96,28 +96,14 @@ func (index *Index) ReadOneMarklId(
 ) (err error) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
 
-	originalBlobId := blobId
-
-	if blobId.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
-		replacementId, repool := index.hashType.GetMarklIdForMarklId(blobId)
-		defer repool()
-
-		blobId = replacementId
-	}
-
 	var loc object_probe_index.Loc
 
 	if loc, err = index.readOneMarklIdLoc(blobId); err != nil {
-		if originalBlobId != blobId {
-			// ui.Debug().Print(
-			// 	originalBlobId.StringWithFormat(),
-			// 	blobId.StringWithFormat(),
-			// )
-		}
 		return err
 	}
 
 	if err = index.readOneLoc(loc, object); err != nil {
+		err = errors.Wrap(err)
 		return err
 	}
 
@@ -135,14 +121,14 @@ func (index *Index) ReadManyMarklId(
 	}
 
 	for _, loc := range locs {
-		sk := sku.GetTransactedPool().Get()
+		object := sku.GetTransactedPool().Get()
 
-		if err = index.readOneLoc(loc, sk); err != nil {
+		if err = index.readOneLoc(loc, object); err != nil {
 			err = errors.Wrapf(err, "Loc: %s", loc)
 			return objects, err
 		}
 
-		objects = append(objects, sk)
+		objects = append(objects, object)
 	}
 
 	return objects, err

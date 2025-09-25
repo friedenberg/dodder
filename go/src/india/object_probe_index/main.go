@@ -132,27 +132,34 @@ func (index *Index) ReadOne(
 }
 
 func (index *Index) ReadMany(
-	digest interfaces.MarklId,
+	originalId interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
-	actual := digest.GetMarklFormat().GetMarklFormatId()
+	id := originalId
 
-	if actual != index.hashType.GetMarklFormatId() {
-		err = errors.Errorf("unsupported hash type: %q", actual)
-		return err
+	if id.GetMarklFormat().GetMarklFormatId() != index.hashType.GetMarklFormatId() {
+		replacementId, repool := index.hashType.GetMarklIdForMarklId(id)
+		defer repool()
+
+		id = replacementId
 	}
 
 	var pageIndex uint8
 
 	if pageIndex, err = page_id.PageIndexForDigest(
 		DigitWidth,
-		digest,
+		id,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	return index.pages[pageIndex].ReadMany(digest, locations)
+	if err = index.pages[pageIndex].ReadMany(id, locations); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }
 
 func (index *Index) PrintAll(env env_ui.Env) (err error) {

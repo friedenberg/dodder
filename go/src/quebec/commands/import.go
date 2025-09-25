@@ -117,13 +117,13 @@ func (cmd Import) Run(req command.Request) {
 						)
 					} else {
 						err = errors.Wrap(err)
-						return
+						return err
 					}
 				} else if env_dir.IsErrBlobAlreadyExists(err) {
 					err = nil
 				} else {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 			}
 
@@ -133,10 +133,10 @@ func (cmd Import) Run(req command.Request) {
 				local.GetEnvRepo().GetConfigPrivate().Blob,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		}
 	}
 

@@ -985,7 +985,12 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return err
 				}
 
-				return printer(object)
+				if err = printer(object); err != nil {
+					err = errors.Wrap(err)
+					return err
+				}
+
+				return err
 			}
 		},
 	},
