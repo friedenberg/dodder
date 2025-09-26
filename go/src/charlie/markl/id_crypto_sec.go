@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 )
 
 func (id *Id) GeneratePrivateKey(
@@ -119,7 +119,7 @@ func (id Id) GetPublicKey(
 
 func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 	if id.IsNull() {
-		ioWrapper = files.NopeIOWrapper{}
+		ioWrapper = ohio.NopeIOWrapper{}
 		return ioWrapper, err
 	}
 

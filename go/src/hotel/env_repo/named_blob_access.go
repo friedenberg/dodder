@@ -8,8 +8,7 @@ import (
 var _ interfaces.NamedBlobAccess = Env{}
 
 func (env Env) MakeNamedBlobReader(path string) (interfaces.BlobReader, error) {
-	// TODO return empty bytes reader on empty
-	return env_dir.NewFileReader(env_dir.DefaultConfig, path)
+	return env_dir.NewFileReaderOrEmptyBytesReader(env_dir.DefaultConfig, path)
 }
 
 func (env Env) MakeNamedBlobWriter(

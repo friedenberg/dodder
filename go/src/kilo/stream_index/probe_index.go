@@ -231,7 +231,7 @@ func (index *Index) readOneLoc(
 	loc object_probe_index.Loc,
 	object *sku.Transacted,
 ) (err error) {
-	pageReader, pageReaderClose := index.makePageReader(loc.Page)
+	pageReader, pageReaderClose := index.makeProbePageReader(loc.Page)
 	defer errors.Deferred(&err, pageReaderClose)
 
 	if err = pageReader.readOneCursor(loc.Cursor, object); err != nil {

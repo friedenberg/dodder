@@ -59,8 +59,7 @@ func NewReader(
 	return reader, err
 }
 
-// TODO fold into markl_io
-func NewFileReader(
+func NewFileReaderOrEmptyBytesReader(
 	config Config,
 	path string,
 ) (blobReader interfaces.BlobReader, err error) {
@@ -84,6 +83,52 @@ func NewFileReader(
 		}
 	}
 
+	if blobReader, err = newFileReaderFromReadSeeker(
+		config,
+		readSeeker,
+	); err != nil {
+		err = errors.Wrap(err)
+		return blobReader, err
+	}
+
+	return blobReader, err
+}
+
+// TODO fold into markl_io
+func NewFileReaderOrErrNotExist(
+	config Config,
+	path string,
+) (blobReader interfaces.BlobReader, err error) {
+	var readSeeker io.ReadSeeker
+
+	if path == "-" {
+		readSeeker = os.Stdin
+	} else {
+		var file *os.File
+
+		if file, err = files.Open(path); err != nil {
+			err = errors.Wrap(err)
+			return blobReader, err
+		}
+
+		readSeeker = file
+	}
+
+	if blobReader, err = newFileReaderFromReadSeeker(
+		config,
+		readSeeker,
+	); err != nil {
+		err = errors.Wrap(err)
+		return blobReader, err
+	}
+
+	return blobReader, err
+}
+
+func newFileReaderFromReadSeeker(
+	config Config,
+	readSeeker io.ReadSeeker,
+) (blobReader interfaces.BlobReader, err error) {
 	// try the existing options. if they fail, try without encryption
 	if blobReader, err = NewReader(
 		config,
@@ -131,11 +176,20 @@ func (reader *blobReader) ReadAt(p []byte, off int64) (n int, err error) {
 	readerAt, ok := reader.decrypter.(io.ReaderAt)
 
 	if !ok {
-		err = errors.ErrorWithStackf("reading at not supported")
+		err = errors.ErrorWithStackf(
+			"reading at not supported for decryptor: %T",
+			reader.decrypter,
+		)
+
 		return n, err
 	}
 
-	return readerAt.ReadAt(p, off)
+	if n, err = readerAt.ReadAt(p, off); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return n, err
+	}
+
+	return n, err
 }
 
 func (reader *blobReader) WriteTo(w io.Writer) (n int64, err error) {

@@ -3,7 +3,6 @@ package blob_stores
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -11,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -116,7 +116,7 @@ func (blobStore localHashBucketed) MakeBlobReader(
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashFormat.Get(),
-			io.NopCloser(bytes.NewReader(nil)),
+			ohio.NopCloser(bytes.NewReader(nil)),
 		)
 		return readCloser, err
 	}
@@ -186,7 +186,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashFormat.Get(),
-			io.NopCloser(bytes.NewReader(nil)),
+			ohio.NopCloser(bytes.NewReader(nil)),
 		)
 		return readCloser, err
 	}
@@ -210,7 +210,7 @@ func (blobStore localHashBucketed) blobReaderFrom(
 		basePath,
 	)
 
-	if readCloser, err = env_dir.NewFileReader(
+	if readCloser, err = env_dir.NewFileReaderOrErrNotExist(
 		blobStore.makeEnvDirConfig(nil),
 		basePath,
 	); err != nil {

@@ -137,9 +137,9 @@ func (cmd Write) doOne(
 	blobStore command_components_madder.BlobStoreWithEnv,
 	path string,
 ) (blobId interfaces.MarklId, err error) {
-	var readCloser io.ReadCloser
+	var blobReader interfaces.BlobReader
 
-	if readCloser, err = env_dir.NewFileReader(
+	if blobReader, err = env_dir.NewFileReaderOrErrNotExist(
 		env_dir.DefaultConfig,
 		path,
 	); err != nil {
@@ -147,7 +147,7 @@ func (cmd Write) doOne(
 		return blobId, err
 	}
 
-	defer errors.DeferredCloser(&err, readCloser)
+	defer errors.DeferredCloser(&err, blobReader)
 
 	var writeCloser interfaces.BlobWriter
 
@@ -169,7 +169,7 @@ func (cmd Write) doOne(
 
 	defer errors.DeferredCloser(&err, writeCloser)
 
-	if _, err = io.Copy(writeCloser, readCloser); err != nil {
+	if _, err = io.Copy(writeCloser, blobReader); err != nil {
 		err = errors.Wrap(err)
 		return blobId, err
 	}

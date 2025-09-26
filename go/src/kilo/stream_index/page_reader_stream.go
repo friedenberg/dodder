@@ -10,29 +10,27 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
-type pageReader struct {
-	*writtenPage
-	blobReader     interfaces.BlobReader
-	bufferedReader *bufio.Reader
-	envRepo        env_repo.Env
+type streamPageReader struct {
+	*page
+	blobReader      interfaces.BlobReader
+	bufferedReader  *bufio.Reader
+	namedBlobAccess interfaces.NamedBlobAccess
 }
 
-func (index *Index) makePageReader(
+func (index *Index) makeStreamPageReader(
 	pageIndex PageIndex,
-) (pageReader, errors.FuncErr) {
-	pageReader := pageReader{
-		writtenPage: &index.pages[pageIndex],
-		envRepo:     index.envRepo,
+) (streamPageReader, errors.FuncErr) {
+	pageReader := streamPageReader{
+		page:            &index.pages[pageIndex],
+		namedBlobAccess: index.envRepo,
 	}
 
 	var err error
 
-	if pageReader.blobReader, err = pageReader.envRepo.MakeNamedBlobReader(
+	if pageReader.blobReader, err = pageReader.namedBlobAccess.MakeNamedBlobReader(
 		pageReader.pageId.Path(),
 	); err != nil {
 		panic(err)
@@ -50,48 +48,7 @@ func (index *Index) makePageReader(
 	}
 }
 
-func (pageReader *pageReader) readOneCursor(
-	cursor object_probe_index.Cursor,
-	object *sku.Transacted,
-) (err error) {
-	bites := make([]byte, cursor.ContentLength)
-
-	if _, err = pageReader.blobReader.ReadAt(bites, cursor.Offset); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Range: %q, Page: %q",
-			cursor,
-			pageReader.pageId,
-		)
-		return err
-	}
-
-	decoder := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
-
-	objectPlus := objectWithCursorAndSigil{
-		objectWithSigil: objectWithSigil{
-			Transacted: object,
-		},
-		Cursor: cursor,
-	}
-
-	if _, err = decoder.readFormatExactly(
-		pageReader.blobReader,
-		&objectPlus,
-	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Range: %q, Page: %q",
-			cursor,
-			pageReader.pageId.Path(),
-		)
-		return err
-	}
-
-	return err
-}
-
-func (pageReader *pageReader) readFrom(
+func (pageReader *streamPageReader) readFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[objectWithCursorAndSigil],
@@ -124,7 +81,7 @@ type pageReadOptions struct {
 	includeAddedLatest bool
 }
 
-func (pageReader *pageReader) readFull(
+func (pageReader *streamPageReader) readFull(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
 	pageReadOptions pageReadOptions,

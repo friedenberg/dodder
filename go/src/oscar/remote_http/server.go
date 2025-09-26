@@ -23,6 +23,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -571,9 +572,8 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 		}
 
 		response.StatusCode = http.StatusCreated
-		response.Body = io.NopCloser(
-			strings.NewReader(copyResult.BlobId.String()),
-		)
+		response.Body = ohio.NopCloser(
+			strings.NewReader(copyResult.BlobId.String()))
 
 		return response
 	}
@@ -609,9 +609,8 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 	}
 
 	response.StatusCode = http.StatusCreated
-	response.Body = io.NopCloser(
-		strings.NewReader(copyResult.BlobId.String()),
-	)
+	response.Body = ohio.NopCloser(
+		strings.NewReader(copyResult.BlobId.String()))
 
 	return response
 }
@@ -746,7 +745,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		server.EnvLocal.Cancel(err)
 	}
 
-	response.Body = io.NopCloser(buffer)
+	response.Body = ohio.NopCloser(buffer)
 
 	return response
 }
@@ -794,7 +793,7 @@ func (server *Server) handleGetInventoryList(
 		}
 	}
 
-	response.Body = io.NopCloser(buffer)
+	response.Body = ohio.NopCloser(buffer)
 
 	return response
 }
@@ -907,7 +906,7 @@ func (server *Server) handleGetConfigImmutable(
 		server.EnvLocal.Cancel(err)
 	}
 
-	response.Body = io.NopCloser(&buffer)
+	response.Body = ohio.NopCloser(&buffer)
 
 	return response
 }

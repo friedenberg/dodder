@@ -243,6 +243,7 @@ deploy-docker: build-docker
   docker tag dodder:latest idealnesswagon5/dodder:latest
   docker push idealnesswagon5/dodder:latest
 
+# TODO extract into a set of scripts that resets state on failure
 deploy-github:
   #! /usr/bin/env -S bash -e
   set -euo pipefail

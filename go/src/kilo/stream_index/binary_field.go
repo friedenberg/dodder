@@ -31,69 +31,78 @@ var binaryFieldOrder = []key_bytes.Binary{
 }
 
 type binaryField struct {
-	key_bytes.Binary
+	Key           key_bytes.Binary
 	ContentLength uint16
 	Content       bytes.Buffer
 }
 
-func (bf *binaryField) String() string {
+func (binaryField *binaryField) String() string {
 	return fmt.Sprintf(
 		"%s:%d:%x",
-		bf.Binary,
-		bf.ContentLength,
-		bf.Content.Bytes(),
+		binaryField.Key,
+		binaryField.ContentLength,
+		binaryField.Content.Bytes(),
 	)
 }
 
-func (bf *binaryField) Reset() {
-	bf.Binary.Reset()
-	bf.ContentLength = 0
-	bf.Content.Reset()
+func (binaryField *binaryField) Reset() {
+	binaryField.Key.Reset()
+	binaryField.ContentLength = 0
+	binaryField.Content.Reset()
 }
 
-var (
-	errContentLengthTooLarge = errors.New("content length too large")
-	errContentLengthNegative = errors.New("content length negative")
-)
+var errContentLengthTooLarge = errors.New("content length too large")
 
-func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
+func (binaryField *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 	var n2 int64
-	n2, err = bf.Binary.ReadFrom(r)
+	n2, err = binaryField.Key.ReadFrom(r)
 	n += int64(n2)
 
 	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+
+		err = errors.Wrap(err)
 		return n, err
 	}
 
-	n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
+	n1, binaryField.ContentLength, err = ohio.ReadFixedUInt16(r)
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+
+		err = errors.Wrap(err)
 		return n, err
 	}
 
-	bf.Content.Grow(int(bf.ContentLength))
-	bf.Content.Reset()
+	binaryField.Content.Grow(int(binaryField.ContentLength))
+	binaryField.Content.Reset()
 
-	n2, err = io.CopyN(&bf.Content, r, int64(bf.ContentLength))
+	n2, err = io.CopyN(
+		&binaryField.Content,
+		r,
+		int64(binaryField.ContentLength),
+	)
 	n += n2
 
 	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+
+		err = errors.Wrap(err)
 		return n, err
 	}
 
 	return n, err
 }
 
-var errContentLengthDoesNotMatchContent = errors.New(
-	"content length does not match content",
-)
-
-func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
+func (binaryField *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	// defer func() {
 	// 	r := recover()
 
@@ -105,16 +114,16 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	// 	panic(r)
 	// }()
 
-	if bf.Content.Len() > math.MaxUint16 {
+	if binaryField.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge
 		return n, err
 	}
 
-	bf.ContentLength = uint16(bf.Content.Len())
+	binaryField.ContentLength = uint16(binaryField.Content.Len())
 
 	var n1 int
 	var n2 int64
-	n2, err = bf.Binary.WriteTo(w)
+	n2, err = binaryField.Key.WriteTo(w)
 	n += int64(n2)
 
 	if err != nil {
@@ -122,7 +131,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
+	n1, err = ohio.WriteFixedUInt16(w, binaryField.ContentLength)
 	n += int64(n1)
 
 	if err != nil {
@@ -130,7 +139,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n2, err = io.Copy(w, &bf.Content)
+	n2, err = io.Copy(w, &binaryField.Content)
 	n += n2
 
 	if err != nil {

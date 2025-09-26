@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -41,7 +42,9 @@ func makeBinaryWithQueryGroup(
 }
 
 type binaryDecoder struct {
+	// TODO unembed
 	bytes.Buffer
+	// TODO unembed
 	binaryField
 
 	sigil         ids.Sigil
@@ -49,19 +52,20 @@ type binaryDecoder struct {
 	limitedReader io.LimitedReader
 }
 
-func (bf *binaryDecoder) readFormatExactly(
-	r io.ReaderAt,
-	sk *objectWithCursorAndSigil,
+func (decoder *binaryDecoder) readFormatExactly(
+	readerAt io.ReaderAt,
+	object *objectWithCursorAndSigil,
 ) (n int64, err error) {
-	bf.binaryField.Reset()
-	bf.Buffer.Reset()
+	decoder.binaryField.Reset()
+	decoder.Buffer.Reset()
 
 	var n1 int
 	var n2 int64
 
-	b := make([]byte, sk.ContentLength)
+	// TODO pool this
+	bites := make([]byte, object.ContentLength)
 
-	n1, err = r.ReadAt(b, sk.Offset)
+	n1, err = readerAt.ReadAt(bites, object.Offset)
 	n += int64(n1)
 
 	if err == io.EOF {
@@ -71,9 +75,9 @@ func (bf *binaryDecoder) readFormatExactly(
 		return n, err
 	}
 
-	buf := bytes.NewBuffer(b)
+	buffer := bytes.NewBuffer(bites)
 
-	n1, bf.ContentLength, err = ohio.ReadFixedUInt16(buf)
+	n1, decoder.ContentLength, err = ohio.ReadFixedUInt16(buffer)
 	n += int64(n1)
 
 	if err != nil {
@@ -81,16 +85,22 @@ func (bf *binaryDecoder) readFormatExactly(
 		return n, err
 	}
 
-	n2, err = bf.readSigil(sk, buf)
+	n2, err = decoder.readSigil(object, buffer)
 	n += n2
 
 	if err != nil {
-		err = errors.Wrapf(err, "ExpectedContentLenght: %d", bf.ContentLength)
+		ui.Debug().Printf("%T: %x", readerAt, buffer.Bytes())
+		err = errors.Wrapf(
+			err,
+			"ExpectedContentLength: %d, ActualBytes: %d",
+			decoder.ContentLength,
+			buffer.Len(),
+		)
 		return n, err
 	}
 
-	for buf.Len() > 0 {
-		n2, err = bf.binaryField.ReadFrom(buf)
+	for buffer.Len() > 0 {
+		n2, err = decoder.binaryField.ReadFrom(buffer)
 		n += n2
 
 		if err != nil {
@@ -98,7 +108,7 @@ func (bf *binaryDecoder) readFormatExactly(
 			return n, err
 		}
 
-		if err = bf.readFieldKey(sk.Transacted); err != nil {
+		if err = decoder.readFieldKey(object.Transacted); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
@@ -220,37 +230,43 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 
 var errExpectedSigil = errors.New("expected sigil")
 
-func (bf *binaryDecoder) readSigil(
-	sk *objectWithCursorAndSigil,
-	r io.Reader,
+func (decoder *binaryDecoder) readSigil(
+	object *objectWithCursorAndSigil,
+	reader io.Reader,
 ) (n int64, err error) {
-	if n, err = bf.binaryField.ReadFrom(r); err != nil {
-		err = errors.Wrapf(err, "Range: %q", sk.Cursor)
+	if n, err = decoder.binaryField.ReadFrom(reader); err != nil {
+		err = errors.Wrapf(err, "Cursor: %q", object.Cursor)
 		return n, err
 	}
 
-	if bf.Binary != key_bytes.Sigil {
-		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Binary)
+	if decoder.Key != key_bytes.Sigil {
+		err = errors.Wrapf(
+			errExpectedSigil,
+			"Key: %s, ContentLength: %d, Reader: %T",
+			decoder.Key,
+			decoder.ContentLength,
+			reader,
+		)
 		return n, err
 	}
 
-	if _, err = sk.Sigil.ReadFrom(&bf.Content); err != nil {
+	if _, err = object.Sigil.ReadFrom(&decoder.Content); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
 
-	sk.SetDormant(sk.IncludesHidden())
+	object.SetDormant(object.IncludesHidden())
 
 	return n, err
 }
 
-func (bf *binaryDecoder) readFieldKey(
+func (decoder *binaryDecoder) readFieldKey(
 	object *sku.Transacted,
 ) (err error) {
-	switch bf.Binary {
+	switch decoder.Key {
 	case key_bytes.Blob:
 		if err = object.Metadata.GetBlobDigestMutable().UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -258,7 +274,7 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case key_bytes.RepoPubKey:
 		if err = object.Metadata.GetRepoPubKeyMutable().UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -266,14 +282,14 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case key_bytes.RepoSig:
 		if err = object.Metadata.GetObjectSigMutable().UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.Description:
-		if err = object.Metadata.Description.Set(bf.Content.String()); err != nil {
+		if err = object.Metadata.Description.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -281,7 +297,7 @@ func (bf *binaryDecoder) readFieldKey(
 	case key_bytes.Tag:
 		var e ids.Tag
 
-		if err = e.Set(bf.Content.String()); err != nil {
+		if err = e.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -292,32 +308,32 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.ObjectId:
-		if _, err = object.ObjectId.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.ObjectId.ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.Tai:
-		if _, err = object.Metadata.Tai.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.Metadata.Tai.ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.CacheParentTai:
-		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&bf.Content); err != nil {
+		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.Type:
-		if err = object.Metadata.Type.Set(bf.Content.String()); err != nil {
+		if err = object.Metadata.Type.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
 		if err = object.Metadata.GetMotherObjectSigMutable().UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -325,7 +341,7 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case key_bytes.DigestMetadataParentObjectId:
 		if err = object.Metadata.GetObjectDigestMutable().UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -333,7 +349,7 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case key_bytes.DigestMetadataWithoutTai:
 		if err = object.Metadata.SelfWithoutTai.UnmarshalBinary(
-			bf.Content.Bytes(),
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -342,7 +358,7 @@ func (bf *binaryDecoder) readFieldKey(
 	case key_bytes.CacheTagImplicit:
 		var tag ids.Tag
 
-		if err = tag.Set(bf.Content.String()); err != nil {
+		if err = tag.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -355,7 +371,7 @@ func (bf *binaryDecoder) readFieldKey(
 	case key_bytes.CacheTagExpanded:
 		var tag ids.Tag
 
-		if err = tag.Set(bf.Content.String()); err != nil {
+		if err = tag.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -368,7 +384,7 @@ func (bf *binaryDecoder) readFieldKey(
 	case key_bytes.CacheTags:
 		var tag tag_paths.PathWithType
 
-		if _, err = tag.ReadFrom(&bf.Content); err != nil {
+		if _, err = tag.ReadFrom(&decoder.Content); err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
 			return err
 		}
@@ -376,7 +392,7 @@ func (bf *binaryDecoder) readFieldKey(
 		object.Metadata.Cache.TagPaths.AddPath(&tag)
 
 	default:
-		err = errors.ErrorWithStackf("unsupported key: %s", bf.Binary)
+		err = errors.ErrorWithStackf("unsupported key: %s", decoder.Key)
 		return err
 	}
 

@@ -36,9 +36,9 @@ type Index struct {
 	path     string
 	interfaces.NamedBlobAccess
 
-	pages            [PageCount]writtenPage
-	pagesAdded       [PageCount]writtenPage
-	pagesAddedLatest [PageCount]writtenPage
+	pages            [PageCount]page
+	pagesAdded       [PageCount]page
+	pagesAddedLatest [PageCount]page
 
 	historicalChanges []string
 	probeIndex
@@ -90,7 +90,7 @@ func (index *Index) Initialize() (err error) {
 	return err
 }
 
-func (index *Index) GetPage(n PageIndex) (p *writtenPage) {
+func (index *Index) GetPage(n PageIndex) (p *page) {
 	p = &index.pages[n]
 	return p
 }
@@ -323,7 +323,7 @@ func (index *Index) ReadPrimitiveQuery(
 		waitGroup.Add(1)
 
 		go func(pageIndex PageIndex, openFileCh chan struct{}) {
-			pageReader, pageReaderClose := index.makePageReader(pageIndex)
+			pageReader, pageReaderClose := index.makeStreamPageReader(pageIndex)
 			defer errors.Deferred(&err, pageReaderClose)
 
 			ui.Log().Printf(

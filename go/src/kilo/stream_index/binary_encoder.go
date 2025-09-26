@@ -56,13 +56,13 @@ func (encoder *binaryEncoder) writeFormat(
 
 	for _, f := range binaryFieldOrder {
 		encoder.binaryField.Reset()
-		encoder.Binary = f
+		encoder.Key = f
 
 		if _, err = encoder.writeFieldKey(object); err != nil {
 			err = errors.Wrapf(
 				err,
 				"Key: %q, Sku: %s",
-				encoder.Binary,
+				encoder.Key,
 				sku.String(object.Transacted),
 			)
 			return n, err
@@ -98,7 +98,7 @@ func (encoder *binaryEncoder) writeFormat(
 func (encoder *binaryEncoder) writeFieldKey(
 	object objectWithSigil,
 ) (n int64, err error) {
-	switch encoder.Binary {
+	switch encoder.Key {
 	case key_bytes.Sigil:
 		s := object.Sigil
 		s.Add(encoder.Sigil)
@@ -116,7 +116,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeMerkleId(
 			object.Metadata.GetBlobDigest(),
 			true,
-			encoder.Binary.String(),
+			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -137,7 +137,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeMerkleId(
 			merkleId,
 			true,
-			encoder.Binary.String(),
+			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -208,7 +208,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeFieldMerkleId(
 			object.Metadata.GetMotherObjectSig(),
 			true,
-			encoder.Binary.String(),
+			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -218,7 +218,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeFieldMerkleId(
 			&object.Metadata.SelfWithoutTai,
 			true,
-			encoder.Binary.String(),
+			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -228,7 +228,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		if n, err = encoder.writeFieldMerkleId(
 			object.Metadata.GetObjectDigest(),
 			true,
-			encoder.Binary.String(),
+			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -277,7 +277,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	default:
-		panic(fmt.Sprintf("unsupported key: %s", encoder.Binary))
+		panic(fmt.Sprintf("unsupported key: %s", encoder.Key))
 	}
 
 	return n, err

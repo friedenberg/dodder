@@ -3,8 +3,8 @@ package genesis_configs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
@@ -89,7 +89,7 @@ func (config *V0Common) GetBlobCompression() interfaces.CommandLineIOWrapper {
 }
 
 func (config *V0Common) GetBlobEncryption() interfaces.IOWrapper {
-	var ioWrapper interfaces.IOWrapper = files.NopeIOWrapper{}
+	var ioWrapper interfaces.IOWrapper = ohio.NopeIOWrapper{}
 	encryption := config.GetAgeEncryption()
 
 	if encryption != nil {

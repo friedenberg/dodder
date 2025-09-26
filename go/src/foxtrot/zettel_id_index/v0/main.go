@@ -3,6 +3,7 @@ package zettel_id_index
 import (
 	"bufio"
 	"encoding/gob"
+	"io"
 	"math/rand"
 	"sync"
 
@@ -130,7 +131,7 @@ func (index *index) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	if err = dec.Decode(&index.encodedIds); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 		return err
 	}
 

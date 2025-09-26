@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -79,7 +79,7 @@ func (cmd Export) Run(req command.Request) {
 		)
 	}
 
-	var writeCloser io.WriteCloser = files.NopWriteCloser(localWorkingCopy.GetUIFile())
+	var writeCloser io.WriteCloser = ohio.NopWriteCloser(localWorkingCopy.GetUIFile())
 
 	defer errors.ContextMustClose(localWorkingCopy, writeCloser)
 

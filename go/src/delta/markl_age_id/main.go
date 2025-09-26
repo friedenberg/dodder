@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 	age_upstream "filippo.io/age"
@@ -196,7 +196,7 @@ func (id Id) GetPurpose() string {
 
 func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 	if id.IsNull() {
-		ioWrapper = files.NopeIOWrapper{}
+		ioWrapper = ohio.NopeIOWrapper{}
 		return ioWrapper, err
 	}
 

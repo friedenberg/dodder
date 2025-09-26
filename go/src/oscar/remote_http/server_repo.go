@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
@@ -187,7 +188,7 @@ func (server *Server) writeInventoryList(
 	// TODO make merge conflicts impossible
 
 	response.StatusCode = http.StatusCreated
-	response.Body = io.NopCloser(b)
+	response.Body = ohio.NopCloser(b)
 
 	if err := server.Repo.GetObjectStore().Commit(
 		listObject,

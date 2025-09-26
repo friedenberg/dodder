@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -344,7 +345,7 @@ func (blobStore blobReaderFactory) BlobReader(
 
 	readCloser = markl_io.MakeNopReadCloser(
 		hashType.Get(),
-		io.NopCloser(strings.NewReader(value)),
+		ohio.NopCloser(strings.NewReader(value)),
 	)
 
 	return readCloser, err

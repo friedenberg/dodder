@@ -143,7 +143,7 @@ func (index *indexAbbr) readIfNecessary() (err error) {
 
 			if err = dec.Decode(&index.indexCodable); err != nil {
 				ui.Log().Print("finished decode unsuccessfully")
-				err = errors.Wrap(err)
+				err = errors.WrapExceptSentinelAsNil(err, io.EOF)
 				return
 			}
 		},

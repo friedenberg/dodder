@@ -59,7 +59,7 @@ function init_compression { # @test
 
 	run_dodder blob_store-cat "$(get_konfig_sha)"
 	assert_success
-  assert_output
+	assert_output
 }
 
 function init_and_reindex { # @test

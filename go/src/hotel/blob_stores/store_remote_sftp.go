@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 )
@@ -272,7 +273,7 @@ func (blobStore *remoteSftp) MakeBlobReader(
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashType.Get(),
-			io.NopCloser(bytes.NewReader(nil)),
+			ohio.NopCloser(bytes.NewReader(nil)),
 		)
 		return readCloser, err
 	}

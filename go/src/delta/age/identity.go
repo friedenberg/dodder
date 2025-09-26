@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"filippo.io/age"
 )
 
@@ -183,7 +184,7 @@ func (identity *Identity) WrapReader(
 		return out, err
 	}
 
-	out = io.NopCloser(src)
+	out = ohio.NopCloser(src)
 
 	return out, err
 }

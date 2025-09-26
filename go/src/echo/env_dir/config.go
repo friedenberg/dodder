@@ -3,7 +3,7 @@ package env_dir
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 )
@@ -34,7 +34,7 @@ func MakeConfig(
 
 var (
 	defaultCompressionTypeValue = compression_type.CompressionTypeNone
-	defaultEncryptionIOWrapper  = files.NopeIOWrapper{}
+	defaultEncryptionIOWrapper  = ohio.NopeIOWrapper{}
 	DefaultConfig               = Config{
 		hashFormat:  blob_store_configs.DefaultHashType,
 		compression: &defaultCompressionTypeValue,

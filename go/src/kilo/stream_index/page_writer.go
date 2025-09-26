@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -20,10 +20,10 @@ import (
 type ObjectIdToObject map[string]objectMetaWithCursorAndSigil
 
 type pageWriter struct {
-	writtenPage *writtenPage
-	pageReader  pageReader
+	writtenPage *page
+	pageReader  streamPageReader
 
-	envRepo  env_repo.Env
+	tempFS   env_dir.TemporaryFS
 	pageId   page_id.PageId
 	preWrite interfaces.FuncIter[*sku.Transacted]
 	path     string
@@ -59,10 +59,11 @@ func (index *Index) makePageFlush(
 
 		defer page.writeLock.Unlock()
 
-		pageReader, pageReaderClose := index.makePageReader(pageIndex)
+		pageReader, pageReaderClose := index.makeStreamPageReader(pageIndex)
 		defer errors.Deferred(&err, pageReaderClose)
 
 		pageWriter := &pageWriter{
+			tempFS:      index.envRepo.GetTempLocal(),
 			pageId:      page.pageId,
 			writtenPage: page,
 			pageReader:  pageReader,
@@ -134,7 +135,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 
 		return pageWriter.flushJustLatest(bufferedReader, bufferedWriter)
 	} else {
-		if pageWriter.file, err = pageWriter.envRepo.GetTempLocal().FileTemp(); err != nil {
+		if pageWriter.file, err = pageWriter.tempFS.FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

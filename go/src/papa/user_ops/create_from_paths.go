@@ -55,7 +55,7 @@ func (op CreateFromPaths) Run(
 		); err != nil {
 			err = errors.Wrapf(
 				err,
-				"zettel text format error for path: %s: %s",
+				"zettel text format error for path: %s",
 				arg,
 			)
 			return results, err

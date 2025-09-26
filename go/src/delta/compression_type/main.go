@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"github.com/DataDog/zstd"
 )
 
@@ -83,7 +83,7 @@ func (compressionType CompressionType) WrapReader(
 		readerOut = zstd.NewReader(readerIn)
 
 	default:
-		readerOut = io.NopCloser(readerIn)
+		readerOut = ohio.NopCloser(readerIn)
 	}
 
 	return readerOut, err
@@ -103,6 +103,6 @@ func (compressionType CompressionType) WrapWriter(
 		return zstd.NewWriter(writerIn), nil
 
 	default:
-		return files.NopWriteCloser(writerIn), nil
+		return ohio.NopWriteCloser(writerIn), nil
 	}
 }

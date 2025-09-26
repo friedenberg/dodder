@@ -1,31 +1,11 @@
 package stream_index
 
-import (
-	"sync"
-
-	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-)
-
-// TODO rename to ???
-type writtenPage struct {
-	writeLock sync.Mutex
-	pageId    page_id.PageId
-	additions pageAdditions
-}
+import "code.linenisgreat.com/dodder/go/src/juliett/sku"
 
 type pageAdditions struct {
 	forceFullFlush      bool
 	addedObjectIdLookup map[string]struct{}
 	added, addedLatest  *sku.ListTransacted
-}
-
-func (page *writtenPage) initialize(
-	pageId page_id.PageId,
-	index *Index,
-) {
-	page.pageId = pageId
-	page.additions.initialize()
 }
 
 func (additions *pageAdditions) initialize() {

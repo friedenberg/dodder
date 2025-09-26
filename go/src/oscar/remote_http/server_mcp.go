@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -129,7 +130,7 @@ func (server *Server) handleMCP(request Request) (response Response) {
 	}
 
 	response.StatusCode = http.StatusOK
-	response.Body = io.NopCloser(bytes.NewReader(responseBytes))
+	response.Body = ohio.NopCloser(bytes.NewReader(responseBytes))
 
 	return response
 }

@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"github.com/gorilla/mux"
 )
 
@@ -54,7 +55,7 @@ func (response *Response) ErrorWithStatus(status int, err error) {
 		var buffer bytes.Buffer
 
 		ui.CLIErrorTreeEncoder.EncodeTo(err, &buffer)
-		response.Body = io.NopCloser(&buffer)
+		response.Body = ohio.NopCloser(&buffer)
 	}
 }
 
@@ -85,7 +86,7 @@ func (response *Response) MCPError(
 	}
 
 	responseBytes, _ := json.Marshal(mcpResponse)
-	response.Body = io.NopCloser(bytes.NewReader(responseBytes))
+	response.Body = ohio.NopCloser(bytes.NewReader(responseBytes))
 }
 
 func ReadErrorFromBody(response *http.Response) (err error) {
