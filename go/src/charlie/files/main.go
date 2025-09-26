@@ -117,7 +117,10 @@ func OpenFile(name string, flag int, perm os.FileMode) (f *os.File, err error) {
 
 func Open(s string) (f *os.File, err error) {
 	if f, err = os.Open(s); err != nil {
-		err = errors.Wrap(err)
+		if !errors.IsNotExist(err) {
+			err = errors.Wrap(err)
+		}
+
 		return f, err
 	}
 

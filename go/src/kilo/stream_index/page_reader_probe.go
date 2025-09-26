@@ -2,11 +2,10 @@ package stream_index
 
 import (
 	"io"
-	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -15,10 +14,8 @@ import (
 
 type probePageReader struct {
 	*page
-	// TODO switch to blob reader once debugged
-	// blobReader     interfaces.BlobReader
-	file    *os.File
-	envRepo env_repo.Env
+	blobReader interfaces.BlobReader
+	envRepo    env_repo.Env
 }
 
 func (index *Index) makeProbePageReader(
@@ -31,30 +28,23 @@ func (index *Index) makeProbePageReader(
 
 	var err error
 
-	// if pageReader.blobReader, err = pageReader.envRepo.MakeNamedBlobReader(
-	// 	pageReader.pageId.Path(),
-	// ); err != nil {
-	// 	panic(err)
-	// }
-
-	if pageReader.file, err = files.Open(pageReader.pageId.Path()); err != nil {
+	if pageReader.blobReader, err = pageReader.envRepo.MakeNamedBlobReader(
+		pageReader.pageId.Path(),
+	); err != nil {
 		if errors.IsNotExist(err) {
-			err = nil
+			return pageReader, func() error { return nil }
 		} else {
 			panic(err)
 		}
 	}
 
 	return pageReader, func() (err error) {
-		if pageReader.file != nil {
-			if err = pageReader.file.Close(); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
+		if err = pageReader.blobReader.Close(); err != nil {
+			err = errors.Wrap(err)
+			return err
 		}
 
 		return err
-		// return pageReader.blobReader.Close()
 	}
 }
 
@@ -64,7 +54,7 @@ func (pageReader *probePageReader) readOneCursor(
 ) (err error) {
 	// pages get deleted before reindexing, so this is actually valid to have a
 	// non-nil cursor request
-	if pageReader.file == nil {
+	if pageReader.blobReader == nil {
 		err = collections.MakeErrNotFound(cursor)
 		return err
 	}
@@ -81,7 +71,7 @@ func (pageReader *probePageReader) readOneCursor(
 	}
 
 	if bytesRead, err = decoder.readFormatExactly(
-		pageReader.file,
+		pageReader.blobReader,
 		&objectPlus,
 	); err != nil {
 		if err == io.EOF {

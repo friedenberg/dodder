@@ -59,41 +59,6 @@ func NewReader(
 	return reader, err
 }
 
-func NewFileReaderOrEmptyBytesReader(
-	config Config,
-	path string,
-) (blobReader interfaces.BlobReader, err error) {
-	var readSeeker io.ReadSeeker
-
-	if path == "-" {
-		readSeeker = os.Stdin
-	} else {
-		var file *os.File
-
-		if file, err = files.Open(path); err != nil {
-			if errors.IsNotExist(err) {
-				readSeeker = bytes.NewReader(nil)
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return blobReader, err
-			}
-		} else {
-			readSeeker = file
-		}
-	}
-
-	if blobReader, err = newFileReaderFromReadSeeker(
-		config,
-		readSeeker,
-	); err != nil {
-		err = errors.Wrap(err)
-		return blobReader, err
-	}
-
-	return blobReader, err
-}
-
 // TODO fold into markl_io
 func NewFileReaderOrErrNotExist(
 	config Config,
@@ -107,7 +72,10 @@ func NewFileReaderOrErrNotExist(
 		var file *os.File
 
 		if file, err = files.Open(path); err != nil {
-			err = errors.Wrap(err)
+			if !errors.IsNotExist(err) {
+				err = errors.Wrap(err)
+			}
+
 			return blobReader, err
 		}
 
@@ -123,6 +91,10 @@ func NewFileReaderOrErrNotExist(
 	}
 
 	return blobReader, err
+}
+
+func NewNopReader() (blobReader interfaces.BlobReader, err error) {
+	return newFileReaderFromReadSeeker(DefaultConfig, bytes.NewReader(nil))
 }
 
 func newFileReaderFromReadSeeker(

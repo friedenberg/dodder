@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -30,7 +31,8 @@ func (index *Index) makeStreamPageReader(
 
 	var err error
 
-	if pageReader.blobReader, err = pageReader.namedBlobAccess.MakeNamedBlobReader(
+	if pageReader.blobReader, err = env_repo.MakeNamedBlobReaderOrNullReader(
+		pageReader.namedBlobAccess,
 		pageReader.pageId.Path(),
 	); err != nil {
 		panic(err)
