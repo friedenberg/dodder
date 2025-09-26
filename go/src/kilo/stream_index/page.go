@@ -6,11 +6,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 )
 
-// TODO rename to ???
 type page struct {
-	writeLock sync.Mutex
-	pageId    page_id.PageId
-	additions pageAdditions
+	writeLock        sync.Mutex
+	pageId           page_id.PageId
+	forceFullWrite   bool
+	additionsHistory pageAdditions
+	additionsLatest  pageAdditions
 }
 
 func (page *page) initialize(
@@ -18,5 +19,15 @@ func (page *page) initialize(
 	index *Index,
 ) {
 	page.pageId = pageId
-	page.additions.initialize()
+	page.additionsHistory.initialize()
+	page.additionsLatest.initialize()
+}
+
+func (page *page) hasChanges() bool {
+	return page.additionsHistory.hasChanges() ||
+		page.additionsLatest.hasChanges() || page.forceFullWrite
+}
+
+func (page *page) lenAdded() int {
+	return page.additionsHistory.Len() + page.additionsLatest.Len()
 }

@@ -36,9 +36,7 @@ type Index struct {
 	path     string
 	interfaces.NamedBlobAccess
 
-	pages            [PageCount]page
-	pagesAdded       [PageCount]page
-	pagesAddedLatest [PageCount]page
+	pages [PageCount]page
 
 	historicalChanges []string
 	probeIndex
@@ -130,7 +128,7 @@ func (index *Index) flushAdded(
 	actualFlushCount := 0
 
 	for n := range index.pages {
-		if index.pages[n].additions.hasChanges() {
+		if index.pages[n].hasChanges() {
 			ui.Log().Printf("actual flush for %d", n)
 			actualFlushCount++
 		}

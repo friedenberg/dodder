@@ -2,18 +2,6 @@ package stream_index
 
 import "code.linenisgreat.com/dodder/go/src/juliett/sku"
 
-type pageAdditions struct {
-	forceFullFlush      bool
-	addedObjectIdLookup map[string]struct{}
-	added, addedLatest  *sku.ListTransacted
-}
-
-func (additions *pageAdditions) initialize() {
-	additions.added = sku.MakeListTransacted()
-	additions.addedLatest = sku.MakeListTransacted()
-	additions.addedObjectIdLookup = make(map[string]struct{})
-}
-
 // TODO write binary representation to file-backed buffered writer and then
 // merge streams using raw binary data
 func (index *Index) add(
@@ -21,25 +9,39 @@ func (index *Index) add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	pageAdditions := &index.pages[pageIndex].additions
+	page := &index.pages[pageIndex]
 
-	pageAdditions.addedObjectIdLookup[object.ObjectId.String()] = struct{}{}
-	objectClone := object.CloneTransacted()
+	additions := page.additionsHistory
 
-	if index.sunrise.Less(objectClone.GetTai()) ||
+	if index.sunrise.Less(object.GetTai()) ||
 		options.StreamIndexOptions.ForceLatest {
-		pageAdditions.addedLatest.Add(objectClone)
-	} else {
-		pageAdditions.added.Add(objectClone)
+		additions = page.additionsLatest
 	}
+
+	additions.add(object)
 
 	return err
 }
 
-func (additions *pageAdditions) hasChanges() bool {
-	return additions.waitingToAddLen() > 0 || additions.forceFullFlush
+type pageAdditions struct {
+	objectIdLookup map[string]struct{}
+	objects        *sku.ListTransacted
 }
 
-func (additions *pageAdditions) waitingToAddLen() int {
-	return additions.added.Len() + additions.addedLatest.Len()
+func (additions *pageAdditions) initialize() {
+	additions.objects = sku.MakeListTransacted()
+	additions.objectIdLookup = make(map[string]struct{})
+}
+
+func (additions *pageAdditions) add(object *sku.Transacted) {
+	additions.objects.Add(object.CloneTransacted())
+	additions.objectIdLookup[object.ObjectId.String()] = struct{}{}
+}
+
+func (additions *pageAdditions) hasChanges() bool {
+	return additions.Len() > 0
+}
+
+func (additions *pageAdditions) Len() int {
+	return additions.objects.Len()
 }

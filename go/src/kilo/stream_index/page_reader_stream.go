@@ -109,7 +109,7 @@ func (pageReader *streamPageReader) readFull(
 	decoder := makeBinaryWithQueryGroup(query, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
-	added := pageReader.additions.added.Copy()
+	added := pageReader.additionsHistory.objects.Copy()
 
 	var object objectWithCursorAndSigil
 
@@ -145,7 +145,7 @@ func (pageReader *streamPageReader) readFull(
 		return err
 	}
 
-	addedLatest := pageReader.additions.addedLatest.Copy()
+	addedLatest := pageReader.additionsLatest.objects.Copy()
 
 	if err = heap.MergeStream(
 		&addedLatest,
