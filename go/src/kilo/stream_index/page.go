@@ -23,6 +23,18 @@ func (page *page) initialize(
 	page.additionsLatest.initialize()
 }
 
+func (page *page) objectIdStringExists(objectIdString string) bool {
+	if _, ok := page.additionsHistory.objectIdLookup[objectIdString]; ok {
+		return true
+	}
+
+	if _, ok := page.additionsLatest.objectIdLookup[objectIdString]; ok {
+		return true
+	}
+
+	return false
+}
+
 func (page *page) hasChanges() bool {
 	return page.additionsHistory.hasChanges() ||
 		page.additionsLatest.hasChanges() || page.forceFullWrite

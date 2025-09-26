@@ -2,6 +2,8 @@ package ohio
 
 import (
 	"io"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 // TODO move this file into src/charlie/ohio_nop
@@ -50,19 +52,19 @@ func (wrapper nopCloserReaderAtWriterTo) WriteTo(
 	return wrapper.Reader.(io.WriterTo).WriteTo(writer)
 }
 
-// func (wrapper nopCloserReaderAtWriterTo) ReadAt(
-// 	p []byte,
-// 	off int64,
-// ) (n int, err error) {
-// 	readerAt := wrapper.Reader.(io.ReaderAt)
+func (wrapper nopCloserReaderAtWriterTo) ReadAt(
+	p []byte,
+	off int64,
+) (n int, err error) {
+	readerAt := wrapper.Reader.(io.ReaderAt)
 
-// 	if n, err = readerAt.ReadAt(p, off); err != nil {
-// 		err = errors.WrapExceptSentinel(err, io.EOF)
-// 		return n, err
-// 	}
+	if n, err = readerAt.ReadAt(p, off); err != nil {
+		err = errors.WrapExceptSentinel(err, io.EOF)
+		return n, err
+	}
 
-// 	return n, err
-// }
+	return n, err
+}
 
 type NopeIOWrapper struct{}
 
