@@ -2,7 +2,6 @@ package store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
@@ -16,15 +15,37 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 )
 
+func (store *Store) Commit(
+	external sku.ExternalLike,
+	options sku.CommitOptions,
+) (err error) {
+	committer := commitFacilitator{
+		Store: store,
+		index: store.streamIndex,
+	}
+
+	if err = committer.commit(external, options); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+type commitFacilitator struct {
+	*Store
+	index stream_index.IndexCommon
+}
+
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
 // runs the new hook, validates the blob, then calculates the digest for the
 // object
-func (store *Store) tryPrecommit(
+func (commitFacilitator commitFacilitator) tryPrecommit(
 	external sku.ExternalLike,
 	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	if err = store.SaveBlob(external); err != nil {
+	if err = commitFacilitator.SaveBlob(external); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -37,7 +58,7 @@ func (store *Store) tryPrecommit(
 
 	// TODO decide if the type proto should actually be applied every time
 	if options.ApplyProtoType {
-		store.protoZettel.ApplyType(object, object)
+		commitFacilitator.protoZettel.ApplyType(object, object)
 	}
 
 	if genres.Type == external.GetSku().GetGenre() {
@@ -49,8 +70,8 @@ func (store *Store) tryPrecommit(
 	}
 
 	// modify pre commit hooks to support import
-	if err = store.tryPreCommitHooks(object, mother, options); err != nil {
-		if store.storeConfig.GetConfig().IgnoreHookErrors {
+	if err = commitFacilitator.tryPreCommitHooks(object, mother, options); err != nil {
+		if commitFacilitator.storeConfig.GetConfig().IgnoreHookErrors {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -60,8 +81,8 @@ func (store *Store) tryPrecommit(
 
 	// TODO just just mutter == nil
 	if mother == nil {
-		if err = store.tryNewHook(object, options); err != nil {
-			if store.storeConfig.GetConfig().IgnoreHookErrors {
+		if err = commitFacilitator.tryNewHook(object, options); err != nil {
+			if commitFacilitator.storeConfig.GetConfig().IgnoreHookErrors {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -70,19 +91,7 @@ func (store *Store) tryPrecommit(
 		}
 	}
 
-	if err = store.validate(object, mother, options); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
-func (store *Store) Commit(
-	external sku.ExternalLike,
-	options sku.CommitOptions,
-) (err error) {
-	if err = store.commit(external, options, store.streamIndex); err != nil {
+	if err = commitFacilitator.validate(object, mother, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -92,10 +101,9 @@ func (store *Store) Commit(
 
 // TODO add RealizeAndOrStore result
 // TODO switch to using a child context for each object commit
-func (store *Store) commit(
+func (commitFacilitator commitFacilitator) commit(
 	external sku.ExternalLike,
 	options sku.CommitOptions,
-	streamIndex *stream_index.Index,
 ) (err error) {
 	daughter := external.GetSku()
 
@@ -107,7 +115,7 @@ func (store *Store) commit(
 
 	// TODO remove this lock check and perform it when actually necessary (when
 	// persisting the changes on flush).
-	if !store.GetEnvRepo().GetLockSmith().IsAcquired() &&
+	if !commitFacilitator.GetEnvRepo().GetLockSmith().IsAcquired() &&
 		(options.AddToInventoryList || options.StreamIndexOptions.AddToStreamIndex) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
@@ -119,7 +127,7 @@ func (store *Store) commit(
 	// TAI must be set before calculating object sha
 	if options.UpdateTai {
 		if options.Clock == nil {
-			options.Clock = store
+			options.Clock = commitFacilitator
 		}
 
 		tai := options.Clock.GetTai()
@@ -131,7 +139,7 @@ func (store *Store) commit(
 		daughter.GetGenre() == genres.Blob) {
 		var zettelId *ids.ZettelId
 
-		if zettelId, err = store.zettelIdIndex.CreateZettelId(); err != nil {
+		if zettelId, err = commitFacilitator.zettelIdIndex.CreateZettelId(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -144,8 +152,7 @@ func (store *Store) commit(
 
 	var mother *sku.Transacted
 
-	if mother, err = store.fetchMotherIfNecessary(
-		streamIndex,
+	if mother, err = commitFacilitator.fetchMotherIfNecessary(
 		daughter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -157,15 +164,14 @@ func (store *Store) commit(
 		daughter.Metadata.Cache.ParentTai = mother.GetTai()
 	}
 
-	if err = store.tryPrecommit(external, mother, options); err != nil {
+	if err = commitFacilitator.tryPrecommit(external, mother, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	{
 		if options.AddToInventoryList {
-			if err = store.addMissingTypes(
-				streamIndex,
+			if err = commitFacilitator.addMissingTypes(
 				options,
 				daughter,
 			); err != nil {
@@ -176,7 +182,7 @@ func (store *Store) commit(
 
 		if options.AddToInventoryList ||
 			options.StreamIndexOptions.AddToStreamIndex {
-			if err = store.GetAbbrStore().AddObjectToIdIndex(
+			if err = commitFacilitator.GetAbbrStore().AddObjectToIdIndex(
 				daughter,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -193,8 +199,8 @@ func (store *Store) commit(
 			sku.TransactedResetter.ResetWithExceptFields(daughter, mother)
 
 			// TODO why is this condition here
-			if store.sunrise.Less(daughter.GetTai()) {
-				if err = store.handleUnchanged(daughter); err != nil {
+			if commitFacilitator.sunrise.Less(daughter.GetTai()) {
+				if err = commitFacilitator.handleUnchanged(daughter); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
@@ -203,7 +209,7 @@ func (store *Store) commit(
 			return err
 		}
 
-		if err = store.applyDormantAndRealizeTags(
+		if err = commitFacilitator.applyDormantAndRealizeTags(
 			daughter,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -211,7 +217,7 @@ func (store *Store) commit(
 		}
 
 		if daughter.GetGenre() == genres.Zettel {
-			if err = store.zettelIdIndex.AddZettelId(&daughter.ObjectId); err != nil {
+			if err = commitFacilitator.zettelIdIndex.AddZettelId(&daughter.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("object id does not contain value: %s", err)
 					err = nil
@@ -227,7 +233,7 @@ func (store *Store) commit(
 		// external.GetSku().Metadata.GetObjectSigMutable().Reset()
 		external.GetSku().Metadata.GetObjectDigestMutable().Reset()
 
-		if err = store.commitTransacted(daughter, mother); err != nil {
+		if err = commitFacilitator.commitTransacted(daughter, mother); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(daughter))
 			return err
 		}
@@ -236,7 +242,7 @@ func (store *Store) commit(
 	if options.AddToInventoryList ||
 		options.StreamIndexOptions.AddToStreamIndex {
 		if store_version.GreaterOrEqual(
-			store.storeConfig.GetConfig().GetStoreVersion(),
+			commitFacilitator.storeConfig.GetConfig().GetStoreVersion(),
 			store_version.V11,
 		) {
 			if err = markl.AssertIdIsNotNull(
@@ -246,7 +252,7 @@ func (store *Store) commit(
 			}
 		}
 
-		if err = store.storeConfig.AddTransacted(
+		if err = commitFacilitator.storeConfig.AddTransacted(
 			daughter,
 			mother,
 		); err != nil {
@@ -254,7 +260,7 @@ func (store *Store) commit(
 			return err
 		}
 
-		if err = streamIndex.Add(
+		if err = commitFacilitator.index.Add(
 			daughter,
 			options,
 		); err != nil {
@@ -273,7 +279,7 @@ func (store *Store) commit(
 				// abort
 			}
 
-			if err = store.ui.TransactedNew(daughter); err != nil {
+			if err = commitFacilitator.ui.TransactedNew(daughter); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -285,7 +291,7 @@ func (store *Store) commit(
 			// 	return
 			// }
 
-			if err = store.ui.TransactedUpdated(daughter); err != nil {
+			if err = commitFacilitator.ui.TransactedUpdated(daughter); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -294,7 +300,7 @@ func (store *Store) commit(
 	}
 
 	if options.MergeCheckedOut {
-		if err = store.ReadExternalAndMergeIfNecessary(
+		if err = commitFacilitator.ReadExternalAndMergeIfNecessary(
 			daughter,
 			mother,
 			options,
@@ -307,8 +313,7 @@ func (store *Store) commit(
 	return err
 }
 
-func (store *Store) fetchMotherIfNecessary(
-	streamIndex *stream_index.Index,
+func (commitFacilitator commitFacilitator) fetchMotherIfNecessary(
 	daughter *sku.Transacted,
 ) (mother *sku.Transacted, err error) {
 	if daughter == nil {
@@ -323,7 +328,7 @@ func (store *Store) fetchMotherIfNecessary(
 
 	mother = sku.GetTransactedPool().Get()
 	// TODO find a way to make this more performant when operating over sshfs
-	if err = streamIndex.ReadOneObjectId(
+	if err = commitFacilitator.index.ReadOneObjectId(
 		objectId,
 		mother,
 	); err != nil {
@@ -348,12 +353,12 @@ func (store *Store) fetchMotherIfNecessary(
 }
 
 // TODO add results for which stores had which change types
-func (store *Store) commitTransacted(
+func (commitFacilitator commitFacilitator) commitTransacted(
 	daughter *sku.Transacted,
 	mother *sku.Transacted,
 ) (err error) {
-	if err = store.inventoryListStore.AddObjectToOpenList(
-		store.inventoryList,
+	if err = commitFacilitator.inventoryListStore.AddObjectToOpenList(
+		commitFacilitator.inventoryList,
 		daughter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -363,22 +368,15 @@ func (store *Store) commitTransacted(
 	return err
 }
 
-func (store *Store) handleUnchanged(
+func (commitFacilitator commitFacilitator) handleUnchanged(
 	object *sku.Transacted,
 ) (err error) {
-	return store.ui.TransactedUnchanged(object)
+	return commitFacilitator.ui.TransactedUnchanged(object)
 }
 
-func (store *Store) UpdateKonfig(
-	blobId interfaces.MarklId,
-) (kt *sku.Transacted, err error) {
-	return store.CreateOrUpdateBlobDigest(
-		&ids.Config{},
-		blobId,
-	)
-}
-
-func (store *Store) createType(typeId *ids.ObjectId) (err error) {
+func (commitFacilitator commitFacilitator) createType(
+	typeId *ids.ObjectId,
+) (err error) {
 	typeObject := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(typeObject)
 
@@ -396,7 +394,7 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 		return err
 	}
 
-	if err = store.Commit(
+	if err = commitFacilitator.Commit(
 		typeObject,
 		sku.CommitOptions{
 			StoreOptions: sku.GetStoreOptionsUpdate(),
@@ -409,8 +407,7 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 	return err
 }
 
-func (store *Store) addTypeIfNecessary(
-	streamIndex *stream_index.Index,
+func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 	typeId ids.Type,
 ) (err error) {
 	if typeId.IsEmpty() {
@@ -425,7 +422,7 @@ func (store *Store) addTypeIfNecessary(
 		return err
 	}
 
-	if err = streamIndex.ObjectExists(&objectId); err == nil {
+	if err = commitFacilitator.index.ObjectExists(&objectId); err == nil {
 		return err
 	}
 
@@ -438,7 +435,7 @@ func (store *Store) addTypeIfNecessary(
 		return err
 	}
 
-	if err = store.createType(&typeObjectId); err != nil {
+	if err = commitFacilitator.createType(&typeObjectId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -446,8 +443,7 @@ func (store *Store) addTypeIfNecessary(
 	return err
 }
 
-func (store *Store) addTypeAndExpandedIfNecessary(
-	streamIndex *stream_index.Index,
+func (commitFacilitator commitFacilitator) addTypeAndExpandedIfNecessary(
 	rootTipe ids.Type,
 ) (err error) {
 	if rootTipe.IsEmpty() {
@@ -465,7 +461,7 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	)
 
 	for _, tipe := range typesExpanded {
-		if err = store.addTypeIfNecessary(streamIndex, tipe); err != nil {
+		if err = commitFacilitator.addTypeIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -474,15 +470,14 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	return err
 }
 
-func (store *Store) addMissingTypes(
-	streamIndex *stream_index.Index,
+func (commitFacilitator commitFacilitator) addMissingTypes(
 	commitOptions sku.CommitOptions,
 	object *sku.Transacted,
 ) (err error) {
 	tipe := object.GetType()
 
 	if !commitOptions.DontAddMissingType {
-		if err = store.addTypeAndExpandedIfNecessary(streamIndex, tipe); err != nil {
+		if err = commitFacilitator.addTypeAndExpandedIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

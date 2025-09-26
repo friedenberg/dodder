@@ -142,3 +142,12 @@ func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {
 	store.ui = ud
 	store.inventoryListStore.SetUIDelegate(ud)
 }
+
+func (store *Store) UpdateKonfig(
+	blobId interfaces.MarklId,
+) (kt *sku.Transacted, err error) {
+	return store.CreateOrUpdateBlobDigest(
+		&ids.Config{},
+		blobId,
+	)
+}

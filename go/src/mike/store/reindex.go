@@ -35,6 +35,11 @@ func (store *Store) Reindex() (err error) {
 		return err
 	}
 
+	commitState := commitFacilitator{
+		Store: store,
+		index: reindexer,
+	}
+
 	type objectWithError struct {
 		error
 		sku.ObjectWithList
@@ -67,7 +72,7 @@ func (store *Store) Reindex() (err error) {
 			panic("empty object")
 		}
 
-		if err = store.reindexOne(reindexer, objectWithList); err != nil {
+		if err = store.reindexOne(commitState, objectWithList); err != nil {
 			keyBytes := objectWithList.List.GetObjectDigest().GetBytes()
 
 			objectsWithErrors[string(keyBytes)] = objectWithError{
@@ -113,14 +118,14 @@ func (store *Store) Reindex() (err error) {
 }
 
 func (store *Store) reindexOne(
-	reindexer *stream_index.Reindexer,
+	commitState commitFacilitator,
 	object sku.ObjectWithList,
 ) (err error) {
 	options := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = store.Commit(object.Object, options); err != nil {
+	if err = commitState.commit(object.Object, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

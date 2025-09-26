@@ -28,6 +28,22 @@ const (
 	PageCount  = 1 << (DigitWidth * 4)
 )
 
+type IndexCommon interface {
+	Add(
+		object *sku.Transacted,
+		options sku.CommitOptions,
+	) (err error)
+
+	ObjectExists(
+		objectId *ids.ObjectId,
+	) (err error)
+
+	ReadOneObjectId(
+		objectId interfaces.ObjectId,
+		object *sku.Transacted,
+	) (err error)
+}
+
 type Index struct {
 	hashType markl.FormatHash
 	envRepo  env_repo.Env
@@ -41,6 +57,8 @@ type Index struct {
 	historicalChanges []string
 	probeIndex
 }
+
+var _ IndexCommon = &Index{}
 
 func MakeIndex(
 	envRepo env_repo.Env,
