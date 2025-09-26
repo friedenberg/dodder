@@ -9,7 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
-// TODO fold into markl_io
+// TODO move into own package
+
 type MoveOptions struct {
 	TemporaryFS
 	ErrorOnAttemptedOverwrite   bool

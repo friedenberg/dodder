@@ -12,7 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 )
 
-// TODO fold into markl_io
+// TODO move into own package
+
 type blobReader struct {
 	readSeeker io.ReadSeeker
 	digester   interfaces.BlobWriter
@@ -59,7 +60,6 @@ func NewReader(
 	return reader, err
 }
 
-// TODO fold into markl_io
 func NewFileReaderOrErrNotExist(
 	config Config,
 	path string,

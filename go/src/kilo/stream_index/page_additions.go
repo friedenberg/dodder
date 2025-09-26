@@ -1,6 +1,8 @@
 package stream_index
 
-import "code.linenisgreat.com/dodder/go/src/juliett/sku"
+import (
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+)
 
 // TODO write binary representation to file-backed buffered writer and then
 // merge streams using raw binary data

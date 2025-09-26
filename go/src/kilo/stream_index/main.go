@@ -88,6 +88,17 @@ func (index *Index) Initialize() (err error) {
 	return err
 }
 
+func (index *Index) MakeReindexer() (reindexer *Reindexer, err error) {
+	if err = index.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return reindexer, err
+	}
+
+	reindexer = &Reindexer{index: index}
+
+	return reindexer, err
+}
+
 func (index *Index) GetPage(n PageIndex) (p *page) {
 	p = &index.pages[n]
 	return p

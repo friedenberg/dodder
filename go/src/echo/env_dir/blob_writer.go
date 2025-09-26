@@ -10,7 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 )
 
-// TODO fold into markl_io
+// TODO move into own package
+
 type writer struct {
 	repoolBufferedWriter  interfaces.FuncRepool
 	digester              interfaces.BlobWriter

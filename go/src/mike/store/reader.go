@@ -38,7 +38,7 @@ func (store *Store) ReadOneObjectId(
 
 	object = sku.GetTransactedPool().Get()
 
-	if err = store.GetStreamIndex().ReadOneObjectId(objectId, object); err != nil {
+	if err = store.streamIndex.ReadOneObjectId(objectId, object); err != nil {
 		if !collections.IsErrNotFound(err) {
 			err = errors.Wrap(err)
 		}
@@ -119,5 +119,5 @@ func (store *Store) ReadPrimitiveQuery(
 	query sku.PrimitiveQueryGroup,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	return store.GetStreamIndex().ReadPrimitiveQuery(query, funcIter)
+	return store.streamIndex.ReadPrimitiveQuery(query, funcIter)
 }

@@ -149,7 +149,7 @@ func (store *Store) makeQueryExecutor(
 
 	executor = pkg_query.MakeExecutorWithExternalStore(
 		queryGroup,
-		store.GetStreamIndex().ReadPrimitiveQuery,
+		store.streamIndex.ReadPrimitiveQuery,
 		store.ReadOneInto,
 		externalStore,
 	)

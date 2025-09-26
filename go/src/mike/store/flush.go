@@ -44,7 +44,7 @@ func (store *Store) FlushInventoryList(
 	}
 
 	if inventoryListSku != nil {
-		if err = store.GetStreamIndex().Add(
+		if err = store.streamIndex.Add(
 			inventoryListSku,
 			sku.CommitOptions{
 				StoreOptions: sku.StoreOptions{},

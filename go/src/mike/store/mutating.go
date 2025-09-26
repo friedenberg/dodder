@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 )
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
@@ -77,11 +78,24 @@ func (store *Store) tryPrecommit(
 	return err
 }
 
-// TODO add RealizeAndOrStore result
-// TODO switch to using a child context for each object commit
 func (store *Store) Commit(
 	external sku.ExternalLike,
 	options sku.CommitOptions,
+) (err error) {
+	if err = store.commit(external, options, store.streamIndex); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+// TODO add RealizeAndOrStore result
+// TODO switch to using a child context for each object commit
+func (store *Store) commit(
+	external sku.ExternalLike,
+	options sku.CommitOptions,
+	streamIndex *stream_index.Index,
 ) (err error) {
 	daughter := external.GetSku()
 
@@ -130,7 +144,10 @@ func (store *Store) Commit(
 
 	var mother *sku.Transacted
 
-	if mother, err = store.fetchMotherIfNecessary(daughter); err != nil {
+	if mother, err = store.fetchMotherIfNecessary(
+		streamIndex,
+		daughter,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -147,7 +164,11 @@ func (store *Store) Commit(
 
 	{
 		if options.AddToInventoryList {
-			if err = store.addMissingTypes(options, daughter); err != nil {
+			if err = store.addMissingTypes(
+				streamIndex,
+				options,
+				daughter,
+			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -233,7 +254,7 @@ func (store *Store) Commit(
 			return err
 		}
 
-		if err = store.GetStreamIndex().Add(
+		if err = streamIndex.Add(
 			daughter,
 			options,
 		); err != nil {
@@ -287,6 +308,7 @@ func (store *Store) Commit(
 }
 
 func (store *Store) fetchMotherIfNecessary(
+	streamIndex *stream_index.Index,
 	daughter *sku.Transacted,
 ) (mother *sku.Transacted, err error) {
 	if daughter == nil {
@@ -301,7 +323,7 @@ func (store *Store) fetchMotherIfNecessary(
 
 	mother = sku.GetTransactedPool().Get()
 	// TODO find a way to make this more performant when operating over sshfs
-	if err = store.GetStreamIndex().ReadOneObjectId(
+	if err = streamIndex.ReadOneObjectId(
 		objectId,
 		mother,
 	); err != nil {
@@ -388,6 +410,7 @@ func (store *Store) createType(typeId *ids.ObjectId) (err error) {
 }
 
 func (store *Store) addTypeIfNecessary(
+	streamIndex *stream_index.Index,
 	typeId ids.Type,
 ) (err error) {
 	if typeId.IsEmpty() {
@@ -402,7 +425,7 @@ func (store *Store) addTypeIfNecessary(
 		return err
 	}
 
-	if err = store.GetStreamIndex().ObjectExists(&objectId); err == nil {
+	if err = streamIndex.ObjectExists(&objectId); err == nil {
 		return err
 	}
 
@@ -424,6 +447,7 @@ func (store *Store) addTypeIfNecessary(
 }
 
 func (store *Store) addTypeAndExpandedIfNecessary(
+	streamIndex *stream_index.Index,
 	rootTipe ids.Type,
 ) (err error) {
 	if rootTipe.IsEmpty() {
@@ -441,7 +465,7 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 	)
 
 	for _, tipe := range typesExpanded {
-		if err = store.addTypeIfNecessary(tipe); err != nil {
+		if err = store.addTypeIfNecessary(streamIndex, tipe); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -451,38 +475,19 @@ func (store *Store) addTypeAndExpandedIfNecessary(
 }
 
 func (store *Store) addMissingTypes(
+	streamIndex *stream_index.Index,
 	commitOptions sku.CommitOptions,
 	object *sku.Transacted,
 ) (err error) {
 	tipe := object.GetType()
 
 	if !commitOptions.DontAddMissingType {
-		if err = store.addTypeAndExpandedIfNecessary(tipe); err != nil {
+		if err = store.addTypeAndExpandedIfNecessary(streamIndex, tipe); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	} else {
 		// TODO enforce that object has signature
-	}
-
-	return err
-}
-
-func (store *Store) reindexOne(object sku.ObjectWithList) (err error) {
-	options := sku.CommitOptions{
-		StoreOptions: sku.GetStoreOptionsReindex(),
-	}
-
-	if err = store.Commit(object.Object, options); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = store.GetAbbrStore().AddObjectToIdIndex(
-		object.Object,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
 	}
 
 	return err

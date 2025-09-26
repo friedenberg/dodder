@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 )
 
-// TODO move to own blob store configs package
+// TODO move into own package
 
 func MakeConfig(
 	hashFormat interfaces.FormatHash,
