@@ -168,8 +168,8 @@ func (pageWriter *pageWriter) flushBoth(
 		sku.MakePrimitiveQueryGroup(),
 		chain,
 		pageReadOptions{
-			includeAddedHistory:       true,
-			includeAddedLatest: false,
+			includeAddedHistory: true,
+			includeAddedLatest:  false,
 		},
 	); err != nil {
 		err = errors.Wrap(err)

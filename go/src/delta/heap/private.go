@@ -8,8 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-type Element interface{
-}
+type Element interface{}
 
 type ElementPtr[T Element] interface {
 	interfaces.Ptr[T]
