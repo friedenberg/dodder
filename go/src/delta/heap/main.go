@@ -1,7 +1,7 @@
 package heap
 
 import (
-	"container/heap"
+	pkg_heap "container/heap"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -11,79 +11,79 @@ import (
 
 // TODO rewrite with quiter.SortComparer
 type Heap[T Element, TPtr ElementPtr[T]] struct {
-	l sync.Mutex
-	h heapPrivate[T, TPtr]
-	s int
+	lock       sync.Mutex
+	private    heapPrivate[T, TPtr]
+	savedIndex int
 }
 
-func (h *Heap[T, TPtr]) GetCollection() interfaces.Collection[TPtr] {
-	return h
+func (heap *Heap[T, TPtr]) GetCollection() interfaces.Collection[TPtr] {
+	return heap
 }
 
-func (h *Heap[T, TPtr]) Any() TPtr {
-	e, _ := h.Peek()
-	return e
+func (heap *Heap[T, TPtr]) Any() TPtr {
+	element, _ := heap.Peek()
+	return element
 }
 
-func (h *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
+func (heap *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
 	return func(yield func(TPtr) bool) {
-		h.l.Lock()
-		defer h.l.Unlock()
-		defer h.restore()
+		heap.lock.Lock()
+		defer heap.lock.Unlock()
+		defer heap.restore()
 
 		for {
-			e, ok := h.popAndSave()
+			element, ok := heap.popAndSave()
 
 			if !ok {
 				return
 			}
 
-			if !yield(e) {
+			if !yield(element) {
 				break
 			}
 		}
 	}
 }
 
-func (h *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
-	h.h.p = v
+func (heap *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
+	heap.private.pool = v
 }
 
-func (h *Heap[T, TPtr]) GetEqualer() interfaces.Equaler[TPtr] {
-	return h.h.equaler
+func (heap *Heap[T, TPtr]) GetEqualer() interfaces.Equaler[TPtr] {
+	return heap.private.equaler
 }
 
-func (h *Heap[T, TPtr]) GetLessor() interfaces.Lessor3[TPtr] {
-	return h.h.Lessor
+func (heap *Heap[T, TPtr]) GetLessor() interfaces.Lessor3[TPtr] {
+	return heap.private.Lessor
 }
 
-func (h *Heap[T, TPtr]) GetResetter() interfaces.Resetter2[T, TPtr] {
-	return h.h.Resetter
+func (heap *Heap[T, TPtr]) GetResetter() interfaces.Resetter2[T, TPtr] {
+	return heap.private.Resetter
 }
 
-func (h *Heap[T, TPtr]) Peek() (sk TPtr, ok bool) {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) Peek() (element TPtr, ok bool) {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	if h.h.Len() > 0 {
-		sk = h.h.GetPool().Get()
-		h.h.Resetter.ResetWith(sk, h.h.Elements[0])
+	if heap.private.Len() > 0 {
+		element = heap.private.GetPool().Get()
+		heap.private.Resetter.ResetWith(element, heap.private.Elements[0])
 		ok = true
 	}
 
-	return sk, ok
+	return element, ok
 }
 
-func (h *Heap[T, TPtr]) Add(sk TPtr) (err error) {
-	h.Push(sk)
+func (heap *Heap[T, TPtr]) Add(element TPtr) (err error) {
+	heap.Push(element)
 	return err
 }
 
-func (h *Heap[T, TPtr]) Push(sk TPtr) {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) Push(element TPtr) {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	if h.s > 0 {
+	if heap.savedIndex > 0 {
 		panic(
 			errors.ErrorWithStackf(
 				"attempting to push to a heap that has saved elements",
@@ -91,98 +91,98 @@ func (h *Heap[T, TPtr]) Push(sk TPtr) {
 		)
 	}
 
-	heap.Push(&h.h, sk)
+	pkg_heap.Push(&heap.private, element)
 }
 
-func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) PopAndSave() (element TPtr, ok bool) {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	return h.popAndSave()
+	return heap.popAndSave()
 }
 
-func (h *Heap[T, TPtr]) popAndSave() (sk TPtr, ok bool) {
+func (heap *Heap[T, TPtr]) popAndSave() (element TPtr, ok bool) {
 	// h.h.discardDupes()
 
-	if h.h.Len() == 0 {
-		return sk, ok
+	if heap.private.Len() == 0 {
+		return element, ok
 	}
 
-	sk = h.h.GetPool().Get()
-	e := heap.Pop(&h.h).(TPtr)
-	h.h.Resetter.ResetWith(sk, e)
+	element = heap.private.GetPool().Get()
+	e := pkg_heap.Pop(&heap.private).(TPtr)
+	heap.private.Resetter.ResetWith(element, e)
 	ok = true
-	h.s += 1
-	faked := h.h.Elements[:h.h.Len()+h.s]
-	faked[h.h.Len()] = e
-	h.h.saveLastPopped(sk)
+	heap.savedIndex += 1
+	faked := heap.private.Elements[:heap.private.Len()+heap.savedIndex]
+	faked[heap.private.Len()] = e
+	heap.private.saveLastPopped(element)
 
-	return sk, ok
+	return element, ok
 }
 
-func (h *Heap[T, TPtr]) Restore() {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) Restore() {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	h.restore()
+	heap.restore()
 }
 
-func (h *Heap[T, TPtr]) restore() {
-	h.h.Elements = h.h.Elements[:h.s]
-	h.s = 0
-	h.h.GetPool().Put(h.h.lastPopped)
-	h.h.lastPopped = nil
+func (heap *Heap[T, TPtr]) restore() {
+	heap.private.Elements = heap.private.Elements[:heap.savedIndex]
+	heap.savedIndex = 0
+	heap.private.GetPool().Put(heap.private.lastPopped)
+	heap.private.lastPopped = nil
 
-	quiter.ReverseSortable(&h.h)
+	quiter.ReverseSortable(&heap.private)
 }
 
 // TODO remove
-func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
+func (heap *Heap[T, TPtr]) PopError() (element TPtr, err error) {
 	ok := false
-	sk, ok = h.Pop()
+	element, ok = heap.Pop()
 
 	if !ok {
 		err = errors.MakeErrStopIteration()
 	}
 
-	return sk, err
+	return element, err
 }
 
-func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) Pop() (element TPtr, ok bool) {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
 	// h.h.discardDupes()
 
-	if h.h.Len() == 0 {
-		return sk, ok
+	if heap.private.Len() == 0 {
+		return element, ok
 	}
 
-	sk = h.h.GetPool().Get()
-	h.h.Resetter.ResetWith(sk, heap.Pop(&h.h).(TPtr))
+	element = heap.private.GetPool().Get()
+	heap.private.Resetter.ResetWith(element, pkg_heap.Pop(&heap.private).(TPtr))
 	ok = true
-	h.h.saveLastPopped(sk)
+	heap.private.saveLastPopped(element)
 
-	return sk, ok
+	return element, ok
 }
 
-func (h *Heap[T, TPtr]) Len() int {
-	h.l.Lock()
-	defer h.l.Unlock()
+func (heap *Heap[T, TPtr]) Len() int {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	return h.h.Len()
+	return heap.private.Len()
 }
 
-func (a *Heap[T, TPtr]) Equals(b *Heap[T, TPtr]) bool {
-	a.l.Lock()
-	defer a.l.Unlock()
+func (heap *Heap[T, TPtr]) Equals(b *Heap[T, TPtr]) bool {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	if a.h.Len() != b.h.Len() {
+	if heap.private.Len() != b.private.Len() {
 		return false
 	}
 
-	for i, av := range a.h.Elements {
-		if b.h.equaler.Equals(b.h.Elements[i], av) {
+	for i, av := range heap.private.Elements {
+		if b.private.equaler.Equals(b.private.Elements[i], av) {
 			return false
 		}
 	}
@@ -190,47 +190,45 @@ func (a *Heap[T, TPtr]) Equals(b *Heap[T, TPtr]) bool {
 	return true
 }
 
-func (a *Heap[T, TPtr]) Copy() Heap[T, TPtr] {
-	a.l.Lock()
-	defer a.l.Unlock()
+func (heap *Heap[T, TPtr]) Copy() Heap[T, TPtr] {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
 	return Heap[T, TPtr]{
-		h: a.h.Copy(),
+		private: heap.private.Copy(),
 	}
 }
 
-func (a *Heap[T, TPtr]) Fix() {
-	a.l.Lock()
-	defer a.l.Unlock()
+func (heap *Heap[T, TPtr]) Fix() {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	heap.Init(&a.h)
+	pkg_heap.Init(&heap.private)
 }
 
-func (a *Heap[T, TPtr]) Sorted() (b []TPtr) {
-	a.l.Lock()
-	defer a.l.Unlock()
+func (heap *Heap[T, TPtr]) Sorted() (heapCopy []TPtr) {
+	heap.lock.Lock()
+	defer heap.lock.Unlock()
 
-	b = a.h.Sorted().Elements
+	heapCopy = heap.private.Sorted().Elements
 
-	return b
+	return heapCopy
 }
 
-func (a *Heap[T, TPtr]) Reset() {
-	a.h.Elements = make([]TPtr, 0)
-	a.h.GetPool().Put(a.h.lastPopped)
-	a.h.p = nil
-	a.h.lastPopped = nil
+func (heap *Heap[T, TPtr]) Reset() {
+	heap.private.Elements = make([]TPtr, 0)
+	heap.private.GetPool().Put(heap.private.lastPopped)
+	heap.private.pool = nil
+	heap.private.lastPopped = nil
 }
 
-func (a *Heap[T, TPtr]) ResetWith(b *Heap[T, TPtr]) {
-	a.h.equaler = b.h.equaler
-	a.h.Lessor = b.h.Lessor
-	a.h.Resetter = b.h.Resetter
-	a.h.Elements = make([]TPtr, b.Len())
+func (heap *Heap[T, TPtr]) ResetWith(b *Heap[T, TPtr]) {
+	heap.private.equaler = b.private.equaler
+	heap.private.Lessor = b.private.Lessor
+	heap.private.Resetter = b.private.Resetter
+	heap.private.Elements = make([]TPtr, b.Len())
 
-	for i, bv := range b.h.Elements {
-		a.h.Elements[i] = bv
-	}
+	copy(heap.private.Elements, b.private.Elements)
 
-	a.h.p = b.h.GetPool()
+	heap.private.pool = b.private.GetPool()
 }

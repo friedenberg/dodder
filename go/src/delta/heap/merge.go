@@ -17,9 +17,9 @@ func MergeHeap[
 		heap,
 		read,
 		write,
-		heap.h.equaler,
-		heap.h.Lessor,
-		heap.h.Resetter,
+		heap.private.equaler,
+		heap.private.Lessor,
+		heap.private.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -40,9 +40,9 @@ func MergeHeapAndRestore[
 		heap,
 		read,
 		write,
-		heap.h.equaler,
-		heap.h.Lessor,
-		heap.h.Resetter,
+		heap.private.equaler,
+		heap.private.Lessor,
+		heap.private.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -95,6 +95,8 @@ func MergeStreamPreferringHeap[
 		return oldWrite(e)
 	}
 
+	// write all the mingled elements
+
 	for {
 		var element ELEMENT_PTR
 
@@ -108,21 +110,21 @@ func MergeStreamPreferringHeap[
 			}
 		}
 
-	LOOP:
+	READ_FROM_HEAP:
 		for {
 			peekedElement, hasElement := heap.Peek()
 
 			switch {
 			case !hasElement:
-				break LOOP
+				break READ_FROM_HEAP
 
 			case equaler.Equals(peekedElement, element):
 				element = peekedElement
 				heap.Pop()
-				continue LOOP
+				continue READ_FROM_HEAP
 
 			case lessor.Less(element, peekedElement):
-				break LOOP
+				break READ_FROM_HEAP
 
 			default:
 			}
@@ -148,6 +150,8 @@ func MergeStreamPreferringHeap[
 			return err
 		}
 	}
+
+	// write all the new elements
 
 	for {
 		popped, ok := heap.Pop()

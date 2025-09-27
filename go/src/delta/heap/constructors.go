@@ -12,7 +12,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 	resetter interfaces.Resetter2[T, TPtr],
 ) *Heap[T, TPtr] {
 	return &Heap[T, TPtr]{
-		h: heapPrivate[T, TPtr]{
+		private: heapPrivate[T, TPtr]{
 			equaler:  equaler,
 			Lessor:   lessor,
 			Resetter: resetter,
@@ -37,7 +37,7 @@ func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
 	sort.Sort(h)
 
 	return &Heap[T, TPtr]{
-		h: h,
+		private: h,
 	}
 }
 
@@ -55,6 +55,6 @@ func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
 	}
 
 	return &Heap[T, TPtr]{
-		h: h,
+		private: h,
 	}
 }

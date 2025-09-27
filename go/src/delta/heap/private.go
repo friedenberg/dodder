@@ -19,16 +19,16 @@ type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
 	Resetter   interfaces.Resetter2[T, TPtr]
 	Elements   []TPtr
 	lastPopped TPtr
-	p          interfaces.Pool[T, TPtr]
+	pool       interfaces.Pool[T, TPtr]
 	equaler    interfaces.Equaler[TPtr]
 }
 
 func (h *heapPrivate[T, TPtr]) GetPool() interfaces.Pool[T, TPtr] {
-	if h.p == nil {
-		h.p = pool.MakeFakePool[T, TPtr]()
+	if h.pool == nil {
+		h.pool = pool.MakeFakePool[T, TPtr]()
 	}
 
-	return h.p
+	return h.pool
 }
 
 func (h heapPrivate[T, TPtr]) Len() int {
@@ -81,7 +81,7 @@ func (a heapPrivate[T, TPtr]) Copy() (b heapPrivate[T, TPtr]) {
 	b = heapPrivate[T, TPtr]{
 		Lessor:   a.Lessor,
 		equaler:  a.equaler,
-		p:        a.p,
+		pool:     a.pool,
 		Resetter: a.Resetter,
 		Elements: make([]TPtr, a.Len()),
 	}
