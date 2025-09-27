@@ -79,8 +79,8 @@ func (pageReader *streamPageReader) readFrom(
 }
 
 type pageReadOptions struct {
-	includeAdded       bool
-	includeAddedLatest bool
+	includeAddedHistory bool
+	includeAddedLatest  bool
 }
 
 func (pageReader *streamPageReader) readFull(
@@ -88,7 +88,8 @@ func (pageReader *streamPageReader) readFull(
 	output interfaces.FuncIter[*sku.Transacted],
 	pageReadOptions pageReadOptions,
 ) (err error) {
-	if !pageReadOptions.includeAdded && !pageReadOptions.includeAddedLatest {
+	if !pageReadOptions.includeAddedHistory &&
+		!pageReadOptions.includeAddedLatest {
 		if err = pageReader.readFrom(
 			pageReader.bufferedReader,
 			query,
@@ -111,12 +112,12 @@ func (pageReader *streamPageReader) readFull(
 	decoder := makeBinaryWithQueryGroup(query, ids.SigilHistory)
 
 	ui.TodoP3("determine performance of this")
-	added := pageReader.additionsHistory.objects.Copy()
+	addedHistory := pageReader.additionsHistory.objects.Copy()
 
 	var object objectWithCursorAndSigil
 
-	if err = heap.MergeStream(
-		&added,
+	if err = heap.MergeHeapAndRestore(
+		&addedHistory,
 		func() (transacted *sku.Transacted, err error) {
 			transacted = sku.GetTransactedPool().Get()
 			object.Transacted = transacted
@@ -149,7 +150,7 @@ func (pageReader *streamPageReader) readFull(
 
 	addedLatest := pageReader.additionsLatest.objects.Copy()
 
-	if err = heap.MergeStream(
+	if err = heap.MergeHeapAndRestore(
 		&addedLatest,
 		func() (object *sku.Transacted, err error) {
 			err = errors.MakeErrStopIteration()

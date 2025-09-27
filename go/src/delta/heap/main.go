@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
+// TODO rewrite with quiter.SortComparer
 type Heap[T Element, TPtr ElementPtr[T]] struct {
 	l sync.Mutex
 	h heapPrivate[T, TPtr]

@@ -370,7 +370,7 @@ func (index *Index) ReadPrimitiveQuery(
 					queryGroup,
 					funcIter,
 					pageReadOptions{
-						includeAdded:       false,
+						includeAddedHistory:       false,
 						includeAddedLatest: false,
 					},
 				); err1 != nil {

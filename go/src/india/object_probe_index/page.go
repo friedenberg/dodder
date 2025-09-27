@@ -316,7 +316,7 @@ func (page *page) Flush() (err error) {
 		return row, err
 	}
 
-	if err = heap.MergeStream(
+	if err = heap.MergeHeapAndRestore(
 		page.added,
 		func() (row *row, err error) {
 			row, err = getOne()

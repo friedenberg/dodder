@@ -1,5 +1,9 @@
 package quiter
 
+type SortComparer[ELEMENT any] interface {
+	SortCompare(ELEMENT, ELEMENT) SortCompare
+}
+
 type SortCompare interface {
 	sortCompare()
 

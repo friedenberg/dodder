@@ -218,7 +218,7 @@ func TestMerge(t1 *testing.T) {
 
 	actual := make([]*values.Int, 0)
 
-	err := MergeStream(
+	err := MergeHeapAndRestore(
 		sut,
 		otherStream.PopError,
 		func(v *values.Int) (err error) {

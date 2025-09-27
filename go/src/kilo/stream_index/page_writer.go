@@ -168,7 +168,7 @@ func (pageWriter *pageWriter) flushBoth(
 		sku.MakePrimitiveQueryGroup(),
 		chain,
 		pageReadOptions{
-			includeAdded:       true,
+			includeAddedHistory:       true,
 			includeAddedLatest: false,
 		},
 	); err != nil {
