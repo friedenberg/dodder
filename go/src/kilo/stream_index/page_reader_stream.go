@@ -116,7 +116,7 @@ func (pageReader *streamPageReader) readFull(
 
 	var object objectWithCursorAndSigil
 
-	if err = heap.MergeHeapAndRestore(
+	if err = heap.MergeHeap(
 		&addedHistory,
 		func() (transacted *sku.Transacted, err error) {
 			transacted = sku.GetTransactedPool().Get()
@@ -150,7 +150,7 @@ func (pageReader *streamPageReader) readFull(
 
 	addedLatest := pageReader.additionsLatest.objects.Copy()
 
-	if err = heap.MergeHeapAndRestore(
+	if err = heap.MergeHeap(
 		&addedLatest,
 		func() (object *sku.Transacted, err error) {
 			err = errors.MakeErrStopIteration()
