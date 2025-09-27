@@ -167,7 +167,7 @@ func MergeStreamPreferringAdditions[
 
 APPEND_ADDITIONS:
 	for {
-		popped, ok := heapAdditions.popAndSave()
+		popped, ok := heapAdditions.Pop()
 
 		if !ok {
 			break
