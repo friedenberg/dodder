@@ -66,8 +66,7 @@ func (heap *Heap[T, TPtr]) Peek() (element TPtr, ok bool) {
 	defer heap.lock.Unlock()
 
 	if heap.private.Len() > 0 {
-		element = heap.private.GetPool().Get()
-		heap.private.Resetter.ResetWith(element, heap.private.Elements[0])
+		element = heap.private.Elements[0]
 		ok = true
 	}
 
