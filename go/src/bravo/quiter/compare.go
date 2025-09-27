@@ -1,15 +1,21 @@
 package quiter
 
 type SortCompare interface {
+	sortCompare()
+
+	GetCompareInt() int
 	Less() bool
 	Equal() bool
 	Greater() bool
-	sortCompare()
 }
 
 type sortCompare int
 
 func (sortCompare) sortCompare() {}
+
+func (sortCompare sortCompare) GetCompareInt() int {
+	return int(sortCompare)
+}
 
 func (sortCompare sortCompare) Less() bool {
 	return sortCompare == SortCompareLess
@@ -24,7 +30,7 @@ func (sortCompare sortCompare) Greater() bool {
 }
 
 const (
-	SortCompareLess = sortCompare(iota)
-	SortCompareEqual
-	SortCompareGreater
+	SortCompareLess    = sortCompare(-1)
+	SortCompareEqual   = sortCompare(0)
+	SortCompareGreater = sortCompare(1)
 )

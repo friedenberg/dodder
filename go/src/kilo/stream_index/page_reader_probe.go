@@ -5,30 +5,32 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type probePageReader struct {
-	*page
-	blobReader interfaces.BlobReader
-	envRepo    env_repo.Env
+	pageId   page_id.PageId
+	readerAt io.ReaderAt
+	decoder  binaryDecoder
 }
 
 func (index *Index) makeProbePageReader(
 	pageIndex PageIndex,
 ) (probePageReader, errors.FuncErr) {
+	page := &index.pages[pageIndex]
 	pageReader := probePageReader{
-		page:    &index.pages[pageIndex],
-		envRepo: index.envRepo,
+		pageId:  page.pageId,
+		decoder: makeBinaryWithQueryGroup(nil, ids.SigilHistory),
 	}
 
 	var err error
+	var blobReader interfaces.BlobReader
 
-	if pageReader.blobReader, err = pageReader.envRepo.MakeNamedBlobReader(
+	if blobReader, err = index.envRepo.MakeNamedBlobReader(
 		pageReader.pageId.Path(),
 	); err != nil {
 		if errors.IsNotExist(err) {
@@ -38,8 +40,10 @@ func (index *Index) makeProbePageReader(
 		}
 	}
 
+	pageReader.readerAt = blobReader
+
 	return pageReader, func() (err error) {
-		if err = pageReader.blobReader.Close(); err != nil {
+		if err = blobReader.Close(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -54,14 +58,12 @@ func (pageReader *probePageReader) readOneCursor(
 ) (err error) {
 	// pages get deleted before reindexing, so this is actually valid to have a
 	// non-nil cursor request
-	if pageReader.blobReader == nil {
+	if pageReader.readerAt == nil {
 		err = collections.MakeErrNotFound(cursor)
 		return err
 	}
 
 	var bytesRead int64
-
-	decoder := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
 
 	objectPlus := objectWithCursorAndSigil{
 		objectWithSigil: objectWithSigil{
@@ -70,8 +72,8 @@ func (pageReader *probePageReader) readOneCursor(
 		Cursor: cursor,
 	}
 
-	if bytesRead, err = decoder.readFormatExactly(
-		pageReader.blobReader,
+	if bytesRead, err = pageReader.decoder.readFormatExactly(
+		pageReader.readerAt,
 		&objectPlus,
 	); err != nil {
 		if err == io.EOF {

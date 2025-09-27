@@ -209,6 +209,8 @@ func (commitFacilitator commitFacilitator) commit(
 			return err
 		}
 
+		// TODO eventually remove when moving to new model of dormancy and expanded
+		// tags
 		if err = commitFacilitator.applyDormantAndRealizeTags(
 			daughter,
 		); err != nil {

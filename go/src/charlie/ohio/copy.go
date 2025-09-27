@@ -89,3 +89,34 @@ func CopyFileWithTransform(
 
 	return err
 }
+
+func CopyReaderAtToWriter(
+	readerAt io.ReaderAt,
+	writer io.Writer,
+	cursor Cursor,
+) (err error) {
+	buffer := make([]byte, 32*1024)
+	var written int64
+
+	for written < cursor.ContentLength {
+		toRead := int64(len(buffer))
+		if remaining := cursor.ContentLength - written; remaining < toRead {
+			toRead = remaining
+		}
+
+		n, err := readerAt.ReadAt(buffer[:toRead], cursor.Offset+written)
+		if n > 0 {
+			if _, werr := writer.Write(buffer[:n]); werr != nil {
+				return werr
+			}
+			written += int64(n)
+		}
+		if err != nil {
+			if err == io.EOF && written == cursor.ContentLength {
+				return nil
+			}
+			return err
+		}
+	}
+	return nil
+}

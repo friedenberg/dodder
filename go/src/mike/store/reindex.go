@@ -28,14 +28,14 @@ func (store *Store) Reindex() (err error) {
 		return err
 	}
 
-	var reindexer *stream_index.Reindexer
+	var reindexer stream_index.IndexCommon
 
 	if reindexer, err = store.streamIndex.MakeReindexer(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	commitState := commitFacilitator{
+	commitFacilitator := commitFacilitator{
 		Store: store,
 		index: reindexer,
 	}
@@ -72,7 +72,7 @@ func (store *Store) Reindex() (err error) {
 			panic("empty object")
 		}
 
-		if err = store.reindexOne(commitState, objectWithList); err != nil {
+		if err = store.reindexOne(commitFacilitator, objectWithList); err != nil {
 			keyBytes := objectWithList.List.GetObjectDigest().GetBytes()
 
 			objectsWithErrors[string(keyBytes)] = objectWithError{
@@ -118,14 +118,14 @@ func (store *Store) Reindex() (err error) {
 }
 
 func (store *Store) reindexOne(
-	commitState commitFacilitator,
+	commitFacilitator commitFacilitator,
 	object sku.ObjectWithList,
 ) (err error) {
 	options := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsReindex(),
 	}
 
-	if err = commitState.commit(object.Object, options); err != nil {
+	if err = commitFacilitator.commit(object.Object, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

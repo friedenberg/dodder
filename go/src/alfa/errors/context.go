@@ -221,6 +221,16 @@ func (ctx *context) After(f interfaces.FuncContext) {
 	ctx.after(1, func() error { return f(ctx) })
 }
 
+//go:noinline
+func ContextCloseAfter(ctx interfaces.ActiveContext, closer io.Closer) {
+	ctx.After(MakeFuncContextFromFuncErr(closer.Close))
+}
+
+//go:noinline
+func ContextFlushAfter(ctx interfaces.ActiveContext, closer io.Closer) {
+	ctx.After(MakeFuncContextFromFuncErr(closer.Close))
+}
+
 // `Must` executes a function even if the context has been cancelled. If the
 // function returns an error, `Must` cancels the context and offers a heartbeat
 // to
