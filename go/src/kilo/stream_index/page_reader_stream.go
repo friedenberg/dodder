@@ -132,82 +132,67 @@ type pageReadOptions struct {
 	includeAddedLatest  bool
 }
 
-// TODO switch to returning seq
 func (pageReader *streamPageReader) readFull(
 	query sku.PrimitiveQueryGroup,
-	output interfaces.FuncIter[*sku.Transacted],
 	pageReadOptions pageReadOptions,
-) (err error) {
+) interfaces.SeqError[*sku.Transacted] {
 	if !pageReadOptions.includeAddedHistory &&
 		!pageReadOptions.includeAddedLatest {
-		if err = pageReader.readFrom(
+		return makeSeqObjectFromReader(
 			pageReader.bufferedReader,
 			query,
-			func(object objectWithCursorAndSigil) (err error) {
-				if err = output(object.Transacted); err != nil {
-					err = errors.Wrapf(err, "%s", object.Transacted)
-					return err
+		)
+	}
+
+	return func(yield func(*sku.Transacted, error) bool) {
+		comments.Optimize("determine performance of this")
+		addedHistory := pageReader.additionsHistory.objects.Copy()
+
+		{
+			seq := quiter.MergeSequences(
+				addedHistory.AllError(),
+				makeSeqObjectFromReader(pageReader.bufferedReader, query),
+				sku.TransactedCompare,
+			)
+
+			for object, errIter := range seq {
+				if errIter != nil {
+					yield(nil, errors.Wrap(errIter))
+					return
 				}
 
-				return err
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		return err
-	}
-
-	comments.Optimize("determine performance of this")
-	addedHistory := pageReader.additionsHistory.objects.Copy()
-
-	{
-		seq := quiter.MergeSequences(
-			addedHistory.AllError(),
-			makeSeqObjectFromReader(pageReader.bufferedReader, query),
-			sku.TransactedCompare,
-		)
-
-		for object, errIter := range seq {
-			if errIter != nil {
-				err = errors.Wrap(errIter)
-				return err
-			}
-
-			if err = output(object); err != nil {
-				err = errors.Wrap(err)
-				return err
+				if !yield(object, nil) {
+					return
+				}
 			}
 		}
-	}
 
-	if !pageReadOptions.includeAddedLatest {
-		return err
-	}
+		if !pageReadOptions.includeAddedLatest {
+			return
+		}
 
-	comments.Optimize("determine performance of this")
-	addedLatest := pageReader.additionsLatest.objects.Copy()
+		comments.Optimize("determine performance of this")
+		addedLatest := pageReader.additionsLatest.objects.Copy()
 
-	{
-		seq := quiter.MergeSequences(
-			addedLatest.AllError(),
-			quiter.MakeSeqErrorEmpty[*sku.Transacted](),
-			sku.TransactedCompare,
-		)
+		{
+			seq := quiter.MergeSequences(
+				addedLatest.AllError(),
+				quiter.MakeSeqErrorEmpty[*sku.Transacted](),
+				sku.TransactedCompare,
+			)
 
-		for object, errIter := range seq {
-			if errIter != nil {
-				err = errors.Wrap(errIter)
-				return err
-			}
+			for object, errIter := range seq {
+				if errIter != nil {
+					yield(nil, errors.Wrap(errIter))
+					return
+				}
 
-			if err = output(object); err != nil {
-				err = errors.Wrap(err)
-				return err
+				if !yield(object, nil) {
+					return
+				}
 			}
 		}
-	}
 
-	return err
+		return
+	}
 }

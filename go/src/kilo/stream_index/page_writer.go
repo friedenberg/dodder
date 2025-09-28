@@ -164,16 +164,24 @@ func (pageWriter *pageWriter) flushBoth(
 		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
-	if err = pageWriter.pageReader.readFull(
+	seq := pageWriter.pageReader.readFull(
 		sku.MakePrimitiveQueryGroup(),
-		chain,
 		pageReadOptions{
 			includeAddedHistory: true,
 			includeAddedLatest:  true,
 		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	)
+
+	for object, errIter := range seq {
+		if errIter != nil {
+			err = errors.Wrap(errIter)
+			return err
+		}
+
+		if err = chain(object); err != nil {
+			err = errors.Wrap(errIter)
+			return err
+		}
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {

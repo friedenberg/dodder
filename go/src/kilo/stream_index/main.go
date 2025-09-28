@@ -364,28 +364,33 @@ func (index *Index) ReadPrimitiveQuery(
 			}()
 
 			for !isDone() {
-				var err1 error
-
-				if err1 = pageReader.readFull(
+				seq := pageReader.readFull(
 					queryGroup,
-					funcIter,
 					pageReadOptions{
 						includeAddedHistory: false,
 						includeAddedLatest:  false,
 					},
-				); err1 != nil {
-					if isDone() {
-						break
+				)
+
+				for object, err1 := range seq {
+					if err1 != nil {
+						if isDone() {
+							break
+						}
+
+						switch {
+						case errors.IsTooManyOpenFiles(err1):
+							<-openFileCh
+							continue
+
+						default:
+							groupBuilder.Add(err1)
+						}
+
+						return
 					}
 
-					switch {
-					case errors.IsTooManyOpenFiles(err1):
-						<-openFileCh
-						continue
-
-					case errors.IsStopIteration(err1):
-
-					default:
+					if err1 = funcIter(object); err1 != nil {
 						groupBuilder.Add(err1)
 					}
 				}
