@@ -3,23 +3,26 @@ package heap
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 )
 
-func MergeHeapAndRestore[
+func MergeHeap[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
-	heap *Heap[ELEMENT, ELEMENT_PTR],
-	read func() (ELEMENT_PTR, error),
+	heapAdditions *Heap[ELEMENT, ELEMENT_PTR],
+	readHistory func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
 ) (err error) {
-	if err = MergeStreamPreferringAdditionsAndRestore(
-		heap,
-		read,
+	if err = MergeStreamPreferringAdditions(
+		heapAdditions.PopError,
+		readHistory,
 		write,
-		heap.private.equaler,
-		heap.private.Lessor,
-		heap.private.Resetter,
+		cmp.MakeComparerFromEqualerAndLessor3EqualFirst(
+			heapAdditions.private.equaler,
+			heapAdditions.private.Lessor,
+		),
+		heapAdditions.private.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -28,40 +31,15 @@ func MergeHeapAndRestore[
 	return err
 }
 
-type stream[
-	ELEMENT Element,
-	ELEMENT_PTR ElementPtr[ELEMENT],
-] interface {
-	Peek() (ELEMENT_PTR, bool)
-	Pop() (ELEMENT_PTR, bool)
-	PopError() (ELEMENT_PTR, error)
-}
-
-type streamWithRestore[
-	ELEMENT Element,
-	ELEMENT_PTR ElementPtr[ELEMENT],
-] interface {
-	stream[ELEMENT, ELEMENT_PTR]
-
-	restore()
-	popAndSave() (ELEMENT_PTR, bool)
-}
-
-func MergeStreamPreferringAdditionsAndRestore[
+func MergeStreamPreferringAdditions[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
-	heapAdditions streamWithRestore[ELEMENT, ELEMENT_PTR],
-	readHistory func() (ELEMENT_PTR, error),
+	readLeft, readRight func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
-	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
+	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,
 	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
 ) (err error) {
-	defer func() {
-		heapAdditions.restore()
-	}()
-
 	oldWrite := write
 
 	var lastElement ELEMENT_PTR
@@ -70,72 +48,86 @@ func MergeStreamPreferringAdditionsAndRestore[
 		if lastElement == nil {
 			var elementValue ELEMENT
 			lastElement = &elementValue
-		} else if equaler.Equals(element, lastElement) {
-			return err
-		} else if lessor.Less(element, lastElement) {
-			err = errors.ErrorWithStackf(
-				"last is greater than current! last:\n%v\ncurrent: %v",
-				lastElement,
-				element,
-			)
+		} else {
+			switch funcCmp(lastElement, element) {
+			case cmp.Less:
+				break
 
-			return err
-		}
-
-		resetter.ResetWith(lastElement, element)
-
-		return oldWrite(element)
-	}
-
-	for {
-		var element ELEMENT_PTR
-
-		if element, err = readHistory(); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-				goto APPEND_ADDITIONS
-			} else {
-				err = errors.Wrap(err)
+			case cmp.Equal:
 				return err
-			}
-		}
 
-	INTERLACE:
-		for {
-			peekedElement, hasElement := heapAdditions.Peek()
-
-			switch {
-			case !hasElement:
-				break INTERLACE
-
-			case equaler.Equals(peekedElement, element):
-				element = peekedElement
-				heapAdditions.Pop()
-				continue INTERLACE
-
-			case lessor.Less(element, peekedElement):
-				break INTERLACE
-
-			default:
-			}
-
-			poppedElement, _ := heapAdditions.popAndSave()
-
-			if !equaler.Equals(peekedElement, poppedElement) {
+			case cmp.Greater:
 				err = errors.ErrorWithStackf(
-					"popped not equal to peeked: %s != %s",
-					poppedElement,
-					peekedElement,
+					"last is greater than current! last:\n%v\ncurrent: %v",
+					lastElement,
+					element,
 				)
 
 				return err
 			}
+		}
 
-			if poppedElement == nil {
-				break INTERLACE
+		resetter.ResetWith(lastElement, element)
+
+		// TODO figure out why writing lastElement fails
+		return oldWrite(element)
+	}
+
+	type readWithElement struct {
+		read  func() (ELEMENT_PTR, error)
+		carry ELEMENT_PTR
+	}
+
+	left := readWithElement{
+		read: readLeft,
+	}
+
+	right := readWithElement{
+		read: readRight,
+	}
+
+	var remaining readWithElement
+
+	for {
+		if right.carry == nil {
+			if right.carry, err = right.read(); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+					remaining = left
+					break
+				} else {
+					err = errors.Wrap(err)
+					return err
+				}
 			}
 
-			if err = write(poppedElement); err != nil {
+			if right.carry == nil {
+				remaining = left
+				break
+			}
+		}
+
+		if left.carry == nil {
+			if left.carry, err = left.read(); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+					remaining = right
+					break
+				} else {
+					err = errors.Wrap(err)
+					return err
+				}
+			}
+
+			if left.carry == nil {
+				remaining = right
+				break
+			}
+		}
+
+		switch funcCmp(left.carry, right.carry) {
+		case cmp.Less, cmp.Equal:
+			if err = write(left.carry); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -144,9 +136,26 @@ func MergeStreamPreferringAdditionsAndRestore[
 
 				return err
 			}
-		}
 
-		if err = write(element); err != nil {
+			left.carry = nil
+
+		case cmp.Greater:
+			if err = write(right.carry); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return err
+			}
+
+			right.carry = nil
+		}
+	}
+
+	if remaining.carry != nil {
+		if err = write(remaining.carry); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -157,15 +166,24 @@ func MergeStreamPreferringAdditionsAndRestore[
 		}
 	}
 
-APPEND_ADDITIONS:
 	for {
-		popped, ok := heapAdditions.popAndSave()
+		var element ELEMENT_PTR
 
-		if !ok {
-			break
+		if element, err = remaining.read(); err != nil {
+			if errors.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return err
 		}
 
-		if err = write(popped); err != nil {
+		if element == nil {
+			return err
+		}
+
+		if err = write(element); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
