@@ -1,6 +1,8 @@
 package heap
 
 import (
+	"iter"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
@@ -14,9 +16,17 @@ func MergeHeap[
 	readHistory func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
 ) (err error) {
+	pullLeft, stopLeft := iter.Pull2(heapAdditions.AllError())
+	defer stopLeft()
+
+	pullRight := func() (ELEMENT_PTR, error, bool) {
+		element, err := readHistory()
+		return element, err, !errors.IsStopIteration(err)
+	}
+
 	seq := MergeStreamPreferringAdditions(
-		heapAdditions.PopError,
-		readHistory,
+		pullLeft,
+		pullRight,
 		cmp.MakeComparerFromEqualerAndLessor3EqualFirst(
 			heapAdditions.private.equaler,
 			heapAdditions.private.Lessor,
@@ -43,22 +53,22 @@ func MergeStreamPreferringAdditions[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
-	readLeft, readRight func() (ELEMENT_PTR, error),
+	pullLeft, pullRight interfaces.Pull2[ELEMENT_PTR, error],
 	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,
 	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
 ) interfaces.SeqError[ELEMENT_PTR] {
 	return func(yield func(ELEMENT_PTR, error) bool) {
 		type readWithElement struct {
-			read  func() (ELEMENT_PTR, error)
+			read  func() (ELEMENT_PTR, error, bool)
 			carry ELEMENT_PTR
 		}
 
 		left := readWithElement{
-			read: readLeft,
+			read: pullLeft,
 		}
 
 		right := readWithElement{
-			read: readRight,
+			read: pullRight,
 		}
 
 		var remaining readWithElement
@@ -66,14 +76,13 @@ func MergeStreamPreferringAdditions[
 		for {
 			if right.carry == nil {
 				var err error
-				if right.carry, err = right.read(); err != nil {
-					if errors.IsStopIteration(err) {
-						remaining = left
-						goto EMIT_REMAINING
-					} else {
-						yield(nil, err)
-						return
-					}
+				var ok bool
+				if right.carry, err, ok = right.read(); !ok {
+					remaining = left
+					goto EMIT_REMAINING
+				} else if err != nil {
+					yield(nil, err)
+					return
 				}
 
 				if right.carry == nil {
@@ -84,14 +93,13 @@ func MergeStreamPreferringAdditions[
 
 			if left.carry == nil {
 				var err error
-				if left.carry, err = left.read(); err != nil {
-					if errors.IsStopIteration(err) {
-						remaining = right
-						goto EMIT_REMAINING
-					} else {
-						yield(nil, err)
-						return
-					}
+				var ok bool
+				if left.carry, err, ok = left.read(); !ok {
+					remaining = right
+					goto EMIT_REMAINING
+				} else if err != nil {
+					yield(nil, err)
+					return
 				}
 
 				if left.carry == nil {
@@ -132,19 +140,13 @@ func MergeStreamPreferringAdditions[
 		for {
 			var element ELEMENT_PTR
 			var err error
+			var ok bool
 
-			if element, err = remaining.read(); err != nil {
-				if errors.IsStopIteration(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-					yield(nil, err)
-				}
-
+			if element, err, ok = remaining.read(); !ok {
 				return
-			}
-
-			if element == nil {
+			} else if err != nil {
+				err = errors.Wrap(err)
+				yield(nil, err)
 				return
 			}
 

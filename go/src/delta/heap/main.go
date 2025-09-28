@@ -25,6 +25,26 @@ func (heap *Heap[T, TPtr]) Any() TPtr {
 	return element
 }
 
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) AllError() interfaces.SeqError[ELEMENT_PTR] {
+	return func(yield func(ELEMENT_PTR, error) bool) {
+		heap.lock.Lock()
+		defer heap.lock.Unlock()
+		defer heap.restore()
+
+		for {
+			element, ok := heap.popAndSave()
+
+			if !ok {
+				return
+			}
+
+			if !yield(element, nil) {
+				break
+			}
+		}
+	}
+}
+
 func (heap *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
 	return func(yield func(TPtr) bool) {
 		heap.lock.Lock()
