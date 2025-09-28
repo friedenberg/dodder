@@ -164,7 +164,7 @@ func (pageWriter *pageWriter) flushBoth(
 		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
-	seq := pageWriter.pageReader.readFull(
+	seq := pageWriter.pageReader.makeSeq(
 		sku.MakePrimitiveQueryGroup(),
 		pageReadOptions{
 			includeAddedHistory: true,

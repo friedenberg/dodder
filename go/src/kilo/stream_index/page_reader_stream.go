@@ -132,7 +132,7 @@ type pageReadOptions struct {
 	includeAddedLatest  bool
 }
 
-func (pageReader *streamPageReader) readFull(
+func (pageReader *streamPageReader) makeSeq(
 	query sku.PrimitiveQueryGroup,
 	pageReadOptions pageReadOptions,
 ) interfaces.SeqError[*sku.Transacted] {

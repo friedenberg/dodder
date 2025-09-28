@@ -364,7 +364,7 @@ func (index *Index) ReadPrimitiveQuery(
 			}()
 
 			for !isDone() {
-				seq := pageReader.readFull(
+				seq := pageReader.makeSeq(
 					queryGroup,
 					pageReadOptions{
 						includeAddedHistory: false,
