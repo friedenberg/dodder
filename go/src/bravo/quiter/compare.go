@@ -1,5 +1,7 @@
 package quiter
 
+import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+
 type SortComparer[ELEMENT any] interface {
 	SortCompare(ELEMENT, ELEMENT) SortCompare
 }
@@ -38,3 +40,18 @@ const (
 	SortCompareEqual   = sortCompare(0)
 	SortCompareGreater = sortCompare(1)
 )
+
+func MakeSortComparerFromEqualerAndLessor3[ELEMENT any](
+	equaler interfaces.Equaler[ELEMENT],
+	lessor interfaces.Lessor3[ELEMENT],
+) func(ELEMENT, ELEMENT) SortCompare {
+	return func(left, right ELEMENT) SortCompare {
+		if equaler.Equals(left, right) {
+			return SortCompareEqual
+		} else if lessor.Less(left, right) {
+			return SortCompareLess
+		} else {
+			return SortCompareGreater
+		}
+	}
+}

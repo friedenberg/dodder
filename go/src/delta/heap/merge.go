@@ -3,6 +3,7 @@ package heap
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
 func MergeHeap[
@@ -17,8 +18,10 @@ func MergeHeap[
 		heap,
 		read,
 		write,
-		heap.private.equaler,
-		heap.private.Lessor,
+		quiter.MakeSortComparerFromEqualerAndLessor3(
+			heap.private.equaler,
+			heap.private.Lessor,
+		),
 		heap.private.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -66,8 +69,7 @@ func MergeStreamPreferringAdditions[
 	heapAdditions stream[ELEMENT, ELEMENT_PTR],
 	readHistory func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
-	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
+	cmp func(ELEMENT_PTR, ELEMENT_PTR) quiter.SortCompare,
 	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
 ) (err error) {
 	oldWrite := write
@@ -78,20 +80,26 @@ func MergeStreamPreferringAdditions[
 		if lastElement == nil {
 			var elementValue ELEMENT
 			lastElement = &elementValue
-		} else if equaler.Equals(element, lastElement) {
-			return err
-		} else if lessor.Less(element, lastElement) {
-			err = errors.ErrorWithStackf(
-				"last is greater than current! last:\n%v\ncurrent: %v",
-				lastElement,
-				element,
-			)
+		} else {
+			switch cmp(lastElement, element) {
+			case quiter.SortCompareLess:
+				break
 
-			return err
+			case quiter.SortCompareEqual:
+				return err
+
+			case quiter.SortCompareGreater:
+				err = errors.ErrorWithStackf(
+					"last is greater than current! last:\n%v\ncurrent: %v",
+					lastElement,
+					element,
+				)
+			}
 		}
 
 		resetter.ResetWith(lastElement, element)
 
+		// TODO figure out why writing lastElement fails
 		return oldWrite(element)
 	}
 
@@ -112,24 +120,25 @@ func MergeStreamPreferringAdditions[
 		for {
 			peekedElement, hasElement := heapAdditions.Peek()
 
-			switch {
-			case !hasElement:
+			if !hasElement {
 				break INTERLACE
+			}
 
-			case equaler.Equals(peekedElement, element):
+			switch cmp(peekedElement, element) {
+			case quiter.SortCompareLess:
+
+			case quiter.SortCompareEqual:
 				element = peekedElement
 				heapAdditions.Pop()
 				continue INTERLACE
 
-			case lessor.Less(element, peekedElement):
+			case quiter.SortCompareGreater:
 				break INTERLACE
-
-			default:
 			}
 
 			poppedElement, _ := heapAdditions.Pop()
 
-			if !equaler.Equals(peekedElement, poppedElement) {
+			if cmp(peekedElement, poppedElement) != quiter.SortCompareEqual {
 				err = errors.ErrorWithStackf(
 					"popped not equal to peeked: %s != %s",
 					poppedElement,
