@@ -47,3 +47,11 @@ func (additions *pageAdditions) hasChanges() bool {
 func (additions *pageAdditions) Len() int {
 	return additions.objects.Len()
 }
+
+func (additions *pageAdditions) Reset() {
+	additions.objects.Reset()
+}
+
+func (additions *pageAdditions) PopError() (*sku.Transacted, error) {
+	return additions.objects.PopError()
+}

@@ -94,8 +94,8 @@ func (pageWriter *pageWriter) Flush() (err error) {
 		return err
 	}
 
-	defer pageWriter.writtenPage.additionsHistory.objects.Reset()
-	defer pageWriter.writtenPage.additionsLatest.objects.Reset()
+	defer pageWriter.writtenPage.additionsHistory.Reset()
+	defer pageWriter.writtenPage.additionsLatest.Reset()
 
 	pageWriter.latestObjects = make(ObjectIdToObject)
 
@@ -177,9 +177,14 @@ func (pageWriter *pageWriter) flushBoth(
 	}
 
 	for {
-		popped, ok := pageWriter.writtenPage.additionsLatest.objects.Pop()
+		var popped *sku.Transacted
 
-		if !ok {
+		if popped, err = pageWriter.writtenPage.additionsLatest.PopError(); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if popped == nil {
 			break
 		}
 
@@ -247,9 +252,14 @@ func (pageWriter *pageWriter) flushJustLatest(
 	)
 
 	for {
-		popped, ok := pageWriter.writtenPage.additionsLatest.objects.Pop()
+		var popped *sku.Transacted
 
-		if !ok {
+		if popped, err = pageWriter.writtenPage.additionsLatest.PopError(); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if popped == nil {
 			break
 		}
 

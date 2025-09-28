@@ -22,7 +22,7 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	otherStream := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
+	otherStream := MakeHeapFromSliceUnsorted(
 		eql,
 		llr,
 		values.IntResetter{},
@@ -47,7 +47,7 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(9),
 	}
 
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted(
 		eql,
 		llr,
 		values.IntResetter{},
