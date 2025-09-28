@@ -245,21 +245,14 @@ func (pageWriter *pageWriter) flushJustLatest(
 		pageWriter.makeWriteOne(bufferedWriter),
 	)
 
-	for {
-		var popped *sku.Transacted
+	{
+		seq := pageWriter.writtenPage.additionsLatest.objects.All()
 
-		if popped, err = pageWriter.writtenPage.additionsLatest.PopError(); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if popped == nil {
-			break
-		}
-
-		if err = chain(popped); err != nil {
-			err = errors.Wrap(err)
-			return err
+		for popped := range seq {
+			if err = chain(popped); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
 		}
 	}
 

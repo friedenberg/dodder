@@ -198,7 +198,5 @@ func (pageReader *streamPageReader) makeSeq(
 				}
 			}
 		}
-
-		return
 	}
 }
