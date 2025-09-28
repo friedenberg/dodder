@@ -10,19 +10,19 @@ func MergeHeap[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
-	heap *Heap[ELEMENT, ELEMENT_PTR],
-	read func() (ELEMENT_PTR, error),
+	heapAdditions *Heap[ELEMENT, ELEMENT_PTR],
+	readHistory func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
 ) (err error) {
 	if err = MergeStreamPreferringAdditions(
-		heap,
-		read,
+		heapAdditions,
+		readHistory,
 		write,
 		quiter.MakeSortComparerFromEqualerAndLessor3(
-			heap.private.equaler,
-			heap.private.Lessor,
+			heapAdditions.private.equaler,
+			heapAdditions.private.Lessor,
 		),
-		heap.private.Resetter,
+		heapAdditions.private.Resetter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -60,6 +60,7 @@ type stream[
 ] interface {
 	Peek() (ELEMENT_PTR, bool)
 	Pop() (ELEMENT_PTR, bool)
+	PopError() (ELEMENT_PTR, error)
 }
 
 func MergeStreamPreferringAdditions[
@@ -94,6 +95,8 @@ func MergeStreamPreferringAdditions[
 					lastElement,
 					element,
 				)
+
+				return err
 			}
 		}
 
@@ -103,10 +106,10 @@ func MergeStreamPreferringAdditions[
 		return oldWrite(element)
 	}
 
-	for {
-		var element ELEMENT_PTR
+	var elementAdded ELEMENT_PTR
 
-		if element, err = readHistory(); err != nil {
+	for {
+		if elementAdded, err = readHistory(); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 				goto APPEND_ADDITIONS
@@ -118,17 +121,17 @@ func MergeStreamPreferringAdditions[
 
 	INTERLACE:
 		for {
-			peekedElement, hasElement := heapAdditions.Peek()
+			peekedElement, _ := heapAdditions.Peek()
 
-			if !hasElement {
+			if peekedElement == nil {
 				break INTERLACE
 			}
 
-			switch cmp(peekedElement, element) {
+			switch cmp(peekedElement, elementAdded) {
 			case quiter.SortCompareLess:
 
 			case quiter.SortCompareEqual:
-				element = peekedElement
+				elementAdded = peekedElement
 				heapAdditions.Pop()
 				continue INTERLACE
 
@@ -163,7 +166,7 @@ func MergeStreamPreferringAdditions[
 			}
 		}
 
-		if err = write(element); err != nil {
+		if err = write(elementAdded); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -175,10 +178,16 @@ func MergeStreamPreferringAdditions[
 	}
 
 APPEND_ADDITIONS:
+	var popped ELEMENT_PTR
 	for {
-		popped, ok := heapAdditions.Pop()
+		popped, err = heapAdditions.PopError()
 
-		if !ok {
+		if err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if popped == nil {
 			break
 		}
 

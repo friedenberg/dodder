@@ -135,8 +135,7 @@ func (heap *Heap[T, TPtr]) restore() {
 	quiter.ReverseSortable(&heap.private)
 }
 
-// TODO remove
-func (heap *Heap[T, TPtr]) PopError() (element TPtr, err error) {
+func (heap *Heap[T, TPtr]) PopOrErrStopIteration() (element TPtr, err error) {
 	ok := false
 	element, ok = heap.Pop()
 
@@ -144,6 +143,11 @@ func (heap *Heap[T, TPtr]) PopError() (element TPtr, err error) {
 		err = errors.MakeErrStopIteration()
 	}
 
+	return element, err
+}
+
+func (heap *Heap[T, TPtr]) PopError() (element TPtr, err error) {
+	element, _ = heap.Pop()
 	return element, err
 }
 

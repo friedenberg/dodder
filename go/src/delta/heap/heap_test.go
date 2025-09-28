@@ -220,7 +220,7 @@ func TestMerge(t1 *testing.T) {
 
 	err := MergeHeapAndRestore(
 		sut,
-		otherStream.PopError,
+		otherStream.PopOrErrStopIteration,
 		func(v *values.Int) (err error) {
 			actual = append(actual, v)
 			return err
