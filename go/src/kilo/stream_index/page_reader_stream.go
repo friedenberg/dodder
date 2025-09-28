@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -132,6 +133,7 @@ type pageReadOptions struct {
 	includeAddedLatest  bool
 }
 
+// TODO switch to returning seq
 func (pageReader *streamPageReader) readFull(
 	query sku.PrimitiveQueryGroup,
 	output interfaces.FuncIter[*sku.Transacted],
@@ -161,21 +163,23 @@ func (pageReader *streamPageReader) readFull(
 	ui.TodoP3("determine performance of this")
 	addedHistory := pageReader.additionsHistory.objects.Copy()
 
-	seq := heap.MergeSequences(
-		addedHistory.AllError(),
-		makeSeqObjectFromReader(pageReader.bufferedReader, query),
-		sku.TransactedCompare,
-	)
+	{
+		seq := heap.MergeSequences(
+			addedHistory.AllError(),
+			makeSeqObjectFromReader(pageReader.bufferedReader, query),
+			sku.TransactedCompare,
+		)
 
-	for object, errIter := range seq {
-		if errIter != nil {
-			err = errors.Wrap(errIter)
-			return err
-		}
+		for object, errIter := range seq {
+			if errIter != nil {
+				err = errors.Wrap(errIter)
+				return err
+			}
 
-		if err = output(object); err != nil {
-			err = errors.Wrap(err)
-			return err
+			if err = output(object); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
 		}
 	}
 
@@ -185,16 +189,24 @@ func (pageReader *streamPageReader) readFull(
 
 	addedLatest := pageReader.additionsLatest.objects.Copy()
 
-	if err = heap.MergeHeapAndReadFunc(
-		&addedLatest,
-		func() (object *sku.Transacted, err error) {
-			err = errors.MakeErrStopIteration()
-			return object, err
-		},
-		output,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	{
+		seq := heap.MergeSequences(
+			addedLatest.AllError(),
+			quiter.MakeSeqErrorEmpty[*sku.Transacted](),
+			sku.TransactedCompare,
+		)
+
+		for object, errIter := range seq {
+			if errIter != nil {
+				err = errors.Wrap(errIter)
+				return err
+			}
+
+			if err = output(object); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+		}
 	}
 
 	return err
