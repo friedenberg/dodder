@@ -11,21 +11,21 @@ import (
 )
 
 func (store *Store) ReadTransactedFromObjectId(
-	k1 interfaces.ObjectId,
-) (sk1 *sku.Transacted, err error) {
-	sk1 = sku.GetTransactedPool().Get()
+	objectId interfaces.ObjectId,
+) (object *sku.Transacted, err error) {
+	object = sku.GetTransactedPool().Get()
 
-	if err = store.ReadOneInto(k1, sk1); err != nil {
+	if err = store.ReadOneInto(objectId, object); err != nil {
 		if collections.IsErrNotFound(err) {
-			sku.GetTransactedPool().Put(sk1)
-			sk1 = nil
+			sku.GetTransactedPool().Put(object)
+			object = nil
 		}
 
 		err = errors.Wrap(err)
-		return sk1, err
+		return object, err
 	}
 
-	return sk1, err
+	return object, err
 }
 
 // TODO transition to a context-based panic / cancel semantic

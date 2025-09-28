@@ -144,30 +144,30 @@ func (cmd EditConfig) makeTempConfigFile(
 func (cmd EditConfig) readTempConfigFile(
 	localWorkingCopy *local_working_copy.Repo,
 	path string,
-) (sk *sku.Transacted, err error) {
-	sk = sku.GetTransactedPool().Get()
+) (object *sku.Transacted, err error) {
+	object = sku.GetTransactedPool().Get()
 
-	if sk.ObjectId.Set("konfig"); err != nil {
+	if object.ObjectId.Set("konfig"); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
 
 	if err = localWorkingCopy.GetEnvWorkspace().GetStoreFS().ReadOneExternalObjectReader(
 		file,
-		sk,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
-	return sk, err
+	return object, err
 }

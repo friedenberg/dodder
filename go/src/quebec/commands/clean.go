@@ -168,12 +168,12 @@ func (c Clean) runOrganize(
 	return err
 }
 
-func (c Clean) shouldClean(
+func (cmd Clean) shouldClean(
 	u *local_working_copy.Repo,
 	co sku.SkuType,
 	qg *query.Query,
 ) bool {
-	if c.force {
+	if cmd.force {
 		return true
 	}
 
@@ -187,20 +187,20 @@ func (c Clean) shouldClean(
 		return !qg.ExcludeRecognized
 	}
 
-	if c.includeParent {
-		mutter := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(mutter)
+	if cmd.includeParent {
+		mother := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(mother)
 
 		err := u.GetStore().GetStreamIndex().ReadOneObjectId(
 			co.GetSku().GetObjectId(),
-			mutter,
+			mother,
 		)
 
 		errors.PanicIfError(err)
 
 		if object_metadata.EqualerSansTai.Equals(
 			&co.GetSkuExternal().GetSku().Metadata,
-			&mutter.Metadata,
+			&mother.Metadata,
 		) {
 			return true
 		}

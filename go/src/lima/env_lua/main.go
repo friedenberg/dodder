@@ -46,14 +46,14 @@ func (s *env) luaSearcher(ls *lua.LState) int {
 	ls.Pop(1)
 
 	var err error
-	var sk *sku.Transacted
+	var object *sku.Transacted
 
-	if sk, err = s.GetSkuFromString(lv); err != nil {
+	if object, err = s.GetSkuFromString(lv); err != nil {
 		ls.Push(lua.LString(err.Error()))
 		return 1
 	}
 
-	sku.GetTransactedPool().Put(sk)
+	sku.GetTransactedPool().Put(object)
 
 	ls.Push(ls.NewFunction(s.LuaRequire))
 
@@ -98,24 +98,24 @@ func (s *env) LuaRequire(ls *lua.LState) int {
 	ls.Pop(1)
 
 	var err error
-	var sk *sku.Transacted
+	var object *sku.Transacted
 
-	if sk, err = s.GetSkuFromString(lv); err != nil {
+	if object, err = s.GetSkuFromString(lv); err != nil {
 		panic(err)
 		// ls.Push(lua.LString(err.Error()))
 		// return 1
 	}
 
-	defer sku.GetTransactedPool().Put(sk)
+	defer sku.GetTransactedPool().Put(object)
 
-	if err = s.objectStore.ReadOneInto(sk.GetObjectId(), sk); err != nil {
+	if err = s.objectStore.ReadOneInto(object.GetObjectId(), object); err != nil {
 		panic(err)
 	}
 
 	var ar interfaces.BlobReader
 
 	if ar, err = s.envRepo.GetDefaultBlobStore().MakeBlobReader(
-		sk.GetBlobDigest(),
+		object.GetBlobDigest(),
 	); err != nil {
 		panic(err)
 	}

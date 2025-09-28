@@ -54,14 +54,14 @@ func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 	return ok
 }
 
-func (pz Proto) Make() (z *Transacted) {
+func (pz Proto) Make() (object *Transacted) {
 	comments.Change("add type")
 	comments.Change("add description")
-	z = GetTransactedPool().Get()
+	object = GetTransactedPool().Get()
 
-	pz.Apply(z, genres.Zettel)
+	pz.Apply(object, genres.Zettel)
 
-	return z
+	return object
 }
 
 func (proto Proto) ApplyType(
