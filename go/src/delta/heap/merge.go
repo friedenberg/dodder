@@ -161,14 +161,14 @@ func MergeStreamPreferringAdditions[
 		read: readHistory,
 	}
 
-	var remaining *readWithElement
+	var remaining readWithElement
 
 	for {
 		if history.carry == nil {
 			if history.carry, err = history.read(); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
-					remaining = &added
+					remaining = added
 					break
 				} else {
 					err = errors.Wrap(err)
@@ -177,7 +177,7 @@ func MergeStreamPreferringAdditions[
 			}
 
 			if history.carry == nil {
-				remaining = &added
+				remaining = added
 				break
 			}
 		}
@@ -186,7 +186,7 @@ func MergeStreamPreferringAdditions[
 			if added.carry, err = added.read(); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
-					remaining = &history
+					remaining = history
 					break
 				} else {
 					err = errors.Wrap(err)
@@ -195,7 +195,7 @@ func MergeStreamPreferringAdditions[
 			}
 
 			if added.carry == nil {
-				remaining = &history
+				remaining = history
 				break
 			}
 		}
@@ -229,12 +229,8 @@ func MergeStreamPreferringAdditions[
 		}
 	}
 
-	if remaining != nil {
-		if err = funcWriteAll(*remaining); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
+	if err = funcWriteAll(remaining); err != nil {
+		err = errors.Wrap(err)
 		return err
 	}
 
