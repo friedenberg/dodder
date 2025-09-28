@@ -11,8 +11,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -307,13 +307,13 @@ func (tai Tai) Less(t1 Tai) bool {
 	return tai.Before(t1)
 }
 
-func (tai Tai) SortCompare(t1 Tai) quiter.SortCompare {
+func (tai Tai) SortCompare(t1 Tai) cmp.Result {
 	if tai.Equals(t1) {
-		return quiter.SortCompareEqual
+		return cmp.Equal
 	} else if tai.Before(t1) {
-		return quiter.SortCompareLess
+		return cmp.Less
 	} else {
-		return quiter.SortCompareGreater
+		return cmp.Greater
 	}
 }
 
