@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -164,7 +163,7 @@ func (pageReader *streamPageReader) readFull(
 	addedHistory := pageReader.additionsHistory.objects.Copy()
 
 	{
-		seq := heap.MergeSequences(
+		seq := quiter.MergeSequences(
 			addedHistory.AllError(),
 			makeSeqObjectFromReader(pageReader.bufferedReader, query),
 			sku.TransactedCompare,
@@ -191,7 +190,7 @@ func (pageReader *streamPageReader) readFull(
 	addedLatest := pageReader.additionsLatest.objects.Copy()
 
 	{
-		seq := heap.MergeSequences(
+		seq := quiter.MergeSequences(
 			addedLatest.AllError(),
 			quiter.MakeSeqErrorEmpty[*sku.Transacted](),
 			sku.TransactedCompare,

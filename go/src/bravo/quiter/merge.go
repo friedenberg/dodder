@@ -1,4 +1,4 @@
-package heap
+package quiter
 
 import (
 	"iter"
@@ -8,49 +8,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 )
 
-func MergeHeapAndReadFunc[
-	ELEMENT Element,
-	ELEMENT_PTR ElementPtr[ELEMENT],
-](
-	heapAdditions *Heap[ELEMENT, ELEMENT_PTR],
-	readHistory func() (ELEMENT_PTR, error),
-	write interfaces.FuncIter[ELEMENT_PTR],
-) (err error) {
-	pullLeft, stopLeft := iter.Pull2(heapAdditions.AllError())
-	defer stopLeft()
-
-	pullRight := func() (ELEMENT_PTR, error, bool) {
-		element, err := readHistory()
-		return element, err, !errors.IsStopIteration(err)
-	}
-
-	seq := MergeStreamPreferringAdditions(
-		pullLeft,
-		pullRight,
-		cmp.MakeComparerFromEqualerAndLessor3EqualFirst(
-			heapAdditions.private.equaler,
-			heapAdditions.private.Lessor,
-		),
-	)
-
-	for element, errIter := range seq {
-		if errIter != nil {
-			err = errors.Wrap(errIter)
-			return err
-		}
-
-		if err = write(element); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	return err
-}
-
 func MergeSequences[
-	ELEMENT Element,
-	ELEMENT_PTR ElementPtr[ELEMENT],
+	ELEMENT any,
+	ELEMENT_PTR interfaces.Ptr[ELEMENT],
 ](
 	seqLeft, seqRight interfaces.SeqError[ELEMENT_PTR],
 	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,
@@ -62,7 +22,7 @@ func MergeSequences[
 		pullRight, stopRight := iter.Pull2(seqRight)
 		defer stopRight()
 
-		seq := MergeStreamPreferringAdditions(
+		seq := MergeStreamPreferringLeft(
 			pullLeft,
 			pullRight,
 			funcCmp,
@@ -78,14 +38,12 @@ func MergeSequences[
 				return
 			}
 		}
-
-		return
 	}
 }
 
-func MergeStreamPreferringAdditions[
-	ELEMENT Element,
-	ELEMENT_PTR ElementPtr[ELEMENT],
+func MergeStreamPreferringLeft[
+	ELEMENT any,
+	ELEMENT_PTR interfaces.Ptr[ELEMENT],
 ](
 	pullLeft, pullRight interfaces.Pull2[ELEMENT_PTR, error],
 	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,

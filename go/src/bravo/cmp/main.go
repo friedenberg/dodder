@@ -53,18 +53,3 @@ func MakeComparerFromEqualerAndLessor3EqualFirst[ELEMENT any](
 		}
 	}
 }
-
-func MakeComparerFromEqualerAndLessor3LessFirst[ELEMENT any](
-	equaler interfaces.Equaler[ELEMENT],
-	lessor interfaces.Lessor3[ELEMENT],
-) func(ELEMENT, ELEMENT) Result {
-	return func(left, right ELEMENT) Result {
-		if lessor.Less(left, right) {
-			return Less
-		} else if equaler.Equals(left, right) {
-			return Equal
-		} else {
-			return Greater
-		}
-	}
-}

@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
@@ -56,16 +58,23 @@ func TestMerge(t1 *testing.T) {
 
 	actual := make([]*values.Int, 0)
 
-	err := MergeHeapAndReadFunc(
-		sut,
-		otherStream.PopOrErrStopIteration,
-		func(v *values.Int) (err error) {
-			actual = append(actual, v)
-			return err
+	seq := quiter.MergeSequences(
+		sut.AllError(),
+		otherStream.AllError(),
+		func(left, right *values.Int) cmp.Result {
+			if left.Less(*right) {
+				return cmp.Less
+			} else if left.Equals(*right) {
+				return cmp.Equal
+			} else {
+				return cmp.Greater
+			}
 		},
 	)
-	if err != nil {
-		t.AssertNoError(err)
+
+	for element, errIter := range seq {
+		t.AssertNoError(errIter)
+		actual = append(actual, element)
 	}
 
 	if !reflect.DeepEqual(expected, actual) {
