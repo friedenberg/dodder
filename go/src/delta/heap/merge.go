@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 )
 
-func MergeHeap[
+func MergeHeapAndReadFunc[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
@@ -31,7 +31,6 @@ func MergeHeap[
 			heapAdditions.private.equaler,
 			heapAdditions.private.Lessor,
 		),
-		heapAdditions.private.Resetter,
 	)
 
 	for element, errIter := range seq {
@@ -49,13 +48,47 @@ func MergeHeap[
 	return err
 }
 
+func MergeSequences[
+	ELEMENT Element,
+	ELEMENT_PTR ElementPtr[ELEMENT],
+](
+	seqLeft, seqRight interfaces.SeqError[ELEMENT_PTR],
+	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,
+) interfaces.SeqError[ELEMENT_PTR] {
+	return func(yield func(ELEMENT_PTR, error) bool) {
+		pullLeft, stopLeft := iter.Pull2(seqLeft)
+		defer stopLeft()
+
+		pullRight, stopRight := iter.Pull2(seqRight)
+		defer stopRight()
+
+		seq := MergeStreamPreferringAdditions(
+			pullLeft,
+			pullRight,
+			funcCmp,
+		)
+
+		for element, errIter := range seq {
+			if errIter != nil {
+				yield(nil, errors.Wrap(errIter))
+				return
+			}
+
+			if !yield(element, nil) {
+				return
+			}
+		}
+
+		return
+	}
+}
+
 func MergeStreamPreferringAdditions[
 	ELEMENT Element,
 	ELEMENT_PTR ElementPtr[ELEMENT],
 ](
 	pullLeft, pullRight interfaces.Pull2[ELEMENT_PTR, error],
 	funcCmp func(ELEMENT_PTR, ELEMENT_PTR) cmp.Result,
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
 ) interfaces.SeqError[ELEMENT_PTR] {
 	return func(yield func(ELEMENT_PTR, error) bool) {
 		type readWithElement struct {
