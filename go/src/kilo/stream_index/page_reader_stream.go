@@ -58,10 +58,12 @@ func makeSeqObjectWithCursorAndSigilFromReader(
 		decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
 		var object objectWithCursorAndSigil
+		object.Transacted = sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(object.Transacted)
 
 		for {
+			sku.TransactedResetter.Reset(object.Transacted)
 			object.Offset += object.ContentLength
-			object.Transacted = sku.GetTransactedPool().Get()
 
 			var err error
 
@@ -111,8 +113,12 @@ func (pageReader *streamPageReader) readFrom(
 		defer sku.GetTransactedPool().Put(object.Transacted)
 
 		for {
+			sku.TransactedResetter.Reset(object.Transacted)
+
 			object.Offset += object.ContentLength
+
 			var err error
+
 			if object.ContentLength, err = decoder.readFormatAndMatchSigil(
 				reader,
 				&object,
