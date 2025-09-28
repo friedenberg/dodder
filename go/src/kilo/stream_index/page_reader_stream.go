@@ -151,12 +151,11 @@ func (pageReader *streamPageReader) makeSeq(
 	}
 
 	return func(yield func(*sku.Transacted, error) bool) {
-		comments.Optimize("determine performance of this")
-		addedHistory := pageReader.additionsHistory.objects.Copy()
+		seqAddedHistory := pageReader.additionsHistory.AllError()
 
 		{
 			seq := quiter.MergeSequences(
-				addedHistory.AllError(),
+				seqAddedHistory,
 				makeSeqObjectFromReader(pageReader.bufferedReader, query),
 				sku.TransactedCompare,
 			)
@@ -178,11 +177,11 @@ func (pageReader *streamPageReader) makeSeq(
 		}
 
 		comments.Optimize("determine performance of this")
-		addedLatest := pageReader.additionsLatest.objects.Copy()
+		seqAddedLatest := pageReader.additionsLatest.AllError()
 
 		{
 			seq := quiter.MergeSequences(
-				addedLatest.AllError(),
+				seqAddedLatest,
 				quiter.MakeSeqErrorEmpty[*sku.Transacted](),
 				sku.TransactedCompare,
 			)

@@ -1,6 +1,7 @@
 package stream_index
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -50,6 +51,14 @@ func (additions *pageAdditions) Len() int {
 
 func (additions *pageAdditions) Reset() {
 	additions.objects.Reset()
+}
+
+func (additions *pageAdditions) All() interfaces.Seq[*sku.Transacted] {
+	return additions.objects.All()
+}
+
+func (additions *pageAdditions) AllError() interfaces.SeqError[*sku.Transacted] {
+	return additions.objects.AllError()
 }
 
 func (additions *pageAdditions) PopError() (*sku.Transacted, error) {

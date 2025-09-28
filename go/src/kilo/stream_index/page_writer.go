@@ -246,7 +246,7 @@ func (pageWriter *pageWriter) flushJustLatest(
 	)
 
 	{
-		seq := pageWriter.writtenPage.additionsLatest.objects.All()
+		seq := pageWriter.writtenPage.additionsLatest.All()
 
 		for popped := range seq {
 			if err = chain(popped); err != nil {
