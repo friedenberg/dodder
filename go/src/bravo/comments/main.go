@@ -23,7 +23,7 @@ func Parallelize() {
 	ui.TodoP1("start logging this")
 }
 
-func Optimize() {
+func Optimize(_ string) {
 	ui.TodoP1("start logging this")
 }
 

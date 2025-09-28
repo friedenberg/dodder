@@ -169,29 +169,11 @@ func (pageWriter *pageWriter) flushBoth(
 		chain,
 		pageReadOptions{
 			includeAddedHistory: true,
-			includeAddedLatest:  false,
+			includeAddedLatest:  true,
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
-	}
-
-	for {
-		var popped *sku.Transacted
-
-		if popped, err = pageWriter.writtenPage.additionsLatest.PopError(); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if popped == nil {
-			break
-		}
-
-		if err = chain(popped); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
 	}
 
 	if err = bufferedWriter.Flush(); err != nil {

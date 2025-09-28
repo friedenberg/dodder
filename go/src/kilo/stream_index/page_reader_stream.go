@@ -6,9 +6,9 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -160,7 +160,7 @@ func (pageReader *streamPageReader) readFull(
 		return err
 	}
 
-	ui.TodoP3("determine performance of this")
+	comments.Optimize("determine performance of this")
 	addedHistory := pageReader.additionsHistory.objects.Copy()
 
 	{
@@ -187,6 +187,7 @@ func (pageReader *streamPageReader) readFull(
 		return err
 	}
 
+	comments.Optimize("determine performance of this")
 	addedLatest := pageReader.additionsLatest.objects.Copy()
 
 	{
