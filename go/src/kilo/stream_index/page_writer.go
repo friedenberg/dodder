@@ -222,17 +222,21 @@ func (pageWriter *pageWriter) flushJustLatest(
 ) (err error) {
 	ui.Log().Printf("flushing just tail: %s", pageWriter.path)
 
-	if err = pageWriter.pageReader.readFrom(
-		bufferedReader,
-		sku.MakePrimitiveQueryGroup(),
-		func(object objectWithCursorAndSigil) (err error) {
+	{
+		seq := pageWriter.pageReader.readFrom(
+			bufferedReader,
+			sku.MakePrimitiveQueryGroup(),
+		)
+
+		for object, errIter := range seq {
+			if errIter != nil {
+				err = errors.Wrap(errIter)
+				return err
+			}
+
 			pageWriter.cursor = object.Cursor
 			pageWriter.saveToLatestMap(object.Transacted, object.Sigil)
-			return err
-		},
-	); err != nil {
-		err = errors.Wrapf(err, "Page: %s", pageWriter.pageId)
-		return err
+		}
 	}
 
 	chain := quiter.MakeChain(

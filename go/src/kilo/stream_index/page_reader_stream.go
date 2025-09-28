@@ -102,27 +102,33 @@ func makeSeqObjectFromReader(
 func (pageReader *streamPageReader) readFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
-	output interfaces.FuncIter[objectWithCursorAndSigil],
-) (err error) {
-	decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
+) interfaces.SeqError[objectWithCursorAndSigil] {
+	return func(yield func(objectWithCursorAndSigil, error) bool) {
+		decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
-	var object objectWithCursorAndSigil
-
-	for {
-		object.Offset += object.ContentLength
+		var object objectWithCursorAndSigil
 		object.Transacted = sku.GetTransactedPool().Get()
-		object.ContentLength, err = decoder.readFormatAndMatchSigil(
-			reader,
-			&object,
-		)
-		if err != nil {
-			err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-			return err
-		}
+		defer sku.GetTransactedPool().Put(object.Transacted)
 
-		if err = output(object); err != nil {
-			err = errors.Wrap(err)
-			return err
+		for {
+			object.Offset += object.ContentLength
+			var err error
+			if object.ContentLength, err = decoder.readFormatAndMatchSigil(
+				reader,
+				&object,
+			); err == io.EOF {
+				if err == io.EOF {
+					return
+				}
+			} else if err != nil {
+				object.Transacted = nil
+				yield(object, errors.Wrap(err))
+				return
+			}
+
+			if !yield(object, nil) {
+				return
+			}
 		}
 	}
 }
