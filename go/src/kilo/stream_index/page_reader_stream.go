@@ -50,6 +50,55 @@ func (index *Index) makeStreamPageReader(
 	}
 }
 
+func makeSeqObjectWithCursorAndSigilFromReader(
+	reader io.Reader,
+	queryGroup sku.PrimitiveQueryGroup,
+) interfaces.SeqError[objectWithCursorAndSigil] {
+	return func(yield func(objectWithCursorAndSigil, error) bool) {
+		decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
+
+		var object objectWithCursorAndSigil
+
+		for {
+			object.Offset += object.ContentLength
+			object.Transacted = sku.GetTransactedPool().Get()
+
+			var err error
+
+			if object.ContentLength, err = decoder.readFormatAndMatchSigil(
+				reader,
+				&object,
+			); err != nil {
+				yield(object, errors.WrapExceptSentinelAsNil(err, io.EOF))
+				return
+			}
+
+			if !yield(object, nil) {
+				return
+			}
+		}
+	}
+}
+
+func makeSeqObjectFromReader(
+	reader io.Reader,
+	queryGroup sku.PrimitiveQueryGroup,
+) interfaces.SeqError[*sku.Transacted] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		seq := makeSeqObjectWithCursorAndSigilFromReader(reader, queryGroup)
+		for objectPlus, err := range seq {
+			if err != nil {
+				yield(nil, errors.Wrap(err))
+				return
+			}
+
+			if !yield(objectPlus.Transacted, nil) {
+				return
+			}
+		}
+	}
+}
+
 func (pageReader *streamPageReader) readFrom(
 	reader io.Reader,
 	queryGroup sku.PrimitiveQueryGroup,
@@ -109,39 +158,25 @@ func (pageReader *streamPageReader) readFull(
 		return err
 	}
 
-	decoder := makeBinaryWithQueryGroup(query, ids.SigilHistory)
-
 	ui.TodoP3("determine performance of this")
 	addedHistory := pageReader.additionsHistory.objects.Copy()
 
-	var object objectWithCursorAndSigil
+	seq := heap.MergeSequences(
+		addedHistory.AllError(),
+		makeSeqObjectFromReader(pageReader.bufferedReader, query),
+		sku.TransactedCompare,
+	)
 
-	if err = heap.MergeHeapAndReadFunc(
-		&addedHistory,
-		func() (transacted *sku.Transacted, err error) {
-			transacted = sku.GetTransactedPool().Get()
-			object.Transacted = transacted
+	for object, errIter := range seq {
+		if errIter != nil {
+			err = errors.Wrap(errIter)
+			return err
+		}
 
-			_, err = decoder.readFormatAndMatchSigil(
-				pageReader.bufferedReader,
-				&object,
-			)
-			if err != nil {
-				if errors.IsEOF(err) {
-					err = errors.MakeErrStopIteration()
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return transacted, err
-			}
-
-			return transacted, err
-		},
-		output,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+		if err = output(object); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	if !pageReadOptions.includeAddedLatest {

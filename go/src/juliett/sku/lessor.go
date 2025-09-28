@@ -1,5 +1,19 @@
 package sku
 
+import (
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
+)
+
+func TransactedCompare(left, right *Transacted) cmp.Result {
+	if TransactedLessor.Less(left, right) {
+		return cmp.Less
+	} else if TransactedEqualer.Equals(left, right) {
+		return cmp.Equal
+	} else {
+		return cmp.Greater
+	}
+}
+
 type transactedLessorTaiOnly struct{}
 
 func (transactedLessorTaiOnly) Less(a, b *Transacted) bool {

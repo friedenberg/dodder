@@ -24,3 +24,7 @@ func MakeSeqErrorWithError[ELEMENT any](
 		yield(t, err)
 	}
 }
+
+func MakeSeqErrorEmpty[ELEMENT any]() interfaces.SeqError[ELEMENT] {
+	return func(yield func(ELEMENT, error) bool) {}
+}
