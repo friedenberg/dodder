@@ -106,56 +106,9 @@ func MergeStreamPreferringAdditions[
 		return oldWrite(element)
 	}
 
-	var elementAdded ELEMENT_PTR
-
-	for {
-		if elementAdded, err = readHistory(); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-				goto APPEND_ADDITIONS
-			} else {
-				err = errors.Wrap(err)
-				return err
-			}
-		}
-
-	INTERLACE:
-		for {
-			peekedElement, _ := heapAdditions.Peek()
-
-			if peekedElement == nil {
-				break INTERLACE
-			}
-
-			switch cmp(peekedElement, elementAdded) {
-			case quiter.SortCompareLess:
-
-			case quiter.SortCompareEqual:
-				elementAdded = peekedElement
-				heapAdditions.Pop()
-				continue INTERLACE
-
-			case quiter.SortCompareGreater:
-				break INTERLACE
-			}
-
-			poppedElement, _ := heapAdditions.Pop()
-
-			if cmp(peekedElement, poppedElement) != quiter.SortCompareEqual {
-				err = errors.ErrorWithStackf(
-					"popped not equal to peeked: %s != %s",
-					poppedElement,
-					peekedElement,
-				)
-
-				return err
-			}
-
-			if poppedElement == nil {
-				break INTERLACE
-			}
-
-			if err = write(poppedElement); err != nil {
+	funcWriteAll := func(read func() (ELEMENT_PTR, error), carry ELEMENT_PTR) (err error) {
+		if carry != nil {
+			if err = write(carry); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -166,39 +119,118 @@ func MergeStreamPreferringAdditions[
 			}
 		}
 
-		if err = write(elementAdded); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
+		for {
+			var element ELEMENT_PTR
+
+			if element, err = read(); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return err
 			}
 
-			return err
+			if element == nil {
+				return err
+			}
+
+			if err = write(element); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return err
+			}
 		}
 	}
 
-APPEND_ADDITIONS:
-	var popped ELEMENT_PTR
+	readAdded := heapAdditions.PopError
+	var elementAdded, elementHistory ELEMENT_PTR
+
 	for {
-		popped, err = heapAdditions.PopError()
+		if elementHistory == nil {
+			if elementHistory, err = readHistory(); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+					if err = funcWriteAll(heapAdditions.PopError, elementAdded); err != nil {
+						err = errors.Wrap(err)
+						return err
+					}
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if popped == nil {
-			break
-		}
-
-		if err = write(popped); err != nil {
-			if errors.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
+					return err
+				} else {
+					err = errors.Wrap(err)
+					return err
+				}
 			}
 
-			return err
+			if elementHistory == nil {
+				if err = funcWriteAll(readAdded, elementAdded); err != nil {
+					err = errors.Wrap(err)
+					return err
+				}
+
+				return err
+			}
+		}
+
+		if elementAdded == nil {
+			if elementAdded, err = readAdded(); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+
+					if err = funcWriteAll(readHistory, elementHistory); err != nil {
+						err = errors.Wrap(err)
+						return err
+					}
+
+					return err
+				} else {
+					err = errors.Wrap(err)
+					return err
+				}
+			}
+
+			if elementAdded == nil {
+				if err = funcWriteAll(readHistory, elementHistory); err != nil {
+					err = errors.Wrap(err)
+					return err
+				}
+
+				return err
+			}
+		}
+
+		switch cmp(elementAdded, elementHistory) {
+		case quiter.SortCompareLess, quiter.SortCompareEqual:
+			if err = write(elementAdded); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return err
+			}
+
+			elementAdded = nil
+
+		case quiter.SortCompareGreater:
+			if err = write(elementHistory); err != nil {
+				if errors.IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return err
+			}
+
+			elementHistory = nil
 		}
 	}
 
