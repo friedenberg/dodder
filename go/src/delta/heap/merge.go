@@ -106,9 +106,14 @@ func MergeStreamPreferringAdditions[
 		return oldWrite(element)
 	}
 
-	funcWriteAll := func(read func() (ELEMENT_PTR, error), carry ELEMENT_PTR) (err error) {
-		if carry != nil {
-			if err = write(carry); err != nil {
+	type readWithElement struct {
+		read  func() (ELEMENT_PTR, error)
+		carry ELEMENT_PTR
+	}
+
+	funcWriteAll := func(readWithElement readWithElement) (err error) {
+		if readWithElement.carry != nil {
+			if err = write(readWithElement.carry); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -122,7 +127,7 @@ func MergeStreamPreferringAdditions[
 		for {
 			var element ELEMENT_PTR
 
-			if element, err = read(); err != nil {
+			if element, err = readWithElement.read(); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -148,66 +153,56 @@ func MergeStreamPreferringAdditions[
 		}
 	}
 
-	readAdded := heapAdditions.PopError
-	var elementAdded, elementHistory ELEMENT_PTR
+	added := readWithElement{
+		read: heapAdditions.PopError,
+	}
+
+	history := readWithElement{
+		read: readHistory,
+	}
+
+	var remaining *readWithElement
 
 	for {
-		if elementHistory == nil {
-			if elementHistory, err = readHistory(); err != nil {
+		if history.carry == nil {
+			if history.carry, err = history.read(); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
-					if err = funcWriteAll(heapAdditions.PopError, elementAdded); err != nil {
-						err = errors.Wrap(err)
-						return err
-					}
-
-					return err
+					remaining = &added
+					break
 				} else {
 					err = errors.Wrap(err)
 					return err
 				}
 			}
 
-			if elementHistory == nil {
-				if err = funcWriteAll(readAdded, elementAdded); err != nil {
-					err = errors.Wrap(err)
-					return err
-				}
-
-				return err
+			if history.carry == nil {
+				remaining = &added
+				break
 			}
 		}
 
-		if elementAdded == nil {
-			if elementAdded, err = readAdded(); err != nil {
+		if added.carry == nil {
+			if added.carry, err = added.read(); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
-
-					if err = funcWriteAll(readHistory, elementHistory); err != nil {
-						err = errors.Wrap(err)
-						return err
-					}
-
-					return err
+					remaining = &history
+					break
 				} else {
 					err = errors.Wrap(err)
 					return err
 				}
 			}
 
-			if elementAdded == nil {
-				if err = funcWriteAll(readHistory, elementHistory); err != nil {
-					err = errors.Wrap(err)
-					return err
-				}
-
-				return err
+			if added.carry == nil {
+				remaining = &history
+				break
 			}
 		}
 
-		switch cmp(elementAdded, elementHistory) {
+		switch cmp(added.carry, history.carry) {
 		case quiter.SortCompareLess, quiter.SortCompareEqual:
-			if err = write(elementAdded); err != nil {
+			if err = write(added.carry); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -217,10 +212,10 @@ func MergeStreamPreferringAdditions[
 				return err
 			}
 
-			elementAdded = nil
+			added.carry = nil
 
 		case quiter.SortCompareGreater:
-			if err = write(elementHistory); err != nil {
+			if err = write(history.carry); err != nil {
 				if errors.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -230,8 +225,17 @@ func MergeStreamPreferringAdditions[
 				return err
 			}
 
-			elementHistory = nil
+			history.carry = nil
 		}
+	}
+
+	if remaining != nil {
+		if err = funcWriteAll(*remaining); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		return err
 	}
 
 	return err
