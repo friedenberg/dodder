@@ -8,7 +8,7 @@ const (
 	Greater = result(1)
 )
 
-type FuncCmp[ELEMENT any] func(ELEMENT, ELEMENT) Result
+type Func[ELEMENT any] func(ELEMENT, ELEMENT) Result
 
 type Result interface {
 	cmp()
@@ -41,7 +41,7 @@ func (result result) Greater() bool {
 	return result == Greater
 }
 
-func MakeComparerFromEqualerAndLessor3EqualFirst[ELEMENT any](
+func MakeFuncFromEqualerAndLessor3EqualFirst[ELEMENT any](
 	equaler interfaces.Equaler[ELEMENT],
 	lessor interfaces.Lessor3[ELEMENT],
 ) func(ELEMENT, ELEMENT) Result {
@@ -54,4 +54,31 @@ func MakeComparerFromEqualerAndLessor3EqualFirst[ELEMENT any](
 			return Greater
 		}
 	}
+}
+
+func MakeFuncFromEqualerAndLessor3LessFirst[ELEMENT any](
+	equaler interfaces.Equaler[ELEMENT],
+	lessor interfaces.Lessor3[ELEMENT],
+) func(ELEMENT, ELEMENT) Result {
+	return func(left, right ELEMENT) Result {
+		if lessor.Less(left, right) {
+			return Less
+		} else if equaler.Equals(left, right) {
+			return Equal
+		} else {
+			return Greater
+		}
+	}
+}
+
+type Lesser[ELEMENT any] Func[ELEMENT]
+
+func (lessor Lesser[T]) Less(left, right T) bool {
+	return lessor(left, right).Less()
+}
+
+type Equaler[ELEMENT any] Func[ELEMENT]
+
+func (equaler Equaler[T]) Equals(left, right T) bool {
+	return equaler(left, right).Equal()
 }

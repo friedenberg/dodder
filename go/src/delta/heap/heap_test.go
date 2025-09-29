@@ -19,9 +19,8 @@ func TestReset(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		values.IntEqualer{},
-		values.IntLessor{},
+	sut := MakeNewHeapFromSliceUnsorted[values.Int, *values.Int](
+		makeTestFuncCmp(t),
 		values.IntResetter{},
 		els,
 	)
@@ -50,9 +49,8 @@ func TestSaveAndRestore(t1 *testing.T) {
 
 	eql := values.IntEqualer{}
 
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		eql,
-		values.IntLessor{},
+	sut := MakeNewHeapFromSliceUnsorted[values.Int, *values.Int](
+		makeTestFuncCmp(t),
 		values.IntResetter{},
 		els,
 	)
@@ -109,11 +107,8 @@ func Test3Sorted(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	eql := values.IntEqualer{}
-
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		eql,
-		values.IntLessor{},
+	sut := MakeNewHeapFromSliceUnsorted[values.Int, *values.Int](
+		makeTestFuncCmp(t),
 		values.IntResetter{},
 		els,
 	)
@@ -146,11 +141,8 @@ func TestDupes(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	eql := values.IntEqualer{}
-
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		eql,
-		values.IntLessor{},
+	sut := MakeNewHeapFromSliceUnsorted[values.Int, *values.Int](
+		makeTestFuncCmp(t),
 		values.IntResetter{},
 		els,
 	)

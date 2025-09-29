@@ -10,11 +10,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
+func makeTestFuncCmp(_ ui.T) cmp.Func[*values.Int] {
+	return cmp.MakeFuncFromEqualerAndLessor3LessFirst(
+		values.IntEqualer{},
+		values.IntLessor{},
+	)
+}
+
 func TestMerge(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	eql := values.IntEqualer{}
-	llr := values.IntLessor{}
+	funcCmp := makeTestFuncCmp(t)
 
 	els := []*values.Int{
 		values.MakeInt(1),
@@ -24,9 +30,8 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	otherStream := MakeHeapFromSliceUnsorted(
-		eql,
-		llr,
+	otherStream := MakeNewHeapFromSliceUnsorted(
+		funcCmp,
 		values.IntResetter{},
 		[]*values.Int{
 			values.MakeInt(8),
@@ -49,9 +54,8 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(9),
 	}
 
-	sut := MakeHeapFromSliceUnsorted(
-		eql,
-		llr,
+	sut := MakeNewHeapFromSliceUnsorted(
+		funcCmp,
 		values.IntResetter{},
 		els,
 	)
@@ -85,8 +89,10 @@ func TestMerge(t1 *testing.T) {
 func TestMergeAndRestore(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	eql := values.IntEqualer{}
-	llr := values.IntLessor{}
+	funcCmp := cmp.MakeFuncFromEqualerAndLessor3LessFirst(
+		values.IntEqualer{},
+		values.IntLessor{},
+	)
 
 	els := []*values.Int{
 		values.MakeInt(1),
@@ -96,9 +102,8 @@ func TestMergeAndRestore(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	otherStream := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		eql,
-		llr,
+	otherStream := MakeNewHeapFromSliceUnsorted(
+		funcCmp,
 		values.IntResetter{},
 		[]*values.Int{
 			values.MakeInt(8),
@@ -121,9 +126,8 @@ func TestMergeAndRestore(t1 *testing.T) {
 		values.MakeInt(9),
 	}
 
-	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
-		eql,
-		llr,
+	sut := MakeNewHeapFromSliceUnsorted(
+		funcCmp,
 		values.IntResetter{},
 		els,
 	)
