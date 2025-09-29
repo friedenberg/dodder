@@ -149,6 +149,19 @@ func (test *T) AssertEqualStrings(a, b string) {
 }
 
 //go:noinline
+func (test *T) AssertPanic(funk func()) {
+	test.Helper()
+
+	defer func() {
+		if r := recover(); r == nil {
+			test.errorf(2, "expected panic")
+		}
+	}()
+
+	funk()
+}
+
+//go:noinline
 func (test *T) AssertNoError(err error) {
 	test.Helper()
 

@@ -27,20 +27,20 @@ func MakePermitDuplicates(
 	envRepo env_repo.Env,
 	path string,
 	hashType markl.FormatHash,
-) (indecks *Index, err error) {
-	indecks = &Index{hashType: hashType}
-	err = indecks.initialize(rowEqualerComplete{}, envRepo, path)
-	return indecks, err
+) (index *Index, err error) {
+	index = &Index{hashType: hashType}
+	err = index.initialize(rowEqualerComplete{}, envRepo, path)
+	return index, err
 }
 
 func MakeNoDuplicates(
 	envRepo env_repo.Env,
 	dir string,
 	hashType markl.FormatHash,
-) (indecks *Index, err error) {
-	indecks = &Index{hashType: hashType}
-	err = indecks.initialize(rowEqualerDigestOnly{}, envRepo, dir)
-	return indecks, err
+) (index *Index, err error) {
+	index = &Index{hashType: hashType}
+	err = index.initialize(rowEqualerDigestOnly{}, envRepo, dir)
+	return index, err
 }
 
 func (index *Index) initialize(

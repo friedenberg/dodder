@@ -13,7 +13,7 @@ func (page *page) writeIntoRow(
 	row *row,
 	reader io.Reader,
 ) (n int64, err error) {
-	if n, err = row.ReadFrom(reader, page.hashType); err != nil {
+	if n, err = row.ReadFromWithHashFormat(reader, page.hashType); err != nil {
 		err = errors.WrapExceptSentinel(err, io.EOF)
 		return n, err
 	}
@@ -60,14 +60,14 @@ func (row *row) String() string {
 	)
 }
 
-func (row *row) ReadFrom(
+func (row *row) ReadFromWithHashFormat(
 	reader io.Reader,
-	hashType markl.FormatHash,
+	hashFormat markl.FormatHash,
 ) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n1, err = markl.ReadFrom(reader, &row.Digest, hashType)
+	n1, err = markl.ReadFrom(reader, &row.Digest, hashFormat)
 	n += int64(n1)
 
 	if err != nil {
@@ -111,17 +111,17 @@ func (row *row) WriteTo(writer io.Writer) (n int64, err error) {
 
 type rowEqualerComplete struct{}
 
-func (rowEqualerComplete) Equals(a, b *row) bool {
-	return markl.Equals(&a.Digest, &b.Digest) &&
-		a.Loc.Page == b.Loc.Page &&
-		a.Loc.Offset == b.Loc.Offset &&
-		a.Loc.ContentLength == b.Loc.ContentLength
+func (rowEqualerComplete) Equals(left, right *row) bool {
+	return markl.Equals(&left.Digest, &right.Digest) &&
+		left.Loc.Page == right.Loc.Page &&
+		left.Loc.Offset == right.Loc.Offset &&
+		left.Loc.ContentLength == right.Loc.ContentLength
 }
 
 type rowEqualerDigestOnly struct{}
 
-func (rowEqualerDigestOnly) Equals(a, b *row) bool {
-	return markl.Equals(&a.Digest, &b.Digest)
+func (rowEqualerDigestOnly) Equals(left, right *row) bool {
+	return markl.Equals(&left.Digest, &right.Digest)
 }
 
 type rowResetter struct{}
@@ -142,20 +142,20 @@ func (rowResetter) ResetWith(a, b *row) {
 
 type rowLessor struct{}
 
-func (rowLessor) Less(a, b *row) bool {
-	cmp := bytes.Compare(a.Digest.GetBytes(), b.Digest.GetBytes())
+func (rowLessor) Less(left, right *row) bool {
+	cmp := bytes.Compare(left.Digest.GetBytes(), right.Digest.GetBytes())
 
 	if cmp != 0 {
 		return cmp == -1
 	}
 
-	if a.Page != b.Page {
-		return a.Page < b.Page
+	if left.Page != right.Page {
+		return left.Page < right.Page
 	}
 
-	if a.Offset != b.Offset {
-		return a.Offset < b.Offset
+	if left.Offset != right.Offset {
+		return left.Offset < right.Offset
 	}
 
-	return a.ContentLength < b.ContentLength
+	return left.ContentLength < right.ContentLength
 }
