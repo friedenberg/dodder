@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -53,7 +53,7 @@ func (index *Index) makeProbePageReader(
 }
 
 func (pageReader *probePageReader) readOneCursor(
-	cursor object_probe_index.Cursor,
+	cursor ohio.Cursor,
 	object *sku.Transacted,
 ) (err error) {
 	// pages get deleted before reindexing, so this is actually valid to have a

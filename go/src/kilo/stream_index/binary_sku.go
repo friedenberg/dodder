@@ -1,8 +1,8 @@
 package stream_index
 
 import (
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -13,11 +13,11 @@ type objectWithSigil struct {
 
 type objectWithCursorAndSigil struct {
 	objectWithSigil
-	object_probe_index.Cursor
+	ohio.Cursor
 }
 
 type objectMetaWithCursorAndSigil struct {
 	ids.Sigil
-	object_probe_index.Cursor
+	ohio.Cursor
 	Tai ids.Tai
 }

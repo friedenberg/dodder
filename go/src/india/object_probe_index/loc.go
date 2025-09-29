@@ -10,7 +10,7 @@ import (
 
 type Loc struct {
 	Page uint8
-	Cursor
+	ohio.Cursor
 }
 
 func (loc Loc) IsEmpty() bool {

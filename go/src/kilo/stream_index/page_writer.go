@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
@@ -36,7 +37,7 @@ type pageWriter struct {
 
 	probeIndex *probeIndex
 
-	cursor object_probe_index.Cursor
+	cursor ohio.Cursor
 
 	latestObjects ObjectIdToObject
 }
