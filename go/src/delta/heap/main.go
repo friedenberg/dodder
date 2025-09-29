@@ -10,23 +10,23 @@ import (
 )
 
 // TODO rewrite with quiter.SortComparer
-type Heap[T Element, TPtr ElementPtr[T]] struct {
+type Heap[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]] struct {
 	lock       sync.Mutex
-	private    heapPrivate[T, TPtr]
+	private    heapPrivate[ELEMENT, ELEMENT_PTR]
 	savedIndex int
 }
 
-func (heap *Heap[T, TPtr]) GetCollection() interfaces.Collection[TPtr] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetCollection() interfaces.Collection[ELEMENT_PTR] {
 	return heap
 }
 
-func (heap *Heap[T, TPtr]) Any() TPtr {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Any() ELEMENT_PTR {
 	element, _ := heap.Peek()
 	return element
 }
 
-func (heap *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
-	return func(yield func(TPtr) bool) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) All() interfaces.Seq[ELEMENT_PTR] {
+	return func(yield func(ELEMENT_PTR) bool) {
 		heap.lock.Lock()
 		defer heap.lock.Unlock()
 		defer heap.restore()
@@ -45,23 +45,25 @@ func (heap *Heap[T, TPtr]) All() interfaces.Seq[TPtr] {
 	}
 }
 
-func (heap *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) SetPool(
+	v interfaces.Pool[ELEMENT, ELEMENT_PTR],
+) {
 	heap.private.pool = v
 }
 
-func (heap *Heap[T, TPtr]) GetEqualer() interfaces.Equaler[TPtr] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetEqualer() interfaces.Equaler[ELEMENT_PTR] {
 	return heap.private.equaler
 }
 
-func (heap *Heap[T, TPtr]) GetLessor() interfaces.Lessor3[TPtr] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetLessor() interfaces.Lessor3[ELEMENT_PTR] {
 	return heap.private.Lessor
 }
 
-func (heap *Heap[T, TPtr]) GetResetter() interfaces.Resetter2[T, TPtr] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetResetter() interfaces.Resetter2[ELEMENT, ELEMENT_PTR] {
 	return heap.private.Resetter
 }
 
-func (heap *Heap[T, TPtr]) Peek() (element TPtr, ok bool) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Peek() (element ELEMENT_PTR, ok bool) {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
@@ -73,12 +75,12 @@ func (heap *Heap[T, TPtr]) Peek() (element TPtr, ok bool) {
 	return element, ok
 }
 
-func (heap *Heap[T, TPtr]) Add(element TPtr) (err error) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Add(element ELEMENT_PTR) (err error) {
 	heap.Push(element)
 	return err
 }
 
-func (heap *Heap[T, TPtr]) Push(element TPtr) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Push(element ELEMENT_PTR) {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
@@ -93,14 +95,14 @@ func (heap *Heap[T, TPtr]) Push(element TPtr) {
 	pkg_heap.Push(&heap.private, element)
 }
 
-func (heap *Heap[T, TPtr]) PopAndSave() (element TPtr, ok bool) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) PopAndSave() (element ELEMENT_PTR, ok bool) {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
 	return heap.popAndSave()
 }
 
-func (heap *Heap[T, TPtr]) popAndSave() (element TPtr, ok bool) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) popAndSave() (element ELEMENT_PTR, ok bool) {
 	// h.h.discardDupes()
 
 	if heap.private.Len() == 0 {
@@ -108,7 +110,7 @@ func (heap *Heap[T, TPtr]) popAndSave() (element TPtr, ok bool) {
 	}
 
 	element = heap.private.GetPool().Get()
-	e := pkg_heap.Pop(&heap.private).(TPtr)
+	e := pkg_heap.Pop(&heap.private).(ELEMENT_PTR)
 	heap.private.Resetter.ResetWith(element, e)
 	ok = true
 	heap.savedIndex += 1
@@ -119,14 +121,14 @@ func (heap *Heap[T, TPtr]) popAndSave() (element TPtr, ok bool) {
 	return element, ok
 }
 
-func (heap *Heap[T, TPtr]) Restore() {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Restore() {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
 	heap.restore()
 }
 
-func (heap *Heap[T, TPtr]) restore() {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) restore() {
 	heap.private.Elements = heap.private.Elements[:heap.savedIndex]
 	heap.savedIndex = 0
 	heap.private.GetPool().Put(heap.private.lastPopped)
@@ -135,7 +137,7 @@ func (heap *Heap[T, TPtr]) restore() {
 	quiter.ReverseSortable(&heap.private)
 }
 
-func (heap *Heap[T, TPtr]) PopOrErrStopIteration() (element TPtr, err error) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) PopOrErrStopIteration() (element ELEMENT_PTR, err error) {
 	ok := false
 	element, ok = heap.Pop()
 
@@ -146,12 +148,12 @@ func (heap *Heap[T, TPtr]) PopOrErrStopIteration() (element TPtr, err error) {
 	return element, err
 }
 
-func (heap *Heap[T, TPtr]) PopError() (element TPtr, err error) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) PopError() (element ELEMENT_PTR, err error) {
 	element, _ = heap.Pop()
 	return element, err
 }
 
-func (heap *Heap[T, TPtr]) Pop() (element TPtr, ok bool) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Pop() (element ELEMENT_PTR, ok bool) {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
@@ -162,21 +164,26 @@ func (heap *Heap[T, TPtr]) Pop() (element TPtr, ok bool) {
 	}
 
 	element = heap.private.GetPool().Get()
-	heap.private.Resetter.ResetWith(element, pkg_heap.Pop(&heap.private).(TPtr))
+	heap.private.Resetter.ResetWith(
+		element,
+		pkg_heap.Pop(&heap.private).(ELEMENT_PTR),
+	)
 	ok = true
 	heap.private.saveLastPopped(element)
 
 	return element, ok
 }
 
-func (heap *Heap[T, TPtr]) Len() int {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Len() int {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
 	return heap.private.Len()
 }
 
-func (heap *Heap[T, TPtr]) Equals(b *Heap[T, TPtr]) bool {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Equals(
+	b *Heap[ELEMENT, ELEMENT_PTR],
+) bool {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
@@ -193,23 +200,23 @@ func (heap *Heap[T, TPtr]) Equals(b *Heap[T, TPtr]) bool {
 	return true
 }
 
-func (heap *Heap[T, TPtr]) Copy() Heap[T, TPtr] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Copy() Heap[ELEMENT, ELEMENT_PTR] {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
-	return Heap[T, TPtr]{
+	return Heap[ELEMENT, ELEMENT_PTR]{
 		private: heap.private.Copy(),
 	}
 }
 
-func (heap *Heap[T, TPtr]) Fix() {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Fix() {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
 	pkg_heap.Init(&heap.private)
 }
 
-func (heap *Heap[T, TPtr]) Sorted() (heapCopy []TPtr) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Sorted() (heapCopy []ELEMENT_PTR) {
 	heap.lock.Lock()
 	defer heap.lock.Unlock()
 
@@ -218,18 +225,20 @@ func (heap *Heap[T, TPtr]) Sorted() (heapCopy []TPtr) {
 	return heapCopy
 }
 
-func (heap *Heap[T, TPtr]) Reset() {
-	heap.private.Elements = make([]TPtr, 0)
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) Reset() {
+	heap.private.Elements = make([]ELEMENT_PTR, 0)
 	heap.private.GetPool().Put(heap.private.lastPopped)
 	heap.private.pool = nil
 	heap.private.lastPopped = nil
 }
 
-func (heap *Heap[T, TPtr]) ResetWith(b *Heap[T, TPtr]) {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) ResetWith(
+	b *Heap[ELEMENT, ELEMENT_PTR],
+) {
 	heap.private.equaler = b.private.equaler
 	heap.private.Lessor = b.private.Lessor
 	heap.private.Resetter = b.private.Resetter
-	heap.private.Elements = make([]TPtr, b.Len())
+	heap.private.Elements = make([]ELEMENT_PTR, b.Len())
 
 	copy(heap.private.Elements, b.private.Elements)
 

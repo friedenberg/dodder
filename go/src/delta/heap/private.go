@@ -1,7 +1,7 @@
 package heap
 
 import (
-	"container/heap"
+	pkg_heap "container/heap"
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -10,89 +10,90 @@ import (
 
 type Element interface{}
 
-type ElementPtr[T Element] interface {
-	interfaces.Ptr[T]
+type ElementPtr[ELEMENT Element] interface {
+	interfaces.Ptr[ELEMENT]
 }
 
-type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
-	Lessor     interfaces.Lessor3[TPtr]
-	Resetter   interfaces.Resetter2[T, TPtr]
-	Elements   []TPtr
-	lastPopped TPtr
-	pool       interfaces.Pool[T, TPtr]
-	equaler    interfaces.Equaler[TPtr]
+type heapPrivate[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]] struct {
+	Lessor  interfaces.Lessor3[ELEMENT_PTR]
+	equaler interfaces.Equaler[ELEMENT_PTR]
+
+	Resetter   interfaces.Resetter2[ELEMENT, ELEMENT_PTR]
+	Elements   []ELEMENT_PTR
+	lastPopped ELEMENT_PTR
+	pool       interfaces.Pool[ELEMENT, ELEMENT_PTR]
 }
 
-func (h *heapPrivate[T, TPtr]) GetPool() interfaces.Pool[T, TPtr] {
-	if h.pool == nil {
-		h.pool = pool.MakeFakePool[T, TPtr]()
+func (heap *heapPrivate[ELEMENT, ELEMENT_PTR]) GetPool() interfaces.Pool[ELEMENT, ELEMENT_PTR] {
+	if heap.pool == nil {
+		heap.pool = pool.MakeFakePool[ELEMENT, ELEMENT_PTR]()
 	}
 
-	return h.pool
+	return heap.pool
 }
 
-func (h heapPrivate[T, TPtr]) Len() int {
-	return len(h.Elements)
+func (heap heapPrivate[ELEMENT, ELEMENT_PTR]) Len() int {
+	return len(heap.Elements)
 }
 
-func (h heapPrivate[T, TPtr]) Less(i, j int) (ok bool) {
-	ok = h.Lessor.Less(h.Elements[i], h.Elements[j])
+func (heap heapPrivate[ELEMENT, ELEMENT_PTR]) Less(i, j int) (ok bool) {
+	ok = heap.Lessor.Less(heap.Elements[i], heap.Elements[j])
 	return ok
 }
 
-func (h heapPrivate[T, TPtr]) Swap(i, j int) {
-	h.Elements[i], h.Elements[j] = h.Elements[j], h.Elements[i]
+func (heap heapPrivate[ELEMENT, ELEMENT_PTR]) Swap(i, j int) {
+	heap.Elements[i], heap.Elements[j] = heap.Elements[j], heap.Elements[i]
 }
 
-func (h *heapPrivate[T, TPtr]) Push(x any) {
-	h.Elements = append(h.Elements, x.(TPtr))
+func (heap *heapPrivate[ELEMENT, ELEMENT_PTR]) Push(x any) {
+	heap.Elements = append(heap.Elements, x.(ELEMENT_PTR))
 }
 
-func (h *heapPrivate[T, TPtr]) discardDupes() {
+func (heap *heapPrivate[ELEMENT, ELEMENT_PTR]) discardDupes() {
 	panic("don't use this yet")
 
-	for h.lastPopped != nil &&
-		h.Len() > 0 &&
-		h.equaler.Equals(h.lastPopped, h.Elements[0]) {
-		heap.Pop(h)
+	for heap.lastPopped != nil &&
+		heap.Len() > 0 &&
+		heap.equaler.Equals(heap.lastPopped, heap.Elements[0]) {
+		pkg_heap.Pop(heap)
 		// d := heap.Pop(h)
 		// log.Debug().Printf("discarded: %s", d)
 	}
 }
 
-func (h *heapPrivate[T, TPtr]) Pop() any {
-	old := h.Elements
+func (heap *heapPrivate[ELEMENT, ELEMENT_PTR]) Pop() any {
+	old := heap.Elements
 	n := len(old)
 	x := old[n-1]
-	h.Elements = old[0 : n-1]
+	heap.Elements = old[0 : n-1]
 
 	return x
 }
 
-func (h *heapPrivate[T, TPtr]) saveLastPopped(e TPtr) {
-	if h.lastPopped == nil {
-		h.lastPopped = h.GetPool().Get()
+func (heap *heapPrivate[ELEMENT, ELEMENT_PTR]) saveLastPopped(e ELEMENT_PTR) {
+	if heap.lastPopped == nil {
+		heap.lastPopped = heap.GetPool().Get()
 	}
 
-	h.Resetter.ResetWith(h.lastPopped, e)
+	heap.Resetter.ResetWith(heap.lastPopped, e)
 }
 
-func (a heapPrivate[T, TPtr]) Copy() (b heapPrivate[T, TPtr]) {
-	b = heapPrivate[T, TPtr]{
-		Lessor:   a.Lessor,
-		equaler:  a.equaler,
-		pool:     a.pool,
-		Resetter: a.Resetter,
-		Elements: make([]TPtr, a.Len()),
+func (heap heapPrivate[ELEMENT, ELEMENT_PTR]) Copy() (b heapPrivate[ELEMENT, ELEMENT_PTR]) {
+	b = heapPrivate[ELEMENT, ELEMENT_PTR]{
+		Lessor:   heap.Lessor,
+		equaler:  heap.equaler,
+		pool:     heap.pool,
+		Resetter: heap.Resetter,
+		Elements: make([]ELEMENT_PTR, heap.Len()),
 	}
 
-	copy(b.Elements, a.Elements)
+	copy(b.Elements, heap.Elements)
 
 	return b
 }
 
-func (a heapPrivate[T, TPtr]) Sorted() (b heapPrivate[T, TPtr]) {
-	b = a.Copy()
+func (heap heapPrivate[ELEMENT, ELEMENT_PTR]) Sorted() (b heapPrivate[ELEMENT, ELEMENT_PTR]) {
+	b = heap.Copy()
 	sort.Sort(b)
 	return b
 }

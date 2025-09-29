@@ -8,6 +8,8 @@ const (
 	Greater = result(1)
 )
 
+type FuncCmp[ELEMENT any] func(ELEMENT, ELEMENT) Result
+
 type Result interface {
 	cmp()
 
