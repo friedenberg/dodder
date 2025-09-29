@@ -217,7 +217,7 @@ func (ctx *context) after(skip int, f func() error) {
 }
 
 //go:noinline
-func (ctx *context) After(f interfaces.FuncContext) {
+func (ctx *context) After(f interfaces.FuncActiveContext) {
 	ctx.after(1, func() error { return f(ctx) })
 }
 
@@ -236,7 +236,7 @@ func ContextFlushAfter(ctx interfaces.ActiveContext, closer io.Closer) {
 // to
 // panic. It is meant for defers that must be executed, like closing files,
 // flushing buffers, releasing locks.
-func (ctx *context) Must(f interfaces.FuncContext) {
+func (ctx *context) Must(f interfaces.FuncActiveContext) {
 	defer ContextContinueOrPanic(ctx)
 
 	if err := f(ctx); err != nil {

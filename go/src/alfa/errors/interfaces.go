@@ -12,7 +12,7 @@ type (
 
 	FuncNil     = func()
 	FuncErr     = func() error
-	FuncContext = interfaces.FuncContext
+	FuncContext = interfaces.FuncActiveContext
 
 	FuncWithStackInfo struct {
 		FuncErr
@@ -48,13 +48,13 @@ func MakeFuncErrFromFuncNil(in FuncNil) FuncErr {
 }
 
 func MakeFuncContextFromFuncErr(in FuncErr) FuncContext {
-	return func(interfaces.Context) error {
+	return func(interfaces.ActiveContext) error {
 		return in()
 	}
 }
 
 func MakeFuncContextFromFuncNil(in FuncNil) FuncContext {
-	return func(interfaces.Context) error {
+	return func(interfaces.ActiveContext) error {
 		in()
 		return nil
 	}

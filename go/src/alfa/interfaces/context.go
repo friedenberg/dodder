@@ -35,7 +35,7 @@ func (state ContextState) Is(target error) bool {
 }
 
 type (
-	FuncContext = func(Context) error
+	FuncActiveContext = func(ActiveContext) error
 
 	// TODO think about how to separate "consumers" of context, and "managers or
 	// supervisors"
@@ -55,14 +55,14 @@ type (
 		// called,
 		// like
 		// defers but on a whole-program level.
-		After(FuncContext)
+		After(FuncActiveContext)
 
 		// `Must` executes a function even if the context has been cancelled. If
 		// the function returns an error, `Must` cancels the context. It is
 		// meant for
 		// defers that must be executed, like closing files, flushing buffers,
 		// releasing locks.
-		Must(FuncContext)
+		Must(FuncActiveContext)
 	}
 
 	Context interface {

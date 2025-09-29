@@ -86,7 +86,7 @@ func (cmd Sync) runAllStores(req command.Request) {
 	)
 
 	defer req.Must(
-		func(_ interfaces.Context) error {
+		func(_ interfaces.ActiveContext) error {
 			ui.Err().Printf(
 				"Successes: %d, Failures: %d, Ignored: %d, Total: %d",
 				blobImporter.Counts.Succeeded,

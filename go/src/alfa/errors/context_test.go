@@ -29,13 +29,13 @@ func TestContextCancelled(t *testing.T) {
 				}
 			}()
 
-			defer ctx.Must(func(interfaces.Context) error {
+			defer ctx.Must(func(interfaces.ActiveContext) error {
 				t.Log("must1")
 				must1 = true
 				return nil
 			})
 
-			defer ctx.Must(func(interfaces.Context) error {
+			defer ctx.Must(func(interfaces.ActiveContext) error {
 				t.Log("must2")
 				must2 = true
 				return nil

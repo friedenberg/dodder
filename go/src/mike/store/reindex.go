@@ -2,6 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -9,7 +10,7 @@ import (
 )
 
 // TODO-P2 add support for quiet reindexing
-func (store *Store) Reindex() (err error) {
+func (store *Store) Reindex(context interfaces.ActiveContext) (err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "reindex",

@@ -87,7 +87,9 @@ func (printer *PrinterComplete) PrintOne(
 	return err
 }
 
-func (printer *PrinterComplete) Close(context interfaces.Context) (err error) {
+func (printer *PrinterComplete) Close(
+	context interfaces.ActiveContext,
+) (err error) {
 	close(printer.chObjects)
 	<-printer.chDone
 
