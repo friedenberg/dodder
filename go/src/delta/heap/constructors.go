@@ -6,55 +6,55 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func Make[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler[TPtr],
-	lessor interfaces.Lessor3[TPtr],
-	resetter interfaces.Resetter2[T, TPtr],
-) *Heap[T, TPtr] {
-	return &Heap[T, TPtr]{
-		private: heapPrivate[T, TPtr]{
+func Make[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
+	equaler interfaces.Equaler[ELEMENT_PTR],
+	lessor interfaces.Lessor3[ELEMENT_PTR],
+	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+) *Heap[ELEMENT, ELEMENT_PTR] {
+	return &Heap[ELEMENT, ELEMENT_PTR]{
+		private: heapPrivate[ELEMENT, ELEMENT_PTR]{
 			equaler:  equaler,
 			Lessor:   lessor,
 			Resetter: resetter,
-			Elements: make([]TPtr, 0),
+			Elements: make([]ELEMENT_PTR, 0),
 		},
 	}
 }
 
-func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler[TPtr],
-	lessor interfaces.Lessor3[TPtr],
-	resetter interfaces.Resetter2[T, TPtr],
-	s []TPtr,
-) *Heap[T, TPtr] {
-	h := heapPrivate[T, TPtr]{
+func MakeHeapFromSliceUnsorted[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
+	equaler interfaces.Equaler[ELEMENT_PTR],
+	lessor interfaces.Lessor3[ELEMENT_PTR],
+	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	slice []ELEMENT_PTR,
+) *Heap[ELEMENT, ELEMENT_PTR] {
+	h := heapPrivate[ELEMENT, ELEMENT_PTR]{
 		Lessor:   lessor,
 		Resetter: resetter,
-		Elements: s,
+		Elements: slice,
 		equaler:  equaler,
 	}
 
 	sort.Sort(h)
 
-	return &Heap[T, TPtr]{
+	return &Heap[ELEMENT, ELEMENT_PTR]{
 		private: h,
 	}
 }
 
-func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
-	equaler interfaces.Equaler[TPtr],
-	lessor interfaces.Lessor3[TPtr],
-	resetter interfaces.Resetter2[T, TPtr],
-	s []TPtr,
-) *Heap[T, TPtr] {
-	h := heapPrivate[T, TPtr]{
+func MakeHeapFromSlice[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
+	equaler interfaces.Equaler[ELEMENT_PTR],
+	lessor interfaces.Lessor3[ELEMENT_PTR],
+	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	slice []ELEMENT_PTR,
+) *Heap[ELEMENT, ELEMENT_PTR] {
+	h := heapPrivate[ELEMENT, ELEMENT_PTR]{
 		Lessor:   lessor,
 		Resetter: resetter,
-		Elements: s,
+		Elements: slice,
 		equaler:  equaler,
 	}
 
-	return &Heap[T, TPtr]{
+	return &Heap[ELEMENT, ELEMENT_PTR]{
 		private: h,
 	}
 }

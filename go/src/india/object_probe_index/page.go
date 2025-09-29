@@ -327,6 +327,7 @@ func (page *page) Flush() (err error) {
 
 			return row, err
 		},
+		nil,
 		func(row *row) (err error) {
 			_, err = page.readFromRow(row, bufferedWriter)
 			return err
