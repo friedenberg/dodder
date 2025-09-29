@@ -1,25 +1,47 @@
 package object_probe_index
 
 import (
+	"bufio"
 	"io"
-	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
-func (page *page) makeSeqReadFromFile() interfaces.SeqError[*row] {
+func (page *page) compareRowForFlush(left, right *row) cmp.Result {
+	if (rowEqualerDigestOnly{}).Equals(left, right) {
+		return cmp.Equal
+	}
+
+	if cmp := cmp.Bytes(left.Digest.GetBytes(), right.Digest.GetBytes()); !cmp.Equal() {
+		return cmp
+	}
+
+	if cmp := cmp.Ordered(left.Page, right.Page); !cmp.Equal() {
+		return cmp
+	}
+
+	if cmp := cmp.Ordered(left.Offset, right.Offset); !cmp.Equal() {
+		return cmp
+	}
+
+	return cmp.Ordered(left.ContentLength, right.ContentLength)
+}
+
+func (page *page) makeSeqReadFromFile(
+	bufferedReader *bufio.Reader,
+) interfaces.SeqError[*row] {
 	return func(yield func(*row, error) bool) {
-		if page.file == nil {
+		if bufferedReader == nil {
 			return
 		}
 
 		var row row
 
 		for {
-			n, err := page.writeIntoRow(&row, &page.bufferedReader)
+			n, err := page.writeIntoRow(&row, bufferedReader)
 			if err != nil {
 				if err == io.EOF {
 					return
@@ -40,39 +62,14 @@ func (page *page) makeSeqReadFromFile() interfaces.SeqError[*row] {
 	}
 }
 
-func (page *page) FlushNew() (err error) {
-	page.Lock()
-	defer page.Unlock()
-
-	if page.added.Len() == 0 {
-		return err
-	}
-
-	if page.file != nil {
-		if err = page.seekAndResetTo(0); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	var temporaryFile *os.File
-
-	if temporaryFile, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	defer errors.DeferredCloser(&err, temporaryFile)
-
-	bufferedWriter, repool := pool.GetBufferedWriter(temporaryFile)
-	defer repool()
-
-	defer errors.DeferredFlusher(&err, bufferedWriter)
-
-	seq := quiter.MergeSequences(
+func (page *page) flushNew(
+	bufferedReader *bufio.Reader,
+	bufferedWriter *bufio.Writer,
+) (err error) {
+	seq := quiter.MergeSeqLeft(
 		quiter.MakeSeqErrorFromSeq(page.added.All()),
-		page.makeSeqReadFromFile(),
-		page.compareRows,
+		page.makeSeqReadFromFile(bufferedReader),
+		page.compareRowForFlush,
 	)
 
 	for row, errIter := range seq {
@@ -85,21 +82,6 @@ func (page *page) FlushNew() (err error) {
 			err = errors.Wrap(errIter)
 			return err
 		}
-	}
-
-	if err = os.Rename(
-		temporaryFile.Name(),
-		page.id.Path(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	page.added.Reset()
-
-	if err = page.open(); err != nil {
-		err = errors.Wrap(err)
-		return err
 	}
 
 	return err

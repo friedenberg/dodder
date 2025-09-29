@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
@@ -232,16 +231,6 @@ func (page *page) seekAndResetTo(loc int64) (err error) {
 	return err
 }
 
-func (page *page) compareRows(left, right *row) cmp.Result {
-	if page.added.GetLessor().Less(left, right) {
-		return cmp.Less
-	} else if page.added.GetEqualer().Equals(left, right) {
-		return cmp.Equal
-	} else {
-		return cmp.Greater
-	}
-}
-
 func (page *page) PrintAll(env env_ui.Env) (err error) {
 	page.Lock()
 	defer page.Unlock()
@@ -299,9 +288,35 @@ func (page *page) Flush() (err error) {
 
 	defer errors.DeferredFlusher(&err, bufferedWriter)
 
+	if err = page.flushOld(&page.bufferedReader, bufferedWriter); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if err = os.Rename(
+		temporaryFile.Name(),
+		page.id.Path(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	page.added.Reset()
+
+	if err = page.open(); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func (page *page) flushOld(
+	bufferedReader *bufio.Reader,
+	bufferedWriter *bufio.Writer,
+) (err error) {
 	var current row
 
-	// TODO make iterator
 	getOne := func() (row *row, err error) {
 		if page.file == nil {
 			err = io.EOF
@@ -309,7 +324,7 @@ func (page *page) Flush() (err error) {
 		}
 
 		var n int64
-		n, err = page.writeIntoRow(&current, &page.bufferedReader)
+		n, err = page.writeIntoRow(&current, bufferedReader)
 		if err != nil {
 			if errors.IsEOF(err) {
 				// no-op
@@ -343,21 +358,6 @@ func (page *page) Flush() (err error) {
 			return err
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = os.Rename(
-		temporaryFile.Name(),
-		page.id.Path(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	page.added.Reset()
-
-	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

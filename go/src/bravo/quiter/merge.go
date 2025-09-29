@@ -8,7 +8,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 )
 
-func MergeSequences[
+// merges the two sorted sequences into a single output sequence. when `funcCmp`
+// yields cmp.Equal for two elements, the left element is yielded to the output
+// sequence.
+func MergeSeqLeft[
 	ELEMENT any,
 	ELEMENT_PTR interfaces.Ptr[ELEMENT],
 ](
