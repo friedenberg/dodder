@@ -3,6 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 	"code.linenisgreat.com/dodder/go/src/delta/heap"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -33,27 +34,26 @@ type (
 
 // TODO add buffered writer
 func MakeListTransacted() *ListTransacted {
-	h := heap.Make(
-		transactedEqualer{},
-		transactedLessorStable{},
+	heap := heap.MakeNew(
+		TransactedCompare,
 		transactedResetter{},
 	)
 
-	h.SetPool(GetTransactedPool())
+	heap.SetPool(GetTransactedPool())
 
-	return h
+	return heap
 }
 
 var ResetterList resetterList
 
 type resetterList struct{}
 
-func (resetterList) Reset(a *ListTransacted) {
-	a.Reset()
+func (resetterList) Reset(list *ListTransacted) {
+	list.Reset()
 }
 
-func (resetterList) ResetWith(a, b *ListTransacted) {
-	a.ResetWith(b)
+func (resetterList) ResetWith(left, right *ListTransacted) {
+	left.ResetWith(right)
 }
 
 func CollectList(
@@ -76,15 +76,17 @@ func CollectList(
 type ListCheckedOut = heap.Heap[CheckedOut, *CheckedOut]
 
 func MakeListCheckedOut() *ListCheckedOut {
-	h := heap.Make(
-		genericEqualer[*CheckedOut]{},
-		genericLessorStable[*CheckedOut]{},
+	heap := heap.MakeNew(
+		cmp.MakeFuncFromEqualerAndLessor3LessFirst(
+			genericEqualer[*CheckedOut]{},
+			genericLessorStable[*CheckedOut]{},
+		),
 		CheckedOutResetter,
 	)
 
-	h.SetPool(GetCheckedOutPool())
+	heap.SetPool(GetCheckedOutPool())
 
-	return h
+	return heap
 }
 
 var ResetterListCheckedOut resetterListCheckedOut
