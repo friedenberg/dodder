@@ -15,10 +15,10 @@ type ElementPtr[ELEMENT Element] interface {
 }
 
 type heapPrivate[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]] struct {
-	Lessor  interfaces.Lessor3[ELEMENT_PTR]
+	Lessor  interfaces.Lessor[ELEMENT_PTR]
 	equaler interfaces.Equaler[ELEMENT_PTR]
 
-	Resetter   interfaces.Resetter2[ELEMENT, ELEMENT_PTR]
+	Resetter   interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR]
 	Elements   []ELEMENT_PTR
 	lastPopped ELEMENT_PTR
 	pool       interfaces.Pool[ELEMENT, ELEMENT_PTR]

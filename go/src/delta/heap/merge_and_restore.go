@@ -3,7 +3,6 @@ package heap
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 )
 
 func MergeHeapAndRestore[
@@ -12,14 +11,12 @@ func MergeHeapAndRestore[
 ](
 	heap *Heap[ELEMENT, ELEMENT_PTR],
 	read func() (ELEMENT_PTR, error),
-	funcCmp cmp.Func[ELEMENT_PTR],
 	write interfaces.FuncIter[ELEMENT_PTR],
 ) (err error) {
 	if err = MergeStreamPreferringAdditionsAndRestore(
 		heap,
 		read,
 		write,
-		funcCmp,
 		heap.private.equaler,
 		heap.private.Lessor,
 		heap.private.Resetter,
@@ -57,10 +54,9 @@ func MergeStreamPreferringAdditionsAndRestore[
 	heapAdditions streamWithRestore[ELEMENT, ELEMENT_PTR],
 	readHistory func() (ELEMENT_PTR, error),
 	write interfaces.FuncIter[ELEMENT_PTR],
-	funcCmp cmp.Func[ELEMENT_PTR],
 	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	lessor interfaces.Lessor[ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 ) (err error) {
 	defer func() {
 		heapAdditions.restore()

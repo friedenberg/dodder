@@ -22,7 +22,7 @@ func AddClone[E any, EPtr interface {
 func AddClonePool[E any, EPtr interfaces.Ptr[E]](
 	s interfaces.AdderPtr[E, EPtr],
 	p interfaces.Pool[E, EPtr],
-	r interfaces.Resetter2[E, EPtr],
+	r interfaces.ResetterPtr[E, EPtr],
 	b EPtr,
 ) (err error) {
 	a := p.Get()
@@ -33,7 +33,7 @@ func AddClonePool[E any, EPtr interfaces.Ptr[E]](
 func AddOrReplaceIfGreater[T interface {
 	interfaces.Stringer
 	interfaces.ValueLike
-	interfaces.Lessor[T]
+	interfaces.Lessable[T]
 }](
 	c interfaces.MutableSetLike[T],
 	b T,

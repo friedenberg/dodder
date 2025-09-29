@@ -55,11 +55,11 @@ func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetEqualer() interfaces.Equaler[ELEMENT_
 	return heap.private.equaler
 }
 
-func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetLessor() interfaces.Lessor3[ELEMENT_PTR] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetLessor() interfaces.Lessor[ELEMENT_PTR] {
 	return heap.private.Lessor
 }
 
-func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetResetter() interfaces.Resetter2[ELEMENT, ELEMENT_PTR] {
+func (heap *Heap[ELEMENT, ELEMENT_PTR]) GetResetter() interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR] {
 	return heap.private.Resetter
 }
 

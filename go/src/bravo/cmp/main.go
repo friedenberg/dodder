@@ -43,7 +43,7 @@ func (result result) Greater() bool {
 
 func MakeFuncFromEqualerAndLessor3EqualFirst[ELEMENT any](
 	equaler interfaces.Equaler[ELEMENT],
-	lessor interfaces.Lessor3[ELEMENT],
+	lessor interfaces.Lessor[ELEMENT],
 ) func(ELEMENT, ELEMENT) Result {
 	return func(left, right ELEMENT) Result {
 		if equaler.Equals(left, right) {
@@ -58,7 +58,7 @@ func MakeFuncFromEqualerAndLessor3EqualFirst[ELEMENT any](
 
 func MakeFuncFromEqualerAndLessor3LessFirst[ELEMENT any](
 	equaler interfaces.Equaler[ELEMENT],
-	lessor interfaces.Lessor3[ELEMENT],
+	lessor interfaces.Lessor[ELEMENT],
 ) func(ELEMENT, ELEMENT) Result {
 	return func(left, right ELEMENT) Result {
 		if lessor.Less(left, right) {

@@ -137,7 +137,6 @@ func TestMergeAndRestore(t1 *testing.T) {
 	err := MergeHeapAndRestore(
 		sut,
 		otherStream.PopOrErrStopIteration,
-		nil,
 		func(v *values.Int) (err error) {
 			actual = append(actual, v)
 			return err

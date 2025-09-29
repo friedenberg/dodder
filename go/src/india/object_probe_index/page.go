@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
 	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
@@ -231,6 +232,16 @@ func (page *page) seekAndResetTo(loc int64) (err error) {
 	return err
 }
 
+func (page *page) compareRows(left, right *row) cmp.Result {
+	if page.added.GetLessor().Less(left, right) {
+		return cmp.Less
+	} else if page.added.GetEqualer().Equals(left, right) {
+		return cmp.Equal
+	} else {
+		return cmp.Greater
+	}
+}
+
 func (page *page) PrintAll(env env_ui.Env) (err error) {
 	page.Lock()
 	defer page.Unlock()
@@ -327,7 +338,6 @@ func (page *page) Flush() (err error) {
 
 			return row, err
 		},
-		nil,
 		func(row *row) (err error) {
 			_, err = page.readFromRow(row, bufferedWriter)
 			return err

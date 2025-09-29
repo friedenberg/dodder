@@ -72,7 +72,7 @@ type flagCommas[
 	SP SetterPolicy
 	interfaces.MutableSetPtrLike[T, TPtr]
 	pool     interfaces.Pool[T, TPtr]
-	resetter interfaces.Resetter2[T, TPtr]
+	resetter interfaces.ResetterPtr[T, TPtr]
 }
 
 func (f flagCommas[T, TPtr]) All() interfaces.Seq[T] {

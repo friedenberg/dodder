@@ -26,11 +26,11 @@ type ValuePtr[T any] interface {
 }
 
 // TODO-P2 remove
-type Lessor[T any] interface {
+type Lessable[T any] interface {
 	Less(T) bool
 }
 
-type Lessor3[T any] interface {
+type Lessor[T any] interface {
 	Less(T, T) bool
 }
 
@@ -39,7 +39,7 @@ type Equaler[T any] interface {
 	Equals(T, T) bool
 }
 
-type Resetter2[T any, TPtr Ptr[T]] interface {
+type ResetterPtr[T any, TPtr Ptr[T]] interface {
 	Reset(TPtr)
 	ResetWith(TPtr, TPtr)
 }
@@ -47,4 +47,22 @@ type Resetter2[T any, TPtr Ptr[T]] interface {
 type Resetter3[T any] interface {
 	Reset(T)
 	ResetWith(T, T)
+}
+
+type Equatable[T any] interface {
+	Equals(T) bool
+}
+
+type Resetable interface {
+	Reset()
+}
+
+type ResetableWithError interface {
+	Reset() error
+}
+
+type ResetablePtr[T any] interface {
+	Ptr[T]
+	ResetWith(T)
+	Reset()
 }

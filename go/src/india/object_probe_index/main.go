@@ -176,12 +176,12 @@ func (index *Index) PrintAll(env env_ui.Env) (err error) {
 }
 
 func (index *Index) Flush() (err error) {
-	wg := errors.MakeWaitGroupParallel()
+	waitGroup := errors.MakeWaitGroupParallel()
 
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
-		wg.Do(page.Flush)
+		waitGroup.Do(page.Flush)
 	}
 
-	return wg.GetError()
+	return waitGroup.GetError()
 }

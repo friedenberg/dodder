@@ -9,7 +9,7 @@ import (
 
 func MakeNew[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	funcCmp cmp.Func[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	return &Heap[ELEMENT, ELEMENT_PTR]{
 		private: heapPrivate[ELEMENT, ELEMENT_PTR]{
@@ -23,7 +23,7 @@ func MakeNew[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 
 func MakeNewHeapFromSliceUnsorted[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	funcCmp cmp.Func[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 	slice []ELEMENT_PTR,
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	heap := heapPrivate[ELEMENT, ELEMENT_PTR]{
@@ -42,7 +42,7 @@ func MakeNewHeapFromSliceUnsorted[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMEN
 
 func MakeNewHeapFromSlice[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	funcCmp cmp.Func[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 	slice []ELEMENT_PTR,
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	heap := heapPrivate[ELEMENT, ELEMENT_PTR]{

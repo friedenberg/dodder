@@ -34,7 +34,7 @@ type MutableSetLike[T any] interface {
 	Adder[T]
 	Del(T) error
 	DelKey(string) error
-	Resetter
+	Resetable
 }
 
 type TridexLike interface {

@@ -8,8 +8,8 @@ import (
 
 func Make[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	lessor interfaces.Lessor[ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	return &Heap[ELEMENT, ELEMENT_PTR]{
 		private: heapPrivate[ELEMENT, ELEMENT_PTR]{
@@ -23,8 +23,8 @@ func Make[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 
 func MakeHeapFromSliceUnsorted[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	lessor interfaces.Lessor[ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 	slice []ELEMENT_PTR,
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	h := heapPrivate[ELEMENT, ELEMENT_PTR]{
@@ -43,8 +43,8 @@ func MakeHeapFromSliceUnsorted[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]]
 
 func MakeHeapFromSlice[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
 	equaler interfaces.Equaler[ELEMENT_PTR],
-	lessor interfaces.Lessor3[ELEMENT_PTR],
-	resetter interfaces.Resetter2[ELEMENT, ELEMENT_PTR],
+	lessor interfaces.Lessor[ELEMENT_PTR],
+	resetter interfaces.ResetterPtr[ELEMENT, ELEMENT_PTR],
 	slice []ELEMENT_PTR,
 ) *Heap[ELEMENT, ELEMENT_PTR] {
 	h := heapPrivate[ELEMENT, ELEMENT_PTR]{

@@ -12,7 +12,7 @@ type pool[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]] struct {
 	reset func(SWIMMER_PTR)
 }
 
-func MakeWithResetable[SWIMMER any, SWIMMER_PTR interfaces.Resetable[SWIMMER]]() *pool[SWIMMER, SWIMMER_PTR] {
+func MakeWithResetable[SWIMMER any, SWIMMER_PTR interfaces.ResetablePtr[SWIMMER]]() *pool[SWIMMER, SWIMMER_PTR] {
 	return Make(nil, func(swimmer SWIMMER_PTR) {
 		swimmer.Reset()
 	})
