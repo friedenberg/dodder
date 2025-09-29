@@ -56,11 +56,3 @@ func (additions *pageAdditions) Reset() {
 func (additions *pageAdditions) All() interfaces.Seq[*sku.Transacted] {
 	return additions.objects.All()
 }
-
-func (additions *pageAdditions) AllError() interfaces.SeqError[*sku.Transacted] {
-	return additions.objects.AllError()
-}
-
-func (additions *pageAdditions) PopError() (*sku.Transacted, error) {
-	return additions.objects.PopError()
-}

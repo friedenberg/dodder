@@ -59,8 +59,8 @@ func TestMerge(t1 *testing.T) {
 	actual := make([]*values.Int, 0)
 
 	seq := quiter.MergeSequences(
-		sut.AllError(),
-		otherStream.AllError(),
+		quiter.MakeSeqErrorFromSeq(sut.All()),
+		quiter.MakeSeqErrorFromSeq(otherStream.All()),
 		func(left, right *values.Int) cmp.Result {
 			if left.Less(*right) {
 				return cmp.Less
