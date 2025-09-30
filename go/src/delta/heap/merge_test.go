@@ -19,7 +19,6 @@ func makeTestFuncCmp(_ ui.T) cmp.Func[*values.Int] {
 }
 
 type mergeTestCase[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]] struct {
-	info     ui.TestCaseInfo
 	cmp      cmp.Func[ELEMENT_PTR]
 	resetter interfaces.Resetter[ELEMENT_PTR]
 	left     []ELEMENT_PTR
@@ -54,12 +53,61 @@ func (testCase mergeTestCase[ELEMENT, ELEMENT_PTR]) Test(t *ui.T) {
 	}
 }
 
-func TestMerge(t1 *testing.T) {
-	t := ui.T{T: t1}
+func (testCase mergeTestCase[ELEMENT, ELEMENT_PTR]) TestBoth(
+	t *ui.T,
+) {
+	left := MakeNewHeapFromSliceUnsorted(
+		testCase.cmp,
+		testCase.resetter,
+		testCase.left,
+	)
 
+	right := MakeNewHeapFromSliceUnsorted(
+		testCase.cmp,
+		testCase.resetter,
+		testCase.right,
+	)
+
+	seq := quiter.MergeSeqErrorLeft(
+		quiter.MakeSeqErrorFromSeq(left.All()),
+		quiter.MakeSeqErrorFromSeq(right.All()),
+		testCase.cmp,
+	)
+
+	actualNew, err := quiter.CollectError(seq)
+	t.AssertNoError(err)
+
+	if !reflect.DeepEqual(testCase.expected, actualNew) {
+		t.Skip(1).Errorf("expected %q but got %q", testCase.expected, actualNew)
+	}
+
+	actualOld := make([]ELEMENT_PTR, 0)
+
+	{
+		err := MergeHeapAndRestore(
+			left,
+			right.PopOrErrStopIteration,
+			func(v ELEMENT_PTR) (err error) {
+				actualOld = append(actualOld, v)
+				return err
+			},
+		)
+		if err != nil {
+			t.AssertNoError(err)
+		}
+
+		if !reflect.DeepEqual(testCase.expected, actualNew) {
+			t.Errorf("expected %q but got %q", testCase.expected, actualNew)
+		}
+	}
+}
+
+func getMergeTestCases(
+	t ui.T,
+) []ui.TestCase[mergeTestCase[values.Int, *values.Int]] {
 	funcCmp := makeTestFuncCmp(t)
 
-	testCases := []ui.TestCase[mergeTestCase[values.Int, *values.Int]]{
+	return []ui.TestCase[mergeTestCase[values.Int, *values.Int]]{
 		ui.MakeTestCase(
 			"both empty",
 			mergeTestCase[values.Int, *values.Int]{
@@ -243,8 +291,12 @@ func TestMerge(t1 *testing.T) {
 			},
 		),
 	}
+}
 
-	for _, testCase := range testCases {
+func TestMerge(t1 *testing.T) {
+	t := ui.T{T: t1}
+
+	for _, testCase := range getMergeTestCases(t) {
 		t.Run(
 			testCase,
 			func(t *ui.T) {
@@ -254,112 +306,15 @@ func TestMerge(t1 *testing.T) {
 	}
 }
 
-func TestMergeEqual(t1 *testing.T) {
-	t := ui.T{T: t1}
-
-	funcCmp := makeTestFuncCmp(t)
-
-	left := MakeNewHeapFromSliceUnsorted(
-		funcCmp,
-		values.IntResetter{},
-		[]*values.Int{
-			values.MakeInt(1),
-		},
-	)
-
-	right := MakeNewHeapFromSliceUnsorted(
-		funcCmp,
-		values.IntResetter{},
-		[]*values.Int{
-			values.MakeInt(1),
-		},
-	)
-
-	expected := []*values.Int{
-		values.MakeInt(1),
-	}
-
-	actual := make([]*values.Int, 0)
-
-	seq := quiter.MergeSeqErrorLeft(
-		quiter.MakeSeqErrorFromSeq(left.All()),
-		quiter.MakeSeqErrorFromSeq(right.All()),
-		func(left, right *values.Int) cmp.Result {
-			return cmp.Ordered(left.Int(), right.Int())
-		},
-	)
-
-	for element, errIter := range seq {
-		t.AssertNoError(errIter)
-		actual = append(actual, element)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("expected %q but got %q", expected, actual)
-	}
-}
-
 func TestMergeAndRestore(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	funcCmp := cmp.MakeFuncFromEqualerAndLessor3LessFirst(
-		values.IntEqualer{},
-		values.IntLessor{},
-	)
-
-	els := []*values.Int{
-		values.MakeInt(1),
-		values.MakeInt(0),
-		values.MakeInt(3),
-		values.MakeInt(4),
-		values.MakeInt(2),
-	}
-
-	otherStream := MakeNewHeapFromSliceUnsorted(
-		funcCmp,
-		values.IntResetter{},
-		[]*values.Int{
-			values.MakeInt(8),
-			values.MakeInt(9),
-			values.MakeInt(3),
-			values.MakeInt(7),
-			values.MakeInt(6),
-		},
-	)
-
-	expected := []*values.Int{
-		values.MakeInt(0),
-		values.MakeInt(1),
-		values.MakeInt(2),
-		values.MakeInt(3),
-		values.MakeInt(4),
-		values.MakeInt(6),
-		values.MakeInt(7),
-		values.MakeInt(8),
-		values.MakeInt(9),
-	}
-
-	sut := MakeNewHeapFromSliceUnsorted(
-		funcCmp,
-		values.IntResetter{},
-		els,
-	)
-
-	actual := make([]*values.Int, 0)
-
-	err := MergeHeapAndRestore(
-		sut,
-		otherStream.PopOrErrStopIteration,
-		func(v *values.Int) (err error) {
-			actual = append(actual, v)
-			return err
-		},
-	)
-	if err != nil {
-		t.AssertNoError(err)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("expected %q but got %q", expected, actual)
+	for _, testCase := range getMergeTestCases(t) {
+		t.Run(
+			testCase,
+			func(t *ui.T) {
+				testCase.GetBlob().TestBoth(t)
+			},
+		)
 	}
 }

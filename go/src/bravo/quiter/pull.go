@@ -23,3 +23,14 @@ func PullError[ELEMENT any](
 ) (func() (ELEMENT, error, bool), func()) {
 	return iter.Pull2(seq)
 }
+
+func PullErrorWithoutOk[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]](
+	seq interfaces.SeqError[ELEMENT_PTR],
+) (func() (ELEMENT_PTR, error), func()) {
+	iter, stop := iter.Pull2(seq)
+
+	return func() (ELEMENT_PTR, error) {
+		element, err, _ := iter()
+		return element, err
+	}, stop
+}
