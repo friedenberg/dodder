@@ -267,42 +267,58 @@ func (page *page) Flush() (err error) {
 		return err
 	}
 
-	if page.file != nil {
-		if err = page.seekAndResetTo(0); err != nil {
+	var temporaryFile *os.File
+	var bufferedWriter *bufio.Writer
+
+	// create temporary file and buffered writer
+	{
+		if temporaryFile, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		defer errors.DeferredCloser(&err, temporaryFile)
+
+		var repool interfaces.FuncRepool
+		bufferedWriter, repool = pool.GetBufferedWriter(temporaryFile)
+		defer repool()
+
+		defer errors.DeferredFlusher(&err, bufferedWriter)
+	}
+
+	{
+		var bufferedReader *bufio.Reader
+
+		// move cursor to start of file if necessary
+		if page.file != nil {
+			if err = page.seekAndResetTo(0); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
+			bufferedReader = &page.bufferedReader
+		}
+
+		if err = page.flushOld(bufferedReader, bufferedWriter); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	var temporaryFile *os.File
+	// perform the atomic swap
+	{
+		if err = os.Rename(
+			temporaryFile.Name(),
+			page.id.Path(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 
-	if temporaryFile, err = page.envRepo.GetTempLocal().FileTemp(); err != nil {
-		err = errors.Wrap(err)
-		return err
+		page.added.Reset()
 	}
 
-	defer errors.DeferredCloser(&err, temporaryFile)
-
-	bufferedWriter, repool := pool.GetBufferedWriter(temporaryFile)
-	defer repool()
-
-	defer errors.DeferredFlusher(&err, bufferedWriter)
-
-	if err = page.flushOld(&page.bufferedReader, bufferedWriter); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = os.Rename(
-		temporaryFile.Name(),
-		page.id.Path(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	page.added.Reset()
-
+	// re-open the page for future reads
 	if err = page.open(); err != nil {
 		err = errors.Wrap(err)
 		return err
