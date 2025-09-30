@@ -247,7 +247,7 @@ func (page *page) PrintAll(env env_ui.Env) (err error) {
 	for {
 		var current row
 
-		if _, err = page.writeIntoRow(
+		if _, err = page.readRowFrom(
 			&current,
 			&page.bufferedReader,
 		); err != nil {
@@ -304,60 +304,6 @@ func (page *page) Flush() (err error) {
 	page.added.Reset()
 
 	if err = page.open(); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
-func (page *page) flushOld(
-	bufferedReader *bufio.Reader,
-	bufferedWriter *bufio.Writer,
-) (err error) {
-	var current row
-
-	getOne := func() (row *row, err error) {
-		if page.file == nil {
-			err = io.EOF
-			return row, err
-		}
-
-		var n int64
-		n, err = page.writeIntoRow(&current, bufferedReader)
-		if err != nil {
-			if errors.IsEOF(err) {
-				// no-op
-				// TODO why might this ever be the case
-			} else if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
-				err = io.EOF
-			}
-
-			err = errors.WrapExceptSentinel(err, io.EOF)
-			return row, err
-		}
-
-		row = &current
-
-		return row, err
-	}
-
-	if err = heap.MergeHeapAndRestore(
-		page.added,
-		func() (row *row, err error) {
-			row, err = getOne()
-
-			if errors.IsEOF(err) || row == nil {
-				err = errors.MakeErrStopIteration()
-			}
-
-			return row, err
-		},
-		func(row *row) (err error) {
-			_, err = page.readFromRow(row, bufferedWriter)
-			return err
-		},
-	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

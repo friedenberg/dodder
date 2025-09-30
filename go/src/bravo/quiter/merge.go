@@ -102,7 +102,9 @@ func MergeStreamPreferringLeft[
 				}
 			}
 
-			switch funcCmp(left.carry, right.carry) {
+			cmpResult := funcCmp(left.carry, right.carry)
+
+			switch cmpResult {
 			case cmp.Equal:
 				right.carry = nil
 				fallthrough

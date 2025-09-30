@@ -29,6 +29,10 @@ func (cursor *Cursor) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
+		if err == io.EOF {
+			err = io.ErrUnexpectedEOF
+		}
+
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -36,8 +40,10 @@ func (cursor *Cursor) ReadFrom(r io.Reader) (n int64, err error) {
 	n1, cursor.ContentLength, err = ReadFixedInt64(r)
 	n += int64(n1)
 
-	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+	if err == io.EOF {
+		return n, err
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return n, err
 	}
 

@@ -9,12 +9,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
-func (page *page) writeIntoRow(
+// TODO change to encoder
+func (page *page) readRowFrom(
 	row *row,
 	reader io.Reader,
 ) (n int64, err error) {
-	if n, err = row.ReadFromWithHashFormat(reader, page.hashType); err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+	n, err = row.ReadFromWithHashFormat(reader, page.hashType)
+
+	if err == io.EOF {
+		return n, err
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return n, err
 	}
 
@@ -26,12 +31,17 @@ func (page *page) writeIntoRow(
 	return n, err
 }
 
-func (page *page) readFromRow(
+// TODO change to encoder
+func (page *page) writeRowTo(
 	row *row,
 	writer io.Writer,
 ) (n int64, err error) {
-	if n, err = row.WriteTo(writer); err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+	n, err = row.WriteTo(writer)
+
+	if err == io.EOF {
+		err = nil
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return n, err
 	}
 
@@ -54,9 +64,11 @@ func (row *row) IsEmpty() bool {
 
 func (row *row) String() string {
 	return fmt.Sprintf(
-		"%s %s",
+		"%s %s %s %x",
 		&row.Loc,
-		row.Digest.StringWithFormat(),
+		row.Digest.GetPurpose(),
+		row.Digest.GetMarklFormat().GetMarklFormatId(),
+		row.Digest.GetBytes(),
 	)
 }
 
@@ -70,16 +82,20 @@ func (row *row) ReadFromWithHashFormat(
 	n1, err = markl.ReadFrom(reader, &row.Digest, hashFormat)
 	n += int64(n1)
 
-	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+	if err == io.EOF {
+		return n, err
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return n, err
 	}
 
 	n2, err = row.Loc.ReadFrom(reader)
 	n += int64(n2)
 
-	if err != nil {
-		err = errors.WrapExceptSentinel(err, io.EOF)
+	if err == io.EOF {
+		return n, err
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return n, err
 	}
 

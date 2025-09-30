@@ -61,3 +61,12 @@ func DerivedValues[E any, F any](
 
 	return out, err
 }
+
+func Chunk[T any](slice []T, chunkSize int) (chunks [][]T) {
+	for i := 0; i < len(slice); i += chunkSize {
+		end := min(i+chunkSize, len(slice))
+		chunks = append(chunks, slice[i:end])
+	}
+
+	return chunks
+}

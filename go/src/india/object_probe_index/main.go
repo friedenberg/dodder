@@ -19,7 +19,7 @@ const (
 
 type Index struct {
 	hashType markl.FormatHash
-	rowSize  int
+	rowWidth int
 	pages    [PageCount]page
 }
 
@@ -48,7 +48,7 @@ func (index *Index) initialize(
 	envRepo env_repo.Env,
 	dir string,
 ) (err error) {
-	index.rowSize = index.hashType.GetSize() + 1 + 8 + 8
+	index.rowWidth = index.hashType.GetSize() + 1 + 8 + 8
 
 	for pageIndex := range index.pages {
 		page := &index.pages[pageIndex]
@@ -57,7 +57,7 @@ func (index *Index) initialize(
 			envRepo,
 			page_id.PageIdFromPath(uint8(pageIndex), dir),
 			index.hashType,
-			index.rowSize,
+			index.rowWidth,
 		)
 	}
 
