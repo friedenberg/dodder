@@ -162,7 +162,7 @@ func (pageReader *streamPageReader) makeSeq(
 		)
 
 		{
-			seq := quiter.MergeSeqLeft(
+			seq := quiter.MergeSeqErrorLeft(
 				seqAddedHistory,
 				makeSeqObjectFromReader(pageReader.bufferedReader, query),
 				sku.TransactedCompare,
@@ -190,7 +190,7 @@ func (pageReader *streamPageReader) makeSeq(
 		)
 
 		{
-			seq := quiter.MergeSeqLeft(
+			seq := quiter.MergeSeqErrorLeft(
 				seqAddedLatest,
 				quiter.MakeSeqErrorEmpty[*sku.Transacted](),
 				sku.TransactedCompare,

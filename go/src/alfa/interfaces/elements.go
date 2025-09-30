@@ -44,7 +44,7 @@ type ResetterPtr[T any, TPtr Ptr[T]] interface {
 	ResetWith(TPtr, TPtr)
 }
 
-type Resetter3[T any] interface {
+type Resetter[T any] interface {
 	Reset(T)
 	ResetWith(T, T)
 }

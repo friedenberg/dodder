@@ -1,6 +1,7 @@
 package quiter
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
@@ -27,4 +28,19 @@ func MakeSeqErrorWithError[ELEMENT any](
 
 func MakeSeqErrorEmpty[ELEMENT any]() interfaces.SeqError[ELEMENT] {
 	return func(yield func(ELEMENT, error) bool) {}
+}
+
+func CollectError[ELEMENT any](
+	seq interfaces.SeqError[ELEMENT],
+) ([]ELEMENT, error) {
+	slice := make([]ELEMENT, 0)
+	for element, errIter := range seq {
+		if errIter != nil {
+			return slice, errors.Wrap(errIter)
+		}
+
+		slice = append(slice, element)
+	}
+
+	return slice, nil
 }

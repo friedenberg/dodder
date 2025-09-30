@@ -108,7 +108,7 @@ func (page *page) flushNew(
 	bufferedReader *bufio.Reader,
 	bufferedWriter *bufio.Writer,
 ) (err error) {
-	seq := quiter.MergeSeqLeft(
+	seq := quiter.MergeSeqErrorLeft(
 		quiter.MakeSeqErrorFromSeq(page.added.All()),
 		page.makeSeqReadFromFile(bufferedReader),
 		func(left, right *row) cmp.Result {

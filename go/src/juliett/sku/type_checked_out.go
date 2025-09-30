@@ -28,12 +28,12 @@ func cloneCheckedOut(co *CheckedOut) *CheckedOut {
 
 type objectFactoryCheckedOut struct {
 	interfaces.PoolValue[*CheckedOut]
-	interfaces.Resetter3[*CheckedOut]
+	interfaces.Resetter[*CheckedOut]
 }
 
 func (factory *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryCheckedOut {
-	if factory.Resetter3 == nil {
-		factory.Resetter3 = pool.BespokeResetter[*CheckedOut]{
+	if factory.Resetter == nil {
+		factory.Resetter = pool.BespokeResetter[*CheckedOut]{
 			FuncReset: func(e *CheckedOut) {
 				CheckedOutResetter.Reset(e)
 			},
