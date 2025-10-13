@@ -28,7 +28,6 @@ func init() {
 			),
 		},
 	})
-
 }
 
 type Last struct {

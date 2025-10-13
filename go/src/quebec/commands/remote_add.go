@@ -15,7 +15,6 @@ func init() {
 	utility.AddCmd(
 		"remote-add",
 		&RemoteAdd{})
-
 }
 
 type RemoteAdd struct {

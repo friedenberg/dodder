@@ -18,7 +18,6 @@ func init() {
 	utility.AddCmd(
 		"gen",
 		&Gen{})
-
 }
 
 func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {}

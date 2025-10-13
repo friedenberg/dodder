@@ -19,7 +19,6 @@ func init() {
 		&Edit{
 			CheckoutMode: checkout_mode.MetadataOnly,
 		})
-
 }
 
 type Edit struct {

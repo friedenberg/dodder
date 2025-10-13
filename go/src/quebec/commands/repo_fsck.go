@@ -16,7 +16,6 @@ func init() {
 	utility.AddCmd(
 		"repo-fsck",
 		&RepoFsck{})
-
 }
 
 type RepoFsck struct {

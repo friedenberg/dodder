@@ -21,7 +21,6 @@ func init() {
 	utility.AddCmd(
 		"fsck",
 		&Fsck{})
-
 }
 
 // TODO add options to verify blobs, type formats, tags

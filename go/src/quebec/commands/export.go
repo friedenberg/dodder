@@ -25,7 +25,6 @@ func init() {
 		&Export{
 			CompressionType: compression_type.CompressionTypeEmpty,
 		})
-
 }
 
 type Export struct {

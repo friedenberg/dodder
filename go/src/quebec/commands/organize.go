@@ -29,7 +29,6 @@ func init() {
 		&Organize{
 			Flags: organize_text.MakeFlags(),
 		})
-
 }
 
 // Refactor and fold components into userops

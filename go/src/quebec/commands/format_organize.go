@@ -22,7 +22,6 @@ func init() {
 		&FormatOrganize{
 			Flags: organize_text.MakeFlags(),
 		})
-
 }
 
 type FormatOrganize struct {

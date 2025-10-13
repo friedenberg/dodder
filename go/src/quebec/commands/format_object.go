@@ -23,7 +23,6 @@ func init() {
 		&FormatObject{
 			CheckoutMode: checkout_mode.BlobOnly,
 		})
-
 }
 
 type FormatObject struct {

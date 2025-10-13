@@ -24,7 +24,6 @@ func init() {
 			),
 		},
 	})
-
 }
 
 type Show struct {

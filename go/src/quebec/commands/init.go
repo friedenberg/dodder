@@ -16,7 +16,6 @@ func init() {
 			BigBang: bigBang,
 		},
 	})
-
 }
 
 type Init struct {
