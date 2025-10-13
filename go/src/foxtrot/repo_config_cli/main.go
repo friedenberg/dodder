@@ -38,7 +38,7 @@ func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
 
 // TODO add support for all flags
 // TODO move to store_config
-func (config *Config) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (config *Config) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
 
 	cli.FlagSetVarWithCompletion(

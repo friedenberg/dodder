@@ -40,6 +40,7 @@ func makeTestingWithBigBang(
 	envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
 		t.Context,
 		dirTemp,
+		env_dir.XDGUtilityNameDodder,
 		debug.Options{},
 	)
 

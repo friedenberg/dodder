@@ -12,7 +12,7 @@ import (
 )
 
 type Request struct {
-	Util string
+	Utility Utility
 
 	interfaces.Context
 	repo_config_cli.Config
@@ -39,24 +39,6 @@ type Args struct {
 	argi int
 
 	consumed []consumedArg
-}
-
-func MakeRequest(
-	util string,
-	ctx interfaces.Context,
-	config repo_config_cli.Config,
-	flagSet *flags.FlagSet,
-) Request {
-	return Request{
-		Util:    util,
-		Context: ctx,
-		Config:  config,
-		FlagSet: flagSet,
-		Args: &Args{
-			Context: ctx,
-			args:    flagSet.Args(),
-		},
-	}
 }
 
 func (req *Args) PeekArgs() []string {

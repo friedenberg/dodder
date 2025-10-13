@@ -5,15 +5,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("reindex", &Reindex{})
+	utility.AddCmd("reindex", &Reindex{})
 }
 
 type Reindex struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 func (cmd Reindex) Run(req command.Request) {

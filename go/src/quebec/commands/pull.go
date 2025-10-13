@@ -7,22 +7,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("pull", &Pull{})
+	utility.AddCmd("pull", &Pull{})
 }
 
 type Pull struct {
-	command_components.LocalWorkingCopy
-	command_components.RemoteTransfer
-	command_components.Query
+	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.RemoteTransfer
+	command_components_dodder.Query
 }
 
 var _ interfaces.CommandComponentWriter = (*Pull)(nil)
 
-func (cmd *Pull) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *Pull) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.RemoteTransfer.SetFlagDefinitions(f)
 	cmd.Query.SetFlagDefinitions(f)
 	cmd.LocalWorkingCopy.SetFlagDefinitions(f)

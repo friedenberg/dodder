@@ -368,13 +368,13 @@ func ContextCancelWithErrorf(
 	ctx.Cancel(WrapSkip(1, fmt.Errorf(format, values...)))
 }
 
-func ContextCancelWithBadRequestError(ctx interfaces.Context, err error) {
+func ContextCancelWithBadRequestError(ctx interfaces.ActiveContext, err error) {
 	defer ContextContinueOrPanic(ctx)
 	ctx.Cancel(BadRequest(err))
 }
 
 func ContextCancelWithBadRequestf(
-	ctx interfaces.Context,
+	ctx interfaces.ActiveContext,
 	format string,
 	values ...any,
 ) {

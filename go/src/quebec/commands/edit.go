@@ -9,32 +9,32 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"edit",
 		&Edit{
 			CheckoutMode: checkout_mode.MetadataOnly,
-		},
-	)
+		})
+
 }
 
 type Edit struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	// TODO-P3 add force
-	command_components.Checkout
+	command_components_dodder.Checkout
 	CheckoutMode checkout_mode.Mode
 }
 
 var _ interfaces.CommandComponentWriter = (*Edit)(nil)
 
-func (cmd *Edit) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Edit) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(flagSet)
 
 	cmd.Checkout.SetFlagDefinitions(flagSet)

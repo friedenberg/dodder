@@ -33,7 +33,7 @@ type Proto struct {
 
 var _ interfaces.CommandComponentWriter = (*Proto)(nil)
 
-func (pz *Proto) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (pz *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	pz.Metadata.SetFlagDefinitions(f)
 }
 

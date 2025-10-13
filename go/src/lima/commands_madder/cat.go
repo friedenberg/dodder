@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-cat", &Cat{})
+	utility.AddCmd("cat", &Cat{})
 }
 
 type Cat struct {
@@ -34,7 +34,7 @@ type Cat struct {
 var _ interfaces.CommandComponentWriter = (*Cat)(nil)
 
 func (cmd *Cat) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.Var(&cmd.Utility, "utility", "")
 	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")

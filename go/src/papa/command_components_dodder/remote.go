@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cli"
@@ -35,7 +35,7 @@ type Remote struct {
 var _ interfaces.CommandComponentWriter = (*Remote)(nil)
 
 func (cmd *Remote) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	// TODO remove and replace with repo builtin type options
 	cli.FlagSetVarWithCompletion(

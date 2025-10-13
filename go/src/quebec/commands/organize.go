@@ -19,25 +19,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"organize",
 		&Organize{
 			Flags: organize_text.MakeFlags(),
-		},
-	)
+		})
+
 }
 
 // Refactor and fold components into userops
 type Organize struct {
-	command_components.LocalWorkingCopy
-	command_components.Query
+	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.Query
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	organize_text.Flags
 	Mode organize_text_mode.Mode
@@ -47,7 +47,7 @@ type Organize struct {
 
 var _ interfaces.CommandComponentWriter = (*Organize)(nil)
 
-func (c *Organize) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (c *Organize) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	c.Query.SetFlagDefinitions(f)
 
 	c.Flags.SetFlagDefinitions(f)

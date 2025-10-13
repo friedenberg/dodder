@@ -16,23 +16,24 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register("last", &Last{
+	utility.AddCmd("last", &Last{
 		Format: local_working_copy.FormatFlag{
 			DefaultFormatter: local_working_copy.GetFormatFuncConstructorEntry(
 				"log",
 			),
 		},
 	})
+
 }
 
 type Last struct {
-	command_components.InventoryLists
-	command_components.LocalWorkingCopy
+	command_components_dodder.InventoryLists
+	command_components_dodder.LocalWorkingCopy
 	command_components_madder.EnvRepo
 
 	RepoId   ids.RepoId
@@ -44,7 +45,7 @@ type Last struct {
 var _ interfaces.CommandComponentWriter = (*Last)(nil)
 
 func (cmd *Last) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 

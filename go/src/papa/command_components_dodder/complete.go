@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -83,7 +83,7 @@ func (cmd Complete) GetFlagValueMetadataType(
 
 func (cmd Complete) SetFlagsProto(
 	proto *sku.Proto,
-	flagSet interfaces.CommandLineFlagDefinitions, descriptionUsage string,
+	flagSet interfaces.CLIFlagDefinitions, descriptionUsage string,
 	tagUsage string,
 	typeUsage string,
 ) {

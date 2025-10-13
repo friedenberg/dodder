@@ -13,10 +13,7 @@ import (
 )
 
 func init() {
-	command.Register(
-		"blob_store-sync",
-		&Sync{},
-	)
+	utility.AddCmd("sync", &Sync{})
 }
 
 type Sync struct {
@@ -29,7 +26,7 @@ type Sync struct {
 var _ interfaces.CommandComponentWriter = (*Sync)(nil)
 
 func (cmd *Sync) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.IntVar(
 		&cmd.Limit,

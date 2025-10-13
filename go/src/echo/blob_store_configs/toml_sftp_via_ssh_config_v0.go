@@ -16,7 +16,7 @@ func (TomlSFTPViaSSHConfigV0) GetBlobStoreType() string {
 }
 
 func (config *TomlSFTPViaSSHConfigV0) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	config.TomlUriV0.SetFlagDefinitions(flagSet)
 }

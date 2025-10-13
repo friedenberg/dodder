@@ -12,28 +12,28 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"format-organize",
 		&FormatOrganize{
 			Flags: organize_text.MakeFlags(),
-		},
-	)
+		})
+
 }
 
 type FormatOrganize struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
 	Flags organize_text.Flags
 }
 
 var _ interfaces.CommandComponentWriter = (*FormatOrganize)(nil)
 
-func (cmd *FormatOrganize) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *FormatOrganize) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.Flags.SetFlagDefinitions(f)
 }
 

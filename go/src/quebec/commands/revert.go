@@ -10,22 +10,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/mike/store"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("revert", &Revert{})
+	utility.AddCmd("revert", &Revert{})
 }
 
 type Revert struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
 	Last bool
 }
 
 var _ interfaces.CommandComponentWriter = (*Revert)(nil)
 
-func (md *Revert) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (md *Revert) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	md.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 	f.BoolVar(&md.Last, "last", false, "revert the last changes")
 }

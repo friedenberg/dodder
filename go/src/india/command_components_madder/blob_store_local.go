@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
@@ -15,7 +16,7 @@ type BlobStoreLocal struct{}
 var _ interfaces.CommandComponentWriter = (*BlobStoreLocal)(nil)
 
 func (cmd *BlobStoreLocal) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 }
 
@@ -25,17 +26,18 @@ type BlobStoreWithEnv struct {
 }
 
 func (cmd BlobStoreLocal) MakeBlobStoreLocal(
-	context interfaces.Context,
+	req command.Request,
 	config repo_config_cli.Config,
 	envOptions env_ui.Options,
 ) BlobStoreWithEnv {
 	dir := env_dir.MakeDefault(
-		context,
+		req,
+		req.Utility.GetName(),
 		config.Debug,
 	)
 
 	ui := env_ui.Make(
-		context,
+		req,
 		config,
 		envOptions,
 	)
@@ -53,7 +55,7 @@ func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 			env_local.Make(ui, dir),
 			layoutOptions,
 		); err != nil {
-			context.Cancel(err)
+			req.Cancel(err)
 		}
 	}
 

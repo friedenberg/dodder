@@ -13,22 +13,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("deinit", &Deinit{})
+	utility.AddCmd("deinit", &Deinit{})
 }
 
 type Deinit struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
 	Force bool
 }
 
 var _ interfaces.CommandComponentWriter = (*Deinit)(nil)
 
-func (cmd *Deinit) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *Deinit) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Force,
 		"force",

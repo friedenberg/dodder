@@ -10,22 +10,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"checkin-blob",
 		&CheckinBlob{
 			NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
 				collections_ptr.SetterPolicyAppend,
 			),
-		},
-	)
+		})
 }
 
 type CheckinBlob struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
 	Delete  bool
 	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
@@ -33,9 +32,16 @@ type CheckinBlob struct {
 
 var _ interfaces.CommandComponentWriter = (*CheckinBlob)(nil)
 
-func (cmd *CheckinBlob) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
-	f.BoolVar(&cmd.Delete, "delete", false, "the checked-out file")
-	f.Var(
+func (cmd *CheckinBlob) SetFlagDefinitions(
+	flagDefinitions interfaces.CLIFlagDefinitions,
+) {
+	flagDefinitions.BoolVar(
+		&cmd.Delete,
+		"delete",
+		false,
+		"the checked-out file",
+	)
+	flagDefinitions.Var(
 		cmd.NewTags,
 		"new-tags",
 		"comma-separated tags (will replace existing tags)",

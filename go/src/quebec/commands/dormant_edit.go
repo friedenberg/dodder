@@ -15,16 +15,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register("dormant-edit", &DormantEdit{})
+	utility.AddCmd("dormant-edit", &DormantEdit{})
 }
 
 type DormantEdit struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 func (cmd DormantEdit) Run(req command.Request) {

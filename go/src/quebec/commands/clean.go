@@ -12,16 +12,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register("clean", &Clean{})
+	utility.AddCmd("clean", &Clean{})
 }
 
 type Clean struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
 	force                    bool
 	includeRecognizedBlobs   bool
@@ -32,7 +32,7 @@ type Clean struct {
 
 var _ interfaces.CommandComponentWriter = (*Clean)(nil)
 
-func (c *Clean) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (c *Clean) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	c.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 
 	f.BoolVar(

@@ -12,7 +12,7 @@ type Options struct {
 
 var _ interfaces.CommandComponentWriter = (*Options)(nil)
 
-func (options *Options) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (options *Options) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	flagSet.Func(
 		"merge-tool",
 		"utility to launch for merge conflict resolution",

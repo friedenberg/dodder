@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -19,7 +19,9 @@ type Genesis struct {
 
 var _ interfaces.CommandComponentWriter = (*Genesis)(nil)
 
-func (cmd *Genesis) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Genesis) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 	cmd.BigBang.SetFlagDefinitions(flagSet)
 }
 
@@ -43,6 +45,7 @@ func (cmd Genesis) OnTheFirstDay(
 
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
+		env_dir.XDGUtilityNameDodder,
 		req.Config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)

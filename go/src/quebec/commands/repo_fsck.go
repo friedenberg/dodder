@@ -9,18 +9,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"repo-fsck",
-		&RepoFsck{},
-	)
+		&RepoFsck{})
+
 }
 
 type RepoFsck struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 	command_components_madder.EnvRepo
 	command_components_madder.BlobStore
 }

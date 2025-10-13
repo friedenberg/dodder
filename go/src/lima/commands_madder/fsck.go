@@ -13,10 +13,7 @@ import (
 )
 
 func init() {
-	command.Register(
-		"blob_store-fsck",
-		&Fsck{},
-	)
+	utility.AddCmd("fsck", &Fsck{})
 }
 
 type Fsck struct {

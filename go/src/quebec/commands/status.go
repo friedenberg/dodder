@@ -8,15 +8,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("status", &Status{})
+	utility.AddCmd("status", &Status{})
 }
 
 type Status struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 }
 
 func (cmd Status) Run(req command.Request) {

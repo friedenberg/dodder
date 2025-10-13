@@ -4,15 +4,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("dormant-remove", &DormantRemove{})
+	utility.AddCmd("dormant-remove", &DormantRemove{})
 }
 
 type DormantRemove struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 func (cmd DormantRemove) Run(dep command.Request) {

@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"

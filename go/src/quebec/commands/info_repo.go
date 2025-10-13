@@ -16,7 +16,7 @@ import (
 
 func init() {
 	// TODO rename to repo-info
-	command.Register("info-repo", &InfoRepo{})
+	utility.AddCmd("info-repo", &InfoRepo{})
 }
 
 type InfoRepo struct {

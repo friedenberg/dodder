@@ -82,7 +82,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 	}
 }
 
-func (o *Flags) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (o *Flags) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
 
 	f.Var(

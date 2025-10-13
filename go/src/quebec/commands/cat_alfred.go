@@ -13,24 +13,30 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/alfred_sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("cat-alfred", &CatAlfred{})
+	utility.AddCmd("cat-alfred", &CatAlfred{})
 }
 
 type CatAlfred struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
 	genres.Genre
 }
 
 var _ interfaces.CommandComponentWriter = (*CatAlfred)(nil)
 
-func (cmd *CatAlfred) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
-	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
-	f.Var(&cmd.Genre, "genre", "extract this element from all matching objects")
+func (cmd *CatAlfred) SetFlagDefinitions(
+	flagDefinitions interfaces.CLIFlagDefinitions,
+) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(flagDefinitions)
+	flagDefinitions.Var(
+		&cmd.Genre,
+		"genre",
+		"extract this element from all matching objects",
+	)
 }
 
 func (c CatAlfred) CompletionGenres() ids.Genre {

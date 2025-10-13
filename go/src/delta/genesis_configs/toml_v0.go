@@ -34,7 +34,7 @@ var _ ConfigPublic = &V0Public{}
 var _ interfaces.CommandComponentWriter = (*V0Private)(nil)
 
 func (config *V0Common) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	panic(errors.Err405MethodNotAllowed)
 }
@@ -84,7 +84,7 @@ func (config *V0Common) GetAgeEncryption() *markl_age_id.Id {
 	return &markl_age_id.Id{}
 }
 
-func (config *V0Common) GetBlobCompression() interfaces.CommandLineIOWrapper {
+func (config *V0Common) GetBlobCompression() interfaces.CLIFlagIOWrapper {
 	return &config.CompressionType
 }
 

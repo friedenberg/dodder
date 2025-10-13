@@ -222,7 +222,7 @@ func makeFlagSetFuncBoolVar(valuePtr **bool) func(value string) (err error) {
 	}
 }
 
-func (overlay *Overlay) AddToFlags(flagSet interfaces.CommandLineFlagDefinitions) {
+func (overlay *Overlay) AddToFlags(flagSet interfaces.CLIFlagDefinitions) {
 	flagSet.Func(
 		"print-types",
 		"",

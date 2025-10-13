@@ -32,7 +32,7 @@ type TomlV2Public struct {
 var _ ConfigPublic = &TomlV2Public{}
 
 func (config *TomlV2Common) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 }
 

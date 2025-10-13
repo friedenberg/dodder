@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
 
+// TODO move to command_components
 type EnvRepo struct{}
 
 func (cmd EnvRepo) MakeEnvRepo(
@@ -16,6 +17,7 @@ func (cmd EnvRepo) MakeEnvRepo(
 ) env_repo.Env {
 	dir := env_dir.MakeDefault(
 		req,
+		env_dir.XDGUtilityNameDodder,
 		req.Config.Debug,
 	)
 

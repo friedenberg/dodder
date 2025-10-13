@@ -8,26 +8,25 @@ import (
 )
 
 func init() {
-	command.Register(
-		"blob_store-list",
-		&List{},
-	)
+	utility.AddCmd("list", &List{})
 }
 
 type List struct {
-	command_components_madder.EnvRepo
+	command_components_madder.EnvBlobStore
 }
 
 var _ interfaces.CommandComponentWriter = (*List)(nil)
 
-func (cmd *List) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *List) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 }
 
 func (cmd List) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
+	envRepo := cmd.MakeEnvBlobStore(req)
 	blobStoresAll := envRepo.GetBlobStores()
 
 	for _, blobStore := range blobStoresAll {
-		ui.Out().Printf("%s", blobStore.Name)
+		ui.Out().Printf("%#v", blobStore)
 	}
 }

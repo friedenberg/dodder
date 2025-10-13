@@ -3,15 +3,15 @@ package commands
 import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("find-missing", &FindMissing{})
+	utility.AddCmd("find-missing", &FindMissing{})
 }
 
 type FindMissing struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 func (cmd FindMissing) Run(dep command.Request) {

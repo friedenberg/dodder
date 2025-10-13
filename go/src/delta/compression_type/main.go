@@ -37,14 +37,23 @@ type CompressionType string
 
 var _ interfaces.CommandComponentWriter = (*CompressionType)(nil)
 
-func (compressionType *CompressionType) GetBlobCompression() interfaces.CommandLineIOWrapper {
+func (compressionType *CompressionType) GetBlobCompression() interfaces.CLIFlagIOWrapper {
 	return compressionType
 }
 
 func (compressionType *CompressionType) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagDefinitions interfaces.CLIFlagDefinitions,
 ) {
-	flagSet.Var(compressionType, "compression-type", "")
+	flagDefinitions.Var(compressionType, "compression-type", "")
+}
+
+func (compressionType CompressionType) GetCLICompletion() map[string]string {
+	return map[string]string{
+		CompressionTypeNone.String(): "",
+		CompressionTypeGzip.String(): "",
+		CompressionTypeZlib.String(): "",
+		CompressionTypeZstd.String(): "",
+	}
 }
 
 func (compressionType CompressionType) String() string {

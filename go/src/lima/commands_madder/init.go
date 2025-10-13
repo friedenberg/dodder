@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-init", &Init{
+	utility.AddCmd("init", &Init{
 		tipe: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
 		blobStoreConfig: &blob_store_configs.TomlV1{
 			CompressionType:   compression_type.CompressionTypeDefault,
@@ -24,14 +24,14 @@ func init() {
 		},
 	})
 
-	command.Register("blob_store-init-sftp-explicit", &Init{
+	utility.AddCmd("init-sftp-explicit", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigSftpExplicitV0,
 		).Type,
 		blobStoreConfig: &blob_store_configs.TomlSFTPV0{},
 	})
 
-	command.Register("blob_store-init-sftp-ssh_config", &Init{
+	utility.AddCmd("init-sftp-ssh_config", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigSftpViaSSHConfigV0,
 		).Type,
@@ -43,15 +43,15 @@ type Init struct {
 	tipe            ids.Type
 	blobStoreConfig blob_store_configs.ConfigMutable
 
-	command_components_madder.EnvRepo
+	command_components_madder.EnvBlobStore
 }
 
 var _ interfaces.CommandComponentWriter = (*Init)(nil)
 
 func (cmd *Init) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagDefinitions interfaces.CLIFlagDefinitions,
 ) {
-	cmd.blobStoreConfig.SetFlagDefinitions(flagSet)
+	cmd.blobStoreConfig.SetFlagDefinitions(flagDefinitions)
 }
 
 func (cmd *Init) Run(req command.Request) {
@@ -64,7 +64,7 @@ func (cmd *Init) Run(req command.Request) {
 
 	req.AssertNoMoreArgs()
 
-	env := cmd.MakeEnvRepo(req, false)
+	env := cmd.MakeEnvBlobStore(req)
 
 	blobStoreCount := len(env.GetBlobStores())
 

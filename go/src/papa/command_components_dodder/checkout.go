@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 
@@ -10,7 +10,7 @@ type Checkout struct {
 
 var _ interfaces.CommandComponentWriter = (*Checkout)(nil)
 
-func (c *Checkout) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (c *Checkout) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	f.BoolVar(
 		&c.Delete,
 		"delete",

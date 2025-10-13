@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"io"
@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/india/command_components"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -23,7 +22,6 @@ func init() {
 
 type Complete struct {
 	command_components.Env
-	command_components_dodder.Complete
 
 	bashStyle  bool
 	inProgress string

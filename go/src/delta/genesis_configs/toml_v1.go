@@ -33,7 +33,7 @@ type TomlV1Public struct {
 var _ ConfigPublic = &TomlV1Public{}
 
 func (config *TomlV1Common) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		config.BlobStore.SetFlagDefinitions(flagSet)

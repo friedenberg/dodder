@@ -24,7 +24,7 @@ func (*TomlSFTPV0) GetBlobStoreType() string {
 }
 
 func (blobStoreConfig *TomlSFTPV0) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.StringVar(
 		&blobStoreConfig.Host,

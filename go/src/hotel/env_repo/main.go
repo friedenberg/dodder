@@ -29,26 +29,18 @@ const (
 )
 
 type directoryLayout interface {
-	interfaces.DirectoryLayout
+	interfaces.RepoDirectoryLayout
 	initDirectoryLayout(xdg.XDG) error
 }
 
 type Env struct {
-	env_local.Env
-
 	config genesis_configs.TypedConfigPrivate
 
 	lockSmith interfaces.LockSmith
 
 	directoryLayout
 
-	blobStoreDefaultIndex int
-
-	// TODO switch to implementing LocalBlobStore directly and writing to all of
-	// the defined blob stores instead of having a default
-	// TODO switch to primary blob store and others, and add support for v10
-	// directory layout
-	blobStores []blob_stores.BlobStoreInitialized
+	BlobStoreEnv
 }
 
 func Make(
@@ -139,19 +131,14 @@ func Make(
 	}
 
 	if configLoaded {
-		env.setupStores()
+		env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(
+			envLocal,
+			env.directoryLayout,
+			env.GetConfigPrivate().Blob,
+		)
 	}
 
 	return env, err
-}
-
-func (env *Env) setupStores() {
-	env.blobStores = blob_stores.MakeBlobStores(
-		env,
-		env,
-		env.GetConfigPrivate().Blob,
-		env.directoryLayout,
-	)
 }
 
 func (env Env) GetEnv() env_ui.Env {
@@ -216,20 +203,6 @@ func (env Env) GetStoreVersion() store_version.Version {
 	} else {
 		return env.config.Blob.GetStoreVersion()
 	}
-}
-
-func (env Env) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
-	if len(env.blobStores) == 0 {
-		panic("calling GetDefaultBlobStore without any initialized blob stores")
-	}
-
-	return env.blobStores[env.blobStoreDefaultIndex]
-}
-
-func (env Env) GetBlobStores() []blob_stores.BlobStoreInitialized {
-	blobStores := make([]blob_stores.BlobStoreInitialized, len(env.blobStores))
-	copy(blobStores, env.blobStores)
-	return blobStores
 }
 
 func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {

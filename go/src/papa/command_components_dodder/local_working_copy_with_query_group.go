@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -14,7 +14,7 @@ type LocalWorkingCopyWithQueryGroup struct {
 
 var _ interfaces.CommandComponentWriter = (*LocalWorkingCopyWithQueryGroup)(nil)
 
-func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(f)
 	cmd.Query.SetFlagDefinitions(f)
 }

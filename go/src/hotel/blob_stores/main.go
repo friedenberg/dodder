@@ -34,11 +34,11 @@ type BlobStoreInitialized struct {
 }
 
 // TODO pass in custom UI context for printing
-func MakeBlobStores(
+func MakeBlobStoresFromRepoConfig(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,
 	config genesis_configs.ConfigPrivate,
-	directoryLayout interfaces.DirectoryLayout,
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
 ) (blobStores []BlobStoreInitialized) {
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
@@ -75,6 +75,63 @@ func MakeBlobStores(
 			} else {
 				blobStores[i].Config = typedConfig
 			}
+		}
+	}
+
+	for i, blobStore := range blobStores {
+		var err error
+
+		// TODO use sha of config to determine blob store base path
+		if blobStores[i].BlobStore, err = MakeBlobStore(
+			ctx,
+			blobStore.BlobStoreConfigNamed,
+			envDir.GetTempLocal(),
+		); err != nil {
+			ctx.Cancel(err)
+			return blobStores
+		}
+	}
+
+	return blobStores
+}
+
+func MakeBlobStores(
+	ctx interfaces.ActiveContext,
+	envDir env_dir.Env,
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+) (blobStores []BlobStoreInitialized) {
+	var configPaths []string
+
+	{
+		var err error
+
+		if configPaths, err = files.DirNames(
+			filepath.Join(directoryLayout.DirBlobStoreConfigs()),
+		); err != nil {
+			if errors.IsNotExist(err) {
+				return blobStores
+			} else {
+				ctx.Cancel(err)
+				// no-op
+				return blobStores
+			}
+		}
+	}
+
+	blobStores = make([]BlobStoreInitialized, len(configPaths))
+
+	for i, configPath := range configPaths {
+		blobStores[i].Name = fd.FileNameSansExt(configPath)
+		blobStores[i].BasePath = directoryLayout.DirBlobStores(strconv.Itoa(i))
+
+		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
+			blob_store_configs.Coder,
+			configPath,
+		); err != nil {
+			ctx.Cancel(err)
+			return blobStores
+		} else {
+			blobStores[i].Config = typedConfig
 		}
 	}
 

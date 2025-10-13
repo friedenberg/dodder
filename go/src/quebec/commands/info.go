@@ -21,17 +21,20 @@ type Info struct{}
 var _ interfaces.CommandComponentWriter = (*Info)(nil)
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"info",
-		&Info{},
-	)
+		&Info{})
 }
 
-func (cmd Info) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {}
+func (cmd Info) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
+}
 
 func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(
 		req,
+		env_dir.XDGUtilityNameDodder,
 		req.Debug,
 	)
 

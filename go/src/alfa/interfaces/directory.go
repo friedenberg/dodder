@@ -1,14 +1,18 @@
 package interfaces
 
-type DirectoryLayout interface {
+type BlobStoreDirectoryLayout interface {
+	DirFirstBlobStoreBlobs() string
+	DirBlobStoreConfigs(p ...string) string
+	DirBlobStores(p ...string) string
+}
+
+type RepoDirectoryLayout interface {
+	BlobStoreDirectoryLayout
+
 	Dir(p ...string) string
 	DirDodder(p ...string) string
 
-	DirFirstBlobStoreBlobs() string
 	DirFirstBlobStoreInventoryLists() string
-
-	DirBlobStoreConfigs(p ...string) string
-	DirBlobStores(p ...string) string
 
 	// TODO rename Cache to Index
 	DirCache(p ...string) string
@@ -32,6 +36,6 @@ type DirectoryLayout interface {
 }
 
 type Directory interface {
-	DirectoryLayout
+	RepoDirectoryLayout
 	Delete(...string) error
 }

@@ -53,6 +53,7 @@ func (transacted *Transacted) AssertObjectDigestAndObjectSigNotNull() (err error
 	return err
 }
 
+// TODO extract into a versioned object finalizer
 // calculates the object digests using the object's repo pubkey
 func (transacted *Transacted) FinalizeUsingObject() (err error) {
 	if err = markl.AssertIdIsNotNull(

@@ -14,25 +14,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"fsck",
-		&Fsck{},
-	)
+		&Fsck{})
+
 }
 
 // TODO add options to verify blobs, type formats, tags
 type Fsck struct {
-	command_components.LocalWorkingCopy
-	command_components.Query
+	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.Query
 }
 
 var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
 
-func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 }
 

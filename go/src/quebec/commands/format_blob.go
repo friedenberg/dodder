@@ -16,17 +16,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("format-blob", &FormatBlob{})
+	utility.AddCmd("format-blob", &FormatBlob{})
 }
 
 type FormatBlob struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	Stdin    bool
 	UTIGroup string
@@ -34,7 +34,7 @@ type FormatBlob struct {
 
 var _ interfaces.CommandComponentWriter = (*FormatBlob)(nil)
 
-func (cmd *FormatBlob) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *FormatBlob) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Stdin,
 		"stdin",

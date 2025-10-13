@@ -85,7 +85,11 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.writeFile(env.FileConfigMutable(), "")
 	env.writeFile(env.FileCacheDormant(), "")
 
-	env.setupStores()
+	env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(
+		env.Env,
+		env.directoryLayout,
+		env.GetConfigPrivate().Blob,
+	)
 }
 
 func (env Env) writeInventoryListLog() {

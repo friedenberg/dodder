@@ -7,15 +7,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("peek-zettel-ids", &PeekZettelIds{})
+	utility.AddCmd("peek-zettel-ids", &PeekZettelIds{})
 }
 
 type PeekZettelIds struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 func (cmd PeekZettelIds) Run(req command.Request) {

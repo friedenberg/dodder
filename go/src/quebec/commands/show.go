@@ -13,26 +13,27 @@ import (
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("show", &Show{
+	utility.AddCmd("show", &Show{
 		Format: local_working_copy.FormatFlag{
 			DefaultFormatter: local_working_copy.GetFormatFuncConstructorEntry(
 				"log",
 			),
 		},
 	})
+
 }
 
 type Show struct {
 	command_components_madder.EnvRepo
-	command_components.LocalWorkingCopy
-	command_components.Query
-	command_components.RemoteTransfer
+	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.Query
+	command_components_dodder.RemoteTransfer
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	After      ids.Tai
 	Before     ids.Tai
@@ -42,7 +43,7 @@ type Show struct {
 
 var _ interfaces.CommandComponentWriter = (*Show)(nil)
 
-func (cmd *Show) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Show) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 	cmd.Query.SetFlagDefinitions(flagSet)
 

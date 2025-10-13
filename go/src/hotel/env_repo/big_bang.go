@@ -36,7 +36,7 @@ func (bigBang *BigBang) SetDefaults() {
 }
 
 // TODO switch to flagset wrapper that enforces non-empty descriptions
-func (bigBang *BigBang) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (bigBang *BigBang) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	flagSet.Var(
 		&bigBang.InventoryListType,
 		"inventory_list-type",

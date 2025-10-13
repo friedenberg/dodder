@@ -1,35 +1,14 @@
-package cmd
+package command
 
 import (
 	"fmt"
-	"os"
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/quebec/commands"
 )
-
-func Run(util string) {
-	utilWithExtension := extendNameIfNecessary(util)
-	ctx := errors.MakeContextDefault()
-
-	ctx.SetCancelOnSignals(
-		syscall.SIGTERM,
-		syscall.SIGINT,
-		syscall.SIGHUP,
-	)
-
-	if err := ctx.Run(
-		func(ctx interfaces.Context) {
-			commands.Run(util, ctx, os.Args...)
-		},
-	); err != nil {
-		os.Exit(handleMainErrors(ctx, utilWithExtension, err))
-	}
-}
 
 func extendNameIfNecessary(name string) string {
 	if name == "dodder" {

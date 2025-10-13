@@ -14,13 +14,14 @@ type FlagValue interface {
 	StringerSetter
 }
 
-type CommandLineIOWrapper interface {
+type CLIFlagIOWrapper interface {
 	FlagValue
 	IOWrapper
 }
 
 // TODO rename to CLIFlagDefinitions
-type CommandLineFlagDefinitions interface {
+// TODO add completion options
+type CLIFlagDefinitions interface {
 	BoolVar(variable *bool, name string, defaultValue bool, usage string)
 	StringVar(variable *string, name string, defaultValue string, usage string)
 	Var(value FlagValue, name string, usage string)
@@ -29,5 +30,5 @@ type CommandLineFlagDefinitions interface {
 }
 
 type CommandComponentWriter interface {
-	SetFlagDefinitions(CommandLineFlagDefinitions)
+	SetFlagDefinitions(CLIFlagDefinitions)
 }

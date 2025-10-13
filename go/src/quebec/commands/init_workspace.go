@@ -12,22 +12,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/india/command_components"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"init-workspace",
-		&InitWorkspace{},
-	)
+		&InitWorkspace{})
 }
 
 type InitWorkspace struct {
 	command_components.Env
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	DefaultQueryGroup values.String
 	Proto             sku.Proto
@@ -35,7 +35,9 @@ type InitWorkspace struct {
 
 var _ interfaces.CommandComponentWriter = (*InitWorkspace)(nil)
 
-func (cmd *InitWorkspace) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *InitWorkspace) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 	// TODO add command.Completer variants of tags, type, and query flags
 

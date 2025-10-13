@@ -19,7 +19,7 @@ type FlagValueWithCompetion interface {
 }
 
 func FlagSetVarWithCompletion(
-	flagSet interfaces.CommandLineFlagDefinitions, value FlagValueWithCompetion,
+	flagSet interfaces.CLIFlagDefinitions, value FlagValueWithCompetion,
 	key string,
 ) {
 	flagSet.Var(

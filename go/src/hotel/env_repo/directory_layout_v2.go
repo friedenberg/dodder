@@ -19,7 +19,7 @@ func (layout *directoryLayoutV2) initDirectoryLayout(
 	return err
 }
 
-func (layout directoryLayoutV2) GetDirectoryPaths() interfaces.DirectoryLayout {
+func (layout directoryLayoutV2) GetDirectoryPaths() interfaces.RepoDirectoryLayout {
 	return layout
 }
 

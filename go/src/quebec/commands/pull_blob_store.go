@@ -11,21 +11,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("pull-blob-store", &PullBlobStore{})
+	utility.AddCmd("pull-blob-store", &PullBlobStore{})
 }
 
 type PullBlobStore struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 	command_components_madder.BlobStore
 }
 
 var _ interfaces.CommandComponentWriter = (*PullBlobStore)(nil)
 
-func (cmd *PullBlobStore) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *PullBlobStore) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 }
 

@@ -19,7 +19,7 @@ type OptionsWithoutMode struct {
 var _ interfaces.CommandComponentWriter = (*Options)(nil)
 
 func (c *Options) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 	flagSet.BoolVar(

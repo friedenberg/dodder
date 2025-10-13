@@ -1,20 +1,23 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
+	"code.linenisgreat.com/dodder/go/src/india/command_components"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 type LocalWorkingCopy struct {
-	Env
+	command_components.Env
 }
 
 var _ interfaces.CommandComponentWriter = (*LocalWorkingCopy)(nil)
 
-func (cmd *LocalWorkingCopy) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *LocalWorkingCopy) SetFlagDefinitions(
+	f interfaces.CLIFlagDefinitions,
+) {
 }
 
 func (cmd LocalWorkingCopy) MakeLocalWorkingCopy(

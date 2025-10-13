@@ -16,8 +16,7 @@ import (
 )
 
 func init() {
-	command.Register("write-blob", &Write{})
-	command.Register("blob_store-write", &Write{})
+	utility.AddCmd("write", &Write{})
 }
 
 type Write struct {
@@ -31,7 +30,7 @@ type Write struct {
 var _ interfaces.CommandComponentWriter = (*Write)(nil)
 
 func (cmd *Write) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.BoolVar(
 		&cmd.Check,

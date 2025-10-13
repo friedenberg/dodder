@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
@@ -20,20 +20,20 @@ func init() {
 		Proto: sku.MakeProto(nil),
 	}
 
-	command.Register("checkin", cmd)
-	command.Register("add", cmd)
-	command.Register("save", cmd)
+	utility.AddCmd("checkin", cmd)
+	utility.AddCmd("add", cmd)
+	utility.AddCmd("save", cmd)
 }
 
 type Checkin struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	IgnoreBlob bool
 	Proto      sku.Proto
 
-	command_components.Checkout
+	command_components_dodder.Checkout
 
 	CheckoutBlobAndRun string
 	OpenBlob           bool
@@ -41,7 +41,9 @@ type Checkin struct {
 
 var _ interfaces.CommandComponentWriter = (*Checkin)(nil)
 
-func (cmd *Checkin) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Checkin) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(flagSet)
 
 	flagSet.BoolVar(

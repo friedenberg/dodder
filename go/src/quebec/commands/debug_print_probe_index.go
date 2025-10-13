@@ -5,21 +5,21 @@ package commands
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 type DebugPrintProbeIndex struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 }
 
 var _ interfaces.CommandComponentWriter = (*DebugPrintProbeIndex)(nil)
 
 func init() {
-	command.Register("debug-print-probe-index", &DebugPrintProbeIndex{})
+	utility.AddCmd("debug-print-probe-index", &DebugPrintProbeIndex{})
 }
 
 func (*DebugPrintProbeIndex) SetFlagDefinitions(
-	interfaces.CommandLineFlagDefinitions,
+	interfaces.CLIFlagDefinitions,
 ) {
 }
 

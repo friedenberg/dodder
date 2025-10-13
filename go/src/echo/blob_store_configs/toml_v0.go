@@ -24,7 +24,7 @@ func (TomlV0) GetBlobStoreType() string {
 }
 
 func (blobStoreConfig *TomlV0) SetFlagDefinitions(
-	flagSet interfaces.CommandLineFlagDefinitions,
+	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	blobStoreConfig.CompressionType.SetFlagDefinitions(flagSet)
 

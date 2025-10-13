@@ -13,22 +13,22 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 // TODO switch to registerCommandWithExternalQuery
 func init() {
-	command.Register("diff", &Diff{})
+	utility.AddCmd("diff", &Diff{})
 }
 
 type Diff struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 }
 
 var _ interfaces.CommandComponentWriter = (*Diff)(nil)
 
-func (cmd *Diff) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *Diff) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 }
 

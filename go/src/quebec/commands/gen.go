@@ -15,13 +15,13 @@ type Gen struct{}
 var _ interfaces.CommandComponentWriter = (*Gen)(nil)
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"gen",
-		&Gen{},
-	)
+		&Gen{})
+
 }
 
-func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {}
+func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {}
 
 func (cmd Gen) Run(req command.Request) {
 	envUI := env_ui.Make(

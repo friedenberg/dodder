@@ -1,4 +1,4 @@
-package commands
+package commands_madder
 
 import (
 	"encoding/json"
@@ -13,10 +13,10 @@ import (
 )
 
 func init() {
-	command.Register("read-blob", &ReadBlob{})
+	utility.AddCmd("read", &Read{})
 }
 
-type ReadBlob struct {
+type Read struct {
 	command_components_madder.EnvRepo
 }
 
@@ -24,19 +24,19 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(dep command.Request) {
-	repoLayout := c.MakeEnvRepo(dep, false)
+func (cmd Read) Run(dep command.Request) {
+	envRepo := cmd.MakeEnvRepo(dep, false)
 
-	dec := json.NewDecoder(repoLayout.GetInFile())
+	decoder := json.NewDecoder(envRepo.GetInFile())
 
 	for {
 		var entry readBlobEntry
 
-		if err := dec.Decode(&entry); err != nil {
+		if err := decoder.Decode(&entry); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				repoLayout.Cancel(err)
+				envRepo.Cancel(err)
 			}
 
 			return
@@ -45,14 +45,14 @@ func (c ReadBlob) Run(dep command.Request) {
 		{
 			var err error
 
-			if _, err = c.readOneBlob(repoLayout, entry); err != nil {
-				repoLayout.Cancel(err)
+			if _, err = cmd.readOneBlob(envRepo, entry); err != nil {
+				envRepo.Cancel(err)
 			}
 		}
 	}
 }
 
-func (ReadBlob) readOneBlob(
+func (Read) readOneBlob(
 	envRepo env_repo.Env,
 	entry readBlobEntry,
 ) (digest interfaces.MarklId, err error) {

@@ -16,6 +16,7 @@ import (
 
 func MakeDefault(
 	context interfaces.Context,
+	utilityName string,
 	debugOptions debug.Options,
 ) env {
 	var home string
@@ -28,11 +29,19 @@ func MakeDefault(
 		}
 	}
 
-	return MakeWithHome(context, home, debugOptions, true, true)
+	return MakeWithHome(
+		context,
+		home,
+		utilityName,
+		debugOptions,
+		true,
+		true,
+	)
 }
 
 func MakeDefaultNoInit(
 	context interfaces.Context,
+	utilityName string,
 	debugOptions debug.Options,
 ) env {
 	var home string
@@ -45,7 +54,14 @@ func MakeDefaultNoInit(
 		}
 	}
 
-	return MakeWithHome(context, home, debugOptions, true, false)
+	return MakeWithHome(
+		context,
+		home,
+		utilityName,
+		debugOptions,
+		true,
+		false,
+	)
 }
 
 func MakeFromXDGDotenvPath(
@@ -84,6 +100,7 @@ func MakeFromXDGDotenvPath(
 
 func MakeDefaultAndInitialize(
 	context interfaces.Context,
+	utilityName string,
 	do debug.Options,
 	overrideXDGWithCwd bool,
 ) env {
@@ -111,6 +128,7 @@ func MakeDefaultAndInitialize(
 		return MakeWithXDGRootOverrideHomeAndInitialize(
 			context,
 			cwd,
+			utilityName,
 			do,
 		)
 	} else {
@@ -125,6 +143,7 @@ func MakeDefaultAndInitialize(
 func MakeWithHome(
 	context interfaces.Context,
 	home string,
+	utilityName string,
 	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
 	initialize bool,
@@ -143,7 +162,7 @@ func MakeWithHome(
 		return env
 	}
 
-	addedPath := XDGUtilityName
+	addedPath := utilityName
 
 	if addedPathOverride := os.Getenv(EnvXDGUtilityNameOverride); addedPathOverride != "" {
 		addedPath = addedPathOverride
@@ -175,11 +194,10 @@ func MakeWithHome(
 func MakeWithXDGRootOverrideHomeAndInitialize(
 	context interfaces.Context,
 	xdgRootOverride string,
+	utilityName string,
 	debugOptions debug.Options,
 ) (env env) {
 	env.Context = context
-
-	utilityName := XDGUtilityName
 
 	if utilityNameOverride := os.Getenv(EnvXDGUtilityNameOverride); utilityNameOverride != "" {
 		utilityName = utilityNameOverride

@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	command.Register("blob_store-cat-ids", &CatIds{})
+	utility.AddCmd("cat-ids", &CatIds{})
 }
 
 type CatIds struct {

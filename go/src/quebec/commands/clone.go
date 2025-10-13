@@ -7,34 +7,35 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"clone",
 		&Clone{
-			Genesis: command_components.Genesis{
+			Genesis: command_components_dodder.Genesis{
 				BigBang: env_repo.BigBang{
 					ExcludeDefaultType: true,
 				},
 			},
-		},
-	)
+		})
 }
 
 type Clone struct {
-	command_components.Genesis
-	command_components.RemoteTransfer
-	command_components.Query
+	command_components_dodder.Genesis
+	command_components_dodder.RemoteTransfer
+	command_components_dodder.Query
 }
 
 var _ interfaces.CommandComponentWriter = (*Clone)(nil)
 
-func (cmd *Clone) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
-	cmd.Genesis.SetFlagDefinitions(flagSet)
-	cmd.RemoteTransfer.SetFlagDefinitions(flagSet)
-	cmd.Query.SetFlagDefinitions(flagSet)
+func (cmd *Clone) SetFlagDefinitions(
+	flagDefinitions interfaces.CLIFlagDefinitions,
+) {
+	cmd.Genesis.SetFlagDefinitions(flagDefinitions)
+	cmd.RemoteTransfer.SetFlagDefinitions(flagDefinitions)
+	cmd.Query.SetFlagDefinitions(flagDefinitions)
 }
 
 func (cmd Clone) Run(req command.Request) {

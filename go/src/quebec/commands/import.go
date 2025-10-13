@@ -15,15 +15,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register("import", &Import{})
+	utility.AddCmd("import", &Import{})
 }
 
 type Import struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 	command_components_madder.BlobStore
 
 	repo.ImporterOptions
@@ -34,7 +34,7 @@ type Import struct {
 var _ interfaces.CommandComponentWriter = (*Import)(nil)
 
 func (cmd *Import) SetFlagDefinitions(
-	flagDefinitions interfaces.CommandLineFlagDefinitions,
+	flagDefinitions interfaces.CLIFlagDefinitions,
 ) {
 	cmd.ImporterOptions.SetFlagDefinitions(flagDefinitions)
 	cmd.Proto.SetFlagDefinitions(flagDefinitions)

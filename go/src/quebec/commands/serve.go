@@ -8,27 +8,30 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/india/command_components"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/oscar/remote_http"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"tailscale.com/client/local"
 )
 
 func init() {
-	command.Register("serve", &Serve{})
+	utility.AddCmd("serve", &Serve{})
 }
 
 type Serve struct {
 	command_components.Env
 	command_components_madder.EnvRepo
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
 	TailscaleTLS bool
 }
 
 var _ interfaces.CommandComponentWriter = (*Serve)(nil)
 
-func (cmd *Serve) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Serve) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
 
 	flags.BoolVar(

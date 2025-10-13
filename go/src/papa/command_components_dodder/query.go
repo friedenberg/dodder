@@ -1,4 +1,4 @@
-package command_components
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -15,7 +15,7 @@ type Query struct {
 
 var _ interfaces.CommandComponentWriter = (*Query)(nil)
 
-func (cmd *Query) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *Query) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	// TODO switch to repo
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 	flagSet.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")

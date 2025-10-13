@@ -7,29 +7,29 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 // TODO switch to using compound command pattern from blob_store_init.go
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"remote-add",
-		&RemoteAdd{},
-	)
+		&RemoteAdd{})
+
 }
 
 type RemoteAdd struct {
-	command_components.LocalWorkingCopy
-	command_components.RemoteTransfer
+	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.RemoteTransfer
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	proto sku.Proto
 }
 
 var _ interfaces.CommandComponentWriter = (*RemoteAdd)(nil)
 
-func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	cmd.RemoteTransfer.SetFlagDefinitions(flagSet)
 
 	flagSet.Var(

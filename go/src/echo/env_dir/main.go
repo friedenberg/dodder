@@ -16,7 +16,7 @@ const (
 	EnvDir                    = "DIR_DODDER" // TODO chang to dodder-prefixed
 	EnvBin                    = "BIN_DODDER" // TODO change to dodder-prefixed
 	EnvXDGUtilityNameOverride = "DODDER_XDG_UTILITY_OVERRIDE"
-	XDGUtilityName            = "dodder"
+	XDGUtilityNameDodder      = "dodder"
 )
 
 type Env interface {

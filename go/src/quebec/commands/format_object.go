@@ -14,30 +14,31 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"format-object",
 		&FormatObject{
 			CheckoutMode: checkout_mode.BlobOnly,
-		},
-	)
+		})
+
 }
 
 type FormatObject struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
 	CheckoutMode checkout_mode.Mode // add test that says this is unused for stdin
 	Stdin        bool               // switch to using `-`
 	ids.RepoId
 	UTIGroup string
+	// TODO add lockfile override option
 }
 
 var _ interfaces.CommandComponentWriter = (*FormatObject)(nil)
 
-func (cmd *FormatObject) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *FormatObject) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	f.BoolVar(
 		&cmd.Stdin,
 		"stdin",

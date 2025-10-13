@@ -13,23 +13,23 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/lima/store_fs"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
 
 func init() {
-	command.Register("new", &New{})
+	utility.AddCmd("new", &New{})
 }
 
 type New struct {
-	command_components.LocalWorkingCopy
+	command_components_dodder.LocalWorkingCopy
 
-	complete command_components.Complete
+	complete command_components_dodder.Complete
 
 	ids.RepoId
 	Count int
 	// TODO combine organize and edit and refactor
-	command_components.Checkout
+	command_components_dodder.Checkout
 	PrintOnly bool
 	Filter    script_value.ScriptValue
 	Shas      bool
@@ -39,7 +39,7 @@ type New struct {
 
 var _ interfaces.CommandComponentWriter = (*New)(nil)
 
-func (cmd *New) SetFlagDefinitions(flagSet interfaces.CommandLineFlagDefinitions) {
+func (cmd *New) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	flagSet.Var(&cmd.RepoId, "kasten", "none or Browser")
 
 	flagSet.BoolVar(

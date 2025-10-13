@@ -16,20 +16,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/query"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
-	command.Register(
+	utility.AddCmd(
 		"export",
 		&Export{
 			CompressionType: compression_type.CompressionTypeEmpty,
-		},
-	)
+		})
+
 }
 
 type Export struct {
-	command_components.LocalWorkingCopyWithQueryGroup
+	command_components_dodder.LocalWorkingCopyWithQueryGroup
 
 	AgeIdentity     age.Identity
 	CompressionType compression_type.CompressionType
@@ -37,7 +37,7 @@ type Export struct {
 
 var _ interfaces.CommandComponentWriter = (*Export)(nil)
 
-func (cmd *Export) SetFlagDefinitions(f interfaces.CommandLineFlagDefinitions) {
+func (cmd *Export) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
 
 	f.Var(&cmd.AgeIdentity, "age-identity", "")
