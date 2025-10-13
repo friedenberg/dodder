@@ -1,7 +1,12 @@
 package main
 
-import "code.linenisgreat.com/dodder/go/src/romeo/cmd"
+import (
+	"os"
+
+	"code.linenisgreat.com/dodder/go/src/quebec/commands"
+)
 
 func main() {
-	cmd.Run("dodder")
+	utility := commands.GetUtility("dodder")
+	utility.Run(os.Args)
 }

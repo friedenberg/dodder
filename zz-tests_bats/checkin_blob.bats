@@ -61,7 +61,7 @@ function checkin_blob_filepath { # @test
 	assert_output "$(cat "$expected")"
 }
 
-function checkin_blob_sha { # @test
+function checkin_blob_digest { # @test
 	expected="$(mktemp)"
 	{
 		echo ---
@@ -85,7 +85,7 @@ function checkin_blob_sha { # @test
 	assert_output "$(cat "$expected")"
 
 	# when
-	run_dodder write-blob <(echo the body but new)
+	run_dodder blob_store-write <(echo the body but new)
 	assert_success
 	assert_output --regexp - <<-EOM
 		blake2b256-2qwngrkkpcptsnphu6jcyrwmtpyxux0hmsg4pjfpsn0tr7yt732sgk5lza

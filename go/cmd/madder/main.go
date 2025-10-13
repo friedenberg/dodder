@@ -1,7 +1,12 @@
 package main
 
-import "code.linenisgreat.com/dodder/go/src/romeo/cmd"
+import (
+	"os"
+
+	"code.linenisgreat.com/dodder/go/src/lima/commands_madder"
+)
 
 func main() {
-	cmd.Run("madder")
+	utility := commands_madder.GetUtility()
+	utility.Run(os.Args)
 }

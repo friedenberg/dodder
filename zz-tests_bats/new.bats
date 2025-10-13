@@ -66,8 +66,8 @@ function can_duplicate_zettel_content { # @test
 	assert_output "$(cat "$expected")"
 }
 
-function use_blob_shas { # @test
-	run_dodder write-blob - <<-EOM
+function use_blob_digests { # @test
+	run_dodder blob_store-write - <<-EOM
 		  the blob
 	EOM
 	assert_success
@@ -79,21 +79,21 @@ function use_blob_shas { # @test
 		[two/uno @blake2b256-t9kaw07x3c89sft5axwjhe8z76p6d2642qr5xc62j5a4zq49pmvqypsla0 !md]
 	EOM
 
-	the_blob2_sha="blake2b256-65lys7dm4vfkag9y5j2hqhnah45qnc0kqvpdc46dw2cw63974a5q40q7xg"
-	run_dodder write-blob - <<-EOM
+	the_blob2_digest="blake2b256-65lys7dm4vfkag9y5j2hqhnah45qnc0kqvpdc46dw2cw63974a5q40q7xg"
+	run_dodder blob_store-write - <<-EOM
 		  the blob2
 	EOM
 	assert_success
-	assert_output "$the_blob2_sha - (checked in)"
+	assert_output "$the_blob2_digest - (checked in)"
 
-	run_dodder new -edit=false -shas -type txt "$the_blob2_sha"
+	run_dodder new -edit=false -shas -type txt "$the_blob2_digest"
 	assert_success
 	assert_output - <<-EOM
 		[!txt !toml-type-v1]
-		[one/tres @$the_blob2_sha !txt]
+		[one/tres @$the_blob2_digest !txt]
 	EOM
 
-	run_dodder_stderr_unified new -edit=false -shas "$the_blob2_sha"
+	run_dodder_stderr_unified new -edit=false -shas "$the_blob2_digest"
 	assert_success
 	assert_output --partial - <<-EOM
 		blake2b256-65lys7dm4vfkag9y5j2hqhnah45qnc0kqvpdc46dw2cw63974a5q40q7xg appears in object already checked in (["one/tres"]). Ignoring

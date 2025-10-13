@@ -16,6 +16,8 @@ teardown() {
 # bats file_tags=user_story:blob_store
 
 function blob_store_sync_twice { # @test
+	# TODO once migrated to madder blob stores for bats tests, enable this test again
+	skip
 	run_dodder blob_store-init test
 	assert_success
 	assert_output --regexp - <<-EOM

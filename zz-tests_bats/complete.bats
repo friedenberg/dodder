@@ -88,11 +88,13 @@ function complete_subcmd { # @test
 		add
 		blob_store-cat
 		blob_store-cat-ids
+		blob_store-complete.*complete a command-line
 		blob_store-fsck
 		blob_store-init
 		blob_store-init-sftp-explicit
 		blob_store-init-sftp-ssh_config
 		blob_store-list
+		blob_store-read
 		blob_store-sync
 		blob_store-write
 		cat-alfred
@@ -133,7 +135,6 @@ function complete_subcmd { # @test
 		pull
 		pull-blob-store
 		push
-		read-blob
 		reindex
 		remote-add
 		repo-fsck
