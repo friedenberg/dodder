@@ -1,9 +1,6 @@
 package commands_madder
 
 import (
-	"fmt"
-	"path/filepath"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
@@ -11,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
@@ -42,8 +38,10 @@ func init() {
 type Init struct {
 	tipe            ids.Type
 	blobStoreConfig blob_store_configs.ConfigMutable
+	basePath        string
 
 	command_components_madder.EnvBlobStore
+	command_components_madder.Init
 }
 
 var _ interfaces.CommandComponentWriter = (*Init)(nil)
@@ -55,7 +53,6 @@ func (cmd *Init) SetFlagDefinitions(
 }
 
 func (cmd *Init) Run(req command.Request) {
-	// TODO validate no space
 	var blobStoreName ids.Tag
 
 	if err := blobStoreName.Set(req.PopArg("blob store name")); err != nil {
@@ -64,37 +61,17 @@ func (cmd *Init) Run(req command.Request) {
 
 	req.AssertNoMoreArgs()
 
-	env := cmd.MakeEnvBlobStore(req)
+	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	blobStoreCount := len(env.GetBlobStores())
-
-	dir := env.DirBlobStoreConfigs()
-
-	if err := env.MakeDir(dir); err != nil {
-		env.Cancel(err)
-		return
-	}
-
-	pathConfig := filepath.Join(
-		dir,
-		fmt.Sprintf("%d-%s.%s",
-			blobStoreCount,
-			blobStoreName,
-			env_repo.FileNameBlobStoreConfig,
-		),
-	)
-
-	if err := triple_hyphen_io.EncodeToFile(
-		blob_store_configs.Coder,
+	pathConfig := cmd.InitBlobStore(
+		req,
+		envBlobStore,
+		blobStoreName.String(),
 		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
 			Type: cmd.tipe,
 			Blob: cmd.blobStoreConfig,
 		},
-		pathConfig,
-	); err != nil {
-		env.Cancel(err)
-		return
-	}
+	)
 
-	env.GetUI().Printf("Wrote config to %s", pathConfig)
+	envBlobStore.GetUI().Printf("Wrote config to %s", pathConfig)
 }

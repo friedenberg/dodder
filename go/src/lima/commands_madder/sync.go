@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -17,7 +18,7 @@ func init() {
 }
 
 type Sync struct {
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 	command_components_madder.BlobStore
 
 	Limit int

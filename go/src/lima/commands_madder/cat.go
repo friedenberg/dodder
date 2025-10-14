@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -22,7 +23,7 @@ func init() {
 }
 
 type Cat struct {
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 	command_components_madder.BlobStore
 
 	BlobStoreIndexOrConfigPath string

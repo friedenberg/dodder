@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -13,7 +14,7 @@ func init() {
 }
 
 type CatIds struct {
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 	command_components_madder.BlobStore
 }
 

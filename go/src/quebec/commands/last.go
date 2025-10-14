@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -33,7 +32,7 @@ func init() {
 type Last struct {
 	command_components_dodder.InventoryLists
 	command_components_dodder.LocalWorkingCopy
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 
 	RepoId   ids.RepoId
 	Edit     bool

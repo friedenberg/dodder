@@ -50,9 +50,17 @@ func MakeBlobStoreEnv(
 	envLocal env_local.Env,
 ) BlobStoreEnv {
 	env := BlobStoreEnv{
-		Env:                      envLocal,
-		BlobStoreDirectoryLayout: &directoryLayoutV2{},
+		Env: envLocal,
 	}
+
+	directoryLayout := &directoryLayoutV2{}
+
+	if err := directoryLayout.initDirectoryLayout(envLocal.GetXDG()); err != nil {
+		envLocal.Cancel(err)
+		return env
+	}
+
+	env.BlobStoreDirectoryLayout = directoryLayout
 
 	env.setupStores()
 

@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
-	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
@@ -27,7 +26,7 @@ type Remote struct {
 
 	InventoryLists
 	LocalWorkingCopy
-	command_components_madder.EnvRepo
+	EnvRepo
 
 	RemoteConnectionType repo.RemoteConnectionType
 }

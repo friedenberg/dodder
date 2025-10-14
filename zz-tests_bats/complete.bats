@@ -91,6 +91,7 @@ function complete_subcmd { # @test
 		blob_store-complete.*complete a command-line
 		blob_store-fsck
 		blob_store-init
+		blob_store-init-from
 		blob_store-init-sftp-explicit
 		blob_store-init-sftp-ssh_config
 		blob_store-list

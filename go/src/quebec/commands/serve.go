@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/command_components"
-	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/oscar/remote_http"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"tailscale.com/client/local"
@@ -21,7 +20,7 @@ func init() {
 
 type Serve struct {
 	command_components.Env
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 	command_components_dodder.LocalWorkingCopy
 
 	TailscaleTLS bool

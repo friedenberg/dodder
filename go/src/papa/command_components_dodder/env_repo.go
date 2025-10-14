@@ -1,4 +1,4 @@
-package command_components_madder
+package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"

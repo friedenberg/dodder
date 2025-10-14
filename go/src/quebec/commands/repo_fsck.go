@@ -20,7 +20,7 @@ func init() {
 
 type RepoFsck struct {
 	command_components_dodder.LocalWorkingCopy
-	command_components_madder.EnvRepo
+	command_components_dodder.EnvRepo
 	command_components_madder.BlobStore
 }
 
