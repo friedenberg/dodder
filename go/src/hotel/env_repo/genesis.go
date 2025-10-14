@@ -2,20 +2,16 @@ package env_repo
 
 import (
 	"encoding/gob"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -66,7 +62,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	env.writeInventoryListLog()
 	env.writeConfig(bigBang)
-	env.writeBlobStoreConfig(bigBang)
+	env.writeBlobStoreConfig(bigBang, env.directoryLayout)
 
 	if err := ohio.CopyFileLines(
 		bigBang.Yin,
@@ -129,36 +125,6 @@ func (env *Env) writeConfig(bigBang BigBang) {
 		genesis_configs.CoderPrivate,
 		&env.config,
 		env.FileConfigPermanent(),
-	); err != nil {
-		env.Cancel(err)
-		return
-	}
-}
-
-// TODO extract this into madder
-func (env *Env) writeBlobStoreConfig(bigBang BigBang) {
-	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		// the immutable config contains the only blob stores's config
-		return
-	}
-
-	blobStoreConfig := bigBang.TypedBlobStoreConfig
-
-	if configLocalMutable, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
-		configLocalMutable.SetBasePath(
-			env.DirBlobStores(strconv.Itoa(0)),
-		)
-	}
-
-	if err := triple_hyphen_io.EncodeToFile(
-		blob_store_configs.Coder,
-		&blob_store_configs.TypedConfig{
-			Type: blobStoreConfig.Type,
-			Blob: blobStoreConfig.Blob,
-		},
-		env.DirBlobStoreConfigs(
-			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
-		),
 	); err != nil {
 		env.Cancel(err)
 		return

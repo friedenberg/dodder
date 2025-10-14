@@ -1,8 +1,14 @@
 package env_repo
 
 import (
+	"fmt"
+	"strconv"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
@@ -87,4 +93,37 @@ func (env BlobStoreEnv) GetBlobStores() []blob_stores.BlobStoreInitialized {
 	blobStores := make([]blob_stores.BlobStoreInitialized, len(env.blobStores))
 	copy(blobStores, env.blobStores)
 	return blobStores
+}
+
+// TODO extract this into madder
+func (env *BlobStoreEnv) writeBlobStoreConfig(
+	bigBang BigBang,
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+) {
+	if store_version.IsCurrentVersionLessOrEqualToV10() {
+		// the immutable config contains the only blob stores's config
+		return
+	}
+
+	blobStoreConfig := bigBang.TypedBlobStoreConfig
+
+	if config, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
+		config.SetBasePath(
+			directoryLayout.DirBlobStores(strconv.Itoa(0)),
+		)
+	}
+
+	if err := triple_hyphen_io.EncodeToFile(
+		blob_store_configs.Coder,
+		&blob_store_configs.TypedConfig{
+			Type: blobStoreConfig.Type,
+			Blob: blobStoreConfig.Blob,
+		},
+		directoryLayout.DirBlobStoreConfigs(
+			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
+		),
+	); err != nil {
+		env.Cancel(err)
+		return
+	}
 }

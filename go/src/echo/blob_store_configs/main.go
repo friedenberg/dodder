@@ -80,10 +80,12 @@ var (
 
 var DefaultHashBuckets []int = []int{2}
 
+type DefaultType = TomlV1
+
 func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
 		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
-		Blob: &TomlV1{
+		Blob: &DefaultType{
 			HashBuckets:       DefaultHashBuckets,
 			HashTypeId:        markl.FormatIdHashBlake2b256,
 			CompressionType:   compression_type.CompressionTypeDefault,

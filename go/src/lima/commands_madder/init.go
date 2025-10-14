@@ -14,7 +14,7 @@ import (
 func init() {
 	utility.AddCmd("init", &Init{
 		tipe: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type,
-		blobStoreConfig: &blob_store_configs.TomlV1{
+		blobStoreConfig: &blob_store_configs.DefaultType{
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,
 		},
