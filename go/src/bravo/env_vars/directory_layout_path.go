@@ -1,6 +1,10 @@
 package env_vars
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+import (
+	"path/filepath"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+)
 
 type DirectoryLayoutPath struct {
 	envVar   interfaces.DirectoryLayoutBaseEnvVar
@@ -20,4 +24,8 @@ func (path DirectoryLayoutPath) GetTarget() string {
 
 func (path DirectoryLayoutPath) String() string {
 	return path.fullPath
+}
+
+func (path DirectoryLayoutPath) GetTemplate() string {
+	return filepath.Join(path.envVar.GetBaseEnvVarName(), path.target)
 }

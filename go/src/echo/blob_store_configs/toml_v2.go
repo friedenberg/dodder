@@ -100,7 +100,7 @@ func (blobStoreConfig *TomlV2) SetFlagDefinitions(
 	)
 }
 
-func (blobStoreConfig TomlV2) GetBasePath() string {
+func (blobStoreConfig TomlV2) getBasePath() string {
 	if blobStoreConfig.BasePath == "" {
 		panic(errors.BadRequestf("empty base path"))
 	}
@@ -134,5 +134,5 @@ func (blobStoreConfig TomlV2) GetDefaultHashTypeId() string {
 
 func (blobStoreConfig *TomlV2) SetBasePath(value string) {
 	blobStoreConfig.BasePath = value
-	blobStoreConfig.GetBasePath()
+	blobStoreConfig.getBasePath()
 }

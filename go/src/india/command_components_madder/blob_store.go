@@ -47,9 +47,9 @@ func (cmd *BlobStore) MakeBlobStore(
 			Config: typedConfig,
 		}
 
-		if configLocal, ok := typedConfig.Blob.(blob_store_configs.ConfigLocal); ok {
-			configNamed.BasePath = configLocal.GetBasePath()
-		}
+		configNamed.BasePath, _ = blob_store_configs.GetBasePath(
+			typedConfig.Blob,
+		)
 
 		{
 			var err error

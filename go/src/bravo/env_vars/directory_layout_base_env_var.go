@@ -14,7 +14,7 @@ type DirectoryLayoutBaseEnvVar struct {
 
 var _ interfaces.DirectoryLayoutBaseEnvVar = DirectoryLayoutBaseEnvVar{}
 
-func (envVar DirectoryLayoutBaseEnvVar) GetBaseEnvVar() string {
+func (envVar DirectoryLayoutBaseEnvVar) GetBaseEnvVarName() string {
 	return envVar.Name
 }
 
@@ -22,7 +22,7 @@ func (envVar DirectoryLayoutBaseEnvVar) String() string {
 	return envVar.ActualValue
 }
 
-func (envVar DirectoryLayoutBaseEnvVar) GetBase() string {
+func (envVar DirectoryLayoutBaseEnvVar) GetBaseEnvVarValue() string {
 	return envVar.ActualValue
 }
 
@@ -34,6 +34,6 @@ func (envVar DirectoryLayoutBaseEnvVar) MakePath(
 	return DirectoryLayoutPath{
 		envVar:   envVar,
 		target:   target,
-		fullPath: filepath.Join(envVar.GetBase(), target),
+		fullPath: filepath.Join(envVar.GetBaseEnvVarValue(), target),
 	}
 }

@@ -44,7 +44,7 @@ func (blobStoreConfig *TomlV0) SetFlagDefinitions(
 	)
 }
 
-func (blobStoreConfig TomlV0) GetBasePath() string {
+func (blobStoreConfig TomlV0) getBasePath() string {
 	return blobStoreConfig.BasePath
 }
 

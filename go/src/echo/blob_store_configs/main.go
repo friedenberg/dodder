@@ -1,6 +1,8 @@
 package blob_store_configs
 
 import (
+	"os"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -33,18 +35,19 @@ type (
 		GetDefaultHashTypeId() string
 	}
 
-	ConfigLocal interface {
+	configLocal interface {
 		Config
-		GetBasePath() string
+		getBasePath() string
 	}
 
+	// TODO make private and use public static setter pattern
 	ConfigLocalMutable interface {
-		ConfigLocal
+		configLocal
 		SetBasePath(string)
 	}
 
 	ConfigLocalHashBucketed interface {
-		ConfigLocal
+		configLocal
 		ConfigHashType
 		interfaces.BlobIOWrapper
 		GetHashBuckets() []int
@@ -98,3 +101,23 @@ func Default() *TypedMutableConfig {
 		},
 	}
 }
+
+func GetBasePath(config Config) (string, bool) {
+	configLocal, ok := config.(configLocal)
+
+	if !ok {
+		return "", false
+	}
+
+	return os.ExpandEnv(configLocal.getBasePath()), true
+}
+
+// func SetBasePath(config Config, basePath string) error {
+// 	configLocalMutable, ok := config.(ConfigLocalMutable)
+
+// 	if !ok {
+// 		return errors.Errorf("kk
+// 	}
+
+// 	return os.ExpandEnv(configLocalMutable.getBasePath()), true
+// }

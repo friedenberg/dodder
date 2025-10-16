@@ -6,13 +6,16 @@ type (
 
 		GetBaseEnvVar() DirectoryLayoutBaseEnvVar
 		GetTarget() string
+
+		GetTemplate() string
 	}
 
 	DirectoryLayoutBaseEnvVar interface {
 		Stringer
 
-		GetBaseEnvVar() string
-		GetBase() string
+		GetBaseEnvVarName() string
+		GetBaseEnvVarValue() string
+
 		MakePath(...string) DirectoryLayoutPath
 	}
 

@@ -95,18 +95,17 @@ func (cmd InitFrom) tryAddBasePath(
 	req command.Request,
 	config blob_store_configs.Config,
 ) {
-	var configLocal blob_store_configs.ConfigLocal
+	var basePath string
 
 	{
 		var ok bool
-		configLocal, ok = config.(blob_store_configs.ConfigLocal)
+
+		basePath, ok = blob_store_configs.GetBasePath(config)
 
 		if !ok {
 			return
 		}
 	}
-
-	basePath := configLocal.GetBasePath()
 
 	if filepath.IsAbs(basePath) {
 		return
@@ -117,14 +116,14 @@ func (cmd InitFrom) tryAddBasePath(
 	{
 		var ok bool
 
-		configLocalMutable, ok = configLocal.(blob_store_configs.ConfigLocalMutable)
+		configLocalMutable, ok = config.(blob_store_configs.ConfigLocalMutable)
 
 		if !ok {
 			errors.ContextCancelWithBadRequestf(
 				req,
 				"expected %T but got %T",
 				configLocalMutable,
-				configLocal,
+				config,
 			)
 
 			return
