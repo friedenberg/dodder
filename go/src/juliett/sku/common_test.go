@@ -460,7 +460,6 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 }
 
 func testWriteWithInlineBlob(t *ui.TestContext) {
-
 	object := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
