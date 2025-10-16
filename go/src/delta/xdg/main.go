@@ -86,9 +86,9 @@ func (exdg *XDG) InitializeOverridden(
 ) (err error) {
 	exdg.AddedPath = addedPath
 
-	toInitialize := exdg.getInitElements()
+	initElements := exdg.getInitElements()
 
-	for _, ie := range toInitialize {
+	for _, ie := range initElements {
 		// TODO validate this to prevent root xdg directories
 		if *ie.out, err = exdg.setDefaultOrEnv(
 			ie.standard.overridden,

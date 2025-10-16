@@ -58,12 +58,8 @@ func (layout directoryLayoutV1) DirCacheRepo(p ...string) string {
 	return layout.MakeDirData(append([]string{"cache", "repo"}, p...)...)
 }
 
-func (layout directoryLayoutV1) DirBlobStores(p ...string) string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
-}
-
 func (layout directoryLayoutV1) DirBlobStoreConfigs(p ...string) string {
-	return layout.DirBlobStores(p...)
+	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
 }
 
 func (layout directoryLayoutV1) DirLostAndFound() string {

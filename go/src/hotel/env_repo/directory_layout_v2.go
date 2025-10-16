@@ -29,10 +29,6 @@ func (layout directoryLayoutV2) MakePathBlobStore(
 	return layout.xdg.Data.MakePath(stringSliceJoin("blob_stores", targets)...)
 }
 
-func (layout directoryLayoutV2) DirBlobStores(p ...string) string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
-}
-
 func (layout directoryLayoutV2) DirBlobStoreConfigs(p ...string) string {
 	return layout.MakeDirData(append([]string{"blob_stores-configs"}, p...)...)
 }

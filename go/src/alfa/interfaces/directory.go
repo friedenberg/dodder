@@ -28,7 +28,6 @@ type (
 	BlobStoreDirectoryLayout interface {
 		DirFirstBlobStoreBlobs() string
 		DirBlobStoreConfigs(p ...string) string
-		DirBlobStores(p ...string) string
 
 		MakePathBlobStore(...string) DirectoryLayoutPath
 	}

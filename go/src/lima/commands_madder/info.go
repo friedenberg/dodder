@@ -99,9 +99,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			}
 
 		case "dir-blob_stores":
-			env.GetUI().Print(
-				env.DirBlobStores(),
-			)
+			env.GetUI().Print(env.MakePathBlobStore())
 
 			// TODO make dynamic and parse index
 		case "dir-blob_stores-0-blobs":
