@@ -5,12 +5,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -18,24 +18,17 @@ func init() {
 }
 
 type Fsck struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStore
 }
 
 // TODO add completion for blob store id's
 
 func (cmd Fsck) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
+	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	blobStoreIds := req.PopArgs()
-	blobStores := envRepo.GetBlobStores()
-
-	if len(blobStoreIds) > 0 {
-		blobStores = blobStores[:0]
-		for _, id := range blobStoreIds {
-			blobStores = append(blobStores, cmd.MakeBlobStore(envRepo, id))
-		}
-	}
+	// blobStoreIds := req.PopArgs()
+	blobStores := envBlobStore.GetBlobStores()
 
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
@@ -55,15 +48,10 @@ func (cmd Fsck) Run(req command.Request) {
 
 		countSuccessPtr := &count
 
-		type errorBlob struct {
-			blobId interfaces.MarklId
-			err    error
-		}
-
-		var blobErrors []errorBlob
+		var blobErrors quiter.Slice[command_components_madder.BlobError]
 
 		if err := errors.RunChildContextWithPrintTicker(
-			envRepo,
+			envBlobStore,
 			func(ctx interfaces.Context) {
 				for digest, err := range blobStore.AllBlobs() {
 					errors.ContextContinueOrPanic(ctx)
@@ -71,7 +59,8 @@ func (cmd Fsck) Run(req command.Request) {
 					// subsequent stores
 
 					if err != nil {
-						blobErrors = append(blobErrors, errorBlob{err: err})
+						blobErrors.Append(command_components_madder.BlobError{Err: err})
+
 						continue
 					}
 
@@ -83,7 +72,10 @@ func (cmd Fsck) Run(req command.Request) {
 					// - print size
 					// - compare against other blob stores
 					if !blobStore.HasBlob(digest) {
-						blobErrors = append(blobErrors, errorBlob{err: errors.Errorf("blob missing")})
+						blobErrors.Append(
+							command_components_madder.BlobError{Err: errors.Errorf("blob missing")},
+						)
+
 						continue
 					}
 
@@ -93,7 +85,10 @@ func (cmd Fsck) Run(req command.Request) {
 						digest,
 						&progressWriter,
 					); err != nil {
-						blobErrors = append(blobErrors, errorBlob{err: err})
+						blobErrors.Append(
+							command_components_madder.BlobError{Err: err},
+						)
+
 						continue
 					}
 				}
@@ -108,19 +103,16 @@ func (cmd Fsck) Run(req command.Request) {
 			},
 			3*time.Second,
 		); err != nil {
-			envRepo.Cancel(err)
+			envBlobStore.Cancel(err)
 			return
 		}
 
 		ui.Out().Printf("blobs verified: %d", count)
 		ui.Out().Printf(
-			"blob bytes verified: %d",
+			"blob bytes verified: %s",
 			progressWriter.GetWrittenHumanString(),
 		)
-		ui.Out().Printf("blobs with errors: %d", len(blobErrors))
 
-		for _, errorBlob := range blobErrors {
-			ui.Out().Printf("%s: %s", errorBlob.blobId, errorBlob.err)
-		}
+		command_components_madder.PrintBlobErrors(envBlobStore, blobErrors)
 	}
 }

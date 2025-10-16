@@ -13,19 +13,19 @@ import (
 )
 
 func MakeBlobImporter(
-	envRepo env_repo.Env,
+	envRepo env_repo.BlobStoreEnv,
 	src interfaces.BlobStore,
 	dsts ...interfaces.BlobStore,
 ) BlobImporter {
 	return BlobImporter{
-		EnvRepo: envRepo,
-		Src:     src,
-		Dsts:    dsts,
+		EnvBlobStore: envRepo,
+		Src:          src,
+		Dsts:         dsts,
 	}
 }
 
 type BlobImporter struct {
-	EnvRepo                env_repo.Env
+	EnvBlobStore           env_repo.BlobStoreEnv
 	CopierDelegate         interfaces.FuncIter[sku.BlobCopyResult]
 	Src                    interfaces.BlobStore
 	Dsts                   []interfaces.BlobStore
@@ -118,7 +118,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 	var progressWriter env_ui.ProgressWriter
 
 	if err := errors.RunChildContextWithPrintTicker(
-		blobImporter.EnvRepo,
+		blobImporter.EnvBlobStore,
 		func(ctx interfaces.Context) {
 			blobImporter.Counts.Total++
 
@@ -129,7 +129,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 			}
 
 			copyResult.CopyResult = blob_stores.CopyBlobIfNecessary(
-				blobImporter.EnvRepo,
+				blobImporter.EnvBlobStore,
 				dst,
 				blobImporter.Src,
 				blobId,

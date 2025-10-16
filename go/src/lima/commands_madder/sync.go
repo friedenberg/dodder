@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -18,7 +17,7 @@ func init() {
 }
 
 type Sync struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStore
 
 	Limit int
@@ -46,8 +45,8 @@ func (cmd Sync) Run(req command.Request) {
 
 func (cmd Sync) runAllStores(req command.Request) {
 	req.AssertNoMoreArgs()
-	envRepo := cmd.MakeEnvRepo(req, false)
-	blobStoresInitialized := envRepo.GetBlobStores()
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStoresInitialized := envBlobStore.GetBlobStores()
 	blobStores := make([]interfaces.BlobStore, len(blobStoresInitialized))
 
 	for idx := range blobStoresInitialized {
@@ -73,13 +72,13 @@ func (cmd Sync) runAllStores(req command.Request) {
 	blobStores = blobStores[1:]
 
 	blobImporter := blob_transfers.MakeBlobImporter(
-		envRepo,
+		envBlobStore,
 		primary,
 		blobStores...,
 	)
 
 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
-		envRepo.GetUI(),
+		envBlobStore.GetUI(),
 		false,
 	)
 

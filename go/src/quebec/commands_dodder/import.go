@@ -75,7 +75,7 @@ func (cmd Import) Run(req command.Request) {
 
 	if blobStoreConfigPath != "" {
 		cmd.RemoteBlobStore = cmd.MakeBlobStore(
-			local.GetEnvRepo(),
+			local.GetEnvRepo().GetEnvBlobStore(),
 			blobStoreConfigPath,
 		)
 	}
@@ -83,7 +83,7 @@ func (cmd Import) Run(req command.Request) {
 	var afterDecoding func(*sku.Transacted) error
 
 	blobImporter := blob_transfers.MakeBlobImporter(
-		local.GetEnvRepo(),
+		local.GetEnvRepo().GetEnvBlobStore(),
 		cmd.RemoteBlobStore,
 		local.GetBlobStore(),
 	)

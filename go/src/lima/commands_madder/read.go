@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 }
 
 type Read struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 }
 
 type readBlobEntry struct {
@@ -25,9 +25,9 @@ type readBlobEntry struct {
 }
 
 func (cmd Read) Run(dep command.Request) {
-	envRepo := cmd.MakeEnvRepo(dep, false)
+	envBlobStore := cmd.MakeEnvBlobStore(dep)
 
-	decoder := json.NewDecoder(envRepo.GetInFile())
+	decoder := json.NewDecoder(envBlobStore.GetInFile())
 
 	for {
 		var entry readBlobEntry
@@ -36,7 +36,7 @@ func (cmd Read) Run(dep command.Request) {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				envRepo.Cancel(err)
+				envBlobStore.Cancel(err)
 			}
 
 			return
@@ -45,20 +45,22 @@ func (cmd Read) Run(dep command.Request) {
 		{
 			var err error
 
-			if _, err = cmd.readOneBlob(envRepo, entry); err != nil {
-				envRepo.Cancel(err)
+			if _, err = cmd.readOneBlob(envBlobStore, entry); err != nil {
+				envBlobStore.Cancel(err)
 			}
 		}
 	}
 }
 
 func (Read) readOneBlob(
-	envRepo env_repo.Env,
+	envBlobStore env_repo.BlobStoreEnv,
 	entry readBlobEntry,
 ) (digest interfaces.MarklId, err error) {
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
+	if writeCloser, err = envBlobStore.GetDefaultBlobStore().MakeBlobWriter(
+		nil,
+	); err != nil {
 		err = errors.Wrap(err)
 		return digest, err
 	}

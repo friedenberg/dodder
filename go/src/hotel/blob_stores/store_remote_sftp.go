@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -225,9 +226,24 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 				continue
 			}
 
+			currentPath := walker.Path()
+
+			{
+				var err error
+
+				if currentPath, err = filepath.Rel(basePath, currentPath); err != nil {
+					if !yield(
+						nil,
+						errors.Wrapf(err, "BasePath: %q", basePath),
+					) {
+						return
+					}
+				}
+			}
+
 			if err := markl.SetHexStringFromAbsolutePath(
 				digest,
-				walker.Path(),
+				currentPath,
 				basePath,
 			); err != nil {
 				if !yield(nil, errors.Wrap(err)) {

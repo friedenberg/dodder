@@ -27,6 +27,10 @@ func (cmd List) Run(req command.Request) {
 	blobStoresAll := envRepo.GetBlobStores()
 
 	for _, blobStore := range blobStoresAll {
-		ui.Out().Printf("%#v", blobStore)
+		ui.Out().Printf(
+			"%s: %s",
+			blobStore.Name,
+			blobStore.GetBlobStoreDescription(),
+		)
 	}
 }

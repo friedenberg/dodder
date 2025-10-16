@@ -51,7 +51,7 @@ func (cmd *PullBlobStore) Run(
 	}
 
 	importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
-		localWorkingCopy.GetEnvRepo(),
+		localWorkingCopy.GetEnvRepo().GetEnvBlobStore(),
 		blobStoreConfigPath,
 	)
 

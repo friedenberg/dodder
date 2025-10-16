@@ -2,11 +2,14 @@ package commands_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -14,7 +17,7 @@ func init() {
 }
 
 type CatIds struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStore
 }
 
@@ -25,27 +28,43 @@ func (cmd CatIds) CompletionGenres() ids.Genre {
 }
 
 func (cmd CatIds) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
-	var blobStoreIndexOrConfigPath string
+	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	if req.RemainingArgCount() == 1 {
-		blobStoreIndexOrConfigPath = req.PopArg(
-			"blob store id or blob store config path",
-		)
-	}
+	// var blobStoreIndexOrConfigPath string
+
+	// if req.RemainingArgCount() == 1 {
+	// 	blobStoreIndexOrConfigPath = req.PopArg(
+	// 		"blob store id or blob store config path",
+	// 	)
+	// }
 
 	req.AssertNoMoreArgs()
 
-	blobStore := cmd.MakeBlobStore(envRepo, blobStoreIndexOrConfigPath)
+	blobStoresAll := envBlobStore.GetBlobStores()
+	var blobErrors quiter.Slice[command_components_madder.BlobError]
 
+	for _, blobStore := range blobStoresAll {
+		ui.Debug().PrintDebug(blobStore)
+		cmd.runOne(envBlobStore, blobStore, &blobErrors)
+	}
+
+	command_components_madder.PrintBlobErrors(envBlobStore, blobErrors)
+}
+
+func (cmd CatIds) runOne(
+	envBlobStore env_repo.BlobStoreEnv,
+	blobStore blob_stores.BlobStoreInitialized,
+	blobErrors *quiter.Slice[command_components_madder.BlobError],
+) {
 	for id, err := range blobStore.AllBlobs() {
-		errors.ContextContinueOrPanic(envRepo)
+		errors.ContextContinueOrPanic(envBlobStore)
 
 		if err != nil {
-			// ui.CLIErrorTreeEncoder.EncodeTo(err, envRepo.GetErr())
-			envRepo.GetErr().Print(err)
+			blobErrors.Append(
+				command_components_madder.BlobError{BlobId: id, Err: err},
+			)
 		} else {
-			envRepo.GetUI().Print(id)
+			envBlobStore.GetUI().Print(id)
 		}
 	}
 }

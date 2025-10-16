@@ -13,7 +13,7 @@ import (
 type BlobStore struct{}
 
 func (cmd *BlobStore) MakeBlobStore(
-	envRepo env_repo.Env,
+	envBlobStore env_repo.BlobStoreEnv,
 	blobStoreIndexOrConfigPath string,
 ) (blobStore blob_stores.BlobStoreInitialized) {
 	if blobStoreIndexOrConfigPath == "" {
@@ -35,7 +35,7 @@ func (cmd *BlobStore) MakeBlobStore(
 					err = nil
 					goto tryBlobStoreIndex
 				} else {
-					envRepo.Cancel(err)
+					envBlobStore.Cancel(err)
 					return blobStore
 				}
 			}
@@ -55,11 +55,11 @@ func (cmd *BlobStore) MakeBlobStore(
 			var err error
 
 			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
-				envRepo,
+				envBlobStore,
 				configNamed,
-				envRepo.GetTempLocal(),
+				envBlobStore.GetTempLocal(),
 			); err != nil {
-				envRepo.Cancel(err)
+				envBlobStore.Cancel(err)
 				return blobStore
 			}
 		}
@@ -75,16 +75,16 @@ tryBlobStoreIndex:
 			var err error
 
 			if blobStoreIndex, err = strconv.Atoi(blobStoreIndexOrConfigPath); err != nil {
-				envRepo.Cancel(err)
+				envBlobStore.Cancel(err)
 				return blobStore
 			}
 		}
 
-		blobStores := envRepo.GetBlobStores()
+		blobStores := envBlobStore.GetBlobStores()
 
 		if len(blobStores)-1 < blobStoreIndex {
 			errors.ContextCancelWithBadRequestf(
-				envRepo,
+				envBlobStore,
 				"invalid blob store index: %d. Valid indexes: 0-%d",
 				blobStoreIndex,
 				len(blobStores)-1,
@@ -93,11 +93,11 @@ tryBlobStoreIndex:
 			return blobStore
 		}
 
-		blobStore = envRepo.GetBlobStores()[blobStoreIndex]
+		blobStore = envBlobStore.GetBlobStores()[blobStoreIndex]
 
 		return blobStore
 	}
 
 tryDefaultBlobStore:
-	return envRepo.GetDefaultBlobStore()
+	return envBlobStore.GetDefaultBlobStore()
 }

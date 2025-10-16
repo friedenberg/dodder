@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
@@ -23,7 +22,7 @@ func init() {
 }
 
 type Cat struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStore
 
 	BlobStoreIndexOrConfigPath string
@@ -48,7 +47,7 @@ type blobIdWithReadCloser struct {
 }
 
 func (cmd Cat) makeBlobWriter(
-	envRepo env_repo.Env,
+	envRepo env_repo.BlobStoreEnv,
 	blobStore blob_stores.BlobStoreInitialized,
 ) interfaces.FuncIter[blobIdWithReadCloser] {
 	if cmd.Utility.IsEmpty() {
@@ -106,7 +105,7 @@ func (cmd Cat) makeBlobWriter(
 }
 
 func (cmd Cat) Run(req command.Request) {
-	envRepo := cmd.MakeEnvRepo(req, false)
+	envRepo := cmd.MakeEnvBlobStore(req)
 	blobStore := cmd.MakeBlobStore(
 		envRepo,
 		cmd.BlobStoreIndexOrConfigPath,
@@ -131,7 +130,7 @@ func (cmd Cat) Run(req command.Request) {
 }
 
 func (cmd Cat) copy(
-	envRepo env_repo.Env,
+	envBlobStore env_repo.BlobStoreEnv,
 	blobStore blob_stores.BlobStoreInitialized,
 	readCloser blobIdWithReadCloser,
 ) (err error) {
@@ -141,7 +140,7 @@ func (cmd Cat) copy(
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
 			markl.FormatBytesAsHex(readCloser.BlobId),
-			envRepo.GetUI(),
+			envBlobStore.GetUI(),
 			readCloser.ReadCloser,
 			true,
 		); err != nil {
@@ -149,7 +148,7 @@ func (cmd Cat) copy(
 			return err
 		}
 	} else {
-		if _, err = io.Copy(envRepo.GetUIFile(), readCloser.ReadCloser); err != nil {
+		if _, err = io.Copy(envBlobStore.GetUIFile(), readCloser.ReadCloser); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
