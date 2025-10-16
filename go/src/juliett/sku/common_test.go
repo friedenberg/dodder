@@ -75,8 +75,10 @@ func readFormat(
 }
 
 func TestMakeTags(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testMakeTags)
+}
 
+func testMakeTags(t *ui.TestContext) {
 	vs := []string{
 		"tag1",
 		"tag2",
@@ -138,8 +140,10 @@ func TestMakeTags(t1 *testing.T) {
 }
 
 func TestEqualitySelf(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testEqualitySelf)
+}
 
+func testEqualitySelf(t *ui.TestContext) {
 	text := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "text"),
@@ -157,8 +161,10 @@ func TestEqualitySelf(t1 *testing.T) {
 }
 
 func TestEqualityNotSelf(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testEqualityNotSelf)
+}
 
+func testEqualityNotSelf(t *ui.TestContext) {
 	text := object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "text"),
@@ -199,7 +205,10 @@ func makeTestTextFormat(
 }
 
 func TestReadWithoutBlob(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testReadWithoutBlob)
+}
+
+func testReadWithoutBlob(t *ui.TestContext) {
 	envRepo := env_repo.MakeTesting(t, nil)
 
 	actual := readFormat(
@@ -240,8 +249,10 @@ func TestReadWithoutBlob(t1 *testing.T) {
 }
 
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testReadWithoutBlobWithMultilineDescription)
+}
 
+func testReadWithoutBlobWithMultilineDescription(t *ui.TestContext) {
 	envRepo := env_repo.MakeTesting(t, nil)
 
 	actual := readFormat(
@@ -279,8 +290,10 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 }
 
 func TestReadWithBlob(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testReadWithBlob)
+}
 
+func testReadWithBlob(t *ui.TestContext) {
 	envRepo := env_repo.MakeTesting(
 		t,
 		nil,
@@ -390,8 +403,10 @@ func writeFormat(
 }
 
 func TestWriteWithoutBlob(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testWriteWithoutBlob)
+}
 
+func testWriteWithoutBlob(t *ui.TestContext) {
 	object := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
@@ -441,7 +456,10 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 }
 
 func TestWriteWithInlineBlob(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testWriteWithInlineBlob)
+}
+
+func testWriteWithInlineBlob(t *ui.TestContext) {
 
 	object := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),

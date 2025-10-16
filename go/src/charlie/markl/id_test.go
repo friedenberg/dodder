@@ -8,14 +8,16 @@ import (
 )
 
 func TestIdNullAndEqual(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testIdNullAndEqual)
+}
 
+func testIdNullAndEqual(t *ui.TestContext) {
 	for _, formatHash := range formatHashes {
-		testIdNullAndEqual(t, formatHash)
+		testIdNullAndEqualFor(t, formatHash)
 	}
 }
 
-func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
+func testIdNullAndEqualFor(t *ui.TestContext, formatHash FormatHash) {
 	{
 		t.AssertError(AssertIdIsNotNull(formatHash.null))
 		t.AssertNoError(AssertIdIsNull(formatHash.null))
@@ -75,8 +77,10 @@ func testIdNullAndEqual(t *ui.TestContext, formatHash FormatHash) {
 }
 
 func TestIdEncodeDecode(t1 *testing.T) {
-	t := ui.MakeTestContext(t1)
+	ui.RunTestContext(t1, testIdEncodeDecode)
+}
 
+func testIdEncodeDecode(t *ui.TestContext) {
 	for _, formatHash := range formatHashes {
 		hash := formatHash.Get()
 

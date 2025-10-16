@@ -15,43 +15,34 @@ type TestContext struct {
 	t
 
 	Context interfaces.Context
-	done    <-chan struct{}
 }
 
-func MakeTestContext(t *testing.T) *TestContext {
-	return makeTestContext(t, errors.MakeContextDefault())
+func RunTestContext(
+	t *testing.T,
+	run func(*TestContext),
+) {
+	testContext := makeTestContext(t, errors.MakeContextDefault())
+
+	if err := testContext.Context.Run(
+		func(_ interfaces.Context) {
+			run(testContext)
+		},
+	); err != nil {
+		// TODO replay this `t.Fatalf` on the main go routine
+		testContext.Skip(1).Fatalf("test context failed: %s", err)
+	}
 }
 
 func makeTestContext(
 	t *testing.T,
 	ctx interfaces.Context,
 ) *TestContext {
-	done := make(chan struct{})
-
 	testContext := &TestContext{
 		t: T{
 			T: t,
 		},
 		Context: ctx,
-		done:    done,
 	}
-
-	go func() {
-		if err := testContext.Context.Run(
-			func(ctx interfaces.Context) {
-				<-testContext.done
-			},
-		); err != nil {
-			// TODO replay this `t.Fatalf` on the main go routine
-			testContext.Fatalf("test context failed: %s", err)
-		}
-	}()
-
-	t.Cleanup(
-		func() {
-			close(done)
-		},
-	)
 
 	return testContext
 }
