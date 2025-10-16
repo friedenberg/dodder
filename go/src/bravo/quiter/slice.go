@@ -2,38 +2,33 @@ package quiter
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 )
 
 // TODO move to own package
-type Slice[E any] []E
+type Slice[ELEMENT any] []ELEMENT
 
-func (s Slice[E]) Len() int {
-	return len(s)
+func (slice Slice[ELEMENT]) Len() int {
+	return len(slice)
 }
 
-func (s Slice[E]) Any() (e E) {
-	if s.Len() > 0 {
-		e = s[0]
+func (slice Slice[ELEMENT]) Any() (element ELEMENT) {
+	if slice.Len() > 0 {
+		element = slice[0]
 	}
 
-	return e
+	return element
 }
 
-func (s Slice[E]) Each(f interfaces.FuncIter[E]) error {
-	return comments.Implement()
-}
-
-func (s Slice[E]) All() interfaces.Seq[E] {
-	return func(yield func(E) bool) {
-		for _, e := range s {
-			if !yield(e) {
+func (slice Slice[ELEMENT]) All() interfaces.Seq[ELEMENT] {
+	return func(yield func(ELEMENT) bool) {
+		for _, element := range slice {
+			if !yield(element) {
 				break
 			}
 		}
 	}
 }
 
-func (s *Slice[E]) Append(element ...E) {
-	*s = append(*s, element...)
+func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {
+	*slice = append(*slice, elements...)
 }

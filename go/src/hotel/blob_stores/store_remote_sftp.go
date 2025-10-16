@@ -141,7 +141,7 @@ func (blobStore *remoteSftp) initialize() (err error) {
 }
 
 func (blobStore *remoteSftp) GetBlobStoreDescription() string {
-	return fmt.Sprintf("TODO: sftp")
+	return "remote sftp hash bucketed"
 }
 
 func (blobStore *remoteSftp) GetBlobIOWrapper() interfaces.BlobIOWrapper {

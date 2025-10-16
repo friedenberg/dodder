@@ -19,14 +19,18 @@ func DecodeFromFileInto[
 ) (err error) {
 	var file *os.File
 
-	if file, err = files.OpenExclusiveReadOnly(
-		path,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
+	if path == "-" {
+		file = os.Stdin
+	} else {
+		if file, err = files.OpenExclusiveReadOnly(
+			path,
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 
-	defer errors.DeferredCloser(&err, file)
+		defer errors.DeferredCloser(&err, file)
+	}
 
 	if _, err = coders.DecodeFrom(typedBlob, file); err != nil {
 		err = errors.Wrap(err)
@@ -85,14 +89,18 @@ func EncodeToFile[
 ) (err error) {
 	var file *os.File
 
-	if file, err = files.CreateExclusiveWriteOnly(
-		path,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
+	if path == "-" {
+		file = os.Stdin
+	} else {
+		if file, err = files.CreateExclusiveWriteOnly(
+			path,
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 
-	defer errors.DeferredCloser(&err, file)
+		defer errors.DeferredCloser(&err, file)
+	}
 
 	if _, err = coders.EncodeTo(typedBlob, file); err != nil {
 		err = errors.Wrap(err)

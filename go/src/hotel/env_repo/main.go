@@ -145,6 +145,10 @@ func (env Env) GetEnv() env_ui.Env {
 	return env.Env
 }
 
+func (env Env) GetEnvBlobStore() BlobStoreEnv {
+	return env.BlobStoreEnv
+}
+
 func (env Env) GetConfigPublic() genesis_configs.TypedConfigPublic {
 	return genesis_configs.TypedConfigPublic{
 		Type: env.config.Type,

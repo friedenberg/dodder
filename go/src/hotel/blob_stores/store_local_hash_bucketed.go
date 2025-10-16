@@ -2,7 +2,6 @@ package blob_stores
 
 import (
 	"bytes"
-	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -56,7 +55,7 @@ func (blobStore localHashBucketed) GetBlobStoreConfig() blob_store_configs.Confi
 }
 
 func (blobStore localHashBucketed) GetBlobStoreDescription() string {
-	return fmt.Sprintf("TODO: local-git-like")
+	return "local hash bucketed"
 }
 
 func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {

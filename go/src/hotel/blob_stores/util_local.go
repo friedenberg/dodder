@@ -36,7 +36,12 @@ func localAllBlobs(
 
 				if err = markl.SetHexStringFromAbsolutePath(id, path, basePath); err != nil {
 					if !yield(nil, errors.Wrap(err)) {
-						err = filepath.SkipAll
+						if dirEntry.IsDir() {
+							err = filepath.SkipDir
+						} else {
+							err = nil
+						}
+
 						return err
 					}
 
