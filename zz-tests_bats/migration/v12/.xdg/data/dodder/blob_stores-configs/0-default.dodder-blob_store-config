@@ -1,9 +1,9 @@
 ---
-! toml-blob_store_config-v1
+! toml-blob_store_config-v2
 ---
 
-hash-buckets = [2]
-base-path = '/tmp/bats-run-a9IFUJ/test/1/.xdg/data/dodder/blob_stores/0'
+hash_buckets = [2]
+base_path = '/tmp/bats-run-MJf5NQ/test/1/.xdg/data/dodder/blob_stores/0'
 hash_type-id = 'blake2b256'
 encryption = ''
 compression-type = 'zstd'
