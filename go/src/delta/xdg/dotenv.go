@@ -27,7 +27,7 @@ func (d Dotenv) setDefaultOrEnvFromMap(
 		*out = os.Expand(defawlt, func(v string) string {
 			switch v {
 			case "HOME":
-				return d.Home
+				return d.Home.String()
 
 			default:
 				return os.Getenv(v)
@@ -77,8 +77,8 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 
 	for _, ie := range toInitialize {
 		if err = d.setDefaultOrEnvFromMap(
-			ie.standard,
-			ie.envKey,
+			ie.standard.DefaultValueTemplate,
+			ie.standard.Name,
 			ie.out,
 			env,
 		); err != nil {
@@ -97,7 +97,7 @@ func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 
 	for _, e := range toWrite {
-		n1, err = fmt.Fprintf(bw, "%s=%s\n", e.envKey, *e.out)
+		n1, err = fmt.Fprintf(bw, "%s=%s\n", e.standard.Name, *e.out)
 		n += int64(n1)
 
 		if err != nil {

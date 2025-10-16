@@ -5,27 +5,42 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 )
 
 type XDG struct {
-	Home      string
-	AddedPath string // name of the utility
+	Home    env_vars.DirectoryLayoutBaseEnvVar
+	Data    env_vars.DirectoryLayoutBaseEnvVar
+	Config  env_vars.DirectoryLayoutBaseEnvVar
+	State   env_vars.DirectoryLayoutBaseEnvVar
+	Cache   env_vars.DirectoryLayoutBaseEnvVar
+	Runtime env_vars.DirectoryLayoutBaseEnvVar
 
-	Data    string
-	Config  string
-	State   string
-	Cache   string
-	Runtime string
+	AddedPath string // name of the utility
 }
+
+var _ interfaces.DirectoryLayout = XDG{}
+
+func (exdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Home }
+
+func (exdg XDG) GetDirData() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Data }
+
+func (exdg XDG) GetDirConfig() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Config }
+
+func (exdg XDG) GetDirState() interfaces.DirectoryLayoutBaseEnvVar { return exdg.State }
+
+func (exdg XDG) GetDirCache() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Cache }
+
+func (exdg XDG) GetDirRuntime() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Runtime }
 
 func (exdg XDG) GetXDGPaths() []string {
 	return []string{
-		exdg.Data,
-		exdg.Config,
-		exdg.State,
-		exdg.Cache,
-		exdg.Runtime,
+		exdg.Data.String(),
+		exdg.Config.String(),
+		exdg.State.String(),
+		exdg.Cache.String(),
+		exdg.Runtime.String(),
 	}
 }
 
@@ -33,7 +48,7 @@ func (exdg XDG) AddToEnvVars(envVars env_vars.EnvVars) {
 	initElements := exdg.getInitElements()
 
 	for _, element := range initElements {
-		envVars[element.envKey] = *element.out
+		envVars[element.standard.Name] = *element.out
 	}
 }
 
@@ -50,7 +65,7 @@ func (exdg *XDG) setDefaultOrEnv(
 			func(v string) string {
 				switch v {
 				case "HOME":
-					return exdg.Home
+					return exdg.Home.String()
 
 				default:
 					return os.Getenv(v)
@@ -76,7 +91,7 @@ func (exdg *XDG) InitializeOverridden(
 	for _, ie := range toInitialize {
 		// TODO validate this to prevent root xdg directories
 		if *ie.out, err = exdg.setDefaultOrEnv(
-			ie.overridden,
+			ie.standard.overridden,
 			"",
 		); err != nil {
 			err = errors.Wrap(err)
@@ -97,8 +112,8 @@ func (exdg *XDG) InitializeStandardFromEnv(
 	for _, ie := range toInitialize {
 		// TODO valid this to prevent root xdg directories
 		if *ie.out, err = exdg.setDefaultOrEnv(
-			ie.standard,
-			ie.envKey,
+			ie.standard.DefaultValueTemplate,
+			ie.standard.Name,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err

@@ -1,41 +1,68 @@
 package interfaces
 
-type BlobStoreDirectoryLayout interface {
-	DirFirstBlobStoreBlobs() string
-	DirBlobStoreConfigs(p ...string) string
-	DirBlobStores(p ...string) string
-}
+type (
+	DirectoryLayoutPath interface {
+		Stringer
 
-type RepoDirectoryLayout interface {
-	BlobStoreDirectoryLayout
+		GetBaseEnvVar() DirectoryLayoutBaseEnvVar
+		GetTarget() string
+	}
 
-	Dir(p ...string) string
-	DirDodder(p ...string) string
+	DirectoryLayoutBaseEnvVar interface {
+		Stringer
 
-	DirFirstBlobStoreInventoryLists() string
+		GetBaseEnvVar() string
+		GetBase() string
+		MakePath(...string) DirectoryLayoutPath
+	}
 
-	// TODO rename Cache to Index
-	DirCache(p ...string) string
-	DirCacheInventoryListLog() string
-	DirCacheObjectPointers() string
-	DirCacheObjects() string
-	DirCacheRepo(p ...string) string
+	DirectoryLayout interface {
+		GetDirHome() DirectoryLayoutBaseEnvVar
+		GetDirData() DirectoryLayoutBaseEnvVar
+		GetDirConfig() DirectoryLayoutBaseEnvVar
+		GetDirState() DirectoryLayoutBaseEnvVar
+		GetDirCache() DirectoryLayoutBaseEnvVar
+		GetDirRuntime() DirectoryLayoutBaseEnvVar
+	}
 
-	DirLostAndFound() string
-	DirObjectId() string
+	BlobStoreDirectoryLayout interface {
+		DirFirstBlobStoreBlobs() string
+		DirBlobStoreConfigs(p ...string) string
+		DirBlobStores(p ...string) string
 
-	FileCacheDormant() string
-	FileCacheObjectId() string
-	FileConfigMutable() string
-	FileLock() string
-	FileTags() string
-	FileInventoryListLog() string
+		// MakePathBlobStore(string) DirectoryLayoutPath
+	}
 
-	// TODO remove from DirectoryLayout and move to method on EnvRepo
-	FileConfigPermanent() string
-}
+	RepoDirectoryLayout interface {
+		BlobStoreDirectoryLayout
 
-type Directory interface {
-	RepoDirectoryLayout
-	Delete(...string) error
-}
+		MakeDirData(p ...string) string
+
+		DirFirstBlobStoreInventoryLists() string
+
+		// TODO rename Cache to Index
+		DirCache(p ...string) string
+		DirCacheInventoryListLog() string
+		DirCacheObjectPointers() string
+		DirCacheObjects() string
+		DirCacheRepo(p ...string) string
+
+		DirLostAndFound() string
+		DirObjectId() string
+
+		FileCacheDormant() string
+		FileCacheObjectId() string
+		FileConfigMutable() string
+		FileLock() string
+		FileTags() string
+		FileInventoryListLog() string
+
+		// TODO remove from DirectoryLayout and move to method on EnvRepo
+		FileConfigPermanent() string
+	}
+
+	Directory interface {
+		RepoDirectoryLayout
+		Delete(...string) error
+	}
+)

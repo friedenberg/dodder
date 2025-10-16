@@ -22,11 +22,21 @@ var (
 
 func TomlXDGV0FromXDG(xdg xdg.XDG) *TomlXDGV0 {
 	return &TomlXDGV0{
-		Data:    xdg.Data,
-		Config:  xdg.Config,
-		State:   xdg.State,
-		Cache:   xdg.Cache,
-		Runtime: xdg.Runtime,
+		Data:    xdg.Data.String(),
+		Config:  xdg.Config.String(),
+		State:   xdg.State.String(),
+		Cache:   xdg.Cache.String(),
+		Runtime: xdg.Runtime.String(),
+	}
+}
+
+func (blob TomlXDGV0) MakeXDG() xdg.XDG {
+	return xdg.XDG{
+		Data:    xdg.DefaultData.MakeBaseEnvVar(blob.Data),
+		Config:  xdg.DefaultConfig.MakeBaseEnvVar(blob.Config),
+		Cache:   xdg.DefaultCache.MakeBaseEnvVar(blob.Cache),
+		Runtime: xdg.DefaultRuntime.MakeBaseEnvVar(blob.Runtime),
+		State:   xdg.DefaultState.MakeBaseEnvVar(blob.State),
 	}
 }
 

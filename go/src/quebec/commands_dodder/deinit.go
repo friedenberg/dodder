@@ -28,8 +28,10 @@ type Deinit struct {
 
 var _ interfaces.CommandComponentWriter = (*Deinit)(nil)
 
-func (cmd *Deinit) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	f.BoolVar(
+func (cmd *Deinit) SetFlagDefinitions(
+	flagDefinitions interfaces.CLIFlagDefinitions,
+) {
+	flagDefinitions.BoolVar(
 		&cmd.Force,
 		"force",
 		false,
@@ -65,7 +67,7 @@ func (cmd Deinit) Run(req command.Request) {
 	{
 		var err error
 
-		if xdgHome, err = filepath.Abs(exdg.Home); err != nil {
+		if xdgHome, err = filepath.Abs(exdg.Home.String()); err != nil {
 			req.Cancel(err)
 		}
 	}
@@ -105,7 +107,7 @@ The following directories and files would be deleted:
 		return
 	}
 
-	base := path.Join(repo.GetEnvRepo().Dir())
+	base := path.Join(repo.GetEnvRepo().MakeDirData())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
 		repo.Cancel(err)

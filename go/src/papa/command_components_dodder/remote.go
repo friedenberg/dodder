@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/repo_blobs"
@@ -160,13 +159,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 		envDir := env_dir.MakeWithXDG(
 			req,
 			req.Config.Debug,
-			xdg.XDG{
-				Data:    blob.Data,
-				Config:  blob.Config,
-				Cache:   blob.Cache,
-				Runtime: blob.Runtime,
-				State:   blob.State,
-			},
+			blob.MakeXDG(),
 		)
 
 		envUI := env_ui.Make(

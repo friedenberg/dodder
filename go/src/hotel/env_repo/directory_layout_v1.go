@@ -1,8 +1,6 @@
 package env_repo
 
 import (
-	"path/filepath"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
@@ -11,6 +9,8 @@ type directoryLayoutV1 struct {
 	xdg.XDG
 }
 
+var _ interfaces.RepoDirectoryLayout = directoryLayoutV1{}
+
 func (layout *directoryLayoutV1) initDirectoryLayout(
 	xdg xdg.XDG,
 ) (err error) {
@@ -18,50 +18,42 @@ func (layout *directoryLayoutV1) initDirectoryLayout(
 	return err
 }
 
-func (layout directoryLayoutV1) GetDirectoryPaths() interfaces.RepoDirectoryLayout {
-	return layout
-}
-
 func (layout directoryLayoutV1) FileCacheDormant() string {
-	return layout.DirDodder("dormant")
+	return layout.MakeDirData("dormant")
 }
 
 func (layout directoryLayoutV1) FileTags() string {
-	return layout.DirDodder("tags")
+	return layout.MakeDirData("tags")
 }
 
 func (layout directoryLayoutV1) FileLock() string {
-	return filepath.Join(layout.State, "lock")
+	return layout.State.MakePath("lock").String()
 }
 
 func (layout directoryLayoutV1) FileConfigPermanent() string {
-	return layout.DirDodder("config-permanent")
+	return layout.MakeDirData("config-permanent")
 }
 
 func (layout directoryLayoutV1) FileConfigMutable() string {
-	return layout.DirDodder("config-mutable")
+	return layout.MakeDirData("config-mutable")
 }
 
-func (layout directoryLayoutV1) Dir(p ...string) string {
-	return filepath.Join(stringSliceJoin(layout.Data, p)...)
-}
-
-func (layout directoryLayoutV1) DirDodder(p ...string) string {
-	return layout.Dir(p...)
+func (layout directoryLayoutV1) MakeDirData(p ...string) string {
+	return layout.Data.MakePath(p...).String()
 }
 
 func (layout directoryLayoutV1) DirCache(p ...string) string {
-	return layout.DirDodder(append([]string{"cache"}, p...)...)
+	return layout.MakeDirData(append([]string{"cache"}, p...)...)
 }
 
 func (layout directoryLayoutV1) DirCacheRepo(p ...string) string {
 	// TODO switch to XDG cache
 	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
-	return layout.DirDodder(append([]string{"cache", "repo"}, p...)...)
+	return layout.MakeDirData(append([]string{"cache", "repo"}, p...)...)
 }
 
 func (layout directoryLayoutV1) DirBlobStores(p ...string) string {
-	return layout.DirDodder(append([]string{"objects"}, p...)...)
+	return layout.MakeDirData(append([]string{"objects"}, p...)...)
 }
 
 func (layout directoryLayoutV1) DirBlobStoreConfigs(p ...string) string {
@@ -69,7 +61,7 @@ func (layout directoryLayoutV1) DirBlobStoreConfigs(p ...string) string {
 }
 
 func (layout directoryLayoutV1) DirLostAndFound() string {
-	return layout.DirDodder("lost_and_found")
+	return layout.MakeDirData("lost_and_found")
 }
 
 func (layout directoryLayoutV1) DirCacheObjects() string {
@@ -85,7 +77,7 @@ func (layout directoryLayoutV1) DirCacheInventoryListLog() string {
 }
 
 func (layout directoryLayoutV1) DirObjectId() string {
-	return layout.DirDodder("object_ids")
+	return layout.MakeDirData("object_ids")
 }
 
 func (layout directoryLayoutV1) FileCacheObjectId() string {

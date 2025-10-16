@@ -150,8 +150,8 @@ func MakeWithHome(
 ) (env env) {
 	env.Context = context
 
-	xdg := xdg.XDG{
-		Home: home,
+	exdg := xdg.XDG{
+		Home: xdg.DefaultHome.MakeBaseEnvVar(home),
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
@@ -171,18 +171,18 @@ func MakeWithHome(
 	pathCwdXDGOverride := filepath.Join(env.cwd, fmt.Sprintf(".%s", addedPath))
 
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
-		xdg.Home = pathCwdXDGOverride
+		exdg.Home = xdg.DefaultHome.MakeBaseEnvVar(pathCwdXDGOverride)
 		addedPath = ""
-		if err := xdg.InitializeOverridden(addedPath); err != nil {
+		if err := exdg.InitializeOverridden(addedPath); err != nil {
 			env.Cancel(err)
 		}
 	} else {
-		if err := xdg.InitializeStandardFromEnv(addedPath); err != nil {
+		if err := exdg.InitializeStandardFromEnv(addedPath); err != nil {
 			env.Cancel(err)
 		}
 	}
 
-	if err := env.initializeXDG(xdg); err != nil {
+	if err := env.initializeXDG(exdg); err != nil {
 		env.Cancel(err)
 	}
 
@@ -205,19 +205,21 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 
 	utilityNameWithDot := fmt.Sprintf(".%s", utilityName)
 
-	xdg := xdg.XDG{
-		Home: filepath.Join(xdgRootOverride, utilityNameWithDot),
+	exdg := xdg.XDG{
+		Home: xdg.DefaultHome.MakeBaseEnvVar(
+			filepath.Join(xdgRootOverride, utilityNameWithDot),
+		),
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
 		env.Cancel(err)
 	}
 
-	if err := xdg.InitializeOverridden(""); err != nil {
+	if err := exdg.InitializeOverridden(""); err != nil {
 		env.Cancel(err)
 	}
 
-	if err := env.initializeXDG(xdg); err != nil {
+	if err := env.initializeXDG(exdg); err != nil {
 		env.Cancel(err)
 	}
 
@@ -233,19 +235,19 @@ func MakeWithHomeAndInitialize(
 ) (env env) {
 	env.Context = context
 
-	xdg := xdg.XDG{
-		Home: home,
+	exdg := xdg.XDG{
+		Home: xdg.DefaultHome.MakeBaseEnvVar(home),
 	}
 
 	if err := env.beforeXDG.initialize(debugOptions); err != nil {
 		env.Cancel(err)
 	}
 
-	if err := xdg.InitializeStandardFromEnv("dodder"); err != nil {
+	if err := exdg.InitializeStandardFromEnv("dodder"); err != nil {
 		env.Cancel(err)
 	}
 
-	if err := env.initializeXDG(xdg); err != nil {
+	if err := env.initializeXDG(exdg); err != nil {
 		env.Cancel(err)
 	}
 

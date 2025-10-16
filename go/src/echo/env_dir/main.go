@@ -47,10 +47,9 @@ type env struct {
 func (env *env) initializeXDG(xdg xdg.XDG) (err error) {
 	env.XDG = xdg
 
-	env.TempLocal.BasePath = filepath.Join(
-		env.Cache,
+	env.TempLocal.BasePath = env.Cache.MakePath(
 		fmt.Sprintf("tmp-%d", env.GetPid()),
-	)
+	).String()
 
 	if err = env.MakeDir(env.GetTempLocal().BasePath); err != nil {
 		err = errors.Wrap(err)

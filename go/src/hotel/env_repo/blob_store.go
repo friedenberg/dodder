@@ -95,7 +95,6 @@ func (env BlobStoreEnv) GetBlobStores() []blob_stores.BlobStoreInitialized {
 	return blobStores
 }
 
-// TODO extract this into madder
 func (env *BlobStoreEnv) writeBlobStoreConfig(
 	bigBang BigBang,
 	directoryLayout interfaces.BlobStoreDirectoryLayout,

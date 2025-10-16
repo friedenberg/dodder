@@ -108,7 +108,7 @@ func (server *Server) InitializeUnixSocket(
 	if sock.Path == "" {
 		dir := server.EnvLocal.GetXDG().State
 
-		if err = os.MkdirAll(dir, 0o700); err != nil {
+		if err = os.MkdirAll(dir.String(), 0o700); err != nil {
 			err = errors.Wrap(err)
 			return sock, err
 		}

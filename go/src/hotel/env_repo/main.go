@@ -2,7 +2,6 @@ package env_repo
 
 import (
 	"os"
-	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -61,7 +60,7 @@ func Make(
 	}
 
 	xdg := env.GetXDG()
-	fileConfigPermanent := filepath.Join(xdg.Data, "config-permanent")
+	fileConfigPermanent := xdg.Data.MakePath("config-permanent").String()
 
 	var configLoaded bool
 
@@ -112,7 +111,7 @@ func Make(
 	// 	return
 	// }
 
-	if env.DirDodder() == "" {
+	if env.MakeDirData() == "" {
 		panic("empty dir dodder")
 	}
 
@@ -198,7 +197,7 @@ func (env Env) ResetCache() (err error) {
 }
 
 func (env Env) DataFileStoreVersion() string {
-	return filepath.Join(env.GetXDG().Data, "version")
+	return env.GetXDG().Data.MakePath("version").String()
 }
 
 func (env Env) GetStoreVersion() store_version.Version {
