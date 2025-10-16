@@ -28,7 +28,6 @@ func RunTestContext(
 			run(testContext)
 		},
 	); err != nil {
-		// TODO replay this `t.Fatalf` on the main go routine
 		testContext.Skip(1).Fatalf("test context failed: %s", err)
 	}
 }
