@@ -18,6 +18,11 @@ type (
 		GetBlobStoreType() string
 	}
 
+	ConfigUpgradeable interface {
+		Config
+		Upgrade() (Config, ids.Type)
+	}
+
 	ConfigMutable interface {
 		Config
 		interfaces.CommandComponentWriter

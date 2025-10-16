@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"golang.org/x/crypto/ssh"
 )
@@ -45,6 +46,9 @@ func MakeBlobStoresFromRepoConfig(
 		blob := config.(interfaces.BlobIOWrapperGetter)
 		blobStores[0].Name = "0-default"
 		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
+		blobStores[0].Config.Type = ids.GetOrPanic(
+			ids.TypeTomlBlobStoreConfigV0,
+		).Type
 		blobStores[0].BasePath = directoryLayout.DirBlobStores("blobs")
 	} else {
 		var configPaths []string

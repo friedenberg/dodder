@@ -8,7 +8,10 @@ import (
 
 const (
 	// TODO figure out a more ergonomic way of incrementing and labeling as
-	// latest
+	// latest -> interface {
+	//   All() interface.Seq[id.Type]
+	// 	 GetCurrent() Type
+	// }
 
 	// keep sorted
 	TypeInventoryListJsonV0                   = "!inventory_list-json-v0"

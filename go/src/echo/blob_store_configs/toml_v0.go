@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/delta/markl_age_id"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type TomlV0 struct {
@@ -16,6 +17,7 @@ type TomlV0 struct {
 
 var (
 	_ ConfigLocalHashBucketed = TomlV0{}
+	_ ConfigUpgradeable       = TomlV0{}
 	_ ConfigLocalMutable      = &TomlV0{}
 )
 
@@ -72,4 +74,18 @@ func (blobStoreConfig TomlV0) GetDefaultHashTypeId() string {
 
 func (blobStoreConfig *TomlV0) SetBasePath(value string) {
 	blobStoreConfig.BasePath = value
+}
+
+func (blobStoreConfig TomlV0) Upgrade() (Config, ids.Type) {
+	upgraded := &TomlV1{
+		HashBuckets:       []int{2},
+		BasePath:          blobStoreConfig.BasePath,
+		HashTypeId:        markl.FormatIdHashSha256,
+		CompressionType:   blobStoreConfig.CompressionType,
+		LockInternalFiles: blobStoreConfig.LockInternalFiles,
+	}
+
+	upgraded.Encryption.ResetWithMarklId(blobStoreConfig.AgeEncryption)
+
+	return upgraded, ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV1).Type
 }

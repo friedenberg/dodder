@@ -1,6 +1,8 @@
 package commands_madder
 
 import (
+	"path/filepath"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -53,12 +55,12 @@ func (cmd *InitFrom) Run(req command.Request) {
 
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	var config triple_hyphen_io.TypedBlob[blob_store_configs.Config]
+	var typedConfig triple_hyphen_io.TypedBlob[blob_store_configs.Config]
 
 	{
 		var err error
 
-		if config, err = triple_hyphen_io.DecodeFromFile(
+		if typedConfig, err = triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
 			configPathFD.String(),
 		); err != nil {
@@ -67,24 +69,70 @@ func (cmd *InitFrom) Run(req command.Request) {
 		}
 	}
 
-	if config, ok := config.Blob.(blob_store_configs.ConfigLocal); ok {
-		config, ok := config.(blob_store_configs.ConfigLocalMutable)
+	for {
+		configUpgraded, ok := typedConfig.Blob.(blob_store_configs.ConfigUpgradeable)
 
 		if !ok {
-			// TODO emit error, blob must support setting base path
+			break
 		}
 
-		// TODO get base path relative to config path
-		config.SetBasePath("test")
+		typedConfig.Blob, typedConfig.Type = configUpgraded.Upgrade()
 	}
-	// TODO populate basepath for config to be absolute
+
+	cmd.tryAddBasePath(req, typedConfig.Blob)
 
 	pathConfig := cmd.InitBlobStore(
 		req,
 		envBlobStore,
 		name.String(),
-		&config,
+		&typedConfig,
 	)
 
 	envBlobStore.GetUI().Printf("Wrote config to %s", pathConfig)
+}
+
+func (cmd InitFrom) tryAddBasePath(
+	req command.Request,
+	config blob_store_configs.Config,
+) {
+	var configLocal blob_store_configs.ConfigLocal
+
+	{
+		var ok bool
+		configLocal, ok = config.(blob_store_configs.ConfigLocal)
+
+		if !ok {
+			return
+		}
+	}
+
+	basePath := configLocal.GetBasePath()
+
+	if filepath.IsAbs(basePath) {
+		return
+	}
+
+	var configLocalMutable blob_store_configs.ConfigLocalMutable
+
+	{
+		var ok bool
+
+		configLocalMutable, ok = configLocal.(blob_store_configs.ConfigLocalMutable)
+
+		if !ok {
+			errors.ContextCancelWithBadRequestf(
+				req,
+				"expected %T but got %T",
+				configLocalMutable,
+				configLocal,
+			)
+
+			return
+		}
+
+		// TODO get base path relative to config path
+
+		// TODO populate basepath for config to be absolute
+		configLocalMutable.SetBasePath("test")
+	}
 }

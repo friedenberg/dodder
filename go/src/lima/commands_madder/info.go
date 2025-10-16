@@ -1,17 +1,15 @@
-package commands_dodder
+package commands_madder
 
 import (
 	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
 func init() {
@@ -20,22 +18,15 @@ func init() {
 }
 
 type InfoRepo struct {
-	command_components_dodder.EnvRepo
+	command_components_madder.EnvBlobStore
 }
 
 func (cmd InfoRepo) Run(req command.Request) {
 	args := req.PopArgs()
-	env := cmd.MakeEnvRepo(req, false)
+	env := cmd.MakeEnvBlobStore(req)
 
-	// TODO should this be the private config flavor?
-	configPublicTypedBlob := env.GetConfigPublic()
-	configPublicBlob := configPublicTypedBlob.Blob
-
-	configPrivateTypedBlob := env.GetConfigPrivate()
-	configPrivateBlob := configPrivateTypedBlob.Blob
-
-	storeVersion := configPublicBlob.GetStoreVersion()
 	blobStore := env.GetDefaultBlobStore()
+	blobStoreConfig := blobStore.Config
 	blobIOWrapper := blobStore.GetBlobIOWrapper()
 
 	if len(args) == 0 {
@@ -52,18 +43,15 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "config-immutable":
-			if _, err := genesis_configs.CoderPublic.EncodeTo(
-				&configPublicTypedBlob,
+			if _, err := blob_store_configs.Coder.EncodeTo(
+				&blobStoreConfig,
 				env.GetUIFile(),
 			); err != nil {
 				env.Cancel(err)
 			}
 
-		case "store-version":
-			env.GetUI().Print(configPublicBlob.GetStoreVersion())
-
-		case "id":
-			env.GetUI().Print(configPublicBlob.GetRepoId())
+		case "name":
+			// TODO
 
 			// TODO switch to `blob_stores.N.compression_type`
 		case "compression-type":
@@ -119,30 +107,6 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "dir-blob_stores-0-blobs":
 			env.GetUI().Print(
 				env.DirFirstBlobStoreBlobs(),
-			)
-
-			// TODO make dynamic and parse index
-		case "dir-blob_stores-0-inventory_lists":
-			if store_version.LessOrEqual(storeVersion, store_version.V10) {
-				env.GetUI().Print(
-					env.DirFirstBlobStoreInventoryLists(),
-				)
-			} else {
-				env.GetUI().Print(
-					env.DirFirstBlobStoreBlobs(),
-				)
-			}
-
-		case "pubkey":
-			env.GetUI().Print(
-				configPublicBlob.GetPublicKey().StringWithFormat(),
-			)
-
-		case "seckey":
-			env.Cancel(errors.Err405MethodNotAllowed)
-
-			env.GetUI().Print(
-				configPrivateBlob.GetPrivateKey().StringWithFormat(),
 			)
 
 		case "xdg":
