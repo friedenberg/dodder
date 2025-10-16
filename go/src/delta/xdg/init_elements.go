@@ -1,12 +1,12 @@
 package xdg
 
-type xdgInitElement struct {
+type initElement struct {
 	standard DefaultEnvVar
 	out      *string
 }
 
-func (exdg *XDG) getInitElements() []xdgInitElement {
-	return []xdgInitElement{
+func (exdg *XDG) getInitElements() []initElement {
+	return []initElement{
 		{
 			standard: DefaultData,
 			out:      &exdg.Data.ActualValue,

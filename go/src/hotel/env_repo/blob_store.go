@@ -108,7 +108,7 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 
 	if config, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
 		config.SetBasePath(
-			directoryLayout.DirBlobStores(strconv.Itoa(0)),
+			interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(0)),
 		)
 	}
 

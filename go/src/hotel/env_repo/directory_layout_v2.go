@@ -23,17 +23,14 @@ func (layout directoryLayoutV2) MakeDirData(p ...string) string {
 	return layout.xdg.Data.MakePath(p...).String()
 }
 
-// func (layout directoryLayoutV2) MakePathBlobStore(
-// 	target string,
-// ) interfaces.DirectoryLayoutPath {
-// 	return Path{
-// 		baseEnvVar: layout.xdg.Data,
-// 		target:     filepath.Join("blob_stores", target),
-// 	}
-// }
+func (layout directoryLayoutV2) MakePathBlobStore(
+	targets ...string,
+) interfaces.DirectoryLayoutPath {
+	return layout.xdg.Data.MakePath(stringSliceJoin("blob_stores", targets)...)
+}
 
 func (layout directoryLayoutV2) DirBlobStores(p ...string) string {
-	return layout.MakeDirData(append([]string{"blob_stores"}, p...)...)
+	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
 }
 
 func (layout directoryLayoutV2) DirBlobStoreConfigs(p ...string) string {
@@ -42,12 +39,12 @@ func (layout directoryLayoutV2) DirBlobStoreConfigs(p ...string) string {
 
 // TODO deprecate and remove
 func (layout directoryLayoutV2) DirFirstBlobStoreInventoryLists() string {
-	return layout.DirBlobStores("0")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
 }
 
 // TODO deprecate and remove
 func (layout directoryLayoutV2) DirFirstBlobStoreBlobs() string {
-	return layout.DirBlobStores("0")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
 }
 
 func (layout directoryLayoutV2) FileCacheDormant() string {
@@ -105,5 +102,5 @@ func (layout directoryLayoutV2) FileCacheObjectId() string {
 }
 
 func (layout directoryLayoutV2) FileInventoryListLog() string {
-	return layout.DirBlobStores("inventory_lists_log")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists_log")
 }

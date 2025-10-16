@@ -18,6 +18,12 @@ func (layout *directoryLayoutV1) initDirectoryLayout(
 	return err
 }
 
+func (layout directoryLayoutV1) MakePathBlobStore(
+	targets ...string,
+) interfaces.DirectoryLayoutPath {
+	return layout.XDG.Data.MakePath(stringSliceJoin("blob_stores", targets)...)
+}
+
 func (layout directoryLayoutV1) FileCacheDormant() string {
 	return layout.MakeDirData("dormant")
 }
@@ -53,7 +59,7 @@ func (layout directoryLayoutV1) DirCacheRepo(p ...string) string {
 }
 
 func (layout directoryLayoutV1) DirBlobStores(p ...string) string {
-	return layout.MakeDirData(append([]string{"objects"}, p...)...)
+	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
 }
 
 func (layout directoryLayoutV1) DirBlobStoreConfigs(p ...string) string {
@@ -85,13 +91,13 @@ func (layout directoryLayoutV1) FileCacheObjectId() string {
 }
 
 func (layout directoryLayoutV1) FileInventoryListLog() string {
-	return layout.DirBlobStores("inventory_lists_log")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists_log")
 }
 
 func (layout directoryLayoutV1) DirFirstBlobStoreInventoryLists() string {
-	return layout.DirBlobStores("inventory_lists")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists")
 }
 
 func (layout directoryLayoutV1) DirFirstBlobStoreBlobs() string {
-	return layout.DirBlobStores("blobs")
+	return interfaces.DirectoryLayoutDirBlobStore(layout, "blobs")
 }

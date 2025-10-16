@@ -30,7 +30,7 @@ type (
 		DirBlobStoreConfigs(p ...string) string
 		DirBlobStores(p ...string) string
 
-		// MakePathBlobStore(string) DirectoryLayoutPath
+		MakePathBlobStore(...string) DirectoryLayoutPath
 	}
 
 	RepoDirectoryLayout interface {
@@ -66,3 +66,10 @@ type (
 		Delete(...string) error
 	}
 )
+
+func DirectoryLayoutDirBlobStore(
+	layout BlobStoreDirectoryLayout,
+	targets ...string,
+) string {
+	return layout.MakePathBlobStore(targets...).String()
+}

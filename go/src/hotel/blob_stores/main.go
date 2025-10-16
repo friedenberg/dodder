@@ -49,7 +49,7 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].BasePath = directoryLayout.DirBlobStores("blobs")
+		blobStores[0].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, "blobs")
 	} else {
 		var configPaths []string
 
@@ -68,7 +68,7 @@ func MakeBlobStoresFromRepoConfig(
 
 		for i, configPath := range configPaths {
 			blobStores[i].Name = fd.FileNameSansExt(configPath)
-			blobStores[i].BasePath = directoryLayout.DirBlobStores(strconv.Itoa(i))
+			blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(i))
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
@@ -126,7 +126,7 @@ func MakeBlobStores(
 
 	for i, configPath := range configPaths {
 		blobStores[i].Name = fd.FileNameSansExt(configPath)
-		blobStores[i].BasePath = directoryLayout.DirBlobStores(strconv.Itoa(i))
+		blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(i))
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
