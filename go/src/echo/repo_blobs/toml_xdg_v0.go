@@ -3,6 +3,7 @@ package repo_blobs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
+	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
@@ -32,11 +33,11 @@ func TomlXDGV0FromXDG(xdg xdg.XDG) *TomlXDGV0 {
 
 func (blob TomlXDGV0) MakeXDG() xdg.XDG {
 	return xdg.XDG{
-		Data:    xdg.DefaultData.MakeBaseEnvVar(blob.Data),
-		Config:  xdg.DefaultConfig.MakeBaseEnvVar(blob.Config),
-		Cache:   xdg.DefaultCache.MakeBaseEnvVar(blob.Cache),
-		Runtime: xdg.DefaultRuntime.MakeBaseEnvVar(blob.Runtime),
-		State:   xdg.DefaultState.MakeBaseEnvVar(blob.State),
+		Data:    xdg_defaults.Data.MakeBaseEnvVar(blob.Data),
+		Config:  xdg_defaults.Config.MakeBaseEnvVar(blob.Config),
+		Cache:   xdg_defaults.Cache.MakeBaseEnvVar(blob.Cache),
+		Runtime: xdg_defaults.Runtime.MakeBaseEnvVar(blob.Runtime),
+		State:   xdg_defaults.State.MakeBaseEnvVar(blob.State),
 	}
 }
 
