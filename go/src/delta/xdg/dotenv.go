@@ -79,9 +79,9 @@ func (dotenv Dotenv) ReadFrom(reader io.Reader) (n int64, err error) {
 
 	for _, ie := range toInitialize {
 		if err = dotenv.setDefaultOrEnvFromMap(
-			ie.standard.DefaultValueTemplate,
-			ie.standard.Name,
-			ie.out,
+			ie.defawlt.DefaultValueTemplate,
+			ie.defawlt.Name,
+			&ie.actual.ActualValue,
 			env,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -103,8 +103,8 @@ func (dotenv Dotenv) WriteTo(writer io.Writer) (n int64, err error) {
 		n1, err = fmt.Fprintf(
 			bufferedWriter,
 			"%s=%s\n",
-			initElement.standard.Name,
-			*initElement.out,
+			initElement.defawlt.Name,
+			initElement.actual.ActualValue,
 		)
 		n += int64(n1)
 

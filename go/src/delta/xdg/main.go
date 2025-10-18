@@ -61,7 +61,7 @@ func (exdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
 	initElements := exdg.getInitElements()
 
 	for _, element := range initElements {
-		envVars[element.standard.Name] = *element.out
+		envVars[element.defawlt.Name] = element.actual.ActualValue
 	}
 }
 
@@ -103,8 +103,8 @@ func (exdg *XDG) InitializeOverridden(
 
 	for _, ie := range initElements {
 		// TODO validate this to prevent root xdg directories
-		if *ie.out, err = exdg.setDefaultOrEnv(
-			ie.standard.overridden,
+		if ie.actual.ActualValue, err = exdg.setDefaultOrEnv(
+			ie.defawlt.overridden,
 			"",
 		); err != nil {
 			err = errors.Wrap(err)
@@ -124,9 +124,9 @@ func (exdg *XDG) InitializeStandardFromEnv(
 
 	for _, ie := range toInitialize {
 		// TODO valid this to prevent root xdg directories
-		if *ie.out, err = exdg.setDefaultOrEnv(
-			ie.standard.DefaultValueTemplate,
-			ie.standard.Name,
+		if ie.actual.ActualValue, err = exdg.setDefaultOrEnv(
+			ie.defawlt.DefaultValueTemplate,
+			ie.defawlt.Name,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
