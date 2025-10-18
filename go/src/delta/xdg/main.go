@@ -143,7 +143,7 @@ func (xdg *XDG) InitializeStandardFromEnv(
 
 	for _, initElement := range xdg.getInitElements() {
 		initElement.actual.Name = initElement.defawlt.Name
-		initElement.actual.DefaultValueTemplate = initElement.defawlt.TemplateOverride
+		initElement.actual.DefaultValueTemplate = initElement.defawlt.TemplateDefault
 
 		if err = initElement.actual.InitializeXDGEnvVarOrTemplate(
 			xdg.UtilityName,

@@ -225,7 +225,6 @@ func (env Env) getV10OrLessInventoryListBlobStore() interfaces.BlobStore {
 	if store, err := blob_stores.MakeBlobStore(
 		env,
 		blob_stores.BlobStoreConfigNamed{
-			BasePath: env.DirFirstBlobStoreInventoryLists(),
 			Config: blob_store_configs.TypedConfig{
 				Blob: blob.GetBlobIOWrapper().(blob_store_configs.Config),
 			},

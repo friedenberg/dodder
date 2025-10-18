@@ -90,14 +90,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "blob_stores-0-config":
-			// TODO this is gross, fix it
 			blobStoreConfig := blobStore.BlobStoreConfigNamed.Config
-
-			if configLocalMutable, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
-				configLocalMutable.SetBasePath(
-					blobStore.BlobStoreConfigNamed.BasePath,
-				)
-			}
 
 			if _, err := blob_store_configs.Coder.EncodeTo(
 				&blob_store_configs.TypedConfig{

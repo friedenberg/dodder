@@ -16,19 +16,8 @@ func MakeDefault(
 	utilityName string,
 	debugOptions debug.Options,
 ) env {
-	var home string
-
-	{
-		var err error
-
-		if home, err = os.UserHomeDir(); err != nil {
-			context.Cancel(err)
-		}
-	}
-
-	return MakeWithHome(
+	return MakeWithDefaultHome(
 		context,
-		home,
 		utilityName,
 		debugOptions,
 		true,
@@ -41,19 +30,8 @@ func MakeDefaultNoInit(
 	utilityName string,
 	debugOptions debug.Options,
 ) env {
-	var home string
-
-	{
-		var err error
-
-		if home, err = os.UserHomeDir(); err != nil {
-			context.Cancel(err)
-		}
-	}
-
-	return MakeWithHome(
+	return MakeWithDefaultHome(
 		context,
-		home,
 		utilityName,
 		debugOptions,
 		true,
@@ -137,9 +115,8 @@ func MakeDefaultAndInitialize(
 	}
 }
 
-func MakeWithHome(
+func MakeWithDefaultHome(
 	context interfaces.Context,
-	home string,
 	utilityName string,
 	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
