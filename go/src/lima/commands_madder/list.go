@@ -23,8 +23,8 @@ func (cmd *List) SetFlagDefinitions(
 }
 
 func (cmd List) Run(req command.Request) {
-	envRepo := cmd.MakeEnvBlobStore(req)
-	blobStoresAll := envRepo.GetBlobStores()
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStoresAll := envBlobStore.GetBlobStores()
 
 	for _, blobStore := range blobStoresAll {
 		ui.Out().Printf(

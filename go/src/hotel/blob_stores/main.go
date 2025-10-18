@@ -49,7 +49,10 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, "blobs")
+		blobStores[0].BasePath = interfaces.DirectoryLayoutDirBlobStore(
+			directoryLayout,
+			"blobs",
+		)
 	} else {
 		var configPaths []string
 
@@ -126,7 +129,10 @@ func MakeBlobStores(
 
 	for i, configPath := range configPaths {
 		blobStores[i].Name = fd.FileNameSansExt(configPath)
-		blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(i))
+		blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(
+			directoryLayout,
+			strconv.Itoa(i),
+		)
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
@@ -158,10 +164,10 @@ func MakeBlobStores(
 
 func MakeRemoteBlobStore(
 	ctx interfaces.ActiveContext,
-	config BlobStoreConfigNamed,
+	configNamed BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 ) (blobStore BlobStoreInitialized) {
-	blobStore.BlobStoreConfigNamed = config
+	blobStore.BlobStoreConfigNamed = configNamed
 
 	{
 		var err error
@@ -169,7 +175,7 @@ func MakeRemoteBlobStore(
 		// TODO use sha of config to determine blob store base path
 		if blobStore.BlobStore, err = MakeBlobStore(
 			ctx,
-			config,
+			configNamed,
 			tempFS,
 		); err != nil {
 			ctx.Cancel(err)
@@ -183,66 +189,60 @@ func MakeRemoteBlobStore(
 // TODO describe base path agnostically
 func MakeBlobStore(
 	context interfaces.ActiveContext,
-	config BlobStoreConfigNamed,
+	configNamed BlobStoreConfigNamed,
 	tempFS env_dir.TemporaryFS,
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
-		fmt.Sprintf("(blob_store: %s) ", config.Name),
+		fmt.Sprintf("(blob_store: %s) ", configNamed.Name),
 	)
 
 	// TODO don't use tipe, use interfaces on the config
-	switch tipe := config.Config.Blob.GetBlobStoreType(); tipe {
-	default:
-		err = errors.BadRequestf("unsupported blob store type %q", tipe)
-		return store, err
+	// switch tipe := config.Config.Blob.GetBlobStoreType(); tipe {
+	configBlob := configNamed.Config.Blob
 
-	case "sftp":
+	switch config := configBlob.(type) {
+	case blob_store_configs.ConfigSFTPUri:
 		var sshClient *ssh.Client
-		var configSFTP blob_store_configs.ConfigSFTPRemotePath
 
-		switch config := config.Config.Blob.(type) {
-		default:
-			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
+		if sshClient, err = MakeSSHClientFromSSHConfig(context, printer, config); err != nil {
+			err = errors.Wrap(err)
 			return store, err
-
-		case blob_store_configs.ConfigSFTPUri:
-			if sshClient, err = MakeSSHClientFromSSHConfig(context, printer, config); err != nil {
-				err = errors.Wrap(err)
-				return store, err
-			}
-
-			configSFTP = config
-
-		case blob_store_configs.ConfigSFTPConfigExplicit:
-			if sshClient, err = MakeSSHClientForExplicitConfig(context, printer, config); err != nil {
-				err = errors.Wrap(err)
-				return store, err
-			}
-
-			configSFTP = config
 		}
 
 		return makeSftpStore(
 			context,
 			printer,
-			configSFTP,
+			config,
 			sshClient,
 		)
 
-	case "local":
-		if configLocal, ok := config.Config.Blob.(blob_store_configs.ConfigLocalHashBucketed); ok {
-			return makeLocalHashBucketed(
-				context,
-				config.BasePath,
-				// configLocal.GetBasePath(),
-				configLocal,
-				tempFS,
-			)
-		} else {
-			err = errors.BadRequestf("unsupported blob store config for type %q: %T", tipe, config)
+	case blob_store_configs.ConfigSFTPConfigExplicit:
+		var sshClient *ssh.Client
+
+		if sshClient, err = MakeSSHClientForExplicitConfig(context, printer, config); err != nil {
+			err = errors.Wrap(err)
 			return store, err
 		}
+
+		return makeSftpStore(
+			context,
+			printer,
+			config,
+			sshClient,
+		)
+
+	case blob_store_configs.ConfigLocalHashBucketed:
+		return makeLocalHashBucketed(
+			context,
+			configNamed.BasePath,
+			config,
+			tempFS,
+		)
+
+	default:
+		err = errors.BadRequestf("unsupported blob store type %q:%T", configBlob.GetBlobStoreType(), configBlob)
+		return store, err
 	}
 }
 
