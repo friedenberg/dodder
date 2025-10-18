@@ -27,6 +27,7 @@ type (
 
 	DirectoryLayout interface {
 		GetDirHome() DirectoryLayoutBaseEnvVar
+		GetDirCwd() DirectoryLayoutBaseEnvVar
 		GetDirData() DirectoryLayoutBaseEnvVar
 		GetDirConfig() DirectoryLayoutBaseEnvVar
 		GetDirState() DirectoryLayoutBaseEnvVar

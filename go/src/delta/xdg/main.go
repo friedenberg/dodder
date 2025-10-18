@@ -11,6 +11,7 @@ import (
 
 type XDG struct {
 	Home    env_vars.DirectoryLayoutBaseEnvVar
+	CWD     env_vars.DirectoryLayoutBaseEnvVar
 	Data    env_vars.DirectoryLayoutBaseEnvVar
 	Config  env_vars.DirectoryLayoutBaseEnvVar
 	State   env_vars.DirectoryLayoutBaseEnvVar
@@ -23,6 +24,8 @@ type XDG struct {
 var _ interfaces.DirectoryLayout = XDG{}
 
 func (exdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Home }
+
+func (exdg XDG) GetDirCwd() interfaces.DirectoryLayoutBaseEnvVar { return exdg.CWD }
 
 func (exdg XDG) GetDirData() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Data }
 

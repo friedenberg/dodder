@@ -7,12 +7,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-// TODO add support for comments
-type EnvVars map[string]string
-
-type Adder = interfaces.EnvVarsAdder
-
-type Getenv = func(string) string
+type (
+	// TODO add support for comments
+	EnvVars map[string]string
+	Getenv  = func(string) string
+)
 
 func Make(adders ...interfaces.EnvVarsAdder) EnvVars {
 	envVars := make(EnvVars)
