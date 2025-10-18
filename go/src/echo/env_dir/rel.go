@@ -17,9 +17,9 @@ func (env env) MakeRelativePathStringFormatWriter() interfaces.StringEncoderTo[s
 
 type relativePathStringFormatWriter env
 
-func (f relativePathStringFormatWriter) EncodeStringTo(
-	p string,
-	w interfaces.WriterAndStringWriter,
+func (formatter relativePathStringFormatWriter) EncodeStringTo(
+	path string,
+	writer interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var n1 int
 
@@ -29,14 +29,14 @@ func (f relativePathStringFormatWriter) EncodeStringTo(
 		// 	return
 		// }
 
-		p1, _ := filepath.Rel(f.cwd, p)
+		p1, _ := filepath.Rel(formatter.xdgInitArgs.Cwd, path)
 
 		if p1 != "" {
-			p = p1
+			path = p1
 		}
 	}
 
-	n1, err = w.WriteString(p)
+	n1, err = writer.WriteString(path)
 	n += int64(n1)
 
 	if err != nil {

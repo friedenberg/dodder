@@ -1,6 +1,8 @@
 package env_repo
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
@@ -19,8 +21,12 @@ func (layout *directoryLayoutV2) initDirectoryLayout(
 	return err
 }
 
-func (layout directoryLayoutV2) MakeDirData(p ...string) string {
-	return layout.xdg.Data.MakePath(p...).String()
+func (layout directoryLayoutV2) MakeDirData(targets ...string) string {
+	if layout.xdg.Data.ActualValue == "" {
+		panic(fmt.Sprintf("empty xdg data dir: %#v", layout.xdg.Data))
+	}
+
+	return layout.xdg.Data.MakePath(targets...).String()
 }
 
 func (layout directoryLayoutV2) MakePathBlobStore(

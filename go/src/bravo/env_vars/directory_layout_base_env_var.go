@@ -1,8 +1,10 @@
 package env_vars
 
 import (
+	"os"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
@@ -24,6 +26,30 @@ func (envVar DirectoryLayoutBaseEnvVar) String() string {
 
 func (envVar DirectoryLayoutBaseEnvVar) GetBaseEnvVarValue() string {
 	return envVar.ActualValue
+}
+
+func (envVar *DirectoryLayoutBaseEnvVar) InitializeXDGEnvVarOrTemplate(
+	utilityName string,
+	getenv Getenv,
+) (err error) {
+	if envVar.ActualValue, _ = os.LookupEnv(envVar.Name); envVar.ActualValue != "" {
+		envVar.ActualValue = filepath.Join(envVar.ActualValue, utilityName)
+	} else {
+		if err = envVar.InitializeXDGTemplate(getenv); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+	}
+
+	return err
+}
+
+func (envVar *DirectoryLayoutBaseEnvVar) InitializeXDGTemplate(
+	getenv Getenv,
+) (err error) {
+	envVar.ActualValue = os.Expand(envVar.DefaultValueTemplate, getenv)
+
+	return err
 }
 
 func (envVar DirectoryLayoutBaseEnvVar) MakePath(

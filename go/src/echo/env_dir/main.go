@@ -12,10 +12,9 @@ import (
 )
 
 const (
-	EnvDir                    = "DIR_DODDER" // TODO chang to dodder-prefixed
-	EnvBin                    = "BIN_DODDER" // TODO change to dodder-prefixed
-	EnvXDGUtilityNameOverride = "DODDER_XDG_UTILITY_OVERRIDE"
-	XDGUtilityNameDodder      = "dodder"
+	EnvDir               = "DIR_DODDER" // TODO chang to dodder-prefixed
+	EnvBin               = "BIN_DODDER" // TODO change to dodder-prefixed
+	XDGUtilityNameDodder = "dodder"
 )
 
 type Env interface {
@@ -39,13 +38,14 @@ type Env interface {
 type env struct {
 	interfaces.Context
 	beforeXDG
+
+	TempLocal, TempOS TemporaryFS
+
 	xdg.XDG
 }
 
 // sets XDG and creates tmp local
-func (env *env) initializeXDG(xdg xdg.XDG) (err error) {
-	env.XDG = xdg
-
+func (env *env) initializeXDG() (err error) {
 	env.TempLocal.BasePath = env.Cache.MakePath(
 		fmt.Sprintf("tmp-%d", env.GetPid()),
 	).String()
@@ -67,7 +67,7 @@ func (env env) IsDryRun() bool {
 }
 
 func (env env) GetPid() int {
-	return env.pid
+	return env.xdgInitArgs.Pid
 }
 
 func (env env) AddToEnvVars(envVars interfaces.EnvVars) {
@@ -75,11 +75,11 @@ func (env env) AddToEnvVars(envVars interfaces.EnvVars) {
 }
 
 func (env env) GetExecPath() string {
-	return env.execPath
+	return env.xdgInitArgs.ExecPath
 }
 
 func (env env) GetCwd() string {
-	return env.cwd
+	return env.xdgInitArgs.Cwd
 }
 
 func (env env) GetXDG() xdg.XDG {

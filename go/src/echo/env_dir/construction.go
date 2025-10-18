@@ -1,12 +1,9 @@
 package env_dir
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -150,40 +147,30 @@ func MakeWithHome(
 ) (env env) {
 	env.Context = context
 
-	exdg := xdg.XDG{
-		Home: xdg.DefaultHome.MakeBaseEnvVar(home),
-	}
-
-	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+	if err := env.beforeXDG.initialize(debugOptions, utilityName); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
 	if !initialize {
 		return env
 	}
 
-	addedPath := utilityName
-
-	if addedPathOverride := os.Getenv(EnvXDGUtilityNameOverride); addedPathOverride != "" {
-		addedPath = addedPathOverride
-	}
-
-	pathCwdXDGOverride := filepath.Join(env.cwd, fmt.Sprintf(".%s", addedPath))
-
-	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
-		exdg.Home = xdg.DefaultHome.MakeBaseEnvVar(pathCwdXDGOverride)
-		addedPath = ""
-		if err := exdg.InitializeOverridden(addedPath); err != nil {
+	if permitCwdXDGOverride {
+		if err := env.XDG.InitializeOverriddenIfNecessary(env.xdgInitArgs); err != nil {
 			env.Cancel(err)
+			return env
 		}
 	} else {
-		if err := exdg.InitializeStandardFromEnv(addedPath); err != nil {
+		if err := env.XDG.InitializeStandardFromEnv(env.xdgInitArgs); err != nil {
 			env.Cancel(err)
+			return env
 		}
 	}
 
-	if err := env.initializeXDG(exdg); err != nil {
+	if err := env.initializeXDG(); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
 	env.After(env.resetTempOnExit)
@@ -198,29 +185,21 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 	debugOptions debug.Options,
 ) (env env) {
 	env.Context = context
+	env.xdgInitArgs.Cwd = xdgRootOverride
 
-	if utilityNameOverride := os.Getenv(EnvXDGUtilityNameOverride); utilityNameOverride != "" {
-		utilityName = utilityNameOverride
-	}
-
-	utilityNameWithDot := fmt.Sprintf(".%s", utilityName)
-
-	exdg := xdg.XDG{
-		Home: xdg.DefaultHome.MakeBaseEnvVar(
-			filepath.Join(xdgRootOverride, utilityNameWithDot),
-		),
-	}
-
-	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+	if err := env.beforeXDG.initialize(debugOptions, utilityName); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
-	if err := exdg.InitializeOverridden(""); err != nil {
+	if err := env.XDG.InitializeOverridden(env.xdgInitArgs); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
-	if err := env.initializeXDG(exdg); err != nil {
+	if err := env.initializeXDG(); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
 	env.After(env.resetTempOnExit)
@@ -235,20 +214,18 @@ func MakeWithHomeAndInitialize(
 ) (env env) {
 	env.Context = context
 
-	exdg := xdg.XDG{
-		Home: xdg.DefaultHome.MakeBaseEnvVar(home),
-	}
-
-	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+	if err := env.beforeXDG.initialize(debugOptions, "dodder"); err != nil {
 		env.Cancel(err)
 	}
 
-	if err := exdg.InitializeStandardFromEnv("dodder"); err != nil {
+	if err := env.XDG.InitializeStandardFromEnv(env.xdgInitArgs); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
-	if err := env.initializeXDG(exdg); err != nil {
+	if err := env.initializeXDG(); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
 	env.After(env.resetTempOnExit)
@@ -262,13 +239,16 @@ func MakeWithXDG(
 	xdg xdg.XDG,
 ) (env env) {
 	env.Context = context
+	env.XDG = xdg
 
-	if err := env.beforeXDG.initialize(debugOptions); err != nil {
+	if err := env.beforeXDG.initialize(debugOptions, xdg.UtilityName); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
-	if err := env.initializeXDG(xdg); err != nil {
+	if err := env.initializeXDG(); err != nil {
 		env.Cancel(err)
+		return env
 	}
 
 	return env

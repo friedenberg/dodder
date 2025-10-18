@@ -2,34 +2,35 @@ package xdg
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
+	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
 )
 
 type initElement struct {
-	defawlt DefaultEnvVar
+	defawlt xdg_defaults.DefaultEnvVar
 	actual  *env_vars.DirectoryLayoutBaseEnvVar
 }
 
-func (exdg *XDG) getInitElements() []initElement {
+func (xdg *XDG) getInitElements() []initElement {
 	return []initElement{
 		{
-			defawlt: DefaultData,
-			actual:  &exdg.Data,
+			defawlt: xdg_defaults.Data,
+			actual:  &xdg.Data,
 		},
 		{
-			defawlt: DefaultConfig,
-			actual:  &exdg.Config,
+			defawlt: xdg_defaults.Config,
+			actual:  &xdg.Config,
 		},
 		{
-			defawlt: DefaultState,
-			actual:  &exdg.State,
+			defawlt: xdg_defaults.State,
+			actual:  &xdg.State,
 		},
 		{
-			defawlt: DefaultCache,
-			actual:  &exdg.Cache,
+			defawlt: xdg_defaults.Cache,
+			actual:  &xdg.Cache,
 		},
 		{
-			defawlt: DefaultRuntime,
-			actual:  &exdg.Runtime,
+			defawlt: xdg_defaults.Runtime,
+			actual:  &xdg.Runtime,
 		},
 	}
 }

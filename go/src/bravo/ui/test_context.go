@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
 type t = T
@@ -29,6 +30,8 @@ func RunTestContext(
 			run(testContext)
 		},
 	); err != nil {
+		_, frames := testContext.Context.CauseWithStackFrames()
+		err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 		CLIErrorTreeEncoder.EncodeTo(err, os.Stderr)
 		testContext.Skip(1).Fatalf("test context failed: %s", err)
 	}

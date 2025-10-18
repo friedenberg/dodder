@@ -1,112 +1,97 @@
 package xdg
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
 )
 
 type XDG struct {
-	Home    env_vars.DirectoryLayoutBaseEnvVar
-	CWD     env_vars.DirectoryLayoutBaseEnvVar
+	Home env_vars.DirectoryLayoutBaseEnvVar
+	Cwd  env_vars.DirectoryLayoutBaseEnvVar
+
+	UtilityName string
+
 	Data    env_vars.DirectoryLayoutBaseEnvVar
 	Config  env_vars.DirectoryLayoutBaseEnvVar
 	State   env_vars.DirectoryLayoutBaseEnvVar
 	Cache   env_vars.DirectoryLayoutBaseEnvVar
 	Runtime env_vars.DirectoryLayoutBaseEnvVar
-
-	AddedPath string // name of the utility
 }
 
 var _ interfaces.DirectoryLayout = XDG{}
 
-func (exdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Home }
+func (xdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Home }
 
-func (exdg XDG) GetDirCwd() interfaces.DirectoryLayoutBaseEnvVar { return exdg.CWD }
+func (xdg XDG) GetDirCwd() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Cwd }
 
-func (exdg XDG) GetDirData() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Data }
+func (xdg XDG) GetDirData() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Data }
 
-func (exdg XDG) GetDirConfig() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Config }
+func (xdg XDG) GetDirConfig() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Config }
 
-func (exdg XDG) GetDirState() interfaces.DirectoryLayoutBaseEnvVar { return exdg.State }
+func (xdg XDG) GetDirState() interfaces.DirectoryLayoutBaseEnvVar { return xdg.State }
 
-func (exdg XDG) GetDirCache() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Cache }
+func (xdg XDG) GetDirCache() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Cache }
 
-func (exdg XDG) GetDirRuntime() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Runtime }
+func (xdg XDG) GetDirRuntime() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Runtime }
 
-func (exdg XDG) GetXDGEnvVars() []env_vars.DirectoryLayoutBaseEnvVar {
+func (xdg XDG) GetXDGEnvVars() []env_vars.DirectoryLayoutBaseEnvVar {
 	return []env_vars.DirectoryLayoutBaseEnvVar{
-		exdg.Data,
-		exdg.Config,
-		exdg.State,
-		exdg.Cache,
-		exdg.Runtime,
+		xdg.Data,
+		xdg.Config,
+		xdg.State,
+		xdg.Cache,
+		xdg.Runtime,
 	}
 }
 
-func (exdg XDG) GetXDGPaths() []string {
+func (xdg XDG) GetXDGPaths() []string {
 	return []string{
-		exdg.Data.String(),
-		exdg.Config.String(),
-		exdg.State.String(),
-		exdg.Cache.String(),
-		exdg.Runtime.String(),
+		xdg.Data.String(),
+		xdg.Config.String(),
+		xdg.State.String(),
+		xdg.Cache.String(),
+		xdg.Runtime.String(),
 	}
 }
 
-func (exdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
-	initElements := exdg.getInitElements()
+func (xdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
+	initElements := xdg.getInitElements()
 
 	for _, element := range initElements {
 		envVars[element.defawlt.Name] = element.actual.ActualValue
 	}
 }
 
-// TODO simplify this and document it
-func (exdg *XDG) setDefaultOrEnv(
-	defaultValue string,
-	envKey string,
-) (out string, err error) {
-	if v, ok := os.LookupEnv(envKey); envKey != "" && ok {
-		out = v
-	} else {
-		out = os.Expand(
-			defaultValue,
-			func(v string) string {
-				switch v {
-				case "HOME":
-					return exdg.Home.String()
+func (xdg *XDG) setInitArgs(initArgs InitArgs) (err error) {
+	xdg.Home = xdg_defaults.Home.MakeBaseEnvVar(initArgs.Home)
+	xdg.Cwd = xdg_defaults.Cwd.MakeBaseEnvVar(initArgs.Cwd)
+	xdg.UtilityName = initArgs.UtilityName
 
-				default:
-					return os.Getenv(v)
-				}
-			},
-		)
-	}
-
-	if exdg.AddedPath != "" {
-		out = filepath.Join(out, exdg.AddedPath)
-	}
-
-	return out, err
+	return err
 }
 
-func (exdg *XDG) InitializeOverridden(
-	addedPath string,
+func (xdg *XDG) InitializeOverriddenIfNecessary(
+	initArgs InitArgs,
 ) (err error) {
-	exdg.AddedPath = addedPath
+	pathCwdXDGOverride := filepath.Join(
+		initArgs.Cwd,
+		fmt.Sprintf(".%s", initArgs.UtilityName),
+	)
 
-	initElements := exdg.getInitElements()
-
-	for _, ie := range initElements {
-		// TODO validate this to prevent root xdg directories
-		if ie.actual.ActualValue, err = exdg.setDefaultOrEnv(
-			ie.defawlt.overridden,
-			"",
-		); err != nil {
+	if files.Exists(pathCwdXDGOverride) {
+		if err = xdg.InitializeOverridden(initArgs); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+	} else {
+		if err = xdg.InitializeStandardFromEnv(initArgs); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -115,18 +100,54 @@ func (exdg *XDG) InitializeOverridden(
 	return err
 }
 
-func (exdg *XDG) InitializeStandardFromEnv(
-	addedPath string,
+func (xdg *XDG) InitializeOverridden(
+	initArgs InitArgs,
 ) (err error) {
-	exdg.AddedPath = addedPath
+	if err = xdg.setInitArgs(initArgs); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
 
-	toInitialize := exdg.getInitElements()
+	getenv := xdg_defaults.MakeGetenv(
+		os.Getenv,
+		xdg.Cwd.ActualValue,
+		xdg.UtilityName,
+	)
 
-	for _, ie := range toInitialize {
-		// TODO valid this to prevent root xdg directories
-		if ie.actual.ActualValue, err = exdg.setDefaultOrEnv(
-			ie.defawlt.DefaultValueTemplate,
-			ie.defawlt.Name,
+	for _, initElement := range xdg.getInitElements() {
+		initElement.actual.Name = initElement.defawlt.Name
+		initElement.actual.DefaultValueTemplate = initElement.defawlt.TemplateOverride
+
+		if err = initElement.actual.InitializeXDGTemplate(getenv); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+	}
+
+	return err
+}
+
+func (xdg *XDG) InitializeStandardFromEnv(
+	initArgs InitArgs,
+) (err error) {
+	if err = xdg.setInitArgs(initArgs); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	getenv := xdg_defaults.MakeGetenv(
+		os.Getenv,
+		xdg.Cwd.ActualValue,
+		xdg.UtilityName,
+	)
+
+	for _, initElement := range xdg.getInitElements() {
+		initElement.actual.Name = initElement.defawlt.Name
+		initElement.actual.DefaultValueTemplate = initElement.defawlt.TemplateOverride
+
+		if err = initElement.actual.InitializeXDGEnvVarOrTemplate(
+			xdg.UtilityName,
+			getenv,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err

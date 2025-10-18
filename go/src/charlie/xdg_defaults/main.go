@@ -1,10 +1,12 @@
 package xdg_defaults
 
-import "code.linenisgreat.com/dodder/go/src/bravo/env_vars"
+import (
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
+)
 
 const (
-	VarXDGHomeOverride = "xdgHomeOverride"
-	VarUtilityName     = "utilityName"
+	VarCWD         = "XDG_CWD"
+	VarUtilityName = "XDG_UTILITY_NAME"
 )
 
 type DefaultEnvVar struct {
@@ -20,34 +22,40 @@ var (
 		TemplateOverride: "$HOME",
 	}
 
+	Cwd = DefaultEnvVar{
+		Name:             "PWD",
+		TemplateDefault:  "$PWD",
+		TemplateOverride: "$PWD",
+	}
+
 	Data = DefaultEnvVar{
 		Name:             "XDG_DATA_HOME",
-		TemplateDefault:  "$HOME/.local/share/$utilityName",
-		TemplateOverride: "$xdgHomeOverride/$utilityName/local/share",
+		TemplateDefault:  "$HOME/.local/share/$XDG_UTILITY_NAME",
+		TemplateOverride: "$XDG_CWD/.$XDG_UTILITY_NAME/local/share",
 	}
 
 	Config = DefaultEnvVar{
 		Name:             "XDG_CONFIG_HOME",
-		TemplateDefault:  "$HOME/.config/$utilityName",
-		TemplateOverride: "$xdgHomeOverride/$utilityName/config",
+		TemplateDefault:  "$HOME/.config/$XDG_UTILITY_NAME",
+		TemplateOverride: "$XDG_CWD/.$XDG_UTILITY_NAME/config",
 	}
 
 	State = DefaultEnvVar{
 		Name:             "XDG_STATE_HOME",
-		TemplateDefault:  "$HOME/.local/state/$utilityName",
-		TemplateOverride: "$xdgHomeOverride/$utilityName/local/state",
+		TemplateDefault:  "$HOME/.local/state/$XDG_UTILITY_NAME",
+		TemplateOverride: "$XDG_CWD/.$XDG_UTILITY_NAME/local/state",
 	}
 
 	Cache = DefaultEnvVar{
 		Name:             "XDG_CACHE_HOME",
-		TemplateDefault:  "$HOME/.cache/$utilityName",
-		TemplateOverride: "$xdgHomeOverride/$utilityName/cache",
+		TemplateDefault:  "$HOME/.cache/$XDG_UTILITY_NAME",
+		TemplateOverride: "$XDG_CWD/.$XDG_UTILITY_NAME/cache",
 	}
 
 	Runtime = DefaultEnvVar{
 		Name:             "XDG_RUNTIME_HOME",
-		TemplateDefault:  "$HOME/.local/runtime/$utilityName",
-		TemplateOverride: "$xdgHomeOverride/$utilityName/local/runtime",
+		TemplateDefault:  "$HOME/.local/runtime/$XDG_UTILITY_NAME",
+		TemplateOverride: "$XDG_CWD/.$XDG_UTILITY_NAME/local/runtime",
 	}
 )
 
@@ -63,19 +71,24 @@ func (defaultEnvVar DefaultEnvVar) MakeBaseEnvVar(
 
 func MakeGetenv(
 	getenv env_vars.Getenv,
-	homeOverride string,
+	cwd string,
 	utilityName string,
 ) env_vars.Getenv {
 	return func(envVarName string) string {
-		switch envVarName {
-		case VarUtilityName:
-			return utilityName
+		var envVarValue string
 
-		case VarXDGHomeOverride:
-			return homeOverride
+		switch envVarName {
+		case VarCWD:
+			envVarValue = cwd
+
+		case VarUtilityName:
+			envVarValue = utilityName
 
 		default:
-			return getenv(envVarName)
+			envVarValue = getenv(envVarName)
+
 		}
+
+		return envVarValue
 	}
 }

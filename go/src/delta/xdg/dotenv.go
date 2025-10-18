@@ -79,7 +79,7 @@ func (dotenv Dotenv) ReadFrom(reader io.Reader) (n int64, err error) {
 
 	for _, ie := range toInitialize {
 		if err = dotenv.setDefaultOrEnvFromMap(
-			ie.defawlt.DefaultValueTemplate,
+			ie.defawlt.TemplateDefault,
 			ie.defawlt.Name,
 			&ie.actual.ActualValue,
 			env,

@@ -42,6 +42,7 @@ type Env struct {
 	BlobStoreEnv
 }
 
+// TODO stop returning error and just cancel context
 func Make(
 	envLocal env_local.Env,
 	options Options,
@@ -60,6 +61,12 @@ func Make(
 	}
 
 	xdg := env.GetXDG()
+
+	if env.GetXDG().Data.ActualValue == "" {
+		err = errors.Errorf("empty data dir: %#v", env.GetXDG().Data)
+		return env, err
+	}
+
 	fileConfigPermanent := xdg.Data.MakePath("config-permanent").String()
 
 	var configLoaded bool
@@ -84,7 +91,7 @@ func Make(
 			fileConfigPermanent,
 		); err != nil {
 			if errors.IsNotExist(err) {
-				err = errors.Wrap(ErrNotInDodderDir{})
+				err = errors.Wrap(ErrNotInDodderDir{Expected: fileConfigPermanent})
 			} else {
 				err = errors.Wrap(err)
 			}
@@ -110,10 +117,6 @@ func Make(
 	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
 	// 	return
 	// }
-
-	if env.MakeDirData() == "" {
-		panic("empty dir dodder")
-	}
 
 	if err = env.MakeDirPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
 		err = errors.Wrap(err)

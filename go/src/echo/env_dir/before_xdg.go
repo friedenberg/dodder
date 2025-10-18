@@ -5,37 +5,32 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
+	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
 type beforeXDG struct {
-	cwd          string
-	execPath     string
-	pid          int
+	xdgInitArgs xdg.InitArgs
+
 	dryRun       bool
 	debugOptions debug.Options
-
-	TempLocal, TempOS TemporaryFS
 }
 
-func (env *beforeXDG) initialize(debugOptions debug.Options) (err error) {
+func (env *beforeXDG) initialize(
+	debugOptions debug.Options,
+	utilityName string,
+) (err error) {
 	env.debugOptions = debugOptions
 
-	if env.cwd, err = os.Getwd(); err != nil {
+	if err = env.xdgInitArgs.Initialize(utilityName); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	env.pid = os.Getpid()
 	env.dryRun = debugOptions.DryRun
-
-	if env.execPath, err = os.Executable(); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
 
 	// TODO switch to useing MakeCommonEnv()
 	{
-		if err = os.Setenv(EnvBin, env.execPath); err != nil {
+		if err = os.Setenv(EnvBin, env.xdgInitArgs.ExecPath); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
