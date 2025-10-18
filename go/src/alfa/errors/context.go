@@ -236,6 +236,8 @@ func ContextFlushAfter(ctx interfaces.ActiveContext, closer io.Closer) {
 // to
 // panic. It is meant for defers that must be executed, like closing files,
 // flushing buffers, releasing locks.
+//
+//go:noinline
 func (ctx *context) Must(f interfaces.FuncActiveContext) {
 	defer ContextContinueOrPanic(ctx)
 

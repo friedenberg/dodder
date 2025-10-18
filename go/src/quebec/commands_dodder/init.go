@@ -31,5 +31,6 @@ func (cmd *Init) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 func (cmd *Init) Run(req command.Request) {
 	repoId := req.PopArg("repo-id")
 	req.AssertNoMoreArgs()
+
 	cmd.OnTheFirstDay(req, repoId)
 }

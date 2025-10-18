@@ -46,7 +46,8 @@ func (test *T) Run(testCaseInfo TestCaseInfo, funk func(*T)) {
 		func(t1 *testing.T) {
 			printTestCaseInfo(testCaseInfo, description)
 			funk(&T{T: t1})
-		})
+		},
+	)
 }
 
 //   ___ ___

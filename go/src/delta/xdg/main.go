@@ -44,7 +44,7 @@ func (exdg XDG) GetXDGPaths() []string {
 	}
 }
 
-func (exdg XDG) AddToEnvVars(envVars env_vars.EnvVars) {
+func (exdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
 	initElements := exdg.getInitElements()
 
 	for _, element := range initElements {

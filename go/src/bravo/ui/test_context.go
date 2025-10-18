@@ -3,6 +3,7 @@
 package ui
 
 import (
+	"os"
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -28,6 +29,7 @@ func RunTestContext(
 			run(testContext)
 		},
 	); err != nil {
+		CLIErrorTreeEncoder.EncodeTo(err, os.Stderr)
 		testContext.Skip(1).Fatalf("test context failed: %s", err)
 	}
 }

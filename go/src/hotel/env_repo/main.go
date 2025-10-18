@@ -124,10 +124,8 @@ func Make(
 
 	envVars := env_vars.Make(env)
 
-	if err = envVars.Setenv(); err != nil {
-		err = errors.Wrap(err)
-		return env, err
-	}
+	env.Must(errors.MakeFuncContextFromFuncErr(envVars.Set))
+	env.After(errors.MakeFuncContextFromFuncErr(envVars.Unset))
 
 	if configLoaded {
 		env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(

@@ -1,6 +1,12 @@
 package interfaces
 
 type (
+	EnvVars = map[string]string
+
+	EnvVarsAdder interface {
+		AddToEnvVars(EnvVars)
+	}
+
 	DirectoryLayoutPath interface {
 		Stringer
 
