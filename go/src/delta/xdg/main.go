@@ -34,6 +34,16 @@ func (exdg XDG) GetDirCache() interfaces.DirectoryLayoutBaseEnvVar { return exdg
 
 func (exdg XDG) GetDirRuntime() interfaces.DirectoryLayoutBaseEnvVar { return exdg.Runtime }
 
+func (exdg XDG) GetXDGEnvVars() []env_vars.DirectoryLayoutBaseEnvVar {
+	return []env_vars.DirectoryLayoutBaseEnvVar{
+		exdg.Data,
+		exdg.Config,
+		exdg.State,
+		exdg.Cache,
+		exdg.Runtime,
+	}
+}
+
 func (exdg XDG) GetXDGPaths() []string {
 	return []string{
 		exdg.Data.String(),

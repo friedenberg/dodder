@@ -1,13 +1,13 @@
 package xdg
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
 // TODO replace with env_vars.BufferedCoderDotenv
@@ -15,19 +15,19 @@ type Dotenv struct {
 	*XDG
 }
 
-func (d Dotenv) setDefaultOrEnvFromMap(
+func (dotenv Dotenv) setDefaultOrEnvFromMap(
 	defawlt string,
 	envKey string,
 	out *string,
 	env map[string]string,
 ) (err error) {
-	if v, ok := env[envKey]; ok {
-		*out = v
+	if value, ok := env[envKey]; ok {
+		*out = value
 	} else {
 		*out = os.Expand(defawlt, func(v string) string {
 			switch v {
 			case "HOME":
-				return d.Home.String()
+				return dotenv.Home.String()
 
 			default:
 				return os.Getenv(v)
@@ -38,15 +38,17 @@ func (d Dotenv) setDefaultOrEnvFromMap(
 	return err
 }
 
-func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
+func (dotenv Dotenv) ReadFrom(reader io.Reader) (n int64, err error) {
 	env := make(map[string]string)
 
-	br := bufio.NewReader(r)
+	bufferedReader, repool := pool.GetBufferedReader(reader)
+	defer repool()
+
 	eof := false
 
 	for !eof {
 		var line string
-		line, err = br.ReadString('\n')
+		line, err = bufferedReader.ReadString('\n')
 		n += int64(len(line))
 
 		if err == io.EOF {
@@ -73,10 +75,10 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 		env[left] = right
 	}
 
-	toInitialize := d.getInitElements()
+	toInitialize := dotenv.getInitElements()
 
 	for _, ie := range toInitialize {
-		if err = d.setDefaultOrEnvFromMap(
+		if err = dotenv.setDefaultOrEnvFromMap(
 			ie.standard.DefaultValueTemplate,
 			ie.standard.Name,
 			ie.out,
@@ -90,14 +92,20 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
-	bw := bufio.NewWriter(w)
+func (dotenv Dotenv) WriteTo(writer io.Writer) (n int64, err error) {
+	bufferedWriter, repool := pool.GetBufferedWriter(writer)
+	defer repool()
 
-	toWrite := d.getInitElements()
+	initElements := dotenv.getInitElements()
 	var n1 int
 
-	for _, e := range toWrite {
-		n1, err = fmt.Fprintf(bw, "%s=%s\n", e.standard.Name, *e.out)
+	for _, initElement := range initElements {
+		n1, err = fmt.Fprintf(
+			bufferedWriter,
+			"%s=%s\n",
+			initElement.standard.Name,
+			*initElement.out,
+		)
 		n += int64(n1)
 
 		if err != nil {
@@ -106,7 +114,7 @@ func (d Dotenv) WriteTo(w io.Writer) (n int64, err error) {
 		}
 	}
 
-	if err = bw.Flush(); err != nil {
+	if err = bufferedWriter.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
