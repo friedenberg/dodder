@@ -26,7 +26,9 @@ import (
 )
 
 type remoteSftp struct {
+	ctx       interfaces.ActiveContext
 	uiPrinter ui.Printer
+	once      sync.Once
 
 	buckets []int
 
@@ -37,9 +39,10 @@ type remoteSftp struct {
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
-	blobIOWrapper interfaces.BlobIOWrapper
-	sshClient     *ssh.Client
-	sftpClient    *sftp.Client
+	blobIOWrapper        interfaces.BlobIOWrapper
+	sshClientInitializer func() (*ssh.Client, error)
+	sshClient            *ssh.Client
+	sftpClient           *sftp.Client
 
 	// TODO extract below into separate struct
 	blobCacheLock sync.RWMutex
@@ -52,7 +55,7 @@ func makeSftpStore(
 	ctx interfaces.ActiveContext,
 	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPRemotePath,
-	sshClient *ssh.Client,
+	sshClientInitializer func() (*ssh.Client, error),
 ) (blobStore *remoteSftp, err error) {
 	var defaultHashType markl.FormatHash
 
@@ -64,26 +67,13 @@ func makeSftpStore(
 	}
 
 	blobStore = &remoteSftp{
-		defaultHashType: defaultHashType,
-		uiPrinter:       uiPrinter,
-		buckets:         defaultBuckets,
-		config:          config,
-		sshClient:       sshClient,
-		blobCache:       make(map[string]struct{}),
-	}
-
-	ui.Log().Print("creating sftp client")
-
-	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
-		err = errors.Wrapf(err, "failed to create SFTP client")
-		return blobStore, err
-	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(blobStore.close))
-
-	if err = blobStore.initialize(); err != nil {
-		err = errors.Wrap(err)
-		return blobStore, err
+		ctx:                  ctx,
+		defaultHashType:      defaultHashType,
+		uiPrinter:            uiPrinter,
+		buckets:              defaultBuckets,
+		config:               config,
+		blobCache:            make(map[string]struct{}),
+		sshClientInitializer: sshClientInitializer,
 	}
 
 	return blobStore, err
@@ -108,7 +98,28 @@ func (blobStore *remoteSftp) close() (err error) {
 	return nil
 }
 
+func (blobStore *remoteSftp) initializeOnce() {
+	blobStore.once.Do(func() {
+		if err := blobStore.initialize(); err != nil {
+			err = errors.Wrap(err)
+			blobStore.ctx.Cancel(err)
+		}
+	})
+}
+
 func (blobStore *remoteSftp) initialize() (err error) {
+	if blobStore.sshClient, err = blobStore.sshClientInitializer(); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if blobStore.sftpClient, err = sftp.NewClient(blobStore.sshClient); err != nil {
+		err = errors.Wrapf(err, "failed to create SFTP client")
+		return err
+	}
+
+	blobStore.ctx.After(errors.MakeFuncContextFromFuncErr(blobStore.close))
+
 	remotePath := blobStore.config.GetRemotePath()
 	// TODO read remote blob store config (including hash buckets)
 
@@ -146,6 +157,7 @@ func (blobStore *remoteSftp) GetBlobStoreDescription() string {
 }
 
 func (blobStore *remoteSftp) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+	blobStore.initializeOnce()
 	return blobStore.blobIOWrapper
 }
 
@@ -175,6 +187,8 @@ func (blobStore *remoteSftp) remotePathForMerkleId(
 func (blobStore *remoteSftp) HasBlob(
 	merkleId interfaces.MarklId,
 ) (ok bool) {
+	blobStore.initializeOnce()
+
 	if merkleId.IsNull() {
 		ok = true
 		return ok
@@ -202,6 +216,8 @@ func (blobStore *remoteSftp) HasBlob(
 }
 
 func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+	blobStore.initializeOnce()
+
 	return func(yield func(interfaces.MarklId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
@@ -267,6 +283,8 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 func (blobStore *remoteSftp) MakeBlobWriter(
 	marklHashType interfaces.FormatHash,
 ) (blobWriter interfaces.BlobWriter, err error) {
+	blobStore.initializeOnce()
+
 	// TODO use hash type
 	mover := &sftpMover{
 		store:  blobStore,
@@ -286,6 +304,8 @@ func (blobStore *remoteSftp) MakeBlobWriter(
 func (blobStore *remoteSftp) MakeBlobReader(
 	digest interfaces.MarklId,
 ) (readCloser interfaces.BlobReader, err error) {
+	blobStore.initializeOnce()
+
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashType.Get(),

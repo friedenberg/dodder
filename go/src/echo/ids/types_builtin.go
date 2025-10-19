@@ -26,6 +26,7 @@ const (
 	TypeTomlBlobStoreConfigV0                 = "!toml-blob_store_config-v0"
 	TypeTomlBlobStoreConfigV1                 = "!toml-blob_store_config-v1"
 	TypeTomlBlobStoreConfigV2                 = "!toml-blob_store_config-v2"
+	TypeTomlBlobStoreConfigPointerV0          = "!toml-blob_store_config-pointer-v0"
 	TypeTomlBlobStoreConfigVCurrent           = TypeTomlBlobStoreConfigV2
 	TypeTomlConfigImmutableV1                 = "!toml-config-immutable-v1" // Deprecated
 	TypeTomlConfigImmutableV2                 = "!toml-config-immutable-v2"
@@ -73,6 +74,11 @@ func init() {
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV1, genres.None, false)
 	registerBuiltinTypeString(TypeTomlBlobStoreConfigV2, genres.None, false)
+	registerBuiltinTypeString(
+		TypeTomlBlobStoreConfigPointerV0,
+		genres.None,
+		false,
+	)
 	registerBuiltinTypeString(
 		TypeTomlBlobStoreConfigSftpExplicitV0,
 		genres.None,

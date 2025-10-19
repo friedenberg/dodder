@@ -54,6 +54,11 @@ type (
 		GetLockInternalFiles() bool
 	}
 
+	ConfigPointer interface {
+		Config
+		GetConfigPath() string
+	}
+
 	ConfigSFTPRemotePath interface {
 		Config
 		GetRemotePath() string

@@ -203,33 +203,23 @@ func MakeBlobStore(
 
 	switch config := configBlob.(type) {
 	case blob_store_configs.ConfigSFTPUri:
-		var sshClient *ssh.Client
-
-		if sshClient, err = MakeSSHClientFromSSHConfig(context, printer, config); err != nil {
-			err = errors.Wrap(err)
-			return store, err
-		}
-
 		return makeSftpStore(
 			context,
 			printer,
 			config,
-			sshClient,
+			func() (*ssh.Client, error) {
+				return MakeSSHClientFromSSHConfig(context, printer, config)
+			},
 		)
 
 	case blob_store_configs.ConfigSFTPConfigExplicit:
-		var sshClient *ssh.Client
-
-		if sshClient, err = MakeSSHClientForExplicitConfig(context, printer, config); err != nil {
-			err = errors.Wrap(err)
-			return store, err
-		}
-
 		return makeSftpStore(
 			context,
 			printer,
 			config,
-			sshClient,
+			func() (*ssh.Client, error) {
+				return MakeSSHClientForExplicitConfig(context, printer, config)
+			},
 		)
 
 	case blob_store_configs.ConfigLocalHashBucketed:
@@ -240,8 +230,28 @@ func MakeBlobStore(
 			tempFS,
 		)
 
+	case blob_store_configs.ConfigPointer:
+		var typedConfig triple_hyphen_io.TypedBlob[blob_store_configs.Config]
+
+		if typedConfig, err = triple_hyphen_io.DecodeFromFile(
+			blob_store_configs.Coder,
+			config.GetConfigPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return store, err
+		}
+
+		configNamed.Config = typedConfig
+
+		return MakeBlobStore(context, configNamed, tempFS)
+
 	default:
-		err = errors.BadRequestf("unsupported blob store type %q:%T", configBlob.GetBlobStoreType(), configBlob)
+		err = errors.BadRequestf(
+			"unsupported blob store type %q:%T",
+			configBlob.GetBlobStoreType(),
+			configBlob,
+		)
+
 		return store, err
 	}
 }

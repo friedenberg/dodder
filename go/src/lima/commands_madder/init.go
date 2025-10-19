@@ -20,6 +20,13 @@ func init() {
 		},
 	})
 
+	utility.AddCmd("init-pointer", &Init{
+		tipe: ids.GetOrPanic(
+			ids.TypeTomlBlobStoreConfigPointerV0,
+		).Type,
+		blobStoreConfig: &blob_store_configs.TomlPointerV0{},
+	})
+
 	utility.AddCmd("init-sftp-explicit", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigSftpExplicitV0,
