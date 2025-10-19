@@ -2,8 +2,11 @@ package files
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 func PathElements(p string) []string {
@@ -53,4 +56,21 @@ func DirectoriesRelativeTo(p string) []string {
 	}
 
 	return out
+}
+
+func Readlink(path string) (string, error) {
+	var err error
+	var newPath string
+
+	if newPath, err = os.Readlink(path); err != nil {
+		if errors.IsReadlinkInvalidArgument(err) {
+			err = nil
+			return path, err
+		} else {
+			err = errors.Wrap(err)
+			return "", err
+		}
+	}
+
+	return newPath, err
 }

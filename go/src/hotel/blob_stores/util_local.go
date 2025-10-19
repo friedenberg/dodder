@@ -2,7 +2,6 @@ package blob_stores
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -26,17 +25,10 @@ func localAllBlobs(
 
 		{
 			var err error
-			var newBasePath string
 
-			if newBasePath, err = os.Readlink(basePath); err != nil {
-				if errors.IsReadlinkInvalidArgument(err) {
-					err = nil
-				} else {
-					yield(nil, errors.Wrap(err))
-					return
-				}
-			} else {
-				basePath = newBasePath
+			if basePath, err = files.Readlink(basePath); err != nil {
+				yield(nil, errors.Wrap(err))
+				return
 			}
 		}
 
