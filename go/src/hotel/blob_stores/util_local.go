@@ -2,6 +2,7 @@ package blob_stores
 
 import (
 	"io/fs"
+	"os"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -18,11 +19,32 @@ func localAllBlobs(
 		id, repool := defaultHashType.GetBlobId()
 		defer repool()
 
+		if basePath == "" {
+			yield(nil, errors.Errorf("empty base path"))
+			return
+		}
+
+		{
+			var err error
+			var newBasePath string
+
+			if newBasePath, err = os.Readlink(basePath); err != nil {
+				if errors.IsReadlinkInvalidArgument(err) {
+					err = nil
+				} else {
+					yield(nil, errors.Wrap(err))
+					return
+				}
+			} else {
+				basePath = newBasePath
+			}
+		}
+
 		if err := filepath.WalkDir(
 			basePath,
 			func(path string, dirEntry fs.DirEntry, in error) (err error) {
 				if in != nil {
-					err = errors.Wrap(in)
+					err = errors.Wrapf(in, "BasePath: %q", basePath)
 					return err
 				}
 
