@@ -49,7 +49,7 @@ func NewIndex(
 		Options: options,
 		lock:    &sync.Mutex{},
 		once:    &sync.Once{},
-		path:    envRepo.DirCache("Abbr"),
+		path:    envRepo.DirIndex("Abbr"),
 		envRepo: envRepo,
 		indexCodable: indexCodable{
 			SeenIds: map[genres.Genre]interfaces.MutableTridex{

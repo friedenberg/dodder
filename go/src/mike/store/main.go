@@ -96,7 +96,7 @@ func (store *Store) Initialize(
 	if store.streamIndex, err = stream_index.MakeIndex(
 		store.GetEnvRepo(),
 		store.applyDormantAndRealizeTags,
-		store.GetEnvRepo().DirCacheObjects(),
+		store.GetEnvRepo().DirIndexObjects(),
 		store.sunrise,
 	); err != nil {
 		err = errors.Wrap(err)

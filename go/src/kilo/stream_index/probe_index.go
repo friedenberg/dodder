@@ -31,7 +31,7 @@ func (index *probeIndex) Initialize(
 ) (err error) {
 	if index.index, err = object_probe_index.MakeNoDuplicates(
 		envRepo,
-		envRepo.DirCacheObjectPointers(),
+		envRepo.DirIndexObjectPointers(),
 		hashType,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -49,11 +49,11 @@ type (
 
 		DirFirstBlobStoreInventoryLists() string
 
-		// TODO rename Cache to Index
-		DirCache(p ...string) string
-		DirCacheInventoryListLog() string
-		DirCacheObjectPointers() string
-		DirCacheObjects() string
+		DirIndex(p ...string) string
+		DirCacheRemoteInventoryListLog() string
+		DirIndexObjectPointers() string
+		DirIndexObjects() string
+
 		DirCacheRepo(p ...string) string
 
 		DirLostAndFound() string

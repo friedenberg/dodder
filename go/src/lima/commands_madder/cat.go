@@ -162,14 +162,14 @@ func (cmd Cat) blob(
 	blobId interfaces.MarklId,
 	blobWriter interfaces.FuncIter[blobIdWithReadCloser],
 ) (err error) {
-	var r interfaces.BlobReader
+	var reader interfaces.BlobReader
 
-	if r, err = blobStore.MakeBlobReader(blobId); err != nil {
+	if reader, err = blobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = blobWriter(blobIdWithReadCloser{BlobId: blobId, ReadCloser: r}); err != nil {
+	if err = blobWriter(blobIdWithReadCloser{BlobId: blobId, ReadCloser: reader}); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

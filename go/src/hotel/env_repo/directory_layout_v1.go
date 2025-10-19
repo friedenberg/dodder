@@ -48,7 +48,7 @@ func (layout directoryLayoutV1) MakeDirData(p ...string) string {
 	return layout.Data.MakePath(p...).String()
 }
 
-func (layout directoryLayoutV1) DirCache(p ...string) string {
+func (layout directoryLayoutV1) DirIndex(p ...string) string {
 	return layout.MakeDirData(append([]string{"cache"}, p...)...)
 }
 
@@ -66,16 +66,16 @@ func (layout directoryLayoutV1) DirLostAndFound() string {
 	return layout.MakeDirData("lost_and_found")
 }
 
-func (layout directoryLayoutV1) DirCacheObjects() string {
-	return layout.DirCache("objects")
+func (layout directoryLayoutV1) DirIndexObjects() string {
+	return layout.DirIndex("objects")
 }
 
-func (layout directoryLayoutV1) DirCacheObjectPointers() string {
-	return layout.DirCache("object_pointers")
+func (layout directoryLayoutV1) DirIndexObjectPointers() string {
+	return layout.DirIndex("object_pointers")
 }
 
-func (layout directoryLayoutV1) DirCacheInventoryListLog() string {
-	return layout.DirCache("inventory_list_logs")
+func (layout directoryLayoutV1) DirCacheRemoteInventoryListLog() string {
+	return layout.DirIndex("inventory_list_logs")
 }
 
 func (layout directoryLayoutV1) DirObjectId() string {
@@ -83,7 +83,7 @@ func (layout directoryLayoutV1) DirObjectId() string {
 }
 
 func (layout directoryLayoutV1) FileCacheObjectId() string {
-	return layout.DirCache("object_id")
+	return layout.DirIndex("object_id")
 }
 
 func (layout directoryLayoutV1) FileInventoryListLog() string {

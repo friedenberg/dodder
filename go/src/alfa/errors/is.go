@@ -116,3 +116,15 @@ func IsExist(err error) bool {
 func IsNotExist(err error) bool {
 	return Is(err, fs.ErrNotExist)
 }
+
+func IsReadlinkInvalidArgument(err error) bool {
+	var pathError *fs.PathError
+
+	if errors.As(err, &pathError) {
+		if pathError.Err.Error() == "invalid argument" {
+			return true
+		}
+	}
+
+	return false
+}

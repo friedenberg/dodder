@@ -47,7 +47,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	if err := env.MakeDir(
 		env.DirObjectId(),
-		env.DirCache(),
+		env.DirIndex(),
 		env.DirLostAndFound(),
 
 		// TODO remove

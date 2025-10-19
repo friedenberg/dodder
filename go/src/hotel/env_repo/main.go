@@ -169,27 +169,27 @@ func stringSliceJoin(s string, vs []string) []string {
 }
 
 func (env Env) ResetCache() (err error) {
-	if err = files.SetAllowUserChangesRecursive(env.DirCache()); err != nil {
+	if err = files.SetAllowUserChangesRecursive(env.DirIndex()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = os.RemoveAll(env.DirCache()); err != nil {
+	if err = os.RemoveAll(env.DirIndex()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return err
 	}
 
-	if err = env.MakeDir(env.DirCache()); err != nil {
+	if err = env.MakeDir(env.DirIndex()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = env.MakeDir(env.DirCacheObjects()); err != nil {
+	if err = env.MakeDir(env.DirIndexObjects()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = env.MakeDir(env.DirCacheObjectPointers()); err != nil {
+	if err = env.MakeDir(env.DirIndexObjectPointers()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

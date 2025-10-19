@@ -69,30 +69,30 @@ func (layout directoryLayoutV2) FileConfigMutable() string {
 	return layout.MakeDirData("config-mutable")
 }
 
-func (layout directoryLayoutV2) DirCache(p ...string) string {
+func (layout directoryLayoutV2) DirIndex(p ...string) string {
 	return layout.MakeDirData(append([]string{"index"}, p...)...)
 }
 
 func (layout directoryLayoutV2) DirCacheRepo(p ...string) string {
-	// TODO switch to XDG cache
-	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
-	return layout.MakeDirData(append([]string{"index", "repo"}, p...)...)
+	return layout.xdg.Cache.MakePath(
+		append([]string{"index", "repo"}, p...)...,
+	).String()
 }
 
 func (layout directoryLayoutV2) DirLostAndFound() string {
 	return layout.MakeDirData("lost_and_found")
 }
 
-func (layout directoryLayoutV2) DirCacheObjects() string {
-	return layout.DirCache("objects")
+func (layout directoryLayoutV2) DirIndexObjects() string {
+	return layout.DirIndex("objects")
 }
 
-func (layout directoryLayoutV2) DirCacheObjectPointers() string {
-	return layout.DirCache("object_pointers/Page")
+func (layout directoryLayoutV2) DirIndexObjectPointers() string {
+	return layout.DirIndex("object_pointers/Page")
 }
 
-func (layout directoryLayoutV2) DirCacheInventoryListLog() string {
-	return layout.DirCache("inventory_list_logs")
+func (layout directoryLayoutV2) DirCacheRemoteInventoryListLog() string {
+	return layout.xdg.Cache.MakePath("inventory_list_logs").String()
 }
 
 func (layout directoryLayoutV2) DirObjectId() string {
@@ -100,7 +100,7 @@ func (layout directoryLayoutV2) DirObjectId() string {
 }
 
 func (layout directoryLayoutV2) FileCacheObjectId() string {
-	return layout.DirCache("object_id")
+	return layout.DirIndex("object_id")
 }
 
 func (layout directoryLayoutV2) FileInventoryListLog() string {
