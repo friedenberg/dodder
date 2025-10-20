@@ -14,8 +14,8 @@ import (
 
 func MakeBlobImporter(
 	envRepo env_repo.BlobStoreEnv,
-	src interfaces.BlobStore,
-	dsts ...interfaces.BlobStore,
+	src blob_stores.BlobStoreInitialized,
+	dsts ...blob_stores.BlobStoreInitialized,
 ) BlobImporter {
 	return BlobImporter{
 		EnvBlobStore: envRepo,
@@ -27,8 +27,8 @@ func MakeBlobImporter(
 type BlobImporter struct {
 	EnvBlobStore           env_repo.BlobStoreEnv
 	CopierDelegate         interfaces.FuncIter[sku.BlobCopyResult]
-	Src                    interfaces.BlobStore
-	Dsts                   []interfaces.BlobStore
+	Src                    blob_stores.BlobStoreInitialized
+	Dsts                   []blob_stores.BlobStoreInitialized
 	UseDestinationHashType bool
 
 	Counts Counts
@@ -109,7 +109,7 @@ func (blobImporter *BlobImporter) emitCopyResultIfNecessary(
 }
 
 func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
-	dst interfaces.BlobStore,
+	dst blob_stores.BlobStoreInitialized,
 	blobId interfaces.MarklId,
 	object *sku.Transacted,
 ) (copyResult sku.BlobCopyResult) {
@@ -131,7 +131,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 			copyResult.CopyResult = blob_stores.CopyBlobIfNecessary(
 				blobImporter.EnvBlobStore,
 				dst,
-				blobImporter.Src,
+				blobImporter.Src.GetBlobStore(),
 				blobId,
 				&progressWriter,
 				hashType,
@@ -151,7 +151,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 			if err := blobImporter.emitCopyResultIfNecessary(
 				copyResult,
 			); err != nil {
-				copyResult.SetError(err)
+				copyResult.SetError(errors.Wrap(err))
 				return
 			}
 		},
@@ -164,7 +164,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 		},
 		3*time.Second,
 	); err != nil {
-		copyResult.SetError(err)
+		copyResult.SetError(errors.Wrap(err))
 		return copyResult
 	}
 

@@ -26,9 +26,10 @@ func (cmd List) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 	blobStoresAll := envBlobStore.GetBlobStores()
 
-	for _, blobStore := range blobStoresAll {
+	for i, blobStore := range blobStoresAll {
 		ui.Out().Printf(
-			"%s: %s",
+			"%d: %s: %s",
+			i,
 			blobStore.Name,
 			blobStore.GetBlobStoreDescription(),
 		)

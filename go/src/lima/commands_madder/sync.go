@@ -44,31 +44,22 @@ func (cmd Sync) Run(req command.Request) {
 }
 
 func (cmd Sync) runAllStores(req command.Request) {
-	req.AssertNoMoreArgs()
 	envBlobStore := cmd.MakeEnvBlobStore(req)
-	blobStoresInitialized := envBlobStore.GetBlobStores()
-	blobStores := make([]interfaces.BlobStore, len(blobStoresInitialized))
-
-	for idx := range blobStoresInitialized {
-		blobStores[idx] = blobStoresInitialized[idx]
-	}
+	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
 
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
 
-	for i, blobStore := range blobStoresInitialized {
-		ui.Out().Printf("%d: %s", i, blobStore.Name)
-	}
-
-	if len(blobStoresInitialized) == 1 {
+	if len(blobStores) == 1 {
 		errors.ContextCancelWithBadRequestf(
 			req,
 			"only one blob store, nothing to sync",
 		)
+
 		return
 	}
 
-	primary := blobStoresInitialized[0]
+	primary := blobStores[0]
 	blobStores = blobStores[1:]
 
 	blobImporter := blob_transfers.MakeBlobImporter(

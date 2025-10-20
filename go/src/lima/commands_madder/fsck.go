@@ -27,15 +27,16 @@ type Fsck struct {
 func (cmd Fsck) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	// blobStoreIds := req.PopArgs()
-	blobStores := envBlobStore.GetBlobStores()
+	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
 
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
 
-	for i, blobStore := range blobStores {
-		ui.Out().Printf("%d: %s", i, blobStore.Name)
+	for _, blobStore := range blobStores {
+		ui.Out().Printf("%s", blobStore.Name)
 	}
+
+	ui.Out().Print()
 
 	for _, blobStore := range blobStores {
 		ui.Out().Printf(

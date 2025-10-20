@@ -422,6 +422,8 @@ func RunContextWithPrintTicker(
 			runFunc(ctx)
 		},
 	); err != nil {
+		_, frames := context.CauseWithStackFrames()
+		err = stack_frame.MakeErrorTreeOrErr(err, frames...)
 		return err
 	}
 

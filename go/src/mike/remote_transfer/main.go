@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
@@ -50,7 +51,7 @@ func Make(
 	importer.committer.initialize(options, envRepo, storeObject)
 
 	if importer.blobCopierDelegate == nil &&
-		importer.remoteBlobStore != nil &&
+		importer.remoteBlobStore.BlobStore != nil &&
 		options.PrintCopies {
 		importer.blobCopierDelegate = sku.MakeBlobCopierDelegate(
 			envRepo.GetUI(),
@@ -81,7 +82,7 @@ type importer struct {
 	envRepo                     env_repo.Env
 	blobGenres                  ids.Genre
 	excludeObjects              bool
-	remoteBlobStore             interfaces.BlobStore
+	remoteBlobStore             blob_stores.BlobStoreInitialized
 	blobCopierDelegate          interfaces.FuncIter[sku.BlobCopyResult]
 	storeOptions                sku.StoreOptions
 	allowMergeConflicts         bool

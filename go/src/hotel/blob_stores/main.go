@@ -34,6 +34,10 @@ type BlobStoreInitialized struct {
 	interfaces.BlobStore
 }
 
+func (blobStoreInitialized BlobStoreInitialized) GetBlobStore() interfaces.BlobStore {
+	return blobStoreInitialized.BlobStore
+}
+
 // TODO pass in custom UI context for printing
 func MakeBlobStoresFromRepoConfig(
 	ctx interfaces.ActiveContext,

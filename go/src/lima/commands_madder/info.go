@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
@@ -19,27 +20,47 @@ func init() {
 
 type InfoRepo struct {
 	command_components_madder.EnvBlobStore
+	command_components_madder.BlobStore
 }
 
 func (cmd InfoRepo) Run(req command.Request) {
-	args := req.PopArgs()
 	env := cmd.MakeEnvBlobStore(req)
 
-	blobStore := env.GetDefaultBlobStore()
+	var blobStore blob_stores.BlobStoreInitialized
+	var keys []string
+
+	switch req.RemainingArgCount() {
+	case 0:
+		blobStore = env.GetDefaultBlobStore()
+		keys = []string{"config-immutable"}
+
+	case 1:
+		blobStore = env.GetDefaultBlobStore()
+
+		keys = []string{req.PopArg("blob store config key")}
+
+	case 2:
+		blobStoreIndex := req.PopArg("blob store index")
+		blobStore = cmd.MakeBlobStoreFromIndex(env, blobStoreIndex)
+
+		keys = []string{req.PopArg("blob store config key")}
+
+	default:
+		blobStoreIndex := req.PopArg("blob store index")
+		blobStore = cmd.MakeBlobStoreFromIndex(env, blobStoreIndex)
+		keys = req.PopArgs()
+	}
+
 	blobStoreConfig := blobStore.Config
 	blobIOWrapper := blobStore.GetBlobIOWrapper()
 
-	if len(args) == 0 {
-		args = []string{"store-version"}
-	}
-
-	for _, arg := range args {
-		switch strings.ToLower(arg) {
+	for _, key := range keys {
+		switch strings.ToLower(key) {
 		default:
 			errors.ContextCancelWithBadRequestf(
 				env,
 				"unsupported info key: %q",
-				arg,
+				key,
 			)
 
 		case "config-immutable":

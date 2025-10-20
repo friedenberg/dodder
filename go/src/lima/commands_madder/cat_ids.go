@@ -3,7 +3,6 @@ package commands_madder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -30,21 +29,11 @@ func (cmd CatIds) CompletionGenres() ids.Genre {
 func (cmd CatIds) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	// var blobStoreIndexOrConfigPath string
+	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
 
-	// if req.RemainingArgCount() == 1 {
-	// 	blobStoreIndexOrConfigPath = req.PopArg(
-	// 		"blob store id or blob store config path",
-	// 	)
-	// }
-
-	req.AssertNoMoreArgs()
-
-	blobStoresAll := envBlobStore.GetBlobStores()
 	var blobErrors quiter.Slice[command_components_madder.BlobError]
 
-	for _, blobStore := range blobStoresAll {
-		ui.Debug().PrintDebug(blobStore)
+	for _, blobStore := range blobStores {
 		cmd.runOne(envBlobStore, blobStore, &blobErrors)
 	}
 

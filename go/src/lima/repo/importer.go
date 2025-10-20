@@ -3,6 +3,7 @@ package repo
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -32,7 +33,7 @@ type (
 		OverwriteSignatures bool
 
 		DedupingFormatId   string
-		RemoteBlobStore    interfaces.BlobStore
+		RemoteBlobStore    blob_stores.BlobStoreInitialized
 		BlobCopierDelegate interfaces.FuncIter[sku.BlobCopyResult]
 		ParentNegotiator   sku.ParentNegotiator
 		CheckedOutPrinter  interfaces.FuncIter[*sku.CheckedOut]
