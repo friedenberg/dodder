@@ -1,0 +1,10 @@
+---
+! toml-blob_store_config-v2
+---
+
+hash_buckets = [2]
+base_path = '/tmp/bats-run-VNkYBi/test/1/.dodder/local/share/blob_stores/0'
+hash_type-id = 'blake2b256'
+encryption = ''
+compression-type = 'zstd'
+lock-internal-files = false
