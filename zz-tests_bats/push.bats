@@ -16,7 +16,8 @@ teardown() {
 # bats file_tags=user_story:pull,user_story:repo,user_store:xdg,user_story:remote
 
 function bootstrap_with_content {
-	set_xdg "$1"
+	mkdir -p "$1"
+	pushd "$1" || exit 1
 	run_dodder_init
 
 	{
@@ -54,8 +55,6 @@ function bootstrap_with_content {
 
 function bootstrap_without_content_xdg {
 	mkdir -p them || exit 1
-	set_xdg "$(realpath them)"
-
 	pushd them || exit 1
 	run_dodder_init
 	assert_success
@@ -89,21 +88,22 @@ function bootstrap_archive {
 	popd || exit 1
 }
 
+function print_their_xdg() (
+	them="${1:-them}"
+	pushd "$them" >/dev/null || exit 1
+	dodder info xdg
+)
+
 function push_history_zettel_type_tag_no_conflicts { # @test
 	them="them"
-	set_xdg "$them"
+	mkdir -p them
+	pushd them || exit 1
 	run_dodder_init
-
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	popd || exit 1
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		<(print_their_xdg them) \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -122,7 +122,7 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
 	EOM
 
-	set_xdg "$them"
+	pushd "$them" || exit 1
 	run_dodder show +zettel,typ,konfig,etikett,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v2]
@@ -138,12 +138,7 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 	bootstrap_with_content "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
@@ -163,11 +158,12 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 		import failed with conflicts, merging required
 	EOM
 
+	run_dodder_init_workspace
+
 	run_dodder status .
 	assert_output_unsorted - <<-EOM
 		       conflicted [one/dos]
 		       conflicted [one/uno]
-		        untracked [to_add @blake2b256-45lpe4rm9mjvdx8pt04kp5gh04uy77h0m0xtw2fhr0q7vl98g0vqls6hxe]
 	EOM
 
 	run_dodder show +zettel,typ,konfig,etikett
@@ -182,13 +178,6 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 
 function push_history_default { # @test
 	bootstrap_without_content_xdg
-
-	function print_their_xdg() (
-		set_xdg them
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
@@ -211,7 +200,7 @@ function push_history_default { # @test
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	set_xdg them
+	pushd them || exit 1
 	run_dodder show +zettel,typ,konfig,etikett #,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v2]
@@ -224,13 +213,6 @@ function push_history_default { # @test
 
 function push_history_default_only_blobs { # @test
 	bootstrap_without_content_xdg
-
-	function print_their_xdg() (
-		set_xdg them
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
@@ -262,7 +244,7 @@ function push_history_default_only_blobs { # @test
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	set_xdg them
+	pushd them || exit 1
 	run_dodder show +zettel,typ,konfig,etikett,repo
 	assert_output_unsorted - <<-EOM
 		[konfig @$(get_konfig_sha) !toml-config-v2]
@@ -305,7 +287,6 @@ function push_default_stdio_local_once { # @test
 
 function push_history_default_stdio_local_twice { # @test
 	bootstrap_without_content
-	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
@@ -343,7 +324,6 @@ function push_history_default_stdio_local_twice { # @test
 
 function push_history_default_stdio_twice { # @test
 	bootstrap_without_content
-	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_dodder remote-add \
 		-remote-type stdio-local \

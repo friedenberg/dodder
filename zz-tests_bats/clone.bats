@@ -15,42 +15,44 @@ teardown() {
 
 function bootstrap {
 	mkdir -p "$1"
-	pushd "$1" || exit 1
-	run_dodder_init -override-xdg-with-cwd "test-repo-id-them"
-
 	{
-		echo "---"
-		echo "# wow"
-		echo "- tag"
-		echo "! md"
-		echo "---"
-		echo
-		echo "body"
-	} >to_add
+		pushd "$1" || exit 1
+		run_dodder_init -override-xdg-with-cwd "test-repo-id-them"
 
-	run_dodder new -edit=false to_add
-	assert_success
-	assert_output - <<-EOM
-		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
-	EOM
+		{
+			echo "---"
+			echo "# wow"
+			echo "- tag"
+			echo "! md"
+			echo "---"
+			echo
+			echo "body"
+		} >to_add
 
-	run_dodder new -edit=false - <<-EOM
-		---
-		# zettel with multiple etiketten
-		- this_is_the_first
-		- this_is_the_second
-		! md
-		---
+		run_dodder new -edit=false to_add
+		assert_success
+		assert_output - <<-EOM
+			[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
+		EOM
 
-		zettel with multiple etiketten body
-	EOM
+		run_dodder new -edit=false - <<-EOM
+			---
+			# zettel with multiple etiketten
+			- this_is_the_first
+			- this_is_the_second
+			! md
+			---
 
-	assert_success
-	assert_output - <<-EOM
-		[one/dos @blake2b256-fm7kce7793j3npevpm29spk04r6ycxv38dvx3hjxlzl8tcm5m3qq2mml86 !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
-	EOM
+			zettel with multiple etiketten body
+		EOM
 
-	popd || exit 1
+		assert_success
+		assert_output - <<-EOM
+			[one/dos @blake2b256-fm7kce7793j3npevpm29spk04r6ycxv38dvx3hjxlzl8tcm5m3qq2mml86 !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		EOM
+
+		popd || exit 1
+	}
 }
 
 function print_their_xdg() {
@@ -63,6 +65,7 @@ function run_clone_default_with() {
 		-encryption none \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
+		-override-xdg-with-cwd \
 		-lock-internal-files=false \
 		"$@"
 }
@@ -91,10 +94,8 @@ function clone_history_zettel_type_tag { # @test
 	bootstrap "$them"
 	assert_success
 
-  BATS_TEST_FILE=true
+	BATS_TEST_FILE=true
 
-	us="us"
-	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
 		test-repo-id-us \
@@ -120,8 +121,6 @@ function clone_history_zettel_type_tag_stdio_local { # @test
 	bootstrap "$them"
 	assert_success
 
-	us="us"
-	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
 		test-repo-id-us \
@@ -147,8 +146,6 @@ function clone_history_one_zettel_stdio_local { # @test
 	bootstrap "$them"
 	assert_success
 
-	us="us"
-	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
 		test-repo-id-us \
@@ -168,8 +165,6 @@ function clone_history_zettel_type_tag_stdio_ssh { # @test
 	bootstrap "$them"
 	assert_success
 
-	us="us"
-	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type stdio-local \
 		test-repo-id-us \
@@ -195,8 +190,6 @@ function clone_history_default_allow_conflicts { # @test
 	bootstrap "$them"
 	assert_success
 
-	us="us"
-	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
 		test-repo-id-us \
@@ -229,8 +222,6 @@ function clone_history_zettel_type_tag_port { # @test
 	trap 'kill $server_PID' EXIT
 	assert_output 'x'
 
-	us="us"
-	set_xdg "$us"
 	# shellcheck disable=SC2154
 	run_clone_default_with \
 		-remote-type url \

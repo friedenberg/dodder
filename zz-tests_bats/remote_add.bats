@@ -17,16 +17,16 @@ teardown() {
 # bats file_tags=user_story:remote
 
 function print_their_xdg() {
-	set_xdg "$(realpath "$1")"
 	pushd "$1" >/dev/null || exit 1
 	"$DODDER_BIN" info-repo xdg
 }
 
 function remote_add_dotenv_xdg { # @test
-	set_xdg them
+	mkdir -p them
+	pushd them || exit 1
 	run_dodder_init
+	popd || exit 1
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder remote-add -remote-type native-dotenv-xdg <(print_their_xdg them) test-repo-id-them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -47,24 +47,22 @@ function remote_add_dotenv_xdg { # @test
 		---
 
 		public-key = 'dodder-repo-public_key-v1.*'
-		data = '/tmp/bats-run-\w+/test/.+/them/\.xdg/data/dodder'
-		config = '/tmp/bats-run-\w+/test/.+/\.xdg/config/dodder'
-		state = '/tmp/bats-run-\w+/test/.+/them/\.xdg/state/dodder'
-		cache = '/tmp/bats-run-\w+/test/.+/\.xdg/cache/dodder'
-		runtime = '/tmp/bats-run-\w+/test/.+/them/\.xdg/runtime/dodder'
+		data = '/tmp/bats-run-\w+/test/.+/them/\.dodder/local/share'
+		config = '/tmp/bats-run-\w+/test/.+/them/\.dodder/config'
+		state = '/tmp/bats-run-\w+/test/.+/them/\.dodder/local/state'
+		cache = '/tmp/bats-run-\w+/test/.+/them/\.dodder/cache'
+		runtime = '/tmp/bats-run-\w+/test/.+/them/\.dodder/local/runtime'
 	EOM
 }
 
 function remote_add_local_path { # @test
 	{
-		set_xdg them
 		mkdir -p them
 		pushd them || exit 1
 		run_dodder_init -override-xdg-with-cwd test-repo-remote
 		popd || exit 1
 	}
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder remote-add -remote-type stdio-local them test-repo-id-them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'

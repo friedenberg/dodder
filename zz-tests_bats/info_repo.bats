@@ -6,8 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(dodder info store-version)"
-	copy_from_version "$DIR" "$version"
+	# copy_from_version "$DIR"
 }
 
 teardown() {
@@ -18,6 +17,7 @@ teardown() {
 
 # bats test_tags=user_story:config-immutable
 function info_config_immutable { # @test
+	run_dodder_init_disable_age
 	run_dodder info store-version
 	assert_success
 	assert_output --regexp '[0-9]+'
@@ -67,16 +67,17 @@ function info_store_version { # @test
 
 # bats test_tags=user_story:age_encryption
 function info_age_none { # @test
+	run_dodder_init_disable_age
 	run_dodder info-repo blob_stores-0-encryption
 	assert_output ''
 }
 
 # bats test_tags=user_story:age_encryption
 function info_age_some { # @test
-  run_dodder gen madder-private_key-v1
-  assert_output --regexp 'madder-private_key-v1@age_x25519_sec-'
-  key="$output"
-  echo "$key" > age-key
+	run_dodder gen madder-private_key-v1
+	assert_output --regexp 'madder-private_key-v1@age_x25519_sec-'
+	key="$output"
+	echo "$key" >age-key
 	run_dodder_init -override-xdg-with-cwd -encryption age-key test-repo-id
 	run_dodder info-repo blob_stores-0-encryption
 	assert_output "$key"
@@ -84,12 +85,15 @@ function info_age_some { # @test
 
 # bats test_tags=user_story:compression
 function info_compression_type { # @test
+	run_dodder_init_disable_age
 	run_dodder info-repo compression-type
 	assert_output 'zstd'
 }
 
 # bats test_tags=user_story:xdg
 function info_xdg { # @test
+	set_xdg "$BATS_TEST_TMPDIR"
+	run_dodder_init_disable_age_xdg
 	run_dodder info-repo xdg
 	assert_output - <<-EOM
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.xdg/data/dodder

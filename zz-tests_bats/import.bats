@@ -17,11 +17,10 @@ function import { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
+    popd || exit 1
 	)
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder info-repo pubkey
 	assert_success
 	# old_pubkey="$output"
@@ -34,7 +33,6 @@ function import { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder info-repo pubkey
 	assert_success
@@ -66,11 +64,10 @@ function import_with_overwrite_sig { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
+    popd || exit 1
 	)
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder info-repo pubkey
 	assert_success
 	# old_pubkey="$output"
@@ -92,7 +89,6 @@ function import_with_overwrite_sig { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder info-repo pubkey
 	assert_success
@@ -129,7 +125,6 @@ function import_with_overwrite_sig_different_hash { # @test
 	)
 
 	(
-		set_xdg "$BATS_TEST_TMPDIR"
 		run_dodder_debug export -print-time=true +z,e,t >list
 	)
 
@@ -175,11 +170,9 @@ function import_with_dupes_in_list { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder info-repo pubkey
 	assert_success
 	# old_pubkey="$output"
@@ -201,7 +194,6 @@ function import_with_dupes_in_list { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder info-repo pubkey
 	assert_success
@@ -242,7 +234,6 @@ function import_one_tai_same { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
@@ -257,7 +248,6 @@ function import_one_tai_same { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder import \
 		"$list" \
@@ -285,7 +275,6 @@ function import_twice_no_dupes_one_zettel { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
@@ -297,7 +286,6 @@ function import_twice_no_dupes_one_zettel { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder import "$list" "$blobs" -compression-type zstd
 	assert_success
@@ -326,7 +314,6 @@ function import_conflict { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
@@ -338,7 +325,6 @@ function import_conflict { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder new -edit=false - <<-EOM
 		---
@@ -370,11 +356,9 @@ function import_twice_no_dupes { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder export -print-time=true +z,e,t
 	assert_success
 	echo "$output" >list
@@ -383,7 +367,6 @@ function import_twice_no_dupes { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	run_dodder import \
 		"$list" \
@@ -438,11 +421,9 @@ function import_inventory_lists { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
-		set_xdg "$(pwd)"
 		run_dodder_init
 	)
 
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder export -print-time=true
 	assert_success
 	echo "$output" >list
@@ -451,7 +432,6 @@ function import_inventory_lists { # @test
 	blobs="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
 	pushd inner || exit 1
-	set_xdg "$(pwd)"
 
 	export BATS_TEST_BODY=true
 	run_dodder import \

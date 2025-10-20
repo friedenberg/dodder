@@ -63,14 +63,9 @@ function init_compression { # @test
 }
 
 function init_and_reindex { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	set_xdg "$wd"
-
 	run_dodder_init_disable_age
 
-	run test -f .xdg/data/dodder/config-permanent
+	run test -f .dodder/local/share/config-permanent
 	assert_success
 
 	run_dodder show -format log :konfig
@@ -99,14 +94,9 @@ function init_and_reindex { # @test
 }
 
 function init_and_deinit { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	set_xdg "$wd"
-
 	run_dodder_init_disable_age
 
-	run test -f .xdg/data/dodder/config-permanent
+	run test -f .dodder/local/share/config-permanent
 	assert_success
 
 	# run cat .dodder/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
@@ -128,15 +118,13 @@ function init_and_deinit { # @test
 }
 
 function init_and_with_another_age { # @test
-	set_xdg "$BATS_TEST_TMPDIR"
 	run_dodder_init
 	age_id="$("$DODDER_BIN" gen madder-private_key-v1)"
 
 	mkdir inner
 	pushd inner || exit 1
 
-	set_xdg "$(pwd)"
-	run_dodder init -yin <(cat_yin) -yang <(cat_yang) -encryption "$age_id" test-repo-id
+	run_dodder_init -yin <(cat_yin) -yang <(cat_yang) -encryption "$age_id" test-repo-id
 	assert_success
 
 	run_dodder info-repo blob_stores-0-encryption
@@ -165,8 +153,7 @@ function non_repo_failure { # @test
 }
 
 function init_and_init { # @test
-	set_xdg "$BATS_TEST_TMPDIR"
-	run_dodder_init -override-xdg-with-cwd test-repo-id
+	run_dodder_init test-repo-id
 	assert_success
 
 	{
@@ -221,6 +208,7 @@ function init_with_age { # @test
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
+    -override-xdg-with-cwd \
 		-encryption generate \
 		test-repo-id
 
@@ -241,6 +229,7 @@ function init_with_json_inventory_list_type { # @test
 	run_dodder init \
 		-yin <(cat_yin) \
 		-yang <(cat_yang) \
+    -override-xdg-with-cwd \
 		-encryption generate \
 		-inventory_list-type inventory_list-json-v0 \
 		test-repo-id

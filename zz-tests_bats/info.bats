@@ -27,7 +27,14 @@ function info_compression_type { # @test
 
 # bats test_tags=user_story:xdg
 function info_xdg { # @test
-	run_dodder_init_disable_age
+	loc="$BATS_TEST_TMPDIR"
+	export XDG_DATA_HOME="$loc/.xdg/data"
+	export XDG_CONFIG_HOME="$loc/.xdg/config"
+	export XDG_STATE_HOME="$loc/.xdg/state"
+	export XDG_CACHE_HOME="$loc/.xdg/cache"
+	export XDG_RUNTIME_HOME="$loc/.xdg/runtime"
+
+	run_dodder_init_disable_age_xdg
 	run_dodder info xdg
 	assert_output - <<-EOM
 		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.xdg/cache/dodder

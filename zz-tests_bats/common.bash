@@ -25,7 +25,6 @@ load "$BATS_CWD/test_helper/bats-support/load"
 load "$BATS_CWD/test_helper/bats-assert/load"
 load "$BATS_CWD/test_helper/bats-assert-additions/load"
 
-# TODO remove this in favor of `-override-xdg-with-cwd`
 set_xdg() {
   if [[ -z $1 ]]; then
     echo "trying to set empty XDG override. aborting." >&2
@@ -45,8 +44,6 @@ set_xdg() {
   export XDG_CACHE_HOME="$loc/.xdg/cache"
   export XDG_RUNTIME_HOME="$loc/.xdg/runtime"
 }
-
-set_xdg "$BATS_TEST_TMPDIR"
 
 # get the containing directory of this file
 # use $BATS_TEST_FILENAME instead of ${BASH_SOURCE[0]} or $0,
@@ -102,8 +99,9 @@ fi
 
 function copy_from_version {
   DIR="$1"
-  rm -rf "$BATS_TEST_TMPDIR/.xdg"
-  cp -r "$DIR/migration/$DODDER_VERSION/.xdg" "$BATS_TEST_TMPDIR/.xdg"
+
+  rm -rf "$BATS_TEST_TMPDIR/.dodder"
+  cp -r "$DIR/migration/$DODDER_VERSION/.dodder" "$BATS_TEST_TMPDIR/.dodder"
 }
 
 # TODO remove
@@ -156,6 +154,7 @@ function run_dodder_init {
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -lock-internal-files=false \
+    -override-xdg-with-cwd \
     "${args[@]}"
 
   assert_success
@@ -197,16 +196,16 @@ function run_dodder_init_sha256 {
     args=("$@")
   fi
 
-	run_dodder init \
-		-yin <(cat_yin) \
-		-yang <(cat_yang) \
-		-lock-internal-files=false \
-		-override-xdg-with-cwd \
-		-hash_type-id sha256 \
-		"${args[@]}"
+  run_dodder init \
+    -yin <(cat_yin) \
+    -yang <(cat_yang) \
+    -lock-internal-files=false \
+    -override-xdg-with-cwd \
+    -hash_type-id sha256 \
+    "${args[@]}"
 
-	assert_success
-	assert_output --regexp - <<-EOM
+  assert_success
+  assert_output --regexp - <<-EOM
 		\[!md @sha256-.+ !toml-type-v1]
 		\[konfig @sha256-.+ !toml-config-v2]
 	EOM
@@ -233,7 +232,37 @@ function get_type_blob_sha() {
 }
 
 run_find() {
-  run find . -maxdepth 2 ! -ipath './.xdg*' ! -iname '.dodder-workspace'
+  run find . \
+    -maxdepth 2 \
+    ! -ipath './.dodder*' \
+    ! -iname '.dodder-workspace'
+}
+
+function run_dodder_init_disable_age_xdg {
+  if [[ $# -eq 0 ]]; then
+    args=("test-repo-id")
+  else
+    args=("$@")
+  fi
+
+  run_dodder init \
+    -yin <(cat_yin) \
+    -yang <(cat_yang) \
+    -encryption none \
+    -lock-internal-files=false \
+    "${args[@]}"
+
+  assert_success
+  # assert_output - <<-EOM
+  # [!md @$(get_type_blob_sha) !toml-type-v1]
+  # [konfig @$(get_konfig_sha) !toml-config-v2]
+  # EOM
+
+  run_dodder blob_store-cat "$(get_konfig_sha)"
+  assert_success
+  assert_output
+
+  run_dodder init-workspace
 }
 
 function run_dodder_init_disable_age {
@@ -247,6 +276,7 @@ function run_dodder_init_disable_age {
     -yin <(cat_yin) \
     -yang <(cat_yang) \
     -encryption none \
+    -override-xdg-with-cwd \
     -lock-internal-files=false \
     "${args[@]}"
 

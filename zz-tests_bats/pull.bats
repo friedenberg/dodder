@@ -13,10 +13,12 @@ teardown() {
 
 # bats file_tags=user_story:pull,user_story:repo,user_store:xdg,user_story:remote
 
-function bootstrap_xdg {
-	set_xdg "$1"
+function bootstrap_repo {
+	mkdir -p "$1"
+	pushd "$1" >/dev/null || exit 1
 	run_dodder_init
 	bootstrap_content
+	popd || exit 1
 }
 
 function bootstrap_repo_at_dir_with_name {
@@ -89,17 +91,18 @@ function try_add_new_after_pull {
 	EOM
 }
 
+function print_their_xdg() (
+	them="${1:-them}"
+	pushd "$them" >/dev/null || exit 1
+	dodder info xdg
+)
+
 function pull_history_zettel_type_tag_no_conflicts { # @test
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder_init_disable_age
 
@@ -131,7 +134,7 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 	bootstrap_repo_at_dir_with_name them
 	assert_success
 
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 	export BATS_TEST_BODY=true
 
 	run_dodder_init_disable_age
@@ -163,15 +166,10 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 
 function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	copy_from_version "$DIR"
 
@@ -215,12 +213,14 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 		import failed with conflicts, merging required
 	EOM
 
+	run_dodder_init_workspace
+	tree -n .
+
 	run_dodder status
 	assert_success
 	assert_output_unsorted - <<-EOM
 		       conflicted [one/dos]
 		       conflicted [one/uno]
-		        untracked [to_add @blake2b256-45lpe4rm9mjvdx8pt04kp5gh04uy77h0m0xtw2fhr0q7vl98g0vqls6hxe]
 	EOM
 
 	run_dodder show +z
@@ -276,7 +276,7 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 }
 
 function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @test
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 	run_dodder_init_disable_age
 
 	run_dodder new -edit=false - <<-EOM
@@ -294,15 +294,10 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 	EOM
 
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
@@ -315,7 +310,7 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 
 	run_dodder pull -allow-merge-conflicts /them +zettel,typ,etikett
 	assert_success
-  # TODO address the bandaid of two `[tag]` objects
+	# TODO address the bandaid of two `[tag]` objects
 	assert_output_unsorted - <<-EOM
 		copied Blob blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc (5 B)
 		[one/uno @blake2b256-gu738nunyrnsqukgqkuaau9zslu0fhwg4dgs9ltuyvnlp42wal8sdpn2hc !md "wow" tag]
@@ -327,9 +322,7 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 
 	run_dodder status
 	assert_success
-	assert_output_unsorted - <<-EOM
-		        untracked [to_add @blake2b256-45lpe4rm9mjvdx8pt04kp5gh04uy77h0m0xtw2fhr0q7vl98g0vqls6hxe]
-	EOM
+	assert_output_unsorted ''
 
 	run_dodder show -format text one/dos
 	assert_success
@@ -353,7 +346,7 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 }
 
 function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 	run_dodder_init_disable_age
 
 	run_dodder new -edit=false - <<-EOM
@@ -371,15 +364,10 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 	EOM
 
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
@@ -411,7 +399,6 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		       conflicted [one/uno]
-		        untracked [to_add @blake2b256-45lpe4rm9mjvdx8pt04kp5gh04uy77h0m0xtw2fhr0q7vl98g0vqls6hxe]
 	EOM
 
 	run_dodder merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
@@ -445,15 +432,10 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 
 function pull_history_default_no_conflict { # @test
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder_init_disable_age
 
@@ -503,15 +485,10 @@ function pull_history_zettel_one_abbr { # @test
 	# TODO add support for abbreviations in remote transfers
 	skip
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder_init_disable_age
 
@@ -540,21 +517,16 @@ function pull_history_zettel_one_abbr { # @test
 
 function pull_history_zettels_no_conflict_no_blobs { # @test
 	them="them"
-	bootstrap_xdg "$them"
+	bootstrap_repo "$them"
 	assert_success
 
-	function print_their_xdg() (
-		set_xdg "$them"
-		dodder info xdg
-	)
-
-	set_xdg "$BATS_TEST_TMPDIR"
+	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		<(print_their_xdg them) \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'

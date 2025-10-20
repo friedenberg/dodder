@@ -1,6 +1,5 @@
 #! /bin/bash -e
 
-
 dir_git_root="$(git rev-parse --show-toplevel)"
 dir_base="$(realpath "$(dirname "$0")")"
 
@@ -33,4 +32,4 @@ else
 fi
 
 mkdir -p "$d"
-cp -r "$bats_dir/test/1/.xdg" "$d/.xdg"
+cp -r "$bats_dir/test/1/.dodder" "$d/.dodder"

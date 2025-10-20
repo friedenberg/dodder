@@ -137,10 +137,10 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "xdg":
-			ecksDeeGee := env.GetXDG()
+			exdg := env.GetXDG()
 
 			dotenv := xdg.Dotenv{
-				XDG: &ecksDeeGee,
+				XDG: &exdg,
 			}
 
 			if _, err := dotenv.WriteTo(env.GetUIFile()); err != nil {

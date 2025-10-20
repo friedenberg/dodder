@@ -196,6 +196,10 @@ function workspace_parent_directory { # @test
 	run_dodder init-workspace -tags tag-3 -query tag-3
 	assert_success
 
+	run_dodder info-workspace
+	assert_success
+	assert_output ''
+
 	mkdir -p child
 	pushd child || exit 1
 
