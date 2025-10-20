@@ -24,9 +24,11 @@ import (
 var defaultBuckets = []int{2}
 
 type BlobStoreConfigNamed struct {
-	Name     string
-	BasePath string
-	Config   blob_store_configs.TypedConfig
+	Index         int
+	BasePath      string
+	Name          string
+	NameWithIndex string
+	Config        blob_store_configs.TypedConfig
 }
 
 type BlobStoreInitialized struct {
@@ -48,7 +50,8 @@ func MakeBlobStoresFromRepoConfig(
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
-		blobStores[0].Name = "0-default"
+		blobStores[0].Name = "default"
+		blobStores[0].NameWithIndex = "0-default"
 		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
@@ -74,7 +77,8 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 		for i, configPath := range configPaths {
-			blobStores[i].Name = fd.FileNameSansExt(configPath)
+			// TODO add name
+			blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
 			blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(i))
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
@@ -132,7 +136,8 @@ func MakeBlobStores(
 	blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 	for i, configPath := range configPaths {
-		blobStores[i].Name = fd.FileNameSansExt(configPath)
+		// TODO add name
+		blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
 		blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(
 			directoryLayout,
 			strconv.Itoa(i),
@@ -198,7 +203,7 @@ func MakeBlobStore(
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
-		fmt.Sprintf("(blob_store: %s) ", configNamed.Name),
+		fmt.Sprintf("(blob_store: %s) ", configNamed.NameWithIndex),
 	)
 
 	// TODO don't use tipe, use interfaces on the config
