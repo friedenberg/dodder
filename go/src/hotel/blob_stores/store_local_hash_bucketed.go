@@ -28,10 +28,9 @@ type localHashBucketed struct {
 var _ interfaces.BlobStore = localHashBucketed{}
 
 func makeLocalHashBucketed(
-	ctx interfaces.ActiveContext,
+	envDir env_dir.Env,
 	basePath string,
 	config blob_store_configs.ConfigLocalHashBucketed,
-	tempFS env_dir.TemporaryFS,
 ) (store localHashBucketed, err error) {
 	// TODO read default hash type from config
 	if store.defaultHashFormat, err = markl.GetFormatHashOrError(
@@ -44,7 +43,7 @@ func makeLocalHashBucketed(
 	store.multiHash = config.SupportsMultiHash()
 	store.buckets = config.GetHashBuckets()
 	store.config = config
-	store.tempFS = tempFS
+	store.tempFS = envDir.GetTempLocal()
 
 	store.basePath = basePath
 	// store.basePath, _ = blob_store_configs.GetBasePath(config)

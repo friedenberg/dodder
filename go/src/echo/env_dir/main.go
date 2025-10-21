@@ -18,9 +18,11 @@ const (
 )
 
 type Env interface {
+	interfaces.ActiveContextGetter
+	interfaces.EnvVarsAdder
+
 	IsDryRun() bool
 	GetCwd() string
-	interfaces.EnvVarsAdder
 	GetXDG() xdg.XDG
 	GetExecPath() string
 	GetTempLocal() TemporaryFS

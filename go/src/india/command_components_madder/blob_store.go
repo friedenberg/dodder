@@ -58,7 +58,6 @@ func (cmd *BlobStore) MakeBlobStore(
 			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
 				envBlobStore,
 				configNamed,
-				envBlobStore.GetTempLocal(),
 			); err != nil {
 				envBlobStore.Cancel(err)
 				return blobStore

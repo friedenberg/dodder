@@ -229,7 +229,6 @@ func (env Env) getV10OrLessInventoryListBlobStore() interfaces.BlobStore {
 				Blob: blob.GetBlobIOWrapper().(blob_store_configs.Config),
 			},
 		},
-		env.GetTempLocal(),
 	); err != nil {
 		env.Cancel(err)
 		return nil

@@ -98,9 +98,8 @@ func MakeBlobStoresFromRepoConfig(
 
 		// TODO use sha of config to determine blob store base path
 		if blobStores[i].BlobStore, err = MakeBlobStore(
-			ctx,
+			envDir,
 			blobStore.BlobStoreConfigNamed,
-			envDir.GetTempLocal(),
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
@@ -159,9 +158,8 @@ func MakeBlobStores(
 
 		// TODO use sha of config to determine blob store base path
 		if blobStores[i].BlobStore, err = MakeBlobStore(
-			ctx,
+			envDir,
 			blobStore.BlobStoreConfigNamed,
-			envDir.GetTempLocal(),
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
@@ -172,9 +170,8 @@ func MakeBlobStores(
 }
 
 func MakeRemoteBlobStore(
-	ctx interfaces.ActiveContext,
+	envDir env_dir.Env,
 	configNamed BlobStoreConfigNamed,
-	tempFS env_dir.TemporaryFS,
 ) (blobStore BlobStoreInitialized) {
 	blobStore.BlobStoreConfigNamed = configNamed
 
@@ -183,11 +180,10 @@ func MakeRemoteBlobStore(
 
 		// TODO use sha of config to determine blob store base path
 		if blobStore.BlobStore, err = MakeBlobStore(
-			ctx,
+			envDir,
 			configNamed,
-			tempFS,
 		); err != nil {
-			ctx.Cancel(err)
+			envDir.GetActiveContext().Cancel(err)
 			return blobStore
 		}
 	}
@@ -197,9 +193,8 @@ func MakeRemoteBlobStore(
 
 // TODO describe base path agnostically
 func MakeBlobStore(
-	context interfaces.ActiveContext,
+	envDir env_dir.Env,
 	configNamed BlobStoreConfigNamed,
-	tempFS env_dir.TemporaryFS,
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
@@ -213,30 +208,37 @@ func MakeBlobStore(
 	switch config := configBlob.(type) {
 	case blob_store_configs.ConfigSFTPUri:
 		return makeSftpStore(
-			context,
+			envDir.GetActiveContext(),
 			printer,
 			config,
 			func() (*ssh.Client, error) {
-				return MakeSSHClientFromSSHConfig(context, printer, config)
+				return MakeSSHClientFromSSHConfig(
+					envDir.GetActiveContext(),
+					printer,
+					config,
+				)
 			},
 		)
 
 	case blob_store_configs.ConfigSFTPConfigExplicit:
 		return makeSftpStore(
-			context,
+			envDir.GetActiveContext(),
 			printer,
 			config,
 			func() (*ssh.Client, error) {
-				return MakeSSHClientForExplicitConfig(context, printer, config)
+				return MakeSSHClientForExplicitConfig(
+					envDir.GetActiveContext(),
+					printer,
+					config,
+				)
 			},
 		)
 
 	case blob_store_configs.ConfigLocalHashBucketed:
 		return makeLocalHashBucketed(
-			context,
+			envDir,
 			configNamed.BasePath,
 			config,
-			tempFS,
 		)
 
 	case blob_store_configs.ConfigPointer:
@@ -252,7 +254,7 @@ func MakeBlobStore(
 
 		configNamed.Config = typedConfig
 
-		return MakeBlobStore(context, configNamed, tempFS)
+		return MakeBlobStore(envDir, configNamed)
 
 	default:
 		err = errors.BadRequestf(
