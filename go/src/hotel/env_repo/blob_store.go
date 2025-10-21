@@ -106,14 +106,13 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 
 	blobStoreConfig := bigBang.TypedBlobStoreConfig
 
-	if config, ok := blobStoreConfig.Blob.(blob_store_configs.ConfigLocalMutable); ok {
-		config.SetBasePath(
-			interfaces.DirectoryLayoutDirBlobStore(
-				directoryLayout,
-				strconv.Itoa(0),
-			),
-		)
-	}
+	blob_store_configs.SetBasePath(
+		blobStoreConfig.Blob,
+		interfaces.DirectoryLayoutPathBlobStore(
+			directoryLayout,
+			strconv.Itoa(0),
+		),
+	)
 
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,

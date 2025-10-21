@@ -70,6 +70,6 @@ func (blobStoreConfig TomlV0) GetDefaultHashTypeId() string {
 	return markl.FormatIdHashSha256
 }
 
-func (blobStoreConfig *TomlV0) SetBasePath(value string) {
+func (blobStoreConfig *TomlV0) setBasePath(value string) {
 	blobStoreConfig.BasePath = value
 }

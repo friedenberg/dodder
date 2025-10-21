@@ -1,21 +1,33 @@
 package env_vars
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type DirectoryLayoutPath struct {
-	envVar   interfaces.DirectoryLayoutBaseEnvVar
-	target   string
-	fullPath string
+	baseEnvVar interfaces.DirectoryLayoutBaseEnvVar
+	target     string
+	fullPath   string
 }
 
 var _ interfaces.DirectoryLayoutPath = DirectoryLayoutPath{}
 
+func MakeAbsolutePath(path string) DirectoryLayoutPath {
+	if !filepath.IsAbs(path) {
+		panic(fmt.Sprintf("path is not absolute: %q, path", path))
+	}
+
+	return DirectoryLayoutPath{
+		target:   path,
+		fullPath: path,
+	}
+}
+
 func (path DirectoryLayoutPath) GetBaseEnvVar() interfaces.DirectoryLayoutBaseEnvVar {
-	return path.envVar
+	return path.baseEnvVar
 }
 
 func (path DirectoryLayoutPath) GetTarget() string {
@@ -27,5 +39,13 @@ func (path DirectoryLayoutPath) String() string {
 }
 
 func (path DirectoryLayoutPath) GetTemplate() string {
-	return filepath.Join(path.envVar.GetBaseEnvVarName(), path.target)
+	if path.baseEnvVar == nil {
+		return ""
+	} else {
+		return fmt.Sprintf(
+			"$%s/%s",
+			filepath.Clean(path.baseEnvVar.GetBaseEnvVarName()),
+			filepath.Clean(path.target),
+		)
+	}
 }

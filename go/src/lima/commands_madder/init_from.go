@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -129,9 +130,9 @@ func (cmd InitFrom) tryAddBasePath(
 			return
 		}
 
-		// TODO get base path relative to config path
-
-		// TODO populate basepath for config to be absolute
-		configLocalMutable.SetBasePath("test")
+		blob_store_configs.SetBasePath(
+			configLocalMutable,
+			env_vars.MakeAbsolutePath(basePath),
+		)
 	}
 }

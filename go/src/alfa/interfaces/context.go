@@ -65,6 +65,10 @@ type (
 		Must(FuncActiveContext)
 	}
 
+	ActiveContextGetter interface {
+		GetActiveContext() ActiveContext
+	}
+
 	Context interface {
 		ActiveContext
 		CauseWithStackFrames() (error, []stack_frame.Frame)

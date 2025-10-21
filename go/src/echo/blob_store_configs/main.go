@@ -1,8 +1,7 @@
 package blob_store_configs
 
 import (
-	"os"
-
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -40,10 +39,13 @@ type (
 		getBasePath() string
 	}
 
-	// TODO make private and use public static setter pattern
-	ConfigLocalMutable interface {
+	configLocalMutable interface {
 		configLocal
-		SetBasePath(string)
+		setBasePath(string)
+	}
+
+	ConfigLocalMutable interface {
+		configLocalMutable
 	}
 
 	ConfigLocalHashBucketed interface {
@@ -114,7 +116,23 @@ func GetBasePath(config Config) (string, bool) {
 		return "", false
 	}
 
-	return os.ExpandEnv(configLocal.getBasePath()), true
+	return configLocal.getBasePath(), true
+}
+
+func SetBasePath(
+	config Config,
+	basePath interfaces.DirectoryLayoutPath,
+) (err error) {
+	configLocalMutable, ok := config.(configLocalMutable)
+
+	if !ok {
+		err = errors.Errorf("setting base path not supported on %T", config)
+		return err
+	}
+
+	configLocalMutable.setBasePath(basePath.String())
+
+	return err
 }
 
 // func SetBasePath(config Config, basePath string) error {

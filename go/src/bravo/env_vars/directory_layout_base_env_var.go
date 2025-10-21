@@ -58,7 +58,7 @@ func (envVar DirectoryLayoutBaseEnvVar) MakePath(
 	target := filepath.Join(targets...)
 
 	return DirectoryLayoutPath{
-		envVar:   envVar,
+		baseEnvVar:   envVar,
 		target:   target,
 		fullPath: filepath.Join(envVar.GetBaseEnvVarValue(), target),
 	}

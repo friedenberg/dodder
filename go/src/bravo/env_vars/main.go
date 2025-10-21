@@ -1,6 +1,7 @@
 package env_vars
 
 import (
+	"fmt"
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -56,4 +57,21 @@ func (envVars EnvVars) GetWithOSFallback(lookup string) string {
 	}
 
 	return os.Getenv(lookup)
+}
+
+func GetOrPanic(getenv Getenv) Getenv {
+	return func(lookup string) string {
+		value := getenv(lookup)
+
+		if value == "" {
+			panic(
+				fmt.Sprintf(
+					"lookup for env var %q returned empty string",
+					lookup,
+				),
+			)
+		}
+
+		return value
+	}
 }

@@ -128,6 +128,6 @@ func (blobStoreConfig TomlV2) GetDefaultHashTypeId() string {
 	return blobStoreConfig.HashTypeId
 }
 
-func (blobStoreConfig *TomlV2) SetBasePath(value string) {
+func (blobStoreConfig *TomlV2) setBasePath(value string) {
 	blobStoreConfig.BasePath = value
 }

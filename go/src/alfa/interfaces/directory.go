@@ -76,9 +76,16 @@ type (
 	}
 )
 
+func DirectoryLayoutPathBlobStore(
+	layout BlobStoreDirectoryLayout,
+	targets ...string,
+) DirectoryLayoutPath {
+	return layout.MakePathBlobStore(targets...)
+}
+
 func DirectoryLayoutDirBlobStore(
 	layout BlobStoreDirectoryLayout,
 	targets ...string,
 ) string {
-	return layout.MakePathBlobStore(targets...).String()
+	return DirectoryLayoutPathBlobStore(layout, targets...).String()
 }

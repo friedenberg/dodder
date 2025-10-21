@@ -58,6 +58,10 @@ func (env *env) initializeXDG() (err error) {
 	return err
 }
 
+func (env env) GetActiveContext() interfaces.ActiveContext {
+	return env.Context
+}
+
 func (env env) GetDebug() debug.Options {
 	return env.debugOptions
 }
