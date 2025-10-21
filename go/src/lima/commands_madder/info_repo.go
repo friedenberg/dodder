@@ -52,7 +52,6 @@ func (cmd InfoRepo) Run(req command.Request) {
 	}
 
 	blobStoreConfig := blobStore.Config
-	blobIOWrapper := blobStore.GetBlobIOWrapper()
 
 	for _, key := range keys {
 		switch strings.ToLower(key) {
@@ -76,6 +75,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 			// TODO switch to `blob_stores.N.compression_type`
 		case "compression-type":
+			blobIOWrapper := blobStore.GetBlobIOWrapper()
+
 			// TODO read default blob store and expose config
 			env.GetUI().Print(
 				blobIOWrapper.GetBlobCompression(),
@@ -83,6 +84,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 			// TODO switch to `blob_stores.N.age_encryption`
 		case "blob_stores-0-encryption":
+			blobIOWrapper := blobStore.GetBlobIOWrapper()
+
 			env.GetUI().Print(
 				blobIOWrapper.GetBlobEncryption().StringWithFormat(),
 			)
