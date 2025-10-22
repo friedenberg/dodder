@@ -12,7 +12,7 @@ import (
 
 type TomlV1 struct {
 	HashBuckets values.IntSlice `toml:"hash-buckets"`
-	BasePath    string          `toml:"base-path"` // can include env vars
+	BasePath    string          `toml:"base-path,omitempty"`
 	HashTypeId  string          `toml:"hash_type-id"`
 
 	// cannot use `omitempty`, as markl.Id's empty value equals its non-empty

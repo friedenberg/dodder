@@ -1,6 +1,8 @@
 package blob_store_configs
 
 import (
+	"strconv"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -109,14 +111,47 @@ func Default() *TypedMutableConfig {
 	}
 }
 
-func GetBasePath(config Config) (string, bool) {
+func GetDefaultBasePath(
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	index int,
+) string {
+	return interfaces.DirectoryLayoutDirBlobStore(
+		directoryLayout,
+		strconv.Itoa(index),
+	)
+}
+
+func GetBasePath(
+	config Config,
+) (string, bool) {
 	configLocal, ok := config.(configLocal)
 
 	if !ok {
 		return "", false
 	}
 
-	return configLocal.getBasePath(), true
+	basePath := configLocal.getBasePath()
+	return basePath, basePath != ""
+}
+
+func GetBasePathOrDefault(
+	config Config,
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	index int,
+) (string, bool) {
+	configLocal, ok := config.(configLocal)
+
+	if !ok {
+		return "", false
+	}
+
+	basePath := configLocal.getBasePath()
+
+	if basePath != "" {
+		return basePath, true
+	}
+
+	return GetDefaultBasePath(directoryLayout, index), true
 }
 
 func SetBasePath(
@@ -134,13 +169,3 @@ func SetBasePath(
 
 	return err
 }
-
-// func SetBasePath(config Config, basePath string) error {
-// 	configLocalMutable, ok := config.(ConfigLocalMutable)
-
-// 	if !ok {
-// 		return errors.Errorf("kk
-// 	}
-
-// 	return os.ExpandEnv(configLocalMutable.getBasePath()), true
-// }

@@ -43,10 +43,8 @@ func makeLocalHashBucketed(
 	store.multiHash = config.SupportsMultiHash()
 	store.buckets = config.GetHashBuckets()
 	store.config = config
-	store.tempFS = envDir.GetTempLocal()
-
 	store.basePath = basePath
-	// store.basePath, _ = blob_store_configs.GetBasePath(config)
+	store.tempFS = envDir.GetTempLocal()
 
 	return store, err
 }

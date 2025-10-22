@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -79,7 +78,7 @@ func MakeBlobStoresFromRepoConfig(
 		for i, configPath := range configPaths {
 			// TODO add name
 			blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
-			blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(directoryLayout, strconv.Itoa(i))
+			blobStores[i].BasePath = blob_store_configs.GetDefaultBasePath(directoryLayout, i)
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
@@ -137,9 +136,9 @@ func MakeBlobStores(
 	for i, configPath := range configPaths {
 		// TODO add name
 		blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
-		blobStores[i].BasePath = interfaces.DirectoryLayoutDirBlobStore(
+		blobStores[i].BasePath = blob_store_configs.GetDefaultBasePath(
 			directoryLayout,
-			strconv.Itoa(i),
+			i,
 		)
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(

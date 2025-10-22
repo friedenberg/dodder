@@ -8,7 +8,7 @@ import (
 )
 
 type TomlV0 struct {
-	BasePath          string                           `toml:"base-path"` // can include env vars
+	BasePath          string                           `toml:"base-path,omitempty"`
 	AgeEncryption     markl_age_id.Id                  `toml:"age-encryption,omitempty"`
 	CompressionType   compression_type.CompressionType `toml:"compression-type"`
 	LockInternalFiles bool                             `toml:"lock-internal-files"`
