@@ -32,17 +32,17 @@ func makeLocalHashBucketed(
 	basePath string,
 	config blob_store_configs.ConfigLocalHashBucketed,
 ) (store localHashBucketed, err error) {
-	// TODO read default hash type from config
+	store.config = config
+
+	store.multiHash = config.SupportsMultiHash()
 	if store.defaultHashFormat, err = markl.GetFormatHashOrError(
 		config.GetDefaultHashTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return store, err
 	}
-
-	store.multiHash = config.SupportsMultiHash()
 	store.buckets = config.GetHashBuckets()
-	store.config = config
+
 	store.basePath = basePath
 	store.tempFS = envDir.GetTempLocal()
 

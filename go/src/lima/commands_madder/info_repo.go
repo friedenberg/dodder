@@ -103,7 +103,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 		case "blob_stores-0-config":
 			// TODO this is gross, fix it
-			blobStoreConfig := blobStore.BlobStoreConfigNamed.Config
+			blobStoreConfig := blobStore.ConfigNamed.Config
 
 			if _, err := blob_store_configs.Coder.EncodeTo(
 				&blob_store_configs.TypedConfig{

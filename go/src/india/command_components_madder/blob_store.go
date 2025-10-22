@@ -44,7 +44,7 @@ func (cmd *BlobStore) MakeBlobStore(
 
 		blobStore.Config = typedConfig
 
-		configNamed := blob_stores.BlobStoreConfigNamed{
+		configNamed := blob_store_configs.ConfigNamed{
 			Config: typedConfig,
 		}
 

@@ -31,7 +31,7 @@ type BlobStoreConfigNamed struct {
 }
 
 type BlobStoreInitialized struct {
-	BlobStoreConfigNamed
+	blob_store_configs.ConfigNamed
 	interfaces.BlobStore
 }
 
@@ -98,7 +98,7 @@ func MakeBlobStoresFromRepoConfig(
 		// TODO use sha of config to determine blob store base path
 		if blobStores[i].BlobStore, err = MakeBlobStore(
 			envDir,
-			blobStore.BlobStoreConfigNamed,
+			blobStore.ConfigNamed,
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
@@ -158,7 +158,7 @@ func MakeBlobStores(
 		// TODO use sha of config to determine blob store base path
 		if blobStores[i].BlobStore, err = MakeBlobStore(
 			envDir,
-			blobStore.BlobStoreConfigNamed,
+			blobStore.ConfigNamed,
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
@@ -170,9 +170,9 @@ func MakeBlobStores(
 
 func MakeRemoteBlobStore(
 	envDir env_dir.Env,
-	configNamed BlobStoreConfigNamed,
+	configNamed blob_store_configs.ConfigNamed,
 ) (blobStore BlobStoreInitialized) {
-	blobStore.BlobStoreConfigNamed = configNamed
+	blobStore.ConfigNamed = configNamed
 
 	{
 		var err error
@@ -193,7 +193,7 @@ func MakeRemoteBlobStore(
 // TODO describe base path agnostically
 func MakeBlobStore(
 	envDir env_dir.Env,
-	configNamed BlobStoreConfigNamed,
+	configNamed blob_store_configs.ConfigNamed,
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
