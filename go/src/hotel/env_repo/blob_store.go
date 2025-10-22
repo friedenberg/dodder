@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
@@ -59,9 +60,9 @@ func MakeBlobStoreEnv(
 		Env: envLocal,
 	}
 
-	directoryLayout := &directoryLayoutV2{}
+	directoryLayout := &directory_layout.V2{}
 
-	if err := directoryLayout.initDirectoryLayout(envLocal.GetXDG()); err != nil {
+	if err := directoryLayout.Initialize(envLocal.GetXDG()); err != nil {
 		envLocal.Cancel(err)
 		return env
 	}

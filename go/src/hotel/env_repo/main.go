@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -27,10 +27,7 @@ const (
 	FileNameBlobStoreConfig = "dodder-blob_store-config"
 )
 
-type directoryLayout interface {
-	interfaces.RepoDirectoryLayout
-	initDirectoryLayout(xdg.XDG) error
-}
+type directoryLayout = directory_layout.DirectoryLayout
 
 type Env struct {
 	config genesis_configs.TypedConfigPrivate
@@ -102,12 +99,12 @@ func Make(
 	}
 
 	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
-		env.directoryLayout = &directoryLayoutV1{}
+		env.directoryLayout = &directory_layout.V1{}
 	} else {
-		env.directoryLayout = &directoryLayoutV2{}
+		env.directoryLayout = &directory_layout.V2{}
 	}
 
-	if err = env.initDirectoryLayout(xdg); err != nil {
+	if err = env.Initialize(xdg); err != nil {
 		err = errors.Wrap(err)
 		return env, err
 	}
