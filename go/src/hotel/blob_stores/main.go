@@ -200,8 +200,6 @@ func MakeBlobStore(
 		fmt.Sprintf("(blob_store: %s) ", configNamed.NameWithIndex),
 	)
 
-	// TODO don't use tipe, use interfaces on the config
-	// switch tipe := config.Config.Blob.GetBlobStoreType(); tipe {
 	configBlob := configNamed.Config.Blob
 
 	switch config := configBlob.(type) {

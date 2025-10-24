@@ -35,8 +35,18 @@ func (cmd InfoWorkspace) Run(req command.Request) {
 		)
 
 	case "":
-		// TODO what should this be?
-		// TODO print toml representation?
+		fallthrough
+
+	case "config":
+		typedConfig := envWorkspace.GetWorkspaceConfigTyped()
+
+		if _, err := workspace_config_blobs.Coder.EncodeTo(
+			&typedConfig,
+			repo.GetEnvRepo().GetOut(),
+		); err != nil {
+			repo.Cancel(err)
+			return
+		}
 
 	case "query":
 		workspaceConfig := envWorkspace.GetWorkspaceConfig()

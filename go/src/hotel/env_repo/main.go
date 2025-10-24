@@ -98,11 +98,9 @@ func Make(
 		}
 	}
 
-	if env.GetStoreVersion().LessOrEqual(store_version.V10) {
-		env.directoryLayout = &directory_layout.V1{}
-	} else {
-		env.directoryLayout = &directory_layout.V2{}
-	}
+	env.directoryLayout = directory_layout.MakeDirectoryLayout(
+		env.GetStoreVersion(),
+	)
 
 	if err = env.Initialize(xdg); err != nil {
 		err = errors.Wrap(err)

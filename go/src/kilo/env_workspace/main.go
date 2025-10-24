@@ -27,6 +27,7 @@ type Env interface {
 	AssertNotTemporary(interfaces.Context)
 	AssertNotTemporaryOrOfferToCreate(interfaces.Context)
 	IsTemporary() bool
+	GetWorkspaceConfigTyped() workspace_config_blobs.TypedConfig
 	GetWorkspaceConfig() workspace_config_blobs.Config
 	GetWorkspaceConfigFilePath() string
 	GetDefaults() repo_configs.Defaults
@@ -220,6 +221,15 @@ func (env *env) IsTemporary() bool {
 	return env.isTemporary
 }
 
+func (env *env) GetWorkspaceConfigTyped() workspace_config_blobs.TypedConfig {
+	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
+
+	return workspace_config_blobs.TypedConfig{
+		Type: typeWorkspaceConfig,
+		Blob: env.blob,
+	}
+}
+
 func (env *env) GetWorkspaceConfig() workspace_config_blobs.Config {
 	return env.blob
 }
@@ -240,16 +250,17 @@ func (env *env) CreateWorkspace(
 	blob workspace_config_blobs.Config,
 ) (err error) {
 	env.blob = blob
-	tipe := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
+
+	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
 
 	object := workspace_config_blobs.TypedConfig{
-		Type: tipe,
+		Type: typeWorkspaceConfig,
 		Blob: env.blob,
 	}
 
 	env.dir = env.GetCwd()
 
-	if err = triple_hyphen_io.EncodeToFile[workspace_config_blobs.Config](
+	if err = triple_hyphen_io.EncodeToFile(
 		workspace_config_blobs.Coder,
 		&object,
 		env.GetWorkspaceConfigFilePath(),

@@ -198,12 +198,33 @@ function workspace_parent_directory { # @test
 
 	run_dodder info-workspace
 	assert_success
-	assert_output ''
+	assert_output - <<-EOM
+		---
+		! toml-workspace_config-v0
+		---
+
+		query = 'tag-3'
+		dry-run = false
+
+		[defaults]
+		tags = ['tag-3']
+	EOM
+	run test -f .dodder-workspace
 
 	mkdir -p child
 	pushd child || exit 1
 
 	run_dodder info-workspace
 	assert_success
-	assert_output ''
+	assert_output - <<-EOM
+		---
+		! toml-workspace_config-v0
+		---
+
+		query = 'tag-3'
+		dry-run = false
+
+		[defaults]
+		tags = ['tag-3']
+	EOM
 }
