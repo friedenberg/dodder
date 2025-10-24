@@ -101,16 +101,16 @@ func (initArgs InitArgs) getCwdXDGOverridePath() (string, bool) {
 		}
 	}
 
-	return pathCwdXDGOverride, exists
+	return dir, exists
 }
 
 func (xdg *XDG) InitializeOverriddenIfNecessary(
 	initArgs InitArgs,
 ) (err error) {
-	pathCwdXDGOverride, exists := initArgs.getCwdXDGOverridePath()
+	dirCwdXDGOverride, exists := initArgs.getCwdXDGOverridePath()
 
 	if exists {
-		if err = xdg.InitializeOverridden(initArgs, pathCwdXDGOverride); err != nil {
+		if err = xdg.InitializeOverridden(initArgs, dirCwdXDGOverride); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -135,7 +135,7 @@ func (xdg *XDG) InitializeOverridden(
 
 	getenv := xdg_defaults.MakeGetenv(
 		os.Getenv,
-		xdg.Cwd.ActualValue,
+		overridePath,
 		xdg.UtilityName,
 	)
 

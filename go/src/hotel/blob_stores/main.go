@@ -117,9 +117,10 @@ func MakeBlobStores(
 
 	{
 		var err error
+		path := filepath.Join(directoryLayout.DirBlobStoreConfigs())
 
 		if configPaths, err = files.DirNames(
-			filepath.Join(directoryLayout.DirBlobStoreConfigs()),
+			path,
 		); err != nil {
 			if errors.IsNotExist(err) {
 				return blobStores
