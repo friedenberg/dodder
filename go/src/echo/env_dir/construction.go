@@ -169,7 +169,10 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 		return env
 	}
 
-	if err := env.XDG.InitializeOverridden(env.xdgInitArgs); err != nil {
+	if err := env.XDG.InitializeOverridden(
+		env.xdgInitArgs,
+		xdgRootOverride,
+	); err != nil {
 		env.Cancel(err)
 		return env
 	}

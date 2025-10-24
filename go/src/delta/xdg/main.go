@@ -84,13 +84,33 @@ func (initArgs InitArgs) makeCwdXDGOverridePath(base string) string {
 	)
 }
 
+func (initArgs InitArgs) getCwdXDGOverridePath() (string, bool) {
+	dir := initArgs.Cwd
+	pathCwdXDGOverride := initArgs.makeCwdXDGOverridePath(dir)
+
+	var exists bool
+
+	var count int
+	for exists = files.Exists(pathCwdXDGOverride); !exists && dir != string(filepath.Separator); {
+		count++
+		dir = filepath.Dir(dir)
+		pathCwdXDGOverride = initArgs.makeCwdXDGOverridePath(dir)
+
+		if count > 100 {
+			panic("too deep")
+		}
+	}
+
+	return pathCwdXDGOverride, exists
+}
+
 func (xdg *XDG) InitializeOverriddenIfNecessary(
 	initArgs InitArgs,
 ) (err error) {
-	pathCwdXDGOverride := initArgs.makeCwdXDGOverridePath(initArgs.Cwd)
+	pathCwdXDGOverride, exists := initArgs.getCwdXDGOverridePath()
 
-	if files.Exists(pathCwdXDGOverride) {
-		if err = xdg.InitializeOverridden(initArgs); err != nil {
+	if exists {
+		if err = xdg.InitializeOverridden(initArgs, pathCwdXDGOverride); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -106,6 +126,7 @@ func (xdg *XDG) InitializeOverriddenIfNecessary(
 
 func (xdg *XDG) InitializeOverridden(
 	initArgs InitArgs,
+	overridePath string,
 ) (err error) {
 	if err = xdg.setInitArgs(initArgs); err != nil {
 		err = errors.Wrap(err)
