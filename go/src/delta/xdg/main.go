@@ -77,13 +77,17 @@ func (xdg *XDG) setInitArgs(initArgs InitArgs) (err error) {
 	return err
 }
 
+func (initArgs InitArgs) makeCwdXDGOverridePath(base string) string {
+	return filepath.Join(
+		base,
+		fmt.Sprintf(".%s", initArgs.UtilityName),
+	)
+}
+
 func (xdg *XDG) InitializeOverriddenIfNecessary(
 	initArgs InitArgs,
 ) (err error) {
-	pathCwdXDGOverride := filepath.Join(
-		initArgs.Cwd,
-		fmt.Sprintf(".%s", initArgs.UtilityName),
-	)
+	pathCwdXDGOverride := initArgs.makeCwdXDGOverridePath(initArgs.Cwd)
 
 	if files.Exists(pathCwdXDGOverride) {
 		if err = xdg.InitializeOverridden(initArgs); err != nil {
