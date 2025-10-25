@@ -1,15 +1,14 @@
 package commands_madder
 
 import (
-	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
 
@@ -93,13 +92,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 		case "blob_stores-0-config-path":
 			env.GetUI().Print(
-				env.DirBlobStoreConfigs(
-					fmt.Sprintf(
-						"%d-default.%s",
-						0,
-						env_repo.FileNameBlobStoreConfig,
-					),
-				),
+				directory_layout.GetDefaultBlobStoreConfigPath(env),
 			)
 
 		case "blob_stores-0-config":

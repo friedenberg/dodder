@@ -1,11 +1,14 @@
 package directory_layout
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
+
+const FileNameBlobStoreConfig = "dodder-blob_store-config"
 
 func GetBlobStoreConfigPaths(
 	ctx interfaces.ActiveContext,
@@ -25,4 +28,29 @@ func GetBlobStoreConfigPaths(
 	}
 
 	return configPaths
+}
+
+func GetDefaultBlobStoreConfigPath(
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+) string {
+	return directoryLayout.DirBlobStoreConfigs(
+		fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
+	)
+}
+
+func GetBlobStoreConfigPath(
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	currentBlobStoreCount int,
+	name string,
+) (dir string, target string) {
+	dir = directoryLayout.DirBlobStoreConfigs()
+
+	target = fmt.Sprintf(
+		"%d-%s.%s",
+		currentBlobStoreCount,
+		name,
+		FileNameBlobStoreConfig,
+	)
+
+	return dir, target
 }

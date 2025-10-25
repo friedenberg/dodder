@@ -1,11 +1,11 @@
 package command_components_madder
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 )
@@ -20,22 +20,18 @@ func (cmd Init) InitBlobStore(
 ) (pathConfig string) {
 	blobStoreCount := len(envBlobStore.GetBlobStores())
 
-	dir := envBlobStore.DirBlobStoreConfigs()
+	dir, target := directory_layout.GetBlobStoreConfigPath(
+		envBlobStore,
+		blobStoreCount,
+		name,
+	)
 
 	if err := envBlobStore.MakeDir(dir); err != nil {
 		envBlobStore.Cancel(err)
 		return pathConfig
 	}
 
-	pathConfig = filepath.Join(
-		dir,
-		fmt.Sprintf(
-			"%d-%s.%s",
-			blobStoreCount,
-			name,
-			env_repo.FileNameBlobStoreConfig,
-		),
-	)
+	pathConfig = filepath.Join(dir, target)
 
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,

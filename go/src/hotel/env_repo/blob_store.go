@@ -1,7 +1,6 @@
 package env_repo
 
 import (
-	"fmt"
 	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -121,9 +120,7 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 			Type: blobStoreConfig.Type,
 			Blob: blobStoreConfig.Blob,
 		},
-		directoryLayout.DirBlobStoreConfigs(
-			fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
-		),
+		directory_layout.GetDefaultBlobStoreConfigPath(directoryLayout),
 	); err != nil {
 		env.Cancel(err)
 		return

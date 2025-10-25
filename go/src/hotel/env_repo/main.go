@@ -23,8 +23,6 @@ const (
 	// TODO move to mutable config
 	FileWorkspaceTemplate = ".%s-workspace"
 	FileWorkspace         = ".dodder-workspace"
-
-	FileNameBlobStoreConfig = "dodder-blob_store-config"
 )
 
 type directoryLayout = directory_layout.DirectoryLayout
