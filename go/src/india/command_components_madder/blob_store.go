@@ -48,7 +48,7 @@ func (cmd *BlobStore) MakeBlobStore(
 			Config: typedConfig,
 		}
 
-		configNamed.BasePath, _ = blob_store_configs.GetBasePath(
+		configNamed.BlobStoreBasePath, _ = blob_store_configs.GetBasePath(
 			typedConfig.Blob,
 		)
 

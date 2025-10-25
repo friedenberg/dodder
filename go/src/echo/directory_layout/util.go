@@ -1,5 +1,28 @@
 package directory_layout
 
-func stringSliceJoin(s string, vs []string) []string {
-	return append([]string{s}, vs...)
+import (
+	"path/filepath"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
+)
+
+func GetBlobStoreConfigPaths(
+	ctx interfaces.ActiveContext,
+	directoryLayout interfaces.BlobStoreDirectoryLayout,
+) []string {
+	var configPaths []string
+
+	{
+		var err error
+
+		if configPaths, err = files.DirNames(
+			filepath.Join(directoryLayout.DirBlobStoreConfigs()),
+		); err != nil {
+			ctx.Cancel(err)
+			return configPaths
+		}
+	}
+
+	return configPaths
 }

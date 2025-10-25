@@ -19,7 +19,7 @@ import (
 func (client *client) GetBlobStore() blob_stores.BlobStoreInitialized {
 	return blob_stores.BlobStoreInitialized{
 		ConfigNamed: blob_store_configs.ConfigNamed{
-			NameWithIndex: "remote",
+			ConfigPath: "remote",
 			// TODO populate these
 			// BasePath:
 			// Config:

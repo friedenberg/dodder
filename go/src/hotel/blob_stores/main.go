@@ -2,17 +2,14 @@ package blob_stores
 
 import (
 	"fmt"
-	"io"
-	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -21,23 +18,6 @@ import (
 )
 
 var defaultBuckets = []int{2}
-
-type BlobStoreConfigNamed struct {
-	Index         int
-	BasePath      string
-	Name          string
-	NameWithIndex string
-	Config        blob_store_configs.TypedConfig
-}
-
-type BlobStoreInitialized struct {
-	blob_store_configs.ConfigNamed
-	interfaces.BlobStore
-}
-
-func (blobStoreInitialized BlobStoreInitialized) GetBlobStore() interfaces.BlobStore {
-	return blobStoreInitialized.BlobStore
-}
 
 // TODO pass in custom UI context for printing
 func MakeBlobStoresFromRepoConfig(
@@ -49,36 +29,26 @@ func MakeBlobStoresFromRepoConfig(
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
-		blobStores[0].Name = "default"
-		blobStores[0].NameWithIndex = "0-default"
+		blobStores[0].ConfigPath = "0-default"
 		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].BasePath = interfaces.DirectoryLayoutDirBlobStore(
+		blobStores[0].BlobStoreBasePath = interfaces.DirectoryLayoutDirBlobStore(
 			directoryLayout,
 			"blobs",
 		)
 	} else {
-		var configPaths []string
-
-		{
-			var err error
-
-			if configPaths, err = files.DirNames(
-				filepath.Join(directoryLayout.DirBlobStoreConfigs()),
-			); err != nil {
-				ctx.Cancel(err)
-				return blobStores
-			}
-		}
-
+		configPaths := directory_layout.GetBlobStoreConfigPaths(ctx, directoryLayout)
 		blobStores = make([]BlobStoreInitialized, len(configPaths))
 
-		for i, configPath := range configPaths {
+		for index, configPath := range configPaths {
 			// TODO add name
-			blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
-			blobStores[i].BasePath = blob_store_configs.GetDefaultBasePath(directoryLayout, i)
+			blobStores[index].ConfigPath = fd.FileNameSansExt(configPath)
+			blobStores[index].BlobStoreBasePath = blob_store_configs.GetDefaultBasePath(
+				directoryLayout,
+				index,
+			)
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
@@ -87,16 +57,16 @@ func MakeBlobStoresFromRepoConfig(
 				ctx.Cancel(err)
 				return blobStores
 			} else {
-				blobStores[i].Config = typedConfig
+				blobStores[index].Config = typedConfig
 			}
 		}
 	}
 
-	for i, blobStore := range blobStores {
+	for index, blobStore := range blobStores {
 		var err error
 
 		// TODO use sha of config to determine blob store base path
-		if blobStores[i].BlobStore, err = MakeBlobStore(
+		if blobStores[index].BlobStore, err = MakeBlobStore(
 			envDir,
 			blobStore.ConfigNamed,
 		); err != nil {
@@ -113,33 +83,18 @@ func MakeBlobStores(
 	envDir env_dir.Env,
 	directoryLayout interfaces.BlobStoreDirectoryLayout,
 ) (blobStores []BlobStoreInitialized) {
-	var configPaths []string
-
-	{
-		var err error
-		path := filepath.Join(directoryLayout.DirBlobStoreConfigs())
-
-		if configPaths, err = files.DirNames(
-			path,
-		); err != nil {
-			if errors.IsNotExist(err) {
-				return blobStores
-			} else {
-				ctx.Cancel(err)
-				// no-op
-				return blobStores
-			}
-		}
-	}
-
+	configPaths := directory_layout.GetBlobStoreConfigPaths(
+		ctx,
+		directoryLayout,
+	)
 	blobStores = make([]BlobStoreInitialized, len(configPaths))
 
-	for i, configPath := range configPaths {
+	for index, configPath := range configPaths {
 		// TODO add name
-		blobStores[i].NameWithIndex = fd.FileNameSansExt(configPath)
-		blobStores[i].BasePath = blob_store_configs.GetDefaultBasePath(
+		blobStores[index].ConfigPath = fd.FileNameSansExt(configPath)
+		blobStores[index].BlobStoreBasePath = blob_store_configs.GetDefaultBasePath(
 			directoryLayout,
-			i,
+			index,
 		)
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
@@ -149,15 +104,15 @@ func MakeBlobStores(
 			ctx.Cancel(err)
 			return blobStores
 		} else {
-			blobStores[i].Config = typedConfig
+			blobStores[index].Config = typedConfig
 		}
 	}
 
-	for i, blobStore := range blobStores {
+	for index, blobStore := range blobStores {
 		var err error
 
 		// TODO use sha of config to determine blob store base path
-		if blobStores[i].BlobStore, err = MakeBlobStore(
+		if blobStores[index].BlobStore, err = MakeBlobStore(
 			envDir,
 			blobStore.ConfigNamed,
 		); err != nil {
@@ -198,7 +153,7 @@ func MakeBlobStore(
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
-		fmt.Sprintf("(blob_store: %s) ", configNamed.NameWithIndex),
+		fmt.Sprintf("(blob_store: %s) ", configNamed.ConfigPath),
 	)
 
 	configBlob := configNamed.Config.Blob
@@ -235,7 +190,7 @@ func MakeBlobStore(
 	case blob_store_configs.ConfigLocalHashBucketed:
 		return makeLocalHashBucketed(
 			envDir,
-			configNamed.BasePath,
+			configNamed.BlobStoreBasePath,
 			config,
 		)
 
@@ -263,44 +218,4 @@ func MakeBlobStore(
 
 		return store, err
 	}
-}
-
-// TODO offer options like just checking the existence of the blob, getting its
-// size, or full verification
-func VerifyBlob(
-	ctx interfaces.Context,
-	blobStore interfaces.BlobStore,
-	expected interfaces.MarklId,
-	progressWriter io.Writer,
-) (err error) {
-	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
-	// instead (for expensive blob stores that may implement their own remote
-	// verification, such as ssh, sftp, or something else)
-
-	var readCloser interfaces.BlobReader
-
-	if readCloser, err = blobStore.MakeBlobReader(expected); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if _, err = io.Copy(progressWriter, readCloser); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = markl.AssertEqual(
-		expected,
-		readCloser.GetMarklId(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = readCloser.Close(); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
 }

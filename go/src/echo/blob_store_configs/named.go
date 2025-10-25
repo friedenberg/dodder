@@ -8,11 +8,9 @@ import (
 )
 
 type ConfigNamed struct {
-	Index         int
-	BasePath      string
-	Name          string
-	NameWithIndex string
-	Config        TypedConfig
+	BlobStoreBasePath string
+	ConfigPath        string
+	Config            TypedConfig
 }
 
 func GetDefaultBasePath(

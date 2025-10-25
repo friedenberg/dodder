@@ -30,7 +30,7 @@ func (cmd List) Run(req command.Request) {
 		ui.Out().Printf(
 			"%d: %s: %s",
 			i,
-			blobStore.NameWithIndex,
+			blobStore.ConfigPath,
 			blobStore.GetBlobStoreDescription(),
 		)
 	}
