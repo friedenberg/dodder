@@ -45,7 +45,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.config.Type = bigBang.GenesisConfig.Type
 	env.config.Blob = bigBang.GenesisConfig.Blob
 
-	if err := env.MakeDir(
+	if err := env.MakeDirs(
 		env.DirObjectId(),
 		env.DirIndex(),
 		env.DirLostAndFound(),
@@ -58,6 +58,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		env.DirBlobStoreConfigs(),
 	); err != nil {
 		env.Cancel(err)
+		return
 	}
 
 	env.writeInventoryListLog()
@@ -69,6 +70,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		filepath.Join(env.DirObjectId(), "Yin"),
 	); err != nil {
 		env.Cancel(err)
+		return
 	}
 
 	if err := ohio.CopyFileLines(
@@ -76,6 +78,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		filepath.Join(env.DirObjectId(), "Yang"),
 	); err != nil {
 		env.Cancel(err)
+		return
 	}
 
 	env.writeFile(env.FileConfigMutable(), "")
@@ -98,6 +101,7 @@ func (env Env) writeInventoryListLog() {
 			env.FileInventoryListLog(),
 		); err != nil {
 			env.Cancel(err)
+			return
 		}
 
 		defer errors.ContextMustClose(env, file)
@@ -143,6 +147,7 @@ func (env *Env) writeFile(path string, contents any) {
 				err = nil
 			} else {
 				env.Cancel(err)
+				return
 			}
 		}
 	}
@@ -152,6 +157,7 @@ func (env *Env) writeFile(path string, contents any) {
 	if value, ok := contents.(string); ok {
 		if _, err := io.WriteString(file, value); err != nil {
 			env.Cancel(err)
+			return
 		}
 	} else {
 		// TODO remove gob
@@ -159,6 +165,7 @@ func (env *Env) writeFile(path string, contents any) {
 
 		if err := enc.Encode(contents); err != nil {
 			env.Cancel(err)
+			return
 		}
 	}
 }

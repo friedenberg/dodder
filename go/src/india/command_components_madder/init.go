@@ -26,7 +26,7 @@ func (cmd Init) InitBlobStore(
 		name,
 	)
 
-	if err := envBlobStore.MakeDir(dir); err != nil {
+	if err := envBlobStore.MakeDirs(dir); err != nil {
 		envBlobStore.Cancel(err)
 		return pathConfig
 	}

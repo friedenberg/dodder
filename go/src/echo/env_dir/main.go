@@ -26,8 +26,8 @@ type Env interface {
 	GetXDG() xdg.XDG
 	GetExecPath() string
 	GetTempLocal() TemporaryFS
-	MakeDir(ds ...string) (err error)
-	MakeDirPerms(perms os.FileMode, ds ...string) (err error)
+	MakeDirs(dirs ...string) (err error)
+	MakeDirsPerms(perms os.FileMode, dirs ...string) (err error)
 	Rel(p string) (out string)
 	RelToCwdOrSame(p string) (p1 string)
 	MakeCommonEnv() map[string]string
@@ -46,13 +46,15 @@ type env struct {
 	xdg.XDG
 }
 
+var _ Env = &env{}
+
 // sets XDG and creates tmp local
 func (env *env) initializeXDG() (err error) {
 	env.TempLocal.BasePath = env.Cache.MakePath(
 		fmt.Sprintf("tmp-%d", env.GetPid()),
 	).String()
 
-	if err = env.MakeDir(env.GetTempLocal().BasePath); err != nil {
+	if err = env.MakeDirs(env.GetTempLocal().BasePath); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -142,11 +144,11 @@ func (env env) MakeCommonEnv() map[string]string {
 	}
 }
 
-func (env env) MakeDir(ds ...string) (err error) {
-	return env.MakeDirPerms(0o755, ds...)
+func (env env) MakeDirs(ds ...string) (err error) {
+	return env.MakeDirsPerms(0o755, ds...)
 }
 
-func (env env) MakeDirPerms(perms os.FileMode, ds ...string) (err error) {
+func (env env) MakeDirsPerms(perms os.FileMode, ds ...string) (err error) {
 	for _, d := range ds {
 		if err = os.MkdirAll(d, os.ModeDir|perms); err != nil {
 			err = errors.Wrapf(err, "Dir: %q", d)

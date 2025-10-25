@@ -109,7 +109,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 	case 1:
 		dir := req.PopArg("dir")
 
-		if err := envLocal.MakeDir(dir); err != nil {
+		if err := envLocal.MakeDirs(dir); err != nil {
 			req.Cancel(err)
 			return
 		}

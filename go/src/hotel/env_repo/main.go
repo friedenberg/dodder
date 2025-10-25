@@ -111,7 +111,7 @@ func Make(
 	// 	return
 	// }
 
-	if err = env.MakeDirPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
+	if err = env.MakeDirsPerms(0o700, env.GetXDG().GetXDGPaths()...); err != nil {
 		err = errors.Wrap(err)
 		return env, err
 	}
@@ -172,17 +172,17 @@ func (env Env) ResetCache() (err error) {
 		return err
 	}
 
-	if err = env.MakeDir(env.DirIndex()); err != nil {
+	if err = env.MakeDirs(env.DirIndex()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = env.MakeDir(env.DirIndexObjects()); err != nil {
+	if err = env.MakeDirs(env.DirIndexObjects()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = env.MakeDir(env.DirIndexObjectPointers()); err != nil {
+	if err = env.MakeDirs(env.DirIndexObjectPointers()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
