@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
@@ -20,6 +21,7 @@ func init() {
 }
 
 type InfoRepo struct {
+	command_components_madder.BlobStoreConfig
 	command_components_dodder.EnvRepo
 }
 
@@ -92,7 +94,8 @@ func (cmd InfoRepo) Run(req command.Request) {
 		case "blob_stores-0-config":
 			blobStoreConfig := blobStore.ConfigNamed.Config
 
-			if _, err := blob_store_configs.Coder.EncodeTo(
+			if err := cmd.PrintBlobStoreConfig(
+				env,
 				&blob_store_configs.TypedConfig{
 					Type: blobStoreConfig.Type,
 					Blob: blobStoreConfig.Blob,

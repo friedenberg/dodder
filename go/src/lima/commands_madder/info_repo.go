@@ -20,6 +20,7 @@ func init() {
 
 type InfoRepo struct {
 	command_components_madder.EnvBlobStore
+	command_components_madder.BlobStoreConfig
 	command_components_madder.BlobStore
 }
 
@@ -102,10 +103,10 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "blob_stores-0-config":
-			// TODO this is gross, fix it
 			blobStoreConfig := blobStore.ConfigNamed.Config
 
-			if _, err := blob_store_configs.Coder.EncodeTo(
+			if err := cmd.PrintBlobStoreConfig(
+				env,
 				&blob_store_configs.TypedConfig{
 					Type: blobStoreConfig.Type,
 					Blob: blobStoreConfig.Blob,
