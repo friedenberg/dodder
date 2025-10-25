@@ -14,7 +14,9 @@ type DirectoryLayout interface {
 func MakeDirectoryLayout(storeVersion store_version.Version) DirectoryLayout {
 	if storeVersion.LessOrEqual(store_version.V10) {
 		return &V1{}
-	} else {
+	} else if storeVersion.LessOrEqual(store_version.V12) {
 		return &V2{}
+	} else {
+		return &V3{}
 	}
 }

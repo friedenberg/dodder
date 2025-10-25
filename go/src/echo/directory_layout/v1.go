@@ -97,3 +97,15 @@ func (layout V1) DirFirstBlobStoreInventoryLists() string {
 func (layout V1) DirFirstBlobStoreBlobs() string {
 	return interfaces.DirectoryLayoutDirBlobStore(layout, "blobs")
 }
+
+func (layout V1) DirsGenesis() []string {
+	return []string{
+		layout.DirObjectId(),
+		layout.DirIndex(),
+		layout.DirLostAndFound(),
+		layout.DirBlobStoreConfigs(),
+		layout.DirFirstBlobStoreInventoryLists(),
+		layout.DirFirstBlobStoreBlobs(),
+		interfaces.DirectoryLayoutDirBlobStore(layout, "0"),
+	}
+}

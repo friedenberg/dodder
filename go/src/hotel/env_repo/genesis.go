@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -45,18 +44,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.config.Type = bigBang.GenesisConfig.Type
 	env.config.Blob = bigBang.GenesisConfig.Blob
 
-	if err := env.MakeDirs(
-		env.DirObjectId(),
-		env.DirIndex(),
-		env.DirLostAndFound(),
-
-		// TODO remove
-		env.DirFirstBlobStoreInventoryLists(),
-		env.DirFirstBlobStoreBlobs(),
-
-		interfaces.DirectoryLayoutDirBlobStore(env, "0"),
-		env.DirBlobStoreConfigs(),
-	); err != nil {
+	if err := env.MakeDirs(env.DirsGenesis()...); err != nil {
 		env.Cancel(err)
 		return
 	}

@@ -68,6 +68,8 @@ type (
 
 		// TODO remove from DirectoryLayout and move to method on EnvRepo
 		FileConfigPermanent() string
+
+		DirsGenesis() []string
 	}
 
 	Directory interface {

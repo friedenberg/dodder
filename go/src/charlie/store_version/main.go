@@ -24,6 +24,7 @@ var (
 	V11 = Version(values.Int(11))
 	V12 = Version(values.Int(12))
 	V13 = Version(values.Int(13))
+	V14 = Version(values.Int(14))
 
 	VCurrent = V12
 	VNext    = V13
