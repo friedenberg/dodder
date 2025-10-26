@@ -3,6 +3,7 @@ package directory_layout
 import (
 	"fmt"
 	"path/filepath"
+	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -30,33 +31,34 @@ func GetBlobStoreConfigPaths(
 	return configPaths
 }
 
-func GetDefaultBlobStoreConfigPath(
+func GetDefaultBlobStore(
 	directoryLayout BlobStore,
-) string {
-	dir, target := GetBlobStoreConfigPath(
+) BlobStorePath {
+	return GetBlobStorePath(
 		directoryLayout,
 		0,
 		"default",
 	)
-
-	return filepath.Join(dir, target)
 }
 
-func GetBlobStoreConfigPath(
+func GetBlobStorePath(
 	directoryLayout BlobStore,
 	currentBlobStoreCount int,
 	name string,
-) (dir string, target string) {
-	dir = directoryLayout.DirBlobStoreConfigs()
+) BlobStorePath {
+	dirConfig := directoryLayout.DirBlobStoreConfigs()
 
-	target = fmt.Sprintf(
+	targetConfig := fmt.Sprintf(
 		"%d-%s.%s",
 		currentBlobStoreCount,
 		name,
 		FileNameBlobStoreConfig,
 	)
 
-	return dir, target
+	return BlobStorePath{
+		Base:   DirBlobStore(directoryLayout, strconv.Itoa(0)),
+		Config: filepath.Join(dirConfig, targetConfig),
+	}
 }
 
 func PathBlobStore(

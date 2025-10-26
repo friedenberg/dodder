@@ -122,7 +122,7 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 			Type: blobStoreConfig.Type,
 			Blob: blobStoreConfig.Blob,
 		},
-		directory_layout.GetDefaultBlobStoreConfigPath(directoryLayout),
+		directory_layout.GetDefaultBlobStore(directoryLayout).Config,
 	); err != nil {
 		env.Cancel(err)
 		return

@@ -80,7 +80,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 		case "blob_stores-0-config-path":
 			env.GetUI().Print(
-				directory_layout.GetDefaultBlobStoreConfigPath(env),
+				directory_layout.GetDefaultBlobStore(env).Config,
 			)
 
 		case "blob_stores-0-config":

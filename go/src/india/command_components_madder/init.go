@@ -17,30 +17,31 @@ func (cmd Init) InitBlobStore(
 	envBlobStore env_repo.BlobStoreEnv,
 	name string,
 	config *blob_store_configs.TypedConfig,
-) (pathConfig string) {
+) (path directory_layout.BlobStorePath) {
 	blobStoreCount := len(envBlobStore.GetBlobStores())
 
-	dir, target := directory_layout.GetBlobStoreConfigPath(
+	path = directory_layout.GetBlobStorePath(
 		envBlobStore,
 		blobStoreCount,
 		name,
 	)
 
-	if err := envBlobStore.MakeDirs(dir); err != nil {
+	if err := envBlobStore.MakeDirs(
+		filepath.Dir(path.Base),
+		filepath.Dir(path.Config),
+	); err != nil {
 		envBlobStore.Cancel(err)
-		return pathConfig
+		return path
 	}
-
-	pathConfig = filepath.Join(dir, target)
 
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		config,
-		pathConfig,
+		path.Config,
 	); err != nil {
 		envBlobStore.Cancel(err)
-		return pathConfig
+		return path
 	}
 
-	return pathConfig
+	return path
 }
