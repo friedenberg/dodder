@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 )
 
 type FD struct {
@@ -403,12 +404,12 @@ func (fd *FD) Exists() bool {
 	return files.Exists(fd.path)
 }
 
-func (fd *FD) Remove(s interfaces.Directory) (err error) {
+func (fd *FD) Remove(directoryLayout directory_layout.Mutable) (err error) {
 	if fd.path == "" {
 		return err
 	}
 
-	if err = s.Delete(fd.path); err != nil {
+	if err = directoryLayout.Delete(fd.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

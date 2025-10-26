@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 )
 
 const (
@@ -19,7 +19,7 @@ type Provider struct {
 	yang provider
 }
 
-func New(ps interfaces.Directory) (f *Provider, err error) {
+func New(ps directory_layout.RepoMutable) (f *Provider, err error) {
 	providerPathYin := path.Join(ps.DirObjectId(), FilePathZettelIdYin)
 	providerPathYang := path.Join(ps.DirObjectId(), FilePathZettelIdYang)
 

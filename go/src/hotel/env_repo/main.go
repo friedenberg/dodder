@@ -25,7 +25,7 @@ const (
 	FileWorkspace         = ".dodder-workspace"
 )
 
-type directoryLayout = directory_layout.DirectoryLayout
+type directoryLayout = directory_layout.Repo
 
 type Env struct {
 	config genesis_configs.TypedConfigPrivate
@@ -96,11 +96,10 @@ func Make(
 		}
 	}
 
-	env.directoryLayout = directory_layout.MakeDirectoryLayout(
+	if env.directoryLayout, err = directory_layout.MakeRepo(
 		env.GetStoreVersion(),
-	)
-
-	if err = env.Initialize(xdg); err != nil {
+		xdg,
+	); err != nil {
 		err = errors.Wrap(err)
 		return env, err
 	}
@@ -162,17 +161,17 @@ func stringSliceJoin(s string, vs []string) []string {
 }
 
 func (env Env) ResetCache() (err error) {
-	if err = files.SetAllowUserChangesRecursive(env.DirIndex()); err != nil {
+	if err = files.SetAllowUserChangesRecursive(env.DirDataIndex()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = os.RemoveAll(env.DirIndex()); err != nil {
+	if err = os.RemoveAll(env.DirDataIndex()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return err
 	}
 
-	if err = env.MakeDirs(env.DirIndex()); err != nil {
+	if err = env.MakeDirs(env.DirDataIndex()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -65,7 +65,7 @@ func (log *v0) initialize(ctx interfaces.Context, env env_repo.Env) {
 
 	log.values = tridex.Make()
 
-	dir := env.DirCacheRemoteInventoryListLog()
+	dir := env.DirCacheRemoteInventoryListsLog()
 
 	log.path = filepath.Join(dir, "log-v0")
 	log.lockSmith = file_lock.New(

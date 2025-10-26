@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 )
@@ -39,11 +40,11 @@ type index struct {
 
 func MakeIndex(
 	configCli repo_config_cli.Config,
-	dir interfaces.Directory,
+	directoryLayout directory_layout.RepoMutable,
 	namedBlobAccess interfaces.NamedBlobAccess,
 ) (i *index, err error) {
 	i = &index{
-		path:               dir.FileCacheObjectId(),
+		path:               directoryLayout.FileCacheObjectId(),
 		nonRandomSelection: configCli.UsePredictableZettelIds(),
 		namedBlobAccess:    namedBlobAccess,
 		encodedIds: encodedIds{
@@ -51,7 +52,7 @@ func MakeIndex(
 		},
 	}
 
-	if i.oldZettelIdStore, err = object_id_provider.New(dir); err != nil {
+	if i.oldZettelIdStore, err = object_id_provider.New(directoryLayout); err != nil {
 		if errors.IsNotExist(err) {
 			ui.TodoP4("determine which layer handles no-create kasten")
 			err = nil

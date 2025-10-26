@@ -12,7 +12,7 @@ const FileNameBlobStoreConfig = "dodder-blob_store-config"
 
 func GetBlobStoreConfigPaths(
 	ctx interfaces.ActiveContext,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout BlobStore,
 ) []string {
 	var configPaths []string
 
@@ -31,7 +31,7 @@ func GetBlobStoreConfigPaths(
 }
 
 func GetDefaultBlobStoreConfigPath(
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout BlobStore,
 ) string {
 	return directoryLayout.DirBlobStoreConfigs(
 		fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
@@ -39,7 +39,7 @@ func GetDefaultBlobStoreConfigPath(
 }
 
 func GetBlobStoreConfigPath(
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout BlobStore,
 	currentBlobStoreCount int,
 	name string,
 ) (dir string, target string) {
@@ -56,14 +56,14 @@ func GetBlobStoreConfigPath(
 }
 
 func PathBlobStore(
-	layout interfaces.BlobStoreDirectoryLayout,
+	layout BlobStore,
 	targets ...string,
 ) interfaces.DirectoryLayoutPath {
 	return layout.MakePathBlobStore(targets...)
 }
 
 func DirBlobStore(
-	layout interfaces.BlobStoreDirectoryLayout,
+	layout BlobStore,
 	targets ...string,
 ) string {
 	return PathBlobStore(layout, targets...).String()

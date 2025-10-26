@@ -15,7 +15,7 @@ type ConfigNamed struct {
 }
 
 func GetDefaultBasePath(
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 	index int,
 ) string {
 	return directory_layout.DirBlobStore(
@@ -39,7 +39,7 @@ func GetBasePath(
 
 func GetBasePathOrDefault(
 	config ConfigNamed,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 	index int,
 ) (string, bool) {
 	configLocal, ok := config.Config.Blob.(configLocal)

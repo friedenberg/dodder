@@ -25,7 +25,7 @@ type XDG struct {
 	Runtime env_vars.DirectoryLayoutBaseEnvVar
 }
 
-var _ interfaces.DirectoryLayout = XDG{}
+var _ interfaces.DirectoryLayoutXDG = XDG{}
 
 func (xdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Home }
 

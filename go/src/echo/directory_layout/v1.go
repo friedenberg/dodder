@@ -2,112 +2,115 @@ package directory_layout
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
-type V1 struct {
-	xdg.XDG
+type v1 struct {
+	interfaces.DirectoryLayoutXDG
 }
 
-var _ interfaces.RepoDirectoryLayout = V1{}
+var (
+	_ Repo        = v1{}
+	_ repoUninitialized = &v1{}
+)
 
-func (layout *V1) Initialize(
-	xdg xdg.XDG,
+func (layout *v1) initialize(
+	xdg interfaces.DirectoryLayoutXDG,
 ) (err error) {
-	layout.XDG = xdg
+	layout.DirectoryLayoutXDG = xdg
 	return err
 }
 
-func (layout V1) MakePathBlobStore(
+func (layout v1) MakePathBlobStore(
 	targets ...string,
 ) interfaces.DirectoryLayoutPath {
-	return layout.XDG.Data.MakePath(stringSliceJoin("blob_stores", targets)...)
+	return layout.GetDirData().MakePath(
+		stringSliceJoin("blob_stores", targets)...)
 }
 
-func (layout V1) FileCacheDormant() string {
+func (layout v1) FileCacheDormant() string {
 	return layout.MakeDirData("dormant")
 }
 
-func (layout V1) FileTags() string {
+func (layout v1) FileTags() string {
 	return layout.MakeDirData("tags")
 }
 
-func (layout V1) FileLock() string {
-	return layout.State.MakePath("lock").String()
+func (layout v1) FileLock() string {
+	return layout.GetDirState().MakePath("lock").String()
 }
 
-func (layout V1) FileConfigPermanent() string {
+func (layout v1) FileConfigPermanent() string {
 	return layout.MakeDirData("config-permanent")
 }
 
-func (layout V1) FileConfigMutable() string {
+func (layout v1) FileConfigMutable() string {
 	return layout.MakeDirData("config-mutable")
 }
 
-func (layout V1) MakeDirData(p ...string) string {
-	return layout.Data.MakePath(p...).String()
+func (layout v1) MakeDirData(p ...string) string {
+	return layout.GetDirData().MakePath(p...).String()
 }
 
-func (layout V1) DirIndex(p ...string) string {
+func (layout v1) DirDataIndex(p ...string) string {
 	return layout.MakeDirData(append([]string{"cache"}, p...)...)
 }
 
-func (layout V1) DirCacheRepo(p ...string) string {
+func (layout v1) DirCacheRepo(p ...string) string {
 	// TODO switch to XDG cache
 	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
 	return layout.MakeDirData(append([]string{"cache", "repo"}, p...)...)
 }
 
-func (layout V1) DirBlobStoreConfigs(p ...string) string {
+func (layout v1) DirBlobStoreConfigs(p ...string) string {
 	return DirBlobStore(layout, p...)
 }
 
-func (layout V1) DirLostAndFound() string {
+func (layout v1) DirLostAndFound() string {
 	return layout.MakeDirData("lost_and_found")
 }
 
-func (layout V1) DirIndexObjects() string {
-	return layout.DirIndex("objects")
+func (layout v1) DirIndexObjects() string {
+	return layout.DirDataIndex("objects")
 }
 
-func (layout V1) DirIndexObjectPointers() string {
-	return layout.DirIndex("object_pointers")
+func (layout v1) DirIndexObjectPointers() string {
+	return layout.DirDataIndex("object_pointers")
 }
 
-func (layout V1) DirCacheRemoteInventoryListLog() string {
-	return layout.DirIndex("inventory_list_logs")
+func (layout v1) DirCacheRemoteInventoryListsLog() string {
+	return layout.DirDataIndex("inventory_list_logs")
 }
 
-func (layout V1) DirObjectId() string {
+func (layout v1) DirObjectId() string {
 	return layout.MakeDirData("object_ids")
 }
 
-func (layout V1) FileCacheObjectId() string {
-	return layout.DirIndex("object_id")
+func (layout v1) FileCacheObjectId() string {
+	return layout.DirDataIndex("object_id")
 }
 
-func (layout V1) FileInventoryListLog() string {
+func (layout v1) FileInventoryListLog() string {
 	return DirBlobStore(
 		layout,
 		"inventory_lists_log",
 	)
 }
 
-func (layout V1) DirFirstBlobStoreInventoryLists() string {
+func (layout v1) DirFirstBlobStoreInventoryLists() string {
 	return DirBlobStore(
 		layout,
 		"inventory_lists",
 	)
 }
 
-func (layout V1) DirFirstBlobStoreBlobs() string {
+func (layout v1) DirFirstBlobStoreBlobs() string {
 	return DirBlobStore(layout, "blobs")
 }
 
-func (layout V1) DirsGenesis() []string {
+func (layout v1) DirsGenesis() []string {
 	return []string{
 		layout.DirObjectId(),
-		layout.DirIndex(),
+		layout.DirDataIndex(),
 		layout.DirLostAndFound(),
 		layout.DirBlobStoreConfigs(),
 		layout.DirFirstBlobStoreInventoryLists(),

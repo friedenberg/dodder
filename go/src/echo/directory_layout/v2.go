@@ -4,106 +4,109 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
 // TODO examine the directories and use XDG more appropriately for them
-type V2 struct {
-	xdg xdg.XDG
+type v2 struct {
+	xdg interfaces.DirectoryLayoutXDG
 }
 
-var _ interfaces.RepoDirectoryLayout = V2{}
+var (
+	_ Repo        = v2{}
+	_ repoUninitialized = &v2{}
+)
 
-func (layout *V2) Initialize(
-	xdg xdg.XDG,
+func (layout *v2) initialize(
+	xdg interfaces.DirectoryLayoutXDG,
 ) (err error) {
 	layout.xdg = xdg
 	return err
 }
 
-func (layout V2) MakeDirData(targets ...string) string {
-	if layout.xdg.Data.ActualValue == "" {
-		panic(fmt.Sprintf("empty xdg data dir: %#v", layout.xdg.Data))
+func (layout v2) MakeDirData(targets ...string) string {
+	if layout.xdg.GetDirData().GetBaseEnvVarValue() == "" {
+		panic(fmt.Sprintf("empty xdg data dir: %#v", layout.xdg.GetDirData()))
 	}
 
-	return layout.xdg.Data.MakePath(targets...).String()
+	return layout.xdg.GetDirData().MakePath(targets...).String()
 }
 
-func (layout V2) MakePathBlobStore(
+func (layout v2) MakePathBlobStore(
 	targets ...string,
 ) interfaces.DirectoryLayoutPath {
-	return layout.xdg.Data.MakePath(stringSliceJoin("blob_stores", targets)...)
+	return layout.xdg.GetDirData().MakePath(
+		stringSliceJoin("blob_stores", targets)...)
 }
 
-func (layout V2) DirBlobStoreConfigs(p ...string) string {
+func (layout v2) DirBlobStoreConfigs(p ...string) string {
 	return layout.MakeDirData(append([]string{"blob_stores-configs"}, p...)...)
 }
 
-func (layout V2) FileCacheDormant() string {
+func (layout v2) FileCacheDormant() string {
 	return layout.MakeDirData("dormant")
 }
 
-func (layout V2) FileTags() string {
+func (layout v2) FileTags() string {
 	return layout.MakeDirData("tags")
 }
 
-func (layout V2) FileLock() string {
-	return layout.xdg.State.MakePath("lock").String()
+func (layout v2) FileLock() string {
+	return layout.xdg.GetDirState().MakePath("lock").String()
 }
 
-func (layout V2) FileConfigPermanent() string {
+func (layout v2) FileConfigPermanent() string {
 	return layout.MakeDirData("config-permanent")
 }
 
-func (layout V2) FileConfigMutable() string {
+func (layout v2) FileConfigMutable() string {
 	return layout.MakeDirData("config-mutable")
 }
 
-func (layout V2) DirIndex(p ...string) string {
+func (layout v2) DirDataIndex(p ...string) string {
 	return layout.MakeDirData(append([]string{"index"}, p...)...)
 }
 
-func (layout V2) DirCacheRepo(p ...string) string {
-	return layout.xdg.Cache.MakePath(
+func (layout v2) DirCacheRepo(p ...string) string {
+	return layout.xdg.GetDirCache().MakePath(
 		append([]string{"index", "repo"}, p...)...,
 	).String()
 }
 
-func (layout V2) DirLostAndFound() string {
+func (layout v2) DirLostAndFound() string {
 	return layout.MakeDirData("lost_and_found")
 }
 
-func (layout V2) DirIndexObjects() string {
-	return layout.DirIndex("objects")
+func (layout v2) DirIndexObjects() string {
+	return layout.DirDataIndex("objects")
 }
 
-func (layout V2) DirIndexObjectPointers() string {
-	return layout.DirIndex("object_pointers/Page")
+func (layout v2) DirIndexObjectPointers() string {
+	return layout.DirDataIndex("object_pointers/Page")
 }
 
-func (layout V2) DirCacheRemoteInventoryListLog() string {
-	return layout.xdg.Cache.MakePath("inventory_list_logs").String()
+func (layout v2) DirCacheRemoteInventoryListsLog() string {
+	return layout.xdg.GetDirCache().MakePath("inventory_list_logs").String()
 }
 
-func (layout V2) DirObjectId() string {
+func (layout v2) DirObjectId() string {
 	return layout.MakeDirData("object_ids")
 }
 
-func (layout V2) FileCacheObjectId() string {
-	return layout.DirIndex("object_id")
+func (layout v2) FileCacheObjectId() string {
+	return layout.DirDataIndex("object_id")
 }
 
-func (layout V2) FileInventoryListLog() string {
+func (layout v2) FileInventoryListLog() string {
 	return DirBlobStore(
 		layout,
 		"inventory_lists_log",
 	)
 }
 
-func (layout V2) DirsGenesis() []string {
+func (layout v2) DirsGenesis() []string {
 	return []string{
 		layout.DirObjectId(),
-		layout.DirIndex(),
+		layout.DirDataIndex(),
 		layout.DirLostAndFound(),
 		layout.DirBlobStoreConfigs(),
 		DirBlobStore(layout, "0"),

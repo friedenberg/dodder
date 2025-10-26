@@ -24,7 +24,7 @@ func MakeBlobStoresFromRepoConfig(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,
 	config genesis_configs.ConfigPrivate,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 ) (blobStores []BlobStoreInitialized) {
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
@@ -81,7 +81,7 @@ func MakeBlobStoresFromRepoConfig(
 func MakeBlobStores(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 ) (blobStores []BlobStoreInitialized) {
 	configPaths := directory_layout.GetBlobStoreConfigPaths(
 		ctx,

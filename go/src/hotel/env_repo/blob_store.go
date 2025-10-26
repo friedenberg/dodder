@@ -3,7 +3,6 @@ package env_repo
 import (
 	"strconv"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -14,7 +13,7 @@ import (
 )
 
 type BlobStoreEnv struct {
-	interfaces.BlobStoreDirectoryLayout
+	directory_layout.BlobStore
 	env_local.Env
 
 	blobStoreDefaultIndex int
@@ -28,12 +27,12 @@ type BlobStoreEnv struct {
 
 func MakeBlobStoreEnvFromRepoConfig(
 	envLocal env_local.Env,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 	config genesis_configs.ConfigPrivate,
 ) BlobStoreEnv {
 	env := BlobStoreEnv{
-		Env:                      envLocal,
-		BlobStoreDirectoryLayout: directoryLayout,
+		Env:       envLocal,
+		BlobStore: directoryLayout,
 	}
 
 	env.setupStoresFromRepoConfig(config)
@@ -48,7 +47,7 @@ func (env *BlobStoreEnv) setupStoresFromRepoConfig(
 		env,
 		env,
 		config,
-		env.BlobStoreDirectoryLayout,
+		env.BlobStore,
 	)
 }
 
@@ -59,14 +58,17 @@ func MakeBlobStoreEnv(
 		Env: envLocal,
 	}
 
-	directoryLayout := &directory_layout.V2{}
+	{
+		var err error
 
-	if err := directoryLayout.Initialize(envLocal.GetXDG()); err != nil {
-		envLocal.Cancel(err)
-		return env
+		if env.BlobStore, err = directory_layout.MakeRepo(
+			store_version.VCurrent,
+			envLocal.GetXDG(),
+		); err != nil {
+			envLocal.Cancel(err)
+			return env
+		}
 	}
-
-	env.BlobStoreDirectoryLayout = directoryLayout
 
 	env.setupStores()
 
@@ -77,7 +79,7 @@ func (env *BlobStoreEnv) setupStores() {
 	env.blobStores = blob_stores.MakeBlobStores(
 		env,
 		env,
-		env.BlobStoreDirectoryLayout,
+		env.BlobStore,
 	)
 }
 
@@ -97,7 +99,7 @@ func (env BlobStoreEnv) GetBlobStores() []blob_stores.BlobStoreInitialized {
 
 func (env *BlobStoreEnv) writeBlobStoreConfig(
 	bigBang BigBang,
-	directoryLayout interfaces.BlobStoreDirectoryLayout,
+	directoryLayout directory_layout.BlobStore,
 ) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		// the immutable config contains the only blob stores's config

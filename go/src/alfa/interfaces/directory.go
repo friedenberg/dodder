@@ -25,7 +25,7 @@ type (
 		MakePath(...string) DirectoryLayoutPath
 	}
 
-	DirectoryLayout interface {
+	DirectoryLayoutXDG interface {
 		GetDirHome() DirectoryLayoutBaseEnvVar
 		GetDirCwd() DirectoryLayoutBaseEnvVar
 		GetDirData() DirectoryLayoutBaseEnvVar
@@ -33,44 +33,5 @@ type (
 		GetDirState() DirectoryLayoutBaseEnvVar
 		GetDirCache() DirectoryLayoutBaseEnvVar
 		GetDirRuntime() DirectoryLayoutBaseEnvVar
-	}
-
-	BlobStoreDirectoryLayout interface {
-		DirBlobStoreConfigs(p ...string) string
-
-		MakePathBlobStore(...string) DirectoryLayoutPath
-	}
-
-	RepoDirectoryLayout interface {
-		BlobStoreDirectoryLayout
-
-		MakeDirData(p ...string) string
-
-		DirIndex(p ...string) string
-		DirCacheRemoteInventoryListLog() string
-		DirIndexObjectPointers() string
-		DirIndexObjects() string
-
-		DirCacheRepo(p ...string) string
-
-		DirLostAndFound() string
-		DirObjectId() string
-
-		FileCacheDormant() string
-		FileCacheObjectId() string
-		FileConfigMutable() string
-		FileLock() string
-		FileTags() string
-		FileInventoryListLog() string
-
-		// TODO remove from DirectoryLayout and move to method on EnvRepo
-		FileConfigPermanent() string
-
-		DirsGenesis() []string
-	}
-
-	Directory interface {
-		RepoDirectoryLayout
-		Delete(...string) error
 	}
 )
