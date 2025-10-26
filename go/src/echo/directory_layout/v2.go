@@ -12,7 +12,7 @@ type v2 struct {
 }
 
 var (
-	_ Repo        = v2{}
+	_ Repo              = v2{}
 	_ repoUninitialized = &v2{}
 )
 
