@@ -34,7 +34,7 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].BlobStoreBasePath = interfaces.DirectoryLayoutDirBlobStore(
+		blobStores[0].BlobStoreBasePath = directory_layout.DirBlobStore(
 			directoryLayout,
 			"blobs",
 		)

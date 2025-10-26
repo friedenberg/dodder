@@ -59,7 +59,7 @@ func (layout V1) DirCacheRepo(p ...string) string {
 }
 
 func (layout V1) DirBlobStoreConfigs(p ...string) string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, p...)
+	return DirBlobStore(layout, p...)
 }
 
 func (layout V1) DirLostAndFound() string {
@@ -87,15 +87,21 @@ func (layout V1) FileCacheObjectId() string {
 }
 
 func (layout V1) FileInventoryListLog() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists_log")
+	return DirBlobStore(
+		layout,
+		"inventory_lists_log",
+	)
 }
 
 func (layout V1) DirFirstBlobStoreInventoryLists() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists")
+	return DirBlobStore(
+		layout,
+		"inventory_lists",
+	)
 }
 
 func (layout V1) DirFirstBlobStoreBlobs() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "blobs")
+	return DirBlobStore(layout, "blobs")
 }
 
 func (layout V1) DirsGenesis() []string {
@@ -106,6 +112,6 @@ func (layout V1) DirsGenesis() []string {
 		layout.DirBlobStoreConfigs(),
 		layout.DirFirstBlobStoreInventoryLists(),
 		layout.DirFirstBlobStoreBlobs(),
-		interfaces.DirectoryLayoutDirBlobStore(layout, "0"),
+		DirBlobStore(layout, "0"),
 	}
 }

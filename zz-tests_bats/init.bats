@@ -198,10 +198,6 @@ function init_and_init { # @test
 function init_without_age { # @test
 	run_dodder_init_disable_age
 	assert_success
-
-	blobs="$("$DODDER_BIN" info-repo dir-blob_stores-0-blobs)"
-	run test -d "$blobs"
-	assert_success
 }
 
 function init_with_age { # @test

@@ -108,7 +108,7 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 
 	blob_store_configs.SetBasePath(
 		blobStoreConfig.Blob,
-		interfaces.DirectoryLayoutPathBlobStore(
+		directory_layout.PathBlobStore(
 			directoryLayout,
 			strconv.Itoa(0),
 		),

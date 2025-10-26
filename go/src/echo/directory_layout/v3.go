@@ -3,11 +3,11 @@ package directory_layout
 import (
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
-// TODO examine the directories and use XDG more appropriately for them
 type V3 struct {
 	xdg xdg.XDG
 }
@@ -36,17 +36,7 @@ func (layout V3) MakePathBlobStore(
 }
 
 func (layout V3) DirBlobStoreConfigs(p ...string) string {
-	return layout.MakeDirData(append([]string{"blob_stores-configs"}, p...)...)
-}
-
-// TODO deprecate and remove
-func (layout V3) DirFirstBlobStoreInventoryLists() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
-}
-
-// TODO deprecate and remove
-func (layout V3) DirFirstBlobStoreBlobs() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
+	return layout.MakeDirData(stringSliceJoin("blob_stores-configs", p)...)
 }
 
 func (layout V3) FileCacheDormant() string {
@@ -70,13 +60,11 @@ func (layout V3) FileConfigMutable() string {
 }
 
 func (layout V3) DirIndex(p ...string) string {
-	return layout.MakeDirData(append([]string{"index"}, p...)...)
+	return layout.MakeDirData(stringSliceJoin("index", p)...)
 }
 
 func (layout V3) DirCacheRepo(p ...string) string {
-	return layout.xdg.Cache.MakePath(
-		append([]string{"index", "repo"}, p...)...,
-	).String()
+	return layout.xdg.Cache.MakePath(stringSliceJoin("repo", p)...).String()
 }
 
 func (layout V3) DirLostAndFound() string {
@@ -114,4 +102,16 @@ func (layout V3) DirsGenesis() []string {
 		layout.DirLostAndFound(),
 		layout.DirBlobStoreConfigs(),
 	}
+}
+
+// Deprecated
+
+// TODO deprecate and remove
+func (layout V3) DirFirstBlobStoreInventoryLists() string {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+// TODO deprecate and remove
+func (layout V3) DirFirstBlobStoreBlobs() string {
+	panic(errors.Err405MethodNotAllowed)
 }

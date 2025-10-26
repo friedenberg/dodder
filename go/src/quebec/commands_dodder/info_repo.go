@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -35,9 +34,9 @@ func (cmd InfoRepo) Run(req command.Request) {
 	configPrivateTypedBlob := env.GetConfigPrivate()
 	configPrivateBlob := configPrivateTypedBlob.Blob
 
-	storeVersion := configPublicBlob.GetStoreVersion()
-	blobStore := env.GetDefaultBlobStore()
-	blobIOWrapper := blobStore.GetBlobIOWrapper()
+	// storeVersion := configPublicBlob.GetStoreVersion()
+	defaultblobStore := env.GetDefaultBlobStore()
+	blobIOWrapper := defaultblobStore.GetBlobIOWrapper()
 
 	if len(args) == 0 {
 		args = []string{"store-version"}
@@ -85,7 +84,7 @@ func (cmd InfoRepo) Run(req command.Request) {
 			)
 
 		case "blob_stores-0-config":
-			blobStoreConfig := blobStore.ConfigNamed.Config
+			blobStoreConfig := defaultblobStore.ConfigNamed.Config
 
 			if err := cmd.PrintBlobStoreConfig(
 				env,
@@ -99,26 +98,30 @@ func (cmd InfoRepo) Run(req command.Request) {
 				return
 			}
 
-		case "dir-blob_stores":
-			env.GetUI().Print(env.MakePathBlobStore())
+		// case "dir-blob_stores":
+		// 	env.GetUI().Print(env.MakePathBlobStore())
 
-			// TODO make dynamic and parse index
-		case "dir-blob_stores-0-blobs":
-			env.GetUI().Print(
-				env.DirFirstBlobStoreBlobs(),
-			)
+		// TODO make dynamic and parse index
+		// case "dir-blob_stores-0-blobs":
+		// 	dir, target := directory_layout.GetBlobStoreConfigPath(
+		// 		env,
+		// 		0,
+		// 		"default",
+		// 	)
 
-			// TODO make dynamic and parse index
-		case "dir-blob_stores-0-inventory_lists":
-			if store_version.LessOrEqual(storeVersion, store_version.V10) {
-				env.GetUI().Print(
-					env.DirFirstBlobStoreInventoryLists(),
-				)
-			} else {
-				env.GetUI().Print(
-					env.DirFirstBlobStoreBlobs(),
-				)
-			}
+		// 	env.GetUI().Print(filepath.Join(dir, target))
+
+		// TODO make dynamic and parse index
+		// case "dir-blob_stores-0-inventory_lists":
+		// 	if store_version.LessOrEqual(storeVersion, store_version.V10) {
+		// 		env.GetUI().Print(
+		// 			env.DirFirstBlobStoreInventoryLists(),
+		// 		)
+		// 	} else {
+		// 		env.GetUI().Print(
+		// 			env.DirFirstBlobStoreBlobs(),
+		// 		)
+		// 	}
 
 		case "pubkey":
 			env.GetUI().Print(

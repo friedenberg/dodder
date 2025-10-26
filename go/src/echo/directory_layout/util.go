@@ -54,3 +54,17 @@ func GetBlobStoreConfigPath(
 
 	return dir, target
 }
+
+func PathBlobStore(
+	layout interfaces.BlobStoreDirectoryLayout,
+	targets ...string,
+) interfaces.DirectoryLayoutPath {
+	return layout.MakePathBlobStore(targets...)
+}
+
+func DirBlobStore(
+	layout interfaces.BlobStoreDirectoryLayout,
+	targets ...string,
+) string {
+	return PathBlobStore(layout, targets...).String()
+}

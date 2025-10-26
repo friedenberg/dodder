@@ -25,6 +25,12 @@ function last_after_init { # @test
 function last_after_type_mutate { # @test
 	run_dodder_init_disable_age
 
+	run_dodder show :b
+	assert_success
+	assert_output --regexp - <<-'EOM'
+		\[[0-9]+\.[0-9]+ @blake2b256-\w+ !inventory_list-v2]
+	EOM
+
 	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
@@ -36,12 +42,18 @@ function last_after_type_mutate { # @test
 		[!md @blake2b256-473260as3d3pd4uramcc60877srvpkxs4krlap45dkl3mfvq2npq2duvvq !toml-type-v1]
 	EOM
 
-  # TODO use switch to using the inventory list log
-  dir_inventory_list="$("$DODDER_BIN" info-repo dir-blob_stores-0-inventory_lists)"
-	run bash -c "find '$dir_inventory_list' -type f | wc -l | tr -d \" \""
+	run_dodder show :b
 	assert_success
-  # to support both <v10 separate inventory list blob store, and >=v11 combined inventory list blob store
-  [[ "$output" -ge 2 ]]
+	assert_output --regexp - <<-'EOM'
+		\[[0-9]+\.[0-9]+ @blake2b256-\w+ !inventory_list-v2]
+		\[[0-9]+\.[0-9]+ @blake2b256-\w+ !inventory_list-v2]
+	EOM
+
+	run_dodder show -format blob :b
+	assert_success
+	assert_output --regexp - <<-EOM
+		\\[!md @blake2b256-473260as3d3pd4uramcc60877srvpkxs4krlap45dkl3mfvq2npq2duvvq .* !toml-type-v1]
+	EOM
 
 	run_dodder last -format inventory_list-sans-tai
 	assert_success

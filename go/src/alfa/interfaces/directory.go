@@ -77,17 +77,3 @@ type (
 		Delete(...string) error
 	}
 )
-
-func DirectoryLayoutPathBlobStore(
-	layout BlobStoreDirectoryLayout,
-	targets ...string,
-) DirectoryLayoutPath {
-	return layout.MakePathBlobStore(targets...)
-}
-
-func DirectoryLayoutDirBlobStore(
-	layout BlobStoreDirectoryLayout,
-	targets ...string,
-) string {
-	return DirectoryLayoutPathBlobStore(layout, targets...).String()
-}

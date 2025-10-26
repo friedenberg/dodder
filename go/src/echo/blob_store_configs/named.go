@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 )
 
 type ConfigNamed struct {
@@ -17,7 +18,7 @@ func GetDefaultBasePath(
 	directoryLayout interfaces.BlobStoreDirectoryLayout,
 	index int,
 ) string {
-	return interfaces.DirectoryLayoutDirBlobStore(
+	return directory_layout.DirBlobStore(
 		directoryLayout,
 		strconv.Itoa(index),
 	)

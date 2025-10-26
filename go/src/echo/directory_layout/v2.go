@@ -41,12 +41,12 @@ func (layout V2) DirBlobStoreConfigs(p ...string) string {
 
 // TODO deprecate and remove
 func (layout V2) DirFirstBlobStoreInventoryLists() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
+	return DirBlobStore(layout, "0")
 }
 
 // TODO deprecate and remove
 func (layout V2) DirFirstBlobStoreBlobs() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "0")
+	return DirBlobStore(layout, "0")
 }
 
 func (layout V2) FileCacheDormant() string {
@@ -104,7 +104,10 @@ func (layout V2) FileCacheObjectId() string {
 }
 
 func (layout V2) FileInventoryListLog() string {
-	return interfaces.DirectoryLayoutDirBlobStore(layout, "inventory_lists_log")
+	return DirBlobStore(
+		layout,
+		"inventory_lists_log",
+	)
 }
 
 func (layout V2) DirsGenesis() []string {
@@ -115,6 +118,6 @@ func (layout V2) DirsGenesis() []string {
 		layout.DirBlobStoreConfigs(),
 		layout.DirFirstBlobStoreInventoryLists(),
 		layout.DirFirstBlobStoreBlobs(),
-		interfaces.DirectoryLayoutDirBlobStore(layout, "0"),
+		DirBlobStore(layout, "0"),
 	}
 }
