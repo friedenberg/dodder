@@ -33,9 +33,13 @@ func GetBlobStoreConfigPaths(
 func GetDefaultBlobStoreConfigPath(
 	directoryLayout BlobStore,
 ) string {
-	return directoryLayout.DirBlobStoreConfigs(
-		fmt.Sprintf("%d-default.%s", 0, FileNameBlobStoreConfig),
+	dir, target := GetBlobStoreConfigPath(
+		directoryLayout,
+		0,
+		"default",
 	)
+
+	return filepath.Join(dir, target)
 }
 
 func GetBlobStoreConfigPath(
