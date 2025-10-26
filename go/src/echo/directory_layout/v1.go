@@ -111,7 +111,6 @@ func (layout V1) DirsGenesis() []string {
 		layout.DirLostAndFound(),
 		layout.DirBlobStoreConfigs(),
 		layout.DirFirstBlobStoreInventoryLists(),
-		layout.DirFirstBlobStoreBlobs(),
 		DirBlobStore(layout, "0"),
 	}
 }

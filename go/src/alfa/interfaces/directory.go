@@ -36,7 +36,6 @@ type (
 	}
 
 	BlobStoreDirectoryLayout interface {
-		DirFirstBlobStoreBlobs() string
 		DirBlobStoreConfigs(p ...string) string
 
 		MakePathBlobStore(...string) DirectoryLayoutPath
@@ -46,8 +45,6 @@ type (
 		BlobStoreDirectoryLayout
 
 		MakeDirData(p ...string) string
-
-		DirFirstBlobStoreInventoryLists() string
 
 		DirIndex(p ...string) string
 		DirCacheRemoteInventoryListLog() string

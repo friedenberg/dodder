@@ -39,16 +39,6 @@ func (layout V2) DirBlobStoreConfigs(p ...string) string {
 	return layout.MakeDirData(append([]string{"blob_stores-configs"}, p...)...)
 }
 
-// TODO deprecate and remove
-func (layout V2) DirFirstBlobStoreInventoryLists() string {
-	return DirBlobStore(layout, "0")
-}
-
-// TODO deprecate and remove
-func (layout V2) DirFirstBlobStoreBlobs() string {
-	return DirBlobStore(layout, "0")
-}
-
 func (layout V2) FileCacheDormant() string {
 	return layout.MakeDirData("dormant")
 }
@@ -116,8 +106,6 @@ func (layout V2) DirsGenesis() []string {
 		layout.DirIndex(),
 		layout.DirLostAndFound(),
 		layout.DirBlobStoreConfigs(),
-		layout.DirFirstBlobStoreInventoryLists(),
-		layout.DirFirstBlobStoreBlobs(),
 		DirBlobStore(layout, "0"),
 	}
 }
