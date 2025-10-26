@@ -29,26 +29,23 @@ func MakeBlobStoresFromRepoConfig(
 	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
 		blobStores = make([]BlobStoreInitialized, 1)
 		blob := config.(interfaces.BlobIOWrapperGetter)
-		blobStores[0].ConfigPath = "0-default"
 		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].BlobStoreBasePath = directory_layout.DirBlobStore(
-			directoryLayout,
-			"blobs",
-		)
+		blobStores[0].Path = directory_layout.BlobStorePath{
+			Base:   directory_layout.DirBlobStore(directoryLayout, "blobs"),
+			Config: "0-default",
+		}
 	} else {
 		configPaths := directory_layout.GetBlobStoreConfigPaths(ctx, directoryLayout)
 		blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 		for index, configPath := range configPaths {
-			// TODO add name
-			blobStores[index].ConfigPath = fd.FileNameSansExt(configPath)
-			blobStores[index].BlobStoreBasePath = blob_store_configs.GetDefaultBasePath(
-				directoryLayout,
-				index,
-			)
+			blobStores[index].Path = directory_layout.BlobStorePath{
+				Base:   blob_store_configs.GetDefaultBasePath(directoryLayout, index),
+				Config: fd.FileNameSansExt(configPath),
+			}
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
@@ -87,15 +84,17 @@ func MakeBlobStores(
 		ctx,
 		directoryLayout,
 	)
+
 	blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 	for index, configPath := range configPaths {
-		// TODO add name
-		blobStores[index].ConfigPath = fd.FileNameSansExt(configPath)
-		blobStores[index].BlobStoreBasePath = blob_store_configs.GetDefaultBasePath(
-			directoryLayout,
-			index,
-		)
+		blobStores[index].Path = directory_layout.BlobStorePath{
+			Base: blob_store_configs.GetDefaultBasePath(
+				directoryLayout,
+				index,
+			),
+			Config: fd.FileNameSansExt(configPath),
+		}
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
@@ -153,7 +152,7 @@ func MakeBlobStore(
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
-		fmt.Sprintf("(blob_store: %s) ", configNamed.ConfigPath),
+		fmt.Sprintf("(blob_store: %s) ", configNamed.Path.Config),
 	)
 
 	configBlob := configNamed.Config.Blob
@@ -190,7 +189,7 @@ func MakeBlobStore(
 	case blob_store_configs.ConfigLocalHashBucketed:
 		return makeLocalHashBucketed(
 			envDir,
-			configNamed.BlobStoreBasePath,
+			configNamed.Path.Base,
 			config,
 		)
 

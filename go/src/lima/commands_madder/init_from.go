@@ -56,7 +56,7 @@ func (cmd *InitFrom) Run(req command.Request) {
 
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	var typedConfig triple_hyphen_io.TypedBlob[blob_store_configs.Config]
+	var typedConfig blob_store_configs.TypedConfig
 
 	{
 		var err error

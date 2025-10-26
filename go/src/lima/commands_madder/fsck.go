@@ -33,7 +33,7 @@ func (cmd Fsck) Run(req command.Request) {
 	ui.Out().Print("Blob Stores:")
 
 	for _, blobStore := range blobStores {
-		ui.Out().Printf("%s", blobStore.ConfigPath)
+		ui.Out().Printf("%s", blobStore.Path.Config)
 	}
 
 	ui.Out().Print()

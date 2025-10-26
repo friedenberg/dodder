@@ -12,6 +12,11 @@ type (
 		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
 	}
 
+	BlobStorePath struct {
+		Base   string
+		Config string
+	}
+
 	Repo interface {
 		BlobStore
 

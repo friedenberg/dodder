@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl_io"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 )
@@ -19,10 +20,11 @@ import (
 func (client *client) GetBlobStore() blob_stores.BlobStoreInitialized {
 	return blob_stores.BlobStoreInitialized{
 		ConfigNamed: blob_store_configs.ConfigNamed{
-			ConfigPath: "remote",
-			// TODO populate these
-			// BasePath:
-			// Config:
+			Path: directory_layout.BlobStorePath{
+				// TODO populate these
+				// Base:
+				Config: "remote",
+			},
 		},
 		BlobStore: client,
 	}

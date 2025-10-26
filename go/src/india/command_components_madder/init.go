@@ -16,7 +16,7 @@ func (cmd Init) InitBlobStore(
 	ctx interfaces.ActiveContext,
 	envBlobStore env_repo.BlobStoreEnv,
 	name string,
-	config *triple_hyphen_io.TypedBlob[blob_store_configs.Config],
+	config *blob_store_configs.TypedConfig,
 ) (pathConfig string) {
 	blobStoreCount := len(envBlobStore.GetBlobStores())
 

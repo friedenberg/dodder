@@ -9,9 +9,8 @@ import (
 )
 
 type ConfigNamed struct {
-	BlobStoreBasePath string
-	ConfigPath        string
-	Config            TypedConfig
+	Path   directory_layout.BlobStorePath
+	Config TypedConfig
 }
 
 func GetDefaultBasePath(

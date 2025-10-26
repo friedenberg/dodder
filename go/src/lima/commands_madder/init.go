@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
@@ -74,7 +73,7 @@ func (cmd *Init) Run(req command.Request) {
 		req,
 		envBlobStore,
 		blobStoreName.String(),
-		&triple_hyphen_io.TypedBlob[blob_store_configs.Config]{
+		&blob_store_configs.TypedConfig{
 			Type: cmd.tipe,
 			Blob: cmd.blobStoreConfig,
 		},
