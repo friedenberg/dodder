@@ -33,5 +33,7 @@ type (
 		GetDirState() DirectoryLayoutBaseEnvVar
 		GetDirCache() DirectoryLayoutBaseEnvVar
 		GetDirRuntime() DirectoryLayoutBaseEnvVar
+
+		CloneWithUtilityName(string) DirectoryLayoutXDG
 	}
 )

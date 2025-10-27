@@ -27,6 +27,8 @@ type printer struct {
 	on    bool
 }
 
+var _ Printer = printer{}
+
 // Returns a copy of this printer with a modified `on` setting
 func (printer printer) withOn(on bool) printer {
 	printer.on = on
@@ -129,3 +131,6 @@ func (printer printer) Printf(format string, args ...any) (err error) {
 
 	return err
 }
+
+// Fatal(args ...any)
+// Fatalf(format string, args ...any)

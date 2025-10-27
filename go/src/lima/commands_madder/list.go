@@ -3,6 +3,7 @@ package commands_madder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
@@ -26,11 +27,11 @@ func (cmd List) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 	blobStoresAll := envBlobStore.GetBlobStores()
 
-	for i, blobStore := range blobStoresAll {
+	for index, blobStore := range blobStoresAll {
 		ui.Out().Printf(
 			"%d: %s: %s",
-			i,
-			blobStore.Path.Config,
+			index,
+			fd.Base(blobStore.Path.Base),
 			blobStore.GetBlobStoreDescription(),
 		)
 	}

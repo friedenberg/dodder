@@ -17,10 +17,17 @@ import (
 )
 
 func (env *Env) Genesis(bigBang BigBang) {
-	if env.directoryLayout == nil {
+	if env.BlobStore == nil {
 		errors.ContextCancelWithErrorf(
 			env,
-			"directory layout not initialized",
+			"blob store directory layout not initialized",
+		)
+	}
+
+	if env.Repo == nil {
+		errors.ContextCancelWithErrorf(
+			env,
+			"repo directory layout not initialized",
 		)
 	}
 
@@ -51,7 +58,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	env.writeInventoryListLog()
 	env.writeConfig(bigBang)
-	env.writeBlobStoreConfig(bigBang, env.directoryLayout)
+	env.writeBlobStoreConfig(bigBang, env.BlobStore)
 
 	if err := ohio.CopyFileLines(
 		bigBang.Yin,
@@ -74,7 +81,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(
 		env.Env,
-		env.directoryLayout,
+		env.BlobStore,
 		env.GetConfigPrivate().Blob,
 	)
 }

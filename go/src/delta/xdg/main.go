@@ -69,6 +69,18 @@ func (xdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
 	}
 }
 
+func (clone XDG) CloneWithUtilityName(
+	name string,
+) interfaces.DirectoryLayoutXDG {
+	clone.setInitArgs(InitArgs{
+		Home:        clone.Home.ActualValue,
+		Cwd:         clone.Cwd.ActualValue,
+		UtilityName: name,
+	})
+
+	return clone
+}
+
 func (xdg *XDG) setInitArgs(initArgs InitArgs) (err error) {
 	xdg.Home = xdg_defaults.Home.MakeBaseEnvVar(initArgs.Home)
 	xdg.Cwd = xdg_defaults.Cwd.MakeBaseEnvVar(initArgs.Cwd)
@@ -91,7 +103,13 @@ func (initArgs InitArgs) getCwdXDGOverridePath() (string, bool) {
 	var exists bool
 
 	var count int
-	for exists = files.Exists(pathCwdXDGOverride); !exists && dir != string(filepath.Separator); {
+	for {
+		exists = files.Exists(pathCwdXDGOverride)
+
+		if exists || dir == string(filepath.Separator) {
+			break
+		}
+
 		count++
 		dir = filepath.Dir(dir)
 		pathCwdXDGOverride = initArgs.makeCwdXDGOverridePath(dir)

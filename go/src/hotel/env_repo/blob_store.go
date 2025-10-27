@@ -61,9 +61,9 @@ func MakeBlobStoreEnv(
 	{
 		var err error
 
-		if env.BlobStore, err = directory_layout.MakeRepo(
+		if env.BlobStore, err = directory_layout.MakeBlobStore(
 			store_version.VCurrent,
-			envLocal.GetXDG(),
+			envLocal.GetXDGForBlobStores(),
 		); err != nil {
 			envLocal.Cancel(err)
 			return env

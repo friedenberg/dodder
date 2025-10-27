@@ -20,6 +20,7 @@ import (
 var defaultBuckets = []int{2}
 
 // TODO pass in custom UI context for printing
+// TODO consolidated envDir and ctx arguments
 func MakeBlobStoresFromRepoConfig(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,

@@ -15,6 +15,8 @@ type devPrinter struct {
 	includesStack bool
 }
 
+var _ DevPrinter = devPrinter{}
+
 //go:noinline
 func (printer devPrinter) PrintDebug(args ...any) (err error) {
 	if !printer.on {

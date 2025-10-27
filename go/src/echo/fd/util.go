@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+func Base(p string) string {
+	return filepath.Base(p)
+}
+
 func Dir(p string) string {
 	return filepath.Dir(p)
 }

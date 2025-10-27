@@ -10,9 +10,14 @@ type Printer interface {
 
 	GetFile() *os.File
 	IsTty() bool
+
 	// TODO add "isOn" function
-	Print(a ...any) (err error)
 	Caller(skip int) Printer
+	Print(a ...any) (err error)
 	PrintDebug(a ...any) (err error)
 	Printf(f string, a ...any) (err error)
+
+	// TODO add below
+	// Fatal(args ...any)
+	// Fatalf(format string, args ...any)
 }

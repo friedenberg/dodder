@@ -38,7 +38,6 @@ func SetHexStringFromAbsolutePath(
 		err = errors.Wrapf(
 			err,
 			"Base: %q",
-			absOrRelPath,
 			base,
 		)
 

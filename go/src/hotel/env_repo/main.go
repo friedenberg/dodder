@@ -25,14 +25,13 @@ const (
 	FileWorkspace         = ".dodder-workspace"
 )
 
-type directoryLayout = directory_layout.Repo
-
 type Env struct {
 	config genesis_configs.TypedConfigPrivate
 
 	lockSmith interfaces.LockSmith
 
-	directoryLayout
+	directory_layout.BlobStore
+	directory_layout.Repo
 
 	BlobStoreEnv
 }
@@ -96,7 +95,15 @@ func Make(
 		}
 	}
 
-	if env.directoryLayout, err = directory_layout.MakeRepo(
+	if env.BlobStore, err = directory_layout.MakeBlobStore(
+		env.GetStoreVersion(),
+		env.GetXDGForBlobStores(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return env, err
+	}
+
+	if env.Repo, err = directory_layout.MakeRepo(
 		env.GetStoreVersion(),
 		xdg,
 	); err != nil {
@@ -125,7 +132,7 @@ func Make(
 	if configLoaded {
 		env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(
 			envLocal,
-			env.directoryLayout,
+			env.BlobStore,
 			env.GetConfigPrivate().Blob,
 		)
 	}

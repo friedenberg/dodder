@@ -7,18 +7,18 @@ import (
 )
 
 type (
-	BlobStore interface {
-		DirBlobStoreConfigs(p ...string) string
-		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
-	}
-
 	BlobStorePath struct {
 		Base   string
 		Config string
 	}
 
+	BlobStore interface {
+		DirBlobStoreConfigs(p ...string) string
+		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
+	}
+
 	Repo interface {
-		BlobStore
+		// BlobStore
 
 		MakeDirData(p ...string) string
 
@@ -53,10 +53,21 @@ type (
 		Repo
 		Mutable
 	}
+)
+
+type (
+	uninitializedXDG interface {
+		initialize(interfaces.DirectoryLayoutXDG) error
+	}
+
+	blobStoreUninitialized interface {
+		BlobStore
+		uninitializedXDG
+	}
 
 	repoUninitialized interface {
 		Repo
-		initialize(interfaces.DirectoryLayoutXDG) error
+		uninitializedXDG
 	}
 )
 
@@ -80,4 +91,26 @@ func MakeRepo(
 	}
 
 	return repo, nil
+}
+
+func MakeBlobStore(
+	storeVersion store_version.Version,
+	xdg interfaces.DirectoryLayoutXDG,
+) (BlobStore, error) {
+	var blobStore blobStoreUninitialized
+
+	if storeVersion.LessOrEqual(store_version.V10) {
+		blobStore = &v1{}
+	} else if storeVersion.LessOrEqual(store_version.V12) {
+		blobStore = &v2{}
+	} else {
+		blobStore = &v3{}
+	}
+
+	if err := blobStore.initialize(xdg); err != nil {
+		err = errors.Wrap(err)
+		return nil, err
+	}
+
+	return blobStore, nil
 }

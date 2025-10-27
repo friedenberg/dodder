@@ -23,7 +23,10 @@ type Env interface {
 
 	IsDryRun() bool
 	GetCwd() string
+
 	GetXDG() xdg.XDG
+	GetXDGForBlobStores() interfaces.DirectoryLayoutXDG
+
 	GetExecPath() string
 	GetTempLocal() TemporaryFS
 	MakeDirs(dirs ...string) (err error)
@@ -92,6 +95,10 @@ func (env env) GetCwd() string {
 
 func (env env) GetXDG() xdg.XDG {
 	return env.XDG
+}
+
+func (env env) GetXDGForBlobStores() interfaces.DirectoryLayoutXDG {
+	return env.XDG.CloneWithUtilityName("madder")
 }
 
 func (env *env) SetXDG(x xdg.XDG) {
