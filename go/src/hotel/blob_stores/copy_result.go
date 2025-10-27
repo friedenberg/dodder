@@ -75,7 +75,7 @@ func (copyResult CopyResult) GetError() error {
 }
 
 func (copyResult CopyResult) IsMissing() bool {
-	return copyResult.state == CopyResultStateMissingLocally
+	return copyResult.state == CopyResultStateNilRemoteBlobStore
 }
 
 func (copyResult CopyResult) Exists() bool {

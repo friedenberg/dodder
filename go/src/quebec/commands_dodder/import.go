@@ -42,6 +42,7 @@ func (cmd *Import) SetFlagDefinitions(
 
 func (cmd Import) Run(req command.Request) {
 	inventoryListPath := req.PopArg("inventory_list-path")
+	blobStoreBasePath := req.PopArg("blob_store-base-path")
 	blobStoreConfigPath := req.PopArg("blob_store-config-path")
 
 	local := cmd.MakeLocalWorkingCopy(req)
@@ -74,10 +75,17 @@ func (cmd Import) Run(req command.Request) {
 	cmd.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
 
 	if blobStoreConfigPath != "" {
-		cmd.RemoteBlobStore = cmd.MakeBlobStore(
+		cmd.RemoteBlobStore = cmd.MakeBlobStoreFromConfigPath(
 			local.GetEnvRepo().GetEnvBlobStore(),
+			blobStoreBasePath,
 			blobStoreConfigPath,
 		)
+
+		if cmd.RemoteBlobStore.GetBlobStore() != nil &&
+			cmd.RemoteBlobStore.Path.Base == "" {
+			req.Cancel(errors.Errorf("missing blob store base path"))
+			return
+		}
 	}
 
 	var afterDecoding func(*sku.Transacted) error

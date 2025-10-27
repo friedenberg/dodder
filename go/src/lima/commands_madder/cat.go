@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
@@ -25,7 +26,7 @@ type Cat struct {
 	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStore
 
-	BlobStoreIndexOrConfigPath string
+	BlobStoreIndex values.Int
 
 	Utility   script_value.Utility
 	PrefixSha bool
@@ -37,7 +38,7 @@ func (cmd *Cat) SetFlagDefinitions(
 	flagSet interfaces.CLIFlagDefinitions,
 ) {
 	flagSet.Var(&cmd.Utility, "utility", "")
-	flagSet.StringVar(&cmd.BlobStoreIndexOrConfigPath, "blob-store", "", "")
+	flagSet.Var(&cmd.BlobStoreIndex, "blob-store", "")
 	flagSet.BoolVar(&cmd.PrefixSha, "prefix-sha", false, "")
 }
 
@@ -105,13 +106,11 @@ func (cmd Cat) makeBlobWriter(
 }
 
 func (cmd Cat) Run(req command.Request) {
-	envRepo := cmd.MakeEnvBlobStore(req)
-	blobStore := cmd.MakeBlobStore(
-		envRepo,
-		cmd.BlobStoreIndexOrConfigPath,
-	)
+	// TODO support other blob stores
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStore := envBlobStore.GetDefaultBlobStore()
 
-	blobWriter := cmd.makeBlobWriter(envRepo, blobStore)
+	blobWriter := cmd.makeBlobWriter(envBlobStore, blobStore)
 
 	for _, blobIdString := range req.PopArgs() {
 		var blobId markl.Id
@@ -120,7 +119,7 @@ func (cmd Cat) Run(req command.Request) {
 			&blobId,
 			blobIdString,
 		); err != nil {
-			envRepo.Cancel(err)
+			envBlobStore.Cancel(err)
 		}
 
 		if err := cmd.blob(blobStore, blobId, blobWriter); err != nil {

@@ -31,7 +31,7 @@ func CopyBlobIfNecessary(
 
 	if src == nil {
 		copyResult.bytesWritten = -1
-		copyResult.state = CopyResultStateMissingLocally
+		copyResult.state = CopyResultStateNilRemoteBlobStore
 		return copyResult
 	}
 

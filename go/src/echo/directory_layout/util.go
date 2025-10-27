@@ -3,10 +3,8 @@ package directory_layout
 import (
 	"fmt"
 	"path/filepath"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
 
 const FileNameBlobStoreConfig = "dodder-blob_store-config"
@@ -20,8 +18,8 @@ func GetBlobStoreConfigPaths(
 	{
 		var err error
 
-		if configPaths, err = files.DirNames(
-			filepath.Join(directoryLayout.DirBlobStoreConfigs()),
+		if configPaths, err = filepath.Glob(
+			DirBlobStore(directoryLayout, fmt.Sprintf("*/%s", FileNameBlobStoreConfig)),
 		); err != nil {
 			ctx.Cancel(err)
 			return configPaths
@@ -36,28 +34,37 @@ func GetDefaultBlobStore(
 ) BlobStorePath {
 	return GetBlobStorePath(
 		directoryLayout,
-		0,
 		"default",
 	)
 }
 
-func GetBlobStorePath(
+func getBlobStorePath(
 	directoryLayout BlobStore,
-	currentBlobStoreCount int,
 	name string,
 ) BlobStorePath {
-	dirConfig := directoryLayout.DirBlobStoreConfigs()
-
-	targetConfig := fmt.Sprintf(
-		"%d-%s.%s",
-		currentBlobStoreCount,
-		name,
-		FileNameBlobStoreConfig,
-	)
-
 	return BlobStorePath{
-		Base:   DirBlobStore(directoryLayout, strconv.Itoa(0)),
-		Config: filepath.Join(dirConfig, targetConfig),
+		Base:   DirBlobStore(directoryLayout, name),
+		Config: DirBlobStore(directoryLayout, name, FileNameBlobStoreConfig),
+	}
+}
+
+func GetBlobStorePath(
+	directoryLayout BlobStore,
+	name string,
+) BlobStorePath {
+	return getBlobStorePath(
+		directoryLayout,
+		name,
+	)
+}
+
+func GetBlobStorePathForCustomPath(
+	basePath string,
+	configPath string,
+) BlobStorePath {
+	return BlobStorePath{
+		Base:   basePath,
+		Config: configPath,
 	}
 }
 

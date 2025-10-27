@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+func Dir(p string) string {
+	return filepath.Dir(p)
+}
+
+func DirBaseOnly(p string) string {
+	return filepath.Base(filepath.Dir(p))
+}
+
 func Ext(p string) string {
 	return strings.ToLower(path.Ext(p))
 }
@@ -31,10 +39,6 @@ func FileNameSansExtRelTo(p, d string) (string, error) {
 	ext := Ext(rel)
 
 	return base[:len(base)-len(ext)], nil
-}
-
-func DirBaseOnly(p string) string {
-	return filepath.Base(filepath.Dir(p))
 }
 
 func ZettelId(p string) string {

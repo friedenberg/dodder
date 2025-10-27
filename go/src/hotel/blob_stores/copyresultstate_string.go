@@ -10,15 +10,16 @@ func _() {
 	var x [1]struct{}
 	_ = x[CopyResultStateUnknown-0]
 	_ = x[CopyResultStateSuccess-1]
-	_ = x[CopyResultStateMissingLocally-2]
-	_ = x[CopyResultStateExistsLocally-3]
-	_ = x[CopyResultStateExistsLocallyAndRemotely-4]
-	_ = x[CopyResultStateError-5]
+	_ = x[CopyResultStateNilRemoteBlobStore-2]
+	_ = x[CopyResultStateMissingLocally-3]
+	_ = x[CopyResultStateExistsLocally-4]
+	_ = x[CopyResultStateExistsLocallyAndRemotely-5]
+	_ = x[CopyResultStateError-6]
 }
 
-const _copyResultState_name = "CopyResultStateUnknownCopyResultStateSuccessCopyResultStateMissingLocallyCopyResultStateExistsLocallyCopyResultStateExistsLocallyAndRemotelyCopyResultStateError"
+const _copyResultState_name = "CopyResultStateUnknownCopyResultStateSuccessCopyResultStateNilRemoteBlobStoreCopyResultStateMissingLocallyCopyResultStateExistsLocallyCopyResultStateExistsLocallyAndRemotelyCopyResultStateError"
 
-var _copyResultState_index = [...]uint8{0, 22, 44, 73, 101, 140, 160}
+var _copyResultState_index = [...]uint8{0, 22, 44, 77, 106, 134, 173, 193}
 
 func (i copyResultState) String() string {
 	if i < 0 || i >= copyResultState(len(_copyResultState_index)-1) {

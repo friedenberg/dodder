@@ -1,11 +1,8 @@
 package commands_madder
 
 import (
-	"path/filepath"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -80,8 +77,6 @@ func (cmd *InitFrom) Run(req command.Request) {
 		typedConfig.Blob, typedConfig.Type = configUpgraded.Upgrade()
 	}
 
-	cmd.tryAddBasePath(req, typedConfig.Blob)
-
 	pathConfig := cmd.InitBlobStore(
 		req,
 		envBlobStore,
@@ -90,49 +85,4 @@ func (cmd *InitFrom) Run(req command.Request) {
 	)
 
 	envBlobStore.GetUI().Printf("Wrote config to %s", pathConfig)
-}
-
-func (cmd InitFrom) tryAddBasePath(
-	req command.Request,
-	config blob_store_configs.Config,
-) {
-	var basePath string
-
-	{
-		var ok bool
-
-		basePath, ok = blob_store_configs.GetBasePath(config)
-
-		if !ok {
-			return
-		}
-	}
-
-	if filepath.IsAbs(basePath) {
-		return
-	}
-
-	var configLocalMutable blob_store_configs.ConfigLocalMutable
-
-	{
-		var ok bool
-
-		configLocalMutable, ok = config.(blob_store_configs.ConfigLocalMutable)
-
-		if !ok {
-			errors.ContextCancelWithBadRequestf(
-				req,
-				"expected %T but got %T",
-				configLocalMutable,
-				config,
-			)
-
-			return
-		}
-
-		blob_store_configs.SetBasePath(
-			configLocalMutable,
-			env_vars.MakeAbsolutePath(basePath),
-		)
-	}
 }

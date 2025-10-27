@@ -32,6 +32,7 @@ func (cmd *PullBlobStore) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (cmd *PullBlobStore) Run(
 	req command.Request,
 ) {
+	blobStoreBasePath := req.PopArg("blob_store-base-path")
 	blobStoreConfigPath := req.PopArg("blob_store-config-path")
 
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
@@ -50,8 +51,9 @@ func (cmd *PullBlobStore) Run(
 		PrintCopies:    true,
 	}
 
-	importerOptions.RemoteBlobStore = cmd.MakeBlobStore(
+	importerOptions.RemoteBlobStore = cmd.MakeBlobStoreFromIndexOrConfigPath(
 		localWorkingCopy.GetEnvRepo().GetEnvBlobStore(),
+		blobStoreBasePath,
 		blobStoreConfigPath,
 	)
 

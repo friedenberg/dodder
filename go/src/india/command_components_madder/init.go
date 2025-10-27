@@ -18,11 +18,8 @@ func (cmd Init) InitBlobStore(
 	name string,
 	config *blob_store_configs.TypedConfig,
 ) (path directory_layout.BlobStorePath) {
-	blobStoreCount := len(envBlobStore.GetBlobStores())
-
 	path = directory_layout.GetBlobStorePath(
 		envBlobStore,
-		blobStoreCount,
 		name,
 	)
 

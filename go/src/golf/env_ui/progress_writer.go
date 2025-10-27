@@ -12,7 +12,7 @@ type ProgressWriter struct {
 
 func (writer *ProgressWriter) GetWrittenHumanString() string {
 	written := writer.GetWritten()
-	return ui.GetHumanBytesString(uint64(written))
+	return ui.GetHumanBytesStringOrError(written)
 }
 
 func (writer *ProgressWriter) GetWritten() int64 {

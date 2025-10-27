@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -13,8 +14,50 @@ import (
 
 type BlobStore struct{}
 
-func (cmd *BlobStore) MakeBlobStore(
+func (cmd *BlobStore) MakeBlobStoreFromConfigPath(
 	envBlobStore env_repo.BlobStoreEnv,
+	basePath string,
+	configPath string,
+) (blobStore blob_stores.BlobStoreInitialized) {
+	var typedConfig blob_store_configs.TypedConfig
+
+	{
+		var err error
+
+		if typedConfig, err = triple_hyphen_io.DecodeFromFile(
+			blob_store_configs.Coder,
+			configPath,
+		); err != nil {
+			envBlobStore.Cancel(err)
+			return blobStore
+		}
+	}
+
+	blobStore.Config = typedConfig
+
+	blobStore.Path = directory_layout.GetBlobStorePathForCustomPath(
+		basePath,
+		configPath,
+	)
+
+	{
+		var err error
+
+		if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
+			envBlobStore,
+			blobStore.ConfigNamed,
+		); err != nil {
+			envBlobStore.Cancel(err)
+			return blobStore
+		}
+	}
+
+	return blobStore
+}
+
+func (cmd *BlobStore) MakeBlobStoreFromIndexOrConfigPath(
+	envBlobStore env_repo.BlobStoreEnv,
+	basePath string,
 	blobStoreIndexOrConfigPath string,
 ) (blobStore blob_stores.BlobStoreInitialized) {
 	if blobStoreIndexOrConfigPath == "" {
@@ -44,13 +87,9 @@ func (cmd *BlobStore) MakeBlobStore(
 
 		blobStore.Config = typedConfig
 
-		configNamed := blob_store_configs.ConfigNamed{
-			Config: typedConfig,
-		}
-
-		configNamed.Path.Config = configPath
-		configNamed.Path.Base, _ = blob_store_configs.GetBasePath(
-			typedConfig.Blob,
+		blobStore.Path = directory_layout.GetBlobStorePathForCustomPath(
+			basePath,
+			blobStoreIndexOrConfigPath,
 		)
 
 		{
@@ -58,7 +97,7 @@ func (cmd *BlobStore) MakeBlobStore(
 
 			if blobStore.BlobStore, err = blob_stores.MakeBlobStore(
 				envBlobStore,
-				configNamed,
+				blobStore.ConfigNamed,
 			); err != nil {
 				envBlobStore.Cancel(err)
 				return blobStore

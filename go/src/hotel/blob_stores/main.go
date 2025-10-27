@@ -42,10 +42,10 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 		for index, configPath := range configPaths {
-			blobStores[index].Path = directory_layout.BlobStorePath{
-				Base:   blob_store_configs.GetDefaultBasePath(directoryLayout, index),
-				Config: fd.FileNameSansExt(configPath),
-			}
+			blobStores[index].Path = directory_layout.GetBlobStorePath(
+				directoryLayout,
+				fd.DirBaseOnly(configPath),
+			)
 
 			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 				blob_store_configs.Coder,
@@ -88,13 +88,10 @@ func MakeBlobStores(
 	blobStores = make([]BlobStoreInitialized, len(configPaths))
 
 	for index, configPath := range configPaths {
-		blobStores[index].Path = directory_layout.BlobStorePath{
-			Base: blob_store_configs.GetDefaultBasePath(
-				directoryLayout,
-				index,
-			),
-			Config: fd.FileNameSansExt(configPath),
-		}
+		blobStores[index].Path = directory_layout.GetBlobStorePath(
+			directoryLayout,
+			fd.DirBaseOnly(configPath),
+		)
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,

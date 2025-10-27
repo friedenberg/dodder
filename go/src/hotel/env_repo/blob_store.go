@@ -1,7 +1,7 @@
 package env_repo
 
 import (
-	"strconv"
+	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -106,15 +106,18 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 		return
 	}
 
-	blobStoreConfig := bigBang.TypedBlobStoreConfig
+	blobStoreConfigPath := directory_layout.GetDefaultBlobStore(
+		directoryLayout,
+	).Config
 
-	blob_store_configs.SetBasePath(
-		blobStoreConfig.Blob,
-		directory_layout.PathBlobStore(
-			directoryLayout,
-			strconv.Itoa(0),
-		),
-	)
+	blobStoreConfigDir := filepath.Dir(blobStoreConfigPath)
+
+	if err := env.MakeDirs(blobStoreConfigDir); err != nil {
+		env.Cancel(err)
+		return
+	}
+
+	blobStoreConfig := bigBang.TypedBlobStoreConfig
 
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
@@ -122,7 +125,7 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 			Type: blobStoreConfig.Type,
 			Blob: blobStoreConfig.Blob,
 		},
-		directory_layout.GetDefaultBlobStore(directoryLayout).Config,
+		blobStoreConfigPath,
 	); err != nil {
 		env.Cancel(err)
 		return

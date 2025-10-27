@@ -2,14 +2,22 @@ package ui
 
 import "fmt"
 
+func GetHumanBytesStringOrError(bytes int64) string {
+	if bytes < 0 {
+		return fmt.Sprintf("%d bytes (error)", bytes)
+	} else {
+		return GetHumanBytesString(uint64(bytes))
+	}
+}
+
 func GetHumanBytesString(bytes uint64) string {
-	const unit = 1024
+	const unit = uint64(1024)
 
 	if bytes < unit {
 		return fmt.Sprintf("%d B", bytes)
 	}
 
-	div, exp := int64(unit), 0
+	div, exp := uint64(unit), 0
 
 	for n := bytes / unit; n >= unit; n /= unit {
 		div *= unit

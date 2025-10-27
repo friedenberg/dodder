@@ -12,6 +12,7 @@ func (copyResultState) state() {}
 const (
 	CopyResultStateUnknown = copyResultState(iota)
 	CopyResultStateSuccess
+	CopyResultStateNilRemoteBlobStore
 	CopyResultStateMissingLocally
 	CopyResultStateExistsLocally
 	CopyResultStateExistsLocallyAndRemotely

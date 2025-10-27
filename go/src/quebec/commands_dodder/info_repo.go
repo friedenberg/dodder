@@ -78,6 +78,11 @@ func (cmd InfoRepo) Run(req command.Request) {
 				blobIOWrapper.GetBlobEncryption().StringWithFormat(),
 			)
 
+		case "blob_stores-0-base-path":
+			env.GetUI().Print(
+				directory_layout.GetDefaultBlobStore(env).Base,
+			)
+
 		case "blob_stores-0-config-path":
 			env.GetUI().Print(
 				directory_layout.GetDefaultBlobStore(env).Config,
