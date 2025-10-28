@@ -18,8 +18,6 @@ type (
 	}
 
 	Repo interface {
-		// BlobStore
-
 		MakeDirData(p ...string) string
 
 		DirDataIndex(p ...string) string
@@ -101,7 +99,7 @@ func MakeBlobStore(
 
 	if storeVersion.LessOrEqual(store_version.V10) {
 		blobStore = &v1{}
-	} else if storeVersion.LessOrEqual(store_version.V12) {
+	} else if storeVersion.LessOrEqual(store_version.V11) {
 		blobStore = &v2{}
 	} else {
 		blobStore = &v3{}

@@ -395,6 +395,8 @@ function show_konfig { # @test
 		! toml-config-v2
 		---
 
+		default-blob_store = 'default'
+
 		[defaults]
 		type = '!md'
 		tags = []

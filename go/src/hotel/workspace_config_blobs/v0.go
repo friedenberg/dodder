@@ -1,11 +1,11 @@
 package workspace_config_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
 )
 
 type V0 struct {
-	Defaults repo_configs.DefaultsV1OmitEmpty `toml:"defaults,omitempty"`
+	Defaults repo_config.DefaultsV1OmitEmpty `toml:"defaults,omitempty"`
 	// FileExtensions file_extensions.V1    `toml:"file-extensions"`
 	// PrintOptions   options_print.V0      `toml:"cli-output"`
 	// Tools          options_tools.Options `toml:"tools"`
@@ -15,7 +15,7 @@ type V0 struct {
 	DryRun bool `toml:"dry-run"`
 }
 
-func (blob V0) GetDefaults() repo_configs.Defaults {
+func (blob V0) GetDefaults() repo_config.Defaults {
 	return blob.Defaults
 }
 

@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
@@ -13,11 +13,6 @@ type Config struct {
 	FileExtensions file_extensions.Config
 	PrintOptions   options_print.Overlay
 	ToolOptions    options_tools.Options
-}
-
-type ConfigOverlay2 struct {
-	DefaultType *ids.Type
-	DefaultTags ids.TagSet
 }
 
 func MakeConfigFromOverlays(base Config, overlays ...ConfigOverlay) Config {

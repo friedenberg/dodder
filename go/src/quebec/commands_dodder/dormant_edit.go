@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
@@ -157,7 +157,7 @@ func (cmd DormantEdit) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, writeCloser)
 
-	var typedBlob repo_configs.TypedBlob
+	var typedBlob repo_config.TypedBlob
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 

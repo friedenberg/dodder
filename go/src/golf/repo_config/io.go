@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"

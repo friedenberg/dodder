@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
@@ -24,6 +24,11 @@ type (
 		GetToolOptions() options_tools.Options
 	}
 
+	ConfigOverlay2 interface {
+		ConfigOverlay
+		GetDefaultBlobStoreName() string
+	}
+
 	Defaults interface {
 		GetDefaultType() ids.Type
 		GetDefaultTags() quiter.Slice[ids.Tag]
@@ -34,7 +39,6 @@ var (
 	// _ ConfigOverlay = Config{}
 	_ ConfigOverlay = V0{}
 	_ ConfigOverlay = V1{}
-	_ ConfigOverlay = V2{}
 )
 
 func Default(defaultType ids.Type) Config {
@@ -51,10 +55,14 @@ func Default(defaultType ids.Type) Config {
 	}
 }
 
-func DefaultOverlay(defaultType ids.Type) TypedBlob {
+func DefaultOverlay(
+	defaultBlobStoreName string,
+	defaultType ids.Type,
+) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),
 		Blob: V2{
+			DefaultBlobStoreName: defaultBlobStoreName,
 			Defaults: DefaultsV1{
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
@@ -67,5 +75,13 @@ func DefaultOverlay(defaultType ids.Type) TypedBlob {
 				},
 			},
 		},
+	}
+}
+
+func GetDefaultBlobStoreName(config ConfigOverlay, otherwise string) string {
+	if config, ok := config.(ConfigOverlay2); ok {
+		return config.GetDefaultBlobStoreName()
+	} else {
+		return otherwise
 	}
 }

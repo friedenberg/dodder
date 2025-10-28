@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
@@ -32,6 +32,8 @@ type V0 struct {
 	Tools           options_tools.Options                 `toml:"tools"`
 	Filters         map[string]string                     `toml:"filters"`
 }
+
+var _ ConfigOverlay = V0{}
 
 func (blob V0) GetRepoConfig() ConfigOverlay {
 	return blob

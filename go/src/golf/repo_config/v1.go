@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
@@ -12,6 +12,8 @@ type DefaultsV1 struct {
 	Type ids.Type  `toml:"type,omitempty"`
 	Tags []ids.Tag `toml:"tags"`
 }
+
+var _ ConfigOverlay = V1{}
 
 func (defaults DefaultsV1) GetDefaultType() ids.Type {
 	return defaults.Type

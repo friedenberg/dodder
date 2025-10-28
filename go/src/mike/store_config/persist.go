@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -20,8 +20,8 @@ import (
 )
 
 func init() {
-	gob.Register(repo_configs.V1{})
-	gob.Register(repo_configs.V0{})
+	gob.Register(repo_config.V1{})
+	gob.Register(repo_config.V0{})
 }
 
 func (store *store) recompile(
@@ -272,11 +272,11 @@ func (store *store) loadMutableConfigBlob(
 
 	defer errors.DeferredCloser(&err, readCloser)
 
-	typedBlob := repo_configs.TypedBlob{
+	typedBlob := repo_config.TypedBlob{
 		Type: mutableConfigType,
 	}
 
-	if _, err = repo_configs.Coder.DecodeFrom(
+	if _, err = repo_config.Coder.DecodeFrom(
 		&typedBlob,
 		readCloser,
 	); err != nil {

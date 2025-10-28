@@ -221,8 +221,7 @@ function get_konfig_sha() {
   if [[ $storeVersionCurrent -le 10 ]]; then
     echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
   else
-    echo -n "blake2b256-qesavjkvgxhmrczpn962s2yl94nrg4gk0sxsm9hk32mdjpth24rstf724q"
-    # echo -n "ef4d1dba0b64aaf20a9af062a9af714c6a4e8af0e749ad12cdee5269f72aa7b7"
+    echo -n "blake2b256-3fzeljm4pk3ppnvy4enqfea4y4t0nprezvpwgj4yl7r594cyfh6qklmcu2"
   fi
 }
 

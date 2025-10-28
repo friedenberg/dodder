@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -61,6 +61,7 @@ func (local *Repo) initDefaultTypeAndConfig(
 
 	if err = local.initDefaultConfigIfNecessaryAfterLock(
 		bigBang,
+		local.GetEnvRepo().GetDefaultBlobStore().GetName(),
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -121,6 +122,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
+	defaultBlobStoreName string,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bigBang.ExcludeDefaultConfig {
@@ -128,10 +130,11 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	}
 
 	var blobId interfaces.MarklId
-	var typedBlob repo_configs.TypedBlob
+	var typedBlob repo_config.TypedBlob
 
 	if blobId, typedBlob, err = writeDefaultMutableConfig(
 		local,
+		defaultBlobStoreName,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -165,9 +168,10 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 
 func writeDefaultMutableConfig(
 	repo *Repo,
+	defaultBlobStoreName string,
 	defaultType ids.Type,
-) (blobId interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
-	typedBlob = repo_configs.DefaultOverlay(defaultType)
+) (blobId interfaces.MarklId, typedBlob repo_config.TypedBlob, err error) {
+	typedBlob = repo_config.DefaultOverlay(defaultBlobStoreName, defaultType)
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 

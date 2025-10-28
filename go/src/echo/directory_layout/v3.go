@@ -106,7 +106,6 @@ func (layout v3) DirsGenesis() []string {
 		layout.DirObjectId(),
 		layout.DirDataIndex(),
 		layout.DirLostAndFound(),
-		layout.DirBlobStoreConfigs(),
 	}
 }
 

@@ -2,6 +2,7 @@ package blob_stores
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -203,6 +204,10 @@ func MakeBlobStore(
 		}
 
 		configNamed.Config = typedConfig
+		configNamed.Path = directory_layout.BlobStorePath{
+			Base:   filepath.Dir(config.GetConfigPath()),
+			Config: config.GetConfigPath(),
+		}
 
 		return MakeBlobStore(envDir, configNamed)
 

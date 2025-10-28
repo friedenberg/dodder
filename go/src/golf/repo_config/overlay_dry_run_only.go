@@ -1,6 +1,6 @@
 //go:build test
 
-package repo_configs
+package repo_config
 
 type DryRunOnly struct {
 	DryRun bool

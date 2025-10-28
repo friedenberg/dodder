@@ -1,4 +1,4 @@
-package repo_configs
+package repo_config
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
@@ -8,11 +8,14 @@ import (
 )
 
 type V2 struct {
-	Defaults       DefaultsV1             `toml:"defaults"`
-	FileExtensions file_extensions.TOMLV1 `toml:"file-extensions"`
-	PrintOptions   options_print.V2       `toml:"cli-output"`
-	Tools          options_tools.Options  `toml:"tools"`
+	DefaultBlobStoreName string                 `toml:"default-blob_store"`
+	Defaults             DefaultsV1             `toml:"defaults"`
+	FileExtensions       file_extensions.TOMLV1 `toml:"file-extensions"`
+	PrintOptions         options_print.V2       `toml:"cli-output"`
+	Tools                options_tools.Options  `toml:"tools"`
 }
+
+var _ ConfigOverlay2 = V2{}
 
 func (config *V2) Reset() {
 	config.FileExtensions.Reset()
@@ -46,4 +49,8 @@ func (config V2) GetPrintOptionsOverlay() options_print.Overlay {
 
 func (config V2) GetToolOptions() options_tools.Options {
 	return config.Tools
+}
+
+func (config V2) GetDefaultBlobStoreName() string {
+	return config.DefaultBlobStoreName
 }
