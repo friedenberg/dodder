@@ -159,7 +159,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 		envDir := env_dir.MakeWithXDG(
 			req,
 			req.Config.Debug,
-			blob.MakeXDG(),
+			blob.MakeXDG(req.Utility.GetName()),
 		)
 
 		envUI := env_ui.Make(

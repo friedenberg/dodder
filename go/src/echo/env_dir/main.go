@@ -98,7 +98,8 @@ func (env env) GetXDG() xdg.XDG {
 }
 
 func (env env) GetXDGForBlobStores() interfaces.DirectoryLayoutXDG {
-	return env.XDG.CloneWithUtilityName("madder")
+	xdg := env.XDG.CloneWithUtilityName("madder")
+	return xdg
 }
 
 func (env *env) SetXDG(x xdg.XDG) {

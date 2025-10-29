@@ -22,7 +22,7 @@ func (cmd *Env) MakeEnvWithOptions(
 ) env_local.Env {
 	layout := env_dir.MakeDefault(
 		req,
-		env_dir.XDGUtilityNameDodder,
+		req.Utility.GetName(),
 		req.Config.Debug,
 	)
 
@@ -43,6 +43,7 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 ) env_local.Env {
 	dir := env_dir.MakeFromXDGDotenvPath(
 		req,
+		req.Utility.GetName(),
 		req.Config,
 		xdgDotenvPath,
 	)

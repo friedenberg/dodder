@@ -41,6 +41,7 @@ func MakeDefaultNoInit(
 
 func MakeFromXDGDotenvPath(
 	context interfaces.Context,
+	utilityName string,
 	config repo_config_cli.Config,
 	xdgDotenvPath string,
 ) env {
@@ -109,6 +110,7 @@ func MakeDefaultAndInitialize(
 	} else {
 		return MakeWithHomeAndInitialize(
 			context,
+			utilityName,
 			home,
 			do,
 		)
@@ -189,12 +191,13 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 
 func MakeWithHomeAndInitialize(
 	context interfaces.Context,
+	utilityName string,
 	home string,
 	debugOptions debug.Options,
 ) (env env) {
 	env.Context = context
 
-	if err := env.beforeXDG.initialize(debugOptions, "dodder"); err != nil {
+	if err := env.beforeXDG.initialize(debugOptions, utilityName); err != nil {
 		env.Cancel(err)
 	}
 

@@ -2,7 +2,6 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -69,7 +68,6 @@ func (cmd Genesis) OnTheFirstDay(
 	}
 
 	envRepo.Genesis(cmd.BigBang)
-	defer ui.Log().Print("genesis done")
 
 	return local_working_copy.Genesis(cmd.BigBang, envRepo)
 }

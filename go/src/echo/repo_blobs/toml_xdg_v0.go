@@ -31,13 +31,15 @@ func TomlXDGV0FromXDG(xdg xdg.XDG) *TomlXDGV0 {
 	}
 }
 
-func (blob TomlXDGV0) MakeXDG() xdg.XDG {
+func (blob TomlXDGV0) MakeXDG(utilityName string) xdg.XDG {
+	// TODO fix this init to be correct
 	return xdg.XDG{
-		Data:    xdg_defaults.Data.MakeBaseEnvVar(blob.Data),
-		Config:  xdg_defaults.Config.MakeBaseEnvVar(blob.Config),
-		Cache:   xdg_defaults.Cache.MakeBaseEnvVar(blob.Cache),
-		Runtime: xdg_defaults.Runtime.MakeBaseEnvVar(blob.Runtime),
-		State:   xdg_defaults.State.MakeBaseEnvVar(blob.State),
+		UtilityName: utilityName,
+		Data:        xdg_defaults.Data.MakeBaseEnvVar(blob.Data),
+		Config:      xdg_defaults.Config.MakeBaseEnvVar(blob.Config),
+		Cache:       xdg_defaults.Cache.MakeBaseEnvVar(blob.Cache),
+		Runtime:     xdg_defaults.Runtime.MakeBaseEnvVar(blob.Runtime),
+		State:       xdg_defaults.State.MakeBaseEnvVar(blob.State),
 	}
 }
 

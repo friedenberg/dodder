@@ -43,6 +43,7 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 ) env_local.Env {
 	dir := env_dir.MakeFromXDGDotenvPath(
 		req,
+		req.Utility.GetName(),
 		req.Config,
 		xdgDotenvPath,
 	)
