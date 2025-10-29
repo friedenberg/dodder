@@ -175,24 +175,24 @@ func writeDefaultMutableConfig(
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 
-	var writeCloser interfaces.BlobWriter
+	var blobWriter interfaces.BlobWriter
 
-	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
+	if blobWriter, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
 		return blobId, typedBlob, err
 	}
 
-	defer errors.DeferredCloser(&err, writeCloser)
+	defer errors.DeferredCloser(&err, blobWriter)
 
 	if _, err = coder.EncodeTo(
 		&typedBlob,
-		writeCloser,
+		blobWriter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return blobId, typedBlob, err
 	}
 
-	blobId = writeCloser.GetMarklId()
+	blobId = blobWriter.GetMarklId()
 
 	return blobId, typedBlob, err
 }

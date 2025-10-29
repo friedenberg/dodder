@@ -27,7 +27,7 @@ type Remote struct {
 	LocalWorkingCopy
 	EnvRepo
 
-	RemoteConnectionType repo.RemoteConnectionType
+	RemoteConnectionType repo.RemoteConnection
 }
 
 var _ interfaces.CommandComponentWriter = (*Remote)(nil)
@@ -62,7 +62,7 @@ func (cmd Remote) CreateRemoteObject(
 			cmd.RemoteConnectionType,
 		)
 
-	case repo.RemoteConnectionTypeNativeDotenvXDG:
+	case repo.RemoteConnectionNativeLocalOverridePath:
 		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
 
 		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
@@ -76,7 +76,7 @@ func (cmd Remote) CreateRemoteObject(
 		).Type
 		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
 
-	case repo.RemoteConnectionTypeUrl:
+	case repo.RemoteConnectionUrl:
 		url := req.PopArg("url")
 
 		remoteObject.Metadata.Type = ids.GetOrPanic(ids.TypeTomlRepoUri).Type
@@ -88,7 +88,7 @@ func (cmd Remote) CreateRemoteObject(
 
 		blob = &typedBlob
 
-	case repo.RemoteConnectionTypeStdioLocal:
+	case repo.RemoteConnectionStdioLocal:
 		path := req.PopArg("path")
 
 		remoteObject.Metadata.Type = ids.GetOrPanic(

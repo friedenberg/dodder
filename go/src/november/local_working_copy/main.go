@@ -61,12 +61,12 @@ func Make(
 		BasePath: env.GetCLIConfig().BasePath,
 	}
 
-	var repoLayout env_repo.Env
+	var envRepo env_repo.Env
 
 	{
 		var err error
 
-		if repoLayout, err = env_repo.Make(
+		if envRepo, err = env_repo.Make(
 			env,
 			layoutOptions,
 		); err != nil {
@@ -74,7 +74,7 @@ func Make(
 		}
 	}
 
-	return MakeWithEnvRepo(options, repoLayout)
+	return MakeWithEnvRepo(options, envRepo)
 }
 
 func MakeWithEnvRepo(

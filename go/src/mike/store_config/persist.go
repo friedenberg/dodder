@@ -2,7 +2,6 @@ package store_config
 
 import (
 	"encoding/gob"
-	"io"
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -50,7 +49,9 @@ func (store *store) recompileTags() (err error) {
 			err = errors.Wrapf(
 				err,
 				"Sku: %s",
-				sku.StringTaiGenreObjectIdObjectDigestBlobDigest(&ke.Transacted),
+				sku.StringTaiGenreObjectIdObjectDigestBlobDigest(
+					&ke.Transacted,
+				),
 			)
 			return err
 		}
@@ -259,18 +260,19 @@ func (store *store) flushMutableConfig(
 
 func (store *store) loadMutableConfigBlob(
 	mutableConfigType ids.Type,
-	blobSha interfaces.MarklId,
+	blobId interfaces.MarklId,
 ) (err error) {
-	var readCloser io.ReadCloser
+	var blobReader interfaces.BlobReader
 
-	if readCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
-		blobSha,
+	if blobReader, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
+		blobId,
 	); err != nil {
+		ui.Debug().PrintDebug(store.envRepo.GetXDG())
 		err = errors.Wrap(err)
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, readCloser)
+	defer errors.DeferredCloser(&err, blobReader)
 
 	typedBlob := repo_config.TypedBlob{
 		Type: mutableConfigType,
@@ -278,7 +280,7 @@ func (store *store) loadMutableConfigBlob(
 
 	if _, err = repo_config.Coder.DecodeFrom(
 		&typedBlob,
-		readCloser,
+		blobReader,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
