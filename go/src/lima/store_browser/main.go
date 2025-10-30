@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 	"code.linenisgreat.com/dodder/go/src/mike/store_config"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
@@ -212,7 +212,7 @@ func (store *Store) CheckoutOne(
 }
 
 func (store *Store) QueryCheckedOut(
-	qg *query.Query,
+	qg *queries.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// o := sku.CommitOptions{

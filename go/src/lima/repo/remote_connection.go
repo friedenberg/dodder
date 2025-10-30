@@ -32,7 +32,8 @@ func GetAllRemoteConnectionTypes() []RemoteConnection {
 
 func (tipe *RemoteConnection) GetCLICompletion() map[string]string {
 	return map[string]string{
-		"native":            "",
+		"native": "",
+		// TODO rename
 		"native-dotenv-xdg": "",
 		"none":              "",
 		"socket-unix":       "",
@@ -51,6 +52,7 @@ func (tipe *RemoteConnection) Set(value string) (err error) {
 	case "native":
 		*tipe = RemoteConnectionNative
 
+		// TODO rename
 	case "native-dotenv-xdg":
 		*tipe = RemoteConnectionNativeLocalOverridePath
 

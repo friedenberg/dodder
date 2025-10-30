@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
 )
 
@@ -201,13 +201,13 @@ func (server *Server) readMCPResourceTypes(
 ) ([]mcp.ResourceContent, error) {
 	repo := server.Repo
 
-	var queryGroup *query.Query
+	var queryGroup *queries.Query
 
 	{
 		var err error
 
 		if queryGroup, err = repo.MakeExternalQueryGroup(
-			query.BuilderOptions(),
+			queries.BuilderOptions(),
 			sku.ExternalQueryOptions{},
 			":t",
 		); err != nil {
@@ -276,13 +276,13 @@ func (server *Server) readMCPResourceObjects(
 		return server.readMCPResourceObject(object)
 	}
 
-	var queryGroup *query.Query
+	var queryGroup *queries.Query
 
 	{
 		var err error
 
 		if queryGroup, err = repo.MakeExternalQueryGroup(
-			query.BuilderOptions(
+			queries.BuilderOptions(
 			// query.BuilderOptionWorkspace{Env: repo.GetEnvWorkspace()},
 			),
 			sku.ExternalQueryOptions{},

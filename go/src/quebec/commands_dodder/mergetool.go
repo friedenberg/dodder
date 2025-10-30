@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
@@ -28,8 +28,8 @@ type Mergetool struct {
 func (cmd Mergetool) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultGenres(genres.All()...),
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)
 

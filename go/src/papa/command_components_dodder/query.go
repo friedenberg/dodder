@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
+	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )

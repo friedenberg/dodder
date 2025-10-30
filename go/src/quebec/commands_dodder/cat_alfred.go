@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/alfred_sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
@@ -50,8 +50,8 @@ func (c CatAlfred) CompletionGenres() ids.Genre {
 func (cmd CatAlfred) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultGenres(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultGenres(
 				genres.Tag,
 				genres.Type,
 				genres.Zettel,

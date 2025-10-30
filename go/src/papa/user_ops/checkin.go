@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -29,7 +29,7 @@ type Checkin struct {
 
 func (op Checkin) Run(
 	repo *local_working_copy.Repo,
-	q *query.Query,
+	q *queries.Query,
 ) (err error) {
 	var l sync.Mutex
 
@@ -79,7 +79,7 @@ func (op Checkin) Run(
 
 func (op Checkin) runOrganize(
 	repo *local_working_copy.Repo,
-	query *query.Query,
+	query *queries.Query,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{

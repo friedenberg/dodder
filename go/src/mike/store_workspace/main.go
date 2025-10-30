@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/store_workspace"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/typed_blob_store"
 )
 
@@ -75,7 +75,7 @@ type (
 		) (commitOptions sku.CommitOptions, err error)
 	}
 
-	QueryCheckedOut = query.QueryCheckedOut
+	QueryCheckedOut = queries.QueryCheckedOut
 
 	StoreLike interface {
 		Initialize(Supplies) error

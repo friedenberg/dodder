@@ -16,6 +16,8 @@ type XDG struct {
 	Home env_vars.DirectoryLayoutBaseEnvVar
 	Cwd  env_vars.DirectoryLayoutBaseEnvVar
 
+	overridePath string
+
 	UtilityName string
 
 	Data    env_vars.DirectoryLayoutBaseEnvVar
@@ -69,16 +71,24 @@ func (xdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
 	}
 }
 
-func (clone XDG) CloneWithUtilityName(
+func (xdg XDG) CloneWithUtilityName(
 	name string,
 ) interfaces.DirectoryLayoutXDG {
-	clone.setInitArgs(InitArgs{
-		Home:        clone.Home.ActualValue,
-		Cwd:         clone.Cwd.ActualValue,
+	initArgs := InitArgs{
+		Home:        xdg.Home.ActualValue,
+		Cwd:         xdg.Cwd.ActualValue,
 		UtilityName: name,
-	})
+	}
 
-	return clone
+	if xdg.overridePath != "" {
+		errors.PanicIfError(
+			xdg.InitializeOverridden(initArgs, xdg.overridePath),
+		)
+	} else {
+		errors.PanicIfError(xdg.InitializeStandardFromEnv(initArgs))
+	}
+
+	return xdg
 }
 
 func (xdg *XDG) setInitArgs(initArgs InitArgs) (err error) {
@@ -146,6 +156,8 @@ func (xdg *XDG) InitializeOverridden(
 	initArgs InitArgs,
 	overridePath string,
 ) (err error) {
+	xdg.overridePath = overridePath
+
 	if err = xdg.setInitArgs(initArgs); err != nil {
 		err = errors.Wrap(err)
 		return err

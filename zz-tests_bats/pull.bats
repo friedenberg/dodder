@@ -14,23 +14,24 @@ teardown() {
 # bats file_tags=user_story:pull,user_story:repo,user_store:xdg,user_story:remote
 
 function bootstrap_repo {
-	mkdir -p "$1"
-	pushd "$1" >/dev/null || exit 1
-	run_dodder_init
-	bootstrap_content
-	popd || exit 1
+	(
+		mkdir -p "$1"
+		pushd "$1" >/dev/null || exit 1
+		run_dodder_init
+		bootstrap_content
+	)
 }
 
 function bootstrap_repo_at_dir_with_name {
-	mkdir -p "$1"
-	pushd "$1" || exit 1
-	run_dodder_init -override-xdg-with-cwd "$1"
-	bootstrap_content
-	popd || exit 1
+	(
+		mkdir -p "$1"
+		pushd "$1" || exit 1
+		run_dodder_init -override-xdg-with-cwd "$1"
+		bootstrap_content
+	)
 }
 
 function bootstrap_content {
-
 	{
 		echo "---"
 		echo "# wow"
@@ -91,16 +92,9 @@ function try_add_new_after_pull {
 	EOM
 }
 
-function print_their_xdg() (
-	them="${1:-them}"
-	pushd "$them" >/dev/null || exit 1
-	dodder info xdg
-)
-
 function pull_history_zettel_type_tag_no_conflicts { # @test
 	them="them"
 	bootstrap_repo "$them"
-	assert_success
 
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
@@ -108,11 +102,11 @@ function pull_history_zettel_type_tag_no_conflicts { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull /them +zettel,typ,etikett
@@ -132,10 +126,6 @@ function pull_history_zettel_type_tag_no_conflicts { # @test
 
 function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 	bootstrap_repo_at_dir_with_name them
-	assert_success
-
-	pushd "$BATS_TEST_TMPDIR" || exit 1
-	export BATS_TEST_BODY=true
 
 	run_dodder_init_disable_age
 
@@ -145,7 +135,7 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-local_path-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	# TODO make this actually use a socket
@@ -167,7 +157,6 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	them="them"
 	bootstrap_repo "$them"
-	assert_success
 
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
@@ -189,11 +178,11 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull /them +zettel,typ,etikett
@@ -301,11 +290,11 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull -allow-merge-conflicts /them +zettel,typ,etikett
@@ -371,11 +360,11 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull /them +zettel,typ,etikett
@@ -433,7 +422,6 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 function pull_history_default_no_conflict { # @test
 	them="them"
 	bootstrap_repo "$them"
-	assert_success
 
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
@@ -441,11 +429,11 @@ function pull_history_default_no_conflict { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull /them
@@ -494,7 +482,7 @@ function pull_history_zettel_one_abbr { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
@@ -518,7 +506,6 @@ function pull_history_zettel_one_abbr { # @test
 function pull_history_zettels_no_conflict_no_blobs { # @test
 	them="them"
 	bootstrap_repo "$them"
-	assert_success
 
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
@@ -526,11 +513,11 @@ function pull_history_zettels_no_conflict_no_blobs { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg them) \
+		"$(realpath them)" \
 		them
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
-		\[/them @blake2b256-.+ !toml-repo-dotenv_xdg-v0]
+		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
 	EOM
 
 	run_dodder pull -exclude-blobs /them +zettel

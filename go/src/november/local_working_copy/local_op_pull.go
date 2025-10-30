@@ -4,14 +4,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/mike/remote_transfer"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(
 	remote repo.Repo,
-	qg *query.Query,
+	qg *queries.Query,
 	options repo.ImporterOptions,
 ) (err error) {
 	if err = local.pullQueryGroupFromWorkingCopy(
@@ -28,7 +28,7 @@ func (local *Repo) PullQueryGroupFromRemote(
 
 func (local *Repo) pullQueryGroupFromWorkingCopy(
 	remote repo.Repo,
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 	importerOptions repo.ImporterOptions,
 ) (err error) {
 	var list *sku.ListTransacted

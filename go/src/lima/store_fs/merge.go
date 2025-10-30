@@ -370,34 +370,37 @@ func (store *Store) GenerateConflictMarker(
 		return err
 	}
 
-	if err = item.GenerateConflictFD(); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if checkedOut.GetSkuExternal().GetGenre() == genres.Zettel {
-		var zettelId ids.ZettelId
-
-		if err = zettelId.Set(checkedOut.GetSkuExternal().GetObjectId().String()); err != nil {
+	// TODO make this section less fragile around cwd
+	{
+		if err = item.GenerateConflictFD(store.envRepo.GetCwd()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if _, err = env_dir.MakeDirIfNecessaryForStringerWithHeadAndTail(
-			zettelId,
-			store.envRepo.GetCwd(),
+		if checkedOut.GetSkuExternal().GetGenre() == genres.Zettel {
+			var zettelId ids.ZettelId
+
+			if err = zettelId.Set(checkedOut.GetSkuExternal().GetObjectId().String()); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
+			if _, err = env_dir.MakeDirIfNecessaryForStringerWithHeadAndTail(
+				zettelId,
+				store.envRepo.GetCwd(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+		}
+
+		if err = os.Rename(
+			file.Name(),
+			item.Conflict.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
-	}
-
-	if err = os.Rename(
-		file.Name(),
-		item.Conflict.GetPath(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
 	}
 
 	checkedOut.SetState(checked_out_state.Conflicted)

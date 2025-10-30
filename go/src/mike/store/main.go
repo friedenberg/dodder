@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_store"
@@ -39,7 +39,7 @@ type Store struct {
 	dormantIndex  *dormant_index.Index
 
 	protoZettel  sku.Proto
-	queryBuilder *query.Builder
+	queryBuilder *queries.Builder
 
 	ui sku.UIStorePrinters
 }
@@ -52,7 +52,7 @@ func (store *Store) Initialize(
 	envWorkspace env_workspace.Env,
 	sunrise ids.Tai,
 	envLua env_lua.Env,
-	queryBuilder *query.Builder,
+	queryBuilder *queries.Builder,
 	box *box_format.BoxTransacted,
 	typedBlobStore typed_blob_store.Stores,
 	dormantIndex *dormant_index.Index,

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
+	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )

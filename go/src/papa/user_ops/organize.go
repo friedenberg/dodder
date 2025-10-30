@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -26,7 +26,7 @@ type Organize struct {
 }
 
 func (op Organize) RunWithQueryGroup(
-	qg *query.Query,
+	qg *queries.Query,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.RWMutex
@@ -54,7 +54,7 @@ func (op Organize) RunWithQueryGroup(
 
 // TODO remove
 func (op Organize) RunWithTransacted(
-	qg *query.Query,
+	qg *queries.Query,
 	transacted sku.TransactedSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeSkuTypeSetMutable()
@@ -77,7 +77,7 @@ func (op Organize) RunWithTransacted(
 }
 
 func (op Organize) RunWithSkuType(
-	q *query.Query,
+	q *queries.Query,
 	skus sku.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	organizeResults.Original = skus
@@ -118,7 +118,7 @@ func (op Organize) RunWithSkuType(
 		),
 	}
 
-	typen := query.GetTypes(organizeResults.QueryGroup)
+	typen := queries.GetTypes(organizeResults.QueryGroup)
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Type = typen.Any()

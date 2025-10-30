@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
@@ -37,12 +37,12 @@ func (cmd *PullBlobStore) Run(
 
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultSigil(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
 			),
-			query.BuilderOptionDefaultGenres(genres.InventoryList),
+			queries.BuilderOptionDefaultGenres(genres.InventoryList),
 		),
 	)
 

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	index_ids "code.linenisgreat.com/dodder/go/src/kilo/store_abbr"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
 	"code.linenisgreat.com/dodder/go/src/lima/store_browser"
@@ -48,7 +48,7 @@ type Repo struct {
 	// TODO switch key to be workspace type
 	workspaceStores map[ids.RepoId]*env_workspace.Store
 
-	DormantCounter query.DormantCounter
+	DormantCounter queries.DormantCounter
 
 	envLua env_lua.Env
 }
@@ -85,7 +85,7 @@ func MakeWithEnvRepo(
 		config:         store_config.Make(),
 		envLocal:       envRepo,
 		envRepo:        envRepo,
-		DormantCounter: query.MakeDormantCounter(),
+		DormantCounter: queries.MakeDormantCounter(),
 	}
 
 	repo.config.Reset()
@@ -270,7 +270,7 @@ func (local *Repo) MakeObjectIdIndex() ids.Index {
 	return ids.Index{}
 }
 
-func (local *Repo) GetMatcherDormant() query.DormantCounter {
+func (local *Repo) GetMatcherDormant() queries.DormantCounter {
 	return local.DormantCounter
 }
 

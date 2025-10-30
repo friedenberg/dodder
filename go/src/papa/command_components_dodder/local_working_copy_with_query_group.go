@@ -3,7 +3,7 @@ package command_components_dodder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
@@ -21,8 +21,8 @@ func (cmd *LocalWorkingCopyWithQueryGroup) SetFlagDefinitions(f interfaces.CLIFl
 
 func (cmd LocalWorkingCopyWithQueryGroup) MakeLocalWorkingCopyAndQueryGroup(
 	req command.Request,
-	builderOptions query.BuilderOption,
-) (*local_working_copy.Repo, *query.Query) {
+	builderOptions queries.BuilderOption,
+) (*local_working_copy.Repo, *queries.Query) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(

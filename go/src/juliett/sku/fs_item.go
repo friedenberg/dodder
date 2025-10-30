@@ -189,7 +189,7 @@ func (item *FSItem) Equals(b *FSItem) (ok bool, why string) {
 	return ok, why
 }
 
-func (item *FSItem) GenerateConflictFD() (err error) {
+func (item *FSItem) GenerateConflictFD(cwd string) (err error) {
 	if item.ExternalObjectId.IsEmpty() {
 		err = errors.ErrorWithStackf(
 			"cannot generate conflict FD for empty external object id",
@@ -197,7 +197,9 @@ func (item *FSItem) GenerateConflictFD() (err error) {
 		return err
 	}
 
-	if err = item.Conflict.SetPath(item.ExternalObjectId.String() + ".conflict"); err != nil {
+	if err = item.Conflict.SetPath(
+		fmt.Sprintf("%s/%s.conflict", cwd, item.ExternalObjectId.String()),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

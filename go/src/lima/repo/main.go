@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 // TODO explore permissions for who can read / write from the inventory list
@@ -35,19 +35,19 @@ type Repo interface {
 	) error
 
 	MakeExternalQueryGroup(
-		builderOptions query.BuilderOption,
+		builderOptions queries.BuilderOption,
 		externalQueryOptions sku.ExternalQueryOptions,
 		args ...string,
-	) (qg *query.Query, err error)
+	) (qg *queries.Query, err error)
 
 	MakeInventoryList(
-		qg *query.Query,
+		qg *queries.Query,
 	) (list *sku.ListTransacted, err error)
 
 	// TODO replace with WorkingCopy
 	PullQueryGroupFromRemote(
 		remote Repo,
-		qg *query.Query,
+		qg *queries.Query,
 		options ImporterOptions,
 	) (err error)
 

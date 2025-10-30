@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 )
 
@@ -28,11 +28,11 @@ func (local *Repo) MakeOrganizeOptionsWithOrganizeMetadata(
 
 func (local *Repo) MakeOrganizeOptionsWithQueryGroup(
 	organizeFlags organize_text.Flags,
-	qg *query.Query,
+	qg *queries.Query,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
 		local.GetConfig().GetPrintOptions(),
-		query.GetTags(qg),
+		queries.GetTags(qg),
 		local.SkuFormatBoxCheckedOutNoColor(),
 		local.GetStore().GetAbbrStore().GetAbbr(),
 		sku.ObjectFactory{},

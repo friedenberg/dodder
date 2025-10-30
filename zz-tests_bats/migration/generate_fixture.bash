@@ -32,3 +32,4 @@ fi
 
 mkdir -p "$d"
 cp -r "$bats_dir/test/1/.dodder" "$d/.dodder"
+cp -r "$bats_dir/test/1/.madder" "$d/.madder"

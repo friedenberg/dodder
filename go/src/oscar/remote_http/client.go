@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/india/log_remote_inventory_lists"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -137,16 +137,16 @@ func (client *client) ImportSeq(
 }
 
 func (client *client) MakeExternalQueryGroup(
-	builderOptions query.BuilderOption,
+	builderOptions queries.BuilderOption,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
-) (qg *query.Query, err error) {
+) (qg *queries.Query, err error) {
 	err = comments.Implement()
 	return qg, err
 }
 
 func (client *client) MakeInventoryList(
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 ) (list *sku.ListTransacted, err error) {
 	var request *http.Request
 	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeId()
@@ -215,7 +215,7 @@ func (client *client) MakeInventoryList(
 
 func (client *client) PullQueryGroupFromRemote(
 	remote repo.Repo,
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 	options repo.ImporterOptions,
 ) (err error) {
 	return client.pullQueryGroupFromWorkingCopy(
@@ -227,7 +227,7 @@ func (client *client) PullQueryGroupFromRemote(
 
 func (client *client) pullQueryGroupFromWorkingCopy(
 	remote repo.Repo,
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 	options repo.ImporterOptions,
 ) (err error) {
 	var list *sku.ListTransacted

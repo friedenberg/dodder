@@ -1,30 +1,24 @@
 package local_working_copy
 
 import (
-	"sync"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 func (local *Repo) MakeInventoryList(
-	queryGroup *query.Query,
+	query *queries.Query,
 ) (list *sku.ListTransacted, err error) {
 	list = sku.MakeListTransacted()
 
-	var l sync.Mutex
-
 	if err = local.GetStore().QueryTransacted(
-		queryGroup,
-		func(sk *sku.Transacted) (err error) {
-			l.Lock()
-			defer l.Unlock()
-
-			list.Add(sk.CloneTransacted())
-
-			return err
-		},
+		query,
+		quiter.MakeSyncSerializer(
+			func(object *sku.Transacted) (err error) {
+				return list.Add(object.CloneTransacted())
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return list, err

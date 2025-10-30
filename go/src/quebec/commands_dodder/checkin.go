@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
@@ -114,10 +114,10 @@ func (cmd *Checkin) Complete(
 func (cmd Checkin) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.BuilderOptionRequireNonEmptyQuery(),
-			query.BuilderOptionDefaultSigil(ids.SigilExternal),
-			query.BuilderOptionDefaultGenres(genres.All()...),
+		queries.BuilderOptions(
+			queries.BuilderOptionRequireNonEmptyQuery(),
+			queries.BuilderOptionDefaultSigil(ids.SigilExternal),
+			queries.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)
 

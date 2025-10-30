@@ -59,9 +59,15 @@ func (local *Repo) initDefaultTypeAndConfig(
 		return err
 	}
 
+	blobStoreName := local.GetEnvRepo().GetDefaultBlobStore().GetName()
+
+	if bigBang.BlobStoreName != "" {
+		blobStoreName = bigBang.BlobStoreName
+	}
+
 	if err = local.initDefaultConfigIfNecessaryAfterLock(
 		bigBang,
-		local.GetEnvRepo().GetDefaultBlobStore().GetName(),
+		blobStoreName,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)

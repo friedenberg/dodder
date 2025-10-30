@@ -5,14 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 func (local *Repo) MakeExternalQueryGroup(
-	metaBuilder query.BuilderOption,
+	metaBuilder queries.BuilderOption,
 	externalQueryOptions sku.ExternalQueryOptions,
 	args ...string,
-) (queryGroup *query.Query, err error) {
+) (queryGroup *queries.Query, err error) {
 	builder := local.MakeQueryBuilderExcludingHidden(
 		ids.MakeGenre(),
 		metaBuilder,
@@ -31,8 +31,8 @@ func (local *Repo) MakeExternalQueryGroup(
 	return queryGroup, err
 }
 
-func (local *Repo) makeQueryBuilder() *query.Builder {
-	return query.MakeBuilder(
+func (local *Repo) makeQueryBuilder() *queries.Builder {
+	return queries.MakeBuilder(
 		local.GetEnvRepo(),
 		local.GetStore().GetTypedBlobStore(),
 		local.GetStore().GetStreamIndex(),
@@ -43,15 +43,15 @@ func (local *Repo) makeQueryBuilder() *query.Builder {
 
 func (local *Repo) MakeQueryBuilderExcludingHidden(
 	genre ids.Genre,
-	options query.BuilderOption,
-) *query.Builder {
+	options queries.BuilderOption,
+) *queries.Builder {
 	if genre.IsEmpty() {
 		genre = ids.MakeGenre(genres.Zettel)
 	}
 
-	options = query.BuilderOptions(
+	options = queries.BuilderOptions(
 		options,
-		query.BuilderOptionWorkspace(local),
+		queries.BuilderOptionWorkspace(local),
 	)
 
 	return local.makeQueryBuilder().
@@ -65,15 +65,15 @@ func (local *Repo) MakeQueryBuilderExcludingHidden(
 
 func (local *Repo) MakeQueryBuilder(
 	genress ids.Genre,
-	options query.BuilderOption,
-) *query.Builder {
+	options queries.BuilderOption,
+) *queries.Builder {
 	if genress.IsEmpty() {
 		genress = ids.MakeGenre(genres.Zettel)
 	}
 
-	options = query.BuilderOptions(
+	options = queries.BuilderOptions(
 		options,
-		query.BuilderOptionWorkspace(local),
+		queries.BuilderOptionWorkspace(local),
 	)
 
 	return local.makeQueryBuilder().

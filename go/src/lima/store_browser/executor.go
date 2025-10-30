@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 type executor struct {
 	store *Store
-	qg    *query.Query
+	qg    *queries.Query
 	out   interfaces.FuncIter[sku.SkuType]
 	co    sku.CheckedOut
 }
@@ -57,7 +57,7 @@ func (c *executor) tryToEmitOneRecognized(
 ) (err error) {
 	c.co.SetState(checked_out_state.Recognized)
 
-	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
+	if !queries.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
 		return err
 	}
 
@@ -85,7 +85,7 @@ func (c *executor) tryToEmitOneUntracked(
 ) (err error) {
 	c.co.SetState(checked_out_state.Untracked)
 
-	if !query.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
+	if !queries.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
 		return err
 	}
 
@@ -118,7 +118,7 @@ func (c *executor) tryToEmitOneCommon(
 	external.ObjectId.SetGenre(genres.Zettel)
 	external.ExternalObjectId.SetGenre(genres.Zettel)
 
-	if !query.ContainsExternalSku(c.qg, external, c.co.GetState()) {
+	if !queries.ContainsExternalSku(c.qg, external, c.co.GetState()) {
 		return err
 	}
 

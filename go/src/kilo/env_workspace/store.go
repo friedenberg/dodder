@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/mike/store_workspace"
 )
 
@@ -47,7 +47,7 @@ func (store *Store) Flush() (err error) {
 }
 
 func (store *Store) QueryCheckedOut(
-	qg *query.Query,
+	qg *queries.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	es, ok := store.StoreLike.(store_workspace.QueryCheckedOut)

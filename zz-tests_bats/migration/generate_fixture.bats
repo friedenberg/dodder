@@ -17,6 +17,13 @@ cmd_def=(
 )
 
 function generate { # @test
+	function run_dodder {
+		cmd="$1"
+		shift
+		#shellcheck disable=SC2068,SC2154
+		run timeout --preserve-status "2s" "$DODDER_BIN" "$cmd" ${cmd_dodder_def_no_debug[@]} "$@"
+	}
+
 	run_dodder info store-version
 	assert_success
 	assert_output --regexp '[0-9]+'

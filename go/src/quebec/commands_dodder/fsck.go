@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
+	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 

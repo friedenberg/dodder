@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
@@ -69,9 +69,9 @@ func (c *Clean) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (cmd Clean) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionHidden(nil),
-			query.BuilderOptionDefaultGenres(genres.All()...),
+		queries.BuilderOptions(
+			queries.BuilderOptionHidden(nil),
+			queries.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)
 
@@ -115,7 +115,7 @@ func (cmd Clean) Run(req command.Request) {
 
 func (c Clean) runOrganize(
 	u *local_working_copy.Repo,
-	qg *query.Query,
+	qg *queries.Query,
 ) (err error) {
 	opOrganize := user_ops.Organize{
 		Repo: u,
@@ -171,7 +171,7 @@ func (c Clean) runOrganize(
 func (cmd Clean) shouldClean(
 	u *local_working_copy.Repo,
 	co sku.SkuType,
-	qg *query.Query,
+	qg *queries.Query,
 ) bool {
 	if cmd.force {
 		return true

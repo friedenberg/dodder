@@ -3,6 +3,7 @@ package env_repo
 import (
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -85,6 +86,7 @@ func (env *BlobStoreEnv) setupStores() {
 
 func (env BlobStoreEnv) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
 	if len(env.blobStores) == 0 {
+		ui.Debug().PrintDebug(env.BlobStore)
 		panic("calling GetDefaultBlobStore without any initialized blob stores")
 	}
 
@@ -103,6 +105,10 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 ) {
 	if store_version.IsCurrentVersionLessOrEqualToV10() {
 		// the immutable config contains the only blob stores's config
+		return
+	}
+
+	if bigBang.BlobStoreName != "" {
 		return
 	}
 

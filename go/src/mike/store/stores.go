@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/query"
+	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 func (store *Store) SaveBlob(el sku.ExternalLike) (err error) {

@@ -20,6 +20,7 @@ type BigBang struct {
 	ExcludeDefaultType   bool
 	ExcludeDefaultConfig bool
 	OverrideXDGWithCwd   bool
+	BlobStoreName        string
 }
 
 var _ interfaces.CommandComponentWriter = (*BigBang)(nil)
@@ -36,7 +37,9 @@ func (bigBang *BigBang) SetDefaults() {
 }
 
 // TODO switch to flagset wrapper that enforces non-empty descriptions
-func (bigBang *BigBang) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
+func (bigBang *BigBang) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 	flagSet.Var(
 		&bigBang.InventoryListType,
 		"inventory_list-type",
@@ -71,4 +74,11 @@ func (bigBang *BigBang) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions
 	if !store_version.IsCurrentVersionLessOrEqualToV10() {
 		bigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
 	}
+
+	flagSet.StringVar(
+		&bigBang.BlobStoreName,
+		"blob_store-name",
+		"",
+		"The name of the existing madder blob store to use",
+	)
 }

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/mike/store"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
@@ -43,8 +43,8 @@ func (md Revert) CompletionGenres() ids.Genre {
 func (md Revert) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := md.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultGenres(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultGenres(
 				genres.Zettel,
 				genres.Tag,
 				genres.Type,
@@ -76,7 +76,7 @@ func (md Revert) Run(dep command.Request) {
 
 func (md Revert) runRevertFromQuery(
 	u *local_working_copy.Repo,
-	eq *query.Query,
+	eq *queries.Query,
 ) (err error) {
 	if err = u.GetStore().QueryTransacted(
 		eq,

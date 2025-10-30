@@ -26,13 +26,7 @@ function deinit_force() { # @test
 		not in a dodder directory
 	EOM
 
-	# TODO determine why this dodder init is not emitting the created objects
-	run_dodder_init
-	assert_success
-	# assert_output - <<-EOM
-	# 	[!md @$(get_type_blob_sha) !toml-type-v1]
-	# 	[konfig @$(get_konfig_sha) !toml-config-v2]
-	# EOM
+	run_dodder_init -blob_store-name default test
 
 	run_dodder last
 	assert_success

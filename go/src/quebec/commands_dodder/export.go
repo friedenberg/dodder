@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
@@ -46,12 +46,12 @@ func (cmd *Export) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (cmd Export) Run(req command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultSigil(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
 			),
-			query.BuilderOptionDefaultGenres(
+			queries.BuilderOptionDefaultGenres(
 				genres.InventoryList,
 			),
 		),

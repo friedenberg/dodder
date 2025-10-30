@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
@@ -47,12 +47,12 @@ func (cmd Push) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionDefaultSigil(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultSigil(
 				ids.SigilHistory,
 				ids.SigilHidden,
 			),
-			query.BuilderOptionDefaultGenres(genres.InventoryList),
+			queries.BuilderOptionDefaultGenres(genres.InventoryList),
 		),
 		local,
 		req.PopArgs(),

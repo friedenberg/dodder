@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
@@ -45,12 +45,12 @@ func (cmd Checkout) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionPermittedSigil(ids.SigilLatest),
-			query.BuilderOptionPermittedSigil(ids.SigilHidden),
-			query.BuilderOptionRequireNonEmptyQuery(),
-			query.BuilderOptionWorkspace(repo),
-			query.BuilderOptionDefaultGenres(genres.Zettel),
+		queries.BuilderOptions(
+			queries.BuilderOptionPermittedSigil(ids.SigilLatest),
+			queries.BuilderOptionPermittedSigil(ids.SigilHidden),
+			queries.BuilderOptionRequireNonEmptyQuery(),
+			queries.BuilderOptionWorkspace(repo),
+			queries.BuilderOptionDefaultGenres(genres.Zettel),
 		),
 		repo,
 		req.PopArgs(),

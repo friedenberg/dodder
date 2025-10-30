@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
@@ -50,7 +50,7 @@ func (op Checkout) RunWithKasten(
 		ids.SigilExternal,
 	).WithRequireNonEmptyQuery()
 
-	var qg *query.Query
+	var qg *queries.Query
 
 	if qg, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
@@ -68,7 +68,7 @@ func (op Checkout) RunWithKasten(
 }
 
 func (op Checkout) RunQuery(
-	qg *query.Query,
+	qg *queries.Query,
 ) (checkedOut sku.SkuTypeSetMutable, err error) {
 	checkedOut = sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
@@ -148,9 +148,9 @@ func (op Checkout) RunQuery(
 }
 
 func (op Checkout) runOrganize(
-	qgOriginal *query.Query,
+	qgOriginal *queries.Query,
 	onCheckedOut interfaces.FuncIter[sku.SkuType],
-) (qgModified *query.Query, err error) {
+) (qgModified *queries.Query, err error) {
 	opOrganize := Organize{
 		Repo: op.Repo,
 		Metadata: organize_text.Metadata{

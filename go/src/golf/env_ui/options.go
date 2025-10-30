@@ -5,6 +5,7 @@ type OptionsGetter interface {
 }
 
 type Options struct {
-	UIFileIsStderr bool
-	IgnoreTtyState bool
+	UIFileIsStderr   bool
+	IgnoreTtyState   bool
+	UIPrintingPrefix string
 }

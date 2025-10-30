@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
@@ -137,7 +137,7 @@ func (c Changes) String() string {
 type OrganizeResults struct {
 	Before, After *Text
 	Original      sku.SkuTypeSet
-	QueryGroup    *query.Query
+	QueryGroup    *queries.Query
 }
 
 func ChangesFrom(

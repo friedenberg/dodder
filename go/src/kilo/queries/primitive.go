@@ -1,4 +1,4 @@
-package query
+package queries
 
 import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"

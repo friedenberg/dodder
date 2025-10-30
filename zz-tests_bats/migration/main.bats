@@ -38,12 +38,13 @@ function migration_validate_history { # @test
 }
 
 function migration_reindex { # @test
+	tree .madder
 	run_dodder reindex
-  assert_success
-  assert_output
+	assert_success
+	assert_output
 
 	run_dodder show +e,konfig,t,z
-  assert_success
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v2]

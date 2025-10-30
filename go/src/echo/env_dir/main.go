@@ -90,7 +90,7 @@ func (env env) GetExecPath() string {
 }
 
 func (env env) GetCwd() string {
-	return env.xdgInitArgs.Cwd
+	return env.XDG.Cwd.ActualValue
 }
 
 func (env env) GetXDG() xdg.XDG {

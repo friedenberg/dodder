@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 	"code.linenisgreat.com/dodder/go/src/papa/user_ops"
 )
@@ -74,9 +74,9 @@ func (cmd *Diff) Complete(
 func (cmd Diff) Run(dep command.Request) {
 	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
-		query.BuilderOptions(
-			query.BuilderOptionHidden(nil),
-			query.BuilderOptionDefaultGenres(genres.All()...),
+		queries.BuilderOptions(
+			queries.BuilderOptionHidden(nil),
+			queries.BuilderOptionDefaultGenres(genres.All()...),
 		),
 	)
 

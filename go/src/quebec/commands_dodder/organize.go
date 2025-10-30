@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/organize_text"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
@@ -84,7 +84,7 @@ func (cmd Organize) Complete(
 	cmd.complete.CompleteObjects(
 		req,
 		localWorkingCopy,
-		query.BuilderOptionDefaultGenres(
+		queries.BuilderOptionDefaultGenres(
 			genres.Tag,
 			genres.Type,
 		),
@@ -97,11 +97,11 @@ func (cmd *Organize) Run(req command.Request) {
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
-		query.BuilderOptions(
-			query.BuilderOptionRequireNonEmptyQuery(),
-			query.BuilderOptionWorkspace(repo),
-			query.BuilderOptionDefaultGenres(genres.Zettel),
-			query.BuilderOptionDefaultSigil(ids.SigilLatest),
+		queries.BuilderOptions(
+			queries.BuilderOptionRequireNonEmptyQuery(),
+			queries.BuilderOptionWorkspace(repo),
+			queries.BuilderOptionDefaultGenres(genres.Zettel),
+			queries.BuilderOptionDefaultSigil(ids.SigilLatest),
 		),
 		repo,
 		req.PopArgs(),
@@ -140,13 +140,13 @@ func (cmd *Organize) Run(req command.Request) {
 
 	createOrganizeFileOp.Skus = objects
 
-	types := query.GetTypes(queryGroup)
+	types := queries.GetTypes(queryGroup)
 
 	if types.Len() == 1 {
 		createOrganizeFileOp.Type = types.Any()
 	}
 
-	tags := query.GetTags(queryGroup)
+	tags := queries.GetTags(queryGroup)
 
 	if objects.Len() == 0 {
 		workspace := repo.GetEnvWorkspace()
@@ -298,7 +298,7 @@ func (c Organize) readFromVim(
 	repo *local_working_copy.Repo,
 	path string,
 	results *organize_text.Text,
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenEditor{
 		VimOptions: vim_cli_options_builder.New().

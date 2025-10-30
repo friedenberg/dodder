@@ -72,43 +72,44 @@ func MakeDefault(ctx interfaces.Context) *env {
 
 func Make(
 	context interfaces.Context,
-	kCli repo_config_cli.Config,
+	cliConfig repo_config_cli.Config,
 	options Options,
 ) *env {
-	e := &env{
+	// TODO use ui printing prefix
+	env := &env{
 		Context:   context,
 		options:   options,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
-		cliConfig: kCli,
+		cliConfig: cliConfig,
 	}
 
 	if options.UIFileIsStderr {
-		e.ui = e.err
+		env.ui = env.err
 	} else {
-		e.ui = e.out
+		env.ui = env.out
 	}
 
 	{
 		var err error
 
-		if e.debug, err = debug.MakeContext(context, kCli.Debug); err != nil {
+		if env.debug, err = debug.MakeContext(context, cliConfig.Debug); err != nil {
 			context.Cancel(err)
 		}
 	}
 
-	if kCli.Verbose && !kCli.Quiet {
+	if cliConfig.Verbose && !cliConfig.Quiet {
 		ui.SetVerbose(true)
 	} else {
 		ui.SetOutput(io.Discard)
 	}
 
-	if kCli.Todo {
+	if cliConfig.Todo {
 		ui.SetTodoOn()
 	}
 
-	return e
+	return env
 }
 
 func (env env) GetOptions() Options {

@@ -68,8 +68,7 @@ cat_yang() (
   echo "seis"
 )
 
-cmd_dodder_def=(
-  -debug no-tempdir-cleanup
+cmd_dodder_def_no_debug=(
   -abbreviate-zettel-ids=false
   -abbreviate-shas=false
   -predictable-zettel-ids
@@ -82,6 +81,13 @@ cmd_dodder_def=(
   -print-inventory_list=false
   -boxed-description=true
   -print-colors=false
+)
+
+export cmd_dodder_def_no_debug
+
+cmd_dodder_def=(
+  "${cmd_dodder_def_no_debug[@]}"
+  -debug no-tempdir-cleanup
 )
 
 export cmd_dodder_def
@@ -101,7 +107,9 @@ function copy_from_version {
   DIR="$1"
 
   rm -rf "$BATS_TEST_TMPDIR/.dodder"
+  rm -rf "$BATS_TEST_TMPDIR/.madder"
   cp -r "$DIR/migration/$DODDER_VERSION/.dodder" "$BATS_TEST_TMPDIR/.dodder"
+  cp -r "$DIR/migration/$DODDER_VERSION/.madder" "$BATS_TEST_TMPDIR/.madder"
 }
 
 # TODO remove
@@ -234,6 +242,7 @@ run_find() {
   run find . \
     -maxdepth 2 \
     ! -ipath './.dodder*' \
+    ! -ipath './.madder*' \
     ! -iname '.dodder-workspace'
 }
 

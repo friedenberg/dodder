@@ -7,16 +7,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func MakeSyncSerializer[T any](
-	wf interfaces.FuncIter[T],
-) interfaces.FuncIter[T] {
-	l := &sync.Mutex{}
+func MakeSyncSerializer[ELEMENT any](
+	funk interfaces.FuncIter[ELEMENT],
+) interfaces.FuncIter[ELEMENT] {
+	lock := &sync.Mutex{}
 
-	return func(e T) (err error) {
-		l.Lock()
-		defer l.Unlock()
+	return func(element ELEMENT) (err error) {
+		lock.Lock()
+		defer lock.Unlock()
 
-		if err = wf(e); err != nil {
+		if err = funk(element); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

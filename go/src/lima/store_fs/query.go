@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
 
 func (store *Store) QueryCheckedOut(
-	queryGroup *query.Query,
+	queryGroup *queries.Query,
 	funk interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	waitGroup := errors.MakeWaitGroupParallel()
@@ -266,11 +266,11 @@ func (store *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 }
 
 func (store *Store) makeFuncIterFilterAndApply(
-	qg *query.Query,
+	qg *queries.Query,
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	return func(co *sku.CheckedOut) (err error) {
-		if !query.ContainsExternalSku(
+		if !queries.ContainsExternalSku(
 			qg,
 			co.GetSkuExternal(),
 			co.GetState(),
@@ -293,7 +293,7 @@ type fsItemRecognized struct {
 }
 
 func (store *Store) queryUntracked(
-	qg *query.Query, // TODO use this to conditionally perform recognition
+	qg *queries.Query, // TODO use this to conditionally perform recognition
 	aco interfaces.FuncIter[any],
 ) (err error) {
 	definitelyNotCheckedOut := store.dirInfo.definitelyNotCheckedOut.Clone()

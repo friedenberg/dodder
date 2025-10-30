@@ -63,18 +63,15 @@ func (cmd Remote) CreateRemoteObject(
 		)
 
 	case repo.RemoteConnectionNativeLocalOverridePath:
-		xdgDotenvPath := req.PopArg("xdg-dotenv-path")
-
-		envLocal := cmd.MakeEnvWithXDGLayoutAndOptions(
-			req,
-			xdgDotenvPath,
-			remoteEnvRepo.GetOptions(),
-		)
+		xdgOverridePath := req.PopArg("xdg-path-override")
 
 		remoteObject.Metadata.Type = ids.GetOrPanic(
-			ids.TypeTomlRepoDotenvXdgV0,
+			ids.TypeTomlRepoLocalOverridePath,
 		).Type
-		blob = repo_blobs.TomlXDGV0FromXDG(envLocal.GetXDG())
+
+		blob = &repo_blobs.TomlLocalOverridePathV0{
+			OverridePath: xdgOverridePath,
+		}
 
 	case repo.RemoteConnectionUrl:
 		url := req.PopArg("url")
@@ -92,10 +89,10 @@ func (cmd Remote) CreateRemoteObject(
 		path := req.PopArg("path")
 
 		remoteObject.Metadata.Type = ids.GetOrPanic(
-			ids.TypeTomlRepoLocalPath,
+			ids.TypeTomlRepoLocalOverridePath,
 		).Type
-		blob = &repo_blobs.TomlLocalPathV0{
-			Path: remoteEnvRepo.AbsFromCwdOrSame(path),
+		blob = &repo_blobs.TomlLocalOverridePathV0{
+			OverridePath: remoteEnvRepo.AbsFromCwdOrSame(path),
 		}
 	}
 
@@ -173,14 +170,34 @@ func (cmd Remote) MakeRemoteFromBlob(
 			local_working_copy.OptionsEmpty,
 		)
 
-	case repo_blobs.TomlLocalPathV0:
-		remote = cmd.MakeRemoteStdioLocal(
+	case repo_blobs.TomlLocalOverridePathV0:
+		envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
 			req,
-			env,
-			blob.Path,
-			repo,
-			blob.GetPublicKey(),
+			blob.OverridePath,
+			req.Utility.GetName(),
+			req.Config.Debug,
 		)
+
+		envUIOptions := env.GetOptions()
+		envUIOptions.UIPrintingPrefix = "remote"
+
+		envUI := env_ui.Make(
+			req,
+			req.Config,
+			env.GetOptions(),
+		)
+
+		remote = local_working_copy.Make(
+			env_local.Make(envUI, envDir),
+			local_working_copy.OptionsEmpty,
+		)
+		// remote = cmd.MakeRemoteStdioLocal(
+		// 	req,
+		// 	env,
+		// 	blob.OverridePath,
+		// 	repo,
+		// 	blob.GetPublicKey(),
+		// )
 
 	// case repo.RemoteTypeStdioSSH:
 	// 	remote = cmd.MakeRemoteStdioSSH(

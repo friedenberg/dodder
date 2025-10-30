@@ -33,7 +33,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/query"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"github.com/gorilla/mux"
@@ -698,7 +698,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		}
 	}
 
-	var queryGroup *query.Query
+	var queryGroup *queries.Query
 
 	{
 		var err error
