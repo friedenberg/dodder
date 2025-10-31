@@ -39,11 +39,12 @@ func (cmd *Remote) SetFlagDefinitions(
 	cli.FlagSetVarWithCompletion(
 		flagSet,
 		&cmd.RemoteConnectionType,
-		// TODO rename to remote-connection-type?
-		"remote-type",
+		"remote-connection-type",
 	)
 }
 
+// returns a ready-to-use repo.Repo and an associated *sku.Transacted that can
+// be persisted
 func (cmd Remote) CreateRemoteObject(
 	req command.Request,
 	local *local_working_copy.Repo,
@@ -117,6 +118,7 @@ func (cmd Remote) CreateRemoteObject(
 	return remote, remoteObject
 }
 
+// returns a ready-to-use repo.Repo FROM an associated *sku.Transacted
 func (cmd Remote) MakeRemote(
 	req command.Request,
 	repo *local_working_copy.Repo,
@@ -143,6 +145,7 @@ func (cmd Remote) MakeRemote(
 	return remote
 }
 
+// returns a ready-to-use repo.Repo FROM an associated repo_blobs.Blob
 func (cmd Remote) MakeRemoteFromBlob(
 	req command.Request,
 	repo *local_working_copy.Repo,
@@ -153,6 +156,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 	// TODO transform this to match how blob_store configs are turned into
 	// objects
 	// (by using interfaces instead of concrete types)
+	// TODO use cmd.RemoteConnectionType to determine connection type
 	switch blob := blob.(type) {
 	case repo_blobs.BlobXDG:
 		envDir := env_dir.MakeWithXDG(

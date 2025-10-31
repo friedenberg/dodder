@@ -24,7 +24,7 @@ function remote_add_dotenv_xdg { # @test
 
 	run_dodder \
 		remote-add \
-		-remote-type \
+		-remote-connection-type \
 		native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
@@ -63,7 +63,7 @@ function remote_add_local_path { # @test
 
 	run_dodder \
 		remote-add \
-		-remote-type stdio-local \
+		-remote-connection-type stdio-local \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		test-repo-id-them

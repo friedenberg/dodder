@@ -98,7 +98,7 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 	)
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -136,7 +136,7 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 	bootstrap_with_content them
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -180,7 +180,7 @@ function push_history_default { # @test
 	bootstrap_without_content_xdg
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -217,7 +217,7 @@ function push_history_default_only_blobs { # @test
 	bootstrap_without_content_xdg
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -260,7 +260,7 @@ function push_default_stdio_local_once { # @test
 	bootstrap_without_content
 
 	run_dodder remote-add \
-		-remote-type stdio-local \
+		-remote-connection-type stdio-local \
 		toml-repo-local_override_path-v0 \
 		them \
 		them
@@ -292,7 +292,7 @@ function push_history_default_stdio_local_twice { # @test
 	bootstrap_without_content
 
 	run_dodder remote-add \
-		-remote-type stdio-local \
+		-remote-connection-type stdio-local \
 		toml-repo-local_override_path-v0 \
 		them \
 		them
@@ -331,7 +331,7 @@ function push_history_default_stdio_twice { # @test
 	bootstrap_without_content
 
 	run_dodder remote-add \
-		-remote-type stdio-local \
+		-remote-connection-type stdio-local \
 		toml-repo-local_override_path-v0 \
 		them \
 		them

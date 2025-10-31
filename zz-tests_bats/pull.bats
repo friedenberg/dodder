@@ -101,7 +101,7 @@ function pull_history_zettel_type_tag_no_conflicts { # @test
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -132,7 +132,7 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
-		-remote-type stdio-local \
+		-remote-connection-type stdio-local \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -181,7 +181,7 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 	EOM
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -295,7 +295,7 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -367,7 +367,7 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 	pushd "$BATS_TEST_TMPDIR" || exit 1
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -438,7 +438,7 @@ function pull_history_default_no_conflict { # @test
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
@@ -493,7 +493,7 @@ function pull_history_zettel_one_abbr { # @test
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		"$(realpath them)" \
 		them
 	assert_success
@@ -524,7 +524,7 @@ function pull_history_zettels_no_conflict_no_blobs { # @test
 	run_dodder_init_disable_age
 
 	run_dodder remote-add \
-		-remote-type native-dotenv-xdg \
+		-remote-connection-type native-dotenv-xdg \
 		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
