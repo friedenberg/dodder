@@ -99,6 +99,7 @@ function push_history_zettel_type_tag_no_conflicts { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
 	assert_success
@@ -136,6 +137,7 @@ function push_history_zettel_type_tag_yes_conflicts { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
 
@@ -179,8 +181,10 @@ function push_history_default { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -214,8 +218,10 @@ function push_history_default_only_blobs { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -255,6 +261,7 @@ function push_default_stdio_local_once { # @test
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
+		toml-repo-local_override_path-v0 \
 		them \
 		them
 	assert_success
@@ -286,8 +293,10 @@ function push_history_default_stdio_local_twice { # @test
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
+		toml-repo-local_override_path-v0 \
 		them \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -323,8 +332,10 @@ function push_history_default_stdio_twice { # @test
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
+		toml-repo-local_override_path-v0 \
 		them \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]

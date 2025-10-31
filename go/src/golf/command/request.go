@@ -76,19 +76,23 @@ func (req *Args) RemainingArgCount() int {
 	return len(req.args[req.argi:])
 }
 
-// TODO use pools?
 func PopRequestArg[
-	T interfaces.Stringer,
-	Ptr interfaces.StringerSetterPtr[T],
-](req *Args, name string) Ptr {
-	arg := req.PopArg(name)
-	var argValue T
+	VALUE interfaces.Stringer,
+	VALUE_PTR interfaces.StringerSetterPtr[VALUE],
+](req *Args, name string) VALUE_PTR {
+	var value VALUE
 
-	if err := (Ptr(&argValue)).Set(arg); err != nil {
+	PopRequestArgTo(req, name, VALUE_PTR(&value))
+
+	return &value
+}
+
+func PopRequestArgTo(req *Args, name string, value interfaces.StringerSetter) {
+	arg := req.PopArg(name)
+
+	if err := value.Set(arg); err != nil {
 		errors.ContextCancelWithBadRequestError(req, err)
 	}
-
-	return &argValue
 }
 
 func (req *Args) PopArg(name string) string {

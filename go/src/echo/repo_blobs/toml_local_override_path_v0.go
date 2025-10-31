@@ -42,3 +42,7 @@ func (config TomlLocalOverridePathV0) Equals(b TomlLocalOverridePathV0) bool {
 
 	return true
 }
+
+func (config TomlLocalOverridePathV0) IsRemote() bool {
+	return false
+}

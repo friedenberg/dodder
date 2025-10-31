@@ -89,6 +89,7 @@ function clone_history_zettel_type_tag { # @test
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
 		test-repo-id-us \
+    toml-repo-local_override_path-v0 \
 		"$(realpath ./them)" \
 		+zettel,typ,etikett
 
@@ -113,6 +114,7 @@ function clone_history_zettel_type_tag_stdio_local { # @test
 	run_clone_default_with \
 		-remote-type stdio-local \
 		test-repo-id-us \
+    toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -157,6 +159,7 @@ function clone_history_zettel_type_tag_stdio_ssh { # @test
 	run_clone_default_with \
 		-remote-type stdio-local \
 		test-repo-id-us \
+    toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -181,6 +184,7 @@ function clone_history_default_allow_conflicts { # @test
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
 		test-repo-id-us \
+    toml-repo-local_override_path-v0 \
 		"$(realpath ./them)"
 
 	assert_success

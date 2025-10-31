@@ -102,8 +102,10 @@ function pull_history_zettel_type_tag_no_conflicts { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -131,8 +133,10 @@ function pull_history_zettel_type_tag_no_conflicts_stdio_local { # @test
 
 	run_dodder remote-add \
 		-remote-type stdio-local \
-		them \
+		toml-repo-local_override_path-v0 \
+		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -178,8 +182,10 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -290,8 +296,10 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -360,8 +368,10 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -429,8 +439,10 @@ function pull_history_default_no_conflict { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -513,8 +525,10 @@ function pull_history_zettels_no_conflict_no_blobs { # @test
 
 	run_dodder remote-add \
 		-remote-type native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/them @blake2b256-.+ !toml-repo-local_override_path-v0]

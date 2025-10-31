@@ -1,80 +1,47 @@
 package repo_blobs
 
 import (
-	"bufio"
-	"io"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/toml"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/charlie/remote_connection_types"
+	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
-type Blob interface {
-	GetRepoBlob() Blob
-	GetPublicKey() interfaces.MarklId
-	// TODO
-	// GetSupportedConnectionTypes() []connection_type.Type
-}
+type (
+	Blob interface {
+		GetRepoBlob() Blob
+		GetPublicKey() interfaces.MarklId
+		IsRemote() bool
+	}
 
-type BlobMutable interface {
-	Blob
-	SetPublicKey(interfaces.MarklId)
-}
+	BlobMutable interface {
+		Blob
+		SetPublicKey(interfaces.MarklId)
+	}
 
-type TypedBlob = triple_hyphen_io.TypedBlob[*Blob]
-
-var typedCoders = map[string]interfaces.CoderBufferedReadWriter[*TypedBlob]{
-	ids.TypeTomlRepoLocalOverridePath: coderToml[TomlLocalOverridePathV0]{},
-	ids.TypeTomlRepoDotenvXdgV0:       coderToml[TomlXDGV0]{},
-	ids.TypeTomlRepoUri:               coderToml[TomlUriV0]{},
-	"":                                coderToml[TomlUriV0]{},
-}
-
-var Coder = interfaces.CoderBufferedReadWriter[*TypedBlob](
-	triple_hyphen_io.CoderTypeMap[*Blob](typedCoders),
+	BlobXDG interface {
+		Blob
+		MakeXDG(utilityName string) xdg.XDG
+	}
 )
 
-type coderToml[T Blob] struct {
-	Blob T
-}
-
-func (coder coderToml[T]) DecodeFrom(
-	subject *TypedBlob,
-	reader *bufio.Reader,
-) (n int64, err error) {
-	decoder := toml.NewDecoder(reader)
-
-	if err = decoder.Decode(&coder.Blob); err != nil {
-		if err == io.EOF {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return n, err
-		}
+func GetSupportedConnectionTypes(
+	blob Blob,
+) interfaces.SetLike[remote_connection_types.Type] {
+	if blob.IsRemote() {
+		return collections_value.MakeValueSetValue(
+			nil,
+			remote_connection_types.TypeSocketUnix,
+			remote_connection_types.TypeUrl,
+			remote_connection_types.TypeStdioSSH,
+		)
+	} else {
+		return collections_value.MakeValueSetValue(
+			nil,
+			remote_connection_types.TypeNative,
+			remote_connection_types.TypeNativeLocalOverridePath,
+			remote_connection_types.TypeSocketUnix,
+			remote_connection_types.TypeStdioLocal,
+		)
 	}
-
-	blob := Blob(coder.Blob)
-	subject.Blob = &blob
-
-	return n, err
-}
-
-func (coderToml[_]) EncodeTo(
-	subject *TypedBlob,
-	writer *bufio.Writer,
-) (n int64, err error) {
-	encoder := toml.NewEncoder(writer)
-
-	if err = encoder.Encode(subject.Blob); err != nil {
-		if err == io.EOF {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return n, err
-		}
-	}
-
-	return n, err
 }

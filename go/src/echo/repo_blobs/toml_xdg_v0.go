@@ -17,7 +17,7 @@ type TomlXDGV0 struct {
 }
 
 var (
-	_ Blob        = TomlXDGV0{}
+	_ BlobXDG     = TomlXDGV0{}
 	_ BlobMutable = &TomlXDGV0{}
 )
 
@@ -53,4 +53,8 @@ func (blob TomlXDGV0) GetPublicKey() interfaces.MarklId {
 
 func (blob *TomlXDGV0) SetPublicKey(id interfaces.MarklId) {
 	blob.PublicKey.ResetWithMarklId(id)
+}
+
+func (blob TomlXDGV0) IsRemote() bool {
+	return false
 }

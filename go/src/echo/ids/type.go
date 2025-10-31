@@ -26,21 +26,21 @@ type (
 	}
 )
 
-func MakeType(v string) (t Type, err error) {
-	if err = t.Set(v); err != nil {
+func MakeType(value string) (tipe Type, err error) {
+	if err = tipe.Set(value); err != nil {
 		err = errors.Wrap(err)
-		return t, err
+		return tipe, err
 	}
 
-	return t, err
+	return tipe, err
 }
 
-func MustType(v string) (t Type) {
-	if err := t.Set(v); err != nil {
+func MustType(value string) (tipe Type) {
+	if err := tipe.Set(value); err != nil {
 		errors.PanicIfError(err)
 	}
 
-	return t
+	return tipe
 }
 
 func (tipe Type) IsEmpty() bool {
@@ -103,20 +103,20 @@ func (tipe *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
 	return tipe.Set(v.String())
 }
 
-func (tipe *Type) Set(v string) (err error) {
-	v = strings.ToLower(strings.TrimSpace(strings.Trim(v, ".! ")))
+func (tipe *Type) Set(value string) (err error) {
+	value = strings.ToLower(strings.TrimSpace(strings.Trim(value, ".! ")))
 
-	if err = ErrOnConfig(v); err != nil {
+	if err = ErrOnConfig(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if !TagRegex.Match([]byte(v)) {
-		err = errors.ErrorWithStackf("not a valid Typ: '%s'", v)
+	if !TagRegex.Match([]byte(value)) {
+		err = errors.ErrorWithStackf("not a valid Type: '%s'", value)
 		return err
 	}
 
-	tipe.Value = v
+	tipe.Value = value
 
 	return err
 }

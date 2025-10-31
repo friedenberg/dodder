@@ -22,7 +22,14 @@ function remote_add_dotenv_xdg { # @test
 	run_dodder_init
 	popd || exit 1
 
-	run_dodder remote-add -remote-type native-dotenv-xdg "$(realpath them)" test-repo-id-them
+	run_dodder \
+		remote-add \
+		-remote-type \
+		native-dotenv-xdg \
+		toml-repo-local_override_path-v0 \
+		"$(realpath them)" \
+		test-repo-id-them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/test-repo-id-them @blake2b256-.+ !toml-repo-local_override_path-v0]
@@ -54,7 +61,13 @@ function remote_add_local_path { # @test
 		popd || exit 1
 	}
 
-	run_dodder remote-add -remote-type stdio-local them test-repo-id-them
+	run_dodder \
+		remote-add \
+		-remote-type stdio-local \
+		toml-repo-local_override_path-v0 \
+		"$(realpath them)" \
+		test-repo-id-them
+
 	assert_success
 	assert_output_unsorted --regexp - <<-'EOM'
 		\[/test-repo-id-them @blake2b256-.+ !toml-repo-local_override_path-v0]

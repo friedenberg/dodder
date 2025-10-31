@@ -30,7 +30,19 @@ func GetAllRemoteConnectionTypes() []RemoteConnection {
 	return types
 }
 
-func (tipe *RemoteConnection) GetCLICompletion() map[string]string {
+/*
+problem: there are two components of connecting to a remote:
+
+- protocol used (native, socket, stdio, etc)
+- how the remote is available and defined in the repo (the remote config type)
+
+the second determines the first
+
+in the CLI, the remote type shoudl really refer to the remote config blob type, and then the connection type will be determined by that
+
+*/
+
+func (remoteConnection *RemoteConnection) GetCLICompletion() map[string]string {
 	return map[string]string{
 		"native": "",
 		// TODO rename
@@ -44,29 +56,29 @@ func (tipe *RemoteConnection) GetCLICompletion() map[string]string {
 	}
 }
 
-func (tipe *RemoteConnection) Set(value string) (err error) {
+func (remoteConnection *RemoteConnection) Set(value string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(value)) {
 	case "", "none", "unspecified":
-		*tipe = RemoteConnectionUnspecified
+		*remoteConnection = RemoteConnectionUnspecified
 
 	case "native":
-		*tipe = RemoteConnectionNative
+		*remoteConnection = RemoteConnectionNative
 
 		// TODO rename
 	case "native-dotenv-xdg":
-		*tipe = RemoteConnectionNativeLocalOverridePath
+		*remoteConnection = RemoteConnectionNativeLocalOverridePath
 
 	case "socket-unix":
-		*tipe = RemoteConnectionSocketUnix
+		*remoteConnection = RemoteConnectionSocketUnix
 
 	case "url":
-		*tipe = RemoteConnectionUrl
+		*remoteConnection = RemoteConnectionUrl
 
 	case "stdio-local":
-		*tipe = RemoteConnectionStdioLocal
+		*remoteConnection = RemoteConnectionStdioLocal
 
 	case "stdio-ssh":
-		*tipe = RemoteConnectionStdioSSH
+		*remoteConnection = RemoteConnectionStdioSSH
 
 	default:
 		err = errors.ErrorWithStackf("unsupported remote type: %q", value)

@@ -46,3 +46,7 @@ func (a TomlUriV0) Equals(b TomlUriV0) bool {
 
 	return true
 }
+
+func (config TomlUriV0) IsRemote() bool {
+	return true
+}
