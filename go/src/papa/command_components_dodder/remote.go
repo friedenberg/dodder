@@ -132,9 +132,6 @@ func (cmd Remote) MakeRemoteFromBlob(
 ) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
 
-	// TODO transform this to match how blob_store configs are turned into
-	// objects
-	// (by using interfaces instead of concrete types)
 	// TODO use cmd.RemoteConnectionType to determine connection type
 	switch blob := blob.(type) {
 	case repo_blobs.BlobXDG:

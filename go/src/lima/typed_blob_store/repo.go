@@ -14,10 +14,10 @@ type RepoStore struct {
 }
 
 func MakeRepoStore(
-	dirLayout env_repo.Env,
+	envRepo env_repo.Env,
 ) RepoStore {
 	return RepoStore{
-		envRepo: dirLayout,
+		envRepo: envRepo,
 	}
 }
 
@@ -49,7 +49,7 @@ func (store RepoStore) ReadTypedBlob(
 		return common, n, err
 	}
 
-	common = *typedBlob.Blob
+	common = typedBlob.Blob
 
 	return common, n, err
 }
@@ -73,7 +73,7 @@ func (store RepoStore) WriteTypedBlob(
 	if n, err = repo_blobs.Coder.EncodeTo(
 		&repo_blobs.TypedBlob{
 			Type: tipe,
-			Blob: &blob,
+			Blob: blob,
 		},
 		bufferedWriter,
 	); err != nil {
