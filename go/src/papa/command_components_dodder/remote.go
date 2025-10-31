@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/remote_connection_types"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/repo_blobs"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -22,11 +21,10 @@ import (
 )
 
 type Remote struct {
-	Env
+	RemoteRepoBlobs
 
 	InventoryLists
 	LocalWorkingCopy
-	EnvRepo
 
 	RemoteConnectionType remote_connection_types.Type
 }
@@ -45,7 +43,7 @@ func (cmd *Remote) SetFlagDefinitions(
 
 // returns a ready-to-use repo.Repo and an associated *sku.Transacted that can
 // be persisted
-func (cmd Remote) CreateRemoteObject(
+func (cmd Remote) MakeRemoteAndObject(
 	req command.Request,
 	local *local_working_copy.Repo,
 ) (remote repo.Repo, remoteObject *sku.Transacted) {
@@ -54,51 +52,19 @@ func (cmd Remote) CreateRemoteObject(
 
 	remoteObject = sku.GetTransactedPool().Get()
 
-	var blob repo_blobs.BlobMutable
-
 	command.PopRequestArgTo(
 		req.Args,
 		"remote type",
 		&remoteObject.Metadata.Type,
 	)
 
-	switch remoteObject.Metadata.Type {
-	default:
-		errors.ContextCancelWithBadRequestf(
-			req,
-			"unsupported remote type: %q",
-			remoteObject.Metadata.Type,
-		)
+	blob := cmd.CreateRemoteBlob(
+		req,
+		local,
+		remoteObject.Metadata.Type,
+	)
 
-	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).Type:
-		xdgOverridePath := req.PopArg("xdg-path-override")
-
-		blob = &repo_blobs.TomlLocalOverridePathV0{
-			OverridePath: xdgOverridePath,
-		}
-
-	case ids.GetOrPanic(ids.TypeTomlRepoUri).Type:
-		url := req.PopArg("url")
-
-		var typedBlob repo_blobs.TomlUriV0
-
-		if err := typedBlob.Uri.Set(url); err != nil {
-			errors.ContextCancelWithBadRequestf(req, "invalid url: %s", err)
-		}
-
-		blob = &typedBlob
-
-	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).Type:
-		path := req.PopArg("path")
-
-		blob = &repo_blobs.TomlLocalOverridePathV0{
-			OverridePath: remoteEnvRepo.AbsFromCwdOrSame(path),
-		}
-	}
-
-	remote = cmd.MakeRemoteFromBlob(req, local, blob.GetRepoBlob())
-	remoteConfig := remote.GetImmutableConfigPublic()
-	blob.SetPublicKey(remoteConfig.GetPublicKey())
+	remote = cmd.MakeRemoteFromBlobAndSetPublicKey(req, local, blob)
 
 	var blobId interfaces.MarklId
 
@@ -145,6 +111,19 @@ func (cmd Remote) MakeRemote(
 	return remote
 }
 
+func (cmd Remote) MakeRemoteFromBlobAndSetPublicKey(
+	req command.Request,
+	repo *local_working_copy.Repo,
+	blob repo_blobs.BlobMutable,
+) (remote repo.Repo) {
+	remote = cmd.MakeRemoteFromBlob(req, repo, blob)
+
+	remoteConfig := remote.GetImmutableConfigPublic()
+	blob.SetPublicKey(remoteConfig.GetPublicKey())
+
+	return remote
+}
+
 // returns a ready-to-use repo.Repo FROM an associated repo_blobs.Blob
 func (cmd Remote) MakeRemoteFromBlob(
 	req command.Request,
@@ -176,10 +155,10 @@ func (cmd Remote) MakeRemoteFromBlob(
 			local_working_copy.OptionsEmpty,
 		)
 
-	case repo_blobs.TomlLocalOverridePathV0:
+	case repo_blobs.BlobOverridePath:
 		envDir := env_dir.MakeWithXDGRootOverrideHomeAndInitialize(
 			req,
-			blob.OverridePath,
+			blob.GetOverridePath(),
 			req.Utility.GetName(),
 			req.Config.Debug,
 		)
@@ -221,11 +200,11 @@ func (cmd Remote) MakeRemoteFromBlob(
 	// 		local,
 	// 	)
 
-	case repo_blobs.TomlUriV0:
+	case repo_blobs.BlobUri:
 		remote = cmd.MakeRemoteUrl(
 			req,
 			env,
-			blob.Uri,
+			blob.GetUri(),
 			repo,
 		)
 

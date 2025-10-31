@@ -12,7 +12,7 @@ type TomlUriV0 struct {
 }
 
 var (
-	_ Blob        = TomlUriV0{}
+	_ BlobUri     = TomlUriV0{}
 	_ BlobMutable = &TomlUriV0{}
 )
 
@@ -49,4 +49,8 @@ func (a TomlUriV0) Equals(b TomlUriV0) bool {
 
 func (config TomlUriV0) IsRemote() bool {
 	return true
+}
+
+func (config TomlUriV0) GetUri() values.Uri {
+	return config.Uri
 }

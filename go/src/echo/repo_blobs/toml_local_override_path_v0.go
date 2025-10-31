@@ -11,8 +11,8 @@ type TomlLocalOverridePathV0 struct {
 }
 
 var (
-	_ Blob        = TomlLocalOverridePathV0{}
-	_ BlobMutable = &TomlLocalOverridePathV0{}
+	_ BlobOverridePath = TomlLocalOverridePathV0{}
+	_ BlobMutable      = &TomlLocalOverridePathV0{}
 )
 
 func (config TomlLocalOverridePathV0) GetRepoBlob() Blob {
@@ -45,4 +45,8 @@ func (config TomlLocalOverridePathV0) Equals(b TomlLocalOverridePathV0) bool {
 
 func (config TomlLocalOverridePathV0) IsRemote() bool {
 	return false
+}
+
+func (config TomlLocalOverridePathV0) GetOverridePath() string {
+	return config.OverridePath
 }

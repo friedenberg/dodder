@@ -2,6 +2,7 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/remote_connection_types"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
@@ -9,7 +10,6 @@ import (
 
 type (
 	Blob interface {
-		GetRepoBlob() Blob
 		GetPublicKey() interfaces.MarklId
 		IsRemote() bool
 	}
@@ -22,6 +22,16 @@ type (
 	BlobXDG interface {
 		Blob
 		MakeXDG(utilityName string) xdg.XDG
+	}
+
+	BlobOverridePath interface {
+		Blob
+		GetOverridePath() string
+	}
+
+	BlobUri interface {
+		Blob
+		GetUri() values.Uri
 	}
 )
 

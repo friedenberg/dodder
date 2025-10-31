@@ -45,7 +45,7 @@ func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) 
 
 func (cmd RemoteAdd) Run(req command.Request) {
 	local := cmd.MakeLocalWorkingCopy(req)
-	_, remoteObject := cmd.CreateRemoteObject(req, local)
+	_, remoteObject := cmd.MakeRemoteAndObject(req, local)
 
 	var id ids.RepoId
 

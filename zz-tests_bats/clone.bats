@@ -87,9 +87,8 @@ function clone_history_zettel_type_tag { # @test
 	bootstrap "$them"
 
 	run_clone_default_with \
-		-remote-connection-type native-dotenv-xdg \
 		test-repo-id-us \
-    toml-repo-local_override_path-v0 \
+		toml-repo-local_override_path-v0 \
 		"$(realpath ./them)" \
 		+zettel,typ,etikett
 
@@ -112,9 +111,8 @@ function clone_history_zettel_type_tag_stdio_local { # @test
 	bootstrap "$them"
 
 	run_clone_default_with \
-		-remote-connection-type stdio-local \
 		test-repo-id-us \
-    toml-repo-local_override_path-v0 \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -139,7 +137,6 @@ function clone_history_one_zettel_stdio_local { # @test
 	bootstrap "$them"
 
 	run_clone_default_with \
-		-remote-connection-type stdio-local \
 		test-repo-id-us \
 		"$(realpath them)" \
 		o/d+
@@ -157,9 +154,8 @@ function clone_history_zettel_type_tag_stdio_ssh { # @test
 	bootstrap "$them"
 
 	run_clone_default_with \
-		-remote-connection-type stdio-local \
 		test-repo-id-us \
-    toml-repo-local_override_path-v0 \
+		toml-repo-local_override_path-v0 \
 		"$(realpath them)" \
 		+zettel,typ,etikett
 
@@ -182,9 +178,8 @@ function clone_history_default_allow_conflicts { # @test
 	bootstrap "$them"
 
 	run_clone_default_with \
-		-remote-connection-type native-dotenv-xdg \
 		test-repo-id-us \
-    toml-repo-local_override_path-v0 \
+		toml-repo-local_override_path-v0 \
 		"$(realpath ./them)"
 
 	assert_success
@@ -215,7 +210,6 @@ function clone_history_zettel_type_tag_port { # @test
 
 	# shellcheck disable=SC2154
 	run_clone_default_with \
-		-remote-connection-type url \
 		test-repo-id-us \
 		"http://localhost:$port" \
 		+zettel,typ,etikett
