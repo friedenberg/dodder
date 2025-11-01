@@ -25,7 +25,7 @@ type Env interface {
 	GetCwd() string
 
 	GetXDG() xdg.XDG
-	GetXDGForBlobStores() interfaces.DirectoryLayoutXDG
+	GetXDGForBlobStores() xdg.XDG
 
 	GetExecPath() string
 	GetTempLocal() TemporaryFS
@@ -97,7 +97,7 @@ func (env env) GetXDG() xdg.XDG {
 	return env.XDG
 }
 
-func (env env) GetXDGForBlobStores() interfaces.DirectoryLayoutXDG {
+func (env env) GetXDGForBlobStores() xdg.XDG {
 	xdg := env.XDG.CloneWithUtilityName("madder")
 	return xdg
 }

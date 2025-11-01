@@ -224,7 +224,7 @@ function run_dodder_init_workspace {
 }
 
 function get_konfig_sha() {
-  echo -n "blake2b256-jdfwh0f33cz083ztr3ccmevur056qj29xsvg4w5c4prar8pjwf2svazzf8"
+  echo -n "blake2b256-n93gq4v7a9tmyca73uqaj4vzeev35f9lzemffepunl2qtdyyzn3sn7mjf3"
 }
 
 function get_type_blob_sha() {

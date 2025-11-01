@@ -5,10 +5,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 )
 
 type v3 struct {
-	xdg interfaces.DirectoryLayoutXDG
+	xdg XDG
 }
 
 var (
@@ -17,7 +18,7 @@ var (
 )
 
 func (layout *v3) initialize(
-	xdg interfaces.DirectoryLayoutXDG,
+	xdg XDG,
 ) (err error) {
 	layout.xdg = xdg
 	return err
@@ -119,4 +120,8 @@ func (layout v3) DirFirstBlobStoreInventoryLists() string {
 // TODO deprecate and remove
 func (layout v3) DirFirstBlobStoreBlobs() string {
 	panic(errors.Err405MethodNotAllowed)
+}
+
+func (layout v3) GetLocationType() blob_store_id.LocationType {
+	return layout.xdg.GetLocationType()
 }

@@ -3,11 +3,14 @@ package directory_layout
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
+	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
 
 type (
 	BlobStore interface {
+		GetLocationType() blob_store_id.LocationType
 		DirBlobStoreConfigs(p ...string) string
 		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
 	}
@@ -49,8 +52,10 @@ type (
 )
 
 type (
+	XDG = xdg.XDG
+
 	uninitializedXDG interface {
-		initialize(interfaces.DirectoryLayoutXDG) error
+		initialize(XDG) error
 	}
 
 	blobStoreUninitialized interface {
@@ -66,7 +71,7 @@ type (
 
 func MakeRepo(
 	storeVersion store_version.Version,
-	xdg interfaces.DirectoryLayoutXDG,
+	xdg XDG,
 ) (Repo, error) {
 	var repo repoUninitialized
 
@@ -88,7 +93,7 @@ func MakeRepo(
 
 func MakeBlobStore(
 	storeVersion store_version.Version,
-	xdg interfaces.DirectoryLayoutXDG,
+	xdg XDG,
 ) (BlobStore, error) {
 	var blobStore blobStoreUninitialized
 

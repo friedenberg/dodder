@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 )
 
 // TODO examine the directories and use XDG more appropriately for them
 type v2 struct {
-	xdg interfaces.DirectoryLayoutXDG
+	xdg XDG
 }
 
 var (
@@ -17,7 +18,7 @@ var (
 )
 
 func (layout *v2) initialize(
-	xdg interfaces.DirectoryLayoutXDG,
+	xdg XDG,
 ) (err error) {
 	layout.xdg = xdg
 	return err
@@ -111,4 +112,8 @@ func (layout v2) DirsGenesis() []string {
 		layout.DirBlobStoreConfigs(),
 		DirBlobStore(layout, "0"),
 	}
+}
+
+func (layout v2) GetLocationType() blob_store_id.LocationType {
+	return layout.xdg.GetLocationType()
 }

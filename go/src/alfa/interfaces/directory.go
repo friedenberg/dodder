@@ -26,6 +26,8 @@ type (
 	}
 
 	DirectoryLayoutXDG interface {
+		// GetLocationType() blob_store_id.LocationType
+
 		GetDirHome() DirectoryLayoutBaseEnvVar
 		GetDirCwd() DirectoryLayoutBaseEnvVar
 		GetDirData() DirectoryLayoutBaseEnvVar

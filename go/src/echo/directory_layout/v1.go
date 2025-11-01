@@ -2,10 +2,11 @@ package directory_layout
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 )
 
 type v1 struct {
-	interfaces.DirectoryLayoutXDG
+	XDG
 }
 
 var (
@@ -14,9 +15,9 @@ var (
 )
 
 func (layout *v1) initialize(
-	xdg interfaces.DirectoryLayoutXDG,
+	xdg XDG,
 ) (err error) {
-	layout.DirectoryLayoutXDG = xdg
+	layout.XDG = xdg
 	return err
 }
 
@@ -116,4 +117,8 @@ func (layout v1) DirsGenesis() []string {
 		layout.DirFirstBlobStoreInventoryLists(),
 		DirBlobStore(layout, "0"),
 	}
+}
+
+func (layout v1) GetLocationType() blob_store_id.LocationType {
+	return layout.XDG.GetLocationType()
 }

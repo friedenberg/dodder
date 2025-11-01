@@ -50,7 +50,10 @@ func getBlobStorePath(
 	idString string,
 ) BlobStorePath {
 	return MakeBlobStorePath(
-		blob_store_id.Make(idString),
+		blob_store_id.MakeWithLocation(
+			idString,
+			directoryLayout.GetLocationType(),
+		),
 		DirBlobStore(directoryLayout, idString),
 		DirBlobStore(directoryLayout, idString, FileNameBlobStoreConfig),
 	)

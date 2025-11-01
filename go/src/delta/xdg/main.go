@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
@@ -26,8 +27,6 @@ type XDG struct {
 	Cache   env_vars.DirectoryLayoutBaseEnvVar
 	Runtime env_vars.DirectoryLayoutBaseEnvVar
 }
-
-var _ interfaces.DirectoryLayoutXDG = XDG{}
 
 func (xdg XDG) GetDirHome() interfaces.DirectoryLayoutBaseEnvVar { return xdg.Home }
 
@@ -73,7 +72,7 @@ func (xdg XDG) AddToEnvVars(envVars interfaces.EnvVars) {
 
 func (xdg XDG) CloneWithUtilityName(
 	name string,
-) interfaces.DirectoryLayoutXDG {
+) XDG {
 	initArgs := InitArgs{
 		Home:        xdg.Home.ActualValue,
 		Cwd:         xdg.Cwd.ActualValue,
@@ -89,6 +88,14 @@ func (xdg XDG) CloneWithUtilityName(
 	}
 
 	return xdg
+}
+
+func (xdg XDG) GetLocationType() blob_store_id.LocationType {
+	if xdg.overridePath == "" {
+		return blob_store_id.LocationTypeXDG
+	} else {
+		return blob_store_id.LocationTypeOverride
+	}
 }
 
 func (xdg *XDG) setInitArgs(initArgs InitArgs) (err error) {
