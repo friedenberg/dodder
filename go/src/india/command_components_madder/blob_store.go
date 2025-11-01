@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
+	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -36,6 +37,7 @@ func (cmd *BlobStore) MakeBlobStoreFromConfigPath(
 	blobStore.Config = typedConfig
 
 	blobStore.Path = directory_layout.GetBlobStorePathForCustomPath(
+		fd.DirBaseOnly(basePath),
 		basePath,
 		configPath,
 	)
@@ -88,6 +90,7 @@ func (cmd *BlobStore) MakeBlobStoreFromIndexOrConfigPath(
 		blobStore.Config = typedConfig
 
 		blobStore.Path = directory_layout.GetBlobStorePathForCustomPath(
+			blobStoreIndexOrConfigPath,
 			basePath,
 			blobStoreIndexOrConfigPath,
 		)

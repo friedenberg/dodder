@@ -1,4 +1,4 @@
-package repo_config
+package repo_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"

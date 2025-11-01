@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
@@ -30,7 +30,7 @@ type Env interface {
 	GetWorkspaceConfigTyped() workspace_config_blobs.TypedConfig
 	GetWorkspaceConfig() workspace_config_blobs.Config
 	GetWorkspaceConfigFilePath() string
-	GetDefaults() repo_config.Defaults
+	GetDefaults() repo_configs.Defaults
 	CreateWorkspace(workspace_config_blobs.Config) (err error)
 	GetStore() *Store
 
@@ -44,7 +44,7 @@ type Env interface {
 }
 
 type Config interface {
-	repo_config.DefaultsGetter
+	repo_configs.DefaultsGetter
 	sku.Config
 	file_extensions.ConfigGetter
 }
@@ -94,7 +94,7 @@ func Make(
 
 	defaults := outputEnv.configMutable.GetDefaults()
 
-	outputEnv.defaults = repo_config.DefaultsV1{
+	outputEnv.defaults = repo_configs.DefaultsV1{
 		Type: defaults.GetDefaultType(),
 		Tags: defaults.GetDefaultTags(),
 	}
@@ -153,9 +153,9 @@ type env struct {
 	// Later, dir may be set to $PWD/.dodder-workspace by CreateWorkspace
 	dir string
 
-	configMutable repo_config.DefaultsGetter
+	configMutable repo_configs.DefaultsGetter
 	blob          workspace_config_blobs.Config
-	defaults      repo_config.DefaultsV1
+	defaults      repo_configs.DefaultsV1
 
 	storeFS *store_fs.Store
 	store   Store
@@ -234,7 +234,7 @@ func (env *env) GetWorkspaceConfig() workspace_config_blobs.Config {
 	return env.blob
 }
 
-func (env *env) GetDefaults() repo_config.Defaults {
+func (env *env) GetDefaults() repo_configs.Defaults {
 	return env.defaults
 }
 

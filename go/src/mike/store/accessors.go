@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
@@ -58,6 +58,6 @@ func (store *Store) GetStreamIndex() *stream_index.Index {
 	return store.streamIndex
 }
 
-func (store *Store) GetConfigBlobCoder() interfaces.CoderReadWriter[*repo_config.TypedBlob] {
+func (store *Store) GetConfigBlobCoder() interfaces.CoderReadWriter[*repo_configs.TypedBlob] {
 	return store.configBlobCoder
 }

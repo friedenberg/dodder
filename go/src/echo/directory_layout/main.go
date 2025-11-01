@@ -7,11 +7,6 @@ import (
 )
 
 type (
-	BlobStorePath struct {
-		Base   string
-		Config string
-	}
-
 	BlobStore interface {
 		DirBlobStoreConfigs(p ...string) string
 		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath

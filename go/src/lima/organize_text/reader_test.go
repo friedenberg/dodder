@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -75,7 +75,7 @@ func makeAssignmentLineReader() reader {
 	return reader{
 		options: Options{
 			wasMade:       true,
-			Config:        &repo_config.DryRunOnly{},
+			Config:        &repo_configs.DryRunOnly{},
 			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxCheckedOut(
 				string_format_writer.ColorOptions{},

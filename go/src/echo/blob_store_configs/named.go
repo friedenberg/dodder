@@ -1,8 +1,8 @@
 package blob_store_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
-	"code.linenisgreat.com/dodder/go/src/echo/fd"
 )
 
 type ConfigNamed struct {
@@ -10,6 +10,6 @@ type ConfigNamed struct {
 	Config TypedConfig
 }
 
-func (configNamed ConfigNamed) GetName() string {
-	return fd.Base(configNamed.Path.Base)
+func (configNamed ConfigNamed) GetId() blob_store_id.Id {
+	return configNamed.Path.GetId()
 }

@@ -29,45 +29,6 @@ func GetBlobStoreConfigPaths(
 	return configPaths
 }
 
-func GetDefaultBlobStore(
-	directoryLayout BlobStore,
-) BlobStorePath {
-	return GetBlobStorePath(
-		directoryLayout,
-		"default",
-	)
-}
-
-func getBlobStorePath(
-	directoryLayout BlobStore,
-	name string,
-) BlobStorePath {
-	return BlobStorePath{
-		Base:   DirBlobStore(directoryLayout, name),
-		Config: DirBlobStore(directoryLayout, name, FileNameBlobStoreConfig),
-	}
-}
-
-func GetBlobStorePath(
-	directoryLayout BlobStore,
-	name string,
-) BlobStorePath {
-	return getBlobStorePath(
-		directoryLayout,
-		name,
-	)
-}
-
-func GetBlobStorePathForCustomPath(
-	basePath string,
-	configPath string,
-) BlobStorePath {
-	return BlobStorePath{
-		Base:   basePath,
-		Config: configPath,
-	}
-}
-
 func PathBlobStore(
 	layout BlobStore,
 	targets ...string,

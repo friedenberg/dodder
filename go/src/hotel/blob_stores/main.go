@@ -2,10 +2,10 @@ package blob_stores
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
@@ -35,10 +35,14 @@ func MakeBlobStoresFromRepoConfig(
 		blobStores[0].Config.Type = ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigV0,
 		).Type
-		blobStores[0].Path = directory_layout.BlobStorePath{
-			Base:   directory_layout.DirBlobStore(directoryLayout, "blobs"),
-			Config: "0-default",
-		}
+		blobStores[0].Path = directory_layout.MakeBlobStorePath(
+			blob_store_id.MakeWithLocation(
+				"0-default",
+				blob_store_id.LocationTypeRemote,
+			),
+			directory_layout.DirBlobStore(directoryLayout, "blobs"),
+			"0-default",
+		)
 	} else {
 		configPaths := directory_layout.GetBlobStoreConfigPaths(ctx, directoryLayout)
 		blobStores = make([]BlobStoreInitialized, len(configPaths))
@@ -151,7 +155,7 @@ func MakeBlobStore(
 ) (store interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
-		fmt.Sprintf("(blob_store: %s) ", configNamed.Path.Config),
+		fmt.Sprintf("(blob_store: %s) ", configNamed.Path.GetConfig()),
 	)
 
 	configBlob := configNamed.Config.Blob
@@ -188,7 +192,7 @@ func MakeBlobStore(
 	case blob_store_configs.ConfigLocalHashBucketed:
 		return makeLocalHashBucketed(
 			envDir,
-			configNamed.Path.Base,
+			configNamed.Path.GetBase(),
 			config,
 		)
 
@@ -203,11 +207,14 @@ func MakeBlobStore(
 			return store, err
 		}
 
+		idString := fd.DirBaseOnly(config.GetConfigPath())
+
 		configNamed.Config = typedConfig
-		configNamed.Path = directory_layout.BlobStorePath{
-			Base:   filepath.Dir(config.GetConfigPath()),
-			Config: config.GetConfigPath(),
-		}
+		configNamed.Path = directory_layout.MakeBlobStorePath(
+			blob_store_id.Make(idString),
+			fd.Dir(config.GetConfigPath()),
+			config.GetConfigPath(),
+		)
 
 		return MakeBlobStore(envDir, configNamed)
 

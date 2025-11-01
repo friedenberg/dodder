@@ -24,8 +24,8 @@ func (cmd Init) InitBlobStore(
 	)
 
 	if err := envBlobStore.MakeDirs(
-		filepath.Dir(path.Base),
-		filepath.Dir(path.Config),
+		filepath.Dir(path.GetBase()),
+		filepath.Dir(path.GetConfig()),
 	); err != nil {
 		envBlobStore.Cancel(err)
 		return path
@@ -34,7 +34,7 @@ func (cmd Init) InitBlobStore(
 	if err := triple_hyphen_io.EncodeToFile(
 		blob_store_configs.Coder,
 		config,
-		path.Config,
+		path.GetConfig(),
 	); err != nil {
 		envBlobStore.Cancel(err)
 		return path

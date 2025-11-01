@@ -14,12 +14,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type (
-	configRepo    = repo_config.ConfigOverlay
+	configRepo    = repo_configs.ConfigOverlay
 	configGenesis = genesis_configs.ConfigPrivate
 	CLI           = repo_config_cli.Config
 

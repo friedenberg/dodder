@@ -108,13 +108,13 @@ func (env *BlobStoreEnv) writeBlobStoreConfig(
 		return
 	}
 
-	if bigBang.BlobStoreName != "" {
+	if !bigBang.BlobStoreId.IsEmpty() {
 		return
 	}
 
 	blobStoreConfigPath := directory_layout.GetDefaultBlobStore(
 		directoryLayout,
-	).Config
+	).GetConfig()
 
 	blobStoreConfigDir := filepath.Dir(blobStoreConfigPath)
 

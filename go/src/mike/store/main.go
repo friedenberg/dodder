@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/zettel_id_index"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
@@ -31,7 +31,7 @@ type Store struct {
 	Abbr               sku.IdIndex
 
 	inventoryList   *sku.OpenList
-	configBlobCoder interfaces.CoderReadWriter[*repo_config.TypedBlob]
+	configBlobCoder interfaces.CoderReadWriter[*repo_configs.TypedBlob]
 	envLua          env_lua.Env
 
 	streamIndex   *stream_index.Index
@@ -107,7 +107,7 @@ func (store *Store) Initialize(
 		store.envWorkspace.GetDefaults(),
 	)
 
-	store.configBlobCoder = repo_config.Coder
+	store.configBlobCoder = repo_configs.Coder
 
 	return err
 }

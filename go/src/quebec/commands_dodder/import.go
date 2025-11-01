@@ -82,7 +82,7 @@ func (cmd Import) Run(req command.Request) {
 		)
 
 		if cmd.RemoteBlobStore.GetBlobStore() != nil &&
-			cmd.RemoteBlobStore.Path.Base == "" {
+			cmd.RemoteBlobStore.Path.GetBase() == "" {
 			req.Cancel(errors.Errorf("missing blob store base path"))
 			return
 		}

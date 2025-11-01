@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
@@ -97,7 +97,7 @@ func (store *store) Reset() error {
 		store.config.compiled = &compiled{}
 	}
 
-	store.config.configRepo = repo_config.V1{}
+	store.config.configRepo = repo_configs.V1{}
 	store.config.ExtensionsToTypes = make(map[string]string)
 	store.config.TypesToExtensions = make(map[string]string)
 

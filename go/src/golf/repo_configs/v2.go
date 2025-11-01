@@ -1,6 +1,7 @@
-package repo_config
+package repo_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
@@ -8,11 +9,11 @@ import (
 )
 
 type V2 struct {
-	DefaultBlobStoreName string                 `toml:"default-blob_store"`
-	Defaults             DefaultsV1             `toml:"defaults"`
-	FileExtensions       file_extensions.TOMLV1 `toml:"file-extensions"`
-	PrintOptions         options_print.V2       `toml:"cli-output"`
-	Tools                options_tools.Options  `toml:"tools"`
+	DefaultBlobStoreId blob_store_id.Id       `toml:"default-blob_store"`
+	Defaults           DefaultsV1             `toml:"defaults"`
+	FileExtensions     file_extensions.TOMLV1 `toml:"file-extensions"`
+	PrintOptions       options_print.V2       `toml:"cli-output"`
+	Tools              options_tools.Options  `toml:"tools"`
 }
 
 var _ ConfigOverlay2 = V2{}
@@ -51,6 +52,6 @@ func (config V2) GetToolOptions() options_tools.Options {
 	return config.Tools
 }
 
-func (config V2) GetDefaultBlobStoreName() string {
-	return config.DefaultBlobStoreName
+func (config V2) GetDefaultBlobStoreId() blob_store_id.Id {
+	return config.DefaultBlobStoreId
 }

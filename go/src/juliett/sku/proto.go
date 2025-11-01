@@ -9,10 +9,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 )
 
-func MakeProto(defaults repo_config.Defaults) (proto Proto) {
+func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 	var tipe ids.Type
 	var tags ids.TagSet
 

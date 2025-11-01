@@ -59,7 +59,7 @@ function generate { # @test
 		! toml-config-v2
 		---
 
-		default-blob_store = 'default'
+		default-blob_store = '/default'
 
 		[defaults]
 		type = '!md'

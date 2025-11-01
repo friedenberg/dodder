@@ -3,18 +3,18 @@ package workspace_config_blobs
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 )
 
 type (
 	TypedConfig = triple_hyphen_io.TypedBlob[Config]
 
 	Config interface {
-		GetDefaults() repo_config.Defaults
+		GetDefaults() repo_configs.Defaults
 	}
 
 	ConfigWithRepo interface {
-		GetRepoConfig() repo_config.ConfigOverlay
+		GetRepoConfig() repo_configs.ConfigOverlay
 	}
 
 	ConfigTemporary interface {

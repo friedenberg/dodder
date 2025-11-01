@@ -2,6 +2,7 @@ package env_repo
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
@@ -20,7 +21,7 @@ type BigBang struct {
 	ExcludeDefaultType   bool
 	ExcludeDefaultConfig bool
 	OverrideXDGWithCwd   bool
-	BlobStoreName        string
+	BlobStoreId          blob_store_id.Id
 }
 
 var _ interfaces.CommandComponentWriter = (*BigBang)(nil)
@@ -75,10 +76,9 @@ func (bigBang *BigBang) SetFlagDefinitions(
 		bigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
 	}
 
-	flagSet.StringVar(
-		&bigBang.BlobStoreName,
-		"blob_store-name",
-		"",
+	flagSet.Var(
+		&bigBang.BlobStoreId,
+		"blob_store-id",
 		"The name of the existing madder blob store to use",
 	)
 }

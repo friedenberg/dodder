@@ -224,17 +224,10 @@ function run_dodder_init_workspace {
 }
 
 function get_konfig_sha() {
-  storeVersionCurrent="$(timeout --preserve-status "2s" "$DODDER_BIN" info "${cmd_dodder_def[@]}" store-version)"
-
-  if [[ $storeVersionCurrent -le 10 ]]; then
-    echo -n "9ad1b8f2538db1acb65265828f4f3d02064d6bef52721ce4cd6d528bc832b822"
-  else
-    echo -n "blake2b256-3fzeljm4pk3ppnvy4enqfea4y4t0nprezvpwgj4yl7r594cyfh6qklmcu2"
-  fi
+  echo -n "blake2b256-jdfwh0f33cz083ztr3ccmevur056qj29xsvg4w5c4prar8pjwf2svazzf8"
 }
 
 function get_type_blob_sha() {
-  # echo -n "b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16"
   echo -n "blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m"
 }
 

@@ -3,9 +3,10 @@ package local_working_copy
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -59,15 +60,15 @@ func (local *Repo) initDefaultTypeAndConfig(
 		return err
 	}
 
-	blobStoreName := local.GetEnvRepo().GetDefaultBlobStore().GetName()
+	blobStoreId := local.GetEnvRepo().GetDefaultBlobStore().GetId()
 
-	if bigBang.BlobStoreName != "" {
-		blobStoreName = bigBang.BlobStoreName
+	if !bigBang.BlobStoreId.IsEmpty() {
+		blobStoreId = bigBang.BlobStoreId
 	}
 
 	if err = local.initDefaultConfigIfNecessaryAfterLock(
 		bigBang,
-		blobStoreName,
+		blobStoreId,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -128,7 +129,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
-	defaultBlobStoreName string,
+	defaultBlobStoreId blob_store_id.Id,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bigBang.ExcludeDefaultConfig {
@@ -136,11 +137,11 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	}
 
 	var blobId interfaces.MarklId
-	var typedBlob repo_config.TypedBlob
+	var typedBlob repo_configs.TypedBlob
 
 	if blobId, typedBlob, err = writeDefaultMutableConfig(
 		local,
-		defaultBlobStoreName,
+		defaultBlobStoreId,
 		defaultTypeObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -174,10 +175,10 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 
 func writeDefaultMutableConfig(
 	repo *Repo,
-	defaultBlobStoreName string,
+	defaultBlobStoreId blob_store_id.Id,
 	defaultType ids.Type,
-) (blobId interfaces.MarklId, typedBlob repo_config.TypedBlob, err error) {
-	typedBlob = repo_config.DefaultOverlay(defaultBlobStoreName, defaultType)
+) (blobId interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
+	typedBlob = repo_configs.DefaultOverlay(defaultBlobStoreId, defaultType)
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 

@@ -1,6 +1,7 @@
-package repo_config
+package repo_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -26,19 +27,13 @@ type (
 
 	ConfigOverlay2 interface {
 		ConfigOverlay
-		GetDefaultBlobStoreName() string
+		GetDefaultBlobStoreId() blob_store_id.Id
 	}
 
 	Defaults interface {
 		GetDefaultType() ids.Type
 		GetDefaultTags() quiter.Slice[ids.Tag]
 	}
-)
-
-var (
-	// _ ConfigOverlay = Config{}
-	_ ConfigOverlay = V0{}
-	_ ConfigOverlay = V1{}
 )
 
 func Default(defaultType ids.Type) Config {
@@ -56,13 +51,13 @@ func Default(defaultType ids.Type) Config {
 }
 
 func DefaultOverlay(
-	defaultBlobStoreName string,
+	defaultBlobStoreId blob_store_id.Id,
 	defaultType ids.Type,
 ) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),
 		Blob: V2{
-			DefaultBlobStoreName: defaultBlobStoreName,
+			DefaultBlobStoreId: defaultBlobStoreId,
 			Defaults: DefaultsV1{
 				Type: defaultType,
 				Tags: make([]ids.Tag, 0),
@@ -78,9 +73,12 @@ func DefaultOverlay(
 	}
 }
 
-func GetDefaultBlobStoreName(config ConfigOverlay, otherwise string) string {
+func GetDefaultBlobStoreId(
+	config ConfigOverlay,
+	otherwise blob_store_id.Id,
+) blob_store_id.Id {
 	if config, ok := config.(ConfigOverlay2); ok {
-		return config.GetDefaultBlobStoreName()
+		return config.GetDefaultBlobStoreId()
 	} else {
 		return otherwise
 	}

@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type Config struct {
-	toml_v0 TypedStore[repo_config.V0, *repo_config.V0]
-	toml_v1 TypedStore[repo_config.V1, *repo_config.V1]
+	toml_v0 TypedStore[repo_configs.V0, *repo_configs.V0]
+	toml_v1 TypedStore[repo_configs.V1, *repo_configs.V1]
 }
 
 func MakeConfigStore(
@@ -23,26 +23,26 @@ func MakeConfigStore(
 		toml_v0: MakeBlobStore(
 			envRepo,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_config.V0](
+				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V0](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_config.V0, *repo_config.V0]{},
+				TomlBlobEncoder[repo_configs.V0, *repo_configs.V0]{},
 				envRepo.GetDefaultBlobStore(),
 			),
-			func(a *repo_config.V0) {
+			func(a *repo_configs.V0) {
 				a.Reset()
 			},
 		),
 		toml_v1: MakeBlobStore(
 			envRepo,
 			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_config.V1](
+				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V1](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_config.V1, *repo_config.V1]{},
+				TomlBlobEncoder[repo_configs.V1, *repo_configs.V1]{},
 				envRepo.GetDefaultBlobStore(),
 			),
-			func(a *repo_config.V1) {
+			func(a *repo_configs.V1) {
 				a.Reset()
 			},
 		),
@@ -52,11 +52,11 @@ func MakeConfigStore(
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
 	blobId interfaces.MarklId,
-) (common repo_config.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
+) (common repo_configs.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
 		store := a.toml_v0
-		var blob *repo_config.V0
+		var blob *repo_configs.V0
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (a Config) ParseTypedBlob(
 
 	case ids.TypeTomlConfigV1:
 		store := a.toml_v1
-		var blob *repo_config.V1
+		var blob *repo_configs.V1
 
 		if blob, repool, err = store.GetBlob(blobId); err != nil {
 			err = errors.Wrap(err)

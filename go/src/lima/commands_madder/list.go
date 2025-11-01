@@ -31,7 +31,7 @@ func (cmd List) Run(req command.Request) {
 		ui.Out().Printf(
 			"%d: %s: %s",
 			index,
-			fd.Base(blobStore.Path.Base),
+			fd.Base(blobStore.Path.GetBase()),
 			blobStore.GetBlobStoreDescription(),
 		)
 	}
