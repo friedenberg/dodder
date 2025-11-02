@@ -1,6 +1,8 @@
 package directory_layout
 
-import "code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
+import (
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
+)
 
 type BlobStorePath interface {
 	GetBase() string

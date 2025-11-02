@@ -9,8 +9,15 @@ import (
 )
 
 type (
+	XDG = xdg.XDG
+
+	Common interface {
+		blob_store_id.LocationTypeGetter
+		cloneUninitialized() uninitializedXDG
+	}
+
 	BlobStore interface {
-		GetLocationType() blob_store_id.LocationType
+		Common
 		DirBlobStoreConfigs(p ...string) string
 		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
 	}
@@ -52,9 +59,9 @@ type (
 )
 
 type (
-	XDG = xdg.XDG
-
 	uninitializedXDG interface {
+		BlobStore
+		Repo
 		initialize(XDG) error
 	}
 
@@ -75,7 +82,7 @@ func MakeRepo(
 ) (Repo, error) {
 	var repo repoUninitialized
 
-	if storeVersion.LessOrEqual(store_version.V10) {
+	if store_version.IsVersionLessOrEqualToV10(storeVersion) {
 		repo = &v1{}
 	} else if storeVersion.LessOrEqual(store_version.V12) {
 		repo = &v2{}
@@ -97,7 +104,7 @@ func MakeBlobStore(
 ) (BlobStore, error) {
 	var blobStore blobStoreUninitialized
 
-	if storeVersion.LessOrEqual(store_version.V10) {
+	if store_version.IsVersionLessOrEqualToV10(storeVersion) {
 		blobStore = &v1{}
 	} else if storeVersion.LessOrEqual(store_version.V11) {
 		blobStore = &v2{}
@@ -111,4 +118,15 @@ func MakeBlobStore(
 	}
 
 	return blobStore, nil
+}
+
+func CloneBlobStoreWithXDG(layout BlobStore, xdg XDG) (BlobStore, error) {
+	clone := layout.cloneUninitialized()
+
+	if err := clone.initialize(xdg); err != nil {
+		err = errors.Wrap(err)
+		return nil, err
+	}
+
+	return clone, nil
 }

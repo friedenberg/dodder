@@ -117,3 +117,7 @@ func (layout v2) DirsGenesis() []string {
 func (layout v2) GetLocationType() blob_store_id.LocationType {
 	return layout.xdg.GetLocationType()
 }
+
+func (layout v2) cloneUninitialized() uninitializedXDG {
+	return &layout
+}

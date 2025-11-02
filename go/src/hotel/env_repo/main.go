@@ -10,12 +10,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )
 
@@ -30,7 +28,7 @@ type Env struct {
 
 	lockSmith interfaces.LockSmith
 
-	directory_layout.BlobStore
+	directoryLayoutBlobStore directory_layout.BlobStore
 	directory_layout.Repo
 
 	BlobStoreEnv
@@ -95,7 +93,7 @@ func Make(
 		}
 	}
 
-	if env.BlobStore, err = directory_layout.MakeBlobStore(
+	if env.directoryLayoutBlobStore, err = directory_layout.MakeBlobStore(
 		env.GetStoreVersion(),
 		env.GetXDGForBlobStores(),
 	); err != nil {
@@ -130,11 +128,7 @@ func Make(
 	env.After(errors.MakeFuncContextFromFuncErr(envVars.Unset))
 
 	if configLoaded {
-		env.BlobStoreEnv = MakeBlobStoreEnvFromRepoConfig(
-			envLocal,
-			env.BlobStore,
-			env.GetConfigPrivate().Blob,
-		)
+		env.BlobStoreEnv = MakeBlobStoreEnv(envLocal)
 	}
 
 	return env, err
@@ -161,10 +155,6 @@ func (env Env) GetConfigPrivate() genesis_configs.TypedConfigPrivate {
 
 func (env Env) GetLockSmith() interfaces.LockSmith {
 	return env.lockSmith
-}
-
-func stringSliceJoin(s string, vs []string) []string {
-	return append([]string{s}, vs...)
 }
 
 func (env Env) ResetCache() (err error) {
@@ -196,10 +186,6 @@ func (env Env) ResetCache() (err error) {
 	return err
 }
 
-func (env Env) DataFileStoreVersion() string {
-	return env.GetXDG().Data.MakePath("version").String()
-}
-
 func (env Env) GetStoreVersion() store_version.Version {
 	if env.config.Blob == nil {
 		return store_version.VCurrent
@@ -209,33 +195,5 @@ func (env Env) GetStoreVersion() store_version.Version {
 }
 
 func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
-	storeVersion := env.GetStoreVersion()
-
-	if store_version.LessOrEqual(storeVersion, store_version.V10) {
-		return env.getV10OrLessInventoryListBlobStore()
-	} else {
-		return env.GetDefaultBlobStore()
-	}
-}
-
-func (env Env) getV10OrLessInventoryListBlobStore() interfaces.BlobStore {
-	blob := env.GetConfigPublic().Blob.(interfaces.BlobIOWrapperGetter)
-
-	if store, err := blob_stores.MakeBlobStore(
-		env,
-		blob_store_configs.ConfigNamed{
-			Config: blob_store_configs.TypedConfig{
-				Blob: blob.GetBlobIOWrapper().(blob_store_configs.Config),
-			},
-		},
-	); err != nil {
-		env.Cancel(err)
-		return nil
-	} else {
-		return store
-	}
-}
-
-func (env Env) GetBlobStoreById(id int) interfaces.BlobStore {
-	return env.blobStores[id]
+	return env.GetDefaultBlobStore()
 }

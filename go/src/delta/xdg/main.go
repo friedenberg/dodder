@@ -90,9 +90,23 @@ func (xdg XDG) CloneWithUtilityName(
 	return xdg
 }
 
+func (xdg XDG) CloneWithoutOverride() XDG {
+	xdg.overridePath = ""
+
+	initArgs := InitArgs{
+		Home:        xdg.Home.ActualValue,
+		Cwd:         xdg.Cwd.ActualValue,
+		UtilityName: xdg.UtilityName,
+	}
+
+	errors.PanicIfError(xdg.InitializeStandardFromEnv(initArgs))
+
+	return xdg
+}
+
 func (xdg XDG) GetLocationType() blob_store_id.LocationType {
 	if xdg.overridePath == "" {
-		return blob_store_id.LocationTypeXDG
+		return blob_store_id.LocationTypeXDGUser
 	} else {
 		return blob_store_id.LocationTypeOverride
 	}

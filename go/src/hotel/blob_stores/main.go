@@ -7,91 +7,26 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 	"golang.org/x/crypto/ssh"
 )
 
 var defaultBuckets = []int{2}
 
-// TODO pass in custom UI context for printing
-// TODO consolidated envDir and ctx arguments
-func MakeBlobStoresFromRepoConfig(
+func makeBlobStoreConfigs(
 	ctx interfaces.ActiveContext,
-	envDir env_dir.Env,
-	config genesis_configs.ConfigPrivate,
 	directoryLayout directory_layout.BlobStore,
-) (blobStores []BlobStoreInitialized) {
-	if store_version.LessOrEqual(config.GetStoreVersion(), store_version.V10) {
-		blobStores = make([]BlobStoreInitialized, 1)
-		blob := config.(interfaces.BlobIOWrapperGetter)
-		blobStores[0].Config.Blob = blob.GetBlobIOWrapper().(blob_store_configs.Config)
-		blobStores[0].Config.Type = ids.GetOrPanic(
-			ids.TypeTomlBlobStoreConfigV0,
-		).Type
-		blobStores[0].Path = directory_layout.MakeBlobStorePath(
-			blob_store_id.MakeWithLocation(
-				"0-default",
-				blob_store_id.LocationTypeRemote,
-			),
-			directory_layout.DirBlobStore(directoryLayout, "blobs"),
-			"0-default",
-		)
-	} else {
-		configPaths := directory_layout.GetBlobStoreConfigPaths(ctx, directoryLayout)
-		blobStores = make([]BlobStoreInitialized, len(configPaths))
-
-		for index, configPath := range configPaths {
-			blobStores[index].Path = directory_layout.GetBlobStorePath(
-				directoryLayout,
-				fd.DirBaseOnly(configPath),
-			)
-
-			if typedConfig, err := triple_hyphen_io.DecodeFromFile(
-				blob_store_configs.Coder,
-				configPath,
-			); err != nil {
-				ctx.Cancel(err)
-				return blobStores
-			} else {
-				blobStores[index].Config = typedConfig
-			}
-		}
-	}
-
-	for index, blobStore := range blobStores {
-		var err error
-
-		// TODO use sha of config to determine blob store base path
-		if blobStores[index].BlobStore, err = MakeBlobStore(
-			envDir,
-			blobStore.ConfigNamed,
-		); err != nil {
-			ctx.Cancel(err)
-			return blobStores
-		}
-	}
-
-	return blobStores
-}
-
-func MakeBlobStores(
-	ctx interfaces.ActiveContext,
-	envDir env_dir.Env,
-	directoryLayout directory_layout.BlobStore,
-) (blobStores []BlobStoreInitialized) {
+) []BlobStoreInitialized {
 	configPaths := directory_layout.GetBlobStoreConfigPaths(
 		ctx,
 		directoryLayout,
 	)
 
-	blobStores = make([]BlobStoreInitialized, len(configPaths))
+	blobStores := make([]BlobStoreInitialized, len(configPaths))
 
 	for index, configPath := range configPaths {
 		blobStores[index].Path = directory_layout.GetBlobStorePath(
@@ -110,10 +45,35 @@ func MakeBlobStores(
 		}
 	}
 
+	return blobStores
+}
+
+// TODO pass in custom UI context for printing
+// TODO consolidated envDir and ctx arguments
+func MakeBlobStores(
+	ctx interfaces.ActiveContext,
+	envDir env_dir.Env,
+	directoryLayout directory_layout.BlobStore,
+) (blobStores []BlobStoreInitialized) {
+	// based on explicit xdg (that is, may include override)
+	blobStores = makeBlobStoreConfigs(ctx, directoryLayout)
+
+	if envDir.GetXDG().GetLocationType() == blob_store_id.LocationTypeOverride {
+		if directoryLayoutForXDG, err := directory_layout.CloneBlobStoreWithXDG(
+			directoryLayout,
+			envDir.GetXDG().CloneWithoutOverride(),
+		); err != nil {
+			ctx.Cancel(err)
+			return blobStores
+		} else {
+			blobStoresForXDG := makeBlobStoreConfigs(ctx, directoryLayoutForXDG)
+			blobStores = append(blobStores, blobStoresForXDG...)
+		}
+	}
+
 	for index, blobStore := range blobStores {
 		var err error
 
-		// TODO use sha of config to determine blob store base path
 		if blobStores[index].BlobStore, err = MakeBlobStore(
 			envDir,
 			blobStore.ConfigNamed,
@@ -135,7 +95,6 @@ func MakeRemoteBlobStore(
 	{
 		var err error
 
-		// TODO use sha of config to determine blob store base path
 		if blobStore.BlobStore, err = MakeBlobStore(
 			envDir,
 			configNamed,

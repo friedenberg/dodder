@@ -3,9 +3,8 @@ package env_repo
 import (
 	"path/filepath"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
@@ -24,32 +23,6 @@ type BlobStoreEnv struct {
 	// TODO switch to primary blob store and others, and add support for v10
 	// directory layout
 	blobStores []blob_stores.BlobStoreInitialized
-}
-
-func MakeBlobStoreEnvFromRepoConfig(
-	envLocal env_local.Env,
-	directoryLayout directory_layout.BlobStore,
-	config genesis_configs.ConfigPrivate,
-) BlobStoreEnv {
-	env := BlobStoreEnv{
-		Env:       envLocal,
-		BlobStore: directoryLayout,
-	}
-
-	env.setupStoresFromRepoConfig(config)
-
-	return env
-}
-
-func (env *BlobStoreEnv) setupStoresFromRepoConfig(
-	config genesis_configs.ConfigPrivate,
-) {
-	env.blobStores = blob_stores.MakeBlobStoresFromRepoConfig(
-		env,
-		env,
-		config,
-		env.BlobStore,
-	)
 }
 
 func MakeBlobStoreEnv(
@@ -86,8 +59,12 @@ func (env *BlobStoreEnv) setupStores() {
 
 func (env BlobStoreEnv) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
 	if len(env.blobStores) == 0 {
-		ui.Debug().PrintDebug(env.BlobStore)
-		panic("calling GetDefaultBlobStore without any initialized blob stores")
+		panic(
+			errors.Errorf(
+				"calling GetDefaultBlobStore without any initialized blob stores: %#v",
+				env.BlobStore,
+			),
+		)
 	}
 
 	return env.blobStores[env.blobStoreDefaultIndex]
