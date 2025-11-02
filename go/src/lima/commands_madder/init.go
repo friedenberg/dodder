@@ -44,7 +44,6 @@ func init() {
 type Init struct {
 	tipe            ids.Type
 	blobStoreConfig blob_store_configs.ConfigMutable
-	basePath        string
 
 	command_components_madder.EnvBlobStore
 	command_components_madder.Init

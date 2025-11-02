@@ -29,6 +29,19 @@ func (TomlPointerV0) GetBlobStoreType() string {
 func (blobStoreConfig *TomlPointerV0) SetFlagDefinitions(
 	flagSet interfaces.CLIFlagDefinitions,
 ) {
+	flagSet.Var(
+		&blobStoreConfig.Id,
+		"id",
+		"another blob store's id",
+	)
+
+	flagSet.StringVar(
+		&blobStoreConfig.BasePath,
+		"base-path",
+		"",
+		"path to another blob store base directory",
+	)
+
 	flagSet.StringVar(
 		&blobStoreConfig.ConfigPath,
 		"config-path",
