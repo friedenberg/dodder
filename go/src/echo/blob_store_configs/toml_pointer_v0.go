@@ -2,11 +2,15 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type TomlPointerV0 struct {
-	ConfigPath string `toml:"config-path"`
+	Id         blob_store_id.Id `toml:"id"`
+	BasePath   string           `toml:"base-path"`
+	ConfigPath string           `toml:"config-path"`
 }
 
 var (
@@ -33,6 +37,10 @@ func (blobStoreConfig *TomlPointerV0) SetFlagDefinitions(
 	)
 }
 
-func (blobStoreConfig TomlPointerV0) GetConfigPath() string {
-	return blobStoreConfig.ConfigPath
+func (blobStoreConfig TomlPointerV0) GetPath() directory_layout.BlobStorePath {
+	return directory_layout.MakeBlobStorePath(
+		blobStoreConfig.Id,
+		blobStoreConfig.BasePath,
+		blobStoreConfig.ConfigPath,
+	)
 }

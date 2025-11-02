@@ -198,22 +198,21 @@ func MakeBlobStore(
 
 	case blob_store_configs.ConfigPointer:
 		var typedConfig triple_hyphen_io.TypedBlob[blob_store_configs.Config]
+		otherStorePath := config.GetPath()
 
 		if typedConfig, err = triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
-			config.GetConfigPath(),
+			otherStorePath.GetConfig(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return store, err
 		}
 
-		idString := fd.DirBaseOnly(config.GetConfigPath())
-
 		configNamed.Config = typedConfig
 		configNamed.Path = directory_layout.MakeBlobStorePath(
-			blob_store_id.Make(idString),
-			fd.Dir(config.GetConfigPath()),
-			config.GetConfigPath(),
+			configNamed.Path.GetId(),
+			otherStorePath.GetBase(),
+			otherStorePath.GetConfig(),
 		)
 
 		return MakeBlobStore(envDir, configNamed)

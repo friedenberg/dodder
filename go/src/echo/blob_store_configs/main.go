@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
+	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -57,7 +58,7 @@ type (
 
 	ConfigPointer interface {
 		Config
-		GetConfigPath() string
+		GetPath() directory_layout.BlobStorePath
 	}
 
 	ConfigSFTPRemotePath interface {

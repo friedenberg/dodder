@@ -3,7 +3,6 @@ package commands_madder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/echo/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 )
@@ -31,7 +30,7 @@ func (cmd List) Run(req command.Request) {
 		ui.Out().Printf(
 			"%d: %s: %s",
 			index,
-			fd.Base(blobStore.Path.GetBase()),
+			blobStore.Path.GetId(),
 			blobStore.GetBlobStoreDescription(),
 		)
 	}

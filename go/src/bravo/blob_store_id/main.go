@@ -27,9 +27,9 @@ func Make(id string) Id {
 	}
 }
 
-func MakeWithLocation(id string, location LocationType) Id {
+func MakeWithLocation(id string, location LocationTypeGetter) Id {
 	return Id{
-		location: location,
+		location: location.GetLocationType(),
 		id:       id,
 	}
 }
