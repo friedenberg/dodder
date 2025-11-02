@@ -91,6 +91,17 @@ func DirNames2(p string) interfaces.SeqError[os.DirEntry] {
 	}
 }
 
+func DirEntries(
+	dirPath string,
+) (dirEntries quiter.Slice[os.DirEntry], err error) {
+	if dirEntries, err = ReadDir(dirPath); err != nil {
+		err = errors.Wrap(err)
+		return dirEntries, err
+	}
+
+	return dirEntries, err
+}
+
 func DirNames(dirPath string) (slice quiter.Slice[string], err error) {
 	var names []os.DirEntry
 

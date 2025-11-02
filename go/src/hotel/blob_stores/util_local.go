@@ -85,14 +85,18 @@ func localAllBlobsMultihash(
 	basePath string,
 ) interfaces.SeqError[interfaces.MarklId] {
 	return func(yield func(interfaces.MarklId, error) bool) {
-		dirnames, err := files.DirNames(basePath)
+		dirEntries, err := files.DirEntries(basePath)
 		if err != nil {
 			yield(nil, errors.Wrap(err))
 			return
 		}
 
-		for _, dirname := range dirnames {
-			hashTypeId := filepath.Base(dirname)
+		for _, dirEntry := range dirEntries {
+			if !dirEntry.IsDir() {
+				continue
+			}
+
+			hashTypeId := dirEntry.Name()
 
 			if hashTypeId == "." {
 				continue
@@ -107,7 +111,10 @@ func localAllBlobsMultihash(
 				continue
 			}
 
-			seq := localAllBlobs(dirname, hashType)
+			seq := localAllBlobs(
+				filepath.Join(basePath, dirEntry.Name()),
+				hashType,
+			)
 
 			for id, err := range seq {
 				if !yield(id, err) {

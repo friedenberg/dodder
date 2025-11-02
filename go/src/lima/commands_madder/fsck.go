@@ -1,6 +1,7 @@
 package commands_madder
 
 import (
+	"fmt"
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -29,20 +30,13 @@ func (cmd Fsck) Run(req command.Request) {
 
 	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
 
-	// TODO output TAP
-	ui.Out().Print("Blob Stores:")
-
 	for _, blobStore := range blobStores {
-		ui.Out().Printf("%s", blobStore.Path.GetConfig())
-	}
-
-	ui.Out().Print()
-
-	for _, blobStore := range blobStores {
-		ui.Out().Printf(
-			"Verification for %s in progress...",
-			blobStore.GetBlobStoreDescription(),
+		printer := ui.MakePrefixPrinter(
+			ui.Err(),
+			fmt.Sprintf("(blob_store: %s)", blobStore.Path.GetId()),
 		)
+
+		printer.Print("starting fsck...")
 
 		var count int
 		var progressWriter env_ui.ProgressWriter
@@ -95,7 +89,7 @@ func (cmd Fsck) Run(req command.Request) {
 				}
 			},
 			func(time time.Time) {
-				ui.Out().Printf(
+				printer.Printf(
 					"%d blobs / %s verified, %d errors",
 					*countSuccessPtr,
 					progressWriter.GetWrittenHumanString(),
@@ -108,12 +102,15 @@ func (cmd Fsck) Run(req command.Request) {
 			return
 		}
 
-		ui.Out().Printf("blobs verified: %d", count)
-		ui.Out().Printf(
+		printer.Printf("blobs verified: %d", count)
+		printer.Printf(
 			"blob bytes verified: %s",
 			progressWriter.GetWrittenHumanString(),
 		)
 
 		command_components_madder.PrintBlobErrors(envBlobStore, blobErrors)
+
+		printer.Print("finished fsck")
+		ui.Out().Print()
 	}
 }
