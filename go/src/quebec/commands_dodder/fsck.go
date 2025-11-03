@@ -101,7 +101,14 @@ func (cmd Fsck) runVerification(
 		func(ctx interfaces.Context) {
 			for object, errIter := range seq {
 				if errIter != nil {
-					objectErrors.Append(objectError{err: errIter})
+					err := objectError{err: errIter}
+
+					if object != nil {
+						err.object = object.CloneTransacted()
+					}
+
+					objectErrors.Append(err)
+
 					return
 				}
 
@@ -145,10 +152,7 @@ func (cmd Fsck) runVerification(
 	ui.Out().Printf("objects with errors: %d", len(objectErrors))
 
 	for _, objectError := range objectErrors {
-		ui.Out().Printf(
-			"%s: %s",
-			sku.StringMetadataTaiMerkle(objectError.object),
-			objectError.err,
-		)
+		ui.Out().Printf("%s:", sku.StringMetadataTaiMerkle(objectError.object))
+		ui.CLIErrorTreeEncoder.EncodeTo(objectError.err, ui.Out())
 	}
 }
