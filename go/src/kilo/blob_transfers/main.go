@@ -15,7 +15,7 @@ import (
 func MakeBlobImporter(
 	envRepo env_repo.BlobStoreEnv,
 	src blob_stores.BlobStoreInitialized,
-	dsts ...blob_stores.BlobStoreInitialized,
+	dsts blob_stores.BlobStoreMap,
 ) BlobImporter {
 	return BlobImporter{
 		EnvBlobStore: envRepo,
@@ -28,7 +28,7 @@ type BlobImporter struct {
 	EnvBlobStore           env_repo.BlobStoreEnv
 	CopierDelegate         interfaces.FuncIter[sku.BlobCopyResult]
 	Src                    blob_stores.BlobStoreInitialized
-	Dsts                   []blob_stores.BlobStoreInitialized
+	Dsts                   blob_stores.BlobStoreMap
 	UseDestinationHashType bool
 
 	Counts Counts

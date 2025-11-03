@@ -24,7 +24,7 @@ func (client *client) GetBlobStore() blob_stores.BlobStoreInitialized {
 			Path: directory_layout.MakeBlobStorePath(
 				blob_store_id.MakeWithLocation(
 					"remote",
-					blob_store_id.LocationTypeRemote,
+					blob_store_id.LocationTypeUnknown,
 				),
 				"",
 				"remote",

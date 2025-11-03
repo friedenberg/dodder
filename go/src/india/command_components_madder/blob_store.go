@@ -1,9 +1,8 @@
 package command_components_madder
 
 import (
-	"strconv"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/fd"
@@ -57,7 +56,7 @@ func (cmd *BlobStore) MakeBlobStoreFromConfigPath(
 	return blobStore
 }
 
-func (cmd *BlobStore) MakeBlobStoreFromIndexOrConfigPath(
+func (cmd *BlobStore) MakeBlobStoreFromIdOrConfigPath(
 	envBlobStore env_repo.BlobStoreEnv,
 	basePath string,
 	blobStoreIndexOrConfigPath string,
@@ -79,7 +78,7 @@ func (cmd *BlobStore) MakeBlobStoreFromIndexOrConfigPath(
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
-					goto tryBlobStoreIndex
+					goto tryBlobStoreId
 				} else {
 					envBlobStore.Cancel(err)
 					return blobStore
@@ -110,52 +109,33 @@ func (cmd *BlobStore) MakeBlobStoreFromIndexOrConfigPath(
 		return blobStore
 	}
 
-tryBlobStoreIndex:
-	return cmd.MakeBlobStoreFromIndex(envBlobStore, blobStoreIndexOrConfigPath)
+tryBlobStoreId:
+	return cmd.MakeBlobStoreFromIdString(envBlobStore, blobStoreIndexOrConfigPath)
 
 tryDefaultBlobStore:
 	return envBlobStore.GetDefaultBlobStore()
 }
 
-func (cmd *BlobStore) MakeBlobStoreFromIndex(
+func (cmd *BlobStore) MakeBlobStoreFromIdString(
 	envBlobStore env_repo.BlobStoreEnv,
-	blobStoreIndexString string,
+	blobStoreIdString string,
 ) (blobStore blob_stores.BlobStoreInitialized) {
-	var blobStoreIndex int
+	var blobStoreId blob_store_id.Id
 
-	{
-		var err error
-
-		if blobStoreIndex, err = strconv.Atoi(blobStoreIndexString); err != nil {
-			envBlobStore.Cancel(err)
-			return blobStore
-		}
-	}
-
-	blobStores := envBlobStore.GetBlobStores()
-
-	if len(blobStores)-1 < blobStoreIndex {
-		errors.ContextCancelWithBadRequestf(
-			envBlobStore,
-			"invalid blob store index: %d. Valid indexes: 0-%d",
-			blobStoreIndex,
-			len(blobStores)-1,
-		)
-
+	if err := blobStoreId.Set(blobStoreIdString); err != nil {
+		envBlobStore.Cancel(err)
 		return blobStore
 	}
 
-	blobStore = envBlobStore.GetBlobStores()[blobStoreIndex]
-
-	return blobStore
+	return envBlobStore.GetBlobStore(blobStoreId)
 }
 
-func (cmd BlobStore) MakeBlobStoresFromIndexesOrAll(
+func (cmd BlobStore) MakeBlobStoresFromIdsOrAll(
 	req command.Request,
 	envBlobStore env_repo.BlobStoreEnv,
-) []blob_stores.BlobStoreInitialized {
+) blob_stores.BlobStoreMap {
 	blobStores := make(
-		[]blob_stores.BlobStoreInitialized,
+		blob_stores.BlobStoreMap,
 		req.RemainingArgCount(),
 	)
 
@@ -163,9 +143,15 @@ func (cmd BlobStore) MakeBlobStoresFromIndexesOrAll(
 		return envBlobStore.GetBlobStores()
 	}
 
-	for i := range blobStores {
-		blobStoreIndex := req.PopArg("blob store index")
-		blobStores[i] = cmd.MakeBlobStoreFromIndex(envBlobStore, blobStoreIndex)
+	for range req.RemainingArgCount() {
+		blobStoreId := command.PopRequestArg[blob_store_id.Id](
+			req.Args,
+			"blob store id",
+		)
+
+		blobStores[blobStoreId.String()] = envBlobStore.GetBlobStore(
+			*blobStoreId,
+		)
 	}
 
 	return blobStores

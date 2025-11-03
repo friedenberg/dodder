@@ -108,7 +108,7 @@ func (xdg XDG) GetLocationType() blob_store_id.LocationType {
 	if xdg.overridePath == "" {
 		return blob_store_id.LocationTypeXDGUser
 	} else {
-		return blob_store_id.LocationTypeOverride
+		return blob_store_id.LocationTypeCwd
 	}
 }
 

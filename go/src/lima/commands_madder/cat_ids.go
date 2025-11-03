@@ -29,7 +29,7 @@ func (cmd CatIds) CompletionGenres() ids.Genre {
 func (cmd CatIds) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
+	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
 
 	var blobErrors quiter.Slice[command_components_madder.BlobError]
 

@@ -51,7 +51,7 @@ func (cmd *PullBlobStore) Run(
 		PrintCopies:    true,
 	}
 
-	importerOptions.RemoteBlobStore = cmd.MakeBlobStoreFromIndexOrConfigPath(
+	importerOptions.RemoteBlobStore = cmd.MakeBlobStoreFromIdOrConfigPath(
 		localWorkingCopy.GetEnvRepo().GetEnvBlobStore(),
 		blobStoreBasePath,
 		blobStoreConfigPath,

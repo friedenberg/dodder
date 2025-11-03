@@ -13,14 +13,17 @@ func GetBlobStoreConfigPaths(
 	ctx interfaces.ActiveContext,
 	directoryLayout BlobStore,
 ) []string {
+	globPattern := DirBlobStore(
+		directoryLayout,
+		fmt.Sprintf("*/%s", FileNameBlobStoreConfig),
+	)
+
 	var configPaths []string
 
 	{
 		var err error
 
-		if configPaths, err = filepath.Glob(
-			DirBlobStore(directoryLayout, fmt.Sprintf("*/%s", FileNameBlobStoreConfig)),
-		); err != nil {
+		if configPaths, err = filepath.Glob(globPattern); err != nil {
 			ctx.Cancel(err)
 			return configPaths
 		}

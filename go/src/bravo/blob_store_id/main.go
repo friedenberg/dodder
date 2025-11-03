@@ -62,6 +62,14 @@ func (id *Id) Set(value string) (err error) {
 	return err
 }
 
+func (id Id) Less(otherId Id) bool {
+	if id.location < otherId.location {
+		return true
+	}
+
+	return id.id < otherId.id
+}
+
 func (id Id) MarshalText() ([]byte, error) {
 	return []byte(id.String()), nil
 }

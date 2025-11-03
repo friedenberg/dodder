@@ -61,6 +61,4 @@ func OutputCliCompletions(
 	}
 
 	envLocal.Must(errors.MakeFuncContextFromFuncErr(waitGroup.GetError))
-
-	return
 }

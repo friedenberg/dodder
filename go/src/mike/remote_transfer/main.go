@@ -62,7 +62,7 @@ func Make(
 	importer.blobImporter = blob_transfers.MakeBlobImporter(
 		envRepo.GetEnvBlobStore(),
 		importer.remoteBlobStore,
-		envRepo.GetDefaultBlobStore(),
+		blob_stores.MakeBlobStoreMap(envRepo.GetDefaultBlobStore()),
 	)
 
 	importer.blobImporter.CopierDelegate = importer.blobCopierDelegate

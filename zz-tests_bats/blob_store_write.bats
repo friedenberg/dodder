@@ -37,7 +37,7 @@ function write_blob_one_file { # @test
 	assert_success
 	assert_output "$(printf "%s\n" wow)"
 
-	run_dodder blob_store-cat-ids
+	run_dodder blob_store-cat-ids .default
 	assert_success
 	assert_output --partial "blake2b256-40mtcwggatwwql4pp9ty93nyugn3r3ppvzs48uza0ze9zltneh3qez5yrs"
 }

@@ -79,7 +79,7 @@ func GetBlobStorePathForCustomPath(
 	return MakeBlobStorePath(
 		blob_store_id.MakeWithLocation(
 			idString,
-			blob_store_id.LocationTypeRemote,
+			blob_store_id.LocationTypeUnknown,
 		),
 		basePath,
 		configPath,

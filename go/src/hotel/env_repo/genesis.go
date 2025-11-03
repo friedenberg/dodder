@@ -58,7 +58,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 
 	env.writeInventoryListLog()
 	env.writeConfig(bigBang)
-	env.writeBlobStoreConfig(bigBang, env.directoryLayoutBlobStore)
+	env.writeBlobStoreConfigIfNecessary(bigBang, env.directoryLayoutBlobStore)
 
 	if err := ohio.CopyFileLines(
 		bigBang.Yin,

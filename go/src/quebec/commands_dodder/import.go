@@ -5,11 +5,13 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
@@ -25,10 +27,13 @@ func init() {
 type Import struct {
 	command_components_dodder.LocalWorkingCopy
 	command_components_madder.BlobStore
+	command_components_madder.Complete
 
 	repo.ImporterOptions
 
-	sku.Proto
+	Proto sku.Proto
+
+	BlobStoreId blob_store_id.Id
 }
 
 var _ interfaces.CommandComponentWriter = (*Import)(nil)
@@ -38,12 +43,16 @@ func (cmd *Import) SetFlagDefinitions(
 ) {
 	cmd.ImporterOptions.SetFlagDefinitions(flagDefinitions)
 	cmd.Proto.SetFlagDefinitions(flagDefinitions)
+
+	flagDefinitions.Var(
+		cmd.Complete.GetFlagValueBlobIds(&cmd.BlobStoreId),
+		"blob_store-id",
+		"The name of the existing madder blob store to use",
+	)
 }
 
 func (cmd Import) Run(req command.Request) {
 	inventoryListPath := req.PopArg("inventory_list-path")
-	blobStoreBasePath := req.PopArg("blob_store-base-path")
-	blobStoreConfigPath := req.PopArg("blob_store-config-path")
 
 	local := cmd.MakeLocalWorkingCopy(req)
 
@@ -74,18 +83,27 @@ func (cmd Import) Run(req command.Request) {
 	cmd.DedupingFormatId = markl.PurposeV5MetadataDigestWithoutTai
 	cmd.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
 
-	if blobStoreConfigPath != "" {
-		cmd.RemoteBlobStore = cmd.MakeBlobStoreFromConfigPath(
-			local.GetEnvRepo().GetEnvBlobStore(),
-			blobStoreBasePath,
-			blobStoreConfigPath,
-		)
+	if cmd.BlobStoreId.IsEmpty() {
+		blobStoreBasePath := req.PopArg("blob_store-base-path")
+		blobStoreConfigPath := req.PopArg("blob_store-config-path")
 
-		if cmd.RemoteBlobStore.GetBlobStore() != nil &&
-			cmd.RemoteBlobStore.Path.GetBase() == "" {
-			req.Cancel(errors.Errorf("missing blob store base path"))
-			return
+		if blobStoreConfigPath != "" {
+			cmd.RemoteBlobStore = cmd.MakeBlobStoreFromConfigPath(
+				local.GetEnvRepo().GetEnvBlobStore(),
+				blobStoreBasePath,
+				blobStoreConfigPath,
+			)
+
+			if cmd.RemoteBlobStore.GetBlobStore() != nil &&
+				cmd.RemoteBlobStore.Path.GetBase() == "" {
+				req.Cancel(errors.Errorf("missing blob store base path"))
+				return
+			}
 		}
+	} else {
+		cmd.RemoteBlobStore = local.GetEnvRepo().GetEnvBlobStore().GetBlobStore(
+			cmd.BlobStoreId,
+		)
 	}
 
 	var afterDecoding func(*sku.Transacted) error
@@ -93,7 +111,7 @@ func (cmd Import) Run(req command.Request) {
 	blobImporter := blob_transfers.MakeBlobImporter(
 		local.GetEnvRepo().GetEnvBlobStore(),
 		cmd.RemoteBlobStore,
-		local.GetBlobStore(),
+		blob_stores.MakeBlobStoreMap(local.GetBlobStore()),
 	)
 
 	blobImporter.UseDestinationHashType = true

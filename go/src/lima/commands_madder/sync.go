@@ -45,7 +45,7 @@ func (cmd Sync) Run(req command.Request) {
 
 func (cmd Sync) runAllStores(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
-	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
+	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
 
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
@@ -59,13 +59,12 @@ func (cmd Sync) runAllStores(req command.Request) {
 		return
 	}
 
-	primary := blobStores[0]
-	blobStores = blobStores[1:]
+	primary, blobStores := envBlobStore.GetDefaultBlobStoreAndRemaining()
 
 	blobImporter := blob_transfers.MakeBlobImporter(
 		envBlobStore,
 		primary,
-		blobStores...,
+		blobStores,
 	)
 
 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(

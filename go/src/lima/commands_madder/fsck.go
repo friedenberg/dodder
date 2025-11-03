@@ -28,7 +28,7 @@ type Fsck struct {
 func (cmd Fsck) Run(req command.Request) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 
-	blobStores := cmd.MakeBlobStoresFromIndexesOrAll(req, envBlobStore)
+	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
 
 	for _, blobStore := range blobStores {
 		printer := ui.MakePrefixPrinter(

@@ -2,6 +2,7 @@ package blob_stores
 
 import (
 	"fmt"
+	"maps"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
@@ -17,22 +18,39 @@ import (
 
 var defaultBuckets = []int{2}
 
+type BlobStoreMap = map[string]BlobStoreInitialized
+
+func MakeBlobStoreMap(blobStores ...BlobStoreInitialized) BlobStoreMap {
+	output := make(BlobStoreMap, len(blobStores))
+
+	for _, blobStore := range blobStores {
+		blobStoreIdString := blobStore.Path.GetId().String()
+		output[blobStoreIdString] = blobStore
+	}
+
+	return output
+}
+
 func makeBlobStoreConfigs(
 	ctx interfaces.ActiveContext,
 	directoryLayout directory_layout.BlobStore,
-) []BlobStoreInitialized {
+) BlobStoreMap {
 	configPaths := directory_layout.GetBlobStoreConfigPaths(
 		ctx,
 		directoryLayout,
 	)
 
-	blobStores := make([]BlobStoreInitialized, len(configPaths))
+	blobStores := make(BlobStoreMap, len(configPaths))
 
-	for index, configPath := range configPaths {
-		blobStores[index].Path = directory_layout.GetBlobStorePath(
+	for _, configPath := range configPaths {
+		blobStorePath := directory_layout.GetBlobStorePath(
 			directoryLayout,
 			fd.DirBaseOnly(configPath),
 		)
+
+		blobStoreIdString := blobStorePath.GetId().String()
+		blobStore := blobStores[blobStoreIdString]
+		blobStore.Path = blobStorePath
 
 		if typedConfig, err := triple_hyphen_io.DecodeFromFile(
 			blob_store_configs.Coder,
@@ -41,8 +59,10 @@ func makeBlobStoreConfigs(
 			ctx.Cancel(err)
 			return blobStores
 		} else {
-			blobStores[index].Config = typedConfig
+			blobStore.Config = typedConfig
 		}
+
+		blobStores[blobStoreIdString] = blobStore
 	}
 
 	return blobStores
@@ -54,33 +74,37 @@ func MakeBlobStores(
 	ctx interfaces.ActiveContext,
 	envDir env_dir.Env,
 	directoryLayout directory_layout.BlobStore,
-) (blobStores []BlobStoreInitialized) {
+) (blobStores BlobStoreMap) {
 	// based on explicit xdg (that is, may include override)
 	blobStores = makeBlobStoreConfigs(ctx, directoryLayout)
 
-	if envDir.GetXDG().GetLocationType() == blob_store_id.LocationTypeOverride {
-		if directoryLayoutForXDG, err := directory_layout.CloneBlobStoreWithXDG(
+	// If we're in an override directory, add the User blob stores
+	if envDir.GetXDG().GetLocationType() == blob_store_id.LocationTypeCwd {
+		if directoryLayoutForUser, err := directory_layout.CloneBlobStoreWithXDG(
 			directoryLayout,
-			envDir.GetXDG().CloneWithoutOverride(),
+			envDir.GetXDGForBlobStores().CloneWithoutOverride(),
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
 		} else {
-			blobStoresForXDG := makeBlobStoreConfigs(ctx, directoryLayoutForXDG)
-			blobStores = append(blobStores, blobStoresForXDG...)
+			blobStoresForXDG := makeBlobStoreConfigs(ctx, directoryLayoutForUser)
+			maps.Insert(blobStores, maps.All(blobStoresForXDG))
 		}
 	}
 
-	for index, blobStore := range blobStores {
+	for blobStoreIdString := range blobStores {
+		blobStore := blobStores[blobStoreIdString]
 		var err error
 
-		if blobStores[index].BlobStore, err = MakeBlobStore(
+		if blobStore.BlobStore, err = MakeBlobStore(
 			envDir,
 			blobStore.ConfigNamed,
 		); err != nil {
 			ctx.Cancel(err)
 			return blobStores
 		}
+
+		blobStores[blobStoreIdString] = blobStore
 	}
 
 	return blobStores

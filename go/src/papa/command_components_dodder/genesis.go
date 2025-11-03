@@ -2,18 +2,21 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 )
 
 type Genesis struct {
 	env_repo.BigBang
 	LocalWorkingCopy
+	command_components_madder.Complete
 }
 
 var _ interfaces.CommandComponentWriter = (*Genesis)(nil)
@@ -21,7 +24,46 @@ var _ interfaces.CommandComponentWriter = (*Genesis)(nil)
 func (cmd *Genesis) SetFlagDefinitions(
 	flagSet interfaces.CLIFlagDefinitions,
 ) {
-	cmd.BigBang.SetFlagDefinitions(flagSet)
+	flagSet.Var(
+		&cmd.BigBang.InventoryListType,
+		"inventory_list-type",
+		"the type that will be used when creating inventory lists for this repo",
+	)
+
+	flagSet.BoolVar(
+		&cmd.BigBang.OverrideXDGWithCwd,
+		"override-xdg-with-cwd",
+		false,
+		"don't use XDG for this repo, and instead use the CWD and make a `.dodder` directory",
+	)
+
+	flagSet.StringVar(
+		&cmd.BigBang.Yin,
+		"yin",
+		"",
+		"File containing list of zettel id left parts",
+	)
+
+	flagSet.StringVar(
+		&cmd.BigBang.Yang,
+		"yang",
+		"",
+		"File containing list of zettel id right parts",
+	)
+
+	cmd.BigBang.SetDefaults()
+
+	cmd.BigBang.GenesisConfig.Blob.SetFlagDefinitions(flagSet)
+
+	if !store_version.IsCurrentVersionLessOrEqualToV10() {
+		cmd.BigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
+	}
+
+	flagSet.Var(
+		cmd.Complete.GetFlagValueBlobIds(&cmd.BlobStoreId),
+		"blob_store-id",
+		"The name of the existing madder blob store to use",
+	)
 }
 
 func (cmd Genesis) OnTheFirstDay(

@@ -41,13 +41,13 @@ func (cmd InfoRepo) Run(req command.Request) {
 
 	case 2:
 		blobStoreIndex := req.PopArg("blob store index")
-		blobStore = cmd.MakeBlobStoreFromIndex(env, blobStoreIndex)
+		blobStore = cmd.MakeBlobStoreFromIdString(env, blobStoreIndex)
 
 		keys = []string{req.PopArg("blob store config key")}
 
 	default:
 		blobStoreIndex := req.PopArg("blob store index")
-		blobStore = cmd.MakeBlobStoreFromIndex(env, blobStoreIndex)
+		blobStore = cmd.MakeBlobStoreFromIdString(env, blobStoreIndex)
 		keys = req.PopArgs()
 	}
 

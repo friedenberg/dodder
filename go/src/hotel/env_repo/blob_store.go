@@ -1,9 +1,13 @@
 package env_repo
 
 import (
+	"maps"
 	"path/filepath"
+	"slices"
+	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
@@ -16,13 +20,13 @@ type BlobStoreEnv struct {
 	directory_layout.BlobStore
 	env_local.Env
 
-	blobStoreDefaultIndex int
+	defaultBlobStoreIdString string
 
 	// TODO switch to implementing LocalBlobStore directly and writing to all of
 	// the defined blob stores instead of having a default
 	// TODO switch to primary blob store and others, and add support for v10
 	// directory layout
-	blobStores []blob_stores.BlobStoreInitialized
+	blobStores map[string]blob_stores.BlobStoreInitialized
 }
 
 func MakeBlobStoreEnv(
@@ -55,6 +59,15 @@ func (env *BlobStoreEnv) setupStores() {
 		env,
 		env.BlobStore,
 	)
+
+	keys := slices.Collect(maps.Keys(env.blobStores))
+
+	if len(keys) == 0 {
+		return
+	}
+
+	sort.Strings(keys)
+	env.defaultBlobStoreIdString = keys[0]
 }
 
 func (env BlobStoreEnv) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
@@ -67,16 +80,43 @@ func (env BlobStoreEnv) GetDefaultBlobStore() blob_stores.BlobStoreInitialized {
 		)
 	}
 
-	return env.blobStores[env.blobStoreDefaultIndex]
+	return env.blobStores[env.defaultBlobStoreIdString]
 }
 
-func (env BlobStoreEnv) GetBlobStores() []blob_stores.BlobStoreInitialized {
-	blobStores := make([]blob_stores.BlobStoreInitialized, len(env.blobStores))
-	copy(blobStores, env.blobStores)
+func (env BlobStoreEnv) GetBlobStores() blob_stores.BlobStoreMap {
+	blobStores := maps.Clone(env.blobStores)
 	return blobStores
 }
 
-func (env *BlobStoreEnv) writeBlobStoreConfig(
+func (env BlobStoreEnv) GetBlobStoresSorted() []blob_stores.BlobStoreInitialized {
+	blobStores := slices.Collect(maps.Values(env.blobStores))
+	sort.Slice(blobStores, func(i, j int) bool {
+		return blobStores[i].Path.GetId().Less(blobStores[j].Path.GetId())
+	})
+	return blobStores
+}
+
+func (env BlobStoreEnv) GetBlobStore(
+	blobStoreId blob_store_id.Id,
+) blob_stores.BlobStoreInitialized {
+	return env.blobStores[blobStoreId.String()]
+}
+
+func (env BlobStoreEnv) GetDefaultBlobStoreAndRemaining() (blob_stores.BlobStoreInitialized, blob_stores.BlobStoreMap) {
+	defaultBlobStore := env.GetDefaultBlobStore()
+	remaining := env.GetBlobStores()
+
+	maps.DeleteFunc(
+		remaining,
+		func(idString string, _ blob_stores.BlobStoreInitialized) bool {
+			return idString == env.defaultBlobStoreIdString
+		},
+	)
+
+	return defaultBlobStore, remaining
+}
+
+func (env *BlobStoreEnv) writeBlobStoreConfigIfNecessary(
 	bigBang BigBang,
 	directoryLayout directory_layout.BlobStore,
 ) {

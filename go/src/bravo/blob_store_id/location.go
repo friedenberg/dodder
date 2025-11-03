@@ -17,6 +17,13 @@ type (
 	location int
 )
 
+const (
+	LocationTypeUnknown = location(iota)
+	LocationTypeCwd
+	LocationTypeXDGUser
+	LocationTypeXDGSystem
+)
+
 var (
 	_ LocationTypeGetter = location(0)
 	_ LocationType       = location(0)
@@ -35,10 +42,10 @@ func (location *location) SetPrefix(firstChar rune) (err error) {
 		*location = LocationTypeXDGUser
 
 	case '.':
-		*location = LocationTypeOverride
+		*location = LocationTypeCwd
 
 	case '_':
-		*location = LocationTypeRemote
+		*location = LocationTypeUnknown
 
 	default:
 		err = errors.Errorf(
@@ -60,21 +67,13 @@ func (location location) GetPrefix() rune {
 	case LocationTypeXDGUser:
 		return '~'
 
-	case LocationTypeOverride:
+	case LocationTypeCwd:
 		return '.'
 
-	case LocationTypeRemote:
+	case LocationTypeUnknown:
 		return '_'
 
 	default:
 		panic(errors.Errorf("unsupported location type: %q", location))
 	}
 }
-
-const (
-	LocationTypeUnknown = location(iota)
-	LocationTypeXDGSystem
-	LocationTypeXDGUser
-	LocationTypeOverride
-	LocationTypeRemote
-)
