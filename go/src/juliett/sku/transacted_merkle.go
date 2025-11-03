@@ -245,19 +245,22 @@ func (transacted *Transacted) Verify() (err error) {
 	pubKey := transacted.Metadata.GetRepoPubKey()
 
 	if err = markl.AssertIdIsNotNull(
-		pubKey); err != nil {
+		pubKey,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest()); err != nil {
+		transacted.Metadata.GetObjectDigest(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectSig()); err != nil {
+		transacted.Metadata.GetObjectSig(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -6,16 +6,37 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 )
+
+func (store *Store) All(
+	query *queries.Query,
+) interfaces.SeqError[*sku.Transacted] {
+	return func(yield func(*sku.Transacted, error) bool) {
+		store.QueryTransacted(
+			query,
+			quiter.MakeSyncSerializer(
+				func(object *sku.Transacted) (err error) {
+					if !yield(object, nil) {
+						err = errors.MakeErrStopIteration()
+						return err
+					}
+
+					return err
+				},
+			),
+		)
+	}
+}
 
 // TODO make iterator
 func (store *Store) QueryPrimitive(
 	group sku.PrimitiveQueryGroup,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	executor := pkg_query.MakeExecutorPrimitive(
+	executor := queries.MakeExecutorPrimitive(
 		group,
 		store.GetStreamIndex().ReadPrimitiveQuery,
 		store.ReadOneInto,
@@ -31,10 +52,10 @@ func (store *Store) QueryPrimitive(
 
 // TODO make iterator
 func (store *Store) QueryTransacted(
-	group *pkg_query.Query,
+	group *queries.Query,
 	funcIter interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var executor pkg_query.Executor
+	var executor queries.Executor
 
 	if executor, err = store.makeQueryExecutor(group); err != nil {
 		err = errors.Wrap(err)
@@ -69,10 +90,10 @@ func (store *Store) QueryTransacted(
 
 // TODO make iterator
 func (store *Store) QueryTransactedAsSkuType(
-	query *pkg_query.Query,
+	query *queries.Query,
 	funcIter interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	var executor pkg_query.Executor
+	var executor queries.Executor
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
@@ -89,10 +110,10 @@ func (store *Store) QueryTransactedAsSkuType(
 
 // TODO make iterator
 func (store *Store) QuerySkuType(
-	query *pkg_query.Query,
+	query *queries.Query,
 	output interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	var executor pkg_query.Executor
+	var executor queries.Executor
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
@@ -108,9 +129,9 @@ func (store *Store) QuerySkuType(
 }
 
 func (store *Store) QueryExactlyOneExternal(
-	query *pkg_query.Query,
+	query *queries.Query,
 ) (object *sku.Transacted, err error) {
-	var executor pkg_query.Executor
+	var executor queries.Executor
 
 	if executor, err = store.makeQueryExecutor(query); err != nil {
 		err = errors.Wrap(err)
@@ -126,9 +147,9 @@ func (store *Store) QueryExactlyOneExternal(
 }
 
 func (store *Store) QueryExactlyOne(
-	queryGroup *pkg_query.Query,
+	queryGroup *queries.Query,
 ) (object *sku.Transacted, err error) {
-	var executor pkg_query.Executor
+	var executor queries.Executor
 
 	if executor, err = store.makeQueryExecutor(queryGroup); err != nil {
 		err = errors.Wrap(err)

@@ -1,12 +1,12 @@
 package commands_dodder
 
 import (
-	"sync"
 	"sync/atomic"
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -14,47 +14,79 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
+	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
 
 func init() {
 	utility.AddCmd(
 		"fsck",
-		&Fsck{})
+		&Fsck{},
+	)
 }
 
 // TODO add options to verify blobs, type formats, tags
 type Fsck struct {
 	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.InventoryLists
 	command_components_dodder.Query
+
+	InventoryListPath string
 }
 
 var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
 
 func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	cmd.LocalWorkingCopy.SetFlagDefinitions(flagSet)
+
+	flagSet.StringVar(
+		&cmd.InventoryListPath,
+		"inventory_list-path",
+		"",
+		"instead of using the store's object, verify the objects at the inventory list at the given path",
+	)
 }
 
 func (cmd Fsck) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 
-	query := cmd.MakeQueryIncludingWorkspace(
-		req,
-		pkg_query.BuilderOptions(
-			pkg_query.BuilderOptionWorkspace(repo),
-			pkg_query.BuilderOptionDefaultGenres(genres.All()...),
-			pkg_query.BuilderOptionDefaultSigil(
-				ids.SigilLatest,
-				ids.SigilHistory,
-				ids.SigilHidden,
+	var seq interfaces.SeqError[*sku.Transacted]
+
+	if cmd.InventoryListPath == "" {
+		query := cmd.MakeQueryIncludingWorkspace(
+			req,
+			pkg_query.BuilderOptions(
+				pkg_query.BuilderOptionWorkspace(repo),
+				pkg_query.BuilderOptionDefaultGenres(genres.All()...),
+				pkg_query.BuilderOptionDefaultSigil(
+					ids.SigilLatest,
+					ids.SigilHistory,
+					ids.SigilHidden,
+				),
 			),
-		),
-		repo,
-		req.PopArgs(),
-	)
+			repo,
+			req.PopArgs(),
+		)
 
-	ui.Out().Printf("verification for %q objects in progress...", query)
+		seq = repo.GetStore().All(query)
 
+		ui.Out().Printf("verification for %q objects in progress...", query)
+	} else {
+		seq = cmd.MakeSeqFromPath(
+			repo,
+			repo.GetInventoryListCoderCloset(),
+			cmd.InventoryListPath,
+			nil,
+		)
+	}
+
+	cmd.runVerification(repo, seq)
+}
+
+func (cmd Fsck) runVerification(
+	repo *local_working_copy.Repo,
+	seq interfaces.SeqError[*sku.Transacted],
+) {
 	var count atomic.Uint32
 
 	type objectError struct {
@@ -62,57 +94,37 @@ func (cmd Fsck) Run(req command.Request) {
 		err    error
 	}
 
-	var objectErrorsLock sync.Mutex
-	var objectErrors []objectError
+	var objectErrors quiter.Slice[objectError]
 
 	if err := errors.RunChildContextWithPrintTicker(
 		repo,
 		func(ctx interfaces.Context) {
-			if err := repo.GetStore().QueryTransacted(
-				query,
-				func(object *sku.Transacted) (err error) {
-					if err = markl.AssertIdIsNotNull(
-						object.GetObjectDigest()); err != nil {
-						objectErrorsLock.Lock()
+			for object, errIter := range seq {
+				if errIter != nil {
+					objectErrors.Append(objectError{err: errIter})
+					return
+				}
 
-						objectErrors = append(
-							objectErrors,
-							objectError{
-								err:    err,
-								object: object.CloneTransacted(),
-							},
-						)
+				if err := markl.AssertIdIsNotNull(
+					object.GetObjectDigest()); err != nil {
+					objectErrors.Append(
+						objectError{
+							err:    err,
+							object: object.CloneTransacted(),
+						},
+					)
+				}
 
-						objectErrorsLock.Unlock()
+				if err := object.Verify(); err != nil {
+					objectErrors.Append(
+						objectError{
+							err:    err,
+							object: object.CloneTransacted(),
+						},
+					)
+				}
 
-						err = nil
-						return err
-					}
-
-					if err = object.Verify(); err != nil {
-						objectErrorsLock.Lock()
-
-						objectErrors = append(
-							objectErrors,
-							objectError{
-								err:    err,
-								object: object.CloneTransacted(),
-							},
-						)
-
-						objectErrorsLock.Unlock()
-
-						err = nil
-						return err
-					}
-
-					count.Add(1)
-
-					return err
-				},
-			); err != nil {
-				ui.Err().Print(err)
-				err = nil
+				count.Add(1)
 			}
 		},
 		func(time time.Time) {

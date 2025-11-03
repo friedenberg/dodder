@@ -1,13 +1,9 @@
 package commands_dodder
 
 import (
-	"io"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -26,6 +22,7 @@ func init() {
 
 type Import struct {
 	command_components_dodder.LocalWorkingCopy
+	command_components_dodder.InventoryLists
 	command_components_madder.BlobStore
 	command_components_madder.Complete
 
@@ -59,26 +56,6 @@ func (cmd Import) Run(req command.Request) {
 	if inventoryListPath == "" {
 		errors.ContextCancelWithBadRequestf(req, "empty inventory list")
 	}
-
-	var readCloser io.ReadCloser
-
-	// setup inventory list reader
-	{
-		var err error
-
-		if readCloser, err = files.Open(
-			inventoryListPath,
-		); err != nil {
-			local.Cancel(err)
-		}
-
-		defer errors.ContextMustClose(local, readCloser)
-	}
-
-	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
-	defer repoolBufferedReader()
-
-	inventoryListCoderCloset := local.GetInventoryListCoderCloset()
 
 	cmd.DedupingFormatId = markl.PurposeV5MetadataDigestWithoutTai
 	cmd.CheckedOutPrinter = local.PrinterCheckedOutConflictsForRemoteTransfers()
@@ -166,8 +143,10 @@ func (cmd Import) Run(req command.Request) {
 		}
 	}
 
-	seq := inventoryListCoderCloset.AllDecodedObjectsFromStream(
-		bufferedReader,
+	seq := cmd.MakeSeqFromPath(
+		local,
+		local.GetInventoryListCoderCloset(),
+		inventoryListPath,
 		afterDecoding,
 	)
 

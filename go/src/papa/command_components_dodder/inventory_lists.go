@@ -1,8 +1,15 @@
 package command_components_dodder
 
 import (
+	"io"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
@@ -21,4 +28,43 @@ func (InventoryLists) MakeInventoryListCoderCloset(
 		envRepo,
 		boxFormat,
 	)
+}
+
+func (InventoryLists) MakeSeqFromPath(
+	ctx interfaces.ActiveContext,
+	inventoryListCoderCloset inventory_list_coders.Closet,
+	inventoryListPath string,
+	afterDecoding func(*sku.Transacted) error,
+) interfaces.SeqError[*sku.Transacted] {
+	var readCloser io.ReadCloser
+
+	// setup inventory list reader
+	{
+		var err error
+
+		if readCloser, err = files.Open(
+			inventoryListPath,
+		); err != nil {
+			ctx.Cancel(err)
+			return nil
+		}
+	}
+
+	bufferedReader, repoolBufferedReader := pool.GetBufferedReader(readCloser)
+
+	seq := inventoryListCoderCloset.AllDecodedObjectsFromStream(
+		bufferedReader,
+		afterDecoding,
+	)
+
+	return func(yield func(*sku.Transacted, error) bool) {
+		defer errors.ContextMustClose(ctx, readCloser)
+		defer repoolBufferedReader()
+
+		for object, err := range seq {
+			if !yield(object, err) {
+				return
+			}
+		}
+	}
 }
