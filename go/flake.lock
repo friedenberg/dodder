@@ -9,11 +9,11 @@
       },
       "locked": {
         "dir": "pkgs/alfa/devenv-go",
-        "lastModified": 1761856126,
-        "narHash": "sha256-aPbFMi/YwlTmrqSL8w4YSpsyw8LnLxKS3Aa8b5s2Nt0=",
+        "lastModified": 1762206616,
+        "narHash": "sha256-XlT1R9rC8Ifp2rNddFAWSWIp8k8y+8j3Z3wRRaBOBsk=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "6781bc9179845d4b9fb8936a06c3d4ab32a13d92",
+        "rev": "d2a2657a281c5fe442d5d7401b155631f5ff2716",
         "type": "github"
       },
       "original": {
@@ -31,11 +31,11 @@
       },
       "locked": {
         "dir": "pkgs/alfa/devenv-shell",
-        "lastModified": 1761856126,
-        "narHash": "sha256-aPbFMi/YwlTmrqSL8w4YSpsyw8LnLxKS3Aa8b5s2Nt0=",
+        "lastModified": 1762206616,
+        "narHash": "sha256-XlT1R9rC8Ifp2rNddFAWSWIp8k8y+8j3Z3wRRaBOBsk=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "6781bc9179845d4b9fb8936a06c3d4ab32a13d92",
+        "rev": "d2a2657a281c5fe442d5d7401b155631f5ff2716",
         "type": "github"
       },
       "original": {
@@ -72,11 +72,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1756047880,
-        "narHash": "sha256-JeuGh9kA1SPL70fnvpLxkIkCWpTjtoPaus3jzvdna0k=",
+        "lastModified": 1759991118,
+        "narHash": "sha256-pDyrtUQyeP1lVTMIYqJtftzDtsXEZaJjYy9ZQ/SGhL8=",
         "owner": "nix-community",
         "repo": "gomod2nix",
-        "rev": "47d628dc3b506bd28632e47280c6b89d3496909d",
+        "rev": "7f8d7438f5870eb167abaf2c39eea3d2302019d1",
         "type": "github"
       },
       "original": {
@@ -264,7 +264,7 @@
       },
       "original": {
         "type": "tarball",
-        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz"
+        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102"
       }
     },
     "utils_2": {
@@ -281,7 +281,7 @@
       },
       "original": {
         "type": "tarball",
-        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz"
+        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102"
       }
     },
     "utils_3": {
@@ -298,7 +298,7 @@
       },
       "original": {
         "type": "tarball",
-        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz"
+        "url": "https://flakehub.com/f/numtide/flake-utils/0.1.102"
       }
     }
   },

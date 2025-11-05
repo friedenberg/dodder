@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	pkg_query "code.linenisgreat.com/dodder/go/src/kilo/queries"
+	"code.linenisgreat.com/dodder/go/src/kilo/queries"
 	"code.linenisgreat.com/dodder/go/src/november/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/papa/command_components_dodder"
 )
@@ -55,10 +55,10 @@ func (cmd Fsck) Run(req command.Request) {
 	if cmd.InventoryListPath == "" {
 		query := cmd.MakeQueryIncludingWorkspace(
 			req,
-			pkg_query.BuilderOptions(
-				pkg_query.BuilderOptionWorkspace(repo),
-				pkg_query.BuilderOptionDefaultGenres(genres.All()...),
-				pkg_query.BuilderOptionDefaultSigil(
+			queries.BuilderOptions(
+				queries.BuilderOptionWorkspace(repo),
+				queries.BuilderOptionDefaultGenres(genres.All()...),
+				queries.BuilderOptionDefaultSigil(
 					ids.SigilLatest,
 					ids.SigilHistory,
 					ids.SigilHidden,
@@ -101,7 +101,7 @@ func (cmd Fsck) runVerification(
 		func(ctx interfaces.Context) {
 			for object, errIter := range seq {
 				if errIter != nil {
-					err := objectError{err: errIter}
+					err := objectError{err: errors.Wrap(errIter)}
 
 					if object != nil {
 						err.object = object.CloneTransacted()

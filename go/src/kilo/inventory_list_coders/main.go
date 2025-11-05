@@ -229,6 +229,7 @@ func writeInventoryListObject(
 	return n, err
 }
 
+// TODO swap SeqCoder to support yielding errors
 type SeqCoder struct {
 	ctx   interfaces.ActiveContext
 	coder coder
@@ -279,15 +280,17 @@ func (coder SeqErrorDecoder) DecodeFrom(
 		// TODO Fix upstream issues with repooling
 		// defer sku.GetTransactedPool().Put(object)
 
+		// TODO add bufferedReader location information (line location, etc)
 		if _, err = coder.coder.DecodeFrom(object, bufferedReader); err != nil {
 			if err == io.EOF {
 				err = nil
 				break
 			} else {
-				err = errors.Wrap(err)
+				errIter := errors.Wrap(err)
+				err = nil
 
-				if !yield(nil, err) {
-					return n, err
+				if !yield(object, errIter) {
+					break
 				}
 			}
 		}

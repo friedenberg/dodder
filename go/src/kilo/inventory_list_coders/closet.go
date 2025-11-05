@@ -248,19 +248,19 @@ func (closet Closet) AllDecodedObjectsFromStream(
 	reader io.Reader,
 	afterDecoding func(*sku.Transacted) error,
 ) interfaces.SeqError[*sku.Transacted] {
-	var coders map[string]interfaces.DecoderFromBufferedReader[funcIterSeq]
+	var coders map[string]interfaces.DecoderFromBufferedReader[funcIterSeqError]
 
 	if afterDecoding == nil {
-		coders = closet.seqDecoders
+		coders = closet.seqErrorDecoders
 	} else {
 		coders = make(
-			map[string]interfaces.DecoderFromBufferedReader[funcIterSeq],
+			map[string]interfaces.DecoderFromBufferedReader[funcIterSeqError],
 			len(closet.coders),
 		)
 
 		for tipe, coder := range closet.coders {
 			coder.afterDecoding = afterDecoding
-			coders[tipe] = SeqCoder{
+			coders[tipe] = SeqErrorDecoder{
 				ctx:   closet.envRepo,
 				coder: coder,
 			}
@@ -268,9 +268,9 @@ func (closet Closet) AllDecodedObjectsFromStream(
 	}
 
 	return func(yield func(*sku.Transacted, error) bool) {
-		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[funcIterSeq]]{
-			Metadata: triple_hyphen_io.TypedMetadataCoder[funcIterSeq]{},
-			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeq](
+		decoder := triple_hyphen_io.Decoder[*triple_hyphen_io.TypedBlob[funcIterSeqError]]{
+			Metadata: triple_hyphen_io.TypedMetadataCoder[funcIterSeqError]{},
+			Blob: triple_hyphen_io.DecoderTypeMapWithoutType[funcIterSeqError](
 				coders,
 			),
 		}
@@ -279,10 +279,10 @@ func (closet Closet) AllDecodedObjectsFromStream(
 		defer repoolBufferedReader()
 
 		if _, err := decoder.DecodeFrom(
-			&triple_hyphen_io.TypedBlob[funcIterSeq]{
+			&triple_hyphen_io.TypedBlob[funcIterSeqError]{
 				Type: ids.Type{},
-				Blob: func(object *sku.Transacted) bool {
-					return yield(object, nil)
+				Blob: func(object *sku.Transacted, err error) bool {
+					return yield(object, err)
 				},
 			},
 			bufferedReader,

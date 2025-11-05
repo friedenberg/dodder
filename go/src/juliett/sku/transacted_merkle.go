@@ -40,13 +40,13 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 func (transacted *Transacted) AssertObjectDigestAndObjectSigNotNull() (err error) {
 	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectDigest()); err != nil {
-		err = errors.Wrapf(err, "Object: %q", String(transacted))
+		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
 		transacted.Metadata.GetObjectSig()); err != nil {
-		err = errors.Wrapf(err, "Object: %q", String(transacted))
+		err = errors.Wrap(err)
 		return err
 	}
 
@@ -269,7 +269,7 @@ func (transacted *Transacted) Verify() (err error) {
 		transacted.Metadata.GetObjectDigest(),
 		transacted.Metadata.GetObjectSig(),
 	); err != nil {
-		err = errors.Wrapf(err, "Object: %q", String(transacted))
+		err = errors.Wrap(err)
 		return err
 	}
 

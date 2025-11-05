@@ -253,10 +253,24 @@ func (id *Id) Reset() {
 	id.purpose = ""
 }
 
+func (id *Id) ResetWithPurpose(purpose string) {
+	id.format = nil
+	id.data = id.data[:0]
+	id.purpose = purpose
+}
+
 func (id *Id) ResetWith(src Id) {
 	id.purpose = src.purpose
 	id.format = src.format
 	errors.PanicIfError(id.setData(src.data))
+}
+
+func (id *Id) ResetWithOrDefaultPurpose(src Id, purpose string) {
+	if src.IsEmpty() {
+		id.ResetWithPurpose(purpose)
+	} else {
+		id.ResetWith(src)
+	}
 }
 
 func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
