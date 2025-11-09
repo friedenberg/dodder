@@ -2,8 +2,7 @@
 set -euo pipefail
 
 if [[ "$(git branch --show-current)" != master ]]; then
-  echo "not on master, refusing to deploy" >&2
-  exit 1
+  gum log -l fatal "not on master, refusing to deploy"
 fi
 
 append_trap() {

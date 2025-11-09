@@ -64,6 +64,7 @@
             bats
             fish
             gnumake
+            gum
             just
           ]);
 
