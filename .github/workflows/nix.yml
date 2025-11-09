@@ -30,7 +30,16 @@ jobs:
           directory: ./go
 
   build-nix-package:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            system: x86_64-linux
+          - os: macos-13
+            system: x86_64-darwin
+          - os: macos-14
+            system: aarch64-darwin
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
       id-token: write
