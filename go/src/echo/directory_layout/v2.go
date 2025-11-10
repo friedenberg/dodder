@@ -55,11 +55,11 @@ func (layout v2) FileLock() string {
 	return layout.xdg.GetDirState().MakePath("lock").String()
 }
 
-func (layout v2) FileConfigPermanent() string {
+func (layout v2) FileConfigSeed() string {
 	return layout.MakeDirData("config-permanent")
 }
 
-func (layout v2) FileConfigMutable() string {
+func (layout v2) FileConfig() string {
 	return layout.MakeDirData("config-mutable")
 }
 

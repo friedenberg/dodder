@@ -76,7 +76,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		return
 	}
 
-	env.writeFile(env.FileConfigMutable(), "")
+	env.writeFile(env.FileConfig(), "")
 	env.writeFile(env.FileCacheDormant(), "")
 
 	env.BlobStoreEnv = MakeBlobStoreEnv(
@@ -121,7 +121,7 @@ func (env *Env) writeConfig(bigBang BigBang) {
 	if err := triple_hyphen_io.EncodeToFile(
 		genesis_configs.CoderPrivate,
 		&env.config,
-		env.FileConfigPermanent(),
+		env.GetPathConfigSeed().String(),
 	); err != nil {
 		env.Cancel(err)
 		return

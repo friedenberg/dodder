@@ -65,7 +65,7 @@ function init_compression { # @test
 function init_and_reindex { # @test
 	run_dodder_init_disable_age
 
-	run test -f .dodder/local/share/config-permanent
+	run test -f .dodder/local/share/config-seed
 	assert_success
 
 	run_dodder show -format log :konfig
@@ -96,7 +96,7 @@ function init_and_reindex { # @test
 function init_and_deinit { # @test
 	run_dodder_init_disable_age
 
-	run test -f .dodder/local/share/config-permanent
+	run test -f .dodder/local/share/config-seed
 	assert_success
 
 	# run cat .dodder/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685

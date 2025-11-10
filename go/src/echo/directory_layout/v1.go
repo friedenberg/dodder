@@ -40,11 +40,11 @@ func (layout v1) FileLock() string {
 	return layout.GetDirState().MakePath("lock").String()
 }
 
-func (layout v1) FileConfigPermanent() string {
+func (layout v1) FileConfigSeed() string {
 	return layout.MakeDirData("config-permanent")
 }
 
-func (layout v1) FileConfigMutable() string {
+func (layout v1) FileConfig() string {
 	return layout.MakeDirData("config-mutable")
 }
 

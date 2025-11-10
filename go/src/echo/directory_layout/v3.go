@@ -32,15 +32,21 @@ func (layout v3) MakeDirData(targets ...string) string {
 	return layout.xdg.GetDirData().MakePath(targets...).String()
 }
 
+func (layout v3) MakeDirConfig(targets ...string) string {
+	dirConfig := layout.xdg.GetDirConfig()
+
+	if dirConfig.GetBaseEnvVarValue() == "" {
+		panic(fmt.Sprintf("empty xdg config dir: %#v", dirConfig))
+	}
+
+	return dirConfig.MakePath(targets...).String()
+}
+
 func (layout v3) MakePathBlobStore(
 	targets ...string,
 ) interfaces.DirectoryLayoutPath {
 	return layout.xdg.GetDirData().MakePath(
 		stringSliceJoin("blob_stores", targets)...)
-}
-
-func (layout v3) DirBlobStoreConfigs(p ...string) string {
-	return layout.MakeDirData(stringSliceJoin("blob_stores-configs", p)...)
 }
 
 func (layout v3) FileCacheDormant() string {
@@ -55,12 +61,8 @@ func (layout v3) FileLock() string {
 	return layout.xdg.GetDirState().MakePath("lock").String()
 }
 
-func (layout v3) FileConfigPermanent() string {
-	return layout.MakeDirData("config-permanent")
-}
-
-func (layout v3) FileConfigMutable() string {
-	return layout.MakeDirData("config-mutable")
+func (layout v3) FileConfig() string {
+	return layout.MakeDirConfig("config-mutable")
 }
 
 func (layout v3) DirDataIndex(p ...string) string {
@@ -104,6 +106,7 @@ func (layout v3) FileInventoryListLog() string {
 
 func (layout v3) DirsGenesis() []string {
 	return []string{
+		layout.MakeDirConfig(),
 		layout.DirObjectId(),
 		layout.DirDataIndex(),
 		layout.DirLostAndFound(),

@@ -59,7 +59,7 @@ func Make(
 		return env, err
 	}
 
-	fileConfigPermanent := xdg.Data.MakePath("config-permanent").String()
+	fileConfigPermanent := env.GetPathConfigSeed().String()
 
 	var configLoaded bool
 
@@ -196,4 +196,8 @@ func (env Env) GetStoreVersion() store_version.Version {
 
 func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
 	return env.GetDefaultBlobStore()
+}
+
+func (env Env) GetPathConfigSeed() interfaces.DirectoryLayoutPath {
+	return env.GetXDG().Data.MakePath("config-seed")
 }

@@ -18,7 +18,6 @@ type (
 
 	BlobStore interface {
 		Common
-		DirBlobStoreConfigs(p ...string) string
 		MakePathBlobStore(...string) interfaces.DirectoryLayoutPath
 	}
 
@@ -37,13 +36,10 @@ type (
 
 		FileCacheDormant() string
 		FileCacheObjectId() string
-		FileConfigMutable() string
+		FileConfig() string
 		FileLock() string
 		FileTags() string
 		FileInventoryListLog() string
-
-		// TODO remove from DirectoryLayout and move to method on EnvRepo
-		FileConfigPermanent() string
 
 		DirsGenesis() []string
 	}
@@ -84,7 +80,7 @@ func MakeRepo(
 
 	if store_version.IsVersionLessOrEqualToV10(storeVersion) {
 		repo = &v1{}
-	} else if storeVersion.LessOrEqual(store_version.V12) {
+	} else if storeVersion.LessOrEqual(store_version.V11) {
 		repo = &v2{}
 	} else {
 		repo = &v3{}
