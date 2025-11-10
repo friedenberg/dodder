@@ -1,7 +1,7 @@
 package env_ui
 
 import (
-	"fmt"
+	"github.com/charmbracelet/huh"
 )
 
 func (env *env) Confirm(message string) (success bool) {
@@ -13,30 +13,12 @@ func (env *env) Confirm(message string) (success bool) {
 		return success
 	}
 
-	var err error
-
-	env.GetErr().Printf(
-		"%s (y/*)",
-		message,
-	)
-
-	var answer rune
-	var n int
-
-	// TODO add support for context cancellation
-	if n, err = fmt.Fscanf(env.GetInFile(), "%c\n", &answer); err != nil {
-		env.GetErr().Printf("failed to read answer: %s", err)
-		return success
-	}
-
-	if n != 1 {
-		env.GetErr().Printf("failed to read at exactly 1 answer: %s", err)
-		return success
-	}
-
-	if answer == 'y' || answer == 'Y' {
-		success = true
-	}
+	huh.NewConfirm().
+		Title(message).
+		Affirmative("Yes").
+		Negative("No").
+		Value(&success).
+		Run()
 
 	return success
 }
