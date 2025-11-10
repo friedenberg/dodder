@@ -76,7 +76,7 @@ func (blobStoreConfig *TomlV1) SetFlagDefinitions(
 			case "", "generate":
 				if err = blobStoreConfig.Encryption.GeneratePrivateKey(
 					nil,
-					markl.FormatIdSecAgeX25519,
+					markl.FormatIdAgeX25519Sec,
 					markl.PurposeMadderPrivateKeyV1,
 				); err != nil {
 					err = errors.Wrap(err)

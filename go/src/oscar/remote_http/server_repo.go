@@ -65,7 +65,7 @@ func (server *Server) writeInventoryList(
 			var pubkey markl.Id
 
 			if err = pubkey.SetMarklId(
-				markl.FormatIdPubEd25519,
+				markl.FormatIdEd25519Pub,
 				bites,
 			); err != nil {
 				response.Error(err)

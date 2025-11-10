@@ -203,7 +203,7 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 	var formatSec markl.FormatSec
 
 	if formatSec, err = markl.GetFormatSecOrError(
-		markl.FormatId(markl.FormatIdSecAgeX25519),
+		markl.FormatId(markl.FormatIdAgeX25519Sec),
 	); err != nil {
 		err = errors.Wrap(err)
 		return ioWrapper, err

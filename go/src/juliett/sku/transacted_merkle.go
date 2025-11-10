@@ -20,7 +20,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetMarklId(
-		markl.FormatIdSigEd25519,
+		markl.FormatIdEd25519Sig,
 		mother.Metadata.GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)

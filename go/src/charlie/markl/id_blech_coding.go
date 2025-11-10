@@ -142,7 +142,7 @@ func SetMarklIdWithFormatBlech32(
 	marklTypeId := id.GetMarklFormat()
 
 	switch marklTypeId.GetMarklFormatId() {
-	case FormatIdSigEd25519:
+	case FormatIdEd25519Sig:
 		switch purpose {
 		case PurposeObjectMotherSigV1,
 			PurposeObjectSigV0,
@@ -158,7 +158,7 @@ func SetMarklIdWithFormatBlech32(
 			return err
 		}
 
-	case FormatIdPubEd25519:
+	case FormatIdEd25519Pub:
 		switch purpose {
 		case PurposeRepoPubKeyV1:
 			break

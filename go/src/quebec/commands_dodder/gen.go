@@ -40,7 +40,7 @@ func (cmd Gen) Run(req command.Request) {
 
 			if err := id.GeneratePrivateKey(
 				nil,
-				markl.FormatIdSecAgeX25519,
+				markl.FormatIdAgeX25519Sec,
 				arg,
 			); err != nil {
 				ui.Err().Print(err)
@@ -54,7 +54,7 @@ func (cmd Gen) Run(req command.Request) {
 
 			if err := id.GeneratePrivateKey(
 				nil,
-				markl.FormatIdSecAgeX25519,
+				markl.FormatIdAgeX25519Sec,
 				arg,
 			); err != nil {
 				ui.Err().Print(err)
@@ -68,7 +68,7 @@ func (cmd Gen) Run(req command.Request) {
 
 			if err := id.GeneratePrivateKey(
 				nil,
-				markl.FormatIdSecEd25519,
+				markl.FormatIdEd25519Sec,
 				arg,
 			); err != nil {
 				ui.Err().Print(err)

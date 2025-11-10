@@ -11,7 +11,7 @@ type tipe struct{}
 var _ interfaces.MarklFormat = tipe{}
 
 func (tipe tipe) GetMarklFormatId() string {
-	return markl.FormatIdSecAgeX25519
+	return markl.FormatIdAgeX25519Sec
 }
 
 func (tipe tipe) GetSize() int {

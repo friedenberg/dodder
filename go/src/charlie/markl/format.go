@@ -13,24 +13,24 @@ import (
 const (
 	// TODO maybe switch to type-prefixed
 	// keep sorted
-	FormatIdPubEd25519 = "ed25519_pub"
-	FormatIdSecEd25519 = "ed25519_sec"
-	FormatIdSigEd25519 = "ed25519_sig"
+	FormatIdEd25519Pub = "ed25519_pub"
+	FormatIdEd25519Sec = "ed25519_sec"
+	FormatIdEd25519Sig = "ed25519_sig"
 
-	FormatIdPubAgeX25519 = "age_x25519_pub"
-	FormatIdSecAgeX25519 = "age_x25519_sec"
+	FormatIdAgeX25519Pub = "age_x25519_pub"
+	FormatIdAgeX25519Sec = "age_x25519_sec"
 
 	FormatIdHashSha256     = "sha256"
 	FormatIdHashBlake2b256 = "blake2b256"
 
-	FormatIdSecNonce = "nonce"
+	FormatIdNonceSec = "nonce"
 )
 
 func init() {
 	// Ed22519
 	makeFormat(
 		FormatPub{
-			Id:     FormatIdPubEd25519,
+			Id:     FormatIdEd25519Pub,
 			Size:   ed25519.PublicKeySize,
 			Verify: Ed25519Verify,
 		},
@@ -38,22 +38,22 @@ func init() {
 
 	makeFormat(
 		FormatSec{
-			Id:   FormatIdSecEd25519,
+			Id:   FormatIdEd25519Sec,
 			Size: ed25519.PrivateKeySize,
 
 			Generate: Ed25519GeneratePrivateKey,
 
-			PubFormatId:  FormatIdPubEd25519,
+			PubFormatId:  FormatIdEd25519Pub,
 			GetPublicKey: Ed25519GetPublicKey,
 
-			SigFormatId: FormatIdSigEd25519,
+			SigFormatId: FormatIdEd25519Sig,
 			Sign:        Ed25519Sign,
 		},
 	)
 
 	makeFormat(
 		Format{
-			Id:   FormatIdSigEd25519,
+			Id:   FormatIdEd25519Sig,
 			Size: ed25519.SignatureSize,
 		},
 	)
@@ -61,13 +61,13 @@ func init() {
 	// AgeX25519
 	makeFormat(
 		Format{
-			Id:   FormatIdPubAgeX25519,
+			Id:   FormatIdAgeX25519Pub,
 			Size: curve25519.ScalarSize,
 		},
 	)
 	makeFormat(
 		FormatSec{
-			Id:           FormatIdSecAgeX25519,
+			Id:           FormatIdAgeX25519Sec,
 			Size:         curve25519.ScalarSize,
 			Generate:     AgeX25519Generate,
 			GetIOWrapper: AgeX25519GetIOWrapper,
@@ -77,7 +77,7 @@ func init() {
 	// Nonce
 	makeFormat(
 		FormatSec{
-			Id:       FormatIdSecNonce,
+			Id:       FormatIdNonceSec,
 			Size:     32,
 			Generate: NonceGenerate32,
 		},
@@ -89,7 +89,7 @@ var formats map[string]interfaces.MarklFormat = map[string]interfaces.MarklForma
 func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
 	switch formatId {
 	case "zit-repo-private_key-v1", "dodder-repo-private_key-v1":
-		formatId = FormatIdSecEd25519
+		formatId = FormatIdEd25519Sec
 	}
 
 	format, ok := formats[formatId]
