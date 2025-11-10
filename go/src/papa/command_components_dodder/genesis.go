@@ -2,7 +2,6 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -55,9 +54,7 @@ func (cmd *Genesis) SetFlagDefinitions(
 
 	cmd.BigBang.GenesisConfig.Blob.SetFlagDefinitions(flagSet)
 
-	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		cmd.BigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
-	}
+	cmd.BigBang.TypedBlobStoreConfig.Blob.SetFlagDefinitions(flagSet)
 
 	flagSet.Var(
 		cmd.Complete.GetFlagValueBlobIds(&cmd.BlobStoreId),

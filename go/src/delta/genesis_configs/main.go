@@ -4,8 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/delta/compression_type"
-	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/triple_hyphen_io"
 )
@@ -60,34 +58,16 @@ func DefaultWithVersion(
 	storeVersion store_version.Version,
 	inventoryListTypeString string,
 ) *TypedConfigPrivateMutable {
-	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		return &TypedConfigPrivateMutable{
-			Type: ids.GetOrPanic(
-				ids.TypeTomlConfigImmutableV1,
-			).Type,
-			Blob: &TomlV1Private{
-				TomlV1Common: TomlV1Common{
-					StoreVersion: storeVersion,
-					BlobStore: blob_store_configs.TomlV0{
-						CompressionType:   compression_type.CompressionTypeDefault,
-						LockInternalFiles: true,
-					},
-					InventoryListType: inventoryListTypeString,
-				},
+	return &TypedConfigPrivateMutable{
+		Type: ids.GetOrPanic(
+			ids.TypeTomlConfigImmutableV2,
+		).Type,
+		Blob: &TomlV2Private{
+			TomlV2Common: TomlV2Common{
+				StoreVersion:      storeVersion,
+				InventoryListType: inventoryListTypeString,
+				ObjectSigType:     markl.PurposeObjectSigV1,
 			},
-		}
-	} else {
-		return &TypedConfigPrivateMutable{
-			Type: ids.GetOrPanic(
-				ids.TypeTomlConfigImmutableV2,
-			).Type,
-			Blob: &TomlV2Private{
-				TomlV2Common: TomlV2Common{
-					StoreVersion:      storeVersion,
-					InventoryListType: inventoryListTypeString,
-					ObjectSigType:     markl.PurposeObjectSigV1,
-				},
-			},
-		}
+		},
 	}
 }

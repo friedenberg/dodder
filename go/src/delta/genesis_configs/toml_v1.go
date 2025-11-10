@@ -35,9 +35,6 @@ var _ ConfigPublic = &TomlV1Public{}
 func (config *TomlV1Common) SetFlagDefinitions(
 	flagSet interfaces.CLIFlagDefinitions,
 ) {
-	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		config.BlobStore.SetFlagDefinitions(flagSet)
-	}
 }
 
 func (config *TomlV1Common) SetRepoId(id ids.RepoId) {

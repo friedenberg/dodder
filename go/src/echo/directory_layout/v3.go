@@ -24,22 +24,10 @@ func (layout *v3) initialize(
 	return err
 }
 
-func (layout v3) MakeDirData(targets ...string) string {
-	return layout.makeDir(layout.xdg.GetDirData(), targets...)
-}
-
-func (layout v3) MakeDirConfig(targets ...string) string {
-	return layout.makeDir(layout.xdg.GetDirConfig(), targets...)
-}
-
-func (layout v3) MakeDirCache(targets ...string) string {
-	return layout.makeDir(layout.xdg.GetDirCache(), targets...)
-}
-
-func (layout v3) makeDir(
+func (layout v3) makeDirOrPanic(
 	dirLayout interfaces.DirectoryLayoutBaseEnvVar,
 	targets ...string,
-) string {
+) interfaces.DirectoryLayoutPath {
 	if dirLayout.GetBaseEnvVarValue() == "" {
 		panic(
 			fmt.Sprintf(
@@ -50,7 +38,23 @@ func (layout v3) makeDir(
 		)
 	}
 
-	return dirLayout.MakePath(targets...).String()
+	return dirLayout.MakePath(targets...)
+}
+
+func (layout v3) MakeDirData(targets ...string) interfaces.DirectoryLayoutPath {
+	return layout.makeDirOrPanic(layout.xdg.GetDirData(), targets...)
+}
+
+func (layout v3) MakeDirConfig(
+	targets ...string,
+) interfaces.DirectoryLayoutPath {
+	return layout.makeDirOrPanic(layout.xdg.GetDirConfig(), targets...)
+}
+
+func (layout v3) MakeDirCache(
+	targets ...string,
+) interfaces.DirectoryLayoutPath {
+	return layout.makeDirOrPanic(layout.xdg.GetDirCache(), targets...)
 }
 
 func (layout v3) MakePathBlobStore(
@@ -61,11 +65,11 @@ func (layout v3) MakePathBlobStore(
 }
 
 func (layout v3) FileCacheDormant() string {
-	return layout.MakeDirData("dormant")
+	return layout.MakeDirData("dormant").String()
 }
 
 func (layout v3) FileTags() string {
-	return layout.MakeDirData("tags")
+	return layout.MakeDirData("tags").String()
 }
 
 func (layout v3) FileLock() string {
@@ -73,11 +77,11 @@ func (layout v3) FileLock() string {
 }
 
 func (layout v3) FileConfig() string {
-	return layout.MakeDirConfig("config-mutable")
+	return layout.MakeDirConfig("config-mutable").String()
 }
 
 func (layout v3) DirDataIndex(p ...string) string {
-	return layout.MakeDirData(stringSliceJoin("index", p)...)
+	return layout.MakeDirData(stringSliceJoin("index", p)...).String()
 }
 
 func (layout v3) DirCacheRepo(p ...string) string {
@@ -86,7 +90,7 @@ func (layout v3) DirCacheRepo(p ...string) string {
 }
 
 func (layout v3) DirLostAndFound() string {
-	return layout.MakeDirCache("lost_and_found")
+	return layout.MakeDirCache("lost_and_found").String()
 }
 
 func (layout v3) DirIndexObjects() string {
@@ -104,7 +108,7 @@ func (layout v3) DirCacheRemoteInventoryListsLog() string {
 }
 
 func (layout v3) DirObjectId() string {
-	return layout.MakeDirData("object_ids")
+	return layout.MakeDirData("object_ids").String()
 }
 
 func (layout v3) FileCacheObjectId() string {
@@ -112,12 +116,12 @@ func (layout v3) FileCacheObjectId() string {
 }
 
 func (layout v3) FileInventoryListLog() string {
-	return layout.MakeDirData("inventory_lists_log")
+	return layout.MakeDirData("inventory_lists_log").String()
 }
 
 func (layout v3) DirsGenesis() []string {
 	return []string{
-		layout.MakeDirConfig(),
+		layout.MakeDirConfig().String(),
 		layout.DirObjectId(),
 		layout.DirDataIndex(),
 		layout.DirLostAndFound(),

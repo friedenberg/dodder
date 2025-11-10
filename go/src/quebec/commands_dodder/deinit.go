@@ -107,7 +107,7 @@ The following directories and files would be deleted:
 		return
 	}
 
-	base := path.Join(repo.GetEnvRepo().MakeDirData())
+	base := path.Join(repo.GetEnvRepo().MakeDirData().String())
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
 		repo.Cancel(err)

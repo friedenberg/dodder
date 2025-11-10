@@ -22,7 +22,7 @@ type (
 	}
 
 	Repo interface {
-		MakeDirData(p ...string) string
+		MakeDirData(p ...string) interfaces.DirectoryLayoutPath
 
 		DirDataIndex(p ...string) string
 		DirCacheRemoteInventoryListsLog() string
@@ -78,10 +78,8 @@ func MakeRepo(
 ) (Repo, error) {
 	var repo repoUninitialized
 
-	if store_version.IsVersionLessOrEqualToV10(storeVersion) {
-		repo = &v1{}
-	} else if storeVersion.LessOrEqual(store_version.V11) {
-		repo = &v2{}
+	if store_version.IsVersionLessOrEqualToV11(storeVersion) {
+		return nil, errors.Err501NotImplemented
 	} else {
 		repo = &v3{}
 	}
@@ -100,10 +98,8 @@ func MakeBlobStore(
 ) (BlobStore, error) {
 	var blobStore blobStoreUninitialized
 
-	if store_version.IsVersionLessOrEqualToV10(storeVersion) {
-		blobStore = &v1{}
-	} else if storeVersion.LessOrEqual(store_version.V11) {
-		blobStore = &v2{}
+	if store_version.IsVersionLessOrEqualToV11(storeVersion) {
+		return nil, errors.Err501NotImplemented
 	} else {
 		blobStore = &v3{}
 	}

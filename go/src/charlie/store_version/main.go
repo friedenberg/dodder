@@ -100,8 +100,7 @@ func (version *Version) Set(p string) (err error) {
 	return err
 }
 
-// TODO remove callers and self
-func IsVersionLessOrEqualToV10(other interfaces.StoreVersion) bool {
+func IsVersionLessOrEqualToV11(other interfaces.StoreVersion) bool {
 	return LessOrEqual(other, V10)
 }
 

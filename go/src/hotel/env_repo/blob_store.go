@@ -120,11 +120,6 @@ func (env *BlobStoreEnv) writeBlobStoreConfigIfNecessary(
 	bigBang BigBang,
 	directoryLayout directory_layout.BlobStore,
 ) {
-	if store_version.IsCurrentVersionLessOrEqualToV10() {
-		// the immutable config contains the only blob stores's config
-		return
-	}
-
 	if !bigBang.BlobStoreId.IsEmpty() {
 		return
 	}

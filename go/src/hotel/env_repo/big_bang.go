@@ -2,7 +2,6 @@ package env_repo
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -29,7 +28,5 @@ func (bigBang *BigBang) SetDefaults() {
 		ids.TypeInventoryListVCurrent,
 	).Type
 
-	if !store_version.IsCurrentVersionLessOrEqualToV10() {
-		bigBang.TypedBlobStoreConfig = blob_store_configs.Default()
-	}
+	bigBang.TypedBlobStoreConfig = blob_store_configs.Default()
 }
