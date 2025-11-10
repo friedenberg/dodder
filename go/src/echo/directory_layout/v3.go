@@ -25,21 +25,32 @@ func (layout *v3) initialize(
 }
 
 func (layout v3) MakeDirData(targets ...string) string {
-	if layout.xdg.GetDirData().GetBaseEnvVarValue() == "" {
-		panic(fmt.Sprintf("empty xdg data dir: %#v", layout.xdg.GetDirData()))
-	}
-
-	return layout.xdg.GetDirData().MakePath(targets...).String()
+	return layout.makeDir(layout.xdg.GetDirData(), targets...)
 }
 
 func (layout v3) MakeDirConfig(targets ...string) string {
-	dirConfig := layout.xdg.GetDirConfig()
+	return layout.makeDir(layout.xdg.GetDirConfig(), targets...)
+}
 
-	if dirConfig.GetBaseEnvVarValue() == "" {
-		panic(fmt.Sprintf("empty xdg config dir: %#v", dirConfig))
+func (layout v3) MakeDirCache(targets ...string) string {
+	return layout.makeDir(layout.xdg.GetDirCache(), targets...)
+}
+
+func (layout v3) makeDir(
+	dirLayout interfaces.DirectoryLayoutBaseEnvVar,
+	targets ...string,
+) string {
+	if dirLayout.GetBaseEnvVarValue() == "" {
+		panic(
+			fmt.Sprintf(
+				"empty xdg %q dir: %#v",
+				dirLayout.GetBaseEnvVarName(),
+				dirLayout,
+			),
+		)
 	}
 
-	return dirConfig.MakePath(targets...).String()
+	return dirLayout.MakePath(targets...).String()
 }
 
 func (layout v3) MakePathBlobStore(
@@ -75,7 +86,7 @@ func (layout v3) DirCacheRepo(p ...string) string {
 }
 
 func (layout v3) DirLostAndFound() string {
-	return layout.MakeDirData("lost_and_found")
+	return layout.MakeDirCache("lost_and_found")
 }
 
 func (layout v3) DirIndexObjects() string {
