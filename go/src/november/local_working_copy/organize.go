@@ -60,6 +60,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 				"a large number (%d) of objects are being changed. continue to commit?",
 				count,
 			),
+			"",
 		) {
 			// TODO output organize file used
 			errors.ContextCancelWith499ClientClosedRequest(local)

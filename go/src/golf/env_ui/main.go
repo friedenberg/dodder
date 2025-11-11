@@ -29,7 +29,7 @@ type Env interface {
 	GetErrFile() interfaces.WriterAndStringWriter
 	GetCLIConfig() repo_config_cli.Config
 
-	Confirm(message string) (success bool)
+	Confirm(title, description string) (success bool)
 	Retry(header, retry string, err error) (tryAgain bool)
 
 	FormatOutputOptions(

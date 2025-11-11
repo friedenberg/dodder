@@ -97,9 +97,9 @@ func (cmd Deinit) Run(req command.Request) {
 
 	if !cmd.Force &&
 		!repo.Confirm(
+			"are you sure you want to deinit?",
 			fmt.Sprintf(
-				`are you sure you want to deinit?
-The following directories and files would be deleted:
+				`The following directories and files would be deleted:
 
 %s`, strings.Join(filesAndDirectories, "\n")),
 		) {

@@ -32,6 +32,7 @@ func (err ErrNotInWorkspace) Recover(
 	if err.offerToCreate &&
 		err.Confirm(
 			"a workspace is necessary to run this command. create one?",
+			"",
 		) {
 		blob := &workspace_config_blobs.V0{}
 

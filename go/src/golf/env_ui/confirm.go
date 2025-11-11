@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-func (env *env) Confirm(message string) (success bool) {
+func (env *env) Confirm(title, description string) (success bool) {
 	if !env.GetIn().IsTty() {
 		env.GetErr().Print(
 			"stdin is not a tty, unable to get permission to continue",
@@ -14,7 +14,8 @@ func (env *env) Confirm(message string) (success bool) {
 	}
 
 	huh.NewConfirm().
-		Title(message).
+		Title(title).
+		Description(description).
 		Affirmative("Yes").
 		Negative("No").
 		Value(&success).

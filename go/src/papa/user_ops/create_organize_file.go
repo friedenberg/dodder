@@ -40,6 +40,7 @@ func (cmd CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
 				"a large number (%d) of objects would be edited in organize. continue to organize?",
 				count,
 			),
+			"",
 		) {
 			err = errors.Err499ClientClosedRequest
 			return results, err

@@ -65,7 +65,7 @@ func (err ErrUnableToAcquireLock) Recover(
 ) {
 	errors.PrintHelpful(err.envUI.GetErr(), err)
 
-	if err.envUI.Confirm("delete the existing lock?") {
+	if err.envUI.Confirm("delete the existing lock?", "") {
 		if err := os.Remove(err.Path); err != nil {
 			ctx.Cancel(err)
 		}
