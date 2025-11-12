@@ -59,7 +59,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 			metadata.AddTagString(remainder)
 
 		case '!':
-			err = parser.readTyp(metadata, remainder)
+			err = parser.readType(metadata, remainder)
 
 		default:
 			err = errors.ErrorWithStackf("unsupported entry: %q", line)
@@ -80,7 +80,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (parser *textParser2) readTyp(
+func (parser *textParser2) readType(
 	metadata *Metadata,
 	desc string,
 ) (err error) {

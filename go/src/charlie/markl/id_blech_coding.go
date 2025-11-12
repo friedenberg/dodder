@@ -65,6 +65,7 @@ func SetBlechCombinedHRPAndData(
 
 // TODO remove
 func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
+	// TODO use registered format lengths
 	switch len(value) {
 	case 65:
 		if value[0] != '@' {
@@ -76,7 +77,7 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 		fallthrough
 
 	case 64:
-		if err = SetSha256(id, value); err != nil {
+		if err = setSha256(id, value); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -92,7 +93,7 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 }
 
 // TODO remove
-func SetSha256(id interfaces.MutableMarklId, value string) (err error) {
+func setSha256(id interfaces.MutableMarklId, value string) (err error) {
 	var decodedBytes []byte
 
 	if decodedBytes, err = hex.DecodeString(value); err != nil {
@@ -126,7 +127,7 @@ func SetMarklIdWithFormatBlech32(
 		blechValue,
 	); err != nil {
 		if errors.Is(err, blech32.ErrSeparatorMissing) {
-			if err = SetSha256(
+			if err = setSha256(
 				id,
 				blechValue,
 			); err != nil {

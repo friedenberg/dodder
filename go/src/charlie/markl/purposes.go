@@ -10,10 +10,14 @@ const (
 	// and then add registration
 	// keep sorted
 
-	// Digests
+	// Blob Digests
+	PurposeBlobDigestV1 = "dodder-blob-digest-sha256-v1"
+
+	// Object Digests
 	PurposeObjectDigestV1             = "dodder-object-digest-sha256-v1"
 	PurposeObjectDigestV2             = "dodder-object-digest-v2"
 	PurposeV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
+
 	// FormatIdObjectDigestObjectId       = "dodder-object-digest-objectId-v1"
 	// FormatIdObjectDigestObjectIdTai    =
 	// "dodder-object-digest-objectId+tai-v1"
@@ -40,6 +44,8 @@ const (
 
 func init() {
 	// purposes that need to be reregistered
+	makePurpose(PurposeBlobDigestV1)
+
 	makePurpose(PurposeObjectMotherSigV1)
 	makePurpose(PurposeObjectSigV0)
 	makePurpose(PurposeObjectSigV1)
