@@ -117,15 +117,15 @@ func (id Id) IsNull() bool {
 }
 
 func (id *Id) Set(value string) (err error) {
-	format, body, ok := strings.Cut(value, "@")
+	purpose, body, ok := strings.Cut(value, "@")
 
 	if ok {
-		if err = id.setWithFormat(format, body); err != nil {
+		if err = id.setWithPurpose(purpose, body); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	} else {
-		if err = id.setWithoutFormat(value); err != nil {
+		if err = id.setWithoutPurpose(value); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -134,13 +134,13 @@ func (id *Id) Set(value string) (err error) {
 	return err
 }
 
-func (id *Id) setWithFormat(format, body string) (err error) {
-	if err = id.SetPurpose(format); err != nil {
+func (id *Id) setWithPurpose(purpose, body string) (err error) {
+	if err = id.SetPurpose(purpose); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = id.Set(body); err != nil {
+	if err = id.setWithoutPurpose(body); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -148,7 +148,7 @@ func (id *Id) setWithFormat(format, body string) (err error) {
 	return err
 }
 
-func (id *Id) setWithoutFormat(value string) (err error) {
+func (id *Id) setWithoutPurpose(value string) (err error) {
 	var typeId string
 
 	if typeId, id.data, err = blech32.DecodeString(value); err != nil {

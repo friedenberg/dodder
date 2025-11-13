@@ -91,7 +91,7 @@ func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 	if format == nil && len(bites) == 0 {
 		return bytes, err
 	} else if format == nil {
-		err = errors.Errorf("empty type")
+		err = errors.Errorf("empty format for markl id")
 		return bytes, err
 	}
 

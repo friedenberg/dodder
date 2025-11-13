@@ -113,6 +113,7 @@ func setSha256(id interfaces.MutableMarklId, value string) (err error) {
 }
 
 // TODO use type and format registrations
+// TODO need to set format
 func SetMarklIdWithFormatBlech32(
 	id interfaces.MutableMarklId,
 	purpose string,

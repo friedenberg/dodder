@@ -11,7 +11,6 @@ import (
 
 // actual formats
 const (
-	// TODO maybe switch to type-prefixed
 	// keep sorted
 	FormatIdEd25519Pub = "ed25519_pub"
 	FormatIdEd25519Sec = "ed25519_sec"
@@ -65,6 +64,7 @@ func init() {
 			Size: curve25519.ScalarSize,
 		},
 	)
+
 	makeFormat(
 		FormatSec{
 			Id:           FormatIdAgeX25519Sec,

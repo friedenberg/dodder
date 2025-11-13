@@ -54,9 +54,9 @@ func (encoder *binaryEncoder) writeFormat(
 ) (n int64, err error) {
 	encoder.Buffer.Reset()
 
-	for _, f := range binaryFieldOrder {
+	for _, key := range binaryFieldOrder {
 		encoder.binaryField.Reset()
-		encoder.Key = f
+		encoder.Key = key
 
 		if _, err = encoder.writeFieldKey(object); err != nil {
 			err = errors.Wrapf(
@@ -100,23 +100,22 @@ func (encoder *binaryEncoder) writeFieldKey(
 ) (n int64, err error) {
 	switch encoder.Key {
 	case key_bytes.Sigil:
-		s := object.Sigil
-		s.Add(encoder.Sigil)
+		sigil := object.Sigil
+		sigil.Add(encoder.Sigil)
 
 		if object.Metadata.Cache.Dormant.Bool() {
-			s.Add(ids.SigilHidden)
+			sigil.Add(ids.SigilHidden)
 		}
 
-		if n, err = encoder.writeFieldByteReader(s); err != nil {
+		if n, err = encoder.writeFieldByteReader(sigil); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.Blob:
-		if n, err = encoder.writeMerkleId(
+		if n, err = encoder.writeMarklId(
 			object.Metadata.GetBlobDigest(),
 			true,
-			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -134,10 +133,9 @@ func (encoder *binaryEncoder) writeFieldKey(
 		merkleId := object.Metadata.GetObjectSig()
 
 		// TODO change to false once dropping V8
-		if n, err = encoder.writeMerkleId(
+		if n, err = encoder.writeMarklId(
 			merkleId,
 			true,
-			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -283,20 +281,23 @@ func (encoder *binaryEncoder) writeFieldKey(
 	return n, err
 }
 
-func (encoder *binaryEncoder) writeMerkleId(
-	merkleId interfaces.MarklId,
+func (encoder *binaryEncoder) writeMarklId(
+	marklId interfaces.MarklId,
 	allowNull bool,
-	key string,
 ) (n int64, err error) {
 	if !allowNull {
-		if err = markl.AssertIdIsNotNull(merkleId); err != nil {
+		if err = markl.AssertIdIsNotNull(marklId); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 	}
 
+	if marklId.IsNull() {
+		return n, err
+	}
+
 	if n, err = encoder.writeFieldBinaryMarshaler(
-		merkleId,
+		marklId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
