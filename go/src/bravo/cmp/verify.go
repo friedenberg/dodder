@@ -3,7 +3,7 @@ package cmp
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type EqualerVerify[ELEMENT any] []interfaces.Equaler[ELEMENT]

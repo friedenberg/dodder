@@ -3,7 +3,7 @@ package cmp
 import (
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func TestLessorVerify(t1 *testing.T) {

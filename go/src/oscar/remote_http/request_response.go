@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/mcp"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
@@ -23,7 +22,7 @@ type MethodPath struct {
 }
 
 type Request struct {
-	ctx     interfaces.Context
+	ctx     errors.Context
 	request *http.Request
 	MethodPath
 	Headers http.Header

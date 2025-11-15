@@ -3,15 +3,15 @@ package blob_stores
 import (
 	"io"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 )
 
 // TODO offer options like just checking the existence of the blob, getting its
 // size, or full verification
 func VerifyBlob(
-	ctx interfaces.Context,
+	ctx errors.Context,
 	blobStore interfaces.BlobStore,
 	expected interfaces.MarklId,
 	progressWriter io.Writer,

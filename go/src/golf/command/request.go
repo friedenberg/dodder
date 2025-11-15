@@ -3,8 +3,8 @@ package command
 import (
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -14,7 +14,7 @@ import (
 type Request struct {
 	Utility Utility
 
-	interfaces.Context
+	errors.Context
 	repo_config_cli.Config
 	*flags.FlagSet
 	*Args
@@ -34,7 +34,7 @@ func (arg consumedArg) String() string {
 
 // TODO switch to ActiveContext
 type Args struct {
-	interfaces.Context
+	errors.Context
 	args []string
 	argi int
 

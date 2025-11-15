@@ -1,7 +1,7 @@
 package repo_config_cli
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
 	"code.linenisgreat.com/dodder/go/src/charlie/cli"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"

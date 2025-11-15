@@ -3,8 +3,8 @@ package typed_blob_store
 import (
 	"io"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type nopBlobParseSaver[

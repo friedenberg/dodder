@@ -3,7 +3,7 @@ package env_dir
 import (
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -12,7 +12,7 @@ import (
 // TODO separate read-only from write
 
 func MakeDefault(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	debugOptions debug.Options,
 ) env {
@@ -26,7 +26,7 @@ func MakeDefault(
 }
 
 func MakeDefaultNoInit(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	debugOptions debug.Options,
 ) env {
@@ -40,7 +40,7 @@ func MakeDefaultNoInit(
 }
 
 func MakeFromXDGDotenvPath(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	config repo_config_cli.Config,
 	xdgDotenvPath string,
@@ -75,7 +75,7 @@ func MakeFromXDGDotenvPath(
 }
 
 func MakeDefaultAndInitialize(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	do debug.Options,
 	overrideXDGWithCwd bool,
@@ -118,7 +118,7 @@ func MakeDefaultAndInitialize(
 }
 
 func MakeWithDefaultHome(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	debugOptions debug.Options,
 	permitCwdXDGOverride bool,
@@ -158,7 +158,7 @@ func MakeWithDefaultHome(
 }
 
 func MakeWithXDGRootOverrideHomeAndInitialize(
-	context interfaces.Context,
+	context errors.Context,
 	xdgRootOverride string,
 	utilityName string,
 	debugOptions debug.Options,
@@ -190,7 +190,7 @@ func MakeWithXDGRootOverrideHomeAndInitialize(
 }
 
 func MakeWithHomeAndInitialize(
-	context interfaces.Context,
+	context errors.Context,
 	utilityName string,
 	home string,
 	debugOptions debug.Options,
@@ -217,7 +217,7 @@ func MakeWithHomeAndInitialize(
 }
 
 func MakeWithXDG(
-	context interfaces.Context,
+	context errors.Context,
 	debugOptions debug.Options,
 	xdg xdg.XDG,
 ) (env env) {

@@ -3,7 +3,8 @@
 package errors
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 )
 
 func PrintStackTracerIfNecessary(
@@ -12,7 +13,7 @@ func PrintStackTracerIfNecessary(
 	err error,
 	_ ...any,
 ) {
-	var normalError interfaces.ErrorStackTracer
+	var normalError stack_frame.ErrorStackTracer
 
 	if As(err, &normalError) && !normalError.ShouldShowStackTrace() {
 		printer.Printf(

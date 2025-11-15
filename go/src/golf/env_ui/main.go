@@ -4,7 +4,8 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
@@ -16,7 +17,7 @@ import (
 // TODO explore storing buffered writer and reader
 type Env interface {
 	// TODO remove and keep separate
-	interfaces.Context
+	errors.Context
 
 	GetOptions() Options
 	GetIn() fd.Std
@@ -48,7 +49,7 @@ type Env interface {
 }
 
 type env struct {
-	interfaces.Context
+	errors.Context
 
 	options Options
 
@@ -62,7 +63,7 @@ type env struct {
 	cliConfig repo_config_cli.Config
 }
 
-func MakeDefault(ctx interfaces.Context) *env {
+func MakeDefault(ctx errors.Context) *env {
 	return Make(
 		ctx,
 		repo_config_cli.Config{},
@@ -71,7 +72,7 @@ func MakeDefault(ctx interfaces.Context) *env {
 }
 
 func Make(
-	context interfaces.Context,
+	context errors.Context,
 	cliConfig repo_config_cli.Config,
 	options Options,
 ) *env {

@@ -1,7 +1,7 @@
 package command
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 )

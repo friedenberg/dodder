@@ -1,6 +1,6 @@
 package quiter
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+import "code.linenisgreat.com/dodder/go/src/_/interfaces"
 
 type AsyncSerializer[T any] struct {
 	chError <-chan error

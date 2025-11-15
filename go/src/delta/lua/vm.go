@@ -1,8 +1,8 @@
 package lua
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	lua "github.com/yuin/gopher-lua"
 )
 

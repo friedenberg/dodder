@@ -4,8 +4,8 @@ import (
 	"io"
 	"time"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 )
@@ -131,7 +131,7 @@ func CopyBlobIfNecessary(
 }
 
 func CopyReaderToWriter(
-	ctx interfaces.Context,
+	ctx errors.Context,
 	dst interfaces.BlobWriter,
 	src io.Reader,
 	expected interfaces.MarklId,
@@ -147,7 +147,7 @@ func CopyReaderToWriter(
 
 	if err := errors.RunChildContextWithPrintTicker(
 		ctx,
-		func(ctx interfaces.Context) {
+		func(ctx errors.Context) {
 			var err error
 
 			if copyResult.bytesWritten, err = io.Copy(writer, src); err != nil {

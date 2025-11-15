@@ -3,7 +3,7 @@ package markl
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type (

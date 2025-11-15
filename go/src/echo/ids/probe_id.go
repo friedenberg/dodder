@@ -1,7 +1,7 @@
 package ids
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type ProbeId struct {

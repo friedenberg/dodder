@@ -2,9 +2,6 @@ package interfaces
 
 import (
 	"context"
-	"os"
-
-	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 )
 
 //go:generate stringer -type=ContextState
@@ -67,15 +64,6 @@ type (
 
 	ActiveContextGetter interface {
 		GetActiveContext() ActiveContext
-	}
-
-	Context interface {
-		ActiveContext
-		CauseWithStackFrames() (error, []stack_frame.Frame)
-		Run(func(Context)) error
-
-		// TODO extricate from *context and turn into generic function
-		SetCancelOnSignals(signals ...os.Signal)
 	}
 
 	FuncRetry        func()

@@ -3,8 +3,8 @@ package quiter
 import (
 	"sync"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 func Chain[T any](e T, wfs ...interfaces.FuncIter[T]) (err error) {

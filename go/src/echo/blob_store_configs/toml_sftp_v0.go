@@ -1,7 +1,7 @@
 package blob_store_configs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type TomlSFTPV0 struct {

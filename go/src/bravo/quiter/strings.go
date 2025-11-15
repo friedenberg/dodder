@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func SortedValuesBy[ELEMENT any](

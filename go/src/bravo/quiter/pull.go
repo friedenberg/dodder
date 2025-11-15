@@ -3,7 +3,7 @@ package quiter
 import (
 	"iter"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func Pull[ELEMENT any](

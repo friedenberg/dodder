@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -47,7 +46,7 @@ func (cmd Fsck) Run(req command.Request) {
 
 		if err := errors.RunChildContextWithPrintTicker(
 			envBlobStore,
-			func(ctx interfaces.Context) {
+			func(ctx errors.Context) {
 				for digest, err := range blobStore.AllBlobs() {
 					errors.ContextContinueOrPanic(ctx)
 					// TODO keep track of blobs in a tridex and compare

@@ -1,10 +1,6 @@
 package interfaces
 
-import "code.linenisgreat.com/dodder/go/src/_/stack_frame"
-
 type (
-	ErrorStackTracer = stack_frame.ErrorStackTracer
-
 	ErrorOneUnwrapper interface {
 		error
 		Unwrap() error

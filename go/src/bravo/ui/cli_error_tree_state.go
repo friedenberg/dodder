@@ -7,10 +7,10 @@ import (
 	"io"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/box_chars"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type cliTreeState struct {

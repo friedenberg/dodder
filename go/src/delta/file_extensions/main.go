@@ -1,7 +1,7 @@
 package file_extensions
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/equals"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 )

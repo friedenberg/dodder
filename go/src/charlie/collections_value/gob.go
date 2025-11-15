@@ -3,7 +3,7 @@ package collections_value
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 

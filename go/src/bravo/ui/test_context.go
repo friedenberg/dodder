@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type t = T
@@ -16,7 +15,7 @@ type t = T
 type TestContext struct {
 	t
 
-	Context interfaces.Context
+	Context errors.Context
 }
 
 func RunTestContext(
@@ -26,7 +25,7 @@ func RunTestContext(
 	testContext := makeTestContext(t, errors.MakeContextDefault())
 
 	if err := testContext.Context.Run(
-		func(_ interfaces.Context) {
+		func(_ errors.Context) {
 			run(testContext)
 		},
 	); err != nil {
@@ -39,7 +38,7 @@ func RunTestContext(
 
 func makeTestContext(
 	t *testing.T,
-	ctx interfaces.Context,
+	ctx errors.Context,
 ) *TestContext {
 	testContext := &TestContext{
 		t: T{

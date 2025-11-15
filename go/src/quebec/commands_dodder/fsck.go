@@ -4,8 +4,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -98,7 +98,7 @@ func (cmd Fsck) runVerification(
 
 	if err := errors.RunChildContextWithPrintTicker(
 		repo,
-		func(ctx interfaces.Context) {
+		func(ctx errors.Context) {
 			for object, errIter := range seq {
 				if errIter != nil {
 					err := objectError{err: errors.Wrap(errIter)}

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 

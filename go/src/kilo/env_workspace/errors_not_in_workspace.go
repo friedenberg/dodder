@@ -1,8 +1,8 @@
 package env_workspace
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
 )
 
@@ -25,7 +25,7 @@ func (err ErrNotInWorkspace) ShouldShowStackTrace() bool {
 }
 
 func (err ErrNotInWorkspace) Recover(
-	ctx interfaces.Context,
+	ctx errors.Context,
 	retry interfaces.FuncRetry,
 	abort interfaces.FuncRetryAborted,
 ) {

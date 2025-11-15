@@ -8,8 +8,8 @@ import (
 	"sort"
 	"syscall"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -79,7 +79,7 @@ func (utility Utility) MergeUtility(otherUtility Utility) Utility {
 	return utility.MergeUtilityWithPrefix(otherUtility, "")
 }
 
-func (utility Utility) PrintUsage(ctx interfaces.Context, err error) {
+func (utility Utility) PrintUsage(ctx errors.Context, err error) {
 	if err != nil {
 		defer ctx.Cancel(err)
 	}
@@ -144,7 +144,7 @@ func (utility Utility) Run(
 	)
 
 	if err := ctx.Run(
-		func(ctx interfaces.Context) {
+		func(ctx errors.Context) {
 			if len(args) <= 1 {
 				utility.PrintUsage(
 					ctx,

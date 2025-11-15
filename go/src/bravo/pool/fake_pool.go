@@ -1,6 +1,6 @@
 package pool
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+import "code.linenisgreat.com/dodder/go/src/_/interfaces"
 
 type fakePool[T any, TPtr interfaces.Ptr[T]] struct{}
 

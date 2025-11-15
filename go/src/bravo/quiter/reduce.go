@@ -3,7 +3,7 @@ package quiter
 import (
 	"sort"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func Elements[T any](s interfaces.Collection[T]) (out []T) {

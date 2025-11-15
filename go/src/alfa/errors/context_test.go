@@ -5,7 +5,7 @@ import (
 	"syscall"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func TestContextCancelled(t *testing.T) {
@@ -14,7 +14,7 @@ func TestContextCancelled(t *testing.T) {
 	var must1, must2, after1 bool
 
 	if err := ctx.Run(
-		func(ctx interfaces.Context) {
+		func(ctx Context) {
 			defer func() {
 				t.Log("defer1")
 
@@ -84,7 +84,7 @@ func TestContextCancelledRetry(t *testing.T) {
 	tryCount := 0
 
 	if err := ctx.Run(
-		func(ctx interfaces.Context) {
+		func(ctx Context) {
 			t.Logf("try count: %d", tryCount)
 
 			if tryCount == 0 {
@@ -111,7 +111,7 @@ func TestContextCancelledRetryFailed(t *testing.T) {
 	expected := errContextRetryAborted{}
 
 	if err := ctx.Run(
-		func(ctx interfaces.Context) {
+		func(ctx Context) {
 			t.Logf("try count: %d", tryCount)
 
 			if tryCount == 0 {
@@ -140,11 +140,11 @@ func TestContextSignal(t *testing.T) {
 
 	go func() {
 		if err := ctx.Run(
-			func(ctx interfaces.Context) {
+			func(ctx Context) {
 				child := MakeContext(ctx)
 
 				if err := child.Run(
-					func(ctx interfaces.Context) {
+					func(ctx Context) {
 						<-ctx.Done()
 						cont <- struct{}{}
 					},

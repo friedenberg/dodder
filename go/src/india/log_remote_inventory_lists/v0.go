@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"sync"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
@@ -60,7 +60,7 @@ func (log *v0) Flush() (err error) {
 	return nil
 }
 
-func (log *v0) initialize(ctx interfaces.Context, env env_repo.Env) {
+func (log *v0) initialize(ctx errors.Context, env env_repo.Env) {
 	gob.Register(tridex.Make())
 
 	log.values = tridex.Make()

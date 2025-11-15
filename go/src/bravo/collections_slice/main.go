@@ -3,7 +3,7 @@ package collections_slice
 import (
 	"slices"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type Slice[ELEMENT any] []ELEMENT

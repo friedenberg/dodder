@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 )
@@ -41,7 +41,7 @@ type Env interface {
 }
 
 type env struct {
-	interfaces.Context
+	errors.Context
 	beforeXDG
 
 	TempLocal, TempOS TemporaryFS

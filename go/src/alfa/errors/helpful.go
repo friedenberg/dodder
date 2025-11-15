@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 func PrintHelpful(printer interfaces.Printer, helpful Helpful) {

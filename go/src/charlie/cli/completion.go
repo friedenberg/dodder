@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 // TODO add support for comma-separated values

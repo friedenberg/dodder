@@ -7,7 +7,6 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 func New(text string) error {
@@ -93,7 +92,7 @@ func shouldNotWrap(err error) bool {
 		panic("trying to wrap io.EOF")
 	}
 
-	var errStackTracer interfaces.ErrorStackTracer
+	var errStackTracer stack_frame.ErrorStackTracer
 
 	if As(err, &errStackTracer) && !errStackTracer.ShouldShowStackTrace() {
 		return true
@@ -136,14 +135,6 @@ func Wrapf(err error, format string, values ...any) error {
 	}
 
 	return stackFrame.Wrapf(err, format, values...)
-}
-
-//go:noinline
-func IterWrapped[T any](err error) interfaces.SeqError[T] {
-	return func(yield func(T, error) bool) {
-		var t T
-		yield(t, WrapSkip(1, err))
-	}
 }
 
 type funcGetNext func() (error, funcGetNext)

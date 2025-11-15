@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 )
@@ -23,7 +22,7 @@ type Context struct {
 }
 
 func MakeContext(
-	ctx interfaces.Context,
+	ctx errors.Context,
 	options Options,
 ) (c *Context, err error) {
 	c = &Context{

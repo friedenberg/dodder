@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -19,7 +18,7 @@ func extendNameIfNecessary(name string) string {
 }
 
 func handleMainErrors(
-	ctx interfaces.Context,
+	ctx errors.Context,
 	name string,
 	err error,
 ) (exitStatus int) {

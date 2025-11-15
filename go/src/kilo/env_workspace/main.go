@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
@@ -24,8 +24,8 @@ import (
 type Env interface {
 	env_dir.Env
 	GetWorkspaceDir() string
-	AssertNotTemporary(interfaces.Context)
-	AssertNotTemporaryOrOfferToCreate(interfaces.Context)
+	AssertNotTemporary(errors.Context)
+	AssertNotTemporaryOrOfferToCreate(errors.Context)
 	IsTemporary() bool
 	GetWorkspaceConfigTyped() workspace_config_blobs.TypedConfig
 	GetWorkspaceConfig() workspace_config_blobs.Config
@@ -201,13 +201,13 @@ func (env *env) GetWorkspaceConfigFilePath() string {
 	return filepath.Join(env.GetWorkspaceDir(), env_repo.FileWorkspace)
 }
 
-func (env *env) AssertNotTemporary(context interfaces.Context) {
+func (env *env) AssertNotTemporary(context errors.Context) {
 	if env.IsTemporary() {
 		context.Cancel(ErrNotInWorkspace{env: env})
 	}
 }
 
-func (env *env) AssertNotTemporaryOrOfferToCreate(context interfaces.Context) {
+func (env *env) AssertNotTemporaryOrOfferToCreate(context errors.Context) {
 	if env.IsTemporary() {
 		context.Cancel(
 			ErrNotInWorkspace{

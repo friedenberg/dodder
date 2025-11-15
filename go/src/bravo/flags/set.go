@@ -1,6 +1,6 @@
 package flags
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+import "code.linenisgreat.com/dodder/go/src/_/interfaces"
 
 type Definitions interface {
 	BoolVar(variable *bool, name string, defaultValue bool, usage string)

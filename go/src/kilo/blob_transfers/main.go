@@ -3,8 +3,8 @@ package blob_transfers
 import (
 	"time"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
@@ -119,7 +119,7 @@ func (blobImporter *BlobImporter) ImportBlobToStoreIfNecessary(
 
 	if err := errors.RunChildContextWithPrintTicker(
 		blobImporter.EnvBlobStore,
-		func(ctx interfaces.Context) {
+		func(ctx errors.Context) {
 			blobImporter.Counts.Total++
 
 			var hashType interfaces.FormatHash

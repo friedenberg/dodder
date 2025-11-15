@@ -3,7 +3,7 @@ package quiter
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type StringerKeyer[

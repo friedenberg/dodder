@@ -7,19 +7,18 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 type memoryLimit struct {
-	ctx interfaces.Context
+	ctx errors.Context
 	*time.Ticker
 	memoryLimit atomic.Uint64
 	memoryInUse atomic.Uint64
 	sync.Once
 }
 
-func (ml *memoryLimit) Start(ctx interfaces.Context) (err error) {
+func (ml *memoryLimit) Start(ctx errors.Context) (err error) {
 	ml.ctx = ctx
 
 	ml.Ticker = time.NewTicker(time.Microsecond)

@@ -11,10 +11,19 @@ import (
 	"syscall"
 	"time"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"golang.org/x/xerrors"
 )
+
+type Context interface {
+	interfaces.ActiveContext
+	CauseWithStackFrames() (error, []stack_frame.Frame)
+	Run(func(Context)) error
+
+	// TODO extricate from *context and turn into generic function
+	SetCancelOnSignals(signals ...os.Signal)
+}
 
 // TODO maybe consider adding a target error that is used to determine whether a
 // stack trace is printed?
@@ -28,7 +37,7 @@ type context struct {
 	lockCancel        sync.Mutex
 
 	funcCancel ConTeXT.CancelCauseFunc
-	funcRun    func(interfaces.Context)
+	funcRun    func(Context)
 
 	signals chan os.Signal
 
@@ -92,7 +101,7 @@ func (ctx *context) SetCancelOnSignals(signals ...os.Signal) {
 	signal.Notify(ctx.signals, signals...)
 }
 
-func (ctx *context) Run(funcRun func(interfaces.Context)) error {
+func (ctx *context) Run(funcRun func(Context)) error {
 	if !ctx.lockRun.TryLock() {
 		return ErrorWithStackf(
 			"Context.Run called before previous run completed.",
@@ -315,15 +324,15 @@ func ContextContinueOrPanic(ctx interfaces.ActiveContext) {
 //  |____/|_|\__, |_| |_|\__,_|_|___/
 //           |___/
 
-func ContextSetCancelOnSIGTERM(ctx interfaces.Context) {
+func ContextSetCancelOnSIGTERM(ctx Context) {
 	ctx.SetCancelOnSignals(syscall.SIGTERM)
 }
 
-func ContextSetCancelOnSIGINT(ctx interfaces.Context) {
+func ContextSetCancelOnSIGINT(ctx Context) {
 	ctx.SetCancelOnSignals(syscall.SIGINT)
 }
 
-func ContextSetCancelOnSIGHUP(ctx interfaces.Context) {
+func ContextSetCancelOnSIGHUP(ctx Context) {
 	ctx.SetCancelOnSignals(syscall.SIGHUP)
 }
 
@@ -397,13 +406,13 @@ func CancelWithNotImplemented(ctx interfaces.ActiveContext) {
 //                                   |___/
 
 func RunContextWithPrintTicker(
-	context interfaces.Context,
-	runFunc func(interfaces.Context),
+	context Context,
+	runFunc func(Context),
 	printFunc func(time.Time),
 	duration time.Duration,
 ) (err error) {
 	if err = context.Run(
-		func(ctx interfaces.Context) {
+		func(ctx Context) {
 			ticker := time.NewTicker(duration)
 			ctx.After(MakeFuncContextFromFuncNil(ticker.Stop))
 
@@ -431,8 +440,8 @@ func RunContextWithPrintTicker(
 }
 
 func RunChildContextWithPrintTicker(
-	parentContext interfaces.Context,
-	runFunc func(interfaces.Context),
+	parentContext Context,
+	runFunc func(Context),
 	printFunc func(time.Time),
 	duration time.Duration,
 ) (err error) {

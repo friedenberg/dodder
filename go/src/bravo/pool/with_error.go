@@ -3,8 +3,8 @@ package pool
 import (
 	"sync"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
 type poolWithError[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]] struct {

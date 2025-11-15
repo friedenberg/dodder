@@ -16,9 +16,9 @@ import (
 	"syscall"
 	"time"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -416,7 +416,7 @@ func (server *Server) makeHandler(
 
 		if err := errors.RunContextWithPrintTicker(
 			request.ctx,
-			func(ctx interfaces.Context) {
+			func(ctx errors.Context) {
 				response = handler(request)
 			},
 			func(time time.Time) {
@@ -438,7 +438,7 @@ func (server *Server) makeHandler(
 
 		if err := errors.RunContextWithPrintTicker(
 			request.ctx,
-			func(ctx interfaces.Context) {
+			func(ctx errors.Context) {
 				header := responseWriter.Header()
 
 				for key, values := range response.Headers() {

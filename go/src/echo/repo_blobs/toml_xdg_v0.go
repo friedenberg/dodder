@@ -1,7 +1,7 @@
 package repo_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
