@@ -38,6 +38,10 @@ type (
 	}
 )
 
+func Make() Finalizer {
+	return finalizer{}
+}
+
 func (finalizer finalizer) GetObjectFinalizer() Finalizer {
 	return finalizer
 }

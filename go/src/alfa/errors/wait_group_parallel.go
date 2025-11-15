@@ -4,7 +4,7 @@ import (
 	"slices"
 	"sync"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 )
 
 func MakeWaitGroupParallel() WaitGroup {

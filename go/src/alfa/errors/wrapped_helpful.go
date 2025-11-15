@@ -1,12 +1,18 @@
 package errors
 
-import "code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+type (
+	Helpful interface {
+		error
+		GetErrorCause() []string
+		GetErrorRecovery() []string
+	}
+)
 
 func WithHelp(
 	err error,
 	cause []string,
 	recovery []string,
-) interfaces.ErrorHelpful {
+) Helpful {
 	return helpful{
 		underlying: err,
 		cause:      cause,

@@ -63,7 +63,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 		{
 			config := genesis_configs.Default().Blob
-			finalizer := object_finalizer.Finalizer{}
+			finalizer := object_finalizer.Make()
 
 			t.AssertNoError(config.GetPrivateKeyMutable().GeneratePrivateKey(
 				nil,

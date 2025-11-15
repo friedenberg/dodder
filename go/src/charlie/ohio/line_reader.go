@@ -3,9 +3,9 @@ package ohio
 import (
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 )
 
 func MakeLineReaderIterateStrict(

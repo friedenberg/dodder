@@ -1,6 +1,6 @@
 package interfaces
 
-import "code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+import "code.linenisgreat.com/dodder/go/src/_/stack_frame"
 
 type (
 	ErrorStackTracer = stack_frame.ErrorStackTracer
@@ -23,9 +23,4 @@ type (
 		ShouldHideUnwrap() bool
 	}
 
-	ErrorHelpful interface {
-		error
-		GetErrorCause() []string
-		GetErrorRecovery() []string
-	}
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
+	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 )
 
 //go:generate stringer -type=ContextState

@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func PrintHelpful(printer interfaces.Printer, helpful interfaces.ErrorHelpful) {
+func PrintHelpful(printer interfaces.Printer, helpful Helpful) {
 	printer.Printf("Error: %s", helpful.Error())
 	printer.Printf("\nCause:")
 

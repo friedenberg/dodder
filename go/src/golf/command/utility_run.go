@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"syscall"
 
+	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -39,7 +39,7 @@ func handleMainErrors(
 		return exitStatus
 	}
 
-	var helpful interfaces.ErrorHelpful
+	var helpful errors.Helpful
 
 	if errors.As(err, &helpful) {
 		errors.PrintHelpful(ui.Err(), helpful)

@@ -26,7 +26,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) coder {
 		configGenesis := envRepo.GetConfigPublic().Blob
-		finalizer := object_finalizer.Finalizer{}
+		finalizer := object_finalizer.Make()
 
 		doddishCoder := doddish{
 			box: box,
@@ -66,7 +66,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			box: box,
 		}
 
-		finalizer := object_finalizer.Finalizer{}
+		finalizer := object_finalizer.Make()
 
 		return coder{
 			listCoder: doddishCoder,
@@ -91,7 +91,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 
-		finalizer := object_finalizer.Finalizer{}
+		finalizer := object_finalizer.Make()
 
 		return coder{
 			listCoder:      jsonCoder,

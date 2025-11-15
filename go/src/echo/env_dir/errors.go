@@ -80,7 +80,7 @@ func MakeErrTempAlreadyExists(
 	return err
 }
 
-var _ interfaces.ErrorHelpful = ErrTempAlreadyExists{}
+var _ errors.Helpful = ErrTempAlreadyExists{}
 
 type ErrTempAlreadyExists struct {
 	Path string

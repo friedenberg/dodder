@@ -3,7 +3,7 @@ package object_id_provider
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type ErrDoesNotExist struct {
@@ -19,7 +19,7 @@ func (err ErrDoesNotExist) Is(target error) bool {
 	return ok
 }
 
-var _ interfaces.ErrorHelpful = ErrZettelIdsExhausted{}
+var _ errors.Helpful = ErrZettelIdsExhausted{}
 
 type ErrZettelIdsExhausted struct{}
 

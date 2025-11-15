@@ -342,10 +342,9 @@ func (store *Store) GenerateConflictMarker(
 
 	blobStore := store.storeSupplies.BlobStore.InventoryList
 	// TODO assert that left and right both have a mother sig
+	finalizer := object_finalizer.Make()
 
 	for object := range conflicted.All() {
-		finalizer := object_finalizer.Finalizer{}
-
 		if err = finalizer.FinalizeAndSignIfNecessary(
 			object,
 			store.envRepo.GetConfigPrivate().Blob,

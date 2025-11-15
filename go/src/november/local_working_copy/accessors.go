@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_local"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_workspace"
@@ -106,4 +107,8 @@ func (local *Repo) GetStore() *store.Store {
 
 func (local *Repo) GetAbbr() sku.IdIndex {
 	return local.indexIds
+}
+
+func (local *Repo) GetObjectFinalizer() object_finalizer.Finalizer {
+	return object_finalizer.Make()
 }
