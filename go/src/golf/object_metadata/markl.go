@@ -4,42 +4,42 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-func (metadata *Metadata) GetBlobDigest() interfaces.MarklId {
+func (metadata *metadata) GetBlobDigest() interfaces.MarklId {
 	return &metadata.DigBlob
 }
 
-func (metadata *Metadata) GetBlobDigestMutable() interfaces.MutableMarklId {
+func (metadata *metadata) GetBlobDigestMutable() interfaces.MutableMarklId {
 	return &metadata.DigBlob
 }
 
-func (metadata *Metadata) GetObjectDigest() interfaces.MarklId {
+func (metadata *metadata) GetObjectDigest() interfaces.MarklId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetObjectDigestMutable() interfaces.MutableMarklId {
+func (metadata *metadata) GetObjectDigestMutable() interfaces.MutableMarklId {
 	return &metadata.digSelf
 }
 
-func (metadata *Metadata) GetMotherObjectSig() interfaces.MarklId {
+func (metadata *metadata) GetMotherObjectSig() interfaces.MarklId {
 	return &metadata.sigMother
 }
 
-func (metadata *Metadata) GetMotherObjectSigMutable() interfaces.MutableMarklId {
+func (metadata *metadata) GetMotherObjectSigMutable() interfaces.MutableMarklId {
 	return &metadata.sigMother
 }
 
-func (metadata *Metadata) GetRepoPubKey() interfaces.MarklId {
+func (metadata *metadata) GetRepoPubKey() interfaces.MarklId {
 	return metadata.pubRepo
 }
 
-func (metadata *Metadata) GetRepoPubKeyMutable() interfaces.MutableMarklId {
+func (metadata *metadata) GetRepoPubKeyMutable() interfaces.MutableMarklId {
 	return &metadata.pubRepo
 }
 
-func (metadata *Metadata) GetObjectSig() interfaces.MarklId {
+func (metadata *metadata) GetObjectSig() interfaces.MarklId {
 	return &metadata.sigRepo
 }
 
-func (metadata *Metadata) GetObjectSigMutable() interfaces.MutableMarklId {
+func (metadata *metadata) GetObjectSigMutable() interfaces.MutableMarklId {
 	return &metadata.sigRepo
 }

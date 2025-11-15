@@ -17,7 +17,7 @@ type Field = string_format_writer.Field
 
 // TODO transform into a view interface that can be backed by various
 // representations
-type Metadata struct {
+type metadata struct {
 	// Domain
 	// InventoryListTai
 
@@ -45,24 +45,24 @@ type Metadata struct {
 }
 
 var (
-	_ interfaces.CommandComponentWriter = (*Metadata)(nil)
-	_ Getter                            = &Metadata{}
-	_ GetterMutable                     = &Metadata{}
+	_ interfaces.CommandComponentWriter = (*metadata)(nil)
+	_ Getter                            = &metadata{}
+	_ GetterMutable                     = &metadata{}
 )
 
-func (metadata *Metadata) GetMetadata() Metadata {
+func (metadata *metadata) GetMetadata() metadata {
 	return *metadata
 }
 
-func (metadata *Metadata) GetMetadataMutable() *Metadata {
+func (metadata *metadata) GetMetadataMutable() *metadata {
 	return metadata
 }
 
-func (metadata *Metadata) GetLockfile() Lockfile {
+func (metadata *metadata) GetLockfile() Lockfile {
 	return metadata.lockfile
 }
 
-func (metadata *Metadata) UserInputIsEmpty() bool {
+func (metadata *metadata) UserInputIsEmpty() bool {
 	if !metadata.Description.IsEmpty() {
 		return false
 	}
@@ -78,7 +78,7 @@ func (metadata *Metadata) UserInputIsEmpty() bool {
 	return true
 }
 
-func (metadata *Metadata) IsEmpty() bool {
+func (metadata *metadata) IsEmpty() bool {
 	if !metadata.DigBlob.IsNull() {
 		return false
 	}
@@ -95,7 +95,7 @@ func (metadata *Metadata) IsEmpty() bool {
 }
 
 // TODO fix issue with GetTags being nil sometimes
-func (metadata *Metadata) GetTags() ids.TagSet {
+func (metadata *metadata) GetTags() ids.TagSet {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
@@ -103,7 +103,7 @@ func (metadata *Metadata) GetTags() ids.TagSet {
 	return metadata.Tags
 }
 
-func (metadata *Metadata) ResetTags() {
+func (metadata *metadata) ResetTags() {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
@@ -112,7 +112,7 @@ func (metadata *Metadata) ResetTags() {
 	metadata.Cache.TagPaths.Reset()
 }
 
-func (metadata *Metadata) AddTagString(tagString string) (err error) {
+func (metadata *metadata) AddTagString(tagString string) (err error) {
 	if tagString == "" {
 		return err
 	}
@@ -132,7 +132,7 @@ func (metadata *Metadata) AddTagString(tagString string) (err error) {
 	return err
 }
 
-func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
+func (metadata *metadata) AddTagPtr(e *ids.Tag) (err error) {
 	if e == nil || e.String() == "" {
 		return err
 	}
@@ -148,7 +148,7 @@ func (metadata *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	return err
 }
 
-func (metadata *Metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
+func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
@@ -168,7 +168,7 @@ func (metadata *Metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 	return err
 }
 
-func (metadata *Metadata) SetTags(tags ids.TagSet) {
+func (metadata *metadata) SetTags(tags ids.TagSet) {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
@@ -188,7 +188,7 @@ func (metadata *Metadata) SetTags(tags ids.TagSet) {
 	}
 }
 
-func (metadata *Metadata) SetTagsFast(tags ids.TagSet) {
+func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
 	if metadata.Tags == nil {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
@@ -208,30 +208,30 @@ func (metadata *Metadata) SetTagsFast(tags ids.TagSet) {
 	}
 }
 
-func (metadata *Metadata) GetType() ids.Type {
+func (metadata *metadata) GetType() ids.Type {
 	return metadata.Type
 }
 
-func (metadata *Metadata) GetTypePtr() *ids.Type {
+func (metadata *metadata) GetTypePtr() *ids.Type {
 	return &metadata.Type
 }
 
-func (metadata *Metadata) GetTai() ids.Tai {
+func (metadata *metadata) GetTai() ids.Tai {
 	return metadata.Tai
 }
 
 // TODO-P2 remove
-func (metadata *Metadata) EqualsSansTai(a *Metadata) bool {
+func (metadata *metadata) EqualsSansTai(a *metadata) bool {
 	return EqualerSansTai.Equals(a, metadata)
 }
 
 // TODO-P2 remove
-func (metadata *Metadata) Equals(z1 *Metadata) bool {
+func (metadata *metadata) Equals(z1 *metadata) bool {
 	return Equaler.Equals(metadata, z1)
 }
 
-func (metadata *Metadata) Subtract(
-	b *Metadata,
+func (metadata *metadata) Subtract(
+	b *metadata,
 ) {
 	if metadata.Type.String() == b.Type.String() {
 		metadata.Type = ids.Type{}
@@ -251,11 +251,11 @@ func (metadata *Metadata) Subtract(
 	// ui.Debug().Print("after", b.Tags, a.Tags)
 }
 
-func (metadata *Metadata) AddComment(f string, vals ...any) {
+func (metadata *metadata) AddComment(f string, vals ...any) {
 	metadata.Comments = append(metadata.Comments, fmt.Sprintf(f, vals...))
 }
 
-func (metadata *Metadata) GenerateExpandedTags() {
+func (metadata *metadata) GenerateExpandedTags() {
 	metadata.Cache.SetExpandedTags(ids.ExpandMany(
 		metadata.GetTags(),
 		expansion.ExpanderRight,

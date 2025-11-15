@@ -64,20 +64,20 @@ func MakeErrHasInlineBlobAndMetadataBlobId(
 	inline, metadata interfaces.MarklId,
 ) (err *ErrHasInlineBlobAndMetadataDigest) {
 	err = &ErrHasInlineBlobAndMetadataDigest{}
-	err.Metadata = markl.Clone(metadata)
+	err.metadata = markl.Clone(metadata)
 	err.Inline = markl.Clone(inline)
 	return err
 }
 
 type ErrHasInlineBlobAndMetadataDigest struct {
 	Inline   interfaces.MarklId
-	Metadata interfaces.MarklId
+	metadata interfaces.MarklId
 }
 
 func (err *ErrHasInlineBlobAndMetadataDigest) Error() string {
 	return fmt.Sprintf(
 		"text has inline blob and metadata blob id: \ninline blob id: %s\n metadata blob id: %s",
 		err.Inline,
-		err.Metadata,
+		err.metadata,
 	)
 }

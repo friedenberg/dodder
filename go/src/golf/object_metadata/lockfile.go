@@ -7,7 +7,9 @@ type (
 		GetTypeLock() Lock
 	}
 
-	LockfileMutable interface{}
+	LockfileMutable interface {
+		Lockfile
+	}
 
 	Lock struct {
 		Key string
@@ -20,7 +22,10 @@ type lockfile struct {
 	tags []Lock
 }
 
-var _ Lockfile = lockfile{}
+var (
+	_ Lockfile        = lockfile{}
+	_ LockfileMutable = &lockfile{}
+)
 
 func (lockfile lockfile) GetTypeLock() Lock {
 	return lockfile.tipe

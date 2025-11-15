@@ -81,7 +81,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (parser *textParser2) readType(
-	metadata *Metadata,
+	metadata *metadata,
 	desc string,
 ) (err error) {
 	if desc == "" {
@@ -138,7 +138,7 @@ func (parser *textParser2) readType(
 }
 
 func (parser *textParser2) setBlobSha(
-	metadata *Metadata,
+	metadata *metadata,
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(

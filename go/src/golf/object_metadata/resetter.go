@@ -10,7 +10,7 @@ var Resetter resetter
 
 type resetter struct{}
 
-func (resetter) Reset(metadata *Metadata) {
+func (resetter) Reset(metadata *metadata) {
 	metadata.Description.Reset()
 	metadata.Comments = metadata.Comments[:0]
 	metadata.sigRepo.Reset()
@@ -26,7 +26,7 @@ func (resetter) Reset(metadata *Metadata) {
 	metadata.Fields = metadata.Fields[:0]
 }
 
-func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
+func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.Description = src.Description
 	dst.Comments = dst.Comments[:0]
 	dst.Comments = append(dst.Comments, src.Comments...)
@@ -46,7 +46,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 	dst.sigMother.ResetWith(src.sigMother)
 }
 
-func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
+func (r resetter) ResetWith(dst *metadata, src *metadata) {
 	r.ResetWithExceptFields(dst, src)
 	dst.Fields = dst.Fields[:0]
 	dst.Fields = append(dst.Fields, src.Fields...)

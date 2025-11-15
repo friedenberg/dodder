@@ -10,7 +10,7 @@ import (
 )
 
 // TODO replace with command_components.ObjectMetadata
-func (metadata *Metadata) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
+func (metadata *metadata) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 	metadata.SetFlagSetDescription(
 		flagSet,
 		"the description to use for created or updated Zettels",
@@ -27,7 +27,7 @@ func (metadata *Metadata) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitio
 	)
 }
 
-func (metadata *Metadata) SetFlagSetDescription(f interfaces.CLIFlagDefinitions, usage string) {
+func (metadata *metadata) SetFlagSetDescription(f interfaces.CLIFlagDefinitions, usage string) {
 	f.Var(
 		&metadata.Description,
 		"description",
@@ -35,7 +35,7 @@ func (metadata *Metadata) SetFlagSetDescription(f interfaces.CLIFlagDefinitions,
 	)
 }
 
-func (metadata *Metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage string) {
+func (metadata *metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage string) {
 	// TODO add support for tag_paths
 	fes := flag.Make(
 		flag_policy.FlagPolicyAppend,
@@ -66,7 +66,7 @@ func (metadata *Metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage 
 	)
 }
 
-func (metadata *Metadata) SetFlagSetType(f interfaces.CLIFlagDefinitions, usage string) {
+func (metadata *metadata) SetFlagSetType(f interfaces.CLIFlagDefinitions, usage string) {
 	f.Func(
 		"type",
 		usage,

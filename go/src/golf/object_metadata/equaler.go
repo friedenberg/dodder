@@ -19,7 +19,7 @@ type equaler struct {
 const debug = false
 
 // TODO make better diffing facility
-func (e equaler) Equals(a, b *Metadata) bool {
+func (e equaler) Equals(a, b *metadata) bool {
 	if e.includeTai && !a.Tai.Equals(b.Tai) {
 		if debug {
 			ui.Debug().Print(&a.Tai, "->", &b.Tai)

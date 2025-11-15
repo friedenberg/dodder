@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
-func StringSansTai(o *Metadata) (str string) {
+func StringSansTai(o *metadata) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(" ")

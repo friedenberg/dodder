@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	// Metadata = Metadata
+	Metadata = metadata
 
 	Getter interface {
 		GetMetadata() Metadata

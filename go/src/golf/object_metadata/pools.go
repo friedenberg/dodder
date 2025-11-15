@@ -5,15 +5,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 )
 
-var thePool interfaces.Pool[Metadata, *Metadata]
+var thePool interfaces.Pool[metadata, *metadata]
 
 func init() {
-	thePool = pool.Make[Metadata, *Metadata](
+	thePool = pool.Make[metadata, *metadata](
 		nil,
 		Resetter.Reset,
 	)
 }
 
-func GetPool() interfaces.Pool[Metadata, *Metadata] {
+func GetPool() interfaces.Pool[metadata, *metadata] {
 	return thePool
 }
