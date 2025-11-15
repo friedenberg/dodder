@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 	"code.linenisgreat.com/dodder/go/src/alfa/box_chars"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
 
 type encoder struct{}

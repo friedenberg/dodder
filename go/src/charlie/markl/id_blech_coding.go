@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
+	"code.linenisgreat.com/dodder/go/src/charlie/blech32"
 )
 
 func StringHRPCombined(id interfaces.MarklId) string {

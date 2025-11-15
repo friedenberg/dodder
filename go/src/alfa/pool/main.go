@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type pool[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]] struct {
@@ -40,19 +39,6 @@ func Make[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]](
 
 func (pool pool[SWIMMER, SWIMMER_PTR]) Get() SWIMMER_PTR {
 	return pool.inner.Get().(SWIMMER_PTR)
-}
-
-func (pool pool[SWIMMER, SWIMMER_PTR]) PutMany(
-	swimmers ...SWIMMER_PTR,
-) (err error) {
-	for _, i := range swimmers {
-		if err = pool.Put(i); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	return err
 }
 
 func (pool pool[SWIMMER, SWIMMER_PTR]) Put(swimmer SWIMMER_PTR) (err error) {

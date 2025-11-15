@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/flag_policy"
-	"code.linenisgreat.com/dodder/go/src/bravo/flag"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 )
 
 // TODO replace with command_components.ObjectMetadata
@@ -37,7 +37,7 @@ func (metadata *metadata) SetFlagSetDescription(f interfaces.CLIFlagDefinitions,
 
 func (metadata *metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage string) {
 	// TODO add support for tag_paths
-	fes := flag.Make(
+	fes := flags.MakeWithPolicy(
 		flag_policy.FlagPolicyAppend,
 		func() string {
 			return metadata.Cache.TagPaths.String()

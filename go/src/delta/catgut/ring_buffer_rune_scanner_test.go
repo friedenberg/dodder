@@ -3,7 +3,7 @@ package catgut
 import (
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"github.com/google/go-cmp/cmp"
 )

@@ -2,8 +2,6 @@ package pool
 
 import (
 	"sync"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type value[SWIMMER any] struct {
@@ -34,19 +32,6 @@ func MakeValue[SWIMMER any](
 
 func (pool value[SWIMMER]) Get() SWIMMER {
 	return pool.inner.Get().(SWIMMER)
-}
-
-func (pool value[SWIMMER]) PutMany(
-	swimmers ...SWIMMER,
-) (err error) {
-	for _, i := range swimmers {
-		if err = pool.Put(i); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	return err
 }
 
 func (pool value[SWIMMER]) Put(swimmer SWIMMER) (err error) {

@@ -3,7 +3,7 @@ package stream_index
 import (
 	"sync"
 
-	"code.linenisgreat.com/dodder/go/src/bravo/page_id"
+	"code.linenisgreat.com/dodder/go/src/delta/page_id"
 )
 
 type page struct {

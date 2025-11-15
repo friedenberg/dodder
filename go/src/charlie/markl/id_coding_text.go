@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
+	"code.linenisgreat.com/dodder/go/src/charlie/blech32"
 )
 
 func (id Id) MarshalText() (bites []byte, err error) {

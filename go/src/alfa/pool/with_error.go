@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type poolWithError[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]] struct {
@@ -39,32 +38,7 @@ func MakeWithError[SWIMMER any, SWIMMER_PTR interfaces.Ptr[SWIMMER]](
 }
 
 func (pool poolWithError[SWIMMER, SWIMMER_PTR]) Get() (e SWIMMER_PTR, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch rt := r.(type) {
-			case error:
-				err = rt
-
-			default:
-				err = errors.ErrorWithStackf("panicked during pool new: %w", err)
-			}
-		}
-	}()
-
 	return pool.inner.Get().(SWIMMER_PTR), nil
-}
-
-func (pool poolWithError[SWIMMER, SWIMMER_PTR]) PutMany(
-	swimmers ...SWIMMER_PTR,
-) (err error) {
-	for _, swimmer := range swimmers {
-		if err = pool.Put(swimmer); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	return err
 }
 
 func (pool poolWithError[SWIMMER, SWIMMER_PTR]) Put(

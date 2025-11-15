@@ -7,27 +7,26 @@ package interfaces
 
 type FuncRepool func()
 
-type PoolablePtr[T any] interface {
-	Ptr[T]
+type PoolablePtr[SWIMMER any] interface {
+	Ptr[SWIMMER]
 }
 
-type PoolValue[T any] interface {
-	Get() T
-	Put(i T) (err error)
+type PoolValue[SWIMMER any] interface {
+	Get() SWIMMER
+	Put(i SWIMMER) (err error)
 }
 
-type Pool[T any, TPtr Ptr[T]] interface {
-	PoolValue[TPtr]
-	PutMany(...TPtr) error
+type Pool[SWIMMER any, SWIMMER_PTR Ptr[SWIMMER]] interface {
+	PoolValue[SWIMMER_PTR]
 }
 
 // TODO remove below in favor of panicking
 
-type PoolWithErrors[T any] interface {
-	Get() (T, error)
-	Put(i T) (err error)
+type PoolWithErrors[SWIMMER any] interface {
+	Get() (SWIMMER, error)
+	Put(i SWIMMER) (err error)
 }
 
-type PoolWithErrorsPtr[T any, TPtr Ptr[T]] interface {
-	PoolWithErrors[TPtr]
+type PoolWithErrorsPtr[SWIMMER any, SWIMMER_PTR Ptr[SWIMMER]] interface {
+	PoolWithErrors[SWIMMER_PTR]
 }

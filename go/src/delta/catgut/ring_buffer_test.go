@@ -7,8 +7,8 @@ import (
 	"testing"
 	"unicode"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
-	"code.linenisgreat.com/dodder/go/src/bravo/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 

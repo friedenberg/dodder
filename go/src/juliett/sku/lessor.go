@@ -1,7 +1,7 @@
 package sku
 
 import (
-	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 )
 
 func TransactedCompare(left, right *Transacted) cmp.Result {

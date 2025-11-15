@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/cmp"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 )
 
 func MakeNew[ELEMENT Element, ELEMENT_PTR ElementPtr[ELEMENT]](
