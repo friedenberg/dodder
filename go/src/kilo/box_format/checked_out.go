@@ -232,7 +232,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	builder *object_metadata_box_builder.Builder,
 	item *sku.FSItem,
 ) (err error) {
-	metadata := object.GetMetadata()
+	metadata := object.GetMetadataMutable()
 
 	if options.PrintBlobDigests &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {

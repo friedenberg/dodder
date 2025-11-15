@@ -21,7 +21,7 @@ type textParser2 struct {
 }
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
-	metadata := parser.GetMetadata()
+	metadata := parser.GetMetadataMutable()
 	Resetter.Reset(metadata)
 
 	delimReader := delim_reader.MakeDelimReader('\n', r)

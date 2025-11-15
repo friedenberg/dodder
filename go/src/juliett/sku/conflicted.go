@@ -172,9 +172,9 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 
 	tags := same.CloneSetPtrLike()
 
-	conflicted.Local.GetMetadata().SetTags(tags)
-	conflicted.Base.GetMetadata().SetTags(tags)
-	conflicted.Remote.GetMetadata().SetTags(tags)
+	conflicted.Local.GetMetadataMutable().SetTags(tags)
+	conflicted.Base.GetMetadataMutable().SetTags(tags)
+	conflicted.Remote.GetMetadataMutable().SetTags(tags)
 
 	return err
 }

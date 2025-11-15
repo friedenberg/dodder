@@ -25,6 +25,8 @@ type Transacted struct {
 	ExternalObjectId ids.ExternalObjectId
 }
 
+var _ object_metadata.GetterMutable = &Transacted{}
+
 func (transacted *Transacted) GetSkuExternal() *Transacted {
 	return transacted
 }
@@ -79,7 +81,7 @@ func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 		return err
 	}
 
-	if err = transacted.GetMetadata().AddTagPtr(tag); err != nil {
+	if err = transacted.GetMetadataMutable().AddTagPtr(tag); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -88,7 +90,7 @@ func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 }
 
 func (transacted *Transacted) AddTagPtrFast(tag *ids.Tag) (err error) {
-	if err = transacted.GetMetadata().AddTagPtrFast(tag); err != nil {
+	if err = transacted.GetMetadataMutable().AddTagPtrFast(tag); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -100,7 +102,7 @@ func (transacted *Transacted) GetType() ids.Type {
 	return transacted.Metadata.Type
 }
 
-func (transacted *Transacted) GetMetadata() *object_metadata.Metadata {
+func (transacted *Transacted) GetMetadataMutable() *object_metadata.Metadata {
 	return &transacted.Metadata
 }
 
@@ -109,7 +111,7 @@ func (transacted *Transacted) GetTai() ids.Tai {
 }
 
 func (transacted *Transacted) SetTai(tai ids.Tai) {
-	transacted.GetMetadata().Tai = tai
+	transacted.GetMetadataMutable().Tai = tai
 }
 
 func (transacted *Transacted) GetObjectId() *ids.ObjectId {
@@ -161,7 +163,7 @@ func (transacted *Transacted) SetDormant(v bool) {
 }
 
 func (transacted *Transacted) GetObjectDigest() interfaces.MarklId {
-	return transacted.GetMetadata().GetObjectDigest()
+	return transacted.GetMetadataMutable().GetObjectDigest()
 }
 
 func (transacted *Transacted) GetBlobDigest() interfaces.MarklId {

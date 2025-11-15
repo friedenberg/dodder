@@ -44,9 +44,17 @@ type Metadata struct {
 	lockfile
 }
 
-var _ interfaces.CommandComponentWriter = (*Metadata)(nil)
+var (
+	_ interfaces.CommandComponentWriter = (*Metadata)(nil)
+	_ Getter                            = &Metadata{}
+	_ GetterMutable                     = &Metadata{}
+)
 
-func (metadata *Metadata) GetMetadata() *Metadata {
+func (metadata *Metadata) GetMetadata() Metadata {
+	return *metadata
+}
+
+func (metadata *Metadata) GetMetadataMutable() *Metadata {
 	return metadata
 }
 

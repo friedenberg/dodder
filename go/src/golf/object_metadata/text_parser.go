@@ -35,7 +35,7 @@ func (parser textParser) ParseMetadata(
 	reader io.Reader,
 	context TextParserContext,
 ) (n int64, err error) {
-	metadata := context.GetMetadata()
+	metadata := context.GetMetadataMutable()
 	Resetter.Reset(metadata)
 
 	var n1 int64

@@ -78,7 +78,7 @@ func (json *Transacted) FromTransacted(
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
-		object.GetMetadata(),
+		object.GetMetadataMutable(),
 		blobStore,
 	)
 }

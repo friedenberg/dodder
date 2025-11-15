@@ -54,7 +54,7 @@ func (objectId ObjectId) ContainsSku(
 ) (ok bool) {
 	object := objectGetter.GetSku()
 
-	metadata := object.GetMetadata()
+	metadata := object.GetMetadataMutable()
 
 	method := ids.Contains
 

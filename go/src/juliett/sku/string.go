@@ -89,7 +89,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	m := object.GetMetadata()
+	m := object.GetMetadataMutable()
 
 	t := m.GetType()
 
@@ -143,7 +143,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	m := object.GetMetadata()
+	m := object.GetMetadataMutable()
 
 	t := m.GetType()
 
@@ -189,7 +189,7 @@ func StringMetadataSansTaiMerkle2(
 	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	metadata := object.GetMetadata()
+	metadata := object.GetMetadataMutable()
 
 	tipe := metadata.GetType()
 

@@ -68,7 +68,7 @@ func (proto Proto) ApplyType(
 	metadataLike object_metadata.MetadataLike,
 	genreGetter interfaces.GenreGetter,
 ) (ok bool) {
-	metadata := metadataLike.GetMetadata()
+	metadata := metadataLike.GetMetadataMutable()
 
 	g := genreGetter.GetGenre()
 	ui.Log().Print(metadataLike, g)
@@ -90,7 +90,7 @@ func (proto Proto) Apply(
 	metadataLike object_metadata.MetadataLike,
 	genreGetter interfaces.GenreGetter,
 ) (changed bool) {
-	metadata := metadataLike.GetMetadata()
+	metadata := metadataLike.GetMetadataMutable()
 
 	if proto.ApplyType(metadataLike, genreGetter) {
 		changed = true
@@ -117,7 +117,7 @@ func (pz Proto) ApplyWithBlobFD(
 	ml object_metadata.MetadataLike,
 	blobFD *fd.FD,
 ) (err error) {
-	z := ml.GetMetadata()
+	z := ml.GetMetadataMutable()
 
 	if ids.IsEmpty(z.GetType()) &&
 		!ids.IsEmpty(pz.Metadata.Type) &&

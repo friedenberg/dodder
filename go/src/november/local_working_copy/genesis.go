@@ -114,7 +114,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	}
 
 	object.Metadata.GetBlobDigestMutable().ResetWithMarklId(sh)
-	object.GetMetadata().Type = ids.DefaultOrPanic(genres.Type)
+	object.GetMetadataMutable().Type = ids.DefaultOrPanic(genres.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		object,

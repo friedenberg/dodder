@@ -61,7 +61,7 @@ func (cmd RemoteAdd) Run(req command.Request) {
 
 	// TODO connect to remote and get public key and validate
 
-	cmd.proto.Apply(remoteObject.GetMetadata(), genres.Repo)
+	cmd.proto.Apply(remoteObject.GetMetadataMutable(), genres.Repo)
 
 	req.Must(errors.MakeFuncContextFromFuncErr(local.Lock))
 

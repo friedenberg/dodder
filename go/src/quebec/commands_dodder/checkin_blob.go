@@ -98,7 +98,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 		}
 
 		if cmd.NewTags.Len() > 0 {
-			m := object.GetMetadata()
+			m := object.GetMetadataMutable()
 			m.SetTags(cmd.NewTags)
 		}
 	}

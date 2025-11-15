@@ -67,11 +67,11 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 // this splits on right-expanded
 func (prefixSet *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.GetSkuExternal().GetMetadata().Cache.GetImplicitTags(),
+		z.GetSkuExternal().GetMetadataMutable().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	for e := range z.GetSkuExternal().GetMetadata().Cache.GetExpandedTags().AllPtr() {
+	for e := range z.GetSkuExternal().GetMetadataMutable().Cache.GetExpandedTags().AllPtr() {
 		if err = es.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
 			return err

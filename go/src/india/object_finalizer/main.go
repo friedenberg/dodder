@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
 type (
@@ -19,7 +19,22 @@ type (
 	Finalizer = finalizer
 
 	finalizer struct {
-		pubKey interfaces.MarklId
+		// pubKey interfaces.MarklId
+	}
+
+	ObjectDigestWriteMap map[string]interfaces.MutableMarklId
+
+	object interface {
+		object_metadata.GetterMutable
+
+		CalculateDigests(
+			debug bool,
+			formats ObjectDigestWriteMap,
+		) (err error)
+
+		GetDigestWriteMapWithMerkle() ObjectDigestWriteMap
+		GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap
+		Verify() (err error)
 	}
 )
 
@@ -29,9 +44,9 @@ func (finalizer finalizer) GetObjectFinalizer() Finalizer {
 
 // TODO extract into a versioned object finalizer
 // calculates the object digests using the object's repo pubkey
-func (finalizer finalizer) FinalizeUsingObject(transacted *sku.Transacted) (err error) {
+func (finalizer finalizer) FinalizeUsingObject(transacted object) (err error) {
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetRepoPubKey(),
+		transacted.GetMetadataMutable().GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -39,7 +54,7 @@ func (finalizer finalizer) FinalizeUsingObject(transacted *sku.Transacted) (err 
 
 	if err = finalizer.FinalizeUsingRepoPubKey(
 		transacted,
-		transacted.Metadata.GetRepoPubKey(),
+		transacted.GetMetadataMutable().GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -50,16 +65,16 @@ func (finalizer finalizer) FinalizeUsingObject(transacted *sku.Transacted) (err 
 
 // calculates the object digests using the provided repo pubkey
 func (finalizer finalizer) FinalizeUsingRepoPubKey(
-	transacted *sku.Transacted,
+	transacted object,
 	pubKey interfaces.MarklId,
 ) (err error) {
 	// TODO migrate this to config
-	pubKeyMutable := transacted.Metadata.GetRepoPubKeyMutable()
+	pubKeyMutable := transacted.GetMetadataMutable().GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {
 		pubKeyMutable.ResetWithMarklId(pubKey)
 		// if err = markl.SetMerkleIdWithFormat(
-		// 	transacted.Metadata.GetRepoPubKeyMutable(),
+		// 	transacted.GetMetadataMutable().GetRepoPubKeyMutable(),
 		// 	markl.FormatIdRepoPubKeyV1,
 		// 	pubKey,
 		// ); err != nil {
@@ -92,9 +107,9 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 }
 
 func (finalizer finalizer) FinalizeWithoutPubKey(
-	transacted *sku.Transacted,
+	transacted object,
 ) (err error) {
-	transacted.Metadata.GetRepoPubKeyMutable().Reset()
+	transacted.GetMetadataMutable().GetRepoPubKeyMutable().Reset()
 
 	if err = transacted.CalculateDigests(
 		false,
@@ -109,7 +124,7 @@ func (finalizer finalizer) FinalizeWithoutPubKey(
 
 // TODO remove / rename
 func (finalizer finalizer) CalculateObjectDigests(
-	transacted *sku.Transacted,
+	transacted object,
 ) (err error) {
 	return transacted.CalculateDigests(
 		false,
@@ -118,10 +133,10 @@ func (finalizer finalizer) CalculateObjectDigests(
 }
 
 func (finalizer finalizer) FinalizeAndSignIfNecessary(
-	transacted *sku.Transacted,
+	transacted object,
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
-	if !transacted.Metadata.GetObjectSig().IsNull() {
+	if !transacted.GetMetadataMutable().GetObjectSig().IsNull() {
 		return err
 	}
 
@@ -130,7 +145,7 @@ func (finalizer finalizer) FinalizeAndSignIfNecessary(
 		return err
 	}
 
-	if transacted.Metadata.GetRepoPubKey().GetPurpose() == "" {
+	if transacted.GetMetadataMutable().GetRepoPubKey().GetPurpose() == "" {
 		panic("empty pbukey format")
 	}
 
@@ -138,12 +153,12 @@ func (finalizer finalizer) FinalizeAndSignIfNecessary(
 }
 
 func (finalizer finalizer) FinalizeAndSignOverwrite(
-	transacted *sku.Transacted,
+	transacted object,
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	// TODO populate format ids from config
-	transacted.Metadata.GetObjectSigMutable().Reset()
-	transacted.Metadata.GetRepoPubKeyMutable().Reset()
+	transacted.GetMetadataMutable().GetObjectSigMutable().Reset()
+	transacted.GetMetadataMutable().GetRepoPubKeyMutable().Reset()
 
 	if err = finalizer.FinalizeAndSign(
 		transacted,
@@ -157,24 +172,24 @@ func (finalizer finalizer) FinalizeAndSignOverwrite(
 }
 
 func (finalizer finalizer) FinalizeAndSign(
-	transacted *sku.Transacted,
+	transacted object,
 	config genesis_configs.ConfigPrivate,
 ) (err error) {
 	if err = markl.AssertIdIsNull(
-		transacted.Metadata.GetRepoPubKey(),
+		transacted.GetMetadataMutable().GetRepoPubKey(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNull(
-		transacted.Metadata.GetObjectSig(),
+		transacted.GetMetadataMutable().GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	transacted.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
+	transacted.GetMetadataMutable().GetRepoPubKeyMutable().ResetWithMarklId(
 		config.GetPublicKey(),
 	)
 
@@ -184,7 +199,7 @@ func (finalizer finalizer) FinalizeAndSign(
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest()); err != nil {
+		transacted.GetMetadataMutable().GetObjectDigest()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -192,8 +207,8 @@ func (finalizer finalizer) FinalizeAndSign(
 	privateKey := config.GetPrivateKey()
 
 	if err = privateKey.Sign(
-		transacted.Metadata.GetObjectDigest(),
-		transacted.Metadata.GetObjectSigMutable(),
+		transacted.GetMetadataMutable().GetObjectDigest(),
+		transacted.GetMetadataMutable().GetObjectSigMutable(),
 		config.GetObjectSigMarklTypeId(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -209,7 +224,7 @@ func (finalizer finalizer) FinalizeAndSign(
 }
 
 func (finalizer finalizer) FinalizeAndVerify(
-	transacted *sku.Transacted,
+	transacted object,
 ) (err error) {
 	if err = finalizer.FinalizeUsingObject(transacted); err != nil {
 		err = errors.Wrap(err)
@@ -218,7 +233,7 @@ func (finalizer finalizer) FinalizeAndVerify(
 
 	if slices.Contains(
 		[]string{ids.TypeInventoryListV1},
-		transacted.GetType().String(),
+		transacted.GetMetadataMutable().GetType().String(),
 	) {
 		return err
 	}

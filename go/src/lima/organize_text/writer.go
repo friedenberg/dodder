@@ -66,7 +66,7 @@ func (av writer) write(a *Assignment) (err error) {
 		cursor := object.sku.Clone()
 		cursorExternal := cursor.GetSkuExternal()
 		cursorExternal.Metadata.Subtract(&av.Metadata)
-		mes := cursorExternal.GetMetadata().GetTags().CloneMutableSetPtrLike()
+		mes := cursorExternal.GetMetadataMutable().GetTags().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)

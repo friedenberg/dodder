@@ -62,7 +62,7 @@ func (json *MCP) FromTransacted(
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
-		object.GetMetadata(),
+		object.GetMetadataMutable(),
 		blobStore,
 	)
 }

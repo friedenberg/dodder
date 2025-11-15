@@ -238,7 +238,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 	includeDescriptionInBox bool,
 	builder *object_metadata_box_builder.Builder,
 ) (err error) {
-	metadata := object.GetMetadata()
+	metadata := object.GetMetadataMutable()
 
 	if options.PrintBlobDigests &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {

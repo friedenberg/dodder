@@ -69,7 +69,7 @@ func readFormat(
 		t.Fatalf("expected to read %d but only read %d", len(contents), n)
 	}
 
-	metadata = object.GetMetadata()
+	metadata = object.GetMetadataMutable()
 
 	return metadata
 }

@@ -40,7 +40,7 @@ func (transacted *Transacted) StringObjectIdSha() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&transacted.ObjectId,
-		transacted.GetMetadata().GetObjectDigest(),
+		transacted.GetMetadataMutable().GetObjectDigest(),
 	)
 }
 
@@ -48,6 +48,6 @@ func (transacted *Transacted) StringObjectIdParent() string {
 	return fmt.Sprintf(
 		"%s^@%s",
 		&transacted.ObjectId,
-		transacted.GetMetadata().GetMotherObjectSig(),
+		transacted.GetMetadataMutable().GetMotherObjectSig(),
 	)
 }

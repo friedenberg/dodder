@@ -7,8 +7,14 @@ import (
 )
 
 type (
+	// Metadata = Metadata
+
 	Getter interface {
-		GetMetadata() *Metadata
+		GetMetadata() Metadata
+	}
+
+	GetterMutable interface {
+		GetMetadataMutable() *Metadata
 	}
 
 	Setter interface {
@@ -16,15 +22,15 @@ type (
 	}
 
 	MetadataLike interface {
-		Getter
+		GetterMutable
 	}
 
 	PersistentFormatterContext interface {
-		Getter
+		GetterMutable
 	}
 
 	PersistentParserContext interface {
-		Getter
+		GetterMutable
 	}
 
 	TextFormatterContext struct {

@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_fmt_digest"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 )
 
 func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
@@ -86,7 +87,7 @@ func (transacted *Transacted) Verify() (err error) {
 
 type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterContext) (interfaces.MarklId, error)
 
-type ObjectDigestWriteMap map[string]interfaces.MutableMarklId
+type ObjectDigestWriteMap = object_finalizer.ObjectDigestWriteMap
 
 func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{

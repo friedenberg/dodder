@@ -41,7 +41,7 @@ func (deps Dependencies) writeComments(
 ) (n int64, err error) {
 	n1 := 0
 
-	for _, c := range context.GetMetadata().Comments {
+	for _, c := range context.GetMetadataMutable().Comments {
 		n1, err = io.WriteString(writer, "% ")
 		n += int64(n1)
 
@@ -86,7 +86,7 @@ func (deps Dependencies) writeCommonMetadataFormat(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	w := format.NewLineWriter()
-	m := c.GetMetadata()
+	m := c.GetMetadataMutable()
 
 	if m.Description.String() != "" || !c.DoNotWriteEmptyDescription {
 		reader, repool := pool.GetStringReader(m.Description.String())
@@ -133,7 +133,7 @@ func (deps Dependencies) writeTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadata()
+	m := c.GetMetadataMutable()
 
 	if m.Type.IsEmpty() {
 		return n, err
@@ -146,7 +146,7 @@ func (deps Dependencies) writeBlobDigestAndType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadata()
+	m := c.GetMetadataMutable()
 	return ohio.WriteLine(
 		w1,
 		fmt.Sprintf(
@@ -163,7 +163,7 @@ func (deps Dependencies) writePathType(
 ) (n int64, err error) {
 	var ap string
 
-	for _, f := range c.PersistentFormatterContext.GetMetadata().Fields {
+	for _, f := range c.PersistentFormatterContext.GetMetadataMutable().Fields {
 		if strings.ToLower(f.Key) == "blob" {
 			ap = f.Value
 			break
@@ -185,7 +185,7 @@ func (deps Dependencies) writeBlob(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	var ar io.ReadCloser
-	m := c.GetMetadata()
+	m := c.GetMetadataMutable()
 
 	if ar, err = deps.BlobStore.MakeBlobReader(&m.DigBlob); err != nil {
 		err = errors.Wrap(err)

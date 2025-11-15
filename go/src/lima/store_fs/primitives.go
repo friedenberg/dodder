@@ -62,8 +62,8 @@ func (store *Store) HydrateExternalFromItem(
 
 	case checkout_mode.BlobRecognized:
 		object_metadata.Resetter.ResetWith(
-			external.GetMetadata(),
-			internal.GetMetadata(),
+			external.GetMetadataMutable(),
+			internal.GetMetadataMutable(),
 		)
 
 	default:
@@ -102,8 +102,8 @@ func (store *Store) readOneExternalObject(
 ) (err error) {
 	if internal != nil {
 		object_metadata.Resetter.ResetWith(
-			external.GetMetadata(),
-			internal.GetMetadata(),
+			external.GetMetadataMutable(),
+			internal.GetMetadataMutable(),
 		)
 	}
 
@@ -131,7 +131,7 @@ func (store *Store) readOneExternalBlob(
 ) (err error) {
 	object_metadata.Resetter.ResetWith(
 		&external.Metadata,
-		internal.GetMetadata(),
+		internal.GetMetadataMutable(),
 	)
 
 	// TODO use cache
@@ -162,7 +162,7 @@ func (store *Store) readOneExternalBlob(
 		}
 
 		markl.SetDigester(
-			external.GetMetadata().GetBlobDigestMutable(),
+			external.GetMetadataMutable().GetBlobDigestMutable(),
 			writeCloser,
 		)
 	}

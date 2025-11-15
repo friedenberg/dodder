@@ -124,7 +124,7 @@ func (writer *Writer) addCommonMatches(
 	matchBuilder.AddMatchBytes(parts.Left.Bytes())
 	matchBuilder.AddMatchBytes(parts.Right.Bytes())
 
-	matchBuilder.AddMatches(object.GetMetadata().Description.String())
+	matchBuilder.AddMatches(object.GetMetadataMutable().Description.String())
 	matchBuilder.AddMatches(object.GetType().String())
 	for e := range object.Metadata.GetTags().All() {
 		expansion.ExpanderAll.Expand(

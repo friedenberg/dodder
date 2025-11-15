@@ -66,7 +66,7 @@ func writeMetadataKeyStringTo(
 	context FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
-	metadata := context.GetMetadata()
+	metadata := context.GetMetadataMutable()
 
 	var n1 int
 
@@ -322,7 +322,7 @@ func GetDigestForContext(
 	format Format,
 	context FormatterContext,
 ) (digest interfaces.MarklId, err error) {
-	metadata := context.GetMetadata()
+	metadata := context.GetMetadataMutable()
 
 	if metadata.GetTai().IsEmpty() {
 		err = ErrEmptyTai

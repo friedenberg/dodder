@@ -78,7 +78,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 
 				return err
 			},
-			afterDecoding: finalizer.FinalizeAndVerify,
+			afterDecoding: func(object *sku.Transacted) error {
+				return finalizer.FinalizeAndVerify(object)
+			},
 		}
 	},
 	ids.TypeInventoryListJsonV0: func(
@@ -94,7 +96,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		return coder{
 			listCoder:      jsonCoder,
 			beforeEncoding: (*sku.Transacted).Verify,
-			afterDecoding:  finalizer.FinalizeAndVerify,
+			afterDecoding: func(object *sku.Transacted) error {
+				return finalizer.FinalizeAndVerify(object)
+			},
 		}
 	},
 }
