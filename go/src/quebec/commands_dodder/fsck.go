@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -94,7 +94,7 @@ func (cmd Fsck) runVerification(
 		err    error
 	}
 
-	var objectErrors quiter.Slice[objectError]
+	var objectErrors collections_slice.Slice[objectError]
 
 	if err := errors.RunChildContextWithPrintTicker(
 		repo,

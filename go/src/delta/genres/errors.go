@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
@@ -50,7 +51,7 @@ func (e errUnrecognizedGenre) Error() string {
 	return fmt.Sprintf(
 		"unknown genre: %q. Available genres: %q",
 		string(e),
-		quiter.Strings(quiter.Slice[Genre](All())),
+		quiter.Strings(collections_slice.Slice[Genre](All())),
 	)
 }
 

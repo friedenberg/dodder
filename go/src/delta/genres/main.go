@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
@@ -46,7 +46,7 @@ const (
 	repo
 )
 
-func All() (out quiter.Slice[Genre]) {
+func All() (out collections_slice.Slice[Genre]) {
 	out = make([]Genre, 0, maxGenre-1)
 
 	for i := None + 1; i <= maxGenre; i++ {

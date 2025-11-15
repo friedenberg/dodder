@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 )
 
 // TODO migrate all dir walking to this package
@@ -93,7 +93,7 @@ func DirNames2(p string) interfaces.SeqError[os.DirEntry] {
 
 func DirEntries(
 	dirPath string,
-) (dirEntries quiter.Slice[os.DirEntry], err error) {
+) (dirEntries collections_slice.Slice[os.DirEntry], err error) {
 	if dirEntries, err = ReadDir(dirPath); err != nil {
 		err = errors.Wrap(err)
 		return dirEntries, err
@@ -102,7 +102,7 @@ func DirEntries(
 	return dirEntries, err
 }
 
-func DirNames(dirPath string) (slice quiter.Slice[string], err error) {
+func DirNames(dirPath string) (slice collections_slice.Slice[string], err error) {
 	var names []os.DirEntry
 
 	if names, err = ReadDir(dirPath); err != nil {
@@ -144,7 +144,7 @@ func DirNamesLevel2(
 	dirPath string,
 ) interfaces.SeqError[string] {
 	return func(yield func(string, error) bool) {
-		var topLevel quiter.Slice[string]
+		var topLevel collections_slice.Slice[string]
 
 		{
 			var err error
@@ -156,7 +156,7 @@ func DirNamesLevel2(
 		}
 
 		for topLevelDir := range topLevel.All() {
-			var secondLevel quiter.Slice[string]
+			var secondLevel collections_slice.Slice[string]
 
 			{
 				var err error

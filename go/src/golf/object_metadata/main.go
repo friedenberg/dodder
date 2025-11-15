@@ -32,7 +32,7 @@ type Metadata struct {
 	sigMother markl.Id
 	sigRepo   markl.Id
 
-	SelfWithoutTai markl.Id // TODO moving to a separate key-value store
+	SelfWithoutTai markl.Id // TODO move to a separate key-value store
 	Tai            ids.Tai
 
 	// TODO move to Cache
@@ -40,6 +40,8 @@ type Metadata struct {
 
 	blob
 	Cache Index
+
+	lockfile
 }
 
 var _ interfaces.CommandComponentWriter = (*Metadata)(nil)

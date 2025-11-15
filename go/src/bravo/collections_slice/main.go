@@ -1,10 +1,11 @@
-package quiter
+package collections_slice
 
 import (
+	"slices"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 )
 
-// TODO move to own package
 type Slice[ELEMENT any] []ELEMENT
 
 func (slice Slice[ELEMENT]) Len() int {
@@ -27,6 +28,10 @@ func (slice Slice[ELEMENT]) All() interfaces.Seq[ELEMENT] {
 			}
 		}
 	}
+}
+
+func (slice *Slice[ELEMENT]) Grow(n int) {
+	*slice = slices.Grow(*slice, 10)
 }
 
 func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {

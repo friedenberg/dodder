@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 )
 
 type Field struct {
@@ -29,8 +30,8 @@ type HeaderWriter[T any] interface {
 
 type Box struct {
 	Header                   BoxHeader
-	Contents                 []Field
-	Trailer                  []Field
+	Contents                 collections_slice.Slice[Field]
+	Trailer                  collections_slice.Slice[Field]
 	EachFieldOnANewline      bool
 	IdFieldsSeparatedByLines bool
 }

@@ -1,8 +1,8 @@
 package repo_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
@@ -18,8 +18,8 @@ func (defaults DefaultsV0) GetDefaultType() ids.Type {
 	return defaults.Typ
 }
 
-func (defaults DefaultsV0) GetDefaultTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](defaults.Etiketten)
+func (defaults DefaultsV0) GetDefaultTags() collections_slice.Slice[ids.Tag] {
+	return collections_slice.Slice[ids.Tag](defaults.Etiketten)
 }
 
 type V0 struct {

@@ -1,8 +1,6 @@
 package box_format
 
 import (
-	"slices"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
@@ -48,6 +46,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 	co *sku.CheckedOut,
 	sw interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
+	// TODO pool boxes
 	var box string_format_writer.Box
 
 	if format.headerWriter != nil {
@@ -57,7 +56,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 		}
 	}
 
-	box.Contents = slices.Grow(box.Contents, 10)
+	box.Contents.Grow(10)
 
 	var fds *sku.FSItem
 	var errFS error
@@ -89,14 +88,11 @@ func (format *BoxCheckedOut) EncodeStringTo(
 	b := &external.Metadata.Description
 
 	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
-		box.Trailer = append(
-			box.Trailer,
-			string_format_writer.Field{
-				Value:              b.StringWithoutNewlines(),
-				ColorType:          string_format_writer.ColorTypeUserData,
-				DisableValueQuotes: true,
-			},
-		)
+		box.Trailer.Append(string_format_writer.Field{
+			Value:              b.StringWithoutNewlines(),
+			ColorType:          string_format_writer.ColorTypeUserData,
+			DisableValueQuotes: true,
+		})
 	}
 
 	if n, err = format.boxStringEncoder.EncodeStringTo(box, sw); err != nil {
@@ -212,13 +208,13 @@ func (format *BoxTransacted) addFieldsObjectIdsWithFSItem(
 
 	switch {
 	case (internalEmpty || preferExternal) && external.Value != "":
-		box.Contents = append(box.Contents, external)
+		box.Contents.Append(external)
 
 	case internal.Value != "":
-		box.Contents = append(box.Contents, internal)
+		box.Contents.Append(internal)
 
 	case external.Value != "":
-		box.Contents = append(box.Contents, external)
+		box.Contents.Append(external)
 
 	default:
 		err = errors.Errorf("empty id")

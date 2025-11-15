@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -43,7 +43,7 @@ func (cmd Fsck) Run(req command.Request) {
 
 		countSuccessPtr := &count
 
-		var blobErrors quiter.Slice[command_components_madder.BlobError]
+		var blobErrors collections_slice.Slice[command_components_madder.BlobError]
 
 		if err := errors.RunChildContextWithPrintTicker(
 			envBlobStore,

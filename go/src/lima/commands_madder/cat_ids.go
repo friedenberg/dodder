@@ -2,7 +2,7 @@ package commands_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/command"
@@ -31,7 +31,7 @@ func (cmd CatIds) Run(req command.Request) {
 
 	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
 
-	var blobErrors quiter.Slice[command_components_madder.BlobError]
+	var blobErrors collections_slice.Slice[command_components_madder.BlobError]
 
 	for _, blobStore := range blobStores {
 		cmd.runOne(envBlobStore, blobStore, &blobErrors)
@@ -43,7 +43,7 @@ func (cmd CatIds) Run(req command.Request) {
 func (cmd CatIds) runOne(
 	envBlobStore env_repo.BlobStoreEnv,
 	blobStore blob_stores.BlobStoreInitialized,
-	blobErrors *quiter.Slice[command_components_madder.BlobError],
+	blobErrors *collections_slice.Slice[command_components_madder.BlobError],
 ) {
 	for id, err := range blobStore.AllBlobs() {
 		errors.ContextContinueOrPanic(envBlobStore)

@@ -73,6 +73,16 @@ func AddMotherSigIfNecessary(
 	)
 }
 
+func AddReferencedObject(
+	boxContents []string_format_writer.Field,
+	metadata *object_metadata.Metadata,
+) []string_format_writer.Field {
+	return append(
+		boxContents,
+		makeMarklIdField(metadata.GetObjectSig()),
+	)
+}
+
 func addMarklIdIfNotNull(
 	boxContents []string_format_writer.Field,
 	id interfaces.MarklId,

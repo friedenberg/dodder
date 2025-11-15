@@ -141,14 +141,14 @@ func (format *BoxTransacted) EncodeStringTo(
 }
 
 func (format *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (field string_format_writer.Field, err error) {
 	field = string_format_writer.Field{
 		ColorType: string_format_writer.ColorTypeId,
 	}
 
-	if !sk.ExternalObjectId.IsEmpty() {
-		oid := &sk.ExternalObjectId
+	if !object.ExternalObjectId.IsEmpty() {
+		oid := &object.ExternalObjectId
 		// TODO quote as necessary
 		field.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
 	}
@@ -185,13 +185,13 @@ func (format *BoxTransacted) makeFieldObjectId(
 }
 
 func (format *BoxTransacted) addFieldsObjectIds(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 	box *string_format_writer.Box,
 ) (err error) {
 	var external string_format_writer.Field
 
 	if external, err = format.makeFieldExternalObjectIdsIfNecessary(
-		sk,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -200,7 +200,7 @@ func (format *BoxTransacted) addFieldsObjectIds(
 	var internal string_format_writer.Field
 	var externalEmpty bool
 
-	if internal, externalEmpty, err = format.makeFieldObjectId(sk); err != nil {
+	if internal, externalEmpty, err = format.makeFieldObjectId(object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -279,9 +279,9 @@ func (format *BoxTransacted) addFieldsMetadata(
 		)
 	}
 
-	b := metadata.Description
+	description := metadata.Description
 
-	if includeDescriptionInBox && !b.IsEmpty() {
+	if includeDescriptionInBox && !description.IsEmpty() {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldDescription(metadata),

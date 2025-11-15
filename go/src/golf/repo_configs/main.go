@@ -2,8 +2,8 @@ package repo_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
@@ -32,7 +32,7 @@ type (
 
 	Defaults interface {
 		GetDefaultType() ids.Type
-		GetDefaultTags() quiter.Slice[ids.Tag]
+		GetDefaultTags() collections_slice.Slice[ids.Tag]
 	}
 )
 

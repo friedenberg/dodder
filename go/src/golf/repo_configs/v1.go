@@ -1,8 +1,8 @@
 package repo_configs
 
 import (
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -19,8 +19,8 @@ func (defaults DefaultsV1) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1) GetDefaultTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](defaults.Tags)
+func (defaults DefaultsV1) GetDefaultTags() collections_slice.Slice[ids.Tag] {
+	return collections_slice.Slice[ids.Tag](defaults.Tags)
 }
 
 type DefaultsV1OmitEmpty struct {
@@ -32,8 +32,8 @@ func (defaults DefaultsV1OmitEmpty) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1OmitEmpty) GetDefaultTags() quiter.Slice[ids.Tag] {
-	return quiter.Slice[ids.Tag](defaults.Tags)
+func (defaults DefaultsV1OmitEmpty) GetDefaultTags() collections_slice.Slice[ids.Tag] {
+	return collections_slice.Slice[ids.Tag](defaults.Tags)
 }
 
 type V1 struct {

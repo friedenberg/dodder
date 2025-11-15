@@ -309,24 +309,6 @@ LOOP_AFTER_OID:
 	return err
 }
 
-// expects `seq` to include `@` as the first token
-func (format *BoxTransacted) parseOldBlobIdTag(
-	object *sku.Transacted,
-	seq doddish.Seq,
-) (err error) {
-	if err = markl.SetHexBytes(
-		"sha256",
-		// merkle.HRPObjectBlobDigestSha256V1,
-		object.Metadata.GetBlobDigestMutable(),
-		seq.At(1).Contents,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
 var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
 	"":                             (*object_metadata.Metadata).GetBlobDigestMutable,
 	markl.PurposeRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
