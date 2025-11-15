@@ -109,7 +109,7 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 			typeObject,
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		lockfileMutable := metadataMutable.GetLockfileMutable()
