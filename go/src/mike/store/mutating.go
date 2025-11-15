@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 )
 
 func (store *Store) Commit(
@@ -34,7 +33,7 @@ func (store *Store) Commit(
 
 type commitFacilitator struct {
 	*Store
-	index stream_index.IndexCommon
+	index sku.Reindexer
 }
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,

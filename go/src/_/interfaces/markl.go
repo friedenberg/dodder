@@ -86,4 +86,6 @@ type (
 	MarklIdGetter interface {
 		GetMarklId() MarklId
 	}
+
+	DigestWriteMap map[string]MutableMarklId
 )

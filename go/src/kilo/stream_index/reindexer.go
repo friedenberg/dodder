@@ -10,7 +10,7 @@ type Reindexer struct {
 	index *Index
 }
 
-var _ IndexCommon = &Reindexer{}
+var _ sku.Reindexer = &Reindexer{}
 
 func (reindexer *Reindexer) Add(
 	object *sku.Transacted,

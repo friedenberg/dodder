@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type (
@@ -19,25 +20,25 @@ type (
 	Finalizer = finalizer
 
 	finalizer struct {
+		index sku.IndexPrimitives
 		// pubKey interfaces.MarklId
 	}
-
-	ObjectDigestWriteMap map[string]interfaces.MutableMarklId
 
 	object interface {
 		object_metadata.GetterMutable
 
 		CalculateDigests(
 			debug bool,
-			formats ObjectDigestWriteMap,
+			formats interfaces.DigestWriteMap,
 		) (err error)
 
-		GetDigestWriteMapWithMerkle() ObjectDigestWriteMap
-		GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap
+		GetDigestWriteMapWithMerkle() interfaces.DigestWriteMap
+		GetDigestWriteMapWithoutMerkle() interfaces.DigestWriteMap
 		Verify() (err error)
 	}
 )
 
+// TODO pass in index
 func Make() Finalizer {
 	return finalizer{}
 }
@@ -69,11 +70,12 @@ func (finalizer finalizer) FinalizeUsingObject(transacted object) (err error) {
 
 // calculates the object digests using the provided repo pubkey
 func (finalizer finalizer) FinalizeUsingRepoPubKey(
-	transacted object,
+	object object,
 	pubKey interfaces.MarklId,
 ) (err error) {
+	metadataMutable := object.GetMetadataMutable()
 	// TODO migrate this to config
-	pubKeyMutable := transacted.GetMetadataMutable().GetRepoPubKeyMutable()
+	pubKeyMutable := metadataMutable.GetRepoPubKeyMutable()
 
 	if pubKeyMutable.IsNull() {
 		pubKeyMutable.ResetWithMarklId(pubKey)
@@ -98,10 +100,28 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 	// TODO populate lockfile
 	// read current signature of type
 	// write to lock
+	if finalizer.index != nil {
+		typeObject := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(typeObject)
 
-	if err = transacted.CalculateDigests(
+		if err = finalizer.index.ReadOneObjectId(
+			metadataMutable.GetType(),
+			typeObject,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		lockfileMutable := metadataMutable.GetLockfileMutable()
+		lockfileMutable.GetTypeLockMutable().Key = metadataMutable.GetType().String()
+		lockfileMutable.GetTypeLockMutable().Id.ResetWithMarklId(
+			typeObject.GetMetadataMutable().GetObjectSig(),
+		)
+	}
+
+	if err = object.CalculateDigests(
 		false,
-		transacted.GetDigestWriteMapWithMerkle(),
+		object.GetDigestWriteMapWithMerkle(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

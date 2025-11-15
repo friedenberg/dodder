@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
-	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 )
 
 // TODO-P2 add support for quiet reindexing
@@ -29,7 +28,7 @@ func (store *Store) Reindex(context interfaces.ActiveContext) (err error) {
 		return err
 	}
 
-	var reindexer stream_index.IndexCommon
+	var reindexer sku.Reindexer
 
 	if reindexer, err = store.streamIndex.MakeReindexer(); err != nil {
 		err = errors.Wrap(err)

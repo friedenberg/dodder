@@ -9,6 +9,8 @@ type (
 
 	LockfileMutable interface {
 		Lockfile
+
+		GetTypeLockMutable() *Lock
 	}
 
 	Lock struct {
@@ -29,4 +31,8 @@ var (
 
 func (lockfile lockfile) GetTypeLock() Lock {
 	return lockfile.tipe
+}
+
+func (lockfile *lockfile) GetTypeLockMutable() *Lock {
+	return &lockfile.tipe
 }
