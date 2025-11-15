@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata_fmt"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata_box_builder"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -84,6 +84,7 @@ func (format *BoxTransacted) EncodeStringTo(
 	writer interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var box string_format_writer.Box
+	builder := (*object_metadata_box_builder.Builder)(&box)
 
 	// box.Header.RightAligned = true
 
@@ -103,7 +104,7 @@ func (format *BoxTransacted) EncodeStringTo(
 
 	if err = format.addFieldsObjectIds(
 		object,
-		&box,
+		builder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
@@ -113,7 +114,7 @@ func (format *BoxTransacted) EncodeStringTo(
 		format.optionsPrint,
 		object,
 		format.optionsPrint.BoxDescriptionInBox,
-		&box,
+		builder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
@@ -186,7 +187,7 @@ func (format *BoxTransacted) makeFieldObjectId(
 
 func (format *BoxTransacted) addFieldsObjectIds(
 	object *sku.Transacted,
-	box *string_format_writer.Box,
+	builder *object_metadata_box_builder.Builder,
 ) (err error) {
 	var external string_format_writer.Field
 
@@ -215,13 +216,13 @@ func (format *BoxTransacted) addFieldsObjectIds(
 	// 	}
 
 	case externalEmpty && external.Value != "":
-		box.Contents = append(box.Contents, external)
+		builder.Contents.Append(external)
 
 	case internal.Value != "":
-		box.Contents = append(box.Contents, internal)
+		builder.Contents.Append(internal)
 
 	case external.Value != "":
-		box.Contents = append(box.Contents, external)
+		builder.Contents.Append(external)
 
 	default:
 		err = errors.ErrorWithStackf("empty id")
@@ -235,66 +236,42 @@ func (format *BoxTransacted) addFieldsMetadata(
 	options options_print.Options,
 	object *sku.Transacted,
 	includeDescriptionInBox bool,
-	box *string_format_writer.Box,
+	builder *object_metadata_box_builder.Builder,
 ) (err error) {
 	metadata := object.GetMetadata()
 
 	if options.PrintBlobDigests &&
 		(options.BoxPrintEmptyBlobIds || !metadata.GetBlobDigest().IsNull()) {
-		box.Contents = object_metadata_fmt.AddBlobDigestIfNecessary(
-			box.Contents,
+		builder.AddBlobDigestIfNecessary(
 			metadata.GetBlobDigest(),
 			format.abbr.BlobId.Abbreviate,
 		)
 	}
 
 	if options.BoxPrintTai && object.GetGenre() != genres.InventoryList {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldTai(metadata),
-		)
+		builder.AddTai(metadata)
 	}
 
 	if format.isArchive && !object.Metadata.GetObjectSig().IsNull() {
-		box.Contents = object_metadata_fmt.AddRepoPubKey(
-			box.Contents,
-			metadata,
-		)
-
-		box.Contents = object_metadata_fmt.AddMotherSigIfNecessary(
-			box.Contents,
-			metadata,
-		)
-
-		box.Contents = object_metadata_fmt.AddObjectSig(
-			box.Contents,
-			metadata,
-		)
+		builder.AddRepoPubKey(metadata)
+		builder.AddMotherSigIfNecessary(metadata)
+		builder.AddObjectSig(metadata)
 	}
 
 	if !metadata.Type.IsEmpty() {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldType(metadata),
-		)
+		builder.AddType(metadata)
 	}
 
 	description := metadata.Description
 
 	if includeDescriptionInBox && !description.IsEmpty() {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldDescription(metadata),
-		)
+		builder.AddDescription(metadata)
 	}
 
-	box.Contents = append(
-		box.Contents,
-		object_metadata_fmt.MetadataFieldTags(metadata)...,
-	)
+	builder.AddTags(metadata)
 
 	if !options.BoxExcludeFields && !format.isArchive {
-		box.Contents = append(box.Contents, metadata.Fields...)
+		builder.Contents.Append(metadata.Fields...)
 	}
 
 	return err

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -62,13 +63,14 @@ func TestBinaryOne(t1 *testing.T) {
 
 		{
 			config := genesis_configs.Default().Blob
+			finalizer := object_finalizer.Finalizer{}
 
 			t.AssertNoError(config.GetPrivateKeyMutable().GeneratePrivateKey(
 				nil,
 				markl.FormatIdEd25519Sec,
 				markl.PurposeRepoPrivateKeyV1,
 			))
-			t.AssertNoError(expected.FinalizeAndSignOverwrite(config))
+			t.AssertNoError(finalizer.FinalizeAndSignOverwrite(expected, config))
 		}
 
 		t.Logf("%s", expected)

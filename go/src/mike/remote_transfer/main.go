@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
@@ -75,6 +76,7 @@ type importer struct {
 
 	blobImporter blob_transfers.BlobImporter
 
+	finalizer                   object_finalizer.Finalizer
 	typedInventoryListBlobStore inventory_list_coders.Closet
 	index                       sku.Index
 	storeExternal               store_workspace.MergeCheckedOut
@@ -205,14 +207,17 @@ func (importer importer) importLeaf(
 
 	// TODO set this as an importer option
 	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
-		if err = checkedOut.GetSkuExternal().FinalizeAndSignOverwrite(
+		if err = importer.finalizer.FinalizeAndSignOverwrite(
+			checkedOut.GetSkuExternal(),
 			importer.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err
 		}
 	} else {
-		if err = checkedOut.GetSkuExternal().FinalizeUsingObject(); err != nil {
+		if err = importer.finalizer.FinalizeUsingObject(
+			checkedOut.GetSkuExternal(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err
 		}

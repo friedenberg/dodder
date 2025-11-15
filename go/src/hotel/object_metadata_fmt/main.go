@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -11,10 +12,10 @@ import (
 )
 
 func AddBlobDigestIfNecessary(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	digest interfaces.MarklId,
 	funcAbbreviate ids.FuncAbbreviateString,
-) []string_format_writer.Field {
+) {
 	value := digest.String()
 
 	if funcAbbreviate != nil {
@@ -31,7 +32,7 @@ func AddBlobDigestIfNecessary(
 	}
 
 	if value == "" {
-		return boxContents
+		return
 	}
 
 	field := string_format_writer.Field{
@@ -40,66 +41,63 @@ func AddBlobDigestIfNecessary(
 		NoTruncate: true,
 	}
 
-	return append(boxContents, field)
+	boxContents.Append(field)
 }
 
 func AddRepoPubKey(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	metadata *object_metadata.Metadata,
-) []string_format_writer.Field {
-	return addMarklIdIfNotNull(
+) {
+	addMarklIdIfNotNull(
 		boxContents,
 		metadata.GetRepoPubKey(),
 	)
 }
 
 func AddObjectSig(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	metadata *object_metadata.Metadata,
-) []string_format_writer.Field {
-	return append(
-		boxContents,
+) {
+	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),
 	)
 }
 
 func AddMotherSigIfNecessary(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	metadata *object_metadata.Metadata,
-) []string_format_writer.Field {
-	return addMarklIdIfNotNull(
+) {
+	addMarklIdIfNotNull(
 		boxContents,
 		metadata.GetMotherObjectSig(),
 	)
 }
 
 func AddReferencedObject(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	metadata *object_metadata.Metadata,
-) []string_format_writer.Field {
-	return append(
-		boxContents,
+) {
+	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),
 	)
 }
 
 func addMarklIdIfNotNull(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	id interfaces.MarklId,
-) []string_format_writer.Field {
+) {
 	if id.IsNull() {
-		return boxContents
+		return
 	}
 
-	return addMarklId(boxContents, id)
+	addMarklId(boxContents, id)
 }
 
 func addMarklId(
-	boxContents []string_format_writer.Field,
+	boxContents collections_slice.Slice[string_format_writer.Field],
 	id interfaces.MarklId,
-) []string_format_writer.Field {
-	return append(
-		boxContents,
+) {
+	boxContents.Append(
 		makeMarklIdField(id),
 	)
 }

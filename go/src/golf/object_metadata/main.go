@@ -50,6 +50,10 @@ func (metadata *Metadata) GetMetadata() *Metadata {
 	return metadata
 }
 
+func (metadata *Metadata) GetLockfile() Lockfile {
+	return metadata.lockfile
+}
+
 func (metadata *Metadata) UserInputIsEmpty() bool {
 	if !metadata.Description.IsEmpty() {
 		return false

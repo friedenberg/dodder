@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/command"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/india/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/blob_transfers"
 	"code.linenisgreat.com/dodder/go/src/lima/repo"
@@ -98,6 +99,8 @@ func (cmd Import) Run(req command.Request) {
 		false,
 	)
 
+	finalizer := object_finalizer.Finalizer{}
+
 	// TODO traverse object graph and rewrite all signature in topological order
 	// TODO move this to the importer directly
 	if cmd.OverwriteSignatures {
@@ -132,7 +135,8 @@ func (cmd Import) Run(req command.Request) {
 
 			// TODO add mother?
 			// TODO rewrite time?
-			if err = object.FinalizeAndSignOverwrite(
+			if err = finalizer.FinalizeAndSignOverwrite(
+				object,
 				local.GetEnvRepo().GetConfigPrivate().Blob,
 			); err != nil {
 				err = errors.Wrap(err)

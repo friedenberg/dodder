@@ -11,11 +11,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/file_lock"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
@@ -43,6 +43,7 @@ var _ sku.InventoryListStore = &Store{}
 
 type inventoryListBlobStore interface {
 	interfaces.BlobStore
+	object_finalizer.FinalizerGetter
 
 	getType() ids.Type
 	getFormat() sku.ListCoder
@@ -78,26 +79,13 @@ func (store *Store) Initialize(
 	inventoryListBlobStore := envRepo.GetInventoryListBlobStore()
 	coder := inventoryListCoderCloset.GetCoderForType(blobType)
 
-	if store_version.LessOrEqual(
-		store.storeVersion,
-		store_version.V8,
-	) {
-		store.inventoryListBlobStore = &blobStoreV0{
-			envRepo:                  envRepo,
-			blobType:                 blobType,
-			BlobStore:                inventoryListBlobStore,
-			listFormat:               coder,
-			inventoryListCoderCloset: inventoryListCoderCloset,
-		}
-	} else {
-		store.inventoryListBlobStore = &blobStoreV1{
-			envRepo:                  envRepo,
-			pathLog:                  envRepo.FileInventoryListLog(),
-			blobType:                 blobType,
-			BlobStore:                inventoryListBlobStore,
-			listFormat:               coder,
-			inventoryListCoderCloset: inventoryListCoderCloset,
-		}
+	store.inventoryListBlobStore = &blobStoreV1{
+		envRepo:                  envRepo,
+		pathLog:                  envRepo.FileInventoryListLog(),
+		blobType:                 blobType,
+		BlobStore:                inventoryListBlobStore,
+		listFormat:               coder,
+		inventoryListCoderCloset: inventoryListCoderCloset,
 	}
 
 	return err
@@ -156,7 +144,10 @@ func (store *Store) AddObjectToOpenList(
 	openList *sku.OpenList,
 	object *sku.Transacted,
 ) (err error) {
-	if err = object.FinalizeAndSignOverwrite(
+	// TODO swap this to not overwrite, as when importing from remotes, we want to
+	// keep their signatures
+	if err = store.inventoryListBlobStore.GetObjectFinalizer().FinalizeAndSignOverwrite(
+		object,
 		store.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)

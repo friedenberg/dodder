@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 )
@@ -21,8 +22,13 @@ type blobStoreV1 struct {
 	blobType                 ids.Type
 	listFormat               sku.ListCoder
 	inventoryListCoderCloset inventory_list_coders.Closet
+	finalizer                object_finalizer.Finalizer
 
 	interfaces.BlobStore
+}
+
+func (blobStore *blobStoreV1) GetObjectFinalizer() object_finalizer.Finalizer {
+	return blobStore.finalizer
 }
 
 func (blobStore *blobStoreV1) getType() ids.Type {
@@ -93,7 +99,8 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 	)
 	defer repoolBufferedWriter()
 
-	if err = object.FinalizeAndSignOverwrite(
+	if err = blobStore.finalizer.FinalizeAndSignOverwrite(
+		object,
 		blobStore.envRepo.GetConfigPrivate().Blob,
 	); err != nil {
 		err = errors.Wrap(err)

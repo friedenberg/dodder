@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -343,7 +344,10 @@ func (store *Store) GenerateConflictMarker(
 	// TODO assert that left and right both have a mother sig
 
 	for object := range conflicted.All() {
-		if err = object.FinalizeAndSignIfNecessary(
+		finalizer := object_finalizer.Finalizer{}
+
+		if err = finalizer.FinalizeAndSignIfNecessary(
+			object,
 			store.envRepo.GetConfigPrivate().Blob,
 		); err != nil {
 			err = errors.Wrap(err)

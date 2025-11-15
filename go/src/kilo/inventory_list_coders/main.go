@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
+	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
@@ -25,6 +26,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		box *box_format.BoxTransacted,
 	) coder {
 		configGenesis := envRepo.GetConfigPublic().Blob
+		finalizer := object_finalizer.Finalizer{}
 
 		doddishCoder := doddish{
 			box: box,
@@ -41,12 +43,12 @@ var coderConstructors = map[string]funcListFormatConstructor{
 					envRepo.GetStoreVersion(),
 					store_version.V8,
 				) {
-					if err = object.FinalizeWithoutPubKey(); err != nil {
+					if err = finalizer.FinalizeWithoutPubKey(object); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 				} else {
-					if err = object.FinalizeUsingObject(); err != nil {
+					if err = finalizer.FinalizeUsingObject(object); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
@@ -64,6 +66,8 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			box: box,
 		}
 
+		finalizer := object_finalizer.Finalizer{}
+
 		return coder{
 			listCoder: doddishCoder,
 			beforeEncoding: func(object *sku.Transacted) (err error) {
@@ -74,7 +78,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 
 				return err
 			},
-			afterDecoding: (*sku.Transacted).FinalizeAndVerify,
+			afterDecoding: finalizer.FinalizeAndVerify,
 		}
 	},
 	ids.TypeInventoryListJsonV0: func(
@@ -85,10 +89,12 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 
+		finalizer := object_finalizer.Finalizer{}
+
 		return coder{
 			listCoder:      jsonCoder,
 			beforeEncoding: (*sku.Transacted).Verify,
-			afterDecoding:  (*sku.Transacted).FinalizeAndVerify,
+			afterDecoding:  finalizer.FinalizeAndVerify,
 		}
 	},
 }
