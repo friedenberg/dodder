@@ -22,5 +22,4 @@ type (
 		ErrorOneUnwrapper
 		ShouldHideUnwrap() bool
 	}
-
 )
