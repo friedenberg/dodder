@@ -120,7 +120,7 @@ func (finalizer finalizer) writeLockfileIfNecessary(
 	object object,
 ) (err error) {
 	if finalizer.index == nil {
-		return
+		return err
 	}
 
 	metadataMutable := object.GetMetadataMutable()
@@ -145,7 +145,7 @@ func (finalizer finalizer) writeLockfileIfNecessary(
 		typeObject.GetMetadataMutable().GetObjectSig(),
 	)
 
-	return
+	return err
 }
 
 // TODO remove / rename
