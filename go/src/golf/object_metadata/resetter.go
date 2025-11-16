@@ -10,20 +10,23 @@ var Resetter resetter
 
 type resetter struct{}
 
-func (resetter) Reset(metadata *metadata) {
-	metadata.Description.Reset()
-	metadata.Comments = metadata.Comments[:0]
-	metadata.sigRepo.Reset()
-	metadata.pubRepo.Reset()
-	metadata.ResetTags()
-	ResetterCache.Reset(&metadata.Cache)
-	metadata.Type = ids.Type{}
-	metadata.Tai.Reset()
-	metadata.DigBlob.Reset()
-	metadata.SelfWithoutTai.Reset()
-	metadata.digSelf.Reset()
-	metadata.sigMother.Reset()
-	metadata.Fields = metadata.Fields[:0]
+func (resetter) Reset(metadatuh IMetadataMutable) {
+	{
+		metadata := metadatuh.(*metadata)
+		metadata.Description.Reset()
+		metadata.Comments = metadata.Comments[:0]
+		metadata.sigRepo.Reset()
+		metadata.pubRepo.Reset()
+		metadata.ResetTags()
+		ResetterCache.Reset(&metadata.Cache)
+		metadata.Type = ids.Type{}
+		metadata.Tai.Reset()
+		metadata.DigBlob.Reset()
+		metadata.SelfWithoutTai.Reset()
+		metadata.digSelf.Reset()
+		metadata.sigMother.Reset()
+		metadata.Fields = metadata.Fields[:0]
+	}
 }
 
 func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
@@ -46,10 +49,14 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.sigMother.ResetWith(src.sigMother)
 }
 
-func (r resetter) ResetWith(dst *metadata, src *metadata) {
-	r.ResetWithExceptFields(dst, src)
-	dst.Fields = dst.Fields[:0]
-	dst.Fields = append(dst.Fields, src.Fields...)
+func (r resetter) ResetWith(dst IMetadataMutable, src IMetadataMutable) {
+	{
+		dst := dst.(*metadata)
+		src := src.(*metadata)
+		r.ResetWithExceptFields(dst, src)
+		dst.Fields = dst.Fields[:0]
+		dst.Fields = append(dst.Fields, src.Fields...)
+	}
 }
 
 var ResetterCache resetterCache

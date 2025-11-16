@@ -265,7 +265,7 @@ func (decoder *binaryDecoder) readFieldKey(
 ) (err error) {
 	switch decoder.Key {
 	case key_bytes.Blob:
-		if err = object.Metadata.GetBlobDigestMutable().UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetBlobDigestMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -273,7 +273,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.RepoPubKey:
-		if err = object.Metadata.GetRepoPubKeyMutable().UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetRepoPubKeyMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -281,7 +281,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.RepoSig:
-		if err = object.Metadata.GetObjectSigMutable().UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetObjectSigMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -289,7 +289,9 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Description:
-		if err = object.Metadata.Description.Set(decoder.Content.String()); err != nil {
+		if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
+			decoder.Content.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -314,11 +316,14 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Tai:
-		if _, err = object.Metadata.Tai.ReadFrom(&decoder.Content); err != nil {
+		if _, err = object.GetMetadataMutable().GetTaiMutable().ReadFrom(
+			&decoder.Content,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
+		// TODO remove
 	case key_bytes.CacheParentTai:
 		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
@@ -326,13 +331,15 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Type:
-		if err = object.Metadata.Type.Set(decoder.Content.String()); err != nil {
+		if err = object.GetMetadataMutable().GetTypePtr().Set(
+			decoder.Content.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
-		if err = object.Metadata.GetMotherObjectSigMutable().UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetMotherObjectSigMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -340,7 +347,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataParentObjectId:
-		if err = object.Metadata.GetObjectDigestMutable().UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetObjectDigestMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

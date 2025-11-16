@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/markl"
 	"code.linenisgreat.com/dodder/go/src/delta/catgut"
@@ -36,7 +37,7 @@ type metadata struct {
 	Tai            ids.Tai
 
 	// TODO move to Cache
-	Comments []string
+	Comments collections_slice.Slice[string]
 
 	blob
 	Cache Index
@@ -46,16 +47,42 @@ type metadata struct {
 
 var (
 	_ interfaces.CommandComponentWriter = (*metadata)(nil)
+	_ IMetadata                         = &metadata{}
+	_ IMetadataMutable                  = &metadata{}
 	_ Getter                            = &metadata{}
 	_ GetterMutable                     = &metadata{}
 )
 
-func (metadata *metadata) GetMetadata() metadata {
-	return *metadata
+func (metadata *metadata) GetMetadata() IMetadata {
+	return metadata
 }
 
-func (metadata *metadata) GetMetadataMutable() *metadata {
+func (metadata *metadata) GetMetadataMutable() IMetadataMutable {
 	return metadata
+}
+
+func (metadata *metadata) GetIndex() IIndex {
+	return &metadata.Cache
+}
+
+func (metadata *metadata) GetIndexMutable() IIndexMutable {
+	return &metadata.Cache
+}
+
+func (metadata *metadata) GetDescription() descriptions.Description {
+	return metadata.Description
+}
+
+func (metadata *metadata) GetDescriptionMutable() *descriptions.Description {
+	return &metadata.Description
+}
+
+func (metadata *metadata) GetTai() ids.Tai {
+	return metadata.Tai
+}
+
+func (metadata *metadata) GetTaiMutable() *ids.Tai {
+	return &metadata.Tai
 }
 
 func (metadata *metadata) GetLockfile() Lockfile {
@@ -220,18 +247,9 @@ func (metadata *metadata) GetTypePtr() *ids.Type {
 	return &metadata.Type
 }
 
-func (metadata *metadata) GetTai() ids.Tai {
-	return metadata.Tai
-}
-
 // TODO-P2 remove
 func (metadata *metadata) EqualsSansTai(a *metadata) bool {
 	return EqualerSansTai.Equals(a, metadata)
-}
-
-// TODO-P2 remove
-func (metadata *metadata) Equals(z1 *metadata) bool {
-	return Equaler.Equals(metadata, z1)
 }
 
 func (metadata *metadata) Subtract(
@@ -253,6 +271,14 @@ func (metadata *metadata) Subtract(
 	}
 
 	// ui.Debug().Print("after", b.Tags, a.Tags)
+}
+
+func (metadata *metadata) GetComments() interfaces.Seq[string] {
+	return metadata.Comments.All()
+}
+
+func (metadata *metadata) GetCommentsMutable() *collections_slice.Slice[string] {
+	return &metadata.Comments
 }
 
 func (metadata *metadata) AddComment(f string, vals ...any) {

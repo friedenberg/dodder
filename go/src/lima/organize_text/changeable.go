@@ -98,7 +98,7 @@ func (a *Assignment) addToSet(
 					continue
 				}
 
-				if _, ok := outputMetadata.Cache.TagPaths.All.ContainsString(
+				if _, ok := outputMetadata.GetIndex().GetTagPaths().All.ContainsString(
 					e.String(),
 				); ok {
 					continue

@@ -86,7 +86,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.Bezeichnung, key_strings.Description:
-		lines := strings.Split(metadata.Description.String(), "\n")
+		lines := strings.Split(metadata.GetDescription().String(), "\n")
 
 		for _, line := range lines {
 			if line == "" {
@@ -251,7 +251,7 @@ func writeMetadataKeyStringTo(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
 			key_strings.Tai.String(),
-			metadata.Tai.String(),
+			metadata.GetTai().String(),
 		)
 		n += int64(n1)
 
@@ -261,7 +261,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.Typ, key_strings.Type:
-		if !metadata.Type.IsEmpty() {
+		if !metadata.GetType().IsEmpty() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				writer,
 				key.String(),

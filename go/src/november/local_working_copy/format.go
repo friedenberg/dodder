@@ -337,7 +337,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				esImp := object.GetMetadataMutable().Cache.GetExpandedTags()
+				esImp := object.GetMetadataMutable().GetIndexMutable().GetExpandedTags()
 
 				if _, err = fmt.Fprintln(
 					writer,
@@ -357,7 +357,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				esImp := object.GetMetadataMutable().Cache.GetImplicitTags()
+				esImp := object.GetMetadataMutable().GetIndexMutable().GetImplicitTags()
 
 				if _, err = fmt.Fprintln(
 					writer,
@@ -414,7 +414,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				if _, err = fmt.Fprintln(writer, object.GetMetadataMutable().Description); err != nil {
+				if _, err = fmt.Fprintln(writer, object.GetMetadataMutable().GetDescription()); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}

@@ -164,7 +164,7 @@ func (store *Store) addSuperTags(
 func (store *Store) addImplicitTags(
 	object *sku.Transacted,
 ) (err error) {
-	metadata := &object.Metadata
+	metadata := object.GetMetadataMutable()
 	tagSet := ids.MakeTagMutableSet()
 
 	addImplicitTags := func(tag *ids.Tag) (err error) {
@@ -217,7 +217,7 @@ func (store *Store) addImplicitTags(
 		}
 	}
 
-	metadata.Cache.SetImplicitTags(tagSet)
+	metadata.GetIndexMutable().SetImplicitTags(tagSet)
 
 	return err
 }

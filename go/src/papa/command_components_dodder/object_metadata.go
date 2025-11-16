@@ -13,13 +13,13 @@ import (
 type ObjectMetadata struct{}
 
 func (cmd ObjectMetadata) GetFlagValueMetadataTags(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
 	// TODO add support for tag_paths
 	fes := flags.MakeWithPolicy(
 		flag_policy.FlagPolicyAppend,
 		func() string {
-			return metadata.Cache.TagPaths.String()
+			return metadata.GetIndex().GetTagPaths().String()
 		},
 		func(v string) (err error) {
 			vs := strings.Split(v, ",")
@@ -42,13 +42,13 @@ func (cmd ObjectMetadata) GetFlagValueMetadataTags(
 }
 
 func (cmd ObjectMetadata) GetFlagValueMetadataDescription(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
-	return &metadata.Description
+	return metadata.GetDescriptionMutable()
 }
 
 func (cmd ObjectMetadata) GetFlagValueMetadataType(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
-	return &metadata.Type
+	return metadata.GetTypePtr()
 }

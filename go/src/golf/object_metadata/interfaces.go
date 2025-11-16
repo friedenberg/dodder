@@ -4,17 +4,66 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
+	"code.linenisgreat.com/dodder/go/src/echo/descriptions"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type (
-	Metadata = metadata
+	Metadata        = metadata
+	MetadataMutable = *metadata
+
+	IMetadata interface {
+		Getter
+
+		GetTags() ids.TagSet
+		GetIndex() IIndex
+		GetLockfile() Lockfile
+		GetDescription() descriptions.Description
+		GetTai() ids.Tai
+		GetType() ids.Type
+		GetComments() interfaces.Seq[string]
+		GetFields() interfaces.Seq[Field]
+
+		GetBlobDigest() interfaces.MarklId
+		GetObjectDigest() interfaces.MarklId
+		GetMotherObjectSig() interfaces.MarklId
+		GetRepoPubKey() interfaces.MarklId
+		GetObjectSig() interfaces.MarklId
+	}
+
+	IMetadataMutable interface {
+		IMetadata
+		GetterMutable
+
+		AddTagPtr(e *ids.Tag) (err error)
+		ResetTags()
+		SetTags(ids.TagSet)
+		SetTagsFast(ids.TagSet)
+		AddTagString(tagString string) (err error)
+		AddTagPtrFast(tag *ids.Tag) (err error)
+
+		GetCommentsMutable() *collections_slice.Slice[string]
+		GetFieldsMutable() *collections_slice.Slice[Field]
+		GetIndexMutable() IIndexMutable
+		GetLockfileMutable() LockfileMutable
+		// TODO rename to GetTypeMutable
+		GetTypePtr() *ids.Type
+		GetDescriptionMutable() *descriptions.Description
+		GetTaiMutable() *ids.Tai
+		GetBlobDigestMutable() interfaces.MutableMarklId
+		GetObjectDigestMutable() interfaces.MutableMarklId
+		GetMotherObjectSigMutable() interfaces.MutableMarklId
+		GetRepoPubKeyMutable() interfaces.MutableMarklId
+		GetObjectSigMutable() interfaces.MutableMarklId
+	}
 
 	Getter interface {
-		GetMetadata() Metadata
+		GetMetadata() IMetadata
 	}
 
 	GetterMutable interface {
-		GetMetadataMutable() *Metadata
+		GetMetadataMutable() IMetadataMutable
 	}
 
 	Setter interface {
@@ -26,6 +75,7 @@ type (
 	}
 
 	PersistentFormatterContext interface {
+		Getter
 		GetterMutable
 	}
 

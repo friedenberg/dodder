@@ -18,46 +18,46 @@ func init() {
 }
 
 func GetExternalLikeKeyer[
-	T interface {
+	ELEMENT interface {
 		ExternalObjectIdGetter
 		ids.ObjectIdGetter
 		ExternalLikeGetter
 	},
-]() interfaces.StringKeyer[T] {
-	return interfaces.CompoundKeyer[T]{
-		ObjectIdKeyer[T]{},
-		ExternalObjectIdKeyer[T]{},
-		DescriptionKeyer[T]{},
+]() interfaces.StringKeyer[ELEMENT] {
+	return interfaces.CompoundKeyer[ELEMENT]{
+		ObjectIdKeyer[ELEMENT]{},
+		ExternalObjectIdKeyer[ELEMENT]{},
+		DescriptionKeyer[ELEMENT]{},
 	}
 }
 
-type ObjectIdKeyer[T ids.ObjectIdGetter] struct{}
+type ObjectIdKeyer[ELEMENT ids.ObjectIdGetter] struct{}
 
-func (sk ObjectIdKeyer[T]) GetKey(e T) (key string) {
-	if e.GetObjectId().IsEmpty() {
+func (keyer ObjectIdKeyer[ELEMENT]) GetKey(element ELEMENT) (key string) {
+	if element.GetObjectId().IsEmpty() {
 		return key
 	}
 
-	key = e.GetObjectId().String()
+	key = element.GetObjectId().String()
 
 	return key
 }
 
-type ExternalObjectIdKeyer[T ExternalObjectIdGetter] struct{}
+type ExternalObjectIdKeyer[ELEMENT ExternalObjectIdGetter] struct{}
 
-func (ExternalObjectIdKeyer[T]) GetKey(e T) (key string) {
-	if e.GetExternalObjectId().IsEmpty() {
+func (ExternalObjectIdKeyer[ELEMENT]) GetKey(element ELEMENT) (key string) {
+	if element.GetExternalObjectId().IsEmpty() {
 		return key
 	}
 
-	key = e.GetExternalObjectId().String()
+	key = element.GetExternalObjectId().String()
 
 	return key
 }
 
-type DescriptionKeyer[T ExternalLikeGetter] struct{}
+type DescriptionKeyer[ELEMENT ExternalLikeGetter] struct{}
 
-func (DescriptionKeyer[T]) GetKey(el T) (key string) {
-	key = el.GetSkuExternal().Metadata.Description.String()
+func (DescriptionKeyer[ELEMENT]) GetKey(element ELEMENT) (key string) {
+	key = element.GetSkuExternal().Metadata.GetDescription().String()
 	return key
 }

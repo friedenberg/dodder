@@ -78,8 +78,8 @@ func (op CreateFromPaths) Run(
 		existing, ok := toCreate[string(digestBytes)]
 
 		if ok {
-			if err = existing.Metadata.Description.Set(
-				object.Metadata.Description.String(),
+			if err = existing.GetMetadataMutable().GetDescriptionMutable().Set(
+				object.Metadata.GetDescription().String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return results, err

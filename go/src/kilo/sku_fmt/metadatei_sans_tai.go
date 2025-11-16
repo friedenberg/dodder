@@ -40,7 +40,7 @@ func StringMetadataSansTai(object *sku.Transacted) (str string) {
 		)
 	}
 
-	b := m.Description
+	b := m.GetDescription()
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")

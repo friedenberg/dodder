@@ -44,7 +44,7 @@ func (format *BoxTransacted) ReadStringFormat(
 
 	// TODO extract into dedicated parser and make incompatible with
 	// BoxTransactedWithSignature
-	if err = object.Metadata.Description.ReadFromBoxScanner(scanner); err != nil {
+	if err = object.GetMetadataMutable().GetDescriptionMutable().ReadFromBoxScanner(scanner); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -157,7 +157,9 @@ func (format *BoxTransacted) readStringFormatBox(
 		}
 
 		if object.ObjectId.GetGenre() == genres.InventoryList {
-			if err = object.Metadata.Tai.Set(object.ObjectId.String()); err != nil {
+			if err = object.GetMetadataMutable().GetTaiMutable().Set(
+				object.ObjectId.String(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -187,7 +189,7 @@ LOOP_AFTER_OID:
 
 			// "value"
 		case seq.MatchAll(doddish.TokenTypeLiteral):
-			if err = object.Metadata.Description.Set(
+			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
 				seq.String(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -213,7 +215,9 @@ LOOP_AFTER_OID:
 		case seq.MatchAll(
 			doddish.TokenTypeLiteral,
 		):
-			if err = object.Metadata.Description.Set(seq.String()); err != nil {
+			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
+				seq.String(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -262,13 +266,17 @@ LOOP_AFTER_OID:
 		switch genre {
 		case genres.InventoryList:
 			// TODO make more performant
-			if err = object.Metadata.Tai.Set(objectId.String()); err != nil {
+			if err = object.GetMetadataMutable().GetTaiMutable().Set(
+				objectId.String(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 
 		case genres.Type:
-			if err = object.Metadata.Type.TodoSetFromObjectId(&objectId); err != nil {
+			if err = object.GetMetadataMutable().GetTypePtr().TodoSetFromObjectId(
+				&objectId,
+			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -309,12 +317,12 @@ LOOP_AFTER_OID:
 	return err
 }
 
-var dodderTagMerkleIdGetterTypeMapping = map[string]func(*object_metadata.Metadata) interfaces.MutableMarklId{
-	"":                             (*object_metadata.Metadata).GetBlobDigestMutable,
-	markl.PurposeRepoPubKeyV1:      (*object_metadata.Metadata).GetRepoPubKeyMutable,
-	markl.PurposeObjectSigV0:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.PurposeObjectSigV1:       (*object_metadata.Metadata).GetObjectSigMutable,
-	markl.PurposeObjectMotherSigV1: (*object_metadata.Metadata).GetMotherObjectSigMutable,
+var dodderTagMerkleIdGetterTypeMapping = map[string]func(object_metadata.IMetadataMutable) interfaces.MutableMarklId{
+	"":                             (object_metadata.IMetadataMutable).GetBlobDigestMutable,
+	markl.PurposeRepoPubKeyV1:      (object_metadata.IMetadataMutable).GetRepoPubKeyMutable,
+	markl.PurposeObjectSigV0:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
+	markl.PurposeObjectSigV1:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
+	markl.PurposeObjectMotherSigV1: (object_metadata.IMetadataMutable).GetMotherObjectSigMutable,
 }
 
 // expects `seq` to include `@` as the first token

@@ -8,6 +8,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/tag_paths"
 )
 
+type (
+	IIndex interface {
+		GetTagPaths() *tag_paths.Tags // TODO make immutable view
+		GetExpandedTags() ids.TagSet
+		GetDormant() values.Bool
+		GetImplicitTags() ids.TagSet
+	}
+
+	IIndexMutable interface {
+		IIndex
+
+		GetDormantMutable() *values.Bool
+		AddTagExpandedPtr(e *ids.Tag) (err error)
+		GetExpandedTagsMutable() ids.TagMutableSet
+		SetExpandedTags(tags ids.TagSet)
+		SetImplicitTags(e ids.TagSet)
+	}
+)
+
 type Index struct {
 	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
@@ -15,6 +34,23 @@ type Index struct {
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private
 	TagPaths     tag_paths.Tags
 	QueryPath
+}
+
+var (
+	_ IIndex        = &Index{}
+	_ IIndexMutable = &Index{}
+)
+
+func (index *Index) GetTagPaths() *tag_paths.Tags {
+	return &index.TagPaths
+}
+
+func (index *Index) GetDormant() values.Bool {
+	return index.Dormant
+}
+
+func (index *Index) GetDormantMutable() *values.Bool {
+	return &index.Dormant
 }
 
 func (index *Index) GetExpandedTags() ids.TagSet {

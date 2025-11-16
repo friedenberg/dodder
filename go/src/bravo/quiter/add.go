@@ -5,6 +5,24 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+func AppendSeq[ELEMENT any, APPENDER interface{ Append(...ELEMENT) }](
+	collection APPENDER,
+	seq interfaces.Seq[ELEMENT],
+) {
+	for element := range seq {
+		collection.Append(element)
+	}
+}
+
+func AppendSeq2[INDEX any, ELEMENT any, APPENDER interface{ Append(...ELEMENT) }](
+	collection APPENDER,
+	seq interfaces.Seq2[INDEX, ELEMENT],
+) {
+	for _, element := range seq {
+		collection.Append(element)
+	}
+}
+
 func AddClone[E any, EPtr interface {
 	*E
 	ResetWithPtr(*E)

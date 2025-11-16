@@ -47,17 +47,17 @@ func (builder *Builder) AddBlobDigestIfNecessary(
 }
 
 func (builder *Builder) AddRepoPubKey(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetRepoPubKey())
 }
 
-func (builder *Builder) AddObjectSig(metadata *object_metadata.Metadata) {
+func (builder *Builder) AddObjectSig(metadata object_metadata.IMetadataMutable) {
 	builder.addMarklId(metadata.GetObjectSig())
 }
 
 func (builder *Builder) AddMotherSigIfNecessary(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetMotherObjectSig())
 }
@@ -128,34 +128,30 @@ func (builder *Builder) AddError(err error) {
 	}
 }
 
-func (builder *Builder) AddTai(metadata *object_metadata.Metadata) {
+func (builder *Builder) AddTai(metadata object_metadata.IMetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
-		Value:     metadata.Tai.String(),
+		Value:     metadata.GetTai().String(),
 		ColorType: string_format_writer.ColorTypeHash,
 	})
 }
 
-func (builder *Builder) AddType(metadata *object_metadata.Metadata) {
+func (builder *Builder) AddType(metadata object_metadata.IMetadataMutable) {
 	// builder.addMarklIdLockWithColorType(
 	// 	metadata.GetLockfile().GetTypeLock(),
 	// 	string_format_writer.ColorTypeType,
 	// )
 	builder.Contents.Append(string_format_writer.Field{
-		Value:     metadata.Type.String(),
+		Value:     metadata.GetType().String(),
 		ColorType: string_format_writer.ColorTypeType,
 	})
 }
 
 // TODO modify this method to not allocate an intermediate slice and instead
 // append to box.Contents and sort within that slice
-func (builder *Builder) AddTags(metadata *object_metadata.Metadata) {
-	if metadata.Tags == nil {
-		return
-	}
+func (builder *Builder) AddTags(metadata object_metadata.IMetadataMutable) {
+	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
-	tags := make([]string_format_writer.Field, 0, metadata.Tags.Len())
-
-	for tag := range metadata.Tags.AllPtr() {
+	for tag := range metadata.GetTags().AllPtr() {
 		tags = append(
 			tags,
 			string_format_writer.Field{
@@ -173,9 +169,9 @@ func (builder *Builder) AddTags(metadata *object_metadata.Metadata) {
 	}
 }
 
-func (builder *Builder) AddDescription(metadata *object_metadata.Metadata) {
+func (builder *Builder) AddDescription(metadata object_metadata.IMetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
-		Value:     metadata.Description.StringWithoutNewlines(),
+		Value:     metadata.GetDescription().StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,
 	})
 }

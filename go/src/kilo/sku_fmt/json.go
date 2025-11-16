@@ -22,7 +22,7 @@ type JSONMCP struct {
 }
 
 type JSON struct {
-	// TODO rename to blob-id
+	// TODO add object digest
 	BlobId      string   `json:"blob-sha"`
 	BlobString  string   `json:"blob-string,omitempty"`
 	Date        string   `json:"date"`
@@ -31,7 +31,6 @@ type JSON struct {
 	ObjectId    string   `json:"object-id"`
 	RepoPubkey  markl.Id `json:"repo-pub_key"`
 	RepoSig     markl.Id `json:"repo-sig"`
-	Sha         string   `json:"sha"`
 	Tags        []string `json:"tags"`
 	Tai         string   `json:"tai"`
 	Type        string   `json:"type"`
@@ -41,7 +40,7 @@ type JSON struct {
 
 func (json *JSON) FromStringAndMetadata(
 	objectId string,
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
@@ -67,16 +66,15 @@ func (json *JSON) FromStringAndMetadata(
 	}
 
 	json.BlobId = metadata.GetBlobDigest().String()
-	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
-	json.Description = metadata.Description.String()
-	json.Dormant = metadata.Cache.Dormant.Bool()
+	json.Date = metadata.GetTai().Format(string_format_writer.StringFormatDateTime)
+	json.Description = metadata.GetDescription().String()
+	json.Dormant = metadata.GetIndex().GetDormant().Bool()
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
-	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
-	json.Tai = metadata.Tai.String()
-	json.Type = metadata.Type.String()
+	json.Tai = metadata.GetTai().String()
+	json.Type = metadata.GetType().String()
 
 	json.URI = fmt.Sprintf("dodder:///objects/%s", objectId)
 
@@ -191,14 +189,6 @@ func (json *JSON) ToTransacted(
 		}
 	} else if json.Date != "" {
 		if err = object.Metadata.Tai.SetFromRFC3339(json.Date); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
-	// Set SelfMetadataWithoutTai SHA
-	if json.Sha != "" {
-		if err = object.Metadata.SelfWithoutTai.Set(json.Sha); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

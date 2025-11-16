@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -120,7 +121,7 @@ func (format *BoxTransacted) EncodeStringTo(
 		return n, err
 	}
 
-	b := &object.Metadata.Description
+	b := object.Metadata.GetDescription()
 
 	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
@@ -258,11 +259,11 @@ func (format *BoxTransacted) addFieldsMetadata(
 		builder.AddObjectSig(metadata)
 	}
 
-	if !metadata.Type.IsEmpty() {
+	if !metadata.GetType().IsEmpty() {
 		builder.AddType(metadata)
 	}
 
-	description := metadata.Description
+	description := metadata.GetDescription()
 
 	if includeDescriptionInBox && !description.IsEmpty() {
 		builder.AddDescription(metadata)
@@ -271,7 +272,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 	builder.AddTags(metadata)
 
 	if !options.BoxExcludeFields && !format.isArchive {
-		builder.Contents.Append(metadata.Fields...)
+		quiter.AppendSeq(&builder.Contents, metadata.GetFields())
 	}
 
 	return err

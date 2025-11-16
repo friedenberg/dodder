@@ -65,11 +65,11 @@ func (objectId ObjectId) ContainsSku(
 	switch objectId.GetGenre() {
 	case genres.Tag:
 		if objectId.Exact {
-			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTagExact(
+			_, ok = metadata.GetIndex().GetTagPaths().All.ContainsObjectIdTagExact(
 				objectId.GetObjectId(),
 			)
 		} else {
-			_, ok = metadata.Cache.TagPaths.All.ContainsObjectIdTag(
+			_, ok = metadata.GetIndex().GetTagPaths().All.ContainsObjectIdTag(
 				objectId.GetObjectId(),
 			)
 		}

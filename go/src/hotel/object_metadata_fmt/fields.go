@@ -42,33 +42,29 @@ func MetadataFieldError(
 }
 
 func MetadataFieldTai(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     metadata.Tai.String(),
+		Value:     metadata.GetTai().String(),
 		ColorType: string_format_writer.ColorTypeHash,
 	}
 }
 
 func MetadataFieldType(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     metadata.Type.String(),
+		Value:     metadata.GetType().String(),
 		ColorType: string_format_writer.ColorTypeType,
 	}
 }
 
 func MetadataFieldTags(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) []string_format_writer.Field {
-	if metadata.Tags == nil {
-		return nil
-	}
+	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
-	tags := make([]string_format_writer.Field, 0, metadata.Tags.Len())
-
-	for t := range metadata.Tags.AllPtr() {
+	for t := range metadata.GetTags().AllPtr() {
 		tags = append(
 			tags,
 			string_format_writer.Field{
@@ -85,10 +81,10 @@ func MetadataFieldTags(
 }
 
 func MetadataFieldDescription(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     metadata.Description.StringWithoutNewlines(),
+		Value:     metadata.GetDescription().StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,
 	}
 }

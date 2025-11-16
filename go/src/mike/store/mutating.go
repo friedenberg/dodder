@@ -62,8 +62,8 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 
 	if genres.Type == external.GetSku().GetGenre() {
 		if external.GetSku().GetType().IsEmpty() {
-			external.GetSku().GetMetadataMutable().Type = ids.DefaultOrPanic(
-				genres.Type,
+			external.GetSku().GetMetadataMutable().GetTypePtr().ResetWith(
+				ids.DefaultOrPanic(genres.Type),
 			)
 		}
 	}
@@ -387,7 +387,9 @@ func (commitFacilitator commitFacilitator) createType(
 		return err
 
 	case genres.Type:
-		typeObject.GetMetadataMutable().Type = ids.DefaultOrPanic(genres.Type)
+		typeObject.GetMetadataMutable().GetTypePtr().ResetWith(
+			ids.DefaultOrPanic(genres.Type),
+		)
 	}
 
 	if err = typeObject.ObjectId.SetWithIdLike(typeId); err != nil {

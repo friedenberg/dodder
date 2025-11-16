@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -86,7 +87,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 		}
 	}
 
-	b := &external.Metadata.Description
+	b := external.Metadata.GetDescription()
 
 	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer.Append(string_format_writer.Field{
@@ -246,11 +247,11 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 		builder.AddTai(metadata)
 	}
 
-	if !metadata.Type.IsEmpty() {
+	if !metadata.GetType().IsEmpty() {
 		builder.AddType(metadata)
 	}
 
-	b := metadata.Description
+	b := metadata.GetDescription()
 
 	if includeDescriptionInBox && !b.IsEmpty() {
 		builder.AddDescription(metadata)
@@ -260,7 +261,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 	if !options.BoxExcludeFields &&
 		(item == nil || item.FDs.Len() == 0) {
-		builder.Contents.Append(metadata.Fields...)
+		quiter.AppendSeq(&builder.Contents, metadata.GetFields())
 	}
 
 	return err

@@ -33,39 +33,39 @@ type Proto struct {
 
 var _ interfaces.CommandComponentWriter = (*Proto)(nil)
 
-func (pz *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	pz.Metadata.SetFlagDefinitions(f)
+func (proto *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
+	proto.Metadata.SetFlagDefinitions(f)
 }
 
-func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
-	var okTyp, okMet bool
+func (proto Proto) Equals(metadata object_metadata.IMetadataMutable) (ok bool) {
+	var okType, okMetadata bool
 
-	if !ids.IsEmpty(pz.Metadata.Type) &&
-		pz.Metadata.Type.Equals(z.GetType()) {
-		okTyp = true
+	if !ids.IsEmpty(proto.Metadata.Type) &&
+		proto.Metadata.Type.Equals(metadata.GetType()) {
+		okType = true
 	}
 
-	if pz.Metadata.Equals(z) {
-		okMet = true
+	if object_metadata.Equaler.Equals(&proto.Metadata, metadata) {
+		okMetadata = true
 	}
 
-	ok = okTyp && okMet
+	ok = okType && okMetadata
 
 	return ok
 }
 
-func (pz Proto) Make() (object *Transacted) {
+func (proto Proto) Make() (object *Transacted) {
 	comments.Change("add type")
 	comments.Change("add description")
 	object = GetTransactedPool().Get()
 
-	pz.Apply(object, genres.Zettel)
+	proto.Apply(object, genres.Zettel)
 
 	return object
 }
 
 func (proto Proto) ApplyType(
-	metadataLike object_metadata.MetadataLike,
+	metadataLike object_metadata.GetterMutable,
 	genreGetter interfaces.GenreGetter,
 ) (ok bool) {
 	metadata := metadataLike.GetMetadataMutable()
@@ -79,7 +79,7 @@ func (proto Proto) ApplyType(
 			!ids.IsEmpty(proto.Metadata.Type) &&
 			!metadata.GetType().Equals(proto.Metadata.Type) {
 			ok = true
-			metadata.Type = proto.Metadata.Type
+			metadata.GetTypePtr().ResetWith(proto.Metadata.Type)
 		}
 	}
 
@@ -87,7 +87,7 @@ func (proto Proto) ApplyType(
 }
 
 func (proto Proto) Apply(
-	metadataLike object_metadata.MetadataLike,
+	metadataLike object_metadata.GetterMutable,
 	genreGetter interfaces.GenreGetter,
 ) (changed bool) {
 	metadata := metadataLike.GetMetadataMutable()
@@ -97,9 +97,9 @@ func (proto Proto) Apply(
 	}
 
 	if proto.Metadata.Description.WasSet() &&
-		!metadata.Description.Equals(proto.Metadata.Description) {
+		!metadata.GetDescription().Equals(proto.Metadata.Description) {
 		changed = true
-		metadata.Description = proto.Metadata.Description
+		metadata.GetDescriptionMutable().ResetWith(proto.Metadata.GetDescription())
 	}
 
 	if proto.Metadata.GetTags().Len() > 0 {
@@ -113,22 +113,22 @@ func (proto Proto) Apply(
 	return changed
 }
 
-func (pz Proto) ApplyWithBlobFD(
-	ml object_metadata.MetadataLike,
+func (proto Proto) ApplyWithBlobFD(
+	metadataGetter object_metadata.GetterMutable,
 	blobFD *fd.FD,
 ) (err error) {
-	z := ml.GetMetadataMutable()
+	metadataMutable := metadataGetter.GetMetadataMutable()
 
-	if ids.IsEmpty(z.GetType()) &&
-		!ids.IsEmpty(pz.Metadata.Type) &&
-		!z.GetType().Equals(pz.Metadata.Type) {
-		z.Type = pz.Metadata.Type
+	if ids.IsEmpty(metadataMutable.GetType()) &&
+		!ids.IsEmpty(proto.Metadata.Type) &&
+		!metadataMutable.GetType().Equals(proto.Metadata.Type) {
+		metadataMutable.GetTypePtr().ResetWith(proto.Metadata.Type)
 	} else {
 		// TODO-P4 use konfig
 		ext := blobFD.Ext()
 
 		if ext != "" {
-			if err = z.Type.Set(blobFD.Ext()); err != nil {
+			if err = metadataMutable.GetTypePtr().Set(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -137,18 +137,18 @@ func (pz Proto) ApplyWithBlobFD(
 
 	desc := blobFD.FileNameSansExt()
 
-	if pz.Metadata.Description.WasSet() &&
-		!z.Description.Equals(pz.Metadata.Description) {
-		desc = pz.Metadata.Description.String()
+	if proto.Metadata.Description.WasSet() &&
+		!metadataMutable.GetDescription().Equals(proto.Metadata.Description) {
+		desc = proto.Metadata.Description.String()
 	}
 
-	if err = z.Description.Set(desc); err != nil {
+	if err = metadataMutable.GetDescriptionMutable().Set(desc); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	for e := range pz.Metadata.GetTags().AllPtr() {
-		errors.PanicIfError(z.AddTagPtr(e))
+	for e := range proto.Metadata.GetTags().AllPtr() {
+		errors.PanicIfError(metadataMutable.AddTagPtr(e))
 	}
 
 	return err

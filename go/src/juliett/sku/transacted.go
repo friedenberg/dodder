@@ -102,7 +102,11 @@ func (transacted *Transacted) GetType() ids.Type {
 	return transacted.Metadata.Type
 }
 
-func (transacted *Transacted) GetMetadataMutable() *object_metadata.Metadata {
+func (transacted *Transacted) GetMetadata() object_metadata.IMetadata {
+	return &transacted.Metadata
+}
+
+func (transacted *Transacted) GetMetadataMutable() object_metadata.IMetadataMutable {
 	return &transacted.Metadata
 }
 
@@ -111,7 +115,7 @@ func (transacted *Transacted) GetTai() ids.Tai {
 }
 
 func (transacted *Transacted) SetTai(tai ids.Tai) {
-	transacted.GetMetadataMutable().Tai = tai
+	transacted.GetMetadataMutable().GetTaiMutable().ResetWith(tai)
 }
 
 func (transacted *Transacted) GetObjectId() *ids.ObjectId {
@@ -143,7 +147,7 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !transacted.Metadata.Equals(&other.Metadata) {
+	if !object_metadata.Equaler.Equals(&transacted.Metadata, &other.Metadata) {
 		return ok
 	}
 

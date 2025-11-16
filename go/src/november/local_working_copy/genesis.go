@@ -95,10 +95,10 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return defaultTypeObjectId, err
 	}
 
-	var sh interfaces.MarklId
+	var digest interfaces.MarklId
 
 	// TODO remove and replace with two-step process
-	if sh, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
+	if digest, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
 		&defaultTypeBlob,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -113,8 +113,10 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return defaultTypeObjectId, err
 	}
 
-	object.Metadata.GetBlobDigestMutable().ResetWithMarklId(sh)
-	object.GetMetadataMutable().Type = ids.DefaultOrPanic(genres.Type)
+	object.Metadata.GetBlobDigestMutable().ResetWithMarklId(digest)
+	object.GetMetadataMutable().GetTypePtr().ResetWith(
+		ids.DefaultOrPanic(genres.Type),
+	)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		object,

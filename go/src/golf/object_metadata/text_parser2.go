@@ -50,10 +50,10 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 
 		switch key {
 		case '#':
-			err = metadata.Description.Set(remainder)
+			err = metadata.GetDescriptionMutable().Set(remainder)
 
 		case '%':
-			metadata.Comments = append(metadata.Comments, remainder)
+			metadata.GetCommentsMutable().Append(remainder)
 
 		case '-':
 			metadata.AddTagString(remainder)
@@ -81,7 +81,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (parser *textParser2) readType(
-	metadata *metadata,
+	metadata IMetadataMutable,
 	desc string,
 ) (err error) {
 	if desc == "" {
@@ -94,7 +94,7 @@ func (parser *textParser2) readType(
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = metadata.Type.Set(tail); err != nil {
+		if err = metadata.GetTypePtr().Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -111,7 +111,7 @@ func (parser *textParser2) readType(
 			return err
 		}
 
-		if err = metadata.Type.Set(tail); err != nil {
+		if err = metadata.GetTypePtr().Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -128,7 +128,7 @@ func (parser *textParser2) readType(
 
 	//! <typ ext>
 	default:
-		if err = metadata.Type.Set(head); err != nil {
+		if err = metadata.GetTypePtr().Set(head); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -138,7 +138,7 @@ func (parser *textParser2) readType(
 }
 
 func (parser *textParser2) setBlobSha(
-	metadata *metadata,
+	metadata IMetadataMutable,
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(

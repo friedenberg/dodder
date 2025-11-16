@@ -19,77 +19,82 @@ type equaler struct {
 const debug = false
 
 // TODO make better diffing facility
-func (e equaler) Equals(a, b *metadata) bool {
-	if e.includeTai && !a.Tai.Equals(b.Tai) {
-		if debug {
-			ui.Debug().Print(&a.Tai, "->", &b.Tai)
-		}
-		return false
-	}
+func (e equaler) Equals(a, b IMetadataMutable) bool {
+	{
+		a := a.(*metadata)
+		b := b.(*metadata)
 
-	if !markl.Equals(&a.DigBlob, &b.DigBlob) {
-		if debug {
-			ui.Debug().Print(&a.DigBlob, "->", &b.DigBlob)
-		}
-		return false
-	}
-
-	if !a.Type.Equals(b.Type) {
-		if debug {
-			ui.Debug().Print(&a.Type, "->", &b.Type)
-		}
-		return false
-	}
-
-	aes := a.GetTags()
-	bes := b.GetTags()
-
-	found := false
-	for ea := range aes.AllPtr() {
-		if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
-			continue
-		}
-
-		if !bes.ContainsKey(bes.KeyPtr(ea)) {
+		if e.includeTai && !a.Tai.Equals(b.Tai) {
 			if debug {
-				ui.Debug().Print(ea, "-> X")
+				ui.Debug().Print(&a.Tai, "->", &b.Tai)
 			}
-			found = true
-			break
-		}
-	}
-	if found {
-		if debug {
-			ui.Debug().Print(aes, "->", bes)
+			return false
 		}
 
-		return false
-	}
-
-	found2 := false
-	for eb := range bes.AllPtr() {
-		if !e.includeVirtual && eb.IsVirtual() {
-			continue
+		if !markl.Equals(&a.DigBlob, &b.DigBlob) {
+			if debug {
+				ui.Debug().Print(&a.DigBlob, "->", &b.DigBlob)
+			}
+			return false
 		}
 
-		if !aes.ContainsKey(aes.KeyPtr(eb)) {
-			found2 = true
-			break
+		if !a.Type.Equals(b.Type) {
+			if debug {
+				ui.Debug().Print(&a.Type, "->", &b.Type)
+			}
+			return false
 		}
-	}
-	if found2 {
-		if debug {
-			ui.Debug().Print(aes, "->", bes)
-		}
-		return false
-	}
 
-	if !a.Description.Equals(b.Description) {
-		if debug {
-			ui.Debug().Print(a.Description, "->", b.Description)
-		}
-		return false
-	}
+		aes := a.GetTags()
+		bes := b.GetTags()
 
-	return true
+		found := false
+		for ea := range aes.AllPtr() {
+			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
+				continue
+			}
+
+			if !bes.ContainsKey(bes.KeyPtr(ea)) {
+				if debug {
+					ui.Debug().Print(ea, "-> X")
+				}
+				found = true
+				break
+			}
+		}
+		if found {
+			if debug {
+				ui.Debug().Print(aes, "->", bes)
+			}
+
+			return false
+		}
+
+		found2 := false
+		for eb := range bes.AllPtr() {
+			if !e.includeVirtual && eb.IsVirtual() {
+				continue
+			}
+
+			if !aes.ContainsKey(aes.KeyPtr(eb)) {
+				found2 = true
+				break
+			}
+		}
+		if found2 {
+			if debug {
+				ui.Debug().Print(aes, "->", bes)
+			}
+			return false
+		}
+
+		if !a.Description.Equals(b.Description) {
+			if debug {
+				ui.Debug().Print(a.Description, "->", b.Description)
+			}
+			return false
+		}
+
+		return true
+	}
 }

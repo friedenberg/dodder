@@ -31,7 +31,7 @@ type Transacted struct {
 
 func (json *Transacted) FromStringAndMetadata(
 	objectId string,
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
@@ -57,15 +57,14 @@ func (json *Transacted) FromStringAndMetadata(
 	}
 
 	json.BlobId = metadata.GetBlobDigest().String()
-	json.Date = metadata.Tai.Format(string_format_writer.StringFormatDateTime)
-	json.Description = metadata.Description.String()
+	json.Date = metadata.GetTai().Format(string_format_writer.StringFormatDateTime)
+	json.Description = metadata.GetDescription().String()
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
-	json.Sha = metadata.SelfWithoutTai.String()
 	json.Tags = quiter.Strings(metadata.GetTags())
-	json.Tai = metadata.Tai.String()
-	json.Type = metadata.Type.String()
+	json.Tai = metadata.GetTai().String()
+	json.Type = metadata.GetType().String()
 
 	// TODO add support for "preview"
 

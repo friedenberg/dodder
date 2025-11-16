@@ -52,7 +52,7 @@ func readFormat(
 	t1 *ui.TestContext,
 	format object_metadata.TextFormat,
 	contents string,
-) (metadata *object_metadata.Metadata) {
+) (metadata object_metadata.IMetadataMutable) {
 	var object Transacted
 
 	t := t1
@@ -155,7 +155,7 @@ func testEqualitySelf(t *ui.TestContext) {
 		"tag3",
 	))
 
-	if !text.Equals(text) {
+	if !object_metadata.Equaler.Equals(text, text) {
 		t.Fatalf("expected %v to equal itself", text)
 	}
 }
@@ -187,7 +187,7 @@ func testEqualityNotSelf(t *ui.TestContext) {
 		"tag3",
 	))
 
-	if !text.Equals(text1) {
+	if !object_metadata.Equaler.Equals(&text, text1) {
 		t.Fatalf("expected %v to equal %v", text, text1)
 	}
 }
@@ -235,7 +235,7 @@ func testReadWithoutBlob(t *ui.TestContext) {
 		"tag3",
 	))
 
-	if !actual.Equals(expected) {
+	if !object_metadata.Equaler.Equals(actual, expected) {
 		t.Fatalf(
 			"zettel:\nexpected: %s\n  actual: %s",
 			StringMetadataSansTaiMerkle2(expected),
@@ -280,7 +280,7 @@ func testReadWithoutBlobWithMultilineDescription(t *ui.TestContext) {
 		"tag3",
 	))
 
-	if !actual.Equals(expected) {
+	if !object_metadata.Equaler.Equals(actual, expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
@@ -331,7 +331,7 @@ the body`,
 		"tag3",
 	))
 
-	if !actual.Equals(expected) {
+	if !object_metadata.Equaler.Equals(actual, expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 }
@@ -366,7 +366,7 @@ func (blobStore blobReaderFactory) BlobReader(
 
 func writeFormat(
 	t *ui.TestContext,
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 	formatter object_metadata.TextFormatter,
 	includeBlob bool,
 	blobBody string,

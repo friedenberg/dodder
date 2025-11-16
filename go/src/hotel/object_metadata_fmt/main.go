@@ -46,7 +46,7 @@ func AddBlobDigestIfNecessary(
 
 func AddRepoPubKey(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	addMarklIdIfNotNull(
 		boxContents,
@@ -56,7 +56,7 @@ func AddRepoPubKey(
 
 func AddObjectSig(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),
@@ -65,7 +65,7 @@ func AddObjectSig(
 
 func AddMotherSigIfNecessary(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	addMarklIdIfNotNull(
 		boxContents,
@@ -75,7 +75,7 @@ func AddMotherSigIfNecessary(
 
 func AddReferencedObject(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) {
 	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),

@@ -89,35 +89,35 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	m := object.GetMetadataMutable()
+	metadata := object.GetMetadataMutable()
 
-	t := m.GetType()
+	t := metadata.GetType()
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType()))
 	}
 
-	es := m.GetTags()
+	es := metadata.GetTags()
 
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
 			quiter.StringDelimiterSeparated(
 				" ",
-				m.GetTags(),
+				metadata.GetTags(),
 			),
 		)
 	}
 
-	b := m.Description
+	b := metadata.GetDescription()
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for _, field := range m.Fields {
+	for field := range metadata.GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}
@@ -143,35 +143,35 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 
-	m := object.GetMetadataMutable()
+	metadata := object.GetMetadataMutable()
 
-	t := m.GetType()
+	t := metadata.GetType()
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType()))
 	}
 
-	es := m.GetTags()
+	es := metadata.GetTags()
 
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
 			quiter.StringDelimiterSeparated(
 				" ",
-				m.GetTags(),
+				metadata.GetTags(),
 			),
 		)
 	}
 
-	b := m.Description
+	b := metadata.GetDescription()
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for _, field := range m.Fields {
+	for field := range metadata.GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}
@@ -180,7 +180,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 }
 
 func StringMetadataSansTaiMerkle2(
-	object *object_metadata.Metadata,
+	object object_metadata.IMetadataMutable,
 ) (str string) {
 	sb := &strings.Builder{}
 
@@ -210,14 +210,14 @@ func StringMetadataSansTaiMerkle2(
 		)
 	}
 
-	b := metadata.Description
+	b := metadata.GetDescription()
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for _, field := range metadata.Fields {
+	for field := range metadata.GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}

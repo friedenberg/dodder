@@ -75,7 +75,7 @@ func (parser textParser) ParseMetadata(
 
 	inlineBlobDigest := blobWriter.GetMarklId()
 
-	if !metadata.DigBlob.IsNull() && !parser2.Blob.GetDigest().IsNull() {
+	if !metadata.GetBlobDigest().IsNull() && !parser2.Blob.GetDigest().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
 				&parser2.Blob,
@@ -85,8 +85,7 @@ func (parser textParser) ParseMetadata(
 
 		return n, err
 	} else if !parser2.Blob.GetDigest().IsNull() {
-		metadata.Fields = append(
-			metadata.Fields,
+		metadata.GetFieldsMutable().Append(
 			Field{
 				Key:       "blob",
 				Value:     parser2.Blob.GetPath(),
@@ -94,22 +93,22 @@ func (parser textParser) ParseMetadata(
 			},
 		)
 
-		metadata.DigBlob.SetDigest(parser2.Blob.GetDigest())
+		metadata.GetBlobDigestMutable().ResetWithMarklId(parser2.Blob.GetDigest())
 	}
 
 	switch {
-	case metadata.DigBlob.IsNull() && !inlineBlobDigest.IsNull():
-		metadata.DigBlob.SetDigest(inlineBlobDigest)
+	case metadata.GetBlobDigest().IsNull() && !inlineBlobDigest.IsNull():
+		metadata.GetBlobDigestMutable().ResetWithMarklId(inlineBlobDigest)
 
-	case !metadata.DigBlob.IsNull() && inlineBlobDigest.IsNull():
+	case !metadata.GetBlobDigest().IsNull() && inlineBlobDigest.IsNull():
 		// noop
 
-	case !metadata.DigBlob.IsNull() && !inlineBlobDigest.IsNull() &&
-		!markl.Equals(&metadata.DigBlob, inlineBlobDigest):
+	case !metadata.GetBlobDigest().IsNull() && !inlineBlobDigest.IsNull() &&
+		!markl.Equals(metadata.GetBlobDigest(), inlineBlobDigest):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadataBlobId(
 				inlineBlobDigest,
-				&metadata.DigBlob,
+				metadata.GetBlobDigest(),
 			),
 		)
 

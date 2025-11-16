@@ -15,7 +15,7 @@ type WithDormant struct {
 
 func (json *WithDormant) FromStringAndMetadata(
 	objectId string,
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if err = json.Transacted.FromStringAndMetadata(
@@ -27,7 +27,7 @@ func (json *WithDormant) FromStringAndMetadata(
 		return err
 	}
 
-	json.Dormant = metadata.Cache.Dormant.Bool()
+	json.Dormant = metadata.GetIndex().GetDormant().Bool()
 
 	return err
 }

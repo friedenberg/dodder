@@ -51,20 +51,20 @@ func (m *Metadata) GetTags() ids.TagSet {
 	return m.TagSet
 }
 
-func (m *Metadata) SetFromObjectMetadata(
-	om *object_metadata.Metadata,
+func (metadata *Metadata) SetFromObjectMetadata(
+	otherMetadata object_metadata.IMetadataMutable,
 	repoId ids.RepoId,
 ) (err error) {
-	m.TagSet = om.Tags.CloneSetPtrLike()
+	metadata.TagSet = otherMetadata.GetTags().CloneSetPtrLike()
 
-	for _, c := range om.Comments {
-		if err = m.OptionCommentSet.Set(c); err != nil {
+	for comment := range otherMetadata.GetComments() {
+		if err = metadata.OptionCommentSet.Set(comment); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	m.Type = om.Type
+	metadata.Type = otherMetadata.GetType()
 
 	return err
 }

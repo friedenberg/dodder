@@ -47,12 +47,12 @@ func MakePrinterComplete(envLocal env_local.Env) *PrinterComplete {
 				printer.bufferedWriter.WriteString(object.GetType().String())
 			}
 
-			description := object.GetMetadataMutable().Description.String()
+			description := object.GetMetadataMutable().GetDescription().String()
 
 			if description != "" {
 				printer.bufferedWriter.WriteString(" ")
 				printer.bufferedWriter.WriteString(
-					object.GetMetadataMutable().Description.String(),
+					object.GetMetadataMutable().GetDescription().String(),
 				)
 			}
 

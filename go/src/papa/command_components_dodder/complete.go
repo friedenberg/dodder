@@ -19,7 +19,7 @@ type Complete struct {
 }
 
 func (cmd Complete) GetFlagValueMetadataTags(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
 	return command.FlagValueCompleter{
 		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataTags(metadata),
@@ -61,7 +61,7 @@ func (cmd Complete) GetFlagValueStringTags(
 }
 
 func (cmd Complete) GetFlagValueMetadataType(
-	metadata *object_metadata.Metadata,
+	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
 	return command.FlagValueCompleter{
 		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataType(metadata),

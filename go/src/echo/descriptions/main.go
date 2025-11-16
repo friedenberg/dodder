@@ -23,15 +23,15 @@ func Make(v string) Description {
 	}
 }
 
-func (b Description) String() string {
-	return b.value
+func (description Description) String() string {
+	return description.value
 }
 
-func (b Description) StringWithoutNewlines() string {
-	return strings.ReplaceAll(b.value, "\n", " ")
+func (description Description) StringWithoutNewlines() string {
+	return strings.ReplaceAll(description.value, "\n", " ")
 }
 
-func (b *Description) TodoSetManyCatgutStrings(
+func (description *Description) TodoSetManyCatgutStrings(
 	vs ...*catgut.String,
 ) (err error) {
 	var s catgut.String
@@ -41,14 +41,14 @@ func (b *Description) TodoSetManyCatgutStrings(
 		return err
 	}
 
-	return b.Set(s.String())
+	return description.Set(s.String())
 }
 
-func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
-	return b.Set(v.String())
+func (description *Description) TodoSetSlice(v catgut.Slice) (err error) {
+	return description.Set(v.String())
 }
 
-func (b *Description) readFromRuneScannerAfterNewline(
+func (description *Description) readFromRuneScannerAfterNewline(
 	rs *doddish.Scanner,
 	sb *strings.Builder,
 ) (err error) {
@@ -82,7 +82,7 @@ func (b *Description) readFromRuneScannerAfterNewline(
 		return err
 	}
 
-	if err = b.readFromRuneScannerOrdinary(rs, sb); err != nil {
+	if err = description.readFromRuneScannerOrdinary(rs, sb); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -90,7 +90,7 @@ func (b *Description) readFromRuneScannerAfterNewline(
 	return err
 }
 
-func (b *Description) readFromRuneScannerOrdinary(
+func (description *Description) readFromRuneScannerOrdinary(
 	rs *doddish.Scanner,
 	sb *strings.Builder,
 ) (err error) {
@@ -106,7 +106,7 @@ func (b *Description) readFromRuneScannerOrdinary(
 		}
 
 		if r == '\n' {
-			if err = b.readFromRuneScannerAfterNewline(rs, sb); err != nil {
+			if err = description.readFromRuneScannerAfterNewline(rs, sb); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -129,15 +129,15 @@ func (b *Description) readFromRuneScannerOrdinary(
 	return err
 }
 
-func (b *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
+func (description *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
 	var sb strings.Builder
 
-	if err = b.readFromRuneScannerOrdinary(rs, &sb); err != nil {
+	if err = description.readFromRuneScannerOrdinary(rs, &sb); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = b.Set(sb.String()); err != nil {
+	if err = description.Set(sb.String()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -145,63 +145,68 @@ func (b *Description) ReadFromBoxScanner(rs *doddish.Scanner) (err error) {
 	return err
 }
 
-func (b *Description) Set(v string) (err error) {
-	b.wasSet = true
+func (description *Description) Set(value string) (err error) {
+	description.wasSet = true
 
-	v1 := strings.TrimSpace(v)
+	v1 := strings.TrimSpace(value)
 
-	if v0 := b.String(); v0 != "" && v0 != v1 {
-		b.value = v0 + " " + v1
+	if v0 := description.String(); v0 != "" && v0 != v1 {
+		description.value = v0 + " " + v1
 	} else {
-		b.value = v1
+		description.value = v1
 	}
 
 	return err
 }
 
-func (a Description) WasSet() bool {
-	return a.wasSet
+func (description Description) WasSet() bool {
+	return description.wasSet
 }
 
-func (a *Description) Reset() {
-	a.wasSet = false
-	a.value = ""
+func (description *Description) Reset() {
+	description.wasSet = false
+	description.value = ""
 }
 
-func (a Description) IsEmpty() bool {
-	return a.value == ""
+func (description *Description) ResetWith(other Description) {
+	description.wasSet = other.wasSet
+	description.value = other.value
 }
 
-func (a Description) Equals(b Description) (ok bool) {
+func (description Description) IsEmpty() bool {
+	return description.value == ""
+}
+
+func (description Description) Equals(b Description) (ok bool) {
 	// if !a.wasSet {
 	// 	return false
 	// }
 
-	return a.value == b.value
+	return description.value == b.value
 }
 
-func (a Description) Less(b Description) (ok bool) {
-	return a.value < b.value
+func (description Description) Less(b Description) (ok bool) {
+	return description.value < b.value
 }
 
-func (a Description) MarshalBinary() (text []byte, err error) {
-	text = []byte(a.value)
+func (description Description) MarshalBinary() (text []byte, err error) {
+	text = []byte(description.value)
 	return text, err
 }
 
-func (a *Description) UnmarshalBinary(text []byte) (err error) {
-	a.wasSet = true
-	a.value = string(text)
+func (description *Description) UnmarshalBinary(text []byte) (err error) {
+	description.wasSet = true
+	description.value = string(text)
 	return err
 }
 
-func (a Description) MarshalText() (text []byte, err error) {
-	text = []byte(a.value)
+func (description Description) MarshalText() (text []byte, err error) {
+	text = []byte(description.value)
 	return text, err
 }
 
-func (a *Description) UnmarshalText(text []byte) (err error) {
-	a.wasSet = true
-	a.value = string(text)
+func (description *Description) UnmarshalText(text []byte) (err error) {
+	description.wasSet = true
+	description.value = string(text)
 	return err
 }

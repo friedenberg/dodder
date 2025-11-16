@@ -41,7 +41,7 @@ func (deps Dependencies) writeComments(
 ) (n int64, err error) {
 	n1 := 0
 
-	for _, c := range context.GetMetadataMutable().Comments {
+	for comment := range context.GetMetadataMutable().GetComments() {
 		n1, err = io.WriteString(writer, "% ")
 		n += int64(n1)
 
@@ -49,7 +49,7 @@ func (deps Dependencies) writeComments(
 			return n, err
 		}
 
-		n1, err = io.WriteString(writer, c)
+		n1, err = io.WriteString(writer, comment)
 		n += int64(n1)
 
 		if err != nil {
@@ -88,8 +88,9 @@ func (deps Dependencies) writeCommonMetadataFormat(
 	w := format.NewLineWriter()
 	m := c.GetMetadataMutable()
 
-	if m.Description.String() != "" || !c.DoNotWriteEmptyDescription {
-		reader, repool := pool.GetStringReader(m.Description.String())
+	description := m.GetDescription()
+	if description.String() != "" || !c.DoNotWriteEmptyDescription {
+		reader, repool := pool.GetStringReader(description.String())
 		defer repool()
 		sr := bufio.NewReader(reader)
 
@@ -134,12 +135,13 @@ func (deps Dependencies) writeTyp(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadataMutable()
+	tipe := m.GetType()
 
-	if m.Type.IsEmpty() {
+	if tipe.IsEmpty() {
 		return n, err
 	}
 
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type.StringSansOp()))
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s", tipe.StringSansOp()))
 }
 
 func (deps Dependencies) writeBlobDigestAndType(
@@ -151,8 +153,8 @@ func (deps Dependencies) writeBlobDigestAndType(
 		w1,
 		fmt.Sprintf(
 			"! %s.%s",
-			&m.DigBlob,
-			m.Type.StringSansOp(),
+			m.GetBlobDigest(),
+			m.GetType().StringSansOp(),
 		),
 	)
 }
@@ -163,9 +165,9 @@ func (deps Dependencies) writePathType(
 ) (n int64, err error) {
 	var ap string
 
-	for _, f := range c.PersistentFormatterContext.GetMetadataMutable().Fields {
-		if strings.ToLower(f.Key) == "blob" {
-			ap = f.Value
+	for field := range c.PersistentFormatterContext.GetMetadataMutable().GetFields() {
+		if strings.ToLower(field.Key) == "blob" {
+			ap = field.Value
 			break
 		}
 	}
@@ -187,7 +189,7 @@ func (deps Dependencies) writeBlob(
 	var ar io.ReadCloser
 	m := c.GetMetadataMutable()
 
-	if ar, err = deps.BlobStore.MakeBlobReader(&m.DigBlob); err != nil {
+	if ar, err = deps.BlobStore.MakeBlobReader(m.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

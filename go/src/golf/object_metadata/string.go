@@ -14,35 +14,35 @@ func StringSansTai(o *metadata) (str string) {
 	sb.WriteString(" ")
 	sb.WriteString(o.DigBlob.String())
 
-	m := o.GetMetadata()
+	metadata := o.GetMetadata()
 
-	t := m.GetType()
+	t := metadata.GetType()
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType()))
 	}
 
-	es := m.GetTags()
+	es := metadata.GetTags()
 
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
 			quiter.StringDelimiterSeparated[ids.Tag](
 				" ",
-				m.GetTags(),
+				metadata.GetTags(),
 			),
 		)
 	}
 
-	b := m.Description
+	b := metadata.GetDescription()
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for _, field := range m.Fields {
+	for field := range metadata.GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}
