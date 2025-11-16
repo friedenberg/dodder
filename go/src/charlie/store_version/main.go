@@ -10,13 +10,6 @@ import (
 
 var (
 	VNull = Version(values.Int(0))
-	V1    = Version(values.Int(1))
-	V3    = Version(values.Int(3))
-	V4    = Version(values.Int(4))
-	V6    = Version(values.Int(6))
-	V7    = Version(values.Int(7))
-	V8    = Version(values.Int(8))
-	V9    = Version(values.Int(9))
 
 	// TODO drop support for versions above
 	// TODO use golang generation for versions
@@ -102,8 +95,4 @@ func (version *Version) Set(p string) (err error) {
 
 func IsVersionLessOrEqualToV11(other interfaces.StoreVersion) bool {
 	return LessOrEqual(other, V10)
-}
-
-func IsCurrentVersionLessOrEqualToV10() bool {
-	return LessOrEqual(VCurrent, V10)
 }

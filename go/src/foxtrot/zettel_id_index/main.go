@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -27,10 +26,7 @@ func MakeIndex(
 	directoryLayout directory_layout.RepoMutable,
 	cacheIOFactory interfaces.NamedBlobAccess,
 ) (i Index, err error) {
-	if store_version.GreaterOrEqual(
-		config.GetStoreVersion(),
-		store_version.V1,
-	) && false {
+	if false {
 		ui.TodoP3("investigate using bitsets")
 		if i, err = hinweis_index_v1.MakeIndex(
 			configCli,

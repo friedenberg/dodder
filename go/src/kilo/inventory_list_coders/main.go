@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
@@ -39,19 +38,9 @@ var coderConstructors = map[string]funcListFormatConstructor{
 					configGenesis.GetPublicKey(),
 				)
 
-				if store_version.LessOrEqual(
-					envRepo.GetStoreVersion(),
-					store_version.V8,
-				) {
-					if err = finalizer.FinalizeWithoutPubKey(object); err != nil {
-						err = errors.Wrap(err)
-						return err
-					}
-				} else {
-					if err = finalizer.FinalizeUsingObject(object); err != nil {
-						err = errors.Wrap(err)
-						return err
-					}
+				if err = finalizer.FinalizeUsingObject(object); err != nil {
+					err = errors.Wrap(err)
+					return err
 				}
 
 				return err

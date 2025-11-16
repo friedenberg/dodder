@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 )
 
 type Genre byte
@@ -132,19 +131,11 @@ func (genre Genre) GetGenreString() string {
 }
 
 func (genre Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {
-	if store_version.LessOrEqual(sv, store_version.V6) {
-		return genre.stringOld()
-	} else {
-		return genre.String()
-	}
+	return genre.String()
 }
 
 func (genre Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
-	if store_version.LessOrEqual(sv, store_version.V6) {
-		return genre.getGenreStringPluralOld()
-	} else {
-		return genre.getGenreStringPluralNew()
-	}
+	return genre.getGenreStringPluralNew()
 }
 
 func (genre Genre) getGenreStringPluralNew() string {
@@ -172,31 +163,6 @@ func (genre Genre) getGenreStringPluralNew() string {
 	}
 }
 
-func (genre Genre) getGenreStringPluralOld() string {
-	switch genre {
-	case Blob:
-		return "Akten"
-
-	case Type:
-		return "Typen"
-
-	case Tag:
-		return "Etiketten"
-
-	case Zettel:
-		return "Zettelen"
-
-	case InventoryList:
-		return "Bestandsaufnahmen"
-
-	case Repo:
-		return "Kisten"
-
-	default:
-		return genre.String()
-	}
-}
-
 func (genre Genre) String() string {
 	switch genre {
 	case Blob:
@@ -219,37 +185,6 @@ func (genre Genre) String() string {
 
 	case Repo:
 		return "Repo"
-
-	case None:
-		return "none"
-
-	default:
-		return fmt.Sprintf("Unknown(%#v)", genre)
-	}
-}
-
-func (genre Genre) stringOld() string {
-	switch genre {
-	case Blob:
-		return "Akte"
-
-	case Type:
-		return "Typ"
-
-	case Tag:
-		return "Etikett"
-
-	case Zettel:
-		return "Zettel"
-
-	case Config:
-		return "Konfig"
-
-	case InventoryList:
-		return "Bestandsaufnahme"
-
-	case Repo:
-		return "Kasten"
 
 	case None:
 		return "none"

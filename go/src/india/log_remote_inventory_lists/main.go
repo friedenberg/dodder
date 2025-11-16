@@ -3,7 +3,6 @@ package log_remote_inventory_lists
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -37,13 +36,6 @@ type Log interface {
 }
 
 func Make(ctx errors.Context, envRepo env_repo.Env) (log Log) {
-	sv := envRepo.GetConfigPrivate().Blob.GetStoreVersion()
-
-	if store_version.Less(sv, store_version.V8) {
-		errors.ContextCancelWithErrorf(ctx, "unsupported store version: %s", sv)
-		return nil
-	}
-
 	log = &v0{}
 
 	log.initialize(ctx, envRepo)

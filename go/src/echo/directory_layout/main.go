@@ -76,13 +76,7 @@ func MakeRepo(
 	storeVersion store_version.Version,
 	xdg XDG,
 ) (Repo, error) {
-	var repo repoUninitialized
-
-	if store_version.IsVersionLessOrEqualToV11(storeVersion) {
-		return nil, errors.Err501NotImplemented
-	} else {
-		repo = &v3{}
-	}
+	var repo repoUninitialized = &v3{}
 
 	if err := repo.initialize(xdg); err != nil {
 		err = errors.Wrap(err)
@@ -96,13 +90,7 @@ func MakeBlobStore(
 	storeVersion store_version.Version,
 	xdg XDG,
 ) (BlobStore, error) {
-	var blobStore blobStoreUninitialized
-
-	if store_version.IsVersionLessOrEqualToV11(storeVersion) {
-		return nil, errors.Err501NotImplemented
-	} else {
-		blobStore = &v3{}
-	}
+	var blobStore blobStoreUninitialized = &v3{}
 
 	if err := blobStore.initialize(xdg); err != nil {
 		err = errors.Wrap(err)

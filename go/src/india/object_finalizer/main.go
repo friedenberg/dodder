@@ -38,10 +38,13 @@ type (
 	}
 )
 
-// TODO pass in index
 func Make() Finalizer {
 	return finalizer{}
 }
+
+// func Make(index sku.IndexPrimitives) Finalizer {
+// 	return finalizer{index: index}
+// }
 
 func (finalizer finalizer) GetObjectFinalizer() Finalizer {
 	return finalizer
@@ -97,26 +100,9 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 		}
 	}
 
-	// TODO populate lockfile
-	// read current signature of type
-	// write to lock
-	if finalizer.index != nil {
-		typeObject := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(typeObject)
-
-		if err = finalizer.index.ReadOneObjectId(
-			metadataMutable.GetType(),
-			typeObject,
-		); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		lockfileMutable := metadataMutable.GetLockfileMutable()
-		lockfileMutable.GetTypeLockMutable().Key = metadataMutable.GetType().String()
-		lockfileMutable.GetTypeLockMutable().Id.ResetWithMarklId(
-			typeObject.GetMetadataMutable().GetObjectSig(),
-		)
+	if err = finalizer.writeLockfileIfNecessary(object); err != nil {
+		err = errors.Wrap(err)
+		return err
 	}
 
 	if err = object.CalculateDigests(
@@ -130,20 +116,36 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 	return err
 }
 
-func (finalizer finalizer) FinalizeWithoutPubKey(
-	transacted object,
+func (finalizer finalizer) writeLockfileIfNecessary(
+	object object,
 ) (err error) {
-	transacted.GetMetadataMutable().GetRepoPubKeyMutable().Reset()
+	if finalizer.index == nil {
+		return
+	}
 
-	if err = transacted.CalculateDigests(
-		false,
-		transacted.GetDigestWriteMapWithMerkle(),
+	metadataMutable := object.GetMetadataMutable()
+
+	// TODO populate lockfile
+	// read current signature of type
+	// write to lock
+	typeObject := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(typeObject)
+
+	if err = finalizer.index.ReadOneObjectId(
+		metadataMutable.GetType(),
+		typeObject,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	return err
+	lockfileMutable := metadataMutable.GetLockfileMutable()
+	lockfileMutable.GetTypeLockMutable().Key = metadataMutable.GetType().String()
+	lockfileMutable.GetTypeLockMutable().Id.ResetWithMarklId(
+		typeObject.GetMetadataMutable().GetObjectSig(),
+	)
+
+	return
 }
 
 // TODO remove / rename
