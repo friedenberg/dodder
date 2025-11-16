@@ -66,7 +66,7 @@ func (transacted *Transacted) Less(other *Transacted) bool {
 }
 
 func (transacted *Transacted) GetTags() ids.TagSet {
-	return transacted.Metadata.GetTags()
+	return transacted.GetMetadata().GetTags()
 }
 
 func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
@@ -75,9 +75,9 @@ func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 		return err
 	}
 
-	tagKey := transacted.Metadata.Cache.GetImplicitTags().KeyPtr(tag)
+	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().KeyPtr(tag)
 
-	if transacted.Metadata.Cache.GetImplicitTags().ContainsKey(tagKey) {
+	if transacted.GetMetadata().GetIndex().GetImplicitTags().ContainsKey(tagKey) {
 		return err
 	}
 
@@ -99,7 +99,7 @@ func (transacted *Transacted) AddTagPtrFast(tag *ids.Tag) (err error) {
 }
 
 func (transacted *Transacted) GetType() ids.Type {
-	return transacted.Metadata.Type
+	return transacted.GetMetadata().GetType()
 }
 
 func (transacted *Transacted) GetMetadata() object_metadata.IMetadata {
@@ -111,7 +111,7 @@ func (transacted *Transacted) GetMetadataMutable() object_metadata.IMetadataMuta
 }
 
 func (transacted *Transacted) GetTai() ids.Tai {
-	return transacted.Metadata.GetTai()
+	return transacted.GetMetadata().GetTai()
 }
 
 func (transacted *Transacted) SetTai(tai ids.Tai) {
@@ -147,7 +147,7 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !object_metadata.Equaler.Equals(&transacted.Metadata, &other.Metadata) {
+	if !object_metadata.Equaler.Equals(transacted.GetMetadata().(*object_metadata.Metadata), other.GetMetadata().(*object_metadata.Metadata)) {
 		return ok
 	}
 
@@ -159,11 +159,11 @@ func (transacted *Transacted) GetGenre() interfaces.Genre {
 }
 
 func (transacted *Transacted) IsNew() bool {
-	return transacted.Metadata.GetMotherObjectSig().IsNull()
+	return transacted.GetMetadata().GetMotherObjectSig().IsNull()
 }
 
 func (transacted *Transacted) SetDormant(v bool) {
-	transacted.Metadata.Cache.Dormant.SetBool(v)
+	transacted.GetMetadataMutable().GetIndexMutable().GetDormantMutable().SetBool(v)
 }
 
 func (transacted *Transacted) GetObjectDigest() interfaces.MarklId {
@@ -171,13 +171,13 @@ func (transacted *Transacted) GetObjectDigest() interfaces.MarklId {
 }
 
 func (transacted *Transacted) GetBlobDigest() interfaces.MarklId {
-	return transacted.Metadata.GetBlobDigest()
+	return transacted.GetMetadata().GetBlobDigest()
 }
 
 func (transacted *Transacted) SetBlobDigest(
 	merkleId interfaces.MarklId,
 ) (err error) {
-	if err = transacted.Metadata.GetBlobDigestMutable().SetMarklId(
+	if err = transacted.GetMetadataMutable().GetBlobDigestMutable().SetMarklId(
 		merkleId.GetMarklFormat().GetMarklFormatId(),
 		merkleId.GetBytes(),
 	); err != nil {
@@ -222,7 +222,7 @@ func (transacted *Transacted) AllProbeIds(
 		{
 			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectDigestV1,
-				Id:  transacted.Metadata.GetObjectDigest(),
+				Id:  transacted.GetMetadata().GetObjectDigest(),
 			}
 
 			if !yield(probeId) {
@@ -233,7 +233,7 @@ func (transacted *Transacted) AllProbeIds(
 		{
 			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectDigestV2,
-				Id:  transacted.Metadata.GetObjectDigest(),
+				Id:  transacted.GetMetadata().GetObjectDigest(),
 			}
 
 			if !yield(probeId) {
@@ -244,7 +244,7 @@ func (transacted *Transacted) AllProbeIds(
 		{
 			probeId := ids.ProbeId{
 				Key: markl.PurposeV5MetadataDigestWithoutTai,
-				Id:  transacted.Metadata.SelfWithoutTai,
+				Id:  transacted.GetMetadata().GetSelfWithoutTai(),
 			}
 
 			if !yield(probeId) {
@@ -255,7 +255,7 @@ func (transacted *Transacted) AllProbeIds(
 		{
 			probeId := ids.ProbeId{
 				Key: markl.PurposeObjectSigV1,
-				Id:  transacted.Metadata.GetObjectSig(),
+				Id:  transacted.GetMetadata().GetObjectSig(),
 			}
 
 			if !yield(probeId) {

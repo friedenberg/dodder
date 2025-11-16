@@ -15,7 +15,7 @@ func (transacted *Transacted) StringObjectIdDescription() string {
 	return fmt.Sprintf(
 		"[%s %q]",
 		&transacted.ObjectId,
-		transacted.Metadata.Description,
+		transacted.GetMetadata().GetDescription(),
 	)
 }
 

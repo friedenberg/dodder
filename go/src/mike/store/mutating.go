@@ -161,7 +161,7 @@ func (commitFacilitator commitFacilitator) commit(
 
 	if mother != nil {
 		defer sku.GetTransactedPool().Put(mother)
-		daughter.Metadata.Cache.ParentTai = mother.GetTai()
+		*daughter.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable() = mother.GetTai()
 	}
 
 	if err = commitFacilitator.tryPrecommit(external, mother, options); err != nil {

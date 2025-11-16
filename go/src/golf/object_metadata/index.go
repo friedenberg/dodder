@@ -14,6 +14,7 @@ type (
 		GetExpandedTags() ids.TagSet
 		GetDormant() values.Bool
 		GetImplicitTags() ids.TagSet
+		GetParentTai() ids.Tai
 	}
 
 	IIndexMutable interface {
@@ -24,6 +25,7 @@ type (
 		GetExpandedTagsMutable() ids.TagMutableSet
 		SetExpandedTags(tags ids.TagSet)
 		SetImplicitTags(e ids.TagSet)
+		GetParentTaiMutable() *ids.Tai
 	}
 )
 
@@ -119,4 +121,12 @@ func (index *Index) SetImplicitTags(e ids.TagSet) {
 	for tag := range e.All() {
 		errors.PanicIfError(es.Add(tag))
 	}
+}
+
+func (index *Index) GetParentTai() ids.Tai {
+	return index.ParentTai
+}
+
+func (index *Index) GetParentTaiMutable() *ids.Tai {
+	return &index.ParentTai
 }

@@ -108,7 +108,7 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 		}
 	}
 
-	e.Metadata.Type = ids.MustType("!toml-bookmark")
+	e.GetMetadataMutable().GetTypePtr().Set("!toml-bookmark")
 
 	m := &e.Metadata
 
@@ -122,14 +122,13 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 		return err
 	}
 
-	if e.Metadata.Description.IsEmpty() {
-		if err = e.Metadata.Description.Set(i.Title); err != nil {
+	if e.GetMetadata().GetDescription().IsEmpty() {
+		if err = e.GetMetadataMutable().GetDescriptionMutable().Set(i.Title); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
-	} else if i.Title != "" && e.Metadata.Description.String() != i.Title {
-		e.Metadata.Fields = append(
-			e.Metadata.Fields,
+	} else if i.Title != "" && e.GetMetadata().GetDescription().String() != i.Title {
+		e.GetMetadataMutable().GetFieldsMutable().Append(
 			string_format_writer.Field{
 				Key:       "title",
 				Value:     i.Title,
@@ -138,8 +137,7 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 		)
 	}
 
-	e.Metadata.Fields = append(
-		e.Metadata.Fields,
+	e.GetMetadataMutable().GetFieldsMutable().Append(
 		string_format_writer.Field{
 			Key:       "url",
 			Value:     i.Url.String(),
@@ -173,7 +171,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 		return err
 	}
 
-	for _, field := range e.Metadata.Fields {
+	for field := range e.GetMetadata().GetFields() {
 		switch field.Key {
 		case "id":
 			if field.Value == "" {
@@ -199,7 +197,7 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 				"unsupported field type: %q=%q. Fields: %#v",
 				field.Key,
 				field.Value,
-				e.Metadata.Fields,
+				e.GetMetadata().GetFields(),
 			)
 
 			return err

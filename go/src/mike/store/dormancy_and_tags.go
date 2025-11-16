@@ -48,7 +48,7 @@ func (store *Store) applyDormantAndRealizeTags(
 			return err
 		}
 
-		object.Metadata.Cache.TagPaths.AddSelf(
+		object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddSelf(
 			catgut.MakeFromString(objectIdString),
 		)
 
@@ -130,19 +130,19 @@ func (store *Store) addSuperTags(
 
 			defer sku.GetTransactedPool().Put(tagOrRepoOrTypeObject)
 
-			if tagOrRepoOrTypeObject.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
+			if tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths().Paths.Len() <= 1 {
 				ui.Log().Print(
 					objectIdString,
 					expandedObjectIdComponent,
-					tagOrRepoOrTypeObject.Metadata.Cache.TagPaths,
+					tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths(),
 				)
 				return
 			}
 
 			prefix := catgut.MakeFromString(expandedObjectIdComponent)
 
-			a := &object.Metadata.Cache.TagPaths
-			b := &tagOrRepoOrTypeObject.Metadata.Cache.TagPaths
+			a := object.GetMetadataMutable().GetIndexMutable().GetTagPaths()
+			b := tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths()
 
 			ui.Log().Print("a", a)
 			ui.Log().Print("b", b)
@@ -175,7 +175,7 @@ func (store *Store) addImplicitTags(
 		implicitTags := store.storeConfig.GetConfig().GetImplicitTags(tag)
 
 		if implicitTags.Len() == 0 {
-			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithType)
+			object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddPathWithType(tagPathWithType)
 			return err
 		}
 
@@ -184,7 +184,7 @@ func (store *Store) addImplicitTags(
 			tagPathWithTypeClone.Add(
 				catgut.MakeFromString(implicitTag.String()),
 			)
-			object.Metadata.Cache.TagPaths.AddPathWithType(tagPathWithTypeClone)
+			object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddPathWithType(tagPathWithTypeClone)
 		}
 
 		return err

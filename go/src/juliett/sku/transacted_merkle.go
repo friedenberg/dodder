@@ -8,7 +8,7 @@ import (
 )
 
 func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
-	motherSig := transacted.Metadata.GetMotherObjectSigMutable()
+	motherSig := transacted.GetMetadataMutable().GetMotherObjectSigMutable()
 
 	if mother == nil {
 		motherSig.Reset()
@@ -17,7 +17,7 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 	if err = motherSig.SetMarklId(
 		markl.FormatIdEd25519Sig,
-		mother.Metadata.GetObjectSig().GetBytes(),
+		mother.GetMetadata().GetObjectSig().GetBytes(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -35,13 +35,13 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 
 func (transacted *Transacted) AssertObjectDigestAndObjectSigNotNull() (err error) {
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest()); err != nil {
+		transacted.GetMetadata().GetObjectDigest()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectSig()); err != nil {
+		transacted.GetMetadata().GetObjectSig()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -50,7 +50,7 @@ func (transacted *Transacted) AssertObjectDigestAndObjectSigNotNull() (err error
 }
 
 func (transacted *Transacted) Verify() (err error) {
-	pubKey := transacted.Metadata.GetRepoPubKey()
+	pubKey := transacted.GetMetadata().GetRepoPubKey()
 
 	if err = markl.AssertIdIsNotNull(
 		pubKey,
@@ -60,22 +60,22 @@ func (transacted *Transacted) Verify() (err error) {
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectDigest(),
+		transacted.GetMetadata().GetObjectDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = markl.AssertIdIsNotNull(
-		transacted.Metadata.GetObjectSig(),
+		transacted.GetMetadata().GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = pubKey.Verify(
-		transacted.Metadata.GetObjectDigest(),
-		transacted.Metadata.GetObjectSig(),
+		transacted.GetMetadata().GetObjectDigest(),
+		transacted.GetMetadata().GetObjectSig(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -90,14 +90,14 @@ type ObjectDigestWriteMap = interfaces.DigestWriteMap
 
 func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
-		markl.PurposeV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
-		markl.PurposeObjectDigestV1:             transacted.Metadata.GetObjectDigestMutable(),
+		markl.PurposeV5MetadataDigestWithoutTai: transacted.GetMetadataMutable().GetSelfWithoutTaiMutable(),
+		markl.PurposeObjectDigestV1:             transacted.GetMetadataMutable().GetObjectDigestMutable(),
 	}
 }
 
 func (transacted *Transacted) GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
-		markl.PurposeV5MetadataDigestWithoutTai: &transacted.Metadata.SelfWithoutTai,
+		markl.PurposeV5MetadataDigestWithoutTai: transacted.GetMetadataMutable().GetSelfWithoutTaiMutable(),
 	}
 }
 

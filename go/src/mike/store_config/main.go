@@ -233,7 +233,7 @@ func (store *store) AddTransacted(
 		return err
 	}
 
-	if quiter.SetEquals(daughter.Metadata.Tags, mother.Metadata.Tags) {
+	if quiter.SetEquals(daughter.GetMetadata().GetTags(), mother.GetMetadata().GetTags()) {
 		return err
 	}
 

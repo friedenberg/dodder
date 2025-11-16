@@ -155,10 +155,10 @@ func (writer *Writer) zettelToItem(
 ) (item *alfred.Item) {
 	item = writer.Get()
 
-	item.Title = object.Metadata.Description.String()
+	item.Title = object.GetMetadata().GetDescription().String()
 
 	es := quiter.StringCommaSeparated(
-		object.Metadata.GetTags(),
+		object.GetMetadata().GetTags(),
 	)
 
 	k := &object.ObjectId

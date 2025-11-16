@@ -137,9 +137,9 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb.WriteString(" ")
 	sb.WriteString(object.GetExternalObjectId().String())
 
-	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetRepoPubKey())
-	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetObjectSig())
-	writeMarklIdWithFormatIfNecessary(sb, object.Metadata.GetMotherObjectSig())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetMetadata().GetRepoPubKey())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetMetadata().GetObjectSig())
+	writeMarklIdWithFormatIfNecessary(sb, object.GetMetadata().GetMotherObjectSig())
 	writeMarklIdWithFormatIfNecessary(sb, object.GetObjectDigest())
 	writeMarklIdWithFormatIfNecessary(sb, object.GetBlobDigest())
 

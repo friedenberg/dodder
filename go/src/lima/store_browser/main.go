@@ -163,8 +163,8 @@ func (store *Store) CheckoutOne(
 ) (cz sku.SkuType, err error) {
 	sz := tg.GetSku()
 
-	if !sz.Metadata.Type.Equals(store.typ) {
-		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.Metadata.Type))
+	if !sz.GetMetadata().GetType().Equals(store.typ) {
+		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.GetMetadata().GetType()))
 		return cz, err
 	}
 

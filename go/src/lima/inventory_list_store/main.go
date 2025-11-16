@@ -162,7 +162,7 @@ func (store *Store) AddObjectToOpenList(
 		err = errors.Wrapf(
 			err,
 			"%#v, format type: %q",
-			object.Metadata.Fields,
+			object.GetMetadata().GetFields(),
 			store.getType(),
 		)
 
@@ -190,8 +190,8 @@ func (store *Store) Create(
 
 	object = sku.GetTransactedPool().Get()
 
-	object.Metadata.Type = store.getType()
-	object.Metadata.Description = openList.Description
+	object.GetMetadataMutable().GetTypePtr().ResetWith(store.getType())
+	object.GetMetadataMutable().GetDescriptionMutable().ResetWith(openList.Description)
 
 	tai := store.GetTai()
 

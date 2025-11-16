@@ -83,7 +83,7 @@ func (md Revert) runRevertFromQuery(
 		func(z *sku.Transacted) (err error) {
 			rt := store.RevertId{
 				ObjectId: z.GetObjectId(),
-				Tai:      z.Metadata.Cache.ParentTai,
+				Tai:      z.GetMetadata().GetIndex().GetParentTai(),
 			}
 
 			if err = u.GetStore().RevertTo(rt); err != nil {
@@ -137,7 +137,7 @@ func (md Revert) runRevertFromLast(
 
 		rt := store.RevertId{
 			ObjectId: cachedSku.GetObjectId(),
-			Tai:      cachedSku.Metadata.Cache.ParentTai,
+			Tai:      cachedSku.GetMetadata().GetIndex().GetParentTai(),
 		}
 
 		if err = repo.GetStore().RevertTo(rt); err != nil {

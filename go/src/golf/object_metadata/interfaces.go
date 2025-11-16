@@ -30,6 +30,7 @@ type (
 		GetMotherObjectSig() interfaces.MarklId
 		GetRepoPubKey() interfaces.MarklId
 		GetObjectSig() interfaces.MarklId
+		GetSelfWithoutTai() interfaces.MarklId
 	}
 
 	IMetadataMutable interface {
@@ -42,6 +43,7 @@ type (
 		SetTagsFast(ids.TagSet)
 		AddTagString(tagString string) (err error)
 		AddTagPtrFast(tag *ids.Tag) (err error)
+		GenerateExpandedTags()
 
 		GetCommentsMutable() *collections_slice.Slice[string]
 		GetFieldsMutable() *collections_slice.Slice[Field]
@@ -56,6 +58,7 @@ type (
 		GetMotherObjectSigMutable() interfaces.MutableMarklId
 		GetRepoPubKeyMutable() interfaces.MutableMarklId
 		GetObjectSigMutable() interfaces.MutableMarklId
+		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
 	}
 
 	Getter interface {

@@ -129,13 +129,13 @@ func (json *Transacted) ToTransacted(
 
 	// TODO enforce non-empty types
 	if json.Type != "" {
-		if err = object.Metadata.Type.Set(json.Type); err != nil {
+		if err = object.GetMetadataMutable().GetTypePtr().Set(json.Type); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	if err = object.Metadata.Description.Set(json.Description); err != nil {
+	if err = object.GetMetadataMutable().GetDescriptionMutable().Set(json.Description); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -147,25 +147,25 @@ func (json *Transacted) ToTransacted(
 		return err
 	}
 
-	object.Metadata.SetTags(tagSet)
-	object.Metadata.GenerateExpandedTags()
+	object.GetMetadataMutable().SetTags(tagSet)
+	object.GetMetadataMutable().GenerateExpandedTags()
 
 	if !json.RepoPubkey.IsNull() {
-		object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
+		object.GetMetadataMutable().GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
 	}
 
 	if !json.RepoSig.IsNull() {
-		object.Metadata.GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
+		object.GetMetadataMutable().GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
 	}
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {
-		if err = object.Metadata.Tai.Set(json.Tai); err != nil {
+		if err = object.GetMetadataMutable().GetTaiMutable().Set(json.Tai); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	} else if json.Date != "" {
-		if err = object.Metadata.Tai.SetFromRFC3339(json.Date); err != nil {
+		if err = object.GetMetadataMutable().GetTaiMutable().SetFromRFC3339(json.Date); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -173,7 +173,7 @@ func (json *Transacted) ToTransacted(
 
 	// Set SelfMetadataWithoutTai SHA
 	if json.Sha != "" {
-		if err = object.Metadata.SelfWithoutTai.Set(json.Sha); err != nil {
+		if err = object.GetMetadataMutable().GetSelfWithoutTaiMutable().Set(json.Sha); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

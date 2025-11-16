@@ -60,8 +60,8 @@ func (a *tag) Equals(b *tag) bool {
 	}
 
 	if !quiter.SetEqualsPtr(
-		a.Transacted.Metadata.Cache.GetImplicitTags(),
-		b.Transacted.Metadata.Cache.GetImplicitTags(),
+		a.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
+		b.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
 	) {
 		return false
 	}
