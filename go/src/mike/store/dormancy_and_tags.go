@@ -18,7 +18,7 @@ func (store *Store) applyDormantAndRealizeTags(
 	ui.Log().Print("applying konfig to:", object)
 	metadata := &object.Metadata
 
-	metadata.Cache.SetExpandedTags(ids.ExpandMany(
+	metadata.Index.SetExpandedTags(ids.ExpandMany(
 		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))
@@ -35,9 +35,9 @@ func (store *Store) applyDormantAndRealizeTags(
 	// TODO better solution for "realizing" tags against Config.
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
-	metadata.Cache.TagPaths.Reset()
+	metadata.Index.TagPaths.Reset()
 	for tag := range metadata.GetTags().All() {
-		metadata.Cache.TagPaths.AddTagOld(tag)
+		metadata.Index.TagPaths.AddTagOld(tag)
 	}
 
 	if isTag {
@@ -56,7 +56,7 @@ func (store *Store) applyDormantAndRealizeTags(
 			tag,
 			ids.MakeTag,
 			expansion.ExpanderRight,
-			metadata.Cache.GetExpandedTagsMutable(),
+			metadata.Index.GetExpandedTagsMutable(),
 		)
 	}
 

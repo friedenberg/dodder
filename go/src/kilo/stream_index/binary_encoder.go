@@ -103,7 +103,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		sigil := object.Sigil
 		sigil.Add(encoder.Sigil)
 
-		if object.Metadata.Cache.Dormant.Bool() {
+		if object.Metadata.Index.Dormant.Bool() {
 			sigil.Add(ids.SigilHidden)
 		}
 
@@ -152,7 +152,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheParentTai:
-		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Cache.ParentTai); err != nil {
+		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Index.ParentTai); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
@@ -233,7 +233,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTagImplicit:
-		tags := object.Metadata.Cache.GetImplicitTags()
+		tags := object.Metadata.Index.GetImplicitTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
@@ -247,7 +247,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTagExpanded:
-		tags := object.Metadata.Cache.GetExpandedTags()
+		tags := object.Metadata.Index.GetExpandedTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
@@ -261,7 +261,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTags:
-		tags := object.Metadata.Cache.TagPaths
+		tags := object.Metadata.Index.TagPaths
 
 		for _, tag := range tags.Paths {
 			var n1 int64

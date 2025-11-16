@@ -1,5 +1,4 @@
 {
-  "autoApproveEdits": true,
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -24,8 +23,14 @@
       "Bash(rm:*)",
       "Bash(chmod:*)",
       "Bash(sed:*)",
-      "Bash(go clean:*)"
+      "Bash(go clean:*)",
+      "Bash(./bin/list_package_deps:*)",
+      "Bash(./bin/auto_reposition_packages:*)",
+      "Bash(./debug_deps.sh)",
+      "Bash(just:*)",
+      "Bash(go mod:*)"
     ],
     "deny": []
-  }
+  },
+  "autoApproveEdits": true
 }

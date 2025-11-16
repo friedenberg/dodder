@@ -161,7 +161,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					&object.Metadata.Cache.TagPaths,
+					&object.Metadata.Index.TagPaths,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -180,7 +180,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					&object.Metadata.Cache.TagPaths,
+					&object.Metadata.Index.TagPaths,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -199,7 +199,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					object.Metadata.Cache.QueryPath,
+					object.Metadata.Index.QueryPath,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -313,14 +313,14 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for _, es := range object.Metadata.Cache.TagPaths.Paths {
+				for _, es := range object.Metadata.Index.TagPaths.Paths {
 					if _, err = fmt.Fprintf(writer, "%s: %s\n", object.GetObjectId(), es); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 				}
 
-				for _, es := range object.Metadata.Cache.TagPaths.All {
+				for _, es := range object.Metadata.Index.TagPaths.All {
 					if _, err = fmt.Fprintf(writer, "%s: %s -> %s\n", object.GetObjectId(), es.Tag, es.Parents); err != nil {
 						err = errors.Wrap(err)
 						return err
@@ -459,26 +459,6 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 			return func(object *sku.Transacted) (err error) {
 				_, err = formatter.EncodeStringTo(object, writer)
-				return err
-			}
-		},
-	},
-	"object-id-parent-tai": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			return func(object *sku.Transacted) (err error) {
-				if _, err = fmt.Fprintf(
-					writer,
-					"%s^@%s\n",
-					&object.ObjectId,
-					object.Metadata.Cache.ParentTai,
-				); err != nil {
-					err = errors.Wrap(err)
-					return err
-				}
-
 				return err
 			}
 		},
@@ -978,7 +958,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 
 				if object, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
 					object.GetObjectId(),
-					object.Metadata.Cache.ParentTai,
+					object.Metadata.Index.ParentTai,
 				); err != nil {
 					fmt.Fprintln(writer, err)
 					err = nil

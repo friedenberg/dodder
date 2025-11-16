@@ -51,6 +51,7 @@ type (
 		GetSize() int
 		MarklFormatGetter
 		IsNull() bool
+		IsEmpty() bool
 
 		GetPurpose() string
 

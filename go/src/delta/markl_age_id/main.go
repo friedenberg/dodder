@@ -186,6 +186,10 @@ func (id Id) GetMarklFormat() interfaces.MarklFormat {
 	}
 }
 
+func (id Id) IsEmpty() bool {
+	return len(id.Identities) == 0
+}
+
 func (id Id) IsNull() bool {
 	return len(id.Identities) == 0
 }

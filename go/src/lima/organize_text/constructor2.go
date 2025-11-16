@@ -24,7 +24,7 @@ func (c *constructor2) collectExplicitAndImplicitFor(
 	for st := range skus.All() {
 		sk := st.GetSkuExternal()
 
-		for _, ewp := range sk.Metadata.Cache.TagPaths.All {
+		for _, ewp := range sk.Metadata.Index.TagPaths.All {
 			if ewp.Tag.String() == sk.ObjectId.String() {
 				continue
 			}

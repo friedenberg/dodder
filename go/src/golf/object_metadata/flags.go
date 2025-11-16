@@ -40,7 +40,7 @@ func (metadata *metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage 
 	fes := flags.MakeWithPolicy(
 		flag_policy.FlagPolicyAppend,
 		func() string {
-			return metadata.Cache.TagPaths.String()
+			return metadata.Index.TagPaths.String()
 		},
 		func(value string) (err error) {
 			values := strings.SplitSeq(value, ",")

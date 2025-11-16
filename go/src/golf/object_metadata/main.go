@@ -40,7 +40,7 @@ type metadata struct {
 	Comments collections_slice.Slice[string]
 
 	blob
-	Cache Index
+	Index Index
 
 	lockfile
 }
@@ -62,11 +62,11 @@ func (metadata *metadata) GetMetadataMutable() IMetadataMutable {
 }
 
 func (metadata *metadata) GetIndex() IIndex {
-	return &metadata.Cache
+	return &metadata.Index
 }
 
 func (metadata *metadata) GetIndexMutable() IIndexMutable {
-	return &metadata.Cache
+	return &metadata.Index
 }
 
 func (metadata *metadata) GetDescription() descriptions.Description {
@@ -140,7 +140,7 @@ func (metadata *metadata) ResetTags() {
 	}
 
 	metadata.Tags.Reset()
-	metadata.Cache.TagPaths.Reset()
+	metadata.Index.TagPaths.Reset()
 }
 
 func (metadata *metadata) AddTagString(tagString string) (err error) {
@@ -174,7 +174,7 @@ func (metadata *metadata) AddTagPtr(e *ids.Tag) (err error) {
 
 	ids.AddNormalizedTag(metadata.Tags, e)
 	cs := catgut.MakeFromString(e.String())
-	metadata.Cache.TagPaths.AddTag(cs)
+	metadata.Index.TagPaths.AddTag(cs)
 
 	return err
 }
@@ -191,7 +191,7 @@ func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 
 	tagBytestring := catgut.MakeFromString(tag.String())
 
-	if err = metadata.Cache.TagPaths.AddTag(tagBytestring); err != nil {
+	if err = metadata.Index.TagPaths.AddTag(tagBytestring); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -281,7 +281,7 @@ func (metadata *metadata) AddComment(f string, vals ...any) {
 }
 
 func (metadata *metadata) GenerateExpandedTags() {
-	metadata.Cache.SetExpandedTags(ids.ExpandMany(
+	metadata.Index.SetExpandedTags(ids.ExpandMany(
 		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))

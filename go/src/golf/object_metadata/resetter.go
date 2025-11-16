@@ -18,7 +18,7 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.sigRepo.Reset()
 		metadata.pubRepo.Reset()
 		metadata.ResetTags()
-		ResetterCache.Reset(&metadata.Cache)
+		ResetterCache.Reset(&metadata.Index)
 		metadata.Type = ids.Type{}
 		metadata.Tai.Reset()
 		metadata.DigBlob.Reset()
@@ -36,7 +36,7 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 
 	dst.SetTagsFast(src.Tags)
 
-	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
+	ResetterCache.ResetWith(&dst.Index, &src.Index)
 
 	dst.sigRepo.ResetWith(src.sigRepo)
 	dst.pubRepo.ResetWith(src.pubRepo)

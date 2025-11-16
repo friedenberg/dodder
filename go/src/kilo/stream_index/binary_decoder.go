@@ -325,7 +325,7 @@ func (decoder *binaryDecoder) readFieldKey(
 
 		// TODO remove
 	case key_bytes.CacheParentTai:
-		if _, err = object.Metadata.Cache.ParentTai.ReadFrom(&decoder.Content); err != nil {
+		if _, err = object.Metadata.Index.ParentTai.ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -370,7 +370,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.Metadata.Cache.AddTagsImplicitPtr(&tag); err != nil {
+		if err = object.Metadata.Index.AddTagsImplicitPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -383,7 +383,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.Metadata.Cache.AddTagExpandedPtr(&tag); err != nil {
+		if err = object.Metadata.Index.AddTagExpandedPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -396,7 +396,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		object.Metadata.Cache.TagPaths.AddPath(&tag)
+		object.Metadata.Index.TagPaths.AddPath(&tag)
 
 	default:
 		err = errors.ErrorWithStackf("unsupported key: %s", decoder.Key)
