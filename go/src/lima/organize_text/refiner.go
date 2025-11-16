@@ -40,39 +40,39 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if a.Transacted.Metadata.Tags.Len() == 1 && ids.IsEmpty(a.Transacted.Metadata.Tags.Any()) {
+	if a.Transacted.Metadata.GetTags().Len() == 1 && ids.IsEmpty(a.Transacted.Metadata.GetTags().Any()) {
 		ui.Log().Print("1 tag, and it's empty, merging")
 		return true
 	}
 
-	if a.Transacted.Metadata.Tags.Len() == 0 {
+	if a.Transacted.Metadata.GetTags().Len() == 0 {
 		ui.Log().Print("tags length is 0, merging")
 		return true
 	}
 
-	if a.Parent.Transacted.Metadata.Tags.Len() != 1 {
+	if a.Parent.Transacted.Metadata.GetTags().Len() != 1 {
 		ui.Log().Print("parent tags length is not 1")
 		return false
 	}
 
-	if a.Transacted.Metadata.Tags.Len() != 1 {
+	if a.Transacted.Metadata.GetTags().Len() != 1 {
 		ui.Log().Print("tags length is not 1")
 		return false
 	}
 
-	equal := quiter.SetEqualsPtr(a.Transacted.Metadata.Tags, a.Parent.Transacted.Metadata.Tags)
+	equal := quiter.SetEqualsPtr(a.Transacted.Metadata.GetTags(), a.Parent.Transacted.Metadata.GetTags())
 
 	if !equal {
 		ui.Log().Print("parent tags not equal")
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Parent.Transacted.Metadata.Tags.Any()) {
+	if ids.IsDependentLeaf(a.Parent.Transacted.Metadata.GetTags().Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Transacted.Metadata.Tags.Any()) {
+	if ids.IsDependentLeaf(a.Transacted.Metadata.GetTags().Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
@@ -95,7 +95,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	if a.Parent.Transacted.Metadata.Tags.Len() == 0 {
+	if a.Parent.Transacted.Metadata.GetTags().Len() == 0 {
 		return err
 	}
 

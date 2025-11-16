@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/object_id_provider"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -193,7 +194,7 @@ func (commitFacilitator commitFacilitator) commit(
 		if options.AddToInventoryList &&
 			mother != nil &&
 			ids.Equals(daughter.GetObjectId(), mother.GetObjectId()) &&
-			daughter.Metadata.EqualsSansTai(&mother.Metadata) {
+			object_metadata.EqualerSansTai.Equals(daughter.GetMetadata(), mother.GetMetadata()) {
 
 			sku.TransactedResetter.ResetWithExceptFields(daughter, mother)
 

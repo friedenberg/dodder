@@ -112,14 +112,14 @@ func (a Assignment) String() (s string) {
 
 func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
+	b.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(e))
 	a.addChild(b)
 	return b
 }
 
 func (a *Assignment) makeChildWithSet(es ids.TagMutableSet) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Transacted.Metadata.Tags = es
+	b.Transacted.GetMetadataMutable().SetTags(es)
 	a.addChild(b)
 	return b
 }
@@ -264,15 +264,11 @@ func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 	es = ids.MakeTagSet()
 
-	if a.Transacted.Metadata.Tags == nil {
-		panic("tags are nil")
-	}
-
-	if a.Transacted.Metadata.Tags.Len() != 1 || a.Parent == nil {
-		es = a.Transacted.Metadata.Tags.CloneSetPtrLike()
+	if a.Transacted.Metadata.GetTags().Len() != 1 || a.Parent == nil {
+		es = a.Transacted.Metadata.GetTags().CloneSetPtrLike()
 		return es, err
 	} else {
-		e := a.Transacted.Metadata.Tags.Any()
+		e := a.Transacted.Metadata.GetTags().Any()
 
 		if ids.IsDependentLeaf(e) {
 			var pe ids.TagSet
@@ -285,7 +281,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			if pe.Len() > 1 {
 				err = errors.ErrorWithStackf(
 					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
-					a.Parent.Transacted.Metadata.Tags,
+					a.Parent.Transacted.Metadata.GetTags(),
 				)
 
 				return es, err
@@ -311,7 +307,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 }
 
 func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	for e := range a.Transacted.Metadata.Tags.AllPtr() {
+	for e := range a.Transacted.Metadata.GetTags().AllPtr() {
 		for e1 := range es.AllPtr() {
 			if ids.ContainsExactly(e1, e) {
 				if err = es.DelPtr(e1); err != nil {
@@ -335,7 +331,7 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 }
 
 func (a *Assignment) Contains(e *ids.Tag) bool {
-	if a.Transacted.Metadata.Tags.ContainsKey(e.String()) {
+	if a.Transacted.Metadata.GetTags().ContainsKey(e.String()) {
 		return true
 	}
 
@@ -348,8 +344,8 @@ func (a *Assignment) Contains(e *ids.Tag) bool {
 
 func (parent *Assignment) SortChildren() {
 	sort.Slice(parent.Children, func(i, j int) bool {
-		esi := parent.Children[i].Transacted.Metadata.Tags
-		esj := parent.Children[j].Transacted.Metadata.Tags
+		esi := parent.Children[i].Transacted.Metadata.GetTags()
+		esj := parent.Children[j].Transacted.Metadata.GetTags()
 
 		if esi.Len() == 1 && esj.Len() == 1 {
 			ei := strings.TrimPrefix(esi.Any().String(), "-")

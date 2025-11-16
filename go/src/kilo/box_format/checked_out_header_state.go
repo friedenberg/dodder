@@ -3,6 +3,7 @@ package box_format
 import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -19,7 +20,10 @@ func (f CheckedOutHeaderState) WriteBoxHeader(
 
 	switch state {
 	case checked_out_state.CheckedOut:
-		if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().GetSku().Metadata) {
+		if object_metadata.EqualerSansTai.Equals(
+			&co.GetSku().Metadata,
+			&co.GetSkuExternal().GetSku().Metadata,
+		) {
 			header.Value = string_format_writer.StringSame
 		} else {
 			header.Value = string_format_writer.StringChanged

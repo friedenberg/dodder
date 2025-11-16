@@ -242,7 +242,7 @@ LOOP_AFTER_OID:
 			}
 
 			field.ColorType = string_format_writer.ColorTypeUserData
-			object.Metadata.Fields = append(object.Metadata.Fields, field)
+			object.GetMetadataMutable().GetFieldsMutable().Append(field)
 
 			continue
 		}
@@ -341,7 +341,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 	}
 
 	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[marklFormatId]; ok {
-		id := getMutableMerkleIdMethod(&object.Metadata)
+		id := getMutableMerkleIdMethod(object.GetMetadataMutable())
 
 		if err = markl.SetMarklIdWithFormatBlech32(
 			id,

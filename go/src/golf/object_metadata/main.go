@@ -247,11 +247,6 @@ func (metadata *metadata) GetTypePtr() *ids.Type {
 	return &metadata.Type
 }
 
-// TODO-P2 remove
-func (metadata *metadata) EqualsSansTai(a *metadata) bool {
-	return EqualerSansTai.Equals(a, metadata)
-}
-
 func (metadata *metadata) Subtract(
 	b *metadata,
 ) {

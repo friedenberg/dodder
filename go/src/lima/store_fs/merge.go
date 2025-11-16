@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -45,8 +46,11 @@ func (store *Store) MergeCheckedOut(
 	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return commitOptions, err
-	} else if checkedOut.GetSku().Metadata.EqualsSansTai(&checkedOut.GetSkuExternal().Metadata) {
-		if !checkedOut.GetSku().Metadata.Tai.Less(checkedOut.GetSkuExternal().Metadata.Tai) {
+	} else if object_metadata.EqualerSansTai.Equals(
+		checkedOut.GetSku().GetMetadata(),
+		checkedOut.GetSkuExternal().GetMetadata(),
+	) {
+		if !checkedOut.GetSku().Metadata.GetTai().Less(checkedOut.GetSkuExternal().Metadata.GetTai()) {
 			// TODO implement retroactive change
 		}
 

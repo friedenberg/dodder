@@ -6,15 +6,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/external_state"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 )
 
 func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
 	i := co.GetSku()
 	e := co.GetSkuExternal().GetSku()
 
-	return e.Metadata.EqualsSansTai(
-		&i.Metadata,
-	)
+	return object_metadata.EqualerSansTai.Equals(&e.Metadata, &i.Metadata)
 }
 
 type CheckedOut struct {

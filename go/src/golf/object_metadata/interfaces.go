@@ -66,14 +66,6 @@ type (
 		GetMetadataMutable() IMetadataMutable
 	}
 
-	Setter interface {
-		SetMetadata(*Metadata)
-	}
-
-	MetadataLike interface {
-		GetterMutable
-	}
-
 	PersistentFormatterContext interface {
 		Getter
 		GetterMutable

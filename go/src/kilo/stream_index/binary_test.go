@@ -29,13 +29,13 @@ func TestBinaryOne(t1 *testing.T) {
 		expected.SetTai(ids.NowTai())
 		t.AssertNoError(markl.SetHexBytes(
 			markl.FormatIdHashSha256,
-			expected.Metadata.GetBlobDigestMutable(),
+			expected.GetMetadataMutable().GetBlobDigestMutable(),
 			[]byte(
 				"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 			),
 		))
-		t.AssertNoError(expected.Metadata.Type.Set("da-typ"))
-		t.AssertNoError(expected.Metadata.Description.Set("the bez"))
+		t.AssertNoError(expected.GetMetadataMutable().GetTypePtr().Set("da-typ"))
+		t.AssertNoError(expected.GetMetadataMutable().GetDescriptionMutable().Set("the bez"))
 		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
 
 		// TODO add mother digest field and test

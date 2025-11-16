@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
+	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
@@ -29,7 +30,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 	right := co.GetSkuExternal().GetSku()
 
 	// TODO switch to using mother
-	motherEqualsExternal := right.Metadata.EqualsSansTai(&co.GetSku().Metadata)
+	motherEqualsExternal := object_metadata.EqualerSansTai.Equals(right.GetMetadata(), co.GetSku().GetMetadata())
 
 	if motherEqualsExternal {
 		op := checkout_options.OptionsWithoutMode{

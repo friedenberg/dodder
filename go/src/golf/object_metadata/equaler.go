@@ -19,7 +19,7 @@ type equaler struct {
 const debug = false
 
 // TODO make better diffing facility
-func (e equaler) Equals(a, b IMetadataMutable) bool {
+func (e equaler) Equals(a, b IMetadata) bool {
 	{
 		a := a.(*metadata)
 		b := b.(*metadata)
