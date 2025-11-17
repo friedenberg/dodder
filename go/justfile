@@ -53,7 +53,7 @@ codemod-go-fmt: codemod-go-fix_redundant_import_aliases
   gofumpt -l -w src
 
 # moves a go package from one src/<root>/<leaf> to another src/<root>/<leaf>
-codemod-go-move_package src dst: && codemod-go-fmt build-go
+codemod-go-move_package src dst: && codemod-go-fmt
   #! /bin/bash -e
 
   prefix=code.linenisgreat.com/dodder/go
@@ -79,8 +79,12 @@ codemod-go-move_package src dst: && codemod-go-fmt build-go
     s|^package $original_pkg\$|package $renamed_pkg|g;
   "
 
-  ag "$prefix/$original" -l0 |
-    xargs -0 sed -i'' "$sed_script"
+  cmd_ag="ag \"$prefix/$original\" -l0"
+  ag_results="$($cmd_ag || true)"
+
+  if [[ -n "$ag_results" ]]; then
+    $cmd_ag | xargs -0 sed -i'' "$sed_script"
+  fi
 
 #    ____ _
 #   / ___| | ___  __ _ _ __

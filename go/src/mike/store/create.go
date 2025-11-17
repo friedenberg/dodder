@@ -95,13 +95,13 @@ func (store *Store) CreateOrUpdateBlobDigest(
 
 type RevertId struct {
 	*ids.ObjectId
-	ids.Tai
+	Sig interfaces.MarklId
 }
 
 func (store *Store) RevertTo(
 	revertId RevertId,
 ) (err error) {
-	if revertId.Tai.IsEmpty() {
+	if revertId.Sig.IsEmpty() {
 		return err
 	}
 
@@ -113,11 +113,12 @@ func (store *Store) RevertTo(
 		return err
 	}
 
-	var mother *sku.Transacted
+	mother := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(mother)
 
-	if mother, err = store.streamIndex.ReadOneObjectIdTai(
-		revertId.ObjectId,
-		revertId.Tai,
+	if err = store.streamIndex.ReadOneMarklId(
+		revertId.Sig,
+		mother,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

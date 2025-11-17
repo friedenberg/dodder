@@ -75,18 +75,18 @@ func (md Revert) Run(dep command.Request) {
 }
 
 func (md Revert) runRevertFromQuery(
-	u *local_working_copy.Repo,
+	repo *local_working_copy.Repo,
 	eq *queries.Query,
 ) (err error) {
-	if err = u.GetStore().QueryTransacted(
+	if err = repo.GetStore().QueryTransacted(
 		eq,
-		func(z *sku.Transacted) (err error) {
-			rt := store.RevertId{
-				ObjectId: z.GetObjectId(),
-				Tai:      z.GetMetadata().GetIndex().GetParentTai(),
+		func(object *sku.Transacted) (err error) {
+			revertId := store.RevertId{
+				ObjectId: object.GetObjectId(),
+				Sig:      object.GetMetadata().GetMotherObjectSig(),
 			}
 
-			if err = u.GetStore().RevertTo(rt); err != nil {
+			if err = repo.GetStore().RevertTo(revertId); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -137,7 +137,7 @@ func (md Revert) runRevertFromLast(
 
 		rt := store.RevertId{
 			ObjectId: cachedSku.GetObjectId(),
-			Tai:      cachedSku.GetMetadata().GetIndex().GetParentTai(),
+			Sig:      cachedSku.GetMetadata().GetMotherObjectSig(),
 		}
 
 		if err = repo.GetStore().RevertTo(rt); err != nil {

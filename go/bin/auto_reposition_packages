@@ -1,0 +1,297 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# NATO phonetic alphabet levels in dependency order
+LEVELS=("_" "alfa" "bravo" "charlie" "delta" "echo" "foxtrot" "golf" "hotel" "india" "juliett" "kilo" "lima" "mike" "november" "oscar" "papa" "quebec" "romeo" "sierra" "tango")
+
+# Create mapping from level name to index
+declare -A LEVEL_INDEX
+for i in "${!LEVELS[@]}"; do
+  LEVEL_INDEX["${LEVELS[$i]}"]=$i
+done
+
+DRY_RUN=false
+VERBOSE=false
+
+usage() {
+  cat <<'EOF'
+Usage: auto_reposition_packages [OPTIONS]
+
+Automatically repositions Go packages in the NATO phonetic hierarchy based on their dependencies.
+
+Rules:
+- Packages in src/_ may only depend on stdlib or external packages
+- Packages in src/alfa may depend on stdlib, external, or src/_
+- Each subsequent level may depend on previous levels but not same/higher levels
+- Packages in the same level may not depend on each other
+
+Options:
+    -n, --dry-run     Show what would be moved without actually moving
+    -v, --verbose     Enable verbose output
+    -h, --help        Show this help message
+
+Examples:
+    auto_reposition_packages           # Move packages as needed
+    auto_reposition_packages -n        # Show what would be moved (dry run)
+    auto_reposition_packages -v        # Verbose output while moving
+EOF
+}
+
+log_verbose() {
+  if [[ $VERBOSE == "true" ]]; then
+    gum log -l debug "$*"
+  fi
+}
+
+log_dry_run() {
+  gum log -l debug "[DRY RUN] $*"
+}
+
+log_info() {
+  gum log -l info "$*"
+}
+
+log_error() {
+  gum log -l error "$*"
+}
+
+# Get all internal package dependencies for a given package
+get_package_dependencies() {
+  local pkg_path="$1"
+  local base_module="code.linenisgreat.com/dodder/go"
+
+  # Use go list to get dependencies, filter for internal packages only
+  go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' "$pkg_path" 2>/dev/null |
+    grep "^$base_module/src/" |
+    sed "s|^$base_module/src/||" |
+    sort -u
+}
+
+# Get the NATO level of a package path (e.g., "alfa/errors" -> "alfa")
+get_package_level() {
+  local pkg_path="$1"
+  echo "${pkg_path%%/*}"
+}
+
+# Calculate the minimum required level for a package based on its dependencies
+calculate_required_level() {
+  local pkg_path="$1"
+  local max_dep_level_index=-1
+  local base_module="code.linenisgreat.com/dodder/go"
+
+  log_verbose "Calculating required level for $pkg_path"
+
+  # Get dependencies
+  local deps
+  deps=$(get_package_dependencies "$base_module/src/$pkg_path")
+
+  if [[ -z $deps ]]; then
+    log_verbose "  No internal dependencies found, can stay at level _"
+    echo 0 # Can be at level _ (index 0)
+    return
+  fi
+
+  # Find the highest level among dependencies
+  while IFS= read -r dep; do
+    if [[ -n $dep ]]; then
+      local dep_level
+      dep_level=$(get_package_level "$dep")
+      local dep_level_index=${LEVEL_INDEX[$dep_level]:-999}
+
+      log_verbose "  Depends on $dep (level $dep_level, index $dep_level_index)"
+
+      if [[ $dep_level_index -gt $max_dep_level_index ]]; then
+        max_dep_level_index=$dep_level_index
+      fi
+    fi
+  done <<<"$deps"
+
+  # Required level is one higher than max dependency level
+  local required_level_index=$((max_dep_level_index + 1))
+
+  # Cap at maximum available level
+  if [[ $required_level_index -ge ${#LEVELS[@]} ]]; then
+    log_error "Package $pkg_path requires level beyond available levels!"
+    required_level_index=$((${#LEVELS[@]} - 1))
+  fi
+
+  log_verbose "  Required level index: $required_level_index (${LEVELS[$required_level_index]})"
+  echo $required_level_index
+}
+
+# Get all packages in the source tree
+get_all_packages() {
+  local base_module="code.linenisgreat.com/dodder/go"
+
+  # Find all directories with .go files under src/
+  find src -maxdepth 2 -mindepth 2 -type d | sort -u | while read -r dir; do
+    # Convert to module path and check if it's a valid Go package
+    local module_path="$base_module/$dir"
+    if go list "$module_path" >/dev/null 2>&1; then
+      echo "${dir#src/}"
+    fi
+  done
+}
+
+# Check if a package needs to be moved
+check_package_positioning() {
+  local pkg_path="$1"
+  local current_level
+  current_level=$(get_package_level "$pkg_path")
+  local current_level_index=${LEVEL_INDEX[$current_level]:-999}
+
+  if [[ $current_level_index -eq 999 ]]; then
+    log_error "Unknown level '$current_level' for package $pkg_path"
+    return 1
+  fi
+
+  local required_level_index
+  required_level_index=$(calculate_required_level "$pkg_path")
+
+  if [[ $required_level_index -gt $current_level_index ]]; then
+    local required_level=${LEVELS[$required_level_index]}
+    echo "MOVE_UP $pkg_path $current_level $required_level"
+    return 0
+  elif [[ $required_level_index -lt $current_level_index ]]; then
+    local optimal_level=${LEVELS[$required_level_index]}
+    echo "MOVE_DOWN $pkg_path $current_level $optimal_level"
+    return 0
+  fi
+
+  return 1 # No move needed
+}
+
+# Move a package from one level to another
+move_package() {
+  local pkg_path="$1"
+  local from_level="$2"
+  local to_level="$3"
+  local direction="$4"
+
+  local pkg_name="${pkg_path#*/}" # Remove level prefix
+  local src_path="src/$from_level/$pkg_name"
+  local dst_path="src/$to_level/$pkg_name"
+
+  log_info "Moving $pkg_path from $from_level to $to_level ($direction)"
+
+  if [[ $DRY_RUN == "true" ]]; then
+    log_dry_run "just codemod-go-move_package $src_path $dst_path"
+    return
+  fi
+
+  if [[ ! -d $src_path ]]; then
+    log_error "Source directory $src_path does not exist"
+    return 1
+  fi
+
+  log_verbose "Executing: just codemod-go-move_package $src_path $dst_path"
+
+  if just codemod-go-move_package "$src_path" "$dst_path"; then
+    log_info "Successfully moved $pkg_path to $to_level"
+  else
+    log_error "Failed to move $pkg_path"
+    return 1
+  fi
+}
+
+main() {
+  # Parse command line arguments
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -n | --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    -v | --verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      log_error "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+    esac
+  done
+
+  if [[ $DRY_RUN == "true" ]]; then
+    log_info "Running in dry-run mode - no changes will be made"
+  fi
+
+  log_info "Analyzing package dependencies..."
+
+  local packages
+  packages=$(get_all_packages)
+
+  if [[ -z $packages ]]; then
+    log_info "No packages found"
+    exit 0
+  fi
+
+  local moves_needed=()
+
+  # Check all packages for incorrect positioning
+  while IFS= read -r pkg; do
+    if [[ -n $pkg ]]; then
+      log_verbose "Checking package: $pkg"
+      local move_info
+      if move_info=$(check_package_positioning "$pkg"); then
+        moves_needed+=("$move_info")
+        log_verbose "  $move_info"
+      else
+        log_verbose "  Package $pkg is correctly positioned"
+      fi
+    fi
+  done <<<"$packages"
+
+  if [[ ${#moves_needed[@]} -eq 0 ]]; then
+    log_info "All packages are correctly positioned!"
+    exit 0
+  fi
+
+  log_info "Found ${#moves_needed[@]} packages that need repositioning:"
+
+  # Sort moves: do downward moves first to avoid dependency conflicts
+  local upward_moves=()
+  local downward_moves=()
+
+  for move in "${moves_needed[@]}"; do
+    if [[ $move == MOVE_UP* ]]; then
+      upward_moves+=("$move")
+    else
+      downward_moves+=("$move")
+    fi
+  done
+
+  # Process downward moves first
+  for move in "${downward_moves[@]}"; do
+    IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
+    echo "  $pkg_path: $from_level -> $to_level (optimization)"
+    move_package "$pkg_path" "$from_level" "$to_level" "downward"
+  done
+
+  # Then process upward moves
+  for move in "${upward_moves[@]}"; do
+    IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
+    echo "  $pkg_path: $from_level -> $to_level (required)"
+    move_package "$pkg_path" "$from_level" "$to_level" "upward"
+  done
+
+  if [[ $DRY_RUN == "false" ]]; then
+    log_info "Package repositioning complete!"
+    log_info "You may want to run 'just codemod-go-imports' to update import paths"
+  fi
+}
+
+# Check if we're in the right directory
+if [[ ! -f "go.mod" ]]; then
+  log_error "This script must be run from the root of the Go module (directory with go.mod)"
+  exit 1
+fi
+
+main "$@"
