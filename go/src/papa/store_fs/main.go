@@ -181,12 +181,12 @@ func (store *Store) String() (out string) {
 		return err
 	}
 
-	for z := range store.dirInfo.probablyCheckedOut.All() {
-		writeOneIfNecessary(z)
+	for fsItem := range store.dirInfo.probablyCheckedOut.All() {
+		writeOneIfNecessary(fsItem)
 	}
 
-	for z := range store.definitelyNotCheckedOut.All() {
-		writeOneIfNecessary(z)
+	for fsItem := range store.definitelyNotCheckedOut.All() {
+		writeOneIfNecessary(fsItem)
 	}
 
 	sb.WriteRune(doddish.OpGroupClose)
@@ -195,30 +195,30 @@ func (store *Store) String() (out string) {
 	return out
 }
 
-func (store *Store) GetExternalObjectIds() (ks []*sku.FSItem, err error) {
+func (store *Store) GetExternalObjectIds() (fsItems []*sku.FSItem, err error) {
 	if err = store.dirInfo.processRootDir(); err != nil {
 		err = errors.Wrap(err)
-		return ks, err
+		return fsItems, err
 	}
 
-	ks = make([]*sku.FSItem, 0)
-	var l sync.Mutex
+	fsItems = make([]*sku.FSItem, 0)
+	var lock sync.Mutex
 
 	if err = store.All(
 		func(kfp *sku.FSItem) (err error) {
-			l.Lock()
-			defer l.Unlock()
+			lock.Lock()
+			defer lock.Unlock()
 
-			ks = append(ks, kfp)
+			fsItems = append(fsItems, kfp)
 
 			return err
 		},
 	); err != nil {
 		err = errors.Wrap(err)
-		return ks, err
+		return fsItems, err
 	}
 
-	return ks, err
+	return fsItems, err
 }
 
 func (store *Store) GetFSItemsForDir(
@@ -322,9 +322,9 @@ func (store *Store) GetObjectIdsForString(
 }
 
 func (store *Store) Get(
-	k interfaces.ObjectId,
-) (t *sku.FSItem, ok bool) {
-	return store.dirInfo.probablyCheckedOut.Get(k.String())
+	objectId interfaces.ObjectId,
+) (fsItem *sku.FSItem, ok bool) {
+	return store.dirInfo.probablyCheckedOut.Get(objectId.String())
 }
 
 func (store *Store) Initialize(
@@ -345,15 +345,15 @@ func (store *Store) ReadAllExternalItems() (err error) {
 }
 
 func (store *Store) ReadFSItemFromExternal(
-	tg sku.TransactedGetter,
+	transactedGetter sku.TransactedGetter,
 ) (item *sku.FSItem, err error) {
 	item = &sku.FSItem{} // TODO use pool or use dir_items?
 	item.Reset()
 
-	sk := tg.GetSku()
+	object := transactedGetter.GetSku()
 
 	// TODO handle sort order
-	for _, field := range sk.Metadata.Fields {
+	for _, field := range object.Metadata.Fields {
 		var fdee *fd.FD
 
 		switch strings.ToLower(field.Key) {
@@ -393,7 +393,7 @@ func (store *Store) ReadFSItemFromExternal(
 	}
 
 	if err = item.ExternalObjectId.SetObjectIdLike(
-		&sk.ObjectId,
+		&object.ObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return item, err
@@ -401,7 +401,7 @@ func (store *Store) ReadFSItemFromExternal(
 
 	// external.ObjectId.ResetWith(conflicted.GetSkuExternal().GetObjectId())
 	// TODO populate FD
-	if !sk.ExternalObjectId.IsEmpty() {
+	if !object.ExternalObjectId.IsEmpty() {
 		if err = item.ExternalObjectId.SetObjectIdLike(
 			&item.ExternalObjectId,
 		); err != nil {
@@ -415,13 +415,13 @@ func (store *Store) ReadFSItemFromExternal(
 
 func (store *Store) WriteFSItemToExternal(
 	item *sku.FSItem,
-	tg sku.TransactedGetter,
+	transactedGetter sku.TransactedGetter,
 ) (err error) {
-	external := tg.GetSku()
-	external.Metadata.Fields = external.Metadata.Fields[:0]
+	object := transactedGetter.GetSku()
+	object.Metadata.Fields = object.Metadata.Fields[:0]
 
-	m := &external.Metadata
-	m.Tai = item.GetTai()
+	metadata := object.GetMetadataMutable()
+	metadata.GetTaiMutable().ResetWith(item.GetTai())
 
 	var mode checkout_mode.Mode
 
@@ -439,31 +439,31 @@ func (store *Store) WriteFSItemToExternal(
 		before := item.Blob.String()
 		after := store.envRepo.Rel(before)
 
-		if err = external.ExternalObjectId.SetBlob(after); err != nil {
+		if err = object.ExternalObjectId.SetBlob(after); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	default:
-		k := &item.ExternalObjectId
+		externalObjectId := &item.ExternalObjectId
 
-		if err = external.ObjectId.SetObjectIdLike(k); err != nil {
+		if err = object.ObjectId.SetObjectIdLike(externalObjectId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = external.ExternalObjectId.SetObjectIdLike(
+		if err = object.ExternalObjectId.SetObjectIdLike(
 			&item.ExternalObjectId,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if external.ExternalObjectId.String() != k.String() {
+		if object.ExternalObjectId.String() != externalObjectId.String() {
 			err = errors.ErrorWithStackf(
 				"expected %q but got %q. %s",
-				k,
-				&external.ExternalObjectId,
+				externalObjectId,
+				&object.ExternalObjectId,
 				item.Debug(),
 			)
 
@@ -472,7 +472,7 @@ func (store *Store) WriteFSItemToExternal(
 	}
 
 	if err = item.WriteToSku(
-		external,
+		object,
 		store.envRepo,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -481,27 +481,30 @@ func (store *Store) WriteFSItemToExternal(
 
 	fdees := quiter.SortedValues(item.FDs)
 
-	for _, f := range fdees {
+	for _, fdee := range fdees {
 		field := object_metadata.Field{
-			Value:     f.GetPath(),
+			Value:     fdee.GetPath(),
 			ColorType: string_format_writer.ColorTypeId,
 		}
 
 		switch {
-		case item.Object.Equals(f):
+		case item.Object.Equals(fdee):
 			field.Key = "object"
 
-		case item.Conflict.Equals(f):
+		case item.Conflict.Equals(fdee):
 			field.Key = "conflict"
 
-		case item.Blob.Equals(f):
+		case item.Lockfile.Equals(fdee):
+			field.Key = "lockfile"
+
+		case item.Blob.Equals(fdee):
 			fallthrough
 
 		default:
 			field.Key = "blob"
 		}
 
-		external.Metadata.Fields = append(external.Metadata.Fields, field)
+		object.Metadata.Fields = append(object.Metadata.Fields, field)
 	}
 
 	return err
