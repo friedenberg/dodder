@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
 	hinweis_index_v0 "code.linenisgreat.com/dodder/go/src/india/zettel_id_index/v0"
 	hinweis_index_v1 "code.linenisgreat.com/dodder/go/src/india/zettel_id_index/v1"
-	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
 )
 
 type Index interface {
