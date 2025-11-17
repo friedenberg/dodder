@@ -198,6 +198,7 @@ func (item *FSItem) GenerateConflictFD(cwd string) (err error) {
 		return err
 	}
 
+	// TODO use file extensions
 	if err = item.Conflict.SetPath(
 		fmt.Sprintf("%s/%s.conflict", cwd, item.ExternalObjectId.String()),
 	); err != nil {

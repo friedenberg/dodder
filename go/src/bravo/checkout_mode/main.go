@@ -17,23 +17,40 @@ type Getter interface {
 }
 
 const (
-	None = Mode(iota)
-	All  = Mode(^0)
-
+	none     = Mode(iota)
 	metadata = Mode(1 << iota)
 	blob
 	lockfile
+	conflict
 
+	All             = ModeConstructor(^0)
+	Default         = ModeConstructor(metadata)
 	Blob            = ModeConstructor(blob)
 	Metadata        = ModeConstructor(metadata)
+	Lockfile        = ModeConstructor(lockfile)
+	Conflict        = ModeConstructor(conflict)
 	MetadataAndBlob = ModeConstructor(metadata | blob)
 )
 
 var AvailableModes = []Mode{
-	None,
+	none,
 	metadata,
 	blob,
 	lockfile,
+}
+
+func MakeWith(constructors map[ModeConstructor]bool) Mode {
+	var mode Mode
+
+	for constructor, shouldMake := range constructors {
+		if !shouldMake {
+			continue
+		}
+
+		mode |= Mode(constructor)
+	}
+
+	return mode
 }
 
 func Make(constructors ...ModeConstructor) Mode {
@@ -48,7 +65,7 @@ func Make(constructors ...ModeConstructor) Mode {
 
 func (mode Mode) String() string {
 	switch {
-	case mode == None:
+	case mode == none:
 		return "none"
 
 	case mode.IsMetadataOnly():
@@ -70,7 +87,7 @@ func (mode *Mode) Set(value string) (err error) {
 
 	switch value {
 	case "":
-		*mode = None
+		*mode = none
 
 	case "metadata":
 	case "object":
@@ -117,4 +134,12 @@ func (mode Mode) IncludesLockfile() bool {
 
 func (mode Mode) IsBlobRecognized() bool {
 	return false
+}
+
+func (mode Mode) IsEmpty() bool {
+	return mode == none
+}
+
+func (mode Mode) IsConflict() bool {
+	return mode&conflict != 0
 }

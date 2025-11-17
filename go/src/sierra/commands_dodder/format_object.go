@@ -118,7 +118,7 @@ func (cmd *FormatObject) Run(req command.Request) {
 		},
 		localWorkingCopy.GetConfig(),
 		blobFormatter,
-		checkout_mode.None,
+		checkout_mode.Make(),
 	)
 
 	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {
@@ -142,8 +142,8 @@ func (cmd *FormatObject) Run(req command.Request) {
 	}
 }
 
-func (c *FormatObject) FormatFromStdin(
-	u *local_working_copy.Repo,
+func (cmd *FormatObject) FormatFromStdin(
+	repo *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"
@@ -173,10 +173,10 @@ func (c *FormatObject) FormatFromStdin(
 		return err
 	}
 
-	if blobFormatter, err = u.GetBlobFormatter(
+	if blobFormatter, err = repo.GetBlobFormatter(
 		tipe,
 		formatId,
-		c.UTIGroup,
+		cmd.UTIGroup,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -186,14 +186,14 @@ func (c *FormatObject) FormatFromStdin(
 
 	if wt, err = script_config.MakeWriterToWithStdin(
 		blobFormatter,
-		u.GetEnvRepo().MakeCommonEnv(),
-		u.GetInFile(),
+		repo.GetEnvRepo().MakeCommonEnv(),
+		repo.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if _, err = wt.WriteTo(u.GetUIFile()); err != nil {
+	if _, err = wt.WriteTo(repo.GetUIFile()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

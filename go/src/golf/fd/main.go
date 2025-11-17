@@ -23,20 +23,20 @@ type FD struct {
 	state   State
 }
 
-func (a *FD) IsStdin() bool {
-	return a.path == "-"
+func (fd *FD) IsStdin() bool {
+	return fd.path == "-"
 }
 
-func (a *FD) ModTime() thyme.Time {
-	return a.modTime
+func (fd *FD) ModTime() thyme.Time {
+	return fd.modTime
 }
 
-func (a *FD) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (fd *FD) EqualsAny(b any) bool {
+	return values.Equals(fd, b)
 }
 
-func (a *FD) Equals2(b *FD) (bool, string) {
-	if a.path != b.path {
+func (fd *FD) Equals2(b *FD) (bool, string) {
+	if fd.path != b.path {
 		return false, "path"
 	}
 
@@ -51,16 +51,16 @@ func (a *FD) Equals2(b *FD) (bool, string) {
 	return true, ""
 }
 
-func (a *FD) Equals(b *FD) bool {
-	if a.path != b.path {
+func (fd *FD) Equals(b *FD) bool {
+	if fd.path != b.path {
 		return false
 	}
 
-	if !a.modTime.Equals(b.modTime) {
+	if !fd.modTime.Equals(b.modTime) {
 		return false
 	}
 
-	if !markl.Equals(&a.digest, &b.digest) {
+	if !markl.Equals(&fd.digest, &b.digest) {
 		return false
 	}
 
@@ -208,23 +208,23 @@ func (fd *FD) SetWithBlobWriterFactory(
 	return err
 }
 
-func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
-	f.Reset()
-	f.isDir = fi.IsDir()
-	f.modTime = thyme.Tyme(fi.ModTime())
+func (fd *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
+	fd.Reset()
+	fd.isDir = fi.IsDir()
+	fd.modTime = thyme.Tyme(fi.ModTime())
 
 	p := dir
 
-	if !f.isDir {
+	if !fd.isDir {
 		p = filepath.Join(dir, fi.Name())
 	}
 
-	if f.path, err = filepath.Abs(p); err != nil {
+	if fd.path, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	f.state = StateFileInfo
+	fd.state = StateFileInfo
 
 	return err
 }
@@ -280,19 +280,19 @@ func (fd *FD) Set(v string) (err error) {
 	return err
 }
 
-func (f *FD) String() string {
-	p := filepath.Clean(f.path)
+func (fd *FD) String() string {
+	p := filepath.Clean(fd.path)
 
-	if f.isDir {
+	if fd.isDir {
 		return p + string(filepath.Separator)
 	} else {
 		return p
 	}
 }
 
-func (f *FD) DepthRelativeTo(dir string) int {
+func (fd *FD) DepthRelativeTo(dir string) int {
 	dir = filepath.Clean(dir)
-	rel, err := filepath.Rel(dir, f.GetPath())
+	rel, err := filepath.Rel(dir, fd.GetPath())
 
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return -1
@@ -301,48 +301,49 @@ func (f *FD) DepthRelativeTo(dir string) int {
 	return strings.Count(rel, string(filepath.Separator))
 }
 
-func (e *FD) Ext() string {
-	return Ext(e.path)
+func (fd *FD) Ext() string {
+	return Ext(fd.path)
 }
 
-func (e *FD) ExtSansDot() string {
-	return ExtSansDot(e.path)
+func (fd *FD) ExtSansDot() string {
+	return ExtSansDot(fd.path)
 }
 
-func (e *FD) FilePathSansExt() string {
-	base := e.path
-	ext := e.Ext()
+func (fd *FD) FilePathSansExt() string {
+	base := fd.path
+	ext := fd.Ext()
 	return base[:len(base)-len(ext)]
 }
 
-func (e *FD) FileName() string {
-	return filepath.Base(e.path)
+func (fd *FD) FileName() string {
+	return filepath.Base(fd.path)
 }
 
-func (e *FD) FileNameSansExt() string {
-	return FileNameSansExt(e.path)
+func (fd *FD) FileNameSansExt() string {
+	return FileNameSansExt(fd.path)
 }
 
-func (e *FD) FileNameSansExtRelTo(d string) (string, error) {
-	return FileNameSansExtRelTo(e.path, d)
+func (fd *FD) FileNameSansExtRelTo(d string) (string, error) {
+	return FileNameSansExtRelTo(fd.path, d)
 }
 
-func (e *FD) FilePathRelTo(d string) (string, error) {
-	rel, err := filepath.Rel(d, e.path)
+func (fd *FD) FilePathRelTo(d string) (string, error) {
+	rel, err := filepath.Rel(d, fd.path)
 	if err != nil {
-		return e.path, nil
+		return fd.path, nil
 		// return "", err
 	}
 
 	return rel, nil
 }
 
-func (e *FD) DirBaseOnly() string {
-	return DirBaseOnly(e.path)
+func (fd *FD) DirBaseOnly() string {
+	return DirBaseOnly(fd.path)
 }
 
-func (f *FD) IsEmpty() bool {
-	if f.path == "" {
+func (fd *FD) IsEmpty() bool {
+	switch fd.path {
+	case "":
 		return true
 	}
 
@@ -430,20 +431,20 @@ func (fd *FD) Reset() {
 	fd.digest.Reset()
 }
 
-func (dst *FD) ResetWith(src *FD) {
-	dst.state = src.state
-	dst.isDir = src.isDir
-	dst.path = src.path
-	dst.modTime = src.modTime
-	dst.digest.ResetWith(src.digest)
+func (fd *FD) ResetWith(src *FD) {
+	fd.state = src.state
+	fd.isDir = src.isDir
+	fd.path = src.path
+	fd.modTime = src.modTime
+	fd.digest.ResetWith(src.digest)
 }
 
-func (src *FD) Clone() (dst *FD) {
+func (fd *FD) Clone() (dst *FD) {
 	dst = &FD{}
-	dst.state = src.state
-	dst.isDir = src.isDir
-	dst.path = src.path
-	dst.modTime = src.modTime
-	dst.digest.ResetWith(src.digest)
+	dst.state = fd.state
+	dst.isDir = fd.isDir
+	dst.path = fd.path
+	dst.modTime = fd.modTime
+	dst.digest.ResetWith(fd.digest)
 	return dst
 }

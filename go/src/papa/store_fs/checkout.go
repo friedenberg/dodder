@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
@@ -361,20 +360,20 @@ func (store *Store) RemoveItem(fsItem *sku.FSItem) (err error) {
 
 func (store *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
-	co sku.SkuType,
+	object sku.SkuType,
 ) (err error) {
-	o := checkout_options.Options{
+	checkoutOptions := checkout_options.Options{
 		OptionsWithoutMode: options,
 	}
 
-	if o.CheckoutMode, err = store.GetCheckoutMode(
-		co.GetSkuExternal(),
+	if checkoutOptions.CheckoutMode, err = store.GetCheckoutMode(
+		object.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if o.CheckoutMode == checkout_mode.None {
+	if checkoutOptions.CheckoutMode.IsEmpty() {
 		return err
 	}
 
@@ -385,14 +384,14 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *sku.FSItem
 
-	if oldFDs, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+	if oldFDs, err = store.ReadFSItemFromExternal(object.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if replacement, newFDs, err = store.checkoutOneIfNecessary(
-		o,
-		co.GetSkuExternal(),
+		checkoutOptions,
+		object.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

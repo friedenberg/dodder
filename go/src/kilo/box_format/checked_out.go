@@ -3,7 +3,6 @@ package box_format
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -268,25 +267,24 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 }
 
 func (format *BoxCheckedOut) addFieldsFS(
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 	builder *object_metadata_box_builder.Builder,
 	item *sku.FSItem,
 ) (err error) {
-	// TODO rename to mode
-	m := item.GetCheckoutMode()
+	mode := item.GetCheckoutMode()
 
 	var fdAlreadyWritten *fd.FD
 
 	op := format.optionsPrint
 	op.BoxExcludeFields = true
 
-	switch co.GetState() {
+	switch checkedOut.GetState() {
 	case checked_out_state.Unknown:
 		err = errors.ErrorWithStackf("invalid state unknown")
 		return err
 
 	case checked_out_state.Untracked:
-		if err = format.addFieldsUntracked(co, builder, item, op); err != nil {
+		if err = format.addFieldsUntracked(checkedOut, builder, item, op); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -294,7 +292,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 		return err
 
 	case checked_out_state.Recognized:
-		if err = format.addFieldsRecognized(co, builder, item, op); err != nil {
+		if err = format.addFieldsRecognized(checkedOut, builder, item, op); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -305,16 +303,16 @@ func (format *BoxCheckedOut) addFieldsFS(
 	var id string_format_writer.Field
 
 	switch {
-	case m.IsBlobOnly() || m.IsBlobRecognized():
-		id.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: &co.GetSkuExternal().ObjectId}).String()
+	case mode.IsBlobOnly() || mode.IsBlobRecognized():
+		id.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: &checkedOut.GetSkuExternal().ObjectId}).String()
 
-	case m.IncludesMetadata():
+	case mode.IncludesMetadata():
 		id.Value = format.relativePath.Rel(item.Object.GetPath())
 		fdAlreadyWritten = &item.Object
 
 	default:
 		if id, _, err = format.makeFieldObjectId(
-			co.GetSkuExternal(),
+			checkedOut.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -324,12 +322,12 @@ func (format *BoxCheckedOut) addFieldsFS(
 	id.ColorType = string_format_writer.ColorTypeId
 	builder.Contents.Append(id)
 
-	if co.GetState() == checked_out_state.Conflicted {
+	if checkedOut.GetState() == checked_out_state.Conflicted {
 		// TODO handle conflicted state
 	} else {
 		if err = format.addFieldsMetadata(
 			op,
-			co.GetSkuExternal(),
+			checkedOut.GetSkuExternal(),
 			op.BoxDescriptionInBox,
 			builder,
 		); err != nil {
@@ -337,8 +335,8 @@ func (format *BoxCheckedOut) addFieldsFS(
 			return err
 		}
 
-		if m.IsBlobRecognized() ||
-			(!m.IsMetadataOnly() && m != checkout_mode.None) {
+		if mode.IsBlobRecognized() ||
+			(!mode.IsMetadataOnly() && !mode.IsEmpty()) {
 			if err = format.addFieldsFSBlobExcept(
 				item,
 				fdAlreadyWritten,

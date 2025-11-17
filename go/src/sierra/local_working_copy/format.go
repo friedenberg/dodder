@@ -434,7 +434,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					DoNotWriteEmptyDescription: true,
 				},
 				repo.GetConfig(),
-				checkout_mode.None,
+				checkout_mode.Make(),
 			)
 
 			return func(object *sku.Transacted) (err error) {
@@ -454,7 +454,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					DoNotWriteEmptyDescription: true,
 				},
 				repo.GetConfig(),
-				checkout_mode.Make(checkout_mode.Metadata),
+				checkout_mode.Make(checkout_mode.Default),
 			)
 
 			return func(object *sku.Transacted) (err error) {

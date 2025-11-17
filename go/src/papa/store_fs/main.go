@@ -366,6 +366,9 @@ func (store *Store) ReadFSItemFromExternal(
 		case "conflict":
 			fdee = &item.Conflict
 
+		case "lockfile":
+			fdee = &item.Lockfile
+
 		default:
 			err = errors.ErrorWithStackf("unexpected field: %#v", field)
 			return item, err
@@ -379,7 +382,7 @@ func (store *Store) ReadFSItemFromExternal(
 		}
 
 		if err = fdee.SetIgnoreNotExists(field.Value); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Key: %q", field.Key)
 			return item, err
 		}
 

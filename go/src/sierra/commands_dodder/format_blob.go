@@ -140,7 +140,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		},
 		localWorkingCopy.GetConfig(),
 		blobFormatter,
-		checkout_mode.None,
+		checkout_mode.Make(),
 	)
 
 	if err := localWorkingCopy.GetStore().TryFormatHook(object); err != nil {

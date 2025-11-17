@@ -17,7 +17,7 @@ func init() {
 		"checkout",
 		&Checkout{
 			CheckoutOptions: checkout_options.Options{
-				CheckoutMode: checkout_mode.Make(checkout_mode.Metadata),
+				CheckoutMode: checkout_mode.Make(checkout_mode.Default),
 			},
 		})
 }
