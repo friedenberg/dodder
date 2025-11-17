@@ -1,12 +1,16 @@
 package checkout_mode
 
 import (
+	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-type Mode int
+type (
+	Mode            int
+	ModeConstructor int
+)
 
 type Getter interface {
 	GetCheckoutMode() (Mode, error)
@@ -14,61 +18,74 @@ type Getter interface {
 
 const (
 	None = Mode(iota)
-	MetadataOnly
-	MetadataAndBlob
-	BlobOnly
+	All  = Mode(^0)
 
-	// TODO remove?
-	BlobRecognized // should never be set via flags
+	metadata = Mode(1 << iota)
+	blob
+	lockfile
+
+	MetadataOnly    = ModeConstructor(metadata)
+	MetadataAndBlob = ModeConstructor(metadata | blob)
+	BlobOnly        = ModeConstructor(blob)
 )
 
 var AvailableModes = []Mode{
 	None,
-	MetadataOnly,
-	MetadataAndBlob,
-	BlobOnly,
+	metadata,
+	blob,
+	lockfile,
 }
 
-func (m Mode) String() string {
-	switch m {
-	case None:
+func Make(constructors ...ModeConstructor) Mode {
+	var mode Mode
+
+	for _, constructor := range constructors {
+		mode |= Mode(constructor)
+	}
+
+	return mode
+}
+
+func (mode Mode) String() string {
+	switch {
+	case mode == None:
 		return "none"
 
-	case MetadataOnly:
+	case mode.IsMetadataOnly():
 		return "metadata"
 
-	case BlobOnly:
+	case mode.IsBlobOnly():
 		return "blob"
 
-	case MetadataAndBlob:
+	case mode.IncludesBlob() && mode.IncludesMetadata():
 		return "both"
 
 	default:
-		return "unknown"
+		return fmt.Sprintf("invalid(%08b)", mode)
 	}
 }
 
-func (m *Mode) Set(v string) (err error) {
-	v = strings.ToLower(strings.TrimSpace(v))
+func (mode *Mode) Set(value string) (err error) {
+	value = strings.ToLower(strings.TrimSpace(value))
 
-	switch v {
+	switch value {
 	case "":
-		*m = None
+		*mode = None
 
 	case "metadata":
 	case "object":
-		*m = MetadataOnly
+		*mode = metadata
 
 	case "blob":
-		*m = BlobOnly
+		*mode = blob
 
 	case "both":
-		*m = MetadataAndBlob
+		*mode = metadata | blob
 
 	default:
 		err = errors.ErrorWithStackf(
 			"unsupported checkout mode: %s. Available modes: %q",
-			v,
+			value,
 			AvailableModes,
 		)
 
@@ -78,22 +95,22 @@ func (m *Mode) Set(v string) (err error) {
 	return err
 }
 
-func (m Mode) IncludesBlob() bool {
-	switch m {
-	case MetadataAndBlob, BlobOnly:
-		return true
-
-	default:
-		return false
-	}
+func (mode Mode) IsMetadataOnly() bool {
+	return mode == metadata
 }
 
-func (m Mode) IncludesMetadata() bool {
-	switch m {
-	case MetadataAndBlob, MetadataOnly:
-		return true
+func (mode Mode) IsBlobOnly() bool {
+	return mode == blob
+}
 
-	default:
-		return false
-	}
+func (mode Mode) IncludesBlob() bool {
+	return mode&blob != 0
+}
+
+func (mode Mode) IncludesMetadata() bool {
+	return mode&metadata != 0
+}
+
+func (mode Mode) IsBlobRecognized() bool {
+	return false
 }

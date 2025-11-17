@@ -431,8 +431,8 @@ func (store *Store) WriteFSItemToExternal(
 		}
 	}
 
-	switch mode {
-	case checkout_mode.BlobOnly:
+	switch {
+	case mode.IsBlobOnly():
 		before := item.Blob.String()
 		after := store.envRepo.Rel(before)
 

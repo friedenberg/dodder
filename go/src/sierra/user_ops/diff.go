@@ -36,7 +36,7 @@ func (op Diff) Run(
 	{
 		if localCheckedOut, err = op.GetEnvWorkspace().GetStoreFS().CheckoutOne(
 			checkout_options.Options{
-				CheckoutMode: checkout_mode.MetadataAndBlob,
+				CheckoutMode: checkout_mode.Make(checkout_mode.MetadataAndBlob),
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						Path: store_fs.PathOptionTempLocal,

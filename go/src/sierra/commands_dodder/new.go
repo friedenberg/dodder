@@ -158,7 +158,7 @@ func (cmd *New) Run(req command.Request) {
 		opCheckout := user_ops.Checkout{
 			Repo: repo,
 			Options: checkout_options.Options{
-				CheckoutMode: checkout_mode.MetadataAndBlob,
+				CheckoutMode: checkout_mode.Make(checkout_mode.MetadataAndBlob),
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						ForceInlineBlob:      true,

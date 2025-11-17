@@ -454,7 +454,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					DoNotWriteEmptyDescription: true,
 				},
 				repo.GetConfig(),
-				checkout_mode.MetadataOnly,
+				checkout_mode.Make(checkout_mode.MetadataOnly),
 			)
 
 			return func(object *sku.Transacted) (err error) {

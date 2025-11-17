@@ -65,8 +65,8 @@ func (formatter textFormatter) EncodeStringTo(
 		TextFormatterOptions:       formatter.options,
 	}
 
-	switch formatter.checkoutMode {
-	case checkout_mode.MetadataOnly:
+	switch {
+	case formatter.checkoutMode.IsMetadataOnly():
 		n, err = formatter.MetadataOnly.FormatMetadata(writer, context)
 
 	default:
@@ -93,7 +93,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	}
 
 	if genres.Config.EqualsGenre(sk.GetGenre()) ||
-		mode == checkout_mode.BlobOnly {
+		mode.IsBlobOnly() {
 		n, err = tf.BlobOnly.FormatMetadata(w, ctx)
 	} else if tf.InlineTypeChecker.IsInlineType(sk.GetType()) {
 		n, err = tf.InlineBlob.FormatMetadata(w, ctx)

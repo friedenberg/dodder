@@ -33,21 +33,21 @@ func (store *Store) HydrateExternalFromItem(
 		return err
 	}
 
-	var m checkout_mode.Mode
+	var mode checkout_mode.Mode
 
-	if m, err = item.GetCheckoutModeOrError(); err != nil {
+	if mode, err = item.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	switch m {
-	case checkout_mode.BlobOnly:
+	switch {
+	case mode.IsBlobOnly():
 		if err = store.readOneExternalBlob(external, internal, item); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
+	case mode.IncludesMetadata():
 		if item.Object.IsStdin() {
 			if err = store.ReadOneExternalObjectReader(os.Stdin, external); err != nil {
 				err = errors.Wrap(err)
@@ -60,14 +60,14 @@ func (store *Store) HydrateExternalFromItem(
 			}
 		}
 
-	case checkout_mode.BlobRecognized:
+	case mode.IsBlobRecognized():
 		object_metadata.Resetter.ResetWith(
 			external.GetMetadataMutable(),
 			internal.GetMetadataMutable(),
 		)
 
 	default:
-		err = checkout_mode.MakeErrInvalidCheckoutModeMode(m)
+		err = checkout_mode.MakeErrInvalidCheckoutModeMode(mode)
 		return err
 	}
 

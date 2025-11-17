@@ -210,13 +210,13 @@ func (item *FSItem) GenerateConflictFD(cwd string) (err error) {
 func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
-		m = checkout_mode.MetadataAndBlob
+		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	case !item.Blob.IsEmpty():
-		m = checkout_mode.BlobOnly
+		m = checkout_mode.Make(checkout_mode.BlobOnly)
 
 	case !item.Object.IsEmpty():
-		m = checkout_mode.MetadataOnly
+		m = checkout_mode.Make(checkout_mode.MetadataOnly)
 
 	case !item.Conflict.IsEmpty():
 		err = MakeErrMergeConflict(item)
@@ -233,13 +233,13 @@ func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
 	switch {
 	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
-		m = checkout_mode.MetadataAndBlob
+		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	case !item.Blob.IsEmpty():
-		m = checkout_mode.BlobOnly
+		m = checkout_mode.Make(checkout_mode.BlobOnly)
 
 	case !item.Object.IsEmpty():
-		m = checkout_mode.MetadataOnly
+		m = checkout_mode.Make(checkout_mode.MetadataOnly)
 	}
 
 	return m

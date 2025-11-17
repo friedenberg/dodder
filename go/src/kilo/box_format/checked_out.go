@@ -272,6 +272,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 	builder *object_metadata_box_builder.Builder,
 	item *sku.FSItem,
 ) (err error) {
+	// TODO rename to mode
 	m := item.GetCheckoutMode()
 
 	var fdAlreadyWritten *fd.FD
@@ -304,8 +305,8 @@ func (format *BoxCheckedOut) addFieldsFS(
 	var id string_format_writer.Field
 
 	switch {
-	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		id.Value = (&ids.ObjectIdStringerSansRepo{&co.GetSkuExternal().ObjectId}).String()
+	case m.IsBlobOnly() || m.IsBlobRecognized():
+		id.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: &co.GetSkuExternal().ObjectId}).String()
 
 	case m.IncludesMetadata():
 		id.Value = format.relativePath.Rel(item.Object.GetPath())
@@ -336,8 +337,8 @@ func (format *BoxCheckedOut) addFieldsFS(
 			return err
 		}
 
-		if m == checkout_mode.BlobRecognized ||
-			(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
+		if m.IsBlobRecognized() ||
+			(!m.IsMetadataOnly() && m != checkout_mode.None) {
 			if err = format.addFieldsFSBlobExcept(
 				item,
 				fdAlreadyWritten,

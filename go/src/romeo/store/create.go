@@ -107,27 +107,27 @@ func (store *Store) RevertTo(
 
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: "update many metadata",
+			Operation: "revert",
 		}
 
 		return err
 	}
 
-	mother := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(mother)
+	object := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(object)
 
 	if err = store.streamIndex.ReadOneMarklId(
 		revertId.Sig,
-		mother,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	defer sku.GetTransactedPool().Put(mother)
+	defer sku.GetTransactedPool().Put(object)
 
 	if err = store.Commit(
-		mother,
+		object,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
 		err = errors.WrapExceptSentinel(err, collections.ErrExists)
@@ -138,10 +138,10 @@ func (store *Store) RevertTo(
 }
 
 func (store *Store) CreateOrUpdateCheckedOut(
-	col sku.SkuType,
+	object sku.SkuType,
 	updateCheckout bool,
 ) (err error) {
-	external := col.GetSkuExternal()
+	external := object.GetSkuExternal()
 	internal := external.GetSku()
 
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
@@ -169,7 +169,7 @@ func (store *Store) CreateOrUpdateCheckedOut(
 
 	if err = store.UpdateCheckoutFromCheckedOut(
 		checkout_options.OptionsWithoutMode{Force: true},
-		col,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

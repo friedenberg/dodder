@@ -25,12 +25,12 @@ type Revert struct {
 
 var _ interfaces.CommandComponentWriter = (*Revert)(nil)
 
-func (md *Revert) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	md.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
-	f.BoolVar(&md.Last, "last", false, "revert the last changes")
+func (cmd *Revert) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
+	cmd.LocalWorkingCopyWithQueryGroup.SetFlagDefinitions(f)
+	f.BoolVar(&cmd.Last, "last", false, "revert the last changes")
 }
 
-func (md Revert) CompletionGenres() ids.Genre {
+func (cmd Revert) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -40,8 +40,8 @@ func (md Revert) CompletionGenres() ids.Genre {
 	)
 }
 
-func (md Revert) Run(dep command.Request) {
-	localWorkingCopy, queryGroup := md.MakeLocalWorkingCopyAndQueryGroup(
+func (cmd Revert) Run(dep command.Request) {
+	localWorkingCopy, queryGroup := cmd.MakeLocalWorkingCopyAndQueryGroup(
 		dep,
 		queries.BuilderOptions(
 			queries.BuilderOptionDefaultGenres(
@@ -58,13 +58,13 @@ func (md Revert) Run(dep command.Request) {
 	)
 
 	switch {
-	case md.Last:
-		if err := md.runRevertFromLast(localWorkingCopy); err != nil {
+	case cmd.Last:
+		if err := cmd.runRevertFromLast(localWorkingCopy); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 
 	default:
-		if err := md.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
+		if err := cmd.runRevertFromQuery(localWorkingCopy, queryGroup); err != nil {
 			localWorkingCopy.Cancel(err)
 		}
 	}
@@ -74,7 +74,7 @@ func (md Revert) Run(dep command.Request) {
 	)
 }
 
-func (md Revert) runRevertFromQuery(
+func (cmd Revert) runRevertFromQuery(
 	repo *local_working_copy.Repo,
 	eq *queries.Query,
 ) (err error) {
@@ -101,7 +101,7 @@ func (md Revert) runRevertFromQuery(
 	return err
 }
 
-func (md Revert) runRevertFromLast(
+func (cmd Revert) runRevertFromLast(
 	repo *local_working_copy.Repo,
 ) (err error) {
 	stoar := repo.GetStore()
@@ -135,12 +135,12 @@ func (md Revert) runRevertFromLast(
 
 		defer sku.GetTransactedPool().Put(cachedSku)
 
-		rt := store.RevertId{
+		revertId := store.RevertId{
 			ObjectId: cachedSku.GetObjectId(),
 			Sig:      cachedSku.GetMetadata().GetMotherObjectSig(),
 		}
 
-		if err = repo.GetStore().RevertTo(rt); err != nil {
+		if err = repo.GetStore().RevertTo(revertId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

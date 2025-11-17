@@ -125,7 +125,7 @@ func (cmd Last) runLocalWorkingCopy(localWorkingCopy *local_working_copy.Repo) {
 	} else if cmd.Edit {
 		opCheckout := user_ops.Checkout{
 			Options: checkout_options.Options{
-				CheckoutMode: checkout_mode.MetadataAndBlob,
+				CheckoutMode: checkout_mode.Make(checkout_mode.MetadataAndBlob),
 			},
 			Repo: localWorkingCopy,
 			Edit: true,

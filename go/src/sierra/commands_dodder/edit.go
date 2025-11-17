@@ -17,7 +17,7 @@ func init() {
 	utility.AddCmd(
 		"edit",
 		&Edit{
-			CheckoutMode: checkout_mode.MetadataOnly,
+			CheckoutMode: checkout_mode.Make(checkout_mode.MetadataOnly),
 		})
 }
 

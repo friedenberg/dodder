@@ -28,7 +28,10 @@
       "Bash(./bin/auto_reposition_packages:*)",
       "Bash(./debug_deps.sh)",
       "Bash(just:*)",
-      "Bash(go mod:*)"
+      "Bash(go mod:*)",
+      "Bash(bash:*)",
+      "Bash(timeout:*)",
+      "Bash(go list:*)"
     ],
     "deny": []
   },
