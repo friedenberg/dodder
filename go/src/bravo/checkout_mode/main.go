@@ -24,9 +24,9 @@ const (
 	blob
 	lockfile
 
-	MetadataOnly    = ModeConstructor(metadata)
+	Blob            = ModeConstructor(blob)
+	Metadata        = ModeConstructor(metadata)
 	MetadataAndBlob = ModeConstructor(metadata | blob)
-	BlobOnly        = ModeConstructor(blob)
 )
 
 var AvailableModes = []Mode{

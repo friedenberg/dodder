@@ -150,7 +150,7 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 	if _, err := format.WriteStringFormatWithMode(
 		localWorkingCopy.GetUIFile(),
 		object,
-		checkout_mode.Make(checkout_mode.BlobOnly),
+		checkout_mode.Make(checkout_mode.Blob),
 	); err != nil {
 		localWorkingCopy.Cancel(err)
 	}

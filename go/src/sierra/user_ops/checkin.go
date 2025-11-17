@@ -155,7 +155,7 @@ func (c Checkin) openBlobIfNecessary(
 	opCheckout := Checkout{
 		Repo: repo,
 		Options: checkout_options.Options{
-			CheckoutMode: checkout_mode.Make(checkout_mode.BlobOnly),
+			CheckoutMode: checkout_mode.Make(checkout_mode.Blob),
 		},
 		Utility: c.CheckoutBlobAndRun,
 	}

@@ -56,7 +56,7 @@ func (store *Store) MergeCheckedOut(
 
 		return commitOptions, err
 	} else if markl.Equals(checkedOut.GetSku().Metadata.GetBlobDigest(), checkedOut.GetSkuExternal().Metadata.GetBlobDigest()) {
-		conflicts = checkout_mode.Make(checkout_mode.MetadataOnly)
+		conflicts = checkout_mode.Make(checkout_mode.Metadata)
 	} else {
 		conflicts = checkout_mode.Make(checkout_mode.MetadataAndBlob)
 	}
@@ -225,7 +225,7 @@ func (store *Store) MakeMergedTransacted(
 	mode := checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	if !inlineBlob {
-		mode = checkout_mode.Make(checkout_mode.MetadataOnly)
+		mode = checkout_mode.Make(checkout_mode.Metadata)
 	}
 
 	if localItem, baseItem, remoteItem, err = store.checkoutConflictedForMerge(
@@ -430,7 +430,7 @@ func (store *Store) RunMergeTool(
 	mode := checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	if !inlineBlob {
-		mode = checkout_mode.Make(checkout_mode.MetadataOnly)
+		mode = checkout_mode.Make(checkout_mode.Metadata)
 	}
 
 	var localItem, baseItem, remoteItem *sku.FSItem

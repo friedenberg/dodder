@@ -21,7 +21,7 @@ func init() {
 	utility.AddCmd(
 		"format-object",
 		&FormatObject{
-			CheckoutMode: checkout_mode.Make(checkout_mode.BlobOnly),
+			CheckoutMode: checkout_mode.Make(checkout_mode.Blob),
 		})
 }
 

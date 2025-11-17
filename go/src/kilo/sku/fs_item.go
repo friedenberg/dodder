@@ -213,10 +213,10 @@ func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	case !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.BlobOnly)
+		m = checkout_mode.Make(checkout_mode.Blob)
 
 	case !item.Object.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.MetadataOnly)
+		m = checkout_mode.Make(checkout_mode.Metadata)
 
 	case !item.Conflict.IsEmpty():
 		err = MakeErrMergeConflict(item)
@@ -236,10 +236,10 @@ func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
 		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
 
 	case !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.BlobOnly)
+		m = checkout_mode.Make(checkout_mode.Blob)
 
 	case !item.Object.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.MetadataOnly)
+		m = checkout_mode.Make(checkout_mode.Metadata)
 	}
 
 	return m
