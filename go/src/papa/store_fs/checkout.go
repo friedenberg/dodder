@@ -61,6 +61,11 @@ func (store *Store) checkoutOneForReal(
 		return err
 	}
 
+	if err = store.setLockfileIfNecessary(options, item, info); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
 	if err = store.setBlobIfNecessary(
 		options,
 		item,
@@ -92,53 +97,78 @@ func (store *Store) checkoutOneForReal(
 
 func (store *Store) setObjectIfNecessary(
 	options checkout_options.Options,
-	i *sku.FSItem,
+	fsItem *sku.FSItem,
 	info checkoutFileNameInfo,
 ) (err error) {
 	if !options.CheckoutMode.IncludesMetadata() {
-		i.FDs.Del(&i.Object)
-		i.Object.Reset()
+		fsItem.FDs.Del(&fsItem.Object)
+		fsItem.Object.Reset()
 		return err
 	}
 
-	if err = i.Object.SetPath(info.objectName); err != nil {
+	if err = fsItem.Object.SetPath(info.objectName); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	i.FDs.Add(&i.Object)
+	fsItem.FDs.Add(&fsItem.Object)
+
+	return err
+}
+
+func (store *Store) setLockfileIfNecessary(
+	options checkout_options.Options,
+	fsItem *sku.FSItem,
+	info checkoutFileNameInfo,
+) (err error) {
+	if !options.CheckoutMode.IncludesLockfile() {
+		fsItem.FDs.Del(&fsItem.Lockfile)
+		fsItem.Lockfile.Reset()
+		return err
+	}
+
+	fileExtension := store.fileExtensions.Lockfile
+
+	if err = fsItem.Blob.SetPath(
+		info.basename + "." + fileExtension,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	fsItem.FDs.Add(&fsItem.Lockfile)
 
 	return err
 }
 
 func (store *Store) setBlobIfNecessary(
 	options checkout_options.Options,
-	i *sku.FSItem,
+	fsItem *sku.FSItem,
 	info checkoutFileNameInfo,
 ) (err error) {
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	if fsOptions.ForceInlineBlob ||
 		!options.CheckoutMode.IncludesBlob() {
-		i.FDs.Del(&i.Blob)
-		i.Blob.Reset()
+		fsItem.FDs.Del(&fsItem.Blob)
+		fsItem.Blob.Reset()
 		return err
 	}
 
-	fe := store.config.GetTypeExtension(info.tipe.String())
+	fileExtension := store.config.GetTypeExtension(info.tipe.String())
 
-	if fe == "" {
-		fe = info.tipe.StringSansOp()
+	if fileExtension == "" {
+		fileExtension = info.tipe.StringSansOp()
 	}
 
-	if err = i.Blob.SetPath(
-		info.basename + "." + fe,
+	if err = fsItem.Blob.SetPath(
+		info.basename + "." + fileExtension,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	i.FDs.Add(&i.Blob)
+	fsItem.FDs.Add(&fsItem.Blob)
 
 	return err
 }
@@ -213,7 +243,7 @@ func (store *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 
 func (store *Store) SetFilenameForTransacted(
 	options checkout_options.Options,
-	sk *sku.Transacted,
+	object *sku.Transacted,
 	info *checkoutFileNameInfo,
 ) (err error) {
 	cwd := store.envRepo.GetCwd()
@@ -221,30 +251,30 @@ func (store *Store) SetFilenameForTransacted(
 	fsOptions := GetCheckoutOptionsFromOptions(options)
 
 	if fsOptions.Path == PathOptionTempLocal {
-		var f *os.File
+		var file *os.File
 
-		if f, err = store.envRepo.GetTempLocal().FileTempWithTemplate(
+		if file, err = store.envRepo.GetTempLocal().FileTempWithTemplate(
 			fmt.Sprintf(
 				"*.%s",
-				store.FileExtensionForObject(sk),
+				store.FileExtensionForObject(object),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		defer errors.DeferredCloser(&err, f)
+		defer errors.DeferredCloser(&err, file)
 
-		info.basename = f.Name()
-		info.objectName = f.Name()
+		info.basename = file.Name()
+		info.objectName = file.Name()
 
 		return err
 	}
 
-	if sk.GetGenre() == genres.Zettel {
+	if object.GetGenre() == genres.Zettel {
 		var zettelId ids.ZettelId
 
-		if err = zettelId.Set(sk.GetObjectId().String()); err != nil {
+		if err = zettelId.Set(object.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -257,9 +287,9 @@ func (store *Store) SetFilenameForTransacted(
 			return err
 		}
 
-		info.objectName = store.PathForTransacted(cwd, sk)
+		info.objectName = store.PathForTransacted(cwd, object)
 	} else {
-		info.basename = store.PathForTransacted(cwd, sk)
+		info.basename = store.PathForTransacted(cwd, object)
 		info.objectName = info.basename
 	}
 
@@ -315,16 +345,16 @@ func (store *Store) FileExtensionForObject(
 	return extension
 }
 
-func (store *Store) RemoveItem(i *sku.FSItem) (err error) {
+func (store *Store) RemoveItem(fsItem *sku.FSItem) (err error) {
 	// TODO check conflict state
-	for fdItem := range i.FDs.All() {
+	for fdItem := range fsItem.FDs.All() {
 		if err = fdItem.Remove(store.envRepo); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	i.Reset()
+	fsItem.Reset()
 
 	return err
 }

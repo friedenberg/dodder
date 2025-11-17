@@ -34,6 +34,7 @@ type (
 	}
 
 	IMetadataMutable interface {
+		interfaces.CommandComponentWriter
 		IMetadata
 		GetterMutable
 

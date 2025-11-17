@@ -4,6 +4,8 @@ import "code.linenisgreat.com/dodder/go/src/alfa/equals"
 
 type TOMLV1 struct {
 	Config   *string `toml:"config"`
+	Conflict *string `toml:"conflict"`
+	Lockfile *string `toml:"lockfile"`
 	Organize *string `toml:"organize"`
 	Repo     *string `toml:"repo"`
 	Tag      *string `toml:"tag"`
@@ -16,6 +18,8 @@ func (config TOMLV1) GetFileExtensionsOverlay() Overlay {
 }
 
 func (config *TOMLV1) Reset() {
+	equals.SetIfNotNil(config.Conflict, "")
+	equals.SetIfNotNil(config.Lockfile, "")
 	equals.SetIfNotNil(config.Organize, "")
 	equals.SetIfNotNil(config.Repo, "")
 	equals.SetIfNotNil(config.Tag, "")
@@ -25,6 +29,8 @@ func (config *TOMLV1) Reset() {
 
 func (config *TOMLV1) ResetWith(b TOMLV1) {
 	config.Config = b.Config
+	config.Conflict = b.Conflict
+	config.Lockfile = b.Lockfile
 	config.Organize = b.Organize
 	config.Repo = b.Repo
 	config.Tag = b.Tag

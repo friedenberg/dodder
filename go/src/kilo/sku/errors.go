@@ -19,16 +19,16 @@ type ErrMergeConflict struct {
 	FSItem
 }
 
-func (e *ErrMergeConflict) Is(target error) bool {
+func (err *ErrMergeConflict) Is(target error) bool {
 	_, ok := target.(*ErrMergeConflict)
 	return ok
 }
 
-func (e *ErrMergeConflict) Error() string {
+func (err *ErrMergeConflict) Error() string {
 	return fmt.Sprintf(
 		"merge conflict for fds: Object: %q, Blob: %q",
-		&e.Object,
-		&e.Blob,
+		&err.Object,
+		&err.Blob,
 	)
 }
 

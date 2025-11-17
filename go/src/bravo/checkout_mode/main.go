@@ -111,6 +111,10 @@ func (mode Mode) IncludesMetadata() bool {
 	return mode&metadata != 0
 }
 
+func (mode Mode) IncludesLockfile() bool {
+	return mode&lockfile != 0
+}
+
 func (mode Mode) IsBlobRecognized() bool {
 	return false
 }

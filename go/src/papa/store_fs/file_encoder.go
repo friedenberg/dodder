@@ -51,15 +51,15 @@ func MakeFileEncoder(
 	}
 }
 
-func (encoder *fileEncoder) openOrCreate(p string) (file *os.File, err error) {
-	if file, err = files.OpenFile(p, encoder.mode, encoder.perm); err != nil {
+func (encoder *fileEncoder) openOrCreate(path string) (file *os.File, err error) {
+	if file, err = files.OpenFile(path, encoder.mode, encoder.perm); err != nil {
 		err = errors.Wrap(err)
 
 		if errors.IsExist(err) {
 			// err = nil
 			var err2 error
 
-			if file, err2 = files.OpenExclusiveReadOnly(p); err2 != nil {
+			if file, err2 = files.OpenExclusiveReadOnly(path); err2 != nil {
 				err = errors.Wrap(err2)
 			}
 		} else {
@@ -105,16 +105,16 @@ func (encoder *fileEncoder) EncodeObject(
 				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
-					var aw interfaces.BlobWriter
+					var blobWriter interfaces.BlobWriter
 
-					if aw, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
+					if blobWriter, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 
-					defer errors.DeferredCloser(&err, aw)
+					defer errors.DeferredCloser(&err, blobWriter)
 
-					if _, err = io.Copy(aw, fileBlob); err != nil {
+					if _, err = io.Copy(blobWriter, fileBlob); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}

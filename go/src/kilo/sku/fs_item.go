@@ -23,6 +23,7 @@ type FSItem struct {
 	Object   fd.FD
 	Blob     fd.FD // TODO make set
 	Conflict fd.FD
+	Lockfile fd.FD
 
 	FDs interfaces.MutableSetLike[*fd.FD]
 }

@@ -403,6 +403,8 @@ function show_konfig { # @test
 
 		[file-extensions]
 		config = 'konfig'
+		conflict = 'conflict'
+		lockfile = 'object-lockfile'
 		organize = 'md'
 		repo = 'repo'
 		tag = 'tag'

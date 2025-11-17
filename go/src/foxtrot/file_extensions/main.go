@@ -17,6 +17,8 @@ type (
 
 	Config struct {
 		Config   string
+		Conflict string
+		Lockfile string
 		Organize string
 		Repo     string
 		Tag      string
@@ -26,6 +28,8 @@ type (
 
 	Overlay struct {
 		Config   *string
+		Conflict *string
+		Lockfile *string
 		Organize *string
 		Repo     *string
 		Tag      *string
@@ -42,7 +46,9 @@ var (
 func Default() Config {
 	return Config{
 		Config:   "konfig",
-		Organize: "md",
+		Conflict: "conflict",
+		Lockfile: "object-lockfile",
+		Organize: "md", // TODO change
 		Repo:     "repo",
 		Tag:      "tag",
 		Type:     "type",
@@ -55,6 +61,8 @@ func DefaultOverlay() TOMLV1 {
 
 	return TOMLV1{
 		Config:   &config.Config,
+		Conflict: &config.Conflict,
+		Lockfile: &config.Lockfile,
 		Organize: &config.Organize,
 		Repo:     &config.Repo,
 		Tag:      &config.Tag,
@@ -71,6 +79,8 @@ func MakeConfig(base Config, overlays ...OverlayGetter) Config {
 	for _, overlayGetter := range overlays {
 		overlay := overlayGetter.GetFileExtensionsOverlay()
 		equals.SetIfValueNotNil(&base.Config, overlay.Config)
+		equals.SetIfValueNotNil(&base.Conflict, overlay.Conflict)
+		equals.SetIfValueNotNil(&base.Lockfile, overlay.Lockfile)
 		equals.SetIfValueNotNil(&base.Organize, overlay.Organize)
 		equals.SetIfValueNotNil(&base.Repo, overlay.Repo)
 		equals.SetIfValueNotNil(&base.Tag, overlay.Tag)

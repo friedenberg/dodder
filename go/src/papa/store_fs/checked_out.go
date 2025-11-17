@@ -6,11 +6,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
-func (store *Store) ToSliceFilesZettelen(
-	cos sku.SkuTypeSet,
+func (store *Store) MakeObjectPathSlice(
+	objects sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
-		cos,
+		objects,
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
@@ -31,11 +31,11 @@ func (store *Store) ToSliceFilesZettelen(
 	)
 }
 
-func (store *Store) ToSliceFilesBlobs(
-	cos sku.SkuTypeSet,
+func (store *Store) MakeBlobPathSlice(
+	objects sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
-		cos,
+		objects,
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 

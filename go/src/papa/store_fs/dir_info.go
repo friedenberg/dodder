@@ -391,8 +391,8 @@ func (dirInfo *dirInfo) processRootDir() (err error) {
 func (dirInfo *dirInfo) processFDsOnItem(
 	item *sku.FSItem,
 ) (blobCount, objectCount int, err error) {
-	for f := range item.FDs.All() {
-		ext := f.ExtSansDot()
+	for fd := range item.FDs.All() {
+		ext := fd.ExtSansDot()
 
 		switch ext {
 		case dirInfo.fileExtensions.Zettel:
@@ -407,17 +407,17 @@ func (dirInfo *dirInfo) processFDsOnItem(
 		case dirInfo.fileExtensions.Repo:
 			item.ExternalObjectId.SetGenre(genres.Repo)
 
-		case "conflict":
-			item.Conflict.ResetWith(f)
+		case dirInfo.fileExtensions.Conflict:
+			item.Conflict.ResetWith(fd)
 			continue
 
 		default: // blobs
-			item.Blob.ResetWith(f)
+			item.Blob.ResetWith(fd)
 			blobCount++
 			continue
 		}
 
-		item.Object.ResetWith(f)
+		item.Object.ResetWith(fd)
 		objectCount++
 	}
 
@@ -434,15 +434,15 @@ func (dirInfo *dirInfo) processFDSet(
 		recognized := sku.GetTransactedPool().Get()
 		defer sku.GetTransactedPool().Put(recognized)
 
-		var oid ids.ObjectId
+		var objectId ids.ObjectId
 
-		if err = oid.Set(objectIdString); err != nil {
+		if err = objectId.Set(objectIdString); err != nil {
 			err = errors.Wrap(err)
 			return results, err
 		}
 
 		if err = dirInfo.storeSupplies.ReadOneInto(
-			&oid,
+			&objectId,
 			recognized,
 		); err != nil {
 			if collections.IsErrNotFound(err) {
@@ -512,13 +512,13 @@ func (dirInfo *dirInfo) processFDSet(
 }
 
 func (dirInfo *dirInfo) addOneUntracked(
-	f *fd.FD,
+	fdee *fd.FD,
 ) (result *sku.FSItem, err error) {
 	result = &sku.FSItem{
 		FDs: collections_value.MakeMutableValueSet[*fd.FD](nil),
 	}
 
-	result.Blob.ResetWith(f)
+	result.Blob.ResetWith(fdee)
 
 	if err = result.FDs.Add(&result.Blob); err != nil {
 		err = errors.Wrap(err)
@@ -526,7 +526,7 @@ func (dirInfo *dirInfo) addOneUntracked(
 	}
 
 	if err = result.ExternalObjectId.SetBlob(
-		dirInfo.envRepo.Rel(f.GetPath()),
+		dirInfo.envRepo.Rel(fdee.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return result, err
@@ -537,7 +537,7 @@ func (dirInfo *dirInfo) addOneUntracked(
 		return result, err
 	}
 
-	digest := f.GetDigest()
+	digest := fdee.GetDigest()
 
 	if digest.IsNull() {
 		return result, err
@@ -624,12 +624,12 @@ func (dirInfo *dirInfo) addOneObject(
 
 // TODO switch to seq.Iter2
 func (dirInfo *dirInfo) All(
-	f interfaces.FuncIter[*sku.FSItem],
+	output interfaces.FuncIter[*sku.FSItem],
 ) (err error) {
-	wg := errors.MakeWaitGroupParallel()
+	waitGroup := errors.MakeWaitGroupParallel()
 
-	quiter.ErrorWaitGroupApply(wg, dirInfo.probablyCheckedOut, f)
-	quiter.ErrorWaitGroupApply(wg, dirInfo.definitelyNotCheckedOut, f)
+	quiter.ErrorWaitGroupApply(waitGroup, dirInfo.probablyCheckedOut, output)
+	quiter.ErrorWaitGroupApply(waitGroup, dirInfo.definitelyNotCheckedOut, output)
 
-	return wg.GetError()
+	return waitGroup.GetError()
 }

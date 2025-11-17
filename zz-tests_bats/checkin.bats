@@ -408,7 +408,7 @@ function checkin_explicit_workspace_delete_files { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @blake2b256-96g4hmzapstt2lvdaxaxvspp2wrlchqwn5h2aq0ptsuk8gxfvw0sqsr2zf !toml-config-v2]
+		[konfig @blake2b256-5y2xv5tx28jrkns3u8q4skx4xxjpfhzsl93njr2arpy5n8xsngwqkcay07 !toml-config-v2]
 	EOM
 
 	cat >.dodder-workspace <<-EOM

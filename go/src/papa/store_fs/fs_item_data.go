@@ -21,9 +21,9 @@ func makeFSItemData() fsItemData {
 	}
 }
 
-func (src *fsItemData) Clone() (dst fsItemData) {
-	dst.MutableSetLike = src.MutableSetLike.CloneMutableSetLike()
-	dst.digests = maps.Clone(src.digests)
+func (data *fsItemData) Clone() (dst fsItemData) {
+	dst.MutableSetLike = data.MutableSetLike.CloneMutableSetLike()
+	dst.digests = maps.Clone(data.digests)
 	return dst
 }
 

@@ -20,7 +20,7 @@ function edit_config_and_change { # @test
 	run_dodder edit-config
 	assert_success
 	assert_output - <<-EOM
-		[konfig @blake2b256-38u6g2lzl6gn268umk8r92dpjh4e4dcq69esskuz35v00wt4snrszcpztp !toml-config-v2]
+		[konfig @blake2b256-tj6za035l8qrefq9ctz0scyazvwf6jv2xtzzye42ghyn3z8kgzeq2jvtnj !toml-config-v2]
 	EOM
 }
 

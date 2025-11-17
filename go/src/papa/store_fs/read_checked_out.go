@@ -11,11 +11,13 @@ import (
 // likely due to this method overriding tags that were set by organize. maybe
 // this bug existed before workspaces?
 func (store *Store) RefreshCheckedOut(
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 ) (err error) {
 	var item *sku.FSItem
 
-	if item, err = store.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
+	if item, err = store.ReadFSItemFromExternal(
+		checkedOut.GetSkuExternal(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -27,14 +29,14 @@ func (store *Store) RefreshCheckedOut(
 			},
 		},
 		item,
-		co.GetSku(),
-		co.GetSkuExternal(),
+		checkedOut.GetSku(),
+		checkedOut.GetSkuExternal(),
 	); err != nil {
 		if sku.IsErrMergeConflict(err) {
-			co.SetState(checked_out_state.Conflicted)
+			checkedOut.SetState(checked_out_state.Conflicted)
 
-			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
-				&co.GetSku().ObjectId,
+			if err = checkedOut.GetSkuExternal().ObjectId.SetWithIdLike(
+				&checkedOut.GetSku().ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
 				return err
@@ -49,32 +51,32 @@ func (store *Store) RefreshCheckedOut(
 }
 
 func (store *Store) ReadCheckedOutFromTransacted(
-	sk2 *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	co = GetCheckedOutPool().Get()
+	object *sku.Transacted,
+) (checkedOut *sku.CheckedOut, err error) {
+	checkedOut = GetCheckedOutPool().Get()
 
-	if err = store.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
+	if err = store.readIntoCheckedOutFromTransacted(object, checkedOut); err != nil {
 		err = errors.Wrap(err)
-		return co, err
+		return checkedOut, err
 	}
 
-	return co, err
+	return checkedOut, err
 }
 
 func (store *Store) readIntoCheckedOutFromTransacted(
-	sk *sku.Transacted,
-	co *sku.CheckedOut,
+	object *sku.Transacted,
+	checkedOut *sku.CheckedOut,
 ) (err error) {
-	if co.GetSku() != sk {
-		sku.Resetter.ResetWith(co.GetSku(), sk)
+	if checkedOut.GetSku() != object {
+		sku.Resetter.ResetWith(checkedOut.GetSku(), object)
 	}
 
 	ok := false
 
-	var kfp *sku.FSItem
+	var fsItem *sku.FSItem
 
-	if kfp, ok = store.Get(&sk.ObjectId); !ok {
-		err = collections.MakeErrNotFound(sk.GetObjectId())
+	if fsItem, ok = store.Get(&object.ObjectId); !ok {
+		err = collections.MakeErrNotFound(object.GetObjectId())
 		return err
 	}
 
@@ -84,23 +86,23 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 				UpdateTai: true,
 			},
 		},
-		kfp,
-		sk,
-		co.GetSkuExternal(),
+		fsItem,
+		object,
+		checkedOut.GetSkuExternal(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = errors.MakeErrStopIteration()
 		} else if sku.IsErrMergeConflict(err) {
-			co.SetState(checked_out_state.Conflicted)
+			checkedOut.SetState(checked_out_state.Conflicted)
 
-			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
-				&sk.ObjectId,
+			if err = checkedOut.GetSkuExternal().ObjectId.SetWithIdLike(
+				&object.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", kfp)
+			err = errors.Wrapf(err, "Cwd: %#v", fsItem)
 		}
 
 		return err

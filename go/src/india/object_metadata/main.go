@@ -33,24 +33,22 @@ type metadata struct {
 	sigMother markl.Id
 	sigRepo   markl.Id
 
-	SelfWithoutTai markl.Id // TODO move to a separate key-value store
-	Tai            ids.Tai
+	Tai ids.Tai
 
-	// TODO move to Cache
+	// TODO move to Index
 	Comments collections_slice.Slice[string]
+	Index    Index
 
+	keyValues
 	blob
-	Index Index
-
 	lockfile
 }
 
 var (
-	_ interfaces.CommandComponentWriter = (*metadata)(nil)
-	_ IMetadata                         = &metadata{}
-	_ IMetadataMutable                  = &metadata{}
-	_ Getter                            = &metadata{}
-	_ GetterMutable                     = &metadata{}
+	_ IMetadata        = &metadata{}
+	_ IMetadataMutable = &metadata{}
+	_ Getter           = &metadata{}
+	_ GetterMutable    = &metadata{}
 )
 
 func (metadata *metadata) GetMetadata() IMetadata {
