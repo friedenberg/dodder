@@ -217,10 +217,10 @@ func (item *FSItem) GetCheckoutModeOrError() (mode checkout_mode.Mode, err error
 			errors.ErrorWithStackf("all FD's are empty: %s", item.Debug()),
 		)
 
-		return
+		return mode, err
 	} else if mode.IsConflict() {
 		err = MakeErrMergeConflict(item)
-		return
+		return mode, err
 	}
 
 	return mode, err
