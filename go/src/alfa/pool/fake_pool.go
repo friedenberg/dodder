@@ -16,6 +16,11 @@ func (pool fakePool[T, TPtr]) Get() TPtr {
 	return &t
 }
 
+func (pool fakePool[SWIMMER, SWIMMER_PTR]) GetWithRepool() (SWIMMER_PTR, interfaces.FuncRepool) {
+	element := pool.Get()
+	return element, func() {}
+}
+
 func (pool fakePool[T, TPtr]) Put(i TPtr) (err error) {
 	return err
 }

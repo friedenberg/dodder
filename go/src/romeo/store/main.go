@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 	"code.linenisgreat.com/dodder/go/src/kilo/dormant_index"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/stream_index"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
@@ -35,6 +36,7 @@ type Store struct {
 	envLua          env_lua.Env
 
 	streamIndex   *stream_index.Index
+	finalizer     object_finalizer.Finalizer
 	zettelIdIndex zettel_id_index.Index
 	dormantIndex  *dormant_index.Index
 
@@ -102,6 +104,8 @@ func (store *Store) Initialize(
 		err = errors.Wrap(err)
 		return err
 	}
+
+	store.finalizer = object_finalizer.Make()
 
 	store.protoZettel = sku.MakeProto(
 		store.envWorkspace.GetDefaults(),

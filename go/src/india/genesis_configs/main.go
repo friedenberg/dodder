@@ -50,7 +50,7 @@ type (
 func Default() *TypedConfigPrivateMutable {
 	return DefaultWithVersion(
 		store_version.VCurrent,
-		ids.TypeInventoryListV2,
+		ids.TypeInventoryListVCurrent,
 	)
 }
 

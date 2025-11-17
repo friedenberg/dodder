@@ -25,7 +25,7 @@ func (store *Store) Commit(
 	}
 
 	if err = committer.commit(external, options); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Sku: %q", sku.String(external.GetSku()))
 		return err
 	}
 
@@ -91,7 +91,11 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 		}
 	}
 
-	if err = commitFacilitator.validate(object, mother, options); err != nil {
+	if err = commitFacilitator.validateAndFinalize(
+		object,
+		mother,
+		options,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

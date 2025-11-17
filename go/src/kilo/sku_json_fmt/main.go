@@ -20,6 +20,7 @@ type Transacted struct {
 	BlobString  string   `json:"blob-string,omitempty"`
 	Date        string   `json:"date"`
 	Description string   `json:"description"`
+	Lock        Lock     `json:"lock"`
 	ObjectId    string   `json:"object-id"`
 	RepoPubkey  markl.Id `json:"repo-pub_key"`
 	RepoSig     markl.Id `json:"repo-sig"`
@@ -29,7 +30,9 @@ type Transacted struct {
 	Type        string   `json:"type"`
 }
 
-func (json *Transacted) FromStringAndMetadata(
+// TODO make a json factory
+
+func (json *Transacted) FromObjectIdStringAndMetadata(
 	objectId string,
 	metadata object_metadata.IMetadataMutable,
 	blobStore interfaces.BlobStore,
@@ -66,6 +69,10 @@ func (json *Transacted) FromStringAndMetadata(
 	json.Tai = metadata.GetTai().String()
 	json.Type = metadata.GetType().String()
 
+	json.Lock = Lock{
+		Type: metadata.GetLockfile().GetTypeLock().Id.String(),
+	}
+
 	// TODO add support for "preview"
 
 	return err
@@ -75,7 +82,7 @@ func (json *Transacted) FromTransacted(
 	object *sku.Transacted,
 	blobStore interfaces.BlobStore,
 ) (err error) {
-	return json.FromStringAndMetadata(
+	return json.FromObjectIdStringAndMetadata(
 		object.ObjectId.String(),
 		object.GetMetadataMutable(),
 		blobStore,
@@ -86,6 +93,8 @@ func (json *Transacted) ToTransacted(
 	object *sku.Transacted,
 	blobStore interfaces.BlobStore,
 ) (err error) {
+	metadata := object.GetMetadataMutable()
+
 	if blobStore != nil {
 		var writeCloser interfaces.BlobWriter
 
@@ -107,14 +116,14 @@ func (json *Transacted) ToTransacted(
 		// TODO just compare blob digests
 		// TODO-P1 support states of blob vs blob sha
 		markl.SetDigester(
-			object.Metadata.GetBlobDigestMutable(),
+			metadata.GetBlobDigestMutable(),
 			writeCloser,
 		)
 	}
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = object.Metadata.GetBlobDigestMutable().Set(
+		if err = metadata.GetBlobDigestMutable().Set(
 			json.BlobId,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -129,13 +138,13 @@ func (json *Transacted) ToTransacted(
 
 	// TODO enforce non-empty types
 	if json.Type != "" {
-		if err = object.GetMetadataMutable().GetTypePtr().Set(json.Type); err != nil {
+		if err = metadata.GetTypePtr().Set(json.Type); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	if err = object.GetMetadataMutable().GetDescriptionMutable().Set(json.Description); err != nil {
+	if err = metadata.GetDescriptionMutable().Set(json.Description); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -147,25 +156,34 @@ func (json *Transacted) ToTransacted(
 		return err
 	}
 
-	object.GetMetadataMutable().SetTags(tagSet)
-	object.GetMetadataMutable().GenerateExpandedTags()
+	metadata.SetTags(tagSet)
+	metadata.GenerateExpandedTags()
 
 	if !json.RepoPubkey.IsNull() {
-		object.GetMetadataMutable().GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
+		metadata.GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
 	}
 
 	if !json.RepoSig.IsNull() {
-		object.GetMetadataMutable().GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
+		metadata.GetObjectSigMutable().ResetWithMarklId(json.RepoSig)
+	}
+
+	if json.Lock.Type != "" {
+		if err = metadata.GetLockfileMutable().GetTypeLockMutable().Id.Set(
+			json.Lock.Type,
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	// Set Tai from either Date or Tai field
 	if json.Tai != "" {
-		if err = object.GetMetadataMutable().GetTaiMutable().Set(json.Tai); err != nil {
+		if err = metadata.GetTaiMutable().Set(json.Tai); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	} else if json.Date != "" {
-		if err = object.GetMetadataMutable().GetTaiMutable().SetFromRFC3339(json.Date); err != nil {
+		if err = metadata.GetTaiMutable().SetFromRFC3339(json.Date); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -173,7 +191,7 @@ func (json *Transacted) ToTransacted(
 
 	// Set SelfMetadataWithoutTai SHA
 	if json.Sha != "" {
-		if err = object.GetMetadataMutable().GetSelfWithoutTaiMutable().Set(json.Sha); err != nil {
+		if err = metadata.GetSelfWithoutTaiMutable().Set(json.Sha); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

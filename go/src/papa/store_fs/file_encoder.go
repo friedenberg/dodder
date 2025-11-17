@@ -77,6 +77,7 @@ func (encoder *fileEncoder) EncodeObject(
 	object *sku.Transacted,
 	objectPath string,
 	blobPath string,
+	lockfilePath string,
 ) (err error) {
 	ctx := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: object.GetSku(),
@@ -203,5 +204,6 @@ func (encoder *fileEncoder) Encode(
 		object,
 		fsItem.Object.GetPath(),
 		fsItem.Blob.GetPath(),
+		fsItem.Lockfile.GetPath(),
 	)
 }

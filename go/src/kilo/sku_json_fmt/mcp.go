@@ -21,7 +21,7 @@ func (json *MCP) FromStringAndMetadata(
 	metadata object_metadata.IMetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
-	if err = json.Transacted.FromStringAndMetadata(
+	if err = json.Transacted.FromObjectIdStringAndMetadata(
 		objectId,
 		metadata,
 		blobStore,

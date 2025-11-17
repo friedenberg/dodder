@@ -100,7 +100,7 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 		}
 	}
 
-	if err = finalizer.writeLockfileIfNecessary(object); err != nil {
+	if err = finalizer.WriteLockfileIfNecessary(object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -116,34 +116,30 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 	return err
 }
 
-func (finalizer finalizer) writeLockfileIfNecessary(
+func (finalizer finalizer) WriteLockfileIfNecessary(
 	object object,
 ) (err error) {
 	if finalizer.index == nil {
 		return err
 	}
 
-	metadataMutable := object.GetMetadataMutable()
+	return finalizer.WriteLockfile(object, finalizer.index)
+}
 
-	// TODO populate lockfile
-	// read current signature of type
-	// write to lock
-	typeObject := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(typeObject)
+func (finalizer finalizer) WriteLockfile(
+	object object,
+	index sku.IndexPrimitives,
+) (err error) {
+	metadata := object.GetMetadataMutable()
 
-	if err = finalizer.index.ReadOneObjectId(
-		metadataMutable.GetType(),
-		typeObject,
+	if err = finalizer.writeTypeLockIfNecessary(
+		metadata,
+		metadata.GetType(),
+		index,
 	); err != nil {
 		err = errors.Wrap(err)
-		return err
+		return
 	}
-
-	lockfileMutable := metadataMutable.GetLockfileMutable()
-	lockfileMutable.GetTypeLockMutable().Key = metadataMutable.GetType().String()
-	lockfileMutable.GetTypeLockMutable().Id.ResetWithMarklId(
-		typeObject.GetMetadataMutable().GetObjectSig(),
-	)
 
 	return err
 }

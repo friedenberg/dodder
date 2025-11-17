@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
-func (store *Store) validate(
-	daughter sku.ExternalLike,
+func (store *Store) validateAndFinalize(
+	daughter *sku.Transacted,
 	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
@@ -18,7 +18,7 @@ func (store *Store) validate(
 
 	switch daughter.GetSku().GetGenre() {
 	case genres.Type:
-		tipe := daughter.GetSku().GetType()
+		tipe := daughter.GetType()
 
 		var repool interfaces.FuncRepool
 
@@ -31,6 +31,14 @@ func (store *Store) validate(
 		}
 
 		defer repool()
+	}
+
+	if err = store.finalizer.WriteLockfile(
+		daughter,
+		store.streamIndex,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
 	}
 
 	return err

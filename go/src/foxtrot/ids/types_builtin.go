@@ -13,12 +13,13 @@ const (
 	// 	 GetCurrent() Type
 	// }
 
+	// TODO remove deprecated
 	// keep sorted
 	TypeInventoryListJsonV0                   = "!inventory_list-json-v0"
 	TypeInventoryListV0                       = "!inventory_list-v0" // Deprevated
 	TypeInventoryListV1                       = "!inventory_list-v1"
 	TypeInventoryListV2                       = "!inventory_list-v2"
-	TypeInventoryListVCurrent                 = TypeInventoryListV2
+
 	TypeLuaTagV1                              = "!lua-tag-v1" // Deprecated
 	TypeLuaTagV2                              = "!lua-tag-v2"
 	TypeTomlBlobStoreConfigSftpExplicitV0     = "!toml-blob_store_config_sftp-explicit-v0"
@@ -43,6 +44,9 @@ const (
 	TypeTomlWorkspaceConfigV0                 = "!toml-workspace_config-v0"
 	TypeTomlWorkspaceConfigVCurrent           = TypeTomlWorkspaceConfigV0
 	TypeZettelIdListV0                        = "!zettel_id_list-v0" // not used yet
+
+	// Aliases
+	TypeInventoryListVCurrent = TypeInventoryListV2
 )
 
 type BuiltinType struct {

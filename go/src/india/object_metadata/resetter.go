@@ -18,7 +18,7 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.sigRepo.Reset()
 		metadata.pubRepo.Reset()
 		metadata.ResetTags()
-		ResetterCache.Reset(&metadata.Index)
+		ResetterIndex.Reset(&metadata.Index)
 		metadata.Type = ids.Type{}
 		metadata.Tai.Reset()
 		metadata.DigBlob.Reset()
@@ -26,6 +26,8 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.digSelf.Reset()
 		metadata.sigMother.Reset()
 		metadata.Fields = metadata.Fields[:0]
+		metadata.lockfile.tipe.Key = ""
+		metadata.lockfile.tipe.Id.Reset()
 	}
 }
 
@@ -36,7 +38,7 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 
 	dst.SetTagsFast(src.Tags)
 
-	ResetterCache.ResetWith(&dst.Index, &src.Index)
+	ResetterIndex.ResetWith(&dst.Index, &src.Index)
 
 	dst.sigRepo.ResetWith(src.sigRepo)
 	dst.pubRepo.ResetWith(src.pubRepo)
@@ -47,23 +49,26 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.DigBlob.ResetWith(src.DigBlob)
 	dst.digSelf.ResetWith(src.digSelf)
 	dst.sigMother.ResetWith(src.sigMother)
+
+	dst.lockfile.tipe.Key = src.lockfile.tipe.Key
+	dst.lockfile.tipe.Id.ResetWithMarklId(src.lockfile.tipe.Id)
 }
 
-func (r resetter) ResetWith(dst IMetadataMutable, src IMetadataMutable) {
+func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {
 	{
 		dst := dst.(*metadata)
 		src := src.(*metadata)
-		r.ResetWithExceptFields(dst, src)
+		resetter.ResetWithExceptFields(dst, src)
 		dst.Fields = dst.Fields[:0]
 		dst.Fields = append(dst.Fields, src.Fields...)
 	}
 }
 
-var ResetterCache resetterCache
+var ResetterIndex resetterIndex
 
-type resetterCache struct{}
+type resetterIndex struct{}
 
-func (resetterCache) Reset(a *Index) {
+func (resetterIndex) Reset(a *Index) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
@@ -72,7 +77,7 @@ func (resetterCache) Reset(a *Index) {
 	a.QueryPath.Reset()
 }
 
-func (resetterCache) ResetWith(a, b *Index) {
+func (resetterIndex) ResetWith(a, b *Index) {
 	a.ParentTai.ResetWith(b.ParentTai)
 	a.TagPaths.ResetWith(&b.TagPaths)
 	a.Dormant.ResetWith(b.Dormant)

@@ -13,6 +13,7 @@ type PoolablePtr[SWIMMER any] interface {
 
 type PoolValue[SWIMMER any] interface {
 	Get() SWIMMER
+	GetWithRepool() (SWIMMER, FuncRepool)
 	Put(i SWIMMER) (err error)
 }
 

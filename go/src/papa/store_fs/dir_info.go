@@ -407,6 +407,9 @@ func (dirInfo *dirInfo) processFDsOnItem(
 		case dirInfo.fileExtensions.Repo:
 			item.ExternalObjectId.SetGenre(genres.Repo)
 
+		case dirInfo.fileExtensions.Lockfile:
+			item.Lockfile.ResetWith(fd)
+
 		case dirInfo.fileExtensions.Conflict:
 			item.Conflict.ResetWith(fd)
 			continue

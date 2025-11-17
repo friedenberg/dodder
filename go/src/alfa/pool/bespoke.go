@@ -1,5 +1,7 @@
 package pool
 
+import "code.linenisgreat.com/dodder/go/src/_/interfaces"
+
 // type typeRewritten[FROM TO, TO interface{}] struct {
 // 	inner interfaces.PoolValue[FROM]
 // }
@@ -15,6 +17,14 @@ type Bespoke[T any] struct {
 
 func (ip Bespoke[T]) Get() T {
 	return ip.FuncGet()
+}
+
+func (pool Bespoke[SWIMMER]) GetWithRepool() (SWIMMER, interfaces.FuncRepool) {
+	element := pool.Get()
+
+	return element, func() {
+		pool.Put(element)
+	}
 }
 
 func (ip Bespoke[T]) Put(i T) (err error) {
