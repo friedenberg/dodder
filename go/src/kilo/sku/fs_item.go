@@ -209,40 +209,30 @@ func (item *FSItem) GenerateConflictFD(cwd string) (err error) {
 	return err
 }
 
-func (item *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
-	switch {
-	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
+func (item *FSItem) GetCheckoutModeOrError() (mode checkout_mode.Mode, err error) {
+	mode = item.GetCheckoutMode()
 
-	case !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.Blob)
-
-	case !item.Object.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.Metadata)
-
-	case !item.Conflict.IsEmpty():
-		err = MakeErrMergeConflict(item)
-
-	default:
+	if mode.IsEmpty() {
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.ErrorWithStackf("all FD's are empty: %s", item.Debug()),
 		)
+
+		return
+	} else if mode.IsConflict() {
+		err = MakeErrMergeConflict(item)
+		return
 	}
 
-	return m, err
+	return mode, err
 }
 
-func (item *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
-	switch {
-	case !item.Object.IsEmpty() && !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.MetadataAndBlob)
-
-	case !item.Blob.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.Blob)
-
-	case !item.Object.IsEmpty():
-		m = checkout_mode.Make(checkout_mode.Metadata)
-	}
-
-	return m
+func (item *FSItem) GetCheckoutMode() (mode checkout_mode.Mode) {
+	return checkout_mode.MakeWith(
+		map[checkout_mode.ModeConstructor]bool{
+			checkout_mode.Blob:     !item.Blob.IsEmpty(),
+			checkout_mode.Metadata: !item.Object.IsEmpty(),
+			checkout_mode.Lockfile: !item.Lockfile.IsEmpty(),
+			checkout_mode.Conflict: !item.Conflict.IsEmpty(),
+		},
+	)
 }

@@ -427,7 +427,7 @@ func (store *Store) RunMergeTool(
 
 	inlineBlob := conflicted.IsAllInlineType(store.config)
 
-	mode := checkout_mode.Make(checkout_mode.MetadataAndBlob)
+	mode := checkout_mode.Make(checkout_mode.All)
 
 	if !inlineBlob {
 		mode = checkout_mode.Make(checkout_mode.Metadata)
