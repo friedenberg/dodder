@@ -6,8 +6,8 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type TypeBlobStore interface {

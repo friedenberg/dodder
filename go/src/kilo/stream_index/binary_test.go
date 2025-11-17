@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/markl"
-	"code.linenisgreat.com/dodder/go/src/delta/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/india/object_finalizer"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_finalizer"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 func TestBinaryOne(t1 *testing.T) {

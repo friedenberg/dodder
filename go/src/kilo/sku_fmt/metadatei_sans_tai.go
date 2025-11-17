@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 func StringMetadataSansTai(object *sku.Transacted) (str string) {

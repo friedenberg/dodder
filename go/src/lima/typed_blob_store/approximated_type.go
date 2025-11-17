@@ -1,7 +1,7 @@
 package typed_blob_store
 
 import (
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type ApproximatedType struct {

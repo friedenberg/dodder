@@ -7,8 +7,8 @@ import (
 	"math"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/key_bytes"
+	"code.linenisgreat.com/dodder/go/src/delta/ohio"
+	"code.linenisgreat.com/dodder/go/src/echo/key_bytes"
 )
 
 var binaryFieldOrder = []key_bytes.Binary{

@@ -2,7 +2,7 @@ package stream_index
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 // TODO write binary representation to file-backed buffered writer and then

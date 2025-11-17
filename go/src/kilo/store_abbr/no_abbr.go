@@ -2,7 +2,7 @@ package store_abbr
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type indexNoAbbr[

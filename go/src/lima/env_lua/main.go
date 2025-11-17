@@ -5,11 +5,11 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/delta/catgut"
-	"code.linenisgreat.com/dodder/go/src/delta/lua"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/bravo/lua"
+	"code.linenisgreat.com/dodder/go/src/echo/catgut"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 // TODO extract all of these components into an env_lua

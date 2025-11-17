@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/quebec/commands_dodder"
+	"code.linenisgreat.com/dodder/go/src/sierra/commands_dodder"
 )
 
 func main() {

@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/page_id"
-	"code.linenisgreat.com/dodder/go/src/echo/env_dir"
-	"code.linenisgreat.com/dodder/go/src/echo/ids"
-	"code.linenisgreat.com/dodder/go/src/india/object_probe_index"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/delta/ohio"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/page_id"
+	"code.linenisgreat.com/dodder/go/src/india/env_dir"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_probe_index"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type ObjectIdToObject map[string]objectMetaWithCursorAndSigil

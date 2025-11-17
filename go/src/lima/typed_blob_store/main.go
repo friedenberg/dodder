@@ -1,11 +1,11 @@
 package typed_blob_store
 
 import (
-	"code.linenisgreat.com/dodder/go/src/hotel/env_repo"
-	"code.linenisgreat.com/dodder/go/src/hotel/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
-	"code.linenisgreat.com/dodder/go/src/kilo/inventory_list_coders"
 	"code.linenisgreat.com/dodder/go/src/lima/env_lua"
+	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_coders"
 )
 
 type Stores struct {

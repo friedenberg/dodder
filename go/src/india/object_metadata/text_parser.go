@@ -1,0 +1,119 @@
+package object_metadata
+
+import (
+	"io"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
+	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
+)
+
+type textParser struct {
+	hashType      interfaces.FormatHash
+	blobWriter    interfaces.BlobWriterFactory
+	blobFormatter script_config.RemoteScript
+}
+
+func MakeTextParser(
+	dependencies Dependencies,
+) TextParser {
+	if dependencies.BlobStore == nil {
+		panic("nil BlobWriterFactory")
+	}
+
+	return textParser{
+		hashType:      dependencies.GetBlobDigestType(),
+		blobWriter:    dependencies.BlobStore,
+		blobFormatter: dependencies.BlobFormatter,
+	}
+}
+
+func (parser textParser) ParseMetadata(
+	reader io.Reader,
+	context TextParserContext,
+) (n int64, err error) {
+	metadata := context.GetMetadataMutable()
+	Resetter.Reset(metadata)
+
+	var n1 int64
+
+	parser2 := &textParser2{
+		BlobWriterFactory: parser.blobWriter,
+		hashType:          parser.hashType,
+		TextParserContext: context,
+	}
+
+	var blobWriter interfaces.BlobWriter
+
+	if blobWriter, err = parser.blobWriter.MakeBlobWriter(nil); err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	if blobWriter == nil {
+		err = errors.ErrorWithStackf("blob writer is nil")
+		return n, err
+	}
+
+	defer errors.DeferredCloser(&err, blobWriter)
+
+	metadataReader := triple_hyphen_io.Reader{
+		Metadata: parser2,
+		Blob:     blobWriter,
+	}
+
+	if n, err = metadataReader.ReadFrom(reader); err != nil {
+		n += n1
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	n += n1
+
+	inlineBlobDigest := blobWriter.GetMarklId()
+
+	if !metadata.GetBlobDigest().IsNull() && !parser2.Blob.GetDigest().IsNull() {
+		err = errors.Wrap(
+			MakeErrHasInlineBlobAndFilePath(
+				&parser2.Blob,
+				inlineBlobDigest,
+			),
+		)
+
+		return n, err
+	} else if !parser2.Blob.GetDigest().IsNull() {
+		metadata.GetFieldsMutable().Append(
+			Field{
+				Key:       "blob",
+				Value:     parser2.Blob.GetPath(),
+				ColorType: string_format_writer.ColorTypeId,
+			},
+		)
+
+		metadata.GetBlobDigestMutable().ResetWithMarklId(parser2.Blob.GetDigest())
+	}
+
+	switch {
+	case metadata.GetBlobDigest().IsNull() && !inlineBlobDigest.IsNull():
+		metadata.GetBlobDigestMutable().ResetWithMarklId(inlineBlobDigest)
+
+	case !metadata.GetBlobDigest().IsNull() && inlineBlobDigest.IsNull():
+		// noop
+
+	case !metadata.GetBlobDigest().IsNull() && !inlineBlobDigest.IsNull() &&
+		!markl.Equals(metadata.GetBlobDigest(), inlineBlobDigest):
+		err = errors.Wrap(
+			MakeErrHasInlineBlobAndMetadataBlobId(
+				inlineBlobDigest,
+				metadata.GetBlobDigest(),
+			),
+		)
+
+		return n, err
+	}
+
+	return n, err
+}

@@ -3,8 +3,8 @@ package sku_json_fmt
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type WithDormant struct {

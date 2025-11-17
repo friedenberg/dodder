@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # NATO phonetic alphabet levels in dependency order
-LEVELS=("_" "alfa" "bravo" "charlie" "delta" "echo" "foxtrot" "golf" "hotel" "india" "juliett" "kilo" "lima" "mike" "november" "oscar" "papa" "quebec" "romeo" "sierra" "tango")
+LEVELS=("_" "alfa" "bravo" "charlie" "delta" "echo" "foxtrot" "golf" "hotel" "india" "juliett" "kilo" "lima" "mike" "november" "oscar" "papa" "quebec" "romeo" "sierra" "tango" "uniform" "victor" "whiskey" "xray" "yankee" "zulu")
 
 # Create mapping from level name to index
 declare -A LEVEL_INDEX

@@ -3,7 +3,7 @@ package script_config
 import (
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/alfa/toml"
+	"code.linenisgreat.com/dodder/go/src/_/toml"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 

@@ -1,8 +1,8 @@
 package flags
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/flag_policy"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/flag_policy"
 )
 
 func MakeWithPolicy(

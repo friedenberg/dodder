@@ -1,6 +1,6 @@
 package commands_madder
 
-import "code.linenisgreat.com/dodder/go/src/golf/command"
+import "code.linenisgreat.com/dodder/go/src/juliett/command"
 
 var utility = command.MakeUtility("madder")
 

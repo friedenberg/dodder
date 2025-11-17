@@ -3,8 +3,8 @@ package box_format
 import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
-	"code.linenisgreat.com/dodder/go/src/golf/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type CheckedOutHeaderState struct{}

@@ -2,7 +2,7 @@ package options_print
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/equals"
+	"code.linenisgreat.com/dodder/go/src/alfa/equals"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 

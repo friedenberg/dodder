@@ -2,7 +2,7 @@ package box_format
 
 import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type TransactedHeaderUserTai struct{}

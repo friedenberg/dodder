@@ -1,0 +1,57 @@
+package store_fs
+
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+)
+
+func (store *Store) ToSliceFilesZettelen(
+	cos sku.SkuTypeSet,
+) (out []string, err error) {
+	return quiter.DerivedValues(
+		cos,
+		func(col sku.SkuType) (e string, err error) {
+			var fds *sku.FSItem
+
+			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
+				err = errors.Wrap(err)
+				return e, err
+			}
+
+			e = fds.Object.GetPath()
+
+			if e == "" {
+				err = errors.MakeErrStopIteration()
+				return e, err
+			}
+
+			return e, err
+		},
+	)
+}
+
+func (store *Store) ToSliceFilesBlobs(
+	cos sku.SkuTypeSet,
+) (out []string, err error) {
+	return quiter.DerivedValues(
+		cos,
+		func(col sku.SkuType) (e string, err error) {
+			var fds *sku.FSItem
+
+			if fds, err = store.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
+				err = errors.Wrap(err)
+				return e, err
+			}
+
+			e = fds.Blob.GetPath()
+
+			if e == "" {
+				err = errors.MakeErrStopIteration()
+				return e, err
+			}
+
+			return e, err
+		},
+	)
+}

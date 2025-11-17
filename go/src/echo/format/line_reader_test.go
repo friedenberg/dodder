@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/ohio"
+	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 )
 
 func TestLineReaderOneReaderHappy(t1 *testing.T) {

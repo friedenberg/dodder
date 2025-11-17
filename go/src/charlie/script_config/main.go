@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os/exec"
 
+	"code.linenisgreat.com/dodder/go/src/_/equality"
+	"code.linenisgreat.com/dodder/go/src/_/reset"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/reset"
-	"code.linenisgreat.com/dodder/go/src/bravo/equality"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
