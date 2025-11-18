@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # Read dependency graph from stdin or file
 input="${1:-/dev/stdin}"
@@ -7,18 +7,27 @@ input="${1:-/dev/stdin}"
 declare -A graph       # package -> space-separated list of dependents
 declare -A in_degree   # package -> count of dependencies
 declare -A all_nodes   # track all unique nodes
+declare -A height      # package -> height in dependency tree
 
 # Parse input and build graph
-while IFS=' -> ' read -r pkg dep; do
+while IFS= read -r line; do
     # Skip empty lines
-    [[ -z "$pkg" ]] && continue
+    [[ -z "$line" ]] && continue
+    
+    # Split on " -> " delimiter
+    if [[ "$line" =~ ^(.+)\ -\>\ (.+)$ ]]; then
+        pkg="${BASH_REMATCH[1]}"
+        dep="${BASH_REMATCH[2]}"
+    else
+        continue  # Skip malformed lines
+    fi
     
     # Track all nodes
     all_nodes["$pkg"]=1
     all_nodes["$dep"]=1
     
     # Build adjacency list (reverse direction for Kahn's)
-    graph["$dep"]+="$pkg "
+    graph["$dep"]+="$pkg|"  # Using | as separator to handle spaces
     
     # Increment in-degree for package
     ((in_degree["$pkg"]++))
@@ -29,11 +38,17 @@ while IFS=' -> ' read -r pkg dep; do
     fi
 done < "$input"
 
-# Queue for nodes with in-degree 0
+# Initialize heights to 0
+for node in "${!all_nodes[@]}"; do
+    height["$node"]=0
+done
+
+# Queue for nodes with in-degree 0 (leaves in dependency tree)
 queue=()
 for node in "${!all_nodes[@]}"; do
     if [[ "${in_degree[$node]}" -eq 0 ]]; then
         queue+=("$node")
+        height["$node"]=0  # Leaves have height 0
     fi
 done
 
@@ -46,7 +61,16 @@ while [[ ${#queue[@]} -gt 0 ]]; do
     sorted+=("$current")
     
     # Process all nodes that depend on current
-    for dependent in ${graph[$current]}; do
+    IFS='|' read -ra dependents <<< "${graph[$current]}"
+    for dependent in "${dependents[@]}"; do
+        [[ -z "$dependent" ]] && continue
+        
+        # Update height of dependent (max of current path)
+        new_height=$((height["$current"] + 1))
+        if [[ $new_height -gt ${height["$dependent"]} ]]; then
+            height["$dependent"]=$new_height
+        fi
+        
         ((in_degree["$dependent"]--))
         if [[ "${in_degree[$dependent]}" -eq 0 ]]; then
             queue+=("$dependent")
@@ -60,5 +84,7 @@ if [[ ${#sorted[@]} -ne ${#all_nodes[@]} ]]; then
     exit 1
 fi
 
-# Output sorted order
-printf '%s\n' "${sorted[@]}"
+# Output sorted order with heights
+for node in "${sorted[@]}"; do
+    echo "${height[$node]}: $node"
+done

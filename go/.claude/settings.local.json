@@ -32,7 +32,9 @@
       "Bash(bash:*)",
       "Bash(timeout:*)",
       "Bash(go list:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(./bin/list_deps)",
+      "Bash(./bin/sort_packages)"
     ],
     "deny": []
   },

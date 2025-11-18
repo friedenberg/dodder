@@ -58,143 +58,10 @@ log_error() {
   gum log -l error "$*" >&2
 }
 
-# Get all internal package dependencies for a given package
-get_package_dependencies() {
-  local pkg_path="$1"
-  local base_module="code.linenisgreat.com/dodder/go"
-
-  # Use go list to get dependencies, filter for internal packages only
-  go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' "$pkg_path" 2>/dev/null |
-    grep "^$base_module/src/" |
-    sed "s|^$base_module/src/||" |
-    sort -u
-}
-
 # Get the NATO level of a package path (e.g., "alfa/errors" -> "alfa")
 get_package_level() {
   local pkg_path="$1"
   echo "${pkg_path%%/*}"
-}
-
-# Calculate the minimum required level for a package based on its dependencies
-calculate_required_level() {
-  local pkg_path="$1"
-  local max_dep_level_index=-1
-  local base_module="code.linenisgreat.com/dodder/go"
-
-  log_verbose "Calculating required level for $pkg_path"
-
-  # Get dependencies
-  local deps
-  deps=$(get_package_dependencies "$base_module/src/$pkg_path")
-
-  if [[ -z $deps ]]; then
-    log_verbose "  No internal dependencies found, can stay at level _"
-    echo 0 # Can be at level _ (index 0)
-    return
-  fi
-
-  # Find the highest level among dependencies
-  while IFS= read -r dep; do
-    if [[ -n $dep ]]; then
-      local dep_level
-      dep_level=$(get_package_level "$dep")
-      local dep_level_index=${LEVEL_INDEX[$dep_level]:-999}
-
-      log_verbose "  Depends on $dep (level $dep_level, index $dep_level_index)"
-
-      if [[ $dep_level_index -gt $max_dep_level_index ]]; then
-        max_dep_level_index=$dep_level_index
-      fi
-    fi
-  done <<<"$deps"
-
-  # Required level is one higher than max dependency level
-  local required_level_index=$((max_dep_level_index + 1))
-
-  # Cap at maximum available level
-  if [[ $required_level_index -ge ${#LEVELS[@]} ]]; then
-    log_error "Package $pkg_path requires level beyond available levels!"
-    required_level_index=$((${#LEVELS[@]} - 1))
-  fi
-
-  log_verbose "  Required level index: $required_level_index (${LEVELS[$required_level_index]})"
-  echo $required_level_index
-}
-
-# Get all packages in the source tree
-get_all_packages() {
-  local base_module="code.linenisgreat.com/dodder/go"
-
-  # Find all directories with .go files under src/
-  find src -maxdepth 2 -mindepth 2 -type d | sort -u | while read -r dir; do
-    # Convert to module path and check if it's a valid Go package
-    local module_path="$base_module/$dir"
-    if go list "$module_path" >/dev/null 2>&1; then
-      echo "${dir#src/}"
-    fi
-  done
-}
-
-# Check if a package needs to be moved
-check_package_positioning() {
-  local pkg_path="$1"
-  local current_level
-  current_level=$(get_package_level "$pkg_path")
-  local current_level_index=${LEVEL_INDEX[$current_level]:-999}
-
-  if [[ $current_level_index -eq 999 ]]; then
-    log_error "Unknown level '$current_level' for package $pkg_path"
-    return 1
-  fi
-
-  local required_level_index
-  required_level_index=$(calculate_required_level "$pkg_path")
-
-  if [[ $required_level_index -gt $current_level_index ]]; then
-    local required_level=${LEVELS[$required_level_index]}
-    echo "MOVE_UP $pkg_path $current_level $required_level"
-    return 0
-  elif [[ $required_level_index -lt $current_level_index ]]; then
-    local optimal_level=${LEVELS[$required_level_index]}
-    echo "MOVE_DOWN $pkg_path $current_level $optimal_level"
-    return 0
-  fi
-
-  return 1 # No move needed
-}
-
-# Move a package from one level to another
-move_package() {
-  local pkg_path="$1"
-  local from_level="$2"
-  local to_level="$3"
-  local direction="$4"
-
-  local pkg_name="${pkg_path#*/}" # Remove level prefix
-  local src_path="src/$from_level/$pkg_name"
-  local dst_path="src/$to_level/$pkg_name"
-
-  log_info "Moving $pkg_path from $from_level to $to_level ($direction)"
-
-  if [[ $DRY_RUN == "true" ]]; then
-    log_dry_run "just codemod-go-move_package $src_path $dst_path"
-    return
-  fi
-
-  if [[ ! -d $src_path ]]; then
-    log_error "Source directory $src_path does not exist"
-    return 1
-  fi
-
-  log_verbose "Executing: just codemod-go-move_package $src_path $dst_path"
-
-  if just codemod-go-move_package "$src_path" "$dst_path" >/dev/null 2>&1; then
-    log_info "Successfully moved $pkg_path to $to_level"
-  else
-    log_error "Failed to move $pkg_path"
-    return 1
-  fi
 }
 
 main() {
@@ -221,111 +88,49 @@ main() {
     esac
   done
 
-  # Suppress all logging output
-  VERBOSE=false
+  # Use the new pipeline to get sorted packages with their required levels
+  local sorted_packages
+  sorted_packages=$(./bin/list_deps | ./bin/sort_packages)
 
-  local packages
-  packages=$(get_all_packages)
-
-  if [[ -z $packages ]]; then
+  if [[ -z $sorted_packages ]]; then
     exit 0
   fi
 
-  # Track original positions and moves
-  declare -A original_positions
-  declare -A moves_made
-
-  # Store original positions
-  while IFS= read -r pkg; do
-    if [[ -n $pkg ]]; then
-      original_positions["$pkg"]="$pkg"
+  # Process each package
+  while IFS= read -r line; do
+    if [[ -z $line ]]; then
+      continue
     fi
-  done <<<"$packages"
 
-  local moves_needed=()
+    # Parse the format: "<index>: <current_package_path>"
+    if [[ $line =~ ^([0-9]+):\ (.+)$ ]]; then
+      local required_index="${BASH_REMATCH[1]}"
+      local current_pkg_path="${BASH_REMATCH[2]}"
 
-  # Check all packages for incorrect positioning
-  while IFS= read -r pkg; do
-    if [[ -n $pkg ]]; then
-      local move_info
-      if move_info=$(check_package_positioning "$pkg" 2>/dev/null); then
-        moves_needed+=("$move_info")
-      fi
-    fi
-  done <<<"$packages"
+      # Get required level from NATO alphabet
+      local required_level="${LEVELS[$required_index]}"
 
-  # Sort moves: do downward moves first to avoid dependency conflicts
-  local upward_moves=()
-  local downward_moves=()
+      # Get current level from package path
+      local current_level
+      current_level=$(get_package_level "$current_pkg_path")
 
-  for move in "${moves_needed[@]}"; do
-    if [[ $move == MOVE_UP* ]]; then
-      upward_moves+=("$move")
-    else
-      downward_moves+=("$move")
-    fi
-  done
+      # Check if move is needed
+      if [[ $required_level != $current_level ]]; then
+        local pkg_name="${current_pkg_path#*/}" # Remove level prefix
+        local src_path="src/$current_pkg_path"
+        local dst_path="src/$required_level/$pkg_name"
 
-  # Process downward moves first
-  for move in "${downward_moves[@]}"; do
-    IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
-    local pkg_name="${pkg_path#*/}"
-    local new_path="$to_level/$pkg_name"
-    moves_made["$new_path"]="$pkg_path"
-    if [[ $DRY_RUN == "false" ]]; then
-      move_package "$pkg_path" "$from_level" "$to_level" "downward" >/dev/null 2>&1
-    fi
-  done
-
-  # Then process upward moves
-  for move in "${upward_moves[@]}"; do
-    IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
-    local pkg_name="${pkg_path#*/}"
-    local new_path="$to_level/$pkg_name"
-    moves_made["$new_path"]="$pkg_path"
-    if [[ $DRY_RUN == "false" ]]; then
-      move_package "$pkg_path" "$from_level" "$to_level" "upward" >/dev/null 2>&1
-    fi
-  done
-
-  # Get updated package list if moves were actually made
-  if [[ $DRY_RUN == "false" ]] && [[ ${#moves_needed[@]} -gt 0 ]]; then
-    packages=$(get_all_packages)
-  fi
-
-  # Build final positions list
-  declare -A final_positions
-
-  # Process all current packages
-  while IFS= read -r pkg; do
-    if [[ -n $pkg ]]; then
-      # Check if this was a moved package (destination of a move)
-      if [[ -n "${moves_made[$pkg]:-}" ]]; then
-        final_positions["$pkg"]="${moves_made[$pkg]}"
-      else
-        # Check if this package was moved away (not in new position anymore)
-        local was_moved=false
-        for new_pos in "${!moves_made[@]}"; do
-          if [[ "${moves_made[$new_pos]}" == "$pkg" ]]; then
-            was_moved=true
-            break
+        if [[ $DRY_RUN == "true" ]]; then
+          echo "Would move: just codemod-go-move_package $src_path $dst_path"
+        else
+          if [[ $VERBOSE == "true" ]]; then
+            log_info "Moving $current_pkg_path to $required_level/$pkg_name"
           fi
-        done
-        if [[ $was_moved == "false" ]]; then
-          final_positions["$pkg"]=""
+          just codemod-go-move_package "$src_path" "$dst_path"
         fi
       fi
     fi
-  done <<<"$packages"
-
-  # Output sorted final positions
-  for pkg in $(printf "%s\n" "${!final_positions[@]}" | sort); do
-    if [[ -n "${final_positions[$pkg]}" ]]; then
-      echo "$pkg (moved from ${final_positions[$pkg]})"
-    else
-      echo "$pkg"
-    fi
-  done
+  done <<<"$sorted_packages"
 }
 
 # Check if we're in the right directory

@@ -1,15 +1,18 @@
 #!/bin/bash -e
 
+# forces sorting to place `_` before `a`
+export LC_ALL=C
+
 get_package_dependencies() {
   local pkg_path="$1"
   local base_module="code.linenisgreat.com/dodder/go"
-  echo "$pkg_path"
-
-  # Use go list to get dependencies, filter for internal packages only
-  go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' "$pkg_path" 2>/dev/null |
-    grep "^$base_module/src/" |
+  
+  go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' "./$pkg_path" 2>/dev/null |
+    grep -E "^$base_module/src/\w+/\w+\$" |
     sed "s|^$base_module/src/||" |
-    sort -u
+    sort -u |
+    xargs -L1 printf "%s -> %s\n" "${pkg_path#src/}" |
+    grep -v -- '-> $' || true
 }
 
 while IFS= read -r -d '' package; do
