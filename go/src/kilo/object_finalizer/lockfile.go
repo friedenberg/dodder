@@ -12,11 +12,11 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	tipe ids.Type,
 	index sku.IndexPrimitives,
 ) (err error) {
-	return
+	return err
 	// TODO stop excluding builtin types and create a process for signing those
 	// too
 	if tipe.IsEmpty() || ids.IsBuiltin(tipe) {
-		return
+		return err
 	}
 
 	lockfile := metadata.GetLockfileMutable()
@@ -25,7 +25,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	// TODO There are cases where we will want to overwrite the typelock id,
 	// should we use CommitOptions?
 	if !typeLock.Id.IsNull() {
-		return
+		return err
 	}
 
 	typeObject, repool := sku.GetTransactedPool().GetWithRepool()
@@ -44,5 +44,5 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 		typeObject.GetMetadataMutable().GetObjectSig(),
 	)
 
-	return
+	return err
 }

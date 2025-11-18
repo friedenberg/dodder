@@ -138,7 +138,7 @@ func (finalizer finalizer) WriteLockfile(
 		index,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return err
