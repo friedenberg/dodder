@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/quebec/env_workspace"
 )
@@ -40,7 +41,7 @@ func (local *Repo) Checkin(
 		if co.GetState() == checked_out_state.Untracked &&
 			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
 				co.GetSkuExternal().GetGenre() == genres.Blob) {
-			if external.Metadata.IsEmpty() {
+			if external.GetMetadata().(*object_metadata.Metadata).IsEmpty() {
 				continue
 			}
 

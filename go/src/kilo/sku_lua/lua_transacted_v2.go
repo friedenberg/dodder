@@ -42,13 +42,13 @@ func ToLuaTableV2(
 
 	tags := luaTable.Tags
 
-	for tag := range object.Metadata.GetTags().AllPtr() {
+	for tag := range object.GetMetadata().GetTags().AllPtr() {
 		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 
 	tags = luaTable.TagsImplicit
 
-	for tag := range object.Metadata.Index.GetImplicitTags().AllPtr() {
+	for tag := range object.GetMetadata().GetIndex().GetImplicitTags().AllPtr() {
 		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 }
@@ -80,7 +80,7 @@ func FromLuaTableV2(
 		return err
 	}
 
-	object.Metadata.SetTags(nil)
+	object.GetMetadataMutable().SetTags(nil)
 
 	tagsTable.ForEach(
 		func(key, value lua.LValue) {
@@ -91,7 +91,7 @@ func FromLuaTableV2(
 				panic(err)
 			}
 
-			errors.PanicIfError(object.Metadata.AddTagPtr(&tag))
+			errors.PanicIfError(object.GetMetadataMutable().AddTagPtr(&tag))
 		},
 	)
 

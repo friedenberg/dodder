@@ -104,12 +104,12 @@ func (cmd Import) Run(req command.Request) {
 	// TODO move this to the importer directly
 	if cmd.OverwriteSignatures {
 		afterDecoding = func(object *sku.Transacted) (err error) {
-			object.Metadata.GetObjectDigestMutable().Reset()
-			object.Metadata.GetObjectSigMutable().Reset()
-			object.Metadata.GetRepoPubKeyMutable().Reset()
+			object.GetMetadataMutable().GetObjectDigestMutable().Reset()
+			object.GetMetadataMutable().GetObjectSigMutable().Reset()
+			object.GetMetadataMutable().GetRepoPubKeyMutable().Reset()
 
 			if err = blobImporter.ImportBlobIfNecessary(
-				object.Metadata.GetBlobDigest(),
+				object.GetMetadata().GetBlobDigest(),
 				object,
 			); err != nil { // TODO rewrite blob
 				var errNotEqual markl.ErrNotEqual
@@ -117,7 +117,7 @@ func (cmd Import) Run(req command.Request) {
 				if errors.As(err, &errNotEqual) {
 					if errNotEqual.IsDifferentHashTypes() {
 						err = nil
-						object.Metadata.GetBlobDigestMutable().ResetWithMarklId(
+						object.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(
 							errNotEqual.Actual,
 						)
 					} else {

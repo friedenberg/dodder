@@ -171,7 +171,7 @@ func (op Organize) RunWithSkuType(
 			op.Repo,
 			f,
 			organize_text.NewMetadataWithOptionCommentLookup(
-				organizeResults.Before.Metadata.RepoId,
+				organizeResults.Before.GetRepoId(),
 				op.GetPrototypeOptionComments(),
 			),
 		); err != nil {

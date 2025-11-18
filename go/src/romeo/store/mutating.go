@@ -16,7 +16,7 @@ import (
 )
 
 func (store *Store) Commit(
-	external sku.ExternalLike,
+	daughter *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	committer := commitFacilitator{
@@ -24,8 +24,8 @@ func (store *Store) Commit(
 		index: store.streamIndex,
 	}
 
-	if err = committer.commit(external, options); err != nil {
-		err = errors.Wrapf(err, "Sku: %q", sku.String(external.GetSku()))
+	if err = committer.commit(daughter, options); err != nil {
+		err = errors.Wrapf(err, "Sku: %q", sku.String(daughter))
 		return err
 	}
 
@@ -41,36 +41,34 @@ type commitFacilitator struct {
 // runs the new hook, validates the blob, then calculates the digest for the
 // object
 func (commitFacilitator commitFacilitator) tryPrecommit(
-	external sku.ExternalLike,
+	daughter *sku.Transacted,
 	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	if err = commitFacilitator.SaveBlob(external); err != nil {
+	if err = commitFacilitator.SaveBlob(daughter); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	object := external.GetSku()
-
 	if mother == nil {
-		options.Proto.Apply(object, object)
+		options.Proto.Apply(daughter, daughter)
 	}
 
 	// TODO decide if the type proto should actually be applied every time
 	if options.ApplyProtoType {
-		commitFacilitator.protoZettel.ApplyType(object, object)
+		commitFacilitator.protoZettel.ApplyType(daughter, daughter)
 	}
 
-	if genres.Type == external.GetSku().GetGenre() {
-		if external.GetSku().GetType().IsEmpty() {
-			external.GetSku().GetMetadataMutable().GetTypePtr().ResetWith(
+	if genres.Type == daughter.GetGenre() {
+		if daughter.GetType().IsEmpty() {
+			daughter.GetMetadataMutable().GetTypePtr().ResetWith(
 				ids.DefaultOrPanic(genres.Type),
 			)
 		}
 	}
 
 	// modify pre commit hooks to support import
-	if err = commitFacilitator.tryPreCommitHooks(object, mother, options); err != nil {
+	if err = commitFacilitator.tryPreCommitHooks(daughter, mother, options); err != nil {
 		if commitFacilitator.storeConfig.GetConfig().IgnoreHookErrors {
 			err = nil
 		} else {
@@ -81,7 +79,7 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 
 	// TODO just just mutter == nil
 	if mother == nil {
-		if err = commitFacilitator.tryNewHook(object, options); err != nil {
+		if err = commitFacilitator.tryNewHook(daughter, options); err != nil {
 			if commitFacilitator.storeConfig.GetConfig().IgnoreHookErrors {
 				err = nil
 			} else {
@@ -91,26 +89,15 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 		}
 	}
 
-	if err = commitFacilitator.validateAndFinalize(
-		object,
-		mother,
-		options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
 	return err
 }
 
 // TODO add RealizeAndOrStore result
 // TODO switch to using a child context for each object commit
 func (commitFacilitator commitFacilitator) commit(
-	external sku.ExternalLike,
+	daughter *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	daughter := external.GetSku()
-
 	if daughter == nil {
 		panic("empty daughter")
 	}
@@ -168,7 +155,7 @@ func (commitFacilitator commitFacilitator) commit(
 		*daughter.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable() = mother.GetTai()
 	}
 
-	if err = commitFacilitator.tryPrecommit(external, mother, options); err != nil {
+	if err = commitFacilitator.tryPrecommit(daughter, mother, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -182,6 +169,15 @@ func (commitFacilitator commitFacilitator) commit(
 				err = errors.Wrap(err)
 				return err
 			}
+		}
+
+		if err = commitFacilitator.validateAndFinalize(
+			daughter,
+			mother,
+			options,
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
 		}
 
 		if options.AddToInventoryList ||
@@ -237,7 +233,7 @@ func (commitFacilitator commitFacilitator) commit(
 
 	if options.AddToInventoryList {
 		// external.GetSku().Metadata.GetObjectSigMutable().Reset()
-		external.GetSku().Metadata.GetObjectDigestMutable().Reset()
+		daughter.Metadata.GetObjectDigestMutable().Reset()
 
 		if err = commitFacilitator.commitTransacted(daughter, mother); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(daughter))

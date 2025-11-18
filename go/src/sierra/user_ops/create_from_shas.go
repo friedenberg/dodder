@@ -59,7 +59,7 @@ func (op CreateFromShas) Run(
 		object := sku.GetTransactedPool().Get()
 
 		object.ObjectId.SetGenre(genres.Zettel)
-		object.Metadata.GetBlobDigestMutable().ResetWithMarklId(&digest)
+		object.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(&digest)
 
 		op.Proto.Apply(object, genres.Zettel)
 

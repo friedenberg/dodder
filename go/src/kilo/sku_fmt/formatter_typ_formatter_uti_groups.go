@@ -39,7 +39,7 @@ func (format formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	var skuTyp *sku.Transacted
 
-	if skuTyp, err = format.ReadTransactedFromObjectId(object.Metadata.GetType()); err != nil {
+	if skuTyp, err = format.ReadTransactedFromObjectId(object.GetMetadata().GetType()); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

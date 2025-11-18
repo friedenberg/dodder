@@ -86,7 +86,7 @@ func (op Organize2) Run(
 			op.Repo,
 			file,
 			organize_text.NewMetadataWithOptionCommentLookup(
-				organizeResults.Before.Metadata.RepoId,
+				organizeResults.Before.GetRepoId(),
 				op.GetPrototypeOptionComments(),
 			),
 		); err != nil {

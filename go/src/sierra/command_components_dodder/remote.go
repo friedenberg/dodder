@@ -55,13 +55,13 @@ func (cmd Remote) MakeRemoteAndObject(
 	command.PopRequestArgTo(
 		req.Args,
 		"remote type",
-		&remoteObject.Metadata.Type,
+		remoteObject.GetMetadataMutable().GetTypePtr(),
 	)
 
 	blob := cmd.CreateRemoteBlob(
 		req,
 		local,
-		remoteObject.Metadata.Type,
+		remoteObject.GetMetadata().GetType(),
 	)
 
 	remote = cmd.MakeRemoteFromBlobAndSetPublicKey(req, local, blob)
@@ -72,14 +72,14 @@ func (cmd Remote) MakeRemoteAndObject(
 		var err error
 
 		if blobId, _, err = remoteTypedRepoBlobStore.WriteTypedBlob(
-			remoteObject.Metadata.Type,
+			remoteObject.GetMetadata().GetType(),
 			blob,
 		); err != nil {
 			req.Cancel(err)
 		}
 	}
 
-	remoteObject.Metadata.GetBlobDigestMutable().ResetWithMarklId(blobId)
+	remoteObject.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(blobId)
 
 	return remote, remoteObject
 }
@@ -99,7 +99,7 @@ func (cmd Remote) MakeRemote(
 		var err error
 
 		if blob, _, err = typedRepoBlobStore.ReadTypedBlob(
-			object.Metadata.Type,
+			object.GetMetadata().GetType(),
 			object.GetBlobDigest(),
 		); err != nil {
 			req.Cancel(err)

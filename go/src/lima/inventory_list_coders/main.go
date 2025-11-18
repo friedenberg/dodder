@@ -34,7 +34,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 		return coder{
 			listCoder: doddishCoder,
 			afterDecoding: func(object *sku.Transacted) (err error) {
-				object.Metadata.GetRepoPubKeyMutable().ResetWithMarklId(
+				object.GetMetadataMutable().GetRepoPubKeyMutable().ResetWithMarklId(
 					configGenesis.GetPublicKey(),
 				)
 

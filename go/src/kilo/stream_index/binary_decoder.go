@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -325,7 +326,7 @@ func (decoder *binaryDecoder) readFieldKey(
 
 		// TODO remove
 	case key_bytes.CacheParentTai:
-		if _, err = object.Metadata.Index.ParentTai.ReadFrom(&decoder.Content); err != nil {
+		if _, err = object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable().ReadFrom(&decoder.Content); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -355,7 +356,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if err = object.Metadata.SelfWithoutTai.UnmarshalBinary(
+		if err = object.GetMetadataMutable().GetSelfWithoutTaiMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -370,7 +371,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.Metadata.Index.AddTagsImplicitPtr(&tag); err != nil {
+		if err = object.GetMetadataMutable().GetIndexMutable().(*object_metadata.Index).AddTagsImplicitPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -383,7 +384,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.Metadata.Index.AddTagExpandedPtr(&tag); err != nil {
+		if err = object.GetMetadataMutable().GetIndexMutable().AddTagExpandedPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -396,7 +397,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		object.Metadata.Index.TagPaths.AddPath(&tag)
+		object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddPath(&tag)
 
 	default:
 		err = errors.ErrorWithStackf("unsupported key: %s", decoder.Key)

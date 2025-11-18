@@ -31,7 +31,8 @@
       "Bash(go mod:*)",
       "Bash(bash:*)",
       "Bash(timeout:*)",
-      "Bash(go list:*)"
+      "Bash(go list:*)",
+      "Bash(awk:*)"
     ],
     "deny": []
   },

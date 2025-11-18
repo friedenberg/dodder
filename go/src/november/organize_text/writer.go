@@ -38,7 +38,7 @@ func (av writer) write(a *Assignment) (err error) {
 		return err
 	}
 
-	if a.Transacted.Metadata.Tags != nil && a.Transacted.Metadata.Tags.Len() > 0 {
+	if a.Transacted.GetMetadata().GetTags() != nil && a.Transacted.GetMetadata().GetTags().Len() > 0 {
 		sharps := strings.Repeat("#", a.GetDepth())
 		alignmentSpacing := strings.Repeat(" ", a.AlignmentSpacing())
 
@@ -48,7 +48,7 @@ func (av writer) write(a *Assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				quiter.StringCommaSeparated(a.Transacted.Metadata.Tags),
+				quiter.StringCommaSeparated(a.Transacted.GetMetadata().GetTags()),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -65,7 +65,7 @@ func (av writer) write(a *Assignment) (err error) {
 
 		cursor := object.sku.Clone()
 		cursorExternal := cursor.GetSkuExternal()
-		cursorExternal.Metadata.Subtract(&av.Metadata)
+		cursorExternal.GetMetadataMutable().(*object_metadata.Metadata).Subtract(&av.Metadata)
 		mes := cursorExternal.GetMetadataMutable().GetTags().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
@@ -73,7 +73,7 @@ func (av writer) write(a *Assignment) (err error) {
 			return err
 		}
 
-		cursorExternal.Metadata.SetTags(mes)
+		cursorExternal.GetMetadataMutable().SetTags(mes)
 
 		if _, err = av.options.fmtBox.EncodeStringTo(
 			cursor,

@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+get_package_dependencies() {
+  local pkg_path="$1"
+  local base_module="code.linenisgreat.com/dodder/go"
+  echo "$pkg_path"
+
+  # Use go list to get dependencies, filter for internal packages only
+  go list -f '{{range .Imports}}{{.}}{{"\n"}}{{end}}' "$pkg_path" 2>/dev/null |
+    grep "^$base_module/src/" |
+    sed "s|^$base_module/src/||" |
+    sort -u
+}
+
+while IFS= read -r -d '' package; do
+  get_package_dependencies "$package"
+done < <(find src -mindepth 2 -maxdepth 2 -type d -print0 | sort -z)

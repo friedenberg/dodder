@@ -24,7 +24,7 @@ func (c *constructor2) collectExplicitAndImplicitFor(
 	for st := range skus.All() {
 		sk := st.GetSkuExternal()
 
-		for _, ewp := range sk.Metadata.Index.TagPaths.All {
+		for _, ewp := range sk.GetMetadata().GetIndex().GetTagPaths().All {
 			if ewp.Tag.String() == sk.ObjectId.String() {
 				continue
 			}
@@ -249,7 +249,7 @@ func (c *constructor2) addGroupedChildren(
 		}
 
 		child := newAssignment(parent.GetDepth() + 1)
-		child.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
+		child.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(e))
 		groupingTags.DropFirst()
 
 		psv := MakePrefixSetFrom(zs)

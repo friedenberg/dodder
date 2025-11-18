@@ -1,0 +1,64 @@
+#!/bin/bash -e
+
+# Read dependency graph from stdin or file
+input="${1:-/dev/stdin}"
+
+# Associative arrays for graph representation
+declare -A graph       # package -> space-separated list of dependents
+declare -A in_degree   # package -> count of dependencies
+declare -A all_nodes   # track all unique nodes
+
+# Parse input and build graph
+while IFS=' -> ' read -r pkg dep; do
+    # Skip empty lines
+    [[ -z "$pkg" ]] && continue
+    
+    # Track all nodes
+    all_nodes["$pkg"]=1
+    all_nodes["$dep"]=1
+    
+    # Build adjacency list (reverse direction for Kahn's)
+    graph["$dep"]+="$pkg "
+    
+    # Increment in-degree for package
+    ((in_degree["$pkg"]++))
+    
+    # Initialize dep's in-degree if not seen
+    if [[ -z "${in_degree[$dep]+x}" ]]; then
+        in_degree["$dep"]=0
+    fi
+done < "$input"
+
+# Queue for nodes with in-degree 0
+queue=()
+for node in "${!all_nodes[@]}"; do
+    if [[ "${in_degree[$node]}" -eq 0 ]]; then
+        queue+=("$node")
+    fi
+done
+
+# Process queue and build sorted order
+sorted=()
+while [[ ${#queue[@]} -gt 0 ]]; do
+    # Pop from queue
+    current="${queue[0]}"
+    queue=("${queue[@]:1}")
+    sorted+=("$current")
+    
+    # Process all nodes that depend on current
+    for dependent in ${graph[$current]}; do
+        ((in_degree["$dependent"]--))
+        if [[ "${in_degree[$dependent]}" -eq 0 ]]; then
+            queue+=("$dependent")
+        fi
+    done
+done
+
+# Check for cycles
+if [[ ${#sorted[@]} -ne ${#all_nodes[@]} ]]; then
+    echo "Error: Cycle detected in dependency graph" >&2
+    exit 1
+fi
+
+# Output sorted order
+printf '%s\n' "${sorted[@]}"

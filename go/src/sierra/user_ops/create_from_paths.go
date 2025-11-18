@@ -61,7 +61,7 @@ func (op CreateFromPaths) Run(
 			return results, err
 		}
 
-		digestWithoutTai := &object.Metadata.SelfWithoutTai
+		digestWithoutTai := object.GetMetadataMutable().GetSelfWithoutTaiMutable()
 
 		if err = object.CalculateDigests(false, object.GetDigestWriteMapWithoutMerkle()); err != nil {
 			err = errors.Wrap(err)
@@ -79,7 +79,7 @@ func (op CreateFromPaths) Run(
 
 		if ok {
 			if err = existing.GetMetadataMutable().GetDescriptionMutable().Set(
-				object.Metadata.GetDescription().String(),
+				object.GetMetadata().GetDescription().String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return results, err
@@ -121,7 +121,7 @@ func (op CreateFromPaths) Run(
 	}
 
 	for _, object := range toCreate {
-		if object.Metadata.IsEmpty() {
+		if object.GetMetadata().(*object_metadata.Metadata).IsEmpty() {
 			return results, err
 		}
 

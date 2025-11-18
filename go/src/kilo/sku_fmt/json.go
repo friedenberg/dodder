@@ -145,7 +145,7 @@ func (json *JSON) ToTransacted(
 
 	// Set BlobId from JSON even if not writing to blob store
 	if json.BlobId != "" && blobStore == nil {
-		if err = object.Metadata.GetBlobDigestMutable().Set(
+		if err = object.GetMetadataMutable().GetBlobDigestMutable().Set(
 			json.BlobId,
 		); err != nil {
 			err = errors.Wrap(err)

@@ -126,7 +126,7 @@ func (writer *Writer) addCommonMatches(
 
 	matchBuilder.AddMatches(object.GetMetadataMutable().GetDescription().String())
 	matchBuilder.AddMatches(object.GetType().String())
-	for e := range object.Metadata.GetTags().All() {
+	for e := range object.GetMetadata().GetTags().All() {
 		expansion.ExpanderAll.Expand(
 			func(v string) (err error) {
 				matchBuilder.AddMatches(v)
@@ -168,7 +168,7 @@ func (writer *Writer) zettelToItem(
 		item.Title = ks
 		item.Subtitle = es
 	} else {
-		item.Subtitle = fmt.Sprintf("%s: %s %s", object.Metadata.Type, ks, es)
+		item.Subtitle = fmt.Sprintf("%s: %s %s", object.GetMetadata().GetType(), ks, es)
 	}
 
 	item.Arg = ks

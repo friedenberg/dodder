@@ -86,7 +86,7 @@ func (format *BoxCheckedOut) EncodeStringTo(
 		}
 	}
 
-	b := external.Metadata.GetDescription()
+	b := external.GetMetadata().GetDescription()
 
 	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer.Append(string_format_writer.Field{

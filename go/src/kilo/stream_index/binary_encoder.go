@@ -103,7 +103,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		sigil := object.Sigil
 		sigil.Add(encoder.Sigil)
 
-		if object.Metadata.Index.Dormant.Bool() {
+		if object.GetMetadata().GetIndex().GetDormant().Bool() {
 			sigil.Add(ids.SigilHidden)
 		}
 
@@ -114,7 +114,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.Blob:
 		if n, err = encoder.writeMarklId(
-			object.Metadata.GetBlobDigest(),
+			object.GetMetadata().GetBlobDigest(),
 			true,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -123,14 +123,14 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.RepoPubKey:
 		if n, err = encoder.writeFieldBinaryMarshaler(
-			object.Metadata.GetRepoPubKey(),
+			object.GetMetadata().GetRepoPubKey(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.RepoSig:
-		merkleId := object.Metadata.GetObjectSig()
+		merkleId := object.GetMetadata().GetObjectSig()
 
 		// TODO change to false once dropping V8
 		if n, err = encoder.writeMarklId(
@@ -142,17 +142,17 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.Description:
-		if object.Metadata.Description.IsEmpty() {
+		if object.GetMetadata().GetDescription().IsEmpty() {
 			return n, err
 		}
 
-		if n, err = encoder.writeFieldBinaryMarshaler(&object.Metadata.Description); err != nil {
+		if n, err = encoder.writeFieldBinaryMarshaler(object.GetMetadataMutable().GetDescriptionMutable()); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.CacheParentTai:
-		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Index.ParentTai); err != nil {
+		if n, err = encoder.writeFieldWriterTo(object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable()); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
@@ -187,24 +187,24 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.Tai:
-		if n, err = encoder.writeFieldWriterTo(&object.Metadata.Tai); err != nil {
+		if n, err = encoder.writeFieldWriterTo(object.GetMetadataMutable().GetTaiMutable()); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.Type:
-		if object.Metadata.Type.IsEmpty() {
+		if object.GetMetadata().GetType().IsEmpty() {
 			return n, err
 		}
 
-		if n, err = encoder.writeFieldBinaryMarshaler(&object.Metadata.Type); err != nil {
+		if n, err = encoder.writeFieldBinaryMarshaler(object.GetMetadataMutable().GetTypePtr()); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(
-			object.Metadata.GetMotherObjectSig(),
+			object.GetMetadata().GetMotherObjectSig(),
 			true,
 			encoder.Key.String(),
 		); err != nil {
@@ -214,7 +214,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.DigestMetadataWithoutTai:
 		if n, err = encoder.writeFieldMerkleId(
-			&object.Metadata.SelfWithoutTai,
+			object.GetMetadataMutable().GetSelfWithoutTaiMutable(),
 			true,
 			encoder.Key.String(),
 		); err != nil {
@@ -224,7 +224,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.DigestMetadataParentObjectId:
 		if n, err = encoder.writeFieldMerkleId(
-			object.Metadata.GetObjectDigest(),
+			object.GetMetadata().GetObjectDigest(),
 			true,
 			encoder.Key.String(),
 		); err != nil {
@@ -233,7 +233,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTagImplicit:
-		tags := object.Metadata.Index.GetImplicitTags()
+		tags := object.GetMetadata().GetIndex().GetImplicitTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
@@ -247,7 +247,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTagExpanded:
-		tags := object.Metadata.Index.GetExpandedTags()
+		tags := object.GetMetadata().GetIndex().GetExpandedTags()
 
 		for _, tag := range quiter.SortedValues(tags) {
 			var n1 int64
@@ -261,7 +261,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.CacheTags:
-		tags := object.Metadata.Index.TagPaths
+		tags := object.GetMetadata().GetIndex().GetTagPaths()
 
 		for _, tag := range tags.Paths {
 			var n1 int64

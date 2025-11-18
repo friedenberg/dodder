@@ -110,7 +110,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 		func(object *sku.Transacted) (err error) {
 			switch cmd.Genre {
 			case genres.Tag:
-				for tag := range object.Metadata.GetTags().All() {
+				for tag := range object.GetMetadata().GetTags().All() {
 					var tagObject *sku.Transacted
 
 					if tagObject, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(

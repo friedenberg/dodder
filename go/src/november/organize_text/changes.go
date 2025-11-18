@@ -214,11 +214,11 @@ func applyToText(
 	for el := range t.Options.Skus.All() {
 		sk := el.GetSkuExternal()
 
-		if sk.Metadata.Description.IsEmpty() {
+		if sk.GetMetadata().GetDescription().IsEmpty() {
 			continue
 		}
 
-		sk.Metadata.ResetTags()
+		sk.GetMetadataMutable().ResetTags()
 	}
 
 	return err

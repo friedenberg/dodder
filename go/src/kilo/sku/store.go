@@ -34,7 +34,7 @@ type (
 
 	// TODO rename to RepoStore
 	RepoStore interface {
-		Commit(ExternalLike, CommitOptions) (err error)
+		Commit(*Transacted, CommitOptions) (err error)
 		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
 		ReadPrimitiveQuery(
 			qg PrimitiveQueryGroup,

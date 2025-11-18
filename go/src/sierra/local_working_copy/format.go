@@ -20,6 +20,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
@@ -161,7 +162,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					&object.Metadata.Index.TagPaths,
+					object.GetMetadata().GetIndex().GetTagPaths(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -180,7 +181,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					&object.Metadata.Index.TagPaths,
+					object.GetMetadata().GetIndex().GetTagPaths(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -199,7 +200,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					object.GetObjectId(),
-					object.Metadata.Index.QueryPath,
+					object.GetMetadata().GetIndex().(*object_metadata.Index).QueryPath,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -259,7 +260,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetRepoPubKey().StringWithFormat(),
+					object.GetMetadata().GetRepoPubKey().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -277,7 +278,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetObjectDigest().StringWithFormat(),
+					object.GetMetadata().GetObjectDigest().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -296,8 +297,8 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintf(
 					writer,
 					"%q -> %q\n",
-					object.Metadata.GetObjectDigest().StringWithFormat(),
-					object.Metadata.GetMotherObjectSig().StringWithFormat(),
+					object.GetMetadata().GetObjectDigest().StringWithFormat(),
+					object.GetMetadata().GetMotherObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -313,14 +314,14 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for _, es := range object.Metadata.Index.TagPaths.Paths {
+				for _, es := range object.GetMetadata().GetIndex().GetTagPaths().Paths {
 					if _, err = fmt.Fprintf(writer, "%s: %s\n", object.GetObjectId(), es); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 				}
 
-				for _, es := range object.Metadata.Index.TagPaths.All {
+				for _, es := range object.GetMetadata().GetIndex().GetTagPaths().All {
 					if _, err = fmt.Fprintf(writer, "%s: %s -> %s\n", object.GetObjectId(), es.Tag, es.Parents); err != nil {
 						err = errors.Wrap(err)
 						return err
@@ -380,7 +381,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				if _, err = fmt.Fprintln(
 					writer,
 					quiter.StringCommaSeparated(
-						object.Metadata.GetTags(),
+						object.GetMetadata().GetTags(),
 					),
 				); err != nil {
 					err = errors.Wrap(err)
@@ -397,7 +398,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for e := range object.Metadata.GetTags().AllPtr() {
+				for e := range object.GetMetadata().GetTags().AllPtr() {
 					if _, err = fmt.Fprintln(writer, e); err != nil {
 						err = errors.Wrap(err)
 						return err
@@ -862,7 +863,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetObjectSig().StringWithFormat(),
+					object.GetMetadata().GetObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -880,7 +881,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				_, err = fmt.Fprintf(
 					writer,
 					"%x\n",
-					object.Metadata.GetObjectSig().GetBytes(),
+					object.GetMetadata().GetObjectSig().GetBytes(),
 				)
 				return err
 			}
@@ -895,7 +896,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				_, err = fmt.Fprintf(
 					writer,
 					"%x\n",
-					object.Metadata.GetMotherObjectSig().GetBytes(),
+					object.GetMetadata().GetMotherObjectSig().GetBytes(),
 				)
 				return err
 			}
@@ -909,7 +910,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetMotherObjectSig().StringWithFormat(),
+					object.GetMetadata().GetMotherObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -952,13 +953,13 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			printer := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
-				if object.Metadata.GetMotherObjectSig().IsNull() {
+				if object.GetMetadata().GetMotherObjectSig().IsNull() {
 					return err
 				}
 
 				if object, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
 					object.GetObjectId(),
-					object.Metadata.Index.ParentTai,
+					object.GetMetadata().GetIndex().GetParentTai(),
 				); err != nil {
 					fmt.Fprintln(writer, err)
 					err = nil
@@ -1016,7 +1017,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				if _, err = fmt.Fprintln(
 					writer,
-					object.Metadata.GetObjectSig().StringWithFormat(),
+					object.GetMetadata().GetObjectSig().StringWithFormat(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -1135,7 +1136,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return err
 				}
 
-				a["description"] = object.Metadata.Description.String()
+				a["description"] = object.GetMetadata().GetDescription().String()
 				a["identifier"] = object.ObjectId.String()
 
 				if err = e.Encode(&a); err != nil {
@@ -1175,7 +1176,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					return err
 				}
 
-				a["description"] = object.Metadata.Description.String()
+				a["description"] = object.GetMetadata().GetDescription().String()
 				a["identifier"] = object.ObjectId.String()
 
 				e := toml.NewEncoder(writer)

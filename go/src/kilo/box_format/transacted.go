@@ -121,7 +121,7 @@ func (format *BoxTransacted) EncodeStringTo(
 		return n, err
 	}
 
-	b := object.Metadata.GetDescription()
+	b := object.GetMetadata().GetDescription()
 
 	if !format.optionsPrint.BoxDescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
@@ -253,7 +253,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 		builder.AddTai(metadata)
 	}
 
-	if format.isArchive && !object.Metadata.GetObjectSig().IsNull() {
+	if format.isArchive && !object.GetMetadata().GetObjectSig().IsNull() {
 		builder.AddRepoPubKey(metadata)
 		builder.AddMotherSigIfNecessary(metadata)
 		builder.AddObjectSig(metadata)

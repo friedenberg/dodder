@@ -40,39 +40,39 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if a.Transacted.Metadata.GetTags().Len() == 1 && ids.IsEmpty(a.Transacted.Metadata.GetTags().Any()) {
+	if a.Transacted.GetMetadata().GetTags().Len() == 1 && ids.IsEmpty(a.Transacted.GetMetadata().GetTags().Any()) {
 		ui.Log().Print("1 tag, and it's empty, merging")
 		return true
 	}
 
-	if a.Transacted.Metadata.GetTags().Len() == 0 {
+	if a.Transacted.GetMetadata().GetTags().Len() == 0 {
 		ui.Log().Print("tags length is 0, merging")
 		return true
 	}
 
-	if a.Parent.Transacted.Metadata.GetTags().Len() != 1 {
+	if a.Parent.Transacted.GetMetadata().GetTags().Len() != 1 {
 		ui.Log().Print("parent tags length is not 1")
 		return false
 	}
 
-	if a.Transacted.Metadata.GetTags().Len() != 1 {
+	if a.Transacted.GetMetadata().GetTags().Len() != 1 {
 		ui.Log().Print("tags length is not 1")
 		return false
 	}
 
-	equal := quiter.SetEqualsPtr(a.Transacted.Metadata.GetTags(), a.Parent.Transacted.Metadata.GetTags())
+	equal := quiter.SetEqualsPtr(a.Transacted.GetMetadata().GetTags(), a.Parent.Transacted.GetMetadata().GetTags())
 
 	if !equal {
 		ui.Log().Print("parent tags not equal")
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Parent.Transacted.Metadata.GetTags().Any()) {
+	if ids.IsDependentLeaf(a.Parent.Transacted.GetMetadata().GetTags().Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Transacted.Metadata.GetTags().Any()) {
+	if ids.IsDependentLeaf(a.Transacted.GetMetadata().GetTags().Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
@@ -95,29 +95,29 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	if a.Parent.Transacted.Metadata.GetTags().Len() == 0 {
+	if a.Parent.Transacted.GetMetadata().GetTags().Len() == 0 {
 		return err
 	}
 
-	if a.Parent.Transacted.Metadata.Tags.Len() != 1 {
+	if a.Parent.Transacted.GetMetadata().GetTags().Len() != 1 {
 		return err
 	}
 
-	if ids.IsDependentLeaf(a.Parent.Transacted.Metadata.Tags.Any()) {
+	if ids.IsDependentLeaf(a.Parent.Transacted.GetMetadata().GetTags().Any()) {
 		return err
 	}
 
-	if ids.IsDependentLeaf(a.Transacted.Metadata.Tags.Any()) {
+	if ids.IsDependentLeaf(a.Transacted.GetMetadata().GetTags().Any()) {
 		return err
 	}
 
-	if !ids.HasParentPrefix(a.Transacted.Metadata.Tags.Any(), a.Parent.Transacted.Metadata.Tags.Any()) {
+	if !ids.HasParentPrefix(a.Transacted.GetMetadata().GetTags().Any(), a.Parent.Transacted.GetMetadata().GetTags().Any()) {
 		ui.Log().Print("parent is not prefix joint")
 		return err
 	}
 
-	aEtt := a.Transacted.Metadata.Tags.Any()
-	pEtt := a.Parent.Transacted.Metadata.Tags.Any()
+	aEtt := a.Transacted.GetMetadata().GetTags().Any()
+	pEtt := a.Parent.Transacted.GetMetadata().GetTags().Any()
 
 	if aEtt.Equals(pEtt) {
 		ui.Log().Print("parent is is equal to child")
@@ -131,7 +131,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	a.Transacted.Metadata.Tags = ids.MakeMutableTagSet(ls)
+	a.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(ls))
 
 	return err
 }
@@ -188,7 +188,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 		return err
 	}
 
-	if a.Transacted.Metadata.Tags == nil || a.Transacted.Metadata.Tags.Len() == 0 {
+	if a.Transacted.GetMetadata().GetTags() == nil || a.Transacted.GetMetadata().GetTags().Len() == 0 {
 		return err
 	}
 
@@ -202,12 +202,12 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 
 	var na *Assignment
 
-	if a.Transacted.Metadata.Tags.Len() == 1 &&
-		a.Transacted.Metadata.Tags.Any().Equals(groupingPrefix.Tag) {
+	if a.Transacted.GetMetadata().GetTags().Len() == 1 &&
+		a.Transacted.GetMetadata().GetTags().Any().Equals(groupingPrefix.Tag) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)
-		na.Transacted.Metadata.Tags = ids.MakeMutableTagSet(groupingPrefix.Tag)
+		na.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(groupingPrefix.Tag))
 		a.addChild(na)
 	}
 
@@ -221,10 +221,11 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.Transacted.Metadata.Tags = ids.SubtractPrefix(
-			c.Transacted.Metadata.Tags,
+		subtractedTags := ids.SubtractPrefix(
+			c.Transacted.GetMetadata().GetTags(),
 			groupingPrefix.Tag,
-		).CloneMutableSetPtrLike()
+		)
+		c.Transacted.GetMetadataMutable().SetTags(subtractedTags)
 	}
 
 	return err
@@ -239,12 +240,12 @@ func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 	m := make(map[string][]*Assignment)
 	out = make([]tagBag, 0, len(node.Children))
 
-	if node.Transacted.Metadata.Tags.Len() == 0 {
+	if node.Transacted.GetMetadata().GetTags().Len() == 0 {
 		return out
 	}
 
 	for _, c := range node.Children {
-		expanded := ids.Expanded(c.Transacted.Metadata.Tags, expansion.ExpanderRight)
+		expanded := ids.Expanded(c.Transacted.GetMetadata().GetTags(), expansion.ExpanderRight)
 
 		for e := range expanded.All() {
 			if e.String() == "" {

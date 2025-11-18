@@ -13,7 +13,7 @@ import (
 )
 
 func (store *Store) CreateOrUpdateDefaultProto(
-	external sku.ExternalLike,
+	external *sku.Transacted,
 	storeOptions sku.StoreOptions,
 ) (err error) {
 	options := sku.CommitOptions{
@@ -30,7 +30,7 @@ func (store *Store) CreateOrUpdateDefaultProto(
 }
 
 func (store *Store) CreateOrUpdate(
-	external sku.ExternalLike,
+	external *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
 	options.AddToInventoryList = true

@@ -49,11 +49,13 @@ log_dry_run() {
 }
 
 log_info() {
-  gum log -l info "$*"
+  if [[ $VERBOSE == "true" ]]; then
+    gum log -l info "$*" >&2
+  fi
 }
 
 log_error() {
-  gum log -l error "$*"
+  gum log -l error "$*" >&2
 }
 
 # Get all internal package dependencies for a given package
@@ -187,7 +189,7 @@ move_package() {
 
   log_verbose "Executing: just codemod-go-move_package $src_path $dst_path"
 
-  if just codemod-go-move_package "$src_path" "$dst_path"; then
+  if just codemod-go-move_package "$src_path" "$dst_path" >/dev/null 2>&1; then
     log_info "Successfully moved $pkg_path to $to_level"
   else
     log_error "Failed to move $pkg_path"
@@ -219,42 +221,38 @@ main() {
     esac
   done
 
-  if [[ $DRY_RUN == "true" ]]; then
-    log_info "Running in dry-run mode - no changes will be made"
-  fi
-
-  log_info "Analyzing package dependencies..."
+  # Suppress all logging output
+  VERBOSE=false
 
   local packages
   packages=$(get_all_packages)
 
   if [[ -z $packages ]]; then
-    log_info "No packages found"
     exit 0
   fi
+
+  # Track original positions and moves
+  declare -A original_positions
+  declare -A moves_made
+
+  # Store original positions
+  while IFS= read -r pkg; do
+    if [[ -n $pkg ]]; then
+      original_positions["$pkg"]="$pkg"
+    fi
+  done <<<"$packages"
 
   local moves_needed=()
 
   # Check all packages for incorrect positioning
   while IFS= read -r pkg; do
     if [[ -n $pkg ]]; then
-      log_verbose "Checking package: $pkg"
       local move_info
-      if move_info=$(check_package_positioning "$pkg"); then
+      if move_info=$(check_package_positioning "$pkg" 2>/dev/null); then
         moves_needed+=("$move_info")
-        log_verbose "  $move_info"
-      else
-        log_verbose "  Package $pkg is correctly positioned"
       fi
     fi
   done <<<"$packages"
-
-  if [[ ${#moves_needed[@]} -eq 0 ]]; then
-    log_info "All packages are correctly positioned!"
-    exit 0
-  fi
-
-  log_info "Found ${#moves_needed[@]} packages that need repositioning:"
 
   # Sort moves: do downward moves first to avoid dependency conflicts
   local upward_moves=()
@@ -271,21 +269,63 @@ main() {
   # Process downward moves first
   for move in "${downward_moves[@]}"; do
     IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
-    echo "  $pkg_path: $from_level -> $to_level (optimization)"
-    move_package "$pkg_path" "$from_level" "$to_level" "downward"
+    local pkg_name="${pkg_path#*/}"
+    local new_path="$to_level/$pkg_name"
+    moves_made["$new_path"]="$pkg_path"
+    if [[ $DRY_RUN == "false" ]]; then
+      move_package "$pkg_path" "$from_level" "$to_level" "downward" >/dev/null 2>&1
+    fi
   done
 
   # Then process upward moves
   for move in "${upward_moves[@]}"; do
     IFS=' ' read -r action pkg_path from_level to_level <<<"$move"
-    echo "  $pkg_path: $from_level -> $to_level (required)"
-    move_package "$pkg_path" "$from_level" "$to_level" "upward"
+    local pkg_name="${pkg_path#*/}"
+    local new_path="$to_level/$pkg_name"
+    moves_made["$new_path"]="$pkg_path"
+    if [[ $DRY_RUN == "false" ]]; then
+      move_package "$pkg_path" "$from_level" "$to_level" "upward" >/dev/null 2>&1
+    fi
   done
 
-  if [[ $DRY_RUN == "false" ]]; then
-    log_info "Package repositioning complete!"
-    log_info "You may want to run 'just codemod-go-imports' to update import paths"
+  # Get updated package list if moves were actually made
+  if [[ $DRY_RUN == "false" ]] && [[ ${#moves_needed[@]} -gt 0 ]]; then
+    packages=$(get_all_packages)
   fi
+
+  # Build final positions list
+  declare -A final_positions
+
+  # Process all current packages
+  while IFS= read -r pkg; do
+    if [[ -n $pkg ]]; then
+      # Check if this was a moved package (destination of a move)
+      if [[ -n "${moves_made[$pkg]:-}" ]]; then
+        final_positions["$pkg"]="${moves_made[$pkg]}"
+      else
+        # Check if this package was moved away (not in new position anymore)
+        local was_moved=false
+        for new_pos in "${!moves_made[@]}"; do
+          if [[ "${moves_made[$new_pos]}" == "$pkg" ]]; then
+            was_moved=true
+            break
+          fi
+        done
+        if [[ $was_moved == "false" ]]; then
+          final_positions["$pkg"]=""
+        fi
+      fi
+    fi
+  done <<<"$packages"
+
+  # Output sorted final positions
+  for pkg in $(printf "%s\n" "${!final_positions[@]}" | sort); do
+    if [[ -n "${final_positions[$pkg]}" ]]; then
+      echo "$pkg (moved from ${final_positions[$pkg]})"
+    else
+      echo "$pkg"
+    fi
+  done
 }
 
 # Check if we're in the right directory

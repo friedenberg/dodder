@@ -290,7 +290,7 @@ func (pageWriter *pageWriter) makeWriteOne(
 
 		objectOld := pageWriter.latestObjects[object.GetObjectId().String()]
 
-		object.Metadata.Index.ParentTai = objectOld.Tai
+		*object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable() = objectOld.Tai
 
 		if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
 			bufferedWriter,
@@ -332,7 +332,7 @@ func (pageWriter *pageWriter) saveToLatestMap(
 	objectOld.Tai = object.GetTai()
 	objectOld.Sigil = sigil
 
-	if object.Metadata.Index.Dormant.Bool() {
+	if object.GetMetadata().GetIndex().GetDormant().Bool() {
 		objectOld.Add(ids.SigilHidden)
 	} else {
 		objectOld.Del(ids.SigilHidden)
