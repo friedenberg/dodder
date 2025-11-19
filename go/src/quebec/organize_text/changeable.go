@@ -28,19 +28,21 @@ func (ot *Text) GetSkus(
 	return out, err
 }
 
-func (a *Assignment) addToSet(
+// TODO: claude: refactor to use single call to `GetMetadataMutable()` at start
+// of loops to simplify subsequent nested method calls
+func (assignment *Assignment) addToSet(
 	ot *Text,
 	output SkuMapWithOrder,
 	objectsFromBefore sku.SkuTypeSet,
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 
-	if err = a.AllTags(expanded); err != nil {
+	if err = assignment.AllTags(expanded); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	for _, organizeObject := range a.All() {
+	for _, organizeObject := range assignment.All() {
 		var outputObject sku.SkuType
 
 		objectKey := keyer.GetKey(organizeObject.sku)
@@ -93,18 +95,18 @@ func (a *Assignment) addToSet(
 
 			outputMetadata := outputObject.GetSkuExternal().GetMetadataMutable()
 
-			for e := range ot.Metadata.AllPtr() {
+			for tag := range ot.Metadata.AllPtr() {
 				if organizeObject.tipe == tag_paths.TypeUnknown {
 					continue
 				}
 
 				if _, ok := outputMetadata.GetIndex().GetTagPaths().All.ContainsString(
-					e.String(),
+					tag.String(),
 				); ok {
 					continue
 				}
 
-				outputObject.GetSkuExternal().AddTagPtr(e)
+				outputObject.GetSkuExternal().AddTagPtr(tag)
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
@@ -161,7 +163,7 @@ func (a *Assignment) addToSet(
 		}
 	}
 
-	for _, c := range a.Children {
+	for _, c := range assignment.Children {
 		if err = c.addToSet(ot, output, objectsFromBefore); err != nil {
 			err = errors.Wrap(err)
 			return err

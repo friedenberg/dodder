@@ -18,32 +18,32 @@ type Item struct {
 	browser_items.Item
 }
 
-func (i *Item) GetExternalObjectId() sku.ExternalObjectId {
-	return ids.MakeExternalObjectId(genres.Zettel, i.String())
+func (item *Item) GetExternalObjectId() sku.ExternalObjectId {
+	return ids.MakeExternalObjectId(genres.Zettel, item.String())
 }
 
-func (i *Item) GetGenre() interfaces.Genre {
+func (item *Item) GetGenre() interfaces.Genre {
 	return genres.Zettel
 }
 
-func (i *Item) String() string {
-	return i.GetKey()
+func (item *Item) String() string {
+	return item.GetKey()
 }
 
-func (i *Item) GetKey() string {
-	return i.Id.String()
+func (item *Item) GetKey() string {
+	return item.Id.String()
 }
 
 // TODO replace with external id
-func (i *Item) GetObjectId() *ids.ObjectId {
+func (item *Item) GetObjectId() *ids.ObjectId {
 	var oid ids.ObjectId
-	errors.PanicIfError(oid.SetLeft(i.GetKey()))
+	errors.PanicIfError(oid.SetLeft(item.GetKey()))
 	// errors.PanicIfError(oid.SetRepoId("browser"))
 	return &oid
 }
 
-func (i *Item) GetType() (t ids.Type, err error) {
-	if err = t.Set("browser-" + i.Id.Type); err != nil {
+func (item *Item) GetType() (t ids.Type, err error) {
+	if err = t.Set("browser-" + item.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return t, err
 	}
@@ -52,8 +52,8 @@ func (i *Item) GetType() (t ids.Type, err error) {
 }
 
 // TODO move below to !toml-bookmark type
-func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
-	ur := i.Url.Url()
+func (item Item) GetUrlPathTag() (e ids.Tag, err error) {
+	ur := item.Url.Url()
 	els := strings.Split(ur.Hostname(), ".")
 	slices.Reverse(els)
 
@@ -76,12 +76,12 @@ func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
 	return e, err
 }
 
-func (i Item) GetTai() (t ids.Tai, err error) {
-	if i.Date == "" {
+func (item Item) GetTai() (t ids.Tai, err error) {
+	if item.Date == "" {
 		return t, err
 	}
 
-	if err = t.SetFromRFC3339(i.Date); err != nil {
+	if err = t.SetFromRFC3339(item.Date); err != nil {
 		err = errors.Wrap(err)
 		return t, err
 	}
@@ -91,8 +91,8 @@ func (i Item) GetTai() (t ids.Tai, err error) {
 
 var errEmptyUrl = errors.New("empty url")
 
-func (i Item) GetDescription() (b descriptions.Description, err error) {
-	if err = b.Set(i.Title); err != nil {
+func (item Item) GetDescription() (b descriptions.Description, err error) {
+	if err = b.Set(item.Title); err != nil {
 		err = errors.Wrap(err)
 		return b, err
 	}
@@ -100,47 +100,51 @@ func (i Item) GetDescription() (b descriptions.Description, err error) {
 	return b, err
 }
 
-func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
-	if !i.Id.IsEmpty() {
-		if err = e.ExternalObjectId.Set(i.Id.String()); err != nil {
+func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
+	if !item.Id.IsEmpty() {
+		if err = object.ExternalObjectId.Set(item.Id.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	e.GetMetadataMutable().GetTypeMutable().Set("!toml-bookmark")
+	object.GetMetadataMutable().GetTypeMutable().Set("!toml-bookmark")
 
-	m := &e.Metadata
+	metadata := object.GetMetadataMutable()
 
-	if m.Tai, err = i.GetTai(); err != nil {
+	var tai ids.Tai
+
+	if tai, err = item.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if e.ExternalType, err = i.GetType(); err != nil {
+	metadata.GetTaiMutable().ResetWith(tai)
+
+	if object.ExternalType, err = item.GetType(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if e.GetMetadata().GetDescription().IsEmpty() {
-		if err = e.GetMetadataMutable().GetDescriptionMutable().Set(i.Title); err != nil {
+	if object.GetMetadata().GetDescription().IsEmpty() {
+		if err = object.GetMetadataMutable().GetDescriptionMutable().Set(item.Title); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
-	} else if i.Title != "" && e.GetMetadata().GetDescription().String() != i.Title {
-		e.GetMetadataMutable().GetFieldsMutable().Append(
+	} else if item.Title != "" && object.GetMetadata().GetDescription().String() != item.Title {
+		object.GetMetadataMutable().GetFieldsMutable().Append(
 			string_format_writer.Field{
 				Key:       "title",
-				Value:     i.Title,
+				Value:     item.Title,
 				ColorType: string_format_writer.ColorTypeUserData,
 			},
 		)
 	}
 
-	e.GetMetadataMutable().GetFieldsMutable().Append(
+	object.GetMetadataMutable().GetFieldsMutable().Append(
 		string_format_writer.Field{
 			Key:       "url",
-			Value:     i.Url.String(),
+			Value:     item.Url.String(),
 			ColorType: string_format_writer.ColorTypeUserData,
 		},
 	)
@@ -148,8 +152,8 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 	// TODO move to !toml-bookmark type
 	var t ids.Tag
 
-	if t, err = i.GetUrlPathTag(); err == nil {
-		if err = m.AddTagPtr(&t); err != nil {
+	if t, err = item.GetUrlPathTag(); err == nil {
+		if err = metadata.AddTagPtr(&t); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -160,8 +164,8 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 	return err
 }
 
-func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
-	if err = i.Id.Set(
+func (item *Item) ReadFromExternal(e *sku.Transacted) (err error) {
+	if err = item.Id.Set(
 		strings.TrimSuffix(
 			e.ExternalObjectId.String(),
 			"/",
@@ -178,16 +182,16 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 				continue
 			}
 
-			if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
+			if err = item.Id.Set(e.ExternalObjectId.String()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 
 		case "", "title":
-			i.Title = field.Value
+			item.Title = field.Value
 
 		case "url":
-			if err = i.Url.Set(field.Value); err != nil {
+			if err = item.Url.Set(field.Value); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
