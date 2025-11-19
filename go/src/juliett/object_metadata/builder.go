@@ -3,15 +3,17 @@ package object_metadata
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type builder struct {
-	metadata *metadata
+	metadata *Metadata
 }
 
 func MakeBuilder() *builder {
 	return &builder{
-		metadata: &metadata{},
+		metadata: &Metadata{},
 	}
 }
 
@@ -35,8 +37,20 @@ func (builder *builder) WithDescription(
 	return builder
 }
 
-func (builder *builder) Build() IMetadataMutable {
-	metadata := builder.metadata
+func (builder *builder) WithTags(tags ids.TagSet) *builder {
+	builder.checkReuse()
+	builder.metadata.SetTags(tags)
+	return builder
+}
+
+func (builder *builder) WithBlobDigest(digest markl.Id) *builder {
+	builder.checkReuse()
+	builder.metadata.GetBlobDigestMutable().ResetWithMarklId(digest)
+	return builder
+}
+
+func (builder *builder) Build() Metadata {
+	metadata := *builder.metadata
 	builder.metadata = nil
 	return metadata
 }

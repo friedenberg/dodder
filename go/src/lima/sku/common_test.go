@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
@@ -34,14 +33,6 @@ func makeTagSet(t *ui.TestContext, vs ...string) (es ids.TagSet) {
 	var err error
 
 	if es, err = collections_ptr.MakeValueSetString[ids.Tag](nil, vs...); err != nil {
-		t.Fatalf("%s", err)
-	}
-
-	return es
-}
-
-func makeBlobExt(t *ui.TestContext, v string) (es ids.Type) {
-	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
 
@@ -144,18 +135,17 @@ func TestEqualitySelf(t1 *testing.T) {
 }
 
 func testEqualitySelf(t *ui.TestContext) {
-	text := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "text"),
-	}
+	text := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("text").
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
-	text.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
-
-	if !object_metadata.Equaler.Equals(text, text) {
+	if !object_metadata.Equaler.Equals(&text, &text) {
 		t.Fatalf("expected %v to equal itself", text)
 	}
 }
@@ -165,29 +155,25 @@ func TestEqualityNotSelf(t1 *testing.T) {
 }
 
 func testEqualityNotSelf(t *ui.TestContext) {
-	text := object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "text"),
-	}
-
-	text.SetTags(makeTagSet(t,
+	tags := makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
-	))
+	)
 
-	text1 := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "text"),
-	}
+	text := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("text").
+		WithTags(tags).
+		Build()
 
-	text1.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
+	text1 := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("text").
+		WithTags(tags).
+		Build()
 
-	if !object_metadata.Equaler.Equals(&text, text1) {
+	if !object_metadata.Equaler.Equals(&text, &text1) {
 		t.Fatalf("expected %v to equal %v", text, text1)
 	}
 }
@@ -224,21 +210,20 @@ func testReadWithoutBlob(t *ui.TestContext) {
 `,
 	)
 
-	expected := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "md"),
-	}
+	expected := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("md").
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
-	expected.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
-
-	if !object_metadata.Equaler.Equals(actual, expected) {
+	if !object_metadata.Equaler.Equals(actual, &expected) {
 		t.Fatalf(
 			"zettel:\nexpected: %s\n  actual: %s",
-			StringMetadataSansTaiMerkle2(expected),
+			StringMetadataSansTaiMerkle2(&expected),
 			StringMetadataSansTaiMerkle2(actual),
 		)
 	}
@@ -269,19 +254,18 @@ func testReadWithoutBlobWithMultilineDescription(t *ui.TestContext) {
 `,
 	)
 
-	expected := &object_metadata.Metadata{
-		Description: descriptions.Make("the title continues"),
-		Type:        makeBlobExt(t, "md"),
-	}
+	expected := object_metadata.MakeBuilder().
+		WithDescription("the title continues").
+		WithType("md").
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
-	expected.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
-
-	if !object_metadata.Equaler.Equals(actual, expected) {
-		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
+	if !object_metadata.Equaler.Equals(actual, &expected) {
+		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", &expected, actual)
 	}
 
 	if !actual.GetBlobDigest().IsNull() {
@@ -318,21 +302,19 @@ the body`,
 		"blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz",
 	))
 
-	expected := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "md"),
-	}
+	expected := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("md").
+		WithBlobDigest(expectedBlobDigest).
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
-	expected.GetBlobDigestMutable().ResetWithMarklId(expectedBlobDigest)
-
-	expected.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
-
-	if !object_metadata.Equaler.Equals(actual, expected) {
-		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
+	if !object_metadata.Equaler.Equals(actual, &expected) {
+		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", &expected, actual)
 	}
 }
 
@@ -407,16 +389,15 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 }
 
 func testWriteWithoutBlob(t *ui.TestContext) {
-	object := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "md"),
-	}
-
-	object.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
+	object := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("md").
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
 	envRepo := env_repo.MakeTesting(
 		t,
@@ -433,7 +414,7 @@ func testWriteWithoutBlob(t *ui.TestContext) {
 
 	actual := writeFormat(
 		t,
-		object,
+		&object,
 		format,
 		false,
 		"the body",
@@ -460,16 +441,15 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 }
 
 func testWriteWithInlineBlob(t *ui.TestContext) {
-	object := &object_metadata.Metadata{
-		Description: descriptions.Make("the title"),
-		Type:        makeBlobExt(t, "md"),
-	}
-
-	object.SetTags(makeTagSet(t,
-		"tag1",
-		"tag2",
-		"tag3",
-	))
+	object := object_metadata.MakeBuilder().
+		WithDescription("the title").
+		WithType("md").
+		WithTags(makeTagSet(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		)).
+		Build()
 
 	envRepo := env_repo.MakeTesting(
 		t,
@@ -486,7 +466,7 @@ func testWriteWithInlineBlob(t *ui.TestContext) {
 
 	actual := writeFormat(
 		t,
-		object,
+		&object,
 		format,
 		true,
 		"the body",
