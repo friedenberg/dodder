@@ -52,7 +52,7 @@ func (json *WithDormant) ToTransacted(
 		return err
 	}
 
-	object.Metadata.Index.Dormant.SetBool(json.Dormant)
+	object.Metadata.GetIndexMutable().GetDormantMutable().SetBool(json.Dormant)
 
 	return err
 }

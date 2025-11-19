@@ -92,7 +92,9 @@ func (c *executor) tryToEmitOneUntracked(
 	sku.TransactedResetter.Reset(c.co.GetSkuExternal().GetSku())
 	sku.TransactedResetter.Reset(c.co.GetSku())
 
-	if err = c.co.GetSkuExternal().Metadata.Description.Set(item.Title); err != nil {
+	if err = c.co.GetSkuExternal().GetMetadataMutable().GetDescriptionMutable().Set(
+		item.Title,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

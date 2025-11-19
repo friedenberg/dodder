@@ -13,17 +13,17 @@ import (
 )
 
 // TODO move to object_factory
-func newAssignment(d int) *Assignment {
-	a := &Assignment{
-		Depth:    d,
+func newAssignment(depth int) *Assignment {
+	assignment := &Assignment{
+		Depth:    depth,
 		objects:  make(map[string]struct{}),
 		Objects:  make(Objects, 0),
 		Children: make([]*Assignment, 0),
 	}
 
-	sku.TransactedResetter.Reset(&a.Transacted)
+	sku.TransactedResetter.Reset(&assignment.Transacted)
 
-	return a
+	return assignment
 }
 
 type Assignment struct {
@@ -37,99 +37,92 @@ type Assignment struct {
 	Parent   *Assignment
 }
 
-func (a *Assignment) AddObject(v *obj) (err error) {
-	k := keyer.GetKey(v.sku)
-	_, ok := a.objects[k]
+func (assignment *Assignment) AddObject(object *obj) (err error) {
+	key := keyer.GetKey(object.sku)
+	_, ok := assignment.objects[key]
 
 	if ok {
 		return err
 	}
 
-	a.objects[k] = struct{}{}
+	assignment.objects[key] = struct{}{}
 
-	return a.Objects.Add(v)
+	return assignment.Objects.Add(object)
 }
 
-func (a Assignment) GetDepth() int {
-	if a.Parent == nil {
+func (assignment Assignment) GetDepth() int {
+	if assignment.Parent == nil {
 		return 0
 	} else {
-		return a.Parent.GetDepth() + 1
+		return assignment.Parent.GetDepth() + 1
 	}
 }
 
-func (a Assignment) MaxDepth() (d int) {
-	d = a.GetDepth()
+func (assignment Assignment) MaxDepth() (depth int) {
+	depth = assignment.GetDepth()
 
-	for _, c := range a.Children {
-		cd := c.MaxDepth()
+	for _, child := range assignment.Children {
+		childDepth := child.MaxDepth()
 
-		if d < cd {
-			d = cd
+		if depth < childDepth {
+			depth = childDepth
 		}
 	}
 
-	return d
+	return depth
 }
 
-func (a Assignment) AlignmentSpacing() int {
-	if a.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(a.Transacted.Metadata.GetTags().Any()) {
-		return a.Parent.AlignmentSpacing() + len(
-			a.Parent.Transacted.Metadata.GetTags().Any().String(),
+func (assignment Assignment) AlignmentSpacing() int {
+	if assignment.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(assignment.Transacted.Metadata.GetTags().Any()) {
+		return assignment.Parent.AlignmentSpacing() + len(
+			assignment.Parent.Transacted.Metadata.GetTags().Any().String(),
 		)
 	}
 
 	return 0
 }
 
-func (a Assignment) MaxLen() (m int) {
-	for _, z := range a.Objects.All() {
-		oM := z.sku.GetSkuExternal().ObjectId.Len()
+func (assignment Assignment) MaxLen() (maxLength int) {
+	for _, object := range assignment.Objects.All() {
+		objectIdLength := object.sku.GetSkuExternal().ObjectId.Len()
 
-		if oM > m {
-			m = oM
+		if objectIdLength > maxLength {
+			maxLength = objectIdLength
 		}
 	}
 
-	for _, c := range a.Children {
-		oM := c.MaxLen()
+	for _, child := range assignment.Children {
+		childMaxLength := child.MaxLen()
 
-		if oM > m {
-			m = oM
+		if childMaxLength > maxLength {
+			maxLength = childMaxLength
 		}
 	}
 
-	return m
+	return maxLength
 }
 
-func (a Assignment) String() (s string) {
-	if a.Parent != nil {
-		s = a.Parent.String() + "."
+func (assignment Assignment) String() (s string) {
+	if assignment.Parent != nil {
+		s = assignment.Parent.String() + "."
 	}
 
-	return s + quiter.StringCommaSeparated(a.Transacted.Metadata.GetTags())
+	return s + quiter.StringCommaSeparated(assignment.Transacted.Metadata.GetTags())
 }
 
-func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
-	b = newAssignment(a.GetDepth() + 1)
+func (assignment *Assignment) makeChild(e ids.Tag) (b *Assignment) {
+	b = newAssignment(assignment.GetDepth() + 1)
 	b.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(e))
-	a.addChild(b)
+	assignment.addChild(b)
 	return b
 }
 
-func (a *Assignment) makeChildWithSet(es ids.TagMutableSet) (b *Assignment) {
-	b = newAssignment(a.GetDepth() + 1)
-	b.Transacted.GetMetadataMutable().SetTags(es)
-	a.addChild(b)
-	return b
-}
-
-func (a *Assignment) addChild(c *Assignment) {
-	if a == c {
+func (assignment *Assignment) addChild(c *Assignment) {
+	if assignment == c {
 		panic("child and parent are the same")
 	}
 
-	if c.Parent != nil && c.Parent == a {
+	if c.Parent != nil && c.Parent == assignment {
 		panic("child already has self as parent")
 	}
 
@@ -137,49 +130,49 @@ func (a *Assignment) addChild(c *Assignment) {
 		panic("child already has a parent")
 	}
 
-	a.Children = append(a.Children, c)
-	c.Parent = a
+	assignment.Children = append(assignment.Children, c)
+	c.Parent = assignment
 }
 
-func (a *Assignment) parentOrRoot() (p *Assignment) {
-	switch a.Parent {
+func (assignment *Assignment) parentOrRoot() (p *Assignment) {
+	switch assignment.Parent {
 	case nil:
-		return a
+		return assignment
 
 	default:
-		return a.Parent
+		return assignment.Parent
 	}
 }
 
-func (a *Assignment) nthParent(n int) (p *Assignment, err error) {
+func (assignment *Assignment) nthParent(n int) (p *Assignment, err error) {
 	if n < 0 {
 		n = -n
 	}
 
 	if n == 0 {
-		p = a
+		p = assignment
 		return p, err
 	}
 
-	if a.Parent == nil {
+	if assignment.Parent == nil {
 		err = errors.ErrorWithStackf("cannot get nth parent as parent is nil")
 		return p, err
 	}
 
-	return a.Parent.nthParent(n - 1)
+	return assignment.Parent.nthParent(n - 1)
 }
 
-func (a *Assignment) removeFromParent() (err error) {
-	return a.Parent.removeChild(a)
+func (assignment *Assignment) removeFromParent() (err error) {
+	return assignment.Parent.removeChild(assignment)
 }
 
-func (a *Assignment) removeChild(c *Assignment) (err error) {
-	if c.Parent != a {
+func (assignment *Assignment) removeChild(c *Assignment) (err error) {
+	if c.Parent != assignment {
 		err = errors.ErrorWithStackf("attempting to remove child from wrong parent")
 		return err
 	}
 
-	if len(a.Children) == 0 {
+	if len(assignment.Children) == 0 {
 		err = errors.ErrorWithStackf(
 			"attempting to remove child when there are no children",
 		)
@@ -187,7 +180,7 @@ func (a *Assignment) removeChild(c *Assignment) (err error) {
 	}
 
 	cap1 := 0
-	cap2 := len(a.Children) - 1
+	cap2 := len(assignment.Children) - 1
 
 	if cap2 > 0 {
 		cap1 = cap2
@@ -195,7 +188,7 @@ func (a *Assignment) removeChild(c *Assignment) (err error) {
 
 	nc := make([]*Assignment, 0, cap1)
 
-	for _, c1 := range a.Children {
+	for _, c1 := range assignment.Children {
 		if c1 == c {
 			continue
 		}
@@ -204,23 +197,23 @@ func (a *Assignment) removeChild(c *Assignment) (err error) {
 	}
 
 	c.Parent = nil
-	a.Children = nc
+	assignment.Children = nc
 
 	return err
 }
 
-func (a *Assignment) consume(b *Assignment) (err error) {
+func (assignment *Assignment) consume(b *Assignment) (err error) {
 	for _, c := range b.Children {
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		a.addChild(c)
+		assignment.addChild(c)
 	}
 
 	for _, obj := range b.Objects.All() {
-		a.AddObject(obj)
+		assignment.AddObject(obj)
 	}
 	for _, obj := range b.Objects.All() {
 		b.Objects.Del(obj)
@@ -234,14 +227,14 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 	return err
 }
 
-func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
-	if a == nil {
+func (assignment *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
+	if assignment == nil {
 		return err
 	}
 
 	var es ids.TagSet
 
-	if es, err = a.expandedTags(); err != nil {
+	if es, err = assignment.expandedTags(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -253,7 +246,7 @@ func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 		}
 	}
 
-	if err = a.Parent.AllTags(mes); err != nil {
+	if err = assignment.Parent.AllTags(mes); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -261,19 +254,19 @@ func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 	return err
 }
 
-func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
+func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
 	es = ids.MakeTagSet()
 
-	if a.Transacted.GetMetadata().GetTags().Len() != 1 || a.Parent == nil {
-		es = a.Transacted.GetMetadata().GetTags().CloneSetPtrLike()
+	if assignment.Transacted.GetMetadata().GetTags().Len() != 1 || assignment.Parent == nil {
+		es = assignment.Transacted.GetMetadata().GetTags().CloneSetPtrLike()
 		return es, err
 	} else {
-		e := a.Transacted.GetMetadata().GetTags().Any()
+		e := assignment.Transacted.GetMetadata().GetTags().Any()
 
 		if ids.IsDependentLeaf(e) {
 			var pe ids.TagSet
 
-			if pe, err = a.Parent.expandedTags(); err != nil {
+			if pe, err = assignment.Parent.expandedTags(); err != nil {
 				err = errors.Wrap(err)
 				return es, err
 			}
@@ -281,7 +274,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			if pe.Len() > 1 {
 				err = errors.ErrorWithStackf(
 					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
-					a.Parent.Transacted.GetMetadata().GetTags(),
+					assignment.Parent.Transacted.GetMetadata().GetTags(),
 				)
 
 				return es, err
@@ -306,8 +299,8 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 	return es, err
 }
 
-func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	for e := range a.Transacted.GetMetadata().GetTags().AllPtr() {
+func (assignment *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
+	for e := range assignment.Transacted.GetMetadata().GetTags().AllPtr() {
 		for e1 := range es.AllPtr() {
 			if ids.ContainsExactly(e1, e) {
 				if err = es.DelPtr(e1); err != nil {
@@ -323,29 +316,29 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 		}
 	}
 
-	if a.Parent == nil {
+	if assignment.Parent == nil {
 		return err
 	}
 
-	return a.Parent.SubtractFromSet(es)
+	return assignment.Parent.SubtractFromSet(es)
 }
 
-func (a *Assignment) Contains(e *ids.Tag) bool {
-	if a.Transacted.GetMetadata().GetTags().ContainsKey(e.String()) {
+func (assignment *Assignment) Contains(e *ids.Tag) bool {
+	if assignment.Transacted.GetMetadata().GetTags().ContainsKey(e.String()) {
 		return true
 	}
 
-	if a.Parent == nil {
+	if assignment.Parent == nil {
 		return false
 	}
 
-	return a.Parent.Contains(e)
+	return assignment.Parent.Contains(e)
 }
 
-func (parent *Assignment) SortChildren() {
-	sort.Slice(parent.Children, func(i, j int) bool {
-		esi := parent.Children[i].Transacted.GetMetadata().GetTags()
-		esj := parent.Children[j].Transacted.GetMetadata().GetTags()
+func (assignment *Assignment) SortChildren() {
+	sort.Slice(assignment.Children, func(i, j int) bool {
+		esi := assignment.Children[i].Transacted.GetMetadata().GetTags()
+		esj := assignment.Children[j].Transacted.GetMetadata().GetTags()
 
 		if esi.Len() == 1 && esj.Len() == 1 {
 			ei := strings.TrimPrefix(esi.Any().String(), "-")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
@@ -126,8 +127,8 @@ func (assignment *Assignment) addToSet(
 			panic("empty object")
 		}
 
-		if err = outputObject.GetSkuExternal().Metadata.Description.Set(
-			organizeObject.GetSkuExternal().Metadata.Description.String(),
+		if err = outputObject.GetSkuExternal().GetMetadataMutable().GetDescriptionMutable().Set(
+			organizeObject.GetSkuExternal().GetMetadata().GetDescription().String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -146,9 +147,9 @@ func (assignment *Assignment) addToSet(
 			return err
 		}
 
-		outputObject.GetSkuExternal().Metadata.Comments = append(
-			outputObject.GetSkuExternal().Metadata.Comments,
-			organizeObject.GetSkuExternal().Metadata.Comments...,
+		quiter.AppendSeq(
+			outputObject.GetSkuExternal().GetMetadataMutable().GetCommentsMutable(),
+			organizeObject.GetSkuExternal().GetMetadataMutable().GetComments(),
 		)
 
 		for e := range organizeObject.GetSkuExternal().Metadata.GetTags().AllPtr() {

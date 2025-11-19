@@ -124,8 +124,8 @@ func (cmd Checkin) Run(dep command.Request) {
 	workspace := localWorkingCopy.GetEnvWorkspace()
 	workspaceTags := workspace.GetDefaults().GetDefaultTags()
 
-	for t := range workspaceTags.All() {
-		cmd.Proto.Tags.Add(t)
+	for tag := range workspaceTags.All() {
+		cmd.Proto.AddTagPtr(&tag)
 	}
 
 	op := user_ops.Checkin{

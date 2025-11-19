@@ -67,18 +67,21 @@ func sortObjSet(
 
 func (objects Objects) Sort() {
 	sort.Slice(objects, func(i, j int) bool {
-		switch {
-		case objects[i].GetSkuExternal().ObjectId.IsEmpty() && objects[j].GetSkuExternal().ObjectId.IsEmpty():
-			return objects[i].GetSkuExternal().Metadata.Description.String() < objects[j].GetSkuExternal().Metadata.Description.String()
+		iObject := objects[i].GetSkuExternal()
+		jObject := objects[j].GetSkuExternal()
 
-		case objects[i].GetSkuExternal().ObjectId.IsEmpty():
+		switch {
+		case iObject.ObjectId.IsEmpty() && jObject.ObjectId.IsEmpty():
+			return iObject.GetMetadata().GetDescription().String() < jObject.GetMetadata().GetDescription().String()
+
+		case iObject.ObjectId.IsEmpty():
 			return true
 
-		case objects[j].GetSkuExternal().ObjectId.IsEmpty():
+		case jObject.ObjectId.IsEmpty():
 			return false
 
 		default:
-			return objects[i].GetSkuExternal().ObjectId.String() < objects[j].GetSkuExternal().ObjectId.String()
+			return iObject.ObjectId.String() < jObject.ObjectId.String()
 		}
 	})
 }

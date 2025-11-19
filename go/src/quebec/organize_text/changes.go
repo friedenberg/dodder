@@ -88,18 +88,21 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.SkuType) {
 	}
 
 	sort.Slice(out, func(i, j int) bool {
-		switch {
-		case out[i].GetSkuExternal().ObjectId.IsEmpty() && out[j].GetSkuExternal().ObjectId.IsEmpty():
-			return out[i].GetSkuExternal().Metadata.Description.String() < out[j].GetSkuExternal().Metadata.Description.String()
+		iObject := out[i].GetSkuExternal()
+		jObject := out[j].GetSkuExternal()
 
-		case out[i].GetSkuExternal().ObjectId.IsEmpty():
+		switch {
+		case iObject.ObjectId.IsEmpty() && jObject.ObjectId.IsEmpty():
+			return iObject.GetMetadata().GetDescription().String() < jObject.GetMetadata().GetDescription().String()
+
+		case iObject.ObjectId.IsEmpty():
 			return true
 
-		case out[j].GetSkuExternal().ObjectId.IsEmpty():
+		case jObject.ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].GetSkuExternal().ObjectId.String() < out[j].GetSkuExternal().ObjectId.String()
+			return iObject.ObjectId.String() < jObject.ObjectId.String()
 		}
 	})
 

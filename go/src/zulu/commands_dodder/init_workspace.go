@@ -128,7 +128,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 		Query: cmd.DefaultQueryGroup.String(),
 		Defaults: repo_configs.DefaultsV1OmitEmpty{
 			Type: cmd.Proto.GetType(),
-			Tags: quiter.Elements(cmd.Proto.Tags),
+			Tags: quiter.Elements(cmd.Proto.GetTags()),
 		},
 	}
 

@@ -83,7 +83,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 		return err
 	}
 
-	if object.Metadata.Description.IsEmpty() {
+	if object.GetMetadata().GetDescription().IsEmpty() {
 		sorted := quiter.ElementsSorted(
 			item.FDs,
 			func(a, b *fd.FD) bool {
@@ -94,7 +94,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 		for _, f := range sorted {
 			desc := f.FileNameSansExt()
 
-			if err = object.Metadata.Description.Set(desc); err != nil {
+			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(desc); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}

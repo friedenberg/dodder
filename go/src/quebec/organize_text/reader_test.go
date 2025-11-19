@@ -54,10 +54,13 @@ func makeObjWithZettelIdAndDescription(
 		sku: sku.MakeSkuType(),
 	}
 
-	object.sku.GetSkuExternal().Metadata.Description = makeDescription(
-		t,
-		description,
+	object.sku.GetSkuExternal().GetMetadataMutable().GetDescriptionMutable().ResetWith(
+		makeDescription(
+			t,
+			description,
+		),
 	)
+
 	object.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, zettelId))
 
 	// TODO add pubkeys to assignment reader
@@ -503,7 +506,7 @@ func TestAssignmentLineReaderBigCheese(t1 *testing.T) {
 	// ### w-2022-07-09
 	{
 		expected := ids.MakeTagSet(ids.MustTag("w-2022-07-09"))
-		actual := sub.root.Children[0].Children[0].Children[0].Transacted.Metadata.Tags
+		actual := sub.root.Children[0].Children[0].Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)

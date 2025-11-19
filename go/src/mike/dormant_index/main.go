@@ -56,19 +56,19 @@ func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	return err
 }
 
-func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
+func (sch *Index) ContainsSku(object *sku.Transacted) bool {
 	for _, e := range sch.tags {
 		if e.Len() == 0 {
 			panic("empty dormant tag")
 		}
 
-		all := sk.Metadata.Index.TagPaths.All
+		all := object.Metadata.GetIndex().GetTagPaths().All
 		i, ok := all.ContainsTag(e.Tag)
 
 		if ok {
 			ui.Log().Printf(
 				"dormant true for %s: %s in %s",
-				sk,
+				object,
 				e,
 				all[i],
 			)
@@ -79,7 +79,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 
 	ui.Log().Printf(
 		"dormant false for %s",
-		sk,
+		object,
 	)
 
 	return false

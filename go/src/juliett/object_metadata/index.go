@@ -20,6 +20,7 @@ type (
 	IIndexMutable interface {
 		IIndex
 
+		GetTagPathsMutable() *tag_paths.Tags
 		GetDormantMutable() *values.Bool
 		AddTagExpandedPtr(e *ids.Tag) (err error)
 		GetExpandedTagsMutable() ids.TagMutableSet
@@ -44,6 +45,10 @@ var (
 )
 
 func (index *Index) GetTagPaths() *tag_paths.Tags {
+	return &index.TagPaths
+}
+
+func (index *Index) GetTagPathsMutable() *tag_paths.Tags {
 	return &index.TagPaths
 }
 
