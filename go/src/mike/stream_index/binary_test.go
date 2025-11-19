@@ -34,7 +34,7 @@ func TestBinaryOne(t1 *testing.T) {
 				"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 			),
 		))
-		t.AssertNoError(expected.GetMetadataMutable().GetTypePtr().Set("da-typ"))
+		t.AssertNoError(expected.GetMetadataMutable().GetTypeMutable().Set("da-typ"))
 		t.AssertNoError(expected.GetMetadataMutable().GetDescriptionMutable().Set("the bez"))
 		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
 

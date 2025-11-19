@@ -332,7 +332,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Type:
-		if err = object.GetMetadataMutable().GetTypePtr().Set(
+		if err = object.GetMetadataMutable().GetTypeMutable().Set(
 			decoder.Content.String(),
 		); err != nil {
 			err = errors.Wrap(err)

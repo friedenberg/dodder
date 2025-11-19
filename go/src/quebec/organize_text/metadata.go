@@ -85,7 +85,7 @@ func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
 }
 
 func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
-	m1.Type = m.Type
+	m1.GetTypeMutable().ResetWith(m.Type)
 	m1.SetTags(m.TagSet)
 	return m1
 }

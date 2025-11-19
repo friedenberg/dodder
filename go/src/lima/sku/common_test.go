@@ -79,62 +79,62 @@ func TestMakeTags(t1 *testing.T) {
 }
 
 func testMakeTags(t *ui.TestContext) {
-	vs := []string{
+	tagStrings := []string{
 		"tag1",
 		"tag2",
 		"tag3",
 	}
 
-	var sut ids.TagSet
+	var sutTagSet ids.TagSet
 	var err error
 
-	if sut, err = ids.MakeTagSetStrings(vs...); err != nil {
+	if sutTagSet, err = ids.MakeTagSetStrings(tagStrings...); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	if sut.Len() != 3 {
-		t.Fatalf("expected len 3 but got %d", sut.Len())
+	if sutTagSet.Len() != 3 {
+		t.Fatalf("expected len 3 but got %d", sutTagSet.Len())
 	}
 
 	{
-		ac := sut.Len()
+		actualLength := sutTagSet.Len()
 
-		if ac != 3 {
-			t.Fatalf("expected len 3 but got %d", ac)
+		if actualLength != 3 {
+			t.Fatalf("expected len 3 but got %d", actualLength)
 		}
 	}
 
-	sut2 := sut.CloneSetLike()
+	sutTagSet2 := sutTagSet.CloneSetLike()
 
-	if sut2.Len() != 3 {
-		t.Fatalf("expected len 3 but got %d", sut2.Len())
+	if sutTagSet2.Len() != 3 {
+		t.Fatalf("expected len 3 but got %d", sutTagSet2.Len())
 	}
 
 	{
-		ac := quiter.SortedStrings[ids.Tag](sut)
+		actual := quiter.SortedStrings(sutTagSet)
 
-		if !reflect.DeepEqual(ac, vs) {
-			t.Fatalf("expected %q but got %q", vs, ac)
-		}
-	}
-
-	{
-		ex := "tag1, tag2, tag3"
-		ac := quiter.StringCommaSeparated[ids.Tag](sut)
-
-		if ac != ex {
-			t.Fatalf("expected %q but got %q", ex, ac)
+		if !reflect.DeepEqual(actual, tagStrings) {
+			t.Fatalf("expected %q but got %q", tagStrings, actual)
 		}
 	}
 
 	{
-		ex := "tag1, tag2, tag3"
-		ac := quiter.StringCommaSeparated[ids.Tag](
-			sut.CloneSetLike(),
+		expected := "tag1, tag2, tag3"
+		actual := quiter.StringCommaSeparated(sutTagSet)
+
+		if actual != expected {
+			t.Fatalf("expected %q but got %q", expected, actual)
+		}
+	}
+
+	{
+		expected := "tag1, tag2, tag3"
+		actual := quiter.StringCommaSeparated(
+			sutTagSet.CloneSetLike(),
 		)
 
-		if ac != ex {
-			t.Fatalf("expected %q but got %q", ex, ac)
+		if actual != expected {
+			t.Fatalf("expected %q but got %q", expected, actual)
 		}
 	}
 }

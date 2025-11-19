@@ -50,5 +50,5 @@ func (cmd ObjectMetadata) GetFlagValueMetadataDescription(
 func (cmd ObjectMetadata) GetFlagValueMetadataType(
 	metadata object_metadata.IMetadataMutable,
 ) interfaces.FlagValue {
-	return metadata.GetTypePtr()
+	return metadata.GetTypeMutable()
 }

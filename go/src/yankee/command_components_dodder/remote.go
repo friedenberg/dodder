@@ -55,7 +55,7 @@ func (cmd Remote) MakeRemoteAndObject(
 	command.PopRequestArgTo(
 		req.Args,
 		"remote type",
-		remoteObject.GetMetadataMutable().GetTypePtr(),
+		remoteObject.GetMetadataMutable().GetTypeMutable(),
 	)
 
 	blob := cmd.CreateRemoteBlob(

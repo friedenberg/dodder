@@ -53,7 +53,7 @@ func (a *Assignment) addToSet(
 			ot.ObjectFactory.ResetWith(outputObject, organizeObject.sku)
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
+				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
 					ot.Metadata.Type,
 				)
 			}
@@ -69,16 +69,16 @@ func (a *Assignment) addToSet(
 					objectOriginal.GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 
-				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
-					objectOriginal.GetSkuExternal().Metadata.Type,
+				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
+					objectOriginal.GetSkuExternal().GetMetadata().GetType(),
 				)
 
 				outputObject.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMarklId(
 					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigest(),
 				)
 
-				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Type.ResetWith(
-					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Type,
+				outputObject.GetSkuExternal().GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
+					objectOriginal.GetSkuExternal().GetSkuExternal().GetMetadata().GetType(),
 				)
 
 				outputObject.SetState(objectOriginal.GetState())
@@ -108,7 +108,7 @@ func (a *Assignment) addToSet(
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
+				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
 					ot.Metadata.Type,
 				)
 			}
@@ -131,9 +131,9 @@ func (a *Assignment) addToSet(
 			return err
 		}
 
-		if !organizeObject.GetSkuExternal().Metadata.Type.IsEmpty() {
-			if err = outputObject.GetSkuExternal().Metadata.Type.Set(
-				organizeObject.GetSkuExternal().Metadata.Type.String(),
+		if !organizeObject.GetSkuExternal().GetMetadata().GetType().IsEmpty() {
+			if err = outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().Set(
+				organizeObject.GetSkuExternal().GetMetadata().GetType().String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return err

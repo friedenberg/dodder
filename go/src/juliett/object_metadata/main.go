@@ -241,7 +241,7 @@ func (metadata *metadata) GetType() ids.Type {
 	return metadata.Type
 }
 
-func (metadata *metadata) GetTypePtr() *ids.Type {
+func (metadata *metadata) GetTypeMutable() *ids.Type {
 	return &metadata.Type
 }
 

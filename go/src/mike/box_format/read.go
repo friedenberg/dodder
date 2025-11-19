@@ -274,7 +274,7 @@ LOOP_AFTER_OID:
 			}
 
 		case genres.Type:
-			if err = object.GetMetadataMutable().GetTypePtr().TodoSetFromObjectId(
+			if err = object.GetMetadataMutable().GetTypeMutable().TodoSetFromObjectId(
 				&objectId,
 			); err != nil {
 				err = errors.Wrap(err)

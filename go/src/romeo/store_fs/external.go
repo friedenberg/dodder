@@ -74,16 +74,16 @@ func (store *Store) GetObjectOrError(
 func (store *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
-	sk := el.GetSku()
+	object := el.GetSku()
 
 	var item *sku.FSItem
 
-	if item, err = store.ReadFSItemFromExternal(sk); err != nil {
+	if item, err = store.ReadFSItemFromExternal(object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if sk.Metadata.Description.IsEmpty() {
+	if object.Metadata.Description.IsEmpty() {
 		sorted := quiter.ElementsSorted(
 			item.FDs,
 			func(a, b *fd.FD) bool {
@@ -94,7 +94,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 		for _, f := range sorted {
 			desc := f.FileNameSansExt()
 
-			if err = sk.Metadata.Description.Set(desc); err != nil {
+			if err = object.Metadata.Description.Set(desc); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -104,21 +104,23 @@ func (store *Store) UpdateTransactedFromBlobs(
 	if !item.Blob.IsEmpty() {
 		blobFD := &item.Blob
 		ext := blobFD.ExtSansDot()
-		typFromExtension := store.config.GetTypeStringFromExtension(ext)
+		typeFromExtension := store.config.GetTypeStringFromExtension(ext)
 
-		if typFromExtension == "" {
-			typFromExtension = ext
+		if typeFromExtension == "" {
+			typeFromExtension = ext
 		}
 
-		if typFromExtension != "" {
-			if err = sk.Metadata.Type.Set(typFromExtension); err != nil {
+		if typeFromExtension != "" {
+			if err = object.GetMetadataMutable().GetTypeMutable().Set(
+				typeFromExtension,
+			); err != nil {
 				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
 				return err
 			}
 		}
 	}
 
-	if err = store.WriteFSItemToExternal(item, sk); err != nil {
+	if err = store.WriteFSItemToExternal(item, object); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

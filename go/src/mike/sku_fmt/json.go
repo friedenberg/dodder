@@ -158,7 +158,7 @@ func (json *JSON) ToTransacted(
 		return err
 	}
 
-	if err = object.GetMetadataMutable().GetTypePtr().Set(json.Type); err != nil {
+	if err = object.GetMetadataMutable().GetTypeMutable().Set(json.Type); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

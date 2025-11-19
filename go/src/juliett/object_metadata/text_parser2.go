@@ -94,7 +94,7 @@ func (parser *textParser2) readType(
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = metadata.GetTypePtr().Set(tail); err != nil {
+		if err = metadata.GetTypeMutable().Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -111,7 +111,7 @@ func (parser *textParser2) readType(
 			return err
 		}
 
-		if err = metadata.GetTypePtr().Set(tail); err != nil {
+		if err = metadata.GetTypeMutable().Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -128,7 +128,7 @@ func (parser *textParser2) readType(
 
 	//! <typ ext>
 	default:
-		if err = metadata.GetTypePtr().Set(head); err != nil {
+		if err = metadata.GetTypeMutable().Set(head); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

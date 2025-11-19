@@ -61,7 +61,7 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 
 	if genres.Type == daughter.GetGenre() {
 		if daughter.GetType().IsEmpty() {
-			daughter.GetMetadataMutable().GetTypePtr().ResetWith(
+			daughter.GetMetadataMutable().GetTypeMutable().ResetWith(
 				ids.DefaultOrPanic(genres.Type),
 			)
 		}
@@ -388,7 +388,7 @@ func (commitFacilitator commitFacilitator) createType(
 		return err
 
 	case genres.Type:
-		typeObject.GetMetadataMutable().GetTypePtr().ResetWith(
+		typeObject.GetMetadataMutable().GetTypeMutable().ResetWith(
 			ids.DefaultOrPanic(genres.Type),
 		)
 	}

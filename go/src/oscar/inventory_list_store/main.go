@@ -190,7 +190,7 @@ func (store *Store) Create(
 
 	object = sku.GetTransactedPool().Get()
 
-	object.GetMetadataMutable().GetTypePtr().ResetWith(store.getType())
+	object.GetMetadataMutable().GetTypeMutable().ResetWith(store.getType())
 	object.GetMetadataMutable().GetDescriptionMutable().ResetWith(openList.Description)
 
 	tai := store.GetTai()

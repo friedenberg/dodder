@@ -79,7 +79,7 @@ func (blobStore *blobStoreV0) WriteInventoryListObject(
 
 	defer errors.DeferredCloser(&err, blobStoreWriteCloser)
 
-	object.GetMetadataMutable().GetTypePtr().ResetWith(blobStore.blobType)
+	object.GetMetadataMutable().GetTypeMutable().ResetWith(blobStore.blobType)
 
 	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
 		blobStoreWriteCloser,

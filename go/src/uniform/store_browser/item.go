@@ -108,7 +108,7 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 		}
 	}
 
-	e.GetMetadataMutable().GetTypePtr().Set("!toml-bookmark")
+	e.GetMetadataMutable().GetTypeMutable().Set("!toml-bookmark")
 
 	m := &e.Metadata
 

@@ -114,7 +114,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	}
 
 	object.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(digest)
-	object.GetMetadataMutable().GetTypePtr().ResetWith(
+	object.GetMetadataMutable().GetTypeMutable().ResetWith(
 		ids.DefaultOrPanic(genres.Type),
 	)
 
@@ -162,7 +162,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return err
 	}
 
-	newConfig.GetMetadataMutable().GetTypePtr().ResetWith(typedBlob.Type)
+	newConfig.GetMetadataMutable().GetTypeMutable().ResetWith(typedBlob.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		newConfig,

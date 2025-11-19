@@ -21,7 +21,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 		tags = ids.MakeTagSet(defaults.GetDefaultTags()...)
 	}
 
-	proto.Metadata.Type = tipe
+	proto.Metadata.GetTypeMutable().ResetWith(tipe)
 	proto.Metadata.SetTags(tags)
 
 	return proto
@@ -40,8 +40,8 @@ func (proto *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (proto Proto) Equals(metadata object_metadata.IMetadataMutable) (ok bool) {
 	var okType, okMetadata bool
 
-	if !ids.IsEmpty(proto.Metadata.Type) &&
-		proto.Metadata.Type.Equals(metadata.GetType()) {
+	if !ids.IsEmpty(proto.Metadata.GetType()) &&
+		proto.Metadata.GetType().Equals(metadata.GetType()) {
 		okType = true
 	}
 
@@ -76,10 +76,10 @@ func (proto Proto) ApplyType(
 	switch g {
 	case genres.Zettel, genres.None:
 		if ids.IsEmpty(metadata.GetType()) &&
-			!ids.IsEmpty(proto.Metadata.Type) &&
-			!metadata.GetType().Equals(proto.Metadata.Type) {
+			!ids.IsEmpty(proto.Metadata.GetType()) &&
+			!metadata.GetType().Equals(proto.Metadata.GetType()) {
 			ok = true
-			metadata.GetTypePtr().ResetWith(proto.Metadata.Type)
+			metadata.GetTypeMutable().ResetWith(proto.Metadata.GetType())
 		}
 	}
 
@@ -96,8 +96,8 @@ func (proto Proto) Apply(
 		changed = true
 	}
 
-	if proto.Metadata.Description.WasSet() &&
-		!metadata.GetDescription().Equals(proto.Metadata.Description) {
+	if proto.Metadata.GetDescription().WasSet() &&
+		!metadata.GetDescription().Equals(proto.Metadata.GetDescription()) {
 		changed = true
 		metadata.GetDescriptionMutable().ResetWith(proto.Metadata.GetDescription())
 	}
@@ -120,15 +120,15 @@ func (proto Proto) ApplyWithBlobFD(
 	metadataMutable := metadataGetter.GetMetadataMutable()
 
 	if ids.IsEmpty(metadataMutable.GetType()) &&
-		!ids.IsEmpty(proto.Metadata.Type) &&
-		!metadataMutable.GetType().Equals(proto.Metadata.Type) {
-		metadataMutable.GetTypePtr().ResetWith(proto.Metadata.Type)
+		!ids.IsEmpty(proto.Metadata.GetType()) &&
+		!metadataMutable.GetType().Equals(proto.Metadata.GetType()) {
+		metadataMutable.GetTypeMutable().ResetWith(proto.Metadata.GetType())
 	} else {
 		// TODO-P4 use konfig
 		ext := blobFD.Ext()
 
 		if ext != "" {
-			if err = metadataMutable.GetTypePtr().Set(blobFD.Ext()); err != nil {
+			if err = metadataMutable.GetTypeMutable().Set(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -137,9 +137,9 @@ func (proto Proto) ApplyWithBlobFD(
 
 	desc := blobFD.FileNameSansExt()
 
-	if proto.Metadata.Description.WasSet() &&
-		!metadataMutable.GetDescription().Equals(proto.Metadata.Description) {
-		desc = proto.Metadata.Description.String()
+	if proto.Metadata.GetDescription().WasSet() &&
+		!metadataMutable.GetDescription().Equals(proto.Metadata.GetDescription()) {
+		desc = proto.Metadata.GetDescription().String()
 	}
 
 	if err = metadataMutable.GetDescriptionMutable().Set(desc); err != nil {

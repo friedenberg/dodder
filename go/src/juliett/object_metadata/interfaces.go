@@ -50,8 +50,7 @@ type (
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetIndexMutable() IIndexMutable
 		GetLockfileMutable() LockfileMutable
-		// TODO rename to GetTypeMutable
-		GetTypePtr() *ids.Type
+		GetTypeMutable() *ids.Type
 		GetDescriptionMutable() *descriptions.Description
 		GetTaiMutable() *ids.Tai
 		GetBlobDigestMutable() interfaces.MutableMarklId

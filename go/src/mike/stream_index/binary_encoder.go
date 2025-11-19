@@ -197,7 +197,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return n, err
 		}
 
-		if n, err = encoder.writeFieldBinaryMarshaler(object.GetMetadataMutable().GetTypePtr()); err != nil {
+		if n, err = encoder.writeFieldBinaryMarshaler(object.GetMetadataMutable().GetTypeMutable()); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}

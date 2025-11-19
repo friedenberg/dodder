@@ -82,7 +82,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 
 	defer errors.DeferredCloser(&err, blobStoreWriteCloser)
 
-	object.GetMetadataMutable().GetTypePtr().ResetWith(blobStore.blobType)
+	object.GetMetadataMutable().GetTypeMutable().ResetWith(blobStore.blobType)
 
 	var file *os.File
 
