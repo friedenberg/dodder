@@ -418,7 +418,7 @@ func (store *Store) WriteFSItemToExternal(
 	transactedGetter sku.TransactedGetter,
 ) (err error) {
 	object := transactedGetter.GetSku()
-	object.Metadata.Fields = object.Metadata.Fields[:0]
+	object.GetMetadataMutable().GetFieldsMutable().Reset()
 
 	metadata := object.GetMetadataMutable()
 	metadata.GetTaiMutable().ResetWith(item.GetTai())

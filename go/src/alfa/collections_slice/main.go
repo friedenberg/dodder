@@ -42,18 +42,25 @@ func (slice *Slice[ELEMENT]) Reset() {
 	*slice = (*slice)[:0]
 }
 
-func (slice *Slice[ELEMENT]) ResetWith(other interfaces.Seq[ELEMENT]) {
+func (slice *Slice[ELEMENT]) ResetWith(other Slice[ELEMENT]) {
+	slice.ResetWithCollection(other)
+}
+
+func (slice *Slice[ELEMENT]) ResetWithCollection(
+	collection interfaces.Collection[ELEMENT],
+) {
+	slice.Reset()
+	slice.Grow(collection.Len())
+
+	for element := range collection.All() {
+		slice.Append(element)
+	}
+}
+
+func (slice *Slice[ELEMENT]) ResetWithSeq(other interfaces.Seq[ELEMENT]) {
 	slice.Reset()
 
-	if otherSlice, ok := any(other).(Slice[ELEMENT]); ok {
-		slice.Grow(otherSlice.Len())
-
-		for _, element := range otherSlice {
-			slice.Append(element)
-		}
-	} else {
-		for element := range other {
-			slice.Append(element)
-		}
+	for element := range other {
+		slice.Append(element)
 	}
 }

@@ -22,7 +22,9 @@ function try() {
       ../{zz-pandoc,zz-vim,zz-tests_bats} \
       gomod2nix.toml
 
-    git commit --allow-empty -m "update (pre codegen and test)"
+    if ! git commit --allow-empty -m "update (pre codegen and test)"; then
+      exit 1
+    fi
   }
 
   target="deploy-github"
