@@ -1,6 +1,8 @@
 package sku_fmt
 
 import (
+	"slices"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -32,8 +34,8 @@ func MakeItemDeletedStringWriterFormat(
 }
 
 func (f *itemDeletedStringFormatWriter) EncodeStringTo(
-	o *sku.Transacted,
-	sw interfaces.WriterAndStringWriter,
+	object *sku.Transacted,
+	stringWriter interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -46,7 +48,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 		prefixOne = string_format_writer.StringWouldDelete
 	}
 
-	n2, err = f.rightAlignedWriter.EncodeStringTo(prefixOne, sw)
+	n2, err = f.rightAlignedWriter.EncodeStringTo(prefixOne, stringWriter)
 	n += n2
 
 	if err != nil {
@@ -54,7 +56,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 		return n, err
 	}
 
-	n1, err = sw.WriteString("[")
+	n1, err = stringWriter.WriteString("[")
 	n += int64(n1)
 
 	if err != nil {
@@ -63,8 +65,10 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 	}
 
 	n2, err = f.fieldsFormatWriter.EncodeStringTo(
-		string_format_writer.Box{Contents: o.Metadata.Fields},
-		sw,
+		string_format_writer.Box{
+			Contents: slices.Collect(object.GetMetadata().GetFields()),
+		},
+		stringWriter,
 	)
 	n += n2
 
@@ -73,7 +77,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 		return n, err
 	}
 
-	n1, err = sw.WriteString("]")
+	n1, err = stringWriter.WriteString("]")
 	n += int64(n1)
 
 	if err != nil {
