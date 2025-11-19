@@ -22,7 +22,6 @@ type (
 		GetDescription() descriptions.Description
 		GetTai() ids.Tai
 		GetType() ids.Type
-		GetComments() interfaces.Seq[string]
 		GetFields() interfaces.Seq[Field]
 
 		GetBlobDigest() interfaces.MarklId
@@ -31,6 +30,8 @@ type (
 		GetRepoPubKey() interfaces.MarklId
 		GetObjectSig() interfaces.MarklId
 		GetSelfWithoutTai() interfaces.MarklId
+
+		GetComments() interfaces.Seq[string] // TODO move to IIndex
 	}
 
 	IMetadataMutable interface {
@@ -46,7 +47,6 @@ type (
 		AddTagPtrFast(tag *ids.Tag) (err error)
 		GenerateExpandedTags()
 
-		GetCommentsMutable() *collections_slice.Slice[string]
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetIndexMutable() IIndexMutable
 		GetLockfileMutable() LockfileMutable
@@ -59,6 +59,8 @@ type (
 		GetRepoPubKeyMutable() interfaces.MutableMarklId
 		GetObjectSigMutable() interfaces.MutableMarklId
 		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
+
+		GetCommentsMutable() *collections_slice.Slice[string] // TODO move to IIndexMutable
 	}
 
 	Getter interface {

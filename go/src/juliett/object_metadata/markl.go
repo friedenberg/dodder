@@ -43,11 +43,3 @@ func (metadata *metadata) GetObjectSig() interfaces.MarklId {
 func (metadata *metadata) GetObjectSigMutable() interfaces.MutableMarklId {
 	return &metadata.sigRepo
 }
-
-func (metadata *metadata) GetSelfWithoutTai() interfaces.MarklId {
-	return &metadata.SelfWithoutTai
-}
-
-func (metadata *metadata) GetSelfWithoutTaiMutable() interfaces.MutableMarklId {
-	return &metadata.SelfWithoutTai
-}

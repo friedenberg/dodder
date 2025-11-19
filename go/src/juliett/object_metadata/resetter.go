@@ -14,7 +14,6 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 	{
 		metadata := metadatuh.(*metadata)
 		metadata.Description.Reset()
-		metadata.Comments = metadata.Comments[:0]
 		metadata.sigRepo.Reset()
 		metadata.pubRepo.Reset()
 		metadata.ResetTags()
@@ -22,7 +21,6 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.Type = ids.Type{}
 		metadata.Tai.Reset()
 		metadata.DigBlob.Reset()
-		metadata.SelfWithoutTai.Reset()
 		metadata.digSelf.Reset()
 		metadata.sigMother.Reset()
 		metadata.Fields = metadata.Fields[:0]
@@ -33,8 +31,6 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 
 func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.Description = src.Description
-	dst.Comments = dst.Comments[:0]
-	dst.Comments = append(dst.Comments, src.Comments...)
 
 	dst.SetTagsFast(src.Tags)
 
@@ -75,15 +71,20 @@ func (resetterIndex) Reset(a *Index) {
 	a.SetExpandedTags(nil)
 	a.SetImplicitTags(nil)
 	a.QueryPath.Reset()
+	a.Comments = a.Comments[:0]
+	a.SelfWithoutTai.Reset()
 }
 
-func (resetterIndex) ResetWith(a, b *Index) {
-	a.ParentTai.ResetWith(b.ParentTai)
-	a.TagPaths.ResetWith(&b.TagPaths)
-	a.Dormant.ResetWith(b.Dormant)
-	a.SetExpandedTags(b.GetExpandedTags())
-	a.SetImplicitTags(b.GetImplicitTags())
-	a.QueryPath.Reset()
-	a.QueryPath = slices.Grow(a.QueryPath, b.QueryPath.Len())
-	copy(a.QueryPath, b.QueryPath)
+func (resetterIndex) ResetWith(dst, src *Index) {
+	dst.ParentTai.ResetWith(src.ParentTai)
+	dst.TagPaths.ResetWith(&src.TagPaths)
+	dst.Dormant.ResetWith(src.Dormant)
+	dst.SetExpandedTags(src.GetExpandedTags())
+	dst.SetImplicitTags(src.GetImplicitTags())
+	dst.QueryPath.Reset()
+	dst.QueryPath = slices.Grow(dst.QueryPath, src.QueryPath.Len())
+	copy(dst.QueryPath, src.QueryPath)
+
+	dst.Comments = dst.Comments[:0]
+	dst.Comments = append(dst.Comments, src.Comments...)
 }

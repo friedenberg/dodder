@@ -1,10 +1,6 @@
 package object_metadata
 
 import (
-	"fmt"
-
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -19,9 +15,6 @@ type Field = string_format_writer.Field
 // TODO transform into a view interface that can be backed by various
 // representations
 type metadata struct {
-	// Domain
-	// InventoryListTai
-
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
 	Tags ids.TagMutableSet // public for gob, but should be private
@@ -35,11 +28,8 @@ type metadata struct {
 
 	Tai ids.Tai
 
-	// TODO move to Index
-	Comments collections_slice.Slice[string]
-	Index    Index
+	Index Index
 
-	keyValues
 	blob
 	lockfile
 }
@@ -264,18 +254,6 @@ func (metadata *metadata) Subtract(
 	}
 
 	// ui.Debug().Print("after", b.Tags, a.Tags)
-}
-
-func (metadata *metadata) GetComments() interfaces.Seq[string] {
-	return metadata.Comments.All()
-}
-
-func (metadata *metadata) GetCommentsMutable() *collections_slice.Slice[string] {
-	return &metadata.Comments
-}
-
-func (metadata *metadata) AddComment(f string, vals ...any) {
-	metadata.Comments = append(metadata.Comments, fmt.Sprintf(f, vals...))
 }
 
 func (metadata *metadata) GenerateExpandedTags() {

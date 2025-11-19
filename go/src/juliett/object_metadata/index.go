@@ -1,6 +1,10 @@
 package object_metadata
 
 import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -36,7 +40,10 @@ type Index struct {
 	ExpandedTags ids.TagMutableSet // public for gob, but should be private
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private
 	TagPaths     tag_paths.Tags
+	Comments     collections_slice.Slice[string]
 	QueryPath
+
+	keyValues
 }
 
 var (
@@ -115,16 +122,16 @@ func (index *Index) GetImplicitTagsMutable() ids.TagMutableSet {
 	return index.ImplicitTags
 }
 
-func (index *Index) SetImplicitTags(e ids.TagSet) {
-	es := index.GetImplicitTagsMutable()
-	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
+func (index *Index) SetImplicitTags(tags ids.TagSet) {
+	tagsMutable := index.GetImplicitTagsMutable()
+	quiter.ResetMutableSetWithPool(tagsMutable, ids.GetTagPool())
 
-	if e == nil {
+	if tags == nil {
 		return
 	}
 
-	for tag := range e.All() {
-		errors.PanicIfError(es.Add(tag))
+	for tag := range tags.All() {
+		errors.PanicIfError(tagsMutable.Add(tag))
 	}
 }
 
@@ -134,4 +141,16 @@ func (index *Index) GetParentTai() ids.Tai {
 
 func (index *Index) GetParentTaiMutable() *ids.Tai {
 	return &index.ParentTai
+}
+
+func (metadata *metadata) GetComments() interfaces.Seq[string] {
+	return metadata.Index.Comments.All()
+}
+
+func (metadata *metadata) GetCommentsMutable() *collections_slice.Slice[string] {
+	return &metadata.Index.Comments
+}
+
+func (metadata *metadata) AddComment(f string, vals ...any) {
+	metadata.Index.Comments = append(metadata.Index.Comments, fmt.Sprintf(f, vals...))
 }

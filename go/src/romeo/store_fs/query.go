@@ -349,7 +349,7 @@ func (store *Store) queryUntracked(
 
 			if recognizedObject, err = addRecognizedIfNecessary(
 				object,
-				&object.Metadata.SelfWithoutTai,
+				object.GetMetadataMutable().GetSelfWithoutTaiMutable(),
 				store.probablyCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -37,3 +37,7 @@ func (slice *Slice[ELEMENT]) Grow(n int) {
 func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {
 	*slice = append(*slice, elements...)
 }
+
+func (slice *Slice[ELEMENT]) Reset() {
+	*slice = (*slice)[:0]
+}
