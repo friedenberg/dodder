@@ -41,6 +41,8 @@ type Index struct {
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private
 	TagPaths     tag_paths.Tags
 	Comments     collections_slice.Slice[string]
+	Fields       collections_slice.Slice[Field]
+
 	QueryPath
 
 	keyValues
@@ -153,4 +155,12 @@ func (metadata *metadata) GetCommentsMutable() *collections_slice.Slice[string] 
 
 func (metadata *metadata) AddComment(f string, vals ...any) {
 	metadata.Index.Comments = append(metadata.Index.Comments, fmt.Sprintf(f, vals...))
+}
+
+func (metadata *metadata) GetFields() interfaces.Seq[Field] {
+	return metadata.Index.Fields.All()
+}
+
+func (metadata *metadata) GetFieldsMutable() *collections_slice.Slice[Field] {
+	return &metadata.Index.Fields
 }

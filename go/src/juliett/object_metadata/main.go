@@ -30,7 +30,6 @@ type metadata struct {
 
 	Index Index
 
-	blob
 	lockfile
 }
 

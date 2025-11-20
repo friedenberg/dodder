@@ -17,13 +17,12 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.sigRepo.Reset()
 		metadata.pubRepo.Reset()
 		metadata.ResetTags()
-		ResetterIndex.Reset(&metadata.Index)
+		resetIndex(&metadata.Index)
 		metadata.Type = ids.Type{}
 		metadata.Tai.Reset()
 		metadata.DigBlob.Reset()
 		metadata.digSelf.Reset()
 		metadata.sigMother.Reset()
-		metadata.Fields = metadata.Fields[:0]
 		metadata.lockfile.tipe.Key = ""
 		metadata.lockfile.tipe.Id.Reset()
 	}
@@ -34,7 +33,7 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 
 	dst.SetTagsFast(src.Tags)
 
-	ResetterIndex.ResetWith(&dst.Index, &src.Index)
+	resetIndexWith(&dst.Index, &src.Index)
 
 	dst.sigRepo.ResetWith(src.sigRepo)
 	dst.pubRepo.ResetWith(src.pubRepo)
@@ -55,16 +54,11 @@ func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {
 		dst := dst.(*metadata)
 		src := src.(*metadata)
 		resetter.ResetWithExceptFields(dst, src)
-		dst.Fields = dst.Fields[:0]
-		dst.Fields = append(dst.Fields, src.Fields...)
+		dst.Index.Fields.ResetWith(src.Index.Fields)
 	}
 }
 
-var ResetterIndex resetterIndex
-
-type resetterIndex struct{}
-
-func (resetterIndex) Reset(a *Index) {
+func resetIndex(a *Index) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
@@ -75,7 +69,7 @@ func (resetterIndex) Reset(a *Index) {
 	a.SelfWithoutTai.Reset()
 }
 
-func (resetterIndex) ResetWith(dst, src *Index) {
+func resetIndexWith(dst, src *Index) {
 	dst.ParentTai.ResetWith(src.ParentTai)
 	dst.TagPaths.ResetWith(&src.TagPaths)
 	dst.Dormant.ResetWith(src.Dormant)

@@ -353,7 +353,7 @@ func (store *Store) ReadFSItemFromExternal(
 	object := transactedGetter.GetSku()
 
 	// TODO handle sort order
-	for _, field := range object.Metadata.Fields {
+	for field := range object.Metadata.GetFields() {
 		var fdee *fd.FD
 
 		switch strings.ToLower(field.Key) {
@@ -504,7 +504,7 @@ func (store *Store) WriteFSItemToExternal(
 			field.Key = "blob"
 		}
 
-		object.Metadata.Fields = append(object.Metadata.Fields, field)
+		object.Metadata.GetFieldsMutable().Append(field)
 	}
 
 	return err
