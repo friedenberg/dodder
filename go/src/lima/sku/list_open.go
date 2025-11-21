@@ -55,7 +55,7 @@ func (list *OpenList) Add(object *Transacted) (n int64, err error) {
 		return n, err
 	}
 
-	return
+	return n, err
 }
 
 // TODO swap this to not overwrite, as when importing from remotes, we want to
@@ -90,7 +90,7 @@ func (list *OpenList) Close() (err error) {
 		return err
 	}
 
-	return
+	return err
 }
 
 func (list *OpenList) GetMarklId() interfaces.MarklId {

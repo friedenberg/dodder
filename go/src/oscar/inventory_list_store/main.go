@@ -151,7 +151,7 @@ func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
 				return err
 			}
 
-			return
+			return err
 		})
 
 	return openList, err

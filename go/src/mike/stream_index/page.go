@@ -64,5 +64,5 @@ func (page *page) add(
 
 	additions.add(object)
 
-	return
+	return err
 }
