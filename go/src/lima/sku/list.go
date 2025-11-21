@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/heap"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
@@ -21,14 +20,6 @@ type (
 		ReadLast() (max *Transacted, err error)
 		AllInventoryListContents(interfaces.MarklId) Seq
 		AllInventoryLists() Seq
-	}
-
-	OpenList struct {
-		Tipe        ids.Type
-		Mover       interfaces.BlobWriter
-		Description descriptions.Description
-		LastTai     ids.Tai
-		Len         int
 	}
 )
 

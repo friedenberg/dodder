@@ -5,30 +5,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
-// TODO write binary representation to file-backed buffered writer and then
-// merge streams using raw binary data
-func (index *Index) add(
-	pageIndex PageIndex,
-	object *sku.Transacted,
-	options sku.CommitOptions,
-) (err error) {
-	page := &index.pages[pageIndex]
-
-	additions := page.additionsHistory
-
-	if index.sunrise.Less(object.GetTai()) ||
-		options.StreamIndexOptions.ForceLatest {
-		additions = page.additionsLatest
-	}
-
-	additions.add(object)
-
-	return err
-}
-
 type pageAdditions struct {
 	objectIdLookup map[string]struct{}
 	objects        *sku.ListTransacted
+	// objects        *sku.OpenList
 }
 
 func (additions *pageAdditions) initialize() {

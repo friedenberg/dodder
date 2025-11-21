@@ -128,54 +128,39 @@ func (store *Store) GetEnvRepo() env_repo.Env {
 }
 
 func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
-	openList = &sku.OpenList{}
+	var mover interfaces.BlobWriter
 
-	if openList.Mover, err = store.blobBlobStore.MakeBlobWriter(
+	if mover, err = store.blobBlobStore.MakeBlobWriter(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return openList, err
 	}
 
-	return openList, err
-}
-
-func (store *Store) AddObjectToOpenList(
-	openList *sku.OpenList,
-	object *sku.Transacted,
-) (err error) {
-	// TODO swap this to not overwrite, as when importing from remotes, we want to
-	// keep their signatures
-	if err = store.inventoryListBlobStore.GetObjectFinalizer().FinalizeAndSignOverwrite(
-		object,
-		store.envRepo.GetConfigPrivate().Blob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if _, err = inventory_list_coders.WriteObjectToOpenList(
+	openList = sku.MakeOpenList(
 		store.getFormat(),
-		object,
-		openList,
-	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"%#v, format type: %q",
-			object.GetMetadata().GetIndex().GetFields(),
-			store.getType(),
-		)
+		mover,
+		func(object *sku.Transacted) (err error) {
+			// TODO swap this to not overwrite, as when importing from remotes, we want to
+			// keep their signatures
+			if err = store.inventoryListBlobStore.GetObjectFinalizer().FinalizeAndSignOverwrite(
+				object,
+				store.envRepo.GetConfigPrivate().Blob,
+			); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
 
-		return err
-	}
+			return
+		})
 
-	return err
+	return openList, err
 }
 
 func (store *Store) Create(
 	openList *sku.OpenList,
 ) (object *sku.Transacted, err error) {
-	if openList.Len == 0 {
+	if openList.Len() == 0 {
 		err = errors.Wrap(ErrEmptyInventoryList)
 		return object, err
 	}
@@ -191,7 +176,9 @@ func (store *Store) Create(
 	object = sku.GetTransactedPool().Get()
 
 	object.GetMetadataMutable().GetTypeMutable().ResetWith(store.getType())
-	object.GetMetadataMutable().GetDescriptionMutable().ResetWith(openList.Description)
+	object.GetMetadataMutable().GetDescriptionMutable().ResetWith(
+		openList.GetDescription(),
+	)
 
 	tai := store.GetTai()
 
@@ -202,12 +189,12 @@ func (store *Store) Create(
 
 	object.SetTai(tai)
 
-	if err = openList.Mover.Close(); err != nil {
+	if err = openList.Close(); err != nil {
 		err = errors.Wrap(err)
 		return object, err
 	}
 
-	actual := openList.Mover.GetMarklId()
+	actual := openList.GetMarklId()
 	// expected := &merkle.Id{}
 
 	expected := object.GetBlobDigest()
@@ -237,7 +224,7 @@ func (store *Store) Create(
 	// }
 
 	if err = store.WriteInventoryListObject(object); err != nil {
-		err = errors.Wrapf(err, "OpenList: %d", openList.Len)
+		err = errors.Wrapf(err, "OpenList: %d", openList.Len())
 		return object, err
 	}
 

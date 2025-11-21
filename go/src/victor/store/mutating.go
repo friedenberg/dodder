@@ -359,8 +359,7 @@ func (commitFacilitator commitFacilitator) commitTransacted(
 	daughter *sku.Transacted,
 	mother *sku.Transacted,
 ) (err error) {
-	if err = commitFacilitator.inventoryListStore.AddObjectToOpenList(
-		commitFacilitator.inventoryList,
+	if _, err = commitFacilitator.inventoryList.Add(
 		daughter,
 	); err != nil {
 		err = errors.Wrap(err)

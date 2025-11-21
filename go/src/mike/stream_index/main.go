@@ -297,7 +297,9 @@ func (index *Index) Add(
 		return err
 	}
 
-	if err = index.add(pageIndex, object, options); err != nil {
+	page := &index.pages[pageIndex]
+
+	if err = page.add(object, options); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

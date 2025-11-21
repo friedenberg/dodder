@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
@@ -96,33 +95,6 @@ var (
 	_ sku.ListCoder = doddish{}
 	_ sku.ListCoder = jsonV0{}
 )
-
-func WriteObjectToOpenList(
-	format sku.ListCoder,
-	object *sku.Transacted,
-	list *sku.OpenList,
-) (n int64, err error) {
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.Mover)
-	defer repoolBufferedWriter()
-
-	if n, err = format.EncodeTo(
-		object,
-		bufferedWriter,
-	); err != nil {
-		err = errors.Wrap(err)
-		return n, err
-	}
-
-	if err = bufferedWriter.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return n, err
-	}
-
-	list.LastTai = object.GetTai()
-	list.Len += 1
-
-	return n, err
-}
 
 func WriteInventoryList(
 	ctx interfaces.ActiveContext,

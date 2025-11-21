@@ -12,6 +12,27 @@ func (store *Store) validateAndFinalize(
 	mother *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
+	if err = store.validateIfNecessary(daughter, mother, options); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if err = store.finalizer.WriteLockfile(
+		daughter,
+		store.streamIndex,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func (store *Store) validateIfNecessary(
+	daughter *sku.Transacted,
+	mother *sku.Transacted,
+	options sku.CommitOptions,
+) (err error) {
 	if !options.Validate {
 		return err
 	}
@@ -31,14 +52,6 @@ func (store *Store) validateAndFinalize(
 		}
 
 		defer repool()
-	}
-
-	if err = store.finalizer.WriteLockfile(
-		daughter,
-		store.streamIndex,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
 	}
 
 	return err

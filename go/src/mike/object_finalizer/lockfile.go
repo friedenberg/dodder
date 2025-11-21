@@ -12,7 +12,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	tipe ids.Type,
 	index sku.IndexPrimitives,
 ) (err error) {
-	return err
+	return
 	// TODO stop excluding builtin types and create a process for signing those
 	// too
 	if tipe.IsEmpty() || ids.IsBuiltin(tipe) {

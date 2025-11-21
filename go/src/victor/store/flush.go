@@ -27,7 +27,9 @@ func (store *Store) FlushInventoryList(
 
 	var inventoryListSku *sku.Transacted
 
-	store.inventoryList.Description = store.GetConfigStoreMutable().GetConfig().Description
+	store.inventoryList.GetDescriptionMutable().ResetWith(
+		store.GetConfigStoreMutable().GetConfig().Description,
+	)
 
 	if inventoryListSku, err = store.GetInventoryListStore().Create(
 		store.inventoryList,

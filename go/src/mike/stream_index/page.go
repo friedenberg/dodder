@@ -4,9 +4,12 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
+	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
 type page struct {
+	index *Index
+
 	writeLock        sync.Mutex
 	pageId           page_id.PageId
 	forceFullWrite   bool
@@ -18,6 +21,7 @@ func (page *page) initialize(
 	pageId page_id.PageId,
 	index *Index,
 ) {
+	page.index = index
 	page.pageId = pageId
 	page.additionsHistory.initialize()
 	page.additionsLatest.initialize()
@@ -42,4 +46,23 @@ func (page *page) hasChanges() bool {
 
 func (page *page) lenAdded() int {
 	return page.additionsHistory.Len() + page.additionsLatest.Len()
+}
+
+func (page *page) add(
+	object *sku.Transacted,
+	options sku.CommitOptions,
+) (err error) {
+	additions := page.additionsHistory
+
+	// TODO write binary representation to file-backed buffered writer and then
+	// merge streams using raw binary data
+
+	if page.index.sunrise.Less(object.GetTai()) ||
+		options.StreamIndexOptions.ForceLatest {
+		additions = page.additionsLatest
+	}
+
+	additions.add(object)
+
+	return
 }
