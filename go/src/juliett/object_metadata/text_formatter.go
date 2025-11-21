@@ -27,6 +27,7 @@ func MakeTextFormatterMetadataBlobPath(
 	}
 }
 
+// TODO change format to have blob and type separately
 func MakeTextFormatterMetadataOnly(
 	deps Dependencies,
 ) textFormatter {
@@ -50,7 +51,7 @@ func MakeTextFormatterMetadataInlineBlob(
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
-			common.writeTyp,
+			common.writeType,
 			common.writeComments,
 			common.writeBoundary,
 			common.writeNewLine,
@@ -70,9 +71,9 @@ func MakeTextFormatterExcludeMetadata(
 	}
 }
 
-func (f textFormatter) FormatMetadata(
-	w io.Writer,
-	c TextFormatterContext,
+func (formatter textFormatter) FormatMetadata(
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	return ohio.WriteSeq(w, c, f.sequence...)
+	return ohio.WriteSeq(writer, formatterContext, formatter.sequence...)
 }

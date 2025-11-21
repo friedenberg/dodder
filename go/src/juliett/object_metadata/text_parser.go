@@ -85,7 +85,7 @@ func (parser textParser) ParseMetadata(
 
 		return n, err
 	} else if !parser2.Blob.GetDigest().IsNull() {
-		metadata.GetFieldsMutable().Append(
+		metadata.GetIndexMutable().GetFieldsMutable().Append(
 			Field{
 				Key:       "blob",
 				Value:     parser2.Blob.GetPath(),

@@ -23,8 +23,7 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.DigBlob.Reset()
 		metadata.digSelf.Reset()
 		metadata.sigMother.Reset()
-		metadata.lockfile.tipe.Key = ""
-		metadata.lockfile.tipe.Id.Reset()
+		metadata.lockfile.Type.Reset()
 	}
 }
 
@@ -45,8 +44,7 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.digSelf.ResetWith(src.digSelf)
 	dst.sigMother.ResetWith(src.sigMother)
 
-	dst.lockfile.tipe.Key = src.lockfile.tipe.Key
-	dst.lockfile.tipe.Id.ResetWithMarklId(src.lockfile.tipe.Id)
+	dst.lockfile.Type.ResetWithMarklId(src.lockfile.Type)
 }
 
 func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {

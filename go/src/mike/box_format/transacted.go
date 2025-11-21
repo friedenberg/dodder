@@ -272,7 +272,7 @@ func (format *BoxTransacted) addFieldsMetadata(
 	builder.AddTags(metadata)
 
 	if !options.BoxExcludeFields && !format.isArchive {
-		quiter.AppendSeq(&builder.Contents, metadata.GetFields())
+		quiter.AppendSeq(&builder.Contents, metadata.GetIndex().GetFields())
 	}
 
 	return err

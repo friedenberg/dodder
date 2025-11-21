@@ -14,6 +14,7 @@ import (
 
 type (
 	IIndex interface {
+		GetFields() interfaces.Seq[Field]
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
 		GetExpandedTags() ids.TagSet
 		GetDormant() values.Bool
@@ -24,6 +25,7 @@ type (
 	IIndexMutable interface {
 		IIndex
 
+		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetTagPathsMutable() *tag_paths.Tags
 		GetDormantMutable() *values.Bool
 		AddTagExpandedPtr(e *ids.Tag) (err error)
@@ -157,10 +159,10 @@ func (metadata *metadata) AddComment(f string, vals ...any) {
 	metadata.Index.Comments = append(metadata.Index.Comments, fmt.Sprintf(f, vals...))
 }
 
-func (metadata *metadata) GetFields() interfaces.Seq[Field] {
-	return metadata.Index.Fields.All()
+func (index *Index) GetFields() interfaces.Seq[Field] {
+	return index.Fields.All()
 }
 
-func (metadata *metadata) GetFieldsMutable() *collections_slice.Slice[Field] {
-	return &metadata.Index.Fields
+func (index *Index) GetFieldsMutable() *collections_slice.Slice[Field] {
+	return &index.Fields
 }

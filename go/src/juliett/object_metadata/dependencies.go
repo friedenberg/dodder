@@ -68,35 +68,37 @@ func (deps Dependencies) writeComments(
 }
 
 func (deps Dependencies) writeBoundary(
-	w1 io.Writer,
+	writer io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
-	return ohio.WriteLine(w1, triple_hyphen_io.Boundary)
+	return ohio.WriteLine(writer, triple_hyphen_io.Boundary)
 }
 
 func (deps Dependencies) writeNewLine(
-	w1 io.Writer,
+	writer io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
-	return ohio.WriteLine(w1, "")
+	return ohio.WriteLine(writer, "")
 }
 
 func (deps Dependencies) writeCommonMetadataFormat(
-	w1 io.Writer,
-	c TextFormatterContext,
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	w := format.NewLineWriter()
-	m := c.GetMetadataMutable()
+	lineWriter := format.NewLineWriter()
 
-	description := m.GetDescription()
-	if description.String() != "" || !c.DoNotWriteEmptyDescription {
+	metadata := formatterContext.GetMetadata()
+	description := metadata.GetDescription()
+
+	if description.String() != "" || !formatterContext.DoNotWriteEmptyDescription {
 		reader, repool := pool.GetStringReader(description.String())
 		defer repool()
-		sr := bufio.NewReader(reader)
+
+		stringReader := bufio.NewReader(reader)
 
 		for {
 			var line string
-			line, err = sr.ReadString('\n')
+			line, err = stringReader.ReadString('\n')
 			isEOF := err == io.EOF
 
 			if err != nil && !isEOF {
@@ -104,7 +106,7 @@ func (deps Dependencies) writeCommonMetadataFormat(
 				return n, err
 			}
 
-			w.WriteLines(
+			lineWriter.WriteLines(
 				fmt.Sprintf("# %s", strings.TrimSpace(line)),
 			)
 
@@ -114,15 +116,15 @@ func (deps Dependencies) writeCommonMetadataFormat(
 		}
 	}
 
-	for _, e := range quiter.SortedValues(m.GetTags()) {
+	for _, e := range quiter.SortedValues(metadata.GetTags()) {
 		if ids.IsEmpty(e) {
 			continue
 		}
 
-		w.WriteFormat("- %s", e)
+		lineWriter.WriteFormat("- %s", e)
 	}
 
-	if n, err = w.WriteTo(w1); err != nil {
+	if n, err = lineWriter.WriteTo(writer); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -130,90 +132,121 @@ func (deps Dependencies) writeCommonMetadataFormat(
 	return n, err
 }
 
-func (deps Dependencies) writeTyp(
-	w1 io.Writer,
-	c TextFormatterContext,
+func (deps Dependencies) writeType(
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadataMutable()
-	tipe := m.GetType()
+	metadata := formatterContext.GetMetadata()
+	tipe := metadata.GetType()
 
 	if tipe.IsEmpty() {
 		return n, err
 	}
 
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s", tipe.StringSansOp()))
+	return ohio.WriteLine(writer, fmt.Sprintf("! %s", tipe.StringSansOp()))
+}
+
+func (deps Dependencies) writeTypeWithSig(
+	writer io.Writer,
+	formatterContext TextFormatterContext,
+) (n int64, err error) {
+	metadata := formatterContext.GetMetadata()
+	typeLock := metadata.GetLockfile().GetType()
+
+	if typeLock.IsEmpty() {
+		return deps.writeType(writer, formatterContext)
+	}
+
+	tipe := metadata.GetType()
+
+	if tipe.IsEmpty() {
+		return n, err
+	}
+
+	return ohio.WriteLine(
+		writer,
+		fmt.Sprintf(
+			"! %s@%s",
+			tipe.StringSansOp(),
+			typeLock,
+		),
+	)
 }
 
 func (deps Dependencies) writeBlobDigestAndType(
-	w1 io.Writer,
-	c TextFormatterContext,
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadataMutable()
+	metadata := formatterContext.GetMetadata()
+
 	return ohio.WriteLine(
-		w1,
+		writer,
 		fmt.Sprintf(
 			"! %s.%s",
-			m.GetBlobDigest(),
-			m.GetType().StringSansOp(),
+			metadata.GetBlobDigest(),
+			metadata.GetType().StringSansOp(),
 		),
 	)
 }
 
 func (deps Dependencies) writePathType(
-	w1 io.Writer,
-	c TextFormatterContext,
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	var ap string
+	var blobPath string
 
-	for field := range c.PersistentFormatterContext.GetMetadataMutable().GetFields() {
+	for field := range formatterContext.PersistentFormatterContext.GetMetadataMutable().GetIndexMutable().GetFields() {
 		if strings.ToLower(field.Key) == "blob" {
-			ap = field.Value
+			blobPath = field.Value
 			break
 		}
 	}
 
-	if ap != "" {
-		ap = deps.EnvDir.RelToCwdOrSame(ap)
+	if blobPath != "" {
+		blobPath = deps.EnvDir.RelToCwdOrSame(blobPath)
 	} else {
 		err = errors.ErrorWithStackf("path not found in fields")
 		return n, err
 	}
 
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s", ap))
+	return ohio.WriteLine(writer, fmt.Sprintf("! %s", blobPath))
 }
 
 func (deps Dependencies) writeBlob(
-	w1 io.Writer,
-	c TextFormatterContext,
+	writer io.Writer,
+	formatterContext TextFormatterContext,
 ) (n int64, err error) {
-	var ar io.ReadCloser
-	m := c.GetMetadataMutable()
+	var blobReader interfaces.BlobReader
 
-	if ar, err = deps.BlobStore.MakeBlobReader(m.GetBlobDigest()); err != nil {
+	metadata := formatterContext.GetMetadata()
+
+	if blobReader, err = deps.BlobStore.MakeBlobReader(
+		metadata.GetBlobDigest(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
 
-	if ar == nil {
+	if blobReader == nil {
 		err = errors.ErrorWithStackf("blob reader is nil")
 		return n, err
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.DeferredCloser(&err, blobReader)
 
 	if deps.BlobFormatter != nil {
-		var wt io.WriterTo
+		var writerTo io.WriterTo
 
-		if wt, err = script_config.MakeWriterToWithStdin(
+		if writerTo, err = script_config.MakeWriterToWithStdin(
 			deps.BlobFormatter,
 			deps.EnvDir.MakeCommonEnv(),
-			ar,
+			blobReader,
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
-		if n, err = wt.WriteTo(w1); err != nil {
+		if n, err = writerTo.WriteTo(writer); err != nil {
 			var errExit *exec.ExitError
 
 			if errors.As(err, &errExit) {
@@ -225,7 +258,7 @@ func (deps Dependencies) writeBlob(
 			return n, err
 		}
 	} else {
-		if n, err = io.Copy(w1, ar); err != nil {
+		if n, err = io.Copy(writer, blobReader); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}

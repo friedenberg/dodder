@@ -66,7 +66,7 @@ func (f *itemDeletedStringFormatWriter) EncodeStringTo(
 
 	n2, err = f.fieldsFormatWriter.EncodeStringTo(
 		string_format_writer.Box{
-			Contents: slices.Collect(object.GetMetadata().GetFields()),
+			Contents: slices.Collect(object.GetMetadata().GetIndex().GetFields()),
 		},
 		stringWriter,
 	)

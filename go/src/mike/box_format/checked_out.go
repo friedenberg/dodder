@@ -260,7 +260,7 @@ func (format *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 	if !options.BoxExcludeFields &&
 		(item == nil || item.FDs.Len() == 0) {
-		quiter.AppendSeq(&builder.Contents, metadata.GetFields())
+		quiter.AppendSeq(&builder.Contents, metadata.GetIndex().GetFields())
 	}
 
 	return err

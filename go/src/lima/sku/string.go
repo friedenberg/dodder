@@ -117,7 +117,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for field := range metadata.GetFields() {
+	for field := range metadata.GetIndex().GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}
@@ -171,7 +171,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for field := range metadata.GetFields() {
+	for field := range metadata.GetIndex().GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}
@@ -217,7 +217,7 @@ func StringMetadataSansTaiMerkle2(
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
-	for field := range metadata.GetFields() {
+	for field := range metadata.GetIndex().GetFields() {
 		sb.WriteString(" ")
 		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
 	}

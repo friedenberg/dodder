@@ -22,7 +22,6 @@ type (
 		GetDescription() descriptions.Description
 		GetTai() ids.Tai
 		GetType() ids.Type
-		GetFields() interfaces.Seq[Field]
 
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
@@ -47,7 +46,6 @@ type (
 		AddTagPtrFast(tag *ids.Tag) (err error)
 		GenerateExpandedTags()
 
-		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetIndexMutable() IIndexMutable
 		GetLockfileMutable() LockfileMutable
 		GetTypeMutable() *ids.Type

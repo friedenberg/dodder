@@ -89,8 +89,8 @@ func (assignment *Assignment) addToSet(
 				{
 					src := &objectOriginal.GetSkuExternal().Metadata
 
-					outputObject.GetSkuExternal().GetMetadataMutable().GetFieldsMutable().ResetWithSeq(
-						src.GetFields(),
+					outputObject.GetSkuExternal().GetMetadataMutable().GetIndexMutable().GetFieldsMutable().ResetWithSeq(
+						src.GetIndex().GetFields(),
 					)
 				}
 			}

@@ -80,6 +80,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
+// TODO add support for sigs and new format
 func (parser *textParser2) readType(
 	metadata IMetadataMutable,
 	desc string,

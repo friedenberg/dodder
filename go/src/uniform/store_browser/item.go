@@ -132,7 +132,7 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 			return err
 		}
 	} else if item.Title != "" && object.GetMetadata().GetDescription().String() != item.Title {
-		object.GetMetadataMutable().GetFieldsMutable().Append(
+		object.GetMetadataMutable().GetIndexMutable().GetFieldsMutable().Append(
 			string_format_writer.Field{
 				Key:       "title",
 				Value:     item.Title,
@@ -141,7 +141,7 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 		)
 	}
 
-	object.GetMetadataMutable().GetFieldsMutable().Append(
+	object.GetMetadataMutable().GetIndexMutable().GetFieldsMutable().Append(
 		string_format_writer.Field{
 			Key:       "url",
 			Value:     item.Url.String(),
@@ -164,10 +164,10 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 	return err
 }
 
-func (item *Item) ReadFromExternal(e *sku.Transacted) (err error) {
+func (item *Item) ReadFromExternal(object *sku.Transacted) (err error) {
 	if err = item.Id.Set(
 		strings.TrimSuffix(
-			e.ExternalObjectId.String(),
+			object.ExternalObjectId.String(),
 			"/",
 		),
 	); err != nil {
@@ -175,14 +175,14 @@ func (item *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 		return err
 	}
 
-	for field := range e.GetMetadata().GetFields() {
+	for field := range object.GetMetadata().GetIndex().GetFields() {
 		switch field.Key {
 		case "id":
 			if field.Value == "" {
 				continue
 			}
 
-			if err = item.Id.Set(e.ExternalObjectId.String()); err != nil {
+			if err = item.Id.Set(object.ExternalObjectId.String()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -201,7 +201,7 @@ func (item *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 				"unsupported field type: %q=%q. Fields: %#v",
 				field.Key,
 				field.Value,
-				e.GetMetadata().GetFields(),
+				object.GetMetadata().GetIndex().GetFields(),
 			)
 
 			return err

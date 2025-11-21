@@ -20,11 +20,11 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	}
 
 	lockfile := metadata.GetLockfileMutable()
-	typeLock := lockfile.GetTypeLockMutable()
+	typeLock := lockfile.GetTypeMutable()
 
 	// TODO There are cases where we will want to overwrite the typelock id,
 	// should we use CommitOptions?
-	if !typeLock.Id.IsNull() {
+	if !typeLock.IsNull() {
 		return err
 	}
 
@@ -39,10 +39,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 		return err
 	}
 
-	typeLock.Key = tipe.String()
-	typeLock.Id.ResetWithMarklId(
-		typeObject.GetMetadataMutable().GetObjectSig(),
-	)
+	typeLock.ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())
 
 	return err
 }

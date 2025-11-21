@@ -162,7 +162,7 @@ func (store *Store) AddObjectToOpenList(
 		err = errors.Wrapf(
 			err,
 			"%#v, format type: %q",
-			object.GetMetadata().GetFields(),
+			object.GetMetadata().GetIndex().GetFields(),
 			store.getType(),
 		)
 

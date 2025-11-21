@@ -242,7 +242,7 @@ LOOP_AFTER_OID:
 			}
 
 			field.ColorType = string_format_writer.ColorTypeUserData
-			object.GetMetadataMutable().GetFieldsMutable().Append(field)
+			object.GetMetadataMutable().GetIndexMutable().GetFieldsMutable().Append(field)
 
 			continue
 		}

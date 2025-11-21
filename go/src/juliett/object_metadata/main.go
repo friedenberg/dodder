@@ -30,7 +30,7 @@ type metadata struct {
 
 	Index Index
 
-	lockfile
+	lockfile lockfile
 }
 
 var (

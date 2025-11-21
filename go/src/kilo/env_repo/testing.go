@@ -44,8 +44,6 @@ func makeTestingWithBigBang(
 		debug.Options{},
 	)
 
-	ui.Debug().PrintDebug(envDir.GetXDG())
-
 	{
 		var err error
 
