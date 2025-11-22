@@ -31,12 +31,12 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	typeObject, repool := sku.GetTransactedPool().GetWithRepool()
 	defer repool()
 
-	if err = index.ReadOneObjectId(
+	if !sku.ReadOneObjectId(
+		index,
 		tipe,
 		typeObject,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	) {
+		panic(errors.Errorf("failed to read type"))
 	}
 
 	typeLock.ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())

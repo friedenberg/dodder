@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -329,20 +328,15 @@ func (commitFacilitator commitFacilitator) fetchMotherIfNecessary(
 	}
 
 	mother = sku.GetTransactedPool().Get()
+
 	// TODO find a way to make this more performant when operating over sshfs
-	if err = commitFacilitator.index.ReadOneObjectId(
+	if !sku.ReadOneObjectId(
+		commitFacilitator.index,
 		objectId,
 		mother,
-	); err != nil {
-		if collections.IsErrNotFound(err) || errors.IsNotExist(err) {
-			// TODO decide if this should continue to virtual stores
-			sku.GetTransactedPool().Put(mother)
-			mother = nil
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
+	) {
+		sku.GetTransactedPool().Put(mother)
+		mother = nil
 		return mother, err
 	}
 

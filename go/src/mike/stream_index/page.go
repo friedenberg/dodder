@@ -23,8 +23,8 @@ func (page *page) initialize(
 ) {
 	page.index = index
 	page.pageId = pageId
-	page.additionsHistory.initialize()
-	page.additionsLatest.initialize()
+	page.additionsHistory.initialize(index)
+	page.additionsLatest.initialize(index)
 }
 
 func (page *page) objectIdStringExists(objectIdString string) bool {

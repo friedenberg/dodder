@@ -25,9 +25,9 @@ func (reindexer *Reindexer) ObjectExists(
 	return reindexer.index.ObjectExists(objectId)
 }
 
-func (reindexer *Reindexer) ReadOneObjectId(
-	objectId interfaces.ObjectId,
+func (reindexer *Reindexer) ReadOneMarklId(
+	marklId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
-	return reindexer.index.ReadOneObjectId(objectId, object)
+	return reindexer.index.ReadOneMarklId(marklId, object)
 }

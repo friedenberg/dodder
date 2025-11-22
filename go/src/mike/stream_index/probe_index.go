@@ -2,6 +2,7 @@ package stream_index
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_map"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -11,7 +12,8 @@ import (
 )
 
 type probeIndex struct {
-	index *object_probe_index.Index
+	index          *object_probe_index.Index
+	additionProbes collections_map.Map[string, *sku.Transacted]
 }
 
 func (index *Index) PrintAllProbes() (err error) {
@@ -36,6 +38,8 @@ func (index *probeIndex) Initialize(
 		return err
 	}
 
+	index.additionProbes = make(collections_map.Map[string, *sku.Transacted])
+
 	return err
 }
 
@@ -44,6 +48,8 @@ func (index *probeIndex) Flush() (err error) {
 		err = errors.Wrap(err)
 		return err
 	}
+
+	index.additionProbes.Reset()
 
 	return err
 }

@@ -11,15 +11,30 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
+func (index *Index) ReadOneMarklIdAdded(
+	marklId interfaces.MarklId,
+	object *sku.Transacted,
+) (ok bool) {
+	additionObject, ok := index.additionProbes.Get(string(marklId.GetBytes()))
+
+	if ok {
+		sku.TransactedResetter.ResetWith(object, additionObject)
+		return
+	}
+
+	return
+}
+
+// TODO migrate to panic semantics
 func (index *Index) ReadOneMarklId(
-	blobId interfaces.MarklId,
+	marklId interfaces.MarklId,
 	object *sku.Transacted,
 ) (err error) {
-	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
+	errors.PanicIfError(markl.AssertIdIsNotNull(marklId))
 
 	var loc object_probe_index.Loc
 
-	if loc, err = index.readOneMarklIdLoc(blobId); err != nil {
+	if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
 		return err
 	}
 
@@ -33,12 +48,12 @@ func (index *Index) ReadOneMarklId(
 }
 
 func (index *Index) ReadManyMarklId(
-	blobId interfaces.MarklId,
+	marklId interfaces.MarklId,
 ) (objects []*sku.Transacted, err error) {
 	// TODO read from page additions if necessary
 	var locs []object_probe_index.Loc
 
-	if locs, err = index.readManyMarklIdLoc(blobId); err != nil {
+	if locs, err = index.readManyMarklIdLoc(marklId); err != nil {
 		err = errors.Wrap(err)
 		return objects, err
 	}

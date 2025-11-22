@@ -12,8 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-var testStackFramePrefix = "    "
-
 // TODO make this private and switch users over to MakeTestContext
 // and add a printer
 
