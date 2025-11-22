@@ -48,5 +48,5 @@ func Slice[ELEMENT any](in []ELEMENT) (out []ELEMENT) {
 		out = in[:0]
 	}
 
-	return
+	return out
 }
