@@ -42,7 +42,7 @@ type Repo interface {
 
 	MakeInventoryList(
 		qg *queries.Query,
-	) (list *sku.HeapTransactedTai, err error)
+	) (list *sku.HeapTransacted, err error)
 
 	// TODO replace with WorkingCopy
 	PullQueryGroupFromRemote(

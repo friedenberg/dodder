@@ -2,26 +2,51 @@ package reset
 
 import "golang.org/x/exp/constraints"
 
-func Map[K constraints.Ordered, V any](in map[K]V) (out map[K]V) {
-	if in == nil {
-		out = make(map[K]V)
-	} else {
-		for k := range in {
-			delete(in, k)
-		}
+type (
+	FuncReset[ELEMENT any]     func(ELEMENT)
+	FuncResetWith[ELEMENT any] func(dst ELEMENT, src ELEMENT)
+)
 
-		out = in
+type resetter[ELEMENT any] struct {
+	funcReset     FuncReset[ELEMENT]
+	funcResetWith FuncResetWith[ELEMENT]
+}
+
+func MakeResetter[ELEMENT any](
+	funcReset FuncReset[ELEMENT],
+	funcResetWith FuncResetWith[ELEMENT],
+) resetter[ELEMENT] {
+	return resetter[ELEMENT]{
+		funcReset:     funcReset,
+		funcResetWith: funcResetWith,
+	}
+}
+
+func (resetter resetter[ELEMENT]) Reset(element ELEMENT) {
+	resetter.funcReset(element)
+}
+
+func (resetter resetter[ELEMENT]) ResetWith(dst, src ELEMENT) {
+	resetter.funcResetWith(dst, src)
+}
+
+func Map[KEY constraints.Ordered, VALUE any](mapp map[KEY]VALUE) (out map[KEY]VALUE) {
+	if mapp == nil {
+		out = make(map[KEY]VALUE)
+	} else {
+		clear(mapp)
+		out = mapp
 	}
 
 	return out
 }
 
-func Slice[V any](in []V) (out []V) {
+func Slice[ELEMENT any](in []ELEMENT) (out []ELEMENT) {
 	if in == nil {
-		out = make([]V, 0)
+		out = make([]ELEMENT, 0)
 	} else {
 		out = in[:0]
 	}
 
-	return out
+	return
 }

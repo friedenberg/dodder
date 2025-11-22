@@ -292,7 +292,7 @@ func (server *Server) readMCPResourceObjects(
 		}
 	}
 
-	var list *sku.HeapTransactedTai
+	var list *sku.HeapTransacted
 
 	{
 		var err error

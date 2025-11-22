@@ -131,7 +131,7 @@ func CollectSkuList(
 	ctx interfaces.ActiveContext,
 	listFormat sku.ListCoder,
 	reader *bufio.Reader,
-	list *sku.HeapTransactedTai,
+	list *sku.HeapTransacted,
 ) (err error) {
 	iter := streamInventoryList(ctx, listFormat, reader)
 

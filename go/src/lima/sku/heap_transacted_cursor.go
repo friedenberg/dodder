@@ -1,8 +1,8 @@
 package sku
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/reset"
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
-	"code.linenisgreat.com/dodder/go/src/alfa/reset"
 	"code.linenisgreat.com/dodder/go/src/charlie/heap"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"

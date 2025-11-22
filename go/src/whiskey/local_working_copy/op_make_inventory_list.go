@@ -9,7 +9,7 @@ import (
 
 func (local *Repo) MakeInventoryList(
 	query *queries.Query,
-) (list *sku.HeapTransactedTai, err error) {
+) (list *sku.HeapTransacted, err error) {
 	list = sku.MakeListTransacted()
 
 	if err = local.GetStore().QueryTransacted(

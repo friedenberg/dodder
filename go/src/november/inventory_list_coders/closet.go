@@ -398,7 +398,7 @@ func (closet Closet) ReadInventoryListBlob(
 	ctx interfaces.ActiveContext,
 	tipe ids.Type,
 	reader *bufio.Reader,
-) (list *sku.HeapTransactedTai, err error) {
+) (list *sku.HeapTransacted, err error) {
 	list = sku.MakeListTransacted()
 
 	format, ok := closet.coders[tipe.String()]

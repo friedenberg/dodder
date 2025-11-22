@@ -92,7 +92,7 @@ func (local *Repo) ImportSeq(
 func (repo *Repo) importOne(
 	importur repo.Importer,
 	object *sku.Transacted,
-	missingBlobs *sku.ListCheckedOut,
+	missingBlobs *sku.HeapCheckedOut,
 ) (hasConflicts bool, err error) {
 	var checkedOut *sku.CheckedOut
 	checkedOut, err = importur.Import(object)
