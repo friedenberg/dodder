@@ -109,5 +109,5 @@ func ReadOneObjectId(
 		ok = true
 	}
 
-	return
+	return ok
 }

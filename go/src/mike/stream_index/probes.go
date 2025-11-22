@@ -19,10 +19,10 @@ func (index *Index) ReadOneMarklIdAdded(
 
 	if ok {
 		sku.TransactedResetter.ResetWith(object, additionObject)
-		return
+		return ok
 	}
 
-	return
+	return ok
 }
 
 // TODO migrate to panic semantics
