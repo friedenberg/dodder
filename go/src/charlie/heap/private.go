@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
 
-type Element interface{}
+type Element any
 
 type ElementPtr[ELEMENT Element] interface {
 	interfaces.Ptr[ELEMENT]

@@ -1,9 +1,14 @@
 package sku
 
 import (
+	"bufio"
+
+	"code.linenisgreat.com/dodder/go/src/_/collections_map"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/charlie/heap"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 )
@@ -15,10 +20,15 @@ type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
 type OpenList struct {
 	description descriptions.Description
 
-	coder      ListCoder
-	blobWriter interfaces.BlobWriter
-	cursor     ohio.Cursor
-	count      int
+	coder                    ListCoder
+	blobWriter               interfaces.BlobWriter
+	bufferedBlobWriter       *bufio.Writer
+	bufferedBlobWriterRepool interfaces.FuncRepool
+	cursor                   ohio.Cursor
+	count                    int
+
+	indexOrder     *heap.Heap[TransactedCursor, *TransactedCursor]
+	indexObjectIds collections_map.Map[string, collections_slice.Slice[ohio.Cursor]]
 
 	funcPreWrite func(*Transacted) error
 }
@@ -29,9 +39,11 @@ func MakeOpenList(
 	funcPreWrite interfaces.FuncIter[*Transacted],
 ) *OpenList {
 	return &OpenList{
-		coder:        coder,
-		blobWriter:   blobWriter,
-		funcPreWrite: funcPreWrite,
+		coder:          coder,
+		blobWriter:     blobWriter,
+		indexOrder:     MakeHeapTransactedCursor(),
+		indexObjectIds: make(collections_map.Map[string, collections_slice.Slice[ohio.Cursor]]),
+		funcPreWrite:   funcPreWrite,
 	}
 }
 
@@ -41,6 +53,16 @@ func (list *OpenList) GetDescription() descriptions.Description {
 
 func (list *OpenList) GetDescriptionMutable() *descriptions.Description {
 	return &list.description
+}
+
+func (list *OpenList) getBufferedBlobWriter() *bufio.Writer {
+	if list.bufferedBlobWriter == nil {
+		list.bufferedBlobWriter, list.bufferedBlobWriterRepool = pool.GetBufferedWriter(
+			list.blobWriter,
+		)
+	}
+
+	return list.bufferedBlobWriter
 }
 
 func (list *OpenList) Len() int {
@@ -62,24 +84,35 @@ func (list *OpenList) Add(object *Transacted) (err error) {
 		return err
 	}
 
+	objectIdString := object.GetObjectId().String()
+
+	list.indexOrder.Push(&TransactedCursor{
+		tai:            object.GetTai(),
+		objectIdString: objectIdString,
+		cursor:         list.cursor,
+	})
+
+	{
+		objects, _ := list.indexObjectIds.Get(objectIdString)
+		objects.Append(list.cursor)
+		list.indexObjectIds.Set(objectIdString, objects)
+	}
+
 	return err
 }
 
 func (list *OpenList) writeObject(
 	object *Transacted,
 ) (n int64, err error) {
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.blobWriter)
-	defer repoolBufferedWriter()
-
 	if n, err = list.coder.EncodeTo(
 		object,
-		bufferedWriter,
+		list.getBufferedBlobWriter(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
 
-	if err = bufferedWriter.Flush(); err != nil {
+	if err = list.getBufferedBlobWriter().Flush(); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -90,12 +123,21 @@ func (list *OpenList) writeObject(
 }
 
 func (list *OpenList) Close() (err error) {
+	if err = list.getBufferedBlobWriter().Flush(); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
 	if err = list.blobWriter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	list.cursor.Reset()
+	list.indexOrder.Reset()
+	list.indexObjectIds.Reset()
+	list.bufferedBlobWriter = nil
+	list.bufferedBlobWriterRepool()
 
 	return err
 }
