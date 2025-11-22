@@ -23,6 +23,11 @@ type (
 		// 	object *Transacted,
 		// ) (ok bool)
 
+		ReadOneMarklIdAdded(
+			sh interfaces.MarklId,
+			sk *Transacted,
+		) (ok bool)
+
 		ReadOneMarklId(
 			sh interfaces.MarklId,
 			sk *Transacted,
@@ -75,16 +80,16 @@ func ReadOneObjectId(
 	object *Transacted,
 ) (ok bool) {
 	return ReadOneObjectIdBespoke(
-		index.ReadOneMarklId,
 		objectId,
 		object,
+		index.ReadOneMarklId,
 	)
 }
 
 func ReadOneObjectIdBespoke(
-	funcReadOne FuncReadOne,
 	objectId interfaces.ObjectId,
 	object *Transacted,
+	funcs ...FuncReadOne,
 ) (ok bool) {
 	objectIdString := objectId.String()
 
@@ -98,7 +103,11 @@ func ReadOneObjectIdBespoke(
 	)
 	defer repool()
 
-	ok = funcReadOne(digest, object)
+	for _, funk := range funcs {
+		if ok = funk(digest, object); ok {
+			break
+		}
+	}
 
 	return ok
 }

@@ -10,7 +10,7 @@ import (
 func (finalizer finalizer) writeTypeLockIfNecessary(
 	metadata object_metadata.IMetadataMutable,
 	tipe ids.Type,
-	funcReadOne sku.FuncReadOne,
+	funcs ...sku.FuncReadOne,
 ) (err error) {
 	return err
 	// TODO stop excluding builtin types and create a process for signing those
@@ -31,7 +31,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	typeObject, repool := sku.GetTransactedPool().GetWithRepool()
 	defer repool()
 
-	if !sku.ReadOneObjectIdBespoke(funcReadOne, tipe, typeObject) {
+	if !sku.ReadOneObjectIdBespoke(tipe, typeObject, funcs...) {
 		panic(errors.Errorf("failed to read type"))
 	}
 

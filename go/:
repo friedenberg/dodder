@@ -123,11 +123,7 @@ func (finalizer finalizer) WriteLockfileIfNecessary(
 		return err
 	}
 
-	return finalizer.WriteLockfile(
-		object,
-		finalizer.index.ReadOneMarklIdAdded,
-		finalizer.index.ReadOneMarklId,
-	)
+	return finalizer.WriteLockfile(object, finalizer.index.ReadOneMarklId)
 }
 
 func (finalizer finalizer) WriteLockfile(
