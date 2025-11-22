@@ -18,7 +18,7 @@ func (mapp Map[KEY, VALUE]) Any() (key KEY) {
 		break
 	}
 
-	return
+	return key
 }
 
 func (mapp Map[KEY, VALUE]) All() interfaces.Seq[KEY] {
@@ -47,7 +47,7 @@ func (mapp Map[KEY, VALUE]) Reset() {
 
 func (mapp Map[KEY, VALUE]) Get(key KEY) (value VALUE, ok bool) {
 	value, ok = mapp[key]
-	return
+	return value, ok
 }
 
 func (mapp Map[KEY, VALUE]) Set(key KEY, value VALUE) {
