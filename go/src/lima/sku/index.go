@@ -2,13 +2,16 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type (
+	FuncReadOne = func(
+		sh interfaces.MarklId,
+		sk *Transacted,
+	) (ok bool)
+
 	IndexPrimitives interface {
 		ObjectExists(
 			objectId *ids.ObjectId,
@@ -23,7 +26,7 @@ type (
 		ReadOneMarklId(
 			sh interfaces.MarklId,
 			sk *Transacted,
-		) (err error)
+		) (ok bool)
 	}
 
 	Index interface {
@@ -71,6 +74,18 @@ func ReadOneObjectId(
 	objectId interfaces.ObjectId,
 	object *Transacted,
 ) (ok bool) {
+	return ReadOneObjectIdBespoke(
+		index.ReadOneMarklId,
+		objectId,
+		object,
+	)
+}
+
+func ReadOneObjectIdBespoke(
+	funcReadOne FuncReadOne,
+	objectId interfaces.ObjectId,
+	object *Transacted,
+) (ok bool) {
 	objectIdString := objectId.String()
 
 	if objectIdString == "" {
@@ -83,31 +98,7 @@ func ReadOneObjectId(
 	)
 	defer repool()
 
-	defer func() {
-		r := recover()
-
-		if r == nil {
-			return
-		}
-
-		err, isErr := r.(error)
-
-		if !isErr {
-			panic(r)
-		}
-
-		if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
-			ok = false
-		} else {
-			panic(err)
-		}
-	}()
-
-	if err := index.ReadOneMarklId(digest, object); err != nil {
-		panic(err)
-	} else {
-		ok = true
-	}
+	ok = funcReadOne(digest, object)
 
 	return ok
 }

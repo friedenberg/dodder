@@ -19,7 +19,7 @@ func (store *Store) validateAndFinalize(
 
 	if err = store.finalizer.WriteLockfile(
 		daughter,
-		store.streamIndex,
+		store.streamIndex.ReadOneMarklIdAdded,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

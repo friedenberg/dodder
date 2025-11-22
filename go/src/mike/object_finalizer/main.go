@@ -123,19 +123,19 @@ func (finalizer finalizer) WriteLockfileIfNecessary(
 		return err
 	}
 
-	return finalizer.WriteLockfile(object, finalizer.index)
+	return finalizer.WriteLockfile(object, finalizer.index.ReadOneMarklId)
 }
 
 func (finalizer finalizer) WriteLockfile(
 	object object,
-	index sku.IndexPrimitives,
+	funcReadOne sku.FuncReadOne,
 ) (err error) {
 	metadata := object.GetMetadataMutable()
 
 	if err = finalizer.writeTypeLockIfNecessary(
 		metadata,
 		metadata.GetType(),
-		index,
+		funcReadOne,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

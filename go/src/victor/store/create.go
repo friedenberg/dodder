@@ -116,12 +116,12 @@ func (store *Store) RevertTo(
 	object := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(object)
 
-	if err = store.streamIndex.ReadOneMarklId(
+	if !store.streamIndex.ReadOneMarklId(
 		revertId.Sig,
 		object,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	) {
+		err = errors.Errorf("object with sig %q not found", revertId.Sig)
+		return
 	}
 
 	defer sku.GetTransactedPool().Put(object)

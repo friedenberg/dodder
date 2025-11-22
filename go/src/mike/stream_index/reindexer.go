@@ -28,6 +28,6 @@ func (reindexer *Reindexer) ObjectExists(
 func (reindexer *Reindexer) ReadOneMarklId(
 	marklId interfaces.MarklId,
 	object *sku.Transacted,
-) (err error) {
+) (ok bool) {
 	return reindexer.index.ReadOneMarklId(marklId, object)
 }

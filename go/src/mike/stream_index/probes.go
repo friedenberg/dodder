@@ -29,22 +29,39 @@ func (index *Index) ReadOneMarklIdAdded(
 func (index *Index) ReadOneMarklId(
 	marklId interfaces.MarklId,
 	object *sku.Transacted,
-) (err error) {
+) (ok bool) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(marklId))
 
 	var loc object_probe_index.Loc
 
-	if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
-		return err
+	{
+		var err error
+
+		if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
+			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
+				return
+			} else {
+				panic(err)
+			}
+		}
 	}
 
 	// TODO read from page additions if necessary
-	if err = index.readOneLoc(loc, object); err != nil {
-		err = errors.Wrap(err)
-		return err
+	{
+		var err error
+
+		if err = index.readOneLoc(loc, object); err != nil {
+			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
+				return
+			} else {
+				panic(err)
+			}
+		}
 	}
 
-	return err
+	ok = true
+
+	return
 }
 
 func (index *Index) ReadManyMarklId(
@@ -120,7 +137,8 @@ func (index *Index) ReadOneObjectId(
 	)
 	defer repool()
 
-	if err = index.ReadOneMarklId(digest, object); err != nil {
+	if !index.ReadOneMarklId(digest, object) {
+		err = collections.MakeErrNotFoundString(objectIdString)
 		return err
 	}
 
@@ -151,15 +169,16 @@ func (index *Index) ReadOneObjectIdTai(
 		return object, err
 	}
 
-	digest := markl.FormatHashSha256.FromStringContent(
-		objectId.String() + tai.String(),
-	)
+	key := objectId.String() + tai.String()
+
+	digest := markl.FormatHashSha256.FromStringContent(key)
 	defer markl.PutBlobId(digest)
 
 	object = sku.GetTransactedPool().Get()
 
-	if err = index.ReadOneMarklId(digest, object); err != nil {
-		return object, err
+	if !index.ReadOneMarklId(digest, object) {
+		err = collections.MakeErrNotFoundString(key)
+		return
 	}
 
 	return object, err
