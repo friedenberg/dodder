@@ -48,7 +48,7 @@ func (index *Index) ReadOneMarklId(
 
 	ok = index.readOneLoc(loc, object)
 
-	return
+	return ok
 }
 
 func (index *Index) ReadManyMarklId(
@@ -180,5 +180,5 @@ func (index *Index) readOneLoc(
 
 	ok = pageReader.readOneCursor(loc.Cursor, object)
 
-	return
+	return ok
 }

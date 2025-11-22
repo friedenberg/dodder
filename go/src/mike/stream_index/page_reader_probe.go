@@ -58,7 +58,7 @@ func (pageReader *probePageReader) readOneCursor(
 	// pages get deleted before reindexing, so this is actually valid to have a
 	// non-nil cursor request
 	if pageReader.readerAt == nil {
-		return
+		return ok
 	}
 
 	var bytesRead int64
@@ -101,5 +101,5 @@ NO_ERR:
 
 	ok = true
 
-	return
+	return ok
 }
