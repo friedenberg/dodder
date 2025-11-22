@@ -163,7 +163,7 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	}
 
 	if remoteWorkingCopy != nil {
-		var list *sku.ListTransacted
+		var list *sku.HeapTransactedTai
 
 		{
 			var err error

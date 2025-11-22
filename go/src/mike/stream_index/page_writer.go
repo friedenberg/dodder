@@ -45,7 +45,7 @@ type pageWriter struct {
 func (index *Index) makePageFlush(
 	pageIndex PageIndex,
 	changesAreHistorical bool,
-) func() error {
+) errors.FuncErr {
 	page := &index.pages[pageIndex]
 
 	return func() (err error) {

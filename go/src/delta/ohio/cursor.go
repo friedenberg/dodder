@@ -23,6 +23,11 @@ func (cursor Cursor) String() string {
 	return fmt.Sprintf("%03d+%03d", cursor.Offset, cursor.ContentLength)
 }
 
+func (cursor *Cursor) Reset() {
+	cursor.Offset = 0
+	cursor.ContentLength = 0
+}
+
 func (cursor *Cursor) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 	n1, cursor.Offset, err = ReadFixedInt64(r)

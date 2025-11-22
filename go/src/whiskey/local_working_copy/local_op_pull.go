@@ -31,7 +31,7 @@ func (local *Repo) pullQueryGroupFromWorkingCopy(
 	queryGroup *queries.Query,
 	importerOptions repo.ImporterOptions,
 ) (err error) {
-	var list *sku.ListTransacted
+	var list *sku.HeapTransactedTai
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)

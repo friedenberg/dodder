@@ -234,7 +234,7 @@ func (store *Store) Create(
 func (store *Store) WriteInventoryListBlob(
 	remoteBlobStore interfaces.BlobStore,
 	object *sku.Transacted,
-	list *sku.ListTransacted,
+	list *sku.HeapTransactedTai,
 ) (err error) {
 	if list.Len() == 0 {
 		if !object.GetBlobDigest().IsNull() {

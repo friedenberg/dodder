@@ -7,7 +7,7 @@ import (
 
 type pageAdditions struct {
 	objectIdLookup map[string]struct{}
-	objects        *sku.ListTransacted
+	objects        *sku.HeapTransactedTai
 	// objects        *sku.OpenList
 }
 

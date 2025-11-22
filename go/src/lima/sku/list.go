@@ -9,11 +9,8 @@ import (
 )
 
 type (
-	Seq            = interfaces.SeqError[*Transacted]
-	ListTransacted = heap.Heap[Transacted, *Transacted]
-
-	// TODO move to inventory_list_coders
-	ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
+	Seq               = interfaces.SeqError[*Transacted]
+	HeapTransactedTai = heap.Heap[Transacted, *Transacted]
 
 	InventoryListStore interface {
 		WriteInventoryListObject(*Transacted) (err error)
@@ -23,8 +20,7 @@ type (
 	}
 )
 
-// TODO add buffered writer
-func MakeListTransacted() *ListTransacted {
+func MakeListTransacted() *HeapTransactedTai {
 	heap := heap.MakeNew(
 		TransactedCompare,
 		transactedResetter{},
@@ -39,26 +35,26 @@ var ResetterList resetterList
 
 type resetterList struct{}
 
-func (resetterList) Reset(list *ListTransacted) {
+func (resetterList) Reset(list *HeapTransactedTai) {
 	list.Reset()
 }
 
-func (resetterList) ResetWith(left, right *ListTransacted) {
+func (resetterList) ResetWith(left, right *HeapTransactedTai) {
 	left.ResetWith(right)
 }
 
 func CollectList(
 	seq Seq,
-) (list *ListTransacted, err error) {
+) (list *HeapTransactedTai, err error) {
 	list = MakeListTransacted()
 
-	for sk, iterErr := range seq {
+	for object, iterErr := range seq {
 		if iterErr != nil {
 			err = errors.Wrap(iterErr)
 			return list, err
 		}
 
-		list.Add(sk)
+		list.Add(object)
 	}
 
 	return list, err

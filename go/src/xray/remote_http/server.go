@@ -713,7 +713,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 		}
 	}
 
-	var list *sku.ListTransacted
+	var list *sku.HeapTransactedTai
 
 	{
 		var err error

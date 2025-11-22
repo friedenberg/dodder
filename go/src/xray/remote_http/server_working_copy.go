@@ -164,7 +164,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 		}
 	}
 
-	var list *sku.ListTransacted
+	var list *sku.HeapTransactedTai
 
 	{
 		var err error

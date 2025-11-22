@@ -147,7 +147,7 @@ func (client *client) MakeExternalQueryGroup(
 
 func (client *client) MakeInventoryList(
 	queryGroup *queries.Query,
-) (list *sku.ListTransacted, err error) {
+) (list *sku.HeapTransactedTai, err error) {
 	var request *http.Request
 	listTypeString := client.GetImmutableConfigPublic().GetInventoryListTypeId()
 
@@ -230,7 +230,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 	queryGroup *queries.Query,
 	options repo.ImporterOptions,
 ) (err error) {
-	var list *sku.ListTransacted
+	var list *sku.HeapTransactedTai
 
 	if list, err = remote.MakeInventoryList(queryGroup); err != nil {
 		err = errors.Wrap(err)
@@ -310,7 +310,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 		bufferedReader := bufio.NewReader(response.Body)
 
-		var listMissingObjects *sku.ListTransacted
+		var listMissingObjects *sku.HeapTransactedTai
 
 		if listMissingObjects, err = client.inventoryListCoderCloset.ReadInventoryListBlob(
 			client.GetEnv(),

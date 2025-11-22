@@ -4,28 +4,33 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 )
 
+type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
+
 // TODO add lock
+// TODO add iterate method
 type OpenList struct {
 	description descriptions.Description
 
-	format ListCoder
-	mover  interfaces.BlobWriter
-	count  int
+	coder      ListCoder
+	blobWriter interfaces.BlobWriter
+	cursor     ohio.Cursor
+	count      int
 
 	funcPreWrite func(*Transacted) error
 }
 
 func MakeOpenList(
-	format ListCoder,
-	mover interfaces.BlobWriter,
+	coder ListCoder,
+	blobWriter interfaces.BlobWriter,
 	funcPreWrite interfaces.FuncIter[*Transacted],
 ) *OpenList {
 	return &OpenList{
-		format:       format,
-		mover:        mover,
+		coder:        coder,
+		blobWriter:   blobWriter,
 		funcPreWrite: funcPreWrite,
 	}
 }
@@ -42,31 +47,31 @@ func (list *OpenList) Len() int {
 	return list.count
 }
 
-func (list *OpenList) Add(object *Transacted) (n int64, err error) {
+func (list *OpenList) Add(object *Transacted) (err error) {
 	if list.funcPreWrite != nil {
 		if err = list.funcPreWrite(object); err != nil {
 			err = errors.Wrap(err)
-			return n, err
+			return err
 		}
 	}
 
-	if n, err = list.writeObject(object); err != nil {
+	list.cursor.Offset += list.cursor.ContentLength
+
+	if list.cursor.ContentLength, err = list.writeObject(object); err != nil {
 		err = errors.Wrap(err)
-		return n, err
+		return err
 	}
 
-	return n, err
+	return err
 }
 
-// TODO swap this to not overwrite, as when importing from remotes, we want to
-// keep their signatures
 func (list *OpenList) writeObject(
 	object *Transacted,
 ) (n int64, err error) {
-	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.mover)
+	bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(list.blobWriter)
 	defer repoolBufferedWriter()
 
-	if n, err = list.format.EncodeTo(
+	if n, err = list.coder.EncodeTo(
 		object,
 		bufferedWriter,
 	); err != nil {
@@ -85,14 +90,16 @@ func (list *OpenList) writeObject(
 }
 
 func (list *OpenList) Close() (err error) {
-	if err = list.mover.Close(); err != nil {
+	if err = list.blobWriter.Close(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
+
+	list.cursor.Reset()
 
 	return err
 }
 
 func (list *OpenList) GetMarklId() interfaces.MarklId {
-	return list.mover.GetMarklId()
+	return list.blobWriter.GetMarklId()
 }
