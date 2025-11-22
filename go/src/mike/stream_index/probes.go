@@ -39,7 +39,7 @@ func (index *Index) ReadOneMarklId(
 
 		if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
 			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
-				return
+				return ok
 			} else {
 				panic(err)
 			}
@@ -52,7 +52,7 @@ func (index *Index) ReadOneMarklId(
 
 		if err = index.readOneLoc(loc, object); err != nil {
 			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
-				return
+				return ok
 			} else {
 				panic(err)
 			}
@@ -61,7 +61,7 @@ func (index *Index) ReadOneMarklId(
 
 	ok = true
 
-	return
+	return ok
 }
 
 func (index *Index) ReadManyMarklId(
@@ -178,7 +178,7 @@ func (index *Index) ReadOneObjectIdTai(
 
 	if !index.ReadOneMarklId(digest, object) {
 		err = collections.MakeErrNotFoundString(key)
-		return
+		return object, err
 	}
 
 	return object, err

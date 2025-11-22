@@ -121,7 +121,7 @@ func (store *Store) RevertTo(
 		object,
 	) {
 		err = errors.Errorf("object with sig %q not found", revertId.Sig)
-		return
+		return err
 	}
 
 	defer sku.GetTransactedPool().Put(object)
