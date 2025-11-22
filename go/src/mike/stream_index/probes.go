@@ -25,7 +25,6 @@ func (index *Index) ReadOneMarklIdAdded(
 	return ok
 }
 
-// TODO migrate to panic semantics
 func (index *Index) ReadOneMarklId(
 	marklId interfaces.MarklId,
 	object *sku.Transacted,
@@ -37,6 +36,7 @@ func (index *Index) ReadOneMarklId(
 	{
 		var err error
 
+		// TODO migrate to panic semantics
 		if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
 			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
 				return ok
@@ -46,22 +46,9 @@ func (index *Index) ReadOneMarklId(
 		}
 	}
 
-	// TODO read from page additions if necessary
-	{
-		var err error
+	ok = index.readOneLoc(loc, object)
 
-		if err = index.readOneLoc(loc, object); err != nil {
-			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
-				return ok
-			} else {
-				panic(err)
-			}
-		}
-	}
-
-	ok = true
-
-	return ok
+	return
 }
 
 func (index *Index) ReadManyMarklId(
@@ -78,8 +65,8 @@ func (index *Index) ReadManyMarklId(
 	for _, loc := range locs {
 		object := sku.GetTransactedPool().Get()
 
-		if err = index.readOneLoc(loc, object); err != nil {
-			err = errors.Wrapf(err, "Loc: %s", loc)
+		if !index.readOneLoc(loc, object) {
+			err = errors.Errorf("failed to read loc: %s", loc)
 			return objects, err
 		}
 
@@ -187,14 +174,11 @@ func (index *Index) ReadOneObjectIdTai(
 func (index *Index) readOneLoc(
 	loc object_probe_index.Loc,
 	object *sku.Transacted,
-) (err error) {
+) (ok bool) {
 	pageReader, pageReaderClose := index.makeProbePageReader(loc.Page)
-	defer errors.Deferred(&err, pageReaderClose)
+	defer errors.Must(pageReaderClose)
 
-	if err = pageReader.readOneCursor(loc.Cursor, object); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
+	ok = pageReader.readOneCursor(loc.Cursor, object)
 
-	return err
+	return
 }

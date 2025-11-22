@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
@@ -55,12 +54,11 @@ func (index *Index) makeProbePageReader(
 func (pageReader *probePageReader) readOneCursor(
 	cursor ohio.Cursor,
 	object *sku.Transacted,
-) (err error) {
+) (ok bool) {
 	// pages get deleted before reindexing, so this is actually valid to have a
 	// non-nil cursor request
 	if pageReader.readerAt == nil {
-		err = collections.MakeErrNotFound(cursor)
-		return err
+		return
 	}
 
 	var bytesRead int64
@@ -72,31 +70,36 @@ func (pageReader *probePageReader) readOneCursor(
 		Cursor: cursor,
 	}
 
-	if bytesRead, err = pageReader.decoder.readFormatExactly(
-		pageReader.readerAt,
-		&objectPlus,
-	); err != nil {
-		if err == io.EOF {
-			if bytesRead == cursor.ContentLength {
-				err = nil
-				goto NO_ERR
-			} else {
-				err = io.ErrUnexpectedEOF
+	{
+		var err error
+
+		if bytesRead, err = pageReader.decoder.readFormatExactly(
+			pageReader.readerAt,
+			&objectPlus,
+		); err != nil {
+			if err == io.EOF {
+				if bytesRead == cursor.ContentLength {
+					goto NO_ERR
+				} else {
+					err = io.ErrUnexpectedEOF
+				}
 			}
+
+			err = errors.Wrapf(
+				err,
+				"Range: %q, Page: %q, BytesRead: %d",
+				cursor,
+				pageReader.pageId.Path(),
+				bytesRead,
+			)
+
+			panic(err)
 		}
-
-		err = errors.Wrapf(
-			err,
-			"Range: %q, Page: %q, BytesRead: %d",
-			cursor,
-			pageReader.pageId.Path(),
-			bytesRead,
-		)
-
-		return err
 	}
 
 NO_ERR:
 
-	return err
+	ok = true
+
+	return
 }

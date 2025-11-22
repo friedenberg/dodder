@@ -85,26 +85,8 @@ func Deferred(
 	}
 }
 
-func DeferredChanError(
-	err *error,
-	ch <-chan error,
-) {
-	var err1 error
-
-	select {
-	case err1 = <-ch:
-	}
-
-	if err1 != nil {
-		*err = Join(*err, err1)
-	}
-}
-
-func DeferredChan(
-	ch chan<- error,
-	f func() error,
-) {
-	if err := f(); err != nil {
-		ch <- err
+func Must(funk FuncErr) {
+	if err := funk(); err != nil {
+		panic(err)
 	}
 }
