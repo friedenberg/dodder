@@ -1,4 +1,4 @@
-package object_metadata
+package object_metadata_fmt_triple_hyphen
 
 import (
 	"io"
@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
+	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 )
 
 type textParser2 struct {
@@ -22,7 +23,7 @@ type textParser2 struct {
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	metadata := parser.GetMetadataMutable()
-	Resetter.Reset(metadata)
+	object_metadata.Resetter.Reset(metadata)
 
 	delimReader := delim_reader.MakeDelimReader('\n', r)
 	defer delim_reader.PutDelimReader(delimReader)
@@ -85,7 +86,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 
 // TODO add support for sigs and new format
 func (parser *textParser2) readType(
-	metadata IMetadataMutable,
+	metadata object_metadata.IMetadataMutable,
 	typeString string,
 ) (err error) {
 	if typeString == "" {
@@ -101,7 +102,7 @@ func (parser *textParser2) readType(
 }
 
 func (parser *textParser2) readBlobDigest(
-	metadata IMetadataMutable,
+	metadata object_metadata.IMetadataMutable,
 	metadataLine string,
 ) (err error) {
 	if metadataLine == "" {
@@ -155,7 +156,7 @@ func (parser *textParser2) readBlobDigest(
 }
 
 func (parser *textParser2) setBlobDigest(
-	metadata IMetadataMutable,
+	metadata object_metadata.IMetadataMutable,
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(

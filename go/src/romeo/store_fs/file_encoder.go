@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
@@ -28,7 +28,7 @@ type fileEncoder struct {
 	envRepo           env_repo.Env
 	inlineTypeChecker ids.InlineTypeChecker
 
-	object_metadata.TextFormatterFamily
+	object_metadata_fmt_triple_hyphen.TextFormatterFamily
 }
 
 func MakeFileEncoder(
@@ -42,8 +42,8 @@ func MakeFileEncoder(
 		perm:              0o666,
 		envRepo:           envRepo,
 		inlineTypeChecker: inlineTypeChecker,
-		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			object_metadata.Dependencies{
+		TextFormatterFamily: object_metadata_fmt_triple_hyphen.MakeTextFormatterFamily(
+			object_metadata_fmt_triple_hyphen.Dependencies{
 				EnvDir:    envRepo,
 				BlobStore: blobStore,
 			},
@@ -79,7 +79,7 @@ func (encoder *fileEncoder) EncodeObject(
 	blobPath string,
 	lockfilePath string,
 ) (err error) {
-	ctx := object_metadata.TextFormatterContext{
+	ctx := object_metadata_fmt_triple_hyphen.TextFormatterContext{
 		PersistentFormatterContext: object.GetSku(),
 		TextFormatterOptions:       options,
 	}
@@ -166,7 +166,7 @@ func (encoder *fileEncoder) EncodeObject(
 		}
 
 	case objectPath != "":
-		var mtw object_metadata.TextFormatter
+		var mtw object_metadata_fmt_triple_hyphen.TextFormatter
 
 		if inline {
 			mtw = encoder.InlineBlob

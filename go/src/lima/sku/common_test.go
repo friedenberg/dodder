@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_metadata_fmt_triple_hyphen"
 )
 
 type inlineTypChecker struct {
@@ -41,7 +42,7 @@ func makeTagSet(t *ui.TestContext, vs ...string) (es ids.TagSet) {
 
 func readFormat(
 	t1 *ui.TestContext,
-	format object_metadata.TextFormat,
+	format object_metadata_fmt_triple_hyphen.TextFormat,
 	contents string,
 ) (metadata object_metadata.IMetadataMutable) {
 	var object Transacted
@@ -181,9 +182,9 @@ func testEqualityNotSelf(t *ui.TestContext) {
 func makeTestTextFormat(
 	envDir env_dir.Env,
 	blobStore interfaces.BlobStore,
-) object_metadata.TextFormat {
-	return object_metadata.MakeTextFormat(
-		object_metadata.Dependencies{
+) object_metadata_fmt_triple_hyphen.TextFormat {
+	return object_metadata_fmt_triple_hyphen.MakeTextFormat(
+		object_metadata_fmt_triple_hyphen.Dependencies{
 			EnvDir:    envDir,
 			BlobStore: blobStore,
 		},
@@ -349,10 +350,10 @@ func (blobStore blobReaderFactory) BlobReader(
 func writeFormat(
 	t *ui.TestContext,
 	metadata object_metadata.IMetadataMutable,
-	formatter object_metadata.TextFormatter,
+	formatter object_metadata_fmt_triple_hyphen.TextFormatter,
 	includeBlob bool,
 	blobBody string,
-	options object_metadata.TextFormatterOptions,
+	options object_metadata_fmt_triple_hyphen.TextFormatterOptions,
 	hashType interfaces.FormatHash,
 ) (out string) {
 	hash := sha256.New()
@@ -371,7 +372,7 @@ func writeFormat(
 
 	if _, err := formatter.FormatMetadata(
 		stringBuilder,
-		object_metadata.TextFormatterContext{
+		object_metadata_fmt_triple_hyphen.TextFormatterContext{
 			PersistentFormatterContext: metadata,
 			TextFormatterOptions:       options,
 		},
@@ -406,8 +407,8 @@ func testWriteWithoutBlob(t *ui.TestContext) {
 		},
 	)
 
-	format := object_metadata.MakeTextFormatterMetadataOnly(
-		object_metadata.Dependencies{
+	format := object_metadata_fmt_triple_hyphen.MakeTextFormatterMetadataOnly(
+		object_metadata_fmt_triple_hyphen.Dependencies{
 			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
@@ -418,7 +419,7 @@ func testWriteWithoutBlob(t *ui.TestContext) {
 		format,
 		false,
 		"the body",
-		object_metadata.TextFormatterOptions{},
+		object_metadata_fmt_triple_hyphen.TextFormatterOptions{},
 		envRepo.GetDefaultBlobStore().GetDefaultHashType(),
 	)
 
@@ -457,8 +458,8 @@ func testWriteWithInlineBlob(t *ui.TestContext) {
 		},
 	)
 
-	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
-		object_metadata.Dependencies{
+	format := object_metadata_fmt_triple_hyphen.MakeTextFormatterMetadataInlineBlob(
+		object_metadata_fmt_triple_hyphen.Dependencies{
 			BlobStore: envRepo.GetDefaultBlobStore(),
 		},
 	)
@@ -469,7 +470,7 @@ func testWriteWithInlineBlob(t *ui.TestContext) {
 		format,
 		true,
 		"the body",
-		object_metadata.TextFormatterOptions{},
+		object_metadata_fmt_triple_hyphen.TextFormatterOptions{},
 		envRepo.GetDefaultBlobStore().GetDefaultHashType(),
 	)
 

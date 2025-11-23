@@ -124,8 +124,6 @@ func (store *Store) RevertTo(
 		return err
 	}
 
-	defer sku.GetTransactedPool().Put(object)
-
 	if err = store.Commit(
 		object,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},

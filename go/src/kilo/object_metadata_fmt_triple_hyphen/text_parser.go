@@ -1,4 +1,4 @@
-package object_metadata
+package object_metadata_fmt_triple_hyphen
 
 import (
 	"io"
@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
+	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 )
 
 type textParser struct {
@@ -36,7 +37,7 @@ func (parser textParser) ParseMetadata(
 	context TextParserContext,
 ) (n int64, err error) {
 	metadata := context.GetMetadataMutable()
-	Resetter.Reset(metadata)
+	object_metadata.Resetter.Reset(metadata)
 
 	var n1 int64
 
@@ -86,7 +87,7 @@ func (parser textParser) ParseMetadata(
 		return n, err
 	} else if !parser2.Blob.GetDigest().IsNull() {
 		metadata.GetIndexMutable().GetFieldsMutable().Append(
-			Field{
+			string_format_writer.Field{
 				Key:       "blob",
 				Value:     parser2.Blob.GetPath(),
 				ColorType: string_format_writer.ColorTypeId,

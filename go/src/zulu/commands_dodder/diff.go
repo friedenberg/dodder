@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/papa/queries"
 	"code.linenisgreat.com/dodder/go/src/xray/user_ops"
@@ -86,8 +86,8 @@ func (cmd Diff) Run(dep command.Request) {
 
 	opDiffFS := user_ops.Diff{
 		Repo: localWorkingCopy,
-		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			object_metadata.Dependencies{
+		TextFormatterFamily: object_metadata_fmt_triple_hyphen.MakeTextFormatterFamily(
+			object_metadata_fmt_triple_hyphen.Dependencies{
 				EnvDir:    localWorkingCopy.GetEnvRepo(),
 				BlobStore: localWorkingCopy.GetBlobStore(),
 			},

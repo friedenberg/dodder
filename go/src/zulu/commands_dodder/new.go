@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/quebec/organize_text"
 	"code.linenisgreat.com/dodder/go/src/romeo/store_fs"
@@ -97,8 +97,8 @@ func (cmd *New) Run(req command.Request) {
 
 	cotfo := checkout_options.TextFormatterOptions{}
 
-	f := object_metadata.MakeTextFormat(
-		object_metadata.Dependencies{
+	f := object_metadata_fmt_triple_hyphen.MakeTextFormat(
+		object_metadata_fmt_triple_hyphen.Dependencies{
 			EnvDir:    repo.GetEnvRepo(),
 			BlobStore: repo.GetEnvRepo().GetDefaultBlobStore(),
 		},

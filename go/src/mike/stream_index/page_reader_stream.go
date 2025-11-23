@@ -109,6 +109,7 @@ func (pageReader *streamPageReader) readFrom(
 		decoder := makeBinaryWithQueryGroup(queryGroup, ids.SigilHistory)
 
 		var object objectWithCursorAndSigil
+
 		object.Transacted = sku.GetTransactedPool().Get()
 		defer sku.GetTransactedPool().Put(object.Transacted)
 

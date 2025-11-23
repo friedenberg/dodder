@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/kilo/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/romeo/store_fs"
 	"code.linenisgreat.com/dodder/go/src/whiskey/local_working_copy"
@@ -24,12 +24,12 @@ import (
 type Diff struct {
 	*local_working_copy.Repo
 
-	object_metadata.TextFormatterFamily
+	object_metadata_fmt_triple_hyphen.TextFormatterFamily
 }
 
 func (op Diff) Run(
 	remoteCheckedOut sku.SkuType,
-	options object_metadata.TextFormatterOptions,
+	options object_metadata_fmt_triple_hyphen.TextFormatterOptions,
 ) (err error) {
 	var localCheckedOut sku.SkuType
 
@@ -66,13 +66,13 @@ func (op Diff) Run(
 	var mode checkout_mode.Mode
 
 	local := localCheckedOut.GetSku()
-	localContext := object_metadata.TextFormatterContext{
+	localContext := object_metadata_fmt_triple_hyphen.TextFormatterContext{
 		PersistentFormatterContext: local,
 		TextFormatterOptions:       options,
 	}
 
 	remote := remoteCheckedOut.GetSkuExternal()
-	remoteCtx := object_metadata.TextFormatterContext{
+	remoteCtx := object_metadata_fmt_triple_hyphen.TextFormatterContext{
 		PersistentFormatterContext: remote,
 		TextFormatterOptions:       options,
 	}
@@ -199,14 +199,17 @@ func (op Diff) Run(
 }
 
 func (c Diff) makeDo(
-	w io.WriteCloser,
-	mf object_metadata.TextFormatter,
-	m object_metadata.TextFormatterContext,
+	writeCloser io.WriteCloser,
+	textFormatter object_metadata_fmt_triple_hyphen.TextFormatter,
+	textFormatterContext object_metadata_fmt_triple_hyphen.TextFormatterContext,
 ) errors.FuncErr {
 	return func() (err error) {
-		defer errors.DeferredCloser(&err, w)
+		defer errors.DeferredCloser(&err, writeCloser)
 
-		if _, err = mf.FormatMetadata(w, m); err != nil {
+		if _, err = textFormatter.FormatMetadata(
+			writeCloser,
+			textFormatterContext,
+		); err != nil {
 			if errors.IsBrokenPipe(err) {
 				err = nil
 			} else {

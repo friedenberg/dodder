@@ -1,8 +1,6 @@
 package object_metadata
 
 import (
-	"io"
-
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
@@ -76,28 +74,5 @@ type (
 
 	PersistentParserContext interface {
 		GetterMutable
-	}
-
-	TextFormatterContext struct {
-		TextFormatterOptions
-		PersistentFormatterContext
-	}
-
-	TextParserContext interface {
-		PersistentParserContext
-		SetBlobDigest(interfaces.MarklId) error
-	}
-
-	TextFormatOutput struct {
-		io.Writer
-		string
-	}
-
-	TextFormatter interface {
-		FormatMetadata(io.Writer, TextFormatterContext) (int64, error)
-	}
-
-	TextParser interface {
-		ParseMetadata(io.Reader, TextParserContext) (int64, error)
 	}
 )
