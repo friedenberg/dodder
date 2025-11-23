@@ -1,9 +1,18 @@
 package object_finalizer
 
-import "errors"
+import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+
+type (
+	errTypeLockfileDisamb struct{}
+	errTypeLockfile       = errors.TypedError[errTypeLockfileDisamb]
+)
+
+func newTypeLockfileError(text string) errTypeLockfile {
+	return errors.NewWithType[errTypeLockfileDisamb](text)
+}
 
 var (
-	ErrFailedToReadCurrentTypeObject = errors.New("failed to read current type object")
-	ErrEmptyType                     = errors.New("empty type")
-	ErrBuiltinType                   = errors.New("builtin type")
+	ErrFailedToReadCurrentTypeObject = newTypeLockfileError("failed to read current type object")
+	ErrEmptyType                     = newTypeLockfileError("empty type")
+	ErrBuiltinType                   = newTypeLockfileError("builtin type")
 )

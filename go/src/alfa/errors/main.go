@@ -1,17 +1,12 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
 )
-
-func New(text string) error {
-	return errors.New(text)
-}
 
 func Join(es ...error) error {
 	switch {

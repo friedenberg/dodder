@@ -10,9 +10,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	metadata object_metadata.IMetadataMutable,
 	tipe ids.Type,
 	funcs ...sku.FuncReadOne,
-) (err error) {
-	return err
-
+) (err errTypeLockfile) {
 	// TODO stop excluding builtin types and create a process for signing those
 	// too
 	if tipe.IsEmpty() {
