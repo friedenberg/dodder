@@ -12,6 +12,10 @@ type (
 		sk *Transacted,
 	) (ok bool)
 
+	ObjectProbeIndex interface {
+		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
+	}
+
 	IndexPrimitives interface {
 		ObjectExists(
 			objectId *ids.ObjectId,
@@ -36,11 +40,7 @@ type (
 
 	Index interface {
 		IndexPrimitives
-
-		ReadOneObjectId(
-			objectId interfaces.ObjectId,
-			object *Transacted,
-		) (err error)
+		ObjectProbeIndex
 
 		ReadOneObjectIdTai(
 			k interfaces.ObjectId,

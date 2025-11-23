@@ -21,7 +21,9 @@ type StreamIndexOptions struct {
 
 // TODO switch to methods for all
 type StoreOptions struct {
+	LockfileOptions    LockfileOptions
 	StreamIndexOptions StreamIndexOptions
+
 	AddToInventoryList bool
 	ApplyProto         bool // TODO remove
 	ApplyProtoType     bool // TODO remove
@@ -31,8 +33,15 @@ type StoreOptions struct {
 	Validate           bool
 }
 
+type LockfileOptions struct {
+	AllowTypeFailure bool
+}
+
 func GetStoreOptionsRealizeWithProto() StoreOptions {
 	return StoreOptions{
+		LockfileOptions: LockfileOptions{
+			AllowTypeFailure: true,
+		},
 		ApplyProto: true,
 		RunHooks:   true,
 		UpdateTai:  true,
@@ -41,6 +50,9 @@ func GetStoreOptionsRealizeWithProto() StoreOptions {
 
 func GetStoreOptionsRealizeSansProto() StoreOptions {
 	return StoreOptions{
+		LockfileOptions: LockfileOptions{
+			AllowTypeFailure: true,
+		},
 		RunHooks:  true,
 		UpdateTai: true,
 	}

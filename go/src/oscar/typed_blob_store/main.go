@@ -1,9 +1,9 @@
 package typed_blob_store
 
 import (
-	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/mike/box_format"
+	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/november/env_lua"
 	"code.linenisgreat.com/dodder/go/src/november/inventory_list_coders"
 )
@@ -11,7 +11,7 @@ import (
 type Stores struct {
 	InventoryList inventory_list_coders.Closet
 	Repo          RepoStore
-	Type          Type
+	Type          type_blobs.Coder
 	Tag           Tag
 }
 
@@ -27,10 +27,10 @@ func MakeStores(
 		),
 		Tag:  MakeTagStore(envRepo, envLua),
 		Repo: MakeRepoStore(envRepo),
-		Type: MakeTypeStore(envRepo),
+		Type: type_blobs.MakeTypeStore(envRepo),
 	}
 }
 
-func (stores Stores) GetTypeV1() TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
-	return stores.Type.toml_v1
-}
+// func (stores Stores) GetTypeV1() interfaces.TypedStore[type_blobs.TomlV1, *type_blobs.TomlV1] {
+// 	return stores.Type.toml_v1
+// }

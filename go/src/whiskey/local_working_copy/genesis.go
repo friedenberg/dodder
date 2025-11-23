@@ -4,12 +4,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
-	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 )
 
 func Genesis(
@@ -80,53 +80,52 @@ func (local *Repo) initDefaultTypeAndConfig(
 
 func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
-) (defaultTypeObjectId ids.Type, err error) {
+) (objectIdType ids.Type, err error) {
 	if bigBang.ExcludeDefaultType {
-		return defaultTypeObjectId, err
+		return objectIdType, err
 	}
 
-	defaultTypeObjectId = ids.MustType("md")
-	defaultTypeBlob := type_blobs.Default()
-
-	var objectId ids.ObjectId
-
-	if err = objectId.SetWithIdLike(defaultTypeObjectId); err != nil {
-		err = errors.Wrap(err)
-		return defaultTypeObjectId, err
-	}
-
-	var digest interfaces.MarklId
-
-	// TODO remove and replace with two-step process
-	if digest, _, err = local.GetStore().GetTypedBlobStore().GetTypeV1().SaveBlobText(
-		&defaultTypeBlob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return defaultTypeObjectId, err
-	}
+	objectIdType = ids.MustType("md")
+	tipe := ids.DefaultOrPanic(genres.Type)
+	blob := type_blobs.Default()
 
 	object := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(object)
 
-	if err = object.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
+	if err = object.ObjectId.SetWithIdLike(objectIdType); err != nil {
 		err = errors.Wrap(err)
-		return defaultTypeObjectId, err
+		return objectIdType, err
+	}
+
+	var objectId ids.ObjectId
+
+	if err = objectId.SetWithIdLike(objectIdType); err != nil {
+		err = errors.Wrap(err)
+		return objectIdType, err
+	}
+
+	var digest interfaces.MarklId
+
+	if digest, _, err = local.GetStore().GetTypedBlobStore().Type.SaveBlobText(
+		tipe,
+		&blob,
+	); err != nil {
+		err = errors.Wrap(err)
+		return objectIdType, err
 	}
 
 	object.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(digest)
-	object.GetMetadataMutable().GetTypeMutable().ResetWith(
-		ids.DefaultOrPanic(genres.Type),
-	)
+	object.GetMetadataMutable().GetTypeMutable().ResetWith(tipe)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		object,
 		sku.GetStoreOptionsCreate(),
 	); err != nil {
 		err = errors.Wrap(err)
-		return defaultTypeObjectId, err
+		return objectIdType, err
 	}
 
-	return defaultTypeObjectId, err
+	return objectIdType, err
 }
 
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(

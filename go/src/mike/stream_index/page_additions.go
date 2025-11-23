@@ -29,12 +29,7 @@ func (additions *pageAdditions) add(object *sku.Transacted) {
 
 	for probeId := range seqProbeIds {
 		idBytes := probeId.Id.GetBytes()
-
-		if existingAddition, ok := additionProbes.Get(string(idBytes)); ok && existingAddition.Less(objectClone) {
-			additionProbes.Set(string(idBytes), objectClone)
-		} else {
-			additionProbes.Set(string(idBytes), objectClone)
-		}
+		additionProbes.Set(string(idBytes), objectClone)
 	}
 }
 

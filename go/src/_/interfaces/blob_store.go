@@ -1,6 +1,8 @@
 package interfaces
 
-import "io"
+import (
+	"io"
+)
 
 type (
 	BlobIOWrapper interface {
@@ -63,5 +65,21 @@ type (
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[BLOB any] interface {
 		GetBlob(MarklId) (BLOB, FuncRepool, error)
+	}
+
+	Format[BLOB any, BLOB_PTR Ptr[BLOB]] interface {
+		SavedBlobFormatter
+		CoderReadWriter[BLOB_PTR]
+	}
+
+	TypedStore[
+		BLOB any,
+		BLOB_PTR Ptr[BLOB],
+	] interface {
+		// TODO remove and replace with two-step process
+		SaveBlobText(BLOB_PTR) (MarklId, int64, error)
+		Format[BLOB, BLOB_PTR]
+		// TODO remove
+		BlobPool[BLOB_PTR]
 	}
 )

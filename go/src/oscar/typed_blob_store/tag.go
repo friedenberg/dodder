@@ -4,8 +4,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
+	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
+	"code.linenisgreat.com/dodder/go/src/lima/blob_library"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/november/env_lua"
@@ -15,10 +17,10 @@ import (
 type Tag struct {
 	envRepo env_repo.Env
 	envLua  env_lua.Env
-	toml_v0 TypedStore[tag_blobs.V0, *tag_blobs.V0]
-	toml_v1 TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
-	lua_v1  TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
-	lua_v2  TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
+	toml_v0 interfaces.TypedStore[tag_blobs.V0, *tag_blobs.V0]
+	toml_v1 interfaces.TypedStore[tag_blobs.TomlV1, *tag_blobs.TomlV1]
+	lua_v1  interfaces.TypedStore[tag_blobs.LuaV1, *tag_blobs.LuaV1]
+	lua_v2  interfaces.TypedStore[tag_blobs.LuaV2, *tag_blobs.LuaV2]
 }
 
 func MakeTagStore(
@@ -28,35 +30,35 @@ func MakeTagStore(
 	return Tag{
 		envRepo: envRepo,
 		envLua:  envLua,
-		toml_v0: MakeBlobStore(
+		toml_v0: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.V0](
+			blob_library.MakeBlobFormat(
+				toml.MakeTomlDecoderIgnoreTomlErrors[tag_blobs.V0](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[tag_blobs.V0, *tag_blobs.V0]{},
+				toml.TomlBlobEncoder[tag_blobs.V0, *tag_blobs.V0]{},
 				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.V0) {
 				a.Reset()
 			},
 		),
-		toml_v1: MakeBlobStore(
+		toml_v1: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[tag_blobs.TomlV1](
+			blob_library.MakeBlobFormat(
+				toml.MakeTomlDecoderIgnoreTomlErrors[tag_blobs.TomlV1](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
+				toml.TomlBlobEncoder[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
 				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *tag_blobs.TomlV1) {
 				a.Reset()
 			},
 		),
-		lua_v1: MakeBlobStore(
+		lua_v1: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat[tag_blobs.LuaV1](
+			blob_library.MakeBlobFormat[tag_blobs.LuaV1](
 				nil,
 				nil,
 				envRepo.GetDefaultBlobStore(),
@@ -64,9 +66,9 @@ func MakeTagStore(
 			func(a *tag_blobs.LuaV1) {
 			},
 		),
-		lua_v2: MakeBlobStore(
+		lua_v2: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat[tag_blobs.LuaV2](
+			blob_library.MakeBlobFormat[tag_blobs.LuaV2](
 				nil,
 				nil,
 				envRepo.GetDefaultBlobStore(),

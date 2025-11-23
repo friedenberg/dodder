@@ -175,7 +175,7 @@ func (commitFacilitator commitFacilitator) commit(
 			mother,
 			options,
 		); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "failed to validate object: %q", sku.String(daughter))
 			return err
 		}
 

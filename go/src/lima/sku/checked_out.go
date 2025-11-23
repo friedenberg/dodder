@@ -10,10 +10,13 @@ import (
 )
 
 func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
-	i := co.GetSku()
-	e := co.GetSkuExternal().GetSku()
+	internal := co.GetSku()
+	external := co.GetSkuExternal().GetSku()
 
-	return object_metadata.EqualerSansTai.Equals(&e.Metadata, &i.Metadata)
+	return object_metadata.EqualerSansTai.Equals(
+		&external.Metadata,
+		&internal.Metadata,
+	)
 }
 
 type CheckedOut struct {
@@ -22,58 +25,66 @@ type CheckedOut struct {
 	state    checked_out_state.State
 }
 
-func (c *CheckedOut) GetRepoId() ids.RepoId {
-	return c.GetSkuExternal().RepoId
+var (
+	_ TransactedGetter   = &CheckedOut{}
+	_ ExternalLike       = &CheckedOut{}
+	_ ExternalLikeGetter = &CheckedOut{}
+)
+
+func (checkedOut *CheckedOut) GetRepoId() ids.RepoId {
+	return checkedOut.GetSkuExternal().RepoId
 }
 
-func (c *CheckedOut) GetSkuExternal() *Transacted {
-	return &c.external
+func (checkedOut *CheckedOut) GetSkuExternal() *Transacted {
+	return &checkedOut.external
 }
 
-func (c *CheckedOut) GetSku() *Transacted {
-	return &c.internal
+func (checkedOut *CheckedOut) GetSku() *Transacted {
+	return &checkedOut.internal
 }
 
-func (c *CheckedOut) GetState() checked_out_state.State {
-	return c.state
+func (checkedOut *CheckedOut) GetState() checked_out_state.State {
+	return checkedOut.state
 }
 
-func (src *CheckedOut) Clone() *CheckedOut {
+func (checkedOut *CheckedOut) Clone() *CheckedOut {
 	dst := GetCheckedOutPool().Get()
-	CheckedOutResetter.ResetWith(dst, src)
+	CheckedOutResetter.ResetWith(dst, checkedOut)
 	return dst
 }
 
-func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectIdLike {
-	return t.GetSkuExternal().GetExternalObjectId()
+func (checkedOut *CheckedOut) GetExternalObjectId() ids.ExternalObjectIdLike {
+	return checkedOut.GetSkuExternal().GetExternalObjectId()
 }
 
-func (t *CheckedOut) GetExternalState() external_state.State {
-	return t.GetSkuExternal().GetExternalState()
+func (checkedOut *CheckedOut) GetExternalState() external_state.State {
+	return checkedOut.GetSkuExternal().GetExternalState()
 }
 
-func (a *CheckedOut) GetObjectId() *ids.ObjectId {
-	return a.GetSkuExternal().GetObjectId()
+func (checkedOut *CheckedOut) GetObjectId() *ids.ObjectId {
+	return checkedOut.GetSkuExternal().GetObjectId()
 }
 
-func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
-	c.state = v
+func (checkedOut *CheckedOut) SetState(
+	state checked_out_state.State,
+) (err error) {
+	checkedOut.state = state
 	return err
 }
 
-func (a *CheckedOut) String() string {
-	return fmt.Sprintf("%s %s", a.GetSku(), a.GetSkuExternal())
+func (checkedOut *CheckedOut) String() string {
+	return fmt.Sprintf("%s %s", checkedOut.GetSku(), checkedOut.GetSkuExternal())
 }
 
-func (a *CheckedOut) Equals(b *CheckedOut) bool {
-	return a.internal.Equals(&b.internal) && a.external.Equals(&b.external)
+func (checkedOut *CheckedOut) Equals(b *CheckedOut) bool {
+	return checkedOut.internal.Equals(&b.internal) && checkedOut.external.Equals(&b.external)
 }
 
-func (a *CheckedOut) GetTai() ids.Tai {
-	external := a.external.GetTai()
+func (checkedOut *CheckedOut) GetTai() ids.Tai {
+	external := checkedOut.external.GetTai()
 
 	if external.IsZero() {
-		return a.internal.GetTai()
+		return checkedOut.internal.GetTai()
 	} else {
 		return external
 	}

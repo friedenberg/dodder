@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
 	pkg_query "code.linenisgreat.com/dodder/go/src/papa/queries"
 	"code.linenisgreat.com/dodder/go/src/whiskey/local_working_copy"
 )

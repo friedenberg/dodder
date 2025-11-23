@@ -29,17 +29,17 @@ type Checkin struct {
 
 func (op Checkin) Run(
 	repo *local_working_copy.Repo,
-	q *queries.Query,
+	query *queries.Query,
 ) (err error) {
-	var l sync.Mutex
+	var lock sync.Mutex
 
 	results := sku.MakeSkuTypeSetMutable()
 
 	if err = repo.GetStore().QuerySkuType(
-		q,
+		query,
 		func(co sku.SkuType) (err error) {
-			l.Lock()
-			defer l.Unlock()
+			lock.Lock()
+			defer lock.Unlock()
 
 			return results.Add(co.Clone())
 		},
@@ -49,7 +49,7 @@ func (op Checkin) Run(
 	}
 
 	if op.Organize {
-		if err = op.runOrganize(repo, q, results); err != nil {
+		if err = op.runOrganize(repo, query, results); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

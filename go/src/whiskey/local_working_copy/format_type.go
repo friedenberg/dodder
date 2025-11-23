@@ -6,19 +6,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/sku_fmt"
 	"code.linenisgreat.com/dodder/go/src/mike/sku_lua"
-	"code.linenisgreat.com/dodder/go/src/oscar/typed_blob_store"
+	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
 )
 
 type (
 	FormatTypeFuncConstructor func(
 		*Repo,
-		typed_blob_store.Type,
+		type_blobs.Coder,
 		interfaces.WriterAndStringWriter,
 	) interfaces.FuncIter[*sku.Transacted]
 
@@ -51,7 +50,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 	"vim-syntax-type": {
 		FormatTypeFuncConstructor: func(
 			repo *Repo,
-			typeBlobStore typed_blob_store.Type,
+			typeBlobStore type_blobs.Coder,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
@@ -114,7 +113,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 	"formatters": {
 		FormatTypeFuncConstructor: func(
 			repo *Repo,
-			typeBlobStore typed_blob_store.Type,
+			typeBlobStore type_blobs.Coder,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
@@ -162,7 +161,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 	"formatter-uti-groups": {
 		FormatTypeFuncConstructor: func(
 			repo *Repo,
-			typeBlobStore typed_blob_store.Type,
+			typeBlobStore type_blobs.Coder,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			format := sku_fmt.MakeFormatterTypFormatterUTIGroups(
@@ -183,7 +182,7 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 	"hooks.on_pre_commit": {
 		FormatTypeFuncConstructor: func(
 			repo *Repo,
-			typeBlobStore typed_blob_store.Type,
+			typeBlobStore type_blobs.Coder,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {

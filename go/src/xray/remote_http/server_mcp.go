@@ -17,11 +17,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
-	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/sku_json_fmt"
+	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/papa/queries"
 )
 

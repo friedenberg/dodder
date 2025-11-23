@@ -5,41 +5,43 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/repo_configs"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
+	"code.linenisgreat.com/dodder/go/src/lima/blob_library"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
 type Config struct {
-	toml_v0 TypedStore[repo_configs.V0, *repo_configs.V0]
-	toml_v1 TypedStore[repo_configs.V1, *repo_configs.V1]
+	toml_v0 interfaces.TypedStore[repo_configs.V0, *repo_configs.V0]
+	toml_v1 interfaces.TypedStore[repo_configs.V1, *repo_configs.V1]
 }
 
 func MakeConfigStore(
 	envRepo env_repo.Env,
 ) Config {
 	return Config{
-		toml_v0: MakeBlobStore(
+		toml_v0: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V0](
+			blob_library.MakeBlobFormat(
+				toml.MakeTomlDecoderIgnoreTomlErrors[repo_configs.V0](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_configs.V0, *repo_configs.V0]{},
+				toml.TomlBlobEncoder[repo_configs.V0, *repo_configs.V0]{},
 				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *repo_configs.V0) {
 				a.Reset()
 			},
 		),
-		toml_v1: MakeBlobStore(
+		toml_v1: blob_library.MakeBlobStore(
 			envRepo,
-			MakeBlobFormat(
-				MakeTomlDecoderIgnoreTomlErrors[repo_configs.V1](
+			blob_library.MakeBlobFormat(
+				toml.MakeTomlDecoderIgnoreTomlErrors[repo_configs.V1](
 					envRepo.GetDefaultBlobStore(),
 				),
-				TomlBlobEncoder[repo_configs.V1, *repo_configs.V1]{},
+				toml.TomlBlobEncoder[repo_configs.V1, *repo_configs.V1]{},
 				envRepo.GetDefaultBlobStore(),
 			),
 			func(a *repo_configs.V1) {

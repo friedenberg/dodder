@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
@@ -24,18 +23,20 @@ type (
 		// pubKey interfaces.MarklId
 	}
 
-	object interface {
-		object_metadata.GetterMutable
+	object = *sku.Transacted
 
-		CalculateDigests(
-			debug bool,
-			formats interfaces.DigestWriteMap,
-		) (err error)
+	// object interface {
+	// 	object_metadata.GetterMutable
 
-		GetDigestWriteMapWithMerkle() interfaces.DigestWriteMap
-		GetDigestWriteMapWithoutMerkle() interfaces.DigestWriteMap
-		Verify() (err error)
-	}
+	// 	CalculateDigests(
+	// 		debug bool,
+	// 		formats interfaces.DigestWriteMap,
+	// 	) (err error)
+
+	// 	GetDigestWriteMapWithMerkle() interfaces.DigestWriteMap
+	// 	GetDigestWriteMapWithoutMerkle() interfaces.DigestWriteMap
+	// 	Verify() (err error)
+	// }
 )
 
 func Make() Finalizer {
@@ -125,24 +126,43 @@ func (finalizer finalizer) WriteLockfileIfNecessary(
 
 	return finalizer.WriteLockfile(
 		object,
+		sku.LockfileOptions{},
 		finalizer.index.ReadOneMarklIdAdded,
 		finalizer.index.ReadOneMarklId,
 	)
 }
 
+// TODO offer option to allow type lock failures
 func (finalizer finalizer) WriteLockfile(
 	object object,
+	options sku.LockfileOptions,
 	funcs ...sku.FuncReadOne,
 ) (err error) {
 	metadata := object.GetMetadataMutable()
 
+	tipe := metadata.GetType()
+
 	if err = finalizer.writeTypeLockIfNecessary(
 		metadata,
-		metadata.GetType(),
+		tipe,
 		funcs...,
 	); err != nil {
-		err = errors.Wrap(err)
-		return err
+		switch err {
+		case ErrEmptyType, ErrBuiltinType:
+			err = nil
+
+		case ErrFailedToReadCurrentTypeObject:
+			if options.AllowTypeFailure {
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "failed to write type lock for type: %q", tipe)
+				return err
+			}
+
+		default:
+			err = errors.Wrapf(err, "failed to write type lock for type: %q", tipe)
+			return err
+		}
 	}
 
 	return err

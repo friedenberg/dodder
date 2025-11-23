@@ -5,9 +5,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/delta/type_blobs"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/sku_lua"
+	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 )
 
 func (store *Store) tryNewHook(

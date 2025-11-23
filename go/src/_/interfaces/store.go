@@ -7,10 +7,10 @@ type (
 		FormatSavedBlob(io.Writer, MarklId) (int64, error)
 	}
 
-	Format[T any] interface {
-		SavedBlobFormatter
-		CoderReadWriter[T]
-	}
+	// Format[T any] interface {
+	// 	SavedBlobFormatter
+	// 	CoderReadWriter[T]
+	// }
 
 	TypedBlobStore[T any] interface {
 		ParseTypedBlob(

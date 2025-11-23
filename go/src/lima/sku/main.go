@@ -18,10 +18,6 @@ type (
 		ids.InlineTypeChecker // TODO move out of konfig entirely
 	}
 
-	ObjectProbeIndex interface {
-		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
-	}
-
 	TransactedGetter interface {
 		GetSku() *Transacted
 	}
@@ -42,20 +38,5 @@ type (
 
 	ExternalLikeGetter interface {
 		GetSkuExternal() *Transacted
-	}
-
-	FSItemReadWriter interface {
-		ReadFSItemFromExternal(TransactedGetter) (*FSItem, error)
-		WriteFSItemToExternal(*FSItem, TransactedGetter) (err error)
-	}
-
-	OneReader interface {
-		ReadTransactedFromObjectId(
-			k1 interfaces.ObjectId,
-		) (sk1 *Transacted, err error)
-	}
-
-	BlobSaver interface {
-		SaveBlob(ExternalLike) (err error)
 	}
 )

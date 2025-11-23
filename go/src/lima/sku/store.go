@@ -9,6 +9,20 @@ import (
 )
 
 type (
+	FSItemReadWriter interface {
+		ReadFSItemFromExternal(TransactedGetter) (*FSItem, error)
+		WriteFSItemToExternal(*FSItem, TransactedGetter) (err error)
+	}
+
+	OneReader interface {
+		ReadTransactedFromObjectId(
+			k1 interfaces.ObjectId,
+		) (sk1 *Transacted, err error)
+	}
+
+	BlobSaver interface {
+		SaveBlob(ExternalLike) (err error)
+	}
 	IdAbbrIndexPresenceGeneric[_ any] interface {
 		Exists([3]string) error
 	}

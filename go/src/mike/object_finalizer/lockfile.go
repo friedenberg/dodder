@@ -1,7 +1,6 @@
 package object_finalizer
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
@@ -13,9 +12,14 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	funcs ...sku.FuncReadOne,
 ) (err error) {
 	return err
+
 	// TODO stop excluding builtin types and create a process for signing those
 	// too
-	if tipe.IsEmpty() || ids.IsBuiltin(tipe) {
+	if tipe.IsEmpty() {
+		err = ErrEmptyType
+		return err
+	} else if ids.IsBuiltin(tipe) {
+		err = ErrBuiltinType
 		return err
 	}
 
@@ -31,11 +35,12 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	typeObject, repool := sku.GetTransactedPool().GetWithRepool()
 	defer repool()
 
-	if !sku.ReadOneObjectIdBespoke(tipe, typeObject, funcs...) {
-		panic(errors.Errorf("failed to read type"))
+	if ok := sku.ReadOneObjectIdBespoke(tipe, typeObject, funcs...); ok {
+		typeLock.ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())
+	} else {
+		err = ErrFailedToReadCurrentTypeObject
+		return err
 	}
-
-	typeLock.ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())
 
 	return err
 }

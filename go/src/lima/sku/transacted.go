@@ -25,7 +25,13 @@ type Transacted struct {
 	ExternalObjectId ids.ExternalObjectId
 }
 
-var _ object_metadata.GetterMutable = &Transacted{}
+var (
+	_ object_metadata.Getter        = &Transacted{}
+	_ object_metadata.GetterMutable = &Transacted{}
+	_ TransactedGetter              = &Transacted{}
+	_ ExternalLike                  = &Transacted{}
+	_ ExternalLikeGetter            = &Transacted{}
+)
 
 func (transacted *Transacted) GetSkuExternal() *Transacted {
 	return transacted

@@ -26,56 +26,60 @@ type Checkout struct {
 }
 
 func (op Checkout) Run(
-	skus sku.TransactedSet,
-) (zsc sku.SkuTypeSetMutable, err error) {
-	var k ids.RepoId
+	transactedObjects sku.TransactedSet,
+) (checkedOutObjects sku.SkuTypeSetMutable, err error) {
+	var repoId ids.RepoId
 
-	if zsc, err = op.RunWithKasten(k, skus); err != nil {
+	if checkedOutObjects, err = op.RunWithRepoId(
+		repoId,
+		transactedObjects,
+	); err != nil {
 		err = errors.Wrap(err)
-		return zsc, err
+		return checkedOutObjects, err
 	}
 
-	return zsc, err
+	return checkedOutObjects, err
 }
 
-func (op Checkout) RunWithKasten(
-	kasten ids.RepoId,
-	skus sku.TransactedSet,
-) (zsc sku.SkuTypeSetMutable, err error) {
-	b := op.Repo.MakeQueryBuilder(
+func (op Checkout) RunWithRepoId(
+	repoId ids.RepoId,
+	transactedObjects sku.TransactedSet,
+) (checkedOutObjects sku.SkuTypeSetMutable, err error) {
+	queryBuilder := op.Repo.MakeQueryBuilder(
 		ids.MakeGenre(genres.Zettel),
 		nil,
 	).WithTransacted(
-		skus,
+		transactedObjects,
 		ids.SigilExternal,
 	).WithRequireNonEmptyQuery()
 
-	var qg *queries.Query
+	var query *queries.Query
 
-	if qg, err = b.BuildQueryGroup(); err != nil {
+	if query, err = queryBuilder.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
-		return zsc, err
+		return checkedOutObjects, err
 	}
 
-	if zsc, err = op.RunQuery(
-		qg,
+	if checkedOutObjects, err = op.RunQuery(
+		query,
 	); err != nil {
 		err = errors.Wrap(err)
-		return zsc, err
+		return checkedOutObjects, err
 	}
 
-	return zsc, err
+	return checkedOutObjects, err
 }
 
 func (op Checkout) RunQuery(
-	qg *queries.Query,
+	query *queries.Query,
 ) (checkedOut sku.SkuTypeSetMutable, err error) {
 	checkedOut = sku.MakeSkuTypeSetMutable()
-	var l sync.Mutex
+
+	var lock sync.Mutex
 
 	onCheckedOut := func(col sku.SkuType) (err error) {
-		l.Lock()
-		defer l.Unlock()
+		lock.Lock()
+		defer lock.Unlock()
 
 		cl := col.Clone()
 
@@ -88,7 +92,7 @@ func (op Checkout) RunQuery(
 	}
 
 	if op.Organize {
-		if qg, err = op.runOrganize(qg, onCheckedOut); err != nil {
+		if query, err = op.runOrganize(query, onCheckedOut); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err
 		}
@@ -96,7 +100,7 @@ func (op Checkout) RunQuery(
 
 	if err = op.Repo.GetStore().CheckoutQuery(
 		op.Options,
-		qg,
+		query,
 		onCheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -117,7 +121,7 @@ func (op Checkout) RunQuery(
 
 	if op.Open || op.Edit {
 		if err = op.GetStore().Open(
-			qg.RepoId,
+			query.RepoId,
 			op.CheckoutMode,
 			op.PrinterHeader(),
 			checkedOut,

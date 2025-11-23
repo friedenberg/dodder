@@ -1,4 +1,4 @@
-package typed_blob_store
+package blob_library
 
 import (
 	"io"
@@ -8,24 +8,26 @@ import (
 )
 
 type savedBlobFormatter struct {
-	arf interfaces.BlobReaderFactory
+	blobReaderFactory interfaces.BlobReaderFactory
 }
 
 func MakeSavedBlobFormatter(
 	blobReaderFactory interfaces.BlobReaderFactory,
 ) savedBlobFormatter {
 	return savedBlobFormatter{
-		arf: blobReaderFactory,
+		blobReaderFactory: blobReaderFactory,
 	}
 }
 
-func (f savedBlobFormatter) FormatSavedBlob(
-	w io.Writer,
-	sh interfaces.MarklId,
+func (formatter savedBlobFormatter) FormatSavedBlob(
+	writer io.Writer,
+	digest interfaces.MarklId,
 ) (n int64, err error) {
-	var ar interfaces.BlobReader
+	var blobReader interfaces.BlobReader
 
-	if ar, err = f.arf.MakeBlobReader(sh); err != nil {
+	if blobReader, err = formatter.blobReaderFactory.MakeBlobReader(
+		digest,
+	); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -35,9 +37,9 @@ func (f savedBlobFormatter) FormatSavedBlob(
 		return n, err
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.DeferredCloser(&err, blobReader)
 
-	if n, err = io.Copy(w, ar); err != nil {
+	if n, err = io.Copy(writer, blobReader); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

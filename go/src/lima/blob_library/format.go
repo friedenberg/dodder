@@ -1,4 +1,4 @@
-package typed_blob_store
+package blob_library
 
 import (
 	"io"
@@ -8,31 +8,31 @@ import (
 )
 
 type format[
-	O any,
-	OPtr interfaces.Ptr[O],
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
 ] struct {
-	interfaces.DecoderFromReader[OPtr]
+	interfaces.DecoderFromReader[BLOB_PTR]
 	interfaces.SavedBlobFormatter
-	interfaces.EncoderToWriter[OPtr]
+	interfaces.EncoderToWriter[BLOB_PTR]
 }
 
 func MakeBlobFormat[
-	O any,
-	OPtr interfaces.Ptr[O],
+	BLOB any,
+	BLOB_PTR interfaces.Ptr[BLOB],
 ](
-	decoder interfaces.DecoderFromReader[OPtr],
-	encoder interfaces.EncoderToWriter[OPtr],
+	decoder interfaces.DecoderFromReader[BLOB_PTR],
+	encoder interfaces.EncoderToWriter[BLOB_PTR],
 	blobReader interfaces.BlobReaderFactory,
-) Format[O, OPtr] {
-	return format[O, OPtr]{
+) interfaces.Format[BLOB, BLOB_PTR] {
+	return format[BLOB, BLOB_PTR]{
 		DecoderFromReader:  decoder,
 		EncoderToWriter:    encoder,
 		SavedBlobFormatter: MakeSavedBlobFormatter(blobReader),
 	}
 }
 
-func (af format[O, OPtr]) EncodeTo(
-	object OPtr,
+func (af format[BLOB, BLOB_PTR]) EncodeTo(
+	object BLOB_PTR,
 	writer io.Writer,
 ) (n int64, err error) {
 	if af.EncoderToWriter == nil {

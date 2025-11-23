@@ -3,8 +3,8 @@ package script_config
 import (
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/_/toml"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 )
 
 func TestToml(t1 *testing.T) {

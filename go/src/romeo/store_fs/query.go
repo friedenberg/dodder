@@ -99,6 +99,9 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		if err = store.HydrateExternalFromItem(
 			sku.CommitOptions{
 				StoreOptions: sku.StoreOptions{
+					LockfileOptions: sku.LockfileOptions{
+						AllowTypeFailure: true,
+					},
 					UpdateTai: true,
 				},
 			},
