@@ -171,7 +171,7 @@ func (deps Dependencies) writeTypeAndSig(
 
 	if typeSig.IsEmpty() {
 		err = errors.Errorf("empty type signature for type: %q", tipe)
-		return
+		return n, err
 	}
 
 	return ohio.WriteLine(
