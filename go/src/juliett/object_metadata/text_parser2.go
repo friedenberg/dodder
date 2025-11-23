@@ -148,7 +148,7 @@ func (parser *textParser2) readBlobDigest(
 
 	default:
 		err = errors.Errorf("unsupported blob digest or path: %q", metadataLine)
-		return
+		return err
 	}
 
 	return err
