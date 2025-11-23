@@ -1,25 +1,27 @@
 package ohio
 
 import (
-	"bufio"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
 
-func WriteSeq[T any](
-	w1 io.Writer,
-	e T,
-	seq ...interfaces.FuncWriterElementInterface[T],
+func WriteSeq[ELEMENT any](
+	writer io.Writer,
+	element ELEMENT,
+	seq ...interfaces.FuncWriterElementInterface[ELEMENT],
 ) (n int64, err error) {
-	w := bufio.NewWriter(w1)
-	defer errors.DeferredFlusher(&err, w)
+	bufferedWriter, repool := pool.GetBufferedWriter(writer)
+	defer repool()
+
+	defer errors.DeferredFlusher(&err, bufferedWriter)
 
 	var n1 int64
 
-	for _, s := range seq {
-		n1, err = s(w, e)
+	for _, funcWrite := range seq {
+		n1, err = funcWrite(bufferedWriter, element)
 
 		n += n1
 
@@ -33,11 +35,11 @@ func WriteSeq[T any](
 }
 
 // TODO-P4 check performance of this
-func WriteLine(w io.Writer, s string) (n int64, err error) {
+func WriteLine(writer io.Writer, value string) (n int64, err error) {
 	var n1 int
 
-	if s != "" {
-		n1, err = io.WriteString(w, s)
+	if value != "" {
+		n1, err = io.WriteString(writer, value)
 
 		n += int64(n1)
 
@@ -47,7 +49,7 @@ func WriteLine(w io.Writer, s string) (n int64, err error) {
 		}
 	}
 
-	n1, err = io.WriteString(w, "\n")
+	n1, err = io.WriteString(writer, "\n")
 
 	n += int64(n1)
 

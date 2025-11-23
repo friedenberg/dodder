@@ -132,35 +132,46 @@ func (deps Dependencies) writeCommonMetadataFormat(
 	return n, err
 }
 
-func (deps Dependencies) writeType(
+func (deps Dependencies) writeTypeAndSigIfNecessary(
 	writer io.Writer,
 	formatterContext TextFormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
 	tipe := metadata.GetType()
+	typeSig := metadata.GetLockfile().GetType()
 
 	if tipe.IsEmpty() {
 		return n, err
 	}
 
-	return ohio.WriteLine(writer, fmt.Sprintf("! %s", tipe.StringSansOp()))
+	if typeSig.IsEmpty() {
+		return ohio.WriteLine(
+			writer,
+			fmt.Sprintf(
+				"! %s",
+				tipe.StringSansOp(),
+			),
+		)
+	}
+
+	return deps.writeTypeAndSig(writer, formatterContext)
 }
 
-func (deps Dependencies) writeTypeWithSig(
+func (deps Dependencies) writeTypeAndSig(
 	writer io.Writer,
 	formatterContext TextFormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
-	typeLock := metadata.GetLockfile().GetType()
-
-	if typeLock.IsEmpty() {
-		return deps.writeType(writer, formatterContext)
-	}
-
 	tipe := metadata.GetType()
+	typeSig := metadata.GetLockfile().GetType()
 
 	if tipe.IsEmpty() {
 		return n, err
+	}
+
+	if typeSig.IsEmpty() {
+		err = errors.Errorf("empty type signature for type: %q", tipe)
+		return
 	}
 
 	return ohio.WriteLine(
@@ -168,7 +179,7 @@ func (deps Dependencies) writeTypeWithSig(
 		fmt.Sprintf(
 			"! %s@%s",
 			tipe.StringSansOp(),
-			typeLock,
+			typeSig,
 		),
 	)
 }
