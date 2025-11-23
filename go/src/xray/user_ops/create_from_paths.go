@@ -15,7 +15,7 @@ import (
 type CreateFromPaths struct {
 	*local_working_copy.Repo
 	Proto      sku.Proto
-	TextParser object_metadata_fmt_triple_hyphen.TextParser
+	TextParser object_metadata_fmt_triple_hyphen.Parser
 	Filter     script_value.ScriptValue
 	Delete     bool
 	// ReadHinweisFromPath bool

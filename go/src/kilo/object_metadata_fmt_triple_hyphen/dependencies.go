@@ -37,7 +37,7 @@ func (deps Dependencies) GetBlobDigestType() interfaces.FormatHash {
 
 func (deps Dependencies) writeComments(
 	writer io.Writer,
-	context TextFormatterContext,
+	context FormatterContext,
 ) (n int64, err error) {
 	n1 := 0
 
@@ -69,21 +69,21 @@ func (deps Dependencies) writeComments(
 
 func (deps Dependencies) writeBoundary(
 	writer io.Writer,
-	_ TextFormatterContext,
+	_ FormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(writer, triple_hyphen_io.Boundary)
 }
 
 func (deps Dependencies) writeNewLine(
 	writer io.Writer,
-	_ TextFormatterContext,
+	_ FormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(writer, "")
 }
 
 func (deps Dependencies) writeCommonMetadataFormat(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	lineWriter := format.NewLineWriter()
 
@@ -134,7 +134,7 @@ func (deps Dependencies) writeCommonMetadataFormat(
 
 func (deps Dependencies) writeTypeAndSigIfNecessary(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
 	tipe := metadata.GetType()
@@ -159,7 +159,7 @@ func (deps Dependencies) writeTypeAndSigIfNecessary(
 
 func (deps Dependencies) writeTypeAndSig(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
 	tipe := metadata.GetType()
@@ -186,7 +186,7 @@ func (deps Dependencies) writeTypeAndSig(
 
 func (deps Dependencies) writeBlobDigest(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
 
@@ -201,7 +201,7 @@ func (deps Dependencies) writeBlobDigest(
 
 func (deps Dependencies) writeBlobPath(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	var blobPath string
 
@@ -226,7 +226,7 @@ func (deps Dependencies) writeBlobPath(
 
 func (deps Dependencies) writeBlob(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	var blobReader interfaces.BlobReader
 

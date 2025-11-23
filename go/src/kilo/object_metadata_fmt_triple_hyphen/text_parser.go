@@ -20,7 +20,7 @@ type textParser struct {
 
 func MakeTextParser(
 	dependencies Dependencies,
-) TextParser {
+) Parser {
 	if dependencies.BlobStore == nil {
 		panic("nil BlobWriterFactory")
 	}
@@ -34,7 +34,7 @@ func MakeTextParser(
 
 func (parser textParser) ParseMetadata(
 	reader io.Reader,
-	context TextParserContext,
+	context ParserContext,
 ) (n int64, err error) {
 	metadata := context.GetMetadataMutable()
 	object_metadata.Resetter.Reset(metadata)
@@ -44,7 +44,7 @@ func (parser textParser) ParseMetadata(
 	parser2 := &textParser2{
 		BlobWriterFactory: parser.blobWriter,
 		hashType:          parser.hashType,
-		TextParserContext: context,
+		ParserContext:     context,
 	}
 
 	var blobWriter interfaces.BlobWriter

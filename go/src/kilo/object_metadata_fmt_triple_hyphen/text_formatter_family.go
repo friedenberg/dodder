@@ -1,21 +1,19 @@
 package object_metadata_fmt_triple_hyphen
 
-type TextFormatterFamily struct {
-	BlobPath     TextFormatter
-	InlineBlob   TextFormatter
-	MetadataOnly TextFormatter
-	BlobOnly     TextFormatter
+type FormatterFamily struct {
+	BlobPath     Formatter
+	InlineBlob   Formatter
+	MetadataOnly Formatter
+	BlobOnly     Formatter
 }
 
-type FormatterDependencies struct{}
-
-func MakeTextFormatterFamily(
+func MakeFormatterFamily(
 	common Dependencies,
-) TextFormatterFamily {
-	return TextFormatterFamily{
-		BlobPath:     MakeTextFormatterMetadataBlobPath(common),
-		InlineBlob:   MakeTextFormatterMetadataInlineBlob(common),
-		MetadataOnly: MakeTextFormatterMetadataOnly(common),
-		BlobOnly:     MakeTextFormatterExcludeMetadata(common),
+) FormatterFamily {
+	return FormatterFamily{
+		BlobPath:     MakeFormatterMetadataBlobPath(common),
+		InlineBlob:   MakeFormatterMetadataInlineBlob(common),
+		MetadataOnly: MakeFormatterMetadataOnly(common),
+		BlobOnly:     MakeFormatterExcludeMetadata(common),
 	}
 }

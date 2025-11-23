@@ -24,12 +24,12 @@ import (
 type Diff struct {
 	*local_working_copy.Repo
 
-	object_metadata_fmt_triple_hyphen.TextFormatterFamily
+	object_metadata_fmt_triple_hyphen.FormatterFamily
 }
 
 func (op Diff) Run(
 	remoteCheckedOut sku.SkuType,
-	options object_metadata_fmt_triple_hyphen.TextFormatterOptions,
+	options object_metadata_fmt_triple_hyphen.FormatterOptions,
 ) (err error) {
 	var localCheckedOut sku.SkuType
 
@@ -66,15 +66,15 @@ func (op Diff) Run(
 	var mode checkout_mode.Mode
 
 	local := localCheckedOut.GetSku()
-	localContext := object_metadata_fmt_triple_hyphen.TextFormatterContext{
+	localContext := object_metadata_fmt_triple_hyphen.FormatterContext{
 		PersistentFormatterContext: local,
-		TextFormatterOptions:       options,
+		FormatterOptions:           options,
 	}
 
 	remote := remoteCheckedOut.GetSkuExternal()
-	remoteCtx := object_metadata_fmt_triple_hyphen.TextFormatterContext{
+	remoteCtx := object_metadata_fmt_triple_hyphen.FormatterContext{
 		PersistentFormatterContext: remote,
-		TextFormatterOptions:       options,
+		FormatterOptions:           options,
 	}
 
 	if mode, err = op.GetEnvWorkspace().GetStoreFS().GetCheckoutModeOrError(
@@ -200,8 +200,8 @@ func (op Diff) Run(
 
 func (c Diff) makeDo(
 	writeCloser io.WriteCloser,
-	textFormatter object_metadata_fmt_triple_hyphen.TextFormatter,
-	textFormatterContext object_metadata_fmt_triple_hyphen.TextFormatterContext,
+	textFormatter object_metadata_fmt_triple_hyphen.Formatter,
+	textFormatterContext object_metadata_fmt_triple_hyphen.FormatterContext,
 ) errors.FuncErr {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, writeCloser)

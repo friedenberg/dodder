@@ -28,7 +28,7 @@ type fileEncoder struct {
 	envRepo           env_repo.Env
 	inlineTypeChecker ids.InlineTypeChecker
 
-	object_metadata_fmt_triple_hyphen.TextFormatterFamily
+	object_metadata_fmt_triple_hyphen.FormatterFamily
 }
 
 func MakeFileEncoder(
@@ -42,7 +42,7 @@ func MakeFileEncoder(
 		perm:              0o666,
 		envRepo:           envRepo,
 		inlineTypeChecker: inlineTypeChecker,
-		TextFormatterFamily: object_metadata_fmt_triple_hyphen.MakeTextFormatterFamily(
+		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
 			object_metadata_fmt_triple_hyphen.Dependencies{
 				EnvDir:    envRepo,
 				BlobStore: blobStore,
@@ -79,9 +79,9 @@ func (encoder *fileEncoder) EncodeObject(
 	blobPath string,
 	lockfilePath string,
 ) (err error) {
-	ctx := object_metadata_fmt_triple_hyphen.TextFormatterContext{
+	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
 		PersistentFormatterContext: object.GetSku(),
-		TextFormatterOptions:       options,
+		FormatterOptions:           options,
 	}
 
 	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
@@ -166,7 +166,7 @@ func (encoder *fileEncoder) EncodeObject(
 		}
 
 	case objectPath != "":
-		var mtw object_metadata_fmt_triple_hyphen.TextFormatter
+		var mtw object_metadata_fmt_triple_hyphen.Formatter
 
 		if inline {
 			mtw = encoder.InlineBlob

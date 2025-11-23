@@ -1,15 +1,15 @@
 package object_metadata_fmt_triple_hyphen
 
-type TextFormat struct {
-	TextFormatterFamily
-	TextParser
+type Format struct {
+	FormatterFamily
+	Parser
 }
 
-func MakeTextFormat(
+func Make(
 	common Dependencies,
-) TextFormat {
-	return TextFormat{
-		TextParser:          MakeTextParser(common),
-		TextFormatterFamily: MakeTextFormatterFamily(common),
+) Format {
+	return Format{
+		Parser:          MakeTextParser(common),
+		FormatterFamily: MakeFormatterFamily(common),
 	}
 }

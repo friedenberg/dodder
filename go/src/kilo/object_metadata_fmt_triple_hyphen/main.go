@@ -8,24 +8,20 @@ import (
 )
 
 type (
-	TextFormatOutput struct {
-		io.Writer
-		string
+	Formatter interface {
+		FormatMetadata(io.Writer, FormatterContext) (int64, error)
 	}
 
-	TextFormatter interface {
-		FormatMetadata(io.Writer, TextFormatterContext) (int64, error)
+	Parser interface {
+		ParseMetadata(io.Reader, ParserContext) (int64, error)
 	}
 
-	TextParser interface {
-		ParseMetadata(io.Reader, TextParserContext) (int64, error)
-	}
-	TextFormatterContext struct {
-		TextFormatterOptions
+	FormatterContext struct {
+		FormatterOptions
 		object_metadata.PersistentFormatterContext
 	}
 
-	TextParserContext interface {
+	ParserContext interface {
 		object_metadata.PersistentParserContext
 		SetBlobDigest(interfaces.MarklId) error
 	}

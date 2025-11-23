@@ -38,7 +38,7 @@ func MakeTextFormatterWithBlobFormatter(
 	return textFormatter{
 		options:           options,
 		InlineTypeChecker: inlineTypeChecker,
-		TextFormatterFamily: object_metadata_fmt_triple_hyphen.MakeTextFormatterFamily(
+		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
 			object_metadata_fmt_triple_hyphen.Dependencies{
 				EnvDir:        envRepo,
 				BlobStore:     envRepo.GetDefaultBlobStore(),
@@ -52,7 +52,7 @@ func MakeTextFormatterWithBlobFormatter(
 type textFormatter struct {
 	ids.InlineTypeChecker
 	options checkout_options.TextFormatterOptions
-	object_metadata_fmt_triple_hyphen.TextFormatterFamily
+	object_metadata_fmt_triple_hyphen.FormatterFamily
 	checkoutMode checkout_mode.Mode
 }
 
@@ -60,9 +60,9 @@ func (formatter textFormatter) EncodeStringTo(
 	object *sku.Transacted,
 	writer io.Writer,
 ) (n int64, err error) {
-	context := object_metadata_fmt_triple_hyphen.TextFormatterContext{
+	context := object_metadata_fmt_triple_hyphen.FormatterContext{
 		PersistentFormatterContext: object,
-		TextFormatterOptions:       formatter.options,
+		FormatterOptions:           formatter.options,
 	}
 
 	switch {
@@ -87,9 +87,9 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	sk *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
-	ctx := object_metadata_fmt_triple_hyphen.TextFormatterContext{
+	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
 		PersistentFormatterContext: sk,
-		TextFormatterOptions:       tf.options,
+		FormatterOptions:           tf.options,
 	}
 
 	if genres.Config.EqualsGenre(sk.GetGenre()) ||

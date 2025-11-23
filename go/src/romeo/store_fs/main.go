@@ -67,7 +67,7 @@ func Make(
 type Store struct {
 	config             sku.Config
 	deletedPrinter     interfaces.FuncIter[*fd.FD]
-	metadataTextParser object_metadata_fmt_triple_hyphen.TextParser
+	metadataTextParser object_metadata_fmt_triple_hyphen.Parser
 	envRepo            env_repo.Env
 	fileEncoder        FileEncoder
 	inlineTypeChecker  ids.InlineTypeChecker

@@ -86,7 +86,7 @@ func (cmd Diff) Run(dep command.Request) {
 
 	opDiffFS := user_ops.Diff{
 		Repo: localWorkingCopy,
-		TextFormatterFamily: object_metadata_fmt_triple_hyphen.MakeTextFormatterFamily(
+		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
 			object_metadata_fmt_triple_hyphen.Dependencies{
 				EnvDir:    localWorkingCopy.GetEnvRepo(),
 				BlobStore: localWorkingCopy.GetBlobStore(),

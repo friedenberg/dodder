@@ -7,17 +7,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 )
 
-type textFormatter struct {
+type formatter struct {
 	Dependencies
-	sequence []interfaces.FuncWriterElementInterface[TextFormatterContext]
+	sequence []interfaces.FuncWriterElementInterface[FormatterContext]
 }
 
-func MakeTextFormatterMetadataBlobPath(
+func MakeFormatterMetadataBlobPath(
 	common Dependencies,
-) textFormatter {
-	return textFormatter{
+) formatter {
+	return formatter{
 		Dependencies: common,
-		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[FormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
 			common.writeBlobPath,
@@ -28,13 +28,12 @@ func MakeTextFormatterMetadataBlobPath(
 	}
 }
 
-// TODO change format to have blob and type separately
-func MakeTextFormatterMetadataOnly(
+func MakeFormatterMetadataOnly(
 	deps Dependencies,
-) textFormatter {
-	return textFormatter{
+) formatter {
+	return formatter{
 		Dependencies: deps,
-		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[FormatterContext]{
 			deps.writeBoundary,
 			deps.writeCommonMetadataFormat,
 			deps.writeBlobDigest,
@@ -45,12 +44,12 @@ func MakeTextFormatterMetadataOnly(
 	}
 }
 
-func MakeTextFormatterMetadataInlineBlob(
+func MakeFormatterMetadataInlineBlob(
 	common Dependencies,
-) textFormatter {
-	return textFormatter{
+) formatter {
+	return formatter{
 		Dependencies: common,
-		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[FormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
 			common.writeTypeAndSigIfNecessary,
@@ -62,20 +61,20 @@ func MakeTextFormatterMetadataInlineBlob(
 	}
 }
 
-func MakeTextFormatterExcludeMetadata(
+func MakeFormatterExcludeMetadata(
 	common Dependencies,
-) textFormatter {
-	return textFormatter{
+) formatter {
+	return formatter{
 		Dependencies: common,
-		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[FormatterContext]{
 			common.writeBlob,
 		},
 	}
 }
 
-func (formatter textFormatter) FormatMetadata(
+func (formatter formatter) FormatMetadata(
 	writer io.Writer,
-	formatterContext TextFormatterContext,
+	formatterContext FormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteSeq(writer, formatterContext, formatter.sequence...)
 }

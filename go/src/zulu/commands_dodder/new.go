@@ -95,9 +95,9 @@ func (cmd *New) Run(req command.Request) {
 		repo.Cancel(err)
 	}
 
-	cotfo := checkout_options.TextFormatterOptions{}
+	textFormatterOptions := checkout_options.TextFormatterOptions{}
 
-	f := object_metadata_fmt_triple_hyphen.MakeTextFormat(
+	format := object_metadata_fmt_triple_hyphen.Make(
 		object_metadata_fmt_triple_hyphen.Dependencies{
 			EnvDir:    repo.GetEnvRepo(),
 			BlobStore: repo.GetEnvRepo().GetDefaultBlobStore(),
@@ -134,7 +134,7 @@ func (cmd *New) Run(req command.Request) {
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
 			Repo:       repo,
-			TextParser: f,
+			TextParser: format,
 			Filter:     cmd.Filter,
 			Delete:     cmd.Delete,
 			Proto:      cmd.Proto,
@@ -162,7 +162,7 @@ func (cmd *New) Run(req command.Request) {
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					StoreSpecificOptions: store_fs.CheckoutOptions{
 						ForceInlineBlob:      true,
-						TextFormatterOptions: cotfo,
+						TextFormatterOptions: textFormatterOptions,
 					},
 				},
 			},
