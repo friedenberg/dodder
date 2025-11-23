@@ -115,7 +115,8 @@ function show_simple_one_zettel_binary { # @test
 	assert_output - <<-EOM
 		---
 		# file
-		! blake2b256-w9l3z9c2w8lhr42fwekmhrxeqtmzw40s9p46vt88ydgwux4rxxuqnfqsmk.bin
+		@ blake2b256-w9l3z9c2w8lhr42fwekmhrxeqtmzw40s9p46vt88ydgwux4rxxuqnfqsmk
+		! bin
 		---
 	EOM
 }

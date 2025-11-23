@@ -173,7 +173,7 @@ func (deps Dependencies) writeTypeWithSig(
 	)
 }
 
-func (deps Dependencies) writeBlobDigestAndType(
+func (deps Dependencies) writeBlobDigest(
 	writer io.Writer,
 	formatterContext TextFormatterContext,
 ) (n int64, err error) {
@@ -182,20 +182,21 @@ func (deps Dependencies) writeBlobDigestAndType(
 	return ohio.WriteLine(
 		writer,
 		fmt.Sprintf(
-			"! %s.%s",
+			"@ %s",
 			metadata.GetBlobDigest(),
-			metadata.GetType().StringSansOp(),
 		),
 	)
 }
 
-func (deps Dependencies) writePathType(
+func (deps Dependencies) writeBlobPath(
 	writer io.Writer,
 	formatterContext TextFormatterContext,
 ) (n int64, err error) {
 	var blobPath string
 
-	for field := range formatterContext.PersistentFormatterContext.GetMetadataMutable().GetIndexMutable().GetFields() {
+	metadata := formatterContext.PersistentFormatterContext.GetMetadataMutable()
+
+	for field := range metadata.GetIndexMutable().GetFields() {
 		if strings.ToLower(field.Key) == "blob" {
 			blobPath = field.Value
 			break
@@ -209,7 +210,7 @@ func (deps Dependencies) writePathType(
 		return n, err
 	}
 
-	return ohio.WriteLine(writer, fmt.Sprintf("! %s", blobPath))
+	return ohio.WriteLine(writer, fmt.Sprintf("@ %s", blobPath))
 }
 
 func (deps Dependencies) writeBlob(

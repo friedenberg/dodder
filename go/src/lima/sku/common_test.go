@@ -427,13 +427,12 @@ func testWriteWithoutBlob(t *ui.TestContext) {
 - tag1
 - tag2
 - tag3
-! blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz.md
+@ blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz
+! md
 ---
 `
 
-	if expected != actual {
-		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
-	}
+	t.AssertEqualStrings(expected, actual)
 }
 
 func TestWriteWithInlineBlob(t1 *testing.T) {

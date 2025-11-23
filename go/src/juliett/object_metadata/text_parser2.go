@@ -61,6 +61,9 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 		case '!':
 			err = parser.readType(metadata, remainder)
 
+		case '@':
+			err = parser.readBlobDigest(metadata, remainder)
+
 		default:
 			err = errors.ErrorWithStackf("unsupported entry: %q", line)
 		}
@@ -83,62 +86,75 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 // TODO add support for sigs and new format
 func (parser *textParser2) readType(
 	metadata IMetadataMutable,
-	desc string,
+	typeString string,
 ) (err error) {
-	if desc == "" {
+	if typeString == "" {
 		return err
 	}
 
-	tail := path.Ext(desc)
-	head := desc[:len(desc)-len(tail)]
-
-	//! <path>.<typ ext>
-	switch {
-	case files.Exists(desc):
-		if err = metadata.GetTypeMutable().Set(tail); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if err = parser.Blob.SetWithBlobWriterFactory(desc, parser.BlobWriterFactory); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-	//! <sha>.<typ ext>
-	case tail != "":
-		if err = parser.setBlobSha(metadata, head); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if err = metadata.GetTypeMutable().Set(tail); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-	//! <sha>
-	case tail == "":
-		if err = parser.setBlobSha(metadata, head); err == nil {
-			return err
-		}
-
-		err = nil
-
-		fallthrough
-
-	//! <typ ext>
-	default:
-		if err = metadata.GetTypeMutable().Set(head); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+	if err = metadata.GetTypeMutable().Set(typeString); err != nil {
+		err = errors.Wrap(err)
+		return err
 	}
 
 	return err
 }
 
-func (parser *textParser2) setBlobSha(
+func (parser *textParser2) readBlobDigest(
+	metadata IMetadataMutable,
+	metadataLine string,
+) (err error) {
+	if metadataLine == "" {
+		return err
+	}
+
+	extension := path.Ext(metadataLine)
+	digest := metadataLine[:len(metadataLine)-len(extension)]
+
+	switch {
+	//@ <path>
+	case files.Exists(metadataLine):
+		// TODO cascade type definition
+		if err = metadata.GetTypeMutable().Set(extension); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		if err = parser.Blob.SetWithBlobWriterFactory(
+			metadataLine,
+			parser.BlobWriterFactory,
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+	//@ <dig>.<ext>
+	// case extension != "":
+	// 	if err = parser.setBlobDigest(metadata, digest); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return err
+	// 	}
+
+	// 	if err = metadata.GetTypeMutable().Set(extension); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return err
+	// 	}
+
+	case extension == "":
+		if err = parser.setBlobDigest(metadata, digest); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+	default:
+		err = errors.Errorf("unsupported blob digest or path: %q", metadataLine)
+		return
+	}
+
+	return err
+}
+
+func (parser *textParser2) setBlobDigest(
 	metadata IMetadataMutable,
 	maybeSha string,
 ) (err error) {

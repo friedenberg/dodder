@@ -10,32 +10,40 @@ import (
 )
 
 // TODO replace with command_components.ObjectMetadata
-func (metadata *metadata) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
+func (metadata *metadata) SetFlagDefinitions(
+	flagDefs interfaces.CLIFlagDefinitions,
+) {
 	metadata.SetFlagSetDescription(
-		flagSet,
+		flagDefs,
 		"the description to use for created or updated Zettels",
 	)
 
 	metadata.SetFlagSetTags(
-		flagSet,
+		flagDefs,
 		"the tags to use for created or updated object",
 	)
 
 	metadata.SetFlagSetType(
-		flagSet,
+		flagDefs,
 		"the type for the created or updated object",
 	)
 }
 
-func (metadata *metadata) SetFlagSetDescription(f interfaces.CLIFlagDefinitions, usage string) {
-	f.Var(
+func (metadata *metadata) SetFlagSetDescription(
+	flagDefs interfaces.CLIFlagDefinitions,
+	usage string,
+) {
+	flagDefs.Var(
 		&metadata.Description,
 		"description",
 		usage,
 	)
 }
 
-func (metadata *metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage string) {
+func (metadata *metadata) SetFlagSetTags(
+	flagDefs interfaces.CLIFlagDefinitions,
+	usage string,
+) {
 	// TODO add support for tag_paths
 	fes := flags.MakeWithPolicy(
 		flag_policy.FlagPolicyAppend,
@@ -59,19 +67,22 @@ func (metadata *metadata) SetFlagSetTags(f interfaces.CLIFlagDefinitions, usage 
 		},
 	)
 
-	f.Var(
+	flagDefs.Var(
 		fes,
 		"tags",
 		usage,
 	)
 }
 
-func (metadata *metadata) SetFlagSetType(f interfaces.CLIFlagDefinitions, usage string) {
-	f.Func(
+func (metadata *metadata) SetFlagSetType(
+	flagDefs interfaces.CLIFlagDefinitions,
+	usage string,
+) {
+	flagDefs.Func(
 		"type",
 		usage,
-		func(v string) (err error) {
-			return metadata.Type.Set(v)
+		func(value string) (err error) {
+			return metadata.Type.Set(value)
 		},
 	)
 }

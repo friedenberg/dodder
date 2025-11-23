@@ -18,22 +18,22 @@ import (
 
 func MakeBoxTransactedArchive(
 	env env_ui.Env,
-	options options_print.Options,
+	optionsOriginal options_print.Options,
 ) *BoxTransacted {
-	po := options.
+	options := optionsOriginal.
 		WithPrintBlobDigests(true).
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 
-	co := env.FormatColorOptionsOut(options)
-	co.OffEntirely = true
+	colorOptions := env.FormatColorOptionsOut(optionsOriginal)
+	colorOptions.OffEntirely = true
 
 	format := MakeBoxTransacted(
-		co,
-		po,
+		colorOptions,
+		options,
 		env.StringFormatWriterFields(
 			string_format_writer.CliFormatTruncationNone,
-			co,
+			colorOptions,
 		),
 		ids.Abbr{},
 		nil,
@@ -47,7 +47,7 @@ func MakeBoxTransactedArchive(
 }
 
 func MakeBoxTransacted(
-	co string_format_writer.ColorOptions,
+	colorOptions string_format_writer.ColorOptions,
 	options options_print.Options,
 	boxStringEncoder interfaces.StringEncoderTo[string_format_writer.Box],
 	abbr ids.Abbr,
@@ -56,7 +56,7 @@ func MakeBoxTransacted(
 	headerWriter string_format_writer.HeaderWriter[*sku.Transacted],
 ) *BoxTransacted {
 	return &BoxTransacted{
-		optionsColor:     co,
+		optionsColor:     colorOptions,
 		optionsPrint:     options,
 		boxStringEncoder: boxStringEncoder,
 		abbr:             abbr,

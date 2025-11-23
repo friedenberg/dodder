@@ -98,3 +98,11 @@ func (e equaler) Equals(a, b IMetadata) bool {
 		return true
 	}
 }
+
+var Lessor lessor
+
+type lessor struct{}
+
+func (lessor) Less(a, b *metadata) bool {
+	return a.Tai.Less(b.Tai)
+}

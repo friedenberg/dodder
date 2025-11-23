@@ -20,7 +20,8 @@ func MakeTextFormatterMetadataBlobPath(
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
-			common.writePathType,
+			common.writeBlobPath,
+			common.writeType,
 			common.writeComments,
 			common.writeBoundary,
 		},
@@ -36,7 +37,8 @@ func MakeTextFormatterMetadataOnly(
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			deps.writeBoundary,
 			deps.writeCommonMetadataFormat,
-			deps.writeBlobDigestAndType,
+			deps.writeBlobDigest,
+			deps.writeType,
 			deps.writeComments,
 			deps.writeBoundary,
 		},

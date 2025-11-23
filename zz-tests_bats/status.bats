@@ -48,7 +48,8 @@ function dirty_existing_akte() {
 		---
 		# wildly different
 		- etikett-one
-		! one/uno.md
+		@ one/uno.md
+		! md
 		---
 	EOM
 

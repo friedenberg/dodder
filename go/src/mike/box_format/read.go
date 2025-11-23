@@ -176,7 +176,9 @@ LOOP_AFTER_OID:
 		// instead of a switch
 		switch {
 		// ] ' '
-		case seq.MatchAll(doddish.TokenTypeOperator):
+		case seq.MatchAll(
+			doddish.TokenTypeOperator,
+		):
 			r := rune(seq.At(0).Contents[0])
 
 			switch {
@@ -188,7 +190,9 @@ LOOP_AFTER_OID:
 			}
 
 			// "value"
-		case seq.MatchAll(doddish.TokenTypeLiteral):
+		case seq.MatchAll(
+			doddish.TokenTypeLiteral,
+		):
 			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
 				seq.String(),
 			); err != nil {
@@ -199,11 +203,18 @@ LOOP_AFTER_OID:
 			continue
 
 			// @abcd
-		case seq.MatchAll(doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
+		case seq.MatchAll(
+			doddish.TokenMatcherOp('@'),
+			doddish.TokenTypeIdentifier,
+		):
 			fallthrough
 
 			// key@abcd
-		case seq.MatchAll(doddish.TokenTypeIdentifier, doddish.TokenMatcherOp('@'), doddish.TokenTypeIdentifier):
+		case seq.MatchAll(
+			doddish.TokenTypeIdentifier,
+			doddish.TokenMatcherOp('@'),
+			doddish.TokenTypeIdentifier,
+		):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return err
@@ -317,7 +328,9 @@ LOOP_AFTER_OID:
 	return err
 }
 
-var dodderTagMerkleIdGetterTypeMapping = map[string]func(object_metadata.IMetadataMutable) interfaces.MutableMarklId{
+type FuncMarklIdGetter = func(object_metadata.IMetadataMutable) interfaces.MutableMarklId
+
+var dodderTagMerkleIdGetterTypeMapping = map[string]FuncMarklIdGetter{
 	"":                             (object_metadata.IMetadataMutable).GetBlobDigestMutable,
 	markl.PurposeRepoPubKeyV1:      (object_metadata.IMetadataMutable).GetRepoPubKeyMutable,
 	markl.PurposeObjectSigV0:       (object_metadata.IMetadataMutable).GetObjectSigMutable,

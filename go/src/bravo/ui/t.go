@@ -136,15 +136,15 @@ func (test *T) AssertEqual(a, b any, o ...cmp.Option) {
 }
 
 //go:noinline
-func (test *T) AssertEqualStrings(a, b string) {
+func (test *T) AssertEqualStrings(expected, actual string) {
 	test.Helper()
 
-	if a == b {
+	if expected == actual {
 		return
 	}
 
 	format := "string equality failed\n=== expected ===\n%s\n=== actual ===\n%s"
-	test.errorf(1, format, a, b)
+	test.errorf(1, format, expected, actual)
 }
 
 //go:noinline

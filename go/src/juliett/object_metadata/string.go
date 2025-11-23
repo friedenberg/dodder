@@ -8,26 +8,24 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
-func StringSansTai(o *metadata) (str string) {
-	sb := &strings.Builder{}
+func StringSansTai(metadata *metadata) string {
+	stringBuilder := &strings.Builder{}
 
-	sb.WriteString(" ")
-	sb.WriteString(o.DigBlob.String())
+	stringBuilder.WriteString(" ")
+	stringBuilder.WriteString(metadata.DigBlob.String())
 
-	metadata := o.GetMetadata()
+	tipe := metadata.GetType()
 
-	t := metadata.GetType()
-
-	if !t.IsEmpty() {
-		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(metadata.GetType()))
+	if !tipe.IsEmpty() {
+		stringBuilder.WriteString(" ")
+		stringBuilder.WriteString(ids.FormattedString(metadata.GetType()))
 	}
 
-	es := metadata.GetTags()
+	tags := metadata.GetTags()
 
-	if es.Len() > 0 {
-		sb.WriteString(" ")
-		sb.WriteString(
+	if tags.Len() > 0 {
+		stringBuilder.WriteString(" ")
+		stringBuilder.WriteString(
 			quiter.StringDelimiterSeparated[ids.Tag](
 				" ",
 				metadata.GetTags(),
@@ -35,17 +33,17 @@ func StringSansTai(o *metadata) (str string) {
 		)
 	}
 
-	b := metadata.GetDescription()
+	description := metadata.GetDescription()
 
-	if !b.IsEmpty() {
-		sb.WriteString(" ")
-		sb.WriteString("\"" + b.String() + "\"")
+	if !description.IsEmpty() {
+		stringBuilder.WriteString(" ")
+		stringBuilder.WriteString("\"" + description.String() + "\"")
 	}
 
 	for field := range metadata.GetIndex().GetFields() {
-		sb.WriteString(" ")
-		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
+		stringBuilder.WriteString(" ")
+		fmt.Fprintf(stringBuilder, "%q=%q", field.Key, field.Value)
 	}
 
-	return sb.String()
+	return stringBuilder.String()
 }
