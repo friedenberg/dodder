@@ -23,8 +23,10 @@ func main() {
 
 	tokens := make(map[string]tokenInfo)
 
-	br := bufio.NewReader(os.Stdin)
-	tr := transform.Chain(
+	bufferedReader, repool := pool.GetBufferedReader(os.Stdin)
+	defer repool()
+
+	transform := transform.Chain(
 		norm.NFD,
 		transform.RemoveFunc(
 			func(r rune) bool {
@@ -35,7 +37,7 @@ func main() {
 	)
 
 	for {
-		line, err := br.ReadString('\n')
+		line, err := bufferedReader.ReadString('\n')
 
 		if err != io.EOF && err != nil {
 			log.Fatalf("%s", err)
@@ -68,7 +70,7 @@ func main() {
 
 			b := make([]byte, len(t))
 
-			_, _, err := tr.Transform(b, []byte(t), true)
+			_, _, err := transform.Transform(b, []byte(t), true)
 			if err != nil {
 				log.Fatalf("%s", err)
 			}
