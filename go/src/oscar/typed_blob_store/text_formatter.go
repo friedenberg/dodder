@@ -38,13 +38,11 @@ func MakeTextFormatterWithBlobFormatter(
 	return textFormatter{
 		options:           options,
 		InlineTypeChecker: inlineTypeChecker,
-		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
-			object_metadata_fmt_triple_hyphen.Dependencies{
-				EnvDir:        envRepo,
-				BlobStore:     envRepo.GetDefaultBlobStore(),
-				BlobFormatter: formatter,
-			},
-		),
+		FormatterFamily: object_metadata_fmt_triple_hyphen.Factory{
+			EnvDir:        envRepo,
+			BlobStore:     envRepo.GetDefaultBlobStore(),
+			BlobFormatter: formatter,
+		}.MakeFormatterFamily(),
 		checkoutMode: checkoutMode,
 	}
 }

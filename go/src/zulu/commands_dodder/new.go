@@ -97,12 +97,10 @@ func (cmd *New) Run(req command.Request) {
 
 	textFormatterOptions := checkout_options.TextFormatterOptions{}
 
-	format := object_metadata_fmt_triple_hyphen.Make(
-		object_metadata_fmt_triple_hyphen.Dependencies{
-			EnvDir:    repo.GetEnvRepo(),
-			BlobStore: repo.GetEnvRepo().GetDefaultBlobStore(),
-		},
-	)
+	format := object_metadata_fmt_triple_hyphen.Factory{
+		EnvDir:    repo.GetEnvRepo(),
+		BlobStore: repo.GetEnvRepo().GetDefaultBlobStore(),
+	}.Make()
 
 	var objects sku.TransactedMutableSet
 

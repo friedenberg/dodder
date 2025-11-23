@@ -53,12 +53,10 @@ func Make(
 		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		metadataTextParser: object_metadata_fmt_triple_hyphen.MakeTextParser(
-			object_metadata_fmt_triple_hyphen.Dependencies{
-				EnvDir:    envRepo,
-				BlobStore: blobStore,
-			},
-		),
+		metadataTextParser: object_metadata_fmt_triple_hyphen.Factory{
+			EnvDir:    envRepo,
+			BlobStore: blobStore,
+		}.MakeTextParser(),
 	}
 
 	return store, err

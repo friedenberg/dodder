@@ -86,12 +86,10 @@ func (cmd Diff) Run(dep command.Request) {
 
 	opDiffFS := user_ops.Diff{
 		Repo: localWorkingCopy,
-		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
-			object_metadata_fmt_triple_hyphen.Dependencies{
-				EnvDir:    localWorkingCopy.GetEnvRepo(),
-				BlobStore: localWorkingCopy.GetBlobStore(),
-			},
-		),
+		FormatterFamily: object_metadata_fmt_triple_hyphen.Factory{
+			EnvDir:    localWorkingCopy.GetEnvRepo(),
+			BlobStore: localWorkingCopy.GetBlobStore(),
+		}.MakeFormatterFamily(),
 	}
 
 	if err := localWorkingCopy.GetStore().QuerySkuType(

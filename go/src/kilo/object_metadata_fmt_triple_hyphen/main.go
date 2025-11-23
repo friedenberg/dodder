@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 )
 
@@ -16,6 +17,8 @@ type (
 		ParseMetadata(io.Reader, ParserContext) (int64, error)
 	}
 
+	FormatterOptions = checkout_options.TextFormatterOptions
+
 	FormatterContext struct {
 		FormatterOptions
 		object_metadata.PersistentFormatterContext
@@ -24,5 +27,17 @@ type (
 	ParserContext interface {
 		object_metadata.PersistentParserContext
 		SetBlobDigest(interfaces.MarklId) error
+	}
+
+	FormatterFamily struct {
+		BlobPath     Formatter
+		InlineBlob   Formatter
+		MetadataOnly Formatter
+		BlobOnly     Formatter
+	}
+
+	Format struct {
+		FormatterFamily
+		Parser
 	}
 )

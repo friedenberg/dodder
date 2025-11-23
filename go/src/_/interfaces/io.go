@@ -5,10 +5,6 @@ import (
 )
 
 type (
-	FuncWriterElementInterface[T any] func(io.Writer, T) (int64, error)
-)
-
-type (
 	ReadWrapper interface {
 		WrapReader(r io.Reader) (io.ReadCloser, error)
 	}
@@ -33,4 +29,9 @@ type (
 	FuncStringWriterFormat[T any] func(WriterAndStringWriter, T) (int64, error)
 
 	FuncMakePrinter[OUT any] func(WriterAndStringWriter) FuncIter[OUT]
+
+	FuncWriterElementInterface[ELEMENT any] func(
+		WriterAndStringWriter,
+		ELEMENT,
+	) (int64, error)
 )

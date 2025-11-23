@@ -18,20 +18,6 @@ type textParser struct {
 	blobFormatter script_config.RemoteScript
 }
 
-func MakeTextParser(
-	dependencies Dependencies,
-) Parser {
-	if dependencies.BlobStore == nil {
-		panic("nil BlobWriterFactory")
-	}
-
-	return textParser{
-		hashType:      dependencies.GetBlobDigestType(),
-		blobWriter:    dependencies.BlobStore,
-		blobFormatter: dependencies.BlobFormatter,
-	}
-}
-
 func (parser textParser) ParseMetadata(
 	reader io.Reader,
 	context ParserContext,

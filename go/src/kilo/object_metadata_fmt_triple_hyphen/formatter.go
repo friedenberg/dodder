@@ -16,27 +16,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 )
 
-type Dependencies struct {
-	EnvDir        env_dir.Env
-	BlobStore     interfaces.BlobStore
-	BlobFormatter script_config.RemoteScript
-}
+type formatter []interfaces.FuncWriterElementInterface[FormatterContext]
 
-func (deps Dependencies) GetBlobDigestType() interfaces.FormatHash {
-	hashType := deps.BlobStore.GetDefaultHashType()
-
-	if hashType == nil {
-		panic("no hash type set")
-	}
-
-	return hashType
-}
-
-func (deps Dependencies) writeComments(
+func (formatter formatter) FormatMetadata(
 	writer io.Writer,
+	formatterContext FormatterContext,
+) (n int64, err error) {
+	return ohio.WriteSeq(writer, formatterContext, formatter...)
+}
+
+func (factory Factory) makeFormatterExcludeMetadata() formatter {
+	return formatter{
+		factory.writeBlob,
+	}
+}
+
+func (factory Factory) writeComments(
+	writer interfaces.WriterAndStringWriter,
 	context FormatterContext,
 ) (n int64, err error) {
 	n1 := 0
@@ -67,22 +65,22 @@ func (deps Dependencies) writeComments(
 	return n, err
 }
 
-func (deps Dependencies) writeBoundary(
-	writer io.Writer,
+func (factory Factory) writeBoundary(
+	writer interfaces.WriterAndStringWriter,
 	_ FormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(writer, triple_hyphen_io.Boundary)
 }
 
-func (deps Dependencies) writeNewLine(
-	writer io.Writer,
+func (factory Factory) writeNewLine(
+	writer interfaces.WriterAndStringWriter,
 	_ FormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(writer, "")
 }
 
-func (deps Dependencies) writeCommonMetadataFormat(
-	writer io.Writer,
+func (factory Factory) writeCommonMetadataFormat(
+	writer interfaces.WriterAndStringWriter,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	lineWriter := format.NewLineWriter()
@@ -132,8 +130,8 @@ func (deps Dependencies) writeCommonMetadataFormat(
 	return n, err
 }
 
-func (deps Dependencies) writeTypeAndSigIfNecessary(
-	writer io.Writer,
+func (factory Factory) writeTypeAndSigIfNecessary(
+	writer interfaces.WriterAndStringWriter,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
@@ -154,10 +152,10 @@ func (deps Dependencies) writeTypeAndSigIfNecessary(
 		)
 	}
 
-	return deps.writeTypeAndSig(writer, formatterContext)
+	return factory.writeTypeAndSig(writer, formatterContext)
 }
 
-func (deps Dependencies) writeTypeAndSig(
+func (factory Factory) writeTypeAndSig(
 	writer io.Writer,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
@@ -184,8 +182,8 @@ func (deps Dependencies) writeTypeAndSig(
 	)
 }
 
-func (deps Dependencies) writeBlobDigest(
-	writer io.Writer,
+func (factory Factory) writeBlobDigest(
+	writer interfaces.WriterAndStringWriter,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
@@ -199,8 +197,8 @@ func (deps Dependencies) writeBlobDigest(
 	)
 }
 
-func (deps Dependencies) writeBlobPath(
-	writer io.Writer,
+func (factory Factory) writeBlobPath(
+	writer interfaces.WriterAndStringWriter,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	var blobPath string
@@ -215,7 +213,7 @@ func (deps Dependencies) writeBlobPath(
 	}
 
 	if blobPath != "" {
-		blobPath = deps.EnvDir.RelToCwdOrSame(blobPath)
+		blobPath = factory.EnvDir.RelToCwdOrSame(blobPath)
 	} else {
 		err = errors.ErrorWithStackf("path not found in fields")
 		return n, err
@@ -224,15 +222,15 @@ func (deps Dependencies) writeBlobPath(
 	return ohio.WriteLine(writer, fmt.Sprintf("@ %s", blobPath))
 }
 
-func (deps Dependencies) writeBlob(
-	writer io.Writer,
+func (factory Factory) writeBlob(
+	writer interfaces.WriterAndStringWriter,
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	var blobReader interfaces.BlobReader
 
 	metadata := formatterContext.GetMetadata()
 
-	if blobReader, err = deps.BlobStore.MakeBlobReader(
+	if blobReader, err = factory.BlobStore.MakeBlobReader(
 		metadata.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -246,12 +244,12 @@ func (deps Dependencies) writeBlob(
 
 	defer errors.DeferredCloser(&err, blobReader)
 
-	if deps.BlobFormatter != nil {
+	if factory.BlobFormatter != nil {
 		var writerTo io.WriterTo
 
 		if writerTo, err = script_config.MakeWriterToWithStdin(
-			deps.BlobFormatter,
-			deps.EnvDir.MakeCommonEnv(),
+			factory.BlobFormatter,
+			factory.EnvDir.MakeCommonEnv(),
 			blobReader,
 		); err != nil {
 			err = errors.Wrap(err)

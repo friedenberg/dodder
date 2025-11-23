@@ -42,12 +42,10 @@ func MakeFileEncoder(
 		perm:              0o666,
 		envRepo:           envRepo,
 		inlineTypeChecker: inlineTypeChecker,
-		FormatterFamily: object_metadata_fmt_triple_hyphen.MakeFormatterFamily(
-			object_metadata_fmt_triple_hyphen.Dependencies{
-				EnvDir:    envRepo,
-				BlobStore: blobStore,
-			},
-		),
+		FormatterFamily: object_metadata_fmt_triple_hyphen.Factory{
+			EnvDir:    envRepo,
+			BlobStore: blobStore,
+		}.MakeFormatterFamily(),
 	}
 }
 
