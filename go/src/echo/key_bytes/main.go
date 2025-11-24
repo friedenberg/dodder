@@ -26,9 +26,10 @@ const (
 	Tai           = Binary('T')
 	Type          = Binary('t')
 
+	// TODO rename to match purposes
 	SigParentMetadataParentObjectId = Binary('M')
 	DigestMetadataParentObjectId    = Binary('s')
-	DigestMetadataWithoutTai        = Binary('n')
+	DigestMetadataWithoutTai        = Binary('n') // TODO move to key-values
 	DigestMetadata                  = Binary('m')
 
 	CacheParentTai   = Binary('p')

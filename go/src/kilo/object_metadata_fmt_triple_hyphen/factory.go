@@ -10,16 +10,15 @@ type Factory struct {
 	EnvDir        env_dir.Env
 	BlobStore     interfaces.BlobStore
 	BlobFormatter script_config.RemoteScript
+
+	AllowMissingTypeSig bool
 }
 
-func (factory Factory) getBlobDigestType() interfaces.FormatHash {
-	hashType := factory.BlobStore.GetDefaultHashType()
-
-	if hashType == nil {
-		panic("no hash type set")
+func (factory Factory) Make() Format {
+	return Format{
+		Parser:          factory.MakeTextParser(),
+		FormatterFamily: factory.MakeFormatterFamily(),
 	}
-
-	return hashType
 }
 
 func (factory Factory) MakeFormatterFamily() FormatterFamily {
@@ -43,43 +42,60 @@ func (factory Factory) MakeTextParser() Parser {
 	}
 }
 
-func (factory Factory) Make() Format {
-	return Format{
-		Parser:          factory.MakeTextParser(),
-		FormatterFamily: factory.MakeFormatterFamily(),
+func (factory Factory) getBlobDigestType() interfaces.FormatHash {
+	hashType := factory.BlobStore.GetDefaultHashType()
+
+	if hashType == nil {
+		panic("no hash type set")
 	}
+
+	return hashType
 }
 
 func (factory Factory) makeFormatterMetadataBlobPath() formatter {
+	formatterComponents := formatterComponents(factory)
+
 	return formatter{
-		factory.writeBoundary,
-		factory.writeCommonMetadataFormat,
-		factory.writeBlobPath,
-		factory.writeTypeAndSigIfNecessary,
-		factory.writeComments,
-		factory.writeBoundary,
+		formatterComponents.writeBoundary,
+		formatterComponents.writeCommonMetadataFormat,
+		formatterComponents.writeBlobPath,
+		formatterComponents.getWriteTypeAndSigFunc(),
+		formatterComponents.writeComments,
+		formatterComponents.writeBoundary,
 	}
 }
 
 func (factory Factory) makeFormatterMetadataOnly() formatter {
+	formatterComponents := formatterComponents(factory)
+
 	return formatter{
-		factory.writeBoundary,
-		factory.writeCommonMetadataFormat,
-		factory.writeBlobDigest,
-		factory.writeTypeAndSigIfNecessary,
-		factory.writeComments,
-		factory.writeBoundary,
+		formatterComponents.writeBoundary,
+		formatterComponents.writeCommonMetadataFormat,
+		formatterComponents.writeBlobDigest,
+		formatterComponents.getWriteTypeAndSigFunc(),
+		formatterComponents.writeComments,
+		formatterComponents.writeBoundary,
 	}
 }
 
 func (factory Factory) makeFormatterMetadataInlineBlob() formatter {
+	formatterComponents := formatterComponents(factory)
+
 	return formatter{
-		factory.writeBoundary,
-		factory.writeCommonMetadataFormat,
-		factory.writeTypeAndSigIfNecessary,
-		factory.writeComments,
-		factory.writeBoundary,
-		factory.writeNewLine,
-		factory.writeBlob,
+		formatterComponents.writeBoundary,
+		formatterComponents.writeCommonMetadataFormat,
+		formatterComponents.getWriteTypeAndSigFunc(),
+		formatterComponents.writeComments,
+		formatterComponents.writeBoundary,
+		formatterComponents.writeNewLine,
+		formatterComponents.writeBlob,
+	}
+}
+
+func (factory Factory) makeFormatterExcludeMetadata() formatter {
+	formatterComponents := formatterComponents(factory)
+
+	return formatter{
+		formatterComponents.writeBlob,
 	}
 }

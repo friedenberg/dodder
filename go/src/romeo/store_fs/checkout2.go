@@ -9,50 +9,54 @@ import (
 
 func (store *Store) checkoutOneIfNecessary(
 	options checkout_options.Options,
-	tg sku.TransactedGetter,
-) (co *sku.CheckedOut, item *sku.FSItem, err error) {
-	internal := tg.GetSku()
-	co = GetCheckedOutPool().Get()
+	transactedGetter sku.TransactedGetter,
+) (checkedOut *sku.CheckedOut, item *sku.FSItem, err error) {
+	internal := transactedGetter.GetSku()
+	checkedOut = GetCheckedOutPool().Get()
 
-	sku.Resetter.ResetWith(co.GetSku(), internal)
+	sku.Resetter.ResetWith(checkedOut.GetSku(), internal)
 
 	var alreadyCheckedOut bool
 
-	if item, alreadyCheckedOut, err = store.prepareFSItemForCheckOut(options, co); err != nil {
+	if item, alreadyCheckedOut, err = store.prepareFSItemForCheckOut(
+		options,
+		checkedOut,
+	); err != nil {
 		err = errors.Wrap(err)
-		return co, item, err
+		return
 	}
 
-	if alreadyCheckedOut && !store.shouldCheckOut(options, co, true) {
-		if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if alreadyCheckedOut && !store.shouldCheckOut(options, checkedOut, true) {
+		if err = store.WriteFSItemToExternal(
+			item,
+			checkedOut.GetSkuExternal(),
+		); err != nil {
 			err = errors.Wrap(err)
-			return co, item, err
+			return
 		}
 
 		// FSItem does not have the object ID for certain so we need to add it to the
 		// external on checkout
-		co.GetSkuExternal().GetObjectId().ResetWith(co.GetSku().GetObjectId())
-		co.SetState(checked_out_state.CheckedOut)
+		checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
+		checkedOut.SetState(checked_out_state.CheckedOut)
 
-		return co, item, err
+		return
 	}
-
-	// ui.DebugBatsTestBody().Print(sku_fmt_debug.String(co.GetSku()))
 
 	if err = store.checkoutOneForReal(
 		options,
-		co,
+		checkedOut,
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
-		return co, item, err
+		return
 	}
 
 	// FSItem does not have the object ID for certain so we need to add it to the
 	// external on checkout
-	co.GetSkuExternal().GetObjectId().ResetWith(co.GetSku().GetObjectId())
+	checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
 
-	return co, item, err
+	return
 }
 
 func (store *Store) prepareFSItemForCheckOut(

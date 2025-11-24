@@ -95,7 +95,7 @@ func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
 	format, ok := formats[formatId]
 
 	if !ok {
-		err := errors.Errorf("unknown format: %q", formatId)
+		err := errors.Errorf("unknown format id: %q", formatId)
 		return nil, err
 	}
 

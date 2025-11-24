@@ -147,43 +147,46 @@ func (encoder *fileEncoder) EncodeObject(
 		}
 
 	case blobPath != "":
-		var fBlob *os.File
+		var fileBlob *os.File
 
-		if fBlob, err = encoder.openOrCreate(
+		if fileBlob, err = encoder.openOrCreate(
 			blobPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		defer errors.DeferredCloser(&err, fBlob)
+		defer errors.DeferredCloser(&err, fileBlob)
 
-		if _, err = io.Copy(fBlob, blobReader); err != nil {
+		if _, err = io.Copy(fileBlob, blobReader); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case objectPath != "":
-		var mtw object_metadata_fmt_triple_hyphen.Formatter
+		var metadataFormatter object_metadata_fmt_triple_hyphen.Formatter
 
 		if inline {
-			mtw = encoder.InlineBlob
+			metadataFormatter = encoder.InlineBlob
 		} else {
-			mtw = encoder.MetadataOnly
+			metadataFormatter = encoder.MetadataOnly
 		}
 
-		var fZettel *os.File
+		var fileMetadata *os.File
 
-		if fZettel, err = encoder.openOrCreate(
+		if fileMetadata, err = encoder.openOrCreate(
 			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		defer errors.DeferredCloser(&err, fZettel)
+		defer errors.DeferredCloser(&err, fileMetadata)
 
-		if _, err = mtw.FormatMetadata(fZettel, ctx); err != nil {
+		if _, err = metadataFormatter.FormatMetadata(
+			fileMetadata,
+			ctx,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

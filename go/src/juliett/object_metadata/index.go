@@ -25,14 +25,15 @@ type (
 	IIndexMutable interface {
 		IIndex
 
-		GetFieldsMutable() *collections_slice.Slice[Field]
-		GetTagPathsMutable() *tag_paths.Tags
-		GetDormantMutable() *values.Bool
 		AddTagExpandedPtr(e *ids.Tag) (err error)
+		AddTagsImplicitPtr(tag *ids.Tag) (err error)
+		GetDormantMutable() *values.Bool
 		GetExpandedTagsMutable() ids.TagMutableSet
+		GetFieldsMutable() *collections_slice.Slice[Field]
+		GetParentTaiMutable() *ids.Tai
+		GetTagPathsMutable() *tag_paths.Tags
 		SetExpandedTags(tags ids.TagSet)
 		SetImplicitTags(e ids.TagSet)
-		GetParentTaiMutable() *ids.Tai
 	}
 )
 

@@ -179,14 +179,22 @@ func testEqualityNotSelf(t *ui.TestContext) {
 	}
 }
 
+func makeTestTextFormatFactory(
+	envDir env_dir.Env,
+	blobStore interfaces.BlobStore,
+) object_metadata_fmt_triple_hyphen.Factory {
+	return object_metadata_fmt_triple_hyphen.Factory{
+		AllowMissingTypeSig: true,
+		EnvDir:              envDir,
+		BlobStore:           blobStore,
+	}
+}
+
 func makeTestTextFormat(
 	envDir env_dir.Env,
 	blobStore interfaces.BlobStore,
 ) object_metadata_fmt_triple_hyphen.Format {
-	return object_metadata_fmt_triple_hyphen.Factory{
-		EnvDir:    envDir,
-		BlobStore: blobStore,
-	}.Make()
+	return makeTestTextFormatFactory(envDir, blobStore).Make()
 }
 
 func TestReadWithoutBlob(t1 *testing.T) {
@@ -405,9 +413,10 @@ func testWriteWithoutBlob(t *ui.TestContext) {
 		},
 	)
 
-	formatFamily := object_metadata_fmt_triple_hyphen.Factory{
-		BlobStore: envRepo.GetDefaultBlobStore(),
-	}.MakeFormatterFamily()
+	formatFamily := makeTestTextFormatFactory(
+		envRepo,
+		envRepo.GetDefaultBlobStore(),
+	).MakeFormatterFamily()
 
 	actual := writeFormat(
 		t,
@@ -454,9 +463,10 @@ func testWriteWithInlineBlob(t *ui.TestContext) {
 		},
 	)
 
-	formatFamily := object_metadata_fmt_triple_hyphen.Factory{
-		BlobStore: envRepo.GetDefaultBlobStore(),
-	}.MakeFormatterFamily()
+	formatFamily := makeTestTextFormatFactory(
+		envRepo,
+		envRepo.GetDefaultBlobStore(),
+	).MakeFormatterFamily()
 
 	actual := writeFormat(
 		t,

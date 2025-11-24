@@ -154,29 +154,29 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 
 func (store *Store) CheckoutOne(
 	options checkout_options.Options,
-	sz sku.TransactedGetter,
-) (cz sku.SkuType, err error) {
+	transactedGetter sku.TransactedGetter,
+) (checkedOut sku.SkuType, err error) {
 	es, ok := store.StoreLike.(store_workspace.CheckoutOne)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return cz, err
+		return checkedOut, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return cz, err
+		return checkedOut, err
 	}
 
-	if cz, err = es.CheckoutOne(
+	if checkedOut, err = es.CheckoutOne(
 		options,
-		sz,
+		transactedGetter,
 	); err != nil {
 		err = errors.Wrap(err)
-		return cz, err
+		return checkedOut, err
 	}
 
-	return cz, err
+	return checkedOut, err
 }
 
 func (store *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {

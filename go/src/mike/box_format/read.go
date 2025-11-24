@@ -44,7 +44,9 @@ func (format *BoxTransacted) ReadStringFormat(
 
 	// TODO extract into dedicated parser and make incompatible with
 	// BoxTransactedWithSignature
-	if err = object.GetMetadataMutable().GetDescriptionMutable().ReadFromBoxScanner(scanner); err != nil {
+	if err = object.GetMetadataMutable().GetDescriptionMutable().ReadFromBoxScanner(
+		scanner,
+	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

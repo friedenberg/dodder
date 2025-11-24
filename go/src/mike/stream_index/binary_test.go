@@ -16,9 +16,11 @@ func TestBinaryOne(t1 *testing.T) {
 	t := ui.T{T: t1}
 
 	buffer := new(bytes.Buffer)
+
 	coder := binaryEncoder{Sigil: ids.SigilLatest}
 	decoder := makeBinary(ids.SigilLatest)
 	expected := sku.GetTransactedPool().Get()
+
 	var expectedN int64
 	var err error
 
@@ -34,8 +36,23 @@ func TestBinaryOne(t1 *testing.T) {
 				"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 			),
 		))
-		t.AssertNoError(expected.GetMetadataMutable().GetTypeMutable().Set("da-typ"))
-		t.AssertNoError(expected.GetMetadataMutable().GetDescriptionMutable().Set("the bez"))
+
+		metadata := expected.GetMetadataMutable()
+
+		t.AssertNoError(metadata.GetTypeMutable().Set("da-typ"))
+
+		// generate a fake type signature
+		{
+			typeSig := metadata.GetLockfileMutable().GetTypeMutable()
+			t.AssertNoError(typeSig.GeneratePrivateKey(
+				nil,
+				markl.FormatIdNonceSec,
+				"",
+			))
+		}
+
+		t.AssertNoError(metadata.GetDescriptionMutable().Set("the bez"))
+
 		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
 
 		// TODO add mother digest field and test

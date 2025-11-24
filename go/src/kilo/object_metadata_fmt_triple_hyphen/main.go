@@ -40,4 +40,6 @@ type (
 		FormatterFamily
 		Parser
 	}
+
+	funcWrite = interfaces.FuncWriterElementInterface[FormatterContext]
 )

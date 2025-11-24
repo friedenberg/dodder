@@ -27,7 +27,7 @@ func (store *Store) CheckoutOne(
 
 func (store *Store) checkoutOneForReal(
 	options checkout_options.Options,
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 	item *sku.FSItem,
 ) (err error) {
 	if store.config.IsDryRun() {
@@ -48,7 +48,7 @@ func (store *Store) checkoutOneForReal(
 
 	if err = store.hydrateCheckoutFileNameInfoFromCheckedOut(
 		options,
-		co,
+		checkedOut,
 		&info,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -75,16 +75,16 @@ func (store *Store) checkoutOneForReal(
 	}
 
 	// This is necessary otherwise External is an empty sku
-	sku.Resetter.ResetWith(co.GetSkuExternal(), co.GetSku())
+	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), checkedOut.GetSku())
 
-	if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if err = store.WriteFSItemToExternal(item, checkedOut.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = store.fileEncoder.Encode(
 		fsOptions.TextFormatterOptions,
-		co.GetSkuExternal(),
+		checkedOut.GetSkuExternal(),
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
