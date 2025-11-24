@@ -191,19 +191,19 @@ func (encoder *binaryEncoder) writeFieldKey(
 	case key_bytes.Tai:
 		if n, err = encoder.writeFieldWriterTo(object.GetMetadataMutable().GetTaiMutable()); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.Type:
 		if metadata.GetType().IsEmpty() {
-			return
+			return n, err
 		}
 
 		if n, err = encoder.writeFieldBinaryMarshaler(
 			object.GetMetadataMutable().GetTypeTupleMutable().GetBinaryMarshaler(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
@@ -213,7 +213,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:

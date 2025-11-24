@@ -23,7 +23,7 @@ func (store *Store) checkoutOneIfNecessary(
 		checkedOut,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, item, err
 	}
 
 	if alreadyCheckedOut && !store.shouldCheckOut(options, checkedOut, true) {
@@ -32,7 +32,7 @@ func (store *Store) checkoutOneIfNecessary(
 			checkedOut.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return checkedOut, item, err
 		}
 
 		// FSItem does not have the object ID for certain so we need to add it to the
@@ -40,7 +40,7 @@ func (store *Store) checkoutOneIfNecessary(
 		checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
 		checkedOut.SetState(checked_out_state.CheckedOut)
 
-		return
+		return checkedOut, item, err
 	}
 
 	if err = store.checkoutOneForReal(
@@ -49,14 +49,14 @@ func (store *Store) checkoutOneIfNecessary(
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, item, err
 	}
 
 	// FSItem does not have the object ID for certain so we need to add it to the
 	// external on checkout
 	checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
 
-	return
+	return checkedOut, item, err
 }
 
 func (store *Store) prepareFSItemForCheckOut(
