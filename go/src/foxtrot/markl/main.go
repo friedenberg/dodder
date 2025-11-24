@@ -83,7 +83,7 @@ func (tuple KeyValueTupleMutableBinaryUnmarshaler[KEY, KEY_PTR]) UnmarshalBinary
 	bites []byte,
 ) (err error) {
 	if len(bites) == 0 {
-		return
+		return err
 	}
 
 	var formatAndBytes []byte
@@ -97,15 +97,15 @@ func (tuple KeyValueTupleMutableBinaryUnmarshaler[KEY, KEY_PTR]) UnmarshalBinary
 		if !ok {
 			if err = tuple.Key.Set(string(bites)); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		}
 
 		if err = tuple.Key.Set(string(key)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -114,7 +114,7 @@ func (tuple KeyValueTupleMutableBinaryUnmarshaler[KEY, KEY_PTR]) UnmarshalBinary
 
 		if !ok {
 			err = errors.Errorf("expected empty byte, but none found")
-			return
+			return err
 		}
 
 		id := tuple.Value
@@ -131,5 +131,5 @@ func (tuple KeyValueTupleMutableBinaryUnmarshaler[KEY, KEY_PTR]) UnmarshalBinary
 		}
 	}
 
-	return
+	return err
 }

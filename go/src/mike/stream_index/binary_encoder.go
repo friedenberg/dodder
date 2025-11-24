@@ -211,7 +211,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			encoder.Key.String(),
 		); err != nil {
 			err = errors.Wrap(err)
-			return
+			return n, err
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
