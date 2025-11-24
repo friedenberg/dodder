@@ -5,11 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type (
 	Metadata        = metadata
 	MetadataMutable = *metadata
+
+	TypeTuple = markl.KeyValueTuple[ids.Type, *ids.Type]
 
 	IMetadata interface {
 		Getter
@@ -20,6 +23,7 @@ type (
 		GetDescription() descriptions.Description
 		GetTai() ids.Tai
 		GetType() ids.Type
+		GetTypeTuple() TypeTuple
 
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
@@ -47,6 +51,7 @@ type (
 		GetIndexMutable() IIndexMutable
 		GetLockfileMutable() LockfileMutable
 		GetTypeMutable() *ids.Type
+		GetTypeTupleMutable() *TypeTuple
 		GetDescriptionMutable() *descriptions.Description
 		GetTaiMutable() *ids.Tai
 		GetBlobDigestMutable() interfaces.MutableMarklId

@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
@@ -120,8 +119,8 @@ func (decoder *binaryDecoder) readFormatExactly(
 }
 
 func (decoder *binaryDecoder) readFormatAndMatchSigil(
-	r io.Reader,
-	sk *objectWithCursorAndSigil,
+	reader io.Reader,
+	object *objectWithCursorAndSigil,
 ) (n int64, err error) {
 	decoder.binaryField.Reset()
 	decoder.Buffer.Reset()
@@ -132,7 +131,7 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 	// loop thru entries to find the next one that matches the current sigil
 	// when found, break the loop and deserialize it and return
 	for {
-		n1, decoder.ContentLength, err = ohio.ReadFixedUInt16(r)
+		n1, decoder.ContentLength, err = ohio.ReadFixedUInt16(reader)
 		n += int64(n1)
 
 		if err != nil {
@@ -150,10 +149,10 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 
 		contentLength64 := int64(decoder.ContentLength)
 
-		decoder.limitedReader.R = r
+		decoder.limitedReader.R = reader
 		decoder.limitedReader.N = contentLength64
 
-		n2, err = decoder.readSigil(sk, &decoder.limitedReader)
+		n2, err = decoder.readSigil(object, &decoder.limitedReader)
 		n += n2
 
 		if err != nil {
@@ -173,12 +172,12 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 			return n, err
 		}
 
-		if err = decoder.readFieldKey(sk.Transacted); err != nil {
+		if err = decoder.readFieldKey(object.Transacted); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
-		genre := genres.Must(sk.Transacted)
+		genre := genres.Must(object.Transacted)
 		query, ok := decoder.queryGroup.Get(genre)
 
 		// TODO-D4 use query to decide whether to read and inflate or skip
@@ -187,8 +186,8 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 
 			wantsHidden := sigil.IncludesHidden()
 			wantsHistory := sigil.IncludesHistory()
-			isLatest := sk.Contains(ids.SigilLatest)
-			isHidden := sk.Contains(ids.SigilHidden)
+			isLatest := object.Contains(ids.SigilLatest)
+			isHidden := object.Contains(ids.SigilHidden)
 
 			if (wantsHistory && wantsHidden) ||
 				(wantsHidden && isLatest) ||
@@ -197,9 +196,9 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 				break
 			}
 
-			if query.ContainsObjectId(&sk.ObjectId) &&
+			if query.ContainsObjectId(&object.ObjectId) &&
 				(sigil.ContainsOneOf(ids.SigilHistory) ||
-					sk.ContainsOneOf(ids.SigilLatest)) {
+					object.ContainsOneOf(ids.SigilLatest)) {
 				break
 			}
 		}
@@ -221,8 +220,8 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 			return n, err
 		}
 
-		if err = decoder.readFieldKey(sk.Transacted); err != nil {
-			err = errors.Wrapf(err, "Sku: %#v", sk.Transacted)
+		if err = decoder.readFieldKey(object.Transacted); err != nil {
+			err = errors.Wrapf(err, "Sku: %#v", object.Transacted)
 			return n, err
 		}
 	}
@@ -265,9 +264,11 @@ func (decoder *binaryDecoder) readSigil(
 func (decoder *binaryDecoder) readFieldKey(
 	object *sku.Transacted,
 ) (err error) {
+	metadata := object.GetMetadataMutable()
+
 	switch decoder.Key {
 	case key_bytes.Blob:
-		if err = object.GetMetadataMutable().GetBlobDigestMutable().UnmarshalBinary(
+		if err = metadata.GetBlobDigestMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -275,7 +276,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.RepoPubKey:
-		if err = object.GetMetadataMutable().GetRepoPubKeyMutable().UnmarshalBinary(
+		if err = metadata.GetRepoPubKeyMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -283,7 +284,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.RepoSig:
-		if err = object.GetMetadataMutable().GetObjectSigMutable().UnmarshalBinary(
+		if err = metadata.GetObjectSigMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -291,7 +292,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Description:
-		if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
+		if err = metadata.GetDescriptionMutable().Set(
 			decoder.Content.String(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -299,14 +300,14 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Tag:
-		var e ids.Tag
+		var tag ids.Tag
 
-		if err = e.Set(decoder.Content.String()); err != nil {
+		if err = tag.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = object.AddTagPtrFast(&e); err != nil {
+		if err = object.AddTagPtrFast(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -318,7 +319,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Tai:
-		if _, err = object.GetMetadataMutable().GetTaiMutable().ReadFrom(
+		if _, err = metadata.GetTaiMutable().ReadFrom(
 			&decoder.Content,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -327,21 +328,23 @@ func (decoder *binaryDecoder) readFieldKey(
 
 		// TODO remove
 	case key_bytes.CacheParentTai:
-		if _, err = object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable().ReadFrom(&decoder.Content); err != nil {
+		if _, err = metadata.GetIndexMutable().GetParentTaiMutable().ReadFrom(
+			&decoder.Content,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.Type:
-		if err = object.GetMetadataMutable().GetTypeMutable().Set(
-			decoder.Content.String(),
+		if err = metadata.GetTypeTupleMutable().GetBinaryMarshaler().UnmarshalBinary(
+			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case key_bytes.SigParentMetadataParentObjectId:
-		if err = object.GetMetadataMutable().GetMotherObjectSigMutable().UnmarshalBinary(
+		if err = metadata.GetMotherObjectSigMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -349,7 +352,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataParentObjectId:
-		if err = object.GetMetadataMutable().GetObjectDigestMutable().UnmarshalBinary(
+		if err = metadata.GetObjectDigestMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -357,7 +360,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if err = object.GetMetadataMutable().GetSelfWithoutTaiMutable().UnmarshalBinary(
+		if err = metadata.GetSelfWithoutTaiMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -372,7 +375,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.GetMetadataMutable().GetIndexMutable().(*object_metadata.Index).AddTagsImplicitPtr(&tag); err != nil {
+		if err = metadata.GetIndexMutable().AddTagsImplicitPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -385,7 +388,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = object.GetMetadataMutable().GetIndexMutable().AddTagExpandedPtr(&tag); err != nil {
+		if err = metadata.GetIndexMutable().AddTagExpandedPtr(&tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -398,7 +401,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddPath(&tag)
+		metadata.GetIndexMutable().GetTagPaths().AddPath(&tag)
 
 	default:
 		err = errors.ErrorWithStackf("unsupported key: %s", decoder.Key)

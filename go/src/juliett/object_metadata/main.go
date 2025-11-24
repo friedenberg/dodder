@@ -18,7 +18,7 @@ type metadata struct {
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
 	Tags ids.TagMutableSet // public for gob, but should be private
-	Type ids.Type
+	Type TypeTuple
 
 	DigBlob   markl.Id
 	digSelf   markl.Id
@@ -89,7 +89,7 @@ func (metadata *metadata) UserInputIsEmpty() bool {
 		return false
 	}
 
-	if !ids.IsEmpty(metadata.Type) {
+	if !ids.IsEmpty(metadata.GetType()) {
 		return false
 	}
 
@@ -227,32 +227,35 @@ func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
 }
 
 func (metadata *metadata) GetType() ids.Type {
-	return metadata.Type
+	return metadata.Type.Key
 }
 
 func (metadata *metadata) GetTypeMutable() *ids.Type {
+	return &metadata.Type.Key
+}
+
+func (metadata *metadata) GetTypeTuple() TypeTuple {
+	return metadata.Type
+}
+
+func (metadata *metadata) GetTypeTupleMutable() *TypeTuple {
 	return &metadata.Type
 }
 
 func (metadata *metadata) Subtract(
 	b *metadata,
 ) {
-	if metadata.Type.String() == b.Type.String() {
-		metadata.Type = ids.Type{}
+	if metadata.GetType().String() == b.GetType().String() {
+		metadata.GetTypeMutable().Reset()
 	}
 
 	if metadata.Tags == nil {
 		return
 	}
 
-	// ui.Debug().Print("before", b.Tags, a.Tags)
-
-	for e := range b.Tags.AllPtr() {
-		// ui.Debug().Print(e)
-		metadata.Tags.DelPtr(e)
+	for tag := range b.Tags.AllPtr() {
+		metadata.Tags.DelPtr(tag)
 	}
-
-	// ui.Debug().Print("after", b.Tags, a.Tags)
 }
 
 func (metadata *metadata) GenerateExpandedTags() {

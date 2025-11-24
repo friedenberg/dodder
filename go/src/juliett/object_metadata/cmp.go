@@ -38,7 +38,7 @@ func (e equaler) Equals(a, b IMetadata) bool {
 			return false
 		}
 
-		if !a.Type.Equals(b.Type) {
+		if !a.GetType().Equals(b.GetType()) {
 			if debug {
 				ui.Debug().Print(&a.Type, "->", &b.Type)
 			}

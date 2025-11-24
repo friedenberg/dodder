@@ -2,8 +2,6 @@ package object_metadata
 
 import (
 	"slices"
-
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
 var Resetter resetter
@@ -18,7 +16,7 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 		metadata.pubRepo.Reset()
 		metadata.ResetTags()
 		resetIndex(&metadata.Index)
-		metadata.Type = ids.Type{}
+		metadata.Type.Reset()
 		metadata.Tai.Reset()
 		metadata.DigBlob.Reset()
 		metadata.digSelf.Reset()
@@ -37,7 +35,7 @@ func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
 	dst.sigRepo.ResetWith(src.sigRepo)
 	dst.pubRepo.ResetWith(src.pubRepo)
 
-	dst.Type = src.Type
+	dst.Type.ResetWith(src.Type)
 	dst.Tai = src.Tai
 
 	dst.DigBlob.ResetWith(src.DigBlob)

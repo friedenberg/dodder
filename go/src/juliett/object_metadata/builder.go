@@ -25,7 +25,7 @@ func (builder *builder) checkReuse() {
 
 func (builder *builder) WithType(typeString string) *builder {
 	builder.checkReuse()
-	errors.PanicIfError(builder.metadata.Type.Set(typeString))
+	errors.PanicIfError(builder.metadata.GetTypeMutable().Set(typeString))
 	return builder
 }
 
