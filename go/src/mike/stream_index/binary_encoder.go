@@ -354,20 +354,20 @@ func (encoder *binaryEncoder) writeFieldBinaryMarshaler(
 
 	if bites, err = binaryMarshaler.MarshalBinary(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	if _, err = ohio.WriteAllOrDieTrying(&encoder.Content, bites); err != nil {
 		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
-		return
+		return n, err
 	}
 
 	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
-	return
+	return n, err
 }
 
 func (encoder *binaryEncoder) writeFieldByteReader(
