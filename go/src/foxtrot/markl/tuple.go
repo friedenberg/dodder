@@ -6,11 +6,13 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
 type KeyValueTuple[
 	KEY interface {
 		interfaces.Stringer
+		interfaces.Equatable[KEY]
 	},
 	KEY_PTR interface {
 		interfaces.Resetable
@@ -22,6 +24,8 @@ type KeyValueTuple[
 	Value Id
 }
 
+var _ interfaces.Resetable = &KeyValueTuple[ids.Type, *ids.Type]{}
+
 func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
 	return KEY_PTR(&tuple.Key)
 }
@@ -31,9 +35,25 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) Reset() {
 	tuple.Value.Reset()
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) ResetWith(other KeyValueTuple[KEY, KEY_PTR]) {
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) ResetWith(
+	other KeyValueTuple[KEY, KEY_PTR],
+) {
 	tuple.GetKeyMutable().ResetWith(other.Key)
 	tuple.Value.ResetWithMarklId(other.Value)
+}
+
+func (tuple KeyValueTuple[KEY, KEY_PTR]) Equals(
+	other KeyValueTuple[KEY, KEY_PTR],
+) bool {
+	if !tuple.Key.Equals(other.Key) {
+		return false
+	}
+
+	if !Equals(tuple.Value, other.Value) {
+		return false
+	}
+
+	return true
 }
 
 func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
@@ -43,6 +63,7 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler() KeyValueTupleBina
 type KeyValueTupleBinaryMarshaler[
 	KEY interface {
 		interfaces.Stringer
+		interfaces.Equatable[KEY]
 	},
 	KEY_PTR interface {
 		interfaces.Resetable

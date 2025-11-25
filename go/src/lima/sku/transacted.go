@@ -153,7 +153,10 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !object_metadata.Equaler.Equals(transacted.GetMetadata().(*object_metadata.Metadata), other.GetMetadata().(*object_metadata.Metadata)) {
+	if !object_metadata.Equaler.Equals(
+		transacted.GetMetadata(),
+		other.GetMetadata(),
+	) {
 		return ok
 	}
 

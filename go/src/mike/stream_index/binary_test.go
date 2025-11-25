@@ -101,7 +101,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 	actual := objectWithCursorAndSigil{
 		objectWithSigil: objectWithSigil{
-			Transacted: &sku.Transacted{},
+			Transacted: sku.GetTransactedPool().Get(),
 		},
 	}
 
@@ -117,7 +117,9 @@ func TestBinaryOne(t1 *testing.T) {
 		}
 	}
 
+	t.Logf("%s", sku.String(actual.Transacted))
+
 	if !sku.TransactedEqualer.Equals(expected, actual.Transacted) {
-		t.NotEqual(expected, actual)
+		t.Errorf("expected %q but got %q", sku.String(expected), sku.String(actual.Transacted))
 	}
 }
