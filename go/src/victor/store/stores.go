@@ -226,10 +226,10 @@ func (store *Store) ReadCheckedOutFromTransacted(
 		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (store *Store) UpdateTransactedFromBlobs(

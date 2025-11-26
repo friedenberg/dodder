@@ -80,7 +80,7 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 
 	if fsItem, ok = store.Get(&object.ObjectId); !ok {
 		err = collections.MakeErrNotFound(object.GetObjectId())
-		return
+		return err
 	}
 
 	if err = store.HydrateExternalFromItem(
@@ -105,14 +105,14 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 				&object.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", fsItem)
 		}
 
-		return
+		return err
 	}
 
-	return
+	return err
 }

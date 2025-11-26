@@ -342,22 +342,22 @@ func (store *Store) ReadCheckedOutFromTransacted(
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return
+		return checkedOut, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
 	if checkedOut, err = storeLike.ReadCheckedOutFromTransacted(
 		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return checkedOut, err
 	}
 
-	return
+	return checkedOut, err
 }
 
 func (store *Store) Merge(

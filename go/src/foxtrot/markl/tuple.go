@@ -67,23 +67,23 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) Set(
 	if !ok {
 		if err = key.Set(value); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
-		return
+		return err
 	}
 
 	if err = key.Set(left); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = tuple.Value.Set(right); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler(
@@ -150,7 +150,7 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 	bites []byte,
 ) (err error) {
 	if len(bites) == 0 {
-		return
+		return err
 	}
 
 	var formatAndBytes []byte
@@ -167,12 +167,12 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 				return err
 			}
 
-			return
+			return err
 		}
 
 		if err = marshaler.tuple.GetKeyMutable().Set(string(key)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
@@ -181,7 +181,7 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 
 		if !ok {
 			err = errors.Errorf("expected empty byte between format id and id bytes")
-			return
+			return err
 		}
 
 		id := &marshaler.tuple.Value
@@ -189,14 +189,14 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 
 		if err = id.setFormatId(string(format)); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 
 		if err = id.setData(valueBytes); err != nil {
 			err = errors.Wrap(err)
-			return
+			return err
 		}
 	}
 
-	return
+	return err
 }
