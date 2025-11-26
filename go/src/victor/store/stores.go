@@ -218,16 +218,18 @@ func (store *Store) UpdateTransactedWithExternal(
 
 func (store *Store) ReadCheckedOutFromTransacted(
 	repoId ids.RepoId,
-	sk *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	es := store.envWorkspace.GetStore()
+	object *sku.Transacted,
+) (checkedOut *sku.CheckedOut, err error) {
+	workspaceStore := store.envWorkspace.GetStore()
 
-	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
+	if checkedOut, err = workspaceStore.ReadCheckedOutFromTransacted(
+		object,
+	); err != nil {
 		err = errors.Wrap(err)
-		return co, err
+		return
 	}
 
-	return co, err
+	return
 }
 
 func (store *Store) UpdateTransactedFromBlobs(

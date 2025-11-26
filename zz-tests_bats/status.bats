@@ -363,14 +363,14 @@ function status_conflict { # @test
 		- [one/dos  tag-3 tag-4] wow ok again
 	EOM
   assert_success
-  assert_output_unsorted - <<-EOM
+  assert_output - <<-EOM
 		[!txt2 !toml-type-v1]
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
   run_dodder show -format log new-etikett-for-all:z,e,t
   assert_success
-  assert_output_unsorted - <<-EOM
+  assert_output - <<-EOM
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 

@@ -55,7 +55,10 @@ func (store *Store) ReadCheckedOutFromTransacted(
 ) (checkedOut *sku.CheckedOut, err error) {
 	checkedOut = GetCheckedOutPool().Get()
 
-	if err = store.readIntoCheckedOutFromTransacted(object, checkedOut); err != nil {
+	if err = store.readIntoCheckedOutFromTransacted(
+		object,
+		checkedOut,
+	); err != nil {
 		err = errors.Wrap(err)
 		return checkedOut, err
 	}
@@ -77,12 +80,15 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 
 	if fsItem, ok = store.Get(&object.ObjectId); !ok {
 		err = collections.MakeErrNotFound(object.GetObjectId())
-		return err
+		return
 	}
 
 	if err = store.HydrateExternalFromItem(
 		sku.CommitOptions{
 			StoreOptions: sku.StoreOptions{
+				LockfileOptions: sku.LockfileOptions{
+					AllowTypeFailure: true,
+				},
 				UpdateTai: true,
 			},
 		},
@@ -91,7 +97,7 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 		checkedOut.GetSkuExternal(),
 	); err != nil {
 		if errors.IsNotExist(err) {
-			err = errors.MakeErrStopIteration()
+			// no-op
 		} else if sku.IsErrMergeConflict(err) {
 			checkedOut.SetState(checked_out_state.Conflicted)
 
@@ -99,14 +105,14 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 				&object.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
-				return err
+				return
 			}
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", fsItem)
 		}
 
-		return err
+		return
 	}
 
-	return err
+	return
 }

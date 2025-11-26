@@ -119,7 +119,7 @@ func (pageWriter *pageWriter) Flush() (err error) {
 		!pageWriter.changesAreHistorical {
 		if pageWriter.file, err = files.OpenReadWrite(pageWriter.path); err != nil {
 			err = errors.Wrap(err)
-			return err
+			return
 		}
 
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(
@@ -134,11 +134,14 @@ func (pageWriter *pageWriter) Flush() (err error) {
 		)
 		defer repoolBufferedReader()
 
-		return pageWriter.flushJustLatest(bufferedReader, bufferedWriter)
+		if err = pageWriter.flushJustLatest(bufferedReader, bufferedWriter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
 		if pageWriter.file, err = pageWriter.tempFS.FileTemp(); err != nil {
 			err = errors.Wrap(err)
-			return err
+			return
 		}
 
 		defer errors.DeferredCloseAndRename(
@@ -151,8 +154,13 @@ func (pageWriter *pageWriter) Flush() (err error) {
 		bufferedWriter, repoolBufferedWriter := pool.GetBufferedWriter(pageWriter.file)
 		defer repoolBufferedWriter()
 
-		return pageWriter.flushBoth(bufferedWriter)
+		if err = pageWriter.flushBoth(bufferedWriter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	return
 }
 
 func (pageWriter *pageWriter) flushBoth(
@@ -180,7 +188,7 @@ func (pageWriter *pageWriter) flushBoth(
 		}
 
 		if err = chain(object); err != nil {
-			err = errors.Wrap(errIter)
+			err = errors.Wrap(err)
 			return err
 		}
 	}

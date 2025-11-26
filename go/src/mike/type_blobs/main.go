@@ -4,14 +4,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 )
 
-func Default() (t TomlV1) {
-	t = TomlV1{
+func Default() TomlV1 {
+	return TomlV1{
 		FileExtension: "md",
 		Formatters:    make(map[string]script_config.WithOutputFormat),
 		VimSyntaxType: "markdown",
 	}
-
-	return t
 }
 
 type Blob interface {
@@ -19,6 +17,7 @@ type Blob interface {
 	GetBinary() bool
 	GetMimeType() string
 	GetVimSyntaxType() string
+
 	WithFormatters
 	WithFormatterUTIGroups
 	WithStringLuaHooks

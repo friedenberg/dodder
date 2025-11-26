@@ -246,12 +246,12 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_second { # @test
 
 	run_dodder show -format text one/dos
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# zettel with multiple etiketten
 		- this_is_the_first
 		- this_is_the_second
-		! md
+		! md@.*
 		---
 
 		zettel with multiple etiketten body
@@ -319,12 +319,12 @@ function pull_history_zettel_type_tag_yes_conflicts_allowed_remote_first { # @te
 
 	run_dodder show -format text one/dos
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# zettel with multiple etiketten
 		- this_is_the_first
 		- this_is_the_second
-		! md
+		! md@.*
 		---
 
 		zettel with multiple etiketten body
@@ -405,12 +405,12 @@ function pull_history_zettel_type_tag_yes_conflicts_remote_first { # @test
 
 	run_dodder show -format text one/dos
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# zettel with multiple etiketten
 		- this_is_the_first
 		- this_is_the_second
-		! md
+		! md@.*
 		---
 
 		zettel with multiple etiketten body

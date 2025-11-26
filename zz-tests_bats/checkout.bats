@@ -73,10 +73,10 @@ function checkout_non_binary_simple_zettel { # @test
 
   run_dodder show -format text !txt:z
   assert_success
-  assert_output - <<-EOM
+  assert_output --regexp - <<-EOM
 		---
 		# file
-		! txt
+		! txt@.*
 		---
 
 		text file
@@ -100,11 +100,11 @@ function checkout_binary_simple_zettel { # @test
 
   run cat two/uno.zettel
   assert_success
-  assert_output - <<-EOM
+  assert_output --regexp - <<-EOM
 		---
 		# file
 		@ blake2b256-w9l3z9c2w8lhr42fwekmhrxeqtmzw40s9p46vt88ydgwux4rxxuqnfqsmk
-		! bin
+		! bin@.*
 		---
 	EOM
 }

@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
+	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
@@ -15,48 +16,56 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 		return err
 	}
 
-	var co *sku.CheckedOut
+	var checkedOut *sku.CheckedOut
 
-	if co, err = store.ReadCheckedOutFromTransacted(
+	if checkedOut, err = store.ReadCheckedOutFromTransacted(
 		options.RepoId,
 		mother,
 	); err != nil {
-		err = nil
-		return err
+		if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
 	}
 
-	defer store.PutCheckedOutLike(co)
+	defer store.PutCheckedOutLike(checkedOut)
 
-	right := co.GetSkuExternal().GetSku()
+	right := checkedOut.GetSkuExternal().GetSku()
 
 	// TODO switch to using mother
-	motherEqualsExternal := object_metadata.EqualerSansTai.Equals(right.GetMetadata(), co.GetSku().GetMetadata())
+	motherEqualsExternal := object_metadata.EqualerSansTai.Equals(
+		right.GetMetadata(),
+		checkedOut.GetSku().GetMetadata(),
+	)
 
 	if motherEqualsExternal {
-		op := checkout_options.OptionsWithoutMode{
+		checkoutOptions := checkout_options.OptionsWithoutMode{
 			Force: true,
 		}
 
 		sku.TransactedResetter.ResetWithExceptFields(right, left)
 
 		if err = store.UpdateCheckoutFromCheckedOut(
-			op,
-			co,
+			checkoutOptions,
+			checkedOut,
 		); err != nil {
 			err = errors.Wrap(err)
-			return err
+			return
 		}
 
-		return err
+		return
 	}
 
 	if err = right.SetMother(mother); err != nil {
 		err = errors.Wrap(err)
-		return err
+		return
 	}
 
 	conflicted := sku.Conflicted{
-		CheckedOut: co,
+		CheckedOut: checkedOut,
 		Local:      left,
 		Base:       mother,
 		Remote:     right,
@@ -64,7 +73,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 
 	if err = store.MergeConflicted(conflicted); err != nil {
 		err = errors.Wrap(err)
-		return err
+		return
 	}
 
 	return err

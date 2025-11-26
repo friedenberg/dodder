@@ -31,6 +31,7 @@ func (store *Store) Commit(
 	return err
 }
 
+// TODO move to object_finalizer
 type commitFacilitator struct {
 	*Store
 	index sku.Reindexer

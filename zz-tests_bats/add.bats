@@ -29,11 +29,11 @@ function add { # @test
 
 	run_dodder show -format text one/uno
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# to_add
 		- zz-inbox-2022-11-14
-		! md
+		! md@.*
 		---
 
 		test file
@@ -67,11 +67,11 @@ function add_with_dupe_added { # @test
 
 	run_dodder show -format text one/uno
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# to_add to_add2
 		- zz-inbox-2022-11-14
-		! md
+		! md@.*
 		---
 
 		test file
@@ -104,11 +104,11 @@ function add_not_md { # @test
 
 	run_dodder show -format text one/uno
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# to_add
 		- zz-inbox-2022-11-14
-		! pdf
+		! pdf@.*
 		---
 
 		test file
@@ -301,11 +301,11 @@ function add_several_with_spaces_in_filename { # @test
 
 	run_dodder show -format text one/uno
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# to add
 		- zz-inbox-2022-11-14
-		! md
+		! md@.*
 		---
 
 		test file

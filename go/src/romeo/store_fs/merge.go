@@ -50,12 +50,17 @@ func (store *Store) MergeCheckedOut(
 		checkedOut.GetSku().GetMetadata(),
 		checkedOut.GetSkuExternal().GetMetadata(),
 	) {
-		if !checkedOut.GetSku().Metadata.GetTai().Less(checkedOut.GetSkuExternal().Metadata.GetTai()) {
+		if !checkedOut.GetSku().Metadata.GetTai().Less(
+			checkedOut.GetSkuExternal().Metadata.GetTai(),
+		) {
 			// TODO implement retroactive change
 		}
 
 		return commitOptions, err
-	} else if markl.Equals(checkedOut.GetSku().Metadata.GetBlobDigest(), checkedOut.GetSkuExternal().Metadata.GetBlobDigest()) {
+	} else if markl.Equals(
+		checkedOut.GetSku().Metadata.GetBlobDigest(),
+		checkedOut.GetSkuExternal().Metadata.GetBlobDigest(),
+	) {
 		conflicts = checkout_mode.Make(checkout_mode.Metadata)
 	} else {
 		conflicts = checkout_mode.Make(checkout_mode.MetadataAndBlob)

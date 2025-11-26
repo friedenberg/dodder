@@ -17,15 +17,15 @@ func (store *Store) validateAndFinalize(
 		return err
 	}
 
-	// if err = store.finalizer.WriteLockfile(
-	// 	daughter,
-	// 	options.LockfileOptions,
-	// 	store.streamIndex.ReadOneMarklIdAdded,
-	// 	store.streamIndex.ReadOneMarklId,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return err
-	// }
+	if err = store.finalizer.WriteLockfile(
+		daughter,
+		options.LockfileOptions,
+		store.streamIndex.ReadOneMarklIdAdded,
+		store.streamIndex.ReadOneMarklId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
 
 	return err
 }

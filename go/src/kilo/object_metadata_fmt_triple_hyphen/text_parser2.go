@@ -84,7 +84,6 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-// TODO add support for sigs and new format
 func (parser *textParser2) readType(
 	metadata object_metadata.IMetadataMutable,
 	typeString string,
@@ -93,7 +92,7 @@ func (parser *textParser2) readType(
 		return err
 	}
 
-	if err = metadata.GetTypeMutable().Set(typeString); err != nil {
+	if err = metadata.GetTypeTupleMutable().Set(typeString); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -18,12 +18,12 @@ teardown() {
 function show_simple_one_zettel { # @test
 	run_dodder show -format text one/uno
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# wow the first
 		- tag-3
 		- tag-4
-		! md
+		! md@.*
 		---
 
 		last time
@@ -49,10 +49,10 @@ function show_simple_one_zettel_with_description_with_quotes { # @test
 
 	run_dodder show -format text two/uno:
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# see these "quotes"
-		! md
+		! md@.*
 		---
 
 		last time
@@ -62,12 +62,12 @@ function show_simple_one_zettel_with_description_with_quotes { # @test
 function show_simple_one_zettel_with_sigil { # @test
 	run_dodder show -format text one/uno:
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# wow the first
 		- tag-3
 		- tag-4
-		! md
+		! md@.*
 		---
 
 		last time
@@ -77,12 +77,12 @@ function show_simple_one_zettel_with_sigil { # @test
 function show_simple_one_zettel_with_sigil_and_genre { # @test
 	run_dodder show -format text one/uno:zettel
 	assert_success
-	assert_output - <<-EOM
+	assert_output --regexp - <<-EOM
 		---
 		# wow the first
 		- tag-3
 		- tag-4
-		! md
+		! md@.*
 		---
 
 		last time
@@ -203,12 +203,12 @@ function show_history_one_zettel { # @test
 
 	run_dodder show -format text one/uno+z
 	assert_success
-	assert_output_unsorted - <<-EOM
+	assert_output_unsorted --regexp - <<-EOM
 		---
 		# wow ok
 		- tag-1
 		- tag-2
-		! md
+		! md@.*
 		---
 
 		this is the body aiiiiight
@@ -216,7 +216,7 @@ function show_history_one_zettel { # @test
 		# wow the first
 		- tag-3
 		- tag-4
-		! md
+		! md@.*
 		---
 
 		last time

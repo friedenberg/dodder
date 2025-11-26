@@ -336,26 +336,28 @@ func (store *Store) UpdateCheckoutFromCheckedOut(
 }
 
 func (store *Store) ReadCheckedOutFromTransacted(
-	sk *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	es, ok := store.StoreLike.(store_workspace.ReadCheckedOutFromTransacted)
+	object *sku.Transacted,
+) (checkedOut *sku.CheckedOut, err error) {
+	storeLike, ok := store.StoreLike.(store_workspace.ReadCheckedOutFromTransacted)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return co, err
+		return
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return co, err
+		return
 	}
 
-	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
+	if checkedOut, err = storeLike.ReadCheckedOutFromTransacted(
+		object,
+	); err != nil {
 		err = errors.Wrap(err)
-		return co, err
+		return
 	}
 
-	return co, err
+	return
 }
 
 func (store *Store) Merge(

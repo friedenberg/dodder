@@ -202,7 +202,16 @@ function checkouts_dont_overwrite { # @test
 
 	run cat one/uno.zettel
 	assert_success
-	assert_output "$(cat "$expected")"
+	assert_output --regexp - <<-EOM
+---
+# bez
+- et1
+- et2
+! md@.*
+---
+
+the body
+EOM
 
 	{
 		echo ---

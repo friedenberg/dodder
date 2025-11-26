@@ -59,8 +59,8 @@ type (
 
 	ReadCheckedOutFromTransacted interface {
 		ReadCheckedOutFromTransacted(
-			sk *sku.Transacted,
-		) (co *sku.CheckedOut, err error)
+			object *sku.Transacted,
+		) (checkedOut *sku.CheckedOut, err error)
 	}
 
 	Merge interface {

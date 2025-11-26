@@ -3,6 +3,7 @@ package markl
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -56,8 +57,50 @@ func (tuple KeyValueTuple[KEY, KEY_PTR]) Equals(
 	return true
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
-	return KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]{tuple: tuple}
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) Set(
+	value string,
+) (err error) {
+	key := tuple.GetKeyMutable()
+
+	left, right, ok := strings.Cut(value, "@")
+
+	if !ok {
+		if err = key.Set(value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = key.Set(left); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = tuple.Value.Set(right); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler(
+	requireValue bool,
+) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+	return KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]{
+		requireValue: requireValue,
+		tuple:        tuple,
+	}
+}
+
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshalerValueNotRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+	return tuple.GetBinaryMarshaler(false)
+}
+
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshalerValueRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+	return tuple.GetBinaryMarshaler(true)
 }
 
 type KeyValueTupleBinaryMarshaler[
@@ -71,7 +114,8 @@ type KeyValueTupleBinaryMarshaler[
 		interfaces.StringerSetterPtr[KEY]
 	},
 ] struct {
-	tuple *KeyValueTuple[KEY, KEY_PTR]
+	requireValue bool
+	tuple        *KeyValueTuple[KEY, KEY_PTR]
 }
 
 func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) MarshalBinary() (data []byte, err error) {
@@ -83,14 +127,21 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) AppendBinary(
 ) ([]byte, error) {
 	bites = fmt.Append(bites, marshaler.tuple.Key.String())
 
-	// if marshaler.tuple.Value.IsEmpty() {
-	// 	return bites, errors.Errorf("empty type signature for %q", marshaler.tuple.Key)
-	// }
+	if marshaler.tuple.Value.IsEmpty() {
+		var err error
 
-	// bites = append(bites, '\x00')
-	// bites = fmt.Append(bites, marshaler.tuple.Value.GetMarklFormat().GetMarklFormatId())
-	// bites = append(bites, '\x00')
-	// bites = append(bites, marshaler.tuple.Value.GetBytes()...)
+		if marshaler.requireValue {
+			err = errors.Errorf("empty type signature for %q", marshaler.tuple.Key)
+		}
+
+		return bites, err
+	}
+
+	bites = append(bites, '\x00')
+	formatId := marshaler.tuple.Value.GetMarklFormat().GetMarklFormatId()
+	bites = fmt.Append(bites, formatId)
+	bites = append(bites, '\x00')
+	bites = append(bites, marshaler.tuple.Value.GetBytes()...)
 
 	return bites, nil
 }
@@ -99,16 +150,16 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 	bites []byte,
 ) (err error) {
 	if len(bites) == 0 {
-		return err
+		return
 	}
 
-	// var formatAndBytes []byte
+	var formatAndBytes []byte
 
 	{
 		var key []byte
 		var ok bool
 
-		key, _, ok = bytes.Cut(bites, []byte{'\x00'})
+		key, formatAndBytes, ok = bytes.Cut(bites, []byte{'\x00'})
 
 		if !ok {
 			if err = marshaler.tuple.GetKeyMutable().Set(string(bites)); err != nil {
@@ -116,36 +167,36 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 				return err
 			}
 
-			return err
+			return
 		}
 
 		if err = marshaler.tuple.GetKeyMutable().Set(string(key)); err != nil {
 			err = errors.Wrap(err)
-			return err
+			return
 		}
 	}
 
-	// {
-	// 	format, valueBytes, ok := bytes.Cut(formatAndBytes, []byte{'\x00'})
+	{
+		format, valueBytes, ok := bytes.Cut(formatAndBytes, []byte{'\x00'})
 
-	// 	if !ok {
-	// 		err = errors.Errorf("expected empty byte, but none found")
-	// 		return err
-	// 	}
+		if !ok {
+			err = errors.Errorf("expected empty byte between format id and id bytes")
+			return
+		}
 
-	// 	id := &marshaler.tuple.Value
-	// 	id.Reset()
+		id := &marshaler.tuple.Value
+		id.Reset()
 
-	// 	if err = id.setFormatId(string(format)); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return err
-	// 	}
+		if err = id.setFormatId(string(format)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	// 	if err = id.setData(valueBytes); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return err
-	// 	}
-	// }
+		if err = id.setData(valueBytes); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
-	return err
+	return
 }
