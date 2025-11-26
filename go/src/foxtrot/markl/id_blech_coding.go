@@ -143,7 +143,7 @@ func SetMarklIdWithFormatBlech32(
 
 	if err = validatePurposeAndFormatId(purposeId, formatId); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return err
@@ -151,15 +151,15 @@ func SetMarklIdWithFormatBlech32(
 
 func validatePurposeAndFormatId(purposeId string, formatId string) (err error) {
 	if formatId == "" || purposeId == "" {
-		return
+		return err
 	}
 
 	purpose := GetPurpose(purposeId)
 
 	if _, ok := purpose.formatIds[formatId]; !ok {
 		err = errors.Errorf("format id %q not supported for purpose %q", formatId, purposeId)
-		return
+		return err
 	}
 
-	return
+	return err
 }
