@@ -17,9 +17,9 @@ var (
 )
 
 type Id struct {
-	purpose string
-	format  interfaces.MarklFormat
-	data    []byte
+	purposeId string
+	format    interfaces.MarklFormat
+	data      []byte
 }
 
 func (id Id) String() string {
@@ -61,8 +61,8 @@ func (id Id) StringWithFormat() string {
 		bitesString := string(bites)
 		errors.PanicIfError(err)
 
-		if id.purpose != "" {
-			return fmt.Sprintf("%s@%s", id.purpose, bitesString)
+		if id.purposeId != "" {
+			return fmt.Sprintf("%s@%s", id.purposeId, bitesString)
 		} else {
 			return bitesString
 		}
@@ -70,11 +70,11 @@ func (id Id) StringWithFormat() string {
 }
 
 func (id Id) GetPurpose() string {
-	return id.purpose
+	return id.purposeId
 }
 
 func (id *Id) SetPurpose(value string) error {
-	id.purpose = value
+	id.purposeId = value
 	return nil
 }
 
@@ -149,14 +149,14 @@ func (id *Id) setWithPurpose(purpose, body string) (err error) {
 }
 
 func (id *Id) setWithoutPurpose(value string) (err error) {
-	var typeId string
+	var formatId string
 
-	if typeId, id.data, err = blech32.DecodeString(value); err != nil {
+	if formatId, id.data, err = blech32.DecodeString(value); err != nil {
 		err = errors.Wrapf(err, "Value: %q", value)
 		return err
 	}
 
-	if err = id.SetMarklId(typeId, id.data); err != nil {
+	if err = id.SetMarklId(formatId, id.data); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -183,6 +183,11 @@ func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
 
 func (id *Id) setFormatId(formatId string) (err error) {
 	if id.format, err = GetFormatOrError(formatId); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if err = validatePurposeAndFormatId(id.purposeId, formatId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -250,17 +255,17 @@ func (id *Id) setData(bites []byte) (err error) {
 func (id *Id) Reset() {
 	id.format = nil
 	id.data = id.data[:0]
-	id.purpose = ""
+	id.purposeId = ""
 }
 
 func (id *Id) ResetWithPurpose(purpose string) {
 	id.format = nil
 	id.data = id.data[:0]
-	id.purpose = purpose
+	id.purposeId = purpose
 }
 
 func (id *Id) ResetWith(src Id) {
-	id.purpose = src.purpose
+	id.purposeId = src.purposeId
 	id.format = src.format
 	errors.PanicIfError(id.setData(src.data))
 }

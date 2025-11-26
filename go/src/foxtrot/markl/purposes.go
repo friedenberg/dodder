@@ -104,11 +104,13 @@ func init() {
 	makePurpose(
 		PurposeMadderPrivateKeyV0,
 		FormatIdEd25519Sec,
+		FormatIdAgeX25519Sec,
 	)
 
 	makePurpose(
 		PurposeMadderPrivateKeyV1,
 		FormatIdEd25519Sec,
+		FormatIdAgeX25519Sec,
 	)
 }
 

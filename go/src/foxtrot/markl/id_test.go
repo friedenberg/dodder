@@ -1,11 +1,68 @@
 package markl
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
+
+func StringHRPCombined(id interfaces.MarklId) string {
+	format := id.GetMarklFormat()
+	data := id.GetBytes()
+
+	if format == nil && len(data) == 0 {
+		return ""
+	}
+
+	if len(data) == 0 {
+		return ""
+	} else {
+		formatId := format.GetMarklFormatId()
+		combined := make([]byte, len(formatId)+len(data))
+		copy(combined, []byte(formatId))
+		copy(combined[len(formatId):], data)
+		bites, err := blech32.EncodeDataOnly(combined)
+		errors.PanicIfError(err)
+		return string(bites)
+	}
+}
+
+func SetBlechCombinedHRPAndData(
+	id interfaces.MutableMarklId,
+	value string,
+) (err error) {
+	var formatId string
+
+	var formatIdAndData []byte
+
+	if formatIdAndData, err = blech32.DecodeDataOnly([]byte(value)); err != nil {
+		err = errors.Wrapf(err, "Value: %q", value)
+		return err
+	}
+
+	if bytes.HasPrefix(formatIdAndData, []byte(FormatIdHashSha256)) {
+		formatId = FormatIdHashSha256
+	} else if bytes.HasPrefix(formatIdAndData, []byte(FormatIdHashBlake2b256)) {
+		formatId = FormatIdHashBlake2b256
+	} else {
+		err = errors.Errorf("unsupported format: %x", formatIdAndData)
+		return err
+	}
+
+	data := formatIdAndData[len(formatId):]
+
+	if err = id.SetMarklId(formatId, data); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
 
 func TestIdNullAndEqual(t1 *testing.T) {
 	ui.RunTestContext(t1, testIdNullAndEqual)
