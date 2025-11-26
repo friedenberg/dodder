@@ -44,37 +44,117 @@ const (
 
 func init() {
 	// purposes that need to be reregistered
-	makePurpose(PurposeBlobDigestV1)
+	makePurpose(
+		PurposeBlobDigestV1,
+		FormatIdHashSha256,
+		FormatIdHashBlake2b256,
+	)
 
-	makePurpose(PurposeObjectMotherSigV1)
-	makePurpose(PurposeObjectSigV0)
-	makePurpose(PurposeObjectSigV1)
+	makePurpose(
+		PurposeObjectDigestV1,
+		FormatIdHashSha256,
+		FormatIdHashBlake2b256,
+	)
 
-	makePurpose(PurposeRepoPrivateKeyV1)
-	makePurpose(PurposeRepoPubKeyV1)
+	makePurpose(
+		PurposeObjectDigestV2,
+		FormatIdHashSha256,
+		FormatIdHashBlake2b256,
+	)
+
+	makePurpose(
+		PurposeV5MetadataDigestWithoutTai,
+		FormatIdHashSha256,
+		FormatIdHashBlake2b256,
+	)
+
+	makePurpose(
+		PurposeObjectMotherSigV1,
+		FormatIdEd25519Sig,
+	)
+
+	makePurpose(
+		PurposeObjectSigV0,
+		FormatIdEd25519Sig,
+	)
+
+	makePurpose(
+		PurposeObjectSigV1,
+		FormatIdEd25519Sig,
+	)
+
+	makePurpose(
+		PurposeRepoPrivateKeyV1,
+		FormatIdEd25519Sec,
+	)
+
+	makePurpose(
+		PurposeRepoPubKeyV1,
+		FormatIdEd25519Pub,
+	)
 
 	makePurpose(PurposeRequestAuthChallengeV1)
 	makePurpose(PurposeRequestAuthResponseV1)
 
-	makePurpose(PurposeMadderPubKeyV1)
-	makePurpose(PurposeMadderPrivateKeyV0)
-	makePurpose(PurposeMadderPrivateKeyV1)
+	makePurpose(
+		PurposeMadderPubKeyV1,
+		FormatIdEd25519Pub,
+	)
+
+	makePurpose(
+		PurposeMadderPrivateKeyV0,
+		FormatIdEd25519Sec,
+	)
+
+	makePurpose(
+		PurposeMadderPrivateKeyV1,
+		FormatIdEd25519Sec,
+	)
 }
 
 var purposes = map[string]Purpose{}
 
 type Purpose struct {
-	id string
+	id        string
+	formatIds map[string]struct{}
 }
 
-func makePurpose(purposeId string) {
+func GetPurpose(purposeId string) Purpose {
+	purpose, ok := purposes[purposeId]
+
+	if !ok {
+		panic(fmt.Sprintf("no purpose registered for id %q", purposeId))
+	}
+
+	return purpose
+}
+
+func makePurpose(purposeId string, formatIds ...string) {
 	_, alreadyExists := purposes[purposeId]
 
 	if alreadyExists {
 		panic(fmt.Sprintf("hash type already registered: %q", purposeId))
 	}
 
-	purposes[purposeId] = Purpose{
-		id: purposeId,
+	purpose := Purpose{
+		id:        purposeId,
+		formatIds: make(map[string]struct{}),
 	}
+
+	for _, formatId := range formatIds {
+		_, ok := purpose.formatIds[formatId]
+
+		if ok {
+			panic(
+				fmt.Sprintf("format id (%q) registered for purpose (%q) more than once",
+					formatId,
+					purposeId,
+				),
+			)
+		}
+
+		purpose.formatIds[formatId] = struct{}{}
+	}
+
+	purposes[purposeId] = purpose
 }

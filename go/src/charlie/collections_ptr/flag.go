@@ -15,84 +15,71 @@ const (
 	SetterPolicyReset
 )
 
-type flagPtr[T interfaces.ValueLike] interface {
-	interfaces.ValuePtr[T]
-	interfaces.SetterPtr[T]
-}
-
 // TODO-P2 add Resetter2 and Pool
 type Flag[
-	T interfaces.ValueLike,
-	TPtr flagPtr[T],
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] interface {
 	interfaces.FlagValue
 	SetMany(vs ...string) (err error)
-	interfaces.MutableSetPtrLike[T, TPtr]
-	GetSetPtrLike() interfaces.SetPtrLike[T, TPtr]
-	GetMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr]
+	interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
+	GetSetPtrLike() interfaces.SetPtrLike[VALUE, VALUE_PTR]
+	GetMutableSetPtrLike() interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
 }
 
 func MakeFlagCommasFromExisting[
-	T interfaces.ValueLike,
-	TPtr flagPtr[T],
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
 ](
-	p SetterPolicy,
-	existing interfaces.MutableSetPtrLike[T, TPtr],
-	// pool schnittstellen.Pool[T, TPtr],
-	// resetter schnittstellen.Resetter2[T, TPtr],
-) Flag[T, TPtr] {
-	return &flagCommas[T, TPtr]{
-		SP:                p,
+	policy SetterPolicy,
+	existing interfaces.MutableSetPtrLike[VALUE, VALUE_PTR],
+) Flag[VALUE, VALUE_PTR] {
+	return &flagCommas[VALUE, VALUE_PTR]{
+		SetterPolicy:      policy,
 		MutableSetPtrLike: existing,
-		// pool:              pool,
-		// resetter:          resetter,
 	}
 }
 
 func MakeFlagCommas[
-	T interfaces.ValueLike,
-	TPtr flagPtr[T],
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
 ](
-	p SetterPolicy,
-	// pool schnittstellen.Pool[T, TPtr],
-	// resetter schnittstellen.Resetter2[T, TPtr],
-) Flag[T, TPtr] {
-	return &flagCommas[T, TPtr]{
-		SP:                p,
-		MutableSetPtrLike: MakeMutableValueSet[T, TPtr](nil),
-		// pool:              pool,
-		// resetter:          resetter,
+	policy SetterPolicy,
+) Flag[VALUE, VALUE_PTR] {
+	return &flagCommas[VALUE, VALUE_PTR]{
+		SetterPolicy:      policy,
+		MutableSetPtrLike: MakeMutableValueSet[VALUE, VALUE_PTR](nil),
 	}
 }
 
 type flagCommas[
-	T interfaces.ValueLike,
-	TPtr flagPtr[T],
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] struct {
-	SP SetterPolicy
-	interfaces.MutableSetPtrLike[T, TPtr]
-	pool     interfaces.Pool[T, TPtr]
-	resetter interfaces.ResetterPtr[T, TPtr]
+	SetterPolicy SetterPolicy
+	interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
+	pool     interfaces.Pool[VALUE, VALUE_PTR]
+	resetter interfaces.ResetterPtr[VALUE, VALUE_PTR]
 }
 
-func (f flagCommas[T, TPtr]) All() interfaces.Seq[T] {
-	return f.MutableSetPtrLike.All()
+func (flags flagCommas[T, TPtr]) All() interfaces.Seq[T] {
+	return flags.MutableSetPtrLike.All()
 }
 
-func (f flagCommas[T, TPtr]) GetSetPtrLike() (s interfaces.SetPtrLike[T, TPtr]) {
-	return f.CloneSetPtrLike()
+func (flags flagCommas[T, TPtr]) GetSetPtrLike() (s interfaces.SetPtrLike[T, TPtr]) {
+	return flags.CloneSetPtrLike()
 }
 
-func (f flagCommas[T, TPtr]) GetMutableSetPtrLike() (s interfaces.MutableSetPtrLike[T, TPtr]) {
-	return f.CloneMutableSetPtrLike()
+func (flags flagCommas[T, TPtr]) GetMutableSetPtrLike() (s interfaces.MutableSetPtrLike[T, TPtr]) {
+	return flags.CloneMutableSetPtrLike()
 }
 
-func (f flagCommas[T, TPtr]) String() (out string) {
-	if f.MutableSetPtrLike == nil {
+func (flags flagCommas[T, TPtr]) String() (out string) {
+	if flags.MutableSetPtrLike == nil {
 		return out
 	}
 
-	sorted := quiter.SortedStrings[T](f)
+	sorted := quiter.SortedStrings[T](flags)
 
 	sb := &strings.Builder{}
 	first := true
@@ -112,9 +99,9 @@ func (f flagCommas[T, TPtr]) String() (out string) {
 	return out
 }
 
-func (f *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
+func (flags *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 	for _, v := range vs {
-		if err = f.Set(v); err != nil {
+		if err = flags.Set(v); err != nil {
 			return err
 		}
 	}
@@ -122,10 +109,10 @@ func (f *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 	return err
 }
 
-func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
-	switch f.SP {
+func (flags *flagCommas[T, TPtr]) Set(v string) (err error) {
+	switch flags.SetterPolicy {
 	case SetterPolicyReset:
-		f.Reset()
+		flags.Reset()
 	}
 
 	els := strings.Split(v, ",")
@@ -134,7 +121,7 @@ func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
 		e = strings.TrimSpace(e)
 
 		// TODO-P2 use iter.AddStringPtr
-		if err = quiter.AddString[T, TPtr](f, e); err != nil {
+		if err = quiter.AddString[T, TPtr](flags, e); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

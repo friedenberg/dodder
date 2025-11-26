@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
 // TODO rename to lock
@@ -19,7 +19,7 @@ type KeyValueTuple[
 	Value Id
 }
 
-var _ interfaces.Resetable = &KeyValueTuple[ids.Type, *ids.Type]{}
+var _ interfaces.Resetable = &KeyValueTuple[values.String, *values.String]{}
 
 func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
 	return KEY_PTR(&tuple.Key)

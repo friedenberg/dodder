@@ -7,19 +7,25 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
-func RegisterGobValue[T interfaces.ValueLike, TPtr interfaces.ValuePtr[T]](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
+func RegisterGobValue[
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
+](
+	keyer interfaces.StringKeyerPtr[VALUE, VALUE_PTR],
 ) {
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = quiter.StringerKeyerPtr[VALUE, VALUE_PTR]{}.RegisterGob()
 	}
 
 	gob.Register(keyer)
 
-	RegisterGob[T, TPtr]()
+	RegisterGob[VALUE, VALUE_PTR]()
 }
 
-func RegisterGob[T interfaces.ValueLike, TPtr interfaces.ValuePtr[T]]() {
-	gob.Register(Set[T, TPtr]{})
-	gob.Register(MutableSet[T, TPtr]{})
+func RegisterGob[
+	VALUE interfaces.Value[VALUE],
+	VALUE_PTR interfaces.ValuePtr[VALUE],
+]() {
+	gob.Register(Set[VALUE, VALUE_PTR]{})
+	gob.Register(MutableSet[VALUE, VALUE_PTR]{})
 }

@@ -7,7 +7,7 @@ type (
 		IsEmpty() bool
 	}
 
-	ValuePtr[SELF any] interface {
+	ValuePtr[SELF Value[SELF]] interface {
 		Resetable
 		ResetablePtr[SELF]
 		StringerSetterPtr[SELF]

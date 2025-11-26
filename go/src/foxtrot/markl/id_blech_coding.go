@@ -116,104 +116,50 @@ func setSha256(id interfaces.MutableMarklId, value string) (err error) {
 // TODO need to set format
 func SetMarklIdWithFormatBlech32(
 	id interfaces.MutableMarklId,
-	purpose string,
+	purposeId string,
 	blechValue string,
 ) (err error) {
-	if err = id.SetPurpose(purpose); err != nil {
+	if err = id.SetPurpose(purposeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if err = id.Set(
 		blechValue,
-	); err != nil {
-		if errors.Is(err, blech32.ErrSeparatorMissing) {
-			if err = setSha256(
-				id,
-				blechValue,
-			); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-		} else {
+	); errors.Is(err, blech32.ErrSeparatorMissing) {
+		if err = setSha256(
+			id,
+			blechValue,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
-	}
-
-	marklTypeId := id.GetMarklFormat()
-
-	switch marklTypeId.GetMarklFormatId() {
-	case FormatIdEd25519Sig:
-		switch purpose {
-		case PurposeObjectMotherSigV1,
-			PurposeObjectSigV0,
-			PurposeObjectSigV1:
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return err
-		}
-
-	case FormatIdEd25519Pub:
-		switch purpose {
-		case PurposeRepoPubKeyV1:
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return err
-		}
-
-	case FormatIdHashSha256:
-		switch purpose {
-		case PurposeObjectDigestV1,
-			PurposeV5MetadataDigestWithoutTai,
-			"":
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return err
-		}
-
-	case FormatIdHashBlake2b256:
-		switch purpose {
-		case PurposeObjectDigestV1,
-			PurposeV5MetadataDigestWithoutTai,
-			"":
-			break
-
-		default:
-			err = errors.Errorf(
-				"unsupported format: %q. Value: %q",
-				purpose,
-				blechValue,
-			)
-			return err
-		}
-
-	default:
-		err = errors.Errorf(
-			"unsupported format: %q. Value: %q",
-			purpose,
-			blechValue,
-		)
+	} else if err != nil {
+		err = errors.Wrap(err)
 		return err
 	}
 
+	formatId := id.GetMarklFormat().GetMarklFormatId()
+
+	if err = validatePurposeAndFormatId(purposeId, formatId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return err
+}
+
+func validatePurposeAndFormatId(purposeId string, formatId string) (err error) {
+	if formatId == "" || purposeId == "" {
+		return
+	}
+
+	purpose := GetPurpose(purposeId)
+
+	if _, ok := purpose.formatIds[formatId]; !ok {
+		err = errors.Errorf("format id %q not supported for purpose %q", formatId, purposeId)
+		return
+	}
+
+	return
 }

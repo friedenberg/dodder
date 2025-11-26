@@ -1,11 +1,16 @@
 package values
 
-import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+)
 
 type String struct {
 	wasSet bool
 	string
 }
+
+var _ interfaces.Value[String] = String{}
 
 func MakeString(v string) String {
 	return String{
@@ -44,6 +49,10 @@ func (str String) String() string {
 
 func (str String) IsEmpty() bool {
 	return len(str.string) == 0
+}
+
+func (str String) Equals(other String) bool {
+	return str.string == other.string
 }
 
 func (str String) Len() int {
