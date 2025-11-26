@@ -279,7 +279,7 @@ func writeMetadataKeyStringTo(
 		typeTuple := metadata.GetTypeTuple()
 
 		if typeTuple.IsEmpty() {
-			return
+			return n, err
 		}
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
