@@ -275,6 +275,25 @@ func writeMetadataKeyStringTo(
 			}
 		}
 
+	case key_strings.TypeLock:
+		typeTuple := metadata.GetTypeTuple()
+
+		if typeTuple.IsEmpty() {
+			return
+		}
+
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
+			writer,
+			key.String(),
+			typeTuple.String(),
+		)
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return n, err
+		}
+
 	default:
 		err = errors.Errorf("unsupported key: %s", key)
 		return n, err

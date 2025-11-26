@@ -72,6 +72,7 @@ func registerFormat(purpose string, keys ...keyType) {
 }
 
 func init() {
+	// TODO remove
 	registerFormat(
 		markl.PurposeV5MetadataDigestWithoutTai,
 		key_strings_german.Akte,
@@ -99,6 +100,18 @@ func init() {
 		key_strings.Tag,
 		key_strings.Tai,
 		key_strings.Type,
+		key_strings.ZZRepoPub,
+		key_strings.ZZSigMother,
+	)
+
+	registerFormat(
+		markl.PurposeObjectDigestV2,
+		key_strings.Blob,
+		key_strings.Description,
+		key_strings.ObjectId,
+		key_strings.Tag,
+		key_strings.Tai,
+		key_strings.TypeLock,
 		key_strings.ZZRepoPub,
 		key_strings.ZZSigMother,
 	)

@@ -10,16 +10,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
+// TODO rename to lock
 type KeyValueTuple[
-	KEY interface {
-		interfaces.Stringer
-		interfaces.Equatable[KEY]
-	},
-	KEY_PTR interface {
-		interfaces.Resetable
-		interfaces.ResetablePtr[KEY]
-		interfaces.StringerSetterPtr[KEY]
-	},
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	Key   KEY
 	Value Id
@@ -41,6 +35,10 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) ResetWith(
 ) {
 	tuple.GetKeyMutable().ResetWith(other.Key)
 	tuple.Value.ResetWithMarklId(other.Value)
+}
+
+func (tuple KeyValueTuple[KEY, KEY_PTR]) IsEmpty() bool {
+	return tuple.Key.IsEmpty() && tuple.Value.IsEmpty()
 }
 
 func (tuple KeyValueTuple[KEY, KEY_PTR]) Equals(
@@ -86,6 +84,14 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) Set(
 	return err
 }
 
+func (tuple *KeyValueTuple[KEY, KEY_PTR]) String() string {
+	if tuple.Value.IsEmpty() {
+		return tuple.Key.String()
+	} else {
+		return fmt.Sprintf("%s@%s", tuple.Key, tuple.Value)
+	}
+}
+
 func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler(
 	requireValue bool,
 ) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
@@ -104,15 +110,8 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshalerValueRequired() KeyV
 }
 
 type KeyValueTupleBinaryMarshaler[
-	KEY interface {
-		interfaces.Stringer
-		interfaces.Equatable[KEY]
-	},
-	KEY_PTR interface {
-		interfaces.Resetable
-		interfaces.ResetablePtr[KEY]
-		interfaces.StringerSetterPtr[KEY]
-	},
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool
 	tuple        *KeyValueTuple[KEY, KEY_PTR]

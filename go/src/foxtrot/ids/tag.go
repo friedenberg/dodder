@@ -76,70 +76,74 @@ func MakeTag(v string) (e Tag, err error) {
 	return e, err
 }
 
-func (e tag) init() {
+func (tag tag) init() {
 }
 
-func (e *tag) Reset() {
-	sTagResetter.Reset(e)
+func (tag *tag) Reset() {
+	sTagResetter.Reset(tag)
 }
 
-func (e tag) GetQueryPrefix() string {
+func (tag *tag) ResetWith(other tag) {
+	sTagResetter.ResetWith(tag, &other)
+}
+
+func (tag tag) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e tag) IsEmpty() bool {
-	return e.value == ""
+func (tag tag) IsEmpty() bool {
+	return tag.value == ""
 }
 
-func (e tag) GetGenre() interfaces.Genre {
+func (tag tag) GetGenre() interfaces.Genre {
 	return genres.Tag
 }
 
-func (a tag) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (tag tag) EqualsAny(b any) bool {
+	return values.Equals(tag, b)
 }
 
-func (a tag) Equals(b tag) bool {
-	return a == b
+func (tag tag) Equals(b tag) bool {
+	return tag == b
 }
 
-func (i Tag) GetObjectIdString() string {
-	return i.String()
+func (tag Tag) GetObjectIdString() string {
+	return tag.String()
 }
 
-func (e tag) String() string {
+func (tag tag) String() string {
 	var sb strings.Builder
 
-	if e.virtual {
+	if tag.virtual {
 		sb.WriteRune('%')
 	}
 
-	if e.dependentLeaf {
+	if tag.dependentLeaf {
 		sb.WriteRune('-')
 	}
 
-	sb.WriteString(e.value)
+	sb.WriteString(tag.value)
 
 	return sb.String()
 }
 
-func (e tag) Bytes() []byte {
-	return []byte(e.String())
+func (tag tag) Bytes() []byte {
+	return []byte(tag.String())
 }
 
-func (e tag) Parts() [3]string {
+func (tag tag) Parts() [3]string {
 	switch {
-	case e.virtual && e.dependentLeaf:
-		return [3]string{"%", "-", e.value}
+	case tag.virtual && tag.dependentLeaf:
+		return [3]string{"%", "-", tag.value}
 
-	case e.virtual:
-		return [3]string{"", "%", e.value}
+	case tag.virtual:
+		return [3]string{"", "%", tag.value}
 
-	case e.dependentLeaf:
-		return [3]string{"", "-", e.value}
+	case tag.dependentLeaf:
+		return [3]string{"", "-", tag.value}
 
 	default:
-		return [3]string{"", "", e.value}
+		return [3]string{"", "", tag.value}
 	}
 }
 
@@ -147,19 +151,19 @@ func (tag tag) IsDodderTag() bool {
 	return strings.HasPrefix(tag.value, "dodder-")
 }
 
-func (e tag) IsVirtual() bool {
-	return e.virtual
+func (tag tag) IsVirtual() bool {
+	return tag.virtual
 }
 
-func (e tag) IsDependentLeaf() bool {
-	return e.dependentLeaf
+func (tag tag) IsDependentLeaf() bool {
+	return tag.dependentLeaf
 }
 
-func (e *tag) TodoSetFromObjectId(v *ObjectId) (err error) {
-	return e.Set(v.String())
+func (tag *tag) TodoSetFromObjectId(v *ObjectId) (err error) {
+	return tag.Set(v.String())
 }
 
-func (e *tag) Set(v string) (err error) {
+func (tag *tag) Set(v string) (err error) {
 	v1 := v
 	v = strings.ToLower(strings.TrimSpace(v))
 
@@ -178,24 +182,24 @@ func (e *tag) Set(v string) (err error) {
 		return err
 	}
 
-	e.virtual = strings.HasPrefix(v, "%")
+	tag.virtual = strings.HasPrefix(v, "%")
 	v = strings.TrimPrefix(v, "%")
 
-	e.dependentLeaf = strings.HasPrefix(v, "-")
+	tag.dependentLeaf = strings.HasPrefix(v, "-")
 	v = strings.TrimPrefix(v, "-")
 
-	e.value = v
+	tag.value = v
 
 	return err
 }
 
-func (t tag) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func (tag tag) MarshalText() (text []byte, err error) {
+	text = []byte(tag.String())
 	return text, err
 }
 
-func (t *tag) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tag *tag) UnmarshalText(text []byte) (err error) {
+	if err = tag.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -203,13 +207,13 @@ func (t *tag) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t tag) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (tag tag) MarshalBinary() (text []byte, err error) {
+	text = []byte(tag.String())
 	return text, err
 }
 
-func (t *tag) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (tag *tag) UnmarshalBinary(text []byte) (err error) {
+	if err = tag.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

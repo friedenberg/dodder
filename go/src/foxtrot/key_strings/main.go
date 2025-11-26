@@ -14,6 +14,7 @@ var (
 	Tag         = catgut.MakeFromString("Tag")
 	Tai         = catgut.MakeFromString("Tai")
 	Type        = catgut.MakeFromString("Type")
+	TypeLock    = catgut.MakeFromString("TypeLock")
 	ZZRepoPub   = catgut.MakeFromString("RepoPub")
 	ZZSigMother = catgut.MakeFromString("SigMother")
 )

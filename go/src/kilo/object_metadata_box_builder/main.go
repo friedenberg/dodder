@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 )
 
@@ -75,28 +76,26 @@ func (builder *Builder) addMarklId(id interfaces.MarklId) {
 }
 
 func (builder *Builder) addMarklIdLockWithColorType(
-	lock object_metadata.Lock,
+	key string,
+	value markl.Id,
 	colorType string_format_writer.ColorType,
 ) {
-	key := lock.Key
-	id := lock.Id
-
-	builder.addMarklIdWithColorType(id, key, colorType)
+	builder.addMarklIdWithColorType(value, key, colorType)
 }
 
 func (builder *Builder) addMarklIdWithColorType(
-	id interfaces.MarklId,
+	value interfaces.MarklId,
 	key string,
 	colorType string_format_writer.ColorType,
 ) {
 	if key == "" {
-		panic(fmt.Sprintf("empty key for markl id: %q", id))
+		panic(fmt.Sprintf("empty key for markl id: %q", value))
 	}
 
 	builder.Contents.Append(string_format_writer.Field{
 		Key:        key,
 		Separator:  '@',
-		Value:      id.String(),
+		Value:      value.String(),
 		NoTruncate: true,
 		ColorType:  colorType,
 	})
@@ -135,15 +134,29 @@ func (builder *Builder) AddTai(metadata object_metadata.IMetadataMutable) {
 	})
 }
 
-func (builder *Builder) AddType(metadata object_metadata.IMetadataMutable) {
-	// builder.addMarklIdLockWithColorType(
-	// 	metadata.GetLockfile().GetTypeLock(),
-	// 	string_format_writer.ColorTypeType,
-	// )
+func (builder *Builder) AddType(
+	metadata object_metadata.IMetadataMutable,
+) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetType().String(),
 		ColorType: string_format_writer.ColorTypeType,
 	})
+}
+
+func (builder *Builder) AddTypeAndLock(
+	metadata object_metadata.IMetadataMutable,
+) {
+	typeTuple := metadata.GetTypeTuple()
+
+	if typeTuple.Value.IsEmpty() {
+		builder.AddType(metadata)
+	} else {
+		builder.addMarklIdLockWithColorType(
+			typeTuple.Key.String(),
+			typeTuple.Value,
+			string_format_writer.ColorTypeType,
+		)
+	}
 }
 
 // TODO modify this method to not allocate an intermediate slice and instead

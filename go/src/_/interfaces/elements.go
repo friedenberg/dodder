@@ -14,17 +14,6 @@ type ValueLike interface {
 	Element
 }
 
-type Value[T any] interface {
-	ValueLike
-	Equatable[T]
-}
-
-type ValuePtr[T any] interface {
-	ValueLike
-	// Value[T]
-	Ptr[T]
-}
-
 // TODO-P2 remove
 type Lessable[T any] interface {
 	Less(T) bool
