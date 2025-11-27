@@ -218,7 +218,7 @@ func (importer importer) importLeaf(
 	} else {
 		if err = importer.finalizer.FinalizeUsingObject(
 			checkedOut.GetSkuExternal(),
-			configGenesis.GetObjectDigestMarklTypeId(),
+			importer.envRepo.GetObjectDigestType(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err

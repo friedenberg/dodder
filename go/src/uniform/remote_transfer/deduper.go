@@ -27,8 +27,7 @@ func (deduper *deduper) initialize(
 		deduper.formatId = options.DedupingFormatId
 		deduper.lookupLock = &sync.RWMutex{}
 		deduper.lookup = make(map[string]struct{})
-		config := envRepo.GetConfigPublic().Blob
-		deduper.defaultObjectDigestMarklFormatId = config.GetObjectDigestMarklTypeId()
+		deduper.defaultObjectDigestMarklFormatId = envRepo.GetObjectDigestType()
 	}
 }
 

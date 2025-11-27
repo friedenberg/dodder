@@ -15,7 +15,6 @@ type (
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
 		GetObjectSigMarklTypeId() string
-		GetObjectDigestMarklTypeId() string
 	}
 
 	ConfigPublic interface {
@@ -36,7 +35,6 @@ type (
 
 		SetInventoryListTypeId(string)
 		SetObjectSigMarklTypeId(string)
-		SetObjectDigestMarklTypeId(string)
 		SetRepoId(ids.RepoId)
 		GetPrivateKeyMutable() interfaces.MutableMarklId
 	}
@@ -66,7 +64,6 @@ func DefaultWithVersion(
 				StoreVersion:      storeVersion,
 				InventoryListType: inventoryListTypeString,
 				ObjectSigType:     markl.PurposeObjectSigV1,
-				ObjectDigestType:  markl.PurposeObjectDigestV1,
 			},
 		},
 	}

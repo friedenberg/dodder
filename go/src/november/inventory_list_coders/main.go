@@ -39,7 +39,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 
 				if err = finalizer.FinalizeUsingObject(
 					object,
-					configGenesis.GetObjectDigestMarklTypeId(),
+					envRepo.GetObjectDigestType(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
@@ -57,7 +57,6 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			box: box,
 		}
 
-		configGenesis := envRepo.GetConfigPublic().Blob
 		finalizer := object_finalizer.Make()
 
 		return coder{
@@ -73,7 +72,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			afterDecoding: func(object *sku.Transacted) error {
 				return finalizer.FinalizeAndVerify(
 					object,
-					configGenesis.GetObjectDigestMarklTypeId(),
+					envRepo.GetObjectDigestType(),
 				)
 			},
 		}
@@ -86,7 +85,6 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			genesisConfig: envRepo.GetConfigPrivate().Blob,
 		}
 
-		configGenesis := envRepo.GetConfigPublic().Blob
 		finalizer := object_finalizer.Make()
 
 		return coder{
@@ -95,7 +93,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 			afterDecoding: func(object *sku.Transacted) error {
 				return finalizer.FinalizeAndVerify(
 					object,
-					configGenesis.GetObjectDigestMarklTypeId(),
+					envRepo.GetObjectDigestType(),
 				)
 			},
 		}

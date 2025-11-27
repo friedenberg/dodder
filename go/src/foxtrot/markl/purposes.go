@@ -26,6 +26,7 @@ const (
 	PurposeObjectMotherSigV1     = "dodder-object-mother-sig-v1"
 	PurposeObjectSigV0           = "dodder-repo-sig-v1"
 	PurposeObjectSigV1           = "dodder-object-sig-v1"
+	PurposeObjectSigV2           = "dodder-object-sig-v2"
 	PurposeRequestAuthResponseV1 = "dodder-request_auth-response-v1"
 	PurposeRequestRepoSigV1      = "dodder-request_auth-repo-sig-v1"
 
@@ -80,6 +81,11 @@ func init() {
 
 	makePurpose(
 		PurposeObjectSigV1,
+		FormatIdEd25519Sig,
+	)
+
+	makePurpose(
+		PurposeObjectSigV2,
 		FormatIdEd25519Sig,
 	)
 
@@ -159,4 +165,19 @@ func makePurpose(purposeId string, formatIds ...string) {
 	}
 
 	purposes[purposeId] = purpose
+}
+
+func GetDigestTypeForSigType(sigId string) string {
+	sig := GetPurpose(sigId)
+
+	switch sig.id {
+	default:
+		panic(fmt.Sprintf("unsupported sig purpose: %q", sigId))
+
+	case PurposeObjectSigV1:
+		return PurposeObjectDigestV1
+
+	case PurposeObjectSigV2:
+		return PurposeObjectDigestV2
+	}
 }

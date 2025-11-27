@@ -16,7 +16,6 @@ type (
 		RepoId            ids.RepoId            `toml:"id"`
 		InventoryListType string                `toml:"inventory_list-type"`
 		ObjectSigType     string                `toml:"object-sig-type"`
-		ObjectDigestType  string                `toml:"object-digest-type"`
 	}
 
 	TomlV2Private struct {
@@ -96,10 +95,6 @@ func (config TomlV2Common) GetRepoId() ids.RepoId {
 	return config.RepoId
 }
 
-func (config TomlV2Common) GetObjectDigestMarklTypeId() string {
-	return config.ObjectDigestType
-}
-
 //   __  __       _        _   _
 //  |  \/  |_   _| |_ __ _| |_(_) ___  _ __
 //  | |\/| | | | | __/ _` | __| |/ _ \| '_ \
@@ -113,10 +108,6 @@ func (config *TomlV2Private) SetInventoryListTypeId(value string) {
 
 func (config *TomlV2Private) SetObjectSigMarklTypeId(value string) {
 	config.ObjectSigType = value
-}
-
-func (config *TomlV2Private) SetObjectDigestMarklTypeId(value string) {
-	config.ObjectDigestType = value
 }
 
 func (config *TomlV2Private) SetRepoId(id ids.RepoId) {

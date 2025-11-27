@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
@@ -147,6 +148,12 @@ func (env Env) GetConfigPublic() genesis_configs.TypedConfigPublic {
 		Type: env.config.Type,
 		Blob: env.config.Blob.GetGenesisConfigPublic(),
 	}
+}
+
+func (env Env) GetObjectDigestType() string {
+	return markl.GetDigestTypeForSigType(
+		env.GetConfigPublic().Blob.GetObjectSigMarklTypeId(),
+	)
 }
 
 func (env Env) GetConfigPrivate() genesis_configs.TypedConfigPrivate {

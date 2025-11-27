@@ -120,7 +120,3 @@ func (config V0Common) SetInventoryListTypeString(string) {
 func (config V0Common) SetObjectSigTypeString(string) {
 	panic(errors.Err405MethodNotAllowed)
 }
-
-func (config V0Common) GetObjectDigestMarklTypeId() string {
-	panic(errors.Err405MethodNotAllowed)
-}

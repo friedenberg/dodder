@@ -248,7 +248,7 @@ func (finalizer finalizer) FinalizeAndSign(
 
 	if err = finalizer.FinalizeUsingObject(
 		transacted,
-		config.GetObjectDigestMarklTypeId(),
+		markl.GetDigestTypeForSigType(config.GetObjectSigMarklTypeId()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

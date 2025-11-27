@@ -103,7 +103,3 @@ func (config *TomlV1Common) GetStoreVersion() store_version.Version {
 func (config TomlV1Common) GetRepoId() ids.RepoId {
 	return config.RepoId
 }
-
-func (config TomlV1Common) GetObjectDigestMarklTypeId() string {
-	panic(errors.Err405MethodNotAllowed)
-}

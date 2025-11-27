@@ -14,8 +14,7 @@ type pageAdditions struct {
 }
 
 func (additions *pageAdditions) initialize(index *Index) {
-	configGenesis := index.envRepo.GetConfigPublic().Blob
-	index.defaultObjectDigestMarklFormatId = configGenesis.GetObjectDigestMarklTypeId()
+	index.defaultObjectDigestMarklFormatId = index.envRepo.GetObjectDigestType()
 
 	additions.index = index
 	additions.objects = sku.MakeListTransacted()

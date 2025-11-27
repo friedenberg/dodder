@@ -30,8 +30,7 @@ func (index *probeIndex) Initialize(
 	envRepo env_repo.Env,
 	hashType markl.FormatHash,
 ) (err error) {
-	configGenesis := envRepo.GetConfigPublic().Blob
-	index.defaultObjectDigestMarklFormatId = configGenesis.GetObjectDigestMarklTypeId()
+	index.defaultObjectDigestMarklFormatId = envRepo.GetObjectDigestType()
 
 	if index.index, err = object_probe_index.MakeNoDuplicates(
 		envRepo,
