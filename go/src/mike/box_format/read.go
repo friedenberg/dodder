@@ -170,7 +170,15 @@ func (format *BoxTransacted) readStringFormatBox(
 
 	var objectId ids.ObjectId
 
+	tokenMatcherTypeLock := []doddish.TokenMatcher{
+		doddish.TokenMatcherOp('!'),
+		doddish.TokenTypeIdentifier,
+		doddish.TokenMatcherOp('@'),
+		doddish.TokenTypeIdentifier,
+	}
+
 LOOP_AFTER_OID:
+
 	for scanner.ScanDotAllowedInIdentifiers() {
 		seq := scanner.GetSeq()
 
@@ -178,6 +186,7 @@ LOOP_AFTER_OID:
 		// instead of a switch
 		switch {
 		// ] ' '
+		// TODO rewrite using several cases for token operators
 		case seq.MatchAll(
 			doddish.TokenTypeOperator,
 		):
@@ -209,7 +218,48 @@ LOOP_AFTER_OID:
 			doddish.TokenMatcherOp('@'),
 			doddish.TokenTypeIdentifier,
 		):
-			fallthrough
+			if err = format.parseMarklIdTag(object, seq); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
+			continue
+
+			// !key
+		case seq.MatchAll(
+			doddish.TokenMatcherOp('!'),
+			doddish.TokenTypeIdentifier,
+		):
+			if err = object.GetMetadataMutable().GetTypeMutable().Set(
+				seq.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
+			continue
+
+			// !key@abcd
+		case seq.MatchAll(tokenMatcherTypeLock...):
+			typeLock := object.GetMetadataMutable().GetTypeLockMutable()
+
+			if err = typeLock.Key.Set(
+				seq[0:2].String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
+			if err = markl.SetMarklIdWithFormatBlech32(
+				&typeLock.Value,
+				"",
+				seq[2:].String(),
+			); err != nil {
+				err = errors.Wrapf(err, "Seq: %q", seq)
+				return err
+			}
+
+			continue
 
 			// key@abcd
 		case seq.MatchAll(
@@ -286,14 +336,6 @@ LOOP_AFTER_OID:
 				return err
 			}
 
-		case genres.Type:
-			if err = object.GetMetadataMutable().GetTypeMutable().TodoSetFromObjectId(
-				&objectId,
-			); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
 		case genres.Tag:
 			var tag ids.Tag
 
@@ -337,6 +379,7 @@ var dodderTagMerkleIdGetterTypeMapping = map[string]FuncMarklIdGetter{
 	markl.PurposeRepoPubKeyV1:      (object_metadata.IMetadataMutable).GetRepoPubKeyMutable,
 	markl.PurposeObjectSigV0:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
 	markl.PurposeObjectSigV1:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
+	markl.PurposeObjectSigV2:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
 	markl.PurposeObjectMotherSigV1: (object_metadata.IMetadataMutable).GetMotherObjectSigMutable,
 }
 
@@ -367,7 +410,7 @@ func (format *BoxTransacted) parseMarklIdTag(
 			return err
 		}
 	} else {
-		err = errors.Wrap(ErrUnsupportedDodderTag{tag: string(value)})
+		err = errors.Wrap(ErrUnsupportedDodderTag{tag: seq.String()})
 		return err
 	}
 

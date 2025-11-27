@@ -114,17 +114,6 @@ func (test *T) NotEqual(a, b any) {
 }
 
 //go:noinline
-func (test *T) AssertNotEqual(a, b any, o ...cmp.Option) {
-	diff := cmp.Diff(a, b, o...)
-
-	if diff == "" {
-		return
-	}
-
-	test.errorf(1, "%s", diff)
-}
-
-//go:noinline
 func (test *T) AssertEqual(a, b any, o ...cmp.Option) {
 	diff := cmp.Diff(a, b, o...)
 

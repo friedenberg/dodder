@@ -11,7 +11,7 @@ type (
 	Metadata        = metadata
 	MetadataMutable = *metadata
 
-	TypeTuple = markl.KeyValueTuple[ids.Type, *ids.Type]
+	TypeLock = markl.Lock[ids.Type, *ids.Type]
 
 	IMetadata interface {
 		Getter
@@ -21,7 +21,7 @@ type (
 		GetTags() ids.TagSet
 		GetTai() ids.Tai
 		GetType() ids.Type
-		GetTypeTuple() TypeTuple
+		GetTypeLock() TypeLock
 
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
@@ -55,7 +55,7 @@ type (
 		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
-		GetTypeTupleMutable() *TypeTuple
+		GetTypeLockMutable() *TypeLock
 	}
 
 	Getter interface {

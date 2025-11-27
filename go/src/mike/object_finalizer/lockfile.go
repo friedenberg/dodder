@@ -21,7 +21,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 		return err
 	}
 
-	typeLock := metadata.GetTypeTupleMutable()
+	typeLock := metadata.GetTypeLockMutable()
 
 	// TODO There are cases where we will want to overwrite the typelock id,
 	// should we use CommitOptions?

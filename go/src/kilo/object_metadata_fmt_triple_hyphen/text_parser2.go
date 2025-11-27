@@ -92,7 +92,7 @@ func (parser *textParser2) readType(
 		return err
 	}
 
-	if err = metadata.GetTypeTupleMutable().Set(typeString); err != nil {
+	if err = metadata.GetTypeLockMutable().Set(typeString); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

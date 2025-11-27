@@ -43,7 +43,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 		// generate a fake type signature
 		{
-			typeSig := metadata.GetTypeTupleMutable()
+			typeSig := metadata.GetTypeLockMutable()
 			t.AssertNoError(typeSig.Value.GeneratePrivateKey(
 				nil,
 				markl.FormatIdNonceSec,

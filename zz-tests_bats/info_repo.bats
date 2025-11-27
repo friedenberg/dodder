@@ -54,7 +54,7 @@ function info_config_immutable { # @test
 			store-version = $storeVersionCurrent
 			id = 'test-repo-id'
 			inventory_list-type = '!inventory_list-v2'
-			object-sig-type = 'dodder-object-sig-v1'
+			object-sig-type = 'dodder-object-sig-v2'
 		EOM
 	fi
 }

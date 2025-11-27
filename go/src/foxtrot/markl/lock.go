@@ -10,8 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
-// TODO rename to lock
-type KeyValueTuple[
+type Lock[
 	KEY interfaces.Value[KEY],
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
@@ -19,30 +18,30 @@ type KeyValueTuple[
 	Value Id
 }
 
-var _ interfaces.Resetable = &KeyValueTuple[values.String, *values.String]{}
+var _ interfaces.Resetable = &Lock[values.String, *values.String]{}
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
+func (tuple *Lock[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
 	return KEY_PTR(&tuple.Key)
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) Reset() {
+func (tuple *Lock[KEY, KEY_PTR]) Reset() {
 	tuple.GetKeyMutable().Reset()
 	tuple.Value.Reset()
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) ResetWith(
-	other KeyValueTuple[KEY, KEY_PTR],
+func (tuple *Lock[KEY, KEY_PTR]) ResetWith(
+	other Lock[KEY, KEY_PTR],
 ) {
 	tuple.GetKeyMutable().ResetWith(other.Key)
 	tuple.Value.ResetWithMarklId(other.Value)
 }
 
-func (tuple KeyValueTuple[KEY, KEY_PTR]) IsEmpty() bool {
+func (tuple Lock[KEY, KEY_PTR]) IsEmpty() bool {
 	return tuple.Key.IsEmpty() && tuple.Value.IsEmpty()
 }
 
-func (tuple KeyValueTuple[KEY, KEY_PTR]) Equals(
-	other KeyValueTuple[KEY, KEY_PTR],
+func (tuple Lock[KEY, KEY_PTR]) Equals(
+	other Lock[KEY, KEY_PTR],
 ) bool {
 	if !tuple.Key.Equals(other.Key) {
 		return false
@@ -55,7 +54,7 @@ func (tuple KeyValueTuple[KEY, KEY_PTR]) Equals(
 	return true
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) Set(
+func (tuple *Lock[KEY, KEY_PTR]) Set(
 	value string,
 ) (err error) {
 	key := tuple.GetKeyMutable()
@@ -84,7 +83,7 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) Set(
 	return err
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) String() string {
+func (tuple *Lock[KEY, KEY_PTR]) String() string {
 	if tuple.Value.IsEmpty() {
 		return tuple.Key.String()
 	} else {
@@ -92,7 +91,7 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) String() string {
 	}
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler(
+func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshaler(
 	requireValue bool,
 ) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
 	return KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]{
@@ -101,11 +100,11 @@ func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshaler(
 	}
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshalerValueNotRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshalerValueNotRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
 	return tuple.GetBinaryMarshaler(false)
 }
 
-func (tuple *KeyValueTuple[KEY, KEY_PTR]) GetBinaryMarshalerValueRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshalerValueRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
 	return tuple.GetBinaryMarshaler(true)
 }
 
@@ -114,7 +113,7 @@ type KeyValueTupleBinaryMarshaler[
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool
-	tuple        *KeyValueTuple[KEY, KEY_PTR]
+	tuple        *Lock[KEY, KEY_PTR]
 }
 
 func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) MarshalBinary() (data []byte, err error) {

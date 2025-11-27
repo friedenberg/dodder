@@ -14,6 +14,7 @@ const (
 	SeqTypeField      // url=blah blob=hello contents="wow" contents="wow with\" quote"
 )
 
+// TODO use collections_slice.Slice
 type Seq []Token
 
 func (seq Seq) Len() int {
@@ -24,16 +25,16 @@ func (seq Seq) At(idx int) Token {
 	return seq[idx]
 }
 
-func (seq Seq) EqualsSeq(b Seq) bool {
-	return false
-}
-
 func (seq *Seq) Add(tokenType TokenType, contents []byte) {
 	*seq = append(*seq, Token{TokenType: tokenType, Contents: contents})
 }
 
 func (seq *Seq) AddToken(token Token) {
 	*seq = append(*seq, token)
+}
+
+func (seq *Seq) Merge(otherSeq Seq) {
+	*seq = append(*seq, otherSeq...)
 }
 
 func (seq Seq) StringDebug() string {

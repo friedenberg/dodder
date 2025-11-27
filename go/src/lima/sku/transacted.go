@@ -253,7 +253,7 @@ func (transacted *Transacted) AllProbeIds(
 
 		{
 			probeId := ids.ProbeId{
-				Key: markl.PurposeObjectSigV1,
+				Key: markl.PurposeObjectSigV2,
 				Id:  transacted.GetMetadata().GetObjectSig(),
 			}
 

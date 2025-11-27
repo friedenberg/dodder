@@ -146,14 +146,14 @@ func (builder *Builder) AddType(
 func (builder *Builder) AddTypeAndLock(
 	metadata object_metadata.IMetadataMutable,
 ) {
-	typeTuple := metadata.GetTypeTuple()
+	typeLock := metadata.GetTypeLock()
 
-	if typeTuple.Value.IsEmpty() {
+	if typeLock.Value.IsEmpty() {
 		builder.AddType(metadata)
 	} else {
 		builder.addMarklIdLockWithColorType(
-			typeTuple.Key.String(),
-			typeTuple.Value,
+			typeLock.Key.String(),
+			typeLock.Value,
 			string_format_writer.ColorTypeType,
 		)
 	}

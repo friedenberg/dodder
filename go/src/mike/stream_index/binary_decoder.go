@@ -336,7 +336,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Type:
-		if err = metadata.GetTypeTupleMutable().GetBinaryMarshalerValueRequired().UnmarshalBinary(
+		if err = metadata.GetTypeLockMutable().GetBinaryMarshalerValueRequired().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

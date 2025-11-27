@@ -63,7 +63,7 @@ func DefaultWithVersion(
 			TomlV2Common: TomlV2Common{
 				StoreVersion:      storeVersion,
 				InventoryListType: inventoryListTypeString,
-				ObjectSigType:     markl.PurposeObjectSigV1,
+				ObjectSigType:     markl.PurposeObjectSigV2,
 			},
 		},
 	}

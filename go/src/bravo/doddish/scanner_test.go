@@ -113,6 +113,29 @@ func getScannerTestCases() []scannerTestCase {
 			},
 		},
 		{
+			input: "[uno/dos !pdf@sig zz-inbox]",
+			expected: []testSeq{
+				makeTestSeq(TokenTypeOperator, "["),
+				makeTestSeq(
+					TokenTypeIdentifier, "uno",
+					TokenTypeOperator, "/",
+					TokenTypeIdentifier, "dos",
+				),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(
+					TokenTypeOperator, "!",
+					TokenTypeIdentifier, "pdf",
+					TokenTypeOperator, "@",
+					TokenTypeIdentifier, "sig",
+				),
+				makeTestSeq(TokenTypeOperator, " "),
+				makeTestSeq(
+					TokenTypeIdentifier, "zz-inbox",
+				),
+				makeTestSeq(TokenTypeOperator, "]"),
+			},
+		},
+		{
 			input: `/browser/bookmark-1FuOLQOYZAsP/ "Get Help" url="https://support.\"mozilla.org/products/firefox"`,
 			expected: []testSeq{
 				makeTestSeq(
@@ -163,6 +186,6 @@ func TestTokenScanner(t1 *testing.T) {
 
 		t.Log(tc.input, "->", actual)
 
-		t.AssertNotEqual(tc.expected, actual)
+		t.AssertEqual(tc.expected, actual)
 	}
 }

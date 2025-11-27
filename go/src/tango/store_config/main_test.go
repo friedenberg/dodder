@@ -35,5 +35,5 @@ func TestGob(t1 *testing.T) {
 		t.Fatalf("failed to decode config: %w", err)
 	}
 
-	t.AssertNotEqual(ta.ObjectId.String(), actual.ObjectId.String())
+	t.AssertEqual(ta.ObjectId.String(), actual.ObjectId.String())
 }

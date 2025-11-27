@@ -18,7 +18,7 @@ type metadata struct {
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
 	Tags ids.TagMutableSet // public for gob, but should be private
-	Type TypeTuple
+	Type TypeLock
 
 	DigBlob   markl.Id
 	digSelf   markl.Id
@@ -234,11 +234,11 @@ func (metadata *metadata) GetTypeMutable() *ids.Type {
 	return &metadata.Type.Key
 }
 
-func (metadata *metadata) GetTypeTuple() TypeTuple {
+func (metadata *metadata) GetTypeLock() TypeLock {
 	return metadata.Type
 }
 
-func (metadata *metadata) GetTypeTupleMutable() *TypeTuple {
+func (metadata *metadata) GetTypeLockMutable() *TypeLock {
 	return &metadata.Type
 }
 

@@ -16,14 +16,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
-func (format Format) writeMetadataTo(
+type format struct {
+	purpose string
+	keys    []keyType
+}
+
+func (format format) writeMetadataTo(
 	writer io.Writer,
 	context FormatterContext,
 ) (n int64, err error) {
 	var n1 int64
 
 	for _, key := range format.keys {
-		n1, err = writeMetadataKeyTo(writer, context, key)
+		n1, err = format.writeMetadataKeyTo(writer, context, key)
 		n += n1
 
 		if err != nil {
@@ -35,26 +40,15 @@ func (format Format) writeMetadataTo(
 	return n, err
 }
 
-func writeMetadataKeyTo(
+func (format format) writeMetadataKeyTo(
 	writer io.Writer,
 	context FormatterContext,
 	key keyType,
 ) (n int64, err error) {
-	return writeMetadataKeyStringTo(writer, context, key)
-	// switch key := key.(type) {
-	// case key_bytes.Binary:
-	// 	return writeMetadataKeyByteTo(writer, context, key)
-
-	// case *catgut.String:
-	// 	return writeMetadataKeyStringTo(writer, context, key)
-
-	// default:
-	// 	err = errors.Errorf("unsupported key: %T", key)
-	// 	return
-	// }
+	return format.writeMetadataKeyStringTo(writer, context, key)
 }
 
-func writeMetadataKeyStringTo(
+func (format format) writeMetadataKeyStringTo(
 	writer io.Writer,
 	context FormatterContext,
 	key *catgut.String,
@@ -65,7 +59,7 @@ func writeMetadataKeyStringTo(
 
 	switch key {
 	case key_strings_german.Akte, key_strings.Blob:
-		n1, err = writeMarklIdKeyIfNotNull(
+		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
 			metadata.GetBlobDigestMutable(),
@@ -185,7 +179,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = writeMarklIdKeyIfNotNull(
+		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key_strings_german.ShasMutterMetadateiKennungMutter,
 			metadata.GetMotherObjectSig(),
@@ -199,7 +193,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.ZZRepoPub:
-		n1, err = writeMarklIdKeyIfNotNull(
+		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
 			metadata.GetRepoPubKey(),
@@ -213,7 +207,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.ZZSigMother:
-		n1, err = writeMarklIdKeyIfNotNull(
+		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
 			metadata.GetMotherObjectSig(),
@@ -227,7 +221,7 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = writeMarklIdKeyIfNotNull(
+		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
 			metadata.GetMotherObjectSig(),
@@ -269,22 +263,22 @@ func writeMetadataKeyStringTo(
 		}
 
 	case key_strings.TypeLock:
-		typeTuple := metadata.GetTypeTuple()
+		typeTuple := metadata.GetTypeLock()
 
-		if typeTuple.IsEmpty() {
-			err = errors.Errorf("empty type tuple")
-			return n, err
-		}
+		// if typeTuple.IsEmpty() {
+		// 	err = errors.Errorf("empty type tuple")
+		// 	return n, err
+		// }
 
-		if typeTuple.Key.IsEmpty() {
-			err = errors.Errorf("empty type")
-			return n, err
-		}
+		// if typeTuple.Key.IsEmpty() {
+		// 	err = errors.Errorf("empty type")
+		// 	return n, err
+		// }
 
-		if typeTuple.Value.IsEmpty() {
-			err = errors.Errorf("empty type lock")
-			return n, err
-		}
+		// if !format.allowMissingTypeSig && !typeTuple.Key.IsEmpty() && typeTuple.Value.IsEmpty() && !ids.IsBuiltin(typeTuple.Key) {
+		// 	err = errors.Errorf("empty type lock")
+		// 	return n, err
+		// }
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
@@ -306,7 +300,7 @@ func writeMetadataKeyStringTo(
 	return n, err
 }
 
-func writeMarklIdKey(
+func (format format) writeMarklIdKey(
 	writer io.Writer,
 	key *catgut.String,
 	id interfaces.MarklId,
@@ -329,7 +323,7 @@ func writeMarklIdKey(
 	return n, err
 }
 
-func writeMarklIdKeyIfNotNull(
+func (format format) writeMarklIdKeyIfNotNull(
 	writer io.Writer,
 	key *catgut.String,
 	id interfaces.MarklId,
@@ -338,12 +332,11 @@ func writeMarklIdKeyIfNotNull(
 		return n, err
 	}
 
-	return writeMarklIdKey(writer, key, id)
+	return format.writeMarklIdKey(writer, key, id)
 }
 
-func writeMetadata(
+func (format format) writeMetadata(
 	writer io.Writer,
-	format Format,
 	context FormatterContext,
 ) (blobDigest interfaces.MarklId, err error) {
 	if context.GetMetadata().GetTai().IsEmpty() {

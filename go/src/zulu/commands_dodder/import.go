@@ -83,6 +83,8 @@ func (cmd Import) Run(req command.Request) {
 		)
 	}
 
+	req.AssertNoMoreArgs()
+
 	var afterDecoding func(*sku.Transacted) error
 
 	blobImporter := blob_transfers.MakeBlobImporter(

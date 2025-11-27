@@ -1,81 +1,80 @@
 #! /usr/bin/env bats
 
 setup() {
-	load "$(dirname "$BATS_TEST_FILE")/common.bash"
+  load "$(dirname "$BATS_TEST_FILE")/common.bash"
 
-	# for shellcheck SC2154
-	export output
+  # for shellcheck SC2154
+  export output
 
-	copy_from_version "$DIR"
+  copy_from_version "$DIR"
 }
 
 teardown() {
-	chflags_and_rm
+  chflags_and_rm
 }
 
 function import { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-		popd || exit 1
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+    popd || exit 1
+  )
 
-	run_dodder info-repo pubkey
-	assert_success
-	# old_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  # old_pubkey="$output"
 
-	run_dodder export -print-time=true +z,e,t
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true +z,e,t
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder info-repo pubkey
-	assert_success
-	new_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  new_pubkey="$output"
 
-	run_dodder import \
-		"$list" \
-		"$blobBasePath" \
-		"$blobsConfigPath" \
-		assert_success
-	# assert_output ''
+  run_dodder import \
+    "$list" \
+    "$blobBasePath" \
+    "$blobsConfigPath"
+  assert_success
 
-	run_dodder show -format inventory_list +z,e,t
-	assert_success
-	assert_output_unsorted --regexp - <<-EOM
+  run_dodder show -format inventory_list +z,e,t
+  assert_success
+  assert_output_unsorted --regexp - <<-EOM
 		\\[!md @$(get_type_blob_sha) .* !toml-type-v1]
-		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md "wow ok again" tag-3 tag-4]
-		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md "wow the first" tag-3 tag-4]
-		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md "wow ok" tag-1 tag-2]
+		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md@.* "wow ok again" tag-3 tag-4]
+		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md@.* "wow the first" tag-3 tag-4]
+		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md@.* "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder show one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 }
 
 function import_with_overwrite_sig { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-		popd || exit 1
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+    popd || exit 1
+  )
 
-	run_dodder info-repo pubkey
-	assert_success
-	# old_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  # old_pubkey="$output"
 
-	# run_dodder export -print-time=true +z,e,t
-	cat >list <<-EOM
+  # run_dodder export -print-time=true +z,e,t
+  cat >list <<-EOM
 		---
 		! inventory_list-v2
 		---
@@ -87,102 +86,102 @@ function import_with_overwrite_sig { # @test
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd 2135591162.697539118 dodder-repo-public_key-v1@ed25519_pub-vhhh5p6qfc9q5fpqm2xmjmetgnagmjpxxqlwlac4uvrhrvjvgevsv5z5q6 dodder-object-mother-sig-v1@ed25519_sig-jr7jqjh6rq0zd42n03z5vcl2grqr3eg9eqwnuwxj809h3eaxqw58mm3garf4nzenptmu9mhamhtlt9uuxsrt5wl4dshsfsnak3zvgrcelwkhr dodder-object-sig-v1@ed25519_sig-3ngs79lfywr6ewtdze0c9d3mwk824mymu8xjavzn3uc5s26fzwdy6mz487yasxhd2nqwefjuq3rtnfsj6a4p2u4dcj0wt2h4s2yl6qgm73qt6 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder info-repo pubkey
-	assert_success
-	new_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  new_pubkey="$output"
 
-	run_dodder import \
-		-overwrite-signatures=true \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
+  run_dodder import \
+    -overwrite-signatures=true \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
 
-	run_dodder show -format inventory_list +z,e,t
-	assert_success
-	assert_output_unsorted --regexp - <<-EOM
+  run_dodder show -format inventory_list +z,e,t
+  assert_success
+  assert_output_unsorted --regexp - <<-EOM
 		\\[!md @$(get_type_blob_sha) .* !toml-type-v1]
-		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md "wow ok again" tag-3 tag-4]
-		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md "wow the first" tag-3 tag-4]
-		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md "wow ok" tag-1 tag-2]
+		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md@.* "wow ok again" tag-3 tag-4]
+		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md@.* "wow the first" tag-3 tag-4]
+		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md@.* "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder show one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 }
 
 function import_with_overwrite_sig_different_hash { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init_sha256
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init_sha256
+  )
 
-	(
-		run_dodder_debug export -print-time=true +z,e,t >list
-	)
+  (
+    run_dodder_debug export -print-time=true +z,e,t >list
+  )
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder info-repo pubkey
-	assert_success
-	new_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  new_pubkey="$output"
 
-	run_dodder import \
-		-overwrite-signatures=true \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
+  run_dodder import \
+    -overwrite-signatures=true \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
 
-	run_dodder show -format inventory_list +z,e,t
-	assert_success
-	assert_output_unsorted --regexp - <<-EOM
+  run_dodder show -format inventory_list +z,e,t
+  assert_success
+  assert_output_unsorted --regexp - <<-EOM
 		\\[!md @sha256-.+ .* !toml-type-v1]
-		\\[one/dos @sha256-95mv2p9mtaxxejqycc7fsvt55d3s8c0ptgazzgzgz4z7a3kvtujqa84qe8 .* $new_pubkey .* !md "wow ok again" tag-3 tag-4]
-		\\[one/uno @sha256-z8suqjv408y63y3x8dt83cwlexzusepm94aqa0wu7j7suq5ghsgs7dg4qc .* $new_pubkey .* !md "wow the first" tag-3 tag-4]
-		\\[one/uno @sha256-8259ya5jn9gmqvvy5quv5zkk0ja83tnzduhr2yzzdddp0ftdl92s6huu7d .* $new_pubkey .* !md "wow ok" tag-1 tag-2]
+		\\[one/dos @sha256-95mv2p9mtaxxejqycc7fsvt55d3s8c0ptgazzgzgz4z7a3kvtujqa84qe8 .* $new_pubkey .* !md@.* "wow ok again" tag-3 tag-4]
+		\\[one/uno @sha256-z8suqjv408y63y3x8dt83cwlexzusepm94aqa0wu7j7suq5ghsgs7dg4qc .* $new_pubkey .* !md@.* "wow the first" tag-3 tag-4]
+		\\[one/uno @sha256-8259ya5jn9gmqvvy5quv5zkk0ja83tnzduhr2yzzdddp0ftdl92s6huu7d .* $new_pubkey .* !md@.* "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder show one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @sha256-z8suqjv408y63y3x8dt83cwlexzusepm94aqa0wu7j7suq5ghsgs7dg4qc !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_dodder show -format mother one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show -format mother one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @sha256-8259ya5jn9gmqvvy5quv5zkk0ja83tnzduhr2yzzdddp0ftdl92s6huu7d !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
 function import_with_dupes_in_list { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder info-repo pubkey
-	assert_success
-	# old_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  # old_pubkey="$output"
 
-	# run_dodder export -print-time=true +z,e,t
-	cat >list <<-EOM
+  # run_dodder export -print-time=true +z,e,t
+  cat >list <<-EOM
 		---
 		! inventory_list-v2
 		---
@@ -194,23 +193,23 @@ function import_with_dupes_in_list { # @test
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd 2135591162.697539118 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder info-repo pubkey
-	assert_success
-	new_pubkey="$output"
+  run_dodder info-repo pubkey
+  assert_success
+  new_pubkey="$output"
 
-	run_dodder import \
-		-overwrite-signatures=true \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
-	assert_output - <<-EOM
+  run_dodder import \
+    -overwrite-signatures=true \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
+  assert_output - <<-EOM
 		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 		copied Blob blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd (16 B)
@@ -219,106 +218,106 @@ function import_with_dupes_in_list { # @test
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_dodder show -format inventory_list +z,e,t
-	assert_success
-	assert_output_unsorted --regexp - <<-EOM
+  run_dodder show -format inventory_list +z,e,t
+  assert_success
+  assert_output_unsorted --regexp - <<-EOM
 		\\[!md @$(get_type_blob_sha) .* !toml-type-v1]
-		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md "wow ok again" tag-3 tag-4]
-		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md "wow the first" tag-3 tag-4]
-		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md "wow ok" tag-1 tag-2]
+		\\[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd .* $new_pubkey .* !md@.* "wow ok again" tag-3 tag-4]
+		\\[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd .* $new_pubkey .* !md@.* "wow the first" tag-3 tag-4]
+		\\[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 .* $new_pubkey .* !md@.* "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder show one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 }
 
 function import_one_tai_same { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder show -format tai one/uno
-	tai="$output"
+  run_dodder show -format tai one/uno
+  tai="$output"
 
-	run_dodder export -print-time=true one/uno [tag ^tag-1 ^tag-2]:e
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true one/uno [tag ^tag-1 ^tag-2]:e
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
+  run_dodder import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
 
-	assert_success
-	assert_output_unsorted - <<-EOM
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 		copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
 	EOM
 
-	run_dodder show one/uno
-	assert_success
-	assert_output - <<-EOM
+  run_dodder show one/uno
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_dodder show -format tai one/uno
-	assert_success
-	assert_output "$tai"
+  run_dodder show -format tai one/uno
+  assert_success
+  assert_output "$tai"
 }
 
 function import_twice_no_dupes_one_zettel { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder export -print-time=true one/uno+
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true one/uno+
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder \
-		import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder \
+    import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 		copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
 		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
 	EOM
 
-	run_dodder \
-		import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
-	assert_output - <<-EOM
+  run_dodder \
+    import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
+  assert_output - <<-EOM
 	EOM
 
-	run_dodder show :z,e,t
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder show :z,e,t
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
@@ -326,23 +325,23 @@ function import_twice_no_dupes_one_zettel { # @test
 
 # TODO add support for conflict resolution
 function import_conflict { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder export -print-time=true one/uno+
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true one/uno+
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder new -edit=false - <<-EOM
+  run_dodder new -edit=false - <<-EOM
 		---
 		# get out of here!
 		- scary
@@ -351,50 +350,50 @@ function import_conflict { # @test
 
 		ouch a conflict!
 	EOM
-	assert_success
-	assert_output - <<-EOM
+  assert_success
+  assert_output - <<-EOM
 		[one/uno @blake2b256-u20x7tfr58tc74p5y76xauwfrz382g96gfeenxvsaxaq6l3fnl2sntvzd5 !md "get out of here!" scary]
 	EOM
 
-	run_dodder import \
-		-print-copies=false \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_failure
-	assert_output --partial - <<-EOM
+  run_dodder import \
+    -print-copies=false \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_failure
+  assert_output --partial - <<-EOM
 		       conflicted [one/uno]
 		       conflicted [one/uno]
 	EOM
 
-	assert_output --partial - <<-EOM
+  assert_output --partial - <<-EOM
 		import failed with conflicts, merging required
 	EOM
 }
 
 function import_twice_no_dupes { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder export -print-time=true +z,e,t
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true +z,e,t
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	run_dodder import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
+  assert_output_unsorted - <<-EOM
 		copied Blob blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd (10 B)
 		copied Blob blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd (16 B)
 		copied Blob blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 (27 B)
@@ -403,34 +402,34 @@ function import_twice_no_dupes { # @test
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder show +z,e,t
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder show +z,e,t
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 		[one/uno @blake2b256-c5xgv9eyuv6g49mcwqks24gd3dh39w8220l0kl60qxt60rnt60lsc8fqv0 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_dodder import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
+  assert_success
+  assert_output_unsorted - <<-EOM
 	EOM
 
-	run_dodder show :z,e,t
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder show :z,e,t
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_dodder show +z,e,t
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder show +z,e,t
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[!md @blake2b256-3kj7xgch6rjkq64aa36pnjtn9mdnl89k8pdhtlh33cjfpzy8ek4qnufx0m !toml-type-v1]
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]
@@ -439,34 +438,34 @@ function import_twice_no_dupes { # @test
 }
 
 function import_inventory_lists { # @test
-	(
-		mkdir inner
-		pushd inner || exit 1
-		run_dodder_init
-	)
+  (
+    mkdir inner
+    pushd inner || exit 1
+    run_dodder_init
+  )
 
-	run_dodder export -print-time=true
-	assert_success
-	echo "$output" >list
+  run_dodder export -print-time=true
+  assert_success
+  echo "$output" >list
 
-	list="$(realpath list)"
-	blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
-	blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
+  list="$(realpath list)"
+  blobsBasePath="$("$DODDER_BIN" info-repo blob_stores-0-base-path)"
+  blobsConfigPath="$("$DODDER_BIN" info-repo blob_stores-0-config-path)"
 
-	pushd inner || exit 1
+  pushd inner || exit 1
 
-	export BATS_TEST_BODY=true
-	run_dodder \
-		import \
-		"$list" \
-		"$blobsBasePath" \
-		"$blobsConfigPath"
+  export BATS_TEST_BODY=true
+  run_dodder \
+    import \
+    "$list" \
+    "$blobsBasePath" \
+    "$blobsConfigPath"
 
-	assert_success
+  assert_success
 
-	run_dodder show +z,e,t
-	assert_success
-	assert_output_unsorted - <<-EOM
+  run_dodder show +z,e,t
+  assert_success
+  assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[one/dos @blake2b256-z3zpdf6uhqd3tx6nehjtvyjsjqelgyxfjkx46pq04l6qryxz4efs37xhkd !md "wow ok again" tag-3 tag-4]
 		[one/uno @blake2b256-9ft3m74l5t2ppwjrvfg3wp380jqj2zfrm6zevxqx34sdethvey0s5vm9gd !md "wow the first" tag-3 tag-4]

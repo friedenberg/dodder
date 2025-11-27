@@ -130,7 +130,7 @@ func (factory formatterComponents) writeTypeAndSigIfNecessary(
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
-	typeTuple := metadata.GetTypeTuple()
+	typeTuple := metadata.GetTypeLock()
 
 	if typeTuple.Key.IsEmpty() {
 		return n, err
@@ -154,7 +154,7 @@ func (factory formatterComponents) writeTypeAndSig(
 	formatterContext FormatterContext,
 ) (n int64, err error) {
 	metadata := formatterContext.GetMetadata()
-	typeTuple := metadata.GetTypeTuple()
+	typeTuple := metadata.GetTypeLock()
 
 	if typeTuple.Key.IsEmpty() {
 		return n, err

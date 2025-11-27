@@ -259,7 +259,9 @@ func (format *BoxTransacted) addFieldsMetadata(
 		builder.AddObjectSig(metadata)
 	}
 
-	if !metadata.GetType().IsEmpty() {
+	if format.isArchive {
+		builder.AddTypeAndLock(metadata)
+	} else if !metadata.GetType().IsEmpty() {
 		builder.AddType(metadata)
 	}
 

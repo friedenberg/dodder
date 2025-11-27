@@ -18,27 +18,13 @@ type (
 		object_metadata.PersistentFormatterContext
 		GetObjectId() *ids.ObjectId
 	}
-
-	ParserContext interface {
-		object_metadata.PersistentParserContext
-		SetObjectIdLike(interfaces.ObjectId) error
-	}
 )
 
 type keyType = *catgut.String
 
-type Format struct {
-	purpose string
-	keys    []keyType
-}
-
-func (format Format) GetPurpose() string {
-	return format.purpose
-}
-
 func GetFormatForPurpose(
 	purpose string,
-) (format Format) {
+) (format format) {
 	var found bool
 
 	if format, found = formatsMap[purpose]; !found {
@@ -50,7 +36,7 @@ func GetFormatForPurpose(
 
 func FormatForPurposeOrError(
 	purpose string,
-) (format Format, err error) {
+) (format format, err error) {
 	var found bool
 	if format, found = formatsMap[purpose]; !found {
 		err = errUnknownFormatKey(purpose)
@@ -61,8 +47,8 @@ func FormatForPurposeOrError(
 }
 
 var (
-	formatsList = []Format{}
-	formatsMap  = map[string]Format{}
+	formatsList = []format{}
+	formatsMap  = map[string]format{}
 )
 
 func registerFormat(purpose string, keys ...keyType) {
@@ -146,7 +132,7 @@ func WriteDigest(
 
 	var digest interfaces.MarklId
 
-	if digest, err = writeMetadata(nil, format, context); err != nil {
+	if digest, err = format.writeMetadata(nil, context); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -155,7 +141,7 @@ func WriteDigest(
 
 	output.ResetWithMarklId(digest)
 
-	if err = output.SetPurpose(format.GetPurpose()); err != nil {
+	if err = output.SetPurpose(format.purpose); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
