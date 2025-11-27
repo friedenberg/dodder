@@ -38,6 +38,10 @@ func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {
 	*slice = append(*slice, elements...)
 }
 
+func (slice *Slice[ELEMENT]) Merge(otherSeq Slice[ELEMENT]) {
+	*slice = append(*slice, otherSeq...)
+}
+
 func (slice *Slice[ELEMENT]) Reset() {
 	*slice = (*slice)[:0]
 }

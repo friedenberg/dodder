@@ -3,6 +3,8 @@ package doddish
 import (
 	"fmt"
 	"strings"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 )
 
 //go:generate stringer -type=SeqType
@@ -15,7 +17,7 @@ const (
 )
 
 // TODO use collections_slice.Slice
-type Seq []Token
+type Seq collections_slice.Slice[Token]
 
 func (seq Seq) Len() int {
 	return len(seq)
@@ -25,16 +27,12 @@ func (seq Seq) At(idx int) Token {
 	return seq[idx]
 }
 
+func (seq *Seq) Slice() *collections_slice.Slice[Token] {
+	return (*collections_slice.Slice[Token])(seq)
+}
+
 func (seq *Seq) Add(tokenType TokenType, contents []byte) {
-	*seq = append(*seq, Token{TokenType: tokenType, Contents: contents})
-}
-
-func (seq *Seq) AddToken(token Token) {
-	*seq = append(*seq, token)
-}
-
-func (seq *Seq) Merge(otherSeq Seq) {
-	*seq = append(*seq, otherSeq...)
+	seq.Slice().Append(Token{TokenType: tokenType, Contents: contents})
 }
 
 func (seq Seq) StringDebug() string {
@@ -70,7 +68,7 @@ func (seq Seq) Clone() (dst Seq) {
 }
 
 func (seq *Seq) Reset() {
-	*seq = Seq([]Token{})
+	seq.Slice().Reset()
 }
 
 type TokenTypes []TokenType
