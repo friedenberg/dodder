@@ -3,7 +3,6 @@ package remote_transfer
 import (
 	"sync"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
@@ -36,23 +35,15 @@ func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 		return err
 	}
 
-	objectDigestWriteMap := object.GetDigestWriteMapWithMerkle(
-		deduper.defaultObjectDigestMarklFormatId,
-	)
+	id := markl.GetBlobId()
+	defer markl.PutBlobId(id)
 
-	var id interfaces.MutableMarklId
-
-	{
-		var hasDigest bool
-
-		if id, hasDigest = objectDigestWriteMap[deduper.formatId]; !hasDigest {
-			err = errors.Errorf(
-				"object does not have digest for format id: %q",
-				deduper.formatId,
-			)
-
-			return err
-		}
+	if err = object.CalculateDigestForPurpose(
+		markl.PurposeV5MetadataDigestWithoutTai,
+		id,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
 	}
 
 	bites := id.GetBytes()

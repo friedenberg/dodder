@@ -1,7 +1,6 @@
 package object_finalizer
 
 import (
-	"maps"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -112,10 +111,8 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 		return err
 	}
 
-	if err = object.CalculateDigests(
-		maps.All(object.GetDigestWriteMapWithMerkle(
-			objectDigestMarklFormatId,
-		)),
+	if err = object.CalculateObjectDigest(
+		objectDigestMarklFormatId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

@@ -160,5 +160,12 @@ func WriteDigest(
 		return err
 	}
 
+	if err = markl.AssertIdIsNotNull(
+		output,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
 	return err
 }

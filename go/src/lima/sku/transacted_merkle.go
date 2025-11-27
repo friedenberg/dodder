@@ -84,68 +84,21 @@ func (transacted *Transacted) Verify() (err error) {
 	return err
 }
 
-type (
-	ObjectDigestWriteMap          = interfaces.DigestWriteMap
-	ObjectDigestPurposeMarklIdSeq = interfaces.Seq2[string, interfaces.MutableMarklId]
-)
-
-func (transacted *Transacted) GetDigestWriteMapWithMerkle(
-	defaultMarklFormatId string,
-) ObjectDigestWriteMap {
-	return ObjectDigestWriteMap{
-		markl.PurposeV5MetadataDigestWithoutTai: transacted.GetMetadataMutable().GetSelfWithoutTaiMutable(),
-		defaultMarklFormatId:                    transacted.GetMetadataMutable().GetObjectDigestMutable(),
-	}
-}
-
-func (transacted *Transacted) CalculateDigests(
-	formats ObjectDigestPurposeMarklIdSeq,
+func (transacted *Transacted) CalculateObjectDigest(
+	defaultObjectDigestPurposeId string,
 ) (err error) {
-	return transacted.calculateDigestsAndMaybeDebug(false, formats)
-}
-
-func (transacted *Transacted) CalculateDigestsDebug(
-	formats ObjectDigestPurposeMarklIdSeq,
-) (err error) {
-	return transacted.calculateDigestsAndMaybeDebug(true, formats)
-}
-
-func (transacted *Transacted) calculateDigestsAndMaybeDebug(
-	debug bool,
-	formats ObjectDigestPurposeMarklIdSeq,
-) (err error) {
-	waitGroup := errors.MakeWaitGroupParallel()
-
-	for formatId, id := range formats {
-		waitGroup.Do(
-			transacted.MakeDigestCalcFunc(
-				formatId,
-				id,
-			),
-		)
-	}
-
-	if err = waitGroup.GetError(); err != nil {
+	if err = transacted.CalculateDigestForPurpose(
+		defaultObjectDigestPurposeId,
+		transacted.GetMetadataMutable().GetObjectDigestMutable(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	return err
+	return
 }
 
-func (transacted *Transacted) MakeDigestCalcFunc(
-	purposeId string,
-	digest interfaces.MutableMarklId,
-) errors.FuncErr {
-	return func() (err error) {
-		return transacted.CalculateDigest2(
-			purposeId,
-			digest,
-		)
-	}
-}
-
-func (transacted *Transacted) CalculateDigest2(
+func (transacted *Transacted) CalculateDigestForPurpose(
 	purposeId string,
 	digest interfaces.MutableMarklId,
 ) (err error) {

@@ -65,7 +65,7 @@ func (op CreateFromPaths) Run(
 			return results, err
 		}
 
-		if err = object.CalculateDigest2(
+		if err = object.CalculateDigestForPurpose(
 			markl.PurposeV5MetadataDigestWithoutTai,
 			digestWithoutTai,
 		); err != nil {
