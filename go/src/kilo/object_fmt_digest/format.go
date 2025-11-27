@@ -348,7 +348,7 @@ func writeMetadata(
 ) (blobDigest interfaces.MarklId, err error) {
 	if context.GetMetadata().GetTai().IsEmpty() {
 		err = ErrEmptyTai
-		return
+		return blobDigest, err
 	}
 
 	marklWriter, repool := markl_io.MakeWriterWithRepool(
