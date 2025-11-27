@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings"
@@ -127,4 +128,37 @@ func init() {
 		key_strings.ZZRepoPub,
 		key_strings.ZZSigMother,
 	)
+}
+
+func WriteDigest(
+	formatId string,
+	context FormatterContext,
+	output interfaces.MutableMarklId,
+) (err error) {
+	format := GetFormatForPurpose(formatId)
+
+	metadata := context.GetMetadataMutable()
+
+	if metadata.GetTai().IsEmpty() {
+		err = ErrEmptyTai
+		return err
+	}
+
+	var digest interfaces.MarklId
+
+	if digest, err = writeMetadata(nil, format, context); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	defer markl.PutBlobId(digest)
+
+	output.ResetWithMarklId(digest)
+
+	if err = output.SetPurpose(format.GetPurpose()); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }

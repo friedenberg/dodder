@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -17,13 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
-func FormatForKey(k string) Format {
-	format, err := FormatForPurposeOrError(k)
-	errors.PanicIfError(err)
-	return format
-}
-
-func (format Format) WriteMetadataTo(
+func (format Format) writeMetadataTo(
 	writer io.Writer,
 	context FormatterContext,
 ) (n int64, err error) {
@@ -348,70 +341,23 @@ func writeMarklIdKeyIfNotNull(
 	return writeMarklIdKey(writer, key, id)
 }
 
-func GetDigestForContext(
-	format Format,
-	context FormatterContext,
-) (digest interfaces.MarklId, err error) {
-	metadata := context.GetMetadataMutable()
-
-	if metadata.GetTai().IsEmpty() {
-		err = ErrEmptyTai
-		return digest, err
-	}
-
-	if digest, err = WriteMetadata(nil, format, context); err != nil {
-		err = errors.Wrap(err)
-		return digest, err
-	}
-
-	return digest, err
-}
-
-func WriteDigest(
-	formatId string,
-	context FormatterContext,
-	output interfaces.MutableMarklId,
-) (err error) {
-	format := GetFormatForPurpose(formatId)
-
-	metadata := context.GetMetadataMutable()
-
-	if metadata.GetTai().IsEmpty() {
-		err = ErrEmptyTai
-		return err
-	}
-
-	var digest interfaces.MarklId
-
-	if digest, err = WriteMetadata(nil, format, context); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	defer markl.PutBlobId(digest)
-
-	output.ResetWithMarklId(digest)
-
-	if err = output.SetPurpose(format.GetPurpose()); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
-func WriteMetadata(
+func writeMetadata(
 	writer io.Writer,
 	format Format,
 	context FormatterContext,
 ) (blobDigest interfaces.MarklId, err error) {
+	if context.GetMetadata().GetTai().IsEmpty() {
+		err = ErrEmptyTai
+		return
+	}
+
 	marklWriter, repool := markl_io.MakeWriterWithRepool(
 		markl.FormatHashSha256.Get(),
 		writer,
 	)
 	defer repool()
 
-	_, err = format.WriteMetadataTo(marklWriter, context)
+	_, err = format.writeMetadataTo(marklWriter, context)
 	if err != nil {
 		err = errors.Wrap(err)
 		return blobDigest, err
@@ -422,28 +368,28 @@ func WriteMetadata(
 	return blobDigest, err
 }
 
-func GetDigestForContextDebug(
-	format Format,
-	context FormatterContext,
-) (digest interfaces.MarklId, err error) {
-	var sb strings.Builder
-	writer, repool := markl_io.MakeWriterWithRepool(
-		markl.FormatHashSha256.Get(),
-		&sb,
-	)
-	defer repool()
+// func GetDigestForContextDebug(
+// 	format Format,
+// 	context FormatterContext,
+// ) (digest interfaces.MarklId, err error) {
+// 	var sb strings.Builder
+// 	writer, repool := markl_io.MakeWriterWithRepool(
+// 		markl.FormatHashSha256.Get(),
+// 		&sb,
+// 	)
+// 	defer repool()
 
-	_, err = format.WriteMetadataTo(writer, context)
-	if err != nil {
-		err = errors.Wrap(err)
-		return digest, err
-	}
+// 	_, err = format.WriteMetadataTo(writer, context)
+// 	if err != nil {
+// 		err = errors.Wrap(err)
+// 		return digest, err
+// 	}
 
-	digest = writer.GetMarklId()
+// 	digest = writer.GetMarklId()
 
-	value := sb.String()
+// 	value := sb.String()
 
-	ui.Debug().Printf("%q -> %s", value, markl.FormatBytesAsHex(digest))
+// 	ui.Debug().Printf("%q -> %s", value, markl.FormatBytesAsHex(digest))
 
-	return digest, err
-}
+// 	return digest, err
+// }

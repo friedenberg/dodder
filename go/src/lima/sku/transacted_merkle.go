@@ -84,8 +84,6 @@ func (transacted *Transacted) Verify() (err error) {
 	return err
 }
 
-type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterContext) (interfaces.MarklId, error)
-
 type (
 	ObjectDigestWriteMap          = interfaces.DigestWriteMap
 	ObjectDigestPurposeMarklIdSeq = interfaces.Seq2[string, interfaces.MutableMarklId]
@@ -112,33 +110,16 @@ func (transacted *Transacted) CalculateDigestsDebug(
 	return transacted.calculateDigestsAndMaybeDebug(true, formats)
 }
 
-// calculates the respective digests
 func (transacted *Transacted) calculateDigestsAndMaybeDebug(
 	debug bool,
 	formats ObjectDigestPurposeMarklIdSeq,
 ) (err error) {
-	funcCalcDigest := object_fmt_digest.GetDigestForContext
-
-	if debug {
-		funcCalcDigest = object_fmt_digest.GetDigestForContextDebug
-	}
-
 	waitGroup := errors.MakeWaitGroupParallel()
 
 	for formatId, id := range formats {
-		var format object_fmt_digest.Format
-
-		if format, err = object_fmt_digest.FormatForPurposeOrError(
-			formatId,
-		); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
 		waitGroup.Do(
 			transacted.MakeDigestCalcFunc(
-				funcCalcDigest,
-				format,
+				formatId,
 				id,
 			),
 		)
@@ -153,50 +134,15 @@ func (transacted *Transacted) calculateDigestsAndMaybeDebug(
 }
 
 func (transacted *Transacted) MakeDigestCalcFunc(
-	funcCalcDigest funcCalcDigest,
-	format object_fmt_digest.Format,
+	purposeId string,
 	digest interfaces.MutableMarklId,
 ) errors.FuncErr {
 	return func() (err error) {
-		return transacted.CalculateDigest(
-			funcCalcDigest,
-			format,
+		return transacted.CalculateDigest2(
+			purposeId,
 			digest,
 		)
 	}
-}
-
-func (transacted *Transacted) CalculateDigest(
-	funcCalcDigest funcCalcDigest,
-	format object_fmt_digest.Format,
-	digest interfaces.MutableMarklId,
-) (err error) {
-	var actual interfaces.MarklId
-
-	if actual, err = funcCalcDigest(
-		format,
-		transacted,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	if err = digest.SetPurpose(format.GetPurpose()); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	defer markl.PutBlobId(actual)
-
-	if err = digest.SetMarklId(
-		actual.GetMarklFormat().GetMarklFormatId(),
-		actual.GetBytes(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
 }
 
 func (transacted *Transacted) CalculateDigest2(
