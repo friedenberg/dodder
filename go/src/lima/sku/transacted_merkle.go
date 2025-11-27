@@ -95,7 +95,7 @@ func (transacted *Transacted) CalculateObjectDigest(
 		return err
 	}
 
-	return
+	return err
 }
 
 func (transacted *Transacted) CalculateDigestForPurpose(
