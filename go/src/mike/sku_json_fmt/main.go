@@ -189,13 +189,5 @@ func (json *Transacted) ToTransacted(
 		}
 	}
 
-	// Set SelfMetadataWithoutTai SHA
-	if json.Sha != "" {
-		if err = metadata.GetSelfWithoutTaiMutable().Set(json.Sha); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
-
 	return err
 }

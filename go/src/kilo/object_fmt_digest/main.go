@@ -85,7 +85,7 @@ func registerFormat(purpose string, keys ...keyType) {
 }
 
 func init() {
-	// TODO remove
+	// TODO replace with modern keys
 	registerFormat(
 		markl.PurposeV5MetadataDigestWithoutTai,
 		key_strings_german.Akte,
@@ -151,7 +151,7 @@ func WriteDigest(
 		return err
 	}
 
-	defer markl.PutBlobId(digest)
+	defer markl.PutId(digest)
 
 	output.ResetWithMarklId(digest)
 

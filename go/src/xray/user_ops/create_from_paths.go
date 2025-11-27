@@ -31,8 +31,8 @@ func (op CreateFromPaths) Run(
 		StoreOptions: sku.GetStoreOptionsRealizeWithProto(),
 	}
 
-	digestWithoutTai := markl.GetBlobId()
-	defer markl.PutBlobId(digestWithoutTai)
+	digestWithoutTai := markl.GetId()
+	defer markl.PutId(digestWithoutTai)
 
 	for _, arg := range args {
 		var object *sku.Transacted

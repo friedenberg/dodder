@@ -17,10 +17,9 @@ type (
 	IMetadata interface {
 		Getter
 
-		GetTags() ids.TagSet
-		GetIndex() IIndex
-		GetLockfile() Lockfile
 		GetDescription() descriptions.Description
+		GetIndex() IIndex
+		GetTags() ids.TagSet
 		GetTai() ids.Tai
 		GetType() ids.Type
 		GetTypeTuple() TypeTuple
@@ -49,17 +48,17 @@ type (
 		GenerateExpandedTags()
 
 		GetIndexMutable() IIndexMutable
-		GetLockfileMutable() LockfileMutable
+
+		GetBlobDigestMutable() interfaces.MutableMarklId
+		GetDescriptionMutable() *descriptions.Description
+		GetMotherObjectSigMutable() interfaces.MutableMarklId
+		GetObjectDigestMutable() interfaces.MutableMarklId
+		GetObjectSigMutable() interfaces.MutableMarklId
+		GetRepoPubKeyMutable() interfaces.MutableMarklId
+		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
+		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeTupleMutable() *TypeTuple
-		GetDescriptionMutable() *descriptions.Description
-		GetTaiMutable() *ids.Tai
-		GetBlobDigestMutable() interfaces.MutableMarklId
-		GetObjectDigestMutable() interfaces.MutableMarklId
-		GetMotherObjectSigMutable() interfaces.MutableMarklId
-		GetRepoPubKeyMutable() interfaces.MutableMarklId
-		GetObjectSigMutable() interfaces.MutableMarklId
-		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
 
 		GetCommentsMutable() *collections_slice.Slice[string] // TODO move to IIndexMutable
 	}

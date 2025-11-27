@@ -99,7 +99,7 @@ func (index *Index) ObjectExists(
 	}
 
 	digest := index.hashType.FromStringContent(objectIdString)
-	defer markl.PutBlobId(digest)
+	defer markl.PutId(digest)
 
 	if _, err = index.readOneMarklIdLoc(digest); err != nil {
 		err = errors.Wrap(err)
@@ -136,7 +136,7 @@ func (index *Index) ReadManyObjectId(
 	objectId interfaces.ObjectId,
 ) (objects []*sku.Transacted, err error) {
 	digest := markl.FormatHashSha256.FromStringContent(objectId.String())
-	defer markl.PutBlobId(digest)
+	defer markl.PutId(digest)
 
 	if objects, err = index.ReadManyMarklId(digest); err != nil {
 		err = errors.Wrap(err)
@@ -159,7 +159,7 @@ func (index *Index) ReadOneObjectIdTai(
 	key := objectId.String() + tai.String()
 
 	digest := markl.FormatHashSha256.FromStringContent(key)
-	defer markl.PutBlobId(digest)
+	defer markl.PutId(digest)
 
 	object = sku.GetTransactedPool().Get()
 

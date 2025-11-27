@@ -8,12 +8,12 @@ import (
 
 var idPool interfaces.Pool[Id, *Id] = pool.MakeWithResetable[Id]()
 
-func GetBlobId() interfaces.MutableMarklId {
+func GetId() interfaces.MutableMarklId {
 	return idPool.Get()
 }
 
-func PutBlobId(digest interfaces.MarklId) {
-	switch id := digest.(type) {
+func PutId(id interfaces.MarklId) {
+	switch id := id.(type) {
 	case Id:
 		idPool.Put(&id)
 
@@ -21,6 +21,6 @@ func PutBlobId(digest interfaces.MarklId) {
 		idPool.Put(id)
 
 	default:
-		panic(errors.Errorf("unsupported id type: %T", digest))
+		panic(errors.Errorf("unsupported id type: %T", id))
 	}
 }
