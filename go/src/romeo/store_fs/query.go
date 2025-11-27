@@ -311,7 +311,7 @@ func (store *Store) queryUntracked(
 
 	addRecognizedIfNecessary := func(
 		object *sku.Transacted,
-		digest interfaces.MutableMarklId,
+		digest interfaces.MarklId,
 		digestCache map[string]interfaces.MutableSetLike[*sku.FSItem],
 	) (item *fsItemRecognized, err error) {
 		if digest.IsNull() {
@@ -343,7 +343,7 @@ func (store *Store) queryUntracked(
 
 			if recognizedBlob, err = addRecognizedIfNecessary(
 				object,
-				object.Metadata.GetBlobDigestMutable(),
+				object.Metadata.GetBlobDigest(),
 				definitelyNotCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -352,7 +352,7 @@ func (store *Store) queryUntracked(
 
 			if recognizedObject, err = addRecognizedIfNecessary(
 				object,
-				object.GetMetadataMutable().GetSelfWithoutTaiMutable(),
+				object.GetMetadataMutable().GetSelfWithoutTai(),
 				store.probablyCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)

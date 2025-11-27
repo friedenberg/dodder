@@ -86,7 +86,10 @@ func (transacted *Transacted) Verify() (err error) {
 
 type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterContext) (interfaces.MarklId, error)
 
-type ObjectDigestWriteMap = interfaces.DigestWriteMap
+type (
+	ObjectDigestWriteMap          = interfaces.DigestWriteMap
+	ObjectDigestPurposeMarklIdSeq = interfaces.Seq2[string, interfaces.MutableMarklId]
+)
 
 func (transacted *Transacted) GetDigestWriteMapWithMerkle(
 	defaultMarklFormatId string,
@@ -103,10 +106,22 @@ func (transacted *Transacted) GetDigestWriteMapWithoutMerkle() ObjectDigestWrite
 	}
 }
 
-// calculates the respective digests
 func (transacted *Transacted) CalculateDigests(
+	formats ObjectDigestPurposeMarklIdSeq,
+) (err error) {
+	return transacted.calculateDigestsAndMaybeDebug(false, formats)
+}
+
+func (transacted *Transacted) CalculateDigestsDebug(
+	formats ObjectDigestPurposeMarklIdSeq,
+) (err error) {
+	return transacted.calculateDigestsAndMaybeDebug(true, formats)
+}
+
+// calculates the respective digests
+func (transacted *Transacted) calculateDigestsAndMaybeDebug(
 	debug bool,
-	formats ObjectDigestWriteMap,
+	formats ObjectDigestPurposeMarklIdSeq,
 ) (err error) {
 	funcCalcDigest := object_fmt_digest.GetDigestForContext
 

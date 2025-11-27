@@ -1,6 +1,7 @@
 package object_finalizer
 
 import (
+	"maps"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -112,10 +113,9 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 	}
 
 	if err = object.CalculateDigests(
-		false,
-		object.GetDigestWriteMapWithMerkle(
+		maps.All(object.GetDigestWriteMapWithMerkle(
 			objectDigestMarklFormatId,
-		),
+		)),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -175,16 +175,6 @@ func (finalizer finalizer) WriteLockfile(
 	return err
 }
 
-// TODO remove / rename
-func (finalizer finalizer) CalculateObjectDigests(
-	transacted object,
-) (err error) {
-	return transacted.CalculateDigests(
-		false,
-		transacted.GetDigestWriteMapWithoutMerkle(),
-	)
-}
-
 func (finalizer finalizer) FinalizeAndSignIfNecessary(
 	transacted object,
 	config genesis_configs.ConfigPrivate,
@@ -199,7 +189,7 @@ func (finalizer finalizer) FinalizeAndSignIfNecessary(
 	}
 
 	if transacted.GetMetadataMutable().GetRepoPubKey().GetPurpose() == "" {
-		panic("empty pbukey format")
+		panic("empty pubkey format")
 	}
 
 	return err

@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"maps"
+
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -62,15 +64,18 @@ func (op CreateFromPaths) Run(
 			return results, err
 		}
 
-		digestWithoutTai := object.GetMetadataMutable().GetSelfWithoutTaiMutable()
-
-		if err = object.CalculateDigests(false, object.GetDigestWriteMapWithoutMerkle()); err != nil {
+		if err = object.CalculateDigests(
+			maps.All(object.GetDigestWriteMapWithoutMerkle()),
+		); err != nil {
 			err = errors.Wrap(err)
 			return results, err
 		}
 
+		digestWithoutTai := object.GetMetadataMutable().GetSelfWithoutTaiMutable()
+
 		if err = markl.AssertIdIsNotNull(
-			digestWithoutTai); err != nil {
+			digestWithoutTai,
+		); err != nil {
 			err = errors.Wrap(err)
 			return results, err
 		}

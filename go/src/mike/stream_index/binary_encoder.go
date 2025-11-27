@@ -148,13 +148,17 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return n, err
 		}
 
-		if n, err = encoder.writeFieldBinaryMarshaler(object.GetMetadataMutable().GetDescriptionMutable()); err != nil {
+		if n, err = encoder.writeFieldBinaryMarshaler(
+			object.GetMetadata().GetDescription(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
 	case key_bytes.CacheParentTai:
-		if n, err = encoder.writeFieldWriterTo(object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable()); err != nil {
+		if n, err = encoder.writeFieldWriterTo(
+			object.GetMetadata().GetIndex().GetParentTai(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
@@ -190,7 +194,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.Tai:
 		if n, err = encoder.writeFieldWriterTo(
-			object.GetMetadataMutable().GetTaiMutable(),
+			object.GetMetadata().GetTai(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return n, err
@@ -224,7 +228,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.DigestMetadataWithoutTai:
 		if n, err = encoder.writeFieldMerkleId(
-			object.GetMetadataMutable().GetSelfWithoutTaiMutable(),
+			object.GetMetadata().GetSelfWithoutTai(),
 			true,
 			encoder.Key.String(),
 		); err != nil {
