@@ -9,36 +9,32 @@ import (
 )
 
 // must be public for toml coding to function
-type TomlV2Common struct {
-	StoreVersion      store_version.Version `toml:"store-version"`
-	_                 string                `toml:"repo-type"`
-	RepoId            ids.RepoId            `toml:"id"`
-	InventoryListType string                `toml:"inventory_list-type"`
-	ObjectSigType     string                `toml:"object-sig-type"`
-}
+type (
+	TomlV2Common struct {
+		StoreVersion      store_version.Version `toml:"store-version"`
+		_                 string                `toml:"repo-type"`
+		RepoId            ids.RepoId            `toml:"id"`
+		InventoryListType string                `toml:"inventory_list-type"`
+		ObjectSigType     string                `toml:"object-sig-type"`
+		ObjectDigestType  string                `toml:"object-digest-type"`
+	}
 
-type TomlV2Private struct {
-	PrivateKey markl.Id `toml:"private-key"`
-	TomlV2Common
-}
+	TomlV2Private struct {
+		PrivateKey markl.Id `toml:"private-key"`
+		TomlV2Common
+	}
 
-var _ ConfigPrivate = &TomlV2Private{}
+	TomlV2Public struct {
+		PublicKey markl.Id `toml:"public-key"`
+		TomlV2Common
+	}
+)
 
-type TomlV2Public struct {
-	PublicKey markl.Id `toml:"public-key"`
-	TomlV2Common
-}
-
-var _ ConfigPublic = &TomlV2Public{}
-
-func (config *TomlV2Common) SetFlagDefinitions(
-	flagSet interfaces.CLIFlagDefinitions,
-) {
-}
-
-func (config *TomlV2Common) SetRepoId(id ids.RepoId) {
-	config.RepoId = id
-}
+var (
+	_ ConfigPublic         = &TomlV2Public{}
+	_ ConfigPrivate        = &TomlV2Private{}
+	_ ConfigPrivateMutable = &TomlV2Private{}
+)
 
 func (config *TomlV2Common) GetInventoryListTypeId() string {
 	if config.InventoryListType == "" {
@@ -54,14 +50,6 @@ func (config *TomlV2Common) GetObjectSigMarklTypeId() string {
 	} else {
 		return config.ObjectSigType
 	}
-}
-
-func (config *TomlV2Common) SetInventoryListTypeId(value string) {
-	config.InventoryListType = value
-}
-
-func (config *TomlV2Common) SetObjectSigMarklTypeId(value string) {
-	config.ObjectSigType = value
 }
 
 func (config *TomlV2Private) GetGenesisConfig() ConfigPrivate {
@@ -106,4 +94,36 @@ func (config *TomlV2Common) GetStoreVersion() store_version.Version {
 
 func (config TomlV2Common) GetRepoId() ids.RepoId {
 	return config.RepoId
+}
+
+func (config TomlV2Common) GetObjectDigestMarklTypeId() string {
+	return config.ObjectDigestType
+}
+
+//   __  __       _        _   _
+//  |  \/  |_   _| |_ __ _| |_(_) ___  _ __
+//  | |\/| | | | | __/ _` | __| |/ _ \| '_ \
+//  | |  | | |_| | || (_| | |_| | (_) | | | |
+//  |_|  |_|\__,_|\__\__,_|\__|_|\___/|_| |_|
+//
+
+func (config *TomlV2Private) SetInventoryListTypeId(value string) {
+	config.InventoryListType = value
+}
+
+func (config *TomlV2Private) SetObjectSigMarklTypeId(value string) {
+	config.ObjectSigType = value
+}
+
+func (config *TomlV2Private) SetObjectDigestMarklTypeId(value string) {
+	config.ObjectDigestType = value
+}
+
+func (config *TomlV2Private) SetRepoId(id ids.RepoId) {
+	config.RepoId = id
+}
+
+func (config *TomlV2Private) SetFlagDefinitions(
+	flagSet interfaces.CLIFlagDefinitions,
+) {
 }

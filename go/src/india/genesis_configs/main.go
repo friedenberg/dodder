@@ -14,8 +14,8 @@ type (
 		GetPublicKey() interfaces.MarklId
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
-		// TODO rename to purpose
 		GetObjectSigMarklTypeId() string
+		GetObjectDigestMarklTypeId() string
 	}
 
 	ConfigPublic interface {
@@ -31,13 +31,12 @@ type (
 	}
 
 	ConfigPrivateMutable interface {
+		interfaces.CommandComponentWriter
 		ConfigPrivate
 
 		SetInventoryListTypeId(string)
 		SetObjectSigMarklTypeId(string)
-
-		// TODO separate into non-method function that uses properties
-		interfaces.CommandComponentWriter
+		SetObjectDigestMarklTypeId(string)
 		SetRepoId(ids.RepoId)
 		GetPrivateKeyMutable() interfaces.MutableMarklId
 	}
@@ -67,6 +66,7 @@ func DefaultWithVersion(
 				StoreVersion:      storeVersion,
 				InventoryListType: inventoryListTypeString,
 				ObjectSigType:     markl.PurposeObjectSigV1,
+				ObjectDigestType:  markl.PurposeObjectDigestV1,
 			},
 		},
 	}
