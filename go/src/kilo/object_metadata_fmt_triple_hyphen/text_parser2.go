@@ -54,7 +54,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 			err = metadata.GetDescriptionMutable().Set(remainder)
 
 		case '%':
-			metadata.GetCommentsMutable().Append(remainder)
+			metadata.GetIndexMutable().GetCommentsMutable().Append(remainder)
 
 		case '-':
 			metadata.AddTagString(remainder)

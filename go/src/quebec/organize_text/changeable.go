@@ -149,8 +149,8 @@ func (assignment *Assignment) addToSet(
 		}
 
 		quiter.AppendSeq(
-			outputObject.GetSkuExternal().GetMetadataMutable().GetCommentsMutable(),
-			organizeObject.GetSkuExternal().GetMetadataMutable().GetComments(),
+			outputObject.GetSkuExternal().GetMetadataMutable().GetIndexMutable().GetCommentsMutable(),
+			organizeObject.GetSkuExternal().GetMetadata().GetIndex().GetComments(),
 		)
 
 		for e := range organizeObject.GetSkuExternal().Metadata.GetTags().AllPtr() {

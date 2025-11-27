@@ -34,7 +34,7 @@ func (factory formatterComponents) writeComments(
 ) (n int64, err error) {
 	n1 := 0
 
-	for comment := range context.GetMetadataMutable().GetComments() {
+	for comment := range context.GetMetadata().GetIndex().GetComments() {
 		n1, err = io.WriteString(writer, "% ")
 		n += int64(n1)
 

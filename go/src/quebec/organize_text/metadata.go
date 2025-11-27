@@ -57,7 +57,7 @@ func (metadata *Metadata) SetFromObjectMetadata(
 ) (err error) {
 	metadata.TagSet = otherMetadata.GetTags().CloneSetPtrLike()
 
-	for comment := range otherMetadata.GetComments() {
+	for comment := range otherMetadata.GetIndex().GetComments() {
 		if err = metadata.OptionCommentSet.Set(comment); err != nil {
 			err = errors.Wrap(err)
 			return err

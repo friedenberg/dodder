@@ -2,7 +2,6 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -30,8 +29,6 @@ type (
 		GetRepoPubKey() interfaces.MarklId
 		GetObjectSig() interfaces.MarklId
 		GetSelfWithoutTai() interfaces.MarklId
-
-		GetComments() interfaces.Seq[string] // TODO move to IIndex
 	}
 
 	IMetadataMutable interface {
@@ -59,8 +56,6 @@ type (
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeTupleMutable() *TypeTuple
-
-		GetCommentsMutable() *collections_slice.Slice[string] // TODO move to IIndexMutable
 	}
 
 	Getter interface {

@@ -20,6 +20,7 @@ type (
 		GetDormant() values.Bool
 		GetImplicitTags() ids.TagSet
 		GetParentTai() ids.Tai
+		GetComments() interfaces.Seq[string] // TODO move to IIndex
 	}
 
 	IIndexMutable interface {
@@ -34,6 +35,7 @@ type (
 		GetTagPathsMutable() *tag_paths.Tags
 		SetExpandedTags(tags ids.TagSet)
 		SetImplicitTags(e ids.TagSet)
+		GetCommentsMutable() *collections_slice.Slice[string] // TODO move to IIndexMutable
 	}
 )
 
@@ -148,12 +150,12 @@ func (index *Index) GetParentTaiMutable() *ids.Tai {
 	return &index.ParentTai
 }
 
-func (metadata *metadata) GetComments() interfaces.Seq[string] {
-	return metadata.Index.Comments.All()
+func (index *Index) GetComments() interfaces.Seq[string] {
+	return index.Comments.All()
 }
 
-func (metadata *metadata) GetCommentsMutable() *collections_slice.Slice[string] {
-	return &metadata.Index.Comments
+func (index *Index) GetCommentsMutable() *collections_slice.Slice[string] {
+	return &index.Comments
 }
 
 func (metadata *metadata) AddComment(f string, vals ...any) {
