@@ -12,10 +12,11 @@ import (
 )
 
 type deduper struct {
-	formatId   string
-	lookupLock *sync.RWMutex
-	lookup     map[string]struct{}
-	id         markl.Id
+	formatId                         string
+	lookupLock                       *sync.RWMutex
+	lookup                           map[string]struct{}
+	id                               markl.Id
+	defaultObjectDigestMarklFormatId string
 }
 
 func (deduper *deduper) initialize(
@@ -26,6 +27,8 @@ func (deduper *deduper) initialize(
 		deduper.formatId = options.DedupingFormatId
 		deduper.lookupLock = &sync.RWMutex{}
 		deduper.lookup = make(map[string]struct{})
+		config := envRepo.GetConfigPublic().Blob
+		deduper.defaultObjectDigestMarklFormatId = config.GetObjectDigestMarklTypeId()
 	}
 }
 
@@ -34,7 +37,9 @@ func (deduper *deduper) shouldCommit(object *sku.Transacted) (err error) {
 		return err
 	}
 
-	objectDigestWriteMap := object.GetDigestWriteMapWithMerkle()
+	objectDigestWriteMap := object.GetDigestWriteMapWithMerkle(
+		deduper.defaultObjectDigestMarklFormatId,
+	)
 
 	var id interfaces.MutableMarklId
 

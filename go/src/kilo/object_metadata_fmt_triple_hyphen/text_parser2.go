@@ -160,7 +160,7 @@ func (parser *textParser2) setBlobDigest(
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(
 		metadata.GetBlobDigestMutable(),
-		markl.PurposeObjectDigestV1,
+		markl.PurposeBlobDigestV1,
 		maybeSha,
 	); err != nil {
 		err = errors.Wrap(err)

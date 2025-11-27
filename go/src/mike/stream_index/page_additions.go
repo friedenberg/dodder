@@ -6,13 +6,17 @@ import (
 )
 
 type pageAdditions struct {
-	index          *Index
-	objectIdLookup map[string]struct{}
-	objects        *sku.HeapTransacted
+	defaultObjectDigestMarklFormatId string
+	index                            *Index
+	objectIdLookup                   map[string]struct{}
+	objects                          *sku.HeapTransacted
 	// objects        *sku.OpenList
 }
 
 func (additions *pageAdditions) initialize(index *Index) {
+	configGenesis := index.envRepo.GetConfigPublic().Blob
+	index.defaultObjectDigestMarklFormatId = configGenesis.GetObjectDigestMarklTypeId()
+
 	additions.index = index
 	additions.objects = sku.MakeListTransacted()
 	additions.objectIdLookup = make(map[string]struct{})
@@ -24,8 +28,12 @@ func (additions *pageAdditions) add(object *sku.Transacted) {
 	additions.objects.Add(objectClone)
 	additions.objectIdLookup[object.ObjectId.String()] = struct{}{}
 
+	seqProbeIds := object.AllProbeIds(
+		additions.index.index.GetHashType(),
+		additions.defaultObjectDigestMarklFormatId,
+	)
+
 	additionProbes := additions.index.probeIndex.additionProbes
-	seqProbeIds := object.AllProbeIds(additions.index.index.GetHashType())
 
 	for probeId := range seqProbeIds {
 		idBytes := probeId.Id.GetBytes()

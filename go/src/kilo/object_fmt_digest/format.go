@@ -279,6 +279,17 @@ func writeMetadataKeyStringTo(
 		typeTuple := metadata.GetTypeTuple()
 
 		if typeTuple.IsEmpty() {
+			err = errors.Errorf("empty type tuple")
+			return n, err
+		}
+
+		if typeTuple.Key.IsEmpty() {
+			err = errors.Errorf("empty type")
+			return n, err
+		}
+
+		if typeTuple.Value.IsEmpty() {
+			err = errors.Errorf("empty type lock")
 			return n, err
 		}
 

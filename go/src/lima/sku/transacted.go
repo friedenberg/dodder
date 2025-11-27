@@ -210,6 +210,7 @@ func (transacted *Transacted) GetStringProbeKeys() map[string]string {
 
 func (transacted *Transacted) AllProbeIds(
 	hashType markl.FormatHash,
+	defaultObjectDigestMarklFormatId string,
 ) interfaces.Seq[ids.ProbeId] {
 	return func(yield func(ids.ProbeId) bool) {
 		for key, value := range transacted.GetStringProbeKeys() {
@@ -230,18 +231,7 @@ func (transacted *Transacted) AllProbeIds(
 
 		{
 			probeId := ids.ProbeId{
-				Key: markl.PurposeObjectDigestV1,
-				Id:  transacted.GetMetadata().GetObjectDigest(),
-			}
-
-			if !yield(probeId) {
-				return
-			}
-		}
-
-		{
-			probeId := ids.ProbeId{
-				Key: markl.PurposeObjectDigestV2,
+				Key: transacted.GetMetadata().GetObjectDigest().GetPurpose(),
 				Id:  transacted.GetMetadata().GetObjectDigest(),
 			}
 

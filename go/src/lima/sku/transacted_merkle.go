@@ -88,10 +88,12 @@ type funcCalcDigest func(object_fmt_digest.Format, object_fmt_digest.FormatterCo
 
 type ObjectDigestWriteMap = interfaces.DigestWriteMap
 
-func (transacted *Transacted) GetDigestWriteMapWithMerkle() ObjectDigestWriteMap {
+func (transacted *Transacted) GetDigestWriteMapWithMerkle(
+	defaultMarklFormatId string,
+) ObjectDigestWriteMap {
 	return ObjectDigestWriteMap{
 		markl.PurposeV5MetadataDigestWithoutTai: transacted.GetMetadataMutable().GetSelfWithoutTaiMutable(),
-		markl.PurposeObjectDigestV1:             transacted.GetMetadataMutable().GetObjectDigestMutable(),
+		defaultMarklFormatId:                    transacted.GetMetadataMutable().GetObjectDigestMutable(),
 	}
 }
 

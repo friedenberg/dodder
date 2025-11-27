@@ -926,7 +926,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for probeId := range object.AllProbeIds(markl.FormatHashSha256) {
+				configGenesis := repo.GetEnvRepo().GetConfigPublic().Blob
+				for probeId := range object.AllProbeIds(
+					markl.FormatHashSha256,
+					configGenesis.GetObjectDigestMarklTypeId(),
+				) {
 					if _, err = fmt.Fprintf(
 						writer,
 						"%s %s -> %s\n",

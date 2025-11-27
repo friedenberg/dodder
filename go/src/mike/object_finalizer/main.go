@@ -53,7 +53,10 @@ func (finalizer finalizer) GetObjectFinalizer() Finalizer {
 
 // TODO extract into a versioned object finalizer
 // calculates the object digests using the object's repo pubkey
-func (finalizer finalizer) FinalizeUsingObject(transacted object) (err error) {
+func (finalizer finalizer) FinalizeUsingObject(
+	transacted object,
+	objectDigestMarklFormatId string,
+) (err error) {
 	if err = markl.AssertIdIsNotNull(
 		transacted.GetMetadataMutable().GetRepoPubKey(),
 	); err != nil {
@@ -64,6 +67,7 @@ func (finalizer finalizer) FinalizeUsingObject(transacted object) (err error) {
 	if err = finalizer.FinalizeUsingRepoPubKey(
 		transacted,
 		transacted.GetMetadataMutable().GetRepoPubKey(),
+		objectDigestMarklFormatId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -76,6 +80,7 @@ func (finalizer finalizer) FinalizeUsingObject(transacted object) (err error) {
 func (finalizer finalizer) FinalizeUsingRepoPubKey(
 	object object,
 	pubKey interfaces.MarklId,
+	objectDigestMarklFormatId string,
 ) (err error) {
 	metadataMutable := object.GetMetadataMutable()
 	// TODO migrate this to config
@@ -108,7 +113,9 @@ func (finalizer finalizer) FinalizeUsingRepoPubKey(
 
 	if err = object.CalculateDigests(
 		false,
-		object.GetDigestWriteMapWithMerkle(),
+		object.GetDigestWriteMapWithMerkle(
+			objectDigestMarklFormatId,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -239,7 +246,10 @@ func (finalizer finalizer) FinalizeAndSign(
 		config.GetPublicKey(),
 	)
 
-	if err = finalizer.FinalizeUsingObject(transacted); err != nil {
+	if err = finalizer.FinalizeUsingObject(
+		transacted,
+		config.GetObjectDigestMarklTypeId(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -271,8 +281,12 @@ func (finalizer finalizer) FinalizeAndSign(
 
 func (finalizer finalizer) FinalizeAndVerify(
 	transacted object,
+	objectDigestMarklFormatId string,
 ) (err error) {
-	if err = finalizer.FinalizeUsingObject(transacted); err != nil {
+	if err = finalizer.FinalizeUsingObject(
+		transacted,
+		objectDigestMarklFormatId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

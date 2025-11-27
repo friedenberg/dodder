@@ -202,6 +202,7 @@ func (importer importer) importLeaf(
 	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
 	checkedOut.GetSkuExternal().Metadata.GetObjectDigestMutable().Reset()
+	configGenesis := importer.envRepo.GetConfigPrivate().Blob
 
 	// TODO confirm repo pub key
 
@@ -209,7 +210,7 @@ func (importer importer) importLeaf(
 	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
 		if err = importer.finalizer.FinalizeAndSignOverwrite(
 			checkedOut.GetSkuExternal(),
-			importer.envRepo.GetConfigPrivate().Blob,
+			configGenesis,
 		); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err
@@ -217,6 +218,7 @@ func (importer importer) importLeaf(
 	} else {
 		if err = importer.finalizer.FinalizeUsingObject(
 			checkedOut.GetSkuExternal(),
+			configGenesis.GetObjectDigestMarklTypeId(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return checkedOut, err
