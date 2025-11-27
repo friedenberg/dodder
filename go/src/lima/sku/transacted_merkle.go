@@ -100,12 +100,6 @@ func (transacted *Transacted) GetDigestWriteMapWithMerkle(
 	}
 }
 
-func (transacted *Transacted) GetDigestWriteMapWithoutMerkle() ObjectDigestWriteMap {
-	return ObjectDigestWriteMap{
-		markl.PurposeV5MetadataDigestWithoutTai: transacted.GetMetadataMutable().GetSelfWithoutTaiMutable(),
-	}
-}
-
 func (transacted *Transacted) CalculateDigests(
 	formats ObjectDigestPurposeMarklIdSeq,
 ) (err error) {
@@ -197,6 +191,22 @@ func (transacted *Transacted) CalculateDigest(
 	if err = digest.SetMarklId(
 		actual.GetMarklFormat().GetMarklFormatId(),
 		actual.GetBytes(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func (transacted *Transacted) CalculateDigest2(
+	purposeId string,
+	digest interfaces.MutableMarklId,
+) (err error) {
+	if err = object_fmt_digest.WriteDigest(
+		purposeId,
+		transacted,
+		digest,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

@@ -1,8 +1,6 @@
 package user_ops
 
 import (
-	"maps"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -32,6 +30,9 @@ func (op CreateFromPaths) Run(
 	commitOptions := sku.CommitOptions{
 		StoreOptions: sku.GetStoreOptionsRealizeWithProto(),
 	}
+
+	digestWithoutTai := markl.GetBlobId()
+	defer markl.PutBlobId(digestWithoutTai)
 
 	for _, arg := range args {
 		var object *sku.Transacted
@@ -64,14 +65,13 @@ func (op CreateFromPaths) Run(
 			return results, err
 		}
 
-		if err = object.CalculateDigests(
-			maps.All(object.GetDigestWriteMapWithoutMerkle()),
+		if err = object.CalculateDigest2(
+			markl.PurposeV5MetadataDigestWithoutTai,
+			digestWithoutTai,
 		); err != nil {
 			err = errors.Wrap(err)
 			return results, err
 		}
-
-		digestWithoutTai := object.GetMetadataMutable().GetSelfWithoutTaiMutable()
 
 		if err = markl.AssertIdIsNotNull(
 			digestWithoutTai,

@@ -32,6 +32,7 @@ type (
 	Hash interface {
 		hash.Hash
 		MarklFormatGetter
+		// TODO add `WriteToMarklId` method for reuse
 		GetMarklId() (MutableMarklId, FuncRepool)
 	}
 

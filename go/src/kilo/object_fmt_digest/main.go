@@ -35,6 +35,18 @@ func (format Format) GetPurpose() string {
 	return format.purpose
 }
 
+func GetFormatForPurpose(
+	purpose string,
+) (format Format) {
+	var found bool
+
+	if format, found = formatsMap[purpose]; !found {
+		panic(errUnknownFormatKey(purpose))
+	}
+
+	return format
+}
+
 func FormatForPurposeOrError(
 	purpose string,
 ) (format Format, err error) {

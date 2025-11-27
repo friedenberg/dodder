@@ -367,6 +367,39 @@ func GetDigestForContext(
 	return digest, err
 }
 
+func WriteDigest(
+	formatId string,
+	context FormatterContext,
+	output interfaces.MutableMarklId,
+) (err error) {
+	format := GetFormatForPurpose(formatId)
+
+	metadata := context.GetMetadataMutable()
+
+	if metadata.GetTai().IsEmpty() {
+		err = ErrEmptyTai
+		return err
+	}
+
+	var digest interfaces.MarklId
+
+	if digest, err = WriteMetadata(nil, format, context); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	defer markl.PutBlobId(digest)
+
+	output.ResetWithMarklId(digest)
+
+	if err = output.SetPurpose(format.GetPurpose()); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
 func WriteMetadata(
 	writer io.Writer,
 	format Format,
