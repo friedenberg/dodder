@@ -18,17 +18,19 @@ const (
 	PurposeObjectDigestV2             = "dodder-object-digest-v2"
 	PurposeV5MetadataDigestWithoutTai = "dodder-object-metadata-digest-without_tai-v1"
 
-	// FormatIdObjectDigestObjectId       = "dodder-object-digest-objectId-v1"
-	// FormatIdObjectDigestObjectIdTai    =
-	// "dodder-object-digest-objectId+tai-v1"
+	// Object Mother Sigs
+	PurposeObjectMotherSigV1 = "dodder-object-mother-sig-v1"
+	PurposeObjectMotherSigV2 = "dodder-object-mother-sig-v2"
 
-	// Signatures
-	PurposeObjectMotherSigV1     = "dodder-object-mother-sig-v1"
-	PurposeObjectSigV0           = "dodder-repo-sig-v1"
-	PurposeObjectSigV1           = "dodder-object-sig-v1"
-	PurposeObjectSigV2           = "dodder-object-sig-v2"
-	PurposeRequestAuthResponseV1 = "dodder-request_auth-response-v1"
-	PurposeRequestRepoSigV1      = "dodder-request_auth-repo-sig-v1"
+	// Object Sigs
+	PurposeObjectSigV0 = "dodder-repo-sig-v1"
+	PurposeObjectSigV1 = "dodder-object-sig-v1"
+	PurposeObjectSigV2 = "dodder-object-sig-v2"
+
+	// Request Auth
+	PurposeRequestAuthResponseV1  = "dodder-request_auth-response-v1"
+	PurposeRequestRepoSigV1       = "dodder-request_auth-repo-sig-v1"
+	PurposeRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
 
 	// PubKeys
 	PurposeRepoPubKeyV1   = "dodder-repo-public_key-v1"
@@ -38,83 +40,99 @@ const (
 	PurposeRepoPrivateKeyV1   = "dodder-repo-private_key-v1"
 	PurposeMadderPrivateKeyV0 = "madder-private_key-v0"
 	PurposeMadderPrivateKeyV1 = "madder-private_key-v1"
-
-	// Arbitrary
-	PurposeRequestAuthChallengeV1 = "dodder-request_auth-challenge-v1"
 )
 
 func init() {
 	// purposes that need to be reregistered
 	makePurpose(
 		PurposeBlobDigestV1,
+		PurposeTypeBlobDigest,
 		FormatIdHashSha256,
 		FormatIdHashBlake2b256,
 	)
 
 	makePurpose(
 		PurposeObjectDigestV1,
+		PurposeTypeObjectDigest,
 		FormatIdHashSha256,
 		FormatIdHashBlake2b256,
 	)
 
 	makePurpose(
 		PurposeObjectDigestV2,
+		PurposeTypeObjectDigest,
 		FormatIdHashSha256,
 		FormatIdHashBlake2b256,
 	)
 
 	makePurpose(
 		PurposeV5MetadataDigestWithoutTai,
+		PurposeTypeObjectDigest,
 		FormatIdHashSha256,
 		FormatIdHashBlake2b256,
 	)
 
 	makePurpose(
 		PurposeObjectMotherSigV1,
+		PurposeTypeObjectMotherSig,
+		FormatIdEd25519Sig,
+	)
+
+	makePurpose(
+		PurposeObjectMotherSigV2,
+		PurposeTypeObjectMotherSig,
 		FormatIdEd25519Sig,
 	)
 
 	makePurpose(
 		PurposeObjectSigV0,
+		PurposeTypeObjectSig,
 		FormatIdEd25519Sig,
 	)
 
 	makePurpose(
 		PurposeObjectSigV1,
+		PurposeTypeObjectSig,
 		FormatIdEd25519Sig,
 	)
 
 	makePurpose(
 		PurposeObjectSigV2,
+		PurposeTypeObjectSig,
 		FormatIdEd25519Sig,
 	)
 
 	makePurpose(
 		PurposeRepoPrivateKeyV1,
+		PurposeTypePrivateKey,
 		FormatIdEd25519Sec,
 	)
 
 	makePurpose(
 		PurposeRepoPubKeyV1,
+		PurposeTypeRepoPubKey,
 		FormatIdEd25519Pub,
 	)
 
-	makePurpose(PurposeRequestAuthChallengeV1)
-	makePurpose(PurposeRequestAuthResponseV1)
+	makePurpose(PurposeRequestAuthChallengeV1, PurposeTypeRequestAuth)
+	makePurpose(PurposeRequestAuthResponseV1, PurposeTypeRequestAuth)
 
 	makePurpose(
 		PurposeMadderPubKeyV1,
+		PurposeTypePubKey,
 		FormatIdEd25519Pub,
 	)
 
 	makePurpose(
 		PurposeMadderPrivateKeyV0,
+		PurposeTypePrivateKey,
 		FormatIdEd25519Sec,
 		FormatIdAgeX25519Sec,
 	)
 
 	makePurpose(
 		PurposeMadderPrivateKeyV1,
+		PurposeTypePrivateKey,
 		FormatIdEd25519Sec,
 		FormatIdAgeX25519Sec,
 	)
@@ -124,6 +142,7 @@ var purposes = map[string]Purpose{}
 
 type Purpose struct {
 	id        string
+	tipe      PurposeType
 	formatIds map[string]struct{}
 }
 
@@ -137,7 +156,7 @@ func GetPurpose(purposeId string) Purpose {
 	return purpose
 }
 
-func makePurpose(purposeId string, formatIds ...string) {
+func makePurpose(purposeId string, purposeType PurposeType, formatIds ...string) {
 	_, alreadyExists := purposes[purposeId]
 
 	if alreadyExists {
@@ -146,6 +165,7 @@ func makePurpose(purposeId string, formatIds ...string) {
 
 	purpose := Purpose{
 		id:        purposeId,
+		tipe:      purposeType,
 		formatIds: make(map[string]struct{}),
 	}
 
@@ -167,6 +187,10 @@ func makePurpose(purposeId string, formatIds ...string) {
 	purposes[purposeId] = purpose
 }
 
+func (purpose Purpose) GetPurposeType() PurposeType {
+	return purpose.tipe
+}
+
 func GetDigestTypeForSigType(sigId string) string {
 	sig := GetPurpose(sigId)
 
@@ -179,5 +203,20 @@ func GetDigestTypeForSigType(sigId string) string {
 
 	case PurposeObjectSigV2:
 		return PurposeObjectDigestV2
+	}
+}
+
+func GetMotherSigTypeForSigType(sigId string) string {
+	sig := GetPurpose(sigId)
+
+	switch sig.id {
+	default:
+		panic(fmt.Sprintf("unsupported sig purpose: %q", sigId))
+
+	case PurposeObjectSigV1:
+		return PurposeObjectMotherSigV1
+
+	case PurposeObjectSigV2:
+		return PurposeObjectMotherSigV2
 	}
 }

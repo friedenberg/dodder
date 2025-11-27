@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
@@ -372,45 +371,50 @@ LOOP_AFTER_OID:
 	return err
 }
 
-type FuncMarklIdGetter = func(object_metadata.IMetadataMutable) interfaces.MutableMarklId
-
-var dodderTagMerkleIdGetterTypeMapping = map[string]FuncMarklIdGetter{
-	"":                             (object_metadata.IMetadataMutable).GetBlobDigestMutable,
-	markl.PurposeRepoPubKeyV1:      (object_metadata.IMetadataMutable).GetRepoPubKeyMutable,
-	markl.PurposeObjectSigV0:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
-	markl.PurposeObjectSigV1:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
-	markl.PurposeObjectSigV2:       (object_metadata.IMetadataMutable).GetObjectSigMutable,
-	markl.PurposeObjectMotherSigV1: (object_metadata.IMetadataMutable).GetMotherObjectSigMutable,
-}
-
 // expects `seq` to include `@` as the first token
 func (format *BoxTransacted) parseMarklIdTag(
 	object *sku.Transacted,
 	seq doddish.Seq,
 ) (err error) {
-	var marklFormatId string
+	var purposeId string
 	var value []byte
 
 	if seq.Len() == 3 {
-		marklFormatId = string(seq.At(0).Contents)
+		purposeId = string(seq.At(0).Contents)
 		value = seq.At(2).Contents
 	} else {
+		purposeId = markl.PurposeBlobDigestV1
 		value = seq.At(1).Contents
 	}
 
-	if getMutableMerkleIdMethod, ok := dodderTagMerkleIdGetterTypeMapping[marklFormatId]; ok {
-		id := getMutableMerkleIdMethod(object.GetMetadataMutable())
+	metadata := object.GetMetadataMutable()
 
-		if err = markl.SetMarklIdWithFormatBlech32(
-			id,
-			marklFormatId,
-			string(value),
-		); err != nil {
-			err = errors.Wrapf(err, "Seq: %q", seq)
-			return err
-		}
-	} else {
+	var id interfaces.MutableMarklId
+
+	switch markl.GetPurpose(purposeId).GetPurposeType() {
+	case markl.PurposeTypeBlobDigest:
+		id = metadata.GetBlobDigestMutable()
+
+	case markl.PurposeTypeObjectMotherSig:
+		id = metadata.GetMotherObjectSigMutable()
+
+	case markl.PurposeTypeObjectSig:
+		id = metadata.GetObjectSigMutable()
+
+	case markl.PurposeTypeRepoPubKey:
+		id = metadata.GetRepoPubKeyMutable()
+
+	default:
 		err = errors.Wrap(ErrUnsupportedDodderTag{tag: seq.String()})
+		return err
+	}
+
+	if err = markl.SetMarklIdWithFormatBlech32(
+		id,
+		purposeId,
+		string(value),
+	); err != nil {
+		err = errors.Wrapf(err, "Seq: %q", seq)
 		return err
 	}
 

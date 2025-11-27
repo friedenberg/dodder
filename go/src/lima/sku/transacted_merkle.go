@@ -24,7 +24,9 @@ func (transacted *Transacted) SetMother(mother *Transacted) (err error) {
 	}
 
 	if err = motherSig.SetPurpose(
-		markl.PurposeObjectMotherSigV1,
+		markl.GetMotherSigTypeForSigType(
+			mother.GetMetadata().GetObjectSig().GetPurpose(),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
