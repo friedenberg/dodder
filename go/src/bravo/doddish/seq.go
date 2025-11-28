@@ -7,16 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 )
 
-//go:generate stringer -type=SeqType
-type SeqType int
-
-const (
-	SeqTypeUnknown    = SeqType(iota)
-	SeqTypeIdentifier // one/uno, tag, !type, /browser/bookmark-1, @abcd
-	SeqTypeField      // url=blah blob=hello contents="wow" contents="wow with\" quote"
-)
-
-// TODO use collections_slice.Slice
 type Seq collections_slice.Slice[Token]
 
 func (seq Seq) Len() int {

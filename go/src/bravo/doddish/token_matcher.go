@@ -4,6 +4,50 @@ type TokenMatcher interface {
 	Match(Token) bool
 }
 
+type TokensMatcher []TokenMatcher
+
+var (
+	// @abcd
+	TokenMatcherBlobDigest = TokensMatcher{
+		TokenMatcherOp('@'),
+		TokenTypeIdentifier,
+	}
+
+	// !key
+	TokenMatcherType = TokensMatcher{
+		TokenMatcherOp('!'),
+		TokenTypeIdentifier,
+	}
+
+	// !key@abcd
+	TokenMatcherTypeLock = TokensMatcher{
+		TokenMatcherOp('!'),
+		TokenTypeIdentifier,
+		TokenMatcherOp('@'),
+		TokenTypeIdentifier,
+	}
+
+	// key@abcd
+	TokenMatcherDodderTag = TokensMatcher{
+		TokenTypeIdentifier,
+		TokenMatcherOp('@'),
+		TokenTypeIdentifier,
+	}
+
+	// key=value
+	TokenMatcherKeyValue = TokensMatcher{
+		TokenTypeIdentifier,
+		TokenMatcherOp(OpExact),
+	}
+
+	// key="value"
+	TokenMatcherKeyValueLiteral = TokensMatcher{
+		TokenTypeIdentifier,
+		TokenMatcherOp(OpExact),
+		TokenTypeLiteral,
+	}
+)
+
 type TokenMatcherOp byte
 
 func (tokenMatcher TokenMatcherOp) Match(token Token) bool {

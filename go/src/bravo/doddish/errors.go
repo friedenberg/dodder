@@ -1,13 +1,24 @@
 package doddish
 
 import (
-	"errors"
 	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-var ErrEmptySeq = errors.New("empty seq")
+type (
+	errDisamb struct{}
+	pkgError  = errors.TypedError[errDisamb]
+)
+
+func newError(text string) pkgError {
+	return errors.NewWithType[errDisamb](text)
+}
+
+var ErrEmptySeq = newError("empty seq")
 
 type ErrUnsupportedSeq struct {
+	pkgError
 	Seq
 }
 

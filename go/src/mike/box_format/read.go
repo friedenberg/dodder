@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -169,13 +168,6 @@ func (format *BoxTransacted) readStringFormatBox(
 
 	var objectId ids.ObjectId
 
-	tokenMatcherTypeLock := []doddish.TokenMatcher{
-		doddish.TokenMatcherOp('!'),
-		doddish.TokenTypeIdentifier,
-		doddish.TokenMatcherOp('@'),
-		doddish.TokenTypeIdentifier,
-	}
-
 LOOP_AFTER_OID:
 
 	for scanner.ScanDotAllowedInIdentifiers() {
@@ -184,25 +176,15 @@ LOOP_AFTER_OID:
 		// TODO convert this into a decision tree based on token type sequences
 		// instead of a switch
 		switch {
-		// ] ' '
-		// TODO rewrite using several cases for token operators
-		case seq.MatchAll(
-			doddish.TokenTypeOperator,
-		):
-			r := rune(seq.At(0).Contents[0])
+		case seq.MatchAll(doddish.TokenMatcherOp(']')):
+			break LOOP_AFTER_OID
 
-			switch {
-			case r == ']':
-				break LOOP_AFTER_OID
-
-			case unicorn.IsSpace(r):
-				continue
-			}
+			// ' '
+		case seq.MatchAll(doddish.TokenMatcherOp(' ')):
+			continue
 
 			// "value"
-		case seq.MatchAll(
-			doddish.TokenTypeLiteral,
-		):
+		case seq.MatchAll(doddish.TokenTypeLiteral):
 			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
 				seq.String(),
 			); err != nil {
@@ -212,11 +194,8 @@ LOOP_AFTER_OID:
 
 			continue
 
-			// @abcd
-		case seq.MatchAll(
-			doddish.TokenMatcherOp('@'),
-			doddish.TokenTypeIdentifier,
-		):
+			// @digest
+		case seq.MatchAll(doddish.TokenMatcherBlobDigest...):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return err
@@ -224,11 +203,8 @@ LOOP_AFTER_OID:
 
 			continue
 
-			// !key
-		case seq.MatchAll(
-			doddish.TokenMatcherOp('!'),
-			doddish.TokenTypeIdentifier,
-		):
+			// !type
+		case seq.MatchAll(doddish.TokenMatcherType...):
 			if err = object.GetMetadataMutable().GetTypeMutable().Set(
 				seq.String(),
 			); err != nil {
@@ -238,8 +214,8 @@ LOOP_AFTER_OID:
 
 			continue
 
-			// !key@abcd
-		case seq.MatchAll(tokenMatcherTypeLock...):
+			// !type@sig
+		case seq.MatchAll(doddish.TokenMatcherTypeLock...):
 			typeLock := object.GetMetadataMutable().GetTypeLockMutable()
 
 			if err = typeLock.Key.Set(
@@ -261,11 +237,7 @@ LOOP_AFTER_OID:
 			continue
 
 			// key@abcd
-		case seq.MatchAll(
-			doddish.TokenTypeIdentifier,
-			doddish.TokenMatcherOp('@'),
-			doddish.TokenTypeIdentifier,
-		):
+		case seq.MatchAll(doddish.TokenMatcherDodderTag...):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return err
@@ -273,29 +245,8 @@ LOOP_AFTER_OID:
 
 			continue
 
-			// "value"
-		case seq.MatchAll(
-			doddish.TokenTypeLiteral,
-		):
-			if err = object.GetMetadataMutable().GetDescriptionMutable().Set(
-				seq.String(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
-			continue
-
 			// key=value key="value"
-		case seq.MatchStart(
-			doddish.TokenTypeIdentifier,
-			doddish.TokenMatcherOp(doddish.OpExact),
-		) || seq.MatchStart(
-			doddish.TokenTypeIdentifier,
-			doddish.TokenMatcherOp(doddish.OpExact),
-			doddish.TokenTypeLiteral,
-		):
-
+		case seq.MatchStart(doddish.TokenMatcherKeyValue...) || seq.MatchStart(doddish.TokenMatcherKeyValueLiteral...):
 			value := seq[2:]
 
 			field := string_format_writer.Field{
@@ -383,6 +334,8 @@ func (format *BoxTransacted) parseMarklIdTag(
 		purposeId = string(seq.At(0).Contents)
 		value = seq.At(2).Contents
 	} else {
+		// blobs have only the `@` symbol and no purpose, so we implicitly decide
+		// the purpose when parsing
 		purposeId = markl.PurposeBlobDigestV1
 		value = seq.At(1).Contents
 	}
