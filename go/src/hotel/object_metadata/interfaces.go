@@ -43,6 +43,7 @@ type (
 
 		// TODO rewrite
 		AddTagPtr(e *ids.Tag) (err error)
+		AddTag(ids.Tag) (err error)
 		ResetTags()
 		SetTags(ids.TagSet)
 		AddTagString(tagString string) (err error)

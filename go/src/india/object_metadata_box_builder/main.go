@@ -164,7 +164,7 @@ func (builder *Builder) AddTypeAndLock(
 func (builder *Builder) AddTags(metadata object_metadata.IMetadataMutable) {
 	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
-	for tag := range metadata.GetTags().AllPtr() {
+	for tag := range metadata.AllTags() {
 		tags = append(
 			tags,
 			string_format_writer.Field{

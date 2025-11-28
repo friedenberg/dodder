@@ -153,8 +153,8 @@ func (assignment *Assignment) addToSet(
 			organizeObject.GetSkuExternal().GetMetadata().GetIndex().GetComments(),
 		)
 
-		for e := range organizeObject.GetSkuExternal().Metadata.GetTags().AllPtr() {
-			if err = outputObject.GetSkuExternal().AddTagPtr(e); err != nil {
+		for tag := range organizeObject.GetSkuExternal().Metadata.AllTags() {
+			if err = outputObject.GetSkuExternal().AddTag(tag); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}

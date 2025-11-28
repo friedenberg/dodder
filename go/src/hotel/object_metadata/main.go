@@ -168,8 +168,12 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTagPtr(e *ids.Tag) (err error) {
-	if e == nil || e.String() == "" {
+func (metadata *metadata) AddTag(tag ids.Tag) (err error) {
+	return metadata.AddTagPtr(&tag)
+}
+
+func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
+	if tag == nil || tag.IsEmpty() {
 		return err
 	}
 
@@ -177,8 +181,8 @@ func (metadata *metadata) AddTagPtr(e *ids.Tag) (err error) {
 		metadata.Tags = ids.MakeTagMutableSet()
 	}
 
-	ids.AddNormalizedTag(metadata.Tags, e)
-	cs := catgut.MakeFromString(e.String())
+	ids.AddNormalizedTag(metadata.Tags, tag)
+	cs := catgut.MakeFromString(tag.String())
 	metadata.Index.TagPaths.AddTag(cs)
 
 	return err
@@ -269,8 +273,8 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 		return
 	}
 
-	for tag := range otherMetadata.GetTags().AllPtr() {
-		metadata.Tags.DelPtr(tag)
+	for tag := range otherMetadata.AllTags() {
+		metadata.Tags.Del(tag)
 	}
 }
 

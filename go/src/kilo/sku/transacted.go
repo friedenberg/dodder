@@ -75,6 +75,10 @@ func (transacted *Transacted) GetTags() ids.TagSet {
 	return transacted.GetMetadata().GetTags()
 }
 
+func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
+	return transacted.AddTagPtr(&tag)
+}
+
 func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 	if transacted.ObjectId.GetGenre() == genres.Tag &&
 		strings.HasPrefix(transacted.ObjectId.String(), tag.String()) {

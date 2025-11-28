@@ -398,7 +398,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for e := range object.GetMetadata().GetTags().AllPtr() {
+				for e := range object.GetMetadata().AllTags() {
 					if _, err = fmt.Fprintln(writer, e); err != nil {
 						err = errors.Wrap(err)
 						return err

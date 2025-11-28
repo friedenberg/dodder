@@ -300,7 +300,7 @@ func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
 }
 
 func (assignment *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	for e := range assignment.Transacted.GetMetadata().GetTags().AllPtr() {
+	for e := range assignment.Transacted.GetMetadata().AllTags() {
 		for e1 := range es.AllPtr() {
 			if ids.ContainsExactly(e1, e) {
 				if err = es.DelPtr(e1); err != nil {
@@ -310,7 +310,7 @@ func (assignment *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) 
 			}
 		}
 
-		if err = es.DelPtr(e); err != nil {
+		if err = es.Del(e); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

@@ -39,7 +39,7 @@ func ToLuaTableV1(
 
 	tags := luaTable.Tags
 
-	for tag := range object.GetMetadata().GetTags().AllPtr() {
+	for tag := range object.GetMetadata().AllTags() {
 		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 

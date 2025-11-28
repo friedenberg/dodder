@@ -83,9 +83,9 @@ func (e *tag) String() string {
 }
 
 func (compiled *compiled) AccumulateImplicitTags(
-	e ids.Tag,
+	tag ids.Tag,
 ) (err error) {
-	ek, ok := compiled.Tags.Get(e.String())
+	ek, ok := compiled.Tags.Get(tag.String())
 
 	if !ok {
 		return err
@@ -94,14 +94,14 @@ func (compiled *compiled) AccumulateImplicitTags(
 	ees := ids.MakeTagMutableSet()
 
 	ids.ExpandOneInto(
-		e,
+		tag,
 		ids.MakeTag,
 		expansion.ExpanderRight,
 		ees,
 	)
 
 	for e1 := range ees.All() {
-		if e1.Equals(e) {
+		if e1.Equals(tag) {
 			continue
 		}
 
@@ -110,8 +110,8 @@ func (compiled *compiled) AccumulateImplicitTags(
 			return err
 		}
 
-		for e2 := range compiled.GetImplicitTags(&e1).All() {
-			if err = compiled.ImplicitTags.Set(e, e2); err != nil {
+		for e2 := range compiled.GetImplicitTags(e1).All() {
+			if err = compiled.ImplicitTags.Set(tag, e2); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -119,11 +119,11 @@ func (compiled *compiled) AccumulateImplicitTags(
 	}
 
 	for e1 := range ek.Transacted.Metadata.AllTags() {
-		if compiled.ImplicitTags.Contains(e1, e) {
+		if compiled.ImplicitTags.Contains(e1, tag) {
 			continue
 		}
 
-		if err = compiled.ImplicitTags.Set(e, e1); err != nil {
+		if err = compiled.ImplicitTags.Set(tag, e1); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

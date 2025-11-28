@@ -167,7 +167,7 @@ func (store *Store) addImplicitTags(
 	metadata := object.GetMetadataMutable()
 	tagSet := ids.MakeTagMutableSet()
 
-	addImplicitTags := func(tag *ids.Tag) (err error) {
+	addImplicitTags := func(tag ids.Tag) (err error) {
 		tagPathWithType := tag_paths.MakePathWithType()
 		tagPathWithType.Type = tag_paths.TypeIndirect
 		tagPathWithType.Add(catgut.MakeFromString(tag.String()))
@@ -190,7 +190,7 @@ func (store *Store) addImplicitTags(
 		return err
 	}
 
-	for tag := range metadata.GetTags().AllPtr() {
+	for tag := range metadata.AllTags() {
 		if err = addImplicitTags(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -202,14 +202,14 @@ func (store *Store) addImplicitTags(
 	).ApproximatedOrActual()
 
 	if typeObject != nil {
-		for tag := range typeObject.GetTags().AllPtr() {
-			if err = tagSet.AddPtr(tag); err != nil {
+		for tag := range typeObject.GetMetadata().AllTags() {
+			if err = tagSet.Add(tag); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 		}
 
-		for tag := range typeObject.GetTags().AllPtr() {
+		for tag := range typeObject.GetMetadata().AllTags() {
 			if err = addImplicitTags(tag); err != nil {
 				err = errors.Wrap(err)
 				return err

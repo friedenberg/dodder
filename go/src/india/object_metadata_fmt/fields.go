@@ -64,7 +64,7 @@ func MetadataFieldTags(
 ) []string_format_writer.Field {
 	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
-	for t := range metadata.GetTags().AllPtr() {
+	for t := range metadata.AllTags() {
 		tags = append(
 			tags,
 			string_format_writer.Field{
