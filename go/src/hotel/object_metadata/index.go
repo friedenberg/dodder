@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
@@ -81,12 +80,7 @@ func (index *Index) GetExpandedTags() ids.TagSet {
 }
 
 func (index *Index) AddTagExpandedPtr(e *ids.Tag) (err error) {
-	return quiter.AddClonePool(
-		index.GetExpandedTagsMutable(),
-		ids.GetTagPool(),
-		ids.TagResetter,
-		e,
-	)
+	return index.GetExpandedTagsMutable().Add(*e)
 }
 
 func (index *Index) GetExpandedTagsMutable() ids.TagMutableSet {
@@ -115,12 +109,7 @@ func (index *Index) GetImplicitTags() ids.TagSet {
 }
 
 func (index *Index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
-	return quiter.AddClonePool(
-		index.GetImplicitTagsMutable(),
-		ids.GetTagPool(),
-		ids.TagResetter,
-		tag,
-	)
+	return index.GetImplicitTagsMutable().Add(*tag)
 }
 
 func (index *Index) GetImplicitTagsMutable() ids.TagMutableSet {

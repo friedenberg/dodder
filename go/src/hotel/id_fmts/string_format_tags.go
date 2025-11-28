@@ -2,34 +2,30 @@ package id_fmts
 
 import (
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
 type tagsReader struct{}
 
-func MakeTagsReader() (f *tagsReader) {
-	f = &tagsReader{}
+func MakeTagsReader() (reader *tagsReader) {
+	reader = &tagsReader{}
 
-	return f
+	return reader
 }
 
-func (f *tagsReader) ReadStringFormat(
-	k ids.TagMutableSet,
-	rb *catgut.RingBuffer,
+func (reader *tagsReader) ReadStringFormat(
+	tags ids.TagMutableSet,
+	ringBuffer *catgut.RingBuffer,
 ) (n int64, err error) {
-	flag := collections_ptr.MakeFlagCommasFromExisting(
-		collections_ptr.SetterPolicyAppend,
-		k,
-	)
-
 	var readable catgut.Slice
 
-	if readable, err = rb.PeekUptoAndIncluding('\n'); err != nil && err != io.EOF {
+	if readable, err = ringBuffer.PeekUptoAndIncluding(
+		'\n',
+	); err != nil && err != io.EOF {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -38,19 +34,21 @@ func (f *tagsReader) ReadStringFormat(
 		return n, err
 	}
 
-	tag := strings.TrimSpace(readable.String())
+	seq := flags.SplitCommasAndTrimAndMake[ids.Tag](readable.String())
 
-	if err = flag.Set(tag); err != nil {
-		if errors.Is(err, ids.ErrEmptyTag) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
+	for tag, iterr := range seq {
+		if errors.Is(iterr, ids.ErrEmptyTag) {
+			continue
+		} else if iterr != nil {
+			err = errors.Wrap(iterr)
 			return n, err
 		}
+
+		tags.Add(tag)
 	}
 
 	n = int64(readable.Len())
-	rb.AdvanceRead(readable.Len())
+	ringBuffer.AdvanceRead(readable.Len())
 
 	return n, err
 }

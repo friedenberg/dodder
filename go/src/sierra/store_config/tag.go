@@ -23,7 +23,7 @@ func (iem implicitTagMap) Contains(to, imp ids.Tag) bool {
 		return false
 	}
 
-	if !s.Contains(imp) {
+	if !s.ContainsKey(s.Key(imp)) {
 		return false
 	}
 

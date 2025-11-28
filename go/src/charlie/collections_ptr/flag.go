@@ -109,19 +109,19 @@ func (flags *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 	return err
 }
 
-func (flags *flagCommas[T, TPtr]) Set(v string) (err error) {
+func (flags *flagCommas[T, TPtr]) Set(value string) (err error) {
 	switch flags.SetterPolicy {
 	case SetterPolicyReset:
 		flags.Reset()
 	}
 
-	els := strings.Split(v, ",")
+	elements := strings.SplitSeq(value, ",")
 
-	for _, e := range els {
-		e = strings.TrimSpace(e)
+	for element := range elements {
+		element = strings.TrimSpace(element)
 
 		// TODO-P2 use iter.AddStringPtr
-		if err = quiter.AddString[T, TPtr](flags, e); err != nil {
+		if err = quiter.AddString[T, TPtr](flags, element); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

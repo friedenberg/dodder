@@ -37,17 +37,6 @@ func AddClone[E any, EPtr interface {
 	}
 }
 
-func AddClonePool[E any, EPtr interfaces.Ptr[E]](
-	s interfaces.AdderPtr[E, EPtr],
-	p interfaces.Pool[E, EPtr],
-	r interfaces.ResetterPtr[E, EPtr],
-	b EPtr,
-) (err error) {
-	a := p.Get()
-	r.ResetWith(a, b)
-	return s.AddPtr(a)
-}
-
 func AddOrReplaceIfGreater[T interface {
 	interfaces.Stringer
 	interfaces.ValueLike

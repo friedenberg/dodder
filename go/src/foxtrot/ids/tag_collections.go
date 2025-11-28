@@ -20,7 +20,12 @@ type (
 		Key(Tag) string
 	}
 
-	TagMutableSet = interfaces.MutableSetPtrLike[Tag, *Tag]
+	TagMutableSet = interface {
+		TagSet
+		interfaces.Adder[Tag]
+		Del(Tag) error
+		interfaces.Resetable
+	}
 )
 
 var TagSetEmpty TagSet
