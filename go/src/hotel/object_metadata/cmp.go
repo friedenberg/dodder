@@ -45,18 +45,18 @@ func (equaler equaler) Equals(a, b IMetadata) bool {
 			return false
 		}
 
-		aes := a.GetTags()
-		bes := b.GetTags()
+		aTags := a.GetTags()
+		bTags := b.GetTags()
 
 		found := false
-		for ea := range aes.AllPtr() {
-			if (!equaler.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
+		for aTag := range aTags.All() {
+			if (!equaler.includeVirtual && aTag.IsVirtual()) || aTag.IsEmpty() {
 				continue
 			}
 
-			if !bes.ContainsKey(bes.KeyPtr(ea)) {
+			if !bTags.ContainsKey(bTags.Key(aTag)) {
 				if debug {
-					ui.Debug().Print(ea, "-> X")
+					ui.Debug().Print(aTag, "-> X")
 				}
 				found = true
 				break
@@ -64,26 +64,26 @@ func (equaler equaler) Equals(a, b IMetadata) bool {
 		}
 		if found {
 			if debug {
-				ui.Debug().Print(aes, "->", bes)
+				ui.Debug().Print(aTags, "->", bTags)
 			}
 
 			return false
 		}
 
 		found2 := false
-		for eb := range bes.AllPtr() {
-			if !equaler.includeVirtual && eb.IsVirtual() {
+		for bTag := range bTags.All() {
+			if !equaler.includeVirtual && bTag.IsVirtual() {
 				continue
 			}
 
-			if !aes.ContainsKey(aes.KeyPtr(eb)) {
+			if !aTags.ContainsKey(aTags.Key(bTag)) {
 				found2 = true
 				break
 			}
 		}
 		if found2 {
 			if debug {
-				ui.Debug().Print(aes, "->", bes)
+				ui.Debug().Print(aTags, "->", bTags)
 			}
 			return false
 		}

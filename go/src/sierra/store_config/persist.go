@@ -156,9 +156,9 @@ func (store *store) loadMutableConfig(
 ) (err error) {
 	var file *os.File
 
-	p := envRepo.FileConfig()
+	path := envRepo.FileConfig()
 
-	if file, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

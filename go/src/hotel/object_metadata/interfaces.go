@@ -12,6 +12,10 @@ type (
 
 	TypeLock = markl.Lock[ids.Type, *ids.Type]
 
+	TagSetMutable interface {
+		ids.TagSet
+	}
+
 	IMetadata interface {
 		Getter
 
@@ -19,7 +23,7 @@ type (
 
 		GetDescription() descriptions.Description
 		GetIndex() IIndex
-		GetTags() ids.TagSet // TODO rewrite as generic interface
+		GetTags() ids.TagSet
 		GetTagSetLike() ids.TagSetLike
 		GetTagCollection() ids.TagCollection
 		AllTags() interfaces.Seq[ids.Tag]

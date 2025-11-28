@@ -23,10 +23,6 @@ type (
 		All() Seq[ELEMENT]
 	}
 
-	IterablePtr[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		AllPtr() Seq[ELEMENT_PTR]
-	}
-
 	Adder[E any] interface {
 		Add(E) error
 	}
@@ -49,7 +45,6 @@ type (
 
 	CollectionPtr[T any, TPtr Ptr[T]] interface {
 		Lenner
-		IterablePtr[T, TPtr]
 	}
 )
 
@@ -61,7 +56,6 @@ type (
 		Key(T) string
 		Get(string) (T, bool)
 		Contains(T) bool
-		AllKeys() Seq[string]
 
 		CloneSetLike() SetLike[T]
 		CloneMutableSetLike() MutableSetLike[T]

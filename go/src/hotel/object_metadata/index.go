@@ -99,7 +99,7 @@ func (index *Index) GetExpandedTagsMutable() ids.TagMutableSet {
 
 func (index *Index) SetExpandedTags(tags ids.TagSet) {
 	tagsExpanded := index.GetExpandedTagsMutable()
-	quiter.ResetMutableSetWithPool(tagsExpanded, ids.GetTagPool())
+	tagsExpanded.Reset()
 
 	if tags == nil {
 		return
@@ -133,7 +133,7 @@ func (index *Index) GetImplicitTagsMutable() ids.TagMutableSet {
 
 func (index *Index) SetImplicitTags(tags ids.TagSet) {
 	tagsMutable := index.GetImplicitTagsMutable()
-	quiter.ResetMutableSetWithPool(tagsMutable, ids.GetTagPool())
+	tagsMutable.Reset()
 
 	if tags == nil {
 		return

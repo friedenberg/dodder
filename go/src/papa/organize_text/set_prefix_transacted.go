@@ -29,13 +29,13 @@ func MakePrefixSet(c int) (s PrefixSet) {
 }
 
 func MakePrefixSetFrom(
-	ts objSet,
-) (s PrefixSet) {
-	s = MakePrefixSet(ts.Len())
-	for element := range ts.All() {
-		s.Add(element)
+	objectSet objSet,
+) (prefixSet PrefixSet) {
+	prefixSet = MakePrefixSet(objectSet.Len())
+	for element := range objectSet.All() {
+		prefixSet.Add(element)
 	}
-	return s
+	return prefixSet
 }
 
 func (prefixSet PrefixSet) Len() int {
@@ -65,26 +65,27 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 }
 
 // this splits on right-expanded
-func (prefixSet *PrefixSet) Add(z *obj) (err error) {
-	es := ids.Expanded(
-		z.GetSkuExternal().GetMetadataMutable().GetIndexMutable().GetImplicitTags(),
+func (prefixSet *PrefixSet) Add(object *obj) (err error) {
+	index := object.GetSkuExternal().GetMetadataMutable().GetIndexMutable()
+	expandedTags := ids.Expanded(
+		index.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	for e := range z.GetSkuExternal().GetMetadataMutable().GetIndexMutable().GetExpandedTags().AllPtr() {
-		if err = es.AddPtr(e); err != nil {
+	for tag := range index.GetExpandedTags().All() {
+		if err = expandedTags.Add(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	if es.Len() == 0 {
-		prefixSet.addPair("", z)
+	if expandedTags.Len() == 0 {
+		prefixSet.addPair("", object)
 		return err
 	}
 
-	for e := range es.All() {
-		prefixSet.addPair(e.String(), z)
+	for e := range expandedTags.All() {
+		prefixSet.addPair(e.String(), object)
 	}
 
 	return err

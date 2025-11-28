@@ -60,7 +60,10 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	equal := quiter.SetEqualsPtr(a.Transacted.GetMetadata().GetTags(), a.Parent.Transacted.GetMetadata().GetTags())
+	equal := quiter.SetEquals(
+		a.Transacted.GetMetadata().GetTags(),
+		a.Parent.Transacted.GetMetadata().GetTags(),
+	)
 
 	if !equal {
 		ui.Log().Print("parent tags not equal")

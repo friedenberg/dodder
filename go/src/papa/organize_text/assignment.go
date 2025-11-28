@@ -227,26 +227,26 @@ func (assignment *Assignment) consume(b *Assignment) (err error) {
 	return err
 }
 
-func (assignment *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
+func (assignment *Assignment) AllTags(tags ids.TagMutableSet) (err error) {
 	if assignment == nil {
 		return err
 	}
 
-	var es ids.TagSet
+	var expandedTags ids.TagSet
 
-	if es, err = assignment.expandedTags(); err != nil {
+	if expandedTags, err = assignment.expandedTags(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	for e := range es.AllPtr() {
-		if err = mes.AddPtr(e); err != nil {
+	for tag := range expandedTags.All() {
+		if err = tags.Add(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	if err = assignment.Parent.AllTags(mes); err != nil {
+	if err = assignment.Parent.AllTags(tags); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -299,18 +299,20 @@ func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
 	return es, err
 }
 
-func (assignment *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	for e := range assignment.Transacted.GetMetadata().AllTags() {
-		for e1 := range es.AllPtr() {
-			if ids.ContainsExactly(e1, e) {
-				if err = es.DelPtr(e1); err != nil {
+func (assignment *Assignment) SubtractFromSet(
+	tagsToSubtract ids.TagMutableSet,
+) (err error) {
+	for assignmentTag := range assignment.Transacted.GetMetadata().AllTags() {
+		for tagToSubtract := range tagsToSubtract.All() {
+			if ids.ContainsExactly(tagToSubtract, assignmentTag) {
+				if err = tagsToSubtract.Del(tagToSubtract); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
 			}
 		}
 
-		if err = es.Del(e); err != nil {
+		if err = tagsToSubtract.Del(assignmentTag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -320,7 +322,7 @@ func (assignment *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) 
 		return err
 	}
 
-	return assignment.Parent.SubtractFromSet(es)
+	return assignment.Parent.SubtractFromSet(tagsToSubtract)
 }
 
 func (assignment *Assignment) Contains(e *ids.Tag) bool {

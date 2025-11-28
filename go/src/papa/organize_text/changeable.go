@@ -97,7 +97,7 @@ func (assignment *Assignment) addToSet(
 
 			outputMetadata := outputObject.GetSkuExternal().GetMetadataMutable()
 
-			for tag := range ot.Metadata.AllPtr() {
+			for tag := range ot.Metadata.All() {
 				if organizeObject.tipe == tag_paths.TypeUnknown {
 					continue
 				}
@@ -108,7 +108,7 @@ func (assignment *Assignment) addToSet(
 					continue
 				}
 
-				outputObject.GetSkuExternal().AddTagPtr(tag)
+				outputObject.GetSkuExternal().AddTag(tag)
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
@@ -160,8 +160,8 @@ func (assignment *Assignment) addToSet(
 			}
 		}
 
-		for e := range expanded.AllPtr() {
-			outputObject.GetSkuExternal().AddTagPtr(e)
+		for tag := range expanded.All() {
+			outputObject.GetSkuExternal().AddTag(tag)
 		}
 	}
 

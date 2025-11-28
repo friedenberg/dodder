@@ -223,8 +223,8 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 		panic("empty tag set")
 	}
 
-	for tag := range tags.AllPtr() {
-		errors.PanicIfError(metadata.AddTagPtr(tag))
+	for tag := range tags.All() {
+		errors.PanicIfError(metadata.AddTagPtr(&tag))
 	}
 }
 
@@ -243,8 +243,8 @@ func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
 		panic("empty tag set")
 	}
 
-	for tag := range tags.AllPtr() {
-		errors.PanicIfError(metadata.AddTagPtrFast(tag))
+	for tag := range tags.All() {
+		errors.PanicIfError(metadata.AddTagPtrFast(&tag))
 	}
 }
 
@@ -279,7 +279,7 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 }
 
 func (metadata *metadata) GenerateExpandedTags() {
-	metadata.Index.SetExpandedTags(ids.ExpandMany(
+	metadata.Index.SetExpandedTags(ids.ExpandMany[ids.Tag](
 		metadata.GetTags(),
 		expansion.ExpanderRight,
 	))

@@ -59,7 +59,7 @@ func (a *tag) Equals(b *tag) bool {
 		return false
 	}
 
-	if !quiter.SetEqualsPtr(
+	if !quiter.SetEquals(
 		a.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
 		b.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
 	) {
@@ -85,50 +85,50 @@ func (e *tag) String() string {
 func (compiled *compiled) AccumulateImplicitTags(
 	tag ids.Tag,
 ) (err error) {
-	ek, ok := compiled.Tags.Get(tag.String())
+	compiledTag, ok := compiled.Tags.Get(tag.String())
 
 	if !ok {
 		return err
 	}
 
-	ees := ids.MakeTagMutableSet()
+	expandedTags := ids.MakeTagMutableSet()
 
 	ids.ExpandOneInto(
 		tag,
 		ids.MakeTag,
 		expansion.ExpanderRight,
-		ees,
+		expandedTags,
 	)
 
-	for e1 := range ees.All() {
-		if e1.Equals(tag) {
+	for expandedTag := range expandedTags.All() {
+		if expandedTag.Equals(tag) {
 			continue
 		}
 
-		if err = compiled.AccumulateImplicitTags(e1); err != nil {
+		if err = compiled.AccumulateImplicitTags(expandedTag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		for e2 := range compiled.GetImplicitTags(e1).All() {
-			if err = compiled.ImplicitTags.Set(tag, e2); err != nil {
+		for implicitTag := range compiled.GetImplicitTags(expandedTag).All() {
+			if err = compiled.ImplicitTags.Set(tag, implicitTag); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 		}
 	}
 
-	for e1 := range ek.Transacted.Metadata.AllTags() {
-		if compiled.ImplicitTags.Contains(e1, tag) {
+	for compiledTag := range compiledTag.Transacted.Metadata.AllTags() {
+		if compiled.ImplicitTags.Contains(compiledTag, tag) {
 			continue
 		}
 
-		if err = compiled.ImplicitTags.Set(tag, e1); err != nil {
+		if err = compiled.ImplicitTags.Set(tag, compiledTag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = compiled.AccumulateImplicitTags(e1); err != nil {
+		if err = compiled.AccumulateImplicitTags(compiledTag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -138,17 +138,19 @@ func (compiled *compiled) AccumulateImplicitTags(
 }
 
 func (compiled *compiled) addTag(
-	kinder *sku.Transacted,
-	mutter *sku.Transacted,
+	daughter *sku.Transacted,
+	mother *sku.Transacted,
 ) (didChange bool, err error) {
 	compiled.lock.Lock()
 	defer compiled.lock.Unlock()
 
-	var b tag
+	var tag tag
 
-	sku.Resetter.ResetWith(&b.Transacted, kinder)
+	sku.Resetter.ResetWith(&tag.Transacted, daughter)
 
-	if didChange, err = quiter.AddOrReplaceIfGreater(compiled.Tags, &b); err != nil {
+	if didChange, err = quiter.AddOrReplaceIfGreater(
+		compiled.Tags, &tag,
+	); err != nil {
 		err = errors.Wrap(err)
 		return didChange, err
 	}

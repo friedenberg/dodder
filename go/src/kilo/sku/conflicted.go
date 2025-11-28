@@ -115,25 +115,25 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	deleted := ids.MakeTagMutableSet()
 
 	removeFromAllButAddTo := func(
-		e *ids.Tag,
-		toAdd ids.TagMutableSet,
+		tag ids.Tag,
+		tagSet ids.TagMutableSet,
 	) (err error) {
-		if err = toAdd.AddPtr(e); err != nil {
+		if err = tagSet.Add(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = left.DelPtr(e); err != nil {
+		if err = left.Del(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = middle.DelPtr(e); err != nil {
+		if err = middle.Del(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = right.DelPtr(e); err != nil {
+		if err = right.Del(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -141,14 +141,14 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 		return err
 	}
 
-	for tag := range middle.AllPtr() {
-		if left.ContainsKey(left.KeyPtr(tag)) &&
-			right.ContainsKey(right.KeyPtr(tag)) {
+	for tag := range middle.All() {
+		if left.ContainsKey(left.Key(tag)) &&
+			right.ContainsKey(right.Key(tag)) {
 			if err = removeFromAllButAddTo(tag, same); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
-		} else if left.ContainsKey(left.KeyPtr(tag)) || right.ContainsKey(right.KeyPtr(tag)) {
+		} else if left.ContainsKey(left.Key(tag)) || right.ContainsKey(right.Key(tag)) {
 			if err = removeFromAllButAddTo(tag, deleted); err != nil {
 				err = errors.Wrap(err)
 				return err
@@ -156,15 +156,15 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 		}
 	}
 
-	for tag := range left.AllPtr() {
-		if err = same.AddPtr(tag); err != nil {
+	for tag := range left.All() {
+		if err = same.Add(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	for tag := range right.AllPtr() {
-		if err = same.AddPtr(tag); err != nil {
+	for tag := range right.All() {
+		if err = same.Add(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

@@ -48,7 +48,7 @@ func ToLuaTableV2(
 
 	tags = luaTable.TagsImplicit
 
-	for tag := range object.GetMetadata().GetIndex().GetImplicitTags().AllPtr() {
+	for tag := range object.GetMetadata().GetIndex().GetImplicitTags().All() {
 		luaState.SetField(tags, tag.String(), lua.LBool(true))
 	}
 }

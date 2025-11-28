@@ -33,8 +33,8 @@ func SetEquals[T any](
 	return true
 }
 
-func SetEqualsPtr[T any, TPtr interfaces.Ptr[T]](
-	a, b interfaces.SetPtrLike[T, TPtr],
+func SetEqualsPtr[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]](
+	a, b interfaces.SetPtrLike[ELEMENT, ELEMENT_PTR],
 ) bool {
 	if a == nil && b == nil {
 		return true
@@ -48,10 +48,10 @@ func SetEqualsPtr[T any, TPtr interfaces.Ptr[T]](
 		return false
 	}
 
-	for e := range a.AllPtr() {
-		k := b.KeyPtr(e)
+	for element := range a.All() {
+		key := b.Key(element)
 
-		if ok := b.ContainsKey(k); !ok {
+		if ok := b.ContainsKey(key); !ok {
 			return false
 		}
 	}

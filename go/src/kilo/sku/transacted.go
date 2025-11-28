@@ -85,7 +85,7 @@ func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
 		return err
 	}
 
-	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().KeyPtr(tag)
+	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().Key(*tag)
 
 	if transacted.GetMetadata().GetIndex().GetImplicitTags().ContainsKey(tagKey) {
 		return err

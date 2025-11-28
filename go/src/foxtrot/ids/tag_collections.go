@@ -13,8 +13,20 @@ import (
 type (
 	TagCollection = interfaces.CollectionPtr[Tag, *Tag]
 	TagMutableSet = interfaces.MutableSetPtrLike[Tag, *Tag]
-	TagSet        = interfaces.SetPtrLike[Tag, *Tag]
-	TagSetLike    = interfaces.SetLike[Tag]
+	TagSet        interface {
+		Len() int
+		All() interfaces.Seq[Tag]
+		Any() Tag
+		CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[Tag, *Tag]
+		CloneMutableSetLike() interfaces.MutableSetLike[Tag]
+		CloneSetLike() interfaces.SetLike[Tag]
+		CloneSetPtrLike() interfaces.SetPtrLike[Tag, *Tag]
+		Contains(Tag) bool
+		ContainsKey(string) bool
+		Get(string) (Tag, bool)
+		Key(Tag) string
+	}
+	TagSetLike = interfaces.SetLike[Tag]
 )
 
 var TagSetEmpty TagSet
@@ -52,7 +64,7 @@ func MakeTagMutableSet(hs ...Tag) TagMutableSet {
 }
 
 func TagSetEquals(first, second TagSet) bool {
-	return quiter.SetEqualsPtr(first, second)
+	return quiter.SetEquals(first, second)
 }
 
 type TagSlice []Tag

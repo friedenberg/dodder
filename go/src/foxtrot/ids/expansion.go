@@ -22,13 +22,13 @@ type idExpandablePtr[T idExpandable[T]] interface {
 	interfaces.SetterPtr[T]
 }
 
-func expandOne[T idExpandable[T], TPtr idExpandablePtr[T]](
-	k TPtr,
-	ex expansion.Expander,
-	acc interfaces.Adder[T],
+func expandOne[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
+	k ID,
+	expander expansion.Expander,
+	adder interfaces.Adder[ID],
 ) {
-	f := quiter.MakeFuncSetString[T, TPtr](acc)
-	ex.Expand(f, k.String())
+	f := quiter.MakeFuncSetString[ID, ID_PTR](adder)
+	expander.Expand(f, k.String())
 }
 
 func ExpandOneInto[T interfaces.ObjectId](
@@ -82,17 +82,17 @@ func ExpandOneSlice[T interfaces.ObjectId](
 	return out
 }
 
-func ExpandMany[T idExpandable[T], TPtr idExpandablePtr[T]](
-	ks interfaces.SetPtrLike[T, TPtr],
-	ex expansion.Expander,
-) (out interfaces.SetPtrLike[T, TPtr]) {
-	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
+func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
+	set interfaces.SetLike[ID],
+	expander expansion.Expander,
+) (out interfaces.SetPtrLike[ID, ID_PTR]) {
+	mutableSet := collections_ptr.MakeMutableValueSetValue[ID, ID_PTR](nil)
 
-	for k := range ks.AllPtr() {
-		expandOne[T, TPtr](k, ex, s1)
+	for id := range set.All() {
+		expandOne[ID, ID_PTR](id, expander, mutableSet)
 	}
 
-	out = s1.CloneSetPtrLike()
+	out = mutableSet.CloneSetPtrLike()
 
 	return out
 }
