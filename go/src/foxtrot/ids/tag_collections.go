@@ -11,22 +11,20 @@ import (
 )
 
 type (
-	TagCollection = interfaces.CollectionPtr[Tag, *Tag]
-	TagMutableSet = interfaces.MutableSetPtrLike[Tag, *Tag]
-	TagSet        interface {
+	TagSet interface {
 		Len() int
 		All() interfaces.Seq[Tag]
 		Any() Tag
 		CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[Tag, *Tag]
 		CloneMutableSetLike() interfaces.MutableSetLike[Tag]
-		CloneSetLike() interfaces.SetLike[Tag]
 		CloneSetPtrLike() interfaces.SetPtrLike[Tag, *Tag]
 		Contains(Tag) bool
 		ContainsKey(string) bool
 		Get(string) (Tag, bool)
 		Key(Tag) string
 	}
-	TagSetLike = interfaces.SetLike[Tag]
+
+	TagMutableSet = interfaces.MutableSetPtrLike[Tag, *Tag]
 )
 
 var TagSetEmpty TagSet

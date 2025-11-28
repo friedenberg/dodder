@@ -478,7 +478,7 @@ func (store *Store) WriteFSItemToExternal(
 		return err
 	}
 
-	fdees := quiter.SortedValues(item.FDs)
+	fdees := quiter.SortedValues(item.FDs.All())
 
 	for _, fdee := range fdees {
 		field := object_metadata.Field{

@@ -164,15 +164,15 @@ func (encoder *binaryEncoder) writeFieldKey(
 		}
 
 	case key_bytes.Tag:
-		es := object.GetTags()
+		tags := object.GetTags()
 
-		for _, e := range quiter.SortedValues(es) {
+		for _, e := range quiter.SortedValues(tags.All()) {
 			if e.IsVirtual() {
 				continue
 			}
 
 			if e.String() == "" {
-				err = errors.ErrorWithStackf("empty tag in %q", es)
+				err = errors.ErrorWithStackf("empty tag in %q", tags)
 				return n, err
 			}
 
@@ -249,7 +249,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 	case key_bytes.CacheTagImplicit:
 		tags := metadata.GetIndex().GetImplicitTags()
 
-		for _, tag := range quiter.SortedValues(tags) {
+		for _, tag := range quiter.SortedValues(tags.All()) {
 			var n1 int64
 			n1, err = encoder.writeFieldBinaryMarshaler(&tag)
 			n += n1
@@ -263,7 +263,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 	case key_bytes.CacheTagExpanded:
 		tags := metadata.GetIndex().GetExpandedTags()
 
-		for _, tag := range quiter.SortedValues(tags) {
+		for _, tag := range quiter.SortedValues(tags.All()) {
 			var n1 int64
 			n1, err = encoder.writeFieldBinaryMarshaler(&tag)
 			n += n1

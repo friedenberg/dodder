@@ -88,7 +88,7 @@ func assertSet(
 
 	// Copy
 	{
-		sutCopy := sut.CloneSetLike()
+		sutCopy := sut
 
 		if !quiter.SetEquals(sut, sutCopy) {
 			t.Fatalf("expected copy to equal original")

@@ -107,7 +107,7 @@ func (format format) writeMetadataKeyStringTo(
 				_ = recover()
 			}()
 
-			sortedValues = quiter.SortedValues(tags)
+			sortedValues = quiter.SortedValues(tags.All())
 		}()
 
 		for _, tag := range sortedValues {

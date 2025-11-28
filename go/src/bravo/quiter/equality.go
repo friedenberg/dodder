@@ -4,9 +4,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
+type set[ELEMENT any] interface {
+	Len() int
+	Contains(ELEMENT) bool
+	All() interfaces.Seq[ELEMENT]
+}
+
 // TODO refactor to use iterators
-func SetEquals[T any](
-	a, b interfaces.SetLike[T],
+func SetEquals[ELEMENT any](
+	a, b set[ELEMENT],
 ) bool {
 	if a == nil && b == nil {
 		return true

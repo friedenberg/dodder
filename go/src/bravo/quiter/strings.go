@@ -1,6 +1,7 @@
 package quiter
 
 import (
+	"slices"
 	"sort"
 	"strings"
 
@@ -19,9 +20,9 @@ func SortedValuesBy[ELEMENT any](
 }
 
 func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
-	set interfaces.SetLike[ELEMENT],
+	seq interfaces.Seq[ELEMENT],
 ) (out []ELEMENT) {
-	out = Elements(set)
+	out = slices.Collect(seq)
 
 	sort.Slice(
 		out,

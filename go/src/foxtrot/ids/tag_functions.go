@@ -49,34 +49,34 @@ func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 	return s2
 }
 
-func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
-	es1 := quiter.SortedValues[Tag](s)
-	es := make([]Tag, 0, len(es1))
+func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
+	sortedTags := quiter.SortedValues[Tag](tags.All())
+	filteredTags := make([]Tag, 0, len(sortedTags))
 
-	for _, e := range es1 {
-		if len(es) == 0 {
-			es = append(es, e)
+	for _, e := range sortedTags {
+		if len(filteredTags) == 0 {
+			filteredTags = append(filteredTags, e)
 			continue
 		}
 
-		idxLast := len(es) - 1
-		last := es[idxLast]
+		idxLast := len(filteredTags) - 1
+		last := filteredTags[idxLast]
 
 		switch {
 		case Contains(last, e):
 			continue
 
 		case Contains(e, last):
-			es[idxLast] = e
+			filteredTags[idxLast] = e
 
 		default:
-			es = append(es, e)
+			filteredTags = append(filteredTags, e)
 		}
 	}
 
-	s2 = MakeTagSet(es...)
+	output = MakeTagSet(filteredTags...)
 
-	return s2
+	return output
 }
 
 func AddNormalizedTag(es TagMutableSet, e *Tag) {

@@ -83,12 +83,12 @@ func ExpandOneSlice[T interfaces.ObjectId](
 }
 
 func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
-	set interfaces.SetLike[ID],
+	seq interfaces.Seq[ID],
 	expander expansion.Expander,
 ) (out interfaces.SetPtrLike[ID, ID_PTR]) {
 	mutableSet := collections_ptr.MakeMutableValueSetValue[ID, ID_PTR](nil)
 
-	for id := range set.All() {
+	for id := range seq {
 		expandOne[ID, ID_PTR](id, expander, mutableSet)
 	}
 
@@ -97,6 +97,6 @@ func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
 	return out
 }
 
-func Expanded(s TagSet, ex expansion.Expander) (out TagSet) {
-	return ExpandMany(s, ex)
+func Expanded(set TagSet, expander expansion.Expander) TagSet {
+	return ExpandMany(set.All(), expander)
 }

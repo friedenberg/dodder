@@ -109,12 +109,12 @@ func (factory formatterComponents) writeCommonMetadataFormat(
 		}
 	}
 
-	for _, e := range quiter.SortedValues(metadata.GetTags()) {
-		if ids.IsEmpty(e) {
+	for _, tag := range quiter.SortedValues(metadata.GetTags().All()) {
+		if ids.IsEmpty(tag) {
 			continue
 		}
 
-		lineWriter.WriteFormat("- %s", e)
+		lineWriter.WriteFormat("- %s", tag)
 	}
 
 	if n, err = lineWriter.WriteTo(writer); err != nil {

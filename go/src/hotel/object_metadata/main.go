@@ -122,9 +122,6 @@ func (metadata *metadata) GetTags() ids.TagSet {
 	return metadata.Tags
 }
 
-func (metadata *metadata) GetTagSetLike() ids.TagSetLike       { return metadata.GetTags() }
-func (metadata *metadata) GetTagCollection() ids.TagCollection { return metadata.GetTags() }
-
 func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
 	return func(yield func(ids.Tag) bool) {
 		if metadata.Tags == nil {
@@ -280,7 +277,7 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 
 func (metadata *metadata) GenerateExpandedTags() {
 	metadata.Index.SetExpandedTags(ids.ExpandMany[ids.Tag](
-		metadata.GetTags(),
+		metadata.GetTags().All(),
 		expansion.ExpanderRight,
 	))
 }

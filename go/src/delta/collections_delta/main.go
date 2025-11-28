@@ -17,24 +17,28 @@ func (d delta[T]) GetRemoved() interfaces.SetLike[T] {
 	return d.Removed
 }
 
-func MakeSetDelta[T interfaces.ValueLike](
-	from, to interfaces.SetLike[T],
-) interfaces.Delta[T] {
-	d := delta[T]{
-		Added:   collections_value.MakeMutableValueSet[T](nil),
-		Removed: from.CloneMutableSetLike(),
+func MakeSetDelta[ELEMENT interfaces.ValueLike](
+	from, to interfaces.SetBase[ELEMENT],
+) interfaces.Delta[ELEMENT] {
+	delta := delta[ELEMENT]{
+		Added:   collections_value.MakeMutableValueSet[ELEMENT](nil),
+		Removed: collections_value.MakeMutableValueSet[ELEMENT](nil),
 	}
 
-	for e := range to.All() {
-		if from.Contains(e) {
+	for element := range from.All() {
+		delta.Removed.Add(element)
+	}
+
+	for element := range to.All() {
+		if from.Contains(element) {
 			// had previously
 		} else {
 			// did not have previously
-			d.Added.Add(e)
+			delta.Added.Add(element)
 		}
 
-		d.Removed.Del(e)
+		delta.Removed.Del(element)
 	}
 
-	return d
+	return delta
 }

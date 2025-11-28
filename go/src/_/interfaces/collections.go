@@ -18,6 +18,14 @@ type (
 		ContainsKey(string) bool
 	}
 
+	Container[ELEMENT any] interface {
+		Contains(ELEMENT) bool
+	}
+
+	Aller[ELEMENT any] interface {
+		All() Seq[ELEMENT]
+	}
+
 	Iterable[ELEMENT any] interface {
 		Any() ELEMENT // TODO make derived
 		All() Seq[ELEMENT]
@@ -29,6 +37,12 @@ type (
 
 	AdderPtr[E any, EPtr Ptr[E]] interface {
 		AddPtr(EPtr) error
+	}
+
+	SetBase[ELEMENT any] interface {
+		Lenner
+		Container[ELEMENT]
+		Aller[ELEMENT]
 	}
 )
 

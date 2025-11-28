@@ -19,7 +19,7 @@ func (store *Store) applyDormantAndRealizeTags(
 	metadata := &object.Metadata
 
 	metadata.GetIndexMutable().SetExpandedTags(ids.ExpandMany(
-		metadata.GetTags(),
+		metadata.GetTags().All(),
 		expansion.ExpanderRight,
 	))
 

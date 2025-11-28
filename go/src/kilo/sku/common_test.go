@@ -96,7 +96,7 @@ func testMakeTags(t *ui.TestContext) {
 		}
 	}
 
-	sutTagSet2 := sutTagSet.CloneSetLike()
+	sutTagSet2 := sutTagSet
 
 	if sutTagSet2.Len() != 3 {
 		t.Fatalf("expected len 3 but got %d", sutTagSet2.Len())
@@ -121,9 +121,7 @@ func testMakeTags(t *ui.TestContext) {
 
 	{
 		expected := "tag1, tag2, tag3"
-		actual := quiter.StringCommaSeparated(
-			sutTagSet.CloneSetLike(),
-		)
+		actual := quiter.StringCommaSeparated(sutTagSet)
 
 		if actual != expected {
 			t.Fatalf("expected %q but got %q", expected, actual)

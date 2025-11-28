@@ -24,8 +24,6 @@ type (
 		GetDescription() descriptions.Description
 		GetIndex() IIndex
 		GetTags() ids.TagSet
-		GetTagSetLike() ids.TagSetLike
-		GetTagCollection() ids.TagCollection
 		AllTags() interfaces.Seq[ids.Tag]
 		GetTai() ids.Tai
 		GetType() ids.Type
