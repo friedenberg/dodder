@@ -20,7 +20,8 @@ type (
 		GetDormant() values.Bool
 		GetImplicitTags() ids.TagSet
 		GetParentTai() ids.Tai
-		GetComments() interfaces.Seq[string] // TODO move to IIndex
+		GetComments() interfaces.Seq[string]
+		GetSelfWithoutTai() interfaces.MarklId
 	}
 
 	IIndexMutable interface {
@@ -35,7 +36,8 @@ type (
 		GetTagPathsMutable() *tag_paths.Tags
 		SetExpandedTags(tags ids.TagSet)
 		SetImplicitTags(e ids.TagSet)
-		GetCommentsMutable() *collections_slice.Slice[string] // TODO move to IIndexMutable
+		GetCommentsMutable() *collections_slice.Slice[string]
+		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
 	}
 )
 

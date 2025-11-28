@@ -3,9 +3,9 @@ package commands_dodder
 import (
 	"os"
 	"path/filepath"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/hotel/repo_configs"
@@ -128,7 +128,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 		Query: cmd.DefaultQueryGroup.String(),
 		Defaults: repo_configs.DefaultsV1OmitEmpty{
 			Type: cmd.Proto.GetType(),
-			Tags: quiter.Elements(cmd.Proto.GetTags()),
+			Tags: slices.Collect(cmd.Proto.AllTags()),
 		},
 	}
 

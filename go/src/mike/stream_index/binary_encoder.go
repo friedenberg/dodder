@@ -228,7 +228,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.DigestMetadataWithoutTai:
 		if n, err = encoder.writeFieldMerkleId(
-			object.GetMetadata().GetSelfWithoutTai(),
+			object.GetMetadata().GetIndex().GetSelfWithoutTai(),
 			true,
 			encoder.Key.String(),
 		); err != nil {

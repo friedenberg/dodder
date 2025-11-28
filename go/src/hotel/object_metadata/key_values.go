@@ -9,10 +9,10 @@ type keyValues struct {
 	SelfWithoutTai markl.Id // TODO move to a separate key-value store
 }
 
-func (metadata *metadata) GetSelfWithoutTai() interfaces.MarklId {
-	return &metadata.Index.SelfWithoutTai
+func (index *Index) GetSelfWithoutTai() interfaces.MarklId {
+	return &index.SelfWithoutTai
 }
 
-func (metadata *metadata) GetSelfWithoutTaiMutable() interfaces.MutableMarklId {
-	return &metadata.Index.SelfWithoutTai
+func (index *Index) GetSelfWithoutTaiMutable() interfaces.MutableMarklId {
+	return &index.SelfWithoutTai
 }

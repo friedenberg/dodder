@@ -1,6 +1,7 @@
 package object_metadata
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -119,6 +120,23 @@ func (metadata *metadata) GetTags() ids.TagSet {
 	}
 
 	return metadata.Tags
+}
+
+func (metadata *metadata) GetTagSetLike() ids.TagSetLike       { return metadata.GetTags() }
+func (metadata *metadata) GetTagCollection() ids.TagCollection { return metadata.GetTags() }
+
+func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
+	return func(yield func(ids.Tag) bool) {
+		if metadata.Tags == nil {
+			return
+		}
+
+		for tag := range metadata.Tags.All() {
+			if !yield(tag) {
+				return
+			}
+		}
+	}
 }
 
 func (metadata *metadata) ResetTags() {
@@ -242,10 +260,8 @@ func (metadata *metadata) GetTypeLockMutable() *TypeLock {
 	return &metadata.Type
 }
 
-func (metadata *metadata) Subtract(
-	b *metadata,
-) {
-	if metadata.GetType().String() == b.GetType().String() {
+func (metadata *metadata) Subtract(otherMetadata IMetadata) {
+	if metadata.GetType().String() == otherMetadata.GetType().String() {
 		metadata.GetTypeMutable().Reset()
 	}
 
@@ -253,7 +269,7 @@ func (metadata *metadata) Subtract(
 		return
 	}
 
-	for tag := range b.Tags.AllPtr() {
+	for tag := range otherMetadata.GetTags().AllPtr() {
 		metadata.Tags.DelPtr(tag)
 	}
 }

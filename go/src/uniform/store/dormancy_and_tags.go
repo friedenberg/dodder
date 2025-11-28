@@ -36,7 +36,7 @@ func (store *Store) applyDormantAndRealizeTags(
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
 	metadata.GetIndexMutable().GetTagPathsMutable().Reset()
-	for tag := range metadata.GetTags().All() {
+	for tag := range metadata.AllTags() {
 		metadata.GetIndexMutable().GetTagPathsMutable().AddTagOld(tag)
 	}
 

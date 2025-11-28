@@ -1,7 +1,7 @@
 package store_config
 
 import (
-	"encoding/gob"
+	"encoding/gob" // TODO remove
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"

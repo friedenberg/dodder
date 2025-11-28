@@ -1,7 +1,7 @@
 package ids
 
 import (
-	"sort"
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -11,8 +11,10 @@ import (
 )
 
 type (
-	TagSet        = interfaces.SetPtrLike[Tag, *Tag]
+	TagCollection = interfaces.CollectionPtr[Tag, *Tag]
 	TagMutableSet = interfaces.MutableSetPtrLike[Tag, *Tag]
+	TagSet        = interfaces.SetPtrLike[Tag, *Tag]
+	TagSetLike    = interfaces.SetLike[Tag]
 )
 
 var TagSetEmpty TagSet
@@ -58,9 +60,7 @@ type TagSlice []Tag
 func MakeTagSlice(tags ...Tag) (slice TagSlice) {
 	slice = make([]Tag, len(tags))
 
-	for index, tag := range tags {
-		slice[index] = tag
-	}
+	copy(slice, tags)
 
 	return slice
 }
@@ -78,17 +78,17 @@ func NewSliceFromStrings(tagStrings ...string) (slice TagSlice, err error) {
 	return slice, err
 }
 
-func (s *TagSlice) DropFirst() {
-	if s.Len() > 0 {
-		*s = (*s)[1:]
+func (slice *TagSlice) DropFirst() {
+	if slice.Len() > 0 {
+		*slice = (*slice)[1:]
 	}
 }
 
-func (s TagSlice) Len() int {
-	return len(s)
+func (slice TagSlice) Len() int {
+	return len(slice)
 }
 
-func (tags *TagSlice) AddString(value string) (err error) {
+func (slice *TagSlice) AddString(value string) (err error) {
 	var tag Tag
 
 	if err = tag.Set(value); err != nil {
@@ -96,20 +96,20 @@ func (tags *TagSlice) AddString(value string) (err error) {
 		return err
 	}
 
-	tags.Add(tag)
+	slice.Add(tag)
 
 	return err
 }
 
-func (es *TagSlice) Add(e Tag) {
-	*es = append(*es, e)
+func (slice *TagSlice) Add(e Tag) {
+	*slice = append(*slice, e)
 }
 
-func (s *TagSlice) Set(v string) (err error) {
-	es := strings.Split(v, ",")
+func (slice *TagSlice) Set(v string) (err error) {
+	tags := strings.SplitSeq(v, ",")
 
-	for _, e := range es {
-		if err = s.AddString(e); err != nil {
+	for tag := range tags {
+		if err = slice.AddString(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -118,30 +118,25 @@ func (s *TagSlice) Set(v string) (err error) {
 	return err
 }
 
-func (es TagSlice) SortedString() (out []string) {
-	out = make([]string, len(es))
+func (slice TagSlice) SortedString() (out []string) {
+	out = make([]string, len(slice))
 
 	i := 0
 
-	for _, e := range es {
+	for _, e := range slice {
 		out[i] = e.String()
 		i++
 	}
 
-	sort.Slice(
-		out,
-		func(i, j int) bool {
-			return out[i] < out[j]
-		},
-	)
+	slices.Sort(out)
 
 	return out
 }
 
-func (s TagSlice) String() string {
-	return strings.Join(s.SortedString(), ", ")
+func (slice TagSlice) String() string {
+	return strings.Join(slice.SortedString(), ", ")
 }
 
-func (s TagSlice) ToSet() TagSet {
-	return MakeTagSet([]Tag(s)...)
+func (slice TagSlice) ToSet() TagSet {
+	return MakeTagSet([]Tag(slice)...)
 }

@@ -211,7 +211,7 @@ func (index *indexAbbr) AddObjectToIdIndex(
 		index.ZettelId.Tails.Add(zettelId.GetTail())
 	}
 
-	for tag := range object.GetMetadata().GetTags().All() {
+	for tag := range object.GetMetadata().AllTags() {
 		index.SeenIds[genres.Tag].Add(tag.String())
 	}
 

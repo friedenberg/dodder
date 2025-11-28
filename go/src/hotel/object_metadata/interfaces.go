@@ -8,17 +8,21 @@ import (
 )
 
 type (
-	Metadata        = metadata
-	MetadataMutable = *metadata
+	Metadata = metadata
 
 	TypeLock = markl.Lock[ids.Type, *ids.Type]
 
 	IMetadata interface {
 		Getter
 
+		IsEmpty() bool
+
 		GetDescription() descriptions.Description
 		GetIndex() IIndex
-		GetTags() ids.TagSet
+		GetTags() ids.TagSet // TODO rewrite as generic interface
+		GetTagSetLike() ids.TagSetLike
+		GetTagCollection() ids.TagCollection
+		AllTags() interfaces.Seq[ids.Tag]
 		GetTai() ids.Tai
 		GetType() ids.Type
 		GetTypeLock() TypeLock
@@ -28,7 +32,6 @@ type (
 		GetMotherObjectSig() interfaces.MarklId
 		GetRepoPubKey() interfaces.MarklId
 		GetObjectSig() interfaces.MarklId
-		GetSelfWithoutTai() interfaces.MarklId
 	}
 
 	IMetadataMutable interface {
@@ -36,10 +39,12 @@ type (
 		IMetadata
 		GetterMutable
 
+		Subtract(IMetadata)
+
+		// TODO rewrite
 		AddTagPtr(e *ids.Tag) (err error)
 		ResetTags()
 		SetTags(ids.TagSet)
-		SetTagsFast(ids.TagSet)
 		AddTagString(tagString string) (err error)
 		AddTagPtrFast(tag *ids.Tag) (err error)
 		GenerateExpandedTags()
@@ -52,7 +57,6 @@ type (
 		GetObjectDigestMutable() interfaces.MutableMarklId
 		GetObjectSigMutable() interfaces.MutableMarklId
 		GetRepoPubKeyMutable() interfaces.MutableMarklId
-		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeLockMutable() *TypeLock

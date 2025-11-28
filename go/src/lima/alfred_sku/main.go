@@ -126,7 +126,7 @@ func (writer *Writer) addCommonMatches(
 
 	matchBuilder.AddMatches(object.GetMetadataMutable().GetDescription().String())
 	matchBuilder.AddMatches(object.GetType().String())
-	for e := range object.GetMetadata().GetTags().All() {
+	for e := range object.GetMetadata().AllTags() {
 		expansion.ExpanderAll.Expand(
 			func(v string) (err error) {
 				matchBuilder.AddMatches(v)

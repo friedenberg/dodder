@@ -243,7 +243,7 @@ func (transacted *Transacted) AllProbeIds(
 		{
 			probeId := ids.ProbeId{
 				Key: markl.PurposeV5MetadataDigestWithoutTai,
-				Id:  transacted.GetMetadata().GetSelfWithoutTai(),
+				Id:  transacted.GetMetadata().GetIndex().GetSelfWithoutTai(),
 			}
 
 			if !yield(probeId) {

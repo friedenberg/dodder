@@ -360,7 +360,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.DigestMetadataWithoutTai:
-		if err = metadata.GetSelfWithoutTaiMutable().UnmarshalBinary(
+		if err = metadata.GetIndexMutable().GetSelfWithoutTaiMutable().UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

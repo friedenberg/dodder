@@ -19,12 +19,12 @@ type equaler struct {
 const debug = false
 
 // TODO make better diffing facility
-func (e equaler) Equals(a, b IMetadata) bool {
+func (equaler equaler) Equals(a, b IMetadata) bool {
 	{
 		a := a.(*metadata)
 		b := b.(*metadata)
 
-		if e.includeTai && !a.Tai.Equals(b.Tai) {
+		if equaler.includeTai && !a.Tai.Equals(b.Tai) {
 			if debug {
 				ui.Debug().Print(&a.Tai, "->", &b.Tai)
 			}
@@ -50,7 +50,7 @@ func (e equaler) Equals(a, b IMetadata) bool {
 
 		found := false
 		for ea := range aes.AllPtr() {
-			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
+			if (!equaler.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
 				continue
 			}
 
@@ -72,7 +72,7 @@ func (e equaler) Equals(a, b IMetadata) bool {
 
 		found2 := false
 		for eb := range bes.AllPtr() {
-			if !e.includeVirtual && eb.IsVirtual() {
+			if !equaler.includeVirtual && eb.IsVirtual() {
 				continue
 			}
 

@@ -1,13 +1,9 @@
 package store
 
 import (
-	"encoding/gob"
-
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/november/inventory_list_store"
 )
@@ -90,9 +86,6 @@ func (store *Store) Flush(
 	wg := errors.MakeWaitGroupParallel()
 
 	if store.GetEnvRepo().GetLockSmith().IsAcquired() {
-		gob.Register(
-			quiter.StringerKeyerPtr[ids.Type, *ids.Type]{},
-		) // TODO check if can be removed
 		wg.Do(func() error { return store.streamIndex.Flush(printerHeader) })
 		wg.Do(store.GetAbbrStore().Flush)
 		wg.Do(store.zettelIdIndex.Flush)

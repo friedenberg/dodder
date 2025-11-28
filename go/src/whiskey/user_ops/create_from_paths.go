@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
@@ -127,7 +126,7 @@ func (op CreateFromPaths) Run(
 	}
 
 	for _, object := range toCreate {
-		if object.GetMetadata().(*object_metadata.Metadata).IsEmpty() {
+		if object.GetMetadata().IsEmpty() {
 			return results, err
 		}
 
