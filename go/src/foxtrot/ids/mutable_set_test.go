@@ -15,7 +15,7 @@ func TestAddNormalized(t1 *testing.T) {
 		MustTag("zz-archive-task-done"),
 	)
 
-	sutEx := sut.CloneSetPtrLike()
+	sutEx := CloneTagSet(sut)
 
 	toAdd := MustTag("project-2021-dodder")
 

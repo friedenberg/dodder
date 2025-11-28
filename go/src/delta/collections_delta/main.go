@@ -30,7 +30,7 @@ func MakeSetDelta[ELEMENT interfaces.ValueLike](
 	}
 
 	for element := range to.All() {
-		if from.Contains(element) {
+		if from.ContainsKey(element.String()) {
 			// had previously
 		} else {
 			// did not have previously

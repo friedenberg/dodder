@@ -164,17 +164,17 @@ func (ar *reader) readOneHeading(
 }
 
 func (ar *reader) readOneHeadingLesserDepth(
-	d int,
-	e ids.TagSet,
+	depth int,
+	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
-	depthDiff := d - ar.currentAssignment.GetDepth()
+	depthDiff := depth - ar.currentAssignment.GetDepth()
 
 	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
 		err = errors.Wrap(err)
 		return newCurrent, err
 	}
 
-	if e.Len() == 0 {
+	if tags.Len() == 0 {
 		// `
 		// # task-todo
 		// ## priority-1
@@ -189,8 +189,8 @@ func (ar *reader) readOneHeadingLesserDepth(
 		// - wow
 		// # zz-inbox
 		// `
-		assignment := newAssignment(d)
-		assignment.Transacted.GetMetadataMutable().SetTags(e.CloneMutableSetPtrLike())
+		assignment := newAssignment(depth)
+		assignment.Transacted.GetMetadataMutable().SetTags(tags)
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -199,8 +199,8 @@ func (ar *reader) readOneHeadingLesserDepth(
 }
 
 func (ar *reader) readOneHeadingEqualDepth(
-	d int,
-	e ids.TagSet,
+	depth int,
+	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is ==")
 
@@ -209,7 +209,7 @@ func (ar *reader) readOneHeadingEqualDepth(
 		return newCurrent, err
 	}
 
-	if e.Len() == 0 {
+	if tags.Len() == 0 {
 		// `
 		// # task-todo
 		// ## priority-1
@@ -224,8 +224,8 @@ func (ar *reader) readOneHeadingEqualDepth(
 		// - wow
 		// ## priority-2
 		// `
-		assignment := newAssignment(d)
-		assignment.Transacted.GetMetadataMutable().SetTags(e.CloneMutableSetPtrLike())
+		assignment := newAssignment(depth)
+		assignment.Transacted.GetMetadataMutable().SetTags(tags)
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -234,15 +234,15 @@ func (ar *reader) readOneHeadingEqualDepth(
 }
 
 func (ar *reader) readOneHeadingGreaterDepth(
-	d int,
-	e ids.TagSet,
+	depth int,
+	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)
 
 	newCurrent = ar.currentAssignment
 
-	if e.Len() == 0 {
+	if tags.Len() == 0 {
 		// `
 		// # task-todo
 		// ## priority-1
@@ -257,8 +257,8 @@ func (ar *reader) readOneHeadingGreaterDepth(
 		// - wow
 		// ### priority-2
 		// `
-		assignment := newAssignment(d)
-		assignment.Transacted.GetMetadataMutable().SetTags(e.CloneMutableSetPtrLike())
+		assignment := newAssignment(depth)
+		assignment.Transacted.GetMetadataMutable().SetTags(tags)
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

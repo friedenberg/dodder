@@ -107,9 +107,9 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 		return err
 	}
 
-	left := conflicted.Local.GetTags().CloneMutableSetPtrLike()
-	middle := conflicted.Base.GetTags().CloneMutableSetPtrLike()
-	right := conflicted.Remote.GetTags().CloneMutableSetPtrLike()
+	left := ids.CloneTagSetMutable(conflicted.Local.GetTags())
+	middle := ids.CloneTagSetMutable(conflicted.Base.GetTags())
+	right := ids.CloneTagSetMutable(conflicted.Remote.GetTags())
 
 	same := ids.MakeTagMutableSet()
 	deleted := ids.MakeTagMutableSet()
@@ -170,7 +170,7 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 		}
 	}
 
-	tags := same.CloneSetPtrLike()
+	tags := ids.CloneTagSet(same)
 
 	conflicted.Local.GetMetadataMutable().SetTags(tags)
 	conflicted.Base.GetMetadataMutable().SetTags(tags)

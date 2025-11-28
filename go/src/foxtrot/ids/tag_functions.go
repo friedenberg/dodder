@@ -26,7 +26,7 @@ func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
 		}
 	}
 
-	s3 = s4.CloneSetPtrLike()
+	s3 = CloneTagSet(s4)
 
 	return s3
 }
@@ -44,7 +44,7 @@ func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 		s3.Add(e2)
 	}
 
-	s2 = s3.CloneSetPtrLike()
+	s2 = CloneTagSet(s3)
 
 	return s2
 }
@@ -87,7 +87,7 @@ func AddNormalizedTag(es TagMutableSet, e *Tag) {
 		es,
 	)
 
-	c := es.CloneSetPtrLike()
+	c := CloneTagSet(es)
 	es.Reset()
 	for tag := range WithRemovedCommonPrefixes(c).All() {
 		es.Add(tag)

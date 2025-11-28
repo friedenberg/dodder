@@ -15,10 +15,6 @@ type (
 		Len() int
 		All() interfaces.Seq[Tag]
 		Any() Tag
-		CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[Tag, *Tag]
-		CloneMutableSetLike() interfaces.MutableSetLike[Tag]
-		CloneSetPtrLike() interfaces.SetPtrLike[Tag, *Tag]
-		Contains(Tag) bool
 		ContainsKey(string) bool
 		Get(string) (Tag, bool)
 		Key(Tag) string
@@ -32,6 +28,26 @@ var TagSetEmpty TagSet
 func init() {
 	collections_ptr.RegisterGobValue[Tag](nil)
 	TagSetEmpty = MakeTagSet()
+}
+
+func CloneTagSet(tags TagSet) TagSet {
+	clone := MakeMutableTagSet()
+
+	for tag := range tags.All() {
+		clone.Add(tag)
+	}
+
+	return clone
+}
+
+func CloneTagSetMutable(tags TagSet) TagMutableSet {
+	clone := MakeMutableTagSet()
+
+	for tag := range tags.All() {
+		clone.Add(tag)
+	}
+
+	return clone
 }
 
 func MakeTagSet(es ...Tag) (s TagSet) {

@@ -4,15 +4,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
-type set[ELEMENT any] interface {
-	Len() int
-	Contains(ELEMENT) bool
-	All() interfaces.Seq[ELEMENT]
+type SetBaseContainer[ELEMENT interfaces.Stringer] struct {
+	interfaces.SetBase[ELEMENT]
+}
+
+func (set SetBaseContainer[ELEMENT]) Contains(element ELEMENT) bool {
+	return set.ContainsKey(element.String())
 }
 
 // TODO refactor to use iterators
-func SetEquals[ELEMENT any](
-	a, b set[ELEMENT],
+func SetEquals[ELEMENT interfaces.Stringer](
+	a, b interfaces.SetBase[ELEMENT],
 ) bool {
 	if a == nil && b == nil {
 		return true
@@ -31,7 +33,7 @@ func SetEquals[ELEMENT any](
 	}
 
 	for e := range a.All() {
-		if ok := b.Contains(e); !ok {
+		if ok := b.ContainsKey(e.String()); !ok {
 			return false
 		}
 	}

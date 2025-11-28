@@ -224,7 +224,7 @@ func (c *constructor) addGroupedChildren(
 			e = ids.MustTag(eStr)
 		}
 
-		if e.IsEmpty() || c.TagSet.Contains(e) {
+		if e.IsEmpty() || c.TagSet.ContainsKey(e.String()) {
 			if err = c.makeAndAddUngrouped(parent, func(f interfaces.FuncIter[*obj]) error {
 				for element := range zs.All() {
 					if err := f(element); err != nil {

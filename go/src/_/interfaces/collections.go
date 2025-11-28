@@ -41,7 +41,8 @@ type (
 
 	SetBase[ELEMENT any] interface {
 		Lenner
-		Container[ELEMENT]
+		// Container[ELEMENT]
+		ContainsKeyer
 		Aller[ELEMENT]
 	}
 )

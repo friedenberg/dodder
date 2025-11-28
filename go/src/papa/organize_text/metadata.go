@@ -1,11 +1,11 @@
 package organize_text
 
 import (
-	"bufio"
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
@@ -47,15 +47,15 @@ type Metadata struct {
 	RepoId ids.RepoId
 }
 
-func (m *Metadata) GetTags() ids.TagSet {
-	return m.TagSet
+func (metadata *Metadata) GetTags() ids.TagSet {
+	return metadata.TagSet
 }
 
 func (metadata *Metadata) SetFromObjectMetadata(
 	otherMetadata object_metadata.IMetadataMutable,
 	repoId ids.RepoId,
 ) (err error) {
-	metadata.TagSet = otherMetadata.GetTags().CloneSetPtrLike()
+	metadata.TagSet = ids.CloneTagSet(otherMetadata.GetTags())
 
 	for comment := range otherMetadata.GetIndex().GetComments() {
 		if err = metadata.OptionCommentSet.Set(comment); err != nil {
@@ -69,60 +69,61 @@ func (metadata *Metadata) SetFromObjectMetadata(
 	return err
 }
 
-func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
-	mes := sk.GetSkuExternal().Metadata.GetTags().CloneMutableSetPtrLike()
+func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
+	tags := ids.CloneTagSetMutable(object.GetSkuExternal().Metadata.GetTags())
 
-	for element := range m.All() {
-		if err = mes.Del(element); err != nil {
+	for element := range metadata.All() {
+		if err = tags.Del(element); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	sk.GetSkuExternal().Metadata.SetTags(mes)
+	object.GetSkuExternal().Metadata.SetTags(tags)
 
 	return err
 }
 
-func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
-	m1.GetTypeMutable().ResetWith(m.Type)
-	m1.SetTags(m.TagSet)
+func (metadata Metadata) AsMetadata() (m1 object_metadata.Metadata) {
+	m1.GetTypeMutable().ResetWith(metadata.Type)
+	m1.SetTags(metadata.TagSet)
 	return m1
 }
 
-func (m Metadata) GetMetadataWriterTo() triple_hyphen_io.MetadataWriterTo {
-	return m
+func (metadata Metadata) GetMetadataWriterTo() triple_hyphen_io.MetadataWriterTo {
+	return metadata
 }
 
-func (m Metadata) HasMetadataContent() bool {
-	if m.Len() > 0 {
+func (metadata Metadata) HasMetadataContent() bool {
+	if metadata.Len() > 0 {
 		return true
 	}
 
-	if !m.Type.IsEmpty() {
+	if !metadata.Type.IsEmpty() {
 		return true
 	}
 
-	if len(m.OptionCommentSet.OptionComments) > 0 {
+	if len(metadata.OptionCommentSet.OptionComments) > 0 {
 		return true
 	}
 
 	return false
 }
 
-func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
-	r := bufio.NewReader(r1)
+func (metadata *Metadata) ReadFrom(reader io.Reader) (n int64, err error) {
+	bufferedReader, repool := pool.GetBufferedReader(reader)
+	defer repool()
 
-	mes := ids.MakeTagMutableSet()
+	tagSet := ids.MakeTagMutableSet()
 
 	if n, err = format.ReadLines(
-		r,
+		bufferedReader,
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"%": m.OptionCommentSet.Set,
-					"-": quiter.MakeFuncSetString(mes),
-					"!": m.Type.Set,
+					"%": metadata.OptionCommentSet.Set,
+					"-": quiter.MakeFuncSetString(tagSet),
+					"!": metadata.Type.Set,
 				},
 			),
 		),
@@ -131,30 +132,30 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	m.TagSet = mes.CloneSetPtrLike()
+	metadata.TagSet = ids.CloneTagSet(tagSet)
 
 	return n, err
 }
 
-func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
+func (metadata Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, o := range m.OptionCommentSet.OptionComments {
+	for _, o := range metadata.OptionCommentSet.OptionComments {
 		w.WriteFormat("%% %s", o)
 	}
 
-	for _, e := range quiter.SortedStrings(m.TagSet) {
+	for _, e := range quiter.SortedStrings(metadata.TagSet) {
 		w.WriteFormat("- %s", e)
 	}
 
-	tString := m.Type.StringSansOp()
+	tString := metadata.Type.StringSansOp()
 
 	if tString != "" {
 		w.WriteFormat("! %s", tString)
 	}
 
-	if m.Matchers != nil {
-		for _, c := range quiter.SortedStrings(m.Matchers) {
+	if metadata.Matchers != nil {
+		for _, c := range quiter.SortedStrings(metadata.Matchers) {
 			w.WriteFormat("%% Matcher:%s", c)
 		}
 	}

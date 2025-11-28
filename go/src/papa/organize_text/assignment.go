@@ -254,12 +254,12 @@ func (assignment *Assignment) AllTags(tags ids.TagMutableSet) (err error) {
 	return err
 }
 
-func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
-	es = ids.MakeTagSet()
+func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
+	tags = ids.MakeTagSet()
 
 	if assignment.Transacted.GetMetadata().GetTags().Len() != 1 || assignment.Parent == nil {
-		es = assignment.Transacted.GetMetadata().GetTags().CloneSetPtrLike()
-		return es, err
+		tags = ids.CloneTagSet(assignment.Transacted.GetMetadata().GetTags())
+		return tags, err
 	} else {
 		e := assignment.Transacted.GetMetadata().GetTags().Any()
 
@@ -268,7 +268,7 @@ func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
 
 			if pe, err = assignment.Parent.expandedTags(); err != nil {
 				err = errors.Wrap(err)
-				return es, err
+				return tags, err
 			}
 
 			if pe.Len() > 1 {
@@ -277,26 +277,26 @@ func (assignment *Assignment) expandedTags() (es ids.TagSet, err error) {
 					assignment.Parent.Transacted.GetMetadata().GetTags(),
 				)
 
-				return es, err
+				return tags, err
 			}
 
 			e1 := pe.Any()
 
 			if ids.IsEmpty(e1) {
 				err = errors.ErrorWithStackf("parent tag is empty")
-				return es, err
+				return tags, err
 			}
 
 			if err = e.Set(fmt.Sprintf("%s%s", e1, e)); err != nil {
 				err = errors.Wrap(err)
-				return es, err
+				return tags, err
 			}
 		}
 
-		es = ids.MakeTagSet(e)
+		tags = ids.MakeTagSet(e)
 	}
 
-	return es, err
+	return tags, err
 }
 
 func (assignment *Assignment) SubtractFromSet(

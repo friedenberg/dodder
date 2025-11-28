@@ -15,7 +15,7 @@ func assertSetRemovesPrefixes(
 	t := &ui.T{T: t1}
 	t = t.Skip(1)
 
-	ac := ac1.CloneMutableSetPtrLike()
+	ac := CloneTagSetMutable(ac1)
 	RemovePrefixes(ac, MustTag(prefix))
 
 	if !TagSetEquals(ac, ex) {

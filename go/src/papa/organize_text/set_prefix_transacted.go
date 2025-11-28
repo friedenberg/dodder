@@ -70,7 +70,7 @@ func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 	expandedTags := ids.Expanded(
 		index.GetImplicitTags(),
 		expansion.ExpanderRight,
-	).CloneMutableSetPtrLike()
+	)
 
 	for tag := range index.GetExpandedTags().All() {
 		if err = expandedTags.Add(tag); err != nil {

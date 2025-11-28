@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -66,7 +67,7 @@ func (av writer) write(a *Assignment) (err error) {
 		cursor := object.sku.Clone()
 		cursorExternal := cursor.GetSkuExternal()
 		cursorExternal.GetMetadataMutable().Subtract(&av.Metadata)
-		mes := cursorExternal.GetMetadataMutable().GetTags().CloneMutableSetPtrLike()
+		mes := ids.CloneTagSetMutable(cursorExternal.GetMetadataMutable().GetTags())
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
