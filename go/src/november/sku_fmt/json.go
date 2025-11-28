@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type JSONMCP struct {

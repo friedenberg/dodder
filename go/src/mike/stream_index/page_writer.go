@@ -14,8 +14,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/object_probe_index"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
 type ObjectIdToObject map[string]objectMetaWithCursorAndSigil

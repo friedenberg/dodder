@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type PrinterComplete struct {

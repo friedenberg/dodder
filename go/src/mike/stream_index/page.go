@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type page struct {

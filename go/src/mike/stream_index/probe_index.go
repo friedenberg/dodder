@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/object_probe_index"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
 )
 
 type probeIndex struct {

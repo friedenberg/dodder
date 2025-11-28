@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type (

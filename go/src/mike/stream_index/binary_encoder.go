@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/key_bytes"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/lima/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type binaryEncoder struct {
