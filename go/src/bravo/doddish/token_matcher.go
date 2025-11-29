@@ -46,6 +46,12 @@ var (
 		TokenMatcherOp(OpExact),
 		TokenTypeLiteral,
 	}
+
+	TokenMatcherTai = TokensMatcher{
+		TokenTypeIdentifier,
+		TokenMatcherOp('.'),
+		TokenTypeIdentifier,
+	}
 )
 
 type TokenMatcherOp byte

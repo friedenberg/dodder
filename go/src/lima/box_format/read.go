@@ -116,11 +116,14 @@ func (format *BoxTransacted) readStringFormatBox(
 			err = nil
 			object.ObjectId.Reset()
 
+			// "some_file.ext"
 			if seq.MatchAll(doddish.TokenTypeLiteral) {
 				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
+
+				// /some_file.ext
 			} else if ok, left, _, _ := seq.PartitionFavoringLeft(
 				doddish.TokenMatcherOp(doddish.OpPathSeparator),
 			); ok && left.Len() == 0 {
@@ -128,26 +131,28 @@ func (format *BoxTransacted) readStringFormatBox(
 					err = errors.Wrap(err)
 					return err
 				}
+
+				// maybe one/uno.zettel or some_dir/some_name.ext
 			} else if ok, left, right := seq.MatchEnd(
 				doddish.TokenMatcherOp(doddish.OpSigilExternal),
 				doddish.TokenTypeIdentifier,
 			); ok {
-				var g genres.Genre
+				var genre genres.Genre
 
 				// left: one/uno, right: .zettel
-				if err = g.Set(right.At(1).String()); err != nil {
-					err = nil
-				} else {
-					if err = object.ObjectId.SetWithGenre(left.String(), g); err != nil {
+				if err = genre.Set(right.At(1).String()); err == nil {
+					if err = object.ObjectId.SetWithGenre(left.String(), genre); err != nil {
 						object.ObjectId.Reset()
 						err = errors.Wrap(err)
 						return err
 					}
-				}
 
-				if err = object.ExternalObjectId.Set(seq.String()); err != nil {
-					err = errors.Wrap(err)
-					return err
+					// left: some_dir/some_name, right: .ext
+				} else {
+					if err = object.ExternalObjectId.Set(seq.String()); err != nil {
+						err = errors.Wrap(err)
+						return err
+					}
 				}
 
 			} else {
@@ -166,18 +171,16 @@ func (format *BoxTransacted) readStringFormatBox(
 		}
 	}
 
-	var objectId ids.ObjectId
+LOOP_AFTER_OBJECT_ID:
 
-LOOP_AFTER_OID:
-
-	for scanner.ScanDotAllowedInIdentifiers() {
+	for scanner.Scan() {
 		seq := scanner.GetSeq()
 
 		// TODO convert this into a decision tree based on token type sequences
 		// instead of a switch
 		switch {
 		case seq.MatchAll(doddish.TokenMatcherOp(']')):
-			break LOOP_AFTER_OID
+			break LOOP_AFTER_OBJECT_ID
 
 			// ' '
 		case seq.MatchAll(doddish.TokenMatcherOp(' ')):
@@ -192,16 +195,12 @@ LOOP_AFTER_OID:
 				return err
 			}
 
-			continue
-
 			// @digest
 		case seq.MatchAll(doddish.TokenMatcherBlobDigest...):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
-
-			continue
 
 			// !type
 		case seq.MatchAll(doddish.TokenMatcherType...):
@@ -211,8 +210,6 @@ LOOP_AFTER_OID:
 				err = errors.Wrap(err)
 				return err
 			}
-
-			continue
 
 			// !type@sig
 		case seq.MatchAll(doddish.TokenMatcherTypeLock...):
@@ -234,16 +231,12 @@ LOOP_AFTER_OID:
 				return err
 			}
 
-			continue
-
 			// key@abcd
 		case seq.MatchAll(doddish.TokenMatcherDodderTag...):
 			if err = format.parseMarklIdTag(object, seq); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
-
-			continue
 
 			// key=value key="value"
 		case seq.MatchStart(doddish.TokenMatcherKeyValue...) || seq.MatchStart(doddish.TokenMatcherKeyValueLiteral...):
@@ -257,39 +250,18 @@ LOOP_AFTER_OID:
 			field.ColorType = string_format_writer.ColorTypeUserData
 			object.GetMetadataMutable().GetIndexMutable().GetFieldsMutable().Append(field)
 
-			continue
-		}
-
-		if err = objectId.ReadFromSeq(seq); err != nil {
-			err = nil
-			scanner.Unscan()
-			return err
-		}
-
-		genre := objectId.GetGenre()
-
-		switch genre {
-		case genres.InventoryList:
-			// TODO make more performant
-			if err = object.GetMetadataMutable().GetTaiMutable().Set(
-				objectId.String(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
-		case genres.Tag:
+			// value
+		case seq.MatchAll(doddish.TokenTypeIdentifier):
 			var tag ids.Tag
 
-			if err = tag.TodoSetFromObjectId(&objectId); err != nil {
+			if err = tag.Set(seq.String()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
 
 			if tag.IsDodderTag() {
-				// ignore
-				// err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
-				continue
+				err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
+				return
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)
@@ -297,13 +269,20 @@ LOOP_AFTER_OID:
 				}
 			}
 
+			// value.value
+		case seq.MatchAll(doddish.TokenMatcherTai...):
+			if err = object.GetMetadataMutable().GetTaiMutable().Set(
+				seq.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return err
+			}
+
 		default:
-			err = genres.MakeErrUnsupportedGenre(objectId.GetGenre())
-			err = errors.Wrapf(err, "Seq: %q", seq)
+			err = errors.Errorf("unsupported seq: %q", seq)
+			scanner.Unscan()
 			return err
 		}
-
-		objectId.Reset()
 	}
 
 	if scanner.Error() != nil {

@@ -64,9 +64,9 @@ func MakeFlags() Flags {
 	}
 }
 
-func MakeFlagsWithMetadata(m Metadata) Flags {
-	if m.TagSet == nil {
-		m.TagSet = ids.MakeTagSetFromSlice()
+func MakeFlagsWithMetadata(metadata Metadata) Flags {
+	if metadata.TagSet == nil {
+		metadata.TagSet = ids.MakeTagSetFromSlice()
 	}
 
 	return Flags{
@@ -76,7 +76,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 		),
 
 		Options: Options{
-			Metadata:     m,
+			Metadata:     metadata,
 			wasMade:      true,
 			GroupingTags: collections_slice.MakeFromSlice[ids.Tag](),
 			Skus:         sku.MakeSkuTypeSetMutable(),
@@ -87,7 +87,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 func (flagz *Flags) SetFlagDefinitions(flagDefs interfaces.CLIFlagDefinitions) {
 	flagDefs.Func(
 		"group-by",
-		"tag prefixes to group zettels",
+		"tag prefixes to group objects",
 		func(valueOrValues string) (err error) {
 			seq := flags.SplitCommasAndTrimAndMake[ids.Tag](valueOrValues)
 
