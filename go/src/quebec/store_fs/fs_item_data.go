@@ -19,7 +19,7 @@ type fsItemData struct {
 func makeFSItemData() fsItemData {
 	return fsItemData{
 		SetMutable: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
-		digests:        make(map[string]interfaces.SetMutable[*sku.FSItem]),
+		digests:    make(map[string]interfaces.SetMutable[*sku.FSItem]),
 	}
 }
 
