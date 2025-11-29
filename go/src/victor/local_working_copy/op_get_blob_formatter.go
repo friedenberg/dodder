@@ -8,26 +8,26 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 )
 
 // TODO add support for checked out types
 func (local *Repo) GetBlobFormatter(
-	typeLock ids.Type,
+	typeLock object_metadata.TypeLock,
 	formatId string,
 	utiGroup string,
 ) (blobFormatter script_config.RemoteScript, err error) {
-	if typeLock.GetType().IsEmpty() {
+	if typeLock.Key.IsEmpty() {
 		err = errors.ErrorWithStackf("empty type")
 		return blobFormatter, err
 	}
 
 	var typeObject *sku.Transacted
 
-	if typeObject, err = local.GetStore().ReadTransactedFromObjectId(
-		typeLock.GetType(),
+	if typeObject, err = local.GetStore().ReadTypeObject(
+		typeLock,
 	); err != nil {
 		err = errors.Wrap(err)
 		return blobFormatter, err

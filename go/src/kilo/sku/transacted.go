@@ -112,6 +112,10 @@ func (transacted *Transacted) GetType() ids.Type {
 	return transacted.GetMetadata().GetType()
 }
 
+func (transacted *Transacted) GetTypeLock() object_metadata.TypeLock {
+	return transacted.GetMetadata().GetTypeLock()
+}
+
 func (transacted *Transacted) GetMetadata() object_metadata.IMetadata {
 	return &transacted.Metadata
 }

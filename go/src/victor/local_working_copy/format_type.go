@@ -56,7 +56,9 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				var typeObject *sku.Transacted
 
-				if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(object.GetType()); err != nil {
+				if typeObject, err = repo.GetStore().ReadTypeObject(
+					object.GetTypeLock(),
+				); err != nil {
 					if collections.IsErrNotFound(err) {
 						err = nil
 					} else {
@@ -119,7 +121,9 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				var typeObject *sku.Transacted
 
-				if typeObject, err = repo.GetStore().ReadTransactedFromObjectId(object.GetType()); err != nil {
+				if typeObject, err = repo.GetStore().ReadTypeObject(
+					object.GetTypeLock(),
+				); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}

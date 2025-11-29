@@ -338,8 +338,8 @@ func (server *Server) readMCPResourceObject(
 		{
 			var err error
 
-			if typeObject, err = repo.GetStore().ReadObjectType(
-				object,
+			if typeObject, err = repo.GetStore().ReadTypeObject(
+				object.GetMetadata().GetTypeLock(),
 			); err != nil {
 				if collections.IsErrNotFound(err) {
 					err = nil

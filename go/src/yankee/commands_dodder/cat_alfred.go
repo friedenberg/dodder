@@ -87,12 +87,12 @@ func (cmd CatAlfred) Run(dep command.Request) {
 		}
 	}
 
-	var aw *alfred_sku.Writer
+	var writer *alfred_sku.Writer
 
 	{
 		var err error
 
-		if aw, err = alfred_sku.New(
+		if writer, err = alfred_sku.New(
 			wo,
 			localWorkingCopy.GetStore().GetAbbrStore().GetAbbr(),
 			localWorkingCopy.SkuFormatBoxTransactedNoColor(),
@@ -103,7 +103,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 		}
 	}
 
-	defer errors.ContextMustClose(localWorkingCopy, aw)
+	defer errors.ContextMustClose(localWorkingCopy, writer)
 
 	if err := localWorkingCopy.GetStore().QueryTransacted(
 		queryGroup,
@@ -127,33 +127,33 @@ func (cmd CatAlfred) Run(dep command.Request) {
 						}
 					}
 
-					if err = aw.PrintOne(tagObject); err != nil {
+					if err = writer.PrintOne(tagObject); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 				}
 
 			case genres.Type:
-				tipe := object.GetType()
+				typeLock := object.GetTypeLock()
 
-				if tipe.GetType().IsEmpty() {
+				if typeLock.IsEmpty() {
 					return err
 				}
 
-				if object, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
-					tipe.GetType(),
+				if object, err = localWorkingCopy.GetStore().ReadTypeObject(
+					typeLock,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
 
-				if err = aw.PrintOne(object); err != nil {
+				if err = writer.PrintOne(object); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
 
 			default:
-				if err = aw.PrintOne(object); err != nil {
+				if err = writer.PrintOne(object); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
@@ -162,7 +162,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 			return err
 		},
 	); err != nil {
-		aw.WriteError(err)
+		writer.WriteError(err)
 		err = nil
 		return
 	}

@@ -1,13 +1,15 @@
 package store
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -41,7 +43,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 	}
 
 	if !typeMarklId.IsNull() {
-		return store.ReadObjectType(object)
+		return store.ReadTypeObject(*typeLock)
 	}
 
 	if typeObject, err = store.ReadOneObjectId(object.GetType()); err != nil {
@@ -56,26 +58,19 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 	return typeObject, err
 }
 
-func (store *Store) ReadObjectType(
-	object *sku.Transacted,
+func (store *Store) ReadTypeObject(
+	typeLock object_metadata.TypeLock,
 ) (typeObject *sku.Transacted, err error) {
-	if object == nil {
-		panic("empty object")
-	}
-
-	typeObject = sku.GetTransactedPool().Get()
-	typeLock := object.GetMetadata().GetTypeLock()
-	typeMarklId := typeLock.Value
-
 	if ids.IsBuiltin(typeLock.Key) {
 		err = collections.MakeErrNotFound(typeLock.Key)
 		return typeObject, err
 	}
 
-	if err = markl.AssertIdIsNotNull(typeMarklId); err != nil {
-		err = errors.Errorf("no type lock for type: %q", typeLock.Key)
-		return typeObject, err
+	if typeLock.Value.IsNull() {
+		panic(fmt.Sprintf("empty type lock for type: %q", typeLock.Key))
 	}
+
+	typeObject = sku.GetTransactedPool().Get()
 
 	if !store.streamIndex.ReadOneMarklId(
 		typeLock.Value,

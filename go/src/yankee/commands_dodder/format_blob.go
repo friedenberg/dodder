@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -114,13 +114,13 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 		}
 	}
 
-	tipe := object.GetType()
+	typeLock := object.GetMetadata().GetTypeLock()
 
 	{
 		var err error
 
 		if blobFormatter, err = localWorkingCopy.GetBlobFormatter(
-			tipe,
+			typeLock,
 			formatId,
 			cmd.UTIGroup,
 		); err != nil {
@@ -163,18 +163,18 @@ func (c *FormatBlob) FormatFromStdin(
 	formatId := "text"
 
 	var blobFormatter script_config.RemoteScript
-	var tipe ids.Type
+	var typeLock object_metadata.TypeLock
 
 	switch len(args) {
 	case 1:
-		if err = tipe.Set(args[0]); err != nil {
+		if err = typeLock.Set(args[0]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case 2:
 		formatId = args[0]
-		if err = tipe.Set(args[1]); err != nil {
+		if err = typeLock.Set(args[1]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -188,7 +188,7 @@ func (c *FormatBlob) FormatFromStdin(
 	}
 
 	if blobFormatter, err = u.GetBlobFormatter(
-		tipe,
+		typeLock,
 		formatId,
 		c.UTIGroup,
 	); err != nil {

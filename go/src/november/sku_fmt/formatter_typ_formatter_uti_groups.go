@@ -37,9 +37,12 @@ func (format formatterTypFormatterUTIGroups) Format(
 	writer io.Writer,
 	object *sku.Transacted,
 ) (n int64, err error) {
-	var skuTyp *sku.Transacted
+	var typeObject *sku.Transacted
 
-	if skuTyp, err = format.ReadTransactedFromObjectId(object.GetMetadata().GetType()); err != nil {
+	// TODO switch to ReadTypeObject
+	if typeObject, err = format.ReadTransactedFromObjectId(
+		object.GetMetadata().GetType(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -48,8 +51,8 @@ func (format formatterTypFormatterUTIGroups) Format(
 	var repool interfaces.FuncRepool
 
 	if blob, repool, _, err = format.store.ParseTypedBlob(
-		skuTyp.GetType(),
-		skuTyp.GetBlobDigest(),
+		typeObject.GetType(),
+		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err

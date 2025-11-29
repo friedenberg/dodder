@@ -2,6 +2,8 @@ package sku
 
 import (
 	"bufio"
+	"fmt"
+	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_map"
@@ -18,6 +20,7 @@ type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
 // TODO add lock
 // TODO add iterate method
 type OpenList struct {
+	lock        sync.RWMutex
 	description descriptions.Description
 
 	coder                    ListCoder
@@ -66,10 +69,16 @@ func (list *OpenList) getBufferedBlobWriter() *bufio.Writer {
 }
 
 func (list *OpenList) Len() int {
+	list.lock.RLock()
+	defer list.lock.RUnlock()
+
 	return list.count
 }
 
 func (list *OpenList) Add(object *Transacted) (err error) {
+	list.lock.Lock()
+	defer list.lock.Unlock()
+
 	if list.funcPreWrite != nil {
 		if err = list.funcPreWrite(object); err != nil {
 			err = errors.Wrap(err)
@@ -123,6 +132,13 @@ func (list *OpenList) writeObject(
 }
 
 func (list *OpenList) Close() (err error) {
+	if !list.lock.TryLock() {
+		err = errors.Errorf("trying to close open list while lock is acquired")
+		return
+	}
+
+	defer list.lock.Unlock()
+
 	if err = list.getBufferedBlobWriter().Flush(); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -143,5 +159,11 @@ func (list *OpenList) Close() (err error) {
 }
 
 func (list *OpenList) GetMarklId() interfaces.MarklId {
+	if !list.lock.TryLock() {
+		panic(fmt.Sprintf("trying to get markl id from open list while lock is acquired"))
+	}
+
+	defer list.lock.Unlock()
+
 	return list.blobWriter.GetMarklId()
 }

@@ -131,12 +131,12 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	if !cmd.Before.IsEmpty() {
 		old := output
 
-		output = func(sk *sku.Transacted) (err error) {
-			if !sk.GetTai().Before(cmd.Before) {
+		output = func(object *sku.Transacted) (err error) {
+			if !object.GetTai().Before(cmd.Before) {
 				return err
 			}
 
-			if err = old(sk); err != nil {
+			if err = old(object); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -148,12 +148,12 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 	if !cmd.After.IsEmpty() {
 		old := output
 
-		output = func(sk *sku.Transacted) (err error) {
-			if !sk.GetTai().After(cmd.After) {
+		output = func(object *sku.Transacted) (err error) {
+			if !object.GetTai().After(cmd.After) {
 				return err
 			}
 
-			if err = old(sk); err != nil {
+			if err = old(object); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -173,8 +173,8 @@ func (cmd Show) runWithLocalWorkingCopyAndQuery(
 			}
 		}
 
-		for sk := range list.All() {
-			if err := output(sk); err != nil {
+		for object := range list.All() {
+			if err := output(object); err != nil {
 				localWorkingCopy.Cancel(err)
 			}
 		}
