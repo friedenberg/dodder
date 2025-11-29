@@ -134,7 +134,7 @@ func (list *OpenList) writeObject(
 func (list *OpenList) Close() (err error) {
 	if !list.lock.TryLock() {
 		err = errors.Errorf("trying to close open list while lock is acquired")
-		return
+		return err
 	}
 
 	defer list.lock.Unlock()

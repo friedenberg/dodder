@@ -55,7 +55,7 @@ func (cmd Update) Run(req command.Request) {
 
 			if typeObject, err = store.ReadOneObjectId(object.GetType()); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
 			object.GetMetadataMutable().GetTypeLockMutable().Value.ResetWithMarklId(
@@ -67,10 +67,10 @@ func (cmd Update) Run(req command.Request) {
 				sku.CommitOptions{},
 			); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 	); err != nil {
 		localWorkingCopy.Cancel(err)
