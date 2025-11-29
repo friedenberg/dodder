@@ -19,8 +19,8 @@ var poolObjectId interfaces.Pool[objectId, *objectId]
 func init() {
 	poolObjectId = pool.Make(
 		nil,
-		func(k *objectId) {
-			k.Reset()
+		func(objectId *objectId) {
+			objectId.Reset()
 		},
 	)
 }
@@ -30,55 +30,55 @@ func getObjectIdPool() interfaces.Pool[objectId, *objectId] {
 }
 
 type objectId struct {
-	g           genres.Genre
+	genre       genres.Genre
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
 }
 
-func (a *objectId) Clone() (b *objectId) {
-	b = getObjectIdPool().Get()
-	b.ResetWithIdLike(a)
-	return b
+func (objectId *objectId) Clone() (clone *objectId) {
+	clone = getObjectIdPool().Get()
+	clone.ResetWithIdLike(objectId)
+	return clone
 }
 
-func (a *objectId) IsVirtual() bool {
-	switch a.g {
+func (objectId *objectId) IsVirtual() bool {
+	switch objectId.genre {
 	case genres.Zettel:
-		return slices.Equal(a.left.Bytes(), []byte{'%'})
+		return slices.Equal(objectId.left.Bytes(), []byte{'%'})
 
 	case genres.Tag:
-		return a.middle == '%' || slices.Equal(a.left.Bytes(), []byte{'%'})
+		return objectId.middle == '%' || slices.Equal(objectId.left.Bytes(), []byte{'%'})
 
 	default:
 		return false
 	}
 }
 
-func (a *objectId) Equals(b *objectId) bool {
-	if a.g != b.g {
+func (objectId *objectId) Equals(b *objectId) bool {
+	if objectId.genre != b.genre {
 		return false
 	}
 
-	if a.middle != b.middle {
+	if objectId.middle != b.middle {
 		return false
 	}
 
-	if !a.left.Equals(&b.left) {
+	if !objectId.left.Equals(&b.left) {
 		return false
 	}
 
-	if !a.right.Equals(&b.right) {
+	if !objectId.right.Equals(&b.right) {
 		return false
 	}
 
 	return true
 }
 
-func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
-	if k2.Len() > math.MaxUint8 {
+func (objectId *objectId) WriteTo(writer io.Writer) (n int64, err error) {
+	if objectId.Len() > math.MaxUint8 {
 		err = errors.ErrorWithStackf(
 			"%q is greater than max uint8 (%d)",
-			k2.String(),
+			objectId.String(),
 			math.MaxUint8,
 		)
 
@@ -86,7 +86,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	var n1 int64
-	n1, err = k2.g.WriteTo(w)
+	n1, err = objectId.genre.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -94,10 +94,10 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	b := [2]uint8{uint8(k2.Len()), uint8(k2.left.Len())}
+	b := [2]uint8{uint8(objectId.Len()), uint8(objectId.left.Len())}
 
 	var n2 int
-	n2, err = ohio.WriteAllOrDieTrying(w, b[:])
+	n2, err = ohio.WriteAllOrDieTrying(writer, b[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -105,7 +105,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n1, err = k2.left.WriteTo(w)
+	n1, err = objectId.left.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -113,9 +113,9 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	bMid := [1]byte{k2.middle}
+	bMid := [1]byte{objectId.middle}
 
-	n2, err = ohio.WriteAllOrDieTrying(w, bMid[:])
+	n2, err = ohio.WriteAllOrDieTrying(writer, bMid[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -123,7 +123,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n1, err = k2.right.WriteTo(w)
+	n1, err = objectId.right.WriteTo(writer)
 	n += n1
 
 	if err != nil {
@@ -134,9 +134,9 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 	return n, err
 }
 
-func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
+func (objectId *objectId) ReadFrom(reader io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = k2.g.ReadFrom(r)
+	n1, err = objectId.genre.ReadFrom(reader)
 	n += n1
 
 	if err != nil {
@@ -147,7 +147,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [2]uint8
 
 	var n2 int
-	n2, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n2, err = ohio.ReadAllOrDieTrying(reader, b[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -167,14 +167,14 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	if _, err = k2.left.ReadNFrom(r, int(middlePos)); err != nil {
+	if _, err = objectId.left.ReadNFrom(reader, int(middlePos)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
 
 	var bMiddle [1]uint8
 
-	n2, err = ohio.ReadAllOrDieTrying(r, bMiddle[:])
+	n2, err = ohio.ReadAllOrDieTrying(reader, bMiddle[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -182,9 +182,9 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	k2.middle = bMiddle[0]
+	objectId.middle = bMiddle[0]
 
-	if _, err = k2.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
+	if _, err = objectId.right.ReadNFrom(reader, int(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -192,130 +192,130 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (k2 *objectId) SetGenre(g interfaces.GenreGetter) {
+func (objectId *objectId) SetGenre(g interfaces.GenreGetter) {
 	if g == nil {
-		k2.g = genres.None
+		objectId.genre = genres.None
 	} else {
-		k2.g = genres.Must(g.GetGenre())
+		objectId.genre = genres.Must(g.GetGenre())
 	}
 
-	if k2.g == genres.Zettel {
-		k2.middle = '/'
+	if objectId.genre == genres.Zettel {
+		objectId.middle = '/'
 	}
 }
 
-func (k2 *objectId) StringFromPtr() string {
+func (objectId *objectId) StringFromPtr() string {
 	var sb strings.Builder
 
-	switch k2.g {
+	switch objectId.genre {
 	case genres.Zettel:
-		sb.Write(k2.left.Bytes())
-		sb.WriteByte(k2.middle)
-		sb.Write(k2.right.Bytes())
+		sb.Write(objectId.left.Bytes())
+		sb.WriteByte(objectId.middle)
+		sb.Write(objectId.right.Bytes())
 
 	case genres.Type:
-		sb.Write(k2.right.Bytes())
+		sb.Write(objectId.right.Bytes())
 
 	default:
-		if k2.left.Len() > 0 {
-			sb.Write(k2.left.Bytes())
+		if objectId.left.Len() > 0 {
+			sb.Write(objectId.left.Bytes())
 		}
 
-		if k2.middle != '\x00' {
-			sb.WriteByte(k2.middle)
+		if objectId.middle != '\x00' {
+			sb.WriteByte(objectId.middle)
 		}
 
-		if k2.right.Len() > 0 {
-			sb.Write(k2.right.Bytes())
+		if objectId.right.Len() > 0 {
+			sb.Write(objectId.right.Bytes())
 		}
 	}
 
 	return sb.String()
 }
 
-func (k2 *objectId) IsEmpty() bool {
-	if k2.g == genres.Zettel {
-		if k2.left.IsEmpty() && k2.right.IsEmpty() {
+func (objectId *objectId) IsEmpty() bool {
+	if objectId.genre == genres.Zettel {
+		if objectId.left.IsEmpty() && objectId.right.IsEmpty() {
 			return true
 		}
 	}
 
-	return k2.left.Len() == 0 && k2.middle == 0 && k2.right.Len() == 0
+	return objectId.left.Len() == 0 && objectId.middle == 0 && objectId.right.Len() == 0
 }
 
-func (k2 *objectId) Len() int {
-	return k2.left.Len() + 1 + k2.right.Len()
+func (objectId *objectId) Len() int {
+	return objectId.left.Len() + 1 + objectId.right.Len()
 }
 
-func (k2 *objectId) GetHeadAndTail() (head, tail string) {
-	head = k2.left.String()
-	tail = k2.right.String()
+func (objectId *objectId) GetHeadAndTail() (head, tail string) {
+	head = objectId.left.String()
+	tail = objectId.right.String()
 
 	return head, tail
 }
 
-func (k2 *objectId) LenHeadAndTail() (int, int) {
-	return k2.left.Len(), k2.right.Len()
+func (objectId *objectId) LenHeadAndTail() (int, int) {
+	return objectId.left.Len(), objectId.right.Len()
 }
 
-func (k2 *objectId) GetObjectIdString() string {
-	return k2.StringFromPtr()
+func (objectId *objectId) GetObjectIdString() string {
+	return objectId.StringFromPtr()
 }
 
-func (k2 *objectId) String() string {
-	return k2.StringFromPtr()
+func (objectId *objectId) String() string {
+	return objectId.StringFromPtr()
 }
 
-func (k2 *objectId) Reset() {
-	k2.g = genres.None
-	k2.left.Reset()
-	k2.middle = 0
-	k2.right.Reset()
+func (objectId *objectId) Reset() {
+	objectId.genre = genres.None
+	objectId.left.Reset()
+	objectId.middle = 0
+	objectId.right.Reset()
 }
 
-func (k2 *objectId) PartsStrings() IdParts {
+func (objectId *objectId) PartsStrings() IdParts {
 	return IdParts{
-		Left:   &k2.left,
-		Middle: k2.middle,
-		Right:  &k2.right,
+		Left:   &objectId.left,
+		Middle: objectId.middle,
+		Right:  &objectId.right,
 	}
 }
 
-func (k2 *objectId) Parts() [3]string {
+func (objectId *objectId) Parts() [3]string {
 	var mid string
 
-	if k2.middle != 0 {
-		mid = string([]byte{k2.middle})
+	if objectId.middle != 0 {
+		mid = string([]byte{objectId.middle})
 	}
 
 	return [3]string{
-		k2.left.String(),
+		objectId.left.String(),
 		mid,
-		k2.right.String(),
+		objectId.right.String(),
 	}
 }
 
-func (k2 *objectId) GetGenre() interfaces.Genre {
-	return k2.g
+func (objectId *objectId) GetGenre() interfaces.Genre {
+	return objectId.genre
 }
 
-func (k2 *objectId) Expand(
+func (objectId *objectId) Expand(
 	a Abbr,
 ) (err error) {
-	ex := a.ExpanderFor(k2.g)
+	ex := a.ExpanderFor(objectId.genre)
 
 	if ex == nil {
 		return err
 	}
 
-	v := k2.String()
+	v := objectId.String()
 
 	if v, err = ex(v); err != nil {
 		err = nil
 		return err
 	}
 
-	if err = k2.SetWithGenre(v, k2.g); err != nil {
+	if err = objectId.SetWithGenre(v, objectId.genre); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -323,33 +323,35 @@ func (k2 *objectId) Expand(
 	return err
 }
 
-func (k2 *objectId) Abbreviate(
+func (objectId *objectId) Abbreviate(
 	a Abbr,
 ) (err error) {
 	return err
 }
 
-func (h *objectId) SetWithIdLike(
-	k interfaces.ObjectId,
+type objectIdPtr = *objectId
+
+func (objectId *objectId) SetWithIdLike(
+	otherObjectId interfaces.ObjectId,
 ) (err error) {
-	switch kt := k.(type) {
-	case *objectId:
-		if err = kt.left.CopyTo(&h.left); err != nil {
+	switch kt := otherObjectId.(type) {
+	case objectIdPtr:
+		if err = kt.left.CopyTo(&objectId.left); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		h.middle = kt.middle
+		objectId.middle = kt.middle
 
-		if err = kt.right.CopyTo(&h.right); err != nil {
+		if err = kt.right.CopyTo(&objectId.right); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	default:
-		p := k.Parts()
+		p := otherObjectId.Parts()
 
-		if err = h.left.Set(p[0]); err != nil {
+		if err = objectId.left.Set(p[0]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -357,27 +359,27 @@ func (h *objectId) SetWithIdLike(
 		mid := []byte(p[1])
 
 		if len(mid) >= 1 {
-			h.middle = mid[0]
+			objectId.middle = mid[0]
 		}
 
-		if err = h.right.Set(p[2]); err != nil {
+		if err = objectId.right.Set(p[2]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	h.SetGenre(k)
+	objectId.SetGenre(otherObjectId)
 
 	return err
 }
 
-func (h *objectId) SetWithGenre(
-	v string,
-	g interfaces.GenreGetter,
+func (objectId *objectId) SetWithGenre(
+	value string,
+	genre interfaces.GenreGetter,
 ) (err error) {
-	h.g = genres.Make(g.GetGenre())
+	objectId.genre = genres.Make(genre.GetGenre())
 
-	if err = h.Set(v); err != nil {
+	if err = objectId.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -385,14 +387,14 @@ func (h *objectId) SetWithGenre(
 	return err
 }
 
-func (h *objectId) TodoSetBytes(v *catgut.String) (err error) {
-	return h.Set(v.String())
+func (objectId *objectId) TodoSetBytes(value *catgut.String) (err error) {
+	return objectId.Set(value.String())
 }
 
-func (h *objectId) SetRaw(v string) (err error) {
-	h.g = genres.None
+func (objectId *objectId) SetRaw(value string) (err error) {
+	objectId.genre = genres.None
 
-	if err = h.left.Set(v); err != nil {
+	if err = objectId.left.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -400,53 +402,52 @@ func (h *objectId) SetRaw(v string) (err error) {
 	return err
 }
 
-func (h *objectId) Set(v string) (err error) {
-	var k interfaces.ObjectId
+func (objectId *objectId) Set(value string) (err error) {
+	var parsingObjectId interfaces.ObjectId
 
-	switch h.g {
+	switch objectId.genre {
 	case genres.None:
-		k, err = MakeObjectId(v)
+		parsingObjectId, err = MakeObjectId(value)
 
 	case genres.Zettel:
 		var h ZettelId
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsingObjectId = &h
 
 	case genres.Tag:
 		var h Tag
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsingObjectId = &h
 
 	case genres.Type:
 		var h Type
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsingObjectId = &h
 
 	case genres.Repo:
 		var h RepoId
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsingObjectId = &h
 
 	case genres.Config:
-		var h Config
-		err = h.Set(v)
-		k = &h
+		err = Config.Set(value)
+		parsingObjectId = Config
 
 	case genres.InventoryList:
 		var h Tai
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsingObjectId = &h
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(h.g.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(objectId.genre.GetGenreString())
 	}
 
 	if err != nil {
-		err = errors.Wrapf(err, "String: %q", v)
+		err = errors.Wrapf(err, "String: %q", value)
 		return err
 	}
 
-	if err = h.SetWithIdLike(k); err != nil {
+	if err = objectId.SetWithIdLike(parsingObjectId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -454,24 +455,24 @@ func (h *objectId) Set(v string) (err error) {
 	return err
 }
 
-func (a *objectId) ResetWith(b *objectId) {
-	a.g = b.g
-	b.left.CopyTo(&a.left)
-	b.right.CopyTo(&a.right)
-	a.middle = b.middle
+func (objectId *objectId) ResetWith(otherObjectId *objectId) {
+	objectId.genre = otherObjectId.genre
+	otherObjectId.left.CopyTo(&objectId.left)
+	otherObjectId.right.CopyTo(&objectId.right)
+	objectId.middle = otherObjectId.middle
 }
 
-func (a *objectId) ResetWithIdLike(b interfaces.ObjectId) (err error) {
-	return a.SetWithIdLike(b)
+func (objectId *objectId) ResetWithIdLike(otherObjectId interfaces.ObjectId) (err error) {
+	return objectId.SetWithIdLike(otherObjectId)
 }
 
-func (t *objectId) MarshalText() (text []byte, err error) {
-	text = []byte(FormattedString(t))
+func (objectId *objectId) MarshalText() (text []byte, err error) {
+	text = []byte(FormattedString(objectId))
 	return text, err
 }
 
-func (t *objectId) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (objectId *objectId) UnmarshalText(text []byte) (err error) {
+	if err = objectId.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -479,13 +480,13 @@ func (t *objectId) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t *objectId) MarshalBinary() (text []byte, err error) {
-	text = []byte(FormattedString(t))
+func (objectId *objectId) MarshalBinary() (text []byte, err error) {
+	text = []byte(FormattedString(objectId))
 	return text, err
 }
 
-func (t *objectId) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (objectId *objectId) UnmarshalBinary(text []byte) (err error) {
+	if err = objectId.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

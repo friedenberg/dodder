@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	register(Config{})
+	register(config{})
 }
 
 var configBytes = []byte("konfig")
@@ -33,45 +33,47 @@ func ErrOnConfig(v string) (err error) {
 }
 
 // TODO turn into singleton
-type Config struct{}
+type config struct{}
 
-func (a Config) IsEmpty() bool {
+var Config config
+
+func (a config) IsEmpty() bool {
 	return false
 }
 
-func (a Config) GetGenre() interfaces.Genre {
+func (a config) GetGenre() interfaces.Genre {
 	return genres.Config
 }
 
-func (a Config) EqualsAny(b any) bool {
+func (a config) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Config) Equals(b Config) bool {
+func (a config) Equals(b config) bool {
 	return true
 }
 
-func (a *Config) Reset() {
+func (a *config) Reset() {
 	return
 }
 
-func (a *Config) ResetWith(_ Config) {
+func (a *config) ResetWith(_ config) {
 	return
 }
 
-func (i Config) GetObjectIdString() string {
+func (i config) GetObjectIdString() string {
 	return i.String()
 }
 
-func (i Config) String() string {
+func (i config) String() string {
 	return "konfig"
 }
 
-func (k Config) Parts() [3]string {
+func (k config) Parts() [3]string {
 	return [3]string{"", "", "konfig"}
 }
 
-func (i Config) Set(v string) (err error) {
+func (i config) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
@@ -83,12 +85,12 @@ func (i Config) Set(v string) (err error) {
 	return err
 }
 
-func (t Config) MarshalText() (text []byte, err error) {
+func (t config) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 	return text, err
 }
 
-func (t *Config) UnmarshalText(text []byte) (err error) {
+func (t *config) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -97,12 +99,12 @@ func (t *Config) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t Config) MarshalBinary() (text []byte, err error) {
+func (t config) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
 	return text, err
 }
 
-func (t *Config) UnmarshalBinary(text []byte) (err error) {
+func (t *config) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err

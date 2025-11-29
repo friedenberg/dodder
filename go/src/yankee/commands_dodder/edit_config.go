@@ -114,7 +114,9 @@ func (cmd EditConfig) makeTempConfigFile(
 ) (err error) {
 	var configObject *sku.Transacted
 
-	if configObject, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
+	if configObject, err = repo.GetStore().ReadTransactedFromObjectId(
+		ids.Config,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -151,7 +151,7 @@ func (store *Store) UpdateKonfig(
 	blobId interfaces.MarklId,
 ) (kt *sku.Transacted, err error) {
 	return store.CreateOrUpdateBlobDigest(
-		&ids.Config{},
+		ids.Config,
 		blobId,
 	)
 }

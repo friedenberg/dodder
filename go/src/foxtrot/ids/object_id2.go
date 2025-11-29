@@ -551,9 +551,8 @@ func (objectId *objectId2) Set(v string) (err error) {
 		k = &h
 
 	case genres.Config:
-		var h Config
-		err = h.Set(v)
-		k = &h
+		err = Config.Set(v)
+		k = Config
 
 	case genres.InventoryList:
 		var h Tai
@@ -631,9 +630,8 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		k = &h
 
 	case genres.Config:
-		var h Config
-		err = h.Set(v)
-		k = &h
+		err = Config.Set(v)
+		k = Config
 
 	case genres.InventoryList:
 		var h Tai

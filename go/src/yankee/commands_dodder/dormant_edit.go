@@ -102,7 +102,7 @@ func (cmd DormantEdit) makeTempFile(
 	var object *sku.Transacted
 
 	if object, err = repo.GetStore().ReadTransactedFromObjectId(
-		&ids.Config{},
+		ids.Config,
 	); err != nil {
 		err = errors.Wrap(err)
 		return path, err
