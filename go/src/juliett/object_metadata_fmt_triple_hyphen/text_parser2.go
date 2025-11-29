@@ -92,7 +92,9 @@ func (parser *textParser2) readType(
 		return err
 	}
 
-	if err = metadata.GetTypeLockMutable().Set(typeString); err != nil {
+	marshaler := markl.MakeLockMarshalerValueNotRequired(metadata.GetTypeLockMutable())
+
+	if err = marshaler.Set(typeString); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

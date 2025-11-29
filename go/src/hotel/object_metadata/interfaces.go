@@ -12,6 +12,9 @@ type (
 	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
 	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
 
+	TagLock        = interfaces.Lock[ids.Tag, *ids.Tag]
+	TagLockMutable = interfaces.LockMutable[ids.Tag, *ids.Tag]
+
 	TagSetMutable interface {
 		ids.TagSet
 	}

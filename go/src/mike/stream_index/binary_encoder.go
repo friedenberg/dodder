@@ -205,7 +205,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return n, err
 		}
 
-		binaryMarshaler := markl.GetLockMarshaler(
+		binaryMarshaler := markl.MakeLockMarshaler(
 			object.GetMetadataMutable().GetTypeLockMutable(),
 			!ids.IsBuiltin(metadata.GetType()),
 		)

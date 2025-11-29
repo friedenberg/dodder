@@ -165,17 +165,18 @@ func (cmd *FormatBlob) FormatFromStdin(
 
 	var blobFormatter script_config.RemoteScript
 	typeLock := markl.MakeLock[ids.Type, *ids.Type]()
+	typeLockMarshaler := markl.MakeLockMarshalerValueNotRequired(&typeLock)
 
 	switch len(args) {
 	case 1:
-		if err = typeLock.Set(args[0]); err != nil {
+		if err = typeLockMarshaler.Set(args[0]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case 2:
 		formatId = args[0]
-		if err = typeLock.Set(args[1]); err != nil {
+		if err = typeLockMarshaler.Set(args[1]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

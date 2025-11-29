@@ -98,7 +98,6 @@ type (
 		GetKey() KEY
 		GetValue() MarklId
 		IsEmpty() bool
-		Stringer
 	}
 
 	LockMutable[
@@ -108,6 +107,5 @@ type (
 		Lock[KEY, KEY_PTR]
 		GetKeyMutable() KEY_PTR
 		GetValueMutable() MutableMarklId
-		Setter
 	}
 )

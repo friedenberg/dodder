@@ -58,6 +58,10 @@ func (slice *Slice[ELEMENT]) DropFirst() {
 	}
 }
 
+func (slice *Slice[ELEMENT]) Delete(leftInclusive, rightExclusive int) {
+	*slice = slices.Delete[[]ELEMENT](*slice, leftInclusive, rightExclusive)
+}
+
 func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {
 	*slice = append(*slice, elements...)
 }

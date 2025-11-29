@@ -209,27 +209,13 @@ func (format format) writeMetadataKeyStringTo(
 		}
 
 	case key_strings.TypeLock:
-		typeTuple := metadata.GetTypeLock()
-
-		// if typeTuple.IsEmpty() {
-		// 	err = errors.Errorf("empty type tuple")
-		// 	return n, err
-		// }
-
-		// if typeTuple.Key.IsEmpty() {
-		// 	err = errors.Errorf("empty type")
-		// 	return n, err
-		// }
-
-		// if !format.allowMissingTypeSig && !typeTuple.Key.IsEmpty() && typeTuple.Value.IsEmpty() && !ids.IsBuiltin(typeTuple.Key) {
-		// 	err = errors.Errorf("empty type lock")
-		// 	return n, err
-		// }
+		typeLock := metadata.GetTypeLockMutable()
+		typeLockMarshaler := markl.MakeLockMarshalerValueNotRequired(typeLock)
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
 			key.String(),
-			typeTuple.String(),
+			typeLockMarshaler.String(),
 		)
 		n += int64(n1)
 

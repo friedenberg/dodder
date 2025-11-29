@@ -31,8 +31,6 @@ type metadata struct {
 	Tai ids.Tai
 
 	Index Index
-
-	lockfile lockfile
 }
 
 var (
@@ -115,7 +113,7 @@ func (metadata *metadata) IsEmpty() bool {
 // TODO fix issue with GetTags being nil sometimes
 func (metadata *metadata) GetTags() ids.TagSet {
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	return metadata.Tags
@@ -137,7 +135,7 @@ func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
 
 func (metadata *metadata) ResetTags() {
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	metadata.Tags.Reset()
@@ -174,7 +172,7 @@ func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
 	}
 
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	ids.AddNormalizedTag(metadata.Tags, tag)
@@ -186,7 +184,7 @@ func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
 
 func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	if err = metadata.Tags.Add(*tag); err != nil {
@@ -206,7 +204,7 @@ func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 
 func (metadata *metadata) SetTags(tags ids.TagSet) {
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	metadata.Tags.Reset()
@@ -226,7 +224,7 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 
 func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
 	if metadata.Tags == nil {
-		metadata.Tags = ids.MakeTagMutableSet()
+		metadata.Tags = makeTagSetMutable()
 	}
 
 	metadata.Tags.Reset()
@@ -275,7 +273,7 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 }
 
 func (metadata *metadata) GenerateExpandedTags() {
-	metadata.Index.SetExpandedTags(ids.ExpandMany[ids.Tag](
+	metadata.Index.SetExpandedTags(ids.ExpandMany(
 		metadata.GetTags().All(),
 		expansion.ExpanderRight,
 	))
