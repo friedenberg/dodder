@@ -261,7 +261,7 @@ LOOP_AFTER_OBJECT_ID:
 
 			if tag.IsDodderTag() {
 				err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
-				return
+				return err
 			} else {
 				if err = object.AddTagPtr(&tag); err != nil {
 					err = errors.Wrap(err)
