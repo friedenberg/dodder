@@ -17,7 +17,7 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeValueSet[values.String](
+		sut := MakeValueSetFromSlice[values.String](
 			nil,
 			vals...,
 		)
@@ -47,7 +47,7 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeValueSet[values.String](
+		sut := MakeValueSetFromSlice[values.String](
 			nil,
 			vals...,
 		)

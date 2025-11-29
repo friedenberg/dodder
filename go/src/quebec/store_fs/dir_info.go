@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -573,7 +574,7 @@ func (dirInfo *dirInfo) addOneOrMoreBlobs(
 		var fdsOne *sku.FSItem
 
 		if fdsOne, err = dirInfo.addOneUntracked(
-			fds.FDs.Any(),
+			quiter_set.Any(fds.FDs),
 		); err != nil {
 			err = errors.Wrap(err)
 			return results, err
@@ -589,7 +590,7 @@ func (dirInfo *dirInfo) addOneOrMoreBlobs(
 		var fdsOne *sku.FSItem
 
 		if fdsOne, err = dirInfo.addOneUntracked(
-			fds.FDs.Any(),
+			quiter_set.Any(fds.FDs),
 		); err != nil {
 			err = errors.Wrap(err)
 			return results, err

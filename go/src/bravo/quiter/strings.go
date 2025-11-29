@@ -12,7 +12,7 @@ func SortedValuesBy[ELEMENT any](
 	set interfaces.SetLike[ELEMENT],
 	sortFunc func(ELEMENT, ELEMENT) bool,
 ) (out []ELEMENT) {
-	out = Elements(set)
+	out = CollectSlice(set)
 
 	sort.Slice(out, func(i, j int) bool { return sortFunc(out[i], out[j]) })
 

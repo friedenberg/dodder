@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/vim_cli_options_builder"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/organize_text_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -143,7 +144,7 @@ func (cmd *Organize) Run(req command.Request) {
 	types := queries.GetTypes(queryGroup)
 
 	if types.Len() == 1 {
-		createOrganizeFileOp.Type = types.Any()
+		createOrganizeFileOp.Type = quiter_set.Any(types)
 	}
 
 	tags := queries.GetTags(queryGroup)

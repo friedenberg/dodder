@@ -70,7 +70,7 @@ func assertSet(
 
 	{
 		ex := vals
-		ac := quiter.Elements[values.String](sut)
+		ac := quiter.CollectSlice(sut)
 
 		sort.Slice(ac, func(i, j int) bool { return ac[i].Less(ac[j]) })
 

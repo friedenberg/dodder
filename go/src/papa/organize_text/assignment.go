@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -73,9 +74,11 @@ func (assignment Assignment) MaxDepth() (depth int) {
 }
 
 func (assignment Assignment) AlignmentSpacing() int {
-	if assignment.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(assignment.Transacted.Metadata.GetTags().Any()) {
+	childTag := quiter_set.Any(assignment.Transacted.GetMetadata().GetTags())
+
+	if assignment.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(childTag) {
 		return assignment.Parent.AlignmentSpacing() + len(
-			assignment.Parent.Transacted.Metadata.GetTags().Any().String(),
+			quiter_set.Any(assignment.Parent.Transacted.Metadata.GetTags()).String(),
 		)
 	}
 
@@ -261,17 +264,17 @@ func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
 		tags = ids.CloneTagSet(assignment.Transacted.GetMetadata().GetTags())
 		return tags, err
 	} else {
-		e := assignment.Transacted.GetMetadata().GetTags().Any()
+		tag := quiter_set.Any(assignment.Transacted.GetMetadata().GetTags())
 
-		if ids.IsDependentLeaf(e) {
-			var pe ids.TagSet
+		if ids.IsDependentLeaf(tag) {
+			var parentExpandedTags ids.TagSet
 
-			if pe, err = assignment.Parent.expandedTags(); err != nil {
+			if parentExpandedTags, err = assignment.Parent.expandedTags(); err != nil {
 				err = errors.Wrap(err)
 				return tags, err
 			}
 
-			if pe.Len() > 1 {
+			if parentExpandedTags.Len() > 1 {
 				err = errors.ErrorWithStackf(
 					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
 					assignment.Parent.Transacted.GetMetadata().GetTags(),
@@ -280,20 +283,20 @@ func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
 				return tags, err
 			}
 
-			e1 := pe.Any()
+			parentTag := quiter_set.Any(parentExpandedTags)
 
-			if ids.IsEmpty(e1) {
+			if ids.IsEmpty(parentTag) {
 				err = errors.ErrorWithStackf("parent tag is empty")
 				return tags, err
 			}
 
-			if err = e.Set(fmt.Sprintf("%s%s", e1, e)); err != nil {
+			if err = tag.Set(fmt.Sprintf("%s%s", parentTag, tag)); err != nil {
 				err = errors.Wrap(err)
 				return tags, err
 			}
 		}
 
-		tags = ids.MakeTagSet(e)
+		tags = ids.MakeTagSet(tag)
 	}
 
 	return tags, err
@@ -339,25 +342,26 @@ func (assignment *Assignment) Contains(e *ids.Tag) bool {
 
 func (assignment *Assignment) SortChildren() {
 	sort.Slice(assignment.Children, func(i, j int) bool {
-		esi := assignment.Children[i].Transacted.GetMetadata().GetTags()
-		esj := assignment.Children[j].Transacted.GetMetadata().GetTags()
+		iTags := assignment.Children[i].Transacted.GetMetadata().GetTags()
+		jTags := assignment.Children[j].Transacted.GetMetadata().GetTags()
 
-		if esi.Len() == 1 && esj.Len() == 1 {
-			ei := strings.TrimPrefix(esi.Any().String(), "-")
-			ej := strings.TrimPrefix(esj.Any().String(), "-")
+		if iTags.Len() == 1 && jTags.Len() == 1 {
+			iTag := strings.TrimPrefix(quiter_set.Any(iTags).String(), "-")
+			jTag := strings.TrimPrefix(quiter_set.Any(jTags).String(), "-")
 
-			ii, ierr := strconv.ParseInt(ei, 0, 64)
-			ij, jerr := strconv.ParseInt(ej, 0, 64)
+			iInt, iErr := strconv.ParseInt(iTag, 0, 64)
+			jInt, jErr := strconv.ParseInt(jTag, 0, 64)
 
-			if ierr == nil && jerr == nil {
-				return ii < ij
+			if iErr == nil && jErr == nil {
+				return iInt < jInt
 			} else {
-				return ei < ej
+				return iTag < jTag
 			}
 		} else {
-			vi := quiter.StringCommaSeparated(esi)
-			vj := quiter.StringCommaSeparated(esj)
-			return vi < vj
+			iValue := quiter.StringCommaSeparated(iTags)
+			jValue := quiter.StringCommaSeparated(jTags)
+
+			return iValue < jValue
 		}
 	})
 }

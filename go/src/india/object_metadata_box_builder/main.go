@@ -105,11 +105,11 @@ func (builder *Builder) AddError(err error) {
 	var errorGroup errors.Group
 
 	if errors.As(err, &errorGroup) {
-		for _, e := range errorGroup {
+		for _, err := range errorGroup {
 			builder.Contents.Append(
 				string_format_writer.Field{
 					Key:        "error",
-					Value:      e.Error(),
+					Value:      err.Error(),
 					ColorType:  string_format_writer.ColorTypeUserData,
 					NoTruncate: true,
 				},

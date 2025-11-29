@@ -60,7 +60,7 @@ func (a *obj) String() string {
 func sortObjSet(
 	s interfaces.MutableSetLike[*obj],
 ) (out Objects) {
-	out = quiter.Elements(s)
+	out = quiter.CollectSlice(s)
 	out.Sort()
 	return out
 }

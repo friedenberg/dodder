@@ -31,10 +31,6 @@ func (tagSet tagSetView) All() interfaces.Seq[ids.Tag] {
 	}
 }
 
-func (tagSet tagSetView) Any() ids.Tag {
-	return tagSet.Tags.Any()
-}
-
 func (tagSet tagSetView) ContainsKey(key string) bool {
 	return tagSet.Tags.ContainsKey(key)
 }

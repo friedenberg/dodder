@@ -32,7 +32,7 @@ func init() {
 	)
 
 	gob.Register(
-		collections_value.MakeValueSet[values.String](
+		collections_value.MakeValueSetFromSlice[values.String](
 			nil,
 		),
 	)

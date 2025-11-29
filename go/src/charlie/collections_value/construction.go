@@ -60,25 +60,45 @@ func MakeValueSetValue[T interfaces.Stringer](
 	return s
 }
 
-func MakeValueSet[T interfaces.Stringer](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s Set[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
+func MakeValueSet[ELEMENT interfaces.Stringer](
+	keyer interfaces.StringKeyer[ELEMENT],
+	seq interfaces.Seq[ELEMENT],
+) (set Set[ELEMENT]) {
+	gob.Register(set)
+	set.E = make(map[string]ELEMENT, 0)
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[ELEMENT]{}
 	}
 
-	s.K = keyer
+	set.K = keyer
 
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
+	for element := range seq {
+		set.E[set.K.GetKey(element)] = element
 	}
 
-	return s
+	return set
+}
+
+func MakeValueSetFromSlice[ELEMENT interfaces.Stringer](
+	keyer interfaces.StringKeyer[ELEMENT],
+	elements ...ELEMENT,
+) (set Set[ELEMENT]) {
+	gob.Register(set)
+	set.E = make(map[string]ELEMENT, len(elements))
+
+	if keyer == nil {
+		keyer = quiter.StringerKeyer[ELEMENT]{}
+	}
+
+	set.K = keyer
+
+	for index := range elements {
+		element := elements[index]
+		set.E[set.K.GetKey(element)] = element
+	}
+
+	return set
 }
 
 func MakeSetValue[T interfaces.Stringer](

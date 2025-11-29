@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -32,7 +33,7 @@ func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
 
 	for _, fds := range data.digests {
 		if fds.Len() == 1 {
-			replacement.Add(fds.Any())
+			replacement.Add(quiter_set.Any(fds))
 		}
 
 		sorted := quiter.ElementsSorted(

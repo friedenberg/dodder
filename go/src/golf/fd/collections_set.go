@@ -15,7 +15,7 @@ type (
 )
 
 func MakeSet(ts ...*FD) Set {
-	return collections_value.MakeValueSet[*FD](
+	return collections_value.MakeValueSetFromSlice[*FD](
 		nil,
 		ts...,
 	)

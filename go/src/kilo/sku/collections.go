@@ -33,7 +33,7 @@ type (
 )
 
 func MakeTransactedSet() TransactedSet {
-	return collections_value.MakeValueSet(transactedKeyerObjectId)
+	return collections_value.MakeValueSetFromSlice(transactedKeyerObjectId)
 }
 
 func MakeTransactedMutableSet() TransactedMutableSet {
@@ -41,7 +41,7 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 }
 
 func MakeExternalLikeSet() ExternalLikeSet {
-	return collections_value.MakeValueSet(externalLikeKeyerObjectId)
+	return collections_value.MakeValueSetFromSlice(externalLikeKeyerObjectId)
 }
 
 func MakeExternalLikeMutableSet() ExternalLikeMutableSet {
@@ -49,7 +49,7 @@ func MakeExternalLikeMutableSet() ExternalLikeMutableSet {
 }
 
 func MakeCheckedOutSet() CheckedOutSet {
-	return collections_value.MakeValueSet(CheckedOutKeyerObjectId)
+	return collections_value.MakeValueSetFromSlice(CheckedOutKeyerObjectId)
 }
 
 func MakeCheckedOutMutableSet() CheckedOutMutableSet {

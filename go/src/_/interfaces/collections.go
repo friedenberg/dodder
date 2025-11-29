@@ -18,8 +18,13 @@ type (
 		ContainsKey(string) bool
 	}
 
+	// TODO make derived
 	Container[ELEMENT any] interface {
 		Contains(ELEMENT) bool
+	}
+
+	Keyer[ELEMENT any] interface {
+		Key(ELEMENT) string
 	}
 
 	Aller[ELEMENT any] interface {
@@ -27,21 +32,20 @@ type (
 	}
 
 	Iterable[ELEMENT any] interface {
-		Any() ELEMENT // TODO make derived
 		All() Seq[ELEMENT]
 	}
 
-	Adder[E any] interface {
-		Add(E) error
+	Adder[ELEMENT any] interface {
+		Add(ELEMENT) error
 	}
 
-	AdderPtr[E any, EPtr Ptr[E]] interface {
-		AddPtr(EPtr) error
+	AdderPtr[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
+		AddPtr(ELEMENT_PTR) error
 	}
 
 	SetBase[ELEMENT any] interface {
 		Lenner
-		// Container[ELEMENT]
+		Keyer[ELEMENT]
 		ContainsKeyer
 		Aller[ELEMENT]
 	}
@@ -64,27 +68,26 @@ type (
 )
 
 type (
-	SetLike[T any] interface {
-		Collection[T]
+	SetLike[ELEMENT any] interface {
+		Collection[ELEMENT]
 		ContainsKeyer
 
-		Key(T) string
-		Get(string) (T, bool)
-		Contains(T) bool
+		Key(ELEMENT) string
+		Get(string) (ELEMENT, bool)
+		Contains(ELEMENT) bool
 
-		CloneSetLike() SetLike[T]
-		CloneMutableSetLike() MutableSetLike[T]
+		CloneMutableSetLike() MutableSetLike[ELEMENT]
 	}
 
-	SetPtrLike[T any, TPtr Ptr[T]] interface {
-		SetLike[T]
-		CollectionPtr[T, TPtr]
+	SetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
+		SetLike[ELEMENT]
+		CollectionPtr[ELEMENT, ELEMENT_PTR]
 
-		GetPtr(string) (TPtr, bool)
-		KeyPtr(TPtr) string
+		GetPtr(string) (ELEMENT_PTR, bool)
+		KeyPtr(ELEMENT_PTR) string
 
-		CloneSetPtrLike() SetPtrLike[T, TPtr]
-		CloneMutableSetPtrLike() MutableSetPtrLike[T, TPtr]
+		CloneSetPtrLike() SetPtrLike[ELEMENT, ELEMENT_PTR]
+		CloneMutableSetPtrLike() MutableSetPtrLike[ELEMENT, ELEMENT_PTR]
 	}
 
 	MutableSetPtrLike[T any, TPtr Ptr[T]] interface {

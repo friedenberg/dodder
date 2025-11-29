@@ -6,18 +6,20 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
-func Elements[T any](s interfaces.Collection[T]) (out []T) {
-	if s == nil {
-		return out
+func CollectSlice[ELEMENT any](
+	collection interfaces.Collection[ELEMENT],
+) (slice []ELEMENT) {
+	if collection == nil {
+		return slice
 	}
 
-	out = make([]T, 0, s.Len())
+	slice = make([]ELEMENT, 0, collection.Len())
 
-	for v := range s.All() {
-		out = append(out, v)
+	for element := range collection.All() {
+		slice = append(slice, element)
 	}
 
-	return out
+	return slice
 }
 
 func ElementsSorted[T any](

@@ -14,7 +14,6 @@ type (
 	TagSet interface {
 		Len() int
 		All() interfaces.Seq[Tag]
-		Any() Tag
 		ContainsKey(string) bool
 		Get(string) (Tag, bool)
 		Key(Tag) string

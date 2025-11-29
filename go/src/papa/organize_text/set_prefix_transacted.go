@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
@@ -157,33 +158,30 @@ func (prefixSet PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
 }
 
 func (prefixSet PrefixSet) Match(
-	e ids.Tag,
+	tag ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 
-	for e1, zSet := range prefixSet.innerMap {
-		if e1 == "" {
+	for prefixTag, objects := range prefixSet.innerMap {
+		if prefixTag == "" {
 			continue
 		}
 
-		for z := range zSet.All() {
-			es := z.GetSkuExternal().GetTags()
+		for object := range objects.All() {
+			objectTags := object.GetSkuExternal().GetTags()
 
-			intersection := ids.IntersectPrefixes(
-				es,
-				e,
-			)
+			intersection := ids.IntersectPrefixes(objectTags, tag)
 
 			exactMatch := intersection.Len() == 1 &&
-				intersection.Any().Equals(e)
+				quiter_set.Any(intersection).Equals(tag)
 
 			if intersection.Len() == 0 && !exactMatch {
 				continue
 			}
 
-			for _, e2 := range quiter.Elements(intersection) {
-				out.Grouped.addPair(e2.String(), z)
+			for _, e2 := range quiter.CollectSlice(intersection) {
+				out.Grouped.addPair(e2.String(), object)
 			}
 		}
 	}

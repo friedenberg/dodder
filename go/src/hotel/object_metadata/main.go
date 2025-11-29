@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
@@ -216,7 +217,7 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 		return
 	}
 
-	if tags.Len() == 1 && tags.Any().String() == "" {
+	if tags.Len() == 1 && quiter_set.Any(tags).String() == "" {
 		panic("empty tag set")
 	}
 
@@ -236,7 +237,7 @@ func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
 		return
 	}
 
-	if tags.Len() == 1 && tags.Any().String() == "" {
+	if tags.Len() == 1 && quiter_set.Any(tags).String() == "" {
 		panic("empty tag set")
 	}
 

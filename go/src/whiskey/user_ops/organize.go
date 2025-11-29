@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/vim_cli_options_builder"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -118,25 +119,25 @@ func (op Organize) RunWithSkuType(
 		),
 	}
 
-	typen := queries.GetTypes(organizeResults.QueryGroup)
+	types := queries.GetTypes(organizeResults.QueryGroup)
 
-	if typen.Len() == 1 {
-		createOrganizeFileOp.Type = typen.Any()
+	if types.Len() == 1 {
+		createOrganizeFileOp.Type = quiter_set.Any(types)
 	}
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
+	if file, err = op.GetEnvRepo().GetTempLocal().FileTempWithTemplate(
 		"*." + op.GetConfig().GetFileExtensions().Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return organizeResults, err
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
 	if organizeResults.Before, err = createOrganizeFileOp.RunAndWrite(
-		f,
+		file,
 	); err != nil {
 		err = errors.Wrap(err)
 		return organizeResults, err
@@ -150,7 +151,7 @@ func (op Organize) RunWithSkuType(
 				Build(),
 		}
 
-		if err = openVimOp.Run(op.Repo, f.Name()); err != nil {
+		if err = openVimOp.Run(op.Repo, file.Name()); err != nil {
 			err = errors.Wrap(err)
 			return organizeResults, err
 		}
@@ -162,14 +163,14 @@ func (op Organize) RunWithSkuType(
 
 		readOrganizeTextOp := ReadOrganizeFile{}
 
-		if _, err = f.Seek(0, io.SeekStart); err != nil {
+		if _, err = file.Seek(0, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
 			return organizeResults, err
 		}
 
 		if organizeResults.After, err = readOrganizeTextOp.Run(
 			op.Repo,
-			f,
+			file,
 			organize_text.NewMetadataWithOptionCommentLookup(
 				organizeResults.Before.GetRepoId(),
 				op.GetPrototypeOptionComments(),

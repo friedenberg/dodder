@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
@@ -40,7 +41,10 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if a.Transacted.GetMetadata().GetTags().Len() == 1 && ids.IsEmpty(a.Transacted.GetMetadata().GetTags().Any()) {
+	childTag := quiter_set.Any(a.Transacted.GetMetadata().GetTags())
+	parentTag := quiter_set.Any(a.Parent.Transacted.GetMetadata().GetTags())
+
+	if a.Transacted.GetMetadata().GetTags().Len() == 1 && ids.IsEmpty(childTag) {
 		ui.Log().Print("1 tag, and it's empty, merging")
 		return true
 	}
@@ -70,12 +74,12 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Parent.Transacted.GetMetadata().GetTags().Any()) {
+	if ids.IsDependentLeaf(parentTag) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
 
-	if ids.IsDependentLeaf(a.Transacted.GetMetadata().GetTags().Any()) {
+	if ids.IsDependentLeaf(childTag) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
@@ -106,30 +110,31 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	if ids.IsDependentLeaf(a.Parent.Transacted.GetMetadata().GetTags().Any()) {
+	parentTag := quiter_set.Any(a.Parent.Transacted.GetMetadata().GetTags())
+
+	if ids.IsDependentLeaf(parentTag) {
 		return err
 	}
 
-	if ids.IsDependentLeaf(a.Transacted.GetMetadata().GetTags().Any()) {
+	childTag := quiter_set.Any(a.Transacted.GetMetadata().GetTags())
+
+	if ids.IsDependentLeaf(childTag) {
 		return err
 	}
 
-	if !ids.HasParentPrefix(a.Transacted.GetMetadata().GetTags().Any(), a.Parent.Transacted.GetMetadata().GetTags().Any()) {
+	if !ids.HasParentPrefix(childTag, parentTag) {
 		ui.Log().Print("parent is not prefix joint")
 		return err
 	}
 
-	aEtt := a.Transacted.GetMetadata().GetTags().Any()
-	pEtt := a.Parent.Transacted.GetMetadata().GetTags().Any()
-
-	if aEtt.Equals(pEtt) {
+	if childTag.Equals(parentTag) {
 		ui.Log().Print("parent is is equal to child")
 		return err
 	}
 
 	var ls ids.Tag
 
-	if ls, err = ids.LeftSubtract(aEtt, pEtt); err != nil {
+	if ls, err = ids.LeftSubtract(childTag, parentTag); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -206,7 +211,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 	var na *Assignment
 
 	if a.Transacted.GetMetadata().GetTags().Len() == 1 &&
-		a.Transacted.GetMetadata().GetTags().Any().Equals(groupingPrefix.Tag) {
+		quiter_set.Any(a.Transacted.GetMetadata().GetTags()).Equals(groupingPrefix.Tag) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)

@@ -71,7 +71,10 @@ func (store *store) recompileTypes(
 	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		store.config.InlineTypes = inlineTypes.CloneSetLike()
+		store.config.InlineTypes = collections_value.MakeValueSet(
+			nil,
+			inlineTypes.All(),
+		)
 	}()
 
 	for ct := range store.config.Types.All() {
