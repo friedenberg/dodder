@@ -25,7 +25,7 @@ func Len(cs ...interfaces.Lenner) (n int) {
 }
 
 func DerivedValues[E any, F any](
-	c interfaces.SetLike[E],
+	c interfaces.Set[E],
 	f interfaces.FuncTransform[E, F],
 ) (out []F, err error) {
 	out = make([]F, 0, c.Len())

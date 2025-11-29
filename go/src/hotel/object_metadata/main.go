@@ -272,7 +272,7 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 	}
 
 	for tag := range otherMetadata.AllTags() {
-		metadata.Tags.Del(tag)
+		quiter_set.Del(metadata.Tags, tag)
 	}
 }
 

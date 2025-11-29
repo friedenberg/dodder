@@ -98,14 +98,6 @@ func (s MutableSet[T, TPtr]) Any() (v T) {
 	return v
 }
 
-func (s MutableSet[T, TPtr]) Del(v T) (err error) {
-	return s.DelKey(s.Key(v))
-}
-
-func (s MutableSet[T, TPtr]) DelPtr(v TPtr) (err error) {
-	return s.DelKey(s.K.GetKeyPtr(v))
-}
-
 func (s MutableSet[T, TPtr]) DelKey(k string) (err error) {
 	delete(s.E, k)
 	return err
@@ -145,7 +137,7 @@ func (a MutableSet[T, TPtr]) Reset() {
 	}
 }
 
-func (a MutableSet[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {
+func (a MutableSet[T, TPtr]) CloneSetLike() interfaces.Set[T] {
 	b := MakeSet[T, TPtr](a.K)
 
 	for k, v := range a.E {

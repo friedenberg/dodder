@@ -23,7 +23,7 @@ type (
 		TagSet
 
 		interfaces.Adder[Tag]
-		Del(Tag) error
+		DelKey(string) error
 		interfaces.Resetable
 	}
 )

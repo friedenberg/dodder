@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -41,7 +42,7 @@ func NewMetadataWithOptionCommentLookup(
 // TODO replace with embedded *sku.Transacted
 type Metadata struct {
 	ids.TagSet
-	Matchers interfaces.SetLike[sku.Query] // TODO remove
+	Matchers interfaces.Set[sku.Query] // TODO remove
 	OptionCommentSet
 	Type   ids.Type
 	RepoId ids.RepoId
@@ -73,10 +74,7 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 	tags := ids.CloneTagSetMutable(object.GetSkuExternal().Metadata.GetTags())
 
 	for element := range metadata.All() {
-		if err = tags.Del(element); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+		quiter_set.Del(tags, element)
 	}
 
 	object.GetSkuExternal().Metadata.SetTags(tags)

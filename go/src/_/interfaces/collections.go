@@ -18,17 +18,8 @@ type (
 		ContainsKey(string) bool
 	}
 
-	// TODO make derived
-	Container[ELEMENT any] interface {
-		Contains(ELEMENT) bool
-	}
-
 	Keyer[ELEMENT any] interface {
 		Key(ELEMENT) string
-	}
-
-	Aller[ELEMENT any] interface {
-		All() Seq[ELEMENT]
 	}
 
 	Iterable[ELEMENT any] interface {
@@ -43,64 +34,46 @@ type (
 		AddPtr(ELEMENT_PTR) error
 	}
 
-	SetBase[ELEMENT any] interface {
+	Collection[ELEMENT any] interface {
 		Lenner
-		Keyer[ELEMENT]
+		Iterable[ELEMENT]
+	}
+
+	SetGetter[ELEMENT any] interface {
+		Get(string) (ELEMENT, bool)
+	}
+
+	Set[ELEMENT any] interface {
 		ContainsKeyer
-		Aller[ELEMENT]
+		Iterable[ELEMENT]
+		Keyer[ELEMENT]
+		Lenner
+		SetGetter[ELEMENT]
 	}
 )
 
-type Delta[T any] interface {
-	GetAdded() SetLike[T]
-	GetRemoved() SetLike[T]
+type Delta[ELEMENT any] interface {
+	GetAdded() Set[ELEMENT]
+	GetRemoved() Set[ELEMENT]
 }
 
 type (
-	Collection[T any] interface {
-		Lenner
-		Iterable[T]
-	}
-
-	CollectionPtr[T any, TPtr Ptr[T]] interface {
-		Lenner
-	}
-)
-
-type (
-	SetLike[ELEMENT any] interface {
-		Collection[ELEMENT]
-		ContainsKeyer
-
-		Key(ELEMENT) string
-		Get(string) (ELEMENT, bool)
-		Contains(ELEMENT) bool
-
-		CloneMutableSetLike() MutableSetLike[ELEMENT]
-	}
-
 	SetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		SetLike[ELEMENT]
-		CollectionPtr[ELEMENT, ELEMENT_PTR]
-
-		GetPtr(string) (ELEMENT_PTR, bool)
-		KeyPtr(ELEMENT_PTR) string
+		Set[ELEMENT]
 
 		CloneSetPtrLike() SetPtrLike[ELEMENT, ELEMENT_PTR]
 		CloneMutableSetPtrLike() MutableSetPtrLike[ELEMENT, ELEMENT_PTR]
 	}
 
-	MutableSetPtrLike[T any, TPtr Ptr[T]] interface {
-		SetPtrLike[T, TPtr]
-		MutableSetLike[T]
-		AddPtr(TPtr) error
-		DelPtr(TPtr) error
+	MutableSetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
+		SetPtrLike[ELEMENT, ELEMENT_PTR]
+		MutableSetLike[ELEMENT]
+		AddPtr(ELEMENT_PTR) error
 	}
 
-	MutableSetLike[T any] interface {
-		SetLike[T]
-		Adder[T]
-		Del(T) error
+	MutableSetLike[ELEMENT any] interface {
+		Set[ELEMENT]
+		Adder[ELEMENT]
 		DelKey(string) error
 		Resetable
 	}

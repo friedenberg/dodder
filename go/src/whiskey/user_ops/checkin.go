@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
@@ -135,10 +136,7 @@ func (op Checkin) runOrganize(
 	}
 
 	for _, co := range changes.Removed.AllSkuAndIndex() {
-		if err = results.Del(co); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+		quiter_set.Del(results, co)
 	}
 
 	return err

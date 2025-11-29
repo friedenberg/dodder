@@ -9,7 +9,7 @@ import (
 )
 
 func SortedValuesBy[ELEMENT any](
-	set interfaces.SetLike[ELEMENT],
+	set interfaces.Set[ELEMENT],
 	sortFunc func(ELEMENT, ELEMENT) bool,
 ) (out []ELEMENT) {
 	out = CollectSlice(set)

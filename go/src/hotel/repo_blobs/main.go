@@ -37,7 +37,7 @@ type (
 
 func GetSupportedConnectionTypes(
 	blob Blob,
-) interfaces.SetLike[remote_connection_types.Type] {
+) interfaces.Set[remote_connection_types.Type] {
 	if blob.IsRemote() {
 		return collections_value.MakeValueSetValue(
 			nil,

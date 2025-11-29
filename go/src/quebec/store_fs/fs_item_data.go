@@ -2,6 +2,7 @@ package store_fs
 
 import (
 	"maps"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -23,7 +24,11 @@ func makeFSItemData() fsItemData {
 }
 
 func (data *fsItemData) Clone() (dst fsItemData) {
-	dst.MutableSetLike = data.MutableSetLike.CloneMutableSetLike()
+	dst.MutableSetLike = collections_value.MakeMutableValueSet(
+		nil,
+		slices.Collect(data.MutableSetLike.All())...,
+	)
+
 	dst.digests = maps.Clone(data.digests)
 	return dst
 }

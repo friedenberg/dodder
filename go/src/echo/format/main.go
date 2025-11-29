@@ -79,9 +79,9 @@ func MakeStringer(
 }
 
 func MakeFormatStringer[T interfaces.ValueLike](
-	sf interfaces.FuncString[interfaces.SetLike[T]],
-) interfaces.FuncWriterFormat[interfaces.SetLike[T]] {
-	return func(w io.Writer, e interfaces.SetLike[T]) (n int64, err error) {
+	sf interfaces.FuncString[interfaces.Set[T]],
+) interfaces.FuncWriterFormat[interfaces.Set[T]] {
+	return func(w io.Writer, e interfaces.Set[T]) (n int64, err error) {
 		var n1 int
 
 		if n1, err = io.WriteString(w, sf(e)); err != nil {

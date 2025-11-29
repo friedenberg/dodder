@@ -123,7 +123,7 @@ func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 	return err
 }
 
-func (a Set[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {
+func (a Set[T, TPtr]) CloneSetLike() interfaces.Set[T] {
 	return a
 }
 

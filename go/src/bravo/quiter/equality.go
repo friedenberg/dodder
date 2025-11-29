@@ -5,7 +5,7 @@ import (
 )
 
 type SetBaseContainer[ELEMENT interfaces.Stringer] struct {
-	interfaces.SetBase[ELEMENT]
+	interfaces.Set[ELEMENT]
 }
 
 func (set SetBaseContainer[ELEMENT]) Contains(element ELEMENT) bool {
@@ -14,7 +14,7 @@ func (set SetBaseContainer[ELEMENT]) Contains(element ELEMENT) bool {
 
 // TODO refactor to use iterators
 func SetEquals[ELEMENT interfaces.Stringer](
-	a, b interfaces.SetBase[ELEMENT],
+	a, b interfaces.Set[ELEMENT],
 ) bool {
 	if a == nil && b == nil {
 		return true

@@ -12,9 +12,9 @@ type Set[
 	E map[string]T
 }
 
-func (s Set[T]) AllKeys() interfaces.Seq[string] {
+func (set Set[T]) AllKeys() interfaces.Seq[string] {
 	return func(yield func(string) bool) {
-		for k := range s.E {
+		for k := range set.E {
 			if !yield(k) {
 				break
 			}
@@ -22,9 +22,9 @@ func (s Set[T]) AllKeys() interfaces.Seq[string] {
 	}
 }
 
-func (s Set[T]) All() interfaces.Seq[T] {
+func (set Set[T]) All() interfaces.Seq[T] {
 	return func(yield func(T) bool) {
-		for _, e := range s.E {
+		for _, e := range set.E {
 			if !yield(e) {
 				break
 			}
@@ -32,49 +32,49 @@ func (s Set[T]) All() interfaces.Seq[T] {
 	}
 }
 
-func (s Set[T]) Len() int {
-	if s.E == nil {
+func (set Set[T]) Len() int {
+	if set.E == nil {
 		return 0
 	}
 
-	return len(s.E)
+	return len(set.E)
 }
 
-func (s Set[T]) Key(e T) string {
-	return s.K.GetKey(e)
+func (set Set[T]) Key(e T) string {
+	return set.K.GetKey(e)
 }
 
-func (s Set[T]) Get(k string) (e T, ok bool) {
-	e, ok = s.E[k]
+func (set Set[T]) Get(k string) (e T, ok bool) {
+	e, ok = set.E[k]
 
 	return e, ok
 }
 
-func (s Set[T]) Any() (e T) {
-	for _, e1 := range s.E {
+func (set Set[T]) Any() (e T) {
+	for _, e1 := range set.E {
 		return e1
 	}
 
 	return e
 }
 
-func (s Set[T]) ContainsKey(k string) (ok bool) {
+func (set Set[T]) ContainsKey(k string) (ok bool) {
 	if k == "" {
 		return ok
 	}
 
-	_, ok = s.E[k]
+	_, ok = set.E[k]
 
 	return ok
 }
 
-func (s Set[T]) Contains(e T) (ok bool) {
-	return s.ContainsKey(s.Key(e))
+func (set Set[T]) Contains(e T) (ok bool) {
+	return set.ContainsKey(set.Key(e))
 }
 
 // TODO remove in favor of iterators
-func (s Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
-	for v := range s.E {
+func (set Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
+	for v := range set.E {
 		if err = wf(v); err != nil {
 			if errors.IsStopIteration(err) {
 				err = nil
@@ -89,19 +89,16 @@ func (s Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	return err
 }
 
-func (s Set[T]) Add(v T) (err error) {
-	s.E[s.Key(v)] = v
+func (set Set[T]) Add(v T) (err error) {
+	set.E[set.Key(v)] = v
 	return err
 }
 
-func (a Set[T]) CloneSetLike() interfaces.SetLike[T] {
-	return a
+func (set Set[T]) CloneSetLike() interfaces.Set[T] {
+	return set
 }
 
-func (a Set[T]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
-	c := MakeMutableSet[T](a.K)
-	for e := range a.All() {
-		c.Add(e)
-	}
-	return c
+func (set Set[T]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
+	clone := MakeMutableSet[T](set.K, set.Len(), set.All())
+	return clone
 }

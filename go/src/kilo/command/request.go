@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -61,10 +62,11 @@ func (req *Args) PopArgsAsMutableSet() collections_value.MutableSet[string] {
 	args := req.PeekArgs()
 	set := collections_value.MakeMutableSet(
 		quiter.StringKeyer,
+		len(args),
+		slices.Values(args),
 	)
 
 	for _, arg := range args {
-		set.Add(arg)
 		req.consumed = append(req.consumed, consumedArg{value: arg})
 	}
 

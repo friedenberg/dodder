@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	CheckedOutSet        = interfaces.SetLike[*sku.CheckedOut]
+	CheckedOutSet        = interfaces.Set[*sku.CheckedOut]
 	CheckedOutMutableSet = interfaces.MutableSetLike[*sku.CheckedOut]
 )
 

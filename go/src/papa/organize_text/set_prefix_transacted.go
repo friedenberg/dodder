@@ -93,46 +93,46 @@ func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 }
 
 func (prefixSet PrefixSet) Subtract(
-	b objSet,
-) (c PrefixSet) {
-	c = MakePrefixSet(len(prefixSet.innerMap))
+	objects objSet,
+) (output PrefixSet) {
+	output = MakePrefixSet(len(prefixSet.innerMap))
 
-	for e, aSet := range prefixSet.innerMap {
-		for z := range aSet.All() {
-			if !b.Contains(z) {
-				c.addPair(e, z)
+	for tag, aSet := range prefixSet.innerMap {
+		for object := range aSet.All() {
+			if !quiter_set.Contains(objects, object) {
+				output.addPair(tag, object)
 			}
 		}
 	}
 
-	return c
+	return output
 }
 
 func (prefixSet *PrefixSet) addPair(
-	e string,
-	z *obj,
+	tagString string,
+	object *obj,
 ) {
-	if e == z.GetSkuExternal().ObjectId.String() {
-		e = ""
+	if tagString == object.GetSkuExternal().ObjectId.String() {
+		tagString = ""
 	}
 
-	existingSet, ok := prefixSet.innerMap[e]
+	existingSet, ok := prefixSet.innerMap[tagString]
 
 	if !ok {
 		existingSet = makeObjSet()
-		prefixSet.innerMap[e] = existingSet
+		prefixSet.innerMap[tagString] = existingSet
 	}
 
 	var existingObj *obj
-	existingObj, ok = existingSet.Get(existingSet.Key(z))
+	existingObj, ok = existingSet.Get(existingSet.Key(object))
 
 	if ok && existingObj.tipe.IsDirectOrSelf() {
-		z.tipe.SetDirect()
+		object.tipe.SetDirect()
 	} else if !ok {
 		prefixSet.count += 1
 	}
 
-	existingSet.Add(z)
+	existingSet.Add(object)
 }
 
 func (prefixSet PrefixSet) AllObjectSets() interfaces.Seq2[string, objSet] {

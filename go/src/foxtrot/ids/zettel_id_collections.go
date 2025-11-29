@@ -10,7 +10,7 @@ func init() {
 }
 
 type (
-	ZettelIdSet        = interfaces.SetLike[ZettelId]
+	ZettelIdSet        = interfaces.Set[ZettelId]
 	ZettelIdMutableSet = interfaces.MutableSetLike[ZettelId]
 )
 

@@ -10,7 +10,7 @@ func init() {
 }
 
 type (
-	Set        = interfaces.SetLike[*FD]
+	Set        = interfaces.Set[*FD]
 	MutableSet = interfaces.MutableSetLike[*FD]
 )
 

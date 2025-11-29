@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 )
 
 func IsDependentLeaf(a Tag) (has bool) {
@@ -94,11 +95,12 @@ func AddNormalizedTag(es TagSetMutable, e *Tag) {
 	}
 }
 
-func RemovePrefixes(es TagSetMutable, needle Tag) {
-	for _, haystack := range quiter.CollectSlice(es) {
-		// TODO-P2 make more efficient
-		if strings.HasPrefix(haystack.String(), needle.String()) {
-			es.Del(haystack)
+func RemovePrefixes(haystack TagSetMutable, needle Tag) {
+	for tag := range haystack.All() {
+		if !strings.HasPrefix(tag.String(), needle.String()) {
+			continue
 		}
+
+		quiter_set.Del(haystack, tag)
 	}
 }

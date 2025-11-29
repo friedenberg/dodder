@@ -50,7 +50,7 @@ func (a *mutableSetExperimental[T, TPtr]) EqualsSetPtrLike(
 }
 
 func (a *mutableSetExperimental[T, TPtr]) EqualsSetLike(
-	b interfaces.SetLike[T],
+	b interfaces.Set[T],
 ) bool {
 	if b == nil {
 		return false

@@ -2,6 +2,7 @@ package collections_delta
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 )
 
@@ -9,16 +10,16 @@ type delta[T interfaces.ValueLike] struct {
 	Added, Removed interfaces.MutableSetLike[T]
 }
 
-func (d delta[T]) GetAdded() interfaces.SetLike[T] {
+func (d delta[T]) GetAdded() interfaces.Set[T] {
 	return d.Added
 }
 
-func (d delta[T]) GetRemoved() interfaces.SetLike[T] {
+func (d delta[T]) GetRemoved() interfaces.Set[T] {
 	return d.Removed
 }
 
 func MakeSetDelta[ELEMENT interfaces.ValueLike](
-	from, to interfaces.SetBase[ELEMENT],
+	from, to interfaces.Set[ELEMENT],
 ) interfaces.Delta[ELEMENT] {
 	delta := delta[ELEMENT]{
 		Added:   collections_value.MakeMutableValueSet[ELEMENT](nil),
@@ -37,7 +38,7 @@ func MakeSetDelta[ELEMENT interfaces.ValueLike](
 			delta.Added.Add(element)
 		}
 
-		delta.Removed.Del(element)
+		quiter_set.Del(delta.Removed, element)
 	}
 
 	return delta

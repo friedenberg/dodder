@@ -2,10 +2,12 @@ package collections_value
 
 import (
 	"reflect"
+	"slices"
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
@@ -22,7 +24,7 @@ func makeStringValues(vs ...string) (out []values.String) {
 
 func assertSet(
 	t ui.T,
-	sut interfaces.SetLike[values.String],
+	sut interfaces.Set[values.String],
 	vals []values.String,
 ) {
 	t.Helper()
@@ -81,7 +83,7 @@ func assertSet(
 
 	// Contains(T) bool
 	for _, v := range vals {
-		if !sut.Contains(v) {
+		if !quiter_set.Contains(sut, v) {
 			t.Fatalf("expected %s to contain %s", sut, v)
 		}
 	}
@@ -97,15 +99,15 @@ func assertSet(
 
 	// MutableCopy
 	{
-		sutCopy := sut.CloneMutableSetLike()
+		sutCopy := MakeMutableValueSet(nil, slices.Collect(sut.All())...)
 
-		if !quiter.SetEquals[values.String](sut, sutCopy) {
+		if !quiter.SetEquals(sut, sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
 		sutCopy.Reset()
 
-		if quiter.SetEquals[values.String](sut, sutCopy) {
+		if quiter.SetEquals(sut, sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
 		}
 	}

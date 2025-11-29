@@ -47,8 +47,8 @@ func (tagSet tagSetViewMutable) Add(tag ids.Tag) error {
 	return tagSet.Tags.Add(tag)
 }
 
-func (tagSet tagSetViewMutable) Del(tag ids.Tag) error {
-	return tagSet.Tags.Del(tag)
+func (tagSet tagSetViewMutable) DelKey(key string) error {
+	return tagSet.Tags.DelKey(key)
 }
 
 func (tagSet tagSetViewMutable) Reset() {

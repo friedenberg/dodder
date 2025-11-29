@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
@@ -123,20 +124,10 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 			return err
 		}
 
-		if err = left.Del(tag); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+		quiter_set.Del(left, tag)
+		quiter_set.Del(middle, tag)
 
-		if err = middle.Del(tag); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if err = right.Del(tag); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+		quiter_set.Del(right, tag)
 
 		return err
 	}

@@ -50,7 +50,7 @@ type (
 		ExtensionsToTypes map[string]string
 		TypesToExtensions map[string]string
 		Types             sku.TransactedMutableSet
-		InlineTypes       interfaces.SetLike[values.String]
+		InlineTypes       interfaces.Set[values.String]
 
 		// Kasten
 		Repos sku.TransactedMutableSet

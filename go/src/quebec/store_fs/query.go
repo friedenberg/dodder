@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -363,7 +364,7 @@ func (store *Store) queryUntracked(
 				allRecognized = append(allRecognized, recognizedBlob)
 
 				for _, item := range recognizedBlob.Matching {
-					definitelyNotCheckedOut.Del(item)
+					quiter_set.Del(definitelyNotCheckedOut, item)
 				}
 			}
 
@@ -371,7 +372,7 @@ func (store *Store) queryUntracked(
 				allRecognized = append(allRecognized, recognizedObject)
 
 				for _, item := range recognizedObject.Matching {
-					definitelyNotCheckedOut.Del(item)
+					quiter_set.Del(definitelyNotCheckedOut, item)
 				}
 			}
 

@@ -28,7 +28,7 @@ type Options struct {
 
 	Metadata
 
-	commentMatchers interfaces.SetLike[sku.Query]
+	commentMatchers interfaces.Set[sku.Query]
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
 	Skus            sku.SkuTypeSet

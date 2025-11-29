@@ -2,64 +2,35 @@ package collections_value
 
 import (
 	"encoding/gob"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
-func MakeValueSetString[
-	T interfaces.Stringer,
-	TPtr interfaces.StringSetterPtr[T],
-](
-	keyer interfaces.StringKeyer[T],
-	es ...string,
-) (s Set[T], err error) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
+// TODO move construction to another derived package
+func MakeValueSetValue[ELEMENT interfaces.Stringer](
+	keyer interfaces.StringKeyer[ELEMENT],
+	elements ...ELEMENT,
+) (set Set[ELEMENT]) {
+	gob.Register(set)
+	set.E = make(map[string]ELEMENT, len(elements))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[ELEMENT]{}
 	}
 
-	s.K = keyer
+	set.K = keyer
 
-	for _, v := range es {
-		var e T
-		e1 := TPtr(&e)
-
-		if err = e1.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return s, err
-		}
-
-		s.E[s.K.GetKey(e)] = e
+	for i := range elements {
+		e := elements[i]
+		set.E[set.K.GetKey(e)] = e
 	}
 
-	return s, err
+	return set
 }
 
-func MakeValueSetValue[T interfaces.Stringer](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s Set[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return s
-}
-
+// TODO move construction to another derived package
 func MakeValueSet[ELEMENT interfaces.Stringer](
 	keyer interfaces.StringKeyer[ELEMENT],
 	seq interfaces.Seq[ELEMENT],
@@ -101,128 +72,56 @@ func MakeValueSetFromSlice[ELEMENT interfaces.Stringer](
 	return set
 }
 
-func MakeSetValue[T interfaces.Stringer](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s Set[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
+func MakeSet[ELEMENT any](
+	keyer interfaces.StringKeyer[ELEMENT],
+	elements ...ELEMENT,
+) (set Set[ELEMENT]) {
+	gob.Register(set)
+	set.E = make(map[string]ELEMENT, len(elements))
 
 	if keyer == nil {
 		panic("keyer was nil")
 	}
 
-	s.K = keyer
+	set.K = keyer
 
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
+	for i := range elements {
+		e := elements[i]
+		set.E[set.K.GetKey(e)] = e
 	}
 
-	return s
+	return set
 }
 
-func MakeSet[T any](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s Set[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
+// TODO move construction to another derived package
+func MakeMutableValueSet[ELEMENT interfaces.Stringer](
+	keyer interfaces.StringKeyer[ELEMENT],
+	elements ...ELEMENT,
+) (set MutableSet[ELEMENT]) {
+	if keyer == nil {
+		keyer = quiter.StringerKeyer[ELEMENT]{}
+	}
+
+	return MakeMutableSet(keyer, len(elements), slices.Values(elements))
+}
+
+func MakeMutableSet[ELEMENT any](
+	keyer interfaces.StringKeyer[ELEMENT],
+	count int,
+	seq interfaces.Seq[ELEMENT],
+) (set MutableSet[ELEMENT]) {
+	gob.Register(set)
+	set.E = make(map[string]ELEMENT, count)
 
 	if keyer == nil {
 		panic("keyer was nil")
 	}
 
-	s.K = keyer
+	set.K = keyer
 
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
+	for e := range seq {
+		set.E[set.K.GetKey(e)] = e
 	}
 
-	return s
-}
-
-func MakeMutableValueSetValue[T interfaces.Stringer](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s MutableSet[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return s
-}
-
-func MakeMutableValueSet[T interfaces.Stringer](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s MutableSet[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return s
-}
-
-func MakeMutableSetValue[T any](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s MutableSet[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		panic("keyer was nil")
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return s
-}
-
-func MakeMutableSet[T any](
-	keyer interfaces.StringKeyer[T],
-	es ...T,
-) (s MutableSet[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		panic("keyer was nil")
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return s
+	return set
 }

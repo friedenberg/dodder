@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
@@ -100,7 +101,7 @@ func (store *Store) setObjectIfNecessary(
 	info checkoutFileNameInfo,
 ) (err error) {
 	if !options.CheckoutMode.IncludesMetadata() {
-		fsItem.FDs.Del(&fsItem.Object)
+		quiter_set.Del(fsItem.FDs, &fsItem.Object)
 		fsItem.Object.Reset()
 		return err
 	}
@@ -121,7 +122,7 @@ func (store *Store) setLockfileIfNecessary(
 	info checkoutFileNameInfo,
 ) (err error) {
 	if !options.CheckoutMode.IncludesLockfile() {
-		fsItem.FDs.Del(&fsItem.Lockfile)
+		quiter_set.Del(fsItem.FDs, &fsItem.Lockfile)
 		fsItem.Lockfile.Reset()
 		return err
 	}
@@ -149,7 +150,7 @@ func (store *Store) setBlobIfNecessary(
 
 	if fsOptions.ForceInlineBlob ||
 		!options.CheckoutMode.IncludesBlob() {
-		fsItem.FDs.Del(&fsItem.Blob)
+		quiter_set.Del(fsItem.FDs, &fsItem.Blob)
 		fsItem.Blob.Reset()
 		return err
 	}
