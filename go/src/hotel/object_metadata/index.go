@@ -29,7 +29,7 @@ type (
 		AddTagExpandedPtr(e *ids.Tag) (err error)
 		AddTagsImplicitPtr(tag *ids.Tag) (err error)
 		GetDormantMutable() *values.Bool
-		GetExpandedTagsMutable() ids.TagMutableSet
+		GetExpandedTagsMutable() ids.TagSetMutable
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetParentTaiMutable() *ids.Tai
 		GetTagPathsMutable() *tag_paths.Tags
@@ -43,8 +43,8 @@ type (
 type Index struct {
 	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
-	ExpandedTags ids.TagMutableSet // public for gob, but should be private
-	ImplicitTags ids.TagMutableSet // public for gob, but should be private
+	ExpandedTags ids.TagSetMutable // public for gob, but should be private
+	ImplicitTags ids.TagSetMutable // public for gob, but should be private
 	TagPaths     tag_paths.Tags
 	Comments     collections_slice.Slice[string]
 	Fields       collections_slice.Slice[Field]
@@ -83,7 +83,7 @@ func (index *Index) AddTagExpandedPtr(e *ids.Tag) (err error) {
 	return index.GetExpandedTagsMutable().Add(*e)
 }
 
-func (index *Index) GetExpandedTagsMutable() ids.TagMutableSet {
+func (index *Index) GetExpandedTagsMutable() ids.TagSetMutable {
 	if index.ExpandedTags == nil {
 		index.ExpandedTags = ids.MakeTagMutableSet()
 	}
@@ -112,7 +112,7 @@ func (index *Index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
 	return index.GetImplicitTagsMutable().Add(*tag)
 }
 
-func (index *Index) GetImplicitTagsMutable() ids.TagMutableSet {
+func (index *Index) GetImplicitTagsMutable() ids.TagSetMutable {
 	if index.ImplicitTags == nil {
 		index.ImplicitTags = ids.MakeTagMutableSet()
 	}

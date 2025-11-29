@@ -159,27 +159,21 @@ func (builder *Builder) AddTypeAndLock(
 	}
 }
 
-// TODO modify this method to not allocate an intermediate slice and instead
-// append to box.Contents and sort within that slice
 func (builder *Builder) AddTags(metadata object_metadata.IMetadataMutable) {
-	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
+	tagCount := metadata.GetTags().Len()
+	builder.Contents.Grow(tagCount)
 
 	for tag := range metadata.AllTags() {
-		tags = append(
-			tags,
-			string_format_writer.Field{
-				Value: tag.String(),
-			},
-		)
+		builder.Contents.Append(string_format_writer.Field{
+			Value: tag.String(),
+		})
 	}
+
+	tags := builder.Contents[builder.Contents.Len()-tagCount:]
 
 	sort.Slice(tags, func(i, j int) bool {
 		return tags[i].Value < tags[j].Value
 	})
-
-	for _, tag := range tags {
-		builder.Contents.Append(tag)
-	}
 }
 
 func (builder *Builder) AddTagsAndLocks(metadata object_metadata.IMetadataMutable) {

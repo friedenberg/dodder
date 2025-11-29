@@ -227,7 +227,7 @@ func (assignment *Assignment) consume(b *Assignment) (err error) {
 	return err
 }
 
-func (assignment *Assignment) AllTags(tags ids.TagMutableSet) (err error) {
+func (assignment *Assignment) AllTags(tags ids.TagSetMutable) (err error) {
 	if assignment == nil {
 		return err
 	}
@@ -300,7 +300,7 @@ func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
 }
 
 func (assignment *Assignment) SubtractFromSet(
-	tagsToSubtract ids.TagMutableSet,
+	tagsToSubtract ids.TagSetMutable,
 ) (err error) {
 	for assignmentTag := range assignment.Transacted.GetMetadata().AllTags() {
 		for tagToSubtract := range tagsToSubtract.All() {

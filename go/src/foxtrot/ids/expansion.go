@@ -97,6 +97,6 @@ func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
 	return out
 }
 
-func Expanded(set TagSet, expander expansion.Expander) TagMutableSet {
+func Expanded(set TagSet, expander expansion.Expander) TagSetMutable {
 	return ExpandMany(set.All(), expander)
 }

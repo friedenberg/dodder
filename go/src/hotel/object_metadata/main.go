@@ -18,7 +18,7 @@ type Field = string_format_writer.Field
 type metadata struct {
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
-	Tags ids.TagMutableSet // public for gob, but should be private
+	Tags ids.TagSetMutable // public for gob, but should be private
 	Type TypeLock
 
 	DigBlob   markl.Id

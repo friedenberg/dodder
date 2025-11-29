@@ -20,8 +20,9 @@ type (
 		Key(Tag) string
 	}
 
-	TagMutableSet = interface {
+	TagSetMutable = interface {
 		TagSet
+
 		interfaces.Adder[Tag]
 		Del(Tag) error
 		interfaces.Resetable
@@ -45,7 +46,7 @@ func CloneTagSet(tags TagSet) TagSet {
 	return clone
 }
 
-func CloneTagSetMutable(tags TagSet) TagMutableSet {
+func CloneTagSetMutable(tags TagSet) TagSetMutable {
 	clone := MakeMutableTagSet()
 
 	for tag := range tags.All() {
@@ -69,12 +70,12 @@ func MakeTagSetStrings(vs ...string) (s TagSet, err error) {
 	return collections_ptr.MakeValueSetString[Tag](nil, vs...)
 }
 
-func MakeMutableTagSet(hs ...Tag) TagMutableSet {
+func MakeMutableTagSet(hs ...Tag) TagSetMutable {
 	return MakeTagMutableSet(hs...)
 }
 
-func MakeTagMutableSet(hs ...Tag) TagMutableSet {
-	return TagMutableSet(
+func MakeTagMutableSet(hs ...Tag) TagSetMutable {
+	return TagSetMutable(
 		collections_ptr.MakeMutableValueSetValue(
 			nil,
 			hs...,

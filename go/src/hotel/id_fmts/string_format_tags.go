@@ -18,7 +18,7 @@ func MakeTagsReader() (reader *tagsReader) {
 }
 
 func (reader *tagsReader) ReadStringFormat(
-	tags ids.TagMutableSet,
+	tags ids.TagSetMutable,
 	ringBuffer *catgut.RingBuffer,
 ) (n int64, err error) {
 	var readable catgut.Slice

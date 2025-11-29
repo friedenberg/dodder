@@ -45,7 +45,7 @@ func (tagsOrTypes *expTagsOrTypes) Clone() (b *expTagsOrTypes) {
 	return b
 }
 
-func (tagsOrTypes *expTagsOrTypes) CollectTags(mes ids.TagMutableSet) {
+func (tagsOrTypes *expTagsOrTypes) CollectTags(mes ids.TagSetMutable) {
 	if tagsOrTypes.Or || tagsOrTypes.Negated {
 		return
 	}

@@ -79,7 +79,7 @@ func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
 	return output
 }
 
-func AddNormalizedTag(es TagMutableSet, e *Tag) {
+func AddNormalizedTag(es TagSetMutable, e *Tag) {
 	ExpandOneInto(
 		*e,
 		MakeTag,
@@ -94,7 +94,7 @@ func AddNormalizedTag(es TagMutableSet, e *Tag) {
 	}
 }
 
-func RemovePrefixes(es TagMutableSet, needle Tag) {
+func RemovePrefixes(es TagSetMutable, needle Tag) {
 	for _, haystack := range quiter.Elements(es) {
 		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {

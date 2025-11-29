@@ -14,7 +14,7 @@ func init() {
 	collections_value.RegisterGobValue[*tag](nil)
 }
 
-type implicitTagMap map[string]ids.TagMutableSet
+type implicitTagMap map[string]ids.TagSetMutable
 
 func (iem implicitTagMap) Contains(to, imp ids.Tag) bool {
 	s, ok := iem[to.String()]
