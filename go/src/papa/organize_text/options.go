@@ -96,13 +96,13 @@ func (flagz *Flags) SetFlagDefinitions(flagDefs interfaces.CLIFlagDefinitions) {
 			for tag, err = range seq {
 				if err != nil {
 					err = errors.Wrap(err)
-					return
+					return err
 				}
 
 				flagz.GroupingTags.Append(tag)
 			}
 
-			return
+			return err
 		},
 	)
 
