@@ -201,13 +201,13 @@ func (importer importer) importLeaf(
 
 	sku.Resetter.ResetWith(checkedOut.GetSkuExternal(), external)
 
-	checkedOut.GetSkuExternal().Metadata.GetObjectDigestMutable().Reset()
+	checkedOut.GetSkuExternal().GetMetadataMutable().GetObjectDigestMutable().Reset()
 	configGenesis := importer.envRepo.GetConfigPrivate().Blob
 
 	// TODO confirm repo pub key
 
 	// TODO set this as an importer option
-	if checkedOut.GetSkuExternal().Metadata.GetObjectSig().IsNull() {
+	if checkedOut.GetSkuExternal().GetMetadata().GetObjectSig().IsNull() {
 		if err = importer.finalizer.FinalizeAndSignOverwrite(
 			checkedOut.GetSkuExternal(),
 			configGenesis,
@@ -333,7 +333,7 @@ func (importer importer) ImportBlobIfNecessary(
 ) (err error) {
 	copyResult := importer.blobImporter.ImportBlobToStoreIfNecessary(
 		importer.envRepo.GetDefaultBlobStore(),
-		object.Metadata.GetBlobDigest(),
+		object.GetMetadata().GetBlobDigest(),
 		object,
 	)
 

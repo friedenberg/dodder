@@ -174,7 +174,7 @@ func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string
 			lock.Lock()
 			defer lock.Unlock()
 
-			digestBytes := object.Metadata.GetBlobDigest().GetBytes()
+			digestBytes := object.GetMetadata().GetBlobDigest().GetBytes()
 			objectIds := blobDigestObjectIds[string(digestBytes)]
 			oid := object.ObjectId.String()
 			loc, found := slices.BinarySearch(objectIds, oid)
@@ -185,7 +185,7 @@ func (store *Store) MakeBlobDigestObjectIdsMap() (blobDigestObjectIds map[string
 
 			objectIds = slices.Insert(objectIds, loc, oid)
 
-			bites := object.Metadata.GetBlobDigest().GetBytes()
+			bites := object.GetMetadata().GetBlobDigest().GetBytes()
 			blobDigestObjectIds[string(bites)] = objectIds
 
 			return err

@@ -199,12 +199,12 @@ func (store *store) AddTransacted(
 			return err
 		}
 
-		if daughter.Metadata.GetTags().Len() > 0 {
+		if daughter.GetMetadata().GetTags().Len() > 0 {
 			store.config.SetNeedsRecompile(
 				fmt.Sprintf(
 					"tag with tags added: %q -> %q",
 					tag,
-					quiter.SortedValues(daughter.Metadata.GetTags().All()),
+					quiter.SortedValues(daughter.GetMetadata().GetTags().All()),
 				),
 			)
 		}

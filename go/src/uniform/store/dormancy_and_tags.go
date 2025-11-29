@@ -16,7 +16,7 @@ func (store *Store) applyDormantAndRealizeTags(
 	object *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", object)
-	metadata := &object.Metadata
+	metadata := object.GetMetadataMutable()
 
 	metadata.GetIndexMutable().SetExpandedTags(ids.ExpandMany(
 		metadata.GetTags().All(),

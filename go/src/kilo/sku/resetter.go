@@ -30,7 +30,7 @@ func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
 
 func (transactedResetter) ResetWithExceptFields(dst *Transacted, src *Transacted) {
 	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
-	object_metadata.Resetter.ResetWithExceptFields(&dst.Metadata, &src.Metadata)
+	object_metadata.Resetter.ResetWithExceptFields(dst.GetMetadataMutable(), src.GetMetadata())
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
 	dst.State = src.State

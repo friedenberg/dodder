@@ -344,7 +344,7 @@ func (store *Store) queryUntracked(
 
 			if recognizedBlob, err = addRecognizedIfNecessary(
 				object,
-				object.Metadata.GetBlobDigest(),
+				object.GetMetadata().GetBlobDigest(),
 				definitelyNotCheckedOut.digests,
 			); err != nil {
 				err = errors.Wrap(err)

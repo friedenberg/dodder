@@ -37,7 +37,7 @@ func (cmd *RemoteAdd) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) 
 		"tags added for new objects in `checkin`, `new`, `organize`",
 	)
 
-	cmd.proto.SetFlagSetDescription(
+	cmd.proto.Metadata.SetFlagSetDescription(
 		flagSet,
 		"description to use for the new repo",
 	)

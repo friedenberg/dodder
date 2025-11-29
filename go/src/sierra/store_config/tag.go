@@ -118,7 +118,7 @@ func (compiled *compiled) AccumulateImplicitTags(
 		}
 	}
 
-	for compiledTag := range compiledTag.Transacted.Metadata.AllTags() {
+	for compiledTag := range compiledTag.Transacted.GetMetadata().AllTags() {
 		if compiled.ImplicitTags.Contains(compiledTag, tag) {
 			continue
 		}

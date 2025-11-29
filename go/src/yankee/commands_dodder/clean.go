@@ -199,8 +199,8 @@ func (cmd Clean) shouldClean(
 		errors.PanicIfError(err)
 
 		if object_metadata.EqualerSansTai.Equals(
-			&co.GetSkuExternal().GetSku().Metadata,
-			&mother.Metadata,
+			co.GetSkuExternal().GetSku().GetMetadata(),
+			mother.GetMetadata(),
 		) {
 			return true
 		}

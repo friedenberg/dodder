@@ -24,22 +24,27 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 	}
 }
 
-func (resetter) ResetWithExceptFields(dst *metadata, src *metadata) {
-	dst.Description = src.Description
+func (resetter) ResetWithExceptFields(dst IMetadataMutable, src IMetadata) {
+	{
+		dst := dst.(*metadata)
+		src := src.(*metadata)
 
-	dst.SetTagsFast(src.Tags)
+		dst.Description = src.Description
 
-	resetIndexWith(&dst.Index, &src.Index)
+		dst.SetTagsFast(src.Tags)
 
-	dst.sigRepo.ResetWith(src.sigRepo)
-	dst.pubRepo.ResetWith(src.pubRepo)
+		resetIndexWith(&dst.Index, &src.Index)
 
-	dst.Type.ResetWith(src.Type)
-	dst.Tai = src.Tai
+		dst.sigRepo.ResetWith(src.sigRepo)
+		dst.pubRepo.ResetWith(src.pubRepo)
 
-	dst.DigBlob.ResetWith(src.DigBlob)
-	dst.digSelf.ResetWith(src.digSelf)
-	dst.sigMother.ResetWith(src.sigMother)
+		dst.Type.ResetWith(src.Type)
+		dst.Tai = src.Tai
+
+		dst.DigBlob.ResetWith(src.DigBlob)
+		dst.digSelf.ResetWith(src.digSelf)
+		dst.sigMother.ResetWith(src.sigMother)
+	}
 }
 
 func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {

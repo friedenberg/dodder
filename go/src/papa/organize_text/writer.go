@@ -15,7 +15,7 @@ import (
 type writer struct {
 	sku.ObjectFactory
 	OmitLeadingEmptyLine bool
-	object_metadata.Metadata
+	object_metadata.IMetadata
 	*format.LineWriter
 	maxDepth int
 	options  Options
@@ -66,7 +66,7 @@ func (av writer) write(a *Assignment) (err error) {
 
 		cursor := object.sku.Clone()
 		cursorExternal := cursor.GetSkuExternal()
-		cursorExternal.GetMetadataMutable().Subtract(&av.Metadata)
+		cursorExternal.GetMetadataMutable().Subtract(av.IMetadata)
 		mes := ids.CloneTagSetMutable(cursorExternal.GetMetadataMutable().GetTags())
 
 		if err = a.SubtractFromSet(mes); err != nil {

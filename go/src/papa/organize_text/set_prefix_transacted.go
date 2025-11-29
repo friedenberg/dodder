@@ -204,7 +204,7 @@ func (prefixSet PrefixSet) Subset(
 
 		for z := range zSet.All() {
 			ui.Log().Print(e2, z)
-			intersection := z.GetSkuExternal().Metadata.GetIndex().GetTagPaths().All.GetMatching(
+			intersection := z.GetSkuExternal().GetMetadata().GetIndex().GetTagPaths().All.GetMatching(
 				e2,
 			)
 			hasDirect := false || len(intersection) == 0

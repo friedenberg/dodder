@@ -175,7 +175,7 @@ func (store *Store) setBlobIfNecessary(
 
 func (store *Store) shouldCheckOut(
 	options checkout_options.Options,
-	cz *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 	allowMutterMatch bool,
 ) bool {
 	if options.Force {
@@ -183,8 +183,8 @@ func (store *Store) shouldCheckOut(
 	}
 
 	eq := object_metadata.EqualerSansTai.Equals(
-		&cz.GetSku().Metadata,
-		&cz.GetSkuExternal().Metadata,
+		checkedOut.GetSku().GetMetadata(),
+		checkedOut.GetSkuExternal().GetMetadata(),
 	)
 
 	if eq {
@@ -196,16 +196,16 @@ func (store *Store) shouldCheckOut(
 		return false
 	}
 
-	mutter := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(mutter)
+	mother := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(mother)
 
 	if err := store.storeSupplies.ReadOneInto(
-		cz.GetSku().GetObjectId(),
-		mutter,
+		checkedOut.GetSku().GetObjectId(),
+		mother,
 	); err == nil {
 		if object_metadata.EqualerSansTai.Equals(
-			&mutter.Metadata,
-			&cz.GetSkuExternal().Metadata,
+			mother.GetMetadata(),
+			checkedOut.GetSkuExternal().GetMetadata(),
 		) {
 			return true
 		}

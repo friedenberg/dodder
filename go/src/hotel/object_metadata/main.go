@@ -42,6 +42,12 @@ var (
 	_ GetterMutable    = &metadata{}
 )
 
+func Make() *metadata {
+	metadata := &metadata{}
+	Resetter.Reset(metadata)
+	return metadata
+}
+
 func (metadata *metadata) GetMetadata() IMetadata {
 	return metadata
 }

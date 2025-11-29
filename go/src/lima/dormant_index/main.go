@@ -62,7 +62,7 @@ func (sch *Index) ContainsSku(object *sku.Transacted) bool {
 			panic("empty dormant tag")
 		}
 
-		all := object.Metadata.GetIndex().GetTagPaths().All
+		all := object.GetMetadata().GetIndex().GetTagPaths().All
 		i, ok := all.ContainsTag(e.Tag)
 
 		if ok {

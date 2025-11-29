@@ -87,7 +87,7 @@ func (cmd Complete) SetFlagsProto(
 	tagUsage string,
 	typeUsage string,
 ) {
-	proto.SetFlagSetDescription(
+	proto.Metadata.SetFlagSetDescription(
 		flagSet,
 		descriptionUsage,
 	)

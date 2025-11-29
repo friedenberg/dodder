@@ -303,7 +303,7 @@ func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
 	}()
 
 	markl.SetDigester(
-		object.GetSku().Metadata.GetBlobDigestMutable(),
+		object.GetSku().GetMetadataMutable().GetBlobDigestMutable(),
 		blobWriter,
 	)
 

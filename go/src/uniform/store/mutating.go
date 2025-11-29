@@ -233,7 +233,7 @@ func (commitFacilitator commitFacilitator) commit(
 
 	if options.AddToInventoryList {
 		// external.GetSku().Metadata.GetObjectSigMutable().Reset()
-		daughter.Metadata.GetObjectDigestMutable().Reset()
+		daughter.GetMetadataMutable().GetObjectDigestMutable().Reset()
 
 		if err = commitFacilitator.commitTransacted(daughter, mother); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sku.String(daughter))
@@ -248,7 +248,7 @@ func (commitFacilitator commitFacilitator) commit(
 			store_version.V11,
 		) {
 			if err = markl.AssertIdIsNotNull(
-				daughter.Metadata.GetObjectSig()); err != nil {
+				daughter.GetMetadata().GetObjectSig()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}

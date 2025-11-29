@@ -32,7 +32,7 @@ func (store *Store) MergeCheckedOut(
 	commitOptions.StoreOptions = sku.GetStoreOptionsImport()
 
 	// TODO determine why the internal can ever be null
-	if checkedOut.GetSku().Metadata.GetObjectDigest().IsNull() ||
+	if checkedOut.GetSku().GetMetadata().GetObjectDigest().IsNull() ||
 		allowMergeConflicts {
 		return commitOptions, err
 	}
@@ -41,8 +41,8 @@ func (store *Store) MergeCheckedOut(
 
 	// TODO add checkout_mode.BlobOnly
 	if markl.Equals(
-		checkedOut.GetSku().Metadata.GetObjectDigest(),
-		checkedOut.GetSkuExternal().Metadata.GetObjectDigest(),
+		checkedOut.GetSku().GetMetadata().GetObjectDigest(),
+		checkedOut.GetSkuExternal().GetMetadata().GetObjectDigest(),
 	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return commitOptions, err
@@ -51,15 +51,15 @@ func (store *Store) MergeCheckedOut(
 		checkedOut.GetSkuExternal().GetMetadata(),
 	) {
 		if !checkedOut.GetSku().Metadata.GetTai().Less(
-			checkedOut.GetSkuExternal().Metadata.GetTai(),
+			checkedOut.GetSkuExternal().GetMetadata().GetTai(),
 		) {
 			// TODO implement retroactive change
 		}
 
 		return commitOptions, err
 	} else if markl.Equals(
-		checkedOut.GetSku().Metadata.GetBlobDigest(),
-		checkedOut.GetSkuExternal().Metadata.GetBlobDigest(),
+		checkedOut.GetSku().GetMetadata().GetBlobDigest(),
+		checkedOut.GetSkuExternal().GetMetadata().GetBlobDigest(),
 	) {
 		conflicts = checkout_mode.Make(checkout_mode.Metadata)
 	} else {

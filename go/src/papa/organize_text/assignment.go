@@ -76,9 +76,9 @@ func (assignment Assignment) MaxDepth() (depth int) {
 func (assignment Assignment) AlignmentSpacing() int {
 	childTag := quiter_set.Any(assignment.Transacted.GetMetadata().GetTags())
 
-	if assignment.Transacted.Metadata.GetTags().Len() == 1 && ids.IsDependentLeaf(childTag) {
+	if assignment.Transacted.GetMetadata().GetTags().Len() == 1 && ids.IsDependentLeaf(childTag) {
 		return assignment.Parent.AlignmentSpacing() + len(
-			quiter_set.Any(assignment.Parent.Transacted.Metadata.GetTags()).String(),
+			quiter_set.Any(assignment.Parent.Transacted.GetMetadata().GetTags()).String(),
 		)
 	}
 
@@ -110,7 +110,7 @@ func (assignment Assignment) String() (s string) {
 		s = assignment.Parent.String() + "."
 	}
 
-	return s + quiter.StringCommaSeparated(assignment.Transacted.Metadata.GetTags())
+	return s + quiter.StringCommaSeparated(assignment.Transacted.GetMetadata().GetTags())
 }
 
 func (assignment *Assignment) makeChild(e ids.Tag) (b *Assignment) {

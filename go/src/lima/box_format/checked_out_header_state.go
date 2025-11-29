@@ -11,18 +11,18 @@ type CheckedOutHeaderState struct{}
 
 func (f CheckedOutHeaderState) WriteBoxHeader(
 	header *string_format_writer.BoxHeader,
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 ) (err error) {
 	header.RightAligned = true
 
-	state := co.GetState()
+	state := checkedOut.GetState()
 	stateString := state.String()
 
 	switch state {
 	case checked_out_state.CheckedOut:
 		if object_metadata.EqualerSansTai.Equals(
-			&co.GetSku().Metadata,
-			&co.GetSkuExternal().GetSku().Metadata,
+			checkedOut.GetSku().GetMetadata(),
+			checkedOut.GetSkuExternal().GetSku().GetMetadata(),
 		) {
 			header.Value = string_format_writer.StringSame
 		} else {

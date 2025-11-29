@@ -71,18 +71,19 @@ func (metadata *Metadata) SetFromObjectMetadata(
 }
 
 func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
-	tags := ids.CloneTagSetMutable(object.GetSkuExternal().Metadata.GetTags())
+	tags := ids.CloneTagSetMutable(object.GetSkuExternal().GetMetadata().GetTags())
 
 	for element := range metadata.All() {
 		quiter_set.Del(tags, element)
 	}
 
-	object.GetSkuExternal().Metadata.SetTags(tags)
+	object.GetSkuExternal().GetMetadataMutable().SetTags(tags)
 
 	return err
 }
 
-func (metadata Metadata) AsMetadata() (m1 object_metadata.Metadata) {
+func (metadata Metadata) AsMetadata() (m1 object_metadata.IMetadataMutable) {
+	m1 = object_metadata.Make()
 	m1.GetTypeMutable().ResetWith(metadata.Type)
 	m1.SetTags(metadata.TagSet)
 	return m1

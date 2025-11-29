@@ -130,7 +130,7 @@ func (store *Store) readOneExternalBlob(
 	item *sku.FSItem,
 ) (err error) {
 	object_metadata.Resetter.ResetWith(
-		&external.Metadata,
+		external.GetMetadataMutable(),
 		internal.GetMetadataMutable(),
 	)
 

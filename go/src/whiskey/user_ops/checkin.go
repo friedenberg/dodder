@@ -91,8 +91,8 @@ func (op Checkin) runOrganize(
 	opOrganize := Organize2{
 		Repo: repo,
 		Metadata: organize_text.Metadata{
-			TagSet: op.Proto.GetTags(),
-			Type:   op.Proto.GetType(),
+			TagSet: op.Proto.Metadata.GetTags(),
+			Type:   op.Proto.Metadata.GetType(),
 			RepoId: query.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				map[string]organize_text.OptionComment{

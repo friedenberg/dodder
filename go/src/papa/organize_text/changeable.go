@@ -68,16 +68,16 @@ func (assignment *Assignment) addToSet(
 			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
-				outputObject.GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMarklId(
-					objectOriginal.GetSkuExternal().Metadata.GetBlobDigest(),
+				outputObject.GetSkuExternal().GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(
+					objectOriginal.GetSkuExternal().GetMetadata().GetBlobDigest(),
 				)
 
 				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
 					objectOriginal.GetSkuExternal().GetMetadata().GetType(),
 				)
 
-				outputObject.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigestMutable().ResetWithMarklId(
-					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.GetBlobDigest(),
+				outputObject.GetSkuExternal().GetSkuExternal().GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(
+					objectOriginal.GetSkuExternal().GetSkuExternal().GetMetadata().GetBlobDigest(),
 				)
 
 				outputObject.GetSkuExternal().GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
@@ -87,7 +87,7 @@ func (assignment *Assignment) addToSet(
 				outputObject.SetState(objectOriginal.GetState())
 
 				{
-					src := &objectOriginal.GetSkuExternal().Metadata
+					src := objectOriginal.GetSkuExternal().GetMetadata()
 
 					outputObject.GetSkuExternal().GetMetadataMutable().GetIndexMutable().GetFieldsMutable().ResetWithSeq(
 						src.GetIndex().GetFields(),
@@ -153,7 +153,7 @@ func (assignment *Assignment) addToSet(
 			organizeObject.GetSkuExternal().GetMetadata().GetIndex().GetComments(),
 		)
 
-		for tag := range organizeObject.GetSkuExternal().Metadata.AllTags() {
+		for tag := range organizeObject.GetSkuExternal().GetMetadata().AllTags() {
 			if err = outputObject.GetSkuExternal().AddTag(tag); err != nil {
 				err = errors.Wrap(err)
 				return err
