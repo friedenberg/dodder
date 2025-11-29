@@ -23,9 +23,9 @@ type Tridex struct {
 	Root node
 }
 
-var _ interfaces.MutableTridex = &Tridex{}
+var _ interfaces.TridexMutable = &Tridex{}
 
-func Make(vs ...string) (t interfaces.MutableTridex) {
+func Make(vs ...string) (t interfaces.TridexMutable) {
 	t = &Tridex{
 		Root: node{
 			Children: make(map[byte]node),
@@ -45,7 +45,7 @@ func Make(vs ...string) (t interfaces.MutableTridex) {
 	return t
 }
 
-func (tridex *Tridex) MutableClone() (b interfaces.MutableTridex) {
+func (tridex *Tridex) MutableClone() (b interfaces.TridexMutable) {
 	ui.TodoP4("improve the performance of this")
 	ui.TodoP4("collections-copy")
 	ui.TodoP4("collections-reset")

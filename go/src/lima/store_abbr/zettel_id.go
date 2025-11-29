@@ -12,8 +12,8 @@ import (
 
 type indexZettelId struct {
 	readFunc func() error
-	Heads    interfaces.MutableTridex
-	Tails    interfaces.MutableTridex
+	Heads    interfaces.TridexMutable
+	Tails    interfaces.TridexMutable
 }
 
 func (ih *indexZettelId) Add(h *ids.ZettelId) (err error) {

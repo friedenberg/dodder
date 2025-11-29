@@ -3,6 +3,7 @@ package ids
 import (
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -21,7 +22,7 @@ func TestAddNormalized(t1 *testing.T) {
 
 	AddNormalizedTag(sut, &toAdd)
 
-	if !TagSetEquals(sut, sutEx) {
+	if !quiter_set.Equals(sut, sutEx) {
 		t.NotEqual(sutEx, sut)
 	}
 }
@@ -34,7 +35,7 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 	AddNormalizedTag(sut, &toAdd)
 
-	if !TagSetEquals(sut, sutEx) {
+	if !quiter_set.Equals(sut, sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }
@@ -56,7 +57,7 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		AddNormalizedTag(sut, e)
 	}
 
-	if !TagSetEquals(sut, sutEx) {
+	if !quiter_set.Equals(sut, sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }

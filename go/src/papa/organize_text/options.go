@@ -4,7 +4,9 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -55,7 +57,7 @@ func MakeFlags() Flags {
 
 		Options: Options{
 			wasMade:      true,
-			GroupingTags: ids.MakeTagSlice(),
+			GroupingTags: collections_slice.MakeFromSlice[ids.Tag](),
 			Skus:         sku.MakeSkuTypeSetMutable(),
 			Metadata:     NewMetadata(ids.RepoId{}),
 		},
@@ -76,85 +78,104 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 		Options: Options{
 			Metadata:     m,
 			wasMade:      true,
-			GroupingTags: ids.MakeTagSlice(),
+			GroupingTags: collections_slice.MakeFromSlice[ids.Tag](),
 			Skus:         sku.MakeSkuTypeSetMutable(),
 		},
 	}
 }
 
-func (o *Flags) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
+func (flagz *Flags) SetFlagDefinitions(flagDefs interfaces.CLIFlagDefinitions) {
+	flagDefs.Func(
+		"group-by",
+		"tag prefixes to group zettels",
+		func(valueOrValues string) (err error) {
+			seq := flags.SplitCommasAndTrimAndMake[ids.Tag](valueOrValues)
 
-	f.Var(
-		o.ExtraTags,
+			var tag ids.Tag
+
+			for tag, err = range seq {
+				if err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				flagz.GroupingTags.Append(tag)
+			}
+
+			return
+		},
+	)
+
+	flagDefs.Var(
+		flagz.ExtraTags,
 		"extras",
 		"tags to always add to the organize text",
 	)
 
-	f.BoolVar(
-		&o.UsePrefixJoints,
+	flagDefs.BoolVar(
+		&flagz.UsePrefixJoints,
 		"prefix-joints",
 		true,
 		"split tags around hyphens",
 	)
 
-	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
+	flagDefs.BoolVar(&flagz.UseRefiner, "refine", true, "refine the organize tree")
 
-	f.BoolVar(
-		&o.UseMetadataHeader,
+	flagDefs.BoolVar(
+		&flagz.UseMetadataHeader,
 		"metadata-header",
 		true,
 		"metadata header",
 	)
 
-	f.IntVar(
-		&o.Limit,
+	flagDefs.IntVar(
+		&flagz.Limit,
 		"limit",
 		0,
 		"limit the number of objects edited in organize",
 	)
 }
 
-func (flags *Flags) GetOptionsWithMetadata(
+func (flagz *Flags) GetOptionsWithMetadata(
 	printOptions options_print.Options,
 	boxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr,
 	objectFactory sku.ObjectFactory,
 	metadata Metadata,
 ) Options {
-	flags.once.Do(
+	flagz.once.Do(
 		func() {
-			flags.Options.ExtraTags = ids.CloneTagSet(flags.ExtraTags)
+			flagz.Options.ExtraTags = ids.CloneTagSet(flagz.ExtraTags)
 		},
 	)
 
-	flags.fmtBox = boxFormat
+	flagz.fmtBox = boxFormat
 
 	objectFactory.SetDefaultsIfNecessary()
 
-	flags.ObjectFactory = objectFactory
-	flags.PrintOptions = printOptions
-	flags.Abbr = abbr
-	flags.Metadata = metadata
+	flagz.ObjectFactory = objectFactory
+	flagz.PrintOptions = printOptions
+	flagz.Abbr = abbr
+	flagz.Metadata = metadata
 
-	return flags.Options
+	return flagz.Options
 }
 
-func (o *Flags) GetOptions(
+func (flagz *Flags) GetOptions(
 	printOptions options_print.Options,
 	tagSet ids.TagSet,
 	skuBoxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	objectFactory sku.ObjectFactory,
 ) Options {
-	m := o.Metadata
+	m := flagz.Metadata
 	m.TagSet = tagSet
 
 	if m.prototype == nil {
 		panic("Metadata not initalized")
 	}
 
-	return o.GetOptionsWithMetadata(
+	return flagz.GetOptionsWithMetadata(
 		printOptions,
 		skuBoxFormat,
 		abbr,

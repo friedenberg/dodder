@@ -24,7 +24,7 @@ type v0 struct {
 	path      string
 	lockSmith interfaces.LockSmith
 	file      *os.File
-	values    interfaces.MutableTridex
+	values    interfaces.TridexMutable
 }
 
 func (log *v0) Flush() (err error) {

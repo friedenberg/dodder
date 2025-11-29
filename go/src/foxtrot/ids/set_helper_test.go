@@ -3,6 +3,7 @@ package ids
 import (
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -18,7 +19,7 @@ func assertSetRemovesPrefixes(
 	ac := CloneTagSetMutable(ac1)
 	RemovePrefixes(ac, MustTag(prefix))
 
-	if !TagSetEquals(ac, ex) {
+	if !quiter_set.Equals(ac, ex) {
 		t.Errorf(
 			"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 			ex,

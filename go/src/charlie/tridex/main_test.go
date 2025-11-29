@@ -320,7 +320,7 @@ func TestExpand(t1 *testing.T) {
 
 func TestDoesNotContainPrefix(t1 *testing.T) {
 	t := t(ui.T{T: t1})
-	makeSut := func() interfaces.MutableTridex {
+	makeSut := func() interfaces.TridexMutable {
 		return Make(
 			"121",
 			"127",
@@ -340,7 +340,7 @@ func TestDoesNotContainPrefix(t1 *testing.T) {
 func TestRemove(t1 *testing.T) {
 	t := t(ui.T{T: t1})
 
-	makeSut := func() interfaces.MutableTridex {
+	makeSut := func() interfaces.TridexMutable {
 		return Make(
 			"12",
 			"121",

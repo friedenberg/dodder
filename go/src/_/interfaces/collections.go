@@ -30,10 +30,6 @@ type (
 		Add(ELEMENT) error
 	}
 
-	AdderPtr[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		AddPtr(ELEMENT_PTR) error
-	}
-
 	Collection[ELEMENT any] interface {
 		Lenner
 		Iterable[ELEMENT]
@@ -65,7 +61,7 @@ type Delta[ELEMENT any] interface {
 }
 
 type (
-	TridexLike interface {
+	Tridex interface {
 		Collection[string]
 		ContainsAbbreviation(string) bool
 		ContainsExpansion(string) bool
@@ -73,17 +69,7 @@ type (
 		Expand(string) string
 	}
 
-	MutableTridexLike interface {
-		TridexLike
-		Add(string)
-		Remove(string)
-	}
-
-	Tridex interface {
-		TridexLike
-	}
-
-	MutableTridex interface {
+	TridexMutable interface {
 		Tridex
 		Add(string)
 		Remove(string)

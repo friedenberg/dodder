@@ -8,6 +8,24 @@ import (
 
 type Slice[ELEMENT any] []ELEMENT
 
+func MakeFromSeq[ELEMENT any](count int, seq interfaces.Seq[ELEMENT]) Slice[ELEMENT] {
+	slice := make(Slice[ELEMENT], count)
+
+	for element := range seq {
+		slice.Append(element)
+	}
+
+	return slice
+}
+
+func MakeFromSlice[ELEMENT any](elements ...ELEMENT) Slice[ELEMENT] {
+	slice := make(Slice[ELEMENT], len(elements))
+
+	copy(slice, elements)
+
+	return slice
+}
+
 func (slice Slice[ELEMENT]) Len() int {
 	return len(slice)
 }
@@ -32,6 +50,12 @@ func (slice Slice[ELEMENT]) All() interfaces.Seq[ELEMENT] {
 
 func (slice *Slice[ELEMENT]) Grow(n int) {
 	*slice = slices.Grow(*slice, n)
+}
+
+func (slice *Slice[ELEMENT]) DropFirst() {
+	if slice.Len() > 0 {
+		*slice = (*slice)[1:]
+	}
 }
 
 func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {

@@ -19,7 +19,7 @@ import (
 )
 
 type indexCodable struct {
-	SeenIds  map[genres.Genre]interfaces.MutableTridex
+	SeenIds  map[genres.Genre]interfaces.TridexMutable
 	MarklIds indexNotZettelId[markl.Id, *markl.Id]
 	ZettelId indexZettelId
 }
@@ -52,7 +52,7 @@ func NewIndex(
 		path:    envRepo.DirDataIndex("Abbr"),
 		envRepo: envRepo,
 		indexCodable: indexCodable{
-			SeenIds: map[genres.Genre]interfaces.MutableTridex{
+			SeenIds: map[genres.Genre]interfaces.TridexMutable{
 				genres.Repo:   tridex.Make(),
 				genres.Tag:    tridex.Make(),
 				genres.Type:   tridex.Make(),

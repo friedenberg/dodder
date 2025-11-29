@@ -61,7 +61,7 @@ func TestNormalize(t *testing.T) {
 				t := ui.T{T: t1}
 				ac := WithRemovedCommonPrefixes(te.ac)
 
-				if !TagSetEquals(ac, te.ex) {
+				if !quiter_set.Equals(ac, te.ex) {
 					t.Errorf(
 						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 						te.ex,

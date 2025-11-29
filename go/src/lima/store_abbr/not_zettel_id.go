@@ -12,7 +12,7 @@ type indexNotZettelId[
 	ID_PTR interfaces.StringerSetterPtr[ID],
 ] struct {
 	readFunc  func() error
-	ObjectIds interfaces.MutableTridex
+	ObjectIds interfaces.TridexMutable
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) Add(k ID_PTR) (err error) {
