@@ -7,7 +7,7 @@ func Any[ELEMENT any](seq interfaces.Seq[ELEMENT]) (element ELEMENT) {
 		break
 	}
 
-	return
+	return element
 }
 
 func SeqWithIndex[ELEMENT any](seq interfaces.Seq[ELEMENT]) interfaces.Seq2[int, ELEMENT] {
