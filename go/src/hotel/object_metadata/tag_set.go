@@ -1,6 +1,8 @@
 package object_metadata
 
 import (
+	"encoding/gob"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -8,11 +10,20 @@ import (
 )
 
 type tagSet struct {
-	tags collections_slice.Slice[markl.Lock[ids.Tag, *ids.Tag]]
+	// for gob's stupid illusions
+	Tags collections_slice.Slice[markl.Lock[ids.Tag, *ids.Tag]]
+}
+
+func init() {
+	gob.Register(makeTagSetMutable())
 }
 
 func makeTagSetMutable() ids.TagSetMutable {
-	return ids.MakeTagMutableSet()
+	if usePrivateTagSetInsteadOfIdsTagSetMutable {
+		return &tagSet{}
+	} else {
+		return ids.MakeTagSetMutable()
+	}
 }
 
 var (
@@ -21,12 +32,12 @@ var (
 )
 
 func (tagSet tagSet) Len() int {
-	return tagSet.tags.Len()
+	return tagSet.Tags.Len()
 }
 
 func (tagSet tagSet) All() interfaces.Seq[ids.Tag] {
 	return func(yield func(ids.Tag) bool) {
-		for tag := range tagSet.tags.All() {
+		for tag := range tagSet.Tags.All() {
 			if !yield(tag.GetKey()) {
 				return
 			}
@@ -36,7 +47,7 @@ func (tagSet tagSet) All() interfaces.Seq[ids.Tag] {
 
 // TODO switch to binary search
 func (tagSet tagSet) ContainsKey(key string) bool {
-	for tag := range tagSet.tags.All() {
+	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
 			return true
 		}
@@ -47,7 +58,7 @@ func (tagSet tagSet) ContainsKey(key string) bool {
 
 // TODO switch to binary search
 func (tagSet tagSet) Get(key string) (ids.Tag, bool) {
-	for tag := range tagSet.tags.All() {
+	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
 			return tag.GetKey(), true
 		}
@@ -62,16 +73,21 @@ func (tagSet tagSet) Key(tag ids.Tag) string {
 
 // TODO sort
 func (tagSet *tagSet) Add(tag ids.Tag) error {
-	tagSet.tags.Append(markl.MakeLockWith(tag, nil))
+	if _, alreadyExists := tagSet.Get(tag.String()); alreadyExists {
+		return nil
+	}
+
+	tagSet.Tags.Append(markl.MakeLockWith(tag, nil))
+
 	return nil
 }
 
-func (tagSet tagSet) DelKey(key string) error {
+func (tagSet *tagSet) DelKey(key string) error {
 	var found bool
 	var index int
 	var tagLock TagLock
 
-	for index, tagLock = range tagSet.tags {
+	for index, tagLock = range tagSet.Tags {
 		if tagLock.GetKey().String() == key {
 			found = true
 			break
@@ -79,12 +95,12 @@ func (tagSet tagSet) DelKey(key string) error {
 	}
 
 	if found {
-		tagSet.tags.Delete(index, index+1)
+		tagSet.Tags.Delete(index, index+1)
 	}
 
 	return nil
 }
 
-func (tagSet tagSet) Reset() {
-	tagSet.tags.Reset()
+func (tagSet *tagSet) Reset() {
+	tagSet.Tags.Reset()
 }

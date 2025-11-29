@@ -165,7 +165,7 @@ func (store *Store) addImplicitTags(
 	object *sku.Transacted,
 ) (err error) {
 	metadata := object.GetMetadataMutable()
-	tagSet := ids.MakeTagMutableSet()
+	tagSet := ids.MakeTagSetMutable()
 
 	addImplicitTags := func(tag ids.Tag) (err error) {
 		tagPathWithType := tag_paths.MakePathWithType()

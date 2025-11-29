@@ -71,10 +71,10 @@ func MakeTagSetStrings(tagStrings ...string) (s TagSet, err error) {
 
 // TODO move to quiter
 func MakeMutableTagSet(tags ...Tag) TagSetMutable {
-	return MakeTagMutableSet(tags...)
+	return MakeTagSetMutable(tags...)
 }
 
 // TODO move to quiter
-func MakeTagMutableSet(tags ...Tag) TagSetMutable {
+func MakeTagSetMutable(tags ...Tag) TagSetMutable {
 	return collections_ptr.MakeMutableValueSetValue(nil, tags...)
 }

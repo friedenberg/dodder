@@ -36,7 +36,7 @@ func (assignment *Assignment) addToSet(
 	output SkuMapWithOrder,
 	objectsFromBefore sku.SkuTypeSet,
 ) (err error) {
-	expanded := ids.MakeTagMutableSet()
+	expanded := ids.MakeTagSetMutable()
 
 	if err = assignment.AllTags(expanded); err != nil {
 		err = errors.Wrap(err)

@@ -19,7 +19,7 @@ func HasParentPrefix(a, b Tag) (has bool) {
 }
 
 func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
-	s4 := MakeTagMutableSet()
+	s4 := MakeTagSetMutable()
 
 	for _, e := range quiter.CollectSlice[Tag](haystack) {
 		if strings.HasPrefix(e.String(), needle.String()) {
@@ -33,7 +33,7 @@ func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
 }
 
 func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
-	s3 := MakeTagMutableSet()
+	s3 := MakeTagSetMutable()
 
 	for _, e1 := range quiter.CollectSlice[Tag](s1) {
 		e2, _ := LeftSubtract(e1, e)
@@ -80,18 +80,19 @@ func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
 	return output
 }
 
-func AddNormalizedTag(es TagSetMutable, e *Tag) {
+func AddNormalizedTag(tags TagSetMutable, e *Tag) {
 	ExpandOneInto(
 		*e,
 		MakeTag,
 		expansion.ExpanderRight,
-		es,
+		tags,
 	)
 
-	c := CloneTagSet(es)
-	es.Reset()
-	for tag := range WithRemovedCommonPrefixes(c).All() {
-		es.Add(tag)
+	clone := CloneTagSet(tags)
+	tags.Reset()
+
+	for tag := range WithRemovedCommonPrefixes(clone).All() {
+		tags.Add(tag)
 	}
 }
 

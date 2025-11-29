@@ -113,7 +113,7 @@ func (metadata *Metadata) ReadFrom(reader io.Reader) (n int64, err error) {
 	bufferedReader, repool := pool.GetBufferedReader(reader)
 	defer repool()
 
-	tagSet := ids.MakeTagMutableSet()
+	tagSet := ids.MakeTagSetMutable()
 
 	if n, err = format.ReadLines(
 		bufferedReader,

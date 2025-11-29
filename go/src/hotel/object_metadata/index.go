@@ -85,7 +85,7 @@ func (index *Index) AddTagExpandedPtr(e *ids.Tag) (err error) {
 
 func (index *Index) GetExpandedTagsMutable() ids.TagSetMutable {
 	if index.ExpandedTags == nil {
-		index.ExpandedTags = ids.MakeTagMutableSet()
+		index.ExpandedTags = ids.MakeTagSetMutable()
 	}
 
 	return index.ExpandedTags
@@ -114,7 +114,7 @@ func (index *Index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
 
 func (index *Index) GetImplicitTagsMutable() ids.TagSetMutable {
 	if index.ImplicitTags == nil {
-		index.ImplicitTags = ids.MakeTagMutableSet()
+		index.ImplicitTags = ids.MakeTagSetMutable()
 	}
 
 	return index.ImplicitTags

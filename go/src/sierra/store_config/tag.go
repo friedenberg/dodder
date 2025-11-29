@@ -35,7 +35,7 @@ func (iem implicitTagMap) Set(to, imp ids.Tag) (err error) {
 	s, ok := iem[to.String()]
 
 	if !ok {
-		s = ids.MakeTagMutableSet()
+		s = ids.MakeTagSetMutable()
 		iem[to.String()] = s
 	}
 
@@ -91,7 +91,7 @@ func (compiled *compiled) AccumulateImplicitTags(
 		return err
 	}
 
-	expandedTags := ids.MakeTagMutableSet()
+	expandedTags := ids.MakeTagSetMutable()
 
 	ids.ExpandOneInto(
 		tag,

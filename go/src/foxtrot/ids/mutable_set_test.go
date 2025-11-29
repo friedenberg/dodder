@@ -10,7 +10,7 @@ import (
 func TestAddNormalized(t1 *testing.T) {
 	t := ui.T{T: t1}
 
-	sut := MakeTagMutableSet(
+	sut := MakeTagSetMutable(
 		MustTag("project-2021-dodder-test"),
 		MustTag("project-2021-dodder-ewwwwww"),
 		MustTag("zz-archive-task-done"),
@@ -28,10 +28,10 @@ func TestAddNormalized(t1 *testing.T) {
 }
 
 func TestAddNormalizedEmpty(t *testing.T) {
-	sut := MakeTagMutableSet()
+	sut := MakeTagSetMutable()
 	toAdd := MustTag("project-2021-dodder")
 
-	sutEx := MakeTagMutableSet(toAdd)
+	sutEx := MakeTagSetMutable(toAdd)
 
 	AddNormalizedTag(sut, &toAdd)
 
@@ -46,9 +46,9 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		MustTag("priority-1"),
 	}
 
-	sut := MakeTagMutableSet()
+	sut := MakeTagSetMutable()
 
-	sutEx := MakeTagMutableSet(
+	sutEx := MakeTagSetMutable(
 		MustTag("priority-1"),
 	)
 

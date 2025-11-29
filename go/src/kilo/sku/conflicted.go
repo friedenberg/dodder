@@ -112,8 +112,8 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	middle := ids.CloneTagSetMutable(conflicted.Base.GetTags())
 	right := ids.CloneTagSetMutable(conflicted.Remote.GetTags())
 
-	same := ids.MakeTagMutableSet()
-	deleted := ids.MakeTagMutableSet()
+	same := ids.MakeTagSetMutable()
+	deleted := ids.MakeTagSetMutable()
 
 	removeFromAllButAddTo := func(
 		tag ids.Tag,
