@@ -50,19 +50,6 @@ type (
 		Lenner
 		SetGetter[ELEMENT]
 	}
-)
-
-type Delta[ELEMENT any] interface {
-	GetAdded() Set[ELEMENT]
-	GetRemoved() Set[ELEMENT]
-}
-
-type (
-	MutableSetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		Set[ELEMENT]
-		SetMutable[ELEMENT]
-		AddPtr(ELEMENT_PTR) error
-	}
 
 	SetMutable[ELEMENT any] interface {
 		Set[ELEMENT]
@@ -71,6 +58,11 @@ type (
 		Resetable
 	}
 )
+
+type Delta[ELEMENT any] interface {
+	GetAdded() Set[ELEMENT]
+	GetRemoved() Set[ELEMENT]
+}
 
 type (
 	TridexLike interface {

@@ -9,21 +9,21 @@ import (
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
-func IsExactlyOneObjectId(qg *Query) bool {
-	if len(qg.optimizedQueries) != 1 {
+func IsExactlyOneObjectId(query *Query) bool {
+	if len(query.optimizedQueries) != 1 {
 		return false
 	}
 
-	var q *expSigilAndGenre
+	var expression *expSigilAndGenre
 
-	for _, q1 := range qg.optimizedQueries {
-		q = q1
+	for _, optimizedQueries := range query.optimizedQueries {
+		expression = optimizedQueries
 	}
 
-	kn := q.expObjectIds.internal
-	lk := len(kn)
+	internalObjectIds := expression.expObjectIds.internal
+	internalObjectIdCount := len(internalObjectIds)
 
-	if lk != 1 {
+	if internalObjectIdCount != 1 {
 		return false
 	}
 
@@ -31,17 +31,17 @@ func IsExactlyOneObjectId(qg *Query) bool {
 }
 
 func GetTags(query *Query) ids.TagSetMutable {
-	mes := ids.MakeMutableTagSet()
+	tags := ids.MakeMutableTagSet()
 
-	for _, oq := range query.optimizedQueries {
-		oq.expTagsOrTypes.CollectTags(mes)
+	for _, optimizedQuery := range query.optimizedQueries {
+		optimizedQuery.expTagsOrTypes.CollectTags(tags)
 	}
 
-	return mes
+	return tags
 }
 
-func GetTypes(qg *Query) ids.TypeSet {
-	return qg.types
+func GetTypes(query *Query) ids.TypeSet {
+	return query.types
 }
 
 func (query *Query) String() string {

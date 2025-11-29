@@ -3,6 +3,7 @@ package queries
 import (
 	"sort"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -15,7 +16,7 @@ type Query struct {
 	hidden           sku.Query
 	optimizedQueries map[genres.Genre]*expSigilAndGenre
 	userQueries      map[ids.Genre]*expSigilAndGenre
-	types            ids.TypeMutableSet
+	types            interfaces.SetMutable[ids.Type]
 
 	dotOperatorActive bool
 	matchOnEmpty      bool

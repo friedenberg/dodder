@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 )
 
@@ -22,13 +21,13 @@ type idExpandablePtr[T idExpandable[T]] interface {
 	interfaces.SetterPtr[T]
 }
 
-func expandOne[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
-	k ID,
+func expandOnePtr[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
+	id ID,
 	expander expansion.Expander,
 	adder interfaces.Adder[ID],
 ) {
 	f := quiter.MakeFuncSetString[ID, ID_PTR](adder)
-	expander.Expand(f, k.String())
+	expander.Expand(f, id.String())
 }
 
 func ExpandOneInto[T interfaces.ObjectId](
@@ -85,11 +84,11 @@ func ExpandOneSlice[T interfaces.ObjectId](
 func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
 	seq interfaces.Seq[ID],
 	expander expansion.Expander,
-) (out interfaces.MutableSetPtrLike[ID, ID_PTR]) {
-	mutableSet := collections_ptr.MakeMutableValueSetValue[ID, ID_PTR](nil)
+) (out interfaces.SetMutable[ID]) {
+	mutableSet := collections_value.MakeMutableValueSet[ID](nil)
 
 	for id := range seq {
-		expandOne[ID, ID_PTR](id, expander, mutableSet)
+		expandOnePtr[ID, ID_PTR](id, expander, mutableSet)
 	}
 
 	out = mutableSet

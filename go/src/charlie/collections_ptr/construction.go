@@ -7,23 +7,23 @@ import (
 )
 
 func MakeValueSetString[
-	T interfaces.Stringer,
-	TPtr interfaces.StringSetterPtr[T],
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringSetterPtr[ELEMENT],
 ](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
 	es ...string,
-) (s Set[T, TPtr], err error) {
-	s.E = make(map[string]TPtr, len(es))
+) (s Set[ELEMENT, ELEMENT_PTR], err error) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
 	}
 
 	s.K = keyer
 
 	for _, v := range es {
-		var e T
-		e1 := TPtr(&e)
+		var e ELEMENT
+		e1 := ELEMENT_PTR(&e)
 
 		if err = e1.Set(v); err != nil {
 			err = errors.Wrap(err)
@@ -37,22 +37,22 @@ func MakeValueSetString[
 }
 
 func MakeValueSetValue[
-	T interfaces.Stringer,
-	TPtr interfaces.StringerPtr[T],
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],
 ](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...T,
-) (s Set[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT,
+) (s Set[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
 	}
 
 	s.K = keyer
 
 	for i := range es {
-		e := TPtr(&es[i])
+		e := ELEMENT_PTR(&es[i])
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
@@ -60,16 +60,16 @@ func MakeValueSetValue[
 }
 
 func MakeValueSet[
-	T interfaces.Stringer,
-	TPtr interfaces.StringerPtr[T],
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],
 ](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...TPtr,
-) (s Set[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT_PTR,
+) (s Set[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
 	}
 
 	s.K = keyer
@@ -82,11 +82,11 @@ func MakeValueSet[
 	return s
 }
 
-func MakeSetValue[T any, TPtr interfaces.Ptr[T]](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...T,
-) (s Set[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+func MakeSetValue[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]](
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT,
+) (s Set[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
 		panic("keyer was nil")
@@ -95,18 +95,18 @@ func MakeSetValue[T any, TPtr interfaces.Ptr[T]](
 	s.K = keyer
 
 	for i := range es {
-		e := TPtr(&es[i])
+		e := ELEMENT_PTR(&es[i])
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
 	return s
 }
 
-func MakeSet[T any, TPtr interfaces.Ptr[T]](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...TPtr,
-) (s Set[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+func MakeSet[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]](
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT_PTR,
+) (s Set[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
 		panic("keyer was nil")
@@ -122,40 +122,42 @@ func MakeSet[T any, TPtr interfaces.Ptr[T]](
 	return s
 }
 
+// constructs a mutable set of values using the given pointers
 func MakeMutableValueSetValue[
-	T interfaces.Stringer,
-	TPtr interfaces.StringerPtr[T],
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],
 ](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...T,
-) (s MutableSet[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT,
+) (s MutableSet[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
 	}
 
 	s.K = keyer
 
 	for i := range es {
-		e := TPtr(&es[i])
+		e := ELEMENT_PTR(&es[i])
 		s.E[s.K.GetKeyPtr(e)] = e
 	}
 
 	return s
 }
 
+// constructs a mutable set of values using the given pointers
 func MakeMutableValueSet[
-	T interfaces.Stringer,
-	TPtr interfaces.StringerPtr[T],
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],
 ](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...TPtr,
-) (s MutableSet[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT_PTR,
+) (s MutableSet[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
-		keyer = quiter.StringerKeyerPtr[T, TPtr]{}
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
 	}
 
 	s.K = keyer
@@ -168,34 +170,11 @@ func MakeMutableValueSet[
 	return s
 }
 
-func MakeMutableSetValue[
-	T interfaces.Stringer,
-	TPtr interfaces.StringerPtr[T],
-](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...T,
-) (s MutableSet[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
-
-	if keyer == nil {
-		panic("keyer was nil")
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := TPtr(&es[i])
-		s.E[s.K.GetKeyPtr(e)] = e
-	}
-
-	return s
-}
-
-func MakeMutableSet[T any, TPtr interfaces.Ptr[T]](
-	keyer interfaces.StringKeyerPtr[T, TPtr],
-	es ...TPtr,
-) (s MutableSet[T, TPtr]) {
-	s.E = make(map[string]TPtr, len(es))
+func MakeMutableSet[ELEMENT any, ELEMENT_PTR interfaces.Ptr[ELEMENT]](
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	es ...ELEMENT_PTR,
+) (s MutableSet[ELEMENT, ELEMENT_PTR]) {
+	s.E = make(map[string]ELEMENT_PTR, len(es))
 
 	if keyer == nil {
 		panic("keyer was nil")

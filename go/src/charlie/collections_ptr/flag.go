@@ -32,8 +32,8 @@ func MakeFlagCommas[
 	policy SetterPolicy,
 ) Flag[VALUE, VALUE_PTR] {
 	return &flagCommas[VALUE, VALUE_PTR]{
-		SetterPolicy:      policy,
-		MutableSetPtrLike: MakeMutableValueSet[VALUE, VALUE_PTR](nil),
+		policy: policy,
+		set:    MakeMutableValueSet[VALUE, VALUE_PTR](nil),
 	}
 }
 
@@ -41,38 +41,38 @@ type flagCommas[
 	VALUE interfaces.Value[VALUE],
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] struct {
-	SetterPolicy      SetterPolicy
-	MutableSetPtrLike interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
-	pool              interfaces.Pool[VALUE, VALUE_PTR]
-	resetter          interfaces.ResetterPtr[VALUE, VALUE_PTR]
+	policy   SetterPolicy
+	set      interfaces.SetMutable[VALUE]
+	pool     interfaces.Pool[VALUE, VALUE_PTR]
+	resetter interfaces.ResetterPtr[VALUE, VALUE_PTR]
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Len() int {
-	return flags.MutableSetPtrLike.Len()
+	return flags.set.Len()
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) ContainsKey(key string) bool {
-	return flags.MutableSetPtrLike.ContainsKey(key)
+	return flags.set.ContainsKey(key)
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Key(element ELEMENT) string {
-	return flags.MutableSetPtrLike.Key(element)
+	return flags.set.Key(element)
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Get(key string) (ELEMENT, bool) {
-	return flags.MutableSetPtrLike.Get(key)
+	return flags.set.Get(key)
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) All() interfaces.Seq[ELEMENT] {
-	return flags.MutableSetPtrLike.All()
+	return flags.set.All()
 }
 
 func (flags flagCommas[ELEMENT, ELEMENT_PTR]) String() (out string) {
-	if flags.MutableSetPtrLike == nil {
+	if flags.set == nil {
 		return out
 	}
 
-	sorted := quiter.SortedStrings(flags.MutableSetPtrLike)
+	sorted := quiter.SortedStrings(flags.set)
 
 	sb := &strings.Builder{}
 	first := true
@@ -103,9 +103,9 @@ func (flags *flagCommas[ELEMENT, ELEMENT_PTR]) SetMany(vs ...string) (err error)
 }
 
 func (flags *flagCommas[ELEMENT, ELEMENT_PTR]) Set(value string) (err error) {
-	switch flags.SetterPolicy {
+	switch flags.policy {
 	case SetterPolicyReset:
-		flags.MutableSetPtrLike.Reset()
+		flags.set.Reset()
 	}
 
 	elements := strings.SplitSeq(value, ",")
@@ -115,7 +115,7 @@ func (flags *flagCommas[ELEMENT, ELEMENT_PTR]) Set(value string) (err error) {
 
 		// TODO-P2 use iter.AddStringPtr
 		if err = quiter.AddString[ELEMENT, ELEMENT_PTR](
-			flags.MutableSetPtrLike,
+			flags.set,
 			element,
 		); err != nil {
 			err = errors.Wrap(err)

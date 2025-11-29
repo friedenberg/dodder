@@ -5,14 +5,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+// returns a function that executes `AddString` for the given `adder`
 func MakeFuncSetString[
-	E any,
-	EPtr interfaces.SetterPtr[E],
+	ELEMENT any,
+	ELEMENT_PTR interfaces.SetterPtr[ELEMENT],
 ](
-	c interfaces.Adder[E],
+	adder interfaces.Adder[ELEMENT],
 ) interfaces.FuncSetString {
-	return func(v string) (err error) {
-		return AddString[E, EPtr](c, v)
+	return func(value string) (err error) {
+		return AddString[ELEMENT, ELEMENT_PTR](adder, value)
 	}
 }
 

@@ -62,18 +62,20 @@ func AddOrReplaceIfGreater[T interface {
 	return shouldAdd, err
 }
 
-func AddString[E any, EPtr interfaces.SetterPtr[E]](
-	c interfaces.Adder[E],
-	v string,
+// Constructs an object of type `ELEMENT` by using its `Set` method and adds it to
+// the given `adder`
+func AddString[ELEMENT any, ELEMENT_PTR interfaces.SetterPtr[ELEMENT]](
+	adder interfaces.Adder[ELEMENT],
+	value string,
 ) (err error) {
-	var e E
+	var element ELEMENT
 
-	if err = EPtr(&e).Set(v); err != nil {
+	if err = ELEMENT_PTR(&element).Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = c.Add(e); err != nil {
+	if err = adder.Add(element); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
