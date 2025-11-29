@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 )
@@ -17,18 +18,20 @@ type TypeBlobStore interface {
 	) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error)
 }
 
+type FuncReadTypeObject func(object_metadata.TypeLock) (*sku.Transacted, error)
+
 type formatterTypFormatterUTIGroups struct {
-	sku.OneReader
-	store TypeBlobStore
+	funcReadTypeObject FuncReadTypeObject
+	store              TypeBlobStore
 }
 
-func MakeFormatterTypFormatterUTIGroups(
-	oneReader sku.OneReader,
+func MakeFormatterTypeFormatterUTIGroups(
+	typeReader FuncReadTypeObject,
 	typeBlobStore TypeBlobStore,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
-		OneReader: oneReader,
-		store:     typeBlobStore,
+		funcReadTypeObject: typeReader,
+		store:              typeBlobStore,
 	}
 }
 
@@ -39,9 +42,8 @@ func (format formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	var typeObject *sku.Transacted
 
-	// TODO switch to ReadTypeObject
-	if typeObject, err = format.ReadTransactedFromObjectId(
-		object.GetMetadata().GetType(),
+	if typeObject, err = format.funcReadTypeObject(
+		object.GetTypeLock(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return n, err

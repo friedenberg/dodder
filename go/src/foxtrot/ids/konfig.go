@@ -32,6 +32,7 @@ func ErrOnConfig(v string) (err error) {
 	return nil
 }
 
+// TODO turn into singleton
 type Config struct{}
 
 func (a Config) IsEmpty() bool {

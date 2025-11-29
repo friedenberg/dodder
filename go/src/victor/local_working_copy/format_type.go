@@ -168,8 +168,8 @@ var typeFormatters = map[string]FormatTypeFuncConstructorEntry{
 			typeBlobStore type_blobs.Coder,
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
-			format := sku_fmt.MakeFormatterTypFormatterUTIGroups(
-				repo.GetStore(),
+			format := sku_fmt.MakeFormatterTypeFormatterUTIGroups(
+				repo.GetStore().ReadTypeObject,
 				typeBlobStore,
 			)
 

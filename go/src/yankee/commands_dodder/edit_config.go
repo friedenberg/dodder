@@ -112,27 +112,27 @@ func (cmd EditConfig) makeTempConfigFile(
 	repo *local_working_copy.Repo,
 	path string,
 ) (err error) {
-	var k *sku.Transacted
+	var configObject *sku.Transacted
 
-	if k, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
+	if configObject, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	var i sku.FSItem
-	i.Reset()
+	var fsItem sku.FSItem
+	fsItem.Reset()
 
-	if err = i.Object.Set(path); err != nil {
+	if err = fsItem.Object.Set(path); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	i.FDs.Add(&i.Object)
+	fsItem.FDs.Add(&fsItem.Object)
 
 	if err = repo.GetEnvWorkspace().GetStoreFS().GetFileEncoder().Encode(
 		checkout_options.TextFormatterOptions{},
-		k,
-		&i,
+		configObject,
+		&fsItem,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err

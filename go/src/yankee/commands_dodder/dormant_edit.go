@@ -35,12 +35,12 @@ func (cmd DormantEdit) Run(req command.Request) {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
 
-	var sh interfaces.MarklId
+	var digest interfaces.MarklId
 
 	{
 		var err error
 
-		if sh, err = cmd.editInVim(localWorkingCopy); err != nil {
+		if digest, err = cmd.editInVim(localWorkingCopy); err != nil {
 			localWorkingCopy.Cancel(err)
 			return
 		}
@@ -60,7 +60,7 @@ func (cmd DormantEdit) Run(req command.Request) {
 		errors.MakeFuncContextFromFuncErr(localWorkingCopy.Unlock),
 	)
 
-	if _, err := localWorkingCopy.GetStore().UpdateKonfig(sh); err != nil {
+	if _, err := localWorkingCopy.GetStore().UpdateKonfig(digest); err != nil {
 		localWorkingCopy.Cancel(err)
 		return
 	}
@@ -68,13 +68,13 @@ func (cmd DormantEdit) Run(req command.Request) {
 
 // TODO refactor into common
 func (cmd DormantEdit) editInVim(
-	u *local_working_copy.Repo,
-) (sh interfaces.MarklId, err error) {
-	var p string
+	repo *local_working_copy.Repo,
+) (digest interfaces.MarklId, err error) {
+	var path string
 
-	if p, err = cmd.makeTempKonfigFile(u); err != nil {
+	if path, err = cmd.makeTempFile(repo); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
 	openVimOp := user_ops.OpenEditor{
@@ -82,26 +82,28 @@ func (cmd DormantEdit) editInVim(
 			Build(),
 	}
 
-	if err = openVimOp.Run(u, p); err != nil {
+	if err = openVimOp.Run(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
-	if sh, err = cmd.readTempKonfigFile(u, p); err != nil {
+	if digest, err = cmd.readTempFile(repo, path); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
-	return sh, err
+	return digest, err
 }
 
 // TODO refactor into common
-func (cmd DormantEdit) makeTempKonfigFile(
+func (cmd DormantEdit) makeTempFile(
 	repo *local_working_copy.Repo,
 ) (path string, err error) {
 	var object *sku.Transacted
 
-	if object, err = repo.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
+	if object, err = repo.GetStore().ReadTransactedFromObjectId(
+		&ids.Config{},
+	); err != nil {
 		err = errors.Wrap(err)
 		return path, err
 	}
@@ -135,24 +137,26 @@ func (cmd DormantEdit) makeTempKonfigFile(
 }
 
 // TODO refactor into common
-func (cmd DormantEdit) readTempKonfigFile(
+func (cmd DormantEdit) readTempFile(
 	repo *local_working_copy.Repo,
 	path string,
-) (sh interfaces.MarklId, err error) {
+) (digest interfaces.MarklId, err error) {
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
 	defer errors.DeferredCloser(&err, file)
 
 	var writeCloser interfaces.BlobWriter
 
-	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
+	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(
+		nil,
+	); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
 	defer errors.DeferredCloser(&err, writeCloser)
@@ -167,12 +171,12 @@ func (cmd DormantEdit) readTempKonfigFile(
 		io.TeeReader(file, writeCloser),
 	); err != nil {
 		err = errors.Wrap(err)
-		return sh, err
+		return digest, err
 	}
 
 	// TODO persist blob type
 
-	sh = writeCloser.GetMarklId()
+	digest = writeCloser.GetMarklId()
 
-	return sh, err
+	return digest, err
 }
