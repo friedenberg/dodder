@@ -37,19 +37,19 @@ type FormatObject struct {
 
 var _ interfaces.CommandComponentWriter = (*FormatObject)(nil)
 
-func (cmd *FormatObject) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	f.BoolVar(
+func (cmd *FormatObject) SetFlagDefinitions(flagDefs interfaces.CLIFlagDefinitions) {
+	flagDefs.BoolVar(
 		&cmd.Stdin,
 		"stdin",
 		false,
 		"Read object from stdin and use a Type directly",
 	)
 
-	f.Var(&cmd.RepoId, "kasten", "none or Browser")
+	flagDefs.Var(&cmd.RepoId, "kasten", "none or Browser")
 
-	f.StringVar(&cmd.UTIGroup, "uti-group", "", "lookup format from UTI group")
+	flagDefs.StringVar(&cmd.UTIGroup, "uti-group", "", "lookup format from UTI group")
 
-	f.Var(&cmd.CheckoutMode, "mode", "mode for checking out the zettel")
+	flagDefs.Var(&cmd.CheckoutMode, "mode", "mode for checking out the zettel")
 }
 
 func (cmd *FormatObject) Run(req command.Request) {

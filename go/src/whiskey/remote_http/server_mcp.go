@@ -333,20 +333,19 @@ func (server *Server) readMCPResourceObject(
 	var typeBlob type_blobs.Blob
 
 	{
-		tipe := object.GetType()
 		var typeObject *sku.Transacted
 
 		{
 			var err error
 
-			if typeObject, err = repo.GetStore().ReadOneObjectId(
-				tipe,
+			if typeObject, err = repo.GetStore().ReadObjectType(
+				object,
 			); err != nil {
 				if collections.IsErrNotFound(err) {
 					err = nil
 					goto SKIP_TYPE_BLOB
 				} else {
-					return nil, errors.Wrapf(err, "Type: %q", tipe)
+					return nil, errors.Wrap(err)
 				}
 			}
 

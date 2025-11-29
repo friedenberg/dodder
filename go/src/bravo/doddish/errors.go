@@ -7,18 +7,16 @@ import (
 )
 
 type (
-	errDisamb struct{}
-	pkgError  = errors.TypedError[errDisamb]
+	pkgErrDisamb struct{}
 )
 
-func newError(text string) pkgError {
-	return errors.NewWithType[errDisamb](text)
+func newPkgError(text string) error {
+	return errors.NewWithType[pkgErrDisamb](text)
 }
 
-var ErrEmptySeq = newError("empty seq")
+var ErrEmptySeq = newPkgError("empty seq")
 
 type ErrUnsupportedSeq struct {
-	pkgError
 	Seq
 }
 
@@ -27,6 +25,9 @@ func (err ErrUnsupportedSeq) Error() string {
 }
 
 func (err ErrUnsupportedSeq) Is(target error) bool {
-	_, ok := target.(ErrUnsupportedSeq)
-	return ok
+	if _, ok := target.(ErrUnsupportedSeq); ok {
+		return true
+	}
+
+	return false
 }

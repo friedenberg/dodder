@@ -10,7 +10,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	metadata object_metadata.IMetadataMutable,
 	tipe ids.Type,
 	funcs ...sku.FuncReadOne,
-) (err errTypeLockfile) {
+) (err error) {
 	if tipe.IsEmpty() {
 		err = ErrEmptyType
 		return err

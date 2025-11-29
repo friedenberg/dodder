@@ -20,7 +20,7 @@ func (store *Store) tryNewHook(
 
 	var typeObject *sku.Transacted
 
-	if typeObject, err = store.ReadOneObjectId(child.GetType()); err != nil {
+	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(child); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -80,9 +80,9 @@ func (store *Store) TryFormatHook(
 		}
 	}
 
-	var objectType *sku.Transacted
+	var typeObject *sku.Transacted
 
-	if objectType, err = store.ReadOneObjectId(object.GetType()); err != nil {
+	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(object); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -95,8 +95,8 @@ func (store *Store) TryFormatHook(
 	var repool interfaces.FuncRepool
 
 	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
-		objectType.GetType(),
-		objectType.GetBlobDigest(),
+		typeObject.GetType(),
+		typeObject.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -114,7 +114,7 @@ func (store *Store) TryFormatHook(
 		object,
 		objectMother,
 		sku.CommitOptions{},
-		objectType,
+		typeObject,
 		script,
 		"on_format",
 	); err != nil {
@@ -143,7 +143,7 @@ func (store *Store) tryPreCommitHooks(
 
 	var typeObject *sku.Transacted
 
-	if typeObject, err = store.ReadOneObjectId(child.GetType()); err != nil {
+	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(child); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -156,17 +156,20 @@ func (store *Store) tryPreCommitHooks(
 	}
 
 	var blob type_blobs.Blob
-	var repool interfaces.FuncRepool
 
-	if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
-		typeObject.GetType(),
-		typeObject.GetBlobDigest(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	{
+		var repool interfaces.FuncRepool
+
+		if blob, repool, _, err = store.GetTypedBlobStore().Type.ParseTypedBlob(
+			typeObject.GetType(),
+			typeObject.GetBlobDigest(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		defer repool()
 	}
-
-	defer repool()
 
 	script := blob.GetStringLuaHooks()
 

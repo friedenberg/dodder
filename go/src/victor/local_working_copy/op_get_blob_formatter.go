@@ -15,11 +15,11 @@ import (
 
 // TODO add support for checked out types
 func (local *Repo) GetBlobFormatter(
-	tipe ids.Type,
+	typeLock ids.Type,
 	formatId string,
 	utiGroup string,
 ) (blobFormatter script_config.RemoteScript, err error) {
-	if tipe.GetType().IsEmpty() {
+	if typeLock.GetType().IsEmpty() {
 		err = errors.ErrorWithStackf("empty type")
 		return blobFormatter, err
 	}
@@ -27,7 +27,7 @@ func (local *Repo) GetBlobFormatter(
 	var typeObject *sku.Transacted
 
 	if typeObject, err = local.GetStore().ReadTransactedFromObjectId(
-		tipe.GetType(),
+		typeLock.GetType(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return blobFormatter, err

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -26,6 +27,68 @@ func (store *Store) ReadTransactedFromObjectId(
 	}
 
 	return object, err
+}
+
+func (store *Store) ReadObjectTypeAndLockIfNecessary(
+	object *sku.Transacted,
+) (typeObject *sku.Transacted, err error) {
+	typeLock := object.GetMetadataMutable().GetTypeLockMutable()
+	typeMarklId := typeLock.Value
+
+	if ids.IsBuiltin(typeLock.Key) {
+		err = collections.MakeErrNotFound(typeLock.Key)
+		return
+	}
+
+	if !typeMarklId.IsNull() {
+		return store.ReadObjectType(object)
+	}
+
+	if typeObject, err = store.ReadOneObjectId(object.GetType()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if typeObject != nil {
+		typeLock.Value.ResetWithMarklId(typeObject.GetMetadata().GetObjectSig())
+	}
+
+	return typeObject, err
+}
+
+func (store *Store) ReadObjectType(
+	object *sku.Transacted,
+) (typeObject *sku.Transacted, err error) {
+	if object == nil {
+		panic("empty object")
+	}
+
+	typeObject = sku.GetTransactedPool().Get()
+	typeLock := object.GetMetadata().GetTypeLock()
+	typeMarklId := typeLock.Value
+
+	if ids.IsBuiltin(typeLock.Key) {
+		err = collections.MakeErrNotFound(typeLock.Key)
+		return
+	}
+
+	if err = markl.AssertIdIsNotNull(typeMarklId); err != nil {
+		err = errors.Errorf("no type lock for type: %q", typeLock.Key)
+		return
+	}
+
+	if !store.streamIndex.ReadOneMarklId(
+		typeLock.Value,
+		typeObject,
+	) {
+		sku.GetTransactedPool().Put(typeObject)
+		typeObject = nil
+
+		err = collections.MakeErrNotFound(typeLock.Key)
+		return typeObject, err
+	}
+
+	return typeObject, err
 }
 
 // TODO transition to a context-based panic / cancel semantic
@@ -55,7 +118,7 @@ func (store *Store) ReadOneInto(
 	objectId interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
-	var sk *sku.Transacted
+	var object *sku.Transacted
 
 	switch objectId.GetGenre() {
 	case genres.Zettel:
@@ -69,21 +132,21 @@ func (store *Store) ReadOneInto(
 			err = nil
 		}
 
-		if sk, err = store.ReadOneObjectId(objectId); err != nil {
+		if object, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case genres.Type, genres.Tag, genres.Repo, genres.InventoryList:
-		if sk, err = store.ReadOneObjectId(objectId); err != nil {
+		if object, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
 	case genres.Config:
-		sk = store.GetConfigStore().GetConfig().GetSku()
+		object = store.GetConfigStore().GetConfig().GetSku()
 
-		if sk.GetTai().IsEmpty() {
+		if object.GetTai().IsEmpty() {
 			ui.Err().Print("config tai is empty")
 		}
 
@@ -95,7 +158,7 @@ func (store *Store) ReadOneInto(
 			return err
 		}
 
-		if sk, err = store.ReadOneObjectId(objectId); err != nil {
+		if object, err = store.ReadOneObjectId(objectId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -105,12 +168,12 @@ func (store *Store) ReadOneInto(
 		return err
 	}
 
-	if sk == nil {
+	if object == nil {
 		err = collections.MakeErrNotFound(objectId)
 		return err
 	}
 
-	sku.TransactedResetter.ResetWith(out, sk)
+	sku.TransactedResetter.ResetWith(out, object)
 
 	return err
 }
