@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/collections_delta"
 )
@@ -17,37 +18,37 @@ func TestNormalize(t *testing.T) {
 
 	testEntries := map[string]testEntry{
 		"removes all": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
 		},
 		"removes non": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
 		},
 		"removes right order": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("priority"),
 				MustTag("priority-1"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("priority-1"),
 			),
 		},
@@ -81,23 +82,23 @@ func TestRemovePrefixes(t *testing.T) {
 
 	testEntries := map[string]testEntry{
 		"removes all": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("project-archive-task-done"),
 			),
-			ex:     MakeTagSet(),
+			ex:     MakeTagSetFromSlice(),
 			prefix: "project",
 		},
 		"removes non": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
@@ -106,13 +107,13 @@ func TestRemovePrefixes(t *testing.T) {
 			prefix: "xx",
 		},
 		"removes one": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
@@ -120,13 +121,13 @@ func TestRemovePrefixes(t *testing.T) {
 			prefix: "zz",
 		},
 		"removes most": {
-			ac: MakeTagSet(
+			ac: MakeTagSetFromSlice(
 				MustTag("project-2021-dodder"),
 				MustTag("project-2021-dodder-test"),
 				MustTag("project-2021-dodder-ewwwwww"),
 				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeTagSet(
+			ex: MakeTagSetFromSlice(
 				MustTag("zz-archive-task-done"),
 			),
 			prefix: "project",
@@ -144,7 +145,7 @@ func TestRemovePrefixes(t *testing.T) {
 }
 
 func TestExpandedRight(t *testing.T) {
-	s := MakeTagSet(
+	s := MakeTagSetFromSlice(
 		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
@@ -173,7 +174,7 @@ func TestExpandedRight(t *testing.T) {
 }
 
 func TestPrefixIntersection(t *testing.T) {
-	s := MakeTagSet(
+	s := MakeTagSetFromSlice(
 		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
@@ -217,31 +218,31 @@ func TestPrefixIntersection(t *testing.T) {
 // }
 
 func TestDelta1(t *testing.T) {
-	from := MakeTagSet(
+	from := MakeTagSetFromSlice(
 		MustTag("project-2021-dodder"),
 		MustTag("task-todo"),
 	)
 
-	to := MakeTagSet(
+	to := MakeTagSetFromSlice(
 		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
 
-	d := collections_delta.MakeSetDelta[Tag](from, to)
+	d := collections_delta.MakeSetDelta(from, to)
 
-	c_expected := MakeTagSet(
+	c_expected := MakeTagSetFromSlice(
 		MustTag("zz-archive-task-done"),
 	)
 
-	if !quiter.SetEquals[Tag](c_expected, d.GetAdded()) {
+	if !quiter_set.Equals(c_expected, d.GetAdded()) {
 		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.GetAdded())
 	}
 
-	d_expected := MakeTagSet(
+	d_expected := MakeTagSetFromSlice(
 		MustTag("task-todo"),
 	)
 
-	if !quiter.SetEquals[Tag](d_expected, d.GetRemoved()) {
+	if !quiter_set.Equals(d_expected, d.GetRemoved()) {
 		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.GetRemoved())
 	}
 }

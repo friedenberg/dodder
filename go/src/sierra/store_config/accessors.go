@@ -212,7 +212,7 @@ func (compiled *compiled) GetImplicitTags(tag ids.Tag) ids.TagSet {
 	s, ok := compiled.ImplicitTags[tag.String()]
 
 	if !ok || s == nil {
-		return ids.MakeTagSet()
+		return ids.MakeTagSetFromSlice()
 	}
 
 	return s

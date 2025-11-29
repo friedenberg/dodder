@@ -136,39 +136,3 @@ func (a MutableSet[T, TPtr]) Reset() {
 		delete(a.E, k)
 	}
 }
-
-func (a MutableSet[T, TPtr]) CloneSetLike() interfaces.Set[T] {
-	b := MakeSet[T, TPtr](a.K)
-
-	for k, v := range a.E {
-		b.E[k] = v
-	}
-
-	return b
-}
-
-func (a MutableSet[T, TPtr]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
-	c := MakeMutableSet[T, TPtr](a.K)
-	for e := range a.All() {
-		c.Add(e)
-	}
-	return c
-}
-
-func (a MutableSet[T, TPtr]) CloneSetPtrLike() interfaces.SetPtrLike[T, TPtr] {
-	b := MakeSet[T, TPtr](a.K)
-
-	for k, v := range a.E {
-		b.E[k] = v
-	}
-
-	return b
-}
-
-func (a MutableSet[T, TPtr]) CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr] {
-	c := MakeMutableSet[T, TPtr](a.K)
-	for e := range a.All() {
-		c.Add(e)
-	}
-	return c
-}

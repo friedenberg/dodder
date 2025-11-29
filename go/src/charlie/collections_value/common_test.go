@@ -92,7 +92,7 @@ func assertSet(
 	{
 		sutCopy := sut
 
-		if !quiter.SetEquals(sut, sutCopy) {
+		if !quiter_set.Equals(sut, sutCopy) {
 			t.Fatalf("expected copy to equal original")
 		}
 	}
@@ -101,13 +101,13 @@ func assertSet(
 	{
 		sutCopy := MakeMutableValueSet(nil, slices.Collect(sut.All())...)
 
-		if !quiter.SetEquals(sut, sutCopy) {
+		if !quiter_set.Equals(sut, sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
 		sutCopy.Reset()
 
-		if quiter.SetEquals(sut, sutCopy) {
+		if quiter_set.Equals(sut, sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
 		}
 	}

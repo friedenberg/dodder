@@ -43,7 +43,7 @@ type (
 		// TODO move to store
 		Sku sku.Transacted
 
-		Tags         interfaces.MutableSetLike[*tag]
+		Tags         interfaces.SetMutable[*tag]
 		ImplicitTags implicitTagMap
 
 		// Typen

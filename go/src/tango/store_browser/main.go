@@ -28,7 +28,7 @@ const DefaultTimeout = 2e9
 
 type transacted struct {
 	sync.Mutex
-	interfaces.MutableSetLike[*ids.ObjectId]
+	interfaces.SetMutable[*ids.ObjectId]
 }
 
 type checkedOutWithItem struct {
@@ -72,7 +72,7 @@ func Make(
 		added:     make(map[url.URL][]checkedOutWithItem),
 		itemsById: make(map[string]Item),
 		transacted: transacted{
-			MutableSetLike: collections_value.MakeMutableValueSet(
+			SetMutable: collections_value.MakeMutableValueSet(
 				quiter.StringerKeyer[*ids.ObjectId]{},
 			),
 		},

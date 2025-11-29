@@ -98,7 +98,7 @@ func (set Set[T]) CloneSetLike() interfaces.Set[T] {
 	return set
 }
 
-func (set Set[T]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
+func (set Set[T]) CloneMutableSetLike() interfaces.SetMutable[T] {
 	clone := MakeMutableSet[T](set.K, set.Len(), set.All())
 	return clone
 }

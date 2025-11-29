@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
@@ -25,7 +25,7 @@ type FSItem struct {
 	Conflict fd.FD
 	Lockfile fd.FD
 
-	FDs interfaces.MutableSetLike[*fd.FD]
+	FDs interfaces.SetMutable[*fd.FD]
 }
 
 func (item *FSItem) WriteToSku(
@@ -183,7 +183,7 @@ func (item *FSItem) Equals(b *FSItem) (ok bool, why string) {
 		return false, fmt.Sprintf("Conflict.%s", why)
 	}
 
-	if !quiter.SetEquals(item.FDs, b.FDs) {
+	if !quiter_set.Equals(item.FDs, b.FDs) {
 		return false, "set"
 	}
 

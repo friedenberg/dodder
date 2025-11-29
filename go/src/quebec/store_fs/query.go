@@ -313,7 +313,7 @@ func (store *Store) queryUntracked(
 	addRecognizedIfNecessary := func(
 		object *sku.Transacted,
 		digest interfaces.MarklId,
-		digestCache map[string]interfaces.MutableSetLike[*sku.FSItem],
+		digestCache map[string]interfaces.SetMutable[*sku.FSItem],
 	) (item *fsItemRecognized, err error) {
 		if digest.IsNull() {
 			return item, err

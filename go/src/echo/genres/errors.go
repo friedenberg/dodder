@@ -2,11 +2,11 @@ package genres
 
 import (
 	"fmt"
+	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_seq"
 )
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
@@ -42,16 +42,16 @@ func IsErrUnrecognizedGenre(err error) bool {
 
 type errUnrecognizedGenre string
 
-func (e errUnrecognizedGenre) Is(target error) (ok bool) {
+func (err errUnrecognizedGenre) Is(target error) (ok bool) {
 	_, ok = target.(errUnrecognizedGenre)
 	return ok
 }
 
-func (e errUnrecognizedGenre) Error() string {
+func (err errUnrecognizedGenre) Error() string {
 	return fmt.Sprintf(
 		"unknown genre: %q. Available genres: %q",
-		string(e),
-		quiter.Strings(collections_slice.Slice[Genre](All())),
+		string(err),
+		slices.Collect(quiter_seq.Strings(slices.Values(All()))),
 	)
 }
 

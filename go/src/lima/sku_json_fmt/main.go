@@ -2,12 +2,14 @@ package sku_json_fmt
 
 import (
 	"io"
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_seq"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -65,7 +67,7 @@ func (json *Transacted) FromObjectIdStringAndMetadata(
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
-	json.Tags = quiter.Strings(metadata.GetTags())
+	json.Tags = slices.Collect(quiter.Strings(quiter_seq.Seq[interfaces.Collection[ids.Tag]](metadata.GetTags())))
 	json.Tai = metadata.GetTai().String()
 	json.Type = metadata.GetType().String()
 

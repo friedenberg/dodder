@@ -3,12 +3,13 @@ package sku_fmt
 import (
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -72,7 +73,7 @@ func (json *JSON) FromStringAndMetadata(
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
-	json.Tags = quiter.Strings(metadata.GetTags())
+	json.Tags = slices.Collect(quiter_set.Strings(metadata.GetTags()))
 	json.Tai = metadata.GetTai().String()
 	json.Type = metadata.GetType().String()
 

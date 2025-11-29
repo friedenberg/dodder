@@ -8,7 +8,7 @@ import (
 
 type (
 	CheckedOutSet        = interfaces.Set[*sku.CheckedOut]
-	CheckedOutMutableSet = interfaces.MutableSetLike[*sku.CheckedOut]
+	CheckedOutMutableSet = interfaces.SetMutable[*sku.CheckedOut]
 )
 
 func MakeCheckedOutMutableSet() CheckedOutMutableSet {

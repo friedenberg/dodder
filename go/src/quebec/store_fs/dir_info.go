@@ -40,7 +40,7 @@ type dirInfo struct {
 	probablyCheckedOut      fsItemData
 	definitelyNotCheckedOut fsItemData
 
-	errors interfaces.MutableSetLike[itemWithError]
+	errors interfaces.SetMutable[itemWithError]
 }
 
 func makeObjectsWithDir(

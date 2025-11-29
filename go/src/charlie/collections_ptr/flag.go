@@ -22,22 +22,7 @@ type Flag[
 ] interface {
 	interfaces.FlagValue
 	SetMany(vs ...string) (err error)
-	interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
-	GetSetPtrLike() interfaces.SetPtrLike[VALUE, VALUE_PTR]
-	GetMutableSetPtrLike() interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
-}
-
-func MakeFlagCommasFromExisting[
-	VALUE interfaces.Value[VALUE],
-	VALUE_PTR interfaces.ValuePtr[VALUE],
-](
-	policy SetterPolicy,
-	existing interfaces.MutableSetPtrLike[VALUE, VALUE_PTR],
-) Flag[VALUE, VALUE_PTR] {
-	return &flagCommas[VALUE, VALUE_PTR]{
-		SetterPolicy:      policy,
-		MutableSetPtrLike: existing,
-	}
+	interfaces.Set[VALUE]
 }
 
 func MakeFlagCommas[
@@ -56,30 +41,38 @@ type flagCommas[
 	VALUE interfaces.Value[VALUE],
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] struct {
-	SetterPolicy SetterPolicy
-	interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
-	pool     interfaces.Pool[VALUE, VALUE_PTR]
-	resetter interfaces.ResetterPtr[VALUE, VALUE_PTR]
+	SetterPolicy      SetterPolicy
+	MutableSetPtrLike interfaces.MutableSetPtrLike[VALUE, VALUE_PTR]
+	pool              interfaces.Pool[VALUE, VALUE_PTR]
+	resetter          interfaces.ResetterPtr[VALUE, VALUE_PTR]
 }
 
-func (flags flagCommas[T, TPtr]) All() interfaces.Seq[T] {
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Len() int {
+	return flags.MutableSetPtrLike.Len()
+}
+
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) ContainsKey(key string) bool {
+	return flags.MutableSetPtrLike.ContainsKey(key)
+}
+
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Key(element ELEMENT) string {
+	return flags.MutableSetPtrLike.Key(element)
+}
+
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) Get(key string) (ELEMENT, bool) {
+	return flags.MutableSetPtrLike.Get(key)
+}
+
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) All() interfaces.Seq[ELEMENT] {
 	return flags.MutableSetPtrLike.All()
 }
 
-func (flags flagCommas[T, TPtr]) GetSetPtrLike() (s interfaces.SetPtrLike[T, TPtr]) {
-	return flags.CloneSetPtrLike()
-}
-
-func (flags flagCommas[T, TPtr]) GetMutableSetPtrLike() (s interfaces.MutableSetPtrLike[T, TPtr]) {
-	return flags.CloneMutableSetPtrLike()
-}
-
-func (flags flagCommas[T, TPtr]) String() (out string) {
+func (flags flagCommas[ELEMENT, ELEMENT_PTR]) String() (out string) {
 	if flags.MutableSetPtrLike == nil {
 		return out
 	}
 
-	sorted := quiter.SortedStrings[T](flags)
+	sorted := quiter.SortedStrings(flags.MutableSetPtrLike)
 
 	sb := &strings.Builder{}
 	first := true
@@ -99,7 +92,7 @@ func (flags flagCommas[T, TPtr]) String() (out string) {
 	return out
 }
 
-func (flags *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
+func (flags *flagCommas[ELEMENT, ELEMENT_PTR]) SetMany(vs ...string) (err error) {
 	for _, v := range vs {
 		if err = flags.Set(v); err != nil {
 			return err
@@ -109,10 +102,10 @@ func (flags *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 	return err
 }
 
-func (flags *flagCommas[T, TPtr]) Set(value string) (err error) {
+func (flags *flagCommas[ELEMENT, ELEMENT_PTR]) Set(value string) (err error) {
 	switch flags.SetterPolicy {
 	case SetterPolicyReset:
-		flags.Reset()
+		flags.MutableSetPtrLike.Reset()
 	}
 
 	elements := strings.SplitSeq(value, ",")
@@ -121,7 +114,10 @@ func (flags *flagCommas[T, TPtr]) Set(value string) (err error) {
 		element = strings.TrimSpace(element)
 
 		// TODO-P2 use iter.AddStringPtr
-		if err = quiter.AddString[T, TPtr](flags, element); err != nil {
+		if err = quiter.AddString[ELEMENT, ELEMENT_PTR](
+			flags.MutableSetPtrLike,
+			element,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

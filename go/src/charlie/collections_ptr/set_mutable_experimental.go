@@ -39,42 +39,6 @@ func (s *mutableSetExperimental[T, TPtr]) len() int {
 	return len(s.E)
 }
 
-func (a *mutableSetExperimental[T, TPtr]) EqualsSetPtrLike(
-	b interfaces.SetPtrLike[T, TPtr],
-) bool {
-	defer a.TryProcessMutationsDuringReads()
-	a.l.RLock()
-	defer a.l.RUnlock()
-
-	return a.EqualsSetLike(b)
-}
-
-func (a *mutableSetExperimental[T, TPtr]) EqualsSetLike(
-	b interfaces.Set[T],
-) bool {
-	if b == nil {
-		return false
-	}
-
-	defer a.TryProcessMutationsDuringReads()
-	a.l.RLock()
-	defer a.l.RUnlock()
-
-	if a.len() != b.Len() {
-		return false
-	}
-
-	for k, va := range a.E {
-		vb, ok := b.Get(k)
-
-		if !ok || !va.EqualsAny(vb) {
-			return false
-		}
-	}
-
-	return true
-}
-
 func (s *mutableSetExperimental[T, TPtr]) Key(e T) string {
 	defer s.TryProcessMutationsDuringReads()
 	s.l.RLock()

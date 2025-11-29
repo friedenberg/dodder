@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -64,10 +63,9 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	equal := quiter.SetEquals(
+	equal := quiter_set.Equals(
 		a.Transacted.GetMetadata().GetTags(),
-		a.Parent.Transacted.GetMetadata().GetTags(),
-	)
+		a.Parent.Transacted.GetMetadata().GetTags())
 
 	if !equal {
 		ui.Log().Print("parent tags not equal")

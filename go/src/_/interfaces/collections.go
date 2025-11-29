@@ -58,20 +58,13 @@ type Delta[ELEMENT any] interface {
 }
 
 type (
-	SetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		Set[ELEMENT]
-
-		CloneSetPtrLike() SetPtrLike[ELEMENT, ELEMENT_PTR]
-		CloneMutableSetPtrLike() MutableSetPtrLike[ELEMENT, ELEMENT_PTR]
-	}
-
 	MutableSetPtrLike[ELEMENT any, ELEMENT_PTR Ptr[ELEMENT]] interface {
-		SetPtrLike[ELEMENT, ELEMENT_PTR]
-		MutableSetLike[ELEMENT]
+		Set[ELEMENT]
+		SetMutable[ELEMENT]
 		AddPtr(ELEMENT_PTR) error
 	}
 
-	MutableSetLike[ELEMENT any] interface {
+	SetMutable[ELEMENT any] interface {
 		Set[ELEMENT]
 		Adder[ELEMENT]
 		DelKey(string) error

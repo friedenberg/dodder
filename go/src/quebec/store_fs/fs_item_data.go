@@ -12,21 +12,21 @@ import (
 )
 
 type fsItemData struct {
-	interfaces.MutableSetLike[*sku.FSItem]
-	digests map[string]interfaces.MutableSetLike[*sku.FSItem]
+	interfaces.SetMutable[*sku.FSItem]
+	digests map[string]interfaces.SetMutable[*sku.FSItem]
 }
 
 func makeFSItemData() fsItemData {
 	return fsItemData{
-		MutableSetLike: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
-		digests:        make(map[string]interfaces.MutableSetLike[*sku.FSItem]),
+		SetMutable: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
+		digests:        make(map[string]interfaces.SetMutable[*sku.FSItem]),
 	}
 }
 
 func (data *fsItemData) Clone() (dst fsItemData) {
-	dst.MutableSetLike = collections_value.MakeMutableValueSet(
+	dst.SetMutable = collections_value.MakeMutableValueSet(
 		nil,
-		slices.Collect(data.MutableSetLike.All())...,
+		slices.Collect(data.SetMutable.All())...,
 	)
 
 	dst.digests = maps.Clone(data.digests)
@@ -60,7 +60,7 @@ func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {
 	}
 
 	// TODO make less leaky
-	data.MutableSetLike = replacement
+	data.SetMutable = replacement
 
 	return err
 }

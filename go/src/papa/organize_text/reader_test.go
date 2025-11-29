@@ -132,7 +132,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	t.AssertNoError(err)
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("wow"))
 
 		if len(sub.root.Children) < 1 {
 			t.Fatalf("expected exactly 1 child")
@@ -171,7 +171,7 @@ func TestAssignmentLineReader2Heading2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(
@@ -216,7 +216,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(
@@ -228,7 +228,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("sub-wow"))
 
 		if sub.root != sub.root.Children[0].Parent {
 			t.Fatalf("%v, %v", sub.root, sub.root.Children[0].Parent)
@@ -296,7 +296,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(
@@ -308,7 +308,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("sub-wow"))
 
 		l := len(sub.root.Children[0].Children)
 		if l != 1 {
@@ -326,7 +326,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("cow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("cow"))
 		actual := sub.root.Children[1].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(
@@ -390,7 +390,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("sub-wow"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(actual, expected) {
@@ -399,7 +399,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t1 *testing.T) {
 	}
 
 	{
-		expected := ids.MakeTagSet(ids.MustTag("sub-cow"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("sub-cow"))
 
 		l := len(sub.root.Children)
 		expLen := 2
@@ -466,7 +466,7 @@ func TestAssignmentLineReaderBigCheese(t1 *testing.T) {
 
 	// `# task
 	{
-		expected := ids.MakeTagSet(ids.MustTag("task"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("task"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(actual, expected) {
@@ -488,7 +488,7 @@ func TestAssignmentLineReaderBigCheese(t1 *testing.T) {
 
 	// ## priority-1
 	{
-		expected := ids.MakeTagSet(ids.MustTag("priority-1"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("priority-1"))
 
 		e := 2
 		l := len(sub.root.Children[0].Children)
@@ -505,7 +505,7 @@ func TestAssignmentLineReaderBigCheese(t1 *testing.T) {
 
 	// ### w-2022-07-09
 	{
-		expected := ids.MakeTagSet(ids.MustTag("w-2022-07-09"))
+		expected := ids.MakeTagSetFromSlice(ids.MustTag("w-2022-07-09"))
 		actual := sub.root.Children[0].Children[0].Children[0].Transacted.GetMetadata().GetTags()
 
 		if !ids.TagSetEquals(actual, expected) {

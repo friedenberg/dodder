@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 )
 
@@ -32,7 +32,7 @@ var TagSetEmpty TagSet
 
 func init() {
 	collections_ptr.RegisterGobValue[Tag](nil)
-	TagSetEmpty = MakeTagSet()
+	TagSetEmpty = MakeTagSetFromSlice()
 }
 
 func CloneTagSet(tags TagSet) TagSet {
@@ -55,7 +55,7 @@ func CloneTagSetMutable(tags TagSet) TagSetMutable {
 	return clone
 }
 
-func MakeTagSet(es ...Tag) (s TagSet) {
+func MakeTagSetFromSlice(es ...Tag) (s TagSet) {
 	if len(es) == 0 && TagSetEmpty != nil {
 		return TagSetEmpty
 	}
@@ -83,7 +83,7 @@ func MakeTagMutableSet(hs ...Tag) TagSetMutable {
 }
 
 func TagSetEquals(first, second TagSet) bool {
-	return quiter.SetEquals(first, second)
+	return quiter_set.Equals(first, second)
 }
 
 type TagSlice []Tag
@@ -169,5 +169,5 @@ func (slice TagSlice) String() string {
 }
 
 func (slice TagSlice) ToSet() TagSet {
-	return MakeTagSet([]Tag(slice)...)
+	return MakeTagSetFromSlice([]Tag(slice)...)
 }

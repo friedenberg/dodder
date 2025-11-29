@@ -39,7 +39,7 @@ type (
 func Default(defaultType ids.Type) Config {
 	return Config{
 		DefaultType:    defaultType,
-		DefaultTags:    ids.MakeTagSet(),
+		DefaultTags:    ids.MakeTagSetFromSlice(),
 		FileExtensions: file_extensions.Default(),
 		PrintOptions:   options_print.DefaultOverlay().GetPrintOptionsOverlay(),
 		ToolOptions: options_tools.Options{

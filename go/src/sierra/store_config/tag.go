@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -59,10 +60,9 @@ func (a *tag) Equals(b *tag) bool {
 		return false
 	}
 
-	if !quiter.SetEquals(
+	if !quiter_set.Equals(
 		a.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
-		b.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
-	) {
+		b.Transacted.GetMetadata().GetIndex().GetImplicitTags()) {
 		return false
 	}
 

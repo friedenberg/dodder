@@ -7,7 +7,7 @@ import (
 )
 
 type delta[T interfaces.ValueLike] struct {
-	Added, Removed interfaces.MutableSetLike[T]
+	Added, Removed interfaces.SetMutable[T]
 }
 
 func (d delta[T]) GetAdded() interfaces.Set[T] {

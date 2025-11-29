@@ -23,13 +23,13 @@ func init() {
 
 type (
 	TransactedSet        = interfaces.Set[*Transacted]
-	TransactedMutableSet = interfaces.MutableSetLike[*Transacted]
+	TransactedMutableSet = interfaces.SetMutable[*Transacted]
 
 	ExternalLikeSet        = interfaces.Set[ExternalLike]
-	ExternalLikeMutableSet = interfaces.MutableSetLike[ExternalLike]
+	ExternalLikeMutableSet = interfaces.SetMutable[ExternalLike]
 
 	CheckedOutSet        = interfaces.Set[*CheckedOut]
-	CheckedOutMutableSet = interfaces.MutableSetLike[*CheckedOut]
+	CheckedOutMutableSet = interfaces.SetMutable[*CheckedOut]
 )
 
 func MakeTransactedSet() TransactedSet {

@@ -1,6 +1,14 @@
 package quiter_seq
 
-import "code.linenisgreat.com/dodder/go/src/_/interfaces"
+import (
+	"slices"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+)
+
+func Seq[ELEMENT any](elements ...ELEMENT) interfaces.Seq[ELEMENT] {
+	return slices.Values(elements)
+}
 
 func Any[ELEMENT any](seq interfaces.Seq[ELEMENT]) (element ELEMENT) {
 	for element = range seq {
@@ -20,6 +28,18 @@ func SeqWithIndex[ELEMENT any](seq interfaces.Seq[ELEMENT]) interfaces.Seq2[int,
 			}
 
 			index++
+		}
+	}
+}
+
+func Strings[ELEMENT interfaces.Stringer](
+	seq interfaces.Seq[ELEMENT],
+) interfaces.Seq[string] {
+	return func(yield func(string) bool) {
+		for element := range seq {
+			if !yield(element.String()) {
+				return
+			}
 		}
 	}
 }

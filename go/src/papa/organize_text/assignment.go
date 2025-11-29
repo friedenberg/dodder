@@ -258,7 +258,7 @@ func (assignment *Assignment) AllTags(tags ids.TagSetMutable) (err error) {
 }
 
 func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
-	tags = ids.MakeTagSet()
+	tags = ids.MakeTagSetFromSlice()
 
 	if assignment.Transacted.GetMetadata().GetTags().Len() != 1 || assignment.Parent == nil {
 		tags = ids.CloneTagSet(assignment.Transacted.GetMetadata().GetTags())
@@ -296,7 +296,7 @@ func (assignment *Assignment) expandedTags() (tags ids.TagSet, err error) {
 			}
 		}
 
-		tags = ids.MakeTagSet(tag)
+		tags = ids.MakeTagSetFromSlice(tag)
 	}
 
 	return tags, err

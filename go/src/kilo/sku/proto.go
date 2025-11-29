@@ -18,7 +18,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 
 	if defaults != nil {
 		tipe = defaults.GetDefaultType()
-		tags = ids.MakeTagSet(defaults.GetDefaultTags()...)
+		tags = ids.MakeTagSetFromSlice(defaults.GetDefaultTags()...)
 	}
 
 	proto.Metadata.GetTypeMutable().ResetWith(tipe)

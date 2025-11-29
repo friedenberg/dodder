@@ -12,18 +12,16 @@ func init() {
 }
 
 type (
-	TypeSet        = interfaces.SetPtrLike[Type, *Type]
+	TypeSet        = interfaces.Set[Type]
 	TypeMutableSet = interfaces.MutableSetPtrLike[Type, *Type]
 )
 
 func MakeTypSet(es ...Type) (s TypeSet) {
-	return TypeSet(
-		collections_ptr.MakeValueSetValue[Type, *Type](nil, es...),
-	)
+	return TypeSet(collections_ptr.MakeValueSetValue(nil, es...))
 }
 
 func MakeTypSetStrings(vs ...string) (s TypeSet, err error) {
-	return collections_ptr.MakeValueSetString[Type, *Type](nil, vs...)
+	return collections_ptr.MakeValueSetString[Type](nil, vs...)
 }
 
 func MakeMutableTypeSet(hs ...Type) TypeMutableSet {
@@ -31,10 +29,5 @@ func MakeMutableTypeSet(hs ...Type) TypeMutableSet {
 }
 
 func MakeTypMutableSet(hs ...Type) TypeMutableSet {
-	return TypeMutableSet(
-		collections_ptr.MakeMutableValueSetValue[Type, *Type](
-			nil,
-			hs...,
-		),
-	)
+	return TypeMutableSet(collections_ptr.MakeMutableValueSetValue(nil, hs...))
 }

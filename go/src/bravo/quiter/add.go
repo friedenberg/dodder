@@ -42,7 +42,7 @@ func AddOrReplaceIfGreater[T interface {
 	interfaces.ValueLike
 	interfaces.Lessable[T]
 }](
-	c interfaces.MutableSetLike[T],
+	c interfaces.SetMutable[T],
 	b T,
 ) (shouldAdd bool, err error) {
 	a, ok := c.Get(c.Key(b))

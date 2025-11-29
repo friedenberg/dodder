@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	objSet = interfaces.MutableSetLike[*obj]
+	objSet = interfaces.SetMutable[*obj]
 )
 
 var objKeyer interfaces.StringKeyer[*obj]
@@ -58,7 +58,7 @@ func (a *obj) String() string {
 }
 
 func sortObjSet(
-	s interfaces.MutableSetLike[*obj],
+	s interfaces.SetMutable[*obj],
 ) (out Objects) {
 	out = quiter.CollectSlice(s)
 	out.Sort()

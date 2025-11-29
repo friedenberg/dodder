@@ -122,27 +122,3 @@ func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 	s.E[s.K.GetKeyPtr(v)] = v
 	return err
 }
-
-func (a Set[T, TPtr]) CloneSetLike() interfaces.Set[T] {
-	return a
-}
-
-func (a Set[T, TPtr]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
-	c := MakeMutableSet[T, TPtr](a.K)
-	for e := range a.All() {
-		c.Add(e)
-	}
-	return c
-}
-
-func (a Set[T, TPtr]) CloneSetPtrLike() interfaces.SetPtrLike[T, TPtr] {
-	return a
-}
-
-func (a Set[T, TPtr]) CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr] {
-	c := MakeMutableSet[T, TPtr](a.K)
-	for e := range a.All() {
-		c.Add(e)
-	}
-	return c
-}

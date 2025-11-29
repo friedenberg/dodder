@@ -11,7 +11,7 @@ func init() {
 
 type (
 	ZettelIdSet        = interfaces.Set[ZettelId]
-	ZettelIdMutableSet = interfaces.MutableSetLike[ZettelId]
+	ZettelIdMutableSet = interfaces.SetMutable[ZettelId]
 )
 
 func MakeZettelIdMutableSet(hs ...ZettelId) ZettelIdMutableSet {

@@ -64,7 +64,7 @@ func MakeFlags() Flags {
 
 func MakeFlagsWithMetadata(m Metadata) Flags {
 	if m.TagSet == nil {
-		m.TagSet = ids.MakeTagSet()
+		m.TagSet = ids.MakeTagSetFromSlice()
 	}
 
 	return Flags{
@@ -115,29 +115,29 @@ func (o *Flags) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	)
 }
 
-func (o *Flags) GetOptionsWithMetadata(
+func (flags *Flags) GetOptionsWithMetadata(
 	printOptions options_print.Options,
-	skuFmt *box_format.BoxCheckedOut,
+	boxFormat *box_format.BoxCheckedOut,
 	abbr ids.Abbr,
 	objectFactory sku.ObjectFactory,
-	m Metadata,
+	metadata Metadata,
 ) Options {
-	o.once.Do(
+	flags.once.Do(
 		func() {
-			o.Options.ExtraTags = o.ExtraTags.GetSetPtrLike()
+			flags.Options.ExtraTags = ids.CloneTagSet(flags.ExtraTags)
 		},
 	)
 
-	o.fmtBox = skuFmt
+	flags.fmtBox = boxFormat
 
 	objectFactory.SetDefaultsIfNecessary()
 
-	o.ObjectFactory = objectFactory
-	o.PrintOptions = printOptions
-	o.Abbr = abbr
-	o.Metadata = m
+	flags.ObjectFactory = objectFactory
+	flags.PrintOptions = printOptions
+	flags.Abbr = abbr
+	flags.Metadata = metadata
 
-	return o.Options
+	return flags.Options
 }
 
 func (o *Flags) GetOptions(
@@ -177,7 +177,7 @@ func (o Options) Make() (ot *Text, err error) {
 	c.IsRoot = true
 
 	if c.TagSet == nil {
-		c.TagSet = ids.MakeTagSet()
+		c.TagSet = ids.MakeTagSetFromSlice()
 	}
 
 	var objects Objects

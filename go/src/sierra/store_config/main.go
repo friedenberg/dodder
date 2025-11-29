@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -233,7 +234,7 @@ func (store *store) AddTransacted(
 		return err
 	}
 
-	if quiter.SetEquals(daughter.GetMetadata().GetTags(), mother.GetMetadata().GetTags()) {
+	if quiter_set.Equals(daughter.GetMetadata().GetTags(), mother.GetMetadata().GetTags()) {
 		return err
 	}
 

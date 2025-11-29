@@ -11,7 +11,7 @@ func init() {
 
 type (
 	Set        = interfaces.Set[*FD]
-	MutableSet = interfaces.MutableSetLike[*FD]
+	MutableSet = interfaces.SetMutable[*FD]
 )
 
 func MakeSet(ts ...*FD) Set {

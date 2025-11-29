@@ -45,6 +45,7 @@ const (
 	repo
 )
 
+// TODO convert to seq
 func All() (out collections_slice.Slice[Genre]) {
 	out = make([]Genre, 0, maxGenre-1)
 

@@ -75,7 +75,7 @@ func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
 		}
 	}
 
-	output = MakeTagSet(filteredTags...)
+	output = MakeTagSetFromSlice(filteredTags...)
 
 	return output
 }

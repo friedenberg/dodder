@@ -23,7 +23,7 @@ type TagSetGetter interface {
 func NewMetadata(repoId ids.RepoId) Metadata {
 	return Metadata{
 		RepoId:           repoId,
-		TagSet:           ids.MakeTagSet(),
+		TagSet:           ids.MakeTagSetFromSlice(),
 		OptionCommentSet: MakeOptionCommentSet(nil),
 	}
 }
@@ -34,7 +34,7 @@ func NewMetadataWithOptionCommentLookup(
 ) Metadata {
 	return Metadata{
 		RepoId:           repoId,
-		TagSet:           ids.MakeTagSet(),
+		TagSet:           ids.MakeTagSetFromSlice(),
 		OptionCommentSet: MakeOptionCommentSet(elements),
 	}
 }

@@ -33,37 +33,27 @@ func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
 }
 
 func Strings[ELEMENT interfaces.Stringer](
-	collections ...interfaces.Collection[ELEMENT],
-) (out []string) {
-	l := 0
+	collections interfaces.Seq[interfaces.Collection[ELEMENT]],
+) interfaces.Seq[string] {
+	return func(yield func(string) bool) {
+		for collection := range collections {
+			if collection == nil {
+				continue
+			}
 
-	for _, c := range collections {
-		if c == nil {
-			continue
-		}
-
-		l += c.Len()
-	}
-
-	out = make([]string, 0, l)
-
-	for _, c := range collections {
-		if c == nil {
-			continue
-		}
-
-		for e := range c.All() {
-			out = append(out, e.String())
+			for element := range collection.All() {
+				if !yield(element.String()) {
+					return
+				}
+			}
 		}
 	}
-
-	return out
 }
 
 func SortedStrings[ELEMENT interfaces.Stringer](
 	collections ...interfaces.Collection[ELEMENT],
 ) (out []string) {
-	out = Strings(collections...)
+	out = slices.Collect(Strings(slices.Values(collections)))
 
 	sort.Strings(out)
 
