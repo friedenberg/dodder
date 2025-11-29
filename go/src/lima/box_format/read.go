@@ -215,7 +215,7 @@ LOOP_AFTER_OBJECT_ID:
 		case seq.MatchAll(doddish.TokenMatcherTypeLock...):
 			typeLock := object.GetMetadataMutable().GetTypeLockMutable()
 
-			if err = typeLock.Key.Set(
+			if err = typeLock.GetKeyMutable().Set(
 				seq[0:2].String(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -223,7 +223,7 @@ LOOP_AFTER_OBJECT_ID:
 			}
 
 			if err = markl.SetMarklIdWithFormatBlech32(
-				&typeLock.Value,
+				typeLock.GetValueMutable(),
 				"",
 				seq[2:].String(),
 			); err != nil {

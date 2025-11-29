@@ -18,10 +18,29 @@ type Lock[
 	Value Id
 }
 
+func MakeLock[
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
+]() Lock[KEY, KEY_PTR] {
+	return Lock[KEY, KEY_PTR]{}
+}
+
 var _ interfaces.Resetable = &Lock[values.String, *values.String]{}
+
+func (tuple Lock[KEY, KEY_PTR]) GetKey() KEY {
+	return tuple.Key
+}
 
 func (tuple *Lock[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
 	return KEY_PTR(&tuple.Key)
+}
+
+func (tuple Lock[KEY, KEY_PTR]) GetValue() interfaces.MarklId {
+	return tuple.Value
+}
+
+func (tuple *Lock[KEY, KEY_PTR]) GetValueMutable() interfaces.MutableMarklId {
+	return &tuple.Value
 }
 
 func (tuple *Lock[KEY, KEY_PTR]) Reset() {
@@ -91,21 +110,35 @@ func (tuple *Lock[KEY, KEY_PTR]) String() string {
 	}
 }
 
-func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshaler(
+func GetLockMarshaler[
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
+](
+	lock interfaces.LockMutable[KEY, KEY_PTR],
 	requireValue bool,
 ) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
 	return KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]{
 		requireValue: requireValue,
-		tuple:        tuple,
+		tuple:        lock,
 	}
 }
 
-func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshalerValueNotRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
-	return tuple.GetBinaryMarshaler(false)
+func GetLockMarshalerValueNotRequired[
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
+](
+	lock interfaces.LockMutable[KEY, KEY_PTR],
+) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+	return GetLockMarshaler(lock, false)
 }
 
-func (tuple *Lock[KEY, KEY_PTR]) GetBinaryMarshalerValueRequired() KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
-	return tuple.GetBinaryMarshaler(true)
+func GetLockMarshalerValueRequired[
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
+](
+	lock interfaces.LockMutable[KEY, KEY_PTR],
+) KeyValueTupleBinaryMarshaler[KEY, KEY_PTR] {
+	return GetLockMarshaler(lock, true)
 }
 
 type KeyValueTupleBinaryMarshaler[
@@ -113,7 +146,7 @@ type KeyValueTupleBinaryMarshaler[
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool
-	tuple        *Lock[KEY, KEY_PTR]
+	tuple        interfaces.LockMutable[KEY, KEY_PTR]
 }
 
 func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) MarshalBinary() (data []byte, err error) {
@@ -123,23 +156,23 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) MarshalBinary() (dat
 func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) AppendBinary(
 	bites []byte,
 ) ([]byte, error) {
-	bites = fmt.Append(bites, marshaler.tuple.Key.String())
+	bites = fmt.Append(bites, marshaler.tuple.GetKey().String())
 
-	if marshaler.tuple.Value.IsEmpty() {
+	if marshaler.tuple.GetValue().IsEmpty() {
 		var err error
 
 		if marshaler.requireValue {
-			err = errors.Errorf("empty type signature for %q", marshaler.tuple.Key)
+			err = errors.Errorf("empty type signature for %q", marshaler.tuple.GetKey())
 		}
 
 		return bites, err
 	}
 
 	bites = append(bites, '\x00')
-	formatId := marshaler.tuple.Value.GetMarklFormat().GetMarklFormatId()
+	formatId := marshaler.tuple.GetValue().GetMarklFormat().GetMarklFormatId()
 	bites = fmt.Append(bites, formatId)
 	bites = append(bites, '\x00')
-	bites = append(bites, marshaler.tuple.Value.GetBytes()...)
+	bites = append(bites, marshaler.tuple.GetValue().GetBytes()...)
 
 	return bites, nil
 }
@@ -182,19 +215,29 @@ func (marshaler KeyValueTupleBinaryMarshaler[KEY, KEY_PTR]) UnmarshalBinary(
 			return err
 		}
 
-		id := &marshaler.tuple.Value
+		id := marshaler.tuple.GetValueMutable()
 		id.Reset()
 
-		if err = id.setFormatId(string(format)); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if err = id.setData(valueBytes); err != nil {
+		if err = id.SetMarklId(string(format), valueBytes); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
 	return err
+}
+
+func LockEquals[
+	KEY interfaces.Value[KEY],
+	KEY_PTR interfaces.ValuePtr[KEY],
+](left, right interfaces.Lock[KEY, KEY_PTR]) bool {
+	if !left.GetKey().Equals(right.GetKey()) {
+		return false
+	}
+
+	if !Equals(left.GetValue(), right.GetValue()) {
+		return false
+	}
+
+	return true
 }

@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 )
 
@@ -77,7 +76,7 @@ func (builder *Builder) addMarklId(id interfaces.MarklId) {
 
 func (builder *Builder) addMarklIdLockWithColorType(
 	key string,
-	value markl.Id,
+	value interfaces.MarklId,
 	colorType string_format_writer.ColorType,
 ) {
 	builder.addMarklIdWithColorType(value, key, colorType)
@@ -148,12 +147,12 @@ func (builder *Builder) AddTypeAndLock(
 ) {
 	typeLock := metadata.GetTypeLock()
 
-	if typeLock.Value.IsEmpty() {
+	if typeLock.GetValue().IsEmpty() {
 		builder.AddType(metadata)
 	} else {
 		builder.addMarklIdLockWithColorType(
-			typeLock.Key.String(),
-			typeLock.Value,
+			typeLock.GetKey().String(),
+			typeLock.GetValue(),
 			string_format_writer.ColorTypeType,
 		)
 	}

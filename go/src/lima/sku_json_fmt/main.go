@@ -72,7 +72,7 @@ func (json *Transacted) FromObjectIdStringAndMetadata(
 	json.Type = metadata.GetType().String()
 
 	json.Lock = Lock{
-		Type: metadata.GetTypeLock().Value.String(),
+		Type: metadata.GetTypeLock().GetValue().String(),
 	}
 
 	// TODO add support for "preview"
@@ -170,7 +170,7 @@ func (json *Transacted) ToTransacted(
 	}
 
 	if json.Lock.Type != "" {
-		if err = metadata.GetTypeLockMutable().Value.Set(
+		if err = metadata.GetTypeLockMutable().GetValueMutable().Set(
 			json.Lock.Type,
 		); err != nil {
 			err = errors.Wrap(err)

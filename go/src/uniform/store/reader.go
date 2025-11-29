@@ -35,15 +35,15 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 	object *sku.Transacted,
 ) (typeObject *sku.Transacted, err error) {
 	typeLock := object.GetMetadataMutable().GetTypeLockMutable()
-	typeMarklId := typeLock.Value
+	typeMarklId := typeLock.GetValue()
 
-	if ids.IsBuiltin(typeLock.Key) {
-		err = collections.MakeErrNotFound(typeLock.Key)
+	if ids.IsBuiltin(typeLock.GetKey()) {
+		err = collections.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 
 	if !typeMarklId.IsNull() {
-		return store.ReadTypeObject(*typeLock)
+		return store.ReadTypeObject(typeLock)
 	}
 
 	if typeObject, err = store.ReadOneObjectId(object.GetType()); err != nil {
@@ -52,7 +52,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 	}
 
 	if typeObject != nil {
-		typeLock.Value.ResetWithMarklId(typeObject.GetMetadata().GetObjectSig())
+		typeLock.GetValueMutable().ResetWithMarklId(typeObject.GetMetadata().GetObjectSig())
 	}
 
 	return typeObject, err
@@ -61,25 +61,25 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 func (store *Store) ReadTypeObject(
 	typeLock object_metadata.TypeLock,
 ) (typeObject *sku.Transacted, err error) {
-	if ids.IsBuiltin(typeLock.Key) {
-		err = collections.MakeErrNotFound(typeLock.Key)
+	if ids.IsBuiltin(typeLock.GetKey()) {
+		err = collections.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 
-	if typeLock.Value.IsNull() {
-		panic(fmt.Sprintf("empty type lock for type: %q", typeLock.Key))
+	if typeLock.GetValue().IsNull() {
+		panic(fmt.Sprintf("empty type lock for type: %q", typeLock.GetKey()))
 	}
 
 	typeObject = sku.GetTransactedPool().Get()
 
 	if !store.streamIndex.ReadOneMarklId(
-		typeLock.Value,
+		typeLock.GetValue(),
 		typeObject,
 	) {
 		sku.GetTransactedPool().Put(typeObject)
 		typeObject = nil
 
-		err = collections.MakeErrNotFound(typeLock.Key)
+		err = collections.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 

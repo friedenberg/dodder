@@ -19,7 +19,7 @@ func (local *Repo) GetBlobFormatter(
 	formatId string,
 	utiGroup string,
 ) (blobFormatter script_config.RemoteScript, err error) {
-	if typeLock.Key.IsEmpty() {
+	if typeLock.GetKey().IsEmpty() {
 		err = errors.ErrorWithStackf("empty type")
 		return blobFormatter, err
 	}

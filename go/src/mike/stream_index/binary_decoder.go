@@ -336,7 +336,11 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Type:
-		if err = metadata.GetTypeLockMutable().GetBinaryMarshalerValueRequired().UnmarshalBinary(
+		marshaler := markl.GetLockMarshalerValueRequired(
+			metadata.GetTypeLockMutable(),
+		)
+
+		if err = marshaler.UnmarshalBinary(
 			decoder.Content.Bytes(),
 		); err != nil {
 			err = errors.Wrap(err)

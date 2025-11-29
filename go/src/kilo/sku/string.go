@@ -151,7 +151,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 		sb.WriteString(" ")
 		sb.WriteString(ids.FormattedString(metadata.GetType()))
 		sb.WriteString("@")
-		sb.WriteString(metadata.GetTypeLock().Value.String())
+		sb.WriteString(metadata.GetTypeLock().GetValue().String())
 	}
 
 	es := metadata.GetTags()

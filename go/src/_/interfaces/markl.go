@@ -90,4 +90,24 @@ type (
 	}
 
 	DigestWriteMap map[string]MutableMarklId
+
+	Lock[
+		KEY Value[KEY],
+		KEY_PTR ValuePtr[KEY],
+	] interface {
+		GetKey() KEY
+		GetValue() MarklId
+		IsEmpty() bool
+		Stringer
+	}
+
+	LockMutable[
+		KEY Value[KEY],
+		KEY_PTR ValuePtr[KEY],
+	] interface {
+		Lock[KEY, KEY_PTR]
+		GetKeyMutable() KEY_PTR
+		GetValueMutable() MutableMarklId
+		Setter
+	}
 )

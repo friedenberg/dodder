@@ -38,7 +38,7 @@ func (equaler equaler) Equals(a, b IMetadata) bool {
 			return false
 		}
 
-		if !a.GetTypeLock().Equals(b.GetTypeLock()) {
+		if !markl.LockEquals(a.GetTypeLock(), b.GetTypeLock()) {
 			if debug {
 				ui.Debug().Print(&a.Type, "->", &b.Type)
 			}

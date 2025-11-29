@@ -132,16 +132,16 @@ func (factory formatterComponents) writeTypeAndSigIfNecessary(
 	metadata := formatterContext.GetMetadata()
 	typeTuple := metadata.GetTypeLock()
 
-	if typeTuple.Key.IsEmpty() {
+	if typeTuple.GetKey().IsEmpty() {
 		return n, err
 	}
 
-	if typeTuple.Value.IsEmpty() {
+	if typeTuple.GetValue().IsEmpty() {
 		return ohio.WriteLine(
 			writer,
 			fmt.Sprintf(
 				"! %s",
-				typeTuple.Key.StringSansOp(),
+				typeTuple.GetKey().StringSansOp(),
 			),
 		)
 	}
@@ -156,12 +156,12 @@ func (factory formatterComponents) writeTypeAndSig(
 	metadata := formatterContext.GetMetadata()
 	typeTuple := metadata.GetTypeLock()
 
-	if typeTuple.Key.IsEmpty() {
+	if typeTuple.GetKey().IsEmpty() {
 		return n, err
 	}
 
-	if typeTuple.Value.IsEmpty() {
-		err = errors.Errorf("empty type signature for type: %q", typeTuple.Key)
+	if typeTuple.GetValue().IsEmpty() {
+		err = errors.Errorf("empty type signature for type: %q", typeTuple.GetKey())
 		return n, err
 	}
 
@@ -169,8 +169,8 @@ func (factory formatterComponents) writeTypeAndSig(
 		writer,
 		fmt.Sprintf(
 			"! %s@%s",
-			typeTuple.Key.StringSansOp(),
-			typeTuple.Value,
+			typeTuple.GetKey().StringSansOp(),
+			typeTuple.GetValue(),
 		),
 	)
 }

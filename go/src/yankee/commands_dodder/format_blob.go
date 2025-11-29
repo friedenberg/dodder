@@ -9,7 +9,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -156,14 +157,14 @@ func (cmd *FormatBlob) Run(dep command.Request) {
 	}
 }
 
-func (c *FormatBlob) FormatFromStdin(
+func (cmd *FormatBlob) FormatFromStdin(
 	u *local_working_copy.Repo,
 	args ...string,
 ) (err error) {
 	formatId := "text"
 
 	var blobFormatter script_config.RemoteScript
-	var typeLock object_metadata.TypeLock
+	typeLock := markl.MakeLock[ids.Type, *ids.Type]()
 
 	switch len(args) {
 	case 1:
@@ -188,9 +189,9 @@ func (c *FormatBlob) FormatFromStdin(
 	}
 
 	if blobFormatter, err = u.GetBlobFormatter(
-		typeLock,
+		&typeLock,
 		formatId,
-		c.UTIGroup,
+		cmd.UTIGroup,
 	); err != nil {
 		u.Cancel(err)
 	}

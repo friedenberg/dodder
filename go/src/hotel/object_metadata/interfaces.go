@@ -4,13 +4,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type (
 	Metadata = metadata
 
-	TypeLock = markl.Lock[ids.Type, *ids.Type]
+	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
+	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
 
 	TagSetMutable interface {
 		ids.TagSet
@@ -62,7 +62,7 @@ type (
 		GetRepoPubKeyMutable() interfaces.MutableMarklId
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
-		GetTypeLockMutable() *TypeLock
+		GetTypeLockMutable() TypeLockMutable
 	}
 
 	Getter interface {

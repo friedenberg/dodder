@@ -20,7 +20,7 @@ type metadata struct {
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
 	Tags ids.TagSetMutable // public for gob, but should be private
-	Type TypeLock
+	Type markl.Lock[ids.Type, *ids.Type]
 
 	DigBlob   markl.Id
 	digSelf   markl.Id
@@ -72,14 +72,6 @@ func (metadata *metadata) GetTai() ids.Tai {
 
 func (metadata *metadata) GetTaiMutable() *ids.Tai {
 	return &metadata.Tai
-}
-
-func (metadata *metadata) GetLockfile() Lockfile {
-	return metadata.lockfile
-}
-
-func (metadata *metadata) GetLockfileMutable() LockfileMutable {
-	return &metadata.lockfile
 }
 
 func (metadata *metadata) UserInputIsEmpty() bool {
@@ -255,10 +247,10 @@ func (metadata *metadata) GetTypeMutable() *ids.Type {
 }
 
 func (metadata *metadata) GetTypeLock() TypeLock {
-	return metadata.Type
+	return &metadata.Type
 }
 
-func (metadata *metadata) GetTypeLockMutable() *TypeLock {
+func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 	return &metadata.Type
 }
 

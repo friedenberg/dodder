@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -150,7 +150,7 @@ func (cmd *FormatObject) FormatFromStdin(
 	formatId := "text"
 
 	var blobFormatter script_config.RemoteScript
-	var typeLock object_metadata.TypeLock
+	typeLock := markl.MakeLock[ids.Type, *ids.Type]()
 
 	switch len(args) {
 	case 1:
@@ -175,7 +175,7 @@ func (cmd *FormatObject) FormatFromStdin(
 	}
 
 	if blobFormatter, err = repo.GetBlobFormatter(
-		typeLock,
+		&typeLock,
 		formatId,
 		cmd.UTIGroup,
 	); err != nil {

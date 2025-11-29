@@ -58,7 +58,7 @@ func (cmd Update) Run(req command.Request) {
 				return err
 			}
 
-			object.GetMetadataMutable().GetTypeLockMutable().Value.ResetWithMarklId(
+			object.GetMetadataMutable().GetTypeLockMutable().GetValueMutable().ResetWithMarklId(
 				typeObject.GetMetadata().GetObjectSig(),
 			)
 
