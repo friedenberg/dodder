@@ -37,7 +37,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 
 	if ids.IsBuiltin(typeLock.Key) {
 		err = collections.MakeErrNotFound(typeLock.Key)
-		return
+		return typeObject, err
 	}
 
 	if !typeMarklId.IsNull() {
@@ -46,7 +46,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 
 	if typeObject, err = store.ReadOneObjectId(object.GetType()); err != nil {
 		err = errors.Wrap(err)
-		return
+		return typeObject, err
 	}
 
 	if typeObject != nil {
@@ -69,12 +69,12 @@ func (store *Store) ReadObjectType(
 
 	if ids.IsBuiltin(typeLock.Key) {
 		err = collections.MakeErrNotFound(typeLock.Key)
-		return
+		return typeObject, err
 	}
 
 	if err = markl.AssertIdIsNotNull(typeMarklId); err != nil {
 		err = errors.Errorf("no type lock for type: %q", typeLock.Key)
-		return
+		return typeObject, err
 	}
 
 	if !store.streamIndex.ReadOneMarklId(
