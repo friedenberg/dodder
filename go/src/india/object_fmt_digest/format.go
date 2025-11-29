@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings_german"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
@@ -58,7 +57,7 @@ func (format format) writeMetadataKeyStringTo(
 	var n1 int
 
 	switch key {
-	case key_strings_german.Akte, key_strings.Blob:
+	case key_strings.Blob:
 		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
@@ -72,7 +71,7 @@ func (format format) writeMetadataKeyStringTo(
 			return n, err
 		}
 
-	case key_strings_german.Bezeichnung, key_strings.Description:
+	case key_strings.Description:
 		lines := strings.Split(metadata.GetDescription().String(), "\n")
 
 		for _, line := range lines {
@@ -93,7 +92,7 @@ func (format format) writeMetadataKeyStringTo(
 			}
 		}
 
-	case key_strings_german.Etikett, key_strings.Tag:
+	case key_strings.Tag:
 		tags := metadata.GetTags()
 
 		if tags == nil {
@@ -153,45 +152,6 @@ func (format format) writeMetadataKeyStringTo(
 			return n, err
 		}
 
-	case key_strings_german.Kennung:
-		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			writer,
-			key_strings_german.Gattung.String(),
-			context.GetObjectId().GetGenre().GetGenreString(),
-		)
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return n, err
-		}
-
-		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			writer,
-			key_strings_german.Kennung.String(),
-			context.GetObjectId().String(),
-		)
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return n, err
-		}
-
-	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = format.writeMarklIdKeyIfNotNull(
-			writer,
-			key_strings_german.ShasMutterMetadateiKennungMutter,
-			metadata.GetMotherObjectSig(),
-		)
-
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return n, err
-		}
-
 	case key_strings.ZZRepoPub:
 		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
@@ -220,20 +180,6 @@ func (format format) writeMetadataKeyStringTo(
 			return n, err
 		}
 
-	case key_strings_german.ShasMutterMetadateiKennungMutter:
-		n1, err = format.writeMarklIdKeyIfNotNull(
-			writer,
-			key,
-			metadata.GetMotherObjectSig(),
-		)
-
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return n, err
-		}
-
 	case key_strings.Tai:
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
@@ -247,7 +193,7 @@ func (format format) writeMetadataKeyStringTo(
 			return n, err
 		}
 
-	case key_strings_german.Typ, key_strings.Type:
+	case key_strings.Type:
 		if !metadata.GetType().IsEmpty() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				writer,

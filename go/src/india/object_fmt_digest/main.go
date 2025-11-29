@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings_german"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 )
@@ -70,26 +69,17 @@ func registerFormat(purpose string, keys ...keyType) {
 	formatsMap[purpose] = format
 }
 
+// TODO register these formats with a hash of the code used to generate them to
+// make them immutable. Maybe implement as plugins.
 func init() {
 	// TODO replace with modern keys
 	registerFormat(
 		markl.PurposeV5MetadataDigestWithoutTai,
-		key_strings_german.Akte,
-		key_strings_german.Bezeichnung,
-		key_strings_german.Etikett,
-		key_strings_german.Typ,
+		key_strings.Blob,
+		key_strings.Description,
+		key_strings.Tag,
+		key_strings.Type,
 	)
-
-	// registerFormat(
-	// 	markl.FormatIdObjectDigestObjectId,
-	// 	key_strings.ObjectId,
-	// )
-
-	// registerFormat(
-	// 	markl.FormatIdObjectDigestObjectIdTai,
-	// 	key_strings.ObjectId,
-	// 	key_strings.Tai,
-	// )
 
 	registerFormat(
 		markl.PurposeObjectDigestV1,
