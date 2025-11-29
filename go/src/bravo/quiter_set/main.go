@@ -3,7 +3,7 @@ package quiter_set
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter_seq"
+	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
 )
 
 func Any[ELEMENT any](set interfaces.Set[ELEMENT]) (element ELEMENT) {

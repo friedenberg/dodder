@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter_seq"
+	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
 )
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
