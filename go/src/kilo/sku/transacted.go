@@ -28,9 +28,9 @@ type Transacted struct {
 var (
 	_ objects.Getter        = &Transacted{}
 	_ objects.GetterMutable = &Transacted{}
-	_ TransactedGetter              = &Transacted{}
-	_ ExternalLike                  = &Transacted{}
-	_ ExternalLikeGetter            = &Transacted{}
+	_ TransactedGetter      = &Transacted{}
+	_ ExternalLike          = &Transacted{}
+	_ ExternalLikeGetter    = &Transacted{}
 )
 
 func (transacted *Transacted) GetSkuExternal() *Transacted {
