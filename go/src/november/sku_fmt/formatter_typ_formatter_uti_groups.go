@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
 )
@@ -18,7 +18,7 @@ type TypeBlobStore interface {
 	) (common type_blobs.Blob, repool interfaces.FuncRepool, n int64, err error)
 }
 
-type FuncReadTypeObject func(object_metadata.TypeLock) (*sku.Transacted, error)
+type FuncReadTypeObject func(objects.TypeLock) (*sku.Transacted, error)
 
 type formatterTypFormatterUTIGroups struct {
 	funcReadTypeObject FuncReadTypeObject

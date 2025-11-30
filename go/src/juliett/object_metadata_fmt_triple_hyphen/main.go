@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type (
@@ -21,11 +21,11 @@ type (
 
 	FormatterContext struct {
 		FormatterOptions
-		object_metadata.PersistentFormatterContext
+		objects.PersistentFormatterContext
 	}
 
 	ParserContext interface {
-		object_metadata.PersistentParserContext
+		objects.PersistentParserContext
 		SetBlobDigest(interfaces.MarklId) error
 	}
 

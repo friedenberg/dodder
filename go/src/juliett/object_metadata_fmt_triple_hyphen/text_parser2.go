@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type textParser2 struct {
@@ -23,7 +23,7 @@ type textParser2 struct {
 
 func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	metadata := parser.GetMetadataMutable()
-	object_metadata.Resetter.Reset(metadata)
+	objects.Resetter.Reset(metadata)
 
 	delimReader := delim_reader.MakeDelimReader('\n', r)
 	defer delim_reader.PutDelimReader(delimReader)
@@ -85,7 +85,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (parser *textParser2) readType(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	typeString string,
 ) (err error) {
 	if typeString == "" {
@@ -103,7 +103,7 @@ func (parser *textParser2) readType(
 }
 
 func (parser *textParser2) readBlobDigest(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	metadataLine string,
 ) (err error) {
 	if metadataLine == "" {
@@ -157,7 +157,7 @@ func (parser *textParser2) readBlobDigest(
 }
 
 func (parser *textParser2) setBlobDigest(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(

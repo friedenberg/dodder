@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -481,7 +481,7 @@ func (store *Store) WriteFSItemToExternal(
 	fdees := quiter.SortedValues(item.FDs.All())
 
 	for _, fdee := range fdees {
-		field := object_metadata.Field{
+		field := objects.Field{
 			Value:     fdee.GetPath(),
 			ColorType: string_format_writer.ColorTypeId,
 		}

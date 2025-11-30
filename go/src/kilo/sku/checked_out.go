@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
 	internal := co.GetSku()
 	external := co.GetSkuExternal().GetSku()
 
-	return object_metadata.EqualerSansTai.Equals(
+	return objects.EqualerSansTai.Equals(
 		&external.Metadata,
 		&internal.Metadata,
 	)

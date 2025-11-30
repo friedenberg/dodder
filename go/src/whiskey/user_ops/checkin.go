@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/oscar/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/organize_text"
@@ -55,7 +55,7 @@ func (op Checkin) Run(
 			return err
 		}
 
-		object_metadata.Resetter.Reset(&op.Proto.Metadata)
+		objects.Resetter.Reset(&op.Proto.Metadata)
 	}
 
 	var processed sku.TransactedMutableSet

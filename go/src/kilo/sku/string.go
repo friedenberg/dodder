@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 func String(object *Transacted) (str string) {
@@ -182,7 +182,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 }
 
 func StringMetadataSansTaiMerkle2(
-	object object_metadata.MetadataMutable,
+	object objects.MetadataMutable,
 ) (str string) {
 	sb := &strings.Builder{}
 

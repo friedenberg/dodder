@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/key_strings"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type (
 	FormatterContext interface {
-		object_metadata.PersistentFormatterContext
+		objects.PersistentFormatterContext
 		GetObjectId() *ids.ObjectId
 	}
 )

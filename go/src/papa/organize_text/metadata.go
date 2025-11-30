@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -53,7 +53,7 @@ func (metadata *Metadata) GetTags() ids.TagSet {
 }
 
 func (metadata *Metadata) SetFromObjectMetadata(
-	otherMetadata object_metadata.MetadataMutable,
+	otherMetadata objects.MetadataMutable,
 	repoId ids.RepoId,
 ) (err error) {
 	metadata.TagSet = ids.CloneTagSet(otherMetadata.GetTags())
@@ -82,8 +82,8 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 	return err
 }
 
-func (metadata Metadata) AsMetadata() (m1 object_metadata.MetadataMutable) {
-	m1 = object_metadata.Make()
+func (metadata Metadata) AsMetadata() (m1 objects.MetadataMutable) {
+	m1 = objects.Make()
 	m1.GetTypeMutable().ResetWith(metadata.Type)
 	m1.SetTags(metadata.TagSet)
 	return m1

@@ -1,4 +1,4 @@
-package object_metadata
+package objects
 
 import (
 	"bytes"

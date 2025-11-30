@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 func AddBlobDigestIfNecessary(
@@ -46,7 +46,7 @@ func AddBlobDigestIfNecessary(
 
 func AddRepoPubKey(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	addMarklIdIfNotNull(
 		boxContents,
@@ -56,7 +56,7 @@ func AddRepoPubKey(
 
 func AddObjectSig(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),
@@ -65,7 +65,7 @@ func AddObjectSig(
 
 func AddMotherSigIfNecessary(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	addMarklIdIfNotNull(
 		boxContents,
@@ -75,7 +75,7 @@ func AddMotherSigIfNecessary(
 
 func AddReferencedObject(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	boxContents.Append(
 		makeMarklIdField(metadata.GetObjectSig()),

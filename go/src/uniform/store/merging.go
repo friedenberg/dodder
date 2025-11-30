@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -36,7 +36,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 	right := checkedOut.GetSkuExternal().GetSku()
 
 	// TODO switch to using mother
-	motherEqualsExternal := object_metadata.EqualerSansTai.Equals(
+	motherEqualsExternal := objects.EqualerSansTai.Equals(
 		right.GetMetadata(),
 		checkedOut.GetSku().GetMetadata(),
 	)

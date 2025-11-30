@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type Builder string_format_writer.Box
@@ -47,17 +47,17 @@ func (builder *Builder) AddBlobDigestIfNecessary(
 }
 
 func (builder *Builder) AddRepoPubKey(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetRepoPubKey())
 }
 
-func (builder *Builder) AddObjectSig(metadata object_metadata.MetadataMutable) {
+func (builder *Builder) AddObjectSig(metadata objects.MetadataMutable) {
 	builder.addMarklId(metadata.GetObjectSig())
 }
 
 func (builder *Builder) AddMotherSigIfNecessary(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetMotherObjectSig())
 }
@@ -126,7 +126,7 @@ func (builder *Builder) AddError(err error) {
 	}
 }
 
-func (builder *Builder) AddTai(metadata object_metadata.MetadataMutable) {
+func (builder *Builder) AddTai(metadata objects.MetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetTai().String(),
 		ColorType: string_format_writer.ColorTypeHash,
@@ -134,7 +134,7 @@ func (builder *Builder) AddTai(metadata object_metadata.MetadataMutable) {
 }
 
 func (builder *Builder) AddType(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetType().String(),
@@ -143,7 +143,7 @@ func (builder *Builder) AddType(
 }
 
 func (builder *Builder) AddTypeAndLock(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) {
 	typeLock := metadata.GetTypeLock()
 
@@ -158,7 +158,7 @@ func (builder *Builder) AddTypeAndLock(
 	}
 }
 
-func (builder *Builder) AddTags(metadata object_metadata.MetadataMutable) {
+func (builder *Builder) AddTags(metadata objects.MetadataMutable) {
 	tagCount := metadata.GetTags().Len()
 	builder.Contents.Grow(tagCount)
 
@@ -175,11 +175,11 @@ func (builder *Builder) AddTags(metadata object_metadata.MetadataMutable) {
 	})
 }
 
-func (builder *Builder) AddTagsAndLocks(metadata object_metadata.MetadataMutable) {
+func (builder *Builder) AddTagsAndLocks(metadata objects.MetadataMutable) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (builder *Builder) AddDescription(metadata object_metadata.MetadataMutable) {
+func (builder *Builder) AddDescription(metadata objects.MetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetDescription().StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,

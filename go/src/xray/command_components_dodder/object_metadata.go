@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type ObjectMetadata struct{}
 
 func (cmd ObjectMetadata) GetFlagValueMetadataTags(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
 	// TODO add support for tag_paths
 	fes := flags.MakeWithPolicy(
@@ -21,11 +21,11 @@ func (cmd ObjectMetadata) GetFlagValueMetadataTags(
 		func() string {
 			return metadata.GetIndex().GetTagPaths().String()
 		},
-		func(v string) (err error) {
-			vs := strings.Split(v, ",")
+		func(combinedTag string) (err error) {
+			tagStrings := strings.SplitSeq(combinedTag, ",")
 
-			for _, v := range vs {
-				if err = metadata.AddTagString(v); err != nil {
+			for tag := range tagStrings {
+				if err = metadata.AddTagString(tag); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
@@ -42,13 +42,13 @@ func (cmd ObjectMetadata) GetFlagValueMetadataTags(
 }
 
 func (cmd ObjectMetadata) GetFlagValueMetadataDescription(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
 	return metadata.GetDescriptionMutable()
 }
 
 func (cmd ObjectMetadata) GetFlagValueMetadataType(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
 	return metadata.GetTypeMutable()
 }

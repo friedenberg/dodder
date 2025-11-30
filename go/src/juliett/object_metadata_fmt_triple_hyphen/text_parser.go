@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type textParser struct {
@@ -23,7 +23,7 @@ func (parser textParser) ParseMetadata(
 	context ParserContext,
 ) (n int64, err error) {
 	metadata := context.GetMetadataMutable()
-	object_metadata.Resetter.Reset(metadata)
+	objects.Resetter.Reset(metadata)
 
 	var n1 int64
 

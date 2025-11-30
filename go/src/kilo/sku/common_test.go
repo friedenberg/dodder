@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
@@ -44,7 +44,7 @@ func readFormat(
 	t1 *ui.TestContext,
 	format object_metadata_fmt_triple_hyphen.Format,
 	contents string,
-) (metadata object_metadata.MetadataMutable) {
+) (metadata objects.MetadataMutable) {
 	var object Transacted
 
 	t := t1
@@ -134,7 +134,7 @@ func TestEqualitySelf(t1 *testing.T) {
 }
 
 func testEqualitySelf(t *ui.TestContext) {
-	text := object_metadata.MakeBuilder().
+	text := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("text").
 		WithTags(makeTagSet(t,
@@ -144,7 +144,7 @@ func testEqualitySelf(t *ui.TestContext) {
 		)).
 		Build()
 
-	if !object_metadata.Equaler.Equals(&text, &text) {
+	if !objects.Equaler.Equals(&text, &text) {
 		t.Fatalf("expected %v to equal itself", text)
 	}
 }
@@ -160,19 +160,19 @@ func testEqualityNotSelf(t *ui.TestContext) {
 		"tag3",
 	)
 
-	text := object_metadata.MakeBuilder().
+	text := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("text").
 		WithTags(tags).
 		Build()
 
-	text1 := object_metadata.MakeBuilder().
+	text1 := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("text").
 		WithTags(tags).
 		Build()
 
-	if !object_metadata.Equaler.Equals(&text, &text1) {
+	if !objects.Equaler.Equals(&text, &text1) {
 		t.Fatalf("expected %v to equal %v", text, text1)
 	}
 }
@@ -215,7 +215,7 @@ func testReadWithoutBlob(t *ui.TestContext) {
 `,
 	)
 
-	expected := object_metadata.MakeBuilder().
+	expected := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("md").
 		WithTags(makeTagSet(t,
@@ -225,7 +225,7 @@ func testReadWithoutBlob(t *ui.TestContext) {
 		)).
 		Build()
 
-	if !object_metadata.Equaler.Equals(actual, &expected) {
+	if !objects.Equaler.Equals(actual, &expected) {
 		t.Fatalf(
 			"zettel:\nexpected: %s\n  actual: %s",
 			StringMetadataSansTaiMerkle2(&expected),
@@ -259,7 +259,7 @@ func testReadWithoutBlobWithMultilineDescription(t *ui.TestContext) {
 `,
 	)
 
-	expected := object_metadata.MakeBuilder().
+	expected := objects.MakeBuilder().
 		WithDescription("the title continues").
 		WithType("md").
 		WithTags(makeTagSet(t,
@@ -269,7 +269,7 @@ func testReadWithoutBlobWithMultilineDescription(t *ui.TestContext) {
 		)).
 		Build()
 
-	if !object_metadata.Equaler.Equals(actual, &expected) {
+	if !objects.Equaler.Equals(actual, &expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", &expected, actual)
 	}
 
@@ -307,7 +307,7 @@ the body`,
 		"blake2b256-9j5cj9mjnk43k9rq4k2h3lezpl2sn3ura7cf8pa58cgfujw6nwgst7gtwz",
 	))
 
-	expected := object_metadata.MakeBuilder().
+	expected := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("md").
 		WithBlobDigest(expectedBlobDigest).
@@ -318,7 +318,7 @@ the body`,
 		)).
 		Build()
 
-	if !object_metadata.Equaler.Equals(actual, &expected) {
+	if !objects.Equaler.Equals(actual, &expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", &expected, actual)
 	}
 }
@@ -353,7 +353,7 @@ func (blobStore blobReaderFactory) BlobReader(
 
 func writeFormat(
 	t *ui.TestContext,
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	formatter object_metadata_fmt_triple_hyphen.Formatter,
 	includeBlob bool,
 	blobBody string,
@@ -394,7 +394,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 }
 
 func testWriteWithoutBlob(t *ui.TestContext) {
-	object := object_metadata.MakeBuilder().
+	object := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("md").
 		WithTags(makeTagSet(t,
@@ -444,7 +444,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 }
 
 func testWriteWithInlineBlob(t *ui.TestContext) {
-	object := object_metadata.MakeBuilder().
+	object := objects.MakeBuilder().
 		WithDescription("the title").
 		WithType("md").
 		WithTags(makeTagSet(t,

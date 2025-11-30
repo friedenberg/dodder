@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/oscar/queries"
@@ -198,7 +198,7 @@ func (cmd Clean) shouldClean(
 
 		errors.PanicIfError(err)
 
-		if object_metadata.EqualerSansTai.Equals(
+		if objects.EqualerSansTai.Equals(
 			co.GetSkuExternal().GetSku().GetMetadata(),
 			mother.GetMetadata(),
 		) {

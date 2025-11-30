@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/object_id_provider"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/india/file_lock"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -194,7 +194,7 @@ func (commitFacilitator commitFacilitator) commit(
 		if options.AddToInventoryList &&
 			mother != nil &&
 			ids.Equals(daughter.GetObjectId(), mother.GetObjectId()) &&
-			object_metadata.EqualerSansTai.Equals(daughter.GetMetadata(), mother.GetMetadata()) {
+			objects.EqualerSansTai.Equals(daughter.GetMetadata(), mother.GetMetadata()) {
 
 			sku.TransactedResetter.ResetWithExceptFields(daughter, mother)
 

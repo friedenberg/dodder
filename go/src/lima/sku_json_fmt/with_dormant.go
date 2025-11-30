@@ -3,7 +3,7 @@ package sku_json_fmt
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -15,7 +15,7 @@ type WithDormant struct {
 
 func (json *WithDormant) FromStringAndMetadata(
 	objectId string,
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if err = json.Transacted.FromObjectIdStringAndMetadata(

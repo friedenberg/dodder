@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -19,7 +19,7 @@ type Complete struct {
 }
 
 func (cmd Complete) GetFlagValueMetadataTags(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
 	return command.FlagValueCompleter{
 		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataTags(metadata),
@@ -61,7 +61,7 @@ func (cmd Complete) GetFlagValueStringTags(
 }
 
 func (cmd Complete) GetFlagValueMetadataType(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
 	return command.FlagValueCompleter{
 		FlagValue: cmd.ObjectMetadata.GetFlagValueMetadataType(metadata),

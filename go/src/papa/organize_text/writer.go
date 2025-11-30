@@ -8,14 +8,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 type writer struct {
 	sku.ObjectFactory
 	OmitLeadingEmptyLine bool
-	object_metadata.Metadata
+	objects.Metadata
 	*format.LineWriter
 	maxDepth int
 	options  Options

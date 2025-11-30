@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 var TransactedResetter transactedResetter
@@ -13,7 +13,7 @@ type transactedResetter struct{}
 
 func (transactedResetter) Reset(dst *Transacted) {
 	dst.ObjectId.Reset()
-	object_metadata.Resetter.Reset(&dst.Metadata)
+	objects.Resetter.Reset(&dst.Metadata)
 	dst.ExternalType.Reset()
 	dst.RepoId.Reset()
 	dst.State = external_state.Unknown
@@ -21,7 +21,7 @@ func (transactedResetter) Reset(dst *Transacted) {
 
 func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
 	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
-	object_metadata.Resetter.ResetWith(&dst.Metadata, &src.Metadata)
+	objects.Resetter.ResetWith(&dst.Metadata, &src.Metadata)
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
 	dst.State = src.State
@@ -30,7 +30,7 @@ func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
 
 func (transactedResetter) ResetWithExceptFields(dst *Transacted, src *Transacted) {
 	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
-	object_metadata.Resetter.ResetWithExceptFields(dst.GetMetadataMutable(), src.GetMetadata())
+	objects.Resetter.ResetWithExceptFields(dst.GetMetadataMutable(), src.GetMetadata())
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
 	dst.State = src.State

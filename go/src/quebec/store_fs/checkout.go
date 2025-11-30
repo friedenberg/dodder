@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -182,7 +182,7 @@ func (store *Store) shouldCheckOut(
 		return true
 	}
 
-	eq := object_metadata.EqualerSansTai.Equals(
+	eq := objects.EqualerSansTai.Equals(
 		checkedOut.GetSku().GetMetadata(),
 		checkedOut.GetSkuExternal().GetMetadata(),
 	)
@@ -203,7 +203,7 @@ func (store *Store) shouldCheckOut(
 		checkedOut.GetSku().GetObjectId(),
 		mother,
 	); err == nil {
-		if object_metadata.EqualerSansTai.Equals(
+		if objects.EqualerSansTai.Equals(
 			mother.GetMetadata(),
 			checkedOut.GetSkuExternal().GetMetadata(),
 		) {

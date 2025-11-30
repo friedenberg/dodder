@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -61,7 +61,7 @@ func (store *Store) HydrateExternalFromItem(
 		}
 
 	case mode.IsBlobRecognized():
-		object_metadata.Resetter.ResetWith(
+		objects.Resetter.ResetWith(
 			external.GetMetadataMutable(),
 			internal.GetMetadataMutable(),
 		)
@@ -101,7 +101,7 @@ func (store *Store) readOneExternalObject(
 	item *sku.FSItem,
 ) (err error) {
 	if internal != nil {
-		object_metadata.Resetter.ResetWith(
+		objects.Resetter.ResetWith(
 			external.GetMetadataMutable(),
 			internal.GetMetadataMutable(),
 		)
@@ -129,7 +129,7 @@ func (store *Store) readOneExternalBlob(
 	internal *sku.Transacted,
 	item *sku.FSItem,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(
+	objects.Resetter.ResetWith(
 		external.GetMetadataMutable(),
 		internal.GetMetadataMutable(),
 	)

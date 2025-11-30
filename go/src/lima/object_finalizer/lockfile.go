@@ -2,12 +2,12 @@ package object_finalizer
 
 import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 func (finalizer finalizer) writeTypeLockIfNecessary(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	tipe ids.Type,
 	funcs ...sku.FuncReadOne,
 ) (err error) {
@@ -43,7 +43,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 }
 
 func (finalizer finalizer) writeTagLockIfNecessary(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	tag ids.Tag,
 	funcs ...sku.FuncReadOne,
 ) (err error) {

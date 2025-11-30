@@ -2,7 +2,7 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/sierra/repo"
 )
@@ -62,7 +62,7 @@ func (parentNegotiator ParentNegotiatorFirstAncestor) FindBestCommonAncestor(
 	ancestorLocal := ancestorsLocal[len(ancestorsLocal)-1]
 	ancestorRemote := ancestorsRemote[len(ancestorsRemote)-1]
 
-	if object_metadata.EqualerSansTai.Equals(
+	if objects.EqualerSansTai.Equals(
 		ancestorLocal.GetMetadata(),
 		ancestorRemote.GetMetadata(),
 	) {

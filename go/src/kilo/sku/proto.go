@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/hotel/repo_configs"
 )
 
@@ -28,7 +28,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 }
 
 type Proto struct {
-	Metadata object_metadata.MetadataStruct
+	Metadata objects.MetadataStruct
 }
 
 var _ interfaces.CommandComponentWriter = (*Proto)(nil)
@@ -37,7 +37,7 @@ func (proto *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	proto.Metadata.SetFlagDefinitions(f)
 }
 
-func (proto Proto) Equals(metadata object_metadata.MetadataMutable) (ok bool) {
+func (proto Proto) Equals(metadata objects.MetadataMutable) (ok bool) {
 	var okType, okMetadata bool
 
 	if !ids.IsEmpty(proto.Metadata.GetType()) &&
@@ -45,7 +45,7 @@ func (proto Proto) Equals(metadata object_metadata.MetadataMutable) (ok bool) {
 		okType = true
 	}
 
-	if object_metadata.Equaler.Equals(&proto.Metadata, metadata) {
+	if objects.Equaler.Equals(&proto.Metadata, metadata) {
 		okMetadata = true
 	}
 
@@ -65,7 +65,7 @@ func (proto Proto) Make() (object *Transacted) {
 }
 
 func (proto Proto) ApplyType(
-	metadataLike object_metadata.GetterMutable,
+	metadataLike objects.GetterMutable,
 	genreGetter interfaces.GenreGetter,
 ) (ok bool) {
 	metadata := metadataLike.GetMetadataMutable()
@@ -87,7 +87,7 @@ func (proto Proto) ApplyType(
 }
 
 func (proto Proto) Apply(
-	metadataLike object_metadata.GetterMutable,
+	metadataLike objects.GetterMutable,
 	genreGetter interfaces.GenreGetter,
 ) (changed bool) {
 	metadata := metadataLike.GetMetadataMutable()
@@ -114,7 +114,7 @@ func (proto Proto) Apply(
 }
 
 func (proto Proto) ApplyWithBlobFD(
-	metadataGetter object_metadata.GetterMutable,
+	metadataGetter objects.GetterMutable,
 	blobFD *fd.FD,
 ) (err error) {
 	metadataMutable := metadataGetter.GetMetadataMutable()

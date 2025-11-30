@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -59,7 +59,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 }
 
 func (store *Store) ReadTypeObject(
-	typeLock object_metadata.TypeLock,
+	typeLock objects.TypeLock,
 ) (typeObject *sku.Transacted, err error) {
 	if ids.IsBuiltin(typeLock.GetKey()) {
 		err = collections.MakeErrNotFound(typeLock.GetKey())

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 func MetadataFieldError(
@@ -42,7 +42,7 @@ func MetadataFieldError(
 }
 
 func MetadataFieldTai(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetTai().String(),
@@ -51,7 +51,7 @@ func MetadataFieldTai(
 }
 
 func MetadataFieldType(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetType().String(),
@@ -60,7 +60,7 @@ func MetadataFieldType(
 }
 
 func MetadataFieldTags(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) []string_format_writer.Field {
 	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
@@ -81,7 +81,7 @@ func MetadataFieldTags(
 }
 
 func MetadataFieldDescription(
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetDescription().StringWithoutNewlines(),

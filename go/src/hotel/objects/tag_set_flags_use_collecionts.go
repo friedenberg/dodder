@@ -1,5 +1,5 @@
 //go:build !next
 
-package object_metadata
+package objects
 
 const usePrivateTagSetInsteadOfIdsTagSetMutable = false

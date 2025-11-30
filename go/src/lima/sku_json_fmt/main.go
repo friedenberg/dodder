@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -36,7 +36,7 @@ type Transacted struct {
 
 func (json *Transacted) FromObjectIdStringAndMetadata(
 	objectId string,
-	metadata object_metadata.MetadataMutable,
+	metadata objects.MetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {

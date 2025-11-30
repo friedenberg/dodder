@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type Transacted struct {
 	ObjectId ids.ObjectId
-	Metadata object_metadata.MetadataStruct
+	Metadata objects.MetadataStruct
 
 	ExternalType ids.Type
 
@@ -26,8 +26,8 @@ type Transacted struct {
 }
 
 var (
-	_ object_metadata.Getter        = &Transacted{}
-	_ object_metadata.GetterMutable = &Transacted{}
+	_ objects.Getter        = &Transacted{}
+	_ objects.GetterMutable = &Transacted{}
 	_ TransactedGetter              = &Transacted{}
 	_ ExternalLike                  = &Transacted{}
 	_ ExternalLikeGetter            = &Transacted{}
@@ -112,15 +112,15 @@ func (transacted *Transacted) GetType() ids.Type {
 	return transacted.GetMetadata().GetType()
 }
 
-func (transacted *Transacted) GetTypeLock() object_metadata.TypeLock {
+func (transacted *Transacted) GetTypeLock() objects.TypeLock {
 	return transacted.GetMetadata().GetTypeLock()
 }
 
-func (transacted *Transacted) GetMetadata() object_metadata.Metadata {
+func (transacted *Transacted) GetMetadata() objects.Metadata {
 	return &transacted.Metadata
 }
 
-func (transacted *Transacted) GetMetadataMutable() object_metadata.MetadataMutable {
+func (transacted *Transacted) GetMetadataMutable() objects.MetadataMutable {
 	return &transacted.Metadata
 }
 
@@ -161,7 +161,7 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !object_metadata.Equaler.Equals(
+	if !objects.Equaler.Equals(
 		transacted.GetMetadata(),
 		other.GetMetadata(),
 	) {

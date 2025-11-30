@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/object_finalizer"
@@ -46,7 +46,7 @@ func (store *Store) MergeCheckedOut(
 	) {
 		commitOptions.StoreOptions = sku.StoreOptions{}
 		return commitOptions, err
-	} else if object_metadata.EqualerSansTai.Equals(
+	} else if objects.EqualerSansTai.Equals(
 		checkedOut.GetSku().GetMetadata(),
 		checkedOut.GetSkuExternal().GetMetadata(),
 	) {
