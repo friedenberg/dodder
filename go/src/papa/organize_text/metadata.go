@@ -121,7 +121,7 @@ func (metadata *Metadata) ReadFrom(reader io.Reader) (n int64, err error) {
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
 					"%": metadata.OptionCommentSet.Set,
-					"-": quiter.MakeFuncSetString(tagSet),
+					"-": quiter.MakeFuncAddString(tagSet),
 					"!": metadata.Type.Set,
 				},
 			),

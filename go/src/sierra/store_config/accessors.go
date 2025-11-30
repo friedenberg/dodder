@@ -6,9 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -92,30 +89,29 @@ func (compiled *compiled) GetTagOrRepoIdOrType(
 }
 
 func (compiled *compiled) getTag(
-	k interfaces.ObjectId,
-) (ct *sku.Transacted, ok bool) {
-	if k.GetGenre() != genres.Tag {
-		return ct, ok
+	objectId interfaces.ObjectId,
+) (object *sku.Transacted, ok bool) {
+	if objectId.GetGenre() != genres.Tag {
+		return object, ok
 	}
-
-	v := k.String()
 
 	compiled.lock.Lock()
 	defer compiled.lock.Unlock()
 
-	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-	sa := quiter.MakeFuncSetString(expandedMaybe)
-	expansion.ExpanderRight.Expand(sa, v)
-
 	var cursor *tag
 
-	for v := range expandedMaybe.All() {
+	seq := ids.ExpandOneIntoIds[ids.Tag](
+		objectId.String(),
+		expansion.ExpanderRight,
+	)
+
+	for expandedTag := range seq {
 		if cursor == nil {
-			cursor, _ = compiled.Tags.Get(v.String())
+			cursor, _ = compiled.Tags.Get(expandedTag.String())
 			continue
 		}
 
-		next, ok := compiled.Tags.Get(v.String())
+		next, ok := compiled.Tags.Get(expandedTag.String())
 
 		if !ok {
 			continue
@@ -131,70 +127,32 @@ func (compiled *compiled) getTag(
 	}
 
 	if cursor != nil {
-		ct = sku.GetTransactedPool().Get()
-		sku.Resetter.ResetWith(ct, &cursor.Transacted)
+		object = sku.GetTransactedPool().Get()
+		sku.Resetter.ResetWith(object, &cursor.Transacted)
 	}
 
-	return ct, ok
+	return object, ok
 }
 
 // TODO-P3 merge all the below
 func (compiled *compiled) getSortedTypesExpanded(
-	v string,
+	typeString string,
 ) (expandedActual []*sku.Transacted) {
-	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-
-	sa := quiter.MakeFuncSetString(expandedMaybe)
-
-	expansion.ExpanderRight.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
-	for v := range expandedMaybe.All() {
+	seq := ids.ExpandOneIntoIds[ids.Type](
+		typeString,
+		expansion.ExpanderRight,
+	)
+
+	for expandedType := range seq {
 		compiled.lock.Lock()
-		ct, ok := compiled.Types.Get(v.String())
+		typeObject, ok := compiled.Types.Get(expandedType.String())
 		compiled.lock.Unlock()
 
 		if ok {
-			expandedActual = append(expandedActual, ct)
+			expandedActual = append(expandedActual, typeObject)
 		}
-	}
-
-	sort.Slice(expandedActual, func(i, j int) bool {
-		return len(
-			expandedActual[i].GetObjectId().String(),
-		) > len(
-			expandedActual[j].GetObjectId().String(),
-		)
-	})
-
-	return expandedActual
-}
-
-func (compiled *compiled) getSortedTagsExpanded(
-	v string,
-) (expandedActual []*sku.Transacted) {
-	compiled.lock.Lock()
-	defer compiled.lock.Unlock()
-
-	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-	sa := quiter.MakeFuncSetString(
-		expandedMaybe,
-	)
-	expansion.ExpanderRight.Expand(sa, v)
-	expandedActual = make([]*sku.Transacted, 0)
-
-	for v := range expandedMaybe.All() {
-		ct, ok := compiled.Tags.Get(v.String())
-
-		if !ok {
-			continue
-		}
-
-		ct1 := sku.GetTransactedPool().Get()
-
-		sku.Resetter.ResetWith(ct1, &ct.Transacted)
-
-		expandedActual = append(expandedActual, ct1)
 	}
 
 	sort.Slice(expandedActual, func(i, j int) bool {

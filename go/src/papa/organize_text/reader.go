@@ -120,7 +120,7 @@ func (ar *reader) readOneHeading(
 ) (err error) {
 	depth := unicorn.CountRune(match.Bytes, '#')
 
-	currentTags := ids.MakeMutableTagSet()
+	currentTags := ids.MakeTagSetMutable()
 
 	reader := id_fmts.MakeTagsReader()
 

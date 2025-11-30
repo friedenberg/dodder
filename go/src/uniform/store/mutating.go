@@ -440,23 +440,22 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 }
 
 func (commitFacilitator commitFacilitator) addTypeAndExpandedIfNecessary(
-	rootTipe ids.Type,
+	rootType ids.Type,
 ) (err error) {
-	if rootTipe.IsEmpty() {
+	if rootType.IsEmpty() {
 		return err
 	}
 
-	if ids.IsBuiltin(rootTipe) {
+	if ids.IsBuiltin(rootType) {
 		return err
 	}
 
-	typesExpanded := ids.ExpandOneSlice(
-		rootTipe,
-		ids.MakeType,
+	typesExpanded := ids.ExpandOneIntoIds[ids.Type](
+		rootType.String(),
 		expansion.ExpanderRight,
 	)
 
-	for _, tipe := range typesExpanded {
+	for tipe := range typesExpanded {
 		if err = commitFacilitator.addTypeIfNecessary(tipe); err != nil {
 			err = errors.Wrap(err)
 			return err

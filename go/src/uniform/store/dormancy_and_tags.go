@@ -1,8 +1,10 @@
 package store
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -18,10 +20,12 @@ func (store *Store) applyDormantAndRealizeTags(
 	ui.Log().Print("applying konfig to:", object)
 	metadata := object.GetMetadataMutable()
 
-	metadata.GetIndexMutable().SetExpandedTags(ids.ExpandMany(
-		metadata.GetTags().All(),
-		expansion.ExpanderRight,
-	))
+	metadata.GetIndexMutable().SetExpandedTags(
+		ids.ExpandTagSet(
+			metadata.GetTags(),
+			expansion.ExpanderRight,
+		),
+	)
 
 	genre := genres.Must(object.GetGenre())
 	isTag := genre == genres.Tag
@@ -80,19 +84,16 @@ func (store *Store) addSuperTags(
 ) (err error) {
 	genre := object.GetGenre()
 
-	var expanded []string
+	var expanded collections_slice.Slice[string]
 	var objectIdString string
 
 	switch genre {
 	case genres.Tag, genres.Type, genres.Repo:
 		objectIdString = object.ObjectId.String()
 
-		expansion.ExpanderRight.Expand(
-			func(v string) (err error) {
-				expanded = append(expanded, v)
-				return err
-			},
-			objectIdString,
+		quiter.AppendSeq(
+			&expanded,
+			expansion.ExpanderRight.Expand(objectIdString),
 		)
 
 	default:

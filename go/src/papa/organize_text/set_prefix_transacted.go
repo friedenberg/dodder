@@ -68,7 +68,7 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 // this splits on right-expanded
 func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 	index := object.GetSkuExternal().GetMetadataMutable().GetIndexMutable()
-	expandedTags := ids.Expanded(
+	expandedTags := ids.ExpandTagSet(
 		index.GetImplicitTags(),
 		expansion.ExpanderRight,
 	)

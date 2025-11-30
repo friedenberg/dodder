@@ -10,6 +10,8 @@ type expanderRight struct {
 	delimiter *regexp.Regexp
 }
 
+var _ Expander = expanderRight{}
+
 func MakeExpanderRight(
 	delimiter string,
 ) expanderRight {
@@ -18,26 +20,31 @@ func MakeExpanderRight(
 	}
 }
 
-func (ex expanderRight) Expand(
-	sa interfaces.FuncSetString,
-	s string,
-) {
-	sa(s)
+func (expander expanderRight) Expand(
+	value string,
+) interfaces.Seq[string] {
+	return func(yield func(string) bool) {
+		if !yield(value) {
+			return
+		}
 
-	if s == "" {
-		return
-	}
+		if value == "" {
+			return
+		}
 
-	delim := ex.delimiter.FindAllIndex([]byte(s), -1)
+		delim := expander.delimiter.FindAllIndex([]byte(value), -1)
 
-	if delim == nil {
-		return
-	}
+		if delim == nil {
+			return
+		}
 
-	for _, loc := range delim {
-		locStart := loc[0]
-		t1 := s[0:locStart]
+		for _, loc := range delim {
+			locStart := loc[0]
+			t1 := value[0:locStart]
 
-		sa(t1)
+			if !yield(t1) {
+				return
+			}
+		}
 	}
 }

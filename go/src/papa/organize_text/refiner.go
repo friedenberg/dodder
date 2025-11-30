@@ -137,7 +137,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	a.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(ls))
+	a.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(ls))
 
 	return err
 }
@@ -213,7 +213,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)
-		na.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(groupingPrefix.Tag))
+		na.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(groupingPrefix.Tag))
 		a.addChild(na)
 	}
 
@@ -251,7 +251,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 	}
 
 	for _, c := range node.Children {
-		expanded := ids.Expanded(c.Transacted.GetMetadata().GetTags(), expansion.ExpanderRight)
+		expanded := ids.ExpandTagSet(c.Transacted.GetMetadata().GetTags(), expansion.ExpanderRight)
 
 		for e := range expanded.All() {
 			if e.String() == "" {

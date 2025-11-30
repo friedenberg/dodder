@@ -91,16 +91,12 @@ func (compiled *compiled) AccumulateImplicitTags(
 		return err
 	}
 
-	expandedTags := ids.MakeTagSetMutable()
-
-	ids.ExpandOneInto(
-		tag,
-		ids.MakeTag,
+	expandedTags := ids.ExpandOneIntoIds[ids.Tag](
+		tag.String(),
 		expansion.ExpanderRight,
-		expandedTags,
 	)
 
-	for expandedTag := range expandedTags.All() {
+	for expandedTag := range expandedTags {
 		if expandedTag.Equals(tag) {
 			continue
 		}

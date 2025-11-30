@@ -1,10 +1,11 @@
 package ids
 
 import (
-	"reflect"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
+	"code.linenisgreat.com/dodder/go/src/alfa/quiter_collection"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
@@ -69,13 +70,10 @@ func TestStringSliceEquals(t1 *testing.T) {
 func TestExpansionAll(t1 *testing.T) {
 	t := ui.T{T: t1}
 	e := MustTag("this-is-a-tag")
-	ex := MakeMutableTagSet()
 
-	ExpandOneInto(
-		e,
-		MakeTag,
+	ex := ExpandIntoSlice[Tag](
+		e.String(),
 		expansion.ExpanderAll,
-		ex,
 	)
 
 	expected := []string{
@@ -105,13 +103,10 @@ func TestExpansionRight(t1 *testing.T) {
 	t := ui.T{T: t1}
 
 	e := MustTag("this-is-a-tag")
-	ex := MakeMutableTagSet()
 
-	ExpandOneInto(
-		e,
-		MakeTag,
+	ex := ExpandIntoSlice[Tag](
+		e.String(),
 		expansion.ExpanderRight,
-		ex,
 	)
 
 	expected := []string{
@@ -121,7 +116,7 @@ func TestExpansionRight(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := quiter.SortedStrings[Tag](ex)
+	actual := quiter.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -134,19 +129,18 @@ func TestExpansionRight(t1 *testing.T) {
 
 func TestExpansionRightTypeNone(t1 *testing.T) {
 	t := ui.T{T: t1}
-	e := MustType("md")
+	tipe := MustType("md")
 
-	actual := ExpandOneSlice(
-		e,
-		MakeType,
+	actual := ExpandIntoSlice[Type](
+		tipe.String(),
 		expansion.ExpanderRight,
 	)
 
-	expected := []Type{
+	expected := collections_slice.Slice[Type]{
 		MustType("md"),
 	}
 
-	if !reflect.DeepEqual(actual, expected) {
+	if !quiter_collection.Equals(actual, expected) {
 		t.Errorf(
 			"expanded tags don't match:\nexpected: %q\n  actual: %q",
 			expected,

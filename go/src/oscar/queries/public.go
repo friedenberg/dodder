@@ -31,7 +31,7 @@ func IsExactlyOneObjectId(query *Query) bool {
 }
 
 func GetTags(query *Query) ids.TagSetMutable {
-	tags := ids.MakeMutableTagSet()
+	tags := ids.MakeTagSetMutable()
 
 	for _, optimizedQuery := range query.optimizedQueries {
 		optimizedQuery.expTagsOrTypes.CollectTags(tags)

@@ -251,8 +251,10 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 }
 
 func (metadata *metadata) GenerateExpandedTags() {
-	metadata.Index.SetExpandedTags(ids.ExpandMany(
-		metadata.GetTags().All(),
-		expansion.ExpanderRight,
-	))
+	metadata.Index.SetExpandedTags(
+		ids.ExpandTagSet(
+			metadata.GetTags(),
+			expansion.ExpanderRight,
+		),
+	)
 }

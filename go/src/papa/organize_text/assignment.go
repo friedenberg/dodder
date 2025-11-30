@@ -115,7 +115,7 @@ func (assignment Assignment) String() (s string) {
 
 func (assignment *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(assignment.GetDepth() + 1)
-	b.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(e))
+	b.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(e))
 	assignment.addChild(b)
 	return b
 }

@@ -43,3 +43,19 @@ func Strings[ELEMENT interfaces.Stringer](
 		}
 	}
 }
+
+func SeqErrorToSeqAndPanic[ELEMENT any](
+	seq interfaces.SeqError[ELEMENT],
+) interfaces.Seq[ELEMENT] {
+	return func(yield func(ELEMENT) bool) {
+		for element, err := range seq {
+			if err != nil {
+				panic(err)
+			}
+
+			if !yield(element) {
+				return
+			}
+		}
+	}
+}

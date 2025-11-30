@@ -35,7 +35,7 @@ func init() {
 
 // TODO move to quiter
 func CloneTagSet(tags TagSet) TagSet {
-	clone := MakeMutableTagSet()
+	clone := MakeTagSetMutable()
 
 	for tag := range tags.All() {
 		clone.Add(tag)
@@ -46,7 +46,7 @@ func CloneTagSet(tags TagSet) TagSet {
 
 // TODO move to quiter
 func CloneTagSetMutable(tags TagSet) TagSetMutable {
-	clone := MakeMutableTagSet()
+	clone := MakeTagSetMutable()
 
 	for tag := range tags.All() {
 		clone.Add(tag)
@@ -67,11 +67,6 @@ func MakeTagSetFromSlice(tags ...Tag) (s TagSet) {
 // TODO move to quiter
 func MakeTagSetStrings(tagStrings ...string) (s TagSet, err error) {
 	return collections_ptr.MakeValueSetString[Tag](nil, tagStrings...)
-}
-
-// TODO move to quiter
-func MakeMutableTagSet(tags ...Tag) TagSetMutable {
-	return MakeTagSetMutable(tags...)
 }
 
 // TODO move to quiter

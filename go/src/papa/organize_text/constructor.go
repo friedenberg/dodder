@@ -54,8 +54,8 @@ func (c *constructor) collectExplicitAndImplicitFor(
 }
 
 func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
-	anchored := ids.MakeMutableTagSet()
-	extras := ids.MakeMutableTagSet()
+	anchored := ids.MakeTagSetMutable()
+	extras := ids.MakeTagSetMutable()
 
 	for re := range c.TagSet.All() {
 		var explicitCount, implicitCount int
@@ -248,7 +248,7 @@ func (c *constructor) addGroupedChildren(
 		}
 
 		child := newAssignment(parent.GetDepth() + 1)
-		child.Transacted.GetMetadataMutable().SetTags(ids.MakeMutableTagSet(e))
+		child.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(e))
 		groupingTags.DropFirst()
 
 		psv := MakePrefixSetFrom(zs)

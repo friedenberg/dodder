@@ -1,11 +1,13 @@
 package ids
 
 import (
+	"fmt"
+	"slices"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
+	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
 )
 
 type idExpandable[T any] interface {
@@ -21,81 +23,106 @@ type idExpandablePtr[T idExpandable[T]] interface {
 	interfaces.SetterPtr[T]
 }
 
-func expandOnePtr[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
-	id ID,
+func ExpandOneIntoIds[
+	ID idExpandable[ID],
+	ID_PTR idExpandablePtr[ID],
+](
+	identifierString string,
+	expander expansion.Expander,
+) interfaces.SeqError[ID] {
+	return func(yield func(ID, error) bool) {
+		if identifierString == "" {
+			return
+		}
+
+		var expandedId ID
+
+		for expanded := range expander.Expand(identifierString) {
+			if expanded == "" {
+				continue
+
+				// TODO move this check into expansion.*
+				panic(
+					fmt.Sprintf(
+						"empty expansion for original identifier %q for expander %T",
+						identifierString,
+						expander,
+					),
+				)
+			}
+
+			if err := ID_PTR(&expandedId).Set(expanded); err != nil {
+				if !yield(expandedId, err) {
+					return
+				}
+			}
+
+			if !yield(expandedId, nil) {
+				return
+			}
+		}
+	}
+}
+
+func ExpandIntoSlice[
+	ID interfaces.ObjectId,
+	ID_PTR idExpandablePtr[ID],
+](
+	token string,
+	expander expansion.Expander,
+) collections_slice.Slice[ID] {
+	return slices.Collect(
+		quiter_seq.SeqErrorToSeqAndPanic(
+			ExpandOneIntoIds[ID, ID_PTR](
+				token,
+				expander,
+			),
+		),
+	)
+}
+
+// TODO remove
+func ExpandOneInto[
+	ID interfaces.ObjectId,
+	ID_PTR idExpandablePtr[ID],
+](
+	token ID,
+	funcSetString func(string) (ID, error),
 	expander expansion.Expander,
 	adder interfaces.Adder[ID],
 ) {
-	f := quiter.MakeFuncSetString[ID, ID_PTR](adder)
-	expander.Expand(f, id.String())
-}
-
-func ExpandOneInto[T interfaces.ObjectId](
-	k T,
-	mf func(string) (T, error),
-	ex expansion.Expander,
-	acc interfaces.Adder[T],
-) {
-	ex.Expand(
-		func(v string) (err error) {
-			var e T
-
-			if e, err = mf(v); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
-			if err = acc.Add(e); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
-			return err
-		},
-		k.String(),
-	)
-}
-
-func ExpandOneSlice[T interfaces.ObjectId](
-	k T,
-	mf func(string) (T, error),
-	exes ...expansion.Expander,
-) (out []T) {
-	s1 := collections_value.MakeMutableValueSet[T](nil)
-
-	if len(exes) == 0 {
-		exes = []expansion.Expander{expansion.ExpanderAll}
+	for id := range ExpandOneIntoIds[ID, ID_PTR](token.String(), expander) {
+		if err := adder.Add(id); err != nil {
+			panic(err)
+		}
 	}
-
-	for _, ex := range exes {
-		ExpandOneInto(k, mf, ex, s1)
-	}
-
-	out = quiter.SortedValuesBy(
-		s1,
-		func(a, b T) bool {
-			return len(a.String()) < len(b.String())
-		},
-	)
-
-	return out
 }
 
 func ExpandMany[ID idExpandable[ID], ID_PTR idExpandablePtr[ID]](
 	seq interfaces.Seq[ID],
 	expander expansion.Expander,
-) (out interfaces.SetMutable[ID]) {
-	mutableSet := collections_value.MakeMutableValueSet[ID](nil)
+) interfaces.Seq[ID] {
+	return func(yield func(ID) bool) {
+		for id := range seq {
+			seqExpansion := quiter_seq.SeqErrorToSeqAndPanic(
+				ExpandOneIntoIds[ID, ID_PTR](id.String(), expander),
+			)
 
-	for id := range seq {
-		expandOnePtr[ID, ID_PTR](id, expander, mutableSet)
+			for expanded := range seqExpansion {
+				if !yield(expanded) {
+					return
+				}
+			}
+		}
 	}
-
-	out = mutableSet
-
-	return out
 }
 
-func Expanded(set TagSet, expander expansion.Expander) TagSetMutable {
-	return ExpandMany(set.All(), expander)
+func ExpandTagSet(set TagSet, expander expansion.Expander) TagSetMutable {
+	setMutable := MakeTagSetMutable()
+
+	for tag := range ExpandMany(set.All(), expander) {
+		setMutable.Add(tag)
+	}
+
+	return setMutable
 }

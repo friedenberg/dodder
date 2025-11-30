@@ -6,7 +6,7 @@ import (
 )
 
 // returns a function that executes `AddString` for the given `adder`
-func MakeFuncSetString[
+func MakeFuncAddString[
 	ELEMENT any,
 	ELEMENT_PTR interfaces.SetterPtr[ELEMENT],
 ](

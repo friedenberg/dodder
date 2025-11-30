@@ -150,7 +150,7 @@ func TestExpandedRight(t *testing.T) {
 		MustTag("zz-archive-task-done"),
 	)
 
-	ex := Expanded(s, expansion.ExpanderRight)
+	ex := ExpandTagSet(s, expansion.ExpanderRight)
 
 	expected := []string{
 		"project",

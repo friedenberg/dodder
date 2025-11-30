@@ -51,7 +51,7 @@ func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 }
 
 func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
-	sortedTags := quiter.SortedValues[Tag](tags.All())
+	sortedTags := quiter.SortedValues(tags.All())
 	filteredTags := make([]Tag, 0, len(sortedTags))
 
 	for _, e := range sortedTags {

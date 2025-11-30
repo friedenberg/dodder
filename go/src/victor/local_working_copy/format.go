@@ -338,11 +338,11 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				esImp := object.GetMetadataMutable().GetIndexMutable().GetExpandedTags()
+				epxnadedTags := object.GetMetadataMutable().GetIndexMutable().GetExpandedTags()
 
 				if _, err = fmt.Fprintln(
 					writer,
-					quiter.StringCommaSeparated(esImp),
+					quiter.StringCommaSeparated(epxnadedTags),
 				); err != nil {
 					err = errors.Wrap(err)
 					return err

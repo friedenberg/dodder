@@ -183,7 +183,7 @@ func (finalizer finalizer) WriteLockfile(
 				err = nil
 
 			default:
-				err = errors.Wrapf(err, "failed to write type lock for tag: %q", tag)
+				err = errors.Wrapf(err, "failed to write tag lock for tag: %q", tag)
 				return err
 			}
 		}
