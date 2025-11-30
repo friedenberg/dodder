@@ -100,7 +100,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		ObjectFactory:        ot.ObjectFactory,
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
-		IMetadata:            ot.AsMetadata(),
+		Metadata:            ot.AsMetadata(),
 		OmitLeadingEmptyLine: omit,
 		options:              ot.Options,
 	}

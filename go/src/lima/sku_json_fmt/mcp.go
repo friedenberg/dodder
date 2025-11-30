@@ -18,7 +18,7 @@ type MCP struct {
 
 func (json *MCP) FromStringAndMetadata(
 	objectId string,
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if err = json.Transacted.FromObjectIdStringAndMetadata(

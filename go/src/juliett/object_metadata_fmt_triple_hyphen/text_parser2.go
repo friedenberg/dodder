@@ -85,7 +85,7 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (parser *textParser2) readType(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	typeString string,
 ) (err error) {
 	if typeString == "" {
@@ -103,7 +103,7 @@ func (parser *textParser2) readType(
 }
 
 func (parser *textParser2) readBlobDigest(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	metadataLine string,
 ) (err error) {
 	if metadataLine == "" {
@@ -157,7 +157,7 @@ func (parser *textParser2) readBlobDigest(
 }
 
 func (parser *textParser2) setBlobDigest(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	maybeSha string,
 ) (err error) {
 	if err = markl.SetMarklIdWithFormatBlech32(

@@ -7,7 +7,7 @@ import (
 )
 
 func ExpandTags(
-	metadata IMetadata,
+	metadata Metadata,
 	expander expansion.Expander,
 ) interfaces.Seq[ids.Tag] {
 	expansion.ExpandMany(

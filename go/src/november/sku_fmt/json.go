@@ -41,7 +41,7 @@ type JSON struct {
 
 func (json *JSON) FromStringAndMetadata(
 	objectId string,
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	blobStore interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {

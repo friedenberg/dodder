@@ -47,17 +47,17 @@ func (builder *Builder) AddBlobDigestIfNecessary(
 }
 
 func (builder *Builder) AddRepoPubKey(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetRepoPubKey())
 }
 
-func (builder *Builder) AddObjectSig(metadata object_metadata.IMetadataMutable) {
+func (builder *Builder) AddObjectSig(metadata object_metadata.MetadataMutable) {
 	builder.addMarklId(metadata.GetObjectSig())
 }
 
 func (builder *Builder) AddMotherSigIfNecessary(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) {
 	builder.addMarklIdIfNotNull(metadata.GetMotherObjectSig())
 }
@@ -126,7 +126,7 @@ func (builder *Builder) AddError(err error) {
 	}
 }
 
-func (builder *Builder) AddTai(metadata object_metadata.IMetadataMutable) {
+func (builder *Builder) AddTai(metadata object_metadata.MetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetTai().String(),
 		ColorType: string_format_writer.ColorTypeHash,
@@ -134,7 +134,7 @@ func (builder *Builder) AddTai(metadata object_metadata.IMetadataMutable) {
 }
 
 func (builder *Builder) AddType(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetType().String(),
@@ -143,7 +143,7 @@ func (builder *Builder) AddType(
 }
 
 func (builder *Builder) AddTypeAndLock(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) {
 	typeLock := metadata.GetTypeLock()
 
@@ -158,7 +158,7 @@ func (builder *Builder) AddTypeAndLock(
 	}
 }
 
-func (builder *Builder) AddTags(metadata object_metadata.IMetadataMutable) {
+func (builder *Builder) AddTags(metadata object_metadata.MetadataMutable) {
 	tagCount := metadata.GetTags().Len()
 	builder.Contents.Grow(tagCount)
 
@@ -175,11 +175,11 @@ func (builder *Builder) AddTags(metadata object_metadata.IMetadataMutable) {
 	})
 }
 
-func (builder *Builder) AddTagsAndLocks(metadata object_metadata.IMetadataMutable) {
+func (builder *Builder) AddTagsAndLocks(metadata object_metadata.MetadataMutable) {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (builder *Builder) AddDescription(metadata object_metadata.IMetadataMutable) {
+func (builder *Builder) AddDescription(metadata object_metadata.MetadataMutable) {
 	builder.Contents.Append(string_format_writer.Field{
 		Value:     metadata.GetDescription().StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,

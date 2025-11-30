@@ -15,7 +15,7 @@ import (
 
 type Transacted struct {
 	ObjectId ids.ObjectId
-	Metadata object_metadata.Metadata
+	Metadata object_metadata.MetadataStruct
 
 	ExternalType ids.Type
 
@@ -116,11 +116,11 @@ func (transacted *Transacted) GetTypeLock() object_metadata.TypeLock {
 	return transacted.GetMetadata().GetTypeLock()
 }
 
-func (transacted *Transacted) GetMetadata() object_metadata.IMetadata {
+func (transacted *Transacted) GetMetadata() object_metadata.Metadata {
 	return &transacted.Metadata
 }
 
-func (transacted *Transacted) GetMetadataMutable() object_metadata.IMetadataMutable {
+func (transacted *Transacted) GetMetadataMutable() object_metadata.MetadataMutable {
 	return &transacted.Metadata
 }
 

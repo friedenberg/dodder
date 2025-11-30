@@ -182,7 +182,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 }
 
 func StringMetadataSansTaiMerkle2(
-	object object_metadata.IMetadataMutable,
+	object object_metadata.MetadataMutable,
 ) (str string) {
 	sb := &strings.Builder{}
 

@@ -8,12 +8,12 @@ import (
 )
 
 type builder struct {
-	metadata *Metadata
+	metadata *metadata
 }
 
 func MakeBuilder() *builder {
 	return &builder{
-		metadata: &Metadata{},
+		metadata: &metadata{},
 	}
 }
 
@@ -49,7 +49,7 @@ func (builder *builder) WithBlobDigest(digest markl.Id) *builder {
 	return builder
 }
 
-func (builder *builder) Build() Metadata {
+func (builder *builder) Build() metadata {
 	metadata := *builder.metadata
 	builder.metadata = nil
 	return metadata

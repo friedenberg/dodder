@@ -53,7 +53,7 @@ func (metadata *Metadata) GetTags() ids.TagSet {
 }
 
 func (metadata *Metadata) SetFromObjectMetadata(
-	otherMetadata object_metadata.IMetadataMutable,
+	otherMetadata object_metadata.MetadataMutable,
 	repoId ids.RepoId,
 ) (err error) {
 	metadata.TagSet = ids.CloneTagSet(otherMetadata.GetTags())
@@ -82,7 +82,7 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 	return err
 }
 
-func (metadata Metadata) AsMetadata() (m1 object_metadata.IMetadataMutable) {
+func (metadata Metadata) AsMetadata() (m1 object_metadata.MetadataMutable) {
 	m1 = object_metadata.Make()
 	m1.GetTypeMutable().ResetWith(metadata.Type)
 	m1.SetTags(metadata.TagSet)

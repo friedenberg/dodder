@@ -44,7 +44,7 @@ func readFormat(
 	t1 *ui.TestContext,
 	format object_metadata_fmt_triple_hyphen.Format,
 	contents string,
-) (metadata object_metadata.IMetadataMutable) {
+) (metadata object_metadata.MetadataMutable) {
 	var object Transacted
 
 	t := t1
@@ -353,7 +353,7 @@ func (blobStore blobReaderFactory) BlobReader(
 
 func writeFormat(
 	t *ui.TestContext,
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	formatter object_metadata_fmt_triple_hyphen.Formatter,
 	includeBlob bool,
 	blobBody string,

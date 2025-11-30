@@ -4,7 +4,7 @@ var Resetter resetter
 
 type resetter struct{}
 
-func (resetter) Reset(metadatuh IMetadataMutable) {
+func (resetter) Reset(metadatuh MetadataMutable) {
 	{
 		metadata := metadatuh.(*metadata)
 		metadata.Description.Reset()
@@ -20,7 +20,7 @@ func (resetter) Reset(metadatuh IMetadataMutable) {
 	}
 }
 
-func (resetter) ResetWithExceptFields(dst IMetadataMutable, src IMetadata) {
+func (resetter) ResetWithExceptFields(dst MetadataMutable, src Metadata) {
 	{
 		dst := dst.(*metadata)
 		src := src.(*metadata)
@@ -43,7 +43,7 @@ func (resetter) ResetWithExceptFields(dst IMetadataMutable, src IMetadata) {
 	}
 }
 
-func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {
+func (resetter resetter) ResetWith(dst MetadataMutable, src Metadata) {
 	{
 		dst := dst.(*metadata)
 		src := src.(*metadata)
@@ -52,7 +52,7 @@ func (resetter resetter) ResetWith(dst IMetadataMutable, src IMetadata) {
 	}
 }
 
-func resetIndex(a *Index) {
+func resetIndex(a *index) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
@@ -61,7 +61,7 @@ func resetIndex(a *Index) {
 	a.SelfWithoutTai.Reset()
 }
 
-func resetIndexWith(dst, src *Index) {
+func resetIndexWith(dst, src *index) {
 	dst.ParentTai.ResetWith(src.ParentTai)
 	dst.TagPaths.ResetWith(&src.TagPaths)
 	dst.Dormant.ResetWith(src.Dormant)

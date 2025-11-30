@@ -7,7 +7,7 @@ import (
 )
 
 func (finalizer finalizer) writeTypeLockIfNecessary(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	tipe ids.Type,
 	funcs ...sku.FuncReadOne,
 ) (err error) {
@@ -43,7 +43,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 }
 
 func (finalizer finalizer) writeTagLockIfNecessary(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 	tag ids.Tag,
 	funcs ...sku.FuncReadOne,
 ) (err error) {

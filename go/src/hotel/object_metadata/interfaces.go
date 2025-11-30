@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	Metadata = metadata
+	MetadataStruct = metadata
 
 	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
 	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
@@ -19,13 +19,13 @@ type (
 		ids.TagSet
 	}
 
-	IMetadata interface {
+	Metadata interface {
 		Getter
 
 		IsEmpty() bool
 
 		GetDescription() descriptions.Description
-		GetIndex() IIndex
+		GetIndex() Index
 		GetTags() ids.TagSet
 		AllTags() interfaces.Seq[ids.Tag]
 		GetTai() ids.Tai
@@ -41,12 +41,12 @@ type (
 		GetObjectSig() interfaces.MarklId
 	}
 
-	IMetadataMutable interface {
+	MetadataMutable interface {
 		interfaces.CommandComponentWriter
-		IMetadata
+		Metadata
 		GetterMutable
 
-		Subtract(IMetadata)
+		Subtract(Metadata)
 
 		// TODO rewrite
 		AddTagPtr(e *ids.Tag) (err error)
@@ -57,7 +57,7 @@ type (
 		AddTagPtrFast(tag *ids.Tag) (err error)
 		GenerateExpandedTags()
 
-		GetIndexMutable() IIndexMutable
+		GetIndexMutable() IndexMutable
 
 		GetBlobDigestMutable() interfaces.MutableMarklId
 		GetDescriptionMutable() *descriptions.Description
@@ -72,11 +72,11 @@ type (
 	}
 
 	Getter interface {
-		GetMetadata() IMetadata
+		GetMetadata() Metadata
 	}
 
 	GetterMutable interface {
-		GetMetadataMutable() IMetadataMutable
+		GetMetadataMutable() MetadataMutable
 	}
 
 	PersistentFormatterContext interface {

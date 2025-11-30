@@ -42,7 +42,7 @@ func MetadataFieldError(
 }
 
 func MetadataFieldTai(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetTai().String(),
@@ -51,7 +51,7 @@ func MetadataFieldTai(
 }
 
 func MetadataFieldType(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetType().String(),
@@ -60,7 +60,7 @@ func MetadataFieldType(
 }
 
 func MetadataFieldTags(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) []string_format_writer.Field {
 	tags := make([]string_format_writer.Field, 0, metadata.GetTags().Len())
 
@@ -81,7 +81,7 @@ func MetadataFieldTags(
 }
 
 func MetadataFieldDescription(
-	metadata object_metadata.IMetadataMutable,
+	metadata object_metadata.MetadataMutable,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
 		Value:     metadata.GetDescription().StringWithoutNewlines(),

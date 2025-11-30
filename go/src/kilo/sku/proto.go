@@ -28,7 +28,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 }
 
 type Proto struct {
-	object_metadata.Metadata
+	Metadata object_metadata.MetadataStruct
 }
 
 var _ interfaces.CommandComponentWriter = (*Proto)(nil)
@@ -37,7 +37,7 @@ func (proto *Proto) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 	proto.Metadata.SetFlagDefinitions(f)
 }
 
-func (proto Proto) Equals(metadata object_metadata.IMetadataMutable) (ok bool) {
+func (proto Proto) Equals(metadata object_metadata.MetadataMutable) (ok bool) {
 	var okType, okMetadata bool
 
 	if !ids.IsEmpty(proto.Metadata.GetType()) &&

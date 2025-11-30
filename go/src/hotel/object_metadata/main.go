@@ -29,12 +29,12 @@ type metadata struct {
 
 	Tai ids.Tai
 
-	Index Index
+	Index index
 }
 
 var (
-	_ IMetadata        = &metadata{}
-	_ IMetadataMutable = &metadata{}
+	_ Metadata        = &metadata{}
+	_ MetadataMutable = &metadata{}
 	_ Getter           = &metadata{}
 	_ GetterMutable    = &metadata{}
 )
@@ -45,19 +45,19 @@ func Make() *metadata {
 	return metadata
 }
 
-func (metadata *metadata) GetMetadata() IMetadata {
+func (metadata *metadata) GetMetadata() Metadata {
 	return metadata
 }
 
-func (metadata *metadata) GetMetadataMutable() IMetadataMutable {
+func (metadata *metadata) GetMetadataMutable() MetadataMutable {
 	return metadata
 }
 
-func (metadata *metadata) GetIndex() IIndex {
+func (metadata *metadata) GetIndex() Index {
 	return &metadata.Index
 }
 
-func (metadata *metadata) GetIndexMutable() IIndexMutable {
+func (metadata *metadata) GetIndexMutable() IndexMutable {
 	return &metadata.Index
 }
 
@@ -239,7 +239,7 @@ func (metadata *metadata) GetTagLockMutable(tag ids.Tag) TagLockMutable {
 	return lock
 }
 
-func (metadata *metadata) Subtract(otherMetadata IMetadata) {
+func (metadata *metadata) Subtract(otherMetadata Metadata) {
 	if metadata.GetType().String() == otherMetadata.GetType().String() {
 		metadata.GetTypeMutable().Reset()
 	}

@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	IIndex interface {
+	Index interface {
 		GetFields() interfaces.Seq[Field]
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
 		GetDormant() values.Bool
@@ -22,8 +22,8 @@ type (
 		GetSelfWithoutTai() interfaces.MarklId
 	}
 
-	IIndexMutable interface {
-		IIndex
+	IndexMutable interface {
+		Index
 
 		AddTagsImplicitPtr(tag *ids.Tag) (err error)
 		GetDormantMutable() *values.Bool
@@ -36,7 +36,7 @@ type (
 	}
 )
 
-type Index struct {
+type index struct {
 	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
 	ImplicitTags ids.TagSetMutable // public for gob, but should be private
@@ -48,35 +48,35 @@ type Index struct {
 }
 
 var (
-	_ IIndex        = &Index{}
-	_ IIndexMutable = &Index{}
+	_ Index        = &index{}
+	_ IndexMutable = &index{}
 )
 
-func (index *Index) GetTagPaths() *tag_paths.Tags {
+func (index *index) GetTagPaths() *tag_paths.Tags {
 	return &index.TagPaths
 }
 
-func (index *Index) GetTagPathsMutable() *tag_paths.Tags {
+func (index *index) GetTagPathsMutable() *tag_paths.Tags {
 	return &index.TagPaths
 }
 
-func (index *Index) GetDormant() values.Bool {
+func (index *index) GetDormant() values.Bool {
 	return index.Dormant
 }
 
-func (index *Index) GetDormantMutable() *values.Bool {
+func (index *index) GetDormantMutable() *values.Bool {
 	return &index.Dormant
 }
 
-func (index *Index) GetImplicitTags() ids.TagSet {
+func (index *index) GetImplicitTags() ids.TagSet {
 	return index.GetImplicitTagsMutable()
 }
 
-func (index *Index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
+func (index *index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
 	return index.GetImplicitTagsMutable().Add(*tag)
 }
 
-func (index *Index) GetImplicitTagsMutable() ids.TagSetMutable {
+func (index *index) GetImplicitTagsMutable() ids.TagSetMutable {
 	if index.ImplicitTags == nil {
 		index.ImplicitTags = ids.MakeTagSetMutable()
 	}
@@ -84,7 +84,7 @@ func (index *Index) GetImplicitTagsMutable() ids.TagSetMutable {
 	return index.ImplicitTags
 }
 
-func (index *Index) SetImplicitTags(tags ids.TagSet) {
+func (index *index) SetImplicitTags(tags ids.TagSet) {
 	tagsMutable := index.GetImplicitTagsMutable()
 	tagsMutable.Reset()
 
@@ -97,19 +97,19 @@ func (index *Index) SetImplicitTags(tags ids.TagSet) {
 	}
 }
 
-func (index *Index) GetParentTai() ids.Tai {
+func (index *index) GetParentTai() ids.Tai {
 	return index.ParentTai
 }
 
-func (index *Index) GetParentTaiMutable() *ids.Tai {
+func (index *index) GetParentTaiMutable() *ids.Tai {
 	return &index.ParentTai
 }
 
-func (index *Index) GetComments() interfaces.Seq[string] {
+func (index *index) GetComments() interfaces.Seq[string] {
 	return index.Comments.All()
 }
 
-func (index *Index) GetCommentsMutable() *collections_slice.Slice[string] {
+func (index *index) GetCommentsMutable() *collections_slice.Slice[string] {
 	return &index.Comments
 }
 
@@ -117,10 +117,10 @@ func (metadata *metadata) AddComment(f string, vals ...any) {
 	metadata.Index.Comments = append(metadata.Index.Comments, fmt.Sprintf(f, vals...))
 }
 
-func (index *Index) GetFields() interfaces.Seq[Field] {
+func (index *index) GetFields() interfaces.Seq[Field] {
 	return index.Fields.All()
 }
 
-func (index *Index) GetFieldsMutable() *collections_slice.Slice[Field] {
+func (index *index) GetFieldsMutable() *collections_slice.Slice[Field] {
 	return &index.Fields
 }
