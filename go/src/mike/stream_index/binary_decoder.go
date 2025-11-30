@@ -384,19 +384,6 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-	case key_bytes.CacheTagExpanded:
-		var tag ids.Tag
-
-		if err = tag.Set(decoder.Content.String()); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		if err = metadata.GetIndexMutable().AddTagExpandedPtr(&tag); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
 	case key_bytes.CacheTags:
 		var tag tag_paths.PathWithType
 

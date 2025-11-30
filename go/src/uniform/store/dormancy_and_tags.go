@@ -20,13 +20,6 @@ func (store *Store) applyDormantAndRealizeTags(
 	ui.Log().Print("applying konfig to:", object)
 	metadata := object.GetMetadataMutable()
 
-	metadata.GetIndexMutable().SetExpandedTags(
-		ids.ExpandTagSet(
-			metadata.GetTags(),
-			expansion.ExpanderRight,
-		),
-	)
-
 	genre := genres.Must(object.GetGenre())
 	isTag := genre == genres.Tag
 
@@ -54,13 +47,6 @@ func (store *Store) applyDormantAndRealizeTags(
 
 		object.GetMetadataMutable().GetIndexMutable().GetTagPaths().AddSelf(
 			catgut.MakeFromString(objectIdString),
-		)
-
-		ids.ExpandOneInto(
-			tag,
-			ids.MakeTag,
-			expansion.ExpanderRight,
-			metadata.GetIndexMutable().GetExpandedTagsMutable(),
 		)
 	}
 

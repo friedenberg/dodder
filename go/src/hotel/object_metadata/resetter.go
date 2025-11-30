@@ -60,7 +60,6 @@ func resetIndex(a *Index) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
-	a.SetExpandedTags(nil)
 	a.SetImplicitTags(nil)
 	a.QueryPath.Reset()
 	a.Comments = a.Comments[:0]
@@ -71,7 +70,6 @@ func resetIndexWith(dst, src *Index) {
 	dst.ParentTai.ResetWith(src.ParentTai)
 	dst.TagPaths.ResetWith(&src.TagPaths)
 	dst.Dormant.ResetWith(src.Dormant)
-	dst.SetExpandedTags(src.GetExpandedTags())
 	dst.SetImplicitTags(src.GetImplicitTags())
 	dst.QueryPath.Reset()
 	dst.QueryPath = slices.Grow(dst.QueryPath, src.QueryPath.Len())

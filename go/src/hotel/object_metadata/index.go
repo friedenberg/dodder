@@ -15,7 +15,6 @@ type (
 	IIndex interface {
 		GetFields() interfaces.Seq[Field]
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
-		GetExpandedTags() ids.TagSet
 		GetDormant() values.Bool
 		GetImplicitTags() ids.TagSet
 		GetParentTai() ids.Tai
@@ -26,14 +25,11 @@ type (
 	IIndexMutable interface {
 		IIndex
 
-		AddTagExpandedPtr(e *ids.Tag) (err error)
 		AddTagsImplicitPtr(tag *ids.Tag) (err error)
 		GetDormantMutable() *values.Bool
-		GetExpandedTagsMutable() ids.TagSetMutable
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetParentTaiMutable() *ids.Tai
 		GetTagPathsMutable() *tag_paths.Tags
-		SetExpandedTags(tags ids.TagSet)
 		SetImplicitTags(e ids.TagSet)
 		GetCommentsMutable() *collections_slice.Slice[string]
 		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
@@ -73,35 +69,6 @@ func (index *Index) GetDormant() values.Bool {
 
 func (index *Index) GetDormantMutable() *values.Bool {
 	return &index.Dormant
-}
-
-func (index *Index) GetExpandedTags() ids.TagSet {
-	return index.GetExpandedTagsMutable()
-}
-
-func (index *Index) AddTagExpandedPtr(e *ids.Tag) (err error) {
-	return index.GetExpandedTagsMutable().Add(*e)
-}
-
-func (index *Index) GetExpandedTagsMutable() ids.TagSetMutable {
-	if index.ExpandedTags == nil {
-		index.ExpandedTags = ids.MakeTagSetMutable()
-	}
-
-	return index.ExpandedTags
-}
-
-func (index *Index) SetExpandedTags(tags ids.TagSet) {
-	tagsExpanded := index.GetExpandedTagsMutable()
-	tagsExpanded.Reset()
-
-	if tags == nil {
-		return
-	}
-
-	for tag := range tags.All() {
-		errors.PanicIfError(tagsExpanded.Add(tag))
-	}
 }
 
 func (index *Index) GetImplicitTags() ids.TagSet {

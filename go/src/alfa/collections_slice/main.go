@@ -27,6 +27,10 @@ func MakeFromSlice[ELEMENT any](elements ...ELEMENT) Slice[ELEMENT] {
 	return slice
 }
 
+func Collect[ELEMENT any](seq interfaces.Seq[ELEMENT]) Slice[ELEMENT] {
+	return Slice[ELEMENT](slices.Collect(seq))
+}
+
 func (slice Slice[ELEMENT]) Len() int {
 	return len(slice)
 }

@@ -261,20 +261,6 @@ func (encoder *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case key_bytes.CacheTagExpanded:
-		tags := metadata.GetIndex().GetExpandedTags()
-
-		for _, tag := range quiter.SortedValues(tags.All()) {
-			var n1 int64
-			n1, err = encoder.writeFieldBinaryMarshaler(&tag)
-			n += n1
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return n, err
-			}
-		}
-
 	case key_bytes.CacheTags:
 		tags := metadata.GetIndex().GetTagPaths()
 

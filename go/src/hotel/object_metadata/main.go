@@ -3,7 +3,6 @@ package object_metadata
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
@@ -251,10 +250,4 @@ func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 }
 
 func (metadata *metadata) GenerateExpandedTags() {
-	metadata.Index.SetExpandedTags(
-		ids.ExpandTagSet(
-			metadata.GetTags(),
-			expansion.ExpanderRight,
-		),
-	)
 }

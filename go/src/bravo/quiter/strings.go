@@ -68,7 +68,7 @@ func StringDelimiterSeparated[ELEMENT interfaces.Stringer](
 		return ""
 	}
 
-	sorted := SortedStrings[ELEMENT](collections...)
+	sorted := SortedStrings(collections...)
 
 	if len(sorted) == 0 {
 		return ""

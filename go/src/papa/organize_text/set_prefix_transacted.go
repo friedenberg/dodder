@@ -67,27 +67,37 @@ func (prefixSet *PrefixSet) AddSku(object sku.SkuType) (err error) {
 
 // this splits on right-expanded
 func (prefixSet *PrefixSet) Add(object *obj) (err error) {
-	index := object.GetSkuExternal().GetMetadataMutable().GetIndexMutable()
-	expandedTags := ids.ExpandTagSet(
-		index.GetImplicitTags(),
-		expansion.ExpanderRight,
-	)
+	var addedAny bool
 
-	for tag := range index.GetExpandedTags().All() {
-		if err = expandedTags.Add(tag); err != nil {
-			err = errors.Wrap(err)
-			return err
+	{
+		seq := ids.ExpandMany(
+			object.GetSkuExternal().GetMetadata().GetIndex().GetImplicitTags().All(),
+			expansion.ExpanderRight,
+		)
+
+		for tag := range seq {
+			prefixSet.addPair(tag.String(), object)
+			addedAny = true
 		}
 	}
 
-	if expandedTags.Len() == 0 {
-		prefixSet.addPair("", object)
+	{
+		seq := ids.ExpandMany(
+			object.GetSkuExternal().GetMetadata().GetTags().All(),
+			expansion.ExpanderRight,
+		)
+
+		for tag := range seq {
+			prefixSet.addPair(tag.String(), object)
+			addedAny = true
+		}
+	}
+
+	if addedAny {
 		return err
 	}
 
-	for e := range expandedTags.All() {
-		prefixSet.addPair(e.String(), object)
-	}
+	prefixSet.addPair("", object)
 
 	return err
 }

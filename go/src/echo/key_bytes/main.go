@@ -35,7 +35,6 @@ const (
 	CacheParentTai   = Binary('p')
 	CacheDormant     = Binary('a')
 	CacheTagImplicit = Binary('I')
-	CacheTagExpanded = Binary('e')
 	CacheTags        = Binary('x')
 	CacheTags2       = Binary('y')
 )
