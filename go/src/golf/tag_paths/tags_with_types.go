@@ -23,7 +23,7 @@ func (tags *Tags) String() string {
 func (tags *Tags) Reset() {
 	// TODO pool *Path's
 	tags.Paths.Reset()
-	tags.All.Reset()
+	tags.All.GetSlice().Reset()
 }
 
 // TODO improve performance

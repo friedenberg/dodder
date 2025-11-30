@@ -35,6 +35,10 @@ func (slice Slice[ELEMENT]) Len() int {
 	return len(slice)
 }
 
+func (slice Slice[ELEMENT]) IsEmpty() bool {
+	return slice.Len() == 0
+}
+
 func (slice Slice[ELEMENT]) Any() (element ELEMENT) {
 	if slice.Len() > 0 {
 		element = slice[0]
@@ -113,4 +117,8 @@ func (slice *Slice[ELEMENT]) SortBy(getKey func(ELEMENT) string) {
 			return getKey(slice.At(i)) < getKey(slice.At(j))
 		},
 	)
+}
+
+func (slice *Slice[ELEMENT]) Clone() Slice[ELEMENT] {
+	return MakeFromSlice(*slice...)
 }

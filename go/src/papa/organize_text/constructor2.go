@@ -21,26 +21,26 @@ func (c *constructor2) collectExplicitAndImplicitFor(
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
-	for st := range skus.All() {
-		sk := st.GetSkuExternal()
+	for checkedOut := range skus.All() {
+		object := checkedOut.GetSkuExternal()
 
-		for _, ewp := range sk.GetMetadata().GetIndex().GetTagPaths().All {
-			if ewp.Tag.String() == sk.ObjectId.String() {
+		for _, tag := range object.GetMetadata().GetIndex().GetTagPaths().All {
+			if tag.Tag.String() == object.ObjectId.String() {
 				continue
 			}
 
-			cmp := ewp.ComparePartial(res)
+			cmp := tag.ComparePartial(res)
 
 			if cmp != 0 {
 				continue
 			}
 
-			if len(ewp.Parents) == 0 { // TODO use Type
+			if len(tag.Parents) == 0 { // TODO use Type
 				explicitCount++
 				break
 			}
 
-			for _, p := range ewp.Parents {
+			for _, p := range tag.Parents {
 				if p.Type == tag_paths.TypeDirect {
 					explicitCount++
 				} else {

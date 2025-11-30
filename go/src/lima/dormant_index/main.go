@@ -9,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
@@ -23,21 +24,21 @@ type Index struct {
 	tags    tag_paths.TagsWithParentsAndTypes
 }
 
-func (sch *Index) GetChanges() (out []string) {
-	out = make([]string, len(sch.changes))
-	copy(out, sch.changes)
+func (index *Index) GetChanges() (out []string) {
+	out = make([]string, len(index.changes))
+	copy(out, index.changes)
 
 	return out
 }
 
-func (sch *Index) HasChanges() bool {
-	return len(sch.changes) > 0
+func (index *Index) HasChanges() bool {
+	return len(index.changes) > 0
 }
 
-func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
-	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
+func (index *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
+	index.changes = append(index.changes, fmt.Sprintf("added %q", e))
 
-	if err = sch.tags.Add(e, nil); err != nil {
+	if err = index.tags.Add(e, nil); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -45,10 +46,10 @@ func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
 	return err
 }
 
-func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
-	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
+func (index *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
+	index.changes = append(index.changes, fmt.Sprintf("removed %q", e))
 
-	if err = sch.tags.Remove(e); err != nil {
+	if err = index.tags.Remove(e); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -56,41 +57,28 @@ func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	return err
 }
 
-func (sch *Index) ContainsSku(object *sku.Transacted) bool {
-	for _, e := range sch.tags {
-		if e.Len() == 0 {
+func (index *Index) ContainsSku(object *sku.Transacted) bool {
+	for _, tag := range index.tags {
+		if tag.Len() == 0 {
 			panic("empty dormant tag")
 		}
 
 		all := object.GetMetadata().GetIndex().GetTagPaths().All
-		i, ok := all.ContainsTag(e.Tag)
 
-		if ok {
-			ui.Log().Printf(
-				"dormant true for %s: %s in %s",
-				object,
-				e,
-				all[i],
-			)
-
+		if _, ok := all.ContainsTag(tag.Tag); ok {
 			return true
 		}
 	}
 
-	ui.Log().Printf(
-		"dormant false for %s",
-		object,
-	)
-
 	return false
 }
 
-func (sch *Index) Load(s env_repo.Env) (err error) {
-	var f *os.File
+func (index *Index) Load(envRepo env_repo.Env) (err error) {
+	var file *os.File
 
-	p := s.FileCacheDormant()
+	path := envRepo.FileCacheDormant()
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -100,11 +88,12 @@ func (sch *Index) Load(s env_repo.Env) (err error) {
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	br := bufio.NewReader(f)
+	bufferedReader, repool := pool.GetBufferedReader(file)
+	defer repool()
 
-	if _, err = sch.ReadFrom(br); err != nil {
+	if _, err = index.ReadFrom(bufferedReader); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -112,12 +101,12 @@ func (sch *Index) Load(s env_repo.Env) (err error) {
 	return err
 }
 
-func (sch *Index) Flush(
-	s env_repo.Env,
+func (index *Index) Flush(
+	envRepo env_repo.Env,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {
-	if len(sch.changes) == 0 {
+	if len(index.changes) == 0 {
 		ui.Log().Print("no dormant changes")
 		return err
 	}
@@ -132,21 +121,23 @@ func (sch *Index) Flush(
 		return err
 	}
 
-	p := s.FileCacheDormant()
+	path := envRepo.FileCacheDormant()
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
+	if file, err = files.OpenExclusiveWriteOnlyTruncate(path); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	bw := bufio.NewWriter(f)
-	defer errors.DeferredFlusher(&err, bw)
+	bufferedWriter, repool := pool.GetBufferedWriter(file)
+	defer repool()
 
-	if _, err = sch.WriteTo(bw); err != nil {
+	defer errors.DeferredFlusher(&err, bufferedWriter)
+
+	if _, err = index.WriteTo(bufferedWriter); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -159,12 +150,12 @@ func (sch *Index) Flush(
 	return err
 }
 
-func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
-	s.tags.Reset()
+func (index *Index) ReadFrom(bufferedReader *bufio.Reader) (n int64, err error) {
+	index.tags.GetSlice().Reset()
 	var count uint16
 
 	var n1 int64
-	count, n1, err = ohio.ReadUint16(r)
+	count, n1, err = ohio.ReadUint16(bufferedReader)
 	n += n1
 	// n += int64(n1)
 	if err != nil {
@@ -177,13 +168,13 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	s.tags = slices.Grow(s.tags, int(count))
+	index.tags = slices.Grow(index.tags, int(count))
 
 	for i := uint16(0); i < count; i++ {
 		var l uint16
 
 		var n1 int64
-		l, n1, err = ohio.ReadUint16(r)
+		l, n1, err = ohio.ReadUint16(bufferedReader)
 		n += int64(n1)
 
 		if err != nil {
@@ -193,12 +184,12 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 
 		var cs *catgut.String
 
-		if cs, err = catgut.MakeFromReader(r, int(l)); err != nil {
+		if cs, err = catgut.MakeFromReader(bufferedReader, int(l)); err != nil {
 			err = errors.Wrap(err)
 			return n, err
 		}
 
-		s.tags = append(s.tags, tag_paths.TagWithParentsAndTypes{
+		index.tags = append(index.tags, tag_paths.TagWithParentsAndTypes{
 			Tag: cs,
 		})
 	}
@@ -206,12 +197,12 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (s Index) WriteTo(w io.Writer) (n int64, err error) {
-	count := uint16(s.tags.Len())
+func (index Index) WriteTo(writer io.Writer) (n int64, err error) {
+	count := uint16(index.tags.Len())
 
 	var n1 int
 	var n2 int64
-	n1, err = ohio.WriteUint16(w, count)
+	n1, err = ohio.WriteUint16(writer, count)
 	n += int64(n1)
 
 	if err != nil {
@@ -219,10 +210,10 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	for _, e := range s.tags {
-		l := uint16(e.Len())
+	for _, tags := range index.tags {
+		count := uint16(tags.Len())
 
-		n1, err = ohio.WriteUint16(w, l)
+		n1, err = ohio.WriteUint16(writer, count)
 		n += int64(n1)
 		n += int64(n1)
 
@@ -231,7 +222,7 @@ func (s Index) WriteTo(w io.Writer) (n int64, err error) {
 			return n, err
 		}
 
-		n2, err = e.WriteTo(w)
+		n2, err = tags.WriteTo(writer)
 		n += n2
 
 		if err != nil {

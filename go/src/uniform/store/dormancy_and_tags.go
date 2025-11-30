@@ -117,31 +117,20 @@ func (store *Store) addSuperTags(
 
 			defer sku.GetTransactedPool().Put(tagOrRepoOrTypeObject)
 
-			if tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths().Paths.Len() <= 1 {
-				ui.Log().Print(
-					objectIdString,
-					expandedObjectIdComponent,
-					tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths(),
-				)
+			tagPaths := tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths()
+
+			if tagPaths.Paths.Len() <= 1 {
 				return
 			}
 
 			prefix := catgut.MakeFromString(expandedObjectIdComponent)
 
-			a := object.GetMetadataMutable().GetIndexMutable().GetTagPaths()
-			b := tagOrRepoOrTypeObject.GetMetadata().GetIndex().GetTagPaths()
+			newTagPaths := object.GetMetadataMutable().GetIndexMutable().GetTagPaths()
 
-			ui.Log().Print("a", a)
-			ui.Log().Print("b", b)
-
-			ui.Log().Print("prefix", prefix)
-
-			if err = a.AddSuperFrom(b, prefix); err != nil {
+			if err = newTagPaths.AddSuperFrom(tagPaths, prefix); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			ui.Log().Print("a after", a)
 		}()
 	}
 
