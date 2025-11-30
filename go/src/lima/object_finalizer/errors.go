@@ -17,7 +17,7 @@ func IsTypeLockError(err error) bool {
 }
 
 var (
-	ErrFailedToReadCurrentTypeObject = newTypeLockError("failed to read current type object")
-	ErrEmptyType                     = newTypeLockError("empty type")
+	ErrFailedToReadCurrentLockObject = newTypeLockError("failed to read current lock object")
+	ErrEmptyLockKey                  = newTypeLockError("empty type")
 	ErrBuiltinType                   = newTypeLockError("builtin type")
 )

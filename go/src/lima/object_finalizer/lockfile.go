@@ -12,7 +12,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	funcs ...sku.FuncReadOne,
 ) (err error) {
 	if tipe.IsEmpty() {
-		err = ErrEmptyType
+		err = ErrEmptyLockKey
 		return err
 	} else if ids.IsBuiltin(tipe) {
 		// TODO stop excluding builtin types and create a process for signing those
@@ -35,7 +35,38 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 	if ok := sku.ReadOneObjectIdBespoke(tipe, typeObject, funcs...); ok {
 		typeLock.GetValueMutable().ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())
 	} else {
-		err = ErrFailedToReadCurrentTypeObject
+		err = ErrFailedToReadCurrentLockObject
+		return err
+	}
+
+	return err
+}
+
+func (finalizer finalizer) writeTagLockIfNecessary(
+	metadata object_metadata.IMetadataMutable,
+	tag ids.Tag,
+	funcs ...sku.FuncReadOne,
+) (err error) {
+	if tag.IsEmpty() {
+		err = ErrEmptyLockKey
+		return err
+	}
+
+	tagLock := metadata.GetTagLockMutable(tag)
+
+	// TODO There are cases where we will want to overwrite the typelock id,
+	// should we use CommitOptions?
+	if !tagLock.GetValue().IsNull() {
+		return err
+	}
+
+	typeObject, repool := sku.GetTransactedPool().GetWithRepool()
+	defer repool()
+
+	if ok := sku.ReadOneObjectIdBespoke(tag, typeObject, funcs...); ok {
+		tagLock.GetValueMutable().ResetWithMarklId(typeObject.GetMetadataMutable().GetObjectSig())
+	} else {
+		err = ErrFailedToReadCurrentLockObject
 		return err
 	}
 

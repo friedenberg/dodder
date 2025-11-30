@@ -19,11 +19,7 @@ func init() {
 }
 
 func makeTagSetMutable() ids.TagSetMutable {
-	if usePrivateTagSetInsteadOfIdsTagSetMutable {
-		return &tagSet{}
-	} else {
-		return ids.MakeTagSetMutable()
-	}
+	return &tagSet{}
 }
 
 var (
@@ -54,6 +50,28 @@ func (tagSet tagSet) ContainsKey(key string) bool {
 	}
 
 	return false
+}
+
+func (tagSet tagSet) getLock(key string) (TagLock, bool) {
+	for tag := range tagSet.Tags.All() {
+		if tag.GetKey().String() == key {
+			return tag, true
+		}
+	}
+
+	return nil, false
+}
+
+func (tagSet tagSet) getLockMutable(key string) (TagLockMutable, bool) {
+	for index := range tagSet.Tags {
+		tag := &tagSet.Tags[index]
+
+		if tag.GetKey().String() == key {
+			return tag, true
+		}
+	}
+
+	return nil, false
 }
 
 // TODO switch to binary search

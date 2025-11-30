@@ -19,7 +19,7 @@ type Field = string_format_writer.Field
 type metadata struct {
 	Description descriptions.Description
 	// TODO refactor this to be an efficient structure backed by a slice
-	Tags ids.TagSetMutable // public for gob, but should be private
+	Tags tagSet // public for gob, but should be private
 	Type markl.Lock[ids.Type, *ids.Type]
 
 	DigBlob   markl.Id
@@ -83,7 +83,7 @@ func (metadata *metadata) UserInputIsEmpty() bool {
 		return false
 	}
 
-	if metadata.Tags != nil && metadata.Tags.Len() > 0 {
+	if metadata.Tags.Len() > 0 {
 		return false
 	}
 
@@ -112,19 +112,11 @@ func (metadata *metadata) IsEmpty() bool {
 
 // TODO fix issue with GetTags being nil sometimes
 func (metadata *metadata) GetTags() ids.TagSet {
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
 	return metadata.Tags
 }
 
 func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
 	return func(yield func(ids.Tag) bool) {
-		if metadata.Tags == nil {
-			return
-		}
-
 		for tag := range metadata.Tags.All() {
 			if !yield(tag) {
 				return
@@ -134,10 +126,6 @@ func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
 }
 
 func (metadata *metadata) ResetTags() {
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
 	metadata.Tags.Reset()
 	metadata.Index.TagPaths.Reset()
 }
@@ -171,11 +159,7 @@ func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
 		return err
 	}
 
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
-	ids.AddNormalizedTag(metadata.Tags, tag)
+	ids.AddNormalizedTag(&metadata.Tags, tag)
 	cs := catgut.MakeFromString(tag.String())
 	metadata.Index.TagPaths.AddTag(cs)
 
@@ -183,10 +167,6 @@ func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
 }
 
 func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
 	if err = metadata.Tags.Add(*tag); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -203,10 +183,6 @@ func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 }
 
 func (metadata *metadata) SetTags(tags ids.TagSet) {
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
 	metadata.Tags.Reset()
 
 	if tags == nil {
@@ -223,10 +199,6 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 }
 
 func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
-	if metadata.Tags == nil {
-		metadata.Tags = makeTagSetMutable()
-	}
-
 	metadata.Tags.Reset()
 
 	if tags == nil {
@@ -258,17 +230,23 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 	return &metadata.Type
 }
 
+func (metadata *metadata) GetTagLock(tag ids.Tag) TagLock {
+	lock, _ := metadata.Tags.getLock(tag.String())
+	return lock
+}
+
+func (metadata *metadata) GetTagLockMutable(tag ids.Tag) TagLockMutable {
+	lock, _ := metadata.Tags.getLockMutable(tag.String())
+	return lock
+}
+
 func (metadata *metadata) Subtract(otherMetadata IMetadata) {
 	if metadata.GetType().String() == otherMetadata.GetType().String() {
 		metadata.GetTypeMutable().Reset()
 	}
 
-	if metadata.Tags == nil {
-		return
-	}
-
 	for tag := range otherMetadata.AllTags() {
-		quiter_set.Del(metadata.Tags, tag)
+		quiter_set.Del(&metadata.Tags, tag)
 	}
 }
 

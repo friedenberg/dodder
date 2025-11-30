@@ -48,6 +48,7 @@ func (cmd Update) Run(req command.Request) {
 
 	req.Must(errors.MakeFuncContextFromFuncErr(localWorkingCopy.Lock))
 
+	// TODO fix issue with non-deterministic query causing ordering issues
 	if err := store.QueryTransacted(
 		query,
 		func(object *sku.Transacted) (err error) {

@@ -152,20 +152,40 @@ func (finalizer finalizer) WriteLockfile(
 		funcs...,
 	); err != nil {
 		switch err {
-		case ErrEmptyType, ErrBuiltinType:
+		case ErrEmptyLockKey, ErrBuiltinType:
 			err = nil
 
-		case ErrFailedToReadCurrentTypeObject:
+		case ErrFailedToReadCurrentLockObject:
 			if options.AllowTypeFailure {
 				err = nil
-			} else {
-				err = errors.Wrapf(err, "failed to write type lock for type: %q", tipe)
-				return err
+				break
 			}
+
+			fallthrough
 
 		default:
 			err = errors.Wrapf(err, "failed to write type lock for type: %q", tipe)
 			return err
+		}
+	}
+
+	for tag := range metadata.GetTags().All() {
+		if err = finalizer.writeTagLockIfNecessary(
+			metadata,
+			tag,
+			funcs...,
+		); err != nil {
+			switch err {
+			case ErrEmptyLockKey:
+				err = nil
+
+			case ErrFailedToReadCurrentLockObject:
+				err = nil
+
+			default:
+				err = errors.Wrapf(err, "failed to write type lock for tag: %q", tag)
+				return err
+			}
 		}
 	}
 

@@ -32,6 +32,8 @@ type (
 		GetType() ids.Type
 		GetTypeLock() TypeLock
 
+		GetTagLock(ids.Tag) TagLock
+
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
 		GetMotherObjectSig() interfaces.MarklId
@@ -66,6 +68,7 @@ type (
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeLockMutable() TypeLockMutable
+		GetTagLockMutable(ids.Tag) TagLockMutable
 	}
 
 	Getter interface {

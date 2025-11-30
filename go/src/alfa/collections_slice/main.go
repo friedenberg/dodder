@@ -2,6 +2,7 @@ package collections_slice
 
 import (
 	"slices"
+	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
@@ -62,6 +63,10 @@ func (slice *Slice[ELEMENT]) Delete(leftInclusive, rightExclusive int) {
 	*slice = slices.Delete[[]ELEMENT](*slice, leftInclusive, rightExclusive)
 }
 
+func (slice *Slice[ELEMENT]) At(index int) ELEMENT {
+	return (*slice)[index]
+}
+
 func (slice *Slice[ELEMENT]) Append(elements ...ELEMENT) {
 	*slice = append(*slice, elements...)
 }
@@ -95,4 +100,13 @@ func (slice *Slice[ELEMENT]) ResetWithSeq(other interfaces.Seq[ELEMENT]) {
 	for element := range other {
 		slice.Append(element)
 	}
+}
+
+func (slice *Slice[ELEMENT]) SortBy(getKey func(ELEMENT) string) {
+	sort.Slice(
+		*slice,
+		func(i, j int) bool {
+			return getKey(slice.At(i)) < getKey(slice.At(j))
+		},
+	)
 }

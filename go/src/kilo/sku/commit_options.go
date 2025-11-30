@@ -10,6 +10,7 @@ type CommitOptions struct {
 	ids.RepoId
 	ids.Clock
 	Proto
+
 	DontAddMissingType bool
 }
 
@@ -35,12 +36,14 @@ type StoreOptions struct {
 
 type LockfileOptions struct {
 	AllowTypeFailure bool
+	AllowTagFailure  bool
 }
 
 func GetStoreOptionsRealizeWithProto() StoreOptions {
 	return StoreOptions{
 		LockfileOptions: LockfileOptions{
 			AllowTypeFailure: true,
+			AllowTagFailure:  true,
 		},
 		ApplyProto: true,
 		RunHooks:   true,
@@ -52,6 +55,7 @@ func GetStoreOptionsRealizeSansProto() StoreOptions {
 	return StoreOptions{
 		LockfileOptions: LockfileOptions{
 			AllowTypeFailure: true,
+			AllowTagFailure:  true,
 		},
 		RunHooks:  true,
 		UpdateTai: true,

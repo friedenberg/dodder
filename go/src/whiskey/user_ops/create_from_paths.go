@@ -135,6 +135,9 @@ func (op CreateFromPaths) Run(
 		if err = op.GetStore().CreateOrUpdateDefaultProto(
 			object,
 			sku.StoreOptions{
+				LockfileOptions: sku.LockfileOptions{
+					AllowTagFailure: true,
+				},
 				ApplyProto: true,
 			},
 		); err != nil {

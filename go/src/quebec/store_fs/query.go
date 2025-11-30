@@ -102,6 +102,7 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 				StoreOptions: sku.StoreOptions{
 					LockfileOptions: sku.LockfileOptions{
 						AllowTypeFailure: true,
+						AllowTagFailure:  true,
 					},
 					UpdateTai: true,
 				},
