@@ -1,26 +1,20 @@
 package object_metadata
 
 import (
-	"encoding/gob"
-
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
-type tagSet struct {
-	// for gob's stupid illusions
-	Tags collections_slice.Slice[markl.Lock[ids.Tag, *ids.Tag]]
-}
+type (
+	tagLock = markl.Lock[ids.Tag, *ids.Tag]
 
-func init() {
-	gob.Register(makeTagSetMutable())
-}
-
-func makeTagSetMutable() ids.TagSetMutable {
-	return &tagSet{}
-}
+	tagSet struct {
+		// required to be exported for Gob's stupid illusions
+		Tags collections_slice.Slice[tagLock]
+	}
+)
 
 var (
 	_ ids.TagSet        = &tagSet{}
