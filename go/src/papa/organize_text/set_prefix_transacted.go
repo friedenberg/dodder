@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -200,43 +199,44 @@ func (prefixSet PrefixSet) Match(
 }
 
 func (prefixSet PrefixSet) Subset(
-	e ids.Tag,
+	tag ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 
-	e2 := catgut.MakeFromString(e.String())
+	tagString := catgut.MakeFromString(tag.String())
 
-	for e1, zSet := range prefixSet.innerMap {
-		if e1 == "" {
+	for prefixTag, objects := range prefixSet.innerMap {
+		if prefixTag == "" {
 			continue
 		}
 
-		for z := range zSet.All() {
-			ui.Log().Print(e2, z)
-			intersection := z.GetSkuExternal().GetMetadata().GetIndex().GetTagPaths().All.GetMatching(
-				e2,
+		for object := range objects.All() {
+			intersection := object.GetSkuExternal().GetMetadata().GetIndex().GetTagPaths().All.GetMatching(
+				tagString,
 			)
+
 			hasDirect := false || len(intersection) == 0
+
 			type match struct {
 				string
 				tag_paths.Type
 			}
+
 			toAddGrouped := make([]match, 0)
 
 		OUTER:
-			for _, e2Match := range intersection {
-				e2s := e2Match.Tag.String()
-				ui.Log().Print(e2Match.Tag)
-				for _, e3 := range e2Match.Parents {
+			for _, objectTagMatch := range intersection {
+				objectTagMatchString := objectTagMatch.Tag.String()
+
+				for _, objectTagMatchParents := range objectTagMatch.Parents {
 					toAddGrouped = append(toAddGrouped, match{
-						string: e2s,
-						Type:   e3.Type,
+						string: objectTagMatchString,
+						Type:   objectTagMatchParents.Type,
 					})
 
-					ui.Log().Print(e3)
-					if e3.Type == tag_paths.TypeDirect &&
-						e2Match.Tag.Len() == e2.Len() {
+					if objectTagMatchParents.Type == tag_paths.TypeDirect &&
+						objectTagMatch.Tag.Len() == tagString.Len() {
 						hasDirect = true
 						break OUTER
 					}
@@ -244,11 +244,11 @@ func (prefixSet PrefixSet) Subset(
 			}
 
 			if hasDirect {
-				out.Ungrouped.Add(z)
+				out.Ungrouped.Add(object)
 			} else {
-				for _, e3 := range toAddGrouped {
-					c := z.cloneWithType(e3.Type)
-					out.Grouped.addPair(e3.string, c)
+				for _, tagToAdd := range toAddGrouped {
+					objectClone := object.cloneWithType(tagToAdd.Type)
+					out.Grouped.addPair(tagToAdd.string, objectClone)
 				}
 			}
 		}

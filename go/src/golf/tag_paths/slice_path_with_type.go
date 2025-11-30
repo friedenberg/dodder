@@ -8,25 +8,25 @@ type (
 	PathsWithTypes []*PathWithType
 )
 
-func (a *PathsWithTypes) Reset() {
-	*a = (*a)[:0]
+func (pathsWithTypes *PathsWithTypes) Reset() {
+	*pathsWithTypes = (*pathsWithTypes)[:0]
 }
 
-func (s PathsWithTypes) Len() int {
-	return len(s)
+func (pathsWithTypes PathsWithTypes) Len() int {
+	return len(pathsWithTypes)
 }
 
-func (s PathsWithTypes) Less(i, j int) bool {
-	return s[i].Compare(&s[j].Path) == -1
+func (pathsWithTypes PathsWithTypes) Less(i, j int) bool {
+	return pathsWithTypes[i].Compare(&pathsWithTypes[j].Path) == -1
 }
 
-func (s PathsWithTypes) Swap(i, j int) {
-	s[j], s[i] = s[i], s[j]
+func (pathsWithTypes PathsWithTypes) Swap(i, j int) {
+	pathsWithTypes[j], pathsWithTypes[i] = pathsWithTypes[i], pathsWithTypes[j]
 }
 
-func (s PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
+func (pathsWithTypes PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
 	return slices.BinarySearchFunc(
-		s,
+		pathsWithTypes,
 		p,
 		func(ep *PathWithType, el *PathWithType) int {
 			return ep.Compare(&p.Path)
@@ -34,28 +34,28 @@ func (s PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
 	)
 }
 
-func (s *PathsWithTypes) AddNonEmptyPath(p *PathWithType) {
+func (pathsWithTypes *PathsWithTypes) AddNonEmptyPath(p *PathWithType) {
 	if p == nil {
 		return
 	}
 
-	s.AddPath(p)
+	pathsWithTypes.AddPath(p)
 }
 
-func (s *PathsWithTypes) AddPath(p *PathWithType) (idx int, alreadyExists bool) {
+func (pathsWithTypes *PathsWithTypes) AddPath(p *PathWithType) (idx int, alreadyExists bool) {
 	if p.IsEmpty() {
 		return idx, alreadyExists
 	}
 
 	// p = p.Clone()
 
-	idx, alreadyExists = s.ContainsPath(p)
+	idx, alreadyExists = pathsWithTypes.ContainsPath(p)
 
 	if alreadyExists {
 		return idx, alreadyExists
 	}
 
-	*s = slices.Insert(*s, idx, p)
+	*pathsWithTypes = slices.Insert(*pathsWithTypes, idx, p)
 
 	return idx, alreadyExists
 }

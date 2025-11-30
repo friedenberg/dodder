@@ -16,7 +16,7 @@ func (path *PathWithType) String() string {
 	return fmt.Sprintf(
 		"%s:%s",
 		path.Type.String(),
-		(*StringBackward)(&path.Path).String(),
+		(*StringMarshalerBackward)(&path.Path).String(),
 	)
 }
 

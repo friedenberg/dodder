@@ -114,7 +114,7 @@ func (path *Path) Compare(b *Path) int {
 }
 
 func (path *Path) String() string {
-	return (*StringBackward)(path).String()
+	return (*StringMarshalerBackward)(path).String()
 }
 
 func (path *Path) Copy() (b *Path) {

@@ -2,52 +2,54 @@ package tag_paths
 
 import "strings"
 
-type StringForward Path
+type StringMarshalerForward Path
 
-func (p *StringForward) String() string {
-	var sb strings.Builder
-	sb.WriteString("[")
+func (stringMarshaler *StringMarshalerForward) String() string {
+	var stringBuilder strings.Builder
+
+	stringBuilder.WriteString("[")
 
 	afterFirst := false
-	l := (*Path)(p).Len()
-	for i := l - 1; i >= 0; i-- {
+	count := (*Path)(stringMarshaler).Len()
+
+	for index := count - 1; index >= 0; index-- {
 		if afterFirst {
-			sb.WriteString(" -> ")
+			stringBuilder.WriteString(" -> ")
 		}
 
 		afterFirst = true
 
-		s := (*p)[i]
-		sb.Write(s.Bytes())
+		tag := (*stringMarshaler)[index]
+		stringBuilder.Write(tag.Bytes())
 	}
 
-	sb.WriteString("]")
+	stringBuilder.WriteString("]")
 
-	return sb.String()
+	return stringBuilder.String()
 }
 
-type StringBackward Path
+type StringMarshalerBackward Path
 
-func (p *StringBackward) String() string {
-	var sb strings.Builder
+func (stringMarshaler *StringMarshalerBackward) String() string {
+	var stringBuilder strings.Builder
 
-	sb.WriteString("[")
+	stringBuilder.WriteString("[")
 
 	afterFirst := false
-	l := (*Path)(p).Len()
+	count := (*Path)(stringMarshaler).Len()
 
-	for i := 0; i < l; i++ {
+	for index := range count {
 		if afterFirst {
-			sb.WriteString(" -> ")
+			stringBuilder.WriteString(" -> ")
 		}
 
 		afterFirst = true
 
-		s := (*p)[i]
-		sb.Write(s.Bytes())
+		tag := (*stringMarshaler)[index]
+		stringBuilder.Write(tag.Bytes())
 	}
 
-	sb.WriteString("]")
+	stringBuilder.WriteString("]")
 
-	return sb.String()
+	return stringBuilder.String()
 }

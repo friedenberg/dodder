@@ -10,9 +10,16 @@ import (
 type (
 	tagLock = markl.Lock[ids.Tag, *ids.Tag]
 
+	tagStruct struct {
+		// TODO add path information
+
+		// required to be exported for Gob's stupid illusions
+		Lock tagLock
+	}
+
 	tagSet struct {
 		// required to be exported for Gob's stupid illusions
-		Tags collections_slice.Slice[tagLock]
+		Tags collections_slice.Slice[tagStruct]
 	}
 )
 
@@ -20,6 +27,10 @@ var (
 	_ ids.TagSet        = &tagSet{}
 	_ ids.TagSetMutable = &tagSet{}
 )
+
+func (tag tagStruct) GetKey() ids.Tag {
+	return tag.Lock.GetKey()
+}
 
 func (tagSet tagSet) Len() int {
 	return tagSet.Tags.Len()
@@ -49,7 +60,7 @@ func (tagSet tagSet) ContainsKey(key string) bool {
 func (tagSet tagSet) getLock(key string) (TagLock, bool) {
 	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
-			return tag, true
+			return tag.Lock, true
 		}
 	}
 
@@ -61,7 +72,7 @@ func (tagSet tagSet) getLockMutable(key string) (TagLockMutable, bool) {
 		tag := &tagSet.Tags[index]
 
 		if tag.GetKey().String() == key {
-			return tag, true
+			return &tag.Lock, true
 		}
 	}
 
@@ -89,7 +100,9 @@ func (tagSet *tagSet) Add(tag ids.Tag) error {
 		return nil
 	}
 
-	tagSet.Tags.Append(markl.MakeLockWith(tag, nil))
+	tagSet.Tags.Append(tagStruct{
+		Lock: markl.MakeLockWith(tag, nil),
+	})
 
 	return nil
 }
@@ -97,10 +110,10 @@ func (tagSet *tagSet) Add(tag ids.Tag) error {
 func (tagSet *tagSet) DelKey(key string) error {
 	var found bool
 	var index int
-	var tagLock TagLock
+	var tag tagStruct
 
-	for index, tagLock = range tagSet.Tags {
-		if tagLock.GetKey().String() == key {
+	for index, tag = range tagSet.Tags {
+		if tag.GetKey().String() == key {
 			found = true
 			break
 		}

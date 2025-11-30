@@ -51,41 +51,28 @@ func (tags *Tags) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	return err
 }
 
-func (tags *Tags) ContainsSku(sk *sku.Transacted) bool {
-	for _, e := range tags.tags {
-		if e.Len() == 0 {
+func (tags *Tags) ContainsSku(object *sku.Transacted) bool {
+	for _, tag := range tags.tags {
+		if tag.Len() == 0 {
 			panic("empty dormant tag")
 		}
 
-		all := sk.GetMetadata().GetIndex().GetTagPaths().All
-		i, ok := all.ContainsTag(e.Tag)
+		all := object.GetMetadata().GetIndex().GetTagPaths().All
 
-		if ok {
-			ui.Log().Printf(
-				"dormant true for %s: %s in %s",
-				sk,
-				e,
-				all[i],
-			)
-
+		if _, ok := all.ContainsTag(tag.Tag); ok {
 			return true
 		}
 	}
 
-	ui.Log().Printf(
-		"dormant false for %s",
-		sk,
-	)
-
 	return false
 }
 
-func (tags *Tags) Load(s env_repo.Env) (err error) {
-	var f *os.File
+func (tags *Tags) Load(envRepo env_repo.Env) (err error) {
+	var file *os.File
 
-	p := s.FileTags()
+	path := envRepo.FileTags()
 
-	if f, err = files.Open(p); err != nil {
+	if file, err = files.Open(path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -95,11 +82,12 @@ func (tags *Tags) Load(s env_repo.Env) (err error) {
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	br := bufio.NewReader(f)
+	bufferedReader, repool := pool.GetBufferedReader(file)
+	defer repool()
 
-	if _, err = tags.ReadFrom(br); err != nil {
+	if _, err = tags.ReadFrom(bufferedReader); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -195,7 +183,7 @@ func (tags *Tags) ReadFrom(bufferedReader *bufio.Reader) (n int64, err error) {
 			return n, err
 		}
 
-		tags.tags = append(tags.tags, tag_paths.TagWithParentsAndTypes{
+		tags.tags.GetSlice().Append(tag_paths.TagWithParentsAndTypes{
 			Tag: cs,
 		})
 	}
