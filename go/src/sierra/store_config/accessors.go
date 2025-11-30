@@ -100,7 +100,7 @@ func (compiled *compiled) getTag(
 
 	var cursor *tag
 
-	seq := ids.ExpandOneIntoIds[ids.Tag](
+	seq := expansion.ExpandOneIntoIds[ids.Tag](
 		objectId.String(),
 		expansion.ExpanderRight,
 	)
@@ -140,7 +140,7 @@ func (compiled *compiled) getSortedTypesExpanded(
 ) (expandedActual []*sku.Transacted) {
 	expandedActual = make([]*sku.Transacted, 0)
 
-	seq := ids.ExpandOneIntoIds[ids.Type](
+	seq := expansion.ExpandOneIntoIds[ids.Type](
 		typeString,
 		expansion.ExpanderRight,
 	)

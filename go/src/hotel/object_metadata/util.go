@@ -10,7 +10,7 @@ func ExpandTags(
 	metadata IMetadata,
 	expander expansion.Expander,
 ) interfaces.Seq[ids.Tag] {
-	ids.ExpandMany(
+	expansion.ExpandMany(
 		metadata.GetTags().All(),
 		expander,
 	)

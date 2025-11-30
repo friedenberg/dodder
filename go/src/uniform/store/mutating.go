@@ -450,7 +450,7 @@ func (commitFacilitator commitFacilitator) addTypeAndExpandedIfNecessary(
 		return err
 	}
 
-	typesExpanded := ids.ExpandOneIntoIds[ids.Type](
+	typesExpanded := expansion.ExpandOneIntoIds[ids.Type](
 		rootType.String(),
 		expansion.ExpanderRight,
 	)

@@ -21,7 +21,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -317,15 +316,26 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				for _, es := range object.GetMetadata().GetIndex().GetTagPaths().Paths {
-					if _, err = fmt.Fprintf(writer, "%s: %s\n", object.GetObjectId(), es); err != nil {
+				for _, tag := range object.GetMetadata().GetIndex().GetTagPaths().Paths {
+					if _, err = fmt.Fprintf(
+						writer,
+						"%s: %s\n",
+						object.GetObjectId(),
+						tag,
+					); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
 				}
 
-				for _, es := range object.GetMetadata().GetIndex().GetTagPaths().All {
-					if _, err = fmt.Fprintf(writer, "%s: %s -> %s\n", object.GetObjectId(), es.Tag, es.Parents); err != nil {
+				for _, tag := range object.GetMetadata().GetIndex().GetTagPaths().All {
+					if _, err = fmt.Fprintf(
+						writer,
+						"%s: %s -> %s\n",
+						object.GetObjectId(),
+						tag.Tag,
+						tag.Parents,
+					); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}
@@ -342,7 +352,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
 				expandedTags := collections_slice.Collect(
-					ids.ExpandMany(
+					expansion.ExpandMany(
 						object.GetMetadata().GetTags().All(),
 						expansion.ExpanderAll,
 					),

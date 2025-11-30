@@ -81,12 +81,13 @@ func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
 }
 
 func AddNormalizedTag(tags TagSetMutable, e *Tag) {
-	ExpandOneInto(
-		*e,
-		MakeTag,
-		expansion.ExpanderRight,
-		tags,
-	)
+	seq := expansion.ExpandOneIntoIds[Tag](e.String(), expansion.ExpanderRight)
+
+	for id := range seq {
+		if err := tags.Add(id); err != nil {
+			panic(err)
+		}
+	}
 
 	clone := CloneTagSet(tags)
 	tags.Reset()

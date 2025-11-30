@@ -39,7 +39,6 @@ type (
 type Index struct {
 	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
-	ExpandedTags ids.TagSetMutable // public for gob, but should be private
 	ImplicitTags ids.TagSetMutable // public for gob, but should be private
 	TagPaths     tag_paths.Tags
 	Comments     collections_slice.Slice[string]

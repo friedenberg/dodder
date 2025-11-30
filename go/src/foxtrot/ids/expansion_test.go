@@ -71,7 +71,7 @@ func TestExpansionAll(t1 *testing.T) {
 	t := ui.T{T: t1}
 	e := MustTag("this-is-a-tag")
 
-	ex := ExpandIntoSlice[Tag](
+	ex := expansion.ExpandIntoSlice[Tag](
 		e.String(),
 		expansion.ExpanderAll,
 	)
@@ -104,7 +104,7 @@ func TestExpansionRight(t1 *testing.T) {
 
 	e := MustTag("this-is-a-tag")
 
-	ex := ExpandIntoSlice[Tag](
+	ex := expansion.ExpandIntoSlice[Tag](
 		e.String(),
 		expansion.ExpanderRight,
 	)
@@ -131,7 +131,7 @@ func TestExpansionRightTypeNone(t1 *testing.T) {
 	t := ui.T{T: t1}
 	tipe := MustType("md")
 
-	actual := ExpandIntoSlice[Type](
+	actual := expansion.ExpandIntoSlice[Type](
 		tipe.String(),
 		expansion.ExpanderRight,
 	)

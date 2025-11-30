@@ -70,7 +70,7 @@ func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 	var addedAny bool
 
 	{
-		seq := ids.ExpandMany(
+		seq := expansion.ExpandMany(
 			object.GetSkuExternal().GetMetadata().GetIndex().GetImplicitTags().All(),
 			expansion.ExpanderRight,
 		)
@@ -82,7 +82,7 @@ func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 	}
 
 	{
-		seq := ids.ExpandMany(
+		seq := expansion.ExpandMany(
 			object.GetSkuExternal().GetMetadata().GetTags().All(),
 			expansion.ExpanderRight,
 		)
