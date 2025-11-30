@@ -35,8 +35,8 @@ type metadata struct {
 var (
 	_ Metadata        = &metadata{}
 	_ MetadataMutable = &metadata{}
-	_ Getter           = &metadata{}
-	_ GetterMutable    = &metadata{}
+	_ Getter          = &metadata{}
+	_ GetterMutable   = &metadata{}
 )
 
 func Make() *metadata {
