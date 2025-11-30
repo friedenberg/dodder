@@ -22,10 +22,7 @@ func init() {
 	TagRegex = regexp.MustCompile(TagRegexString)
 }
 
-var (
-	sTagResetter  tagResetter
-	sTag2Resetter tag2Resetter
-)
+var sTagResetter tagResetter
 
 type Tag = tag
 
@@ -219,4 +216,28 @@ func (tag *tag) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return err
+}
+
+func IsDependentLeaf(a Tag) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
+	return has
+}
+
+func HasParentPrefix(a, b Tag) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
+	return has
+}
+
+type tagResetter struct{}
+
+func (tagResetter) Reset(e *Tag) {
+	e.value = ""
+	e.virtual = false
+	e.dependentLeaf = false
+}
+
+func (tagResetter) ResetWith(a, b *Tag) {
+	a.value = b.value
+	a.virtual = b.virtual
+	a.dependentLeaf = b.dependentLeaf
 }

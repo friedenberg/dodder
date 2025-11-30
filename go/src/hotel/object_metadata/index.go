@@ -44,8 +44,6 @@ type Index struct {
 	Comments     collections_slice.Slice[string]
 	Fields       collections_slice.Slice[Field]
 
-	QueryPath
-
 	keyValues
 }
 

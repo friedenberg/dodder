@@ -1,9 +1,5 @@
 package object_metadata
 
-import (
-	"slices"
-)
-
 var Resetter resetter
 
 type resetter struct{}
@@ -61,8 +57,7 @@ func resetIndex(a *Index) {
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
 	a.SetImplicitTags(nil)
-	a.QueryPath.Reset()
-	a.Comments = a.Comments[:0]
+	a.Comments.Reset()
 	a.SelfWithoutTai.Reset()
 }
 
@@ -71,10 +66,5 @@ func resetIndexWith(dst, src *Index) {
 	dst.TagPaths.ResetWith(&src.TagPaths)
 	dst.Dormant.ResetWith(src.Dormant)
 	dst.SetImplicitTags(src.GetImplicitTags())
-	dst.QueryPath.Reset()
-	dst.QueryPath = slices.Grow(dst.QueryPath, src.QueryPath.Len())
-	copy(dst.QueryPath, src.QueryPath)
-
-	dst.Comments = dst.Comments[:0]
-	dst.Comments = append(dst.Comments, src.Comments...)
+	dst.Comments.ResetWith(src.Comments)
 }

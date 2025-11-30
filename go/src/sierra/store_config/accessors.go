@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"

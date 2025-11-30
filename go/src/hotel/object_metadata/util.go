@@ -2,7 +2,7 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 

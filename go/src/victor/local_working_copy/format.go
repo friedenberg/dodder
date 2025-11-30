@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -22,7 +22,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/object_metadata"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/sku_json_fmt"
 	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
@@ -184,25 +183,6 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					writer,
 					object.GetObjectId(),
 					object.GetMetadata().GetIndex().GetTagPaths(),
-				); err != nil {
-					err = errors.Wrap(err)
-					return err
-				}
-
-				return err
-			}
-		},
-	},
-	"query-path": {
-		FormatFuncConstructor: func(
-			repo *Repo,
-			writer interfaces.WriterAndStringWriter,
-		) interfaces.FuncIter[*sku.Transacted] {
-			return func(object *sku.Transacted) (err error) {
-				if _, err = fmt.Fprintln(
-					writer,
-					object.GetObjectId(),
-					object.GetMetadata().GetIndex().(*object_metadata.Index).QueryPath,
 				); err != nil {
 					err = errors.Wrap(err)
 					return err
