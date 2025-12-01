@@ -69,11 +69,11 @@ func (id Id) StringWithFormat() string {
 	}
 }
 
-func (id Id) GetPurpose() string {
+func (id Id) GetPurposeId() string {
 	return id.purposeId
 }
 
-func (id *Id) SetPurpose(value string) error {
+func (id *Id) SetPurposeId(value string) error {
 	id.purposeId = value
 	return nil
 }
@@ -135,7 +135,7 @@ func (id *Id) Set(value string) (err error) {
 }
 
 func (id *Id) setWithPurpose(purpose, body string) (err error) {
-	if err = id.SetPurpose(purpose); err != nil {
+	if err = id.SetPurposeId(purpose); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -165,7 +165,7 @@ func (id *Id) setWithoutPurpose(value string) (err error) {
 }
 
 func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
-	if err = id.SetPurpose(digest.GetPurpose()); err != nil {
+	if err = id.SetPurposeId(digest.GetPurposeId()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -296,7 +296,7 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	}
 
 	errors.PanicIfError(
-		id.SetPurpose(src.GetPurpose()),
+		id.SetPurposeId(src.GetPurposeId()),
 	)
 
 	errors.PanicIfError(

@@ -239,7 +239,7 @@ func (transacted *Transacted) AllProbeIds(
 
 		{
 			probeId := ids.ProbeId{
-				Key: transacted.GetMetadata().GetObjectDigest().GetPurpose(),
+				Key: transacted.GetMetadata().GetObjectDigest().GetPurposeId(),
 				Id:  transacted.GetMetadata().GetObjectDigest(),
 			}
 

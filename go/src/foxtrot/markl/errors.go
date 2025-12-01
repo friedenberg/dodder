@@ -42,7 +42,7 @@ func (err errIsNotNull) Is(target error) bool {
 
 func AssertIdIsNotNull(id interfaces.MarklId) error {
 	if id.IsNull() {
-		return errors.WrapSkip(1, errIsNull{purpose: id.GetPurpose()})
+		return errors.WrapSkip(1, errIsNull{purpose: id.GetPurposeId()})
 	}
 
 	return nil

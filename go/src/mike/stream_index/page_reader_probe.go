@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
@@ -77,11 +78,12 @@ func (pageReader *probePageReader) readOneCursor(
 			pageReader.readerAt,
 			&objectPlus,
 		); err != nil {
+			ui.Debug().Print(err)
 			if err == io.EOF {
 				if bytesRead == cursor.ContentLength {
 					goto NO_ERR
 				} else {
-					err = io.ErrUnexpectedEOF
+					panic(io.ErrUnexpectedEOF)
 				}
 			}
 

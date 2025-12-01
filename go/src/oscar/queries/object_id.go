@@ -78,10 +78,9 @@ func (objectId ObjectId) ContainsSku(
 	switch objectId.GetGenre() {
 
 	case genres.Blob:
-		id := objects.GetMarklIdForPurpose(
-			metadata,
-			objectId.marklId.GetPurpose(),
-		)
+		purposeId := objectId.marklId.GetPurposeId()
+
+		id := objects.GetMarklIdForPurpose(metadata, purposeId)
 
 		return markl.Equals(objectId.marklId, id)
 

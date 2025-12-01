@@ -327,7 +327,7 @@ LOOP:
 				return err
 			}
 
-			pid := pinnedObjectId{
+			pinnedObjectId := pinnedObjectId{
 				Sigil:    ids.SigilLatest,
 				ObjectId: objectId,
 			}
@@ -336,35 +336,42 @@ LOOP:
 			case genres.InventoryList, genres.Zettel, genres.Repo:
 				buildState.pinnedObjectIds = append(
 					buildState.pinnedObjectIds,
-					pid,
+					pinnedObjectId,
 				)
 
-				if err = query.addPinnedObjectId(buildState, pid); err != nil {
+				if err = query.addPinnedObjectId(
+					buildState,
+					pinnedObjectId,
+				); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
+
+			case genres.Blob:
+				exp := buildState.makeExp(isNegated, isExact, &objectId)
+				stack.Last().Add(exp)
 
 			case genres.Tag:
-				var et sku.Query
+				var tag sku.Query
 
-				if et, err = buildState.makeTagExp(&objectId); err != nil {
+				if tag, err = buildState.makeTagExp(&objectId); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
 
-				exp := buildState.makeExp(isNegated, isExact, et)
+				exp := buildState.makeExp(isNegated, isExact, tag)
 				stack.Last().Add(exp)
 
 			case genres.Type:
-				var t ids.Type
+				var tipe ids.Type
 
-				if err = t.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
+				if err = tipe.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}
 
 				if !isNegated {
-					if err = buildState.group.types.Add(t); err != nil {
+					if err = buildState.group.types.Add(tipe); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}

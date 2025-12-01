@@ -43,7 +43,7 @@ func SetMarklIdWithFormatBlech32(
 	purposeId string,
 	blechValue string,
 ) (err error) {
-	if err = id.SetPurpose(purposeId); err != nil {
+	if err = id.SetPurposeId(purposeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -1,6 +1,7 @@
 package box_format
 
 import (
+	"fmt"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -226,8 +227,7 @@ func (format *BoxTransacted) addFieldsObjectIds(
 		builder.Contents.Append(external)
 
 	default:
-		err = errors.ErrorWithStackf("empty id")
-		return err
+		panic(fmt.Sprintf("empty object id: %q", sku.String(object)))
 	}
 
 	return err

@@ -15,10 +15,10 @@ func (id Id) MarshalText() (bites []byte, err error) {
 
 	var hrp string
 
-	if prupose := id.GetPurpose(); prupose != "" {
+	if prupose := id.GetPurposeId(); prupose != "" {
 		hrp = fmt.Sprintf(
 			"%s@%s",
-			id.GetPurpose(),
+			id.GetPurposeId(),
 			id.format.GetMarklFormatId(),
 		)
 	} else {
@@ -49,7 +49,7 @@ func (id *Id) UnmarshalText(bites []byte) (err error) {
 	purpose, formatId, ok := strings.Cut(purposeAndFormatId, "@")
 
 	if ok {
-		if err = id.SetPurpose(purpose); err != nil {
+		if err = id.SetPurposeId(purpose); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

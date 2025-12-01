@@ -51,7 +51,7 @@ func (id *Id) UnmarshalBinary(
 		return err
 	}
 
-	if err = id.SetPurpose(string(formatBytes)); err != nil {
+	if err = id.SetPurposeId(string(formatBytes)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -113,7 +113,7 @@ type IdBinaryEncodingFormatTypeData struct {
 func (id Id) MarshalBinary() (bytes []byte, err error) {
 	// TODO confirm few allocations
 	// TODO confirm size of type is less than 256
-	purpose := id.GetPurpose()
+	purpose := id.GetPurposeId()
 	format := id.GetMarklFormat()
 	bites := id.GetBytes()
 

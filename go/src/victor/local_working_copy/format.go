@@ -954,20 +954,24 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			printer := repo.PrinterTransacted()
 
 			return func(object *sku.Transacted) (err error) {
-				if object.GetMetadata().GetMotherObjectSig().IsNull() {
+				motherSig := object.GetMetadata().GetMotherObjectSig()
+
+				if motherSig.IsNull() {
 					return err
 				}
 
-				if object, err = repo.GetStore().GetStreamIndex().ReadOneObjectIdTai(
-					object.GetObjectId(),
-					object.GetMetadata().GetIndex().GetParentTai(),
-				); err != nil {
-					fmt.Fprintln(writer, err)
-					err = nil
-					return err
+				mother := sku.GetTransactedPool().Get()
+				defer sku.GetTransactedPool().Put(mother)
+
+				if !repo.GetStore().GetStreamIndex().ReadOneMarklId(
+					motherSig,
+					mother,
+				) {
+					// TODO print error
+					return
 				}
 
-				if err = printer(object); err != nil {
+				if err = printer(mother); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}

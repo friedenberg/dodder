@@ -205,7 +205,7 @@ func (finalizer finalizer) FinalizeAndSignIfNecessary(
 		return err
 	}
 
-	if transacted.GetMetadataMutable().GetRepoPubKey().GetPurpose() == "" {
+	if transacted.GetMetadataMutable().GetRepoPubKey().GetPurposeId() == "" {
 		panic("empty pubkey format")
 	}
 

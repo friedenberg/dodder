@@ -131,7 +131,7 @@ func WriteDigest(
 
 	output.ResetWithMarklId(digest)
 
-	if err = output.SetPurpose(format.purpose); err != nil {
+	if err = output.SetPurposeId(format.purpose); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

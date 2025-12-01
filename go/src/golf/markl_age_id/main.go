@@ -194,7 +194,7 @@ func (id Id) IsNull() bool {
 	return len(id.Identities) == 0
 }
 
-func (id Id) GetPurpose() string {
+func (id Id) GetPurposeId() string {
 	return markl.PurposeMadderPrivateKeyV1
 }
 

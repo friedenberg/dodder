@@ -57,7 +57,7 @@ func (id *Id) GeneratePrivateKey(
 		return err
 	}
 
-	if err = id.SetPurpose(purpose); err != nil {
+	if err = id.SetPurposeId(purpose); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -104,7 +104,7 @@ func (id Id) GetPublicKey(
 		return public, err
 	}
 
-	if err = public.SetPurpose(PurposeRepoPubKeyV1); err != nil {
+	if err = public.SetPurposeId(PurposeRepoPubKeyV1); err != nil {
 		err = errors.Wrap(err)
 		return public, err
 	}
@@ -191,7 +191,7 @@ func (id Id) Sign(
 		return err
 	}
 
-	if err = sigDst.SetPurpose(
+	if err = sigDst.SetPurposeId(
 		sigPurpose,
 	); err != nil {
 		err = errors.Wrap(err)

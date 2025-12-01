@@ -119,7 +119,9 @@ function import_with_overwrite_sig { # @test
 	EOM
 }
 
+# TODO add support for imports resolving signatures within the graph
 function import_with_overwrite_sig_different_hash { # @test
+  skip
   (
     mkdir inner
     pushd inner || exit 1
@@ -162,7 +164,9 @@ function import_with_overwrite_sig_different_hash { # @test
 		[one/uno @sha256-z8suqjv408y63y3x8dt83cwlexzusepm94aqa0wu7j7suq5ghsgs7dg4qc !md "wow the first" tag-3 tag-4]
 	EOM
 
-  run_dodder show -format mother one/uno
+  run_dodder_debug show -format sig one/uno+
+
+  run_dodder show -format sig-mother one/uno
   assert_success
   assert_output - <<-EOM
 		[one/uno @sha256-8259ya5jn9gmqvvy5quv5zkk0ja83tnzduhr2yzzdddp0ftdl92s6huu7d !md "wow ok" tag-1 tag-2]

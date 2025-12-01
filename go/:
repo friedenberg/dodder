@@ -75,7 +75,7 @@ type (
 		SetMarklId(formatId string, bites []byte) error
 		Reset()
 		ResetWithMarklId(MarklId)
-		SetPurposeId(string) error
+		SetPurpose(string) error
 
 		// Optional methods
 		GeneratePrivateKey(

@@ -70,7 +70,7 @@ func (builder *Builder) addMarklIdIfNotNull(id interfaces.MarklId) {
 }
 
 func (builder *Builder) addMarklId(id interfaces.MarklId) {
-	builder.addMarklIdWithColorType(id, id.GetPurpose(), string_format_writer.ColorTypeHash)
+	builder.addMarklIdWithColorType(id, id.GetPurposeId(), string_format_writer.ColorTypeHash)
 }
 
 func (builder *Builder) addMarklIdLockWithColorType(
