@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"maps"
 	"sort"
 	"strings"
 
@@ -104,9 +105,7 @@ func (a *expSigilAndGenre) Clone() (b *expSigilAndGenre) {
 	bExp := a.expTagsOrTypes.Clone()
 	b.expTagsOrTypes = *bExp
 
-	for k, v := range a.expObjectIds.internal {
-		b.expObjectIds.internal[k] = v
-	}
+	maps.Copy(b.expObjectIds.internal, a.expObjectIds.internal)
 
 	for k, v := range a.expObjectIds.external {
 		b.expObjectIds.external[k] = v
