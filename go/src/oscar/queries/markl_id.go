@@ -25,10 +25,10 @@ func (marklId *MarklId) ReadFromSeq(seq doddish.Seq) (err error) {
 
 	if err = coder.UnmarshalDoddish(seq); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
-	return
+	return err
 }
 
 // TODO support exact
