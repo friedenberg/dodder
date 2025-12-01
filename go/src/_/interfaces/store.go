@@ -14,11 +14,11 @@ type (
 
 	TypedBlobStore[T any] interface {
 		ParseTypedBlob(
-			tipe ObjectId,
+			tipe ObjectIdWithParts,
 			blobSha MarklId) (common T, n int64, err error)
 
 		PutTypedBlob(
-			ObjectId,
+			ObjectIdWithParts,
 			T,
 		) error
 	}

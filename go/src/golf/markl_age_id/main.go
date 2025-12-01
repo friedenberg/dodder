@@ -235,7 +235,7 @@ func (id Id) Verify(_, _ interfaces.MarklId) (err error) {
 
 func (id Id) Sign(
 	mes interfaces.MarklId,
-	sigDst interfaces.MutableMarklId,
+	sigDst interfaces.MarklIdMutable,
 	sigPurpose string,
 ) (err error) {
 	return errors.Err405MethodNotAllowed

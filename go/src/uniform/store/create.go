@@ -50,7 +50,7 @@ func (store *Store) CreateOrUpdate(
 }
 
 func (store *Store) CreateOrUpdateBlobDigest(
-	objectId ids.ObjectIdLike,
+	objectId interfaces.ObjectId,
 	blobDigest interfaces.MarklId,
 ) (object *sku.Transacted, err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {

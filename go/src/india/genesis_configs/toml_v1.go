@@ -76,7 +76,7 @@ func (config *TomlV1Private) GetPrivateKey() interfaces.MarklId {
 	return markl.Id(config.PrivateKey)
 }
 
-func (config *TomlV1Private) GetPrivateKeyMutable() interfaces.MutableMarklId {
+func (config *TomlV1Private) GetPrivateKeyMutable() interfaces.MarklIdMutable {
 	return (*markl.Id)(&config.PrivateKey)
 }
 

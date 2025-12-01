@@ -157,7 +157,7 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 
 func (id Id) Sign(
 	mes interfaces.MarklId,
-	sigDst interfaces.MutableMarklId,
+	sigDst interfaces.MarklIdMutable,
 	sigPurpose string,
 ) (err error) {
 	var formatSec FormatSec

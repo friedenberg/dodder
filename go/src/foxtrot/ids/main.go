@@ -14,28 +14,6 @@ type Abbreviatable interface {
 	interfaces.Stringer
 }
 
-type (
-	ObjectIdLike interface {
-		interfaces.GenreGetter
-		interfaces.Stringer
-		IsEmpty() bool
-	}
-
-	ObjectIdLikeMutable interface {
-		ObjectIdLike
-		SetObjectIdLike(ObjectIdLike) error
-	}
-
-	ExternalObjectIdGetter interface {
-		GetExternalObjectId() ExternalObjectIdLike
-	}
-
-	ExternalObjectIdLike interface {
-		ObjectIdLike
-		ExternalObjectIdGetter
-	}
-)
-
 type Index struct{}
 
 func MakeObjectId(v string) (objectId *ObjectId, err error) {
@@ -63,7 +41,7 @@ func MakeObjectId(v string) (objectId *ObjectId, err error) {
 	return objectId, err
 }
 
-func Equals(a, b interfaces.ObjectId) (ok bool) {
+func Equals(a, b interfaces.ObjectIdWithParts) (ok bool) {
 	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
 		return ok
 	}
@@ -75,7 +53,7 @@ func Equals(a, b interfaces.ObjectId) (ok bool) {
 	return true
 }
 
-func FormattedString(k interfaces.ObjectId) string {
+func FormattedString(k interfaces.ObjectIdWithParts) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -85,7 +63,7 @@ func FormattedString(k interfaces.ObjectId) string {
 }
 
 func AlignedParts(
-	id interfaces.ObjectId, lenLeft, lenRight int,
+	id interfaces.ObjectIdWithParts, lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
 	left := parts[0]
@@ -105,7 +83,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id interfaces.ObjectId, lenLeft, lenRight int) string {
+func Aligned(id interfaces.ObjectIdWithParts, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
@@ -124,7 +102,7 @@ func LeftSubtract[
 	return c, err
 }
 
-func Contains(a, b interfaces.ObjectId) bool {
+func Contains(a, b interfaces.ObjectIdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -139,7 +117,7 @@ func Contains(a, b interfaces.ObjectId) bool {
 	return true
 }
 
-func ContainsExactly(a, b interfaces.ObjectId) bool {
+func ContainsExactly(a, b interfaces.ObjectIdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()

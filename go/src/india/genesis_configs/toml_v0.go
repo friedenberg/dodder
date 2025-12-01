@@ -68,7 +68,7 @@ func (config V0Common) GetPrivateKey() interfaces.MarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *V0Common) GetPrivateKeyMutable() interfaces.MutableMarklId {
+func (config *V0Common) GetPrivateKeyMutable() interfaces.MarklIdMutable {
 	panic(errors.Err405MethodNotAllowed)
 }
 

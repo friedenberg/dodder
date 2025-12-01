@@ -16,7 +16,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromObjectId(
-			k1 interfaces.ObjectId,
+			k1 interfaces.ObjectIdWithParts,
 		) (sk1 *Transacted, err error)
 	}
 
@@ -32,7 +32,7 @@ type (
 		ExpandStringString(string) (string, error)
 		ExpandString(string) (ID_PTR, error)
 		Expand(ID_PTR) (ID_PTR, error)
-		Abbreviate(ids.Abbreviatable) (string, error)
+		Abbreviate(interfaces.Abbreviatable) (string, error)
 	}
 
 	IdIndex interface {
@@ -48,18 +48,18 @@ type (
 
 	RepoStore interface {
 		Commit(*Transacted, CommitOptions) (err error)
-		ReadOneInto(ids.ObjectIdLike, *Transacted) (err error)
+		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
 		ReadPrimitiveQuery(
 			qg PrimitiveQueryGroup,
 			w interfaces.FuncIter[*Transacted],
 		) (err error)
 	}
 
-	ExternalObjectId       = ids.ExternalObjectIdLike
-	ExternalObjectIdGetter = ids.ExternalObjectIdGetter
+	ExternalObjectId       = interfaces.ExternalObjectId
+	ExternalObjectIdGetter = interfaces.ExternalObjectIdGetter
 
 	FuncReadOneInto = func(
-		k1 ids.ObjectIdLike,
+		k1 interfaces.ObjectId,
 		out *Transacted,
 	) (err error)
 

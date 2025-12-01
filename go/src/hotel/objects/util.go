@@ -1,9 +1,12 @@
 package objects
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 func ExpandTags(
@@ -16,4 +19,54 @@ func ExpandTags(
 	)
 
 	return nil
+}
+
+func GetMarklIdForPurpose(
+	metadata Metadata,
+	purposeId string,
+) interfaces.MarklId {
+	purposeType := markl.GetPurpose(purposeId).GetPurposeType()
+
+	switch purposeType {
+
+	case markl.PurposeTypeBlobDigest:
+		return metadata.GetBlobDigest()
+
+	case markl.PurposeTypeObjectMotherSig:
+		return metadata.GetMotherObjectSig()
+
+	case markl.PurposeTypeObjectSig:
+		return metadata.GetObjectSig()
+
+	case markl.PurposeTypeRepoPubKey:
+		return metadata.GetRepoPubKey()
+
+	default:
+		panic(fmt.Sprintf("unsupported purpose type: %q", purposeType))
+	}
+}
+
+func GetMarklIdMutableForPurpose(
+	metadata MetadataMutable,
+	purposeId string,
+) interfaces.MarklIdMutable {
+	purposeType := markl.GetPurpose(purposeId).GetPurposeType()
+
+	switch purposeType {
+
+	case markl.PurposeTypeBlobDigest:
+		return metadata.GetBlobDigestMutable()
+
+	case markl.PurposeTypeObjectMotherSig:
+		return metadata.GetMotherObjectSigMutable()
+
+	case markl.PurposeTypeObjectSig:
+		return metadata.GetObjectSigMutable()
+
+	case markl.PurposeTypeRepoPubKey:
+		return metadata.GetRepoPubKeyMutable()
+
+	default:
+		panic(fmt.Sprintf("unsupported purpose type: %q", purposeType))
+	}
 }

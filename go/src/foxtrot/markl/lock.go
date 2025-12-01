@@ -49,7 +49,7 @@ func (tuple Lock[KEY, KEY_PTR]) GetValue() interfaces.MarklId {
 	return tuple.Value
 }
 
-func (tuple *Lock[KEY, KEY_PTR]) GetValueMutable() interfaces.MutableMarklId {
+func (tuple *Lock[KEY, KEY_PTR]) GetValueMutable() interfaces.MarklIdMutable {
 	return &tuple.Value
 }
 

@@ -13,7 +13,7 @@ import (
 
 var (
 	_ interfaces.MarklId        = Id{}
-	_ interfaces.MutableMarklId = &Id{}
+	_ interfaces.MarklIdMutable = &Id{}
 )
 
 type Id struct {

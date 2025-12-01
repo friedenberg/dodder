@@ -1,13 +1,12 @@
 package queries
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -15,8 +14,10 @@ type MarklId struct {
 	Id markl.Id
 }
 
+var _ HoistedId = MarklId{}
+
 // TODO add support for abbreviated markl ids
-func (marklId MarklId) reduce(b *buildState) (err error) {
+func (marklId MarklId) reduce(buildState *buildState) (err error) {
 	return err
 }
 
@@ -37,27 +38,10 @@ func (marklId MarklId) ContainsSku(
 ) (ok bool) {
 	metadata := objectGetter.GetSku().GetMetadata()
 
-	var id interfaces.MarklId
-
-	purposeType := markl.GetPurpose(marklId.Id.GetPurpose()).GetPurposeType()
-
-	switch purposeType {
-
-	case markl.PurposeTypeBlobDigest:
-		id = metadata.GetBlobDigest()
-
-	case markl.PurposeTypeObjectMotherSig:
-		id = metadata.GetMotherObjectSig()
-
-	case markl.PurposeTypeObjectSig:
-		id = metadata.GetObjectSig()
-
-	case markl.PurposeTypeRepoPubKey:
-		id = metadata.GetRepoPubKey()
-
-	default:
-		panic(fmt.Sprintf("unsupported purpose type: %q", purposeType))
-	}
+	id := objects.GetMarklIdForPurpose(
+		metadata,
+		marklId.Id.GetPurpose(),
+	)
 
 	return markl.Equals(marklId.Id, id)
 }

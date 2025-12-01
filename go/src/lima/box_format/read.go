@@ -3,13 +3,13 @@ package box_format
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -293,7 +293,6 @@ LOOP_AFTER_OBJECT_ID:
 	return err
 }
 
-// expects `seq` to include `@` as the first token
 func (format *BoxTransacted) parseMarklIdTag(
 	object *sku.Transacted,
 	seq doddish.Seq,
@@ -311,27 +310,10 @@ func (format *BoxTransacted) parseMarklIdTag(
 		value = seq.At(1).Contents
 	}
 
-	metadata := object.GetMetadataMutable()
-
-	var id interfaces.MutableMarklId
-
-	switch markl.GetPurpose(purposeId).GetPurposeType() {
-	case markl.PurposeTypeBlobDigest:
-		id = metadata.GetBlobDigestMutable()
-
-	case markl.PurposeTypeObjectMotherSig:
-		id = metadata.GetMotherObjectSigMutable()
-
-	case markl.PurposeTypeObjectSig:
-		id = metadata.GetObjectSigMutable()
-
-	case markl.PurposeTypeRepoPubKey:
-		id = metadata.GetRepoPubKeyMutable()
-
-	default:
-		err = errors.Wrap(ErrUnsupportedDodderTag{tag: seq.String()})
-		return err
-	}
+	id := objects.GetMarklIdMutableForPurpose(
+		object.GetMetadataMutable(),
+		purposeId,
+	)
 
 	if err = markl.SetMarklIdWithFormatBlech32(
 		id,

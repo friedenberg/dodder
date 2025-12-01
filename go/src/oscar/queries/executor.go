@@ -59,7 +59,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 	permitInternal bool,
 ) (object *sku.Transacted, err error) {
 	if executor.WorkspaceStore != nil {
-		var externalObjectId ids.ObjectIdLike
+		var externalObjectId interfaces.ObjectId
 
 		if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
 			permitInternal,
@@ -90,7 +90,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			sku.TransactedResetter.ResetWith(object, external.GetSku())
 		}
 	} else {
-		var objectId ids.ObjectIdLike
+		var objectId interfaces.ObjectId
 
 		if objectId, _, err = executor.Query.getExactlyOneObjectId(); err != nil {
 			err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 }
 
 func (executor *Executor) ExecuteExactlyOne() (object *sku.Transacted, err error) {
-	var objectId ids.ObjectIdLike
+	var objectId interfaces.ObjectId
 	var sigil ids.Sigil
 
 	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(); err != nil {

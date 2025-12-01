@@ -14,7 +14,7 @@ import (
 )
 
 func (store *Store) ReadTransactedFromObjectId(
-	objectId ids.ObjectIdLike,
+	objectId interfaces.ObjectId,
 ) (object *sku.Transacted, err error) {
 	object = sku.GetTransactedPool().Get()
 
@@ -88,7 +88,7 @@ func (store *Store) ReadTypeObject(
 
 // TODO transition to a context-based panic / cancel semantic
 func (store *Store) ReadOneObjectId(
-	objectId ids.ObjectIdLike,
+	objectId interfaces.ObjectId,
 ) (object *sku.Transacted, err error) {
 	if objectId.IsEmpty() {
 		return object, err
@@ -110,7 +110,7 @@ func (store *Store) ReadOneObjectId(
 // TODO add support for cwd and sigil
 // TODO simplify
 func (store *Store) ReadOneInto(
-	objectId ids.ObjectIdLike,
+	objectId interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
 	var object *sku.Transacted

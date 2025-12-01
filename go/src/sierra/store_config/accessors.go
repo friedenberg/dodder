@@ -16,7 +16,7 @@ func (config Config) GetFileExtensions() file_extensions.Config {
 	return config.FileExtensions
 }
 
-func (compiled *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
+func (compiled *compiled) getType(k interfaces.ObjectIdWithParts) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
 		return ct
 	}
@@ -28,7 +28,7 @@ func (compiled *compiled) getType(k interfaces.ObjectId) (ct *sku.Transacted) {
 	return ct
 }
 
-func (compiled *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
+func (compiled *compiled) getRepo(k interfaces.ObjectIdWithParts) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
 		return ct
 	}
@@ -43,7 +43,7 @@ func (compiled *compiled) getRepo(k interfaces.ObjectId) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (compiled *compiled) GetApproximatedType(
-	k interfaces.ObjectId,
+	k interfaces.ObjectIdWithParts,
 ) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
 		return ct
@@ -89,7 +89,7 @@ func (compiled *compiled) GetTagOrRepoIdOrType(
 }
 
 func (compiled *compiled) getTag(
-	objectId interfaces.ObjectId,
+	objectId interfaces.ObjectIdWithParts,
 ) (object *sku.Transacted, ok bool) {
 	if objectId.GetGenre() != genres.Tag {
 		return object, ok

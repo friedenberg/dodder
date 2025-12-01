@@ -36,7 +36,7 @@ type (
 		SetInventoryListTypeId(string)
 		SetObjectSigMarklTypeId(string)
 		SetRepoId(ids.RepoId)
-		GetPrivateKeyMutable() interfaces.MutableMarklId
+		GetPrivateKeyMutable() interfaces.MarklIdMutable
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

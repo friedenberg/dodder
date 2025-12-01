@@ -18,7 +18,7 @@ import (
 )
 
 func SetHexStringFromAbsolutePath(
-	id interfaces.MutableMarklId,
+	id interfaces.MarklIdMutable,
 	absOrRelPath string,
 	base string,
 ) (err error) {
@@ -48,7 +48,7 @@ func SetHexStringFromAbsolutePath(
 }
 
 func SetHexStringFromRelPath(
-	id interfaces.MutableMarklId,
+	id interfaces.MarklIdMutable,
 	relPath string,
 ) (err error) {
 	if filepath.IsAbs(relPath) {
@@ -126,7 +126,7 @@ func CompareToReaderAt(
 
 func SetHexBytes(
 	formatId string,
-	dst interfaces.MutableMarklId,
+	dst interfaces.MarklIdMutable,
 	bites []byte,
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
@@ -177,7 +177,7 @@ func SetHexBytes(
 }
 
 func SetDigester(
-	dst interfaces.MutableMarklId,
+	dst interfaces.MarklIdMutable,
 	src interfaces.MarklIdGetter,
 ) {
 	digest := src.GetMarklId()
@@ -285,7 +285,7 @@ func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	}
 }
 
-func SetFromPath(id interfaces.MutableMarklId, path string) (err error) {
+func SetFromPath(id interfaces.MarklIdMutable, path string) (err error) {
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {

@@ -32,7 +32,7 @@ type (
 		GetTagPathsMutable() *tag_paths.Tags
 		SetImplicitTags(e ids.TagSet)
 		GetCommentsMutable() *collections_slice.Slice[string]
-		GetSelfWithoutTaiMutable() interfaces.MutableMarklId
+		GetSelfWithoutTaiMutable() interfaces.MarklIdMutable
 	}
 )
 

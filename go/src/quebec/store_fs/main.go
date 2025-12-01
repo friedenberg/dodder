@@ -321,7 +321,7 @@ func (store *Store) GetObjectIdsForString(
 }
 
 func (store *Store) Get(
-	objectId interfaces.ObjectId,
+	objectId interfaces.ObjectIdWithParts,
 ) (fsItem *sku.FSItem, ok bool) {
 	return store.dirInfo.probablyCheckedOut.Get(objectId.String())
 }

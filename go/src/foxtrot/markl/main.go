@@ -8,7 +8,7 @@ import (
 
 var idPool interfaces.Pool[Id, *Id] = pool.MakeWithResetable[Id]()
 
-func GetId() interfaces.MutableMarklId {
+func GetId() interfaces.MarklIdMutable {
 	return idPool.Get()
 }
 

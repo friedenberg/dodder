@@ -13,7 +13,7 @@ type (
 	) (ok bool)
 
 	ObjectProbeIndex interface {
-		ReadOneObjectId(ids.ObjectIdLike, *Transacted) error
+		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
 	}
 
 	IndexPrimitives interface {
@@ -43,12 +43,12 @@ type (
 		ObjectProbeIndex
 
 		ReadOneObjectIdTai(
-			k interfaces.ObjectId,
+			k interfaces.ObjectIdWithParts,
 			t ids.Tai,
 		) (sk *Transacted, err error)
 
 		ReadManyObjectId(
-			id interfaces.ObjectId,
+			id interfaces.ObjectIdWithParts,
 		) (skus []*Transacted, err error)
 
 		ReadManyMarklId(
@@ -76,7 +76,7 @@ type (
 
 func ReadOneObjectId(
 	index IndexPrimitives,
-	objectId interfaces.ObjectId,
+	objectId interfaces.ObjectIdWithParts,
 	object *Transacted,
 ) (ok bool) {
 	return ReadOneObjectIdBespoke(
@@ -87,7 +87,7 @@ func ReadOneObjectId(
 }
 
 func ReadOneObjectIdBespoke(
-	objectId interfaces.ObjectId,
+	objectId interfaces.ObjectIdWithParts,
 	object *Transacted,
 	funcs ...FuncReadOne,
 ) (ok bool) {

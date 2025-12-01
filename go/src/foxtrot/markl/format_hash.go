@@ -133,7 +133,7 @@ func (formatHash FormatHash) GetSize() int {
 	return formatHash.null.GetSize()
 }
 
-func (formatHash FormatHash) GetBlobId() (interfaces.MutableMarklId, interfaces.FuncRepool) {
+func (formatHash FormatHash) GetBlobId() (interfaces.MarklIdMutable, interfaces.FuncRepool) {
 	hash := formatHash.Get()
 	defer formatHash.Put(hash)
 

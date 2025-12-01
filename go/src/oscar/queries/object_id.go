@@ -18,6 +18,8 @@ type ObjectId struct {
 	*ids.ObjectId
 }
 
+var _ HoistedId = ObjectId{}
+
 func (objectId ObjectId) reduce(b *buildState) (err error) {
 	if err = objectId.GetObjectId().Expand(b.builder.expanders); err != nil {
 		err = errors.Wrap(err)

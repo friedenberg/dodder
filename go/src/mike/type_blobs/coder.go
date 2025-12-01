@@ -73,7 +73,7 @@ func (store Coder) SaveBlobText(
 }
 
 func (store Coder) ParseTypedBlob(
-	tipe interfaces.ObjectId,
+	tipe interfaces.ObjectIdWithParts,
 	blobId interfaces.MarklId,
 ) (common Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {

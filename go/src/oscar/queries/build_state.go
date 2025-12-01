@@ -526,17 +526,17 @@ func (buildState *buildState) makeTagOrLuaTag(
 }
 
 func (buildState *buildState) makeTagExp(
-	k *ObjectId,
+	objectId *ObjectId,
 ) (exp sku.Query, err error) {
 	// TODO use b.blobs to read tag blob and find filter if necessary
-	var e ids.Tag
+	var tag ids.Tag
 
-	if err = e.TodoSetFromObjectId(k.GetObjectId()); err != nil {
+	if err = tag.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
 		err = errors.Wrap(err)
 		return exp, err
 	}
 
-	if exp, err = buildState.makeTagOrLuaTag(k); err != nil {
+	if exp, err = buildState.makeTagOrLuaTag(objectId); err != nil {
 		err = errors.Wrap(err)
 		return exp, err
 	}

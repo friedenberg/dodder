@@ -95,7 +95,7 @@ func (ih *indexZettelId) Expand(
 }
 
 func (ih *indexZettelId) Abbreviate(
-	id ids.Abbreviatable,
+	id interfaces.Abbreviatable,
 ) (v string, err error) {
 	var h ids.ZettelId
 

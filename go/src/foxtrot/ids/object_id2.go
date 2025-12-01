@@ -431,7 +431,7 @@ func (objectId *objectId2) Abbreviate(
 }
 
 func (objectId *objectId2) SetWithIdLike(
-	otherObjectId interfaces.ObjectId,
+	otherObjectId interfaces.ObjectIdWithParts,
 ) (err error) {
 	objectId.Reset()
 
@@ -515,7 +515,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		v = els[1]
 	}
 
-	var k interfaces.ObjectId
+	var k interfaces.ObjectIdWithParts
 
 	switch objectId.genre {
 	case genres.None:
@@ -606,7 +606,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		}
 	}
 
-	var k interfaces.ObjectId
+	var k interfaces.ObjectIdWithParts
 
 	switch objectId.genre {
 	case genres.Zettel:
@@ -676,7 +676,7 @@ func (objectId *objectId2) ResetWith(b *objectId2) {
 	b.repoId.CopyTo(&objectId.repoId)
 }
 
-func (objectId *objectId2) SetObjectIdLike(b ObjectIdLike) (err error) {
+func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	if b, ok := b.(*objectId2); ok {
 		objectId.genre = b.genre
 		b.left.CopyTo(&objectId.left)
@@ -700,7 +700,7 @@ func (objectId *objectId2) SetObjectIdLike(b ObjectIdLike) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWithIdLike(b interfaces.ObjectId) (err error) {
+func (objectId *objectId2) ResetWithIdLike(b interfaces.ObjectIdWithParts) (err error) {
 	return objectId.SetWithIdLike(b)
 }
 

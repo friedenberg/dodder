@@ -33,7 +33,7 @@ func StringHRPCombined(id interfaces.MarklId) string {
 }
 
 func SetBlechCombinedHRPAndData(
-	id interfaces.MutableMarklId,
+	id interfaces.MarklIdMutable,
 	value string,
 ) (err error) {
 	var formatId string

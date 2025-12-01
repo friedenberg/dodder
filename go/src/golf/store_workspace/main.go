@@ -1,10 +1,13 @@
 package store_workspace
 
-import "code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+)
 
 type (
 	Store interface {
-		GetObjectIdsForString(string) ([]ids.ExternalObjectIdLike, error)
+		GetObjectIdsForString(string) ([]interfaces.ExternalObjectId, error)
 	}
 
 	StoreGetter interface {

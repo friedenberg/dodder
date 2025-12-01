@@ -102,7 +102,7 @@ func (transacted *Transacted) CalculateObjectDigest(
 
 func (transacted *Transacted) CalculateDigestForPurpose(
 	purposeId string,
-	digest interfaces.MutableMarklId,
+	digest interfaces.MarklIdMutable,
 ) (err error) {
 	if err = object_fmt_digest.WriteDigest(
 		purposeId,

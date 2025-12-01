@@ -21,18 +21,18 @@ type expTagsOrTypes struct {
 	Children []sku.Query
 }
 
-func (tagsOrTypes *expTagsOrTypes) Clone() (b *expTagsOrTypes) {
+func (expression *expTagsOrTypes) Clone() (b *expTagsOrTypes) {
 	b = &expTagsOrTypes{
-		Or:      tagsOrTypes.Or,
-		Negated: tagsOrTypes.Negated,
-		Exact:   tagsOrTypes.Exact,
-		Hidden:  tagsOrTypes.Hidden,
-		Debug:   tagsOrTypes.Debug,
+		Or:      expression.Or,
+		Negated: expression.Negated,
+		Exact:   expression.Exact,
+		Hidden:  expression.Hidden,
+		Debug:   expression.Debug,
 	}
 
-	b.Children = make([]sku.Query, len(tagsOrTypes.Children))
+	b.Children = make([]sku.Query, len(expression.Children))
 
-	for i, c := range tagsOrTypes.Children {
+	for i, c := range expression.Children {
 		switch ct := c.(type) {
 		case *expTagsOrTypes:
 			b.Children[i] = ct.Clone()
@@ -45,36 +45,36 @@ func (tagsOrTypes *expTagsOrTypes) Clone() (b *expTagsOrTypes) {
 	return b
 }
 
-func (tagsOrTypes *expTagsOrTypes) CollectTags(mes ids.TagSetMutable) {
-	if tagsOrTypes.Or || tagsOrTypes.Negated {
+func (expression *expTagsOrTypes) CollectTags(tags ids.TagSetMutable) {
+	if expression.Or || expression.Negated {
 		return
 	}
 
-	for _, m := range tagsOrTypes.Children {
-		switch mt := m.(type) {
+	for _, childExpression := range expression.Children {
+		switch childExpression := childExpression.(type) {
 		case *expTagsOrTypes:
-			mt.CollectTags(mes)
+			childExpression.CollectTags(tags)
 
 		case *ObjectId:
-			if mt.GetGenre() != genres.Tag {
+			if childExpression.GetGenre() != genres.Tag {
 				continue
 			}
 
-			e := ids.MustTag(mt.GetObjectId().String())
-			mes.Add(e)
+			tag := ids.MustTag(childExpression.GetObjectId().String())
+			tags.Add(tag)
 		}
 	}
 }
 
-func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
-	if tagsOrTypes.Exact {
-		for _, child := range tagsOrTypes.Children {
-			switch k := child.(type) {
+func (expression *expTagsOrTypes) reduce(buildState *buildState) (err error) {
+	if expression.Exact {
+		for _, child := range expression.Children {
+			switch childExpression := child.(type) {
 			case *ObjectId:
-				k.Exact = true
+				childExpression.Exact = true
 
 			case *expTagsOrTypes:
-				k.Exact = true
+				childExpression.Exact = true
 
 			default:
 				continue
@@ -82,12 +82,12 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 		}
 	}
 
-	chillen := make([]sku.Query, 0, len(tagsOrTypes.Children))
+	chillen := make([]sku.Query, 0, len(expression.Children))
 
-	for _, m := range tagsOrTypes.Children {
+	for _, m := range expression.Children {
 		switch mt := m.(type) {
 		case *expTagsOrTypes:
-			if err = mt.reduce(b); err != nil {
+			if err = mt.reduce(buildState); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -96,13 +96,13 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 				continue
 			}
 
-			if mt.Or == tagsOrTypes.Or && mt.Negated == tagsOrTypes.Negated && mt.Exact == tagsOrTypes.Exact {
+			if mt.Or == expression.Or && mt.Negated == expression.Negated && mt.Exact == expression.Exact {
 				chillen = append(chillen, mt.Children...)
 				continue
 			}
 
 		case reducer:
-			if err = mt.reduce(b); err != nil {
+			if err = mt.reduce(buildState); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -111,45 +111,45 @@ func (tagsOrTypes *expTagsOrTypes) reduce(b *buildState) (err error) {
 		chillen = append(chillen, m)
 	}
 
-	tagsOrTypes.Children = chillen
+	expression.Children = chillen
 
 	return err
 }
 
-func (tagsOrTypes *expTagsOrTypes) Add(m sku.Query) (err error) {
-	switch mt := m.(type) {
+func (expression *expTagsOrTypes) Add(query sku.Query) (err error) {
+	switch query := query.(type) {
 	case *expTagsOrTypes:
 
 	case *ObjectId:
-		mt.Exact = tagsOrTypes.Exact
+		query.Exact = expression.Exact
 	}
 
-	tagsOrTypes.Children = append(tagsOrTypes.Children, m)
+	expression.Children = append(expression.Children, query)
 
 	return err
 }
 
-func (tagsOrTypes *expTagsOrTypes) Operator() rune {
-	if tagsOrTypes.Or {
+func (expression *expTagsOrTypes) Operator() rune {
+	if expression.Or {
 		return doddish.OpOr
 	} else {
 		return doddish.OpAnd
 	}
 }
 
-func (tagsOrTypes *expTagsOrTypes) StringDebug() string {
+func (expression *expTagsOrTypes) StringDebug() string {
 	var sb strings.Builder
 
-	op := tagsOrTypes.Operator()
+	op := expression.Operator()
 
-	if tagsOrTypes.Negated {
+	if expression.Negated {
 		sb.WriteRune('^')
 	}
 
 	sb.WriteRune(doddish.OpGroupOpen)
-	fmt.Fprintf(&sb, "(%d)", len(tagsOrTypes.Children))
+	fmt.Fprintf(&sb, "(%d)", len(expression.Children))
 
-	for i, m := range tagsOrTypes.Children {
+	for i, m := range expression.Children {
 		if i > 0 {
 			sb.WriteRune(op)
 		}
@@ -162,12 +162,12 @@ func (tagsOrTypes *expTagsOrTypes) StringDebug() string {
 	return sb.String()
 }
 
-func (tagsOrTypes *expTagsOrTypes) String() string {
-	if tagsOrTypes.Hidden {
+func (expression *expTagsOrTypes) String() string {
+	if expression.Hidden {
 		return ""
 	}
 
-	l := len(tagsOrTypes.Children)
+	l := len(expression.Children)
 
 	if l == 0 {
 		return ""
@@ -175,20 +175,20 @@ func (tagsOrTypes *expTagsOrTypes) String() string {
 
 	var sb strings.Builder
 
-	op := tagsOrTypes.Operator()
+	op := expression.Operator()
 
-	if tagsOrTypes.Negated {
+	if expression.Negated {
 		sb.WriteRune('^')
 	}
 
 	switch l {
 	case 1:
-		sb.WriteString(tagsOrTypes.Children[0].String())
+		sb.WriteString(expression.Children[0].String())
 
 	default:
 		sb.WriteRune(doddish.OpGroupOpen)
 
-		for i, m := range tagsOrTypes.Children {
+		for i, m := range expression.Children {
 			if i > 0 {
 				sb.WriteRune(op)
 			}
@@ -202,59 +202,59 @@ func (tagsOrTypes *expTagsOrTypes) String() string {
 	return sb.String()
 }
 
-func (tagsOrTypes *expTagsOrTypes) negateIfNecessary(value bool) bool {
-	if tagsOrTypes.Negated {
+func (expression *expTagsOrTypes) negateIfNecessary(value bool) bool {
+	if expression.Negated {
 		return !value
 	} else {
 		return value
 	}
 }
 
-func (tagsOrTypes *expTagsOrTypes) ContainsSku(
+func (expression *expTagsOrTypes) ContainsSku(
 	objectGetter sku.TransactedGetter,
 ) (ok bool) {
-	if len(tagsOrTypes.Children) == 0 {
-		ok = tagsOrTypes.negateIfNecessary(true)
+	if len(expression.Children) == 0 {
+		ok = expression.negateIfNecessary(true)
 		return ok
 	}
 
-	if tagsOrTypes.Or {
-		ok = tagsOrTypes.containsMatchableOr(objectGetter)
+	if expression.Or {
+		ok = expression.containsMatchableOr(objectGetter)
 	} else {
-		ok = tagsOrTypes.containsMatchableAnd(objectGetter)
+		ok = expression.containsMatchableAnd(objectGetter)
 	}
 
 	return ok
 }
 
-func (tagsOrTypes *expTagsOrTypes) containsMatchableAnd(
+func (expression *expTagsOrTypes) containsMatchableAnd(
 	tg sku.TransactedGetter,
 ) bool {
-	for _, m := range tagsOrTypes.Children {
+	for _, m := range expression.Children {
 		if !m.ContainsSku(tg) {
-			return tagsOrTypes.negateIfNecessary(false)
+			return expression.negateIfNecessary(false)
 		}
 	}
 
-	return tagsOrTypes.negateIfNecessary(true)
+	return expression.negateIfNecessary(true)
 }
 
-func (tagsOrTypes *expTagsOrTypes) containsMatchableOr(
+func (expression *expTagsOrTypes) containsMatchableOr(
 	tg sku.TransactedGetter,
 ) bool {
-	for _, m := range tagsOrTypes.Children {
+	for _, m := range expression.Children {
 		if m.ContainsSku(tg) {
-			return tagsOrTypes.negateIfNecessary(true)
+			return expression.negateIfNecessary(true)
 		}
 	}
 
-	return tagsOrTypes.negateIfNecessary(false)
+	return expression.negateIfNecessary(false)
 }
 
-func (tagsOrTypes *expTagsOrTypes) Each(
+func (expression *expTagsOrTypes) Each(
 	f interfaces.FuncIter[sku.Query],
 ) (err error) {
-	for _, m := range tagsOrTypes.Children {
+	for _, m := range expression.Children {
 		if err = f(m); err != nil {
 			err = errors.Wrap(err)
 			return err

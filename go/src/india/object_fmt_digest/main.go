@@ -109,7 +109,7 @@ func init() {
 func WriteDigest(
 	formatId string,
 	context FormatterContext,
-	output interfaces.MutableMarklId,
+	output interfaces.MarklIdMutable,
 ) (err error) {
 	format := GetFormatForPurpose(formatId)
 

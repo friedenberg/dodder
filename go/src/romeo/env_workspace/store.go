@@ -96,7 +96,7 @@ func (store *Store) ReadAllExternalItems() (err error) {
 
 func (store *Store) ReadTransactedFromObjectId(
 	o sku.CommitOptions,
-	k1 interfaces.ObjectId,
+	k1 interfaces.ObjectIdWithParts,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
 	es, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)

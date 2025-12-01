@@ -59,12 +59,12 @@ type (
 
 		GetIndexMutable() IndexMutable
 
-		GetBlobDigestMutable() interfaces.MutableMarklId
+		GetBlobDigestMutable() interfaces.MarklIdMutable
 		GetDescriptionMutable() *descriptions.Description
-		GetMotherObjectSigMutable() interfaces.MutableMarklId
-		GetObjectDigestMutable() interfaces.MutableMarklId
-		GetObjectSigMutable() interfaces.MutableMarklId
-		GetRepoPubKeyMutable() interfaces.MutableMarklId
+		GetMotherObjectSigMutable() interfaces.MarklIdMutable
+		GetObjectDigestMutable() interfaces.MarklIdMutable
+		GetObjectSigMutable() interfaces.MarklIdMutable
+		GetRepoPubKeyMutable() interfaces.MarklIdMutable
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeLockMutable() TypeLockMutable

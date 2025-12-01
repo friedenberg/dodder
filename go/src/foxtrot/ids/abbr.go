@@ -7,18 +7,9 @@ import (
 )
 
 type (
-	// TODO use catgut.String
-	FuncExpandString     func(string) (string, error)
-	FuncAbbreviateString func(Abbreviatable) (string, error)
-
 	Abbr struct {
-		BlobId   abbrOne
-		ZettelId abbrOne
-	}
-
-	abbrOne struct {
-		Expand     FuncExpandString
-		Abbreviate FuncAbbreviateString
+		BlobId   interfaces.Abbreviator
+		ZettelId interfaces.Abbreviator
 	}
 )
 
@@ -30,7 +21,7 @@ func DontAbbreviateString[VPtr interfaces.Stringer](k VPtr) (string, error) {
 	return k.String(), nil
 }
 
-func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
+func (a Abbr) ExpanderFor(g genres.Genre) interfaces.FuncExpandString {
 	switch g {
 	case genres.Zettel:
 		return a.ZettelId.Expand
@@ -84,7 +75,7 @@ func (a Abbr) AbbreviateZettelIdOnly(
 		return err
 	}
 
-	var getAbbr FuncAbbreviateString
+	var getAbbr interfaces.FuncAbbreviateString
 
 	var h ZettelId
 
@@ -143,7 +134,7 @@ func (a Abbr) AbbreviateObjectId(
 	in *ObjectId,
 	out *ObjectId,
 ) (err error) {
-	var getAbbr FuncAbbreviateString
+	var getAbbr interfaces.FuncAbbreviateString
 
 	switch in.GetGenre() {
 	case genres.Zettel:

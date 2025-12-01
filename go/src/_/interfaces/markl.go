@@ -33,7 +33,7 @@ type (
 		hash.Hash
 		MarklFormatGetter
 		// TODO add `WriteToMarklId` method for reuse
-		GetMarklId() (MutableMarklId, FuncRepool)
+		GetMarklId() (MarklIdMutable, FuncRepool)
 	}
 
 	MarklId interface {
@@ -61,12 +61,12 @@ type (
 		Verify(mes, sig MarklId) error
 		Sign(
 			mes MarklId,
-			sigDst MutableMarklId,
+			sigDst MarklIdMutable,
 			sigPurpose string,
 		) (err error)
 	}
 
-	MutableMarklId interface {
+	MarklIdMutable interface {
 		MarklId
 		Setter
 		encoding.BinaryUnmarshaler
@@ -89,7 +89,7 @@ type (
 		GetMarklId() MarklId
 	}
 
-	DigestWriteMap map[string]MutableMarklId
+	DigestWriteMap map[string]MarklIdMutable
 
 	Lock[
 		KEY Value[KEY],
@@ -106,6 +106,6 @@ type (
 	] interface {
 		Lock[KEY, KEY_PTR]
 		GetKeyMutable() KEY_PTR
-		GetValueMutable() MutableMarklId
+		GetValueMutable() MarklIdMutable
 	}
 )

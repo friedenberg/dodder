@@ -13,6 +13,6 @@ func (index *index) GetSelfWithoutTai() interfaces.MarklId {
 	return &index.SelfWithoutTai
 }
 
-func (index *index) GetSelfWithoutTaiMutable() interfaces.MutableMarklId {
+func (index *index) GetSelfWithoutTaiMutable() interfaces.MarklIdMutable {
 	return &index.SelfWithoutTai
 }

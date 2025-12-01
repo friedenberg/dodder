@@ -26,24 +26,24 @@ type IdParts struct {
 
 var ErrFDNotId = errors.New("not a id file")
 
-func MustObjectId(kp interfaces.ObjectId) (k *ObjectId) {
+func MustObjectId(kp interfaces.ObjectIdWithParts) (k *ObjectId) {
 	k = &ObjectId{}
 	err := k.SetWithIdLike(kp)
 	errors.PanicIfError(err)
 	return k
 }
 
-type ObjectIdStringerSansRepo struct {
-	ObjectIdLike
+type ObjectIdStringMarshalerSansRepo struct {
+	interfaces.ObjectId
 }
 
-func (oid *ObjectIdStringerSansRepo) String() string {
-	switch oid := oid.ObjectIdLike.(type) {
+func (objectId *ObjectIdStringMarshalerSansRepo) String() string {
+	switch objectId := objectId.ObjectId.(type) {
 	case *ObjectId:
-		return oid.StringSansRepo()
+		return objectId.StringSansRepo()
 
 	default:
-		return oid.String()
+		return objectId.String()
 	}
 }
 

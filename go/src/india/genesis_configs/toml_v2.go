@@ -69,7 +69,7 @@ func (config *TomlV2Private) GetPrivateKey() interfaces.MarklId {
 	return config.PrivateKey
 }
 
-func (config *TomlV2Private) GetPrivateKeyMutable() interfaces.MutableMarklId {
+func (config *TomlV2Private) GetPrivateKeyMutable() interfaces.MarklIdMutable {
 	return &config.PrivateKey
 }
 

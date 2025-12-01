@@ -18,7 +18,7 @@ type ExternalObjectId struct {
 	genre genres.Genre
 }
 
-func (eoid *ExternalObjectId) GetExternalObjectId() ExternalObjectIdLike {
+func (eoid *ExternalObjectId) GetExternalObjectId() interfaces.ExternalObjectId {
 	return eoid
 }
 
@@ -89,7 +89,7 @@ func (dst *ExternalObjectId) ResetWith(src *ExternalObjectId) {
 	dst.value = src.value
 }
 
-func (dst *ExternalObjectId) SetObjectIdLike(src ObjectIdLike) (err error) {
+func (dst *ExternalObjectId) SetObjectIdLike(src interfaces.ObjectId) (err error) {
 	if src.IsEmpty() {
 		dst.Reset()
 		return err

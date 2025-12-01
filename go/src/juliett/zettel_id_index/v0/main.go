@@ -177,7 +177,7 @@ func (index *index) Reset() (err error) {
 	return err
 }
 
-func (index *index) AddZettelId(k1 interfaces.ObjectId) (err error) {
+func (index *index) AddZettelId(k1 interfaces.ObjectIdWithParts) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return err

@@ -7,14 +7,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 func AddBlobDigestIfNecessary(
 	boxContents collections_slice.Slice[string_format_writer.Field],
 	digest interfaces.MarklId,
-	funcAbbreviate ids.FuncAbbreviateString,
+	funcAbbreviate interfaces.FuncAbbreviateString,
 ) {
 	value := digest.String()
 

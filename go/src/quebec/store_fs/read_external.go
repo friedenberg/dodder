@@ -15,7 +15,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 	var items []*sku.FSItem
 
 	oidString := objectIdMaybeExternal.String()
-	_, isExternal := objectIdMaybeExternal.(ids.ExternalObjectIdLike)
+	_, isExternal := objectIdMaybeExternal.(interfaces.ExternalObjectId)
 
 	if !isExternal {
 		oidString = store.keyForObjectIdString(oidString)

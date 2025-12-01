@@ -161,17 +161,17 @@ func (format *BoxCheckedOut) addFieldsExternalWithFSItem(
 // }
 
 func (format *BoxCheckedOut) makeFieldObjectId(
-	sk *sku.Transacted,
+	object *sku.Transacted,
 ) (field string_format_writer.Field, empty bool, err error) {
-	oid := &sk.ObjectId
+	objectId := &object.ObjectId
 
-	empty = oid.IsEmpty()
+	empty = objectId.IsEmpty()
 
-	oidString := (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
+	oidString := (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: objectId}).String()
 
 	if format.abbr.ZettelId.Abbreviate != nil &&
-		oid.GetGenre() == genres.Zettel {
-		if oidString, err = format.abbr.ZettelId.Abbreviate(oid); err != nil {
+		objectId.GetGenre() == genres.Zettel {
+		if oidString, err = format.abbr.ZettelId.Abbreviate(objectId); err != nil {
 			err = errors.Wrap(err)
 			return field, empty, err
 		}
@@ -304,7 +304,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 
 	switch {
 	case mode.IsBlobOnly() || mode.IsBlobRecognized():
-		id.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: &checkedOut.GetSkuExternal().ObjectId}).String()
+		id.Value = (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: &checkedOut.GetSkuExternal().ObjectId}).String()
 
 	case mode.IncludesMetadata():
 		id.Value = format.relativePath.Rel(item.Object.GetPath())

@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
 type indexNotZettelId[
@@ -100,7 +99,7 @@ func (index *indexNotZettelId[ID, ID_PTR]) Expand(
 }
 
 func (index *indexNotZettelId[ID, ID_PTR]) Abbreviate(
-	k ids.Abbreviatable,
+	k interfaces.Abbreviatable,
 ) (v string, err error) {
 	if err = index.readFunc(); err != nil {
 		err = errors.Wrap(err)

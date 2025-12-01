@@ -402,9 +402,9 @@ func (decoder *binaryDecoder) readFieldKey(
 	return err
 }
 
-func unmarshalMarklId(id interfaces.MutableMarklId, bites []byte) (err error) {
+func unmarshalMarklId(id interfaces.MarklIdMutable, bites []byte) (err error) {
 	unmarshaler := markl.IdBinaryDecodingFormatTypeData{
-		MutableMarklId: id,
+		MarklIdMutable: id,
 	}
 
 	if err = unmarshaler.UnmarshalBinary(

@@ -150,9 +150,9 @@ func (format *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	}
 
 	if !object.ExternalObjectId.IsEmpty() {
-		oid := &object.ExternalObjectId
+		objectId := &object.ExternalObjectId
 		// TODO quote as necessary
-		field.Value = (&ids.ObjectIdStringerSansRepo{ObjectIdLike: oid}).String()
+		field.Value = (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: objectId}).String()
 	}
 
 	return field, err
@@ -165,7 +165,7 @@ func (format *BoxTransacted) makeFieldObjectId(
 
 	empty = objectId.IsEmpty()
 
-	objectIdString := (&ids.ObjectIdStringerSansRepo{ObjectIdLike: objectId}).String()
+	objectIdString := (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: objectId}).String()
 
 	if format.abbr.ZettelId.Abbreviate != nil &&
 		objectId.GetGenre() == genres.Zettel &&

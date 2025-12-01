@@ -8,7 +8,7 @@ import (
 )
 
 type IdBinaryDecodingTypeData struct {
-	interfaces.MutableMarklId
+	interfaces.MarklIdMutable
 }
 
 func (id IdBinaryDecodingTypeData) UnmarshalBinary(
@@ -34,7 +34,7 @@ func (id IdBinaryDecodingTypeData) UnmarshalBinary(
 }
 
 type IdBinaryDecodingFormatTypeData struct {
-	interfaces.MutableMarklId
+	interfaces.MarklIdMutable
 }
 
 func (id *Id) UnmarshalBinary(

@@ -332,7 +332,7 @@ func (objectId *objectId) Abbreviate(
 type objectIdPtr = *objectId
 
 func (objectId *objectId) SetWithIdLike(
-	otherObjectId interfaces.ObjectId,
+	otherObjectId interfaces.ObjectIdWithParts,
 ) (err error) {
 	switch kt := otherObjectId.(type) {
 	case objectIdPtr:
@@ -403,7 +403,7 @@ func (objectId *objectId) SetRaw(value string) (err error) {
 }
 
 func (objectId *objectId) Set(value string) (err error) {
-	var parsingObjectId interfaces.ObjectId
+	var parsingObjectId interfaces.ObjectIdWithParts
 
 	switch objectId.genre {
 	case genres.None:
@@ -462,7 +462,7 @@ func (objectId *objectId) ResetWith(otherObjectId *objectId) {
 	objectId.middle = otherObjectId.middle
 }
 
-func (objectId *objectId) ResetWithIdLike(otherObjectId interfaces.ObjectId) (err error) {
+func (objectId *objectId) ResetWithIdLike(otherObjectId interfaces.ObjectIdWithParts) (err error) {
 	return objectId.SetWithIdLike(otherObjectId)
 }
 

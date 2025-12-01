@@ -41,7 +41,7 @@ func (transacted *Transacted) GetRepoId() ids.RepoId {
 	return transacted.RepoId
 }
 
-func (transacted *Transacted) GetExternalObjectId() ids.ExternalObjectIdLike {
+func (transacted *Transacted) GetExternalObjectId() interfaces.ExternalObjectId {
 	return &transacted.ExternalObjectId
 }
 
@@ -137,7 +137,7 @@ func (transacted *Transacted) GetObjectId() *ids.ObjectId {
 }
 
 func (transacted *Transacted) SetObjectIdLike(
-	objectIdLike interfaces.ObjectId,
+	objectIdLike interfaces.ObjectIdWithParts,
 ) (err error) {
 	if err = transacted.ObjectId.SetWithIdLike(objectIdLike); err != nil {
 		err = errors.Wrap(err)

@@ -43,7 +43,7 @@ func (hash *Hash) GetMarklFormat() interfaces.MarklFormat {
 	return hash.formatHash
 }
 
-func (hash *Hash) GetMarklId() (interfaces.MutableMarklId, interfaces.FuncRepool) {
+func (hash *Hash) GetMarklId() (interfaces.MarklIdMutable, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.format = hash.GetMarklFormat()
 	id.allocDataIfNecessary(hash.Size())

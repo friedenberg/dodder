@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
@@ -16,7 +15,7 @@ type Builder string_format_writer.Box
 
 func (builder *Builder) AddBlobDigestIfNecessary(
 	digest interfaces.MarklId,
-	funcAbbreviate ids.FuncAbbreviateString,
+	funcAbbreviate interfaces.FuncAbbreviateString,
 ) {
 	value := digest.String()
 

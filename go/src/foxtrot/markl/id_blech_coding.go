@@ -10,7 +10,7 @@ import (
 )
 
 // TODO remove
-func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
+func SetMaybeSha256(id interfaces.MarklIdMutable, value string) (err error) {
 	// TODO use registered format lengths
 	switch len(value) {
 	case 65:
@@ -39,7 +39,7 @@ func SetMaybeSha256(id interfaces.MutableMarklId, value string) (err error) {
 }
 
 func SetMarklIdWithFormatBlech32(
-	id interfaces.MutableMarklId,
+	id interfaces.MarklIdMutable,
 	purposeId string,
 	blechValue string,
 ) (err error) {
@@ -89,7 +89,7 @@ func validatePurposeAndFormatId(purposeId string, formatId string) (err error) {
 }
 
 // TODO remove
-func setSha256(id interfaces.MutableMarklId, value string) (err error) {
+func setSha256(id interfaces.MarklIdMutable, value string) (err error) {
 	var decodedBytes []byte
 
 	if decodedBytes, err = hex.DecodeString(value); err != nil {

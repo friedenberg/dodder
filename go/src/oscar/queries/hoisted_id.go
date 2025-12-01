@@ -3,10 +3,10 @@ package queries
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
-type HoistedId = ids.ObjectIdLike
+type HoistedId = interfaces.ObjectId
 
 func getStringForHoistedId(id HoistedId) string {
 	switch id := id.(type) {
