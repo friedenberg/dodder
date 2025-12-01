@@ -90,7 +90,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			sku.TransactedResetter.ResetWith(object, external.GetSku())
 		}
 	} else {
-		var objectId *ids.ObjectId
+		var objectId ids.ObjectIdLike
 
 		if objectId, _, err = executor.Query.getExactlyOneObjectId(); err != nil {
 			err = errors.Wrap(err)
@@ -111,24 +111,24 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 	return object, err
 }
 
-func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
-	var objectId *ids.ObjectId
+func (executor *Executor) ExecuteExactlyOne() (object *sku.Transacted, err error) {
+	var objectId ids.ObjectIdLike
 	var sigil ids.Sigil
 
 	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
-	sk = sku.GetTransactedPool().Get()
+	object = sku.GetTransactedPool().Get()
 
-	if err = executor.ExecutionInfo.FuncReadOneInto(objectId, sk); err != nil {
+	if err = executor.ExecutionInfo.FuncReadOneInto(objectId, object); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
 	if !sigil.IncludesExternal() {
-		return sk, err
+		return object, err
 	}
 
 	var external sku.ExternalLike
@@ -140,17 +140,17 @@ func (executor *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 			},
 		},
 		objectId,
-		sk,
+		object,
 	); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
 	if external != nil {
-		sku.TransactedResetter.ResetWith(sk, external.GetSku())
+		sku.TransactedResetter.ResetWith(object, external.GetSku())
 	}
 
-	return sk, err
+	return object, err
 }
 
 func (executor *Executor) ExecuteSkuType(

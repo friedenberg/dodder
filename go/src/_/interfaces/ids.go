@@ -4,7 +4,7 @@ type (
 	ObjectId interface {
 		GenreGetter
 		Stringer
-		Parts() [3]string
+		Parts() [3]string // TODO remove this method
 		IsEmpty() bool
 	}
 

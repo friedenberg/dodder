@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
@@ -210,7 +211,7 @@ func (buildState *buildState) addDefaultsIfNecessary() {
 
 func (buildState *buildState) parseTokens() (err error) {
 	query := buildState.makeQuery()
-	stack := []stackEl{query}
+	stack := collections_slice.MakeFromSlice[stackEl](query)
 
 	isNegated := false
 	isExact := false
@@ -219,6 +220,8 @@ LOOP:
 	for buildState.scanner.Scan() {
 		seq := buildState.scanner.GetSeq()
 
+		// TODO convert this into a decision tree based on token type sequences
+		// instead of a switch
 		if seq.MatchAll(doddish.TokenTypeOperator) {
 			op := seq.At(0).Contents[0]
 
@@ -230,12 +233,12 @@ LOOP:
 				isNegated = true
 
 			case ' ':
-				if len(stack) == 1 {
+				if stack.Len() == 1 {
 					break LOOP
 				}
 
 			case ',':
-				last := stack[len(stack)-1].(*expTagsOrTypes)
+				last := stack.Last().(*expTagsOrTypes)
 				last.Or = true
 				// TODO handle or when invalid
 
@@ -243,11 +246,11 @@ LOOP:
 				exp := buildState.makeExp(isNegated, isExact)
 				isExact = false
 				isNegated = false
-				stack[len(stack)-1].Add(exp)
-				stack = append(stack, exp)
+				stack.Last().Add(exp)
+				stack.Append(exp)
 
 			case ']':
-				stack = stack[:len(stack)-1]
+				stack.DropLast()
 				// TODO handle errors of unbalanced
 
 			case '.':
@@ -255,7 +258,7 @@ LOOP:
 				fallthrough
 
 			case ':', '+', '?':
-				if len(stack) > 1 {
+				if stack.Len() > 1 {
 					err = errors.ErrorWithStackf("sigil before end")
 					return err
 				}
@@ -268,8 +271,15 @@ LOOP:
 				}
 
 				continue LOOP
+
+			default:
+				err = errors.Errorf("unsupported operator: %q", op)
+				return
 			}
+
 		} else {
+			// TODO add support for digests and signatures
+
 			if ok, left, right, partition := seq.PartitionFavoringRight(
 				doddish.TokenMatcherOp(doddish.OpSigilExternal),
 			); ok {
@@ -343,7 +353,7 @@ LOOP:
 				}
 
 				exp := buildState.makeExp(isNegated, isExact, et)
-				stack[len(stack)-1].Add(exp)
+				stack.Last().Add(exp)
 
 			case genres.Type:
 				var t ids.Type
@@ -361,7 +371,7 @@ LOOP:
 				}
 
 				exp := buildState.makeExp(isNegated, isExact, &objectId)
-				stack[len(stack)-1].Add(exp)
+				stack.Last().Add(exp)
 			}
 
 			isNegated = false
