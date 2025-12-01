@@ -968,7 +968,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 					mother,
 				) {
 					// TODO print error
-					return
+					return err
 				}
 
 				if err = printer(mother); err != nil {
