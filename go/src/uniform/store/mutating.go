@@ -354,7 +354,7 @@ func (commitFacilitator commitFacilitator) commitTransacted(
 	daughter *sku.Transacted,
 	mother *sku.Transacted,
 ) (err error) {
-	if err = commitFacilitator.inventoryList.Add(daughter); err != nil {
+	if err = commitFacilitator.workingList.Add(daughter); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -31,7 +31,7 @@ type Store struct {
 	inventoryListStore inventory_list_store.Store
 	Abbr               sku.IdIndex
 
-	inventoryList   *sku.OpenList
+	workingList     *sku.WorkingList
 	configBlobCoder interfaces.CoderReadWriter[*repo_configs.TypedBlob]
 	envLua          env_lua.Env
 
@@ -80,7 +80,7 @@ func (store *Store) Initialize(
 		return err
 	}
 
-	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
+	if store.workingList, err = store.inventoryListStore.MakeWorkingList(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

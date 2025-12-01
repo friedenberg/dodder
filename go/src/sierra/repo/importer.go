@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+	"code.linenisgreat.com/dodder/go/src/tango/env_box"
 )
 
 type (
@@ -14,6 +15,13 @@ type (
 		SetCheckedOutPrinter(
 			p interfaces.FuncIter[*sku.CheckedOut],
 		)
+
+		ImportSeq(
+			ctx interfaces.ActiveContext,
+			local LocalRepo,
+			envBox env_box.Env,
+			seq interfaces.SeqError[*sku.Transacted],
+		) (err error)
 
 		ImportBlobIfNecessary(
 			sk *sku.Transacted,

@@ -10,9 +10,11 @@ import (
 type page struct {
 	index *Index
 
-	writeLock        sync.Mutex
-	pageId           page_id.PageId
-	forceFullWrite   bool
+	writeLock      sync.Mutex
+	pageId         page_id.PageId
+	forceFullWrite bool
+
+	// TODO replace pageAdditions with sku.WorkingList
 	additionsHistory pageAdditions
 	additionsLatest  pageAdditions
 }

@@ -23,12 +23,12 @@ func (store *Store) FlushInventoryList(
 
 	var inventoryListSku *sku.Transacted
 
-	store.inventoryList.GetDescriptionMutable().ResetWith(
+	store.workingList.GetDescriptionMutable().ResetWith(
 		store.GetConfigStoreMutable().GetConfig().Description,
 	)
 
 	if inventoryListSku, err = store.GetInventoryListStore().Create(
-		store.inventoryList,
+		store.workingList,
 	); err != nil {
 		if errors.Is(err, inventory_list_store.ErrEmptyInventoryList) {
 			ui.Log().Printf("inventory list was empty")
@@ -60,7 +60,7 @@ func (store *Store) FlushInventoryList(
 		}
 	}
 
-	if store.inventoryList, err = store.inventoryListStore.MakeOpenList(); err != nil {
+	if store.workingList, err = store.inventoryListStore.MakeWorkingList(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

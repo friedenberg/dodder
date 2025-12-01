@@ -19,7 +19,7 @@ type ListCoder = interfaces.CoderBufferedReadWriter[*Transacted]
 
 // TODO add lock
 // TODO add iterate method
-type OpenList struct {
+type WorkingList struct {
 	lock        sync.RWMutex
 	description descriptions.Description
 
@@ -36,12 +36,12 @@ type OpenList struct {
 	funcPreWrite func(*Transacted) error
 }
 
-func MakeOpenList(
+func MakeWorkingList(
 	coder ListCoder,
 	blobWriter interfaces.BlobWriter,
 	funcPreWrite interfaces.FuncIter[*Transacted],
-) *OpenList {
-	return &OpenList{
+) *WorkingList {
+	return &WorkingList{
 		coder:          coder,
 		blobWriter:     blobWriter,
 		indexOrder:     MakeHeapTransactedCursor(),
@@ -50,15 +50,15 @@ func MakeOpenList(
 	}
 }
 
-func (list *OpenList) GetDescription() descriptions.Description {
+func (list *WorkingList) GetDescription() descriptions.Description {
 	return list.description
 }
 
-func (list *OpenList) GetDescriptionMutable() *descriptions.Description {
+func (list *WorkingList) GetDescriptionMutable() *descriptions.Description {
 	return &list.description
 }
 
-func (list *OpenList) getBufferedBlobWriter() *bufio.Writer {
+func (list *WorkingList) getBufferedBlobWriter() *bufio.Writer {
 	if list.bufferedBlobWriter == nil {
 		list.bufferedBlobWriter, list.bufferedBlobWriterRepool = pool.GetBufferedWriter(
 			list.blobWriter,
@@ -68,14 +68,14 @@ func (list *OpenList) getBufferedBlobWriter() *bufio.Writer {
 	return list.bufferedBlobWriter
 }
 
-func (list *OpenList) Len() int {
+func (list *WorkingList) Len() int {
 	list.lock.RLock()
 	defer list.lock.RUnlock()
 
 	return list.count
 }
 
-func (list *OpenList) Add(object *Transacted) (err error) {
+func (list *WorkingList) Add(object *Transacted) (err error) {
 	list.lock.Lock()
 	defer list.lock.Unlock()
 
@@ -110,7 +110,7 @@ func (list *OpenList) Add(object *Transacted) (err error) {
 	return err
 }
 
-func (list *OpenList) writeObject(
+func (list *WorkingList) writeObject(
 	object *Transacted,
 ) (n int64, err error) {
 	if n, err = list.coder.EncodeTo(
@@ -131,7 +131,7 @@ func (list *OpenList) writeObject(
 	return n, err
 }
 
-func (list *OpenList) Close() (err error) {
+func (list *WorkingList) Close() (err error) {
 	if !list.lock.TryLock() {
 		err = errors.Errorf("trying to close open list while lock is acquired")
 		return err
@@ -158,7 +158,7 @@ func (list *OpenList) Close() (err error) {
 	return err
 }
 
-func (list *OpenList) GetMarklId() interfaces.MarklId {
+func (list *WorkingList) GetMarklId() interfaces.MarklId {
 	if !list.lock.TryLock() {
 		panic(fmt.Sprintf("trying to get markl id from open list while lock is acquired"))
 	}

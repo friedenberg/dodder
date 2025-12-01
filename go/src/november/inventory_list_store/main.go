@@ -127,17 +127,17 @@ func (store *Store) GetEnvRepo() env_repo.Env {
 	return store.envRepo
 }
 
-func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
+func (store *Store) MakeWorkingList() (workingList *sku.WorkingList, err error) {
 	var mover interfaces.BlobWriter
 
 	if mover, err = store.blobBlobStore.MakeBlobWriter(
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
-		return openList, err
+		return workingList, err
 	}
 
-	openList = sku.MakeOpenList(
+	workingList = sku.MakeWorkingList(
 		store.getFormat(),
 		mover,
 		func(object *sku.Transacted) (err error) {
@@ -154,11 +154,11 @@ func (store *Store) MakeOpenList() (openList *sku.OpenList, err error) {
 			return err
 		})
 
-	return openList, err
+	return workingList, err
 }
 
 func (store *Store) Create(
-	openList *sku.OpenList,
+	openList *sku.WorkingList,
 ) (object *sku.Transacted, err error) {
 	if openList.Len() == 0 {
 		err = errors.Wrap(ErrEmptyInventoryList)
