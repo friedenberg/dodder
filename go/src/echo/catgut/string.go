@@ -99,7 +99,7 @@ func (b *String) copyCheck() {
 	}
 }
 
-func (a *String) ComparePartialOffset(b *String, offset int) int {
+func (a *String) ComparePartialOffset(b *String, offset int) cmp.Result {
 	lenA, lenB := a.Len(), b.Len()
 
 	if offset > min(lenA, lenB)-1 {
@@ -113,7 +113,7 @@ func (a *String) ComparePartialOffset(b *String, offset int) int {
 	)
 }
 
-func (a *String) ComparePartial(b *String) int {
+func (a *String) ComparePartial(b *String) cmp.Result {
 	return cmp.CompareUTF8Bytes(
 		cmp.ComparableBytes(a.Bytes()),
 		cmp.ComparableBytes(b.Bytes()),
@@ -121,7 +121,7 @@ func (a *String) ComparePartial(b *String) int {
 	)
 }
 
-func (a *String) Compare(b *String) int {
+func (a *String) Compare(b *String) cmp.Result {
 	return cmp.CompareUTF8Bytes(
 		cmp.ComparableBytes(a.Bytes()),
 		cmp.ComparableBytes(b.Bytes()),

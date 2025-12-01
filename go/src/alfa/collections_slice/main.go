@@ -140,3 +140,7 @@ func (slice *Slice[ELEMENT]) SortWithComparer(cmp cmp.Func[ELEMENT]) {
 func (slice *Slice[ELEMENT]) Clone() Slice[ELEMENT] {
 	return MakeFromSlice(*slice...)
 }
+
+func (slice Slice[ELEMENT]) Swap(left, right int) {
+	slice[right], slice[left] = slice[left], slice[right]
+}

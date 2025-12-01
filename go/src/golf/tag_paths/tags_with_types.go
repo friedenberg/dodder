@@ -48,7 +48,7 @@ func (tags *Tags) AddSuperFrom(
 ) (err error) {
 	for _, ep := range b.Paths {
 		ui.Log().Print("adding", prefix, ep)
-		if prefix.ComparePartial(ep.First()) == 0 {
+		if prefix.ComparePartial(ep.First()).IsEqual() {
 			continue
 		}
 

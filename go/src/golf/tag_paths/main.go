@@ -5,6 +5,7 @@ import (
 	"io"
 	"sort"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
@@ -79,22 +80,22 @@ func (path *Path) Equals(b *Path) bool {
 	return true
 }
 
-func (path *Path) Compare(b *Path) int {
+func (path *Path) Compare(otherPath *Path) cmp.Result {
 	elsA := *path
-	elsB := *b
+	elsB := *otherPath
 
 	for {
 		lenA, lenB := len(elsA), len(elsB)
 
 		switch {
 		case lenA == 0 && lenB == 0:
-			return 0
+			return cmp.Equal
 
 		case lenA == 0:
-			return -1
+			return cmp.Less
 
 		case lenB == 0:
-			return 1
+			return cmp.Greater
 		}
 
 		elA := elsA[0]
@@ -105,12 +106,12 @@ func (path *Path) Compare(b *Path) int {
 
 		cmp := elA.Compare(elB)
 
-		if cmp != 0 {
+		if !cmp.IsEqual() {
 			return cmp
 		}
 	}
 
-	return 0
+	return cmp.Equal
 }
 
 func (path *Path) String() string {
@@ -181,7 +182,7 @@ func (path *Path) Add(es ...*Tag) {
 			return
 		}
 
-		if path.Len() > 0 && (*path)[path.Len()-1].Compare(e) == 0 {
+		if path.Len() > 0 && (*path)[path.Len()-1].Compare(e).IsEqual() {
 			return
 		}
 

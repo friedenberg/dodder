@@ -31,7 +31,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 
 			cmp := tag.ComparePartial(res)
 
-			if cmp != 0 {
+			if !cmp.IsEqual() {
 				continue
 			}
 

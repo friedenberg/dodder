@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
@@ -14,7 +15,7 @@ func TestMain(m *testing.M) {
 
 type testCaseCompare struct {
 	a, b     string
-	expected int
+	expected cmp.Result
 }
 
 func getTestCasesCompare() []testCaseCompare {
@@ -22,17 +23,17 @@ func getTestCasesCompare() []testCaseCompare {
 		{
 			a:        "test",
 			b:        "test",
-			expected: 0,
+			expected: cmp.Equal,
 		},
 		{
 			a:        "xest",
 			b:        "test",
-			expected: 1,
+			expected: cmp.Greater,
 		},
 		{
 			a:        "",
 			b:        "test",
-			expected: -1,
+			expected: cmp.Less,
 		},
 	}
 }
@@ -62,22 +63,22 @@ func getTestCasesComparePartial() []testCaseCompare {
 		{
 			a:        "test",
 			b:        "test",
-			expected: 0,
+			expected: cmp.Equal,
 		},
 		{
 			a:        "tests",
 			b:        "test",
-			expected: 0,
+			expected: cmp.Equal,
 		},
 		{
 			a:        "test",
 			b:        "tests",
-			expected: -1,
+			expected: cmp.Less,
 		},
 		{
 			a:        "",
 			b:        "test",
-			expected: -1,
+			expected: cmp.Less,
 		},
 	}
 }

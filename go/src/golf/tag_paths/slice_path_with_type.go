@@ -2,6 +2,8 @@ package tag_paths
 
 import (
 	"slices"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 )
 
 type (
@@ -16,19 +18,19 @@ func (pathsWithTypes PathsWithTypes) Len() int {
 	return len(pathsWithTypes)
 }
 
-func (pathsWithTypes PathsWithTypes) Less(i, j int) bool {
-	return pathsWithTypes[i].Compare(&pathsWithTypes[j].Path) == -1
+func (pathsWithTypes PathsWithTypes) Less(left, right int) bool {
+	return pathsWithTypes[left].Compare(&pathsWithTypes[right].Path).IsLess()
 }
 
-func (pathsWithTypes PathsWithTypes) Swap(i, j int) {
-	pathsWithTypes[j], pathsWithTypes[i] = pathsWithTypes[i], pathsWithTypes[j]
+func (pathsWithTypes PathsWithTypes) Swap(left, right int) {
+	pathsWithTypes[right], pathsWithTypes[left] = pathsWithTypes[left], pathsWithTypes[right]
 }
 
 func (pathsWithTypes PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
-	return slices.BinarySearchFunc(
+	return cmp.BinarySearchFunc(
 		pathsWithTypes,
 		p,
-		func(ep *PathWithType, el *PathWithType) int {
+		func(ep *PathWithType, el *PathWithType) cmp.Result {
 			return ep.Compare(&p.Path)
 		},
 	)

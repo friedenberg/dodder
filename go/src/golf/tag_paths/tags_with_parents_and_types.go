@@ -49,12 +49,11 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 
 		percent.Set("%")
 
-		loc, ok := slices.BinarySearchFunc(
+		loc, ok := cmp.BinarySearchFunc(
 			tagsWithParentsAndTypes,
 			percent,
-			func(ewp TagWithParentsAndTypes, e *Tag) int {
-				cmp := ewp.Tag.ComparePartial(e)
-				return cmp
+			func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
+				return ewp.Tag.ComparePartial(e)
 			},
 		)
 
@@ -66,28 +65,25 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 		tagsWithParentsAndTypes = tagsWithParentsAndTypes[loc:]
 	}
 
-	return slices.BinarySearchFunc(
+	return cmp.BinarySearchFunc(
 		tagsWithParentsAndTypes,
 		e,
-		func(ewp TagWithParentsAndTypes, e *Tag) int {
-			cmp := cmp.CompareUTF8Bytes(
+		func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
+			return cmp.CompareUTF8Bytes(
 				cmp.ComparableBytes(ewp.Tag.Bytes()[offset:]),
 				cmp.ComparableBytes(e.Bytes()),
 				partial,
 			)
-
-			return cmp
 		},
 	)
 }
 
 func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsTag(e *Tag) (int, bool) {
-	return slices.BinarySearchFunc(
+	return cmp.BinarySearchFunc(
 		tagsWithParentsAndTypes,
 		e,
-		func(ewp TagWithParentsAndTypes, e *Tag) int {
-			cmp := ewp.Tag.ComparePartial(e)
-			return cmp
+		func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
+			return ewp.Tag.ComparePartial(e)
 		},
 	)
 }
@@ -95,16 +91,15 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsTag(e *Tag) (int,
 func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsString(
 	value string,
 ) (int, bool) {
-	return slices.BinarySearchFunc(
+	return cmp.BinarySearchFunc(
 		tagsWithParentsAndTypes,
 		cmp.ComparerString(value),
-		func(ewp TagWithParentsAndTypes, c cmp.ComparerString) int {
-			cmp := cmp.CompareUTF8Bytes(
+		func(ewp TagWithParentsAndTypes, c cmp.ComparerString) cmp.Result {
+			return cmp.CompareUTF8Bytes(
 				cmp.ComparableBytes(ewp.Tag.Bytes()),
 				c,
 				true,
 			)
-			return cmp
 		},
 	)
 }
@@ -121,7 +116,7 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) GetMatching(
 	for _, ewp := range tagsWithParentsAndTypes[i:] {
 		cmp := ewp.ComparePartial(e)
 
-		if cmp != 0 {
+		if !cmp.IsEqual() {
 			return matching
 		}
 

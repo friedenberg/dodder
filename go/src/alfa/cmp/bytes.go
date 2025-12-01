@@ -10,65 +10,68 @@ type Comparable[Self any] interface {
 	DecodeRune() (r rune, width int)
 }
 
-func CompareUTF8Bytes[A Comparable[A], B Comparable[B]](
-	a A,
-	b B,
+func CompareUTF8Bytes[
+	LEFT Comparable[LEFT],
+	RIGHT Comparable[RIGHT],
+](
+	left LEFT,
+	right RIGHT,
 	partial bool,
-) int {
-	lenA, lenB := a.Len(), b.Len()
+) Result {
+	lenLeft, lenRight := left.Len(), right.Len()
 
 	// TODO remove?
 	switch {
-	case lenA == 0 && lenB == 0:
-		return 0
+	case lenLeft == 0 && lenRight == 0:
+		return Equal
 
-	case lenA == 0:
-		return -1
+	case lenLeft == 0:
+		return Less
 
-	case lenB == 0:
-		return 1
+	case lenRight == 0:
+		return Greater
 	}
 
 	for {
-		lenA, lenB := a.Len(), b.Len()
+		lenLeft, lenRight := left.Len(), right.Len()
 
 		switch {
-		case lenA == 0 && lenB == 0:
-			return 0
+		case lenLeft == 0 && lenRight == 0:
+			return Equal
 
-		case lenA == 0:
-			if partial && lenB <= lenA {
-				return 0
+		case lenLeft == 0:
+			if partial && lenRight <= lenLeft {
+				return Equal
 			} else {
-				return -1
+				return Less
 			}
 
-		case lenB == 0:
+		case lenRight == 0:
 			if partial {
-				return 0
+				return Equal
 			} else {
-				return 1
+				return Greater
 			}
 		}
 
-		runeA, widthA := a.DecodeRune()
-		a = a.SliceFrom(widthA)
+		runeLeft, widthLeft := left.DecodeRune()
+		left = left.SliceFrom(widthLeft)
 
-		if runeA == utf8.RuneError {
+		if runeLeft == utf8.RuneError {
 			panic("not a valid utf8 string")
 		}
 
-		runeB, widthB := b.DecodeRune()
-		b = b.SliceFrom(widthB)
+		runeRight, widthRight := right.DecodeRune()
+		right = right.SliceFrom(widthRight)
 
-		if runeB == utf8.RuneError {
+		if runeRight == utf8.RuneError {
 			panic("not a valid utf8 string")
 		}
 
-		if runeA < runeB {
-			return -1
-		} else if runeA > runeB {
-			return 1
+		if runeLeft < runeRight {
+			return Less
+		} else if runeLeft > runeRight {
+			return Greater
 		}
 	}
 }

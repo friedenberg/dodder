@@ -1,6 +1,10 @@
 package cmp
 
-import "code.linenisgreat.com/dodder/go/src/_/interfaces"
+import (
+	"slices"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+)
 
 type Func[ELEMENT any] func(ELEMENT, ELEMENT) Result
 
@@ -46,4 +50,22 @@ type Equaler[ELEMENT any] Func[ELEMENT]
 
 func (equaler Equaler[T]) Equals(left, right T) bool {
 	return equaler(left, right).IsEqual()
+}
+
+func BinarySearchFunc[
+	SLICE ~[]ELEMENT,
+	ELEMENT any,
+	TARGET any,
+](
+	slice SLICE,
+	target TARGET,
+	cmp func(ELEMENT, TARGET) Result,
+) (int, bool) {
+	return slices.BinarySearchFunc(
+		slice,
+		target,
+		func(left ELEMENT, right TARGET) int {
+			return cmp(left, right).GetCompareInt()
+		},
+	)
 }
