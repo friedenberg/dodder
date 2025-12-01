@@ -47,6 +47,10 @@ func (slice Slice[ELEMENT]) Any() (element ELEMENT) {
 	return element
 }
 
+func (slice Slice[ELEMENT]) Last() ELEMENT {
+	return slice[slice.Len()-1]
+}
+
 func (slice Slice[ELEMENT]) All() interfaces.Seq[ELEMENT] {
 	return func(yield func(ELEMENT) bool) {
 		for _, element := range slice {
@@ -65,6 +69,10 @@ func (slice *Slice[ELEMENT]) DropFirst() {
 	if slice.Len() > 0 {
 		*slice = (*slice)[1:]
 	}
+}
+
+func (slice *Slice[ELEMENT]) DropLast() {
+	*slice = (*slice)[:slice.Len()-1]
 }
 
 func (slice *Slice[ELEMENT]) Delete(leftInclusive, rightExclusive int) {

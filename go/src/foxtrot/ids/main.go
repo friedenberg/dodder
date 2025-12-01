@@ -19,6 +19,10 @@ type (
 		interfaces.GenreGetter
 		interfaces.Stringer
 		IsEmpty() bool
+	}
+
+	ObjectIdLikeMutable interface {
+		ObjectIdLike
 		SetObjectIdLike(ObjectIdLike) error
 	}
 

@@ -13,7 +13,7 @@ type (
 	) (ok bool)
 
 	ObjectProbeIndex interface {
-		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
+		ReadOneObjectId(ids.ObjectIdLike, *Transacted) error
 	}
 
 	IndexPrimitives interface {

@@ -110,7 +110,7 @@ func (index *Index) ObjectExists(
 }
 
 func (index *Index) ReadOneObjectId(
-	objectId interfaces.ObjectId,
+	objectId ids.ObjectIdLike,
 	object *sku.Transacted,
 ) (err error) {
 	objectIdString := objectId.String()

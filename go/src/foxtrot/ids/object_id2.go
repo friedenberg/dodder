@@ -431,24 +431,24 @@ func (objectId *objectId2) Abbreviate(
 }
 
 func (objectId *objectId2) SetWithIdLike(
-	k interfaces.ObjectId,
+	otherObjectId interfaces.ObjectId,
 ) (err error) {
 	objectId.Reset()
 
-	switch kt := k.(type) {
+	switch kt := otherObjectId.(type) {
 	case *objectId2:
 		objectId.ResetWith(kt)
 		return err
 
 	default:
-		p := k.Parts()
+		parts := otherObjectId.Parts()
 
-		if err = objectId.left.Set(p[0]); err != nil {
+		if err = objectId.left.Set(parts[0]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		mid := []byte(p[1])
+		mid := []byte(parts[1])
 
 		if len(mid) >= 1 {
 			objectId.middle = mid[0]
@@ -458,13 +458,13 @@ func (objectId *objectId2) SetWithIdLike(
 			}
 		}
 
-		if err = objectId.right.Set(p[2]); err != nil {
+		if err = objectId.right.Set(parts[2]); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
-	objectId.SetGenre(k)
+	objectId.SetGenre(otherObjectId)
 
 	return err
 }

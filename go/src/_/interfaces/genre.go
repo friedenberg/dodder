@@ -1,32 +1,34 @@
 package interfaces
 
-type ObjectId interface {
-	GenreGetter
-	Stringer
-	Parts() [3]string
-	IsEmpty() bool
-}
+type (
+	ObjectId interface {
+		GenreGetter
+		Stringer
+		Parts() [3]string
+		IsEmpty() bool
+	}
 
-type RepoId interface {
-	Stringer
-	EqualsRepoId(RepoIdGetter) bool
-	GetRepoIdString() string
-}
+	RepoId interface {
+		Stringer
+		EqualsRepoId(RepoIdGetter) bool
+		GetRepoIdString() string
+	}
 
-type RepoIdGetter interface {
-	GetRepoId() RepoId
-}
+	RepoIdGetter interface {
+		GetRepoId() RepoId
+	}
 
-type Genre interface {
-	GenreGetter
-	Stringer
-	EqualsGenre(GenreGetter) bool
-	GetGenreBitInt() byte
-	GetGenreString() string
-	GetGenreStringVersioned(StoreVersion) string
-	GetGenreStringPlural(StoreVersion) string
-}
+	Genre interface {
+		GenreGetter
+		Stringer
+		EqualsGenre(GenreGetter) bool
+		GetGenreBitInt() byte
+		GetGenreString() string
+		GetGenreStringVersioned(StoreVersion) string
+		GetGenreStringPlural(StoreVersion) string
+	}
 
-type GenreGetter interface {
-	GetGenre() Genre
-}
+	GenreGetter interface {
+		GetGenre() Genre
+	}
+)

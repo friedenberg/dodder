@@ -13,14 +13,3 @@ type (
 		StringerSetterPtr[SELF]
 	}
 )
-
-// type Value[T any] interface {
-// 	ValueLike
-// 	Equatable[T]
-// }
-
-// type ValuePtr[T any] interface {
-// 	ValueLike
-// 	// Value[T]
-// 	Ptr[T]
-// }

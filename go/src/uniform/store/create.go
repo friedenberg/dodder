@@ -50,7 +50,7 @@ func (store *Store) CreateOrUpdate(
 }
 
 func (store *Store) CreateOrUpdateBlobDigest(
-	objectId interfaces.ObjectId,
+	objectId ids.ObjectIdLike,
 	blobDigest interfaces.MarklId,
 ) (object *sku.Transacted, err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
@@ -66,12 +66,18 @@ func (store *Store) CreateOrUpdateBlobDigest(
 
 	object = sku.GetTransactedPool().Get()
 
-	if err = object.ObjectId.SetWithIdLike(objectId); err != nil {
+	if err = object.ObjectId.Set(objectId.String()); err != nil {
+		sku.GetTransactedPool().Put(object)
+		object = nil
+
 		err = errors.Wrap(err)
 		return object, err
 	}
 
 	if err = store.ReadOneInto(objectId, object); err != nil {
+		sku.GetTransactedPool().Put(object)
+		object = nil
+
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {

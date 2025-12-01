@@ -46,10 +46,9 @@ type (
 		errors.Flusher
 	}
 
-	// TODO rename to RepoStore
 	RepoStore interface {
 		Commit(*Transacted, CommitOptions) (err error)
-		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
+		ReadOneInto(ids.ObjectIdLike, *Transacted) (err error)
 		ReadPrimitiveQuery(
 			qg PrimitiveQueryGroup,
 			w interfaces.FuncIter[*Transacted],
@@ -60,7 +59,7 @@ type (
 	ExternalObjectIdGetter = ids.ExternalObjectIdGetter
 
 	FuncReadOneInto = func(
-		k1 interfaces.ObjectId,
+		k1 ids.ObjectIdLike,
 		out *Transacted,
 	) (err error)
 
