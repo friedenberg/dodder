@@ -1,10 +1,12 @@
 package queries
 
-import "code.linenisgreat.com/dodder/go/src/kilo/sku"
+import (
+	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+)
 
 // TODO abstract into "hoisted" ids
 type expObjectIds struct {
-	internal map[string]HoistedId
+	internal map[string]ObjectId
 	external map[string]sku.ExternalObjectId
 }
 

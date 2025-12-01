@@ -94,7 +94,7 @@ func (a *expSigilAndGenre) Clone() (b *expSigilAndGenre) {
 		exp: exp{
 			expObjectIds: expObjectIds{
 				internal: make(
-					map[string]HoistedId,
+					map[string]ObjectId,
 					len(a.expObjectIds.internal),
 				),
 				external: make(
@@ -150,13 +150,13 @@ func (expSigilAndGenre *expSigilAndGenre) Merge(
 
 	if expSigilAndGenre.expObjectIds.internal == nil {
 		expSigilAndGenre.expObjectIds.internal = make(
-			map[string]HoistedId,
+			map[string]ObjectId,
 			len(exp.expObjectIds.internal),
 		)
 	}
 
 	for _, internalHoistedId := range exp.expObjectIds.internal {
-		idString := getStringForHoistedId(internalHoistedId)
+		idString := internalHoistedId.GetObjectId().String()
 		expSigilAndGenre.expObjectIds.internal[idString] = internalHoistedId
 	}
 

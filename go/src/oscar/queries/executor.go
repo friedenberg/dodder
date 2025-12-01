@@ -90,7 +90,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 			sku.TransactedResetter.ResetWith(object, external.GetSku())
 		}
 	} else {
-		var objectId interfaces.ObjectId
+		var objectId ObjectId
 
 		if objectId, _, err = executor.Query.getExactlyOneObjectId(); err != nil {
 			err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 }
 
 func (executor *Executor) ExecuteExactlyOne() (object *sku.Transacted, err error) {
-	var objectId interfaces.ObjectId
+	var objectId ObjectId
 	var sigil ids.Sigil
 
 	if objectId, sigil, err = executor.Query.getExactlyOneObjectId(); err != nil {

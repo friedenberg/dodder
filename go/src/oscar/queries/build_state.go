@@ -560,7 +560,7 @@ func (buildState *buildState) makeQuery() *expSigilAndGenre {
 	return &expSigilAndGenre{
 		exp: exp{
 			expObjectIds: expObjectIds{
-				internal: make(map[string]HoistedId),
+				internal: make(map[string]ObjectId),
 				external: make(map[string]sku.ExternalObjectId),
 			},
 		},

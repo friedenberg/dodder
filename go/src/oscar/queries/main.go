@@ -104,7 +104,7 @@ func (query *Query) add(q *expSigilAndGenre) (err error) {
 			Genre:  q.Genre,
 			exp: exp{
 				expObjectIds: expObjectIds{
-					internal: make(map[string]HoistedId),
+					internal: make(map[string]ObjectId),
 				},
 			},
 		}
@@ -156,7 +156,7 @@ func (query *Query) isEmpty() bool {
 
 func (queryGroup *Query) getExactlyOneExternalObjectId(
 	permitInternal bool,
-) (objectId HoistedId, sigil ids.Sigil, err error) {
+) (objectId interfaces.ObjectId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",
@@ -216,7 +216,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 	return objectId, sigil, err
 }
 
-func (queryGroup *Query) getExactlyOneObjectId() (objectId HoistedId, sigil ids.Sigil, err error) {
+func (queryGroup *Query) getExactlyOneObjectId() (objectId ObjectId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",

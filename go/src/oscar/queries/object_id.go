@@ -7,6 +7,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -16,14 +18,23 @@ type ObjectId struct {
 	Debug   bool
 
 	*ids.ObjectId
+
+	marklId markl.Id
 }
 
-var _ HoistedId = ObjectId{}
+var _ ObjectId = ObjectId{}
 
-func (objectId ObjectId) reduce(b *buildState) (err error) {
-	if err = objectId.GetObjectId().Expand(b.builder.expanders); err != nil {
+func (objectId *ObjectId) reduce(buildState *buildState) (err error) {
+	if err = objectId.GetObjectId().Expand(buildState.builder.expanders); err != nil {
 		err = errors.Wrap(err)
 		return err
+	}
+
+	if objectId.GetGenre() == genres.Blob {
+		if err = objectId.marklId.Set(objectId.GetObjectId().String()); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	return err
@@ -56,7 +67,7 @@ func (objectId ObjectId) ContainsSku(
 ) (ok bool) {
 	object := objectGetter.GetSku()
 
-	metadata := object.GetMetadataMutable()
+	metadata := object.GetMetadata()
 
 	method := ids.Contains
 
@@ -65,6 +76,15 @@ func (objectId ObjectId) ContainsSku(
 	}
 
 	switch objectId.GetGenre() {
+
+	case genres.Blob:
+		id := objects.GetMarklIdForPurpose(
+			metadata,
+			objectId.marklId.GetPurpose(),
+		)
+
+		return markl.Equals(objectId.marklId, id)
+
 	case genres.Tag:
 		if objectId.Exact {
 			_, ok = metadata.GetIndex().GetTagPaths().All.ContainsObjectIdTagExact(
