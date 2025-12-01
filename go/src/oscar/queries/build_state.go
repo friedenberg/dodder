@@ -274,7 +274,7 @@ LOOP:
 
 			default:
 				err = errors.Errorf("unsupported operator: %q", op)
-				return
+				return err
 			}
 
 		} else {
