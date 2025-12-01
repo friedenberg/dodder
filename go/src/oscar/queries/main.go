@@ -70,22 +70,22 @@ func (query *Query) reduce(b *buildState) (err error) {
 }
 
 func (query *Query) addExactExternalObjectId(
-	b *buildState,
-	k sku.ExternalObjectId,
+	buildState *buildState,
+	externalObjectId sku.ExternalObjectId,
 ) (err error) {
-	if k == nil {
+	if externalObjectId == nil {
 		err = errors.ErrorWithStackf("nil object id")
 		return err
 	}
 
-	q := b.makeQuery()
+	exp := buildState.makeQuery()
 
-	q.Sigil.Add(ids.SigilExternal)
-	q.Sigil.Add(ids.SigilLatest)
-	q.Genre.Add(genres.Must(k))
-	q.expObjectIds.external[k.String()] = k
+	exp.Sigil.Add(ids.SigilExternal)
+	exp.Sigil.Add(ids.SigilLatest)
+	exp.Genre.Add(genres.Must(externalObjectId))
+	exp.expObjectIds.external[externalObjectId.String()] = externalObjectId
 
-	if err = query.add(q); err != nil {
+	if err = query.add(exp); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -104,7 +104,7 @@ func (query *Query) add(q *expSigilAndGenre) (err error) {
 			Genre:  q.Genre,
 			exp: exp{
 				expObjectIds: expObjectIds{
-					internal: make(map[string]ObjectId),
+					internal: make(map[string]HoistedId),
 				},
 			},
 		}
@@ -121,25 +121,25 @@ func (query *Query) add(q *expSigilAndGenre) (err error) {
 }
 
 func (query *Query) addOptimized(
-	b *buildState,
-	q *expSigilAndGenre,
+	buildState *buildState,
+	exp *expSigilAndGenre,
 ) (err error) {
-	q = q.Clone()
-	gs := q.Slice()
+	exp = exp.Clone()
+	genres := exp.Slice()
 
-	if len(gs) == 0 {
-		gs = b.defaultGenres.Slice()
+	if len(genres) == 0 {
+		genres = buildState.defaultGenres.Slice()
 	}
 
-	for _, g := range gs {
+	for _, g := range genres {
 		existing, ok := query.optimizedQueries[g]
 
 		if !ok {
-			existing = b.makeQuery()
+			existing = buildState.makeQuery()
 			existing.Genre = ids.MakeGenre(g)
 		}
 
-		if err = existing.Merge(q); err != nil {
+		if err = existing.Merge(exp); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -156,7 +156,7 @@ func (query *Query) isEmpty() bool {
 
 func (queryGroup *Query) getExactlyOneExternalObjectId(
 	permitInternal bool,
-) (objectId ids.ObjectIdLike, sigil ids.Sigil, err error) {
+) (objectId HoistedId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",
@@ -181,21 +181,21 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 		return objectId, sigil, err
 	}
 
-	oids := query.expObjectIds.internal
-	oidsLen := len(oids)
+	internalObjectIds := query.expObjectIds.internal
+	oidsLen := len(internalObjectIds)
 
-	eoids := query.expObjectIds.external
-	eoidsLen := len(eoids)
+	externalObjectIds := query.expObjectIds.external
+	eoidsLen := len(externalObjectIds)
 
 	switch {
 	case eoidsLen == 0 && oidsLen == 1 && permitInternal:
-		for _, k1 := range oids {
-			objectId = k1
+		for _, internalObjectId := range internalObjectIds {
+			objectId = internalObjectId
 		}
 
 	case eoidsLen == 1 && oidsLen == 0:
-		for _, k1 := range eoids {
-			objectId = k1.GetExternalObjectId()
+		for _, externalObjectId := range externalObjectIds {
+			objectId = externalObjectId.GetExternalObjectId()
 		}
 
 		sigil.Add(ids.SigilExternal)
@@ -216,7 +216,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 	return objectId, sigil, err
 }
 
-func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil ids.Sigil, err error) {
+func (queryGroup *Query) getExactlyOneObjectId() (objectId HoistedId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",
@@ -241,16 +241,16 @@ func (queryGroup *Query) getExactlyOneObjectId() (objectId *ids.ObjectId, sigil 
 		return objectId, sigil, err
 	}
 
-	oids := query.expObjectIds.internal
-	oidsLen := len(oids)
+	internalObjectIds := query.expObjectIds.internal
+	oidsLen := len(internalObjectIds)
 
-	eoids := query.expObjectIds.external
-	eoidsLen := len(eoids)
+	externalObjectIds := query.expObjectIds.external
+	eoidsLen := len(externalObjectIds)
 
 	switch {
 	case eoidsLen == 0 && oidsLen == 1:
-		for _, k1 := range oids {
-			objectId = k1.GetObjectId()
+		for _, internalHoistedId := range internalObjectIds {
+			objectId = internalHoistedId
 		}
 
 	default:

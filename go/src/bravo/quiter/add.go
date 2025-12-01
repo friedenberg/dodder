@@ -23,40 +23,22 @@ func AppendSeq2[INDEX any, ELEMENT any, APPENDER interface{ Append(...ELEMENT) }
 	}
 }
 
-func AddClone[E any, EPtr interface {
-	*E
-	ResetWithPtr(*E)
-}](
-	c interfaces.Adder[EPtr],
-) interfaces.FuncIter[EPtr] {
-	return func(e EPtr) (err error) {
-		var e1 E
-		EPtr(&e1).ResetWithPtr((*E)(e))
-		c.Add(&e1)
-		return err
-	}
-}
-
-func AddOrReplaceIfGreater[T interface {
-	interfaces.Stringer
-	interfaces.ValueLike
-	interfaces.Lessable[T]
-}](
-	c interfaces.SetMutable[T],
-	b T,
+func AddOrReplaceIfGreater[
+	ELEMENT interface {
+		interfaces.Stringer
+		interfaces.ValueLike
+		Less(ELEMENT) bool
+	},
+](
+	set interfaces.SetMutable[ELEMENT],
+	newElement ELEMENT,
 ) (shouldAdd bool, err error) {
-	a, ok := c.Get(c.Key(b))
+	existingElement, ok := set.Get(set.Key(newElement))
 
-	// 	if ok {
-	// 		log.Debug().Print("less:", a.Less(b))
-	// 	} else {
-	// 		log.Debug().Print("ok:", ok)
-	// 	}
-
-	shouldAdd = !ok || a.Less(b)
+	shouldAdd = !ok || existingElement.Less(newElement)
 
 	if shouldAdd {
-		err = c.Add(b)
+		err = set.Add(newElement)
 	}
 
 	return shouldAdd, err

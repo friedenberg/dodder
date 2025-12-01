@@ -1,45 +1,34 @@
 package interfaces
 
-type Element interface {
+type ValueLike interface {
+	Stringer
 	EqualsAny(any) bool
 }
 
-type ElementPtr[T any] interface {
-	Ptr[T]
-	Element
-}
-
-type ValueLike interface {
-	Stringer
-	Element
-}
-
-// TODO-P2 remove
-type Lessable[T any] interface {
-	Less(T) bool
-}
-
-type Lessor[T any] interface {
-	Less(T, T) bool
+type Lessor[ELEMENT any] interface {
+	Less(ELEMENT, ELEMENT) bool
 }
 
 // TODO-P2 rename
-type Equaler[T any] interface {
-	Equals(T, T) bool
+type Equaler[ELEMENT any] interface {
+	Equals(ELEMENT, ELEMENT) bool
 }
 
-type ResetterPtr[T any, TPtr Ptr[T]] interface {
-	Reset(TPtr)
-	ResetWith(TPtr, TPtr)
+type ResetterPtr[
+	ELEMENT any,
+	ELEMENT_PTR Ptr[ELEMENT],
+] interface {
+	Reset(ELEMENT_PTR)
+	ResetWith(ELEMENT_PTR, ELEMENT_PTR)
 }
 
-type Resetter[T any] interface {
-	Reset(T)
-	ResetWith(T, T)
+type Resetter[ELEMENT any] interface {
+	Reset(ELEMENT)
+	ResetWith(ELEMENT, ELEMENT)
 }
 
-type Equatable[T any] interface {
-	Equals(T) bool
+type Equatable[ELEMENT any] interface {
+	Equals(ELEMENT) bool
 }
 
 type Resetable interface {
@@ -50,8 +39,8 @@ type ResetableWithError interface {
 	Reset() error
 }
 
-type ResetablePtr[T any] interface {
-	Ptr[T]
-	ResetWith(T)
+type ResetablePtr[ELEMENT any] interface {
+	Ptr[ELEMENT]
+	ResetWith(ELEMENT)
 	Reset()
 }
