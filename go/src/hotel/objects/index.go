@@ -17,7 +17,6 @@ type (
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
 		GetDormant() values.Bool
 		GetImplicitTags() ids.TagSet
-		GetParentTai() ids.Tai
 		GetComments() interfaces.Seq[string]
 		GetSelfWithoutTai() interfaces.MarklId
 	}
@@ -28,7 +27,6 @@ type (
 		AddTagsImplicitPtr(tag *ids.Tag) (err error)
 		GetDormantMutable() *values.Bool
 		GetFieldsMutable() *collections_slice.Slice[Field]
-		GetParentTaiMutable() *ids.Tai
 		GetTagPathsMutable() *tag_paths.Tags
 		SetImplicitTags(e ids.TagSet)
 		GetCommentsMutable() *collections_slice.Slice[string]
@@ -37,7 +35,6 @@ type (
 )
 
 type index struct {
-	ParentTai    ids.Tai // TODO remove in favor of MotherSig
 	Dormant      values.Bool
 	ImplicitTags ids.TagSetMutable // public for gob, but should be private
 	TagPaths     tag_paths.Tags
@@ -95,14 +92,6 @@ func (index *index) SetImplicitTags(tags ids.TagSet) {
 	for tag := range tags.All() {
 		errors.PanicIfError(tagsMutable.Add(tag))
 	}
-}
-
-func (index *index) GetParentTai() ids.Tai {
-	return index.ParentTai
-}
-
-func (index *index) GetParentTaiMutable() *ids.Tai {
-	return &index.ParentTai
 }
 
 func (index *index) GetComments() interfaces.Seq[string] {

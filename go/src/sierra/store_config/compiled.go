@@ -82,6 +82,7 @@ func (compiled *compiled) addRepo(
 	if didChange, err = quiter.AddOrReplaceIfGreater(
 		compiled.Repos,
 		b,
+		sku.TransactedCompare,
 	); err != nil {
 		err = errors.Wrap(err)
 		return didChange, err
@@ -108,6 +109,7 @@ func (compiled *compiled) addType(
 	if didChange, err = quiter.AddOrReplaceIfGreater(
 		compiled.Types,
 		b,
+		sku.TransactedCompare,
 	); err != nil {
 		err = errors.Wrap(err)
 		return didChange, err

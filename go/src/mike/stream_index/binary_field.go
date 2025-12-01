@@ -24,7 +24,6 @@ var binaryFieldOrder = []key_bytes.Binary{
 	key_bytes.SigParentMetadataParentObjectId,
 	key_bytes.DigestMetadataParentObjectId,
 	key_bytes.DigestMetadataWithoutTai,
-	key_bytes.CacheParentTai,
 	key_bytes.CacheTagImplicit,
 	key_bytes.CacheTags,
 }

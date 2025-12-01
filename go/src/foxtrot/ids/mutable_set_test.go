@@ -20,7 +20,7 @@ func TestAddNormalized(t1 *testing.T) {
 
 	toAdd := MustTag("project-2021-dodder")
 
-	AddNormalizedTag(sut, &toAdd)
+	AddNormalizedTag(sut, toAdd)
 
 	if !quiter_set.Equals(sut, sutEx) {
 		t.NotEqual(sutEx, sut)
@@ -33,7 +33,7 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 	sutEx := MakeTagSetMutable(toAdd)
 
-	AddNormalizedTag(sut, &toAdd)
+	AddNormalizedTag(sut, toAdd)
 
 	if !quiter_set.Equals(sut, sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
@@ -52,8 +52,7 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		MustTag("priority-1"),
 	)
 
-	for i := range toAdd {
-		e := &toAdd[i]
+	for _, e := range toAdd {
 		AddNormalizedTag(sut, e)
 	}
 

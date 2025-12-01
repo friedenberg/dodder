@@ -2,6 +2,7 @@ package quiter
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -27,15 +28,15 @@ func AddOrReplaceIfGreater[
 	ELEMENT interface {
 		interfaces.Stringer
 		interfaces.ValueLike
-		Less(ELEMENT) bool
 	},
 ](
 	set interfaces.SetMutable[ELEMENT],
 	newElement ELEMENT,
+	cmp cmp.Func[ELEMENT],
 ) (shouldAdd bool, err error) {
 	existingElement, ok := set.Get(set.Key(newElement))
 
-	shouldAdd = !ok || existingElement.Less(newElement)
+	shouldAdd = !ok || cmp(existingElement, newElement).Less()
 
 	if shouldAdd {
 		err = set.Add(newElement)

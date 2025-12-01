@@ -1,6 +1,8 @@
 package objects
 
 import (
+	_ "encoding/gob"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
@@ -13,13 +15,17 @@ import (
 
 type Field = string_format_writer.Field
 
-// TODO transform into a view interface that can be backed by various
-// representations
+// TODO transform into two views that satisfy the Metadata/MetadataMutable
+// interfaces:
+// - struct like the current one
+// - index bytes, like the representation used by stream_index
 type metadata struct {
+	// all the fiels need to be public for gob's stupid illusions, but should be
+	// private once moving away from the gob entirely
+
 	Description descriptions.Description
-	// TODO refactor this to be an efficient structure backed by a slice
-	Tags tagSet // public for gob, but should be private
-	Type markl.Lock[ids.Type, *ids.Type]
+	Tags        tagSet
+	Type        markl.Lock[ids.Type, *ids.Type]
 
 	DigBlob   markl.Id
 	digSelf   markl.Id
@@ -141,7 +147,7 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 		return err
 	}
 
-	if err = metadata.AddTagPtr(&tag); err != nil {
+	if err = metadata.AddTagPtr(tag); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -150,11 +156,11 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 }
 
 func (metadata *metadata) AddTag(tag ids.Tag) (err error) {
-	return metadata.AddTagPtr(&tag)
+	return metadata.AddTagPtr(tag)
 }
 
-func (metadata *metadata) AddTagPtr(tag *ids.Tag) (err error) {
-	if tag == nil || tag.IsEmpty() {
+func (metadata *metadata) AddTagPtr(tag ids.Tag) (err error) {
+	if tag.IsEmpty() {
 		return err
 	}
 
@@ -193,7 +199,7 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 	}
 
 	for tag := range tags.All() {
-		errors.PanicIfError(metadata.AddTagPtr(&tag))
+		errors.PanicIfError(metadata.AddTagPtr(tag))
 	}
 }
 

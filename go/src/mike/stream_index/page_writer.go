@@ -296,10 +296,6 @@ func (pageWriter *pageWriter) makeWriteOne(
 		// }()
 		pageWriter.cursor.Offset += pageWriter.cursor.ContentLength
 
-		objectOld := pageWriter.latestObjects[object.GetObjectId().String()]
-
-		*object.GetMetadataMutable().GetIndexMutable().GetParentTaiMutable() = objectOld.Tai
-
 		if pageWriter.cursor.ContentLength, err = pageWriter.binaryEncoder.writeFormat(
 			bufferedWriter,
 			objectWithSigil{Transacted: object},

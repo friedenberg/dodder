@@ -106,8 +106,8 @@ func (proto Proto) Apply(
 		changed = true
 	}
 
-	for e := range proto.Metadata.AllTags() {
-		errors.PanicIfError(metadata.AddTag(e))
+	for tag := range proto.Metadata.AllTags() {
+		errors.PanicIfError(metadata.AddTagPtr(tag))
 	}
 
 	return changed
@@ -148,7 +148,7 @@ func (proto Proto) ApplyWithBlobFD(
 	}
 
 	for e := range proto.Metadata.AllTags() {
-		errors.PanicIfError(metadataMutable.AddTag(e))
+		errors.PanicIfError(metadataMutable.AddTagPtr(e))
 	}
 
 	return err

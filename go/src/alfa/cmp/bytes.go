@@ -1,16 +1,16 @@
-package catgut
+package cmp
 
 import "unicode/utf8"
 
 // TODO move to cmp.Result
 
-type Comparer[Self any] interface {
+type Comparable[Self any] interface {
 	Len() int
 	SliceFrom(int) Self
 	DecodeRune() (r rune, width int)
 }
 
-func CompareUTF8Bytes[A Comparer[A], B Comparer[B]](
+func CompareUTF8Bytes[A Comparable[A], B Comparable[B]](
 	a A,
 	b B,
 	partial bool,
@@ -73,17 +73,17 @@ func CompareUTF8Bytes[A Comparer[A], B Comparer[B]](
 	}
 }
 
-type ComparerBytes []byte
+type ComparableBytes []byte
 
-func (cb ComparerBytes) Len() int {
+func (cb ComparableBytes) Len() int {
 	return len(cb)
 }
 
-func (cb ComparerBytes) SliceFrom(start int) ComparerBytes {
-	return ComparerBytes(cb[start:])
+func (cb ComparableBytes) SliceFrom(start int) ComparableBytes {
+	return ComparableBytes(cb[start:])
 }
 
-func (cb ComparerBytes) DecodeRune() (r rune, width int) {
+func (cb ComparableBytes) DecodeRune() (r rune, width int) {
 	r, width = utf8.DecodeRune(cb)
 	return r, width
 }

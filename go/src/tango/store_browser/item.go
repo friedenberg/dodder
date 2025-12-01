@@ -150,10 +150,10 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 	)
 
 	// TODO move to !toml-bookmark type
-	var t ids.Tag
+	var tag ids.Tag
 
-	if t, err = item.GetUrlPathTag(); err == nil {
-		if err = metadata.AddTagPtr(&t); err != nil {
+	if tag, err = item.GetUrlPathTag(); err == nil {
+		if err = metadata.AddTagPtr(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

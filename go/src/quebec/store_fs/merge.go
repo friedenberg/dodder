@@ -50,7 +50,7 @@ func (store *Store) MergeCheckedOut(
 		checkedOut.GetSku().GetMetadata(),
 		checkedOut.GetSkuExternal().GetMetadata(),
 	) {
-		if !checkedOut.GetSku().Metadata.GetTai().Less(
+		if !checkedOut.GetSku().GetMetadata().GetTai().Less(
 			checkedOut.GetSkuExternal().GetMetadata().GetTai(),
 		) {
 			// TODO implement retroactive change

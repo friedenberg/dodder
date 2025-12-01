@@ -53,7 +53,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 		t.AssertNoError(metadata.GetDescriptionMutable().Set("the bez"))
 
-		t.AssertNoError(expected.AddTagPtr(ids.MustTagPtr("tag")))
+		t.AssertNoError(expected.AddTag(ids.MustTag("tag")))
 
 		// TODO add mother digest field and test
 		// {

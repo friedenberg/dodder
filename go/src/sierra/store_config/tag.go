@@ -1,6 +1,7 @@
 package store_config
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -45,6 +46,10 @@ func (iem implicitTagMap) Set(to, imp ids.Tag) (err error) {
 type tag struct {
 	Transacted sku.Transacted
 	Computed   bool
+}
+
+func TagComparePtr(left, right *tag) cmp.Result {
+	return sku.TransactedCompare(&left.Transacted, &right.Transacted)
 }
 
 func (a *tag) Less(b *tag) bool {
@@ -145,7 +150,9 @@ func (compiled *compiled) addTag(
 	sku.Resetter.ResetWith(&tag.Transacted, daughter)
 
 	if didChange, err = quiter.AddOrReplaceIfGreater(
-		compiled.Tags, &tag,
+		compiled.Tags,
+		&tag,
+		TagComparePtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return didChange, err

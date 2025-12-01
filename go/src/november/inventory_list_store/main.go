@@ -1,10 +1,10 @@
 package inventory_list_store
 
 import (
-	"sort"
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -377,7 +377,7 @@ func (store *Store) AllInventoryListObjectsAndContents() interfaces.SeqError[sku
 func (store *Store) AllInventoryListsSorted() sku.Seq {
 	return func(yield func(*sku.Transacted, error) bool) {
 		// TODO optimize space by storing digest and tai but not anything else
-		var lists []*sku.Transacted
+		var lists collections_slice.Slice[*sku.Transacted]
 
 		for list, iterErr := range store.AllInventoryLists() {
 			if iterErr != nil {
@@ -386,13 +386,10 @@ func (store *Store) AllInventoryListsSorted() sku.Seq {
 				}
 			}
 
-			lists = append(lists, list)
+			lists.Append(list)
 		}
 
-		sort.Slice(
-			lists,
-			func(i, j int) bool { return lists[i].Less(lists[j]) },
-		)
+		lists.SortWithComparer(sku.TransactedCompare)
 
 		for _, list := range lists {
 			if !yield(list, nil) {

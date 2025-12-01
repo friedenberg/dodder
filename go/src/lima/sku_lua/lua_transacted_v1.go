@@ -90,7 +90,7 @@ func FromLuaTableV1(
 				panic(err)
 			}
 
-			errors.PanicIfError(object.GetMetadataMutable().AddTagPtr(&tag))
+			errors.PanicIfError(object.GetMetadataMutable().AddTagPtr(tag))
 		},
 	)
 

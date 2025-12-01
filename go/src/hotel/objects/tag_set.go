@@ -19,6 +19,7 @@ type (
 
 	tagSet struct {
 		// required to be exported for Gob's stupid illusions
+		// TODO refactor this to use binary searches
 		Tags collections_slice.Slice[tagStruct]
 	}
 )

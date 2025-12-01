@@ -32,7 +32,6 @@ const (
 	DigestMetadataWithoutTai        = Binary('n') // TODO move to key-values
 	DigestMetadata                  = Binary('m')
 
-	CacheParentTai   = Binary('p')
 	CacheDormant     = Binary('a')
 	CacheTagImplicit = Binary('I')
 	CacheTags        = Binary('x')

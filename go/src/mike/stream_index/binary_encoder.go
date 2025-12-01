@@ -155,29 +155,19 @@ func (encoder *binaryEncoder) writeFieldKey(
 			return n, err
 		}
 
-	case key_bytes.CacheParentTai:
-		if n, err = encoder.writeFieldWriterTo(
-			object.GetMetadata().GetIndex().GetParentTai(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return n, err
-		}
-
 	case key_bytes.Tag:
-		tags := object.GetTags()
-
-		for _, e := range quiter.SortedValues(tags.All()) {
-			if e.IsVirtual() {
+		for _, tag := range quiter.SortedValues(object.AllTags()) {
+			if tag.IsVirtual() {
 				continue
 			}
 
-			if e.String() == "" {
-				err = errors.ErrorWithStackf("empty tag in %q", tags)
+			if tag.String() == "" {
+				err = errors.ErrorWithStackf("empty tag in %q", object.GetTags())
 				return n, err
 			}
 
 			var n1 int64
-			n1, err = encoder.writeFieldBinaryMarshaler(&e)
+			n1, err = encoder.writeFieldBinaryMarshaler(&tag)
 			n += n1
 
 			if err != nil {

@@ -326,15 +326,6 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		// TODO remove
-	case key_bytes.CacheParentTai:
-		if _, err = metadata.GetIndexMutable().GetParentTaiMutable().ReadFrom(
-			&decoder.Content,
-		); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
 	case key_bytes.Type:
 		marshaler := markl.MakeLockMarshalerValueRequired(
 			metadata.GetTypeLockMutable(),

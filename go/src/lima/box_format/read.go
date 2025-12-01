@@ -263,7 +263,7 @@ LOOP_AFTER_OBJECT_ID:
 				err = errors.Err405MethodNotAllowed.Errorf("tag: %q", tag)
 				return err
 			} else {
-				if err = object.AddTagPtr(&tag); err != nil {
+				if err = object.AddTag(tag); err != nil {
 					err = errors.Wrap(err)
 					return err
 				}

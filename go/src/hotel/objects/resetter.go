@@ -53,18 +53,16 @@ func (resetter resetter) ResetWith(dst MetadataMutable, src Metadata) {
 }
 
 func resetIndex(a *index) {
-	a.ParentTai.Reset()
-	a.TagPaths.Reset()
-	a.Dormant.Reset()
-	a.SetImplicitTags(nil)
 	a.Comments.Reset()
+	a.Dormant.Reset()
 	a.SelfWithoutTai.Reset()
+	a.SetImplicitTags(nil)
+	a.TagPaths.Reset()
 }
 
 func resetIndexWith(dst, src *index) {
-	dst.ParentTai.ResetWith(src.ParentTai)
-	dst.TagPaths.ResetWith(&src.TagPaths)
+	dst.Comments.ResetWith(src.Comments)
 	dst.Dormant.ResetWith(src.Dormant)
 	dst.SetImplicitTags(src.GetImplicitTags())
-	dst.Comments.ResetWith(src.Comments)
+	dst.TagPaths.ResetWith(&src.TagPaths)
 }

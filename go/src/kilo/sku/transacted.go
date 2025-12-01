@@ -1,6 +1,7 @@
 package sku
 
 import (
+	_ "encoding/gob"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
@@ -59,33 +60,21 @@ func (transacted *Transacted) GetSku() *Transacted {
 	return transacted
 }
 
-func (transacted *Transacted) SetFromTransacted(other *Transacted) (err error) {
-	TransactedResetter.ResetWith(transacted, other)
-
-	return err
-}
-
-func (transacted *Transacted) Less(other *Transacted) bool {
-	less := transacted.GetTai().Less(other.GetTai())
-
-	return less
-}
-
 func (transacted *Transacted) GetTags() ids.TagSet {
 	return transacted.GetMetadata().GetTags()
 }
 
-func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
-	return transacted.AddTagPtr(&tag)
+func (transacted *Transacted) AllTags() interfaces.Seq[ids.Tag] {
+	return transacted.GetMetadata().AllTags()
 }
 
-func (transacted *Transacted) AddTagPtr(tag *ids.Tag) (err error) {
+func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
 	if transacted.ObjectId.GetGenre() == genres.Tag &&
 		strings.HasPrefix(transacted.ObjectId.String(), tag.String()) {
 		return err
 	}
 
-	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().Key(*tag)
+	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().Key(tag)
 
 	if transacted.GetMetadata().GetIndex().GetImplicitTags().ContainsKey(tagKey) {
 		return err
