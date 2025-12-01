@@ -2,45 +2,9 @@ package cmp
 
 import "code.linenisgreat.com/dodder/go/src/_/interfaces"
 
-const (
-	Less    = result(-1)
-	Equal   = result(0)
-	Greater = result(1)
-)
-
 type Func[ELEMENT any] func(ELEMENT, ELEMENT) Result
 
-type Result interface {
-	cmp()
-
-	GetCompareInt() int
-	Less() bool
-	Equal() bool
-	Greater() bool
-}
-
-type result int
-
-var _ Result = result(0)
-
-func (result) cmp() {}
-
-func (result result) GetCompareInt() int {
-	return int(result)
-}
-
-func (result result) Less() bool {
-	return result == Less
-}
-
-func (result result) Equal() bool {
-	return result == Equal
-}
-
-func (result result) Greater() bool {
-	return result == Greater
-}
-
+// TODO remove
 func MakeFuncFromEqualerAndLessor3EqualFirst[ELEMENT any](
 	equaler interfaces.Equaler[ELEMENT],
 	lessor interfaces.Lessor[ELEMENT],
@@ -56,6 +20,7 @@ func MakeFuncFromEqualerAndLessor3EqualFirst[ELEMENT any](
 	}
 }
 
+// TODO remove
 func MakeFuncFromEqualerAndLessor3LessFirst[ELEMENT any](
 	equaler interfaces.Equaler[ELEMENT],
 	lessor interfaces.Lessor[ELEMENT],
@@ -74,11 +39,11 @@ func MakeFuncFromEqualerAndLessor3LessFirst[ELEMENT any](
 type Lesser[ELEMENT any] Func[ELEMENT]
 
 func (lessor Lesser[T]) Less(left, right T) bool {
-	return lessor(left, right).Less()
+	return lessor(left, right).IsLess()
 }
 
 type Equaler[ELEMENT any] Func[ELEMENT]
 
 func (equaler Equaler[T]) Equals(left, right T) bool {
-	return equaler(left, right).Equal()
+	return equaler(left, right).IsEqual()
 }

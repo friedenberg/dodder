@@ -19,3 +19,13 @@ func Ordered[ELEMENT cmp.Ordered](left, right ELEMENT) Result {
 		return Greater
 	}
 }
+
+func String(left, right string) Result {
+	if left < right {
+		return Less
+	} else if left == right {
+		return Equal
+	} else {
+		return Greater
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
@@ -69,9 +70,9 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 		tagsWithParentsAndTypes,
 		e,
 		func(ewp TagWithParentsAndTypes, e *Tag) int {
-			cmp := catgut.CompareUTF8Bytes(
-				catgut.ComparerBytes(ewp.Tag.Bytes()[offset:]),
-				catgut.ComparerBytes(e.Bytes()),
+			cmp := cmp.CompareUTF8Bytes(
+				cmp.ComparableBytes(ewp.Tag.Bytes()[offset:]),
+				cmp.ComparableBytes(e.Bytes()),
 				partial,
 			)
 
@@ -96,10 +97,10 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsString(
 ) (int, bool) {
 	return slices.BinarySearchFunc(
 		tagsWithParentsAndTypes,
-		catgut.ComparerString(value),
-		func(ewp TagWithParentsAndTypes, c catgut.ComparerString) int {
-			cmp := catgut.CompareUTF8Bytes(
-				catgut.ComparerBytes(ewp.Tag.Bytes()),
+		cmp.ComparerString(value),
+		func(ewp TagWithParentsAndTypes, c cmp.ComparerString) int {
+			cmp := cmp.CompareUTF8Bytes(
+				cmp.ComparableBytes(ewp.Tag.Bytes()),
 				c,
 				true,
 			)

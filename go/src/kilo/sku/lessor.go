@@ -27,8 +27,8 @@ func (transactedLessorTaiOnly) LessPtr(a, b *Transacted) bool {
 type transactedLessorStable struct{}
 
 func (transactedLessorStable) Less(a, b *Transacted) bool {
-	if result := a.GetTai().SortCompare(b.GetTai()); !result.Equal() {
-		return result.Less()
+	if result := a.GetTai().SortCompare(b.GetTai()); !result.IsEqual() {
+		return result.IsLess()
 	}
 
 	return a.GetObjectId().String() < b.GetObjectId().String()

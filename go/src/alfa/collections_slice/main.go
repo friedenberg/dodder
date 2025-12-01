@@ -132,7 +132,7 @@ func (slice *Slice[ELEMENT]) SortWithComparer(cmp cmp.Func[ELEMENT]) {
 	sort.Slice(
 		*slice,
 		func(i, j int) bool {
-			return cmp(slice.At(i), slice.At(j)).Less()
+			return cmp(slice.At(i), slice.At(j)).IsLess()
 		},
 	)
 }

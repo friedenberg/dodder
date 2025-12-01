@@ -36,7 +36,7 @@ func AddOrReplaceIfGreater[
 ) (shouldAdd bool, err error) {
 	existingElement, ok := set.Get(set.Key(newElement))
 
-	shouldAdd = !ok || cmp(existingElement, newElement).Less()
+	shouldAdd = !ok || cmp(existingElement, newElement).IsLess()
 
 	if shouldAdd {
 		err = set.Add(newElement)

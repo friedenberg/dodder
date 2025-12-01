@@ -53,16 +53,16 @@ func TransactedCursorCompare(left, right *TransactedCursor) cmp.Result {
 }
 
 func TransactedCursorLess(a, b *TransactedCursor) bool {
-	if result := a.tai.SortCompare(b.tai); !result.Equal() {
-		return result.Less()
+	if result := a.tai.SortCompare(b.tai); !result.IsEqual() {
+		return result.IsLess()
 	}
 
 	return a.objectIdString < b.objectIdString
 }
 
 func TransactedCursorEqual(a, b *TransactedCursor) bool {
-	if result := a.tai.SortCompare(b.tai); !result.Equal() {
-		return result.Less()
+	if result := a.tai.SortCompare(b.tai); !result.IsEqual() {
+		return result.IsLess()
 	}
 
 	return a.objectIdString < b.objectIdString

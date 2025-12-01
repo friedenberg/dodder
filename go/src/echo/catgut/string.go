@@ -9,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/ohio_buffer"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
@@ -105,25 +106,25 @@ func (a *String) ComparePartialOffset(b *String, offset int) int {
 		panic("offset out of bounds")
 	}
 
-	return CompareUTF8Bytes(
-		ComparerBytes(a.Bytes()[offset:]),
-		ComparerBytes(b.Bytes()[offset:]),
+	return cmp.CompareUTF8Bytes(
+		cmp.ComparableBytes(a.Bytes()[offset:]),
+		cmp.ComparableBytes(b.Bytes()[offset:]),
 		true,
 	)
 }
 
 func (a *String) ComparePartial(b *String) int {
-	return CompareUTF8Bytes(
-		ComparerBytes(a.Bytes()),
-		ComparerBytes(b.Bytes()),
+	return cmp.CompareUTF8Bytes(
+		cmp.ComparableBytes(a.Bytes()),
+		cmp.ComparableBytes(b.Bytes()),
 		true,
 	)
 }
 
 func (a *String) Compare(b *String) int {
-	return CompareUTF8Bytes(
-		ComparerBytes(a.Bytes()),
-		ComparerBytes(b.Bytes()),
+	return cmp.CompareUTF8Bytes(
+		cmp.ComparableBytes(a.Bytes()),
+		cmp.ComparableBytes(b.Bytes()),
 		false,
 	)
 }

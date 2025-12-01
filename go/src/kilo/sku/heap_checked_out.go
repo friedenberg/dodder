@@ -68,8 +68,8 @@ type clockWithObjectId interface {
 type genericLessorStable[T clockWithObjectId] struct{}
 
 func (genericLessorStable[T]) Less(a, b T) bool {
-	if result := a.GetTai().SortCompare(b.GetTai()); !result.Equal() {
-		return result.Less()
+	if result := a.GetTai().SortCompare(b.GetTai()); !result.IsEqual() {
+		return result.IsLess()
 	}
 
 	return a.GetObjectId().String() < b.GetObjectId().String()
