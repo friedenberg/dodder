@@ -57,7 +57,7 @@ func (id *SeqId) Set(value string) (err error) {
 
 	if seq, err = boxScanner.ScanDotAllowedInIdentifiersOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	switch {
