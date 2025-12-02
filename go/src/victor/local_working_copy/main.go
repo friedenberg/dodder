@@ -266,10 +266,6 @@ func (local *Repo) PrintMatchedDormantIfNecessary() {
 	ui.Err().Printf("%d archived objects matched", c)
 }
 
-func (local *Repo) MakeObjectIdIndex() ids.Index {
-	return ids.Index{}
-}
-
 func (local *Repo) GetMatcherDormant() queries.DormantCounter {
 	return local.DormantCounter
 }

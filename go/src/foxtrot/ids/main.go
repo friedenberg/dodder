@@ -10,21 +10,15 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 )
 
-type Abbreviatable interface {
-	interfaces.Stringer
-}
-
-type Index struct{}
-
-func MakeObjectId(v string) (objectId *ObjectId, err error) {
+func MakeObjectId(value string) (objectId *ObjectId, err error) {
 	var boxScanner doddish.Scanner
-	reader, repool := pool.GetStringReader(v)
+	reader, repool := pool.GetStringReader(value)
 	defer repool()
 	boxScanner.Reset(reader)
 
 	objectId = &ObjectId{}
 
-	if v == "" {
+	if value == "" {
 		return objectId, err
 	}
 
@@ -41,12 +35,12 @@ func MakeObjectId(v string) (objectId *ObjectId, err error) {
 	return objectId, err
 }
 
-func Equals(a, b interfaces.ObjectIdWithParts) (ok bool) {
-	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
+func Equals(left, right interfaces.ObjectIdWithParts) (ok bool) {
+	if left.GetGenre().GetGenreString() != right.GetGenre().GetGenreString() {
 		return ok
 	}
 
-	if a.String() != b.String() {
+	if left.String() != right.String() {
 		return ok
 	}
 

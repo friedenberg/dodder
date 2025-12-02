@@ -1,17 +1,24 @@
 package tag_paths
 
 import (
-	"slices"
-
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 )
 
 type (
-	PathsWithTypes []*PathWithType
+	PathsWithTypes collections_slice.Slice[*PathWithType]
 )
 
+func (pathsWithTypes *PathsWithTypes) GetSlice() collections_slice.Slice[*PathWithType] {
+	return collections_slice.Slice[*PathWithType](*pathsWithTypes)
+}
+
+func (pathsWithTypes *PathsWithTypes) GetSliceMutable() *collections_slice.Slice[*PathWithType] {
+	return (*collections_slice.Slice[*PathWithType])(pathsWithTypes)
+}
+
 func (pathsWithTypes *PathsWithTypes) Reset() {
-	*pathsWithTypes = (*pathsWithTypes)[:0]
+	pathsWithTypes.GetSliceMutable().Reset()
 }
 
 func (pathsWithTypes PathsWithTypes) Len() int {
@@ -20,10 +27,6 @@ func (pathsWithTypes PathsWithTypes) Len() int {
 
 func (pathsWithTypes PathsWithTypes) Less(left, right int) bool {
 	return pathsWithTypes[left].Compare(&pathsWithTypes[right].Path).IsLess()
-}
-
-func (pathsWithTypes PathsWithTypes) Swap(left, right int) {
-	pathsWithTypes[right], pathsWithTypes[left] = pathsWithTypes[left], pathsWithTypes[right]
 }
 
 func (pathsWithTypes PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
@@ -57,7 +60,7 @@ func (pathsWithTypes *PathsWithTypes) AddPath(p *PathWithType) (idx int, already
 		return idx, alreadyExists
 	}
 
-	*pathsWithTypes = slices.Insert(*pathsWithTypes, idx, p)
+	pathsWithTypes.GetSliceMutable().Insert(idx, p)
 
 	return idx, alreadyExists
 }

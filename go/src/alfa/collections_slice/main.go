@@ -10,6 +10,8 @@ import (
 
 type Slice[ELEMENT any] []ELEMENT
 
+var _ interfaces.Collection[string] = Slice[string]{}
+
 func MakeFromSeq[ELEMENT any](count int, seq interfaces.Seq[ELEMENT]) Slice[ELEMENT] {
 	slice := make(Slice[ELEMENT], count)
 
@@ -143,4 +145,8 @@ func (slice *Slice[ELEMENT]) Clone() Slice[ELEMENT] {
 
 func (slice Slice[ELEMENT]) Swap(left, right int) {
 	slice[right], slice[left] = slice[left], slice[right]
+}
+
+func (slice *Slice[ELEMENT]) Insert(index int, values ...ELEMENT) {
+	*slice = slices.Insert(*slice, index, values...)
 }

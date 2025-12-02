@@ -212,6 +212,18 @@ func (ts *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
 	return ts.scan(false)
 }
 
+func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, error) {
+	if !scanner.ScanDotAllowedInIdentifiers() {
+		return nil, errors.Errorf("no seq")
+	}
+
+	if scanner.CanScan() {
+		return nil, errors.Errorf("more than one seq")
+	}
+
+	return scanner.GetSeq(), nil
+}
+
 func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType TokenType) {
 	if b := scanner.scanned.Bytes()[scanner.scannedOffset:]; len(b) > 0 {
 		scanner.seq.Add(tokenType, b)

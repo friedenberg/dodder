@@ -80,12 +80,12 @@ func (path *Path) Equals(b *Path) bool {
 	return true
 }
 
-func (path *Path) Compare(otherPath *Path) cmp.Result {
-	elsA := *path
-	elsB := *otherPath
+func ComparePath(left, right *Path) cmp.Result {
+	elementsLeft := *left
+	elementsRIght := *right
 
 	for {
-		lenA, lenB := len(elsA), len(elsB)
+		lenA, lenB := len(elementsLeft), len(elementsRIght)
 
 		switch {
 		case lenA == 0 && lenB == 0:
@@ -98,11 +98,11 @@ func (path *Path) Compare(otherPath *Path) cmp.Result {
 			return cmp.Greater
 		}
 
-		elA := elsA[0]
-		elsA = elsA[1:]
+		elA := elementsLeft[0]
+		elementsLeft = elementsLeft[1:]
 
-		elB := elsB[0]
-		elsB = elsB[1:]
+		elB := elementsRIght[0]
+		elementsRIght = elementsRIght[1:]
 
 		cmp := elA.Compare(elB)
 
@@ -110,8 +110,10 @@ func (path *Path) Compare(otherPath *Path) cmp.Result {
 			return cmp
 		}
 	}
+}
 
-	return cmp.Equal
+func (path *Path) Compare(otherPath *Path) cmp.Result {
+	return ComparePath(path, otherPath)
 }
 
 func (path *Path) String() string {

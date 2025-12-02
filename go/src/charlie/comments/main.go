@@ -27,6 +27,10 @@ func Optimize(_ string) {
 	ui.TodoP1("start logging this")
 }
 
+func Performance(_ string) {
+	ui.TodoP1("start logging this")
+}
+
 func Implement() (err error) {
 	ui.TodoP1("start logging this")
 	return errors.WrapSkip(1, errors.Err501NotImplemented)

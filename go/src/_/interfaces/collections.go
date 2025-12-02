@@ -35,6 +35,11 @@ type (
 		Iterable[ELEMENT]
 	}
 
+	CollectionMutable[ELEMENT any] interface {
+		Collection[ELEMENT]
+		Resetable
+	}
+
 	SetGetter[ELEMENT any] interface {
 		Get(string) (ELEMENT, bool)
 	}

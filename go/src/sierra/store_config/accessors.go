@@ -63,29 +63,31 @@ func (compiled *compiled) GetApproximatedType(
 }
 
 func (compiled *compiled) GetTagOrRepoIdOrType(
-	v string,
-) (sk *sku.Transacted, err error) {
-	var k ids.ObjectId
+	objectIdString string,
+) (object *sku.Transacted, err error) {
+	var objectId ids.ObjectId
 
-	if err = k.Set(v); err != nil {
+	if err = objectId.Set(objectIdString); err != nil {
 		err = errors.Wrap(err)
-		return sk, err
+		return object, err
 	}
 
-	switch k.GetGenre() {
+	switch objectId.GetGenre() {
 	case genres.Tag:
-		sk, _ = compiled.getTag(&k)
+		object, _ = compiled.getTag(&objectId)
+
 	case genres.Repo:
-		sk = compiled.getRepo(&k)
+		object = compiled.getRepo(&objectId)
+
 	case genres.Type:
-		sk = compiled.getType(&k)
+		object = compiled.getType(&objectId)
 
 	default:
-		err = genres.MakeErrUnsupportedGenre(&k)
-		return sk, err
+		err = genres.MakeErrUnsupportedGenre(&objectId)
+		return object, err
 	}
 
-	return sk, err
+	return object, err
 }
 
 func (compiled *compiled) getTag(

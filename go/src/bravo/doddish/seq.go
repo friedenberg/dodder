@@ -17,12 +17,16 @@ func (seq Seq) At(idx int) Token {
 	return seq[idx]
 }
 
-func (seq *Seq) Slice() *collections_slice.Slice[Token] {
+func (seq *Seq) GetSlice() collections_slice.Slice[Token] {
+	return (collections_slice.Slice[Token])(*seq)
+}
+
+func (seq *Seq) GetSliceMutable() *collections_slice.Slice[Token] {
 	return (*collections_slice.Slice[Token])(seq)
 }
 
 func (seq *Seq) Add(tokenType TokenType, contents []byte) {
-	seq.Slice().Append(Token{TokenType: tokenType, Contents: contents})
+	seq.GetSliceMutable().Append(Token{TokenType: tokenType, Contents: contents})
 }
 
 func (seq Seq) StringDebug() string {
@@ -58,23 +62,7 @@ func (seq Seq) Clone() (dst Seq) {
 }
 
 func (seq *Seq) Reset() {
-	seq.Slice().Reset()
-}
-
-type TokenTypes []TokenType
-
-func (actual TokenTypes) Equals(expected ...TokenType) bool {
-	if len(actual) != len(expected) {
-		return false
-	}
-
-	for i, a := range actual {
-		if a != expected[i] {
-			return false
-		}
-	}
-
-	return true
+	seq.GetSliceMutable().Reset()
 }
 
 func (seq Seq) GetTokenTypes() TokenTypes {
