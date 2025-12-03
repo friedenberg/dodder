@@ -2,10 +2,8 @@ package collections_slice
 
 import (
 	"slices"
-	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 )
 
 type Slice[ELEMENT any] []ELEMENT
@@ -27,6 +25,16 @@ func MakeFromSlice[ELEMENT any](elements ...ELEMENT) Slice[ELEMENT] {
 
 	copy(slice, elements)
 
+	return slice
+}
+
+func MakeWithLen[ELEMENT any](length int) Slice[ELEMENT] {
+	slice := make(Slice[ELEMENT], length)
+	return slice
+}
+
+func MakeWithCap[ELEMENT any](capacity int) Slice[ELEMENT] {
+	slice := make(Slice[ELEMENT], 0, capacity)
 	return slice
 }
 
@@ -52,6 +60,10 @@ func (slice Slice[ELEMENT]) Any() (element ELEMENT) {
 
 func (slice Slice[ELEMENT]) Last() ELEMENT {
 	return slice[slice.Len()-1]
+}
+
+func (slice Slice[ELEMENT]) SetLast(element ELEMENT) {
+	slice[slice.Len()-1] = element
 }
 
 func (slice Slice[ELEMENT]) All() interfaces.Seq[ELEMENT] {
@@ -119,24 +131,6 @@ func (slice *Slice[ELEMENT]) ResetWithSeq(other interfaces.Seq[ELEMENT]) {
 	for element := range other {
 		slice.Append(element)
 	}
-}
-
-func (slice *Slice[ELEMENT]) SortByStringFunc(getKey func(ELEMENT) string) {
-	sort.Slice(
-		*slice,
-		func(i, j int) bool {
-			return getKey(slice.At(i)) < getKey(slice.At(j))
-		},
-	)
-}
-
-func (slice *Slice[ELEMENT]) SortWithComparer(cmp cmp.Func[ELEMENT]) {
-	sort.Slice(
-		*slice,
-		func(i, j int) bool {
-			return cmp(slice.At(i), slice.At(j)).IsLess()
-		},
-	)
 }
 
 func (slice *Slice[ELEMENT]) Clone() Slice[ELEMENT] {

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/charlie/comments"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -110,6 +111,15 @@ func (test *T) Fatalf(format string, args ...any) {
 //
 //go:noinline
 func (test *T) NotEqual(a, b any) {
+	comments.GoRefactor("t.NotEqual(a, b)", "TestPrintDiff(t, a, b)")
+	test.errorf(1, "%s", cmp.Diff(a, b, cmpopts.IgnoreUnexported(a)))
+}
+
+func TestPrintDiffString(test *T, a, b string) {
+	test.errorf(1, "%s", cmp.Diff(a, b))
+}
+
+func TestPrintDiff[ELEMENT any](test *T, a, b ELEMENT) {
 	test.errorf(1, "%s", cmp.Diff(a, b, cmpopts.IgnoreUnexported(a)))
 }
 

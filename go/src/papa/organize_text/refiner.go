@@ -244,35 +244,38 @@ type tagBag struct {
 }
 
 func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
-	m := make(map[string][]*Assignment)
+	assignmentMap := make(map[string][]*Assignment)
 	out = make([]tagBag, 0, len(node.Children))
 
 	if node.Transacted.GetMetadata().GetTags().Len() == 0 {
 		return out
 	}
 
-	for _, c := range node.Children {
-		expanded := ids.ExpandTagSet(c.Transacted.GetMetadata().GetTags(), expansion.ExpanderRight)
+	for _, child := range node.Children {
+		expanded := expansion.ExpandMany(
+			child.Transacted.GetMetadata().GetTags().All(),
+			expansion.ExpanderRight,
+		)
 
-		for e := range expanded.All() {
-			if e.String() == "" {
+		for tag := range expanded {
+			if tag.String() == "" {
 				continue
 			}
 
 			var n []*Assignment
 			ok := false
 
-			if n, ok = m[e.String()]; !ok {
+			if n, ok = assignmentMap[tag.String()]; !ok {
 				n = make([]*Assignment, 0)
 			}
 
-			n = append(n, c)
+			n = append(n, child)
 
-			m[e.String()] = n
+			assignmentMap[tag.String()] = n
 		}
 	}
 
-	for e, n := range m {
+	for e, n := range assignmentMap {
 		if len(n) > 1 {
 			var e1 ids.Tag
 

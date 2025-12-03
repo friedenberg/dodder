@@ -2,40 +2,18 @@ package comments
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
-func Comment(_ ...string) {}
-
-func Change(_ string) {
-	ui.TodoP1("start logging this")
-}
-
-func Decide(_ string) {
-	ui.TodoP1("start logging this")
-}
-
-func Refactor(_ string) {
-	ui.TodoP1("start logging this")
-}
-
-func Parallelize() {
-	ui.TodoP1("start logging this")
-}
-
-func Optimize(_ string) {
-	ui.TodoP1("start logging this")
-}
-
-func Performance(_ string) {
-	ui.TodoP1("start logging this")
-}
+func Change(_ string)                 {}
+func Comment(_ ...string)             {}
+func Decide(_ string)                 {}
+func GoRefactor(before, after string) {}
+func Optimize(_ string)               {}
+func Parallelize()                    {}
+func Performance(_ string)            {}
+func Refactor(_ string)               {}
+func Remove()                         {}
 
 func Implement() (err error) {
-	ui.TodoP1("start logging this")
 	return errors.WrapSkip(1, errors.Err501NotImplemented)
-}
-
-func Remove() {
-	ui.TodoP1("start logging this")
 }

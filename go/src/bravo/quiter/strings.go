@@ -6,19 +6,27 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 )
 
+// TODO move to collections_slice
 func SortedValuesBy[ELEMENT any](
-	set interfaces.Set[ELEMENT],
-	sortFunc func(ELEMENT, ELEMENT) bool,
+	set interfaces.Collection[ELEMENT],
+	cmp cmp.Func[ELEMENT],
 ) (out []ELEMENT) {
 	out = CollectSlice(set)
 
-	sort.Slice(out, func(i, j int) bool { return sortFunc(out[i], out[j]) })
+	sort.Slice(
+		out,
+		func(left, right int) bool {
+			return cmp(out[left], out[right]).IsLess()
+		},
+	)
 
 	return out
 }
 
+// TODO move to collections_slice
 func SortedValues[ELEMENT interfaces.Value](
 	seq interfaces.Seq[ELEMENT],
 ) (out []ELEMENT) {
@@ -50,6 +58,7 @@ func Strings[ELEMENT interfaces.Stringer](
 	}
 }
 
+// TODO move to collections_slice
 func SortedStrings[ELEMENT interfaces.Stringer](
 	collections ...interfaces.Collection[ELEMENT],
 ) (out []string) {

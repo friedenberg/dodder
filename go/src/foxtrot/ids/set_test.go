@@ -3,154 +3,20 @@ package ids
 import (
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/collections_delta"
 )
 
-func TestNormalize(t *testing.T) {
-	type testEntry struct {
-		ac TagSet
-		ex TagSet
-	}
-
-	testEntries := map[string]testEntry{
-		"removes all": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("project-archive-task-done"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("project-archive-task-done"),
-			),
-		},
-		"removes non": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-		},
-		"removes right order": {
-			ac: MakeTagSetFromSlice(
-				MustTag("priority"),
-				MustTag("priority-1"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("priority-1"),
-			),
-		},
-	}
-
-	for d, te := range testEntries {
-		t.Run(
-			d,
-			func(t1 *testing.T) {
-				t := ui.T{T: t1}
-				ac := WithRemovedCommonPrefixes(te.ac)
-
-				if !quiter_set.Equals(ac, te.ex) {
-					t.Errorf(
-						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
-						te.ex,
-						ac,
-					)
-				}
-			},
-		)
-	}
-}
-
-func TestRemovePrefixes(t *testing.T) {
-	type testEntry struct {
-		ac     TagSet
-		ex     TagSet
-		prefix string
-	}
-
-	testEntries := map[string]testEntry{
-		"removes all": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("project-archive-task-done"),
-			),
-			ex:     MakeTagSetFromSlice(),
-			prefix: "project",
-		},
-		"removes non": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-			prefix: "xx",
-		},
-		"removes one": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-			),
-			prefix: "zz",
-		},
-		"removes most": {
-			ac: MakeTagSetFromSlice(
-				MustTag("project-2021-dodder"),
-				MustTag("project-2021-dodder-test"),
-				MustTag("project-2021-dodder-ewwwwww"),
-				MustTag("zz-archive-task-done"),
-			),
-			ex: MakeTagSetFromSlice(
-				MustTag("zz-archive-task-done"),
-			),
-			prefix: "project",
-		},
-	}
-
-	for d, te := range testEntries {
-		t.Run(
-			d,
-			func(t *testing.T) {
-				assertSetRemovesPrefixes(t, te.ac, te.ex, te.prefix)
-			},
-		)
-	}
-}
-
 func TestExpandedRight(t *testing.T) {
-	s := MakeTagSetFromSlice(
+	tags := MakeTagSetFromSlice(
 		MustTag("project-2021-dodder"),
 		MustTag("zz-archive-task-done"),
 	)
 
-	ex := ExpandTagSet(s, expansion.ExpanderRight)
+	ex := collections_slice.Collect(expansion.ExpandMany(tags.All(), expansion.ExpanderRight))
 
 	expected := []string{
 		"project",
@@ -162,7 +28,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := quiter.SortedStrings[Tag](ex)
+	actual := quiter.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

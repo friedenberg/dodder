@@ -1,20 +1,18 @@
 package objects
 
 import (
+	"strings"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type (
 	tagLock = markl.Lock[Tag, *Tag]
-
-	tagStruct struct {
-		// TODO add path information
-
-		// required to be exported for Gob's stupid illusions
-		Lock tagLock
-	}
 
 	tagSet struct {
 		// required to be exported for Gob's stupid illusions
@@ -128,4 +126,52 @@ func (tagSet *tagSet) DelKey(key string) error {
 
 func (tagSet *tagSet) Reset() {
 	tagSet.Tags.Reset()
+}
+
+func (tagSet *tagSet) addNormalizedTag(tag Tag) {
+	seq := expansion.ExpandOneIntoIds[Tag](
+		tag.String(),
+		expansion.ExpanderRight,
+	)
+
+	for id := range seq {
+		errors.PanicIfError(tagSet.Add(id))
+	}
+
+	sorted := quiter.SortedValuesBy(
+		tagSet.Tags,
+		tagStructCompareTagKey,
+	)
+
+	var lastTag *tagStruct
+
+	for index := range sorted {
+		tag := &sorted[index]
+
+		if index == 0 {
+			// no need to do anything, this is the first
+			lastTag = tag
+			continue
+		}
+
+		tagString := tag.Lock.GetKey().String()
+		lastTagString := lastTag.Lock.GetKey().String()
+
+		switch {
+		case strings.HasPrefix(lastTagString, tagString):
+			continue
+
+			// replace the shorter value with the longer value that contains the
+			// shorter value
+		case strings.HasPrefix(tagString, lastTagString):
+			if lastTag.Lock.Value.IsEmpty() {
+				tagSet.DelKey(lastTagString)
+			}
+
+		default:
+			// keep the tag
+		}
+
+		lastTag = tag
+	}
 }

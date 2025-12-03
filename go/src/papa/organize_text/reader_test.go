@@ -315,7 +315,8 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t1 *testing.T) {
 
 		if !quiter_set.Equals(
 			actual,
-			expected) {
+			expected,
+		) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}

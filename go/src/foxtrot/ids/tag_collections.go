@@ -5,9 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
-	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 )
 
@@ -65,20 +63,10 @@ func MakeTagSetMutable(tags ...TagStruct) TagSetMutable {
 	return collections_ptr.MakeMutableValueSetValue(nil, tags...)
 }
 
-func ExpandTagSet(set TagSet, expander expansion.Expander) TagSetMutable {
-	setMutable := MakeTagSetMutable()
-
-	for tag := range expansion.ExpandMany(set.All(), expander) {
-		setMutable.Add(tag)
-	}
-
-	return setMutable
-}
-
 func IntersectPrefixes(haystack TagSet, needle TagStruct) (s3 TagSet) {
 	s4 := MakeTagSetMutable()
 
-	for _, e := range quiter.CollectSlice[TagStruct](haystack) {
+	for _, e := range quiter.CollectSlice(haystack) {
 		if strings.HasPrefix(e.String(), needle.String()) {
 			s4.Add(e)
 		}
@@ -92,7 +80,7 @@ func IntersectPrefixes(haystack TagSet, needle TagStruct) (s3 TagSet) {
 func SubtractPrefix(s1 TagSet, e TagStruct) (s2 TagSet) {
 	s3 := MakeTagSetMutable()
 
-	for _, e1 := range quiter.CollectSlice[TagStruct](s1) {
+	for _, e1 := range quiter.CollectSlice(s1) {
 		e2, _ := LeftSubtract(e1, e)
 
 		if e2.String() == "" {
@@ -105,64 +93,4 @@ func SubtractPrefix(s1 TagSet, e TagStruct) (s2 TagSet) {
 	s2 = CloneTagSet(s3)
 
 	return s2
-}
-
-func WithRemovedCommonPrefixes(tags TagSet) (output TagSet) {
-	sortedTags := quiter.SortedValues(tags.All())
-	filteredTags := make([]TagStruct, 0, len(sortedTags))
-
-	for _, e := range sortedTags {
-		if len(filteredTags) == 0 {
-			filteredTags = append(filteredTags, e)
-			continue
-		}
-
-		idxLast := len(filteredTags) - 1
-		last := filteredTags[idxLast]
-
-		switch {
-		case Contains(last, e):
-			continue
-
-		case Contains(e, last):
-			filteredTags[idxLast] = e
-
-		default:
-			filteredTags = append(filteredTags, e)
-		}
-	}
-
-	output = MakeTagSetFromSlice(filteredTags...)
-
-	return output
-}
-
-func AddNormalizedTag(tags TagSetMutable, tag TagStruct) {
-	seq := expansion.ExpandOneIntoIds[TagStruct](
-		tag.String(),
-		expansion.ExpanderRight,
-	)
-
-	for id := range seq {
-		if err := tags.Add(id); err != nil {
-			panic(err)
-		}
-	}
-
-	clone := CloneTagSet(tags)
-	tags.Reset()
-
-	for tag := range WithRemovedCommonPrefixes(clone).All() {
-		tags.Add(tag)
-	}
-}
-
-func RemovePrefixes(haystack TagSetMutable, needle TagStruct) {
-	for tag := range haystack.All() {
-		if !strings.HasPrefix(tag.String(), needle.String()) {
-			continue
-		}
-
-		quiter_set.Del(haystack, tag)
-	}
 }

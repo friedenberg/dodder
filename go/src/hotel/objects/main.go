@@ -164,7 +164,7 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 		return err
 	}
 
-	ids.AddNormalizedTag(&metadata.Tags, tag)
+	metadata.Tags.addNormalizedTag(tag)
 	cs := catgut.MakeFromString(tag.String())
 	metadata.Index.TagPaths.AddTag(cs)
 
