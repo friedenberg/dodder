@@ -415,7 +415,7 @@ func (objectId *objectId) Set(value string) (err error) {
 		parsingObjectId = &h
 
 	case genres.Tag:
-		var h Tag
+		var h TagStruct
 		err = h.Set(value)
 		parsingObjectId = &h
 

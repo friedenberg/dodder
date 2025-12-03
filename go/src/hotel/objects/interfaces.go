@@ -12,9 +12,9 @@ type (
 	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
 	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
 
-	Tag           = ids.Tag
-	TagSet        = ids.TagSet
-	TagSetMutable = ids.TagSetMutable
+	Tag           = ids.TagStruct
+	TagSet        = ids.Set[ids.Tag]
+	TagSetMutable = ids.SetMutable[ids.Tag]
 
 	TagLock        = interfaces.Lock[Tag, *Tag]
 	TagLockMutable = interfaces.LockMutable[Tag, *Tag]
@@ -53,9 +53,8 @@ type (
 
 		AddTagPtr(Tag) (err error)
 		ResetTags()
-		SetTags(TagSet)
 		AddTagString(tagString string) (err error)
-		AddTagPtrFast(tag *Tag) (err error)
+		AddTagPtrFast(tag Tag) (err error)
 		GenerateExpandedTags()
 
 		GetIndexMutable() IndexMutable

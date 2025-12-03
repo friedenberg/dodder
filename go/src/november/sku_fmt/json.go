@@ -176,7 +176,7 @@ func (json *JSON) ToTransacted(
 		return err
 	}
 
-	object.GetMetadataMutable().SetTags(tagSet)
+	objects.SetTags(object.GetMetadataMutable(), tagSet)
 	object.GetMetadataMutable().GenerateExpandedTags()
 
 	object.GetMetadataMutable().GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)

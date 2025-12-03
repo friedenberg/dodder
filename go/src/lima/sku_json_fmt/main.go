@@ -158,7 +158,7 @@ func (json *Transacted) ToTransacted(
 		return err
 	}
 
-	metadata.SetTags(tagSet)
+	objects.SetTags(metadata, tagSet)
 	metadata.GenerateExpandedTags()
 
 	if !json.RepoPubkey.IsNull() {

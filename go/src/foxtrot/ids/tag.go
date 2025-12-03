@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	register(Tag{})
+	register(TagStruct{})
 }
 
 const TagRegexString = `^%?[-a-z0-9_]+$`
@@ -24,12 +24,18 @@ func init() {
 
 var sTagResetter tagResetter
 
-type Tag = tag
+type (
+	TagStruct = tag
+	Tag       = tag
+	ITag      = interface {
+		interfaces.ObjectId
+	}
+)
 
-var TagResetter = sTagResetter
-
-// type Tag = tag2
-// var TagResetter = sTag2Resetter
+var (
+	TagResetter     = sTagResetter
+	_           Tag = TagStruct{}
+)
 
 type tag struct {
 	virtual       bool
@@ -37,40 +43,42 @@ type tag struct {
 	value         string
 }
 
-func MustTagPtr(v string) (e *Tag) {
-	e = &Tag{}
-	e.init()
+func MustTagPtr(value string) *TagStruct {
+	tag := &TagStruct{}
+	tag.init()
 
 	var err error
 
-	if err = e.Set(v); err != nil {
+	if err = tag.Set(value); err != nil {
 		errors.PanicIfError(err)
 	}
 
-	return e
+	return tag
 }
 
-func MustTag(v string) (e Tag) {
-	e.init()
+func MustTag(value string) TagStruct {
+	var tag TagStruct
+	tag.init()
 
 	var err error
 
-	if err = e.Set(v); err != nil {
+	if err = tag.Set(value); err != nil {
 		errors.PanicIfError(err)
 	}
 
-	return e
+	return tag
 }
 
-func MakeTag(v string) (e Tag, err error) {
-	e.init()
+func MakeTag(value string) (TagStruct, error) {
+	var tag TagStruct
+	tag.init()
 
-	if err = e.Set(v); err != nil {
+	if err := tag.Set(value); err != nil {
 		err = errors.Wrap(err)
-		return e, err
+		return tag, err
 	}
 
-	return e, err
+	return tag, nil
 }
 
 func (tag tag) init() {

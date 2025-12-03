@@ -300,14 +300,14 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Tag:
-		var tag ids.Tag
+		var tag ids.TagStruct
 
 		if err = tag.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = object.AddTagPtrFast(&tag); err != nil {
+		if err = object.AddTagPtrFast(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -363,14 +363,14 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.CacheTagImplicit:
-		var tag ids.Tag
+		var tag ids.TagStruct
 
 		if err = tag.Set(decoder.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 
-		if err = metadata.GetIndexMutable().AddTagsImplicitPtr(&tag); err != nil {
+		if err = metadata.GetIndexMutable().AddTagsImplicitPtr(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

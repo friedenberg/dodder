@@ -1,8 +1,6 @@
 package objects
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
@@ -24,7 +22,7 @@ type (
 	IndexMutable interface {
 		Index
 
-		AddTagsImplicitPtr(tag *Tag) (err error)
+		AddTagsImplicitPtr(tag Tag) (err error)
 		GetDormantMutable() *values.Bool
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetTagPathsMutable() *tag_paths.Tags
@@ -69,8 +67,8 @@ func (index *index) GetImplicitTags() TagSet {
 	return index.GetImplicitTagsMutable()
 }
 
-func (index *index) AddTagsImplicitPtr(tag *Tag) (err error) {
-	return index.GetImplicitTagsMutable().Add(*tag)
+func (index *index) AddTagsImplicitPtr(tag Tag) (err error) {
+	return index.GetImplicitTagsMutable().Add(tag)
 }
 
 func (index *index) GetImplicitTagsMutable() TagSetMutable {
@@ -100,10 +98,6 @@ func (index *index) GetComments() interfaces.Seq[string] {
 
 func (index *index) GetCommentsMutable() *collections_slice.Slice[string] {
 	return &index.Comments
-}
-
-func (metadata *metadata) AddComment(f string, vals ...any) {
-	metadata.Index.Comments = append(metadata.Index.Comments, fmt.Sprintf(f, vals...))
 }
 
 func (index *index) GetFields() interfaces.Seq[Field] {

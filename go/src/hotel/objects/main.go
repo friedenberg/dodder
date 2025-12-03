@@ -140,7 +140,7 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 		return err
 	}
 
-	var tag Tag
+	var tag ids.TagStruct
 
 	if err = tag.Set(tagString); err != nil {
 		err = errors.Wrap(err)
@@ -171,8 +171,8 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTagPtrFast(tag *Tag) (err error) {
-	if err = metadata.Tags.Add(*tag); err != nil {
+func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
+	if err = metadata.Tags.Add(tag); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -187,22 +187,6 @@ func (metadata *metadata) AddTagPtrFast(tag *Tag) (err error) {
 	return err
 }
 
-func (metadata *metadata) SetTags(tags TagSet) {
-	metadata.Tags.Reset()
-
-	if tags == nil {
-		return
-	}
-
-	if tags.Len() == 1 && quiter_set.Any(tags).String() == "" {
-		panic("empty tag set")
-	}
-
-	for tag := range tags.All() {
-		errors.PanicIfError(metadata.AddTagPtr(tag))
-	}
-}
-
 func (metadata *metadata) SetTagsFast(tags TagSet) {
 	metadata.Tags.Reset()
 
@@ -215,7 +199,7 @@ func (metadata *metadata) SetTagsFast(tags TagSet) {
 	}
 
 	for tag := range tags.All() {
-		errors.PanicIfError(metadata.AddTagPtrFast(&tag))
+		errors.PanicIfError(metadata.AddTagPtrFast(tag))
 	}
 }
 

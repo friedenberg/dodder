@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterGobValue[
-	VALUE interfaces.Value[VALUE],
+	VALUE interfaces.Value,
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ](
 	keyer interfaces.StringKeyerPtr[VALUE, VALUE_PTR],
@@ -23,7 +23,7 @@ func RegisterGobValue[
 }
 
 func RegisterGob[
-	VALUE interfaces.Value[VALUE],
+	VALUE interfaces.Value,
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ]() {
 	gob.Register(Set[VALUE, VALUE_PTR]{})

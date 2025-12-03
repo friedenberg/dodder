@@ -79,7 +79,7 @@ func FromLuaTableV1(
 		return err
 	}
 
-	object.GetMetadataMutable().SetTags(nil)
+	object.GetMetadataMutable().ResetTags()
 
 	tagsTable.ForEach(
 		func(key, value lua.LValue) {

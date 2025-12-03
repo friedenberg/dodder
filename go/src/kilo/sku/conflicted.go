@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type ParentNegotiator interface {
@@ -163,9 +164,9 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 
 	tags := ids.CloneTagSet(same)
 
-	conflicted.Local.GetMetadataMutable().SetTags(tags)
-	conflicted.Base.GetMetadataMutable().SetTags(tags)
-	conflicted.Remote.GetMetadataMutable().SetTags(tags)
+	objects.SetTags(conflicted.Local.GetMetadataMutable(), tags)
+	objects.SetTags(conflicted.Base.GetMetadataMutable(), tags)
+	objects.SetTags(conflicted.Remote.GetMetadataMutable(), tags)
 
 	return err
 }

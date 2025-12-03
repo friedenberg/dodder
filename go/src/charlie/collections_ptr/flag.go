@@ -17,7 +17,7 @@ const (
 
 // TODO-P2 add Resetter2 and Pool
 type Flag[
-	VALUE interfaces.Value[VALUE],
+	VALUE interfaces.Value,
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] interface {
 	interfaces.FlagValue
@@ -26,7 +26,7 @@ type Flag[
 }
 
 func MakeFlagCommas[
-	VALUE interfaces.Value[VALUE],
+	VALUE interfaces.Value,
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ](
 	policy SetterPolicy,
@@ -38,7 +38,7 @@ func MakeFlagCommas[
 }
 
 type flagCommas[
-	VALUE interfaces.Value[VALUE],
+	VALUE interfaces.Value,
 	VALUE_PTR interfaces.ValuePtr[VALUE],
 ] struct {
 	policy   SetterPolicy

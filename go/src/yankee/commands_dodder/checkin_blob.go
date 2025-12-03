@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -99,7 +100,7 @@ func (cmd CheckinBlob) Run(req command.Request) {
 
 		if cmd.NewTags.Len() > 0 {
 			m := object.GetMetadataMutable()
-			m.SetTags(cmd.NewTags)
+			objects.SetTags(m, cmd.NewTags)
 		}
 	}
 

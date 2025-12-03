@@ -80,11 +80,11 @@ func FromLuaTableV2(
 		return err
 	}
 
-	object.GetMetadataMutable().SetTags(nil)
+	object.GetMetadataMutable().ResetTags()
 
 	tagsTable.ForEach(
 		func(key, value lua.LValue) {
-			var tag ids.Tag
+			var tag ids.TagStruct
 
 			if err = tag.Set(key.String()); err != nil {
 				err = errors.Wrap(err)

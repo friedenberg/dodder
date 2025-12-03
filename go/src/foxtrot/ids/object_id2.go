@@ -536,7 +536,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		k = &h
 
 	case genres.Tag:
-		var h Tag
+		var h TagStruct
 		err = h.Set(v)
 		k = &h
 
@@ -615,7 +615,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		k = &h
 
 	case genres.Tag:
-		var h Tag
+		var h TagStruct
 		err = h.Set(v)
 		k = &h
 

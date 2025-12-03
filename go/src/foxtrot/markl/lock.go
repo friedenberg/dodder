@@ -6,7 +6,7 @@ import (
 )
 
 type Lock[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	Key   KEY
@@ -14,14 +14,14 @@ type Lock[
 }
 
 func MakeLock[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ]() Lock[KEY, KEY_PTR] {
 	return Lock[KEY, KEY_PTR]{}
 }
 
 func MakeLockWith[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](key KEY, value interfaces.MarklId) Lock[KEY, KEY_PTR] {
 	lock := MakeLock[KEY, KEY_PTR]()
@@ -72,7 +72,7 @@ func (tuple Lock[KEY, KEY_PTR]) IsEmpty() bool {
 func (tuple Lock[KEY, KEY_PTR]) Equals(
 	other Lock[KEY, KEY_PTR],
 ) bool {
-	if !tuple.Key.Equals(other.Key) {
+	if tuple.Key.String() != other.Key.String() {
 		return false
 	}
 
@@ -84,10 +84,10 @@ func (tuple Lock[KEY, KEY_PTR]) Equals(
 }
 
 func LockEquals[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](left, right interfaces.Lock[KEY, KEY_PTR]) bool {
-	if !left.GetKey().Equals(right.GetKey()) {
+	if left.GetKey().String() != right.GetKey().String() {
 		return false
 	}
 

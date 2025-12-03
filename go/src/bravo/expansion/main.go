@@ -19,7 +19,7 @@ type Expander interface {
 }
 
 func ExpandOneIntoIds[
-	ID interfaces.Value[ID],
+	ID interfaces.Value,
 	ID_PTR interfaces.ValuePtr[ID],
 ](
 	identifierString string,
@@ -60,7 +60,7 @@ func ExpandOneIntoIds[
 }
 
 func ExpandIntoSlice[
-	ID interfaces.Value[ID],
+	ID interfaces.Value,
 	ID_PTR interfaces.ValuePtr[ID],
 ](
 	token string,
@@ -77,7 +77,7 @@ func ExpandIntoSlice[
 }
 
 func ExpandMany[
-	ID interfaces.Value[ID],
+	ID interfaces.Value,
 	ID_PTR interfaces.ValuePtr[ID],
 ](
 	seq interfaces.Seq[ID],

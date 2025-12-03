@@ -10,7 +10,7 @@ import (
 )
 
 func MakeLockMarshaler[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
 	lock interfaces.LockMutable[KEY, KEY_PTR],
@@ -23,7 +23,7 @@ func MakeLockMarshaler[
 }
 
 func MakeLockMarshalerValueNotRequired[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
 	lock interfaces.LockMutable[KEY, KEY_PTR],
@@ -32,7 +32,7 @@ func MakeLockMarshalerValueNotRequired[
 }
 
 func MakeLockMarshalerValueRequired[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
 	lock interfaces.LockMutable[KEY, KEY_PTR],
@@ -41,7 +41,7 @@ func MakeLockMarshalerValueRequired[
 }
 
 type KeyValueTupleBinaryMarshaler[
-	KEY interfaces.Value[KEY],
+	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool

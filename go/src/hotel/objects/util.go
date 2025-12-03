@@ -4,9 +4,31 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
+
+func SetTags[TAG ids.ITag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
+	{
+		metadata := metadata.(*MetadataStruct)
+		metadata.Tags.Reset()
+
+		if otherTags == nil {
+			return
+		}
+
+		if otherTags.Len() == 1 && quiter_set.Any(otherTags).String() == "" {
+			panic("empty tag set")
+		}
+
+		for tag := range otherTags.All() {
+			errors.PanicIfError(metadata.AddTagString(tag.String()))
+		}
+	}
+}
 
 func ExpandTags(
 	metadata Metadata,

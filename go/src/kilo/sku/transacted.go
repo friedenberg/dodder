@@ -88,7 +88,7 @@ func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
 	return err
 }
 
-func (transacted *Transacted) AddTagPtrFast(tag *ids.Tag) (err error) {
+func (transacted *Transacted) AddTagPtrFast(tag ids.Tag) (err error) {
 	if err = transacted.GetMetadataMutable().AddTagPtrFast(tag); err != nil {
 		err = errors.Wrap(err)
 		return err

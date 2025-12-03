@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -115,7 +116,7 @@ func (assignment Assignment) String() (s string) {
 
 func (assignment *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(assignment.GetDepth() + 1)
-	b.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(e))
+	objects.SetTags(b.Transacted.GetMetadataMutable(), ids.MakeTagSetMutable(e))
 	assignment.addChild(b)
 	return b
 }

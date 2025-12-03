@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
 	"code.linenisgreat.com/dodder/go/src/hotel/id_fmts"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -190,7 +191,7 @@ func (ar *reader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(depth)
-		assignment.Transacted.GetMetadataMutable().SetTags(tags)
+		objects.SetTags(assignment.Transacted.GetMetadataMutable(), tags)
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -225,7 +226,7 @@ func (ar *reader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(depth)
-		assignment.Transacted.GetMetadataMutable().SetTags(tags)
+		objects.SetTags(assignment.Transacted.GetMetadataMutable(), tags)
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -258,7 +259,7 @@ func (ar *reader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(depth)
-		assignment.Transacted.GetMetadataMutable().SetTags(tags)
+		objects.SetTags(assignment.Transacted.GetMetadataMutable(), tags)
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

@@ -74,7 +74,7 @@ func (av writer) write(a *Assignment) (err error) {
 			return err
 		}
 
-		cursorExternal.GetMetadataMutable().SetTags(mes)
+		objects.SetTags(cursorExternal.GetMetadataMutable(), mes)
 
 		if _, err = av.options.fmtBox.EncodeStringTo(
 			cursor,

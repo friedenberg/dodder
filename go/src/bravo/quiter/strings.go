@@ -19,7 +19,7 @@ func SortedValuesBy[ELEMENT any](
 	return out
 }
 
-func SortedValues[ELEMENT interfaces.Value[ELEMENT]](
+func SortedValues[ELEMENT interfaces.Value](
 	seq interfaces.Seq[ELEMENT],
 ) (out []ELEMENT) {
 	out = slices.Collect(seq)

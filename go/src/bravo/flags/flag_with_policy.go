@@ -65,7 +65,7 @@ func SplitCommasAndTrim(value string) interfaces.Seq[string] {
 }
 
 func SplitCommasAndTrimAndMake[
-	ELEMENT interfaces.Value[ELEMENT],
+	ELEMENT interfaces.Value,
 	ELEMENT_PTR interfaces.ValuePtr[ELEMENT],
 ](value string) interfaces.SeqError[ELEMENT] {
 	return func(yield func(ELEMENT, error) bool) {

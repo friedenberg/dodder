@@ -22,7 +22,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 	}
 
 	proto.Metadata.GetTypeMutable().ResetWith(tipe)
-	proto.Metadata.SetTags(tags)
+	objects.SetTags(&proto.Metadata, tags)
 
 	return proto
 }

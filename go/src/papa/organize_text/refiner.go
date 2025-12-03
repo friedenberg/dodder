@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
 
 type Refiner struct {
@@ -137,7 +138,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	a.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(ls))
+	objects.SetTags(a.Transacted.GetMetadataMutable(), ids.MakeTagSetMutable(ls))
 
 	return err
 }
@@ -213,7 +214,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)
-		na.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(groupingPrefix.Tag))
+		objects.SetTags(na.Transacted.GetMetadataMutable(), ids.MakeTagSetMutable(groupingPrefix.Tag))
 		a.addChild(na)
 	}
 
@@ -231,7 +232,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 			c.Transacted.GetMetadata().GetTags(),
 			groupingPrefix.Tag,
 		)
-		c.Transacted.GetMetadataMutable().SetTags(subtractedTags)
+		objects.SetTags(c.Transacted.GetMetadataMutable(), subtractedTags)
 	}
 
 	return err

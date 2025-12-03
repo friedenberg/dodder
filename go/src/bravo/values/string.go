@@ -10,7 +10,7 @@ type String struct {
 	string
 }
 
-var _ interfaces.Value[String] = String{}
+var _ interfaces.Value = String{}
 
 func MakeString(v string) String {
 	return String{

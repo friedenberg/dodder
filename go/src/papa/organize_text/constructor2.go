@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
+	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -249,7 +250,7 @@ func (c *constructor2) addGroupedChildren(
 		}
 
 		child := newAssignment(parent.GetDepth() + 1)
-		child.Transacted.GetMetadataMutable().SetTags(ids.MakeTagSetMutable(e))
+		objects.SetTags(child.Transacted.GetMetadataMutable(), ids.MakeTagSetMutable(e))
 		groupingTags.DropFirst()
 
 		psv := MakePrefixSetFrom(zs)

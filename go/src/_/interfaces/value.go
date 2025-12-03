@@ -1,13 +1,12 @@
 package interfaces
 
 type (
-	Value[SELF any] interface {
+	Value interface {
 		Stringer
-		Equatable[SELF]
 		IsEmpty() bool
 	}
 
-	ValuePtr[SELF Value[SELF]] interface {
+	ValuePtr[SELF Value] interface {
 		Resetable
 		ResetablePtr[SELF]
 		StringerSetterPtr[SELF]

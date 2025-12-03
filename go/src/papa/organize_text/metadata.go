@@ -77,7 +77,7 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 		quiter_set.Del(tags, element)
 	}
 
-	object.GetSkuExternal().GetMetadataMutable().SetTags(tags)
+	objects.SetTags(object.GetSkuExternal().GetMetadataMutable(), tags)
 
 	return err
 }
@@ -85,7 +85,7 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 func (metadata Metadata) AsMetadata() (m1 objects.MetadataMutable) {
 	m1 = objects.Make()
 	m1.GetTypeMutable().ResetWith(metadata.Type)
-	m1.SetTags(metadata.TagSet)
+	objects.SetTags(m1, metadata.TagSet)
 	return m1
 }
 

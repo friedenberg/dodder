@@ -92,7 +92,7 @@ type (
 	DigestWriteMap map[string]MarklIdMutable
 
 	Lock[
-		KEY Value[KEY],
+		KEY Value,
 		KEY_PTR ValuePtr[KEY],
 	] interface {
 		GetKey() KEY
@@ -101,7 +101,7 @@ type (
 	}
 
 	LockMutable[
-		KEY Value[KEY],
+		KEY Value,
 		KEY_PTR ValuePtr[KEY],
 	] interface {
 		Lock[KEY, KEY_PTR]

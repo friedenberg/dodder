@@ -38,7 +38,7 @@ func (builder *builder) WithDescription(
 
 func (builder *builder) WithTags(tags TagSet) *builder {
 	builder.checkReuse()
-	builder.metadata.SetTags(tags)
+	SetTags(builder.metadata, tags)
 	return builder
 }
 
