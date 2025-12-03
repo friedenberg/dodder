@@ -5,14 +5,13 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 func ExpandTags(
 	metadata Metadata,
 	expander expansion.Expander,
-) interfaces.Seq[ids.Tag] {
+) interfaces.Seq[Tag] {
 	expansion.ExpandMany(
 		metadata.GetTags().All(),
 		expander,

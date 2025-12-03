@@ -3,7 +3,6 @@ package objects
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
@@ -37,7 +36,7 @@ func (builder *builder) WithDescription(
 	return builder
 }
 
-func (builder *builder) WithTags(tags ids.TagSet) *builder {
+func (builder *builder) WithTags(tags TagSet) *builder {
 	builder.checkReuse()
 	builder.metadata.SetTags(tags)
 	return builder

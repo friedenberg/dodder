@@ -116,12 +116,12 @@ func (metadata *metadata) IsEmpty() bool {
 }
 
 // TODO fix issue with GetTags being nil sometimes
-func (metadata *metadata) GetTags() ids.TagSet {
+func (metadata *metadata) GetTags() TagSet {
 	return metadata.Tags
 }
 
-func (metadata *metadata) AllTags() interfaces.Seq[ids.Tag] {
-	return func(yield func(ids.Tag) bool) {
+func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
+	return func(yield func(Tag) bool) {
 		for tag := range metadata.Tags.All() {
 			if !yield(tag) {
 				return
@@ -140,7 +140,7 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 		return err
 	}
 
-	var tag ids.Tag
+	var tag Tag
 
 	if err = tag.Set(tagString); err != nil {
 		err = errors.Wrap(err)
@@ -155,11 +155,11 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTag(tag ids.Tag) (err error) {
+func (metadata *metadata) AddTag(tag Tag) (err error) {
 	return metadata.AddTagPtr(tag)
 }
 
-func (metadata *metadata) AddTagPtr(tag ids.Tag) (err error) {
+func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 	if tag.IsEmpty() {
 		return err
 	}
@@ -171,7 +171,7 @@ func (metadata *metadata) AddTagPtr(tag ids.Tag) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
+func (metadata *metadata) AddTagPtrFast(tag *Tag) (err error) {
 	if err = metadata.Tags.Add(*tag); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -187,7 +187,7 @@ func (metadata *metadata) AddTagPtrFast(tag *ids.Tag) (err error) {
 	return err
 }
 
-func (metadata *metadata) SetTags(tags ids.TagSet) {
+func (metadata *metadata) SetTags(tags TagSet) {
 	metadata.Tags.Reset()
 
 	if tags == nil {
@@ -203,7 +203,7 @@ func (metadata *metadata) SetTags(tags ids.TagSet) {
 	}
 }
 
-func (metadata *metadata) SetTagsFast(tags ids.TagSet) {
+func (metadata *metadata) SetTagsFast(tags TagSet) {
 	metadata.Tags.Reset()
 
 	if tags == nil {
@@ -235,12 +235,12 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 	return &metadata.Type
 }
 
-func (metadata *metadata) GetTagLock(tag ids.Tag) TagLock {
+func (metadata *metadata) GetTagLock(tag Tag) TagLock {
 	lock, _ := metadata.Tags.getLock(tag.String())
 	return lock
 }
 
-func (metadata *metadata) GetTagLockMutable(tag ids.Tag) TagLockMutable {
+func (metadata *metadata) GetTagLockMutable(tag Tag) TagLockMutable {
 	lock, _ := metadata.Tags.getLockMutable(tag.String())
 	return lock
 }

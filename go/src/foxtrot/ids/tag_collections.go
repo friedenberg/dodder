@@ -1,9 +1,9 @@
 package ids
 
 import (
+	_ "encoding/gob"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -12,23 +12,9 @@ import (
 )
 
 type (
-	TagSlice = collections_slice.Slice[Tag]
-
-	TagSet interface {
-		Len() int
-		All() interfaces.Seq[Tag]
-		ContainsKey(string) bool
-		Get(string) (Tag, bool)
-		Key(Tag) string
-	}
-
-	TagSetMutable = interface {
-		TagSet
-
-		interfaces.Adder[Tag]
-		DelKey(string) error
-		interfaces.Resetable
-	}
+	TagSlice      = collections_slice.Slice[Tag]
+	TagSet        = Set[Tag]
+	TagSetMutable = SetMutable[Tag]
 )
 
 var TagSetEmpty TagSet

@@ -3,12 +3,11 @@ package objects
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
 type (
-	tagLock = markl.Lock[ids.Tag, *ids.Tag]
+	tagLock = markl.Lock[Tag, *Tag]
 
 	tagStruct struct {
 		// TODO add path information
@@ -25,11 +24,11 @@ type (
 )
 
 var (
-	_ ids.TagSet        = &tagSet{}
-	_ ids.TagSetMutable = &tagSet{}
+	_ TagSet        = &tagSet{}
+	_ TagSetMutable = &tagSet{}
 )
 
-func (tag tagStruct) GetKey() ids.Tag {
+func (tag tagStruct) GetKey() Tag {
 	return tag.Lock.GetKey()
 }
 
@@ -37,8 +36,8 @@ func (tagSet tagSet) Len() int {
 	return tagSet.Tags.Len()
 }
 
-func (tagSet tagSet) All() interfaces.Seq[ids.Tag] {
-	return func(yield func(ids.Tag) bool) {
+func (tagSet tagSet) All() interfaces.Seq[Tag] {
+	return func(yield func(Tag) bool) {
 		for tag := range tagSet.Tags.All() {
 			if !yield(tag.GetKey()) {
 				return
@@ -81,22 +80,22 @@ func (tagSet tagSet) getLockMutable(key string) (TagLockMutable, bool) {
 }
 
 // TODO switch to binary search
-func (tagSet tagSet) Get(key string) (ids.Tag, bool) {
+func (tagSet tagSet) Get(key string) (Tag, bool) {
 	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
 			return tag.GetKey(), true
 		}
 	}
 
-	return ids.Tag{}, false
+	return Tag{}, false
 }
 
-func (tagSet tagSet) Key(tag ids.Tag) string {
+func (tagSet tagSet) Key(tag Tag) string {
 	return tag.String()
 }
 
 // TODO sort
-func (tagSet *tagSet) Add(tag ids.Tag) error {
+func (tagSet *tagSet) Add(tag Tag) error {
 	if _, alreadyExists := tagSet.Get(tag.String()); alreadyExists {
 		return nil
 	}

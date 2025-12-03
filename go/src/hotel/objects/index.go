@@ -16,7 +16,7 @@ type (
 		GetFields() interfaces.Seq[Field]
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
 		GetDormant() values.Bool
-		GetImplicitTags() ids.TagSet
+		GetImplicitTags() TagSet
 		GetComments() interfaces.Seq[string]
 		GetSelfWithoutTai() interfaces.MarklId
 	}
@@ -24,11 +24,11 @@ type (
 	IndexMutable interface {
 		Index
 
-		AddTagsImplicitPtr(tag *ids.Tag) (err error)
+		AddTagsImplicitPtr(tag *Tag) (err error)
 		GetDormantMutable() *values.Bool
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetTagPathsMutable() *tag_paths.Tags
-		SetImplicitTags(e ids.TagSet)
+		SetImplicitTags(e TagSet)
 		GetCommentsMutable() *collections_slice.Slice[string]
 		GetSelfWithoutTaiMutable() interfaces.MarklIdMutable
 	}
@@ -36,7 +36,7 @@ type (
 
 type index struct {
 	Dormant      values.Bool
-	ImplicitTags ids.TagSetMutable // public for gob, but should be private
+	ImplicitTags TagSetMutable // public for gob, but should be private
 	TagPaths     tag_paths.Tags
 	Comments     collections_slice.Slice[string]
 	Fields       collections_slice.Slice[Field]
@@ -65,15 +65,15 @@ func (index *index) GetDormantMutable() *values.Bool {
 	return &index.Dormant
 }
 
-func (index *index) GetImplicitTags() ids.TagSet {
+func (index *index) GetImplicitTags() TagSet {
 	return index.GetImplicitTagsMutable()
 }
 
-func (index *index) AddTagsImplicitPtr(tag *ids.Tag) (err error) {
+func (index *index) AddTagsImplicitPtr(tag *Tag) (err error) {
 	return index.GetImplicitTagsMutable().Add(*tag)
 }
 
-func (index *index) GetImplicitTagsMutable() ids.TagSetMutable {
+func (index *index) GetImplicitTagsMutable() TagSetMutable {
 	if index.ImplicitTags == nil {
 		index.ImplicitTags = ids.MakeTagSetMutable()
 	}
@@ -81,7 +81,7 @@ func (index *index) GetImplicitTagsMutable() ids.TagSetMutable {
 	return index.ImplicitTags
 }
 
-func (index *index) SetImplicitTags(tags ids.TagSet) {
+func (index *index) SetImplicitTags(tags TagSet) {
 	tagsMutable := index.GetImplicitTagsMutable()
 	tagsMutable.Reset()
 
