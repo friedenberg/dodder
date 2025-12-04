@@ -25,7 +25,7 @@ type (
 	IndexMutable interface {
 		Index
 
-		AddTagsImplicitPtr(tag TagStruct) (err error)
+		AddTagsImplicitPtr(tag Tag)
 		GetDormantMutable() *values.Bool
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetTagPathsMutable() *tag_paths.Tags
@@ -70,8 +70,8 @@ func (index *index) GetImplicitTags() TagSet {
 	return index.GetImplicitTagsMutable()
 }
 
-func (index *index) AddTagsImplicitPtr(tag TagStruct) (err error) {
-	return index.GetImplicitTagsMutable().Add(tag)
+func (index *index) AddTagsImplicitPtr(tag Tag) {
+	ids.TagSetMutableAdd(index.GetImplicitTagsMutable(), tag)
 }
 
 func (index *index) GetImplicitTagsMutable() TagSetMutable {

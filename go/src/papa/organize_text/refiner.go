@@ -253,7 +253,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 
 	for _, child := range node.Children {
 		expanded := expansion.ExpandMany(
-			child.Transacted.GetMetadata().GetTags().All(),
+			child.Transacted.GetMetadata().AllTags(),
 			expansion.ExpanderRight,
 		)
 

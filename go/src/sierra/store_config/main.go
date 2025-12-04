@@ -204,7 +204,7 @@ func (store *store) AddTransacted(
 				fmt.Sprintf(
 					"tag with tags added: %q -> %q",
 					tag,
-					quiter.SortedValues(daughter.GetMetadata().GetTags().All()),
+					quiter.SortedValues(daughter.GetMetadata().AllTags()),
 				),
 			)
 		}

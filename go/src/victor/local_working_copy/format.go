@@ -333,7 +333,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				expandedTags := collections_slice.Collect(
 					expansion.ExpandMany(
-						object.GetMetadata().GetTags().All(),
+						object.GetMetadata().AllTags(),
 						expansion.ExpanderAll,
 					),
 				)

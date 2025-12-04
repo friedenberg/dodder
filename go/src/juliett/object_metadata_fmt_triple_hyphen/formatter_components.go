@@ -109,7 +109,7 @@ func (factory formatterComponents) writeCommonMetadataFormat(
 		}
 	}
 
-	for _, tag := range quiter.SortedValues(metadata.GetTags().All()) {
+	for _, tag := range quiter.SortedValues(metadata.AllTags()) {
 		if ids.IsEmpty(tag) {
 			continue
 		}

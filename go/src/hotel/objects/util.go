@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -28,18 +27,6 @@ func SetTags[TAG ids.ITag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
 			errors.PanicIfError(metadata.AddTagString(tag.String()))
 		}
 	}
-}
-
-func ExpandTags(
-	metadata Metadata,
-	expander expansion.Expander,
-) interfaces.Seq[TagStruct] {
-	expansion.ExpandMany(
-		metadata.GetTags().All(),
-		expander,
-	)
-
-	return nil
 }
 
 func GetMarklIdForPurpose(

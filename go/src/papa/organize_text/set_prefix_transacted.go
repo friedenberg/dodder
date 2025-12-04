@@ -82,7 +82,7 @@ func (prefixSet *PrefixSet) Add(object *obj) (err error) {
 
 	{
 		seq := expansion.ExpandMany(
-			object.GetSkuExternal().GetMetadata().GetTags().All(),
+			object.GetSkuExternal().GetMetadata().AllTags(),
 			expansion.ExpanderRight,
 		)
 

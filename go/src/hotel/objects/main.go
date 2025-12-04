@@ -168,11 +168,8 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTagPtrFast(tag TagStruct) (err error) {
-	if err = metadata.Tags.Add(tag); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
+func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
+	ids.TagSetMutableAdd(&metadata.Tags, tag)
 
 	tagBytestring := catgut.MakeFromString(tag.String())
 
@@ -216,12 +213,12 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 	return &metadata.Type
 }
 
-func (metadata *metadata) GetTagLock(tag TagStruct) TagLock {
+func (metadata *metadata) GetTagLock(tag Tag) TagLock {
 	lock, _ := metadata.Tags.getLock(tag.String())
 	return lock
 }
 
-func (metadata *metadata) GetTagLockMutable(tag TagStruct) TagLockMutable {
+func (metadata *metadata) GetTagLockMutable(tag Tag) TagLockMutable {
 	lock, _ := metadata.Tags.getLockMutable(tag.String())
 	return lock
 }

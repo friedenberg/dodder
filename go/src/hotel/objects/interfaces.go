@@ -36,7 +36,7 @@ type (
 		GetType() ids.Type
 		GetTypeLock() TypeLock
 
-		GetTagLock(TagStruct) TagLock
+		GetTagLock(Tag) TagLock
 
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
@@ -55,7 +55,7 @@ type (
 		AddTagPtr(Tag) (err error)
 		ResetTags()
 		AddTagString(tagString string) (err error)
-		AddTagPtrFast(tag TagStruct) (err error)
+		AddTagPtrFast(tag Tag) (err error)
 		GenerateExpandedTags()
 
 		GetIndexMutable() IndexMutable
@@ -69,7 +69,7 @@ type (
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeLockMutable() TypeLockMutable
-		GetTagLockMutable(TagStruct) TagLockMutable
+		GetTagLockMutable(Tag) TagLockMutable
 	}
 
 	Getter interface {

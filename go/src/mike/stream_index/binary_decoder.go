@@ -370,10 +370,7 @@ func (decoder *binaryDecoder) readFieldKey(
 			return err
 		}
 
-		if err = metadata.GetIndexMutable().AddTagsImplicitPtr(tag); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+		metadata.GetIndexMutable().AddTagsImplicitPtr(tag)
 
 	case key_bytes.CacheTags:
 		var tag tag_paths.PathWithType
