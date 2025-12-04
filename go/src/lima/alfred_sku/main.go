@@ -191,7 +191,8 @@ func (writer *Writer) zettelToItem(
 
 func (writer *Writer) emitTag(
 	object *sku.Transacted,
-	tag *ids.TagStruct) (item *alfred.Item) {
+	tag *ids.TagStruct,
+) (item *alfred.Item) {
 	item = writer.Get()
 
 	item.Title = "@" + tag.String()

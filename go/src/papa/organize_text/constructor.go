@@ -18,7 +18,8 @@ type constructor struct {
 
 func (c *constructor) collectExplicitAndImplicitFor(
 	objects sku.SkuTypeSet,
-	re ids.TagStruct) (explicitCount, implicitCount int, err error) {
+	re ids.TagStruct,
+) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
 	for checkedOut := range objects.All() {
