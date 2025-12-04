@@ -13,6 +13,7 @@ type (
 	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
 
 	Tag           = ids.TagStruct
+	ITag          = ids.ITag
 	TagSet        = ids.Set[ids.Tag]
 	TagSetMutable = ids.SetMutable[ids.Tag]
 
@@ -51,7 +52,7 @@ type (
 
 		Subtract(Metadata)
 
-		AddTagPtr(Tag) (err error)
+		AddTagPtr(ITag) (err error)
 		ResetTags()
 		AddTagString(tagString string) (err error)
 		AddTagPtrFast(tag Tag) (err error)

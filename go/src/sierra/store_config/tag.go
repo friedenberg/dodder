@@ -18,29 +18,31 @@ func init() {
 
 type implicitTagMap map[string]ids.TagSetMutable
 
-func (iem implicitTagMap) Contains(to, imp ids.Tag) bool {
-	s, ok := iem[to.String()]
+func (implicitTags implicitTagMap) Contains(to, imp ids.ITag) bool {
+	tagSet, ok := implicitTags[to.String()]
 
-	if !ok || s == nil {
+	if !ok || tagSet == nil {
 		return false
 	}
 
-	if !s.ContainsKey(s.Key(imp)) {
+	if !tagSet.ContainsKey(imp.String()) {
 		return false
 	}
 
 	return true
 }
 
-func (iem implicitTagMap) Set(to, imp ids.Tag) (err error) {
-	s, ok := iem[to.String()]
+func (implicitTags implicitTagMap) Set(to, imp ids.ITag) (err error) {
+	set, ok := implicitTags[to.String()]
 
 	if !ok {
-		s = ids.MakeTagSetMutable()
-		iem[to.String()] = s
+		set = ids.MakeTagSetMutable()
+		implicitTags[to.String()] = set
 	}
 
-	return s.Add(imp)
+	ids.TagSetMutableAdd(set, imp)
+
+	return
 }
 
 type tag struct {
@@ -88,7 +90,7 @@ func (e *tag) String() string {
 }
 
 func (compiled *compiled) AccumulateImplicitTags(
-	tag ids.Tag,
+	tag ids.ITag,
 ) (err error) {
 	compiledTag, ok := compiled.Tags.Get(tag.String())
 
@@ -102,7 +104,7 @@ func (compiled *compiled) AccumulateImplicitTags(
 	)
 
 	for expandedTag := range expandedTags {
-		if expandedTag.Equals(tag) {
+		if ids.TagEquals(expandedTag, tag) {
 			continue
 		}
 

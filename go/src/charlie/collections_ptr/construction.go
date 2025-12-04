@@ -36,6 +36,29 @@ func MakeValueSetString[
 	return s, err
 }
 
+func MakeValueSetSeq[
+	ELEMENT interfaces.Stringer,
+	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],
+](
+	keyer interfaces.StringKeyerPtr[ELEMENT, ELEMENT_PTR],
+	seq interfaces.Seq[ELEMENT_PTR],
+	count int,
+) (set Set[ELEMENT, ELEMENT_PTR]) {
+	set.E = make(map[string]ELEMENT_PTR, count)
+
+	if keyer == nil {
+		keyer = quiter.StringerKeyerPtr[ELEMENT, ELEMENT_PTR]{}
+	}
+
+	set.K = keyer
+
+	for element := range seq {
+		set.E[set.K.GetKeyPtr(element)] = element
+	}
+
+	return set
+}
+
 func MakeValueSetValue[
 	ELEMENT interfaces.Stringer,
 	ELEMENT_PTR interfaces.StringerPtr[ELEMENT],

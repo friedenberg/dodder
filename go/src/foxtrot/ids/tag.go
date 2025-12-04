@@ -156,6 +156,11 @@ func (tag tag) IsDodderTag() bool {
 	return strings.HasPrefix(tag.value, "dodder-")
 }
 
+func TagIsVirtual(tag ITag) bool {
+	// TODO panic if tag is not tag
+	return strings.HasPrefix(tag.String(), "%")
+}
+
 func (tag tag) IsVirtual() bool {
 	return tag.virtual
 }

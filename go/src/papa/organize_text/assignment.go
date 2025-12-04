@@ -308,14 +308,14 @@ func (assignment *Assignment) SubtractFromSet(
 ) (err error) {
 	for assignmentTag := range assignment.Transacted.GetMetadata().AllTags() {
 		for tagToSubtract := range tagsToSubtract.All() {
-			if !ids.ContainsExactly(tagToSubtract, assignmentTag) {
+			if tagToSubtract.String() != assignmentTag.String() {
 				continue
 			}
 
-			quiter_set.Del(tagsToSubtract, tagToSubtract)
+			tagsToSubtract.DelKey(tagToSubtract.String())
 		}
 
-		quiter_set.Del(tagsToSubtract, assignmentTag)
+		tagsToSubtract.DelKey(assignmentTag.String())
 	}
 
 	if assignment.Parent == nil {

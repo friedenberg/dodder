@@ -69,8 +69,8 @@ func (tags *Tags) AddSuperFrom(
 	return err
 }
 
-func (tags *Tags) AddTagOld(e ids.Tag) (err error) {
-	return tags.AddTag(catgut.MakeFromString(e.String()))
+func (tags *Tags) AddTagOld(tag ids.ITag) (err error) {
+	return tags.AddTag(catgut.MakeFromString(tag.String()))
 }
 
 func (tags *Tags) AddTag(e *Tag) (err error) {

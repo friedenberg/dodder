@@ -157,7 +157,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 
 	case key_bytes.Tag:
 		for _, tag := range quiter.SortedValues(object.AllTags()) {
-			if tag.IsVirtual() {
+			if ids.TagIsVirtual(tag) {
 				continue
 			}
 

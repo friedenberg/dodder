@@ -68,13 +68,13 @@ func (transacted *Transacted) AllTags() interfaces.Seq[ids.Tag] {
 	return transacted.GetMetadata().AllTags()
 }
 
-func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
+func (transacted *Transacted) AddTag(tag ids.ITag) (err error) {
 	if transacted.ObjectId.GetGenre() == genres.Tag &&
 		strings.HasPrefix(transacted.ObjectId.String(), tag.String()) {
 		return err
 	}
 
-	tagKey := transacted.GetMetadata().GetIndex().GetImplicitTags().Key(tag)
+	tagKey := tag.String()
 
 	if transacted.GetMetadata().GetIndex().GetImplicitTags().ContainsKey(tagKey) {
 		return err

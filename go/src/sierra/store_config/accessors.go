@@ -168,7 +168,7 @@ func (compiled *compiled) getSortedTypesExpanded(
 	return expandedActual
 }
 
-func (compiled *compiled) GetImplicitTags(tag ids.Tag) ids.TagSet {
+func (compiled *compiled) GetImplicitTags(tag ids.ITag) ids.TagSet {
 	s, ok := compiled.ImplicitTags[tag.String()]
 
 	if !ok || s == nil {

@@ -154,7 +154,7 @@ func (cmd *Organize) Run(req command.Request) {
 		workspaceTags := workspace.GetDefaults().GetDefaultTags()
 
 		for tag := range workspaceTags.All() {
-			tags.Add(tag)
+			ids.TagSetMutableAdd(tags, tag)
 		}
 	}
 

@@ -128,7 +128,7 @@ func (tagSet *tagSet) Reset() {
 	tagSet.Tags.Reset()
 }
 
-func (tagSet *tagSet) addNormalizedTag(tag Tag) {
+func (tagSet *tagSet) addNormalizedTag(tag ITag) {
 	seq := expansion.ExpandOneIntoIds[Tag](
 		tag.String(),
 		expansion.ExpanderRight,

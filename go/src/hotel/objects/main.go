@@ -155,11 +155,11 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTag(tag Tag) (err error) {
+func (metadata *metadata) AddTag(tag ITag) (err error) {
 	return metadata.AddTagPtr(tag)
 }
 
-func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
+func (metadata *metadata) AddTagPtr(tag ITag) (err error) {
 	if tag.IsEmpty() {
 		return err
 	}
@@ -235,7 +235,7 @@ func (metadata *metadata) Subtract(otherMetadata Metadata) {
 	}
 
 	for tag := range otherMetadata.AllTags() {
-		quiter_set.Del(&metadata.Tags, tag)
+		metadata.Tags.DelKey(tag.String())
 	}
 }
 

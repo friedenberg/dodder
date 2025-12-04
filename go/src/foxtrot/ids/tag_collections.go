@@ -4,7 +4,9 @@ import (
 	_ "encoding/gob"
 	"strings"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 )
@@ -53,6 +55,69 @@ func MakeTagSetFromSlice(tags ...TagStruct) (s TagSet) {
 	return collections_ptr.MakeValueSetValue(nil, tags...)
 }
 
+func TagStructSeqToITag(tags interfaces.Seq[TagStruct]) interfaces.Seq[ITag] {
+	return func(yield func(ITag) bool) {
+		for tag := range tags {
+			if !yield(tag) {
+				return
+			}
+		}
+	}
+}
+
+func ITagSeqToTagStructSeq(itags interfaces.Seq[ITag]) interfaces.Seq[TagStruct] {
+	return func(yield func(Tag) bool) {
+		for itag := range itags {
+			var tag TagStruct
+
+			errors.PanicIfError(tag.Set(itag.String()))
+
+			if !yield(tag) {
+				return
+			}
+		}
+	}
+}
+
+func ITagSeqToTagStructPtrSeq(itags interfaces.Seq[ITag]) interfaces.Seq[*TagStruct] {
+	return func(yield func(*TagStruct) bool) {
+		for itag := range itags {
+			var tag TagStruct
+
+			errors.PanicIfError(tag.Set(itag.String()))
+
+			if !yield(&tag) {
+				return
+			}
+		}
+	}
+}
+
+func MakeTagSetFromISeq(itags interfaces.Seq[ITag]) (s TagSet) {
+	tags := ITagSeqToTagStructPtrSeq(itags)
+	return collections_ptr.MakeValueSetSeq(nil, tags, 0)
+}
+
+func MakeTagSetFromISlice(itags ...ITag) (s TagSet) {
+	if len(itags) == 0 {
+		return TagSetEmpty
+	}
+
+	tags := func(yield func(*Tag) bool) {
+		for _, itag := range itags {
+			var tag TagStruct
+
+			errors.PanicIfError(tag.Set(itag.String()))
+
+			if !yield(&tag) {
+				return
+			}
+		}
+	}
+
+	return collections_ptr.MakeValueSetSeq(nil, tags, len(itags))
+}
+
 // TODO move to quiter
 func MakeTagSetStrings(tagStrings ...string) (s TagSet, err error) {
 	return collections_ptr.MakeValueSetString[TagStruct](nil, tagStrings...)
@@ -77,11 +142,11 @@ func IntersectPrefixes(haystack TagSet, needle TagStruct) (s3 TagSet) {
 	return s3
 }
 
-func SubtractPrefix(s1 TagSet, e TagStruct) (s2 TagSet) {
+func SubtractPrefix(input TagSet, tag TagStruct) (output TagSet) {
 	s3 := MakeTagSetMutable()
 
-	for _, e1 := range quiter.CollectSlice(s1) {
-		e2, _ := LeftSubtract(e1, e)
+	for _, e1 := range quiter.CollectSlice(input) {
+		e2, _ := LeftSubtract(e1, tag)
 
 		if e2.String() == "" {
 			continue
@@ -90,7 +155,17 @@ func SubtractPrefix(s1 TagSet, e TagStruct) (s2 TagSet) {
 		s3.Add(e2)
 	}
 
-	s2 = CloneTagSet(s3)
+	output = CloneTagSet(s3)
 
-	return s2
+	return output
+}
+
+func TagSetMutableAdd(set TagSetMutable, itag ITag) {
+	var tag TagStruct
+	errors.PanicIfError(tag.Set(itag.String()))
+	errors.PanicIfError(set.Add(tag))
+}
+
+func TagEquals(left, right ITag) bool {
+	return left.String() == right.String()
 }
