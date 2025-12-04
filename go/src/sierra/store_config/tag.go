@@ -98,7 +98,7 @@ func (compiled *compiled) AccumulateImplicitTags(
 		return err
 	}
 
-	expandedTags := expansion.ExpandOneIntoIds[ids.Tag](
+	expandedTags := expansion.ExpandOneIntoIds[ids.TagStruct](
 		tag.String(),
 		expansion.ExpanderRight,
 	)

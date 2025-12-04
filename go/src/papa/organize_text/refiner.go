@@ -131,7 +131,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return err
 	}
 
-	var ls ids.Tag
+	var ls ids.TagStruct
 
 	if ls, err = ids.LeftSubtract(childTag, parentTag); err != nil {
 		err = errors.Wrap(err)
@@ -239,7 +239,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 }
 
 type tagBag struct {
-	ids.Tag
+	Tag         ids.TagStruct
 	assignments []*Assignment
 }
 
@@ -277,7 +277,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 
 	for e, n := range assignmentMap {
 		if len(n) > 1 {
-			var e1 ids.Tag
+			var e1 ids.TagStruct
 
 			errors.PanicIfError(e1.Set(e))
 

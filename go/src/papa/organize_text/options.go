@@ -18,7 +18,7 @@ type Flags struct {
 	Options
 
 	once      *sync.Once
-	ExtraTags collections_ptr.Flag[ids.Tag, *ids.Tag]
+	ExtraTags collections_ptr.Flag[ids.TagStruct, *ids.TagStruct]
 }
 
 var _ interfaces.CommandComponentWriter = (*Flags)(nil)
@@ -51,13 +51,13 @@ type Options struct {
 func MakeFlags() Flags {
 	return Flags{
 		once: &sync.Once{},
-		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
+		ExtraTags: collections_ptr.MakeFlagCommas[ids.TagStruct](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			wasMade:      true,
-			GroupingTags: collections_slice.MakeFromSlice[ids.Tag](),
+			GroupingTags: collections_slice.MakeFromSlice[ids.TagStruct](),
 			Skus:         sku.MakeSkuTypeSetMutable(),
 			Metadata:     NewMetadata(ids.RepoId{}),
 		},
@@ -71,14 +71,14 @@ func MakeFlagsWithMetadata(metadata Metadata) Flags {
 
 	return Flags{
 		once: &sync.Once{},
-		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
+		ExtraTags: collections_ptr.MakeFlagCommas[ids.TagStruct](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			Metadata:     metadata,
 			wasMade:      true,
-			GroupingTags: collections_slice.MakeFromSlice[ids.Tag](),
+			GroupingTags: collections_slice.MakeFromSlice[ids.TagStruct](),
 			Skus:         sku.MakeSkuTypeSetMutable(),
 		},
 	}
@@ -89,9 +89,9 @@ func (flagz *Flags) SetFlagDefinitions(flagDefs interfaces.CLIFlagDefinitions) {
 		"group-by",
 		"tag prefixes to group objects",
 		func(valueOrValues string) (err error) {
-			seq := flags.SplitCommasAndTrimAndMake[ids.Tag](valueOrValues)
+			seq := flags.SplitCommasAndTrimAndMake[ids.TagStruct](valueOrValues)
 
-			var tag ids.Tag
+			var tag ids.TagStruct
 
 			for tag, err = range seq {
 				if err != nil {

@@ -14,8 +14,8 @@ type (
 
 	Tag           = ids.TagStruct
 	ITag          = ids.ITag
-	TagSet        = ids.Set[ids.Tag]
-	TagSetMutable = ids.SetMutable[ids.Tag]
+	TagSet        = ids.Set[ids.TagStruct]
+	TagSetMutable = ids.SetMutable[ids.TagStruct]
 
 	TagLock        = interfaces.Lock[Tag, *Tag]
 	TagLockMutable = interfaces.LockMutable[Tag, *Tag]

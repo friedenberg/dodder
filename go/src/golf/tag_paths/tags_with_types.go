@@ -134,7 +134,7 @@ func (tags *Tags) Set(v string) (err error) {
 	vs := strings.Split(v, ",")
 
 	for _, v := range vs {
-		var e ids.Tag
+		var e ids.TagStruct
 
 		if err = e.Set(v); err != nil {
 			err = errors.Wrap(err)

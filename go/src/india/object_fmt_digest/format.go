@@ -99,7 +99,7 @@ func (format format) writeMetadataKeyStringTo(
 			break
 		}
 
-		var sortedValues []ids.Tag
+		var sortedValues []ids.TagStruct
 
 		func() {
 			defer func() {

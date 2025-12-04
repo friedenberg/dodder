@@ -52,7 +52,7 @@ func (writer *Writer) PrintOne(object *sku.Transacted) (err error) {
 		item = writer.zettelToItem(object)
 
 	case genres.Tag:
-		var tag ids.Tag
+		var tag ids.TagStruct
 
 		if err = tag.Set(object.ObjectId.String()); err != nil {
 			err = errors.Wrap(err)
@@ -191,8 +191,7 @@ func (writer *Writer) zettelToItem(
 
 func (writer *Writer) emitTag(
 	object *sku.Transacted,
-	tag *ids.Tag,
-) (item *alfred.Item) {
+	tag *ids.TagStruct) (item *alfred.Item) {
 	item = writer.Get()
 
 	item.Title = "@" + tag.String()

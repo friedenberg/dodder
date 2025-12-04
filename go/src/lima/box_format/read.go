@@ -252,7 +252,7 @@ LOOP_AFTER_OBJECT_ID:
 
 			// value
 		case seq.MatchAll(doddish.TokenTypeIdentifier):
-			var tag ids.Tag
+			var tag ids.TagStruct
 
 			if err = tag.Set(seq.String()); err != nil {
 				err = errors.Wrap(err)

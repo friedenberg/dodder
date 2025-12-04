@@ -33,7 +33,7 @@ func (t inlineTypChecker) IsInlineTyp(k ids.Type) bool {
 func makeTagSet(t *ui.TestContext, vs ...string) (es ids.TagSet) {
 	var err error
 
-	if es, err = collections_ptr.MakeValueSetString[ids.Tag](nil, vs...); err != nil {
+	if es, err = collections_ptr.MakeValueSetString[ids.TagStruct](nil, vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

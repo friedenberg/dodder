@@ -9,8 +9,8 @@ import (
 )
 
 type DefaultsV1 struct {
-	Type ids.Type  `toml:"type,omitempty"`
-	Tags []ids.Tag `toml:"tags"`
+	Type ids.Type        `toml:"type,omitempty"`
+	Tags []ids.TagStruct `toml:"tags"`
 }
 
 var _ ConfigOverlay = V1{}
@@ -19,21 +19,21 @@ func (defaults DefaultsV1) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1) GetDefaultTags() collections_slice.Slice[ids.Tag] {
-	return collections_slice.Slice[ids.Tag](defaults.Tags)
+func (defaults DefaultsV1) GetDefaultTags() collections_slice.Slice[ids.TagStruct] {
+	return collections_slice.Slice[ids.TagStruct](defaults.Tags)
 }
 
 type DefaultsV1OmitEmpty struct {
-	Type ids.Type  `toml:"type,omitempty"`
-	Tags []ids.Tag `toml:"tags,omitempty"`
+	Type ids.Type        `toml:"type,omitempty"`
+	Tags []ids.TagStruct `toml:"tags,omitempty"`
 }
 
 func (defaults DefaultsV1OmitEmpty) GetDefaultType() ids.Type {
 	return defaults.Type
 }
 
-func (defaults DefaultsV1OmitEmpty) GetDefaultTags() collections_slice.Slice[ids.Tag] {
-	return collections_slice.Slice[ids.Tag](defaults.Tags)
+func (defaults DefaultsV1OmitEmpty) GetDefaultTags() collections_slice.Slice[ids.TagStruct] {
+	return collections_slice.Slice[ids.TagStruct](defaults.Tags)
 }
 
 type V1 struct {
@@ -48,7 +48,7 @@ var _ ConfigOverlay = V1{}
 func (blob *V1) Reset() {
 	blob.FileExtensions.Reset()
 	blob.Defaults.Type = ids.Type{}
-	blob.Defaults.Tags = make([]ids.Tag, 0)
+	blob.Defaults.Tags = make([]ids.TagStruct, 0)
 	blob.PrintOptions = options_print.V1{}
 }
 
@@ -57,7 +57,7 @@ func (blob *V1) ResetWith(b *V1) {
 
 	blob.Defaults.Type = b.Defaults.Type
 
-	blob.Defaults.Tags = make([]ids.Tag, len(b.Defaults.Tags))
+	blob.Defaults.Tags = make([]ids.TagStruct, len(b.Defaults.Tags))
 	copy(blob.Defaults.Tags, b.Defaults.Tags)
 
 	blob.PrintOptions = b.PrintOptions

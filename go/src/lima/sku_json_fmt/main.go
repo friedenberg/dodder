@@ -67,7 +67,7 @@ func (json *Transacted) FromObjectIdStringAndMetadata(
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
-	json.Tags = slices.Collect(quiter.Strings(quiter_seq.Seq[interfaces.Collection[ids.Tag]](metadata.GetTags())))
+	json.Tags = slices.Collect(quiter.Strings(quiter_seq.Seq[interfaces.Collection[ids.TagStruct]](metadata.GetTags())))
 	json.Tai = metadata.GetTai().String()
 	json.Type = metadata.GetType().String()
 

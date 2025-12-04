@@ -102,7 +102,7 @@ func (compiled *compiled) getTag(
 
 	var cursor *tag
 
-	seq := expansion.ExpandOneIntoIds[ids.Tag](
+	seq := expansion.ExpandOneIntoIds[ids.TagStruct](
 		objectId.String(),
 		expansion.ExpanderRight,
 	)

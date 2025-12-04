@@ -64,7 +64,7 @@ func (transacted *Transacted) GetTags() ids.TagSet {
 	return transacted.GetMetadata().GetTags()
 }
 
-func (transacted *Transacted) AllTags() interfaces.Seq[ids.Tag] {
+func (transacted *Transacted) AllTags() interfaces.Seq[ids.TagStruct] {
 	return transacted.GetMetadata().AllTags()
 }
 
@@ -88,7 +88,7 @@ func (transacted *Transacted) AddTag(tag ids.ITag) (err error) {
 	return err
 }
 
-func (transacted *Transacted) AddTagPtrFast(tag ids.Tag) (err error) {
+func (transacted *Transacted) AddTagPtrFast(tag ids.TagStruct) (err error) {
 	if err = transacted.GetMetadataMutable().AddTagPtrFast(tag); err != nil {
 		err = errors.Wrap(err)
 		return err

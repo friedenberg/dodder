@@ -34,7 +34,7 @@ func (reader *tagsReader) ReadStringFormat(
 		return n, err
 	}
 
-	seq := flags.SplitCommasAndTrimAndMake[ids.Tag](readable.String())
+	seq := flags.SplitCommasAndTrimAndMake[ids.TagStruct](readable.String())
 
 	for tag, iterr := range seq {
 		if errors.Is(iterr, ids.ErrEmptyTag) {

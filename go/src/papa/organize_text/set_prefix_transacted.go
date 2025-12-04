@@ -167,8 +167,7 @@ func (prefixSet PrefixSet) AllObjects() interfaces.Seq2[string, *obj] {
 }
 
 func (prefixSet PrefixSet) Match(
-	tag ids.Tag,
-) (out Segments) {
+	tag ids.TagStruct) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 
@@ -199,8 +198,7 @@ func (prefixSet PrefixSet) Match(
 }
 
 func (prefixSet PrefixSet) Subset(
-	tag ids.Tag,
-) (out Segments) {
+	tag ids.TagStruct) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(prefixSet.innerMap))
 

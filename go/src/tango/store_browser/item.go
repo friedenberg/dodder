@@ -52,7 +52,7 @@ func (item *Item) GetType() (t ids.Type, err error) {
 }
 
 // TODO move below to !toml-bookmark type
-func (item Item) GetUrlPathTag() (e ids.Tag, err error) {
+func (item Item) GetUrlPathTag() (e ids.TagStruct, err error) {
 	ur := item.Url.Url()
 	els := strings.Split(ur.Hostname(), ".")
 	slices.Reverse(els)
@@ -150,7 +150,7 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 	)
 
 	// TODO move to !toml-bookmark type
-	var tag ids.Tag
+	var tag ids.TagStruct
 
 	if tag, err = item.GetUrlPathTag(); err == nil {
 		if err = metadata.AddTagPtr(tag); err != nil {

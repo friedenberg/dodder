@@ -18,7 +18,7 @@ func init() {
 	utility.AddCmd(
 		"checkin-blob",
 		&CheckinBlob{
-			NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
+			NewTags: collections_ptr.MakeFlagCommas[ids.TagStruct](
 				collections_ptr.SetterPolicyAppend,
 			),
 		})
@@ -28,7 +28,7 @@ type CheckinBlob struct {
 	command_components_dodder.LocalWorkingCopy
 
 	Delete  bool
-	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
+	NewTags collections_ptr.Flag[ids.TagStruct, *ids.TagStruct]
 }
 
 var _ interfaces.CommandComponentWriter = (*CheckinBlob)(nil)

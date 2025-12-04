@@ -37,7 +37,7 @@ func (cmd InitFrom) Complete(
 }
 
 func (cmd *InitFrom) Run(req command.Request) {
-	var name ids.Tag
+	var name ids.TagStruct
 
 	if err := name.Set(req.PopArg("blob store name")); err != nil {
 		errors.ContextCancelWithBadRequestError(req, err)

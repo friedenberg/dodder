@@ -117,8 +117,7 @@ func (conflicted *Conflicted) MergeTags() (err error) {
 	deleted := ids.MakeTagSetMutable()
 
 	removeFromAllButAddTo := func(
-		tag ids.Tag,
-		tagSet ids.TagSetMutable,
+		tag ids.TagStruct, tagSet ids.TagSetMutable,
 	) (err error) {
 		if err = tagSet.Add(tag); err != nil {
 			err = errors.Wrap(err)

@@ -26,15 +26,14 @@ var sTagResetter tagResetter
 
 type (
 	TagStruct = tag
-	Tag       = tag
 	ITag      = interface {
 		interfaces.ObjectId
 	}
 )
 
 var (
-	TagResetter     = sTagResetter
-	_           Tag = TagStruct{}
+	TagResetter           = sTagResetter
+	_           TagStruct = TagStruct{}
 )
 
 type tag struct {
@@ -112,7 +111,7 @@ func (tag tag) Equals(b tag) bool {
 	return tag == b
 }
 
-func (tag Tag) GetObjectIdString() string {
+func (tag TagStruct) GetObjectIdString() string {
 	return tag.String()
 }
 
@@ -231,25 +230,25 @@ func (tag *tag) UnmarshalBinary(text []byte) (err error) {
 	return err
 }
 
-func IsDependentLeaf(a Tag) (has bool) {
+func IsDependentLeaf(a TagStruct) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
 	return has
 }
 
-func HasParentPrefix(a, b Tag) (has bool) {
+func HasParentPrefix(a, b TagStruct) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
 	return has
 }
 
 type tagResetter struct{}
 
-func (tagResetter) Reset(e *Tag) {
+func (tagResetter) Reset(e *TagStruct) {
 	e.value = ""
 	e.virtual = false
 	e.dependentLeaf = false
 }
 
-func (tagResetter) ResetWith(a, b *Tag) {
+func (tagResetter) ResetWith(a, b *TagStruct) {
 	a.value = b.value
 	a.virtual = b.virtual
 	a.dependentLeaf = b.dependentLeaf

@@ -32,7 +32,7 @@ type (
 
 	Defaults interface {
 		GetDefaultType() ids.Type
-		GetDefaultTags() collections_slice.Slice[ids.Tag]
+		GetDefaultTags() collections_slice.Slice[ids.TagStruct]
 	}
 )
 
@@ -60,7 +60,7 @@ func DefaultOverlay(
 			DefaultBlobStoreId: defaultBlobStoreId,
 			Defaults: DefaultsV1{
 				Type: defaultType,
-				Tags: make([]ids.Tag, 0),
+				Tags: make([]ids.TagStruct, 0),
 			},
 			PrintOptions:   options_print.DefaultOverlay(),
 			FileExtensions: file_extensions.DefaultOverlay(),

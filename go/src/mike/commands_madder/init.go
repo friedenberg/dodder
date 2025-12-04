@@ -58,7 +58,7 @@ func (cmd *Init) SetFlagDefinitions(
 }
 
 func (cmd *Init) Run(req command.Request) {
-	var blobStoreName ids.Tag
+	var blobStoreName ids.TagStruct
 
 	if err := blobStoreName.Set(req.PopArg("blob store name")); err != nil {
 		errors.ContextCancelWithBadRequestError(req, err)

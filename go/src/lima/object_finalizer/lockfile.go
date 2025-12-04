@@ -44,8 +44,7 @@ func (finalizer finalizer) writeTypeLockIfNecessary(
 
 func (finalizer finalizer) writeTagLockIfNecessary(
 	metadata objects.MetadataMutable,
-	tag ids.Tag,
-	funcs ...sku.FuncReadOne,
+	tag ids.TagStruct, funcs ...sku.FuncReadOne,
 ) (err error) {
 	if tag.IsEmpty() {
 		err = ErrEmptyLockKey

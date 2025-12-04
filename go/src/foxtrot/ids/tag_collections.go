@@ -66,7 +66,7 @@ func TagStructSeqToITag(tags interfaces.Seq[TagStruct]) interfaces.Seq[ITag] {
 }
 
 func ITagSeqToTagStructSeq(itags interfaces.Seq[ITag]) interfaces.Seq[TagStruct] {
-	return func(yield func(Tag) bool) {
+	return func(yield func(TagStruct) bool) {
 		for itag := range itags {
 			var tag TagStruct
 
@@ -103,7 +103,7 @@ func MakeTagSetFromISlice(itags ...ITag) (s TagSet) {
 		return TagSetEmpty
 	}
 
-	tags := func(yield func(*Tag) bool) {
+	tags := func(yield func(*TagStruct) bool) {
 		for _, itag := range itags {
 			var tag TagStruct
 

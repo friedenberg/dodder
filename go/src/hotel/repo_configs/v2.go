@@ -21,7 +21,7 @@ var _ ConfigOverlay2 = V2{}
 func (config *V2) Reset() {
 	config.FileExtensions.Reset()
 	config.Defaults.Type = ids.Type{}
-	config.Defaults.Tags = make([]ids.Tag, 0)
+	config.Defaults.Tags = make([]ids.TagStruct, 0)
 	config.PrintOptions = options_print.V2{}
 }
 
@@ -30,7 +30,7 @@ func (config *V2) ResetWith(b *V2) {
 
 	config.Defaults.Type = b.Defaults.Type
 
-	config.Defaults.Tags = make([]ids.Tag, len(b.Defaults.Tags))
+	config.Defaults.Tags = make([]ids.TagStruct, len(b.Defaults.Tags))
 	copy(config.Defaults.Tags, b.Defaults.Tags)
 
 	config.PrintOptions = b.PrintOptions

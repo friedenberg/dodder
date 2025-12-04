@@ -71,7 +71,7 @@ func TestExpansionAll(t1 *testing.T) {
 	t := ui.T{T: t1}
 	e := MustTag("this-is-a-tag")
 
-	ex := expansion.ExpandIntoSlice[Tag](
+	ex := expansion.ExpandIntoSlice[TagStruct](
 		e.String(),
 		expansion.ExpanderAll,
 	)
@@ -104,7 +104,7 @@ func TestExpansionRight(t1 *testing.T) {
 
 	e := MustTag("this-is-a-tag")
 
-	ex := expansion.ExpandIntoSlice[Tag](
+	ex := expansion.ExpandIntoSlice[TagStruct](
 		e.String(),
 		expansion.ExpanderRight,
 	)

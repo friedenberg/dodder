@@ -27,7 +27,7 @@ func (store *Store) applyDormantAndRealizeTags(
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
 	// }
 
-	var tag ids.Tag
+	var tag ids.TagStruct
 
 	// TODO better solution for "realizing" tags against Config.
 	// Specifically, making this less fragile and dependent on remembering to do

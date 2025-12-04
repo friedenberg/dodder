@@ -83,7 +83,7 @@ func FromLuaTableV1(
 
 	tagsTable.ForEach(
 		func(key, value lua.LValue) {
-			var tag ids.Tag
+			var tag ids.TagStruct
 
 			if err = tag.Set(key.String()); err != nil {
 				err = errors.Wrap(err)

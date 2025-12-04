@@ -43,7 +43,7 @@ func (store *store) recompileTags() (err error) {
 	store.config.ImplicitTags = make(implicitTagMap)
 
 	for ke := range store.config.Tags.All() {
-		var e ids.Tag
+		var e ids.TagStruct
 
 		if err = e.Set(ke.String()); err != nil {
 			err = errors.Wrapf(

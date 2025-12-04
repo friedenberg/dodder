@@ -114,7 +114,7 @@ func (assignment Assignment) String() (s string) {
 	return s + quiter.StringCommaSeparated(assignment.Transacted.GetMetadata().GetTags())
 }
 
-func (assignment *Assignment) makeChild(e ids.Tag) (b *Assignment) {
+func (assignment *Assignment) makeChild(e ids.TagStruct) (b *Assignment) {
 	b = newAssignment(assignment.GetDepth() + 1)
 	objects.SetTags(b.Transacted.GetMetadataMutable(), ids.MakeTagSetMutable(e))
 	assignment.addChild(b)
@@ -325,7 +325,7 @@ func (assignment *Assignment) SubtractFromSet(
 	return assignment.Parent.SubtractFromSet(tagsToSubtract)
 }
 
-func (assignment *Assignment) Contains(e *ids.Tag) bool {
+func (assignment *Assignment) Contains(e *ids.TagStruct) bool {
 	if assignment.Transacted.GetMetadata().GetTags().ContainsKey(e.String()) {
 		return true
 	}

@@ -18,8 +18,7 @@ type constructor2 struct {
 
 func (c *constructor2) collectExplicitAndImplicitFor(
 	skus sku.SkuTypeSet,
-	re ids.Tag,
-) (explicitCount, implicitCount int, err error) {
+	re ids.TagStruct) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
 	for checkedOut := range skus.All() {
@@ -221,7 +220,7 @@ func (c *constructor2) addGroupedChildren(
 	used objSet,
 ) (err error) {
 	for eStr, zs := range grouped.AllObjectSets() {
-		var e ids.Tag
+		var e ids.TagStruct
 		if eStr != "" {
 			e = ids.MustTag(eStr)
 		}
