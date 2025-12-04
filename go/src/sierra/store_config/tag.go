@@ -42,7 +42,7 @@ func (implicitTags implicitTagMap) Set(to, imp ids.ITag) (err error) {
 
 	ids.TagSetMutableAdd(set, imp)
 
-	return
+	return err
 }
 
 type tag struct {
