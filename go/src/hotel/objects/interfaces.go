@@ -17,8 +17,10 @@ type (
 	TagSet        = ids.Set[ids.TagStruct]
 	TagSetMutable = ids.SetMutable[ids.TagStruct]
 
-	TagLock        = interfaces.Lock[TagStruct, *TagStruct]
-	TagLockMutable = interfaces.LockMutable[TagStruct, *TagStruct]
+	tagLock        = interfaces.Lock[TagStruct, *TagStruct]
+	tagLockMutable = interfaces.LockMutable[TagStruct, *TagStruct]
+	TagLock        = tagLock
+	TagLockMutable = tagLockMutable
 
 	IdLock        = interfaces.Lock[SeqId, *SeqId]
 	IdLockMutable = interfaces.LockMutable[SeqId, *SeqId]

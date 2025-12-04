@@ -6,7 +6,7 @@ type tagStruct struct {
 	// TODO add path information
 
 	// required to be exported for Gob's stupid illusions
-	Lock tagLock
+	Lock tagLockStruct
 }
 
 func tagStructCompareTagKey(left, right tagStruct) cmp.Result {

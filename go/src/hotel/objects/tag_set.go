@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	tagLock = markl.Lock[TagStruct, *TagStruct]
+	tagLockStruct = markl.Lock[TagStruct, *TagStruct]
 
 	tagSet struct {
 		// required to be exported for Gob's stupid illusions
