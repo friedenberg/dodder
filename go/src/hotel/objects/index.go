@@ -5,11 +5,14 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
+	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/tag_paths"
 )
 
 type (
+	Field = string_format_writer.Field
+
 	Index interface {
 		GetFields() interfaces.Seq[Field]
 		GetTagPaths() *tag_paths.Tags // TODO make immutable view
@@ -22,7 +25,7 @@ type (
 	IndexMutable interface {
 		Index
 
-		AddTagsImplicitPtr(tag Tag) (err error)
+		AddTagsImplicitPtr(tag TagStruct) (err error)
 		GetDormantMutable() *values.Bool
 		GetFieldsMutable() *collections_slice.Slice[Field]
 		GetTagPathsMutable() *tag_paths.Tags
@@ -67,7 +70,7 @@ func (index *index) GetImplicitTags() TagSet {
 	return index.GetImplicitTagsMutable()
 }
 
-func (index *index) AddTagsImplicitPtr(tag Tag) (err error) {
+func (index *index) AddTagsImplicitPtr(tag TagStruct) (err error) {
 	return index.GetImplicitTagsMutable().Add(tag)
 }
 

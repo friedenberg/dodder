@@ -167,7 +167,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 			}
 
 			var n1 int64
-			n1, err = encoder.writeFieldBinaryMarshaler(&tag)
+			n1, err = encoder.writeFieldStringer(tag)
 			n += n1
 
 			if err != nil {
@@ -327,6 +327,24 @@ func (encoder *binaryEncoder) writeFieldMerkleId(
 	}
 
 	if n, err = encoder.writeFieldBinaryMarshaler(merkleId); err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	return n, err
+}
+
+func (encoder *binaryEncoder) writeFieldStringer(
+	stringer interfaces.Stringer,
+) (n int64, err error) {
+	value := stringer.String()
+
+	if _, err = io.WriteString(&encoder.Content, value); err != nil {
+		err = errors.WrapExceptSentinelAsNil(err, io.EOF)
+		return n, err
+	}
+
+	if n, err = encoder.binaryField.WriteTo(&encoder.Buffer); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

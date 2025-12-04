@@ -26,7 +26,7 @@ func StringSansTai(metadata *metadata) string {
 	if tags.Len() > 0 {
 		stringBuilder.WriteString(" ")
 		stringBuilder.WriteString(
-			quiter.StringDelimiterSeparated[Tag](
+			quiter.StringDelimiterSeparated[TagStruct](
 				" ",
 				metadata.GetTags(),
 			),

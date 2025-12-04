@@ -120,7 +120,11 @@ func (cmd CatAlfred) Run(dep command.Request) {
 							err = nil
 							tagObject = sku.GetTransactedPool().Get()
 							defer sku.GetTransactedPool().Put(tagObject)
-							tagObject.ObjectId.ResetWithIdLike(tag)
+
+							if err = tagObject.ObjectId.Set(tag.String()); err != nil {
+								err = errors.Wrap(err)
+								return err
+							}
 						} else {
 							err = errors.Wrap(err)
 							return err

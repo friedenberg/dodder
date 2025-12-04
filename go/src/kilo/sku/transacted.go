@@ -64,7 +64,7 @@ func (transacted *Transacted) GetTags() ids.TagSet {
 	return transacted.GetMetadata().GetTags()
 }
 
-func (transacted *Transacted) AllTags() interfaces.Seq[ids.TagStruct] {
+func (transacted *Transacted) AllTags() interfaces.Seq[ids.ITag] {
 	return transacted.GetMetadata().AllTags()
 }
 

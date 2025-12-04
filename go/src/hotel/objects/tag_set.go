@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	tagLock = markl.Lock[Tag, *Tag]
+	tagLock = markl.Lock[TagStruct, *TagStruct]
 
 	tagSet struct {
 		// required to be exported for Gob's stupid illusions
@@ -26,7 +26,7 @@ var (
 	_ TagSetMutable = &tagSet{}
 )
 
-func (tag tagStruct) GetKey() Tag {
+func (tag tagStruct) GetKey() TagStruct {
 	return tag.Lock.GetKey()
 }
 
@@ -34,8 +34,8 @@ func (tagSet tagSet) Len() int {
 	return tagSet.Tags.Len()
 }
 
-func (tagSet tagSet) All() interfaces.Seq[Tag] {
-	return func(yield func(Tag) bool) {
+func (tagSet tagSet) All() interfaces.Seq[TagStruct] {
+	return func(yield func(TagStruct) bool) {
 		for tag := range tagSet.Tags.All() {
 			if !yield(tag.GetKey()) {
 				return
@@ -78,22 +78,22 @@ func (tagSet tagSet) getLockMutable(key string) (TagLockMutable, bool) {
 }
 
 // TODO switch to binary search
-func (tagSet tagSet) Get(key string) (Tag, bool) {
+func (tagSet tagSet) Get(key string) (TagStruct, bool) {
 	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
 			return tag.GetKey(), true
 		}
 	}
 
-	return Tag{}, false
+	return TagStruct{}, false
 }
 
-func (tagSet tagSet) Key(tag Tag) string {
+func (tagSet tagSet) Key(tag TagStruct) string {
 	return tag.String()
 }
 
 // TODO sort
-func (tagSet *tagSet) Add(tag Tag) error {
+func (tagSet *tagSet) Add(tag TagStruct) error {
 	if _, alreadyExists := tagSet.Get(tag.String()); alreadyExists {
 		return nil
 	}
@@ -128,8 +128,8 @@ func (tagSet *tagSet) Reset() {
 	tagSet.Tags.Reset()
 }
 
-func (tagSet *tagSet) addNormalizedTag(tag ITag) {
-	seq := expansion.ExpandOneIntoIds[Tag](
+func (tagSet *tagSet) addNormalizedTag(tag Tag) {
+	seq := expansion.ExpandOneIntoIds[TagStruct](
 		tag.String(),
 		expansion.ExpanderRight,
 	)

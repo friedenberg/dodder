@@ -12,13 +12,13 @@ type (
 	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
 	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
 
-	Tag           = ids.TagStruct
-	ITag          = ids.ITag
+	TagStruct     = ids.TagStruct
+	Tag           = ids.ITag
 	TagSet        = ids.Set[ids.TagStruct]
 	TagSetMutable = ids.SetMutable[ids.TagStruct]
 
-	TagLock        = interfaces.Lock[Tag, *Tag]
-	TagLockMutable = interfaces.LockMutable[Tag, *Tag]
+	TagLock        = interfaces.Lock[TagStruct, *TagStruct]
+	TagLockMutable = interfaces.LockMutable[TagStruct, *TagStruct]
 
 	IdLock        = interfaces.Lock[SeqId, *SeqId]
 	IdLockMutable = interfaces.LockMutable[SeqId, *SeqId]
@@ -36,7 +36,7 @@ type (
 		GetType() ids.Type
 		GetTypeLock() TypeLock
 
-		GetTagLock(Tag) TagLock
+		GetTagLock(TagStruct) TagLock
 
 		GetBlobDigest() interfaces.MarklId
 		GetObjectDigest() interfaces.MarklId
@@ -52,10 +52,10 @@ type (
 
 		Subtract(Metadata)
 
-		AddTagPtr(ITag) (err error)
+		AddTagPtr(Tag) (err error)
 		ResetTags()
 		AddTagString(tagString string) (err error)
-		AddTagPtrFast(tag Tag) (err error)
+		AddTagPtrFast(tag TagStruct) (err error)
 		GenerateExpandedTags()
 
 		GetIndexMutable() IndexMutable
@@ -69,7 +69,7 @@ type (
 		GetTaiMutable() *ids.Tai
 		GetTypeMutable() *ids.Type
 		GetTypeLockMutable() TypeLockMutable
-		GetTagLockMutable(Tag) TagLockMutable
+		GetTagLockMutable(TagStruct) TagLockMutable
 	}
 
 	Getter interface {

@@ -33,7 +33,7 @@ func SetTags[TAG ids.ITag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
 func ExpandTags(
 	metadata Metadata,
 	expander expansion.Expander,
-) interfaces.Seq[Tag] {
+) interfaces.Seq[TagStruct] {
 	expansion.ExpandMany(
 		metadata.GetTags().All(),
 		expander,

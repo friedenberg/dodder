@@ -6,14 +6,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
-
-type Field = string_format_writer.Field
 
 // TODO transform into two views that satisfy the Metadata/MetadataMutable
 // interfaces:
@@ -155,11 +152,11 @@ func (metadata *metadata) AddTagString(tagString string) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTag(tag ITag) (err error) {
+func (metadata *metadata) AddTag(tag Tag) (err error) {
 	return metadata.AddTagPtr(tag)
 }
 
-func (metadata *metadata) AddTagPtr(tag ITag) (err error) {
+func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 	if tag.IsEmpty() {
 		return err
 	}
@@ -171,7 +168,7 @@ func (metadata *metadata) AddTagPtr(tag ITag) (err error) {
 	return err
 }
 
-func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
+func (metadata *metadata) AddTagPtrFast(tag TagStruct) (err error) {
 	if err = metadata.Tags.Add(tag); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -219,12 +216,12 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 	return &metadata.Type
 }
 
-func (metadata *metadata) GetTagLock(tag Tag) TagLock {
+func (metadata *metadata) GetTagLock(tag TagStruct) TagLock {
 	lock, _ := metadata.Tags.getLock(tag.String())
 	return lock
 }
 
-func (metadata *metadata) GetTagLockMutable(tag Tag) TagLockMutable {
+func (metadata *metadata) GetTagLockMutable(tag TagStruct) TagLockMutable {
 	lock, _ := metadata.Tags.getLockMutable(tag.String())
 	return lock
 }
