@@ -169,7 +169,7 @@ func (finalizer finalizer) WriteLockfile(
 		}
 	}
 
-	for tag := range metadata.AllTags() {
+	for tag := range metadata.GetTags().All() {
 		if err = finalizer.writeTagLockIfNecessary(
 			metadata,
 			tag,
