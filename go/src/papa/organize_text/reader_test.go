@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
@@ -174,10 +175,12 @@ func TestAssignmentLineReader2Heading2Zettels(t1 *testing.T) {
 		expected := ids.MakeTagSetFromSlice(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Transacted.GetMetadata().GetTags()
 
-		if !quiter_set.Equals(
-			actual,
-			expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
+		if !quiter_set.Equals(actual, expected) {
+			t1.Errorf(
+				"\nexpected: %s\n  actual: %s",
+				quiter.StringCommaSeparated(expected),
+				quiter.StringCommaSeparated(actual),
+			)
 		}
 	}
 

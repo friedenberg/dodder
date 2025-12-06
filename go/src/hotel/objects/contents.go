@@ -1,8 +1,14 @@
 package objects
 
 import (
+	"strings"
+
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
+	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
@@ -10,6 +16,7 @@ type (
 	contents struct {
 		// required to be exported for Gob's stupid illusions
 		// TODO refactor this to use binary searches
+		TagCount int
 		Elements collections_slice.Slice[containedObject]
 	}
 )
@@ -86,6 +93,10 @@ func (contents *contents) Add(id SeqId) error {
 		Lock: markl.MakeLockWith(id, nil),
 	})
 
+	if id.Genre == genres.Tag {
+		contents.TagCount++
+	}
+
 	return nil
 }
 
@@ -102,6 +113,10 @@ func (contents *contents) DelKey(key string) error {
 	}
 
 	if found {
+		if id.GetKey().Genre == genres.Tag {
+			contents.TagCount--
+		}
+
 		contents.Elements.Delete(index, index+1)
 	}
 
@@ -109,5 +124,54 @@ func (contents *contents) DelKey(key string) error {
 }
 
 func (contents *contents) Reset() {
+	contents.TagCount = 0
 	contents.Elements.Reset()
+}
+
+func (contents *contents) addNormalizedTag(tag Tag) {
+	seq := expansion.ExpandOneIntoIds[SeqId](
+		tag.String(),
+		expansion.ExpanderRight,
+	)
+
+	for id := range seq {
+		errors.PanicIfError(contents.Add(id))
+	}
+
+	sorted := quiter.SortedValuesBy(
+		contents.Elements,
+		containedObjectCompareKey,
+	)
+
+	var lastId *containedObject
+
+	for index := range sorted {
+		id := &sorted[index]
+
+		if index == 0 {
+			// no need to do anything, this is the first
+			lastId = id
+			continue
+		}
+
+		tagString := id.Lock.GetKey().String()
+		lastTagString := lastId.Lock.GetKey().String()
+
+		switch {
+		case strings.HasPrefix(lastTagString, tagString):
+			continue
+
+			// replace the shorter value with the longer value that contains the
+			// shorter value
+		case strings.HasPrefix(tagString, lastTagString):
+			if lastId.Lock.Value.IsEmpty() {
+				contents.DelKey(lastTagString)
+			}
+
+		default:
+			// keep the tag
+		}
+
+		lastId = id
+	}
 }

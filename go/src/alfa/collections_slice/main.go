@@ -58,6 +58,10 @@ func (slice Slice[ELEMENT]) Any() (element ELEMENT) {
 	return element
 }
 
+func (slice Slice[ELEMENT]) First() ELEMENT {
+	return slice[0]
+}
+
 func (slice Slice[ELEMENT]) Last() ELEMENT {
 	return slice[slice.Len()-1]
 }
@@ -143,4 +147,12 @@ func (slice Slice[ELEMENT]) Swap(left, right int) {
 
 func (slice *Slice[ELEMENT]) Insert(index int, values ...ELEMENT) {
 	*slice = slices.Insert(*slice, index, values...)
+}
+
+func (slice Slice[ELEMENT]) Shift(amount int) Slice[ELEMENT] {
+	return slice[amount:]
+}
+
+func (slice *Slice[ELEMENT]) ShiftInPlace(amount int) {
+	*slice = slice.Shift(amount)
 }

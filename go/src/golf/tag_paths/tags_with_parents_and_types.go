@@ -68,10 +68,10 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 	return cmp.BinarySearchFunc(
 		tagsWithParentsAndTypes,
 		e,
-		func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
+		func(left TagWithParentsAndTypes, right *Tag) cmp.Result {
 			return cmp.CompareUTF8Bytes(
-				cmp.ComparableBytes(ewp.Tag.Bytes()[offset:]),
-				cmp.ComparableBytes(e.Bytes()),
+				left.Tag.Bytes()[offset:],
+				right.Bytes(),
 				partial,
 			)
 		},
@@ -93,13 +93,9 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsString(
 ) (int, bool) {
 	return cmp.BinarySearchFunc(
 		tagsWithParentsAndTypes,
-		cmp.ComparerString(value),
-		func(ewp TagWithParentsAndTypes, c cmp.ComparerString) cmp.Result {
-			return cmp.CompareUTF8Bytes(
-				cmp.ComparableBytes(ewp.Tag.Bytes()),
-				c,
-				true,
-			)
+		value,
+		func(ewp TagWithParentsAndTypes, c string) cmp.Result {
+			return cmp.CompareUTF8BytesAndString(ewp.Tag.Bytes(), c, true)
 		},
 	)
 }

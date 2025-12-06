@@ -9,9 +9,6 @@ import (
 type (
 	MetadataStruct = metadata
 
-	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
-	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
-
 	TagStruct     = ids.TagStruct
 	Tag           = ids.ITag
 	TagSet        = ids.Set[ids.TagStruct]
@@ -19,11 +16,14 @@ type (
 
 	tagLock        = interfaces.Lock[TagStruct, *TagStruct]
 	tagLockMutable = interfaces.LockMutable[TagStruct, *TagStruct]
-	TagLock        = tagLock
-	TagLockMutable = tagLockMutable
 
 	IdLock        = interfaces.Lock[SeqId, *SeqId]
 	IdLockMutable = interfaces.LockMutable[SeqId, *SeqId]
+
+	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
+	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
+	TagLock         = IdLock
+	TagLockMutable  = IdLockMutable
 
 	Metadata interface {
 		Getter

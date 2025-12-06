@@ -27,7 +27,7 @@ func (resetter) ResetWithExceptFields(dst MetadataMutable, src Metadata) {
 
 		dst.Description = src.Description
 
-		dst.SetTagsFast(src.Tags)
+		dst.SetTagsFast(src.GetTags())
 
 		resetIndexWith(&dst.Index, &src.Index)
 

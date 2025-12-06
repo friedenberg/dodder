@@ -5,6 +5,16 @@ import (
 )
 
 type (
+	RuneDecoder interface {
+		DecodeRune() (char rune, width int)
+	}
+
+	Comparable[SELF any] interface {
+		Lenner
+		RuneDecoder
+		Shift(int) SELF
+	}
+
 	ReadWrapper interface {
 		WrapReader(r io.Reader) (io.ReadCloser, error)
 	}

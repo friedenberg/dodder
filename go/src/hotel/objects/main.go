@@ -21,7 +21,7 @@ type metadata struct {
 	// private once moving away from the gob entirely
 
 	Description descriptions.Description
-	Tags        tagSet
+	Tags        contents
 	Type        markl.Lock[ids.Type, *ids.Type]
 
 	DigBlob   markl.Id
@@ -114,7 +114,11 @@ func (metadata *metadata) IsEmpty() bool {
 
 // TODO fix issue with GetTags being nil sometimes
 func (metadata *metadata) GetTags() TagSet {
-	return metadata.Tags
+	return contentsTagSet{contents: &metadata.Tags}
+}
+
+func (metadata *metadata) GetTagsMutable() TagSetMutable {
+	return &contentsTagSet{contents: &metadata.Tags}
 }
 
 func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
@@ -169,7 +173,7 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 }
 
 func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
-	ids.TagSetMutableAdd(&metadata.Tags, tag)
+	ids.TagSetMutableAdd(metadata.GetTagsMutable(), tag)
 
 	tagBytestring := catgut.MakeFromString(tag.String())
 

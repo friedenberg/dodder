@@ -1,6 +1,9 @@
 package objects
 
-import "code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+import (
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+)
 
 type containedObject struct {
 	// TODO add path information
@@ -9,6 +12,10 @@ type containedObject struct {
 	Lock markl.Lock[SeqId, *SeqId]
 }
 
-func (tag containedObject) GetKey() SeqId {
-	return tag.Lock.GetKey()
+func (object containedObject) GetKey() SeqId {
+	return object.Lock.GetKey()
+}
+
+func containedObjectCompareKey(left, right containedObject) cmp.Result {
+	return SeqIdCompare(left.GetKey(), right.GetKey())
 }

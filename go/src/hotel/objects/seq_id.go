@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_collection"
@@ -14,33 +15,30 @@ import (
 )
 
 type SeqId struct {
-	genre genres.Genre
-	seq   doddish.Seq
+	Genre genres.Genre
+	Seq   doddish.Seq
 }
 
 var _ interfaces.ObjectId = SeqId{}
 
 func (id SeqId) GetGenre() interfaces.Genre {
-	return id.genre
+	return id.Genre
 }
 
 func (id SeqId) IsEmpty() bool {
-	return id.seq.Len() == 0
+	return id.Seq.Len() == 0
 }
 
 func (id SeqId) String() string {
-	return id.seq.String()
+	return id.Seq.String()
 }
 
 func (id SeqId) Equals(other SeqId) bool {
-	if id.genre != other.genre {
+	if id.Genre != other.Genre {
 		return false
 	}
 
-	if !quiter_collection.Equals[doddish.Token](
-		id.seq.GetSlice(),
-		other.seq.GetSlice(),
-	) {
+	if !quiter_collection.Equals(id.Seq.GetSlice(), other.Seq.GetSlice()) {
 		return false
 	}
 
@@ -69,9 +67,9 @@ func (id *SeqId) Set(value string) (err error) {
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
 
 		if ids.TokenIsConfig(seq.At(0)) {
-			id.genre = genres.Config
+			id.Genre = genres.Config
 		} else {
-			id.genre = genres.Tag
+			id.Genre = genres.Tag
 		}
 
 		// !type
@@ -79,28 +77,28 @@ func (id *SeqId) Set(value string) (err error) {
 		doddish.TokenMatcherOp(doddish.OpType),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Type
+		id.Genre = genres.Type
 
 		// %tag
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpVirtual),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Tag
+		id.Genre = genres.Tag
 
 		// /repo
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Repo
+		id.Genre = genres.Repo
 
 		// @digest-or-sig
 	case seq.MatchAll(
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Blob
+		id.Genre = genres.Blob
 
 		// purpose@digest-or-sig
 	case seq.MatchAll(
@@ -108,7 +106,7 @@ func (id *SeqId) Set(value string) (err error) {
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Blob
+		id.Genre = genres.Blob
 
 		// zettel/id
 	case seq.MatchAll(
@@ -116,7 +114,7 @@ func (id *SeqId) Set(value string) (err error) {
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		id.genre = genres.Zettel
+		id.Genre = genres.Zettel
 
 		// sec.asec
 	case seq.MatchAll(
@@ -136,26 +134,30 @@ func (id *SeqId) Set(value string) (err error) {
 			return err
 		}
 
-		id.genre = genres.InventoryList
+		id.Genre = genres.InventoryList
 
 	default:
 		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
 		return err
 	}
 
-	id.seq = seq.Clone()
+	id.Seq = seq.Clone()
 
 	return err
 }
 
 func (id *SeqId) Reset() {
-	id.genre = genres.None
-	id.seq.GetSliceMutable().Reset()
+	id.Genre = genres.None
+	id.Seq.GetSliceMutable().Reset()
 }
 
 func (id *SeqId) ResetWith(other SeqId) {
-	id.genre = other.genre
+	id.Genre = other.Genre
 
 	comments.Performance("switch to reusing exising seq's data")
-	id.seq = other.seq.Clone()
+	id.Seq = other.Seq.Clone()
+}
+
+func SeqIdCompare(left, right SeqId) cmp.Result {
+	return doddish.SeqCompare(left.Seq, right.Seq)
 }

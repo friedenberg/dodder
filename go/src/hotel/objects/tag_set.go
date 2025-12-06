@@ -55,7 +55,7 @@ func (tagSet tagSet) ContainsKey(key string) bool {
 	return false
 }
 
-func (tagSet tagSet) getLock(key string) (TagLock, bool) {
+func (tagSet tagSet) getLock(key string) (tagLock, bool) {
 	for tag := range tagSet.Tags.All() {
 		if tag.GetKey().String() == key {
 			return tag.Lock, true
@@ -65,7 +65,7 @@ func (tagSet tagSet) getLock(key string) (TagLock, bool) {
 	return nil, false
 }
 
-func (tagSet tagSet) getLockMutable(key string) (TagLockMutable, bool) {
+func (tagSet tagSet) getLockMutable(key string) (tagLockMutable, bool) {
 	for index := range tagSet.Tags {
 		tag := &tagSet.Tags[index]
 

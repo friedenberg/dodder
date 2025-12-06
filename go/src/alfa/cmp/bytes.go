@@ -1,18 +1,46 @@
 package cmp
 
-import "unicode/utf8"
+import (
+	"unicode/utf8"
 
-// TODO move to cmp.Result
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+)
 
-type Comparable[Self any] interface {
-	Len() int
-	SliceFrom(int) Self
-	DecodeRune() (r rune, width int)
+func CompareUTF8Bytes(left, right []byte, partial bool) Result {
+	return CompareUTF8(
+		ComparableBytes(left),
+		ComparableBytes(right),
+		partial,
+	)
 }
 
-func CompareUTF8Bytes[
-	LEFT Comparable[LEFT],
-	RIGHT Comparable[RIGHT],
+func CompareUTF8BytesAndString(left []byte, right string, partial bool) Result {
+	return CompareUTF8(
+		ComparableBytes(left),
+		ComparableString(right),
+		partial,
+	)
+}
+
+func CompareUTF8StringAndBytes(left string, right []byte, partial bool) Result {
+	return CompareUTF8(
+		ComparableString(left),
+		ComparableBytes(right),
+		partial,
+	)
+}
+
+func CompareUTF8String(left, right string, partial bool) Result {
+	return CompareUTF8(
+		ComparableString(left),
+		ComparableString(right),
+		partial,
+	)
+}
+
+func CompareUTF8[
+	LEFT interfaces.Comparable[LEFT],
+	RIGHT interfaces.Comparable[RIGHT],
 ](
 	left LEFT,
 	right RIGHT,
@@ -54,18 +82,28 @@ func CompareUTF8Bytes[
 			}
 		}
 
-		runeLeft, widthLeft := left.DecodeRune()
-		left = left.SliceFrom(widthLeft)
+		var runeLeft, runeRight rune
 
-		if runeLeft == utf8.RuneError {
-			panic("not a valid utf8 string")
+		{
+			var width int
+
+			runeLeft, width = left.DecodeRune()
+			left = left.Shift(width)
+
+			if runeLeft == utf8.RuneError {
+				panic("not a valid utf8 string")
+			}
 		}
 
-		runeRight, widthRight := right.DecodeRune()
-		right = right.SliceFrom(widthRight)
+		{
+			var width int
 
-		if runeRight == utf8.RuneError {
-			panic("not a valid utf8 string")
+			runeRight, width = right.DecodeRune()
+			right = right.Shift(width)
+
+			if runeRight == utf8.RuneError {
+				panic("not a valid utf8 string")
+			}
 		}
 
 		if runeLeft < runeRight {
@@ -78,36 +116,35 @@ func CompareUTF8Bytes[
 
 type ComparableBytes []byte
 
-func (cb ComparableBytes) Len() int {
-	return len(cb)
+func (slice ComparableBytes) Len() int {
+	return len(slice)
 }
 
-func (cb ComparableBytes) SliceFrom(start int) ComparableBytes {
-	return ComparableBytes(cb[start:])
+func (slice ComparableBytes) DecodeRune() (char rune, width int) {
+	char, width = utf8.DecodeRune(slice)
+	return char, width
 }
 
-func (cb ComparableBytes) DecodeRune() (r rune, width int) {
-	r, width = utf8.DecodeRune(cb)
-	return r, width
+func (slice ComparableBytes) Shift(amount int) ComparableBytes {
+	return slice[amount:]
 }
 
-type ComparerString string
+type ComparableString string
 
-func (cb ComparerString) Len() int {
-	return len(cb)
+func (comparer ComparableString) Len() int {
+	return len(comparer)
 }
 
-func (cb ComparerString) SliceFrom(start int) ComparerString {
-	return ComparerString(cb[start:])
+func (comparer ComparableString) Shift(start int) ComparableString {
+	return comparer[start:]
 }
 
-func (cb ComparerString) DecodeRune() (r rune, width int) {
-	for _, r1 := range cb {
-		r = r1
+func (comparer ComparableString) DecodeRune() (char rune, width int) {
+	for _, char = range comparer {
 		break
 	}
 
-	width = utf8.RuneLen(r)
+	width = utf8.RuneLen(char)
 
-	return r, width
+	return char, width
 }

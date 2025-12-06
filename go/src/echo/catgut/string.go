@@ -106,27 +106,15 @@ func (a *String) ComparePartialOffset(b *String, offset int) cmp.Result {
 		panic("offset out of bounds")
 	}
 
-	return cmp.CompareUTF8Bytes(
-		cmp.ComparableBytes(a.Bytes()[offset:]),
-		cmp.ComparableBytes(b.Bytes()[offset:]),
-		true,
-	)
+	return cmp.CompareUTF8Bytes(a.Bytes()[offset:], b.Bytes()[offset:], true)
 }
 
 func (a *String) ComparePartial(b *String) cmp.Result {
-	return cmp.CompareUTF8Bytes(
-		cmp.ComparableBytes(a.Bytes()),
-		cmp.ComparableBytes(b.Bytes()),
-		true,
-	)
+	return cmp.CompareUTF8Bytes(a.Bytes(), b.Bytes(), true)
 }
 
 func (a *String) Compare(b *String) cmp.Result {
-	return cmp.CompareUTF8Bytes(
-		cmp.ComparableBytes(a.Bytes()),
-		cmp.ComparableBytes(b.Bytes()),
-		false,
-	)
+	return cmp.CompareUTF8Bytes(a.Bytes(), b.Bytes(), false)
 }
 
 func (str *String) String() string {
