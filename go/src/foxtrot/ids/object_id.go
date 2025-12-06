@@ -420,7 +420,7 @@ func (objectId *objectId) Set(value string) (err error) {
 		parsingObjectId = &h
 
 	case genres.Type:
-		var h Type
+		var h TypeStruct
 		err = h.Set(value)
 		parsingObjectId = &h
 
@@ -439,7 +439,7 @@ func (objectId *objectId) Set(value string) (err error) {
 		parsingObjectId = &h
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(objectId.genre.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(objectId.genre.String())
 	}
 
 	if err != nil {

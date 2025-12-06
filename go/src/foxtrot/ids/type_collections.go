@@ -12,22 +12,22 @@ func init() {
 }
 
 type (
-	TypeSet        = interfaces.Set[Type]
-	TypeMutableSet = interfaces.SetMutable[Type]
+	TypeSet        = interfaces.Set[TypeStruct]
+	TypeMutableSet = interfaces.SetMutable[TypeStruct]
 )
 
-func MakeTypeSet(es ...Type) (s TypeSet) {
+func MakeTypeSet(es ...TypeStruct) (s TypeSet) {
 	return TypeSet(collections_ptr.MakeValueSetValue(nil, es...))
 }
 
 func MakeTypeSetStrings(vs ...string) (s TypeSet, err error) {
-	return collections_ptr.MakeValueSetString[Type](nil, vs...)
+	return collections_ptr.MakeValueSetString[TypeStruct](nil, vs...)
 }
 
-func MakeMutableTypeSet(hs ...Type) TypeMutableSet {
+func MakeMutableTypeSet(hs ...TypeStruct) TypeMutableSet {
 	return MakeTypeMutableSet(hs...)
 }
 
-func MakeTypeMutableSet(hs ...Type) TypeMutableSet {
+func MakeTypeMutableSet(hs ...TypeStruct) TypeMutableSet {
 	return TypeMutableSet(collections_ptr.MakeMutableValueSetValue(nil, hs...))
 }

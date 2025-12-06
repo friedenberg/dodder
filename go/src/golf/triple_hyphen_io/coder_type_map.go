@@ -10,7 +10,7 @@ import (
 
 type TypedBlob[BLOB any] struct {
 	// TODO determine why this needs to be a pointer
-	Type ids.Type
+	Type ids.TypeStruct
 	Blob BLOB
 }
 

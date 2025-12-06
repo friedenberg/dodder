@@ -21,8 +21,8 @@ type metadata struct {
 	// private once moving away from the gob entirely
 
 	Description descriptions.Description
-	Tags        contents
-	Type        markl.Lock[ids.Type, *ids.Type]
+	Contents    contents
+	Type        markl.Lock[Type, TypeMutable]
 
 	DigBlob   markl.Id
 	digSelf   markl.Id
@@ -85,7 +85,7 @@ func (metadata *metadata) UserInputIsEmpty() bool {
 		return false
 	}
 
-	if metadata.Tags.Len() > 0 {
+	if metadata.Contents.Len() > 0 {
 		return false
 	}
 
@@ -114,16 +114,16 @@ func (metadata *metadata) IsEmpty() bool {
 
 // TODO fix issue with GetTags being nil sometimes
 func (metadata *metadata) GetTags() TagSet {
-	return contentsTagSet{contents: &metadata.Tags}
+	return contentsTagSet{contents: &metadata.Contents}
 }
 
 func (metadata *metadata) GetTagsMutable() TagSetMutable {
-	return &contentsTagSet{contents: &metadata.Tags}
+	return &contentsTagSet{contents: &metadata.Contents}
 }
 
 func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
 	return func(yield func(Tag) bool) {
-		for tag := range metadata.Tags.All() {
+		for tag := range metadata.Contents.All() {
 			if !yield(tag) {
 				return
 			}
@@ -132,7 +132,7 @@ func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
 }
 
 func (metadata *metadata) ResetTags() {
-	metadata.Tags.Reset()
+	metadata.Contents.Reset()
 	metadata.Index.TagPaths.Reset()
 }
 
@@ -165,7 +165,7 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 		return err
 	}
 
-	metadata.Tags.addNormalizedTag(tag)
+	metadata.Contents.addNormalizedTag(tag)
 	cs := catgut.MakeFromString(tag.String())
 	metadata.Index.TagPaths.AddTag(cs)
 
@@ -186,7 +186,7 @@ func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
 }
 
 func (metadata *metadata) SetTagsFast(tags TagSet) {
-	metadata.Tags.Reset()
+	metadata.Contents.Reset()
 
 	if tags == nil {
 		return
@@ -201,11 +201,18 @@ func (metadata *metadata) SetTagsFast(tags TagSet) {
 	}
 }
 
-func (metadata *metadata) GetType() ids.Type {
+func (metadata *metadata) GetType() Type {
 	return metadata.Type.Key
+	// id, ok := metadata.Contents.GetPartial("!")
+
+	// if !ok {
+	// 	panic("missing type")
+	// }
+
+	// return ids.MustType(id.String())
 }
 
-func (metadata *metadata) GetTypeMutable() *ids.Type {
+func (metadata *metadata) GetTypeMutable() TypeMutable {
 	return &metadata.Type.Key
 }
 
@@ -218,12 +225,12 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 }
 
 func (metadata *metadata) GetTagLock(tag Tag) TagLock {
-	lock, _ := metadata.Tags.getLock(tag.String())
+	lock, _ := metadata.Contents.getLock(tag.String())
 	return lock
 }
 
 func (metadata *metadata) GetTagLockMutable(tag Tag) TagLockMutable {
-	lock, _ := metadata.Tags.getLockMutable(tag.String())
+	lock, _ := metadata.Contents.getLockMutable(tag.String())
 	return lock
 }
 
@@ -233,7 +240,7 @@ func (metadata *metadata) Subtract(otherMetadata Metadata) {
 	}
 
 	for tag := range otherMetadata.AllTags() {
-		metadata.Tags.DelKey(tag.String())
+		metadata.Contents.DelKey(tag.String())
 	}
 }
 

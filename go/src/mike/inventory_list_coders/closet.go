@@ -117,7 +117,7 @@ func (closet Closet) GetBoxFormat() *box_format.BoxTransacted {
 	return closet.boxFormat
 }
 
-func (closet Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
+func (closet Closet) GetCoderForType(tipe ids.IType) sku.ListCoder {
 	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
@@ -128,7 +128,7 @@ func (closet Closet) GetCoderForType(tipe ids.Type) sku.ListCoder {
 }
 
 func (closet Closet) WriteObjectToWriter(
-	tipe ids.Type,
+	tipe ids.IType,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -150,7 +150,7 @@ func (closet Closet) WriteObjectToWriter(
 // TODO consume interfaces.SeqError and expose as a coder instead
 func (closet Closet) WriteBlobToWriter(
 	ctx interfaces.ActiveContext,
-	tipe ids.Type,
+	tipe ids.IType,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -176,7 +176,7 @@ func (closet Closet) WriteBlobToWriter(
 
 func (closet Closet) WriteTypedBlobToWriter(
 	ctx interfaces.ActiveContext,
-	tipe ids.Type,
+	tipe ids.IType,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -280,7 +280,7 @@ func (closet Closet) AllDecodedObjectsFromStream(
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[funcIterSeqError]{
-				Type: ids.Type{},
+				Type: ids.IType{},
 				Blob: func(object *sku.Transacted, err error) bool {
 					return yield(object, err)
 				},
@@ -294,7 +294,7 @@ func (closet Closet) AllDecodedObjectsFromStream(
 }
 
 func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
-	tipe ids.Type,
+	tipe ids.IType,
 	blobStore interfaces.BlobStore,
 	blobId interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
@@ -337,7 +337,7 @@ func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 }
 
 func (closet Closet) IterInventoryListBlobSkusFromReader(
-	tipe ids.Type,
+	tipe ids.IType,
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
@@ -365,7 +365,7 @@ func (closet Closet) IterInventoryListBlobSkusFromReader(
 
 func (closet Closet) ReadInventoryListObject(
 	ctx interfaces.ActiveContext,
-	tipe ids.Type,
+	tipe ids.IType,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
 	format, ok := closet.coders[tipe.String()]
@@ -396,7 +396,7 @@ func (closet Closet) ReadInventoryListObject(
 
 func (closet Closet) ReadInventoryListBlob(
 	ctx interfaces.ActiveContext,
-	tipe ids.Type,
+	tipe ids.IType,
 	reader *bufio.Reader,
 ) (list *sku.HeapTransacted, err error) {
 	list = sku.MakeListTransacted()

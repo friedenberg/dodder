@@ -39,7 +39,7 @@ type checkedOutWithItem struct {
 type Store struct {
 	config            store_config.Store
 	externalStoreInfo store_workspace.Supplies
-	typ               ids.Type
+	typ               ids.IType
 	browser           browser_items.BrowserProxy
 
 	tabCache cache
@@ -160,41 +160,42 @@ func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 func (store *Store) CheckoutOne(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
-) (cz sku.SkuType, err error) {
-	sz := tg.GetSku()
+) (checkedOut sku.SkuType, err error) {
+	object := tg.GetSku()
 
-	if !sz.GetMetadata().GetType().Equals(store.typ) {
-		err = errors.Wrap(env_workspace.ErrUnsupportedType(sz.GetMetadata().GetType()))
-		return cz, err
+	if !object.GetMetadata().GetType().Equals(store.typ) {
+		err = env_workspace.ErrUnsupportedType{Type: object.GetMetadata().GetType()}
+		err = errors.Wrap(err)
+		return checkedOut, err
 	}
 
-	var u *url.URL
+	var yourl *url.URL
 
-	if u, err = store.getUrl(sz); err != nil {
+	if yourl, err = store.getUrl(object); err != nil {
 		err = errors.Wrap(err)
-		return cz, err
+		return checkedOut, err
 	}
 
 	co := GetCheckedOutPool().Get()
-	cz = co
+	checkedOut = co
 	var item Item
 
-	if err = item.Url.Set(u.String()); err != nil {
+	if err = item.Url.Set(yourl.String()); err != nil {
 		err = errors.Wrap(err)
-		return cz, err
+		return checkedOut, err
 	}
 
-	item.ExternalId = sz.ObjectId.String()
+	item.ExternalId = object.ObjectId.String()
 	item.Id.Type = "tab"
 
-	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
-	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), sz)
+	sku.TransactedResetter.ResetWith(co.GetSku(), object)
+	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), object)
 	co.SetState(checked_out_state.JustCheckedOut)
 	co.GetSkuExternal().ExternalType = ids.MustType("!browser-tab")
 
 	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
-		return cz, err
+		return checkedOut, err
 	}
 
 	co.GetSkuExternal().RepoId = store.externalStoreInfo.RepoId
@@ -202,13 +203,13 @@ func (store *Store) CheckoutOne(
 	store.l.Lock()
 	defer store.l.Unlock()
 
-	existing := store.added[*u]
-	store.added[*u] = append(existing, checkedOutWithItem{
+	existing := store.added[*yourl]
+	store.added[*yourl] = append(existing, checkedOutWithItem{
 		CheckedOut: co.Clone(),
 		Item:       item,
 	})
 
-	return cz, err
+	return checkedOut, err
 }
 
 func (store *Store) QueryCheckedOut(

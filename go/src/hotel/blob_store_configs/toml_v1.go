@@ -134,7 +134,7 @@ func (blobStoreConfig *TomlV1) setBasePath(value string) {
 	blobStoreConfig.BasePath = value
 }
 
-func (blobStoreConfig TomlV1) Upgrade() (Config, ids.Type) {
+func (blobStoreConfig TomlV1) Upgrade() (Config, ids.IType) {
 	upgraded := &TomlV2{
 		HashBuckets:       blobStoreConfig.HashBuckets,
 		BasePath:          blobStoreConfig.BasePath,
@@ -145,5 +145,5 @@ func (blobStoreConfig TomlV1) Upgrade() (Config, ids.Type) {
 
 	upgraded.Encryption.ResetWithMarklId(blobStoreConfig.Encryption)
 
-	return upgraded, ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV2).Type
+	return upgraded, ids.GetOrPanic(ids.TypeTomlBlobStoreConfigV2).TypeStruct
 }

@@ -19,7 +19,7 @@ import (
 type blobStoreV1 struct {
 	envRepo                  env_repo.Env
 	pathLog                  string
-	blobType                 ids.Type
+	blobType                 ids.IType
 	listFormat               sku.ListCoder
 	inventoryListCoderCloset inventory_list_coders.Closet
 	finalizer                object_finalizer.Finalizer
@@ -31,7 +31,7 @@ func (blobStore *blobStoreV1) GetObjectFinalizer() object_finalizer.Finalizer {
 	return blobStore.finalizer
 }
 
-func (blobStore *blobStoreV1) getType() ids.Type {
+func (blobStore *blobStoreV1) getType() ids.IType {
 	return blobStore.blobType
 }
 

@@ -58,7 +58,7 @@ func DefaultWithVersion(
 	return &TypedConfigPrivateMutable{
 		Type: ids.GetOrPanic(
 			ids.TypeTomlConfigImmutableV2,
-		).Type,
+		).TypeStruct,
 		Blob: &TomlV2Private{
 			TomlV2Common: TomlV2Common{
 				StoreVersion:      storeVersion,

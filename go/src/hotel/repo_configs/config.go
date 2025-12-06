@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	DefaultType    ids.Type
+	DefaultType    ids.IType
 	DefaultTags    ids.TagSet
 	FileExtensions file_extensions.Config
 	PrintOptions   options_print.Overlay

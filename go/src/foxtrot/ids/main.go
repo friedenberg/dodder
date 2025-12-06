@@ -36,7 +36,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 }
 
 func Equals(left, right interfaces.ObjectIdWithParts) (ok bool) {
-	if left.GetGenre().GetGenreString() != right.GetGenre().GetGenreString() {
+	if left.GetGenre().String() != right.GetGenre().String() {
 		return ok
 	}
 

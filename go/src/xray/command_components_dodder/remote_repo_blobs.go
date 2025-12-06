@@ -26,7 +26,7 @@ func (cmd *RemoteRepoBlobs) SetFlagDefinitions(
 func (cmd RemoteRepoBlobs) CreateRemoteBlob(
 	req command.Request,
 	local *local_working_copy.Repo,
-	remoteType ids.Type,
+	remoteType ids.IType,
 ) (blob repo_blobs.BlobMutable) {
 	remoteEnvRepo := cmd.MakeEnvRepo(req, false)
 
@@ -38,14 +38,14 @@ func (cmd RemoteRepoBlobs) CreateRemoteBlob(
 			remoteType,
 		)
 
-	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).Type:
+	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).TypeStruct:
 		xdgOverridePath := req.PopArg("xdg-path-override")
 
 		blob = &repo_blobs.TomlLocalOverridePathV0{
 			OverridePath: xdgOverridePath,
 		}
 
-	case ids.GetOrPanic(ids.TypeTomlRepoUri).Type:
+	case ids.GetOrPanic(ids.TypeTomlRepoUri).TypeStruct:
 		url := req.PopArg("url")
 
 		var typedBlob repo_blobs.TomlUriV0
@@ -56,7 +56,7 @@ func (cmd RemoteRepoBlobs) CreateRemoteBlob(
 
 		blob = &typedBlob
 
-	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).Type:
+	case ids.GetOrPanic(ids.TypeTomlRepoLocalOverridePath).TypeStruct:
 		path := req.PopArg("path")
 
 		blob = &repo_blobs.TomlLocalOverridePathV0{

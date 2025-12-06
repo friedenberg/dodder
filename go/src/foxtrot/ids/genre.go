@@ -92,7 +92,7 @@ func (genre Genre) String() string {
 			sb.WriteRune(',')
 		}
 
-		sb.WriteString(g.GetGenreString())
+		sb.WriteString(g.String())
 		first = false
 	}
 

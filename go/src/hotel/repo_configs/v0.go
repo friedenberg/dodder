@@ -10,11 +10,11 @@ import (
 )
 
 type DefaultsV0 struct {
-	Typ       ids.Type        `toml:"typ"`
+	Typ       ids.IType       `toml:"typ"`
 	Etiketten []ids.TagStruct `toml:"etiketten"`
 }
 
-func (defaults DefaultsV0) GetDefaultType() ids.Type {
+func (defaults DefaultsV0) GetDefaultType() ids.IType {
 	return defaults.Typ
 }
 
@@ -37,7 +37,7 @@ var _ ConfigOverlay = V0{}
 
 func (blob *V0) Reset() {
 	blob.FileExtensions.Reset()
-	blob.Defaults.Typ = ids.Type{}
+	blob.Defaults.Typ = ids.TypeStruct{}
 	blob.Defaults.Etiketten = make([]ids.TagStruct, 0)
 	blob.HiddenEtiketten = make([]ids.TagStruct, 0)
 	blob.RemoteScripts = make(map[string]script_config.RemoteScript)

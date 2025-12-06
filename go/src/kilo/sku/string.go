@@ -79,7 +79,7 @@ func writeMarklIdWithFormatIfNecessary(
 func StringMetadataSansTai(object *Transacted) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(object.GetGenre().GetGenreString())
+	sb.WriteString(object.GetGenre().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(object.GetObjectId().String())
@@ -129,7 +129,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(object.GetGenre().GetGenreString())
+	sb.WriteString(object.GetGenre().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(object.GetObjectId().String())

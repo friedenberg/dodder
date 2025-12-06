@@ -1,6 +1,6 @@
 package ids
 
 type TypedBlob[T any] struct {
-	Type Type
+	Type TypeStruct
 	Blob T
 }

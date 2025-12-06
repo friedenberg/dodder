@@ -131,12 +131,12 @@ func TestExpansionRightTypeNone(t1 *testing.T) {
 	t := ui.T{T: t1}
 	tipe := MustType("md")
 
-	actual := expansion.ExpandIntoSlice[Type](
+	actual := expansion.ExpandIntoSlice[TypeStruct](
 		tipe.String(),
 		expansion.ExpanderRight,
 	)
 
-	expected := collections_slice.Slice[Type]{
+	expected := collections_slice.Slice[TypeStruct]{
 		MustType("md"),
 	}
 

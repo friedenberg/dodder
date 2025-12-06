@@ -34,6 +34,8 @@ const (
 	maxGenre = Repo
 )
 
+var _ interfaces.Genre = None
+
 const (
 	unknown = byte(iota)
 	blob    = byte(1 << iota)
@@ -65,24 +67,36 @@ func All() (out collections_slice.Slice[Genre]) {
 	return out
 }
 
-func Must(g interfaces.GenreGetter) Genre {
-	return g.GetGenre().(Genre)
+func Must(genre interfaces.GenreGetter) Genre {
+	return genre.GetGenre().(Genre)
 }
 
-func Make(g interfaces.Genre) Genre {
-	return Must(g)
+func Make(genre interfaces.Genre) Genre {
+	return Must(genre)
 }
 
-func MakeOrUnknown(v string) (g Genre) {
-	if err := g.Set(v); err != nil {
-		g = None
+func MakeOrUnknown(value string) (genre Genre) {
+	if err := genre.Set(value); err != nil {
+		genre = None
 	}
 
-	return g
+	return genre
 }
 
 func (genre Genre) GetGenre() interfaces.Genre {
 	return genre
+}
+
+func (genre Genre) IsConfig() bool {
+	return genre == Config
+}
+
+func (genre Genre) IsZettel() bool {
+	return genre == Zettel
+}
+
+func (genre Genre) IsTag() bool {
+	return genre == Tag
 }
 
 func (genre Genre) GetGenreBitInt() byte {
@@ -114,54 +128,13 @@ func (genre Genre) Equals(b Genre) bool {
 	return genre == b
 }
 
-func (genre Genre) EqualsGenre(b interfaces.GenreGetter) bool {
-	return genre.GetGenreString() == b.GetGenre().GetGenreString()
-}
-
 func (genre Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
-	if genre.GetGenreString() != b.GetGenre().GetGenreString() {
+	if genre.String() != b.GetGenre().String() {
 		err = MakeErrUnsupportedGenre(b)
 		return err
 	}
 
 	return err
-}
-
-func (genre Genre) GetGenreString() string {
-	return genre.String()
-}
-
-func (genre Genre) GetGenreStringVersioned(sv interfaces.StoreVersion) string {
-	return genre.String()
-}
-
-func (genre Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
-	return genre.getGenreStringPluralNew()
-}
-
-func (genre Genre) getGenreStringPluralNew() string {
-	switch genre {
-	case Blob:
-		return "blobs"
-
-	case Type:
-		return "types"
-
-	case Tag:
-		return "tags"
-
-	case Zettel:
-		return "zettels"
-
-	case InventoryList:
-		return "inventory_lists"
-
-	case Repo:
-		return "repos"
-
-	default:
-		panic(fmt.Sprintf("undeclared plural for genre: %q", genre))
-	}
 }
 
 func (genre Genre) String() string {

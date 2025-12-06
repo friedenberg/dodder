@@ -143,7 +143,7 @@ func (op Diff) Run(
 	internalLabel := fmt.Sprintf(
 		"%s:%s",
 		local.GetObjectId(),
-		strings.ToLower(local.GetGenre().GetGenreString()),
+		strings.ToLower(local.GetGenre().String()),
 	)
 
 	externalLabel := op.GetEnvRepo().Rel(externalFD.GetPath())

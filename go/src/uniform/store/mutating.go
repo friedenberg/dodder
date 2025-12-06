@@ -403,7 +403,7 @@ func (commitFacilitator commitFacilitator) createType(
 }
 
 func (commitFacilitator commitFacilitator) addTypeIfNecessary(
-	typeId ids.Type,
+	typeId ids.IType,
 ) (err error) {
 	if typeId.IsEmpty() {
 		err = errors.ErrorWithStackf("attempting to add empty type")
@@ -439,7 +439,7 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 }
 
 func (commitFacilitator commitFacilitator) addTypeAndExpandedIfNecessary(
-	rootType ids.Type,
+	rootType ids.IType,
 ) (err error) {
 	if rootType.IsEmpty() {
 		return err
@@ -449,7 +449,7 @@ func (commitFacilitator commitFacilitator) addTypeAndExpandedIfNecessary(
 		return err
 	}
 
-	typesExpanded := expansion.ExpandOneIntoIds[ids.Type](
+	typesExpanded := expansion.ExpandOneIntoIds[ids.IType](
 		rootType.String(),
 		expansion.ExpanderRight,
 	)

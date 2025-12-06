@@ -142,7 +142,7 @@ func (compiled *compiled) getSortedTypesExpanded(
 ) (expandedActual []*sku.Transacted) {
 	expandedActual = make([]*sku.Transacted, 0)
 
-	seq := expansion.ExpandOneIntoIds[ids.Type](
+	seq := expansion.ExpandOneIntoIds[ids.IType](
 		typeString,
 		expansion.ExpanderRight,
 	)

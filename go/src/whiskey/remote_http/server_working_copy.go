@@ -96,7 +96,7 @@ func (server *Server) writeInventoryListTypedBlobLocalWorkingCopy(
 
 	listType := ids.GetOrPanic(
 		local.GetImmutableConfigPublic().GetInventoryListTypeId(),
-	).Type
+	).TypeStruct
 
 	inventoryListCoderCloset := server.Repo.GetInventoryListCoderCloset()
 
@@ -133,7 +133,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 ) (response Response) {
 	listSkuType := ids.GetOrPanic(
 		server.Repo.GetImmutableConfigPublic().GetInventoryListTypeId(),
-	).Type
+	).TypeStruct
 
 	blobStore := server.Repo.GetBlobStore()
 
@@ -254,7 +254,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 
 	if _, err := inventoryListCoderCloset.WriteTypedBlobToWriter(
 		local,
-		ids.GetOrPanic(local.GetImmutableConfigPublic().GetInventoryListTypeId()).Type,
+		ids.GetOrPanic(local.GetImmutableConfigPublic().GetInventoryListTypeId()).TypeStruct,
 		quiter.MakeSeqErrorFromSeq(listMissingSkus.All()),
 		bufferedWriter,
 	); err != nil {

@@ -5,7 +5,7 @@ import (
 )
 
 func TestBlobExt(t *testing.T) {
-	var e Type
+	var e TypeStruct
 	var err error
 
 	if err = e.Set("!md"); err != nil {
@@ -21,7 +21,7 @@ func TestBlobExt(t *testing.T) {
 }
 
 func TestBlobExt1(t *testing.T) {
-	var e Type
+	var e TypeStruct
 	var err error
 
 	if err = e.Set("md"); err != nil {

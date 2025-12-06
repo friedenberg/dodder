@@ -18,7 +18,7 @@ type Transacted struct {
 	ObjectId ids.ObjectId
 	Metadata objects.MetadataStruct
 
-	ExternalType ids.Type
+	ExternalType ids.IType
 
 	// TODO add support for querying the below
 	RepoId           ids.RepoId
@@ -97,7 +97,7 @@ func (transacted *Transacted) AddTagPtrFast(tag ids.TagStruct) (err error) {
 	return err
 }
 
-func (transacted *Transacted) GetType() ids.Type {
+func (transacted *Transacted) GetType() ids.IType {
 	return transacted.GetMetadata().GetType()
 }
 

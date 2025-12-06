@@ -14,6 +14,7 @@ import (
 )
 
 type (
+	// TODO rename to maybe lockfile or lockedIds or id references or marklIds?
 	contents struct {
 		// required to be exported for Gob's stupid illusions
 		// TODO refactor this to use binary searches
@@ -75,6 +76,16 @@ func (contents contents) getLockMutable(key string) (IdLockMutable, bool) {
 }
 
 func (contents contents) Get(key string) (SeqId, bool) {
+	id, ok := contents.get(key, false)
+	return id.GetKey(), ok
+}
+
+func (contents contents) GetPartial(key string) (SeqId, bool) {
+	id, ok := contents.get(key, true)
+	return id.GetKey(), ok
+}
+
+func (contents contents) get(key string, partial bool) (containedObject, bool) {
 	element, ok := cmp.BinarySearchFuncElement(
 		contents.Elements,
 		key,
@@ -82,12 +93,12 @@ func (contents contents) Get(key string) (SeqId, bool) {
 			return cmp.CompareUTF8(
 				left.GetKey().Seq.GetComparable(),
 				cmp.ComparableString(right),
-				false,
+				partial,
 			)
 		},
 	)
 
-	return element.GetKey(), ok
+	return element, ok
 }
 
 func (contents contents) Key(id SeqId) string {

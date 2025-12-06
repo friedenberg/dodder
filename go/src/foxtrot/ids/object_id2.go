@@ -541,7 +541,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		k = &h
 
 	case genres.Type:
-		var h Type
+		var h TypeStruct
 		err = h.Set(v)
 		k = &h
 
@@ -568,7 +568,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		return err
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(objectId.genre.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(objectId.genre.String())
 	}
 
 	if err != nil {
@@ -620,7 +620,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		k = &h
 
 	case genres.Type:
-		var h Type
+		var h TypeStruct
 		err = h.Set(v)
 		k = &h
 
@@ -647,7 +647,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		return err
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(objectId.genre.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(objectId.genre.String())
 	}
 
 	if err != nil {

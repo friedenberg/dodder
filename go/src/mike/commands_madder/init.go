@@ -12,7 +12,7 @@ import (
 
 func init() {
 	utility.AddCmd("init", &Init{
-		tipe: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigVCurrent).Type,
+		tipe: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigVCurrent).TypeStruct,
 		blobStoreConfig: &blob_store_configs.DefaultType{
 			CompressionType:   compression_type.CompressionTypeDefault,
 			LockInternalFiles: true,
@@ -22,27 +22,27 @@ func init() {
 	utility.AddCmd("init-pointer", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigPointerV0,
-		).Type,
+		).TypeStruct,
 		blobStoreConfig: &blob_store_configs.TomlPointerV0{},
 	})
 
 	utility.AddCmd("init-sftp-explicit", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigSftpExplicitV0,
-		).Type,
+		).TypeStruct,
 		blobStoreConfig: &blob_store_configs.TomlSFTPV0{},
 	})
 
 	utility.AddCmd("init-sftp-ssh_config", &Init{
 		tipe: ids.GetOrPanic(
 			ids.TypeTomlBlobStoreConfigSftpViaSSHConfigV0,
-		).Type,
+		).TypeStruct,
 		blobStoreConfig: &blob_store_configs.TomlSFTPViaSSHConfigV0{},
 	})
 }
 
 type Init struct {
-	tipe            ids.Type
+	tipe            ids.IType
 	blobStoreConfig blob_store_configs.ConfigMutable
 
 	command_components_madder.EnvBlobStore

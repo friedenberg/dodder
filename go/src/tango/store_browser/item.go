@@ -42,7 +42,7 @@ func (item *Item) GetObjectId() *ids.ObjectId {
 	return &oid
 }
 
-func (item *Item) GetType() (t ids.Type, err error) {
+func (item *Item) GetType() (t ids.IType, err error) {
 	if err = t.Set("browser-" + item.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return t, err

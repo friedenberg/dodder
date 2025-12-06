@@ -106,7 +106,7 @@ func (env Env) writeInventoryListLog() {
 
 	tipe := ids.GetOrPanic(
 		env.config.Blob.GetInventoryListTypeId(),
-	).Type
+	).TypeStruct
 
 	subject := triple_hyphen_io.TypedBlobEmpty{
 		Type: tipe,

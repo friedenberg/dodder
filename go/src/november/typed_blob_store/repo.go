@@ -22,7 +22,7 @@ func MakeRepoStore(
 }
 
 func (store RepoStore) ReadTypedBlob(
-	tipe ids.Type,
+	tipe ids.IType,
 	blobSha interfaces.MarklId,
 ) (common repo_blobs.Blob, n int64, err error) {
 	var reader interfaces.BlobReader
@@ -55,7 +55,7 @@ func (store RepoStore) ReadTypedBlob(
 }
 
 func (store RepoStore) WriteTypedBlob(
-	tipe ids.Type,
+	tipe ids.IType,
 	blob repo_blobs.Blob,
 ) (sh interfaces.MarklId, n int64, err error) {
 	var writer interfaces.BlobWriter

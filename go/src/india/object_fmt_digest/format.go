@@ -131,7 +131,7 @@ func (format format) writeMetadataKeyStringTo(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,
 			key_strings.Genre.String(),
-			context.GetObjectId().GetGenre().GetGenreString(),
+			context.GetObjectId().GetGenre().String(),
 		)
 		n += int64(n1)
 

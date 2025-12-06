@@ -4,11 +4,10 @@ type (
 	Genre interface {
 		GenreGetter
 		Stringer
-		EqualsGenre(GenreGetter) bool
+		IsConfig() bool
+		IsTag() bool
+		IsZettel() bool
 		GetGenreBitInt() byte
-		GetGenreString() string
-		GetGenreStringVersioned(StoreVersion) string
-		GetGenreStringPlural(StoreVersion) string
 	}
 
 	GenreGetter interface {

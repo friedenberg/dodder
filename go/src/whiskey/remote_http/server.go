@@ -734,7 +734,7 @@ func (server *Server) handleGetQuery(request Request) (response Response) {
 
 	if _, err := inventoryListCoderCloset.WriteBlobToWriter(
 		server.Repo,
-		ids.GetOrPanic(listTypeString).Type,
+		ids.GetOrPanic(listTypeString).TypeStruct,
 		quiter.MakeSeqErrorFromSeq(list.All()),
 		bufferedWriter,
 	); err != nil {

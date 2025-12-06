@@ -12,21 +12,25 @@ import (
 // TODO MAYBE move Type into its own package
 
 func init() {
-	register(Type{})
+	register(TypeStruct{})
 }
 
 type (
-	Type struct {
+	TypeStruct struct {
 		Value string
 	}
 
+	IType = TypeStruct
+	// IType        = interfaces.ObjectId
+	ITypeMutable = *TypeStruct
+
 	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
-		IsInlineType(Type) bool
+		IsInlineType(IType) bool
 	}
 )
 
-func MakeType(value string) (tipe Type, err error) {
+func MakeType(value string) (tipe TypeStruct, err error) {
 	if err = tipe.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return tipe, err
@@ -35,7 +39,7 @@ func MakeType(value string) (tipe Type, err error) {
 	return tipe, err
 }
 
-func MustType(value string) (tipe Type) {
+func MustType(value string) (tipe TypeStruct) {
 	if err := tipe.Set(value); err != nil {
 		errors.PanicIfError(err)
 	}
@@ -43,67 +47,67 @@ func MustType(value string) (tipe Type) {
 	return tipe
 }
 
-func (tipe Type) IsEmpty() bool {
-	return tipe.Value == ""
+func (typeStruct TypeStruct) IsEmpty() bool {
+	return typeStruct.Value == ""
 }
 
-func (tipe *Type) Reset() {
-	tipe.Value = ""
+func (typeStruct *TypeStruct) Reset() {
+	typeStruct.Value = ""
 }
 
-func (tipe *Type) ResetWith(b Type) {
-	tipe.Value = b.Value
+func (typeStruct *TypeStruct) ResetWith(b TypeStruct) {
+	typeStruct.Value = b.Value
 }
 
-func (tipe Type) EqualsAny(b any) bool {
-	return values.Equals(tipe, b)
+func (typeStruct TypeStruct) EqualsAny(b any) bool {
+	return values.Equals(typeStruct, b)
 }
 
-func (tipe Type) Equals(b Type) bool {
-	return tipe.Value == b.Value
+func (typeStruct TypeStruct) Equals(b TypeStruct) bool {
+	return typeStruct.Value == b.Value
 }
 
-func (tipe Type) GetType() Type {
-	return tipe
+func (typeStruct TypeStruct) GetType() TypeStruct {
+	return typeStruct
 }
 
-func (tipe *Type) GetTypPtr() *Type {
-	return tipe
+func (typeStruct *TypeStruct) GetTypPtr() *TypeStruct {
+	return typeStruct
 }
 
-func (tipe Type) GetGenre() interfaces.Genre {
+func (typeStruct TypeStruct) GetGenre() interfaces.Genre {
 	return genres.Type
 }
 
-func (tipe Type) IsToml() bool {
-	return strings.HasPrefix(tipe.Value, "toml")
+func (typeStruct TypeStruct) IsToml() bool {
+	return strings.HasPrefix(typeStruct.Value, "toml")
 }
 
-func (tipe Type) StringSansOp() string {
-	if tipe.IsEmpty() {
+func (typeStruct TypeStruct) StringSansOp() string {
+	if typeStruct.IsEmpty() {
 		return ""
 	} else {
-		return tipe.Value
+		return typeStruct.Value
 	}
 }
 
-func (tipe Type) String() string {
-	if tipe.IsEmpty() {
+func (typeStruct TypeStruct) String() string {
+	if typeStruct.IsEmpty() {
 		return ""
 	} else {
-		return "!" + tipe.Value
+		return "!" + typeStruct.Value
 	}
 }
 
-func (tipe Type) Parts() [3]string {
-	return [3]string{"", "!", tipe.Value}
+func (typeStruct TypeStruct) Parts() [3]string {
+	return [3]string{"", "!", typeStruct.Value}
 }
 
-func (tipe *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
-	return tipe.Set(v.String())
+func (typeStruct *TypeStruct) TodoSetFromObjectId(v *ObjectId) (err error) {
+	return typeStruct.Set(v.String())
 }
 
-func (tipe *Type) Set(value string) (err error) {
+func (typeStruct *TypeStruct) Set(value string) (err error) {
 	value = strings.ToLower(strings.TrimSpace(strings.Trim(value, ".! ")))
 
 	if err = ErrOnConfig(value); err != nil {
@@ -116,18 +120,18 @@ func (tipe *Type) Set(value string) (err error) {
 		return err
 	}
 
-	tipe.Value = value
+	typeStruct.Value = value
 
 	return err
 }
 
-func (tipe Type) MarshalText() (text []byte, err error) {
-	text = []byte(tipe.String())
+func (typeStruct TypeStruct) MarshalText() (text []byte, err error) {
+	text = []byte(typeStruct.String())
 	return text, err
 }
 
-func (tipe *Type) UnmarshalText(text []byte) (err error) {
-	if err = tipe.Set(string(text)); err != nil {
+func (typeStruct *TypeStruct) UnmarshalText(text []byte) (err error) {
+	if err = typeStruct.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -135,13 +139,13 @@ func (tipe *Type) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (tipe Type) MarshalBinary() (text []byte, err error) {
-	text = []byte(tipe.String())
+func (typeStruct TypeStruct) MarshalBinary() (text []byte, err error) {
+	text = []byte(typeStruct.String())
 	return text, err
 }
 
-func (tipe *Type) UnmarshalBinary(text []byte) (err error) {
-	if err = tipe.Set(string(text)); err != nil {
+func (typeStruct *TypeStruct) UnmarshalBinary(text []byte) (err error) {
+	if err = typeStruct.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

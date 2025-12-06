@@ -363,7 +363,7 @@ LOOP:
 				stack.Last().Add(exp)
 
 			case genres.Type:
-				var tipe ids.Type
+				var tipe ids.IType
 
 				if err = tipe.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
 					err = errors.Wrap(err)

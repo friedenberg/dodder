@@ -178,7 +178,7 @@ func (index *index) Reset() (err error) {
 }
 
 func (index *index) AddZettelId(k1 interfaces.ObjectIdWithParts) (err error) {
-	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
+	if !k1.GetGenre().IsZettel() {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return err
 	}

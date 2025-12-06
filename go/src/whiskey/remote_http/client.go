@@ -106,7 +106,7 @@ func (client *client) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
 	return client.configImmutable.Blob
 }
 
-func (client *client) GetImmutableConfigPublicType() ids.Type {
+func (client *client) GetImmutableConfigPublicType() ids.IType {
 	return client.configImmutable.Type
 }
 
@@ -179,7 +179,7 @@ func (client *client) MakeInventoryList(
 
 	if list, err = inventoryListCoderCloset.ReadInventoryListBlob(
 		client.repo.GetEnvRepo(),
-		ids.GetOrPanic(listTypeString).Type,
+		ids.GetOrPanic(listTypeString).TypeStruct,
 		bufio.NewReader(response.Body),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -241,7 +241,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 
 	listType := ids.GetOrPanic(
 		client.repo.GetImmutableConfigPublic().GetInventoryListTypeId(),
-	).Type
+	).TypeStruct
 
 	buffer := bytes.NewBuffer(nil)
 
@@ -316,7 +316,7 @@ func (client *client) pullQueryGroupFromWorkingCopy(
 			client.GetEnv(),
 			ids.GetOrPanic(
 				client.configImmutable.Blob.GetInventoryListTypeId(),
-			).Type,
+			).TypeStruct,
 			bufferedReader,
 		); err != nil {
 			err = errors.Wrap(err)

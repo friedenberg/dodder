@@ -13,7 +13,7 @@ import (
 )
 
 func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
-	var tipe ids.Type
+	var tipe ids.IType
 	var tags ids.TagSet
 
 	if defaults != nil {

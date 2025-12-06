@@ -44,7 +44,7 @@ type Metadata struct {
 	ids.TagSet
 	Matchers interfaces.Set[sku.Query] // TODO remove
 	OptionCommentSet
-	Type   ids.Type
+	Type   ids.IType
 	RepoId ids.RepoId
 }
 

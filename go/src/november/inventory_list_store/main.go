@@ -45,7 +45,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 	object_finalizer.FinalizerGetter
 
-	getType() ids.Type
+	getType() ids.IType
 	getFormat() sku.ListCoder
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
@@ -110,7 +110,7 @@ func (store *Store) FormatForVersion(
 ) sku.ListCoder {
 	tipe := ids.GetOrPanic(
 		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeId(),
-	).Type
+	).TypeStruct
 
 	return store.GetInventoryListCoderCloset().GetCoderForType(tipe)
 }

@@ -29,7 +29,7 @@ func (local *Repo) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
 	return local.GetEnvRepo().GetConfigPublic().Blob
 }
 
-func (local *Repo) GetImmutableConfigPublicType() ids.Type {
+func (local *Repo) GetImmutableConfigPublicType() ids.IType {
 	return local.GetEnvRepo().GetConfigPublic().Type
 }
 

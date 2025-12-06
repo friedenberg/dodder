@@ -7,15 +7,17 @@ import (
 	"code.linenisgreat.com/dodder/go/src/papa/store_workspace"
 )
 
-type ErrUnsupportedType ids.Type
+type ErrUnsupportedType struct {
+	Type ids.IType
+}
 
-func (e ErrUnsupportedType) Is(target error) bool {
+func (err ErrUnsupportedType) Is(target error) bool {
 	_, ok := target.(ErrUnsupportedType)
 	return ok
 }
 
-func (e ErrUnsupportedType) Error() string {
-	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
+func (err ErrUnsupportedType) Error() string {
+	return fmt.Sprintf("unsupported type: %q", err.Type)
 }
 
 func makeErrUnsupportedOperation(s *Store, op any) error {

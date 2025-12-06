@@ -31,12 +31,12 @@ type (
 	}
 
 	Defaults interface {
-		GetDefaultType() ids.Type
+		GetDefaultType() ids.IType
 		GetDefaultTags() collections_slice.Slice[ids.TagStruct]
 	}
 )
 
-func Default(defaultType ids.Type) Config {
+func Default(defaultType ids.IType) Config {
 	return Config{
 		DefaultType:    defaultType,
 		DefaultTags:    ids.MakeTagSetFromSlice(),
@@ -52,7 +52,7 @@ func Default(defaultType ids.Type) Config {
 
 func DefaultOverlay(
 	defaultBlobStoreId blob_store_id.Id,
-	defaultType ids.Type,
+	defaultType ids.IType,
 ) TypedBlob {
 	return TypedBlob{
 		Type: ids.DefaultOrPanic(genres.Config),

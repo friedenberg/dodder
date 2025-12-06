@@ -1,4 +1,4 @@
-package objects
+package ids
 
 import (
 	"strconv"
@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/comments"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
 
 type SeqId struct {
@@ -66,7 +65,7 @@ func (id *SeqId) Set(value string) (err error) {
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
 
-		if ids.TokenIsConfig(seq.At(0)) {
+		if TokenIsConfig(seq.At(0)) {
 			id.Genre = genres.Config
 		} else {
 			id.Genre = genres.Tag

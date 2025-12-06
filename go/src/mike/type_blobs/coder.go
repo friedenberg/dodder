@@ -48,7 +48,7 @@ func MakeTypeStore(
 }
 
 func (store Coder) SaveBlobText(
-	tipe ids.Type,
+	tipe ids.IType,
 	blob Blob,
 ) (digest interfaces.MarklId, n int64, err error) {
 	switch tipe.String() {
@@ -73,7 +73,7 @@ func (store Coder) SaveBlobText(
 }
 
 func (store Coder) ParseTypedBlob(
-	tipe interfaces.ObjectIdWithParts,
+	tipe interfaces.ObjectId,
 	blobId interfaces.MarklId,
 ) (common Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {

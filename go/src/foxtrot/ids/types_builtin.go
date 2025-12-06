@@ -50,19 +50,19 @@ const (
 )
 
 type BuiltinType struct {
-	Type
+	TypeStruct
 	genres.Genre
 	Default bool
 }
 
 var (
 	allSlice []BuiltinType
-	allMap   map[Type]BuiltinType
+	allMap   map[TypeStruct]BuiltinType
 	defaults map[genres.Genre]BuiltinType
 )
 
 func init() {
-	allMap = make(map[Type]BuiltinType)
+	allMap = make(map[TypeStruct]BuiltinType)
 	defaults = make(map[genres.Genre]BuiltinType)
 
 	// keep sorted
@@ -118,17 +118,17 @@ func registerBuiltinTypeString(
 ) {
 	registerBuiltinType(
 		BuiltinType{
-			Type:    MustType(tipeString),
-			Genre:   genre,
-			Default: isDefault,
+			TypeStruct: MustType(tipeString),
+			Genre:      genre,
+			Default:    isDefault,
 		},
 	)
 }
 
 func registerBuiltinType(bt BuiltinType) {
-	if _, exists := allMap[bt.Type]; exists {
+	if _, exists := allMap[bt.TypeStruct]; exists {
 		panic(
-			fmt.Sprintf("builtin type registered more than once: %s", bt.Type),
+			fmt.Sprintf("builtin type registered more than once: %s", bt.TypeStruct),
 		)
 	}
 
@@ -136,12 +136,12 @@ func registerBuiltinType(bt BuiltinType) {
 		panic(
 			fmt.Sprintf(
 				"builtin default type registered more than once: %s",
-				bt.Type,
+				bt.TypeStruct,
 			),
 		)
 	}
 
-	allMap[bt.Type] = bt
+	allMap[bt.TypeStruct] = bt
 	allSlice = append(allSlice, bt)
 
 	if bt.Default {
@@ -149,12 +149,12 @@ func registerBuiltinType(bt BuiltinType) {
 	}
 }
 
-func IsBuiltin(tipe Type) bool {
+func IsBuiltin(tipe TypeStruct) bool {
 	_, ok := allMap[tipe]
 	return ok
 }
 
-func Get(t Type) (BuiltinType, bool) {
+func Get(t TypeStruct) (BuiltinType, bool) {
 	bt, ok := allMap[t]
 	return bt, ok
 }
@@ -170,12 +170,12 @@ func GetOrPanic(idString string) BuiltinType {
 	return bt
 }
 
-func Default(genre genres.Genre) (Type, bool) {
+func Default(genre genres.Genre) (TypeStruct, bool) {
 	bt, ok := defaults[genre]
-	return bt.Type, ok
+	return bt.TypeStruct, ok
 }
 
-func DefaultOrPanic(genre genres.Genre) Type {
+func DefaultOrPanic(genre genres.Genre) TypeStruct {
 	t, ok := Default(genre)
 
 	if !ok {

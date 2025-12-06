@@ -12,7 +12,7 @@ type BigBang struct {
 	GenesisConfig        *genesis_configs.TypedConfigPrivateMutable
 	TypedBlobStoreConfig *blob_store_configs.TypedMutableConfig
 
-	InventoryListType ids.Type
+	InventoryListType ids.TypeStruct
 
 	Yin                  string
 	Yang                 string
@@ -26,7 +26,7 @@ func (bigBang *BigBang) SetDefaults() {
 	bigBang.GenesisConfig = genesis_configs.Default()
 	bigBang.InventoryListType = ids.GetOrPanic(
 		ids.TypeInventoryListVCurrent,
-	).Type
+	).TypeStruct
 
 	bigBang.TypedBlobStoreConfig = blob_store_configs.Default()
 }

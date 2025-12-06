@@ -14,16 +14,16 @@ type (
 	TagSet        = ids.Set[ids.TagStruct]
 	TagSetMutable = ids.SetMutable[ids.TagStruct]
 
-	tagLock        = interfaces.Lock[TagStruct, *TagStruct]
-	tagLockMutable = interfaces.LockMutable[TagStruct, *TagStruct]
-
 	IdLock        = interfaces.Lock[SeqId, *SeqId]
 	IdLockMutable = interfaces.LockMutable[SeqId, *SeqId]
 
-	TypeLock        = interfaces.Lock[ids.Type, *ids.Type]
-	TypeLockMutable = interfaces.LockMutable[ids.Type, *ids.Type]
+	TypeLock        = interfaces.Lock[Type, TypeMutable]
+	TypeLockMutable = interfaces.LockMutable[Type, TypeMutable]
 	TagLock         = IdLock
 	TagLockMutable  = IdLockMutable
+
+	Type        = ids.TypeStruct
+	TypeMutable = *ids.TypeStruct
 
 	Metadata interface {
 		Getter
@@ -35,7 +35,7 @@ type (
 		GetTags() TagSet
 		AllTags() interfaces.Seq[Tag]
 		GetTai() ids.Tai
-		GetType() ids.Type
+		GetType() Type
 		GetTypeLock() TypeLock
 
 		GetTagLock(Tag) TagLock
@@ -69,7 +69,7 @@ type (
 		GetObjectSigMutable() interfaces.MarklIdMutable
 		GetRepoPubKeyMutable() interfaces.MarklIdMutable
 		GetTaiMutable() *ids.Tai
-		GetTypeMutable() *ids.Type
+		GetTypeMutable() TypeMutable
 		GetTypeLockMutable() TypeLockMutable
 		GetTagLockMutable(Tag) TagLockMutable
 	}

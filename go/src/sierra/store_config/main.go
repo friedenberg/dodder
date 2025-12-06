@@ -39,7 +39,7 @@ func init() {
 	)
 
 	gob.Register(quiter.StringerKeyer[values.String]{})
-	gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{})
+	gob.Register(quiter.StringerKeyerPtr[ids.IType, ids.ITypeMutable]{})
 }
 
 type (

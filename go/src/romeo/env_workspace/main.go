@@ -62,7 +62,7 @@ func Make(
 	}
 
 	object := workspace_config_blobs.TypedConfig{
-		Type: ids.Type{},
+		Type: ids.IType{},
 	}
 
 	dir := outputEnv.GetCwd()
@@ -222,7 +222,7 @@ func (env *env) IsTemporary() bool {
 }
 
 func (env *env) GetWorkspaceConfigTyped() workspace_config_blobs.TypedConfig {
-	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
+	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).TypeStruct
 
 	return workspace_config_blobs.TypedConfig{
 		Type: typeWorkspaceConfig,
@@ -251,7 +251,7 @@ func (env *env) CreateWorkspace(
 ) (err error) {
 	env.blob = blob
 
-	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).Type
+	typeWorkspaceConfig := ids.GetOrPanic(ids.TypeTomlWorkspaceConfigV0).TypeStruct
 
 	object := workspace_config_blobs.TypedConfig{
 		Type: typeWorkspaceConfig,

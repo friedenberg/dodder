@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
@@ -68,7 +67,7 @@ func (formatter textFormatter) EncodeStringTo(
 		n, err = formatter.MetadataOnly.FormatMetadata(writer, context)
 
 	default:
-		if genres.Config.EqualsGenre(object.GetGenre()) {
+		if object.GetGenre().IsConfig() {
 			n, err = formatter.BlobOnly.FormatMetadata(writer, context)
 		} else if formatter.InlineTypeChecker.IsInlineType(object.GetType()) {
 			n, err = formatter.InlineBlob.FormatMetadata(writer, context)
@@ -81,22 +80,22 @@ func (formatter textFormatter) EncodeStringTo(
 }
 
 func (tf textFormatter) WriteStringFormatWithMode(
-	w io.Writer,
-	sk *sku.Transacted,
+	writer io.Writer,
+	object *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
-		PersistentFormatterContext: sk,
+		PersistentFormatterContext: object,
 		FormatterOptions:           tf.options,
 	}
 
-	if genres.Config.EqualsGenre(sk.GetGenre()) ||
+	if object.GetGenre().IsConfig() ||
 		mode.IsBlobOnly() {
-		n, err = tf.BlobOnly.FormatMetadata(w, ctx)
-	} else if tf.InlineTypeChecker.IsInlineType(sk.GetType()) {
-		n, err = tf.InlineBlob.FormatMetadata(w, ctx)
+		n, err = tf.BlobOnly.FormatMetadata(writer, ctx)
+	} else if tf.InlineTypeChecker.IsInlineType(object.GetType()) {
+		n, err = tf.InlineBlob.FormatMetadata(writer, ctx)
 	} else {
-		n, err = tf.MetadataOnly.FormatMetadata(w, ctx)
+		n, err = tf.MetadataOnly.FormatMetadata(writer, ctx)
 	}
 
 	return n, err

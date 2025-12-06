@@ -18,7 +18,7 @@ import (
 type Repo interface {
 	GetEnv() env_ui.Env
 	GetImmutableConfigPublic() genesis_configs.ConfigPublic
-	GetImmutableConfigPublicType() ids.Type
+	GetImmutableConfigPublicType() ids.IType
 	GetBlobStore() blob_stores.BlobStoreInitialized
 	GetObjectStore() sku.RepoStore
 	GetInventoryListCoderCloset() inventory_list_coders.Closet

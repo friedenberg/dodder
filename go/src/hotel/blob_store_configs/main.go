@@ -21,7 +21,7 @@ type (
 
 	ConfigUpgradeable interface {
 		Config
-		Upgrade() (Config, ids.Type)
+		Upgrade() (Config, ids.IType)
 	}
 
 	ConfigMutable interface {
@@ -99,7 +99,7 @@ type DefaultType = TomlV2
 
 func Default() *TypedMutableConfig {
 	return &TypedMutableConfig{
-		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigVCurrent).Type,
+		Type: ids.GetOrPanic(ids.TypeTomlBlobStoreConfigVCurrent).TypeStruct,
 		Blob: &DefaultType{
 			HashBuckets:       DefaultHashBuckets,
 			HashTypeId:        markl.FormatIdHashBlake2b256,
