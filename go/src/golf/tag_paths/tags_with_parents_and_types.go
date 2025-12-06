@@ -49,7 +49,7 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 
 		percent.Set("%")
 
-		loc, ok := cmp.BinarySearchFunc(
+		loc, ok := cmp.BinarySearchFuncIndex(
 			tagsWithParentsAndTypes,
 			percent,
 			func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
@@ -65,7 +65,7 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 		tagsWithParentsAndTypes = tagsWithParentsAndTypes[loc:]
 	}
 
-	return cmp.BinarySearchFunc(
+	return cmp.BinarySearchFuncIndex(
 		tagsWithParentsAndTypes,
 		e,
 		func(left TagWithParentsAndTypes, right *Tag) cmp.Result {
@@ -79,7 +79,7 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 }
 
 func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsTag(e *Tag) (int, bool) {
-	return cmp.BinarySearchFunc(
+	return cmp.BinarySearchFuncIndex(
 		tagsWithParentsAndTypes,
 		e,
 		func(ewp TagWithParentsAndTypes, e *Tag) cmp.Result {
@@ -91,7 +91,7 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsTag(e *Tag) (int,
 func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsString(
 	value string,
 ) (int, bool) {
-	return cmp.BinarySearchFunc(
+	return cmp.BinarySearchFuncIndex(
 		tagsWithParentsAndTypes,
 		value,
 		func(ewp TagWithParentsAndTypes, c string) cmp.Result {

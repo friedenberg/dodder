@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
@@ -35,15 +36,20 @@ func (contents contents) All() interfaces.Seq[SeqId] {
 	}
 }
 
-// TODO switch to binary search
 func (contents contents) ContainsKey(key string) bool {
-	for id := range contents.Elements.All() {
-		if id.GetKey().String() == key {
-			return true
-		}
-	}
+	_, ok := cmp.BinarySearchFuncIndex(
+		contents.Elements,
+		key,
+		func(left containedObject, right string) cmp.Result {
+			return cmp.CompareUTF8(
+				left.GetKey().Seq.GetComparable(),
+				cmp.ComparableString(right),
+				false,
+			)
+		},
+	)
 
-	return false
+	return ok
 }
 
 func (contents contents) getLock(key string) (IdLock, bool) {
@@ -68,22 +74,26 @@ func (contents contents) getLockMutable(key string) (IdLockMutable, bool) {
 	return nil, false
 }
 
-// TODO switch to binary search
 func (contents contents) Get(key string) (SeqId, bool) {
-	for id := range contents.Elements.All() {
-		if id.GetKey().String() == key {
-			return id.GetKey(), true
-		}
-	}
+	element, ok := cmp.BinarySearchFuncElement(
+		contents.Elements,
+		key,
+		func(left containedObject, right string) cmp.Result {
+			return cmp.CompareUTF8(
+				left.GetKey().Seq.GetComparable(),
+				cmp.ComparableString(right),
+				false,
+			)
+		},
+	)
 
-	return SeqId{}, false
+	return element.GetKey(), ok
 }
 
 func (contents contents) Key(id SeqId) string {
 	return id.String()
 }
 
-// TODO sort
 func (contents *contents) Add(id SeqId) error {
 	if _, alreadyExists := contents.Get(id.String()); alreadyExists {
 		return nil
@@ -96,6 +106,8 @@ func (contents *contents) Add(id SeqId) error {
 	if id.Genre == genres.Tag {
 		contents.TagCount++
 	}
+
+	contents.Elements.SortWithComparer(containedObjectCompareKey)
 
 	return nil
 }
@@ -128,6 +140,7 @@ func (contents *contents) Reset() {
 	contents.Elements.Reset()
 }
 
+// TODO add optimized non-sorted path for binary decoding
 func (contents *contents) addNormalizedTag(tag Tag) {
 	seq := expansion.ExpandOneIntoIds[SeqId](
 		tag.String(),

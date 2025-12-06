@@ -30,7 +30,7 @@ func (pathsWithTypes PathsWithTypes) Less(left, right int) bool {
 }
 
 func (pathsWithTypes PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
-	return cmp.BinarySearchFunc(
+	return cmp.BinarySearchFuncIndex(
 		pathsWithTypes,
 		p,
 		func(ep *PathWithType, el *PathWithType) cmp.Result {
