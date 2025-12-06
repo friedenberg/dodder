@@ -13,7 +13,7 @@ import (
 )
 
 func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
-	var tipe ids.IType
+	var tipe ids.TypeStruct
 	var tags ids.TagSet
 
 	if defaults != nil {
@@ -21,7 +21,7 @@ func MakeProto(defaults repo_configs.Defaults) (proto Proto) {
 		tags = ids.MakeTagSetFromSlice(defaults.GetDefaultTags()...)
 	}
 
-	proto.Metadata.GetTypeMutable().ResetWith(tipe)
+	proto.Metadata.GetTypeMutable().ResetWithType(tipe)
 	objects.SetTags(&proto.Metadata, tags)
 
 	return proto
@@ -128,7 +128,7 @@ func (proto Proto) ApplyWithBlobFD(
 		ext := blobFD.Ext()
 
 		if ext != "" {
-			if err = metadataMutable.GetTypeMutable().Set(blobFD.Ext()); err != nil {
+			if err = metadataMutable.GetTypeMutable().SetType(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}

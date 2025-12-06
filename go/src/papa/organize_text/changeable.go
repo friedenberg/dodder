@@ -56,7 +56,7 @@ func (assignment *Assignment) addToSet(
 			ot.ObjectFactory.ResetWith(outputObject, organizeObject.sku)
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
+				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWithObjectId(
 					ot.Metadata.Type,
 				)
 			}
@@ -112,7 +112,7 @@ func (assignment *Assignment) addToSet(
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWith(
+				outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().ResetWithType(
 					ot.Metadata.Type,
 				)
 			}
@@ -136,7 +136,7 @@ func (assignment *Assignment) addToSet(
 		}
 
 		if !organizeObject.GetSkuExternal().GetMetadata().GetType().IsEmpty() {
-			if err = outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().Set(
+			if err = outputObject.GetSkuExternal().GetMetadataMutable().GetTypeMutable().SetType(
 				organizeObject.GetSkuExternal().GetMetadata().GetType().String(),
 			); err != nil {
 				err = errors.Wrap(err)

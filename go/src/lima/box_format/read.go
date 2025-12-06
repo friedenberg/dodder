@@ -204,7 +204,7 @@ LOOP_AFTER_OBJECT_ID:
 
 			// !type
 		case seq.MatchAll(doddish.TokenMatcherType...):
-			if err = object.GetMetadataMutable().GetTypeMutable().Set(
+			if err = object.GetMetadataMutable().GetTypeMutable().SetType(
 				seq.String(),
 			); err != nil {
 				err = errors.Wrap(err)

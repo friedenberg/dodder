@@ -52,10 +52,10 @@ func (cmd Remote) MakeRemoteAndObject(
 
 	remoteObject = sku.GetTransactedPool().Get()
 
-	command.PopRequestArgTo(
+	command.PopRequestArgToFunc(
 		req.Args,
 		"remote type",
-		remoteObject.GetMetadataMutable().GetTypeMutable(),
+		remoteObject.GetMetadataMutable().GetTypeMutable().SetType,
 	)
 
 	blob := cmd.CreateRemoteBlob(

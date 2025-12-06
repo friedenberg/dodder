@@ -9,13 +9,13 @@ import (
 )
 
 type DefaultsV1 struct {
-	Type ids.IType       `toml:"type,omitempty"`
+	Type ids.TypeStruct  `toml:"type,omitempty"`
 	Tags []ids.TagStruct `toml:"tags"`
 }
 
 var _ ConfigOverlay = V1{}
 
-func (defaults DefaultsV1) GetDefaultType() ids.IType {
+func (defaults DefaultsV1) GetDefaultType() ids.TypeStruct {
 	return defaults.Type
 }
 
@@ -24,11 +24,11 @@ func (defaults DefaultsV1) GetDefaultTags() collections_slice.Slice[ids.TagStruc
 }
 
 type DefaultsV1OmitEmpty struct {
-	Type ids.IType       `toml:"type,omitempty"`
+	Type ids.TypeStruct  `toml:"type,omitempty"`
 	Tags []ids.TagStruct `toml:"tags,omitempty"`
 }
 
-func (defaults DefaultsV1OmitEmpty) GetDefaultType() ids.IType {
+func (defaults DefaultsV1OmitEmpty) GetDefaultType() ids.TypeStruct {
 	return defaults.Type
 }
 
@@ -47,7 +47,7 @@ var _ ConfigOverlay = V1{}
 
 func (blob *V1) Reset() {
 	blob.FileExtensions.Reset()
-	blob.Defaults.Type = ids.IType{}
+	blob.Defaults.Type = ids.TypeStruct{}
 	blob.Defaults.Tags = make([]ids.TagStruct, 0)
 	blob.PrintOptions = options_print.V1{}
 }

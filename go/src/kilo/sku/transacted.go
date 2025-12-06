@@ -18,7 +18,7 @@ type Transacted struct {
 	ObjectId ids.ObjectId
 	Metadata objects.MetadataStruct
 
-	ExternalType ids.IType
+	ExternalType ids.TypeStruct
 
 	// TODO add support for querying the below
 	RepoId           ids.RepoId

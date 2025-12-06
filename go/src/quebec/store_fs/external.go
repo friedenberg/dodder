@@ -111,7 +111,7 @@ func (store *Store) UpdateTransactedFromBlobs(
 		}
 
 		if typeFromExtension != "" {
-			if err = object.GetMetadataMutable().GetTypeMutable().Set(
+			if err = object.GetMetadataMutable().GetTypeMutable().SetType(
 				typeFromExtension,
 			); err != nil {
 				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())

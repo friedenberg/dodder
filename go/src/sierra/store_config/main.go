@@ -262,7 +262,7 @@ func (store *store) setTransacted(
 	)
 
 	if err = store.loadMutableConfigBlob(
-		store.config.Sku.GetType(),
+		store.config.Sku.GetType().ToType(),
 		store.config.Sku.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)

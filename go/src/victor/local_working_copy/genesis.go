@@ -51,7 +51,7 @@ func (local *Repo) initDefaultTypeAndConfig(
 
 	defer errors.Deferred(&err, local.Unlock)
 
-	var defaultTypeObjectId ids.IType
+	var defaultTypeObjectId ids.TypeStruct
 
 	if defaultTypeObjectId, err = local.initDefaultTypeIfNecessaryAfterLock(
 		bigBang,
@@ -80,26 +80,26 @@ func (local *Repo) initDefaultTypeAndConfig(
 
 func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
-) (objectIdType ids.IType, err error) {
+) (objectIdType ids.TypeStruct, err error) {
 	if bigBang.ExcludeDefaultType {
 		return objectIdType, err
 	}
 
-	objectIdType = ids.MustType("md")
+	objectIdType = ids.MustTypeStruct("md")
 	tipe := ids.DefaultOrPanic(genres.Type)
 	blob := type_blobs.Default()
 
 	object := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(object)
 
-	if err = object.ObjectId.SetWithIdLike(objectIdType); err != nil {
+	if err = object.ObjectId.SetObjectIdLike(objectIdType); err != nil {
 		err = errors.Wrap(err)
 		return objectIdType, err
 	}
 
 	var objectId ids.ObjectId
 
-	if err = objectId.SetWithIdLike(objectIdType); err != nil {
+	if err = objectId.SetObjectIdLike(objectIdType); err != nil {
 		err = errors.Wrap(err)
 		return objectIdType, err
 	}
@@ -115,7 +115,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	}
 
 	object.GetMetadataMutable().GetBlobDigestMutable().ResetWithMarklId(digest)
-	object.GetMetadataMutable().GetTypeMutable().ResetWith(tipe)
+	object.GetMetadataMutable().GetTypeMutable().ResetWithType(tipe)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		object,
@@ -131,7 +131,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 	bigBang env_repo.BigBang,
 	defaultBlobStoreId blob_store_id.Id,
-	defaultTypeObjectId ids.IType,
+	defaultTypeObjectId ids.TypeStruct,
 ) (err error) {
 	if bigBang.ExcludeDefaultConfig {
 		return err
@@ -163,7 +163,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return err
 	}
 
-	newConfig.GetMetadataMutable().GetTypeMutable().ResetWith(typedBlob.Type)
+	newConfig.GetMetadataMutable().GetTypeMutable().ResetWithType(typedBlob.Type)
 
 	if err = local.GetStore().CreateOrUpdateDefaultProto(
 		newConfig,
@@ -179,7 +179,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 func writeDefaultMutableConfig(
 	repo *Repo,
 	defaultBlobStoreId blob_store_id.Id,
-	defaultType ids.IType,
+	defaultType ids.TypeStruct,
 ) (blobId interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
 	typedBlob = repo_configs.DefaultOverlay(defaultBlobStoreId, defaultType)
 

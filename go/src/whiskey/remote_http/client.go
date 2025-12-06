@@ -106,7 +106,7 @@ func (client *client) GetImmutableConfigPublic() genesis_configs.ConfigPublic {
 	return client.configImmutable.Blob
 }
 
-func (client *client) GetImmutableConfigPublicType() ids.IType {
+func (client *client) GetImmutableConfigPublicType() ids.TypeStruct {
 	return client.configImmutable.Type
 }
 

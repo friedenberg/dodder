@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -20,9 +21,9 @@ type (
 		Value string
 	}
 
-	IType = TypeStruct
-	// IType        = interfaces.ObjectId
-	ITypeMutable = *TypeStruct
+	// IType = TypeStruct
+	IType        = SeqId
+	ITypeMutable = *SeqId
 
 	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
@@ -30,7 +31,41 @@ type (
 	}
 )
 
-func MakeType(value string) (tipe TypeStruct, err error) {
+func MakeTypeString(value string) string {
+	value = strings.TrimSpace(value)
+
+	if !strings.HasPrefix(value, "!") {
+		value = "!" + value
+	}
+
+	return value
+}
+
+func MakeType(value string) (tipe IType, err error) {
+	if err = tipe.SetType(value); err != nil {
+		err = errors.Wrap(err)
+		return tipe, err
+	}
+
+	if err = genres.Type.AssertGenre(tipe); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return tipe, err
+}
+
+func MustType(value string) (tipe IType) {
+	var err error
+	tipe, err = MakeType(value)
+	if err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return tipe
+}
+
+func MakeTypeStruct(value string) (tipe TypeStruct, err error) {
 	if err = tipe.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return tipe, err
@@ -39,7 +74,7 @@ func MakeType(value string) (tipe TypeStruct, err error) {
 	return tipe, err
 }
 
-func MustType(value string) (tipe TypeStruct) {
+func MustTypeStruct(value string) (tipe TypeStruct) {
 	if err := tipe.Set(value); err != nil {
 		errors.PanicIfError(err)
 	}
@@ -151,4 +186,20 @@ func (typeStruct *TypeStruct) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return err
+}
+
+func (typeStruct TypeStruct) ToSeq() SeqId {
+	return SeqId{
+		Genre: genres.Type,
+		Seq: doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte("!"),
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  []byte(typeStruct.String()),
+			},
+		},
+	}
 }

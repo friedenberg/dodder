@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
+	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/lima/blob_library"
@@ -48,9 +49,14 @@ func MakeTypeStore(
 }
 
 func (store Coder) SaveBlobText(
-	tipe ids.IType,
+	tipe interfaces.ObjectId,
 	blob Blob,
 ) (digest interfaces.MarklId, n int64, err error) {
+	if err = genres.Type.AssertGenre(tipe); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	switch tipe.String() {
 	default:
 		err = errors.Errorf("unsupported type: %q", tipe)

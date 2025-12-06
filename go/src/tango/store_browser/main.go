@@ -39,7 +39,7 @@ type checkedOutWithItem struct {
 type Store struct {
 	config            store_config.Store
 	externalStoreInfo store_workspace.Supplies
-	typ               ids.IType
+	tipe              ids.IType
 	browser           browser_items.BrowserProxy
 
 	tabCache cache
@@ -67,7 +67,7 @@ func Make(
 ) *Store {
 	c := &Store{
 		config:    k,
-		typ:       ids.MustType("toml-bookmark"),
+		tipe:      ids.MustType("toml-bookmark"),
 		deleted:   make(map[url.URL][]checkedOutWithItem),
 		added:     make(map[url.URL][]checkedOutWithItem),
 		itemsById: make(map[string]Item),
@@ -163,7 +163,7 @@ func (store *Store) CheckoutOne(
 ) (checkedOut sku.SkuType, err error) {
 	object := tg.GetSku()
 
-	if !object.GetMetadata().GetType().Equals(store.typ) {
+	if !object.GetMetadata().GetType().Equals(store.tipe) {
 		err = env_workspace.ErrUnsupportedType{Type: object.GetMetadata().GetType()}
 		err = errors.Wrap(err)
 		return checkedOut, err
@@ -191,7 +191,7 @@ func (store *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), object)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), object)
 	co.SetState(checked_out_state.JustCheckedOut)
-	co.GetSkuExternal().ExternalType = ids.MustType("!browser-tab")
+	co.GetSkuExternal().ExternalType = ids.MustTypeStruct("!browser-tab")
 
 	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)

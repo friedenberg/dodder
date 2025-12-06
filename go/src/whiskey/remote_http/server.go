@@ -854,7 +854,7 @@ func (server *Server) handlePostInventoryList(
 
 		if object, err = inventoryListCoderCloset.ReadInventoryListObject(
 			request.ctx,
-			ids.MustType(listTypeString),
+			ids.MustTypeStruct(listTypeString),
 			bufferedReader,
 		); err != nil {
 			response.Error(

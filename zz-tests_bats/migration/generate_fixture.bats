@@ -96,7 +96,7 @@ function generate { # @test
 		merge = ['vimdiff']
 	EOM
 
-export BATS_TEST_BODY=true
+  export BATS_TEST_BODY=true
   run_dodder new "${cmd_def[@]}" -edit=false - <<EOM
 ---
 # wow ok

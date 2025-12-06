@@ -19,7 +19,7 @@ import (
 type blobStoreV1 struct {
 	envRepo                  env_repo.Env
 	pathLog                  string
-	blobType                 ids.IType
+	blobType                 ids.TypeStruct
 	listFormat               sku.ListCoder
 	inventoryListCoderCloset inventory_list_coders.Closet
 	finalizer                object_finalizer.Finalizer
@@ -31,7 +31,7 @@ func (blobStore *blobStoreV1) GetObjectFinalizer() object_finalizer.Finalizer {
 	return blobStore.finalizer
 }
 
-func (blobStore *blobStoreV1) getType() ids.IType {
+func (blobStore *blobStoreV1) getType() ids.TypeStruct {
 	return blobStore.blobType
 }
 
@@ -82,7 +82,7 @@ func (blobStore *blobStoreV1) WriteInventoryListObject(
 
 	defer errors.DeferredCloser(&err, blobStoreWriteCloser)
 
-	object.GetMetadataMutable().GetTypeMutable().ResetWith(blobStore.blobType)
+	object.GetMetadataMutable().GetTypeMutable().ResetWithType(blobStore.blobType)
 
 	var file *os.File
 

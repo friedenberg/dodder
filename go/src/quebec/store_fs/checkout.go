@@ -158,7 +158,7 @@ func (store *Store) setBlobIfNecessary(
 	fileExtension := store.config.GetTypeExtension(info.tipe.String())
 
 	if fileExtension == "" {
-		fileExtension = info.tipe.StringSansOp()
+		fileExtension = info.tipe.ToType().StringSansOp()
 	}
 
 	if err = fsItem.Blob.SetPath(
@@ -332,7 +332,7 @@ func (store *Store) FileExtensionForObject(
 		extension = store.config.GetTypeExtension(object.GetType().String())
 
 		if extension == "" {
-			extension = object.GetType().StringSansOp()
+			extension = object.GetType().ToType().StringSansOp()
 		}
 	} else {
 		extension = store.fileExtensions.GetFileExtensionForGenre(object)

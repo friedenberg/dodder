@@ -122,7 +122,7 @@ func (server *Server) writeInventoryList(
 	}
 
 	seqInventoryListSkus := typedInventoryListStore.IterInventoryListBlobSkusFromReader(
-		listObject.GetType(),
+		listObject.GetType().ToType(),
 		bufio.NewReader(io.TeeReader(request.Body, blobWriter)),
 	)
 

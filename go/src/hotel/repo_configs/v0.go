@@ -10,11 +10,11 @@ import (
 )
 
 type DefaultsV0 struct {
-	Typ       ids.IType       `toml:"typ"`
+	Typ       ids.TypeStruct  `toml:"typ"`
 	Etiketten []ids.TagStruct `toml:"etiketten"`
 }
 
-func (defaults DefaultsV0) GetDefaultType() ids.IType {
+func (defaults DefaultsV0) GetDefaultType() ids.TypeStruct {
 	return defaults.Typ
 }
 

@@ -141,7 +141,7 @@ func (factory formatterComponents) writeTypeAndSigIfNecessary(
 			writer,
 			fmt.Sprintf(
 				"! %s",
-				typeTuple.GetKey().StringSansOp(),
+				typeTuple.GetKey().ToType().StringSansOp(),
 			),
 		)
 	}
@@ -169,7 +169,7 @@ func (factory formatterComponents) writeTypeAndSig(
 		writer,
 		fmt.Sprintf(
 			"! %s@%s",
-			typeTuple.GetKey().StringSansOp(),
+			typeTuple.GetKey().ToType().StringSansOp(),
 			typeTuple.GetValue(),
 		),
 	)

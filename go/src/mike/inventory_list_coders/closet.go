@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
@@ -117,7 +118,7 @@ func (closet Closet) GetBoxFormat() *box_format.BoxTransacted {
 	return closet.boxFormat
 }
 
-func (closet Closet) GetCoderForType(tipe ids.IType) sku.ListCoder {
+func (closet Closet) GetCoderForType(tipe ids.TypeStruct) sku.ListCoder {
 	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
@@ -128,7 +129,7 @@ func (closet Closet) GetCoderForType(tipe ids.IType) sku.ListCoder {
 }
 
 func (closet Closet) WriteObjectToWriter(
-	tipe ids.IType,
+	tipe ids.TypeStruct,
 	object *sku.Transacted,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -150,10 +151,15 @@ func (closet Closet) WriteObjectToWriter(
 // TODO consume interfaces.SeqError and expose as a coder instead
 func (closet Closet) WriteBlobToWriter(
 	ctx interfaces.ActiveContext,
-	tipe ids.IType,
+	tipe interfaces.ObjectId,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
+	if err = genres.Type.AssertGenre(tipe); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
@@ -176,7 +182,7 @@ func (closet Closet) WriteBlobToWriter(
 
 func (closet Closet) WriteTypedBlobToWriter(
 	ctx interfaces.ActiveContext,
-	tipe ids.IType,
+	tipe ids.TypeStruct,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -232,7 +238,7 @@ func (closet Closet) StreamInventoryListBlobSkus(
 		defer errors.DeferredYieldCloser(yield, readCloser)
 
 		iter := closet.IterInventoryListBlobSkusFromReader(
-			tipe,
+			tipe.ToType(),
 			readCloser,
 		)
 
@@ -280,7 +286,7 @@ func (closet Closet) AllDecodedObjectsFromStream(
 
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[funcIterSeqError]{
-				Type: ids.IType{},
+				Type: ids.TypeStruct{},
 				Blob: func(object *sku.Transacted, err error) bool {
 					return yield(object, err)
 				},
@@ -294,7 +300,7 @@ func (closet Closet) AllDecodedObjectsFromStream(
 }
 
 func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
-	tipe ids.IType,
+	tipe ids.TypeStruct,
 	blobStore interfaces.BlobStore,
 	blobId interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
@@ -324,8 +330,8 @@ func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[funcIterSeq]{
 				Type: tipe,
-				Blob: func(sk *sku.Transacted) bool {
-					return yield(sk, nil)
+				Blob: func(object *sku.Transacted) bool {
+					return yield(object, nil)
 				},
 			},
 			bufferedReader,
@@ -337,7 +343,7 @@ func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 }
 
 func (closet Closet) IterInventoryListBlobSkusFromReader(
-	tipe ids.IType,
+	tipe ids.TypeStruct,
 	reader io.Reader,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
@@ -351,8 +357,8 @@ func (closet Closet) IterInventoryListBlobSkusFromReader(
 		if _, err := decoder.DecodeFrom(
 			&triple_hyphen_io.TypedBlob[funcIterSeq]{
 				Type: tipe,
-				Blob: func(sk *sku.Transacted) bool {
-					return yield(sk, nil)
+				Blob: func(object *sku.Transacted) bool {
+					return yield(object, nil)
 				},
 			},
 			bufferedReader,
@@ -365,9 +371,14 @@ func (closet Closet) IterInventoryListBlobSkusFromReader(
 
 func (closet Closet) ReadInventoryListObject(
 	ctx interfaces.ActiveContext,
-	tipe ids.IType,
+	tipe interfaces.ObjectId,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
+	if err = genres.Type.AssertGenre(tipe); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	format, ok := closet.coders[tipe.String()]
 
 	if !ok {
@@ -396,7 +407,7 @@ func (closet Closet) ReadInventoryListObject(
 
 func (closet Closet) ReadInventoryListBlob(
 	ctx interfaces.ActiveContext,
-	tipe ids.IType,
+	tipe ids.TypeStruct,
 	reader *bufio.Reader,
 ) (list *sku.HeapTransacted, err error) {
 	list = sku.MakeListTransacted()

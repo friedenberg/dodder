@@ -365,13 +365,10 @@ LOOP:
 			case genres.Type:
 				var tipe ids.IType
 
-				if err = tipe.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
-					err = errors.Wrap(err)
-					return err
-				}
+				tipe.ResetWithObjectId(objectId.GetObjectId())
 
 				if !isNegated {
-					if err = buildState.group.types.Add(tipe); err != nil {
+					if err = buildState.group.types.Add(tipe.ToType()); err != nil {
 						err = errors.Wrap(err)
 						return err
 					}

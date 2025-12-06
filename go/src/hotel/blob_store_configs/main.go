@@ -21,7 +21,7 @@ type (
 
 	ConfigUpgradeable interface {
 		Config
-		Upgrade() (Config, ids.IType)
+		Upgrade() (Config, ids.TypeStruct)
 	}
 
 	ConfigMutable interface {

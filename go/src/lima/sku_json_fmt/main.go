@@ -140,7 +140,7 @@ func (json *Transacted) ToTransacted(
 
 	// TODO enforce non-empty types
 	if json.Type != "" {
-		if err = metadata.GetTypeMutable().Set(json.Type); err != nil {
+		if err = metadata.GetTypeMutable().SetType(json.Type); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

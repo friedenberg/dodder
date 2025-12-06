@@ -22,8 +22,8 @@ type (
 	TagLock         = IdLock
 	TagLockMutable  = IdLockMutable
 
-	Type        = ids.TypeStruct
-	TypeMutable = *ids.TypeStruct
+	Type        = ids.IType
+	TypeMutable = ids.ITypeMutable
 
 	Metadata interface {
 		Getter

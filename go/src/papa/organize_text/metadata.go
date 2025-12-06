@@ -44,7 +44,7 @@ type Metadata struct {
 	ids.TagSet
 	Matchers interfaces.Set[sku.Query] // TODO remove
 	OptionCommentSet
-	Type   ids.IType
+	Type   ids.TypeStruct
 	RepoId ids.RepoId
 }
 
@@ -65,7 +65,7 @@ func (metadata *Metadata) SetFromObjectMetadata(
 		}
 	}
 
-	metadata.Type = otherMetadata.GetType()
+	metadata.Type = otherMetadata.GetType().ToType()
 
 	return err
 }
@@ -84,7 +84,7 @@ func (metadata Metadata) RemoveFromTransacted(object sku.SkuType) (err error) {
 
 func (metadata Metadata) AsMetadata() (m1 objects.MetadataMutable) {
 	m1 = objects.Make()
-	m1.GetTypeMutable().ResetWith(metadata.Type)
+	m1.GetTypeMutable().ResetWithObjectId(metadata.Type)
 	objects.SetTags(m1, metadata.TagSet)
 	return m1
 }

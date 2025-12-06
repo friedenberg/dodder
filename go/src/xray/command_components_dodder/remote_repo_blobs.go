@@ -30,7 +30,7 @@ func (cmd RemoteRepoBlobs) CreateRemoteBlob(
 ) (blob repo_blobs.BlobMutable) {
 	remoteEnvRepo := cmd.MakeEnvRepo(req, false)
 
-	switch remoteType {
+	switch remoteType.ToType() {
 	default:
 		errors.ContextCancelWithBadRequestf(
 			req,

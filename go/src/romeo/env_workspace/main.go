@@ -62,7 +62,7 @@ func Make(
 	}
 
 	object := workspace_config_blobs.TypedConfig{
-		Type: ids.IType{},
+		Type: ids.TypeStruct{},
 	}
 
 	dir := outputEnv.GetCwd()

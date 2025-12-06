@@ -148,7 +148,7 @@ func (server *Server) writeInventoryListLocalWorkingCopy(
 			return response
 		}
 
-		listSkuType = listSku.GetType()
+		listSkuType = listSku.GetType().ToType()
 	}
 
 	listCoderCloset := server.Repo.GetInventoryListCoderCloset()

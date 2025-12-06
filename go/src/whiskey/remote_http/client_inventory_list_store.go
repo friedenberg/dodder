@@ -55,7 +55,7 @@ func (client client) ImportInventoryList(
 		defer repoolBufferedWriter()
 
 		if _, err = client.inventoryListCoderCloset.WriteObjectToWriter(
-			listSku.GetType(),
+			listSku.GetType().ToType(),
 			listSku,
 			bufferedWriter,
 		); err != nil {

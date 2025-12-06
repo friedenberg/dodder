@@ -5,7 +5,9 @@ type (
 		GenreGetter
 		Stringer
 		IsConfig() bool
+		IsNone() bool
 		IsTag() bool
+		IsType() bool
 		IsZettel() bool
 		GetGenreBitInt() byte
 	}

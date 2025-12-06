@@ -25,7 +25,7 @@ func StringMetadataSansTai(object *sku.Transacted) (str string) {
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetType()))
+		sb.WriteString(ids.FormattedString(m.GetType().ToType()))
 	}
 
 	es := m.GetTags()

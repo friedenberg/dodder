@@ -87,7 +87,7 @@ func ReadOneObjectId(
 }
 
 func ReadOneObjectIdBespoke(
-	objectId interfaces.ObjectIdWithParts,
+	objectId interfaces.ObjectId,
 	object *Transacted,
 	funcs ...FuncReadOne,
 ) (ok bool) {

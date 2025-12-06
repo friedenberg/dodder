@@ -20,7 +20,7 @@ func (store *Store) initializeIndex() (err error) {
 	if err = store.externalStoreInfo.ReadPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
-			if !sk.GetType().Equals(store.typ) {
+			if !sk.GetType().Equals(store.tipe) {
 				return err
 			}
 

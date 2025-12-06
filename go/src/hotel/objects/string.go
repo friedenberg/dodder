@@ -18,7 +18,7 @@ func StringSansTai(metadata *metadata) string {
 
 	if !tipe.IsEmpty() {
 		stringBuilder.WriteString(" ")
-		stringBuilder.WriteString(ids.FormattedString(metadata.GetType()))
+		stringBuilder.WriteString(ids.FormattedString(metadata.GetType().ToType()))
 	}
 
 	tags := metadata.GetTags()

@@ -39,7 +39,7 @@ func TestBinaryOne(t1 *testing.T) {
 
 		metadata := expected.GetMetadataMutable()
 
-		t.AssertNoError(metadata.GetTypeMutable().Set("da-typ"))
+		t.AssertNoError(metadata.GetTypeMutable().SetType("!da-typ"))
 
 		// generate a fake type signature
 		{

@@ -45,7 +45,7 @@ type inventoryListBlobStore interface {
 	interfaces.BlobStore
 	object_finalizer.FinalizerGetter
 
-	getType() ids.IType
+	getType() ids.TypeStruct
 	getFormat() sku.ListCoder
 	GetInventoryListCoderCloset() inventory_list_coders.Closet
 
@@ -72,7 +72,7 @@ func (store *Store) Initialize(
 		),
 	}
 
-	blobType := ids.MustType(
+	blobType := ids.MustTypeStruct(
 		store.envRepo.GetConfigPublic().Blob.GetInventoryListTypeId(),
 	)
 
@@ -175,7 +175,7 @@ func (store *Store) Create(
 
 	object = sku.GetTransactedPool().Get()
 
-	object.GetMetadataMutable().GetTypeMutable().ResetWith(store.getType())
+	object.GetMetadataMutable().GetTypeMutable().ResetWithType(store.getType())
 	object.GetMetadataMutable().GetDescriptionMutable().ResetWith(
 		openList.GetDescription(),
 	)

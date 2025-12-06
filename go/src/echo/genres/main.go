@@ -99,6 +99,14 @@ func (genre Genre) IsTag() bool {
 	return genre == Tag
 }
 
+func (genre Genre) IsType() bool {
+	return genre == Type
+}
+
+func (genre Genre) IsNone() bool {
+	return genre == None
+}
+
 func (genre Genre) GetGenreBitInt() byte {
 	switch genre {
 	default:

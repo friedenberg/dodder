@@ -128,7 +128,7 @@ func (cmd InitWorkspace) Run(req command.Request) {
 	blob := &workspace_config_blobs.V0{
 		Query: cmd.DefaultQueryGroup.String(),
 		Defaults: repo_configs.DefaultsV1OmitEmpty{
-			Type: cmd.Proto.Metadata.GetType(),
+			Type: cmd.Proto.Metadata.GetType().ToType(),
 			Tags: slices.Collect(ids.ITagSeqToTagStructSeq(cmd.Proto.Metadata.AllTags())),
 		},
 	}

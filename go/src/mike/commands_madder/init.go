@@ -42,7 +42,7 @@ func init() {
 }
 
 type Init struct {
-	tipe            ids.IType
+	tipe            ids.TypeStruct
 	blobStoreConfig blob_store_configs.ConfigMutable
 
 	command_components_madder.EnvBlobStore

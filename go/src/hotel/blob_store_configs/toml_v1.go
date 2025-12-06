@@ -134,7 +134,7 @@ func (blobStoreConfig *TomlV1) setBasePath(value string) {
 	blobStoreConfig.BasePath = value
 }
 
-func (blobStoreConfig TomlV1) Upgrade() (Config, ids.IType) {
+func (blobStoreConfig TomlV1) Upgrade() (Config, ids.TypeStruct) {
 	upgraded := &TomlV2{
 		HashBuckets:       blobStoreConfig.HashBuckets,
 		BasePath:          blobStoreConfig.BasePath,

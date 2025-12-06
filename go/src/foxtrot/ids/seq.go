@@ -1,6 +1,7 @@
 package ids
 
 import (
+	"fmt"
 	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -157,6 +158,123 @@ func (id *SeqId) ResetWith(other SeqId) {
 	id.Seq = other.Seq.Clone()
 }
 
+func (id *SeqId) ResetWithObjectId(other interfaces.ObjectId) {
+	switch other := other.(type) {
+	case TypeStruct:
+		id.ResetWithType(other)
+
+	case *TypeStruct:
+		id.ResetWithType(*other)
+
+	default:
+		id.Genre = genres.Must(other.GetGenre())
+		errors.PanicIfError(id.Set(other.String()))
+	}
+}
+
+func (id *SeqId) ResetWithType(other TypeStruct) {
+	id.Genre = genres.Type
+	id.Seq = doddish.Seq{
+		doddish.Token{
+			TokenType: doddish.TokenTypeOperator,
+			Contents:  []byte("!"),
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(other.StringSansOp()),
+		},
+	}
+}
+
+func (id SeqId) ToType() TypeStruct {
+	if id.IsEmpty() {
+		return TypeStruct{}
+	} else if !id.Genre.IsType() {
+		panic(fmt.Sprintf("id is not a type, genre is %q: %q", id.Genre, id))
+	}
+
+	return TypeStruct{Value: id.Seq.At(1).String()}
+}
+
+// func (id SeqId) Parts() [3]string {
+// 	return [3]string{"", "!", typeStruct.Value}
+// }
+
 func SeqIdCompare(left, right SeqId) cmp.Result {
 	return doddish.SeqCompare(left.Seq, right.Seq)
+}
+
+func (id *SeqId) SetType(value string) (err error) {
+	reader, repool := pool.GetStringReader(value)
+	defer repool()
+
+	boxScanner := doddish.MakeScanner(reader)
+
+	var seq doddish.Seq
+
+	if seq, err = boxScanner.ScanDotAllowedInIdentifiersOrError(); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	switch {
+	default:
+		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
+		return err
+
+	case seq.Len() == 0:
+		err = doddish.ErrEmptySeq
+		return err
+
+		// type
+	case seq.MatchAll(doddish.TokenTypeIdentifier):
+		if TokenIsConfig(seq.At(0)) {
+			err = errors.Errorf("cannot use konfig identifier: %q", seq)
+			return
+		}
+
+		id.Genre = genres.Type
+		seq = doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte("!"),
+			},
+			seq.At(0),
+		}
+
+		// .type
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpSigilExternal),
+		doddish.TokenTypeIdentifier,
+	):
+		if TokenIsConfig(seq.At(1)) {
+			err = errors.Errorf("cannot use konfig identifier: %q", seq)
+			return
+		}
+
+		id.Genre = genres.Type
+		seq = doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte("!"),
+			},
+			seq.At(0),
+		}
+
+		// !type
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpType),
+		doddish.TokenTypeIdentifier,
+	):
+		if TokenIsConfig(seq.At(1)) {
+			err = errors.Errorf("cannot use konfig identifier: %q", seq)
+			return
+		}
+
+		id.Genre = genres.Type
+	}
+
+	id.Seq = seq.Clone()
+
+	return err
 }

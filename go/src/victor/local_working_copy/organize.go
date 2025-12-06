@@ -73,7 +73,7 @@ func (local *Repo) LockAndCommitOrganizeResults(
 	workspace := local.GetEnvWorkspace()
 	workspaceType := workspace.GetDefaults().GetDefaultType()
 
-	proto.Metadata.GetTypeMutable().ResetWith(workspaceType)
+	proto.Metadata.GetTypeMutable().ResetWithType(workspaceType)
 
 	for _, changed := range changeResults.Changed.AllSkuAndIndex() {
 		if err = local.GetStore().CreateOrUpdate(

@@ -61,7 +61,7 @@ func (commitFacilitator commitFacilitator) tryPrecommit(
 
 	if genres.Type == daughter.GetGenre() {
 		if daughter.GetType().IsEmpty() {
-			daughter.GetMetadataMutable().GetTypeMutable().ResetWith(
+			daughter.GetMetadataMutable().GetTypeMutable().ResetWithObjectId(
 				ids.DefaultOrPanic(genres.Type),
 			)
 		}
@@ -379,7 +379,7 @@ func (commitFacilitator commitFacilitator) createType(
 		return err
 
 	case genres.Type:
-		typeObject.GetMetadataMutable().GetTypeMutable().ResetWith(
+		typeObject.GetMetadataMutable().GetTypeMutable().ResetWithObjectId(
 			ids.DefaultOrPanic(genres.Type),
 		)
 	}
@@ -412,7 +412,7 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 
 	var objectId ids.ObjectId
 
-	if err = objectId.ResetWithIdLike(typeId); err != nil {
+	if err = objectId.SetObjectIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -425,7 +425,7 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 
 	var typeObjectId ids.ObjectId
 
-	if err = typeObjectId.SetWithIdLike(typeId); err != nil {
+	if err = typeObjectId.SetObjectIdLike(typeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

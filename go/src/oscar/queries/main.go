@@ -16,7 +16,7 @@ type Query struct {
 	hidden           sku.Query
 	optimizedQueries map[genres.Genre]*expSigilAndGenre
 	userQueries      map[ids.Genre]*expSigilAndGenre
-	types            interfaces.SetMutable[ids.IType]
+	types            interfaces.SetMutable[ids.TypeStruct]
 
 	dotOperatorActive bool
 	matchOnEmpty      bool

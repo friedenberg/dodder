@@ -42,7 +42,7 @@ func (item *Item) GetObjectId() *ids.ObjectId {
 	return &oid
 }
 
-func (item *Item) GetType() (t ids.IType, err error) {
+func (item *Item) GetType() (t ids.TypeStruct, err error) {
 	if err = t.Set("browser-" + item.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return t, err
@@ -108,7 +108,7 @@ func (item *Item) WriteToExternal(object *sku.Transacted) (err error) {
 		}
 	}
 
-	object.GetMetadataMutable().GetTypeMutable().Set("!toml-bookmark")
+	object.GetMetadataMutable().GetTypeMutable().SetType("!toml-bookmark")
 
 	metadata := object.GetMetadataMutable()
 

@@ -102,7 +102,7 @@ func (objectId ObjectId) ContainsSku(
 		return ok
 
 	case genres.Type:
-		if method(metadata.GetType(), objectId.GetObjectId()) {
+		if method(metadata.GetType().ToType(), objectId.GetObjectId()) {
 			ok = true
 			return ok
 		}

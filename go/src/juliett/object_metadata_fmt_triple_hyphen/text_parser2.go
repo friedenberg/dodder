@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/delim_reader"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
@@ -94,7 +95,7 @@ func (parser *textParser2) readType(
 
 	marshaler := markl.MakeLockMarshalerValueNotRequired(metadata.GetTypeLockMutable())
 
-	if err = marshaler.Set(typeString); err != nil {
+	if err = marshaler.Set(ids.MakeTypeString(typeString)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -117,7 +118,7 @@ func (parser *textParser2) readBlobDigest(
 	//@ <path>
 	case files.Exists(metadataLine):
 		// TODO cascade type definition
-		if err = metadata.GetTypeMutable().Set(extension); err != nil {
+		if err = metadata.GetTypeMutable().SetType(extension); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

@@ -50,5 +50,21 @@ func (cmd ObjectMetadata) GetFlagValueMetadataDescription(
 func (cmd ObjectMetadata) GetFlagValueMetadataType(
 	metadata objects.MetadataMutable,
 ) interfaces.FlagValue {
-	return metadata.GetTypeMutable()
+	return flags.MakeWithPolicy(
+		flag_policy.FlagPolicyReset,
+		func() string {
+			return metadata.GetType().String()
+		},
+		func(value string) (err error) {
+			if err = metadata.GetTypeMutable().SetType(value); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+		func() {
+			metadata.GetTypeMutable().Reset()
+		},
+	)
 }

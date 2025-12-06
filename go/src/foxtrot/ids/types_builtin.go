@@ -3,6 +3,7 @@ package ids
 import (
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -118,7 +119,7 @@ func registerBuiltinTypeString(
 ) {
 	registerBuiltinType(
 		BuiltinType{
-			TypeStruct: MustType(tipeString),
+			TypeStruct: MustTypeStruct(tipeString),
 			Genre:      genre,
 			Default:    isDefault,
 		},
@@ -149,22 +150,47 @@ func registerBuiltinType(bt BuiltinType) {
 	}
 }
 
-func IsBuiltin(tipe TypeStruct) bool {
+func ObjectIdToTypeStruct(id interfaces.ObjectId) TypeStruct {
+	var tipe TypeStruct
+
+	switch id := id.(type) {
+	default:
+		panic(fmt.Sprintf("not a type: %T", id))
+
+	case IType:
+		tipe = id.ToType()
+
+	case *IType:
+		tipe = id.ToType()
+
+	case TypeStruct:
+		tipe = id
+
+	case *TypeStruct:
+		tipe = *id
+	}
+
+	return tipe
+}
+
+func IsBuiltin(id interfaces.ObjectId) bool {
+	tipe := ObjectIdToTypeStruct(id)
 	_, ok := allMap[tipe]
 	return ok
 }
 
-func Get(t TypeStruct) (BuiltinType, bool) {
-	bt, ok := allMap[t]
+func Get(id interfaces.ObjectId) (BuiltinType, bool) {
+	tipe := ObjectIdToTypeStruct(id)
+	bt, ok := allMap[tipe]
 	return bt, ok
 }
 
 func GetOrPanic(idString string) BuiltinType {
-	t := MustType(idString)
-	bt, ok := Get(t)
+	tipe := MustTypeStruct(idString)
+	bt, ok := Get(tipe)
 
 	if !ok {
-		panic(fmt.Sprintf("no builtin type found for %q", t))
+		panic(fmt.Sprintf("no builtin type found for %q", tipe))
 	}
 
 	return bt

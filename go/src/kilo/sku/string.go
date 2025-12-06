@@ -95,7 +95,7 @@ func StringMetadataSansTai(object *Transacted) (str string) {
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(metadata.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType().ToType()))
 	}
 
 	es := metadata.GetTags()
@@ -149,7 +149,7 @@ func StringMetadataSansTaiMerkle(object *Transacted) (str string) {
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(metadata.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType().ToType()))
 		sb.WriteString("@")
 		sb.WriteString(metadata.GetTypeLock().GetValue().String())
 	}
@@ -197,7 +197,7 @@ func StringMetadataSansTaiMerkle2(
 
 	if !tipe.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(metadata.GetType()))
+		sb.WriteString(ids.FormattedString(metadata.GetType().ToType()))
 	}
 
 	es := metadata.GetTags()

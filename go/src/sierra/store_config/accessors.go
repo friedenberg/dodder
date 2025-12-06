@@ -43,18 +43,18 @@ func (compiled *compiled) getRepo(k interfaces.ObjectIdWithParts) (ct *sku.Trans
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (compiled *compiled) GetApproximatedType(
-	k interfaces.ObjectIdWithParts,
+	id interfaces.ObjectId,
 ) (ct ApproximatedType) {
-	if k.GetGenre() != genres.Type {
+	if id.GetGenre() != genres.Type {
 		return ct
 	}
 
-	expandedActual := compiled.getSortedTypesExpanded(k.String())
+	expandedActual := compiled.getSortedTypesExpanded(id.String())
 	if len(expandedActual) > 0 {
 		ct.HasValue = true
 		ct.Type = expandedActual[0]
 
-		if ids.Equals(ct.Type.GetObjectId(), k) {
+		if ids.Equals(ct.Type.GetObjectId(), id) {
 			ct.IsActual = true
 		}
 	}

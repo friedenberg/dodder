@@ -181,7 +181,7 @@ func (store *store) loadMutableConfig(
 	}
 
 	if err = store.loadMutableConfigBlob(
-		store.config.Sku.GetType(),
+		store.config.Sku.GetType().ToType(),
 		store.config.Sku.GetBlobDigest(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -262,7 +262,7 @@ func (store *store) flushMutableConfig(
 }
 
 func (store *store) loadMutableConfigBlob(
-	mutableConfigType ids.IType,
+	mutableConfigType ids.TypeStruct,
 	blobId interfaces.MarklId,
 ) (err error) {
 	var blobReader interfaces.BlobReader

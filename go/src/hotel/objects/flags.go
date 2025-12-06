@@ -82,7 +82,7 @@ func (metadata *metadata) SetFlagSetType(
 		"type",
 		usage,
 		func(value string) (err error) {
-			return metadata.GetTypeMutable().Set(value)
+			return metadata.GetTypeMutable().SetType(value)
 		},
 	)
 }

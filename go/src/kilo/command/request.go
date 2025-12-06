@@ -90,9 +90,13 @@ func PopRequestArg[
 }
 
 func PopRequestArgTo(req *Args, name string, value interfaces.StringerSetter) {
+	PopRequestArgToFunc(req, name, value.Set)
+}
+
+func PopRequestArgToFunc(req *Args, name string, funcSet func(string) error) {
 	arg := req.PopArg(name)
 
-	if err := value.Set(arg); err != nil {
+	if err := funcSet(arg); err != nil {
 		errors.ContextCancelWithBadRequestError(req, err)
 	}
 }
