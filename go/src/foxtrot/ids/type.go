@@ -21,13 +21,19 @@ type (
 		Value string
 	}
 
-	// IType = TypeStruct
-	IType        = SeqId
-	ITypeMutable = *SeqId
+	Type interface {
+		interfaces.ObjectId
+		ToType() TypeStruct
+	}
+
+	TypeMutable interface {
+		Type
+		ResetWithObjectId(other interfaces.ObjectId)
+	}
 
 	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
-		IsInlineType(IType) bool
+		IsInlineType(Type) bool
 	}
 )
 
@@ -41,7 +47,7 @@ func MakeTypeString(value string) string {
 	return value
 }
 
-func MakeType(value string) (tipe IType, err error) {
+func MakeType(value string) (tipe SeqId, err error) {
 	if err = tipe.SetType(value); err != nil {
 		err = errors.Wrap(err)
 		return tipe, err
@@ -55,7 +61,7 @@ func MakeType(value string) (tipe IType, err error) {
 	return tipe, err
 }
 
-func MustType(value string) (tipe IType) {
+func MustType(value string) (tipe SeqId) {
 	var err error
 	tipe, err = MakeType(value)
 	if err != nil {

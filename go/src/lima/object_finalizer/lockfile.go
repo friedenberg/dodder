@@ -8,7 +8,7 @@ import (
 
 func (finalizer finalizer) writeTypeLockIfNecessary(
 	metadata objects.MetadataMutable,
-	tipe ids.IType,
+	tipe ids.Type,
 	funcs ...sku.FuncReadOne,
 ) (err error) {
 	if tipe.IsEmpty() {

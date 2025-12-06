@@ -363,7 +363,7 @@ LOOP:
 				stack.Last().Add(exp)
 
 			case genres.Type:
-				var tipe ids.IType
+				var tipe ids.SeqId
 
 				tipe.ResetWithObjectId(objectId.GetObjectId())
 

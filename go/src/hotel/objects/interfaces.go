@@ -22,8 +22,8 @@ type (
 	TagLock         = IdLock
 	TagLockMutable  = IdLockMutable
 
-	Type        = ids.IType
-	TypeMutable = ids.ITypeMutable
+	Type        = ids.SeqId
+	TypeMutable = *ids.SeqId
 
 	Metadata interface {
 		Getter

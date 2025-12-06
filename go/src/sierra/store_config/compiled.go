@@ -126,7 +126,7 @@ func (config Config) GetTypeExtension(v string) string {
 	return config.TypesToExtensions[v]
 }
 
-func (config Config) IsInlineType(tipe ids.IType) (isInline bool) {
+func (config Config) IsInlineType(tipe ids.Type) (isInline bool) {
 	comments.Change("fix this horrible hack")
 	if tipe.IsEmpty() {
 		return true

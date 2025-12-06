@@ -39,7 +39,7 @@ type checkedOutWithItem struct {
 type Store struct {
 	config            store_config.Store
 	externalStoreInfo store_workspace.Supplies
-	tipe              ids.IType
+	tipe              ids.TypeStruct
 	browser           browser_items.BrowserProxy
 
 	tabCache cache
@@ -67,7 +67,7 @@ func Make(
 ) *Store {
 	c := &Store{
 		config:    k,
-		tipe:      ids.MustType("toml-bookmark"),
+		tipe:      ids.MustTypeStruct("toml-bookmark"),
 		deleted:   make(map[url.URL][]checkedOutWithItem),
 		added:     make(map[url.URL][]checkedOutWithItem),
 		itemsById: make(map[string]Item),
@@ -163,7 +163,7 @@ func (store *Store) CheckoutOne(
 ) (checkedOut sku.SkuType, err error) {
 	object := tg.GetSku()
 
-	if !object.GetMetadata().GetType().Equals(store.tipe) {
+	if !ids.Equals(object.GetMetadata().GetType(), store.tipe.ToSeq()) {
 		err = env_workspace.ErrUnsupportedType{Type: object.GetMetadata().GetType()}
 		err = errors.Wrap(err)
 		return checkedOut, err

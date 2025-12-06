@@ -8,7 +8,7 @@ import (
 )
 
 type ErrUnsupportedType struct {
-	Type ids.IType
+	Type ids.Type
 }
 
 func (err ErrUnsupportedType) Is(target error) bool {

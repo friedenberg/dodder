@@ -52,7 +52,7 @@ func MakeConfigStore(
 }
 
 func (a Config) ParseTypedBlob(
-	tipe ids.IType,
+	tipe ids.Type,
 	blobId interfaces.MarklId,
 ) (common repo_configs.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {

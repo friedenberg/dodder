@@ -157,10 +157,10 @@ func ObjectIdToTypeStruct(id interfaces.ObjectId) TypeStruct {
 	default:
 		panic(fmt.Sprintf("not a type: %T", id))
 
-	case IType:
+	case SeqId:
 		tipe = id.ToType()
 
-	case *IType:
+	case *SeqId:
 		tipe = id.ToType()
 
 	case TypeStruct:

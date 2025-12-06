@@ -97,7 +97,7 @@ func (transacted *Transacted) AddTagPtrFast(tag ids.TagStruct) (err error) {
 	return err
 }
 
-func (transacted *Transacted) GetType() ids.IType {
+func (transacted *Transacted) GetType() ids.Type {
 	return transacted.GetMetadata().GetType()
 }
 

@@ -10,6 +10,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 )
 
+type Id interface {
+	interfaces.ObjectId
+	ToSeq() SeqId
+}
+
 func MakeObjectId(value string) (objectId *ObjectId, err error) {
 	var boxScanner doddish.Scanner
 	reader, repool := pool.GetStringReader(value)

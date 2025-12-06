@@ -4,12 +4,13 @@ import (
 	"net/url"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
 // TODO decide how this should behave
 func (store *Store) UpdateTransacted(object *sku.Transacted) (err error) {
-	if !object.GetType().Equals(store.tipe) {
+	if !ids.Equals(object.GetType(), store.tipe.ToSeq()) {
 		return err
 	}
 

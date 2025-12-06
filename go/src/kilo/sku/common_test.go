@@ -26,7 +26,7 @@ type inlineTypChecker struct {
 	answer bool
 }
 
-func (t inlineTypChecker) IsInlineTyp(k ids.IType) bool {
+func (t inlineTypChecker) IsInlineTyp(k ids.Type) bool {
 	return t.answer
 }
 

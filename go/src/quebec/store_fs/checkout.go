@@ -219,7 +219,7 @@ func (store *Store) shouldCheckOut(
 type checkoutFileNameInfo struct {
 	basename   string
 	objectName string
-	tipe       ids.IType
+	tipe       ids.Type
 	inlineBlob bool
 }
 

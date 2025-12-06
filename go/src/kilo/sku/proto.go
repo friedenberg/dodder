@@ -41,7 +41,7 @@ func (proto Proto) Equals(metadata objects.MetadataMutable) (ok bool) {
 	var okType, okMetadata bool
 
 	if !ids.IsEmpty(proto.Metadata.GetType()) &&
-		proto.Metadata.GetType().Equals(metadata.GetType()) {
+		ids.Equals(proto.Metadata.GetType(), metadata.GetType()) {
 		okType = true
 	}
 
@@ -77,7 +77,7 @@ func (proto Proto) ApplyType(
 	case genres.Zettel, genres.None:
 		if ids.IsEmpty(metadata.GetType()) &&
 			!ids.IsEmpty(proto.Metadata.GetType()) &&
-			!metadata.GetType().Equals(proto.Metadata.GetType()) {
+			!ids.Equals(metadata.GetType(), proto.Metadata.GetType()) {
 			ok = true
 			metadata.GetTypeMutable().ResetWith(proto.Metadata.GetType())
 		}
@@ -121,7 +121,7 @@ func (proto Proto) ApplyWithBlobFD(
 
 	if ids.IsEmpty(metadataMutable.GetType()) &&
 		!ids.IsEmpty(proto.Metadata.GetType()) &&
-		!metadataMutable.GetType().Equals(proto.Metadata.GetType()) {
+		!ids.Equals(metadataMutable.GetType(), proto.Metadata.GetType()) {
 		metadataMutable.GetTypeMutable().ResetWith(proto.Metadata.GetType())
 	} else {
 		// TODO-P4 use konfig

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
 
@@ -15,27 +16,27 @@ func (store *Store) initializeIndex() (err error) {
 		return err
 	}
 
-	var l sync.Mutex
+	var lock sync.Mutex
 
 	if err = store.externalStoreInfo.ReadPrimitiveQuery(
 		nil,
-		func(sk *sku.Transacted) (err error) {
-			if !sk.GetType().Equals(store.tipe) {
+		func(object *sku.Transacted) (err error) {
+			if !ids.Equals(object.GetType(), store.tipe.ToSeq()) {
 				return err
 			}
 
 			var u *url.URL
 
-			if u, err = store.getUrl(sk); err != nil {
+			if u, err = store.getUrl(object); err != nil {
 				err = nil
 				return err
 			}
 
 			cl := sku.GetTransactedPool().Get()
-			sku.TransactedResetter.ResetWith(cl, sk)
+			sku.TransactedResetter.ResetWith(cl, object)
 
-			l.Lock()
-			defer l.Unlock()
+			lock.Lock()
+			defer lock.Unlock()
 
 			{
 				existing, ok := store.transactedUrlIndex[*u]
@@ -52,7 +53,7 @@ func (store *Store) initializeIndex() (err error) {
 			}
 
 			{
-				existing, ok := store.tabCache.Rows[sk.ObjectId.String()]
+				existing, ok := store.tabCache.Rows[object.ObjectId.String()]
 
 				if ok {
 					store.transactedItemIndex[existing] = cl

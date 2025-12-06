@@ -36,7 +36,7 @@ type (
 	}
 )
 
-func Default(defaultType ids.IType) Config {
+func Default(defaultType ids.Type) Config {
 	return Config{
 		DefaultType:    defaultType,
 		DefaultTags:    ids.MakeTagSetFromSlice(),

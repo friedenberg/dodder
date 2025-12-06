@@ -26,7 +26,7 @@ func (cmd *RemoteRepoBlobs) SetFlagDefinitions(
 func (cmd RemoteRepoBlobs) CreateRemoteBlob(
 	req command.Request,
 	local *local_working_copy.Repo,
-	remoteType ids.IType,
+	remoteType ids.Type,
 ) (blob repo_blobs.BlobMutable) {
 	remoteEnvRepo := cmd.MakeEnvRepo(req, false)
 
