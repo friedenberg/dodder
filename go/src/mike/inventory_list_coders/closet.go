@@ -157,7 +157,7 @@ func (closet Closet) WriteBlobToWriter(
 ) (n int64, err error) {
 	if err = genres.Type.AssertGenre(tipe); err != nil {
 		err = errors.Wrap(err)
-		return
+		return n, err
 	}
 
 	format, ok := closet.coders[tipe.String()]
@@ -376,7 +376,7 @@ func (closet Closet) ReadInventoryListObject(
 ) (out *sku.Transacted, err error) {
 	if err = genres.Type.AssertGenre(tipe); err != nil {
 		err = errors.Wrap(err)
-		return
+		return out, err
 	}
 
 	format, ok := closet.coders[tipe.String()]

@@ -230,7 +230,7 @@ func (id *SeqId) SetType(value string) (err error) {
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
 		if TokenIsConfig(seq.At(0)) {
 			err = errors.Errorf("cannot use konfig identifier: %q", seq)
-			return
+			return err
 		}
 
 		id.Genre = genres.Type
@@ -249,7 +249,7 @@ func (id *SeqId) SetType(value string) (err error) {
 	):
 		if TokenIsConfig(seq.At(1)) {
 			err = errors.Errorf("cannot use konfig identifier: %q", seq)
-			return
+			return err
 		}
 
 		id.Genre = genres.Type
@@ -268,7 +268,7 @@ func (id *SeqId) SetType(value string) (err error) {
 	):
 		if TokenIsConfig(seq.At(1)) {
 			err = errors.Errorf("cannot use konfig identifier: %q", seq)
-			return
+			return err
 		}
 
 		id.Genre = genres.Type

@@ -54,7 +54,7 @@ func (store Coder) SaveBlobText(
 ) (digest interfaces.MarklId, n int64, err error) {
 	if err = genres.Type.AssertGenre(tipe); err != nil {
 		err = errors.Wrap(err)
-		return
+		return digest, n, err
 	}
 
 	switch tipe.String() {

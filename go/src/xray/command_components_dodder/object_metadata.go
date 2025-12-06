@@ -58,10 +58,10 @@ func (cmd ObjectMetadata) GetFlagValueMetadataType(
 		func(value string) (err error) {
 			if err = metadata.GetTypeMutable().SetType(value); err != nil {
 				err = errors.Wrap(err)
-				return
+				return err
 			}
 
-			return
+			return err
 		},
 		func() {
 			metadata.GetTypeMutable().Reset()

@@ -49,7 +49,7 @@ func MakeType(value string) (tipe IType, err error) {
 
 	if err = genres.Type.AssertGenre(tipe); err != nil {
 		err = errors.Wrap(err)
-		return
+		return tipe, err
 	}
 
 	return tipe, err
