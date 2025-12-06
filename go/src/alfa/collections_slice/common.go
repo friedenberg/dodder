@@ -13,7 +13,7 @@ type (
 )
 
 func (slice Byte) ReadRune() (char rune, width int, err error) {
-	return
+	return char, width, err
 }
 
 func (slice Byte) Shift(amount int) Byte {
@@ -28,7 +28,7 @@ func (slice Rune) ReadRune() (char rune, width int, err error) {
 
 	width = utf8.RuneLen(char)
 
-	return
+	return char, width, err
 }
 
 func (slice Rune) Shift(amount int) Rune {
