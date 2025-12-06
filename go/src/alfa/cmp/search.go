@@ -41,5 +41,5 @@ func BinarySearchFuncElement[
 		element = slice[index]
 	}
 
-	return
+	return element, ok
 }
