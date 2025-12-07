@@ -7,19 +7,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 )
 
-func RegisterGobValue[T interfaces.ValueLike](
-	keyer interfaces.StringKeyer[T],
+func RegisterGobValue[ELEMENT interfaces.Stringer](
+	keyer interfaces.StringKeyer[ELEMENT],
 ) {
 	if keyer == nil {
-		keyer = quiter.StringerKeyer[T]{}.RegisterGob()
+		keyer = quiter.StringerKeyer[ELEMENT]{}.RegisterGob()
 	}
 
 	gob.Register(keyer)
 
-	RegisterGob[T]()
+	RegisterGob[ELEMENT]()
 }
 
-func RegisterGob[T interfaces.ValueLike]() {
-	gob.Register(Set[T]{})
-	gob.Register(MutableSet[T]{})
+func RegisterGob[ELEMENT interfaces.Stringer]() {
+	gob.Register(Set[ELEMENT]{})
+	gob.Register(MutableSet[ELEMENT]{})
 }

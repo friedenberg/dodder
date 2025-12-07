@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -134,10 +133,6 @@ func (transacted *Transacted) SetObjectIdLike(
 	}
 
 	return err
-}
-
-func (transacted *Transacted) EqualsAny(other any) (ok bool) {
-	return values.Equals(transacted, other)
 }
 
 func (transacted *Transacted) Equals(other *Transacted) (ok bool) {

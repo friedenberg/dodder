@@ -27,7 +27,6 @@ func AppendSeq2[INDEX any, ELEMENT any, APPENDER interface{ Append(...ELEMENT) }
 func AddOrReplaceIfGreater[
 	ELEMENT interface {
 		interfaces.Stringer
-		interfaces.ValueLike
 	},
 ](
 	set interfaces.SetMutable[ELEMENT],

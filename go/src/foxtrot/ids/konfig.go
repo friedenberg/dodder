@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -42,47 +41,37 @@ type config struct{}
 
 var Config config
 
-func (a config) IsEmpty() bool {
+func (config config) IsEmpty() bool {
 	return false
 }
 
-func (a config) GetGenre() interfaces.Genre {
+func (config config) GetGenre() interfaces.Genre {
 	return genres.Config
 }
 
-func (a config) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (config *config) Reset() {
 }
 
-func (a config) Equals(b config) bool {
-	return true
+func (config *config) ResetWith(_ config) {
 }
 
-func (a *config) Reset() {
-	return
+func (config config) GetObjectIdString() string {
+	return config.String()
 }
 
-func (a *config) ResetWith(_ config) {
-	return
-}
-
-func (i config) GetObjectIdString() string {
-	return i.String()
-}
-
-func (i config) String() string {
+func (config config) String() string {
 	return "konfig"
 }
 
-func (k config) Parts() [3]string {
+func (config config) Parts() [3]string {
 	return [3]string{"", "", "konfig"}
 }
 
-func (i config) Set(v string) (err error) {
-	v = strings.TrimSpace(v)
-	v = strings.ToLower(v)
+func (config config) Set(value string) (err error) {
+	value = strings.TrimSpace(value)
+	value = strings.ToLower(value)
 
-	if v != "konfig" {
+	if value != "konfig" {
 		err = errors.Errorf("not konfig")
 		return err
 	}
@@ -90,13 +79,13 @@ func (i config) Set(v string) (err error) {
 	return err
 }
 
-func (t config) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func (config config) MarshalText() (text []byte, err error) {
+	text = []byte(config.String())
 	return text, err
 }
 
-func (t *config) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (config *config) UnmarshalText(text []byte) (err error) {
+	if err = config.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -104,13 +93,13 @@ func (t *config) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t config) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (config config) MarshalBinary() (text []byte, err error) {
+	text = []byte(config.String())
 	return text, err
 }
 
-func (t *config) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (config *config) UnmarshalBinary(text []byte) (err error) {
+	if err = config.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -118,11 +107,11 @@ func (t *config) UnmarshalBinary(text []byte) (err error) {
 	return err
 }
 
-func (id config) ToType() TypeStruct {
+func (config config) ToType() TypeStruct {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (id config) ToSeq() doddish.Seq {
+func (config config) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
 			TokenType: doddish.TokenTypeIdentifier,

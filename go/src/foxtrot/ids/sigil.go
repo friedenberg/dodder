@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -55,10 +54,6 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 
 func (sigil Sigil) GetGenre() interfaces.Genre {
 	return genres.None
-}
-
-func (sigil Sigil) EqualsAny(b any) bool {
-	return values.Equals(sigil, b)
 }
 
 func (sigil Sigil) Equals(b Sigil) bool {

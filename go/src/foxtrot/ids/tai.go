@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
@@ -290,10 +289,6 @@ func (tai *Tai) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return err
-}
-
-func (tai Tai) EqualsAny(b any) bool {
-	return values.Equals(tai, b)
 }
 
 func (tai Tai) Equals(t1 Tai) bool {

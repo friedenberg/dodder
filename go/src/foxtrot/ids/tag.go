@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -95,10 +94,6 @@ func (tag tagStruct) IsEmpty() bool {
 
 func (tag tagStruct) GetGenre() interfaces.Genre {
 	return genres.Tag
-}
-
-func (tag tagStruct) EqualsAny(b any) bool {
-	return values.Equals(tag, b)
 }
 
 func (tag tagStruct) Equals(b tagStruct) bool {

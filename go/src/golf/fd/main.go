@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
@@ -29,10 +28,6 @@ func (fd *FD) IsStdin() bool {
 
 func (fd *FD) ModTime() thyme.Time {
 	return fd.modTime
-}
-
-func (fd *FD) EqualsAny(b any) bool {
-	return values.Equals(fd, b)
 }
 
 func (fd *FD) Equals2(b *FD) (bool, string) {

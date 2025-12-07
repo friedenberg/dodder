@@ -3,13 +3,11 @@ package ids
 import (
 	"fmt"
 	"strings"
-	"unicode"
 
 	"code.linenisgreat.com/dodder/go/src/_/coordinates"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -110,10 +108,6 @@ func (id ZettelId) IsEmpty() bool {
 	return id.left == "" && id.right == ""
 }
 
-func (id ZettelId) EqualsAny(b any) bool {
-	return values.Equals(id, b)
-}
-
 func (id ZettelId) Equals(b ZettelId) bool {
 	if id.left != b.left {
 		return false
@@ -175,64 +169,19 @@ func (id *ZettelId) SetWithSeq(seq doddish.Seq) (err error) {
 
 // TODO switch to doddish.Seq
 func (id *ZettelId) Set(value string) (err error) {
-	value = strings.TrimSpace(value)
-	value = strings.ToLower(value)
+	var seq doddish.Seq
 
-	value = strings.TrimSuffix(value, ".zettel")
-
-	groupBuilder := errors.MakeGroupBuilder()
-
-	if strings.ContainsFunc(
+	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 		value,
-		func(char rune) bool {
-			switch {
-			case unicode.IsDigit(char),
-				unicode.IsLetter(char),
-				char == '_',
-				char == '/',
-				char == '%':
-				return false
-
-			default:
-				return true
-			}
-		},
-	) {
-		groupBuilder.Add(
-			errors.Errorf("contains invalid characters: %q", value),
-		)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if value == "/" {
-		if groupBuilder.Len() > 0 {
-			err = groupBuilder.GetError()
-		}
-
-		return err
+	if err = id.SetWithSeq(seq); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	parts := strings.Split(value, "/")
-	count := len(parts)
-
-	switch count {
-	default:
-		groupBuilder.Add(errors.Errorf(
-			"zettel id needs exactly 2 components, but got %d: %q",
-			count,
-			value,
-		))
-
-	case 2:
-		id.left = parts[0]
-		id.right = parts[1]
-	}
-
-	if (len(id.left) == 0 && len(id.right) > 0) ||
-		(len(id.right) == 0 && len(id.left) > 0) {
-		groupBuilder.Add(errors.Errorf("incomplete zettel id: %s", id))
-	}
-
-	err = groupBuilder.GetError()
 
 	return err
 }

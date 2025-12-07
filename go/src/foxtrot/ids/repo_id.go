@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -46,63 +45,59 @@ type RepoId struct {
 	id     string
 }
 
-func (k RepoId) IsEmpty() bool {
-	return k.id == ""
+func (id RepoId) IsEmpty() bool {
+	return id.id == ""
 }
 
-func (k RepoId) GetRepoId() interfaces.RepoId {
-	return k
+func (id RepoId) GetRepoId() interfaces.RepoId {
+	return id
 }
 
-func (k RepoId) EqualsRepoId(kg interfaces.RepoIdGetter) bool {
-	return kg.GetRepoId().GetRepoIdString() == k.GetRepoIdString()
+func (id RepoId) EqualsRepoId(kg interfaces.RepoIdGetter) bool {
+	return kg.GetRepoId().GetRepoIdString() == id.GetRepoIdString()
 }
 
-func (k RepoId) GetRepoIdString() string {
-	return k.String()
+func (id RepoId) GetRepoIdString() string {
+	return id.String()
 }
 
-func (e *RepoId) Reset() {
-	e.id = ""
+func (id *RepoId) Reset() {
+	id.id = ""
 }
 
-func (e *RepoId) ResetWith(e1 RepoId) {
-	e.id = e1.id
+func (id *RepoId) ResetWith(e1 RepoId) {
+	id.id = e1.id
 }
 
-func (a RepoId) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (id RepoId) Equals(b RepoId) bool {
+	return id.id == b.id
 }
 
-func (a RepoId) Equals(b RepoId) bool {
-	return a.id == b.id
-}
-
-func (o RepoId) GetGenre() interfaces.Genre {
+func (id RepoId) GetGenre() interfaces.Genre {
 	return genres.Repo
 }
 
-func (i RepoId) GetObjectIdString() string {
-	return i.String()
+func (id RepoId) GetObjectIdString() string {
+	return id.String()
 }
 
-func (k RepoId) String() string {
-	return k.id
+func (id RepoId) String() string {
+	return id.id
 }
 
-func (k RepoId) StringWithSlashPrefix() string {
-	return "/" + k.id
+func (id RepoId) StringWithSlashPrefix() string {
+	return "/" + id.id
 }
 
-func (k RepoId) Parts() [3]string {
-	return [3]string{"", "/", k.id}
+func (id RepoId) Parts() [3]string {
+	return [3]string{"", "/", id.id}
 }
 
-func (k RepoId) GetQueryPrefix() string {
+func (id RepoId) GetQueryPrefix() string {
 	return "/"
 }
 
-func (e *RepoId) Set(v string) (err error) {
+func (id *RepoId) Set(v string) (err error) {
 	v = strings.TrimPrefix(v, "/")
 	v = strings.ToLower(strings.TrimSpace(v))
 
@@ -120,18 +115,18 @@ func (e *RepoId) Set(v string) (err error) {
 		return err
 	}
 
-	e.id = v
+	id.id = v
 
 	return err
 }
 
-func (t RepoId) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func (id RepoId) MarshalText() (text []byte, err error) {
+	text = []byte(id.String())
 	return text, err
 }
 
-func (t *RepoId) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (id *RepoId) UnmarshalText(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -139,13 +134,13 @@ func (t *RepoId) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t RepoId) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (id RepoId) MarshalBinary() (text []byte, err error) {
+	text = []byte(id.String())
 	return text, err
 }
 
-func (t *RepoId) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (id *RepoId) UnmarshalBinary(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

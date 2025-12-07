@@ -6,19 +6,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 )
 
-type delta[T interfaces.ValueLike] struct {
-	Added, Removed interfaces.SetMutable[T]
+type delta[ELEMENT interfaces.Stringer] struct {
+	Added, Removed interfaces.SetMutable[ELEMENT]
 }
 
-func (d delta[T]) GetAdded() interfaces.Set[T] {
+func (d delta[ELEMENT]) GetAdded() interfaces.Set[ELEMENT] {
 	return d.Added
 }
 
-func (d delta[T]) GetRemoved() interfaces.Set[T] {
+func (d delta[ELEMENT]) GetRemoved() interfaces.Set[ELEMENT] {
 	return d.Removed
 }
 
-func MakeSetDelta[ELEMENT interfaces.ValueLike](
+func MakeSetDelta[ELEMENT interfaces.Stringer](
 	from, to interfaces.Set[ELEMENT],
 ) interfaces.Delta[ELEMENT] {
 	delta := delta[ELEMENT]{

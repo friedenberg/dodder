@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -54,21 +53,17 @@ func TagComparePtr(left, right *tag) cmp.Result {
 	return sku.TransactedCompare(&left.Transacted, &right.Transacted)
 }
 
-func (a *tag) Less(b *tag) bool {
-	return sku.TransactedLessor.Less(&a.Transacted, &b.Transacted)
+func (tag *tag) Less(b *tag) bool {
+	return sku.TransactedLessor.Less(&tag.Transacted, &b.Transacted)
 }
 
-func (a *tag) EqualsAny(b any) bool {
-	return values.Equals(a, b)
-}
-
-func (a *tag) Equals(b *tag) bool {
-	if !a.Transacted.Equals(&b.Transacted) {
+func (tag *tag) Equals(b *tag) bool {
+	if !tag.Transacted.Equals(&b.Transacted) {
 		return false
 	}
 
 	if !quiter_set.Equals(
-		a.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
+		tag.Transacted.GetMetadata().GetIndex().GetImplicitTags(),
 		b.Transacted.GetMetadata().GetIndex().GetImplicitTags()) {
 		return false
 	}
@@ -76,8 +71,8 @@ func (a *tag) Equals(b *tag) bool {
 	return true
 }
 
-func (e *tag) Set(v string) (err error) {
-	if err = e.Transacted.ObjectId.Set(v); err != nil {
+func (tag *tag) Set(v string) (err error) {
+	if err = tag.Transacted.ObjectId.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -85,8 +80,8 @@ func (e *tag) Set(v string) (err error) {
 	return err
 }
 
-func (e *tag) String() string {
-	return e.Transacted.GetObjectId().String()
+func (tag *tag) String() string {
+	return tag.Transacted.GetObjectId().String()
 }
 
 func (compiled *compiled) AccumulateImplicitTags(

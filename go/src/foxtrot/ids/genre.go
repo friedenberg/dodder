@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -25,10 +24,6 @@ func MakeGenre(vs ...genres.Genre) (s Genre) {
 
 func (genre Genre) IsEmpty() bool {
 	return genre == 0
-}
-
-func (genre Genre) EqualsAny(b any) bool {
-	return values.Equals(genre, b)
 }
 
 func (genre Genre) Equals(b Genre) bool {

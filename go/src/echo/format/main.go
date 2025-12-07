@@ -8,9 +8,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-func MakeWriter[T any](
-	wff interfaces.FuncWriterFormat[T],
-	e T,
+func MakeWriter[ELEMENT any](
+	wff interfaces.FuncWriterFormat[ELEMENT],
+	e ELEMENT,
 ) interfaces.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
@@ -32,9 +32,9 @@ func MakeWriterOr[A interfaces.Stringer, B interfaces.Stringer](
 	}
 }
 
-func MakeWriterPtr[T any](
-	wff interfaces.FuncWriterFormat[*T],
-	e *T,
+func MakeWriterPtr[ELEMENT any](
+	wff interfaces.FuncWriterFormat[*ELEMENT],
+	e *ELEMENT,
 ) interfaces.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
@@ -78,10 +78,10 @@ func MakeStringer(
 	}
 }
 
-func MakeFormatStringer[T interfaces.ValueLike](
-	sf interfaces.FuncString[interfaces.Set[T]],
-) interfaces.FuncWriterFormat[interfaces.Set[T]] {
-	return func(w io.Writer, e interfaces.Set[T]) (n int64, err error) {
+func MakeFormatStringer[ELEMENT interfaces.Stringer](
+	sf interfaces.FuncString[interfaces.Set[ELEMENT]],
+) interfaces.FuncWriterFormat[interfaces.Set[ELEMENT]] {
+	return func(w io.Writer, e interfaces.Set[ELEMENT]) (n int64, err error) {
 		var n1 int
 
 		if n1, err = io.WriteString(w, sf(e)); err != nil {

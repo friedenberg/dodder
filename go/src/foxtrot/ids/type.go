@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
-	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
@@ -83,10 +82,6 @@ func (typeStruct *typeStruct) Reset() {
 
 func (typeStruct *typeStruct) ResetWith(b typeStruct) {
 	typeStruct.Value = b.Value
-}
-
-func (typeStruct typeStruct) EqualsAny(b any) bool {
-	return values.Equals(typeStruct, b)
 }
 
 func (typeStruct typeStruct) Equals(b typeStruct) bool {
