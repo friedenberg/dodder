@@ -90,7 +90,7 @@ func (id *objectId3) Set(value string) (err error) {
 
 		if TokenIsConfig(seq.At(1)) {
 			err = errors.Errorf("config not allowed")
-			return
+			return err
 		}
 
 		id.Genre = genres.Tag

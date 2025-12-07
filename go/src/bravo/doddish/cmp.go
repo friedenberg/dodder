@@ -82,10 +82,10 @@ func (seq ComparableSeq) Shift(amount int) ComparableSeq {
 }
 
 type ComparableSeqs struct {
-	Seqs      []Seq
-	SeqIndex  int
+	Seqs       []Seq
+	SeqIndex   int
 	CurrentSeq ComparableSeq
-	ByteCount int
+	ByteCount  int
 }
 
 func GetComparableSeqs(seqs []Seq) ComparableSeqs {

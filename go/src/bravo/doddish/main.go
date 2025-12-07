@@ -14,8 +14,8 @@ func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(value string) (seq Seq,
 
 	if seq, err = boxScanner.ScanDotAllowedInIdentifiersOrError(); err != nil {
 		err = errors.Wrap(err)
-		return
+		return seq, err
 	}
 
-	return
+	return seq, err
 }
