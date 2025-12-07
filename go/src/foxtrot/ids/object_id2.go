@@ -476,20 +476,6 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 	}
 }
 
-func (objectId *objectId2) Parts() [3]string {
-	var mid string
-
-	if objectId.middle != 0 {
-		mid = string([]byte{objectId.middle})
-	}
-
-	return [3]string{
-		objectId.left.String(),
-		mid,
-		objectId.right.String(),
-	}
-}
-
 func (objectId *objectId2) GetGenre() interfaces.Genre {
 	return objectId.genre
 }

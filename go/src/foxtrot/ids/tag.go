@@ -124,22 +124,6 @@ func (tag tagStruct) Bytes() []byte {
 	return []byte(tag.String())
 }
 
-func (tag tagStruct) Parts() [3]string {
-	switch {
-	case tag.virtual && tag.dependentLeaf:
-		return [3]string{"%", "-", tag.value}
-
-	case tag.virtual:
-		return [3]string{"", "%", tag.value}
-
-	case tag.dependentLeaf:
-		return [3]string{"", "-", tag.value}
-
-	default:
-		return [3]string{"", "", tag.value}
-	}
-}
-
 func (tag tagStruct) IsDodderTag() bool {
 	return strings.HasPrefix(tag.value, "dodder-")
 }

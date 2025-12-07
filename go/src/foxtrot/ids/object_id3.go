@@ -231,10 +231,6 @@ func (id objectId3) ToType() TypeStruct {
 	return TypeStruct{Value: id.Seq.At(1).String()}
 }
 
-// func (id objectId4) Parts() [3]string {
-// 	return [3]string{"", "!", typeStruct.Value}
-// }
-
 func SeqIdCompare(left, right objectId3) cmp.Result {
 	return doddish.SeqCompare(left.Seq, right.Seq)
 }

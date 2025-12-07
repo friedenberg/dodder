@@ -108,10 +108,6 @@ func (typeStruct typeStruct) String() string {
 	}
 }
 
-func (typeStruct typeStruct) Parts() [3]string {
-	return [3]string{"", "!", typeStruct.Value}
-}
-
 func (typeStruct *typeStruct) TodoSetFromObjectId(v *ObjectId) (err error) {
 	return typeStruct.Set(v.String())
 }

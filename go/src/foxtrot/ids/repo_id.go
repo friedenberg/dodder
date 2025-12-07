@@ -89,10 +89,6 @@ func (id RepoId) StringWithSlashPrefix() string {
 	return "/" + id.id
 }
 
-func (id RepoId) Parts() [3]string {
-	return [3]string{"", "/", id.id}
-}
-
 func (id RepoId) GetQueryPrefix() string {
 	return "/"
 }

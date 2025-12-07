@@ -349,10 +349,6 @@ func (fd *FD) IsEmpty() bool {
 	return false
 }
 
-func (fd *FD) Parts() [3]string {
-	return [3]string{"", "", fd.String()}
-}
-
 func (fd *FD) GetPath() string {
 	return fd.path
 }

@@ -63,10 +63,6 @@ func (config config) String() string {
 	return "konfig"
 }
 
-func (config config) Parts() [3]string {
-	return [3]string{"", "", "konfig"}
-}
-
 func (config config) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 	value = strings.ToLower(value)

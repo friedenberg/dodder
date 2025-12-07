@@ -137,10 +137,6 @@ func (id ZettelId) String() string {
 	return v
 }
 
-func (id ZettelId) Parts() [3]string {
-	return [3]string{id.left, "/", id.right}
-}
-
 func (id ZettelId) Less(j ZettelId) bool {
 	return id.String() < j.String()
 }
