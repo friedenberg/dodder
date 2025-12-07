@@ -151,7 +151,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 
 	newConfig := sku.GetTransactedPool().Get()
 
-	if err = newConfig.ObjectId.SetWithIdLike(
+	if err = newConfig.ObjectId.SetWithId(
 		ids.Config,
 	); err != nil {
 		err = errors.Wrap(err)

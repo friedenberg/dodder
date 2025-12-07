@@ -16,7 +16,7 @@ func (config Config) GetFileExtensions() file_extensions.Config {
 	return config.FileExtensions
 }
 
-func (compiled *compiled) getType(k ids.IdWithParts) (ct *sku.Transacted) {
+func (compiled *compiled) getType(k ids.Id) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
 		return ct
 	}
@@ -28,7 +28,7 @@ func (compiled *compiled) getType(k ids.IdWithParts) (ct *sku.Transacted) {
 	return ct
 }
 
-func (compiled *compiled) getRepo(k ids.IdWithParts) (ct *sku.Transacted) {
+func (compiled *compiled) getRepo(k ids.Id) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
 		return ct
 	}
@@ -91,7 +91,7 @@ func (compiled *compiled) GetTagOrRepoIdOrType(
 }
 
 func (compiled *compiled) getTag(
-	objectId ids.IdWithParts,
+	objectId ids.Id,
 ) (object *sku.Transacted, ok bool) {
 	if objectId.GetGenre() != genres.Tag {
 		return object, ok

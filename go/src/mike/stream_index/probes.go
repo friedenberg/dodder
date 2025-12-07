@@ -133,7 +133,7 @@ func (index *Index) ReadOneObjectId(
 }
 
 func (index *Index) ReadManyObjectId(
-	objectId ids.IdWithParts,
+	objectId ids.Id,
 ) (objects []*sku.Transacted, err error) {
 	digest := markl.FormatHashSha256.FromStringContent(objectId.String())
 	defer markl.PutId(digest)
@@ -148,7 +148,7 @@ func (index *Index) ReadManyObjectId(
 
 // TODO switch to empty=not found semantics instead of error
 func (index *Index) ReadOneObjectIdTai(
-	objectId ids.IdWithParts,
+	objectId ids.Id,
 	tai ids.Tai,
 ) (object *sku.Transacted, err error) {
 	if tai.IsEmpty() {

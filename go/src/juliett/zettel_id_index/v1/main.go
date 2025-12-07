@@ -161,7 +161,7 @@ func (index *index) Reset() (err error) {
 	return err
 }
 
-func (index *index) AddZettelId(k1 ids.IdWithParts) (err error) {
+func (index *index) AddZettelId(k1 ids.Id) (err error) {
 	if !k1.GetGenre().IsZettel() {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return err

@@ -29,11 +29,6 @@ type (
 		IsInlineType(Type) bool
 	}
 
-	// TODO remove
-	IdWithParts interface {
-		Id
-	}
-
 	ObjectIdGetter interface {
 		GetObjectId() *ObjectId
 	}
@@ -51,9 +46,9 @@ func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 // 	return getObjectIdPool3()
 // }
 
-func MustObjectId(idWithParts IdWithParts) (id *ObjectId) {
+func MustObjectId(idWithParts Id) (id *ObjectId) {
 	id = &ObjectId{}
-	err := id.SetWithIdLike(idWithParts)
+	err := id.SetWithId(idWithParts)
 	errors.PanicIfError(err)
 	return id
 }

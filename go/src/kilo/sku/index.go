@@ -43,12 +43,12 @@ type (
 		ObjectProbeIndex
 
 		ReadOneObjectIdTai(
-			k ids.IdWithParts,
+			k ids.Id,
 			t ids.Tai,
 		) (sk *Transacted, err error)
 
 		ReadManyObjectId(
-			id ids.IdWithParts,
+			id ids.Id,
 		) (skus []*Transacted, err error)
 
 		ReadManyMarklId(
@@ -76,7 +76,7 @@ type (
 
 func ReadOneObjectId(
 	index IndexPrimitives,
-	objectId ids.IdWithParts,
+	objectId ids.Id,
 	object *Transacted,
 ) (ok bool) {
 	return ReadOneObjectIdBespoke(

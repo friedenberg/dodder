@@ -504,13 +504,7 @@ func (objectId *objectId2) Expand(
 	return err
 }
 
-func (objectId *objectId2) Abbreviate(
-	a Abbr,
-) (err error) {
-	return err
-}
-
-func (objectId *objectId2) SetWithIdLike(
+func (objectId *objectId2) SetWithId(
 	otherObjectId Id,
 ) (err error) {
 	objectId.Reset()
@@ -533,12 +527,12 @@ func (objectId *objectId2) SetWithIdLike(
 }
 
 func (objectId *objectId2) SetWithGenre(
-	v string,
-	g interfaces.GenreGetter,
+	value string,
+	genre interfaces.GenreGetter,
 ) (err error) {
-	objectId.genre = genres.Make(g.GetGenre())
+	objectId.genre = genres.Make(genre.GetGenre())
 
-	if err = objectId.Set(v); err != nil {
+	if err = objectId.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -557,6 +551,7 @@ func (objectId *objectId2) SetLeft(v string) (err error) {
 	return err
 }
 
+// TODO switch to SetWithSeq
 func (objectId *objectId2) Set(v string) (err error) {
 	if v == "/" {
 		objectId.genre = genres.Zettel
@@ -578,7 +573,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		v = els[1]
 	}
 
-	var k IdWithParts
+	var k Id
 
 	switch objectId.genre {
 	case genres.None:
@@ -639,7 +634,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		return err
 	}
 
-	if err = objectId.SetWithIdLike(k); err != nil {
+	if err = objectId.SetWithId(k); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -669,7 +664,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		}
 	}
 
-	var k IdWithParts
+	var k Id
 
 	switch objectId.genre {
 	case genres.Zettel:
@@ -718,7 +713,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		return err
 	}
 
-	if err = objectId.SetWithIdLike(k); err != nil {
+	if err = objectId.SetWithId(k); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -763,8 +758,8 @@ func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWithIdLike(b IdWithParts) (err error) {
-	return objectId.SetWithIdLike(b)
+func (objectId *objectId2) ResetWithIdLike(b Id) (err error) {
+	return objectId.SetWithId(b)
 }
 
 func (objectId *objectId2) MarshalText() (text []byte, err error) {
@@ -797,13 +792,6 @@ func (objectId *objectId2) UnmarshalBinary(bs []byte) (err error) {
 	return err
 }
 
-// /repo/tag
-// /repo/zettel-id
-// /repo/!type
-// /browser/one/uno
-// /browser/bookmark-1
-// /browser/!md
-// /browser/!md
 func (objectId *objectId2) SetWithSeq(
 	seq doddish.Seq,
 ) (err error) {
@@ -811,6 +799,14 @@ func (objectId *objectId2) SetWithSeq(
 	case seq.Len() == 0:
 		err = errors.Wrap(doddish.ErrEmptySeq)
 		return err
+
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpPathSeparator),
+	):
+		objectId.genre = genres.Zettel
+		objectId.middle = '/'
+
+		return
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):

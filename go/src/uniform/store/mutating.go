@@ -384,7 +384,7 @@ func (commitFacilitator commitFacilitator) createType(
 		)
 	}
 
-	if err = typeObject.ObjectId.SetWithIdLike(typeId); err != nil {
+	if err = typeObject.ObjectId.SetWithId(typeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
