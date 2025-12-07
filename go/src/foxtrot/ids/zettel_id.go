@@ -167,7 +167,7 @@ func (id *ZettelId) SetWithSeq(seq doddish.Seq) (err error) {
 
 	default:
 		err = errors.Errorf("seq isn't a zettel id: %q", seq)
-		return
+		return err
 	}
 
 	return err
