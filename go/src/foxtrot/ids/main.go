@@ -31,7 +31,7 @@ type (
 
 	// TODO remove
 	IdWithParts interface {
-		interfaces.ObjectId
+		Id
 		Parts() [3]string // TODO remove this method
 		IsEmpty() bool
 	}
@@ -147,32 +147,22 @@ func LeftSubtract[
 	return c, err
 }
 
-func Contains(a, b IdWithParts) bool {
+func Contains(left, right Id) bool {
 	var (
-		as = a.Parts()
-		bs = b.Parts()
+		leftSeq  = left.ToSeq()
+		rightSeq = right.ToSeq()
 	)
 
-	for i, e := range as {
-		if !strings.HasPrefix(e, bs[i]) {
-			return false
-		}
-	}
-
-	return true
+	return doddish.SeqComparePartial(leftSeq, rightSeq).IsEqual()
 }
 
-func ContainsExactly(a, b IdWithParts) bool {
+func ContainsExactly(left, right Id) bool {
 	var (
-		as = a.Parts()
-		bs = b.Parts()
+		leftSeq  = left.ToSeq()
+		rightSeq = right.ToSeq()
 	)
 
-	if as != bs {
-		return false
-	}
-
-	return true
+	return doddish.SeqCompare(leftSeq, rightSeq).IsEqual()
 }
 
 func IsEmpty[T interfaces.Stringer](a T) bool {

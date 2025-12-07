@@ -15,6 +15,7 @@ const (
 	Greater = result(1)
 )
 
+//go:generate stringer -type=result
 type result int
 
 var _ Result = result(0)

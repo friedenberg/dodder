@@ -57,6 +57,8 @@ func seqCompare(left, right Seq, partial bool) cmp.Result {
 		)
 
 		if result.IsEqual() {
+			left = Seq(left.GetSlice().Shift(1))
+			right = Seq(right.GetSlice().Shift(1))
 			continue
 		} else {
 			return result
