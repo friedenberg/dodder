@@ -117,3 +117,16 @@ func (t *config) UnmarshalBinary(text []byte) (err error) {
 
 	return err
 }
+
+func (id config) ToType() TypeStruct {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (id config) ToSeq() doddish.Seq {
+	return doddish.Seq{
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  configBytes,
+		},
+	}
+}

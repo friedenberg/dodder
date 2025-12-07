@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/coordinates"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -107,49 +108,49 @@ func MakeZettelId(v string) (h *ZettelId, err error) {
 	return h, err
 }
 
-func (a ZettelId) IsEmpty() bool {
-	return a.left == "" && a.right == ""
+func (id ZettelId) IsEmpty() bool {
+	return id.left == "" && id.right == ""
 }
 
-func (a ZettelId) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (id ZettelId) EqualsAny(b any) bool {
+	return values.Equals(id, b)
 }
 
-func (a ZettelId) Equals(b ZettelId) bool {
-	if a.left != b.left {
+func (id ZettelId) Equals(b ZettelId) bool {
+	if id.left != b.left {
 		return false
 	}
 
-	if a.right != b.right {
+	if id.right != b.right {
 		return false
 	}
 
 	return true
 }
 
-func (h ZettelId) GetHead() string {
-	return h.left
+func (id ZettelId) GetHead() string {
+	return id.left
 }
 
-func (h ZettelId) GetTail() string {
-	return h.right
+func (id ZettelId) GetTail() string {
+	return id.right
 }
 
-func (i ZettelId) GetObjectIdString() string {
-	return i.String()
+func (id ZettelId) GetObjectIdString() string {
+	return id.String()
 }
 
-func (h ZettelId) String() string {
-	v := fmt.Sprintf("%s/%s", h.left, h.right)
+func (id ZettelId) String() string {
+	v := fmt.Sprintf("%s/%s", id.left, id.right)
 	return v
 }
 
-func (h ZettelId) Parts() [3]string {
-	return [3]string{h.left, "/", h.right}
+func (id ZettelId) Parts() [3]string {
+	return [3]string{id.left, "/", id.right}
 }
 
-func (i ZettelId) Less(j ZettelId) bool {
-	return i.String() < j.String()
+func (id ZettelId) Less(j ZettelId) bool {
+	return id.String() < j.String()
 }
 
 func (h *ZettelId) SetFromIdParts(parts [3]string) (err error) {
@@ -158,7 +159,7 @@ func (h *ZettelId) SetFromIdParts(parts [3]string) (err error) {
 	return err
 }
 
-func (h *ZettelId) Set(v string) (err error) {
+func (id *ZettelId) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
@@ -207,13 +208,13 @@ func (h *ZettelId) Set(v string) (err error) {
 		))
 
 	case 2:
-		h.left = parts[0]
-		h.right = parts[1]
+		id.left = parts[0]
+		id.right = parts[1]
 	}
 
-	if (len(h.left) == 0 && len(h.right) > 0) ||
-		(len(h.right) == 0 && len(h.left) > 0) {
-		groupBuilder.Add(errors.Errorf("incomplete zettel id: %s", h))
+	if (len(id.left) == 0 && len(id.right) > 0) ||
+		(len(id.right) == 0 && len(id.left) > 0) {
+		groupBuilder.Add(errors.Errorf("incomplete zettel id: %s", id))
 	}
 
 	err = groupBuilder.GetError()
@@ -221,27 +222,27 @@ func (h *ZettelId) Set(v string) (err error) {
 	return err
 }
 
-func (h *ZettelId) Reset() {
-	h.left = ""
-	h.right = ""
+func (id *ZettelId) Reset() {
+	id.left = ""
+	id.right = ""
 }
 
-func (h *ZettelId) ResetWith(h1 ZettelId) {
-	h.left = h1.left
-	h.right = h1.right
+func (id *ZettelId) ResetWith(h1 ZettelId) {
+	id.left = h1.left
+	id.right = h1.right
 }
 
-func (h ZettelId) GetGenre() interfaces.Genre {
+func (id ZettelId) GetGenre() interfaces.Genre {
 	return genres.Zettel
 }
 
-func (t ZettelId) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func (id ZettelId) MarshalText() (text []byte, err error) {
+	text = []byte(id.String())
 	return text, err
 }
 
-func (t *ZettelId) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (id *ZettelId) UnmarshalText(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -249,16 +250,37 @@ func (t *ZettelId) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (t ZettelId) MarshalBinary() (text []byte, err error) {
-	text = []byte(t.String())
+func (id ZettelId) MarshalBinary() (text []byte, err error) {
+	text = []byte(id.String())
 	return text, err
 }
 
-func (t *ZettelId) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (id *ZettelId) UnmarshalBinary(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	return err
+}
+
+func (id ZettelId) ToType() TypeStruct {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (id ZettelId) ToSeq() doddish.Seq {
+	return doddish.Seq{
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(id.left),
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeOperator,
+			Contents:  []byte{'/'},
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(id.right),
+		},
+	}
 }

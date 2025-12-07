@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -150,4 +151,21 @@ func (t *RepoId) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return err
+}
+
+func (id RepoId) ToType() TypeStruct {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (id RepoId) ToSeq() doddish.Seq {
+	return doddish.Seq{
+		doddish.Token{
+			TokenType: doddish.TokenTypeOperator,
+			Contents:  []byte{'/'},
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(id.id),
+		},
+	}
 }

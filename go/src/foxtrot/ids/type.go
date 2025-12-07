@@ -179,7 +179,7 @@ func (typeStruct typeStruct) ToSeq() doddish.Seq {
 		},
 		doddish.Token{
 			TokenType: doddish.TokenTypeIdentifier,
-			Contents:  []byte(typeStruct.String()),
+			Contents:  []byte(typeStruct.StringSansOp()),
 		},
 	}
 }

@@ -292,14 +292,14 @@ func HasParentPrefix(a, b TagStruct) (has bool) {
 
 type tagResetter struct{}
 
-func (tagResetter) Reset(e *TagStruct) {
-	e.value = ""
-	e.virtual = false
-	e.dependentLeaf = false
+func (tagResetter) Reset(tag *TagStruct) {
+	tag.value = ""
+	tag.virtual = false
+	tag.dependentLeaf = false
 }
 
-func (tagResetter) ResetWith(a, b *TagStruct) {
-	a.value = b.value
-	a.virtual = b.virtual
-	a.dependentLeaf = b.dependentLeaf
+func (tagResetter) ResetWith(dst, src *TagStruct) {
+	dst.value = src.value
+	dst.virtual = src.virtual
+	dst.dependentLeaf = src.dependentLeaf
 }

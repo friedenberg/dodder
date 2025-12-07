@@ -417,19 +417,28 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 		}
 
 	case genres.Zettel:
-		return doddish.Seq{
-			doddish.Token{
-				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.left.Bytes(),
-			},
-			doddish.Token{
-				TokenType: doddish.TokenTypeOperator,
-				Contents:  []byte{objectId.middle},
-			},
-			doddish.Token{
-				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
-			},
+		if objectId.IsEmpty() {
+			return doddish.Seq{
+				doddish.Token{
+					TokenType: doddish.TokenTypeOperator,
+					Contents:  []byte{doddish.OpPathSeparator},
+				},
+			}
+		} else {
+			return doddish.Seq{
+				doddish.Token{
+					TokenType: doddish.TokenTypeIdentifier,
+					Contents:  objectId.left.Bytes(),
+				},
+				doddish.Token{
+					TokenType: doddish.TokenTypeOperator,
+					Contents:  []byte{objectId.middle},
+				},
+				doddish.Token{
+					TokenType: doddish.TokenTypeIdentifier,
+					Contents:  objectId.right.Bytes(),
+				},
+			}
 		}
 
 	default:
@@ -808,6 +817,21 @@ func (objectId *objectId2) ReadFromSeq(
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
 		objectId.genre = genres.Tag
 		objectId.right.WriteLower(seq.At(0).Contents)
+
+		if objectId.right.EqualsBytes(configBytes) {
+			objectId.genre = genres.Config
+		}
+
+		return err
+
+		// -tag
+	case seq.MatchAll(
+		doddish.TokenMatcherOp('-'),
+		doddish.TokenTypeIdentifier,
+	):
+		objectId.genre = genres.Tag
+		objectId.middle = '-'
+		objectId.right.WriteLower(seq.At(1).Contents)
 
 		if objectId.right.EqualsBytes(configBytes) {
 			objectId.genre = genres.Config

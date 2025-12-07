@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -343,4 +344,27 @@ func (t *TaiRFC3339Value) String() string {
 	// TODO figure out why the pointer needs to be converted to Tai to execute
 	// correctly
 	return Tai(*t).Format(thyme.RFC3339)
+}
+
+func (id Tai) ToType() TypeStruct {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (id Tai) ToSeq() doddish.Seq {
+	parts := id.Parts()
+
+	return doddish.Seq{
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(parts[0]),
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeOperator,
+			Contents:  []byte{'.'},
+		},
+		doddish.Token{
+			TokenType: doddish.TokenTypeIdentifier,
+			Contents:  []byte(parts[2]),
+		},
+	}
 }

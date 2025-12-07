@@ -7,6 +7,14 @@ import (
 )
 
 func SeqCompare(left, right Seq) cmp.Result {
+	return seqCompare(left, right, false)
+}
+
+func SeqComparePartial(left, right Seq) cmp.Result {
+	return seqCompare(left, right, true)
+}
+
+func seqCompare(left, right Seq, partial bool) cmp.Result {
 	lenLeft, lenRight := left.Len(), right.Len()
 
 	// TODO remove?
@@ -45,7 +53,7 @@ func SeqCompare(left, right Seq) cmp.Result {
 		result := cmp.CompareUTF8Bytes(
 			tokenLeft.Contents,
 			tokenRight.Contents,
-			false,
+			partial,
 		)
 
 		if result.IsEqual() {
