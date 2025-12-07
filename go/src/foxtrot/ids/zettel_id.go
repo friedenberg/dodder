@@ -175,12 +175,12 @@ func (id *ZettelId) Set(value string) (err error) {
 		value,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	if err = id.SetWithSeq(seq); err != nil {
 		err = errors.Wrap(err)
-		return
+		return err
 	}
 
 	return err
