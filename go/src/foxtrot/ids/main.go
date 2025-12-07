@@ -1,7 +1,6 @@
 package ids
 
 import (
-	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -18,6 +17,7 @@ type (
 		interfaces.ObjectId
 		ToSeq() doddish.Seq
 		ToType() TypeStruct
+		IsEmpty() bool
 	}
 
 	Tag   = Id
@@ -32,8 +32,6 @@ type (
 	// TODO remove
 	IdWithParts interface {
 		Id
-		Parts() [3]string // TODO remove this method
-		IsEmpty() bool
 	}
 
 	ObjectIdGetter interface {
@@ -102,40 +100,14 @@ func FormattedString(id Id) string {
 	return id.ToSeq().String()
 }
 
-func AlignedParts(
-	id IdWithParts, lenLeft, lenRight int,
-) (string, string, string) {
-	parts := id.Parts()
-	left := parts[0]
-	middle := parts[1]
-	right := parts[2]
-
-	diffLeft := lenLeft - len(left)
-	if diffLeft > 0 {
-		left = strings.Repeat(" ", diffLeft) + left
-	}
-
-	diffRight := lenRight - len(right)
-	if diffRight > 0 {
-		right = right + strings.Repeat(" ", diffRight)
-	}
-
-	return left, middle, right
-}
-
-func Aligned(id IdWithParts, lenLeft, lenRight int) string {
-	left, middle, right := AlignedParts(id, lenLeft, lenRight)
-	return fmt.Sprintf("%s%s%s", left, middle, right)
-}
-
 func LeftSubtract[
-	T interfaces.Stringer,
-	TPtr interfaces.StringSetterPtr[T],
+	ID interfaces.Stringer,
+	ID_PTR interfaces.StringSetterPtr[ID],
 ](
-	a, b T,
-) (c T, err error) {
-	if err = TPtr(&c).Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
-		err = errors.Wrapf(err, "'%s' - '%s'", a, b)
+	base, toSubtract ID,
+) (c ID, err error) {
+	if err = ID_PTR(&c).Set(strings.TrimPrefix(base.String(), toSubtract.String())); err != nil {
+		err = errors.Wrapf(err, "'%s' - '%s'", base, toSubtract)
 		return c, err
 	}
 
@@ -160,8 +132,8 @@ func ContainsExactly(left, right Id) bool {
 	return doddish.SeqCompare(leftSeq, rightSeq).IsEqual()
 }
 
-func IsEmpty[T interfaces.Stringer](a T) bool {
-	return len(a.String()) == 0
+func IsEmpty(id Id) bool {
+	return id.ToSeq().Len() == 0
 }
 
 func IsVirtual(id Id) bool {

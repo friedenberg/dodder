@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.linenisgreat.com/dodder/go/src/_/ohio_files"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
@@ -60,7 +60,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 	env.writeConfig(bigBang)
 	env.writeBlobStoreConfigIfNecessary(bigBang, env.directoryLayoutBlobStore)
 
-	if err := ohio.CopyFileLines(
+	if err := ohio_files.CopyFileLines(
 		bigBang.Yin,
 		filepath.Join(env.DirObjectId(), "Yin"),
 	); err != nil {
@@ -68,7 +68,7 @@ func (env *Env) Genesis(bigBang BigBang) {
 		return
 	}
 
-	if err := ohio.CopyFileLines(
+	if err := ohio_files.CopyFileLines(
 		bigBang.Yang,
 		filepath.Join(env.DirObjectId(), "Yang"),
 	); err != nil {
