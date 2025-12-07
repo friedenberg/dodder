@@ -806,7 +806,7 @@ func (objectId *objectId2) SetWithSeq(
 		objectId.genre = genres.Zettel
 		objectId.middle = '/'
 
-		return
+		return err
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
