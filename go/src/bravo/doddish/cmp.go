@@ -15,55 +15,11 @@ func SeqComparePartial(left, right Seq) cmp.Result {
 }
 
 func seqCompare(left, right Seq, partial bool) cmp.Result {
-	lenLeft, lenRight := left.Len(), right.Len()
-
-	// TODO remove?
-	switch {
-	case lenLeft == 0 && lenRight == 0:
-		return cmp.Equal
-
-	case lenLeft == 0:
-		return cmp.Less
-
-	case lenRight == 0:
-		return cmp.Greater
-	}
-
-	for {
-		lenLeft, lenRight := left.Len(), right.Len()
-
-		switch {
-		case lenLeft == 0 && lenRight == 0:
-			return cmp.Equal
-
-		case lenLeft == 0:
-			if lenRight <= lenLeft {
-				return cmp.Equal
-			} else {
-				return cmp.Less
-			}
-
-		case lenRight == 0:
-			return cmp.Greater
-		}
-
-		tokenLeft := left.GetSlice().First()
-		tokenRight := right.GetSlice().First()
-
-		result := cmp.CompareUTF8Bytes(
-			tokenLeft.Contents,
-			tokenRight.Contents,
-			partial,
-		)
-
-		if result.IsEqual() {
-			left = Seq(left.GetSlice().Shift(1))
-			right = Seq(right.GetSlice().Shift(1))
-			continue
-		} else {
-			return result
-		}
-	}
+	return cmp.CompareUTF8(
+		left.GetComparable(),
+		right.GetComparable(),
+		partial,
+	)
 }
 
 type ComparableSeq struct {
