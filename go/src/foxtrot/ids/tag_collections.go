@@ -55,8 +55,8 @@ func MakeTagSetFromSlice(tags ...TagStruct) (s TagSet) {
 	return collections_ptr.MakeValueSetValue(nil, tags...)
 }
 
-func TagStructSeqToITag(tags interfaces.Seq[TagStruct]) interfaces.Seq[ITag] {
-	return func(yield func(ITag) bool) {
+func TagStructSeqToITag(tags interfaces.Seq[TagStruct]) interfaces.Seq[Tag] {
+	return func(yield func(Tag) bool) {
 		for tag := range tags {
 			if !yield(tag) {
 				return
@@ -65,7 +65,7 @@ func TagStructSeqToITag(tags interfaces.Seq[TagStruct]) interfaces.Seq[ITag] {
 	}
 }
 
-func ITagSeqToTagStructSeq(itags interfaces.Seq[ITag]) interfaces.Seq[TagStruct] {
+func ITagSeqToTagStructSeq(itags interfaces.Seq[Tag]) interfaces.Seq[TagStruct] {
 	return func(yield func(TagStruct) bool) {
 		for itag := range itags {
 			var tag TagStruct
@@ -79,7 +79,7 @@ func ITagSeqToTagStructSeq(itags interfaces.Seq[ITag]) interfaces.Seq[TagStruct]
 	}
 }
 
-func ITagSeqToTagStructPtrSeq(itags interfaces.Seq[ITag]) interfaces.Seq[*TagStruct] {
+func ITagSeqToTagStructPtrSeq(itags interfaces.Seq[Tag]) interfaces.Seq[*TagStruct] {
 	return func(yield func(*TagStruct) bool) {
 		for itag := range itags {
 			var tag TagStruct
@@ -93,12 +93,12 @@ func ITagSeqToTagStructPtrSeq(itags interfaces.Seq[ITag]) interfaces.Seq[*TagStr
 	}
 }
 
-func MakeTagSetFromISeq(itags interfaces.Seq[ITag]) (s TagSet) {
+func MakeTagSetFromISeq(itags interfaces.Seq[Tag]) (s TagSet) {
 	tags := ITagSeqToTagStructPtrSeq(itags)
 	return collections_ptr.MakeValueSetSeq(nil, tags, 0)
 }
 
-func MakeTagSetFromISlice(itags ...ITag) (s TagSet) {
+func MakeTagSetFromISlice(itags ...Tag) (s TagSet) {
 	if len(itags) == 0 {
 		return TagSetEmpty
 	}
@@ -160,12 +160,12 @@ func SubtractPrefix(input TagSet, tag TagStruct) (output TagSet) {
 	return output
 }
 
-func TagSetMutableAdd(set TagSetMutable, itag ITag) {
+func TagSetMutableAdd(set TagSetMutable, itag Tag) {
 	var tag TagStruct
 	errors.PanicIfError(tag.Set(itag.String()))
 	errors.PanicIfError(set.Add(tag))
 }
 
-func TagEquals(left, right ITag) bool {
+func TagEquals(left, right Tag) bool {
 	return left.String() == right.String()
 }

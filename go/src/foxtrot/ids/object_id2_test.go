@@ -40,6 +40,7 @@ func TestObjectId2IsVirtual(t1 *testing.T) {
 		var sut objectId2
 		err := sut.Set(testCase.input)
 		t.AssertNoError(err)
-		t.AssertEqual(testCase.isVirtual, sut.IsVirtual())
+		t.Log(sut.ToSeq().StringDebug())
+		t.AssertEqual(testCase.isVirtual, IsVirtual(&sut))
 	}
 }

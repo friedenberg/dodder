@@ -145,7 +145,7 @@ func (store *Store) addImplicitTags(
 
 	tagPaths := object.GetMetadataMutable().GetIndexMutable().GetTagPaths()
 
-	addImplicitTags := func(tag ids.ITag) (err error) {
+	addImplicitTags := func(tag ids.Tag) (err error) {
 		tagPathWithType := tag_paths.MakePathWithType()
 		tagPathWithType.Type = tag_paths.TypeIndirect
 		tagPathWithType.Add(catgut.MakeFromString(tag.String()))

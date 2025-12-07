@@ -18,7 +18,7 @@ func init() {
 
 type implicitTagMap map[string]ids.TagSetMutable
 
-func (implicitTags implicitTagMap) Contains(to, imp ids.ITag) bool {
+func (implicitTags implicitTagMap) Contains(to, imp ids.Tag) bool {
 	tagSet, ok := implicitTags[to.String()]
 
 	if !ok || tagSet == nil {
@@ -32,7 +32,7 @@ func (implicitTags implicitTagMap) Contains(to, imp ids.ITag) bool {
 	return true
 }
 
-func (implicitTags implicitTagMap) Set(to, imp ids.ITag) (err error) {
+func (implicitTags implicitTagMap) Set(to, imp ids.Tag) (err error) {
 	set, ok := implicitTags[to.String()]
 
 	if !ok {
@@ -90,7 +90,7 @@ func (e *tag) String() string {
 }
 
 func (compiled *compiled) AccumulateImplicitTags(
-	tag ids.ITag,
+	tag ids.Tag,
 ) (err error) {
 	compiledTag, ok := compiled.Tags.Get(tag.String())
 

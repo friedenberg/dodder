@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
@@ -24,19 +25,12 @@ func init() {
 
 var sTagResetter tagResetter
 
-type (
-	TagStruct = tag
-	ITag      = interface {
-		interfaces.ObjectId
-	}
-)
-
 var (
-	TagResetter           = sTagResetter
-	_           TagStruct = TagStruct{}
+	TagResetter     = sTagResetter
+	_           Tag = TagStruct{}
 )
 
-type tag struct {
+type tagStruct struct {
 	virtual       bool
 	dependentLeaf bool
 	value         string
@@ -80,34 +74,34 @@ func MakeTag(value string) (TagStruct, error) {
 	return tag, nil
 }
 
-func (tag tag) init() {
+func (tag tagStruct) init() {
 }
 
-func (tag *tag) Reset() {
+func (tag *tagStruct) Reset() {
 	sTagResetter.Reset(tag)
 }
 
-func (tag *tag) ResetWith(other tag) {
+func (tag *tagStruct) ResetWith(other tagStruct) {
 	sTagResetter.ResetWith(tag, &other)
 }
 
-func (tag tag) GetQueryPrefix() string {
+func (tag tagStruct) GetQueryPrefix() string {
 	return "-"
 }
 
-func (tag tag) IsEmpty() bool {
+func (tag tagStruct) IsEmpty() bool {
 	return tag.value == ""
 }
 
-func (tag tag) GetGenre() interfaces.Genre {
+func (tag tagStruct) GetGenre() interfaces.Genre {
 	return genres.Tag
 }
 
-func (tag tag) EqualsAny(b any) bool {
+func (tag tagStruct) EqualsAny(b any) bool {
 	return values.Equals(tag, b)
 }
 
-func (tag tag) Equals(b tag) bool {
+func (tag tagStruct) Equals(b tagStruct) bool {
 	return tag == b
 }
 
@@ -115,7 +109,7 @@ func (tag TagStruct) GetObjectIdString() string {
 	return tag.String()
 }
 
-func (tag tag) String() string {
+func (tag tagStruct) String() string {
 	var sb strings.Builder
 
 	if tag.virtual {
@@ -131,11 +125,11 @@ func (tag tag) String() string {
 	return sb.String()
 }
 
-func (tag tag) Bytes() []byte {
+func (tag tagStruct) Bytes() []byte {
 	return []byte(tag.String())
 }
 
-func (tag tag) Parts() [3]string {
+func (tag tagStruct) Parts() [3]string {
 	switch {
 	case tag.virtual && tag.dependentLeaf:
 		return [3]string{"%", "-", tag.value}
@@ -151,28 +145,28 @@ func (tag tag) Parts() [3]string {
 	}
 }
 
-func (tag tag) IsDodderTag() bool {
+func (tag tagStruct) IsDodderTag() bool {
 	return strings.HasPrefix(tag.value, "dodder-")
 }
 
-func TagIsVirtual(tag ITag) bool {
+func TagIsVirtual(tag Tag) bool {
 	// TODO panic if tag is not tag
 	return strings.HasPrefix(tag.String(), "%")
 }
 
-func (tag tag) IsVirtual() bool {
+func (tag tagStruct) IsVirtual() bool {
 	return tag.virtual
 }
 
-func (tag tag) IsDependentLeaf() bool {
+func (tag tagStruct) IsDependentLeaf() bool {
 	return tag.dependentLeaf
 }
 
-func (tag *tag) TodoSetFromObjectId(v *ObjectId) (err error) {
+func (tag *tagStruct) TodoSetFromObjectId(v *ObjectId) (err error) {
 	return tag.Set(v.String())
 }
 
-func (tag *tag) Set(v string) (err error) {
+func (tag *tagStruct) Set(v string) (err error) {
 	v1 := v
 	v = strings.ToLower(strings.TrimSpace(v))
 
@@ -202,12 +196,12 @@ func (tag *tag) Set(v string) (err error) {
 	return err
 }
 
-func (tag tag) MarshalText() (text []byte, err error) {
+func (tag tagStruct) MarshalText() (text []byte, err error) {
 	text = []byte(tag.String())
 	return text, err
 }
 
-func (tag *tag) UnmarshalText(text []byte) (err error) {
+func (tag *tagStruct) UnmarshalText(text []byte) (err error) {
 	if err = tag.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -216,18 +210,74 @@ func (tag *tag) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (tag tag) MarshalBinary() (text []byte, err error) {
+func (tag tagStruct) MarshalBinary() (text []byte, err error) {
 	text = []byte(tag.String())
 	return text, err
 }
 
-func (tag *tag) UnmarshalBinary(text []byte) (err error) {
+func (tag *tagStruct) UnmarshalBinary(text []byte) (err error) {
 	if err = tag.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	return err
+}
+
+func (tag tagStruct) ToType() TypeStruct {
+	panic("tag cannot be transformed into type")
+}
+
+func (tag tagStruct) ToSeq() doddish.Seq {
+	switch {
+	case tag.virtual && tag.dependentLeaf:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{'%'},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{'-'},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  []byte(tag.value),
+			},
+		}
+
+	case tag.virtual:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{'%'},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  []byte(tag.value),
+			},
+		}
+
+	case tag.dependentLeaf:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{'-'},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  []byte(tag.value),
+			},
+		}
+
+	default:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  []byte(tag.value),
+			},
+		}
+	}
 }
 
 func IsDependentLeaf(a TagStruct) (has bool) {

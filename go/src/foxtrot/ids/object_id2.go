@@ -39,6 +39,8 @@ type objectId2 struct {
 	// Domain
 }
 
+var _ Id = &objectId2{}
+
 func (objectId *objectId2) GetObjectId() *objectId2 {
 	return objectId
 }
@@ -47,30 +49,6 @@ func (objectId *objectId2) Clone() (clone *objectId2) {
 	clone = getObjectIdPool2().Get()
 	clone.ResetWithIdLike(objectId)
 	return clone
-}
-
-func (objectId *objectId2) IsVirtual() bool {
-	return objectId.virtual
-}
-
-func (objectId *objectId2) Equals(b *objectId2) bool {
-	if objectId.genre != b.genre {
-		return false
-	}
-
-	if objectId.middle != b.middle {
-		return false
-	}
-
-	if !objectId.left.Equals(&b.left) {
-		return false
-	}
-
-	if !objectId.right.Equals(&b.right) {
-		return false
-	}
-
-	return true
 }
 
 func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
@@ -224,19 +202,8 @@ func (objectId *objectId2) Len() int {
 	return objectId.left.Len() + 1 + objectId.right.Len()
 }
 
-func (objectId *objectId2) GetHeadAndTail() (head, tail string) {
-	head = objectId.left.String()
-	tail = objectId.right.String()
-
-	return head, tail
-}
-
 func (objectId *objectId2) LenHeadAndTail() (int, int) {
 	return objectId.left.Len(), objectId.right.Len()
-}
-
-func (objectId *objectId2) GetRepoId() string {
-	return objectId.repoId.String()
 }
 
 // TODO perform validation
@@ -281,10 +248,6 @@ func (objectId *objectId2) StringSansRepo() string {
 	}
 
 	return sb.String()
-}
-
-func (objectId *objectId2) GetObjectIdString() string {
-	return objectId.String()
 }
 
 func (objectId *objectId2) StringSansOp() string {
@@ -374,11 +337,107 @@ func (objectId *objectId2) Reset() {
 	objectId.repoId.Reset()
 }
 
-func (objectId *objectId2) PartsStrings() IdParts {
-	return IdParts{
-		Left:   &objectId.left,
-		Middle: objectId.middle,
-		Right:  &objectId.right,
+func (objectId *objectId2) ToSeq() doddish.Seq {
+	switch objectId.genre {
+	case genres.Blob:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{objectId.middle},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	case genres.Config:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	case genres.InventoryList:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.left.Bytes(),
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{objectId.middle},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	case genres.Repo:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{objectId.middle},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	case genres.Tag:
+		if objectId.virtual {
+			return doddish.Seq{
+				doddish.Token{
+					TokenType: doddish.TokenTypeOperator,
+					Contents:  []byte{'%'},
+				},
+				doddish.Token{
+					TokenType: doddish.TokenTypeIdentifier,
+					Contents:  objectId.right.Bytes(),
+				},
+			}
+		} else {
+			return doddish.Seq{
+				doddish.Token{
+					TokenType: doddish.TokenTypeIdentifier,
+					Contents:  objectId.right.Bytes(),
+				},
+			}
+		}
+
+	case genres.Type:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{objectId.middle},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	case genres.Zettel:
+		return doddish.Seq{
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.left.Bytes(),
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeOperator,
+				Contents:  []byte{objectId.middle},
+			},
+			doddish.Token{
+				TokenType: doddish.TokenTypeIdentifier,
+				Contents:  objectId.right.Bytes(),
+			},
+		}
+
+	default:
+		panic(genres.MakeErrUnsupportedGenre(objectId.genre))
 	}
 }
 
@@ -848,5 +907,13 @@ func (objectId *objectId2) ReadFromSeq(
 	default:
 		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
 		return err
+	}
+}
+
+func (id objectId2) ToType() TypeStruct {
+	errors.PanicIfError(genres.Type.AssertGenre(id.genre))
+
+	return TypeStruct{
+		Value: id.right.String(),
 	}
 }

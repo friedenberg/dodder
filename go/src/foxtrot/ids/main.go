@@ -10,9 +10,36 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 )
 
-type Id interface {
-	interfaces.ObjectId
-	ToSeq() SeqId
+type (
+	TagStruct  = tagStruct
+	TypeStruct = typeStruct
+	ObjectId   = objectId2
+
+	Id interface {
+		interfaces.ObjectId
+		ToSeq() doddish.Seq
+		ToType() TypeStruct
+	}
+
+	Tag   = Id
+	SeqId = objectId4
+	Type  = Id
+
+	// TODO rename to BinaryTypeChecker and flip uses
+	InlineTypeChecker interface {
+		IsInlineType(Type) bool
+	}
+)
+
+func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
+	return getObjectIdPool2()
+}
+
+func MustObjectId(idWithParts interfaces.ObjectIdWithParts) (id *ObjectId) {
+	id = &ObjectId{}
+	err := id.SetWithIdLike(idWithParts)
+	errors.PanicIfError(err)
+	return id
 }
 
 func MakeObjectId(value string) (objectId *ObjectId, err error) {
@@ -21,7 +48,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 	defer repool()
 	boxScanner.Reset(reader)
 
-	objectId = &ObjectId{}
+	objectId = GetObjectIdPool().Get()
 
 	if value == "" {
 		return objectId, err
@@ -40,6 +67,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 	return objectId, err
 }
 
+// TODO rewrite to use ToSeq comparison
 func Equals(left, right interfaces.ObjectId) (ok bool) {
 	if left.GetGenre().String() != right.GetGenre().String() {
 		return ok
@@ -131,4 +159,18 @@ func ContainsExactly(a, b interfaces.ObjectIdWithParts) bool {
 
 func IsEmpty[T interfaces.Stringer](a T) bool {
 	return len(a.String()) == 0
+}
+
+func IsVirtual(id Id) bool {
+	seq := id.ToSeq()
+
+	if seq.Len() < 1 {
+		return false
+	} else if seq.MatchStart(
+		doddish.TokenMatcherOp(doddish.OpVirtual),
+	) {
+		return true
+	} else {
+		return false
+	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 )
 
 var poolMatchBuilder = pool.Make(
@@ -39,6 +40,13 @@ func (matchBuilder *MatchBuilder) AddMatchBytes(s []byte) {
 	}
 }
 
+func (matchBuilder *MatchBuilder) AddMatchSeq(seq doddish.Seq) {
+	for _, token := range seq {
+		matchBuilder.Write(token.Contents)
+		matchBuilder.WriteString(" ")
+	}
+}
+
 func (matchBuilder *MatchBuilder) AddMatch(s string) {
 	s1 := strings.SplitSeq(s, "_")
 
@@ -48,9 +56,9 @@ func (matchBuilder *MatchBuilder) AddMatch(s string) {
 	}
 }
 
-func (matchBuilder *MatchBuilder) AddMatches(s ...string) {
-	for _, v := range s {
-		matchBuilder.AddMatch(v)
+func (matchBuilder *MatchBuilder) AddMatches(values ...string) {
+	for _, value := range values {
+		matchBuilder.AddMatch(value)
 	}
 }
 

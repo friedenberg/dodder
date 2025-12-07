@@ -163,7 +163,7 @@ func (store *Store) CheckoutOne(
 ) (checkedOut sku.SkuType, err error) {
 	object := tg.GetSku()
 
-	if !ids.Equals(object.GetMetadata().GetType(), store.tipe.ToSeq()) {
+	if !ids.Equals(object.GetMetadata().GetType(), store.tipe) {
 		err = env_workspace.ErrUnsupportedType{Type: object.GetMetadata().GetType()}
 		err = errors.Wrap(err)
 		return checkedOut, err

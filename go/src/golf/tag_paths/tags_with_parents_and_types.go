@@ -37,13 +37,13 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) ContainsObjectIdTagExact(
 
 // TODO make less fragile
 func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
-	k *ids.ObjectId,
+	id *ids.ObjectId,
 	partial bool,
 ) (int, bool) {
-	e := k.PartsStrings().Right
+	tagString := id.String()
 	offset := 0
 
-	if k.IsVirtual() {
+	if ids.IsVirtual(id) {
 		percent := catgut.GetPool().Get()
 		defer catgut.GetPool().Put(percent)
 
@@ -67,11 +67,11 @@ func (tagsWithParentsAndTypes TagsWithParentsAndTypes) containsObjectIdTag(
 
 	return cmp.BinarySearchFuncIndex(
 		tagsWithParentsAndTypes,
-		e,
-		func(left TagWithParentsAndTypes, right *Tag) cmp.Result {
-			return cmp.CompareUTF8Bytes(
+		tagString,
+		func(left TagWithParentsAndTypes, right string) cmp.Result {
+			return cmp.CompareUTF8BytesAndString(
 				left.Tag.Bytes()[offset:],
-				right.Bytes(),
+				right,
 				partial,
 			)
 		},

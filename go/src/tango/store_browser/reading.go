@@ -10,7 +10,7 @@ import (
 
 // TODO decide how this should behave
 func (store *Store) UpdateTransacted(object *sku.Transacted) (err error) {
-	if !ids.Equals(object.GetType(), store.tipe.ToSeq()) {
+	if !ids.Equals(object.GetType(), store.tipe) {
 		return err
 	}
 

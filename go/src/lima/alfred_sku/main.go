@@ -106,23 +106,28 @@ func (writer *Writer) addCommonMatches(
 	object *sku.Transacted,
 	item *alfred.Item,
 ) {
-	k := &object.ObjectId
-	ks := k.String()
+	id := &object.ObjectId
 
 	matchBuilder := alfred.GetPoolMatchBuilder().Get()
 	defer alfred.GetPoolMatchBuilder().Put(matchBuilder)
 
-	parts := k.PartsStrings()
+	{
+		idString := id.String()
+		matchBuilder.AddMatches(idString)
+	}
 
-	matchBuilder.AddMatches(ks)
-	matchBuilder.AddMatchBytes(parts.Left.Bytes())
-	matchBuilder.AddMatchBytes(parts.Right.Bytes())
+	{
+		seq := id.ToSeq()
+		matchBuilder.AddMatchSeq(seq)
+	}
 
-	errors.PanicIfError(writer.abbr.AbbreviateZettelIdOnly(k))
-	matchBuilder.AddMatches(k.String())
-	parts = k.PartsStrings()
-	matchBuilder.AddMatchBytes(parts.Left.Bytes())
-	matchBuilder.AddMatchBytes(parts.Right.Bytes())
+	errors.PanicIfError(writer.abbr.AbbreviateZettelIdOnly(id))
+	matchBuilder.AddMatches(id.String())
+
+	{
+		seq := id.ToSeq()
+		matchBuilder.AddMatchSeq(seq)
+	}
 
 	matchBuilder.AddMatches(object.GetMetadataMutable().GetDescription().String())
 	matchBuilder.AddMatches(object.GetType().String())
@@ -133,10 +138,12 @@ func (writer *Writer) addCommonMatches(
 		}
 	}
 
-	typeString := object.GetType().String()
+	{
+		typeString := object.GetType().String()
 
-	for expandedType := range expansion.ExpanderAll.Expand(typeString) {
-		matchBuilder.AddMatches(expandedType)
+		for expandedType := range expansion.ExpanderAll.Expand(typeString) {
+			matchBuilder.AddMatches(expandedType)
+		}
 	}
 
 	item.Match.Write(matchBuilder.Bytes())

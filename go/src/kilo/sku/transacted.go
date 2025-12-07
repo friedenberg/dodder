@@ -64,11 +64,11 @@ func (transacted *Transacted) GetTags() ids.TagSet {
 	return transacted.GetMetadata().GetTags()
 }
 
-func (transacted *Transacted) AllTags() interfaces.Seq[ids.ITag] {
+func (transacted *Transacted) AllTags() interfaces.Seq[ids.Tag] {
 	return transacted.GetMetadata().AllTags()
 }
 
-func (transacted *Transacted) AddTag(tag ids.ITag) (err error) {
+func (transacted *Transacted) AddTag(tag ids.Tag) (err error) {
 	if transacted.ObjectId.GetGenre() == genres.Tag &&
 		strings.HasPrefix(transacted.ObjectId.String(), tag.String()) {
 		return err

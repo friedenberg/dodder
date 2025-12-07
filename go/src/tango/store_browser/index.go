@@ -21,7 +21,7 @@ func (store *Store) initializeIndex() (err error) {
 	if err = store.externalStoreInfo.ReadPrimitiveQuery(
 		nil,
 		func(object *sku.Transacted) (err error) {
-			if !ids.Equals(object.GetType(), store.tipe.ToSeq()) {
+			if !ids.Equals(object.GetType(), store.tipe) {
 				return err
 			}
 

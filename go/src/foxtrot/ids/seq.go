@@ -14,26 +14,28 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
-type SeqId struct {
+// TODO add support for binary marshaling
+// TODO make fields private
+type objectId4 struct {
 	Genre genres.Genre
 	Seq   doddish.Seq
 }
 
-var _ interfaces.ObjectId = SeqId{}
+var _ interfaces.ObjectId = objectId4{}
 
-func (id SeqId) GetGenre() interfaces.Genre {
+func (id objectId4) GetGenre() interfaces.Genre {
 	return id.Genre
 }
 
-func (id SeqId) IsEmpty() bool {
+func (id objectId4) IsEmpty() bool {
 	return id.Seq.Len() == 0
 }
 
-func (id SeqId) String() string {
+func (id objectId4) String() string {
 	return id.Seq.String()
 }
 
-func (id SeqId) Equals(other SeqId) bool {
+func (id objectId4) Equals(other objectId4) bool {
 	if id.Genre != other.Genre {
 		return false
 	}
@@ -45,7 +47,7 @@ func (id SeqId) Equals(other SeqId) bool {
 	return true
 }
 
-func (id *SeqId) Set(value string) (err error) {
+func (id *objectId4) Set(value string) (err error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 
@@ -71,6 +73,18 @@ func (id *SeqId) Set(value string) (err error) {
 		} else {
 			id.Genre = genres.Tag
 		}
+
+		// %tag
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpVirtual),
+		doddish.TokenTypeIdentifier,
+	):
+		if TokenIsConfig(seq.At(1)) {
+			err = errors.Errorf("unsupported seq: %q", seq)
+			return
+		}
+
+		id.Genre = genres.Tag
 
 		// !type
 	case seq.MatchAll(
@@ -146,19 +160,19 @@ func (id *SeqId) Set(value string) (err error) {
 	return err
 }
 
-func (id *SeqId) Reset() {
+func (id *objectId4) Reset() {
 	id.Genre = genres.None
 	id.Seq.GetSliceMutable().Reset()
 }
 
-func (id *SeqId) ResetWith(other SeqId) {
+func (id *objectId4) ResetWith(other objectId4) {
 	id.Genre = other.Genre
 
 	comments.Performance("switch to reusing exising seq's data")
 	id.Seq = other.Seq.Clone()
 }
 
-func (id *SeqId) ResetWithObjectId(other interfaces.ObjectId) {
+func (id *objectId4) ResetWithObjectId(other interfaces.ObjectId) {
 	switch other := other.(type) {
 	case TypeStruct:
 		id.ResetWithType(other)
@@ -172,7 +186,7 @@ func (id *SeqId) ResetWithObjectId(other interfaces.ObjectId) {
 	}
 }
 
-func (id *SeqId) ResetWithType(other TypeStruct) {
+func (id *objectId4) ResetWithType(other TypeStruct) {
 	id.Genre = genres.Type
 	id.Seq = doddish.Seq{
 		doddish.Token{
@@ -186,7 +200,7 @@ func (id *SeqId) ResetWithType(other TypeStruct) {
 	}
 }
 
-func (id SeqId) ToType() TypeStruct {
+func (id objectId4) ToType() TypeStruct {
 	if id.IsEmpty() {
 		return TypeStruct{}
 	} else if !id.Genre.IsType() {
@@ -196,15 +210,15 @@ func (id SeqId) ToType() TypeStruct {
 	return TypeStruct{Value: id.Seq.At(1).String()}
 }
 
-// func (id SeqId) Parts() [3]string {
+// func (id objectId4) Parts() [3]string {
 // 	return [3]string{"", "!", typeStruct.Value}
 // }
 
-func SeqIdCompare(left, right SeqId) cmp.Result {
+func SeqIdCompare(left, right objectId4) cmp.Result {
 	return doddish.SeqCompare(left.Seq, right.Seq)
 }
 
-func (id *SeqId) SetType(value string) (err error) {
+func (id *objectId4) SetType(value string) (err error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 
@@ -277,4 +291,8 @@ func (id *SeqId) SetType(value string) (err error) {
 	id.Seq = seq.Clone()
 
 	return err
+}
+
+func (id objectId4) ToSeq() doddish.Seq {
+	return id.Seq
 }

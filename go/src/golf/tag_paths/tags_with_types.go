@@ -69,7 +69,7 @@ func (tags *Tags) AddSuperFrom(
 	return err
 }
 
-func (tags *Tags) AddTagOld(tag ids.ITag) (err error) {
+func (tags *Tags) AddTagOld(tag ids.Tag) (err error) {
 	return tags.AddTag(catgut.MakeFromString(tag.String()))
 }
 

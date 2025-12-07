@@ -10,7 +10,7 @@ type (
 	MetadataStruct = metadata
 
 	TagStruct     = ids.TagStruct
-	Tag           = ids.ITag
+	Tag           = ids.Tag
 	TagSet        = ids.Set[ids.TagStruct]
 	TagSetMutable = ids.SetMutable[ids.TagStruct]
 

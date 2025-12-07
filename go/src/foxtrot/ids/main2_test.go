@@ -20,22 +20,23 @@ func idWriteToReadFromData() []string {
 
 func TestIdWriteToReadFrom(t1 *testing.T) {
 	t := ui.T{T: t1}
-	for _, v := range idWriteToReadFromData() {
-		var k ObjectId
-		t.AssertNoError(k.Set(v))
+
+	for _, value := range idWriteToReadFromData() {
+		var id ObjectId
+		t.AssertNoError(id.Set(value))
 
 		var b bytes.Buffer
 
-		_, err := k.WriteTo(&b)
+		_, err := id.WriteTo(&b)
 		t.AssertNoError(err)
 
-		var k2 ObjectId
+		var id2 ObjectId
 
-		_, err = k2.ReadFrom(&b)
+		_, err = id2.ReadFrom(&b)
 		t.AssertNoError(err)
 
-		if k.String() != k2.String() {
-			t.NotEqual(&k, &k2)
+		if id.String() != id2.String() {
+			t.NotEqual(&id, &id2)
 		}
 	}
 }

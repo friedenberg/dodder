@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
-func SetTags[TAG ids.ITag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
+func SetTags[TAG ids.Tag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
 	{
 		metadata := metadata.(*MetadataStruct)
 		metadata.Contents.Reset()

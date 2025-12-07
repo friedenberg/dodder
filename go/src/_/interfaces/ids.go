@@ -22,6 +22,7 @@ type (
 		IsEmpty() bool
 	}
 
+	// TODO remove
 	ObjectIdWithParts interface {
 		GenreGetter
 		Stringer

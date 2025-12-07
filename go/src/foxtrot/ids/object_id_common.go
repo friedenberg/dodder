@@ -4,33 +4,11 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
 type ObjectIdGetter interface {
 	GetObjectId() *ObjectId
-}
-
-func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
-	return getObjectIdPool2()
-}
-
-type ObjectId = objectId2
-
-type IdParts struct {
-	Middle              byte
-	RepoId, Left, Right *catgut.String
-}
-
-var ErrFDNotId = errors.New("not a id file")
-
-func MustObjectId(kp interfaces.ObjectIdWithParts) (k *ObjectId) {
-	k = &ObjectId{}
-	err := k.SetWithIdLike(kp)
-	errors.PanicIfError(err)
-	return k
 }
 
 type ObjectIdStringMarshalerSansRepo struct {

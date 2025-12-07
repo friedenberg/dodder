@@ -71,7 +71,7 @@ func (a Abbr) LenHeadAndTail(
 func (a Abbr) AbbreviateZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
-	if in.GetGenre() != genres.Zettel || in.IsVirtual() {
+	if in.GetGenre() != genres.Zettel || IsVirtual(in) {
 		return err
 	}
 
