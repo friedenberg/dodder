@@ -140,7 +140,7 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	if _, err = objectId.left.ReadNFrom(r, int(middlePos)); err != nil {
+	if _, err = io.CopyN(&objectId.left, r, int64(middlePos)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -157,7 +157,7 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 
 	objectId.middle = bMiddle[0]
 
-	if _, err = objectId.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
+	if _, err = io.CopyN(&objectId.right, r, int64(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

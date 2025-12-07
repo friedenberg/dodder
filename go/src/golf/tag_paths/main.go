@@ -226,7 +226,7 @@ func (path *Path) ReadFrom(r io.Reader) (n int64, err error) {
 			(*path)[i] = catgut.GetPool().Get()
 		}
 
-		_, err = (*path)[i].ReadNFrom(r, int(cl))
+		_, err = io.CopyN((*path)[i], r, int64(cl))
 		if err != nil {
 			err = errors.WrapExceptSentinel(err, io.EOF)
 			return n, err

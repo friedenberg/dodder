@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 )
 
 type String struct {
@@ -20,15 +19,15 @@ type String struct {
 	data bytes.Buffer
 }
 
-func MakeFromReader(r io.Reader, limit int) (s *String, err error) {
-	s = GetPool().Get()
+func MakeFromReader(reader io.Reader, limit int) (str *String, err error) {
+	str = GetPool().Get()
 
-	if _, err = s.ReadNFrom(r, limit); err != nil {
+	if _, err = io.CopyN(str, reader, int64(limit)); err != nil {
 		err = errors.Wrap(err)
-		return s, err
+		return str, err
 	}
 
-	return s, err
+	return str, err
 }
 
 func MakeFromString(v string) (s *String) {
@@ -257,29 +256,6 @@ func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
 func (dst *String) ReadFrom(r io.Reader) (n int64, err error) {
 	dst.Reset()
 	return dst.data.ReadFrom(r)
-}
-
-func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
-	dst.Reset()
-	dst.Grow(toRead)
-	b := dst.AvailableBuffer()[:toRead]
-
-	read, err = ohio.ReadAllOrDieTrying(r, b)
-	if err != nil {
-		if read == toRead && err == io.EOF {
-			err = nil
-		} else {
-			err = errors.WrapExceptSentinel(err, io.EOF)
-			return read, err
-		}
-	}
-
-	if _, err = dst.data.Write(b); err != nil {
-		err = errors.Wrap(err)
-		return read, err
-	}
-
-	return read, err
 }
 
 func (src *String) Clone() (dst *String, err error) {
