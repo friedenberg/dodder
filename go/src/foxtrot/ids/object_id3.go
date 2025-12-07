@@ -34,6 +34,10 @@ type objectId3 struct {
 
 var _ interfaces.ObjectId = objectId3{}
 
+func (id *objectId3) GetObjectId() *objectId3 {
+	return id
+}
+
 func (id objectId3) GetGenre() interfaces.Genre {
 	return id.Genre
 }
@@ -58,6 +62,10 @@ func (id objectId3) Equals(other objectId3) bool {
 	return true
 }
 
+func (id *objectId3) SetWithId(otherId Id) (err error) {
+	return id.SetWithSeq(otherId.ToSeq())
+}
+
 func (id *objectId3) Set(value string) (err error) {
 	var seq doddish.Seq
 
@@ -68,6 +76,10 @@ func (id *objectId3) Set(value string) (err error) {
 		return err
 	}
 
+	return id.SetWithSeq(seq)
+}
+
+func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 	switch {
 	case seq.Len() == 0:
 		err = doddish.ErrEmptySeq

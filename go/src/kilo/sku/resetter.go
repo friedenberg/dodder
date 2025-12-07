@@ -2,7 +2,6 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 )
@@ -20,7 +19,7 @@ func (transactedResetter) Reset(dst *Transacted) {
 }
 
 func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
-	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
+	dst.ObjectId.ResetWithObjectId(&src.ObjectId)
 	objects.Resetter.ResetWith(&dst.Metadata, &src.Metadata)
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
@@ -29,7 +28,7 @@ func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
 }
 
 func (transactedResetter) ResetWithExceptFields(dst *Transacted, src *Transacted) {
-	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
+	dst.ObjectId.ResetWithObjectId(&src.ObjectId)
 	objects.Resetter.ResetWithExceptFields(dst.GetMetadataMutable(), src.GetMetadata())
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId

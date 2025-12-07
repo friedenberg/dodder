@@ -25,14 +25,12 @@ func getObjectIdPool2() interfaces.Pool[objectId2, *objectId2] {
 	return poolObjectId2
 }
 
-// TODO replace with struct similar to markl.Id
 type objectId2 struct {
 	virtual     bool
 	genre       genres.Genre
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
 	repoId      catgut.String
-	// Domain
 }
 
 var _ Id = &objectId2{}
@@ -43,7 +41,7 @@ func (objectId *objectId2) GetObjectId() *objectId2 {
 
 func (objectId *objectId2) Clone() (clone *objectId2) {
 	clone = getObjectIdPool2().Get()
-	clone.ResetWithIdLike(objectId)
+	clone.ResetWithObjectId(objectId)
 	return clone
 }
 
@@ -165,11 +163,11 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (objectId *objectId2) SetGenre(g interfaces.GenreGetter) {
-	if g == nil {
+func (objectId *objectId2) SetGenre(genre interfaces.GenreGetter) {
+	if genre == nil {
 		objectId.genre = genres.None
 	} else {
-		objectId.genre = genres.Must(g.GetGenre())
+		objectId.genre = genres.Must(genre.GetGenre())
 	}
 
 	if objectId.genre == genres.Zettel {
@@ -758,8 +756,8 @@ func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWithIdLike(b Id) (err error) {
-	return objectId.SetWithId(b)
+func (objectId *objectId2) ResetWithObjectId(b Id) {
+	errors.PanicIfError(objectId.SetWithId(b))
 }
 
 func (objectId *objectId2) MarshalText() (text []byte, err error) {

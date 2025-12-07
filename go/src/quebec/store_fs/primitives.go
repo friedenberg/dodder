@@ -22,7 +22,7 @@ func (store *Store) HydrateExternalFromItem(
 	external *sku.Transacted,
 ) (err error) {
 	if internal != nil {
-		external.ObjectId.ResetWith(&internal.ObjectId)
+		external.ObjectId.ResetWithObjectId(&internal.ObjectId)
 	}
 
 	if err = item.WriteToSku(

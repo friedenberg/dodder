@@ -37,7 +37,7 @@ func (store *Store) checkoutOneIfNecessary(
 
 		// FSItem does not have the object ID for certain so we need to add it to the
 		// external on checkout
-		checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
+		checkedOut.GetSkuExternal().GetObjectId().ResetWithObjectId(checkedOut.GetSku().GetObjectId())
 		checkedOut.SetState(checked_out_state.CheckedOut)
 
 		return checkedOut, item, err
@@ -54,7 +54,7 @@ func (store *Store) checkoutOneIfNecessary(
 
 	// FSItem does not have the object ID for certain so we need to add it to the
 	// external on checkout
-	checkedOut.GetSkuExternal().GetObjectId().ResetWith(checkedOut.GetSku().GetObjectId())
+	checkedOut.GetSkuExternal().GetObjectId().ResetWithObjectId(checkedOut.GetSku().GetObjectId())
 
 	return checkedOut, item, err
 }
