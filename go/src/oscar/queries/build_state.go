@@ -76,6 +76,7 @@ func (buildState *buildState) build(
 ) (err error, latent *errors.GroupBuilder) {
 	latent = errors.MakeGroupBuilder()
 
+	// TODO switch to collections_slice
 	var remaining []string
 
 	if buildState.workspaceStore == nil {
@@ -96,7 +97,7 @@ func (buildState *buildState) build(
 					remaining = append(remaining, value)
 				}
 
-				latent.Add(err)
+				latent.Add(errors.Wrap(err))
 				err = nil
 
 				continue
@@ -120,12 +121,12 @@ func (buildState *buildState) build(
 
 	remainingWithSpaces := make([]string, 0, len(remaining)*2)
 
-	for i, s := range remaining {
-		if i > 0 {
+	for index, value := range remaining {
+		if index > 0 {
 			remainingWithSpaces = append(remainingWithSpaces, " ")
 		}
 
-		remainingWithSpaces = append(remainingWithSpaces, s)
+		remainingWithSpaces = append(remainingWithSpaces, value)
 	}
 
 	reader := catgut.MakeMultiRuneReader(remainingWithSpaces...)
@@ -138,27 +139,27 @@ func (buildState *buildState) build(
 		}
 	}
 
-	for _, k := range buildState.pinnedExternalObjectIds {
-		if k.GetGenre() == genres.None {
-			err = errors.ErrorWithStackf("id with empty genre: %q", k)
+	for _, id := range buildState.pinnedExternalObjectIds {
+		if id.GetGenre() == genres.None {
+			err = errors.ErrorWithStackf("id with empty genre: %q", id)
 			return err, latent
 		}
 
-		if err = buildState.group.addExactExternalObjectId(buildState, k); err != nil {
+		if err = buildState.group.addExactExternalObjectId(buildState, id); err != nil {
 			err = errors.Wrap(err)
 			return err, latent
 		}
 	}
 
-	for _, k := range buildState.pinnedObjectIds {
-		q := buildState.makeQuery()
+	for _, id := range buildState.pinnedObjectIds {
+		query := buildState.makeQuery()
 
-		if err = q.addPinnedObjectId(buildState, k); err != nil {
+		if err = query.addPinnedObjectId(buildState, id); err != nil {
 			err = errors.Wrap(err)
 			return err, latent
 		}
 
-		if err = buildState.group.add(q); err != nil {
+		if err = buildState.group.add(query); err != nil {
 			err = errors.Wrap(err)
 			return err, latent
 		}
@@ -223,6 +224,7 @@ LOOP:
 		// TODO convert this into a decision tree based on token type sequences
 		// instead of a switch
 		if seq.MatchAll(doddish.TokenTypeOperator) {
+			// TODO switch to doddish.Op
 			op := seq.At(0).Contents[0]
 
 			switch op {

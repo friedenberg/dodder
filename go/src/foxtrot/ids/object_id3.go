@@ -162,7 +162,7 @@ func (id *objectId3) Set(value string) (err error) {
 		id.Genre = genres.InventoryList
 
 	default:
-		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
+		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
 		return err
 	}
 
@@ -244,7 +244,7 @@ func (id *objectId3) SetType(value string) (err error) {
 
 	switch {
 	default:
-		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
+		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3.SetType"})
 		return err
 
 	case seq.Len() == 0:

@@ -164,13 +164,13 @@ func (store *Store) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteRune(doddish.OpGroupOpen)
+	sb.WriteRune(doddish.OpGroupOpen.ToRune())
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
 		if hasOne {
-			sb.WriteRune(doddish.OpOr)
+			sb.WriteRune(doddish.OpOr.ToRune())
 		}
 
 		sb.WriteString(v.String())
@@ -188,7 +188,7 @@ func (store *Store) String() (out string) {
 		writeOneIfNecessary(fsItem)
 	}
 
-	sb.WriteRune(doddish.OpGroupClose)
+	sb.WriteRune(doddish.OpGroupClose.ToRune())
 
 	out = sb.String()
 	return out

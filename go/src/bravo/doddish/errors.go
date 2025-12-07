@@ -17,11 +17,16 @@ func newPkgError(text string) error {
 var ErrEmptySeq = newPkgError("empty seq")
 
 type ErrUnsupportedSeq struct {
+	For string
 	Seq
 }
 
 func (err ErrUnsupportedSeq) Error() string {
-	return fmt.Sprintf("unsupported seq: %q", err.Seq)
+	if err.For == "" {
+		return fmt.Sprintf("unsupported seq: %q", err.Seq)
+	} else {
+		return fmt.Sprintf("unsupported seq %q for %q", err.Seq, err.For)
+	}
 }
 
 func (err ErrUnsupportedSeq) Is(target error) bool {

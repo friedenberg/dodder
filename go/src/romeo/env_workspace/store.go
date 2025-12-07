@@ -246,24 +246,24 @@ func (store *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
 }
 
 func (store *Store) GetObjectIdsForString(
-	v string,
-) (k []sku.ExternalObjectId, err error) {
+	idString string,
+) (ids []sku.ExternalObjectId, err error) {
 	if store == nil {
-		err = collections.MakeErrNotFoundString(v)
-		return k, err
+		err = collections.MakeErrNotFoundString(idString)
+		return ids, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return k, err
+		return ids, err
 	}
 
-	if k, err = store.StoreLike.GetObjectIdsForString(v); err != nil {
-		err = errors.Wrap(err)
-		return k, err
+	if ids, err = store.StoreLike.GetObjectIdsForString(idString); err != nil {
+		err = errors.Wrapf(err, "IdString: %q", idString)
+		return ids, err
 	}
 
-	return k, err
+	return ids, err
 }
 
 func (store *Store) Open(

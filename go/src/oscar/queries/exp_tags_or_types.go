@@ -131,9 +131,9 @@ func (expression *expTagsOrTypes) Add(query sku.Query) (err error) {
 
 func (expression *expTagsOrTypes) Operator() rune {
 	if expression.Or {
-		return doddish.OpOr
+		return doddish.OpOr.ToRune()
 	} else {
-		return doddish.OpAnd
+		return doddish.OpAnd.ToRune()
 	}
 }
 
@@ -146,7 +146,7 @@ func (expression *expTagsOrTypes) StringDebug() string {
 		sb.WriteRune('^')
 	}
 
-	sb.WriteRune(doddish.OpGroupOpen)
+	sb.WriteRune(doddish.OpGroupOpen.ToRune())
 	fmt.Fprintf(&sb, "(%d)", len(expression.Children))
 
 	for i, m := range expression.Children {
@@ -157,7 +157,7 @@ func (expression *expTagsOrTypes) StringDebug() string {
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteRune(doddish.OpGroupClose)
+	sb.WriteRune(doddish.OpGroupClose.ToRune())
 
 	return sb.String()
 }
@@ -186,7 +186,7 @@ func (expression *expTagsOrTypes) String() string {
 		sb.WriteString(expression.Children[0].String())
 
 	default:
-		sb.WriteRune(doddish.OpGroupOpen)
+		sb.WriteRune(doddish.OpGroupOpen.ToRune())
 
 		for i, m := range expression.Children {
 			if i > 0 {
@@ -196,7 +196,7 @@ func (expression *expTagsOrTypes) String() string {
 			sb.WriteString(m.String())
 		}
 
-		sb.WriteRune(doddish.OpGroupClose)
+		sb.WriteRune(doddish.OpGroupClose.ToRune())
 	}
 
 	return sb.String()

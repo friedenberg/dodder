@@ -164,11 +164,12 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 			return hasSeq
 		}
 
-		isOperator := isOp(char, !dotOperatorAsSplit)
-		isSequenceOperator := isSeqOp(char)
-		isSpace := unicode.IsSpace(char)
+		op, _ := MakeOp(char)
+		isSoloOrPrefix := op.isSoloSeqOp(!dotOperatorAsSplit)
+		isMixedOp := op.isMixedSeqOp()
 
 		switch {
+		// TODO make quotes and backslash operators
 		case char == '"' || char == '\'':
 			if !scanner.consumeLiteralOrFieldValue(
 				char,
@@ -180,11 +181,11 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 
 			return hasSeq
 
-		case !afterFirst && isOperator:
+		case !afterFirst && isSoloOrPrefix:
 			scanner.scanned.WriteRune(char)
 			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 
-			if isSpace {
+			if op.isSpace() {
 				if !scanner.ConsumeSpacesOrErrorOnFalse() {
 					hasSeq = false
 					return hasSeq
@@ -193,13 +194,13 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 
 			return hasSeq
 
-		case !isOperator && !isSequenceOperator:
+		case !isSoloOrPrefix && !isMixedOp:
 			scanner.tokenTypeProbably = TokenTypeIdentifier
 			scanner.scanned.WriteRune(char)
 			afterFirst = true
 			continue
 
-		case isSeqOp(char):
+		case isMixedOp:
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 			scanner.scanned.WriteRune(char)
 			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
@@ -323,7 +324,8 @@ func (scanner *Scanner) consumeIdentifierLike(
 			return ok
 		}
 
-		isOperator := isOp(char, true)
+		op, _ := MakeOp(char)
+		isOperator := op.isSoloSeqOp(true)
 
 		switch {
 		case char == '"' || char == '\'':

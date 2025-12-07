@@ -160,6 +160,17 @@ func getScannerTestCases() []scannerTestCase {
 				),
 			},
 		},
+		{
+			input: `.e`,
+			expected: []testSeq{
+				makeTestSeq(
+					TokenTypeOperator, ".",
+				),
+				makeTestSeq(
+					TokenTypeIdentifier, "e",
+				),
+			},
+		},
 		// {
 		// 	input: `-tag`,
 		// 	expected: []testSeq{

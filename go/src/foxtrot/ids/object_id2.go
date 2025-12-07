@@ -305,7 +305,7 @@ func (objectId *objectId2) String() string {
 		sb.Write(objectId.right.Bytes())
 
 	case genres.Type:
-		sb.WriteByte(doddish.OpType)
+		sb.WriteRune(doddish.OpType.ToRune())
 		sb.Write(objectId.right.Bytes())
 
 	default:
@@ -421,7 +421,7 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 			return doddish.Seq{
 				doddish.Token{
 					TokenType: doddish.TokenTypeOperator,
-					Contents:  []byte{doddish.OpPathSeparator},
+					Contents:  doddish.OpPathSeparator.ToBytes(),
 				},
 			}
 		} else {
@@ -845,7 +845,7 @@ func (objectId *objectId2) ReadFromSeq(
 		doddish.TokenTypeIdentifier,
 	):
 		objectId.genre = genres.Type
-		objectId.middle = doddish.OpType
+		objectId.middle = doddish.OpType.ToByte()
 		objectId.right.Write(seq.At(1).Contents)
 		return err
 
@@ -855,7 +855,7 @@ func (objectId *objectId2) ReadFromSeq(
 		doddish.TokenTypeIdentifier,
 	):
 		objectId.genre = genres.Tag
-		objectId.middle = doddish.OpVirtual
+		objectId.middle = doddish.OpVirtual.ToByte()
 		objectId.right.Write(seq.At(1).Contents)
 		return err
 
@@ -865,7 +865,7 @@ func (objectId *objectId2) ReadFromSeq(
 		doddish.TokenTypeIdentifier,
 	):
 		objectId.genre = genres.Repo
-		objectId.middle = doddish.OpPathSeparator
+		objectId.middle = doddish.OpPathSeparator.ToByte()
 		objectId.right.Write(seq.At(1).Contents)
 		return err
 
@@ -899,7 +899,7 @@ func (objectId *objectId2) ReadFromSeq(
 	):
 		objectId.genre = genres.Zettel
 		objectId.left.Write(seq.At(0).Contents)
-		objectId.middle = doddish.OpPathSeparator
+		objectId.middle = doddish.OpPathSeparator.ToByte()
 		objectId.right.Write(seq.At(2).Contents)
 		return err
 
@@ -913,19 +913,19 @@ func (objectId *objectId2) ReadFromSeq(
 
 		// TODO don't use object for validation, validate directly
 		if err = tai.Set(seq.String()); err != nil {
-			err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
+			err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "tai"})
 			return err
 		}
 
 		objectId.genre = genres.InventoryList
 		objectId.left.Write(seq.At(0).Contents)
-		objectId.middle = doddish.OpSigilExternal
+		objectId.middle = doddish.OpSigilExternal.ToByte()
 		objectId.right.Write(seq.At(2).Contents)
 
 		return err
 
 	default:
-		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq})
+		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "object id"})
 		return err
 	}
 }
