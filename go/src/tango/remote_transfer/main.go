@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -232,9 +231,9 @@ func (importer importer) importLeaf(
 		)
 
 		if err == nil {
-			err = collections.ErrExists
+			err = errors.ErrExists
 			return checkedOut, err
-		} else if collections.IsErrNotFound(err) {
+		} else if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -247,7 +246,7 @@ func (importer importer) importLeaf(
 		checkedOut.GetSkuExternal().GetObjectId(),
 		checkedOut.GetSku(),
 	); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			if err = importer.importNewObject(
 				checkedOut.GetSkuExternal(),
 			); err != nil {
@@ -321,7 +320,7 @@ func (importer importer) importNewObject(
 		object,
 		options,
 	); err != nil {
-		err = errors.WrapExceptSentinel(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, errors.ErrExists)
 		return err
 	}
 

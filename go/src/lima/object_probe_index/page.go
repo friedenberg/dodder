@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/heap"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -125,7 +124,7 @@ func (page *page) ReadOne(id interfaces.MarklId) (loc Loc, err error) {
 	var start int64
 
 	if start, err = page.searchFunc(id); err != nil {
-		if !collections.IsErrNotFound(err) {
+		if !errors.IsErrNotFound(err) {
 			err = errors.Wrap(err)
 		}
 

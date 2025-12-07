@@ -3,7 +3,6 @@ package store_abbr
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 )
 
 type indexNotZettelId[
@@ -26,7 +25,7 @@ func (index *indexNotZettelId[ID, ID_PTR]) Exists(parts [3]string) (err error) {
 	}
 
 	if !index.ObjectIds.ContainsExpansion(parts[2]) {
-		err = collections.MakeErrNotFoundString(parts[2])
+		err = errors.MakeErrNotFoundString(parts[2])
 		return err
 	}
 

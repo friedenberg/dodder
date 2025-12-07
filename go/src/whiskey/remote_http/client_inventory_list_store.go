@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/comments"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -35,7 +34,7 @@ func (client client) ImportInventoryList(
 
 	if err = client.logRemoteInventoryLists.Exists(
 		logEntry,
-	); collections.IsErrNotFound(err) {
+	); errors.IsErrNotFound(err) {
 		err = nil
 	} else if err != nil {
 		err = errors.Wrap(err)

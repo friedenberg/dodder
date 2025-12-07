@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/mcp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -341,7 +340,7 @@ func (server *Server) readMCPResourceObject(
 			if typeObject, err = repo.GetStore().ReadTypeObject(
 				object.GetMetadata().GetTypeLock(),
 			); err != nil {
-				if collections.IsErrNotFound(err) {
+				if errors.IsErrNotFound(err) {
 					err = nil
 					goto SKIP_TYPE_BLOB
 				} else {

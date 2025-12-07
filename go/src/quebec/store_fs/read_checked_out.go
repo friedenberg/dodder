@@ -2,7 +2,6 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -79,7 +78,7 @@ func (store *Store) readIntoCheckedOutFromTransacted(
 	var fsItem *sku.FSItem
 
 	if fsItem, ok = store.Get(&object.ObjectId); !ok {
-		err = collections.MakeErrNotFound(object.GetObjectId())
+		err = errors.MakeErrNotFound(object.GetObjectId())
 		return err
 	}
 

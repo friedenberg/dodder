@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/sku_lua"
 	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
@@ -21,7 +20,7 @@ func (store *Store) tryNewHook(
 	var typeObject *sku.Transacted
 
 	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(child); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -72,7 +71,7 @@ func (store *Store) TryFormatHook(
 	var objectMother *sku.Transacted
 
 	if objectMother, err = store.ReadOneObjectId(object.GetObjectId()); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -83,7 +82,7 @@ func (store *Store) TryFormatHook(
 	var typeObject *sku.Transacted
 
 	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(object); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -144,7 +143,7 @@ func (store *Store) tryPreCommitHooks(
 	var typeObject *sku.Transacted
 
 	if typeObject, err = store.ReadObjectTypeAndLockIfNecessary(child); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
@@ -22,7 +21,7 @@ func (page *page) seekToFirstBinarySearch(
 	)
 
 	if page.file == nil {
-		err = collections.MakeErrNotFoundString(
+		err = errors.MakeErrNotFoundString(
 			"fd nil: " + expected.StringWithFormat(),
 		)
 		return mid, err
@@ -72,7 +71,7 @@ func (page *page) seekToFirstBinarySearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(
+	err = errors.MakeErrNotFoundString(
 		fmt.Sprintf("%d: %s", loops, expected.StringWithFormat()),
 	)
 
@@ -92,7 +91,7 @@ func (page *page) seekToFirstLinearSearch(
 	)
 
 	if page.file == nil {
-		err = collections.MakeErrNotFoundString(
+		err = errors.MakeErrNotFoundString(
 			"fd nil: " + expected.StringWithFormat(),
 		)
 		return loc, err
@@ -115,7 +114,7 @@ func (page *page) seekToFirstLinearSearch(
 		}
 	}
 
-	err = collections.MakeErrNotFoundString(expected.StringWithFormat())
+	err = errors.MakeErrNotFoundString(expected.StringWithFormat())
 
 	return loc, err
 }

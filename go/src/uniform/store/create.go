@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/india/file_lock"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
@@ -42,7 +41,7 @@ func (store *Store) CreateOrUpdate(
 		external,
 		options,
 	); err != nil {
-		err = errors.WrapExceptSentinel(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, errors.ErrExists)
 		return err
 	}
 
@@ -78,7 +77,7 @@ func (store *Store) CreateOrUpdateBlobDigest(
 		sku.GetTransactedPool().Put(object)
 		object = nil
 
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -92,7 +91,7 @@ func (store *Store) CreateOrUpdateBlobDigest(
 		object,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
-		err = errors.WrapExceptSentinel(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, errors.ErrExists)
 		return object, err
 	}
 
@@ -134,7 +133,7 @@ func (store *Store) RevertTo(
 		object,
 		sku.CommitOptions{StoreOptions: sku.GetStoreOptionsUpdate()},
 	); err != nil {
-		err = errors.WrapExceptSentinel(err, collections.ErrExists)
+		err = errors.WrapExceptSentinel(err, errors.ErrExists)
 		return err
 	}
 

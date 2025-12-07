@@ -3,7 +3,6 @@ package stream_index
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/page_id"
@@ -38,7 +37,7 @@ func (index *Index) ReadOneMarklId(
 
 		// TODO migrate to panic semantics
 		if loc, err = index.readOneMarklIdLoc(marklId); err != nil {
-			if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
+			if errors.IsNotExist(err) || errors.IsErrNotFound(err) {
 				return ok
 			} else {
 				panic(err)
@@ -125,7 +124,7 @@ func (index *Index) ReadOneObjectId(
 	defer repool()
 
 	if !index.ReadOneMarklId(digest, object) {
-		err = collections.MakeErrNotFoundString(objectIdString)
+		err = errors.MakeErrNotFoundString(objectIdString)
 		return err
 	}
 
@@ -152,7 +151,7 @@ func (index *Index) ReadOneObjectIdTai(
 	tai ids.Tai,
 ) (object *sku.Transacted, err error) {
 	if tai.IsEmpty() {
-		err = collections.MakeErrNotFoundString(tai.String())
+		err = errors.MakeErrNotFoundString(tai.String())
 		return object, err
 	}
 
@@ -164,7 +163,7 @@ func (index *Index) ReadOneObjectIdTai(
 	object = sku.GetTransactedPool().Get()
 
 	if !index.ReadOneMarklId(digest, object) {
-		err = collections.MakeErrNotFoundString(key)
+		err = errors.MakeErrNotFoundString(key)
 		return object, err
 	}
 

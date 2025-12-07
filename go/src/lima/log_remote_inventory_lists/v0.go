@@ -10,7 +10,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -147,7 +146,7 @@ func (log *v0) Exists(entry Entry) (err error) {
 	}
 
 	if !log.values.ContainsExpansion(key) {
-		return collections.MakeErrNotFoundString(key)
+		return errors.MakeErrNotFoundString(key)
 	}
 
 	return err

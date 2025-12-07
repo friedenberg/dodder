@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 )
@@ -29,12 +28,12 @@ func (ih *indexZettelId) Exists(parts [3]string) (err error) {
 	}
 
 	if !ih.Heads.ContainsExpansion(parts[0]) {
-		err = collections.MakeErrNotFoundString(parts[0])
+		err = errors.MakeErrNotFoundString(parts[0])
 		return err
 	}
 
 	if !ih.Tails.ContainsExpansion(parts[2]) {
-		err = collections.MakeErrNotFoundString(parts[2])
+		err = errors.MakeErrNotFoundString(parts[2])
 		return err
 	}
 

@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -449,7 +448,7 @@ func (dirInfo *dirInfo) processFDSet(
 			&objectId,
 			recognized,
 		); err != nil {
-			if collections.IsErrNotFound(err) {
+			if errors.IsErrNotFound(err) {
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "ObjectId: %q", objectIdString)

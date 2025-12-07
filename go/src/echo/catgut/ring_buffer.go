@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 )
 
 const RingBufferDefaultSize = 4096
@@ -381,7 +380,7 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
 
 	if !ok {
-		err = collections.MakeErrNotFoundString(string(b))
+		err = errors.MakeErrNotFoundString(string(b))
 		return readable, err
 	}
 

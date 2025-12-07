@@ -3,7 +3,6 @@ package store
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 )
@@ -22,7 +21,7 @@ func (store *Store) ReadExternalAndMergeIfNecessary(
 		options.RepoId,
 		mother,
 	); err != nil {
-		if errors.IsNotExist(err) || collections.IsErrNotFound(err) {
+		if errors.IsNotExist(err) || errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

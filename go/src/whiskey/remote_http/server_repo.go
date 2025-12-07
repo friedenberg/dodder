@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
@@ -97,7 +96,7 @@ func (server *Server) writeInventoryList(
 	if len(logEntry.PublicKey.GetBytes()) > 0 {
 		if err := logRemoteInventoryLists.Exists(
 			logEntry,
-		); collections.IsErrNotFound(err) && err != nil {
+		); errors.IsErrNotFound(err) && err != nil {
 			err = nil
 		} else if err != nil {
 			response.Error(err)

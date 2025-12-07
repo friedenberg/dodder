@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -87,7 +86,7 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			&objectId,
 			checkedOut.GetSku(),
 		); err != nil {
-			if collections.IsErrNotFound(err) ||
+			if errors.IsErrNotFound(err) ||
 				genres.IsErrUnsupportedGenre(err) {
 				hasInternal = false
 				err = nil

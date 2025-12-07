@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/oscar/queries"
@@ -249,7 +248,7 @@ func (store *Store) GetObjectIdsForString(
 	idString string,
 ) (ids []sku.ExternalObjectId, err error) {
 	if store == nil {
-		err = collections.MakeErrNotFoundString(idString)
+		err = errors.MakeErrNotFoundString(idString)
 		return ids, err
 	}
 

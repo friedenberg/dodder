@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -498,7 +497,7 @@ func (buildState *buildState) makeTagOrLuaTag(
 		objectId,
 		object,
 	); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

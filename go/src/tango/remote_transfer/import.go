@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
@@ -111,7 +110,7 @@ func (importer importer) importOne(
 	if errors.Is(err, ErrSkipped) {
 		err = nil
 		return hasConflicts, err
-	} else if errors.Is(err, collections.ErrExists) {
+	} else if errors.Is(err, errors.ErrExists) {
 		err = nil
 		return hasConflicts, err
 	} else if genres.IsErrUnsupportedGenre(err) {

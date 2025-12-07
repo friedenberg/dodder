@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/objects"
@@ -19,7 +18,7 @@ func (store *Store) ReadTransactedFromObjectId(
 	object = sku.GetTransactedPool().Get()
 
 	if err = store.ReadOneInto(objectId, object); err != nil {
-		if collections.IsErrNotFound(err) {
+		if errors.IsErrNotFound(err) {
 			sku.GetTransactedPool().Put(object)
 			object = nil
 		}
@@ -38,7 +37,7 @@ func (store *Store) ReadObjectTypeAndLockIfNecessary(
 	typeMarklId := typeLock.GetValue()
 
 	if ids.IsBuiltin(typeLock.GetKey()) {
-		err = collections.MakeErrNotFound(typeLock.GetKey())
+		err = errors.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 
@@ -62,7 +61,7 @@ func (store *Store) ReadTypeObject(
 	typeLock objects.TypeLock,
 ) (typeObject *sku.Transacted, err error) {
 	if ids.IsBuiltin(typeLock.GetKey()) {
-		err = collections.MakeErrNotFound(typeLock.GetKey())
+		err = errors.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 
@@ -79,7 +78,7 @@ func (store *Store) ReadTypeObject(
 		sku.GetTransactedPool().Put(typeObject)
 		typeObject = nil
 
-		err = collections.MakeErrNotFound(typeLock.GetKey())
+		err = errors.MakeErrNotFound(typeLock.GetKey())
 		return typeObject, err
 	}
 
@@ -97,7 +96,7 @@ func (store *Store) ReadOneObjectId(
 	object = sku.GetTransactedPool().Get()
 
 	if err = store.streamIndex.ReadOneObjectId(objectId, object); err != nil {
-		if !collections.IsErrNotFound(err) {
+		if !errors.IsErrNotFound(err) {
 			err = errors.Wrap(err)
 		}
 
@@ -164,7 +163,7 @@ func (store *Store) ReadOneInto(
 	}
 
 	if object == nil {
-		err = collections.MakeErrNotFound(objectId)
+		err = errors.MakeErrNotFound(objectId)
 		return err
 	}
 

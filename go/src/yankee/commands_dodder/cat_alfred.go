@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/charlie/collections"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/alfred"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -116,7 +115,7 @@ func (cmd CatAlfred) Run(dep command.Request) {
 					if tagObject, err = localWorkingCopy.GetStore().ReadTransactedFromObjectId(
 						tag,
 					); err != nil {
-						if collections.IsErrNotFound(err) {
+						if errors.IsErrNotFound(err) {
 							err = nil
 							tagObject = sku.GetTransactedPool().Get()
 							defer sku.GetTransactedPool().Put(tagObject)
