@@ -168,7 +168,7 @@ func (expSigilAndGenre *expSigilAndGenre) Merge(
 	}
 
 	for _, externalObjectId := range exp.expObjectIds.external {
-		idString := externalObjectId.GetExternalObjectId().String()
+		idString := externalObjectId.String()
 		expSigilAndGenre.expObjectIds.external[idString] = externalObjectId
 	}
 

@@ -167,7 +167,7 @@ func (format *BoxCheckedOut) makeFieldObjectId(
 
 	empty = objectId.IsEmpty()
 
-	oidString := (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: objectId}).String()
+	oidString := (&ids.IdStringerSansRepo{Id: objectId}).String()
 
 	if format.abbr.ZettelId.Abbreviate != nil &&
 		objectId.GetGenre() == genres.Zettel {
@@ -304,7 +304,7 @@ func (format *BoxCheckedOut) addFieldsFS(
 
 	switch {
 	case mode.IsBlobOnly() || mode.IsBlobRecognized():
-		id.Value = (&ids.ObjectIdStringMarshalerSansRepo{ObjectId: &checkedOut.GetSkuExternal().ObjectId}).String()
+		id.Value = (&ids.IdStringerSansRepo{Id: &checkedOut.GetSkuExternal().ObjectId}).String()
 
 	case mode.IncludesMetadata():
 		id.Value = format.relativePath.Rel(item.Object.GetPath())

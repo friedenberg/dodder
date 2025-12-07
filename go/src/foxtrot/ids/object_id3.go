@@ -14,28 +14,39 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
+var poolObjectId3 = pool.Make(
+	nil,
+	func(id *objectId3) {
+		id.Reset()
+	},
+)
+
+func getObjectIdPool3() interfaces.Pool[objectId3, *objectId3] {
+	return poolObjectId3
+}
+
 // TODO add support for binary marshaling
 // TODO make fields private
-type objectId4 struct {
+type objectId3 struct {
 	Genre genres.Genre
 	Seq   doddish.Seq
 }
 
-var _ interfaces.ObjectId = objectId4{}
+var _ interfaces.ObjectId = objectId3{}
 
-func (id objectId4) GetGenre() interfaces.Genre {
+func (id objectId3) GetGenre() interfaces.Genre {
 	return id.Genre
 }
 
-func (id objectId4) IsEmpty() bool {
+func (id objectId3) IsEmpty() bool {
 	return id.Seq.Len() == 0
 }
 
-func (id objectId4) String() string {
+func (id objectId3) String() string {
 	return id.Seq.String()
 }
 
-func (id objectId4) Equals(other objectId4) bool {
+func (id objectId3) Equals(other objectId3) bool {
 	if id.Genre != other.Genre {
 		return false
 	}
@@ -47,7 +58,7 @@ func (id objectId4) Equals(other objectId4) bool {
 	return true
 }
 
-func (id *objectId4) Set(value string) (err error) {
+func (id *objectId3) Set(value string) (err error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 
@@ -160,19 +171,19 @@ func (id *objectId4) Set(value string) (err error) {
 	return err
 }
 
-func (id *objectId4) Reset() {
+func (id *objectId3) Reset() {
 	id.Genre = genres.None
 	id.Seq.GetSliceMutable().Reset()
 }
 
-func (id *objectId4) ResetWith(other objectId4) {
+func (id *objectId3) ResetWith(other objectId3) {
 	id.Genre = other.Genre
 
 	comments.Performance("switch to reusing exising seq's data")
 	id.Seq = other.Seq.Clone()
 }
 
-func (id *objectId4) ResetWithObjectId(other interfaces.ObjectId) {
+func (id *objectId3) ResetWithObjectId(other interfaces.ObjectId) {
 	switch other := other.(type) {
 	case TypeStruct:
 		id.ResetWithType(other)
@@ -186,7 +197,7 @@ func (id *objectId4) ResetWithObjectId(other interfaces.ObjectId) {
 	}
 }
 
-func (id *objectId4) ResetWithType(other TypeStruct) {
+func (id *objectId3) ResetWithType(other TypeStruct) {
 	id.Genre = genres.Type
 	id.Seq = doddish.Seq{
 		doddish.Token{
@@ -200,7 +211,7 @@ func (id *objectId4) ResetWithType(other TypeStruct) {
 	}
 }
 
-func (id objectId4) ToType() TypeStruct {
+func (id objectId3) ToType() TypeStruct {
 	if id.IsEmpty() {
 		return TypeStruct{}
 	} else if !id.Genre.IsType() {
@@ -214,11 +225,11 @@ func (id objectId4) ToType() TypeStruct {
 // 	return [3]string{"", "!", typeStruct.Value}
 // }
 
-func SeqIdCompare(left, right objectId4) cmp.Result {
+func SeqIdCompare(left, right objectId3) cmp.Result {
 	return doddish.SeqCompare(left.Seq, right.Seq)
 }
 
-func (id *objectId4) SetType(value string) (err error) {
+func (id *objectId3) SetType(value string) (err error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 
@@ -293,6 +304,6 @@ func (id *objectId4) SetType(value string) (err error) {
 	return err
 }
 
-func (id objectId4) ToSeq() doddish.Seq {
+func (id objectId3) ToSeq() doddish.Seq {
 	return id.Seq
 }

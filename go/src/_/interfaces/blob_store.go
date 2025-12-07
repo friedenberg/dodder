@@ -82,4 +82,8 @@ type (
 		// TODO remove
 		BlobPool[BLOB_PTR]
 	}
+
+	SavedBlobFormatter interface {
+		FormatSavedBlob(io.Writer, MarklId) (int64, error)
+	}
 )

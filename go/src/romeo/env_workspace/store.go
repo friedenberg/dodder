@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/oscar/queries"
 	"code.linenisgreat.com/dodder/go/src/papa/store_workspace"
@@ -96,7 +97,7 @@ func (store *Store) ReadAllExternalItems() (err error) {
 
 func (store *Store) ReadTransactedFromObjectId(
 	o sku.CommitOptions,
-	k1 interfaces.ObjectIdWithParts,
+	k1 ids.IdWithParts,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
 	es, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)

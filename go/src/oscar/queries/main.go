@@ -195,7 +195,7 @@ func (queryGroup *Query) getExactlyOneExternalObjectId(
 
 	case eoidsLen == 1 && oidsLen == 0:
 		for _, externalObjectId := range externalObjectIds {
-			objectId = externalObjectId.GetExternalObjectId()
+			objectId = externalObjectId
 		}
 
 		sigil.Add(ids.SigilExternal)

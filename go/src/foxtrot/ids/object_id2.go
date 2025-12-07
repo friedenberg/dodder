@@ -14,16 +14,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
-var poolObjectId2 interfaces.Pool[objectId2, *objectId2]
-
-func init() {
-	poolObjectId2 = pool.Make(
-		nil,
-		func(k *objectId2) {
-			k.Reset()
-		},
-	)
-}
+var poolObjectId2 = pool.Make(
+	nil,
+	func(id *objectId2) {
+		id.Reset()
+	},
+)
 
 func getObjectIdPool2() interfaces.Pool[objectId2, *objectId2] {
 	return poolObjectId2
@@ -490,7 +486,7 @@ func (objectId *objectId2) Abbreviate(
 }
 
 func (objectId *objectId2) SetWithIdLike(
-	otherObjectId interfaces.ObjectIdWithParts,
+	otherObjectId IdWithParts,
 ) (err error) {
 	objectId.Reset()
 
@@ -574,7 +570,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		v = els[1]
 	}
 
-	var k interfaces.ObjectIdWithParts
+	var k IdWithParts
 
 	switch objectId.genre {
 	case genres.None:
@@ -665,7 +661,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		}
 	}
 
-	var k interfaces.ObjectIdWithParts
+	var k IdWithParts
 
 	switch objectId.genre {
 	case genres.Zettel:
@@ -759,7 +755,7 @@ func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWithIdLike(b interfaces.ObjectIdWithParts) (err error) {
+func (objectId *objectId2) ResetWithIdLike(b IdWithParts) (err error) {
 	return objectId.SetWithIdLike(b)
 }
 

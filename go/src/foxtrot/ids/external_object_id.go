@@ -3,13 +3,14 @@ package ids
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
-func MakeExternalObjectId(g genres.Genre, value string) *ExternalObjectId {
+func MakeExternalObjectId(genre genres.Genre, value string) *ExternalObjectId {
 	return &ExternalObjectId{
 		value: value,
-		genre: g,
+		genre: genre,
 	}
 }
 
@@ -17,6 +18,8 @@ type ExternalObjectId struct {
 	value string
 	genre genres.Genre
 }
+
+var _ Id = &ExternalObjectId{}
 
 func (eoid *ExternalObjectId) GetExternalObjectId() interfaces.ExternalObjectId {
 	return eoid
@@ -136,4 +139,12 @@ func (eoid *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
 	}
 
 	return err
+}
+
+func (id *ExternalObjectId) ToType() TypeStruct {
+	panic(errors.Err405MethodNotAllowed)
+}
+
+func (id *ExternalObjectId) ToSeq() doddish.Seq {
+	panic(errors.Err501NotImplemented)
 }

@@ -22,14 +22,6 @@ type (
 		IsEmpty() bool
 	}
 
-	// TODO remove
-	ObjectIdWithParts interface {
-		GenreGetter
-		Stringer
-		Parts() [3]string // TODO remove this method
-		IsEmpty() bool
-	}
-
 	ExternalObjectId interface {
 		ObjectId
 		ExternalObjectIdGetter

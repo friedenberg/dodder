@@ -126,7 +126,7 @@ func (transacted *Transacted) GetObjectId() *ids.ObjectId {
 }
 
 func (transacted *Transacted) SetObjectIdLike(
-	objectIdLike interfaces.ObjectIdWithParts,
+	objectIdLike ids.IdWithParts,
 ) (err error) {
 	if err = transacted.ObjectId.SetWithIdLike(objectIdLike); err != nil {
 		err = errors.Wrap(err)

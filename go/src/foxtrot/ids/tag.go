@@ -225,7 +225,7 @@ func (tag *tagStruct) UnmarshalBinary(text []byte) (err error) {
 }
 
 func (tag tagStruct) ToType() TypeStruct {
-	panic("tag cannot be transformed into type")
+	panic(errors.Err405MethodNotAllowed)
 }
 
 func (tag tagStruct) ToSeq() doddish.Seq {

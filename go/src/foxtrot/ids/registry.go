@@ -15,17 +15,17 @@ import (
 var (
 	registerOnce   sync.Once
 	registryLock   *sync.Mutex
-	registryGenres map[genres.Genre]interfaces.ObjectIdWithParts
+	registryGenres map[genres.Genre]IdWithParts
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGenres = make(map[genres.Genre]interfaces.ObjectIdWithParts)
+	registryGenres = make(map[genres.Genre]IdWithParts)
 }
 
-func register[T interfaces.ObjectIdWithParts, TPtr interface {
+func register[T IdWithParts, TPtr interface {
 	interfaces.StringSetterPtr[T]
-	interfaces.ObjectIdWithParts
+	IdWithParts
 }](id T,
 ) {
 	gob.Register(&id)
@@ -37,7 +37,7 @@ func register[T interfaces.ObjectIdWithParts, TPtr interface {
 	defer registryLock.Unlock()
 
 	ok := false
-	var id1 interfaces.ObjectIdWithParts
+	var id1 IdWithParts
 	g := genres.Must(id.GetGenre())
 
 	if id1, ok = registryGenres[g]; ok {

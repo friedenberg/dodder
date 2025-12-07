@@ -16,7 +16,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromObjectId(
-			k1 interfaces.ObjectIdWithParts,
+			k1 ids.IdWithParts,
 		) (sk1 *Transacted, err error)
 	}
 

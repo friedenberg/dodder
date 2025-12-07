@@ -13,7 +13,6 @@ import (
 type (
 	TagStruct  = tagStruct
 	TypeStruct = typeStruct
-	ObjectId   = objectId2
 
 	Id interface {
 		interfaces.ObjectId
@@ -22,20 +21,39 @@ type (
 	}
 
 	Tag   = Id
-	SeqId = objectId4
+	SeqId = objectId3
 	Type  = Id
 
 	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
 		IsInlineType(Type) bool
 	}
+
+	// TODO remove
+	IdWithParts interface {
+		interfaces.ObjectId
+		Parts() [3]string // TODO remove this method
+		IsEmpty() bool
+	}
+
+	ObjectIdGetter interface {
+		GetObjectId() *ObjectId
+	}
 )
+
+type ObjectId = objectId2
 
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 	return getObjectIdPool2()
 }
 
-func MustObjectId(idWithParts interfaces.ObjectIdWithParts) (id *ObjectId) {
+// type ObjectId = objectId3
+
+// func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
+// 	return getObjectIdPool3()
+// }
+
+func MustObjectId(idWithParts IdWithParts) (id *ObjectId) {
 	id = &ObjectId{}
 	err := id.SetWithIdLike(idWithParts)
 	errors.PanicIfError(err)
@@ -80,7 +98,7 @@ func Equals(left, right interfaces.ObjectId) (ok bool) {
 	return true
 }
 
-func FormattedString(k interfaces.ObjectIdWithParts) string {
+func FormattedString(k IdWithParts) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -90,7 +108,7 @@ func FormattedString(k interfaces.ObjectIdWithParts) string {
 }
 
 func AlignedParts(
-	id interfaces.ObjectIdWithParts, lenLeft, lenRight int,
+	id IdWithParts, lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
 	left := parts[0]
@@ -110,7 +128,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id interfaces.ObjectIdWithParts, lenLeft, lenRight int) string {
+func Aligned(id IdWithParts, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
@@ -129,7 +147,7 @@ func LeftSubtract[
 	return c, err
 }
 
-func Contains(a, b interfaces.ObjectIdWithParts) bool {
+func Contains(a, b IdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -144,7 +162,7 @@ func Contains(a, b interfaces.ObjectIdWithParts) bool {
 	return true
 }
 
-func ContainsExactly(a, b interfaces.ObjectIdWithParts) bool {
+func ContainsExactly(a, b IdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
