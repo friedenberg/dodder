@@ -81,7 +81,7 @@ func (id *objectId4) Set(value string) (err error) {
 	):
 		if TokenIsConfig(seq.At(1)) {
 			err = errors.Errorf("unsupported seq: %q", seq)
-			return
+			return err
 		}
 
 		id.Genre = genres.Tag
