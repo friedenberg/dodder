@@ -12,6 +12,7 @@ type scannerTestCase struct {
 	expected []testSeq
 }
 
+// TODO transition to ui.TestCase framework
 func getScannerTestCases() []scannerTestCase {
 	return []scannerTestCase{
 		{
@@ -171,15 +172,15 @@ func getScannerTestCases() []scannerTestCase {
 				),
 			},
 		},
-		// {
-		// 	input: `-tag`,
-		// 	expected: []testSeq{
-		// 		makeTestSeq(
-		// 			TokenTypeOperator, "-",
-		// 			TokenTypeIdentifier, "tag",
-		// 		),
-		// 	},
-		// },
+		{
+			input: `-tag`,
+			expected: []testSeq{
+				makeTestSeq(
+					TokenTypeOperator, "-",
+					TokenTypeIdentifier, "tag",
+				),
+			},
+		},
 	}
 }
 

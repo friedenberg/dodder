@@ -22,12 +22,12 @@ type reader struct {
 	currentAssignment *Assignment
 }
 
-func (ar *reader) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (assignmentReader *reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := catgut.MakeRingBuffer(r1, 0)
 	rbs := catgut.MakeRingBufferScanner(r)
 
-	ar.root = newAssignment(0)
-	ar.currentAssignment = ar.root
+	assignmentReader.root = newAssignment(0)
+	assignmentReader.currentAssignment = assignmentReader.root
 
 LOOP:
 	for {
@@ -71,13 +71,13 @@ LOOP:
 
 			switch pr {
 			case '#':
-				if err = ar.readOneHeading(r, sb); err != nil {
+				if err = assignmentReader.readOneHeading(r, sb); err != nil {
 					err = errors.Wrap(err)
 					return n, err
 				}
 
 			case '%':
-				if err = ar.readOneObj(r, tag_paths.TypeUnknown); err != nil {
+				if err = assignmentReader.readOneObj(r, tag_paths.TypeUnknown); err != nil {
 					if err == io.EOF {
 						err = nil
 					} else {
@@ -87,7 +87,7 @@ LOOP:
 				}
 
 			case '-':
-				if err = ar.readOneObj(r, tag_paths.TypeDirect); err != nil {
+				if err = assignmentReader.readOneObj(r, tag_paths.TypeDirect); err != nil {
 					if err == io.EOF {
 						err = nil
 					} else {
@@ -102,7 +102,7 @@ LOOP:
 			}
 		}
 
-		ar.lineNo++
+		assignmentReader.lineNo++
 
 		if err == io.EOF {
 			err = nil
@@ -115,7 +115,7 @@ LOOP:
 	return n, err
 }
 
-func (ar *reader) readOneHeading(
+func (assignmentReader *reader) readOneHeading(
 	rb *catgut.RingBuffer,
 	match catgut.SliceBytes,
 ) (err error) {
@@ -132,22 +132,22 @@ func (ar *reader) readOneHeading(
 
 	var newAssignment *Assignment
 
-	if depth < ar.currentAssignment.Depth {
-		newAssignment, err = ar.readOneHeadingLesserDepth(
+	if depth < assignmentReader.currentAssignment.Depth {
+		newAssignment, err = assignmentReader.readOneHeadingLesserDepth(
 			depth,
 			currentTags,
 		)
-	} else if depth == ar.currentAssignment.Depth {
-		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentTags)
+	} else if depth == assignmentReader.currentAssignment.Depth {
+		newAssignment, err = assignmentReader.readOneHeadingEqualDepth(depth, currentTags)
 	} else {
 		// always use currentTags.depth + 1 because it corrects movements
-		newAssignment, err = ar.readOneHeadingGreaterDepth(depth, currentTags)
+		newAssignment, err = assignmentReader.readOneHeadingGreaterDepth(depth, currentTags)
 	}
 
 	if err != nil {
 		err = ErrorRead{
 			error:  err,
-			line:   ar.lineNo,
+			line:   assignmentReader.lineNo,
 			column: 2,
 		}
 
@@ -159,18 +159,18 @@ func (ar *reader) readOneHeading(
 		return err
 	}
 
-	ar.currentAssignment = newAssignment
+	assignmentReader.currentAssignment = newAssignment
 
 	return err
 }
 
-func (ar *reader) readOneHeadingLesserDepth(
+func (assignmentReader *reader) readOneHeadingLesserDepth(
 	depth int,
 	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
-	depthDiff := depth - ar.currentAssignment.GetDepth()
+	depthDiff := depth - assignmentReader.currentAssignment.GetDepth()
 
-	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
+	if newCurrent, err = assignmentReader.currentAssignment.nthParent(depthDiff - 1); err != nil {
 		err = errors.Wrap(err)
 		return newCurrent, err
 	}
@@ -199,13 +199,13 @@ func (ar *reader) readOneHeadingLesserDepth(
 	return newCurrent, err
 }
 
-func (ar *reader) readOneHeadingEqualDepth(
+func (assignmentReader *reader) readOneHeadingEqualDepth(
 	depth int,
 	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is ==")
 
-	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
+	if newCurrent, err = assignmentReader.currentAssignment.nthParent(1); err != nil {
 		err = errors.Wrap(err)
 		return newCurrent, err
 	}
@@ -234,14 +234,14 @@ func (ar *reader) readOneHeadingEqualDepth(
 	return newCurrent, err
 }
 
-func (ar *reader) readOneHeadingGreaterDepth(
+func (assignmentReader *reader) readOneHeadingGreaterDepth(
 	depth int,
 	tags ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)
 
-	newCurrent = ar.currentAssignment
+	newCurrent = assignmentReader.currentAssignment
 
 	if tags.Len() == 0 {
 		// `
@@ -270,23 +270,23 @@ func (ar *reader) readOneHeadingGreaterDepth(
 	return newCurrent, err
 }
 
-func (ar *reader) readOneObj(
+func (assignmentReader *reader) readOneObj(
 	r *catgut.RingBuffer,
 	t tag_paths.Type,
 ) (err error) {
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-	z.sku = ar.options.ObjectFactory.Get()
+	z.sku = assignmentReader.options.ObjectFactory.Get()
 	z.tipe = t
 
-	if _, err = ar.options.fmtBox.ReadStringFormat(
+	if _, err = assignmentReader.options.fmtBox.ReadStringFormat(
 		z.GetSkuExternal(),
 		catgut.MakeRingBufferRuneScanner(r),
 	); err != nil {
 		err = ErrorRead{
 			error:  err,
-			line:   ar.lineNo,
+			line:   assignmentReader.lineNo,
 			column: 2,
 		}
 
@@ -311,14 +311,14 @@ func (ar *reader) readOneObj(
 	} else {
 		z.sku.SetState(checked_out_state.CheckedOut)
 
-		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.GetSkuExternal().ObjectId); err != nil {
+		if err = assignmentReader.options.Abbr.ExpandZettelIdOnly(&z.GetSkuExternal().ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
 
 	sku.TransactedResetter.ResetWith(z.GetSku(), z.GetSkuExternal())
-	ar.currentAssignment.AddObject(&z)
+	assignmentReader.currentAssignment.AddObject(&z)
 
 	return err
 }

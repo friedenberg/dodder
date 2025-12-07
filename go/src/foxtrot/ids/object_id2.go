@@ -385,22 +385,52 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 
 	case genres.Tag:
 		if objectId.virtual {
-			return doddish.Seq{
-				doddish.Token{
-					TokenType: doddish.TokenTypeOperator,
-					Contents:  []byte{'%'},
-				},
-				doddish.Token{
-					TokenType: doddish.TokenTypeIdentifier,
-					Contents:  objectId.right.Bytes(),
-				},
+			if objectId.middle == '-' {
+				return doddish.Seq{
+					doddish.Token{
+						TokenType: doddish.TokenTypeOperator,
+						Contents:  []byte{'%'},
+					},
+					doddish.Token{
+						TokenType: doddish.TokenTypeOperator,
+						Contents:  []byte{'-'},
+					},
+					doddish.Token{
+						TokenType: doddish.TokenTypeIdentifier,
+						Contents:  objectId.right.Bytes(),
+					},
+				}
+			} else {
+				return doddish.Seq{
+					doddish.Token{
+						TokenType: doddish.TokenTypeOperator,
+						Contents:  []byte{'%'},
+					},
+					doddish.Token{
+						TokenType: doddish.TokenTypeIdentifier,
+						Contents:  objectId.right.Bytes(),
+					},
+				}
 			}
 		} else {
-			return doddish.Seq{
-				doddish.Token{
-					TokenType: doddish.TokenTypeIdentifier,
-					Contents:  objectId.right.Bytes(),
-				},
+			if objectId.middle == '-' {
+				return doddish.Seq{
+					doddish.Token{
+						TokenType: doddish.TokenTypeOperator,
+						Contents:  []byte{'-'},
+					},
+					doddish.Token{
+						TokenType: doddish.TokenTypeIdentifier,
+						Contents:  objectId.right.Bytes(),
+					},
+				}
+			} else {
+				return doddish.Seq{
+					doddish.Token{
+						TokenType: doddish.TokenTypeIdentifier,
+						Contents:  objectId.right.Bytes(),
+					},
+				}
 			}
 		}
 

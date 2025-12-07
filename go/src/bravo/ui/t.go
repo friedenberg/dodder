@@ -49,6 +49,17 @@ func (test *T) Run(testCaseInfo TestCaseInfo, funk func(*T)) {
 	)
 }
 
+// func RunTestCases[BLOB any](t *T, testCases []TestCase[BLOB]) {
+// 	for _, testCase := range testCases {
+// 		t.Run(
+// 			testCase,
+// 			func(t *T) {
+// 				testCase.GetBlob().Test(t)
+// 			},
+// 		)
+// 	}
+// }
+
 //   ___ ___
 //  |_ _/ _ \
 //   | | | | |

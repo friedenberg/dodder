@@ -98,13 +98,8 @@ func Equals(left, right interfaces.ObjectId) (ok bool) {
 	return true
 }
 
-func FormattedString(k IdWithParts) string {
-	sb := &strings.Builder{}
-	parts := k.Parts()
-	sb.WriteString(parts[0])
-	sb.WriteString(parts[1])
-	sb.WriteString(parts[2])
-	return sb.String()
+func FormattedString(id Id) string {
+	return id.ToSeq().String()
 }
 
 func AlignedParts(

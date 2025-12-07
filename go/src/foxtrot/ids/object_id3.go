@@ -59,14 +59,11 @@ func (id objectId3) Equals(other objectId3) bool {
 }
 
 func (id *objectId3) Set(value string) (err error) {
-	reader, repool := pool.GetStringReader(value)
-	defer repool()
-
-	boxScanner := doddish.MakeScanner(reader)
-
 	var seq doddish.Seq
 
-	if seq, err = boxScanner.ScanDotAllowedInIdentifiersOrError(); err != nil {
+	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+		value,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -85,7 +82,20 @@ func (id *objectId3) Set(value string) (err error) {
 			id.Genre = genres.Tag
 		}
 
-		// %tag
+		// -tag
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpTagSeparator),
+		doddish.TokenTypeIdentifier,
+	):
+
+		if TokenIsConfig(seq.At(1)) {
+			err = errors.Errorf("config not allowed")
+			return
+		}
+
+		id.Genre = genres.Tag
+
+	// %tag
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpVirtual),
 		doddish.TokenTypeIdentifier,

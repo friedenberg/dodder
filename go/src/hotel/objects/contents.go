@@ -158,7 +158,8 @@ func (contents *contents) addNormalizedTag(tag Tag) {
 		expansion.ExpanderRight,
 	)
 
-	for id := range seq {
+	for id, err := range seq {
+		errors.PanicIfError(err)
 		errors.PanicIfError(contents.Add(id))
 	}
 

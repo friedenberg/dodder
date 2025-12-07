@@ -3,6 +3,10 @@ package doddish
 import (
 	"fmt"
 	"testing"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 func TestMain(m *testing.M) {
@@ -60,4 +64,53 @@ func makeSeqFromTestSeq(seq testSeq) (ts Seq) {
 	}
 
 	return ts
+}
+
+func makeSeqFromString(t *ui.T, input string) Seq {
+	var scanner Scanner
+
+	reader, repool := pool.GetStringReader(input)
+	defer repool()
+
+	scanner.Reset(reader)
+
+	var index int
+
+	var seq Seq
+
+	for scanner.ScanDotAllowedInIdentifiers() {
+		if index > 0 {
+			t.Errorf("more than one seq in scanner")
+		}
+
+		seq = scanner.GetSeq()
+		index++
+	}
+
+	if err := scanner.Error(); err != nil {
+		t.AssertNoError(err)
+	}
+
+	return seq
+}
+
+func makeSeqsFromString(t *ui.T, input string) collections_slice.Slice[Seq] {
+	var scanner Scanner
+
+	reader, repool := pool.GetStringReader(input)
+	defer repool()
+
+	scanner.Reset(reader)
+
+	var seqs collections_slice.Slice[Seq]
+
+	for scanner.ScanDotAllowedInIdentifiers() {
+		seqs.Append(scanner.GetSeq())
+	}
+
+	if err := scanner.Error(); err != nil {
+		t.AssertNoError(err)
+	}
+
+	return seqs
 }

@@ -167,6 +167,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 		op, _ := MakeOp(char)
 		isSoloOrPrefix := op.isSoloSeqOp(!dotOperatorAsSplit)
 		isMixedOp := op.isMixedSeqOp()
+		isInlineOp := op.isInlineOp()
 
 		switch {
 		// TODO make quotes and backslash operators
@@ -194,7 +195,7 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 
 			return hasSeq
 
-		case !isSoloOrPrefix && !isMixedOp:
+		case (!isSoloOrPrefix && !isMixedOp) || (isInlineOp && afterFirst):
 			scanner.tokenTypeProbably = TokenTypeIdentifier
 			scanner.scanned.WriteRune(char)
 			afterFirst = true

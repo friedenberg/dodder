@@ -225,41 +225,41 @@ LOOP:
 		// instead of a switch
 		if seq.MatchAll(doddish.TokenTypeOperator) {
 			// TODO switch to doddish.Op
-			op := seq.At(0).Contents[0]
+			op, _ := doddish.MakeOp(rune(seq.At(0).Contents[0]))
 
 			switch op {
-			case '=':
+			case doddish.OpExact:
 				isExact = true
 
-			case '^':
+			case doddish.OpNegation:
 				isNegated = true
 
-			case ' ':
+			case doddish.OpAnd:
 				if stack.Len() == 1 {
 					break LOOP
 				}
 
-			case ',':
+			case doddish.OpOr:
 				last := stack.Last().(*expTagsOrTypes)
 				last.Or = true
 				// TODO handle or when invalid
 
-			case '[':
+			case doddish.OpGroupOpen:
 				exp := buildState.makeExp(isNegated, isExact)
 				isExact = false
 				isNegated = false
 				stack.Last().Add(exp)
 				stack.Append(exp)
 
-			case ']':
+			case doddish.OpGroupClose:
 				stack.DropLast()
 				// TODO handle errors of unbalanced
 
-			case '.':
+			case doddish.OpSigilExternal:
 				// TODO end sigil or embedded as part of name
 				fallthrough
 
-			case ':', '+', '?':
+			case doddish.OpSigilLatest, doddish.OpSigilHistory, doddish.OpSigilHidden:
 				if stack.Len() > 1 {
 					err = errors.ErrorWithStackf("sigil before end")
 					return err

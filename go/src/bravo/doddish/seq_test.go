@@ -36,15 +36,15 @@ func getSeqTestCases() []seqTestCase {
 				},
 			},
 		},
-		// {
-		// 	input: "-tag",
-		// 	expected: [][]TokenMatcher{
-		// 		{
-		// 			TokenMatcherOp('-'),
-		// 			TokenTypeIdentifier,
-		// 		},
-		// 	},
-		// },
+		{
+			input: "-tag",
+			expected: [][]TokenMatcher{
+				{
+					TokenMatcherOp('-'),
+					TokenTypeIdentifier,
+				},
+			},
+		},
 		// {
 		// 	input: ":",
 		// 	expected: []testSeq{

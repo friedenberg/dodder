@@ -1,6 +1,8 @@
 package doddish
 
-import "unicode"
+import (
+	"unicode"
+)
 
 type operatorType byte
 
@@ -17,7 +19,9 @@ func (opType operatorType) isSoloOrPrefix() bool {
 	default:
 		return false
 
-	case operatorTypeSoloSeq, operatorTypePrefixSeqOrSeparateTokenWithin:
+	case
+		operatorTypeSoloSeq,
+		operatorTypePrefixSeqOrSeparateTokenWithin:
 		return true
 	}
 }
@@ -27,13 +31,15 @@ func (opType operatorType) isMixedOrPrefix() bool {
 	default:
 		return false
 
-	case operatorTypeMixedSeq, operatorTypePrefixSeqOrSeparateTokenWithin:
+	case
+		operatorTypeMixedSeq,
+		operatorTypePrefixSeqOrSeparateTokenWithin,
+		operatorTypePrefixSeqOrInlineIdentifier:
 		return true
 	}
 }
 
-// TODO switch to byte
-type Op rune
+type Op byte
 
 const (
 	OpOr            = Op(',')
@@ -50,10 +56,15 @@ const (
 	OpPathSeparator = Op('/')
 	OpType          = Op('!')
 	OpVirtual       = Op('%')
-	OpBlob          = Op('@')
+	OpMarklId       = Op('@')
+	OpTagSeparator  = Op('-')
 )
 
 func MakeOp(char rune) (Op, operatorType) {
+	if char > 255 {
+		return Op('\x00'), operatorTypeUnknown
+	}
+
 	op := Op(char)
 	return op, op.GetType()
 }
@@ -88,7 +99,7 @@ func (op Op) GetType() operatorType {
 		return operatorTypeSoloSeq
 
 	case
-		OpBlob,
+		OpMarklId,
 		OpPathSeparator,
 		OpType,
 		OpVirtual:
@@ -97,10 +108,8 @@ func (op Op) GetType() operatorType {
 	case OpExact, OpSigilExternal:
 		return operatorTypePrefixSeqOrSeparateTokenWithin
 
-		// case OpTagSeparator:
-		// 	return operatorTypeUnknown
-		// return operatorTypePrefixSeq
-		// return operatorTypeMixedSeq
+	case OpTagSeparator:
+		return operatorTypePrefixSeqOrInlineIdentifier
 	}
 }
 
@@ -116,6 +125,11 @@ func (op Op) isSoloSeqOp(dotAllowed bool) bool {
 // Is this an operator, and can it appear within a sequence with other tokens?
 func (op Op) isMixedSeqOp() bool {
 	return op.GetType().isMixedOrPrefix()
+}
+
+// Is this an operator, and should it appear within an identifier token?
+func (op Op) isInlineOp() bool {
+	return op.GetType() == operatorTypePrefixSeqOrInlineIdentifier
 }
 
 func (op Op) isSpace() bool {
