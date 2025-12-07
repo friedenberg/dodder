@@ -28,28 +28,28 @@ func getObjectIdPool2() interfaces.Pool[objectId2, *objectId2] {
 type objectId2 struct {
 	virtual     bool
 	genre       genres.Genre
-	middle      byte // remove and replace with virtual
+	middle      byte
 	left, right catgut.String
 	repoId      catgut.String
 }
 
 var _ Id = &objectId2{}
 
-func (objectId *objectId2) GetObjectId() *objectId2 {
-	return objectId
+func (id *objectId2) GetObjectId() *objectId2 {
+	return id
 }
 
-func (objectId *objectId2) Clone() (clone *objectId2) {
+func (id *objectId2) Clone() (clone *objectId2) {
 	clone = getObjectIdPool2().Get()
-	clone.ResetWithObjectId(objectId)
+	clone.ResetWithObjectId(id)
 	return clone
 }
 
-func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
-	if objectId.Len() > math.MaxUint8 {
+func (id *objectId2) WriteTo(w io.Writer) (n int64, err error) {
+	if id.Len() > math.MaxUint8 {
 		err = errors.ErrorWithStackf(
 			"%q is greater than max uint8 (%d)",
-			objectId.String(),
+			id.String(),
 			math.MaxUint8,
 		)
 
@@ -57,7 +57,7 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	var n1 int64
-	n1, err = objectId.genre.WriteTo(w)
+	n1, err = id.genre.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -65,7 +65,7 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	b := [2]uint8{uint8(objectId.Len()), uint8(objectId.left.Len())}
+	b := [2]uint8{uint8(id.Len()), uint8(id.left.Len())}
 
 	var n2 int
 	n2, err = ohio.WriteAllOrDieTrying(w, b[:])
@@ -76,7 +76,7 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n1, err = objectId.left.WriteTo(w)
+	n1, err = id.left.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -84,7 +84,7 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	bMid := [1]byte{objectId.middle}
+	bMid := [1]byte{id.middle}
 
 	n2, err = ohio.WriteAllOrDieTrying(w, bMid[:])
 	n += int64(n2)
@@ -94,7 +94,7 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 		return n, err
 	}
 
-	n1, err = objectId.right.WriteTo(w)
+	n1, err = id.right.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -105,9 +105,9 @@ func (objectId *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 	return n, err
 }
 
-func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
+func (id *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = objectId.genre.ReadFrom(r)
+	n1, err = id.genre.ReadFrom(r)
 	n += n1
 
 	if err != nil {
@@ -138,7 +138,7 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	if _, err = io.CopyN(&objectId.left, r, int64(middlePos)); err != nil {
+	if _, err = io.CopyN(&id.left, r, int64(middlePos)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -153,9 +153,9 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	objectId.middle = bMiddle[0]
+	id.middle = bMiddle[0]
 
-	if _, err = io.CopyN(&objectId.right, r, int64(contentLength-middlePos-1)); err != nil {
+	if _, err = io.CopyN(&id.right, r, int64(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
@@ -163,185 +163,181 @@ func (objectId *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (objectId *objectId2) SetGenre(genre interfaces.GenreGetter) {
+func (id *objectId2) SetGenre(genre interfaces.GenreGetter) {
 	if genre == nil {
-		objectId.genre = genres.None
+		id.genre = genres.None
 	} else {
-		objectId.genre = genres.Must(genre.GetGenre())
+		id.genre = genres.Must(genre.GetGenre())
 	}
 
-	if objectId.genre == genres.Zettel {
-		objectId.middle = '/'
+	if id.genre == genres.Zettel {
+		id.middle = '/'
 	}
 }
 
-func (objectId *objectId2) IsEmpty() bool {
-	switch objectId.genre {
+func (id *objectId2) IsEmpty() bool {
+	switch id.genre {
 	case genres.None:
-		if objectId.left.String() == "/" && objectId.right.IsEmpty() {
+		if id.left.String() == "/" && id.right.IsEmpty() {
 			return true
 		}
 
 	case genres.Zettel, genres.Blob:
-		if objectId.left.IsEmpty() && objectId.right.IsEmpty() {
+		if id.left.IsEmpty() && id.right.IsEmpty() {
 			return true
 		}
 	}
 
-	return objectId.left.Len() == 0 && objectId.middle == 0 &&
-		objectId.right.Len() == 0
+	return id.left.Len() == 0 && id.middle == 0 &&
+		id.right.Len() == 0
 }
 
-func (objectId *objectId2) Len() int {
-	return objectId.left.Len() + 1 + objectId.right.Len()
-}
-
-func (objectId *objectId2) LenHeadAndTail() (int, int) {
-	return objectId.left.Len(), objectId.right.Len()
+func (id *objectId2) Len() int {
+	return id.left.Len() + 1 + id.right.Len()
 }
 
 // TODO perform validation
-func (objectId *objectId2) SetRepoId(v string) (err error) {
-	if err = objectId.repoId.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
+// func (id *objectId2) SetRepoId(v string) (err error) {
+// 	if err = id.repoId.Set(v); err != nil {
+// 		err = errors.Wrap(err)
+// 		return err
+// 	}
 
-	return err
-}
+// 	return err
+// }
 
-func (objectId *objectId2) StringSansRepo() string {
+func (id *objectId2) StringSansRepo() string {
 	var sb strings.Builder
 
-	switch objectId.genre {
+	switch id.genre {
 	case genres.Zettel:
-		sb.Write(objectId.left.Bytes())
+		sb.Write(id.left.Bytes())
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	case genres.Type:
 		sb.WriteRune('!')
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	default:
-		if objectId.left.Len() > 0 {
-			sb.Write(objectId.left.Bytes())
+		if id.left.Len() > 0 {
+			sb.Write(id.left.Bytes())
 		}
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		if objectId.right.Len() > 0 {
-			sb.Write(objectId.right.Bytes())
+		if id.right.Len() > 0 {
+			sb.Write(id.right.Bytes())
 		}
 	}
 
 	return sb.String()
 }
 
-func (objectId *objectId2) StringSansOp() string {
+func (id *objectId2) StringSansOp() string {
 	var sb strings.Builder
 
-	if objectId.repoId.Len() > 0 {
+	if id.repoId.Len() > 0 {
 		sb.WriteRune('/')
-		objectId.repoId.WriteTo(&sb)
+		id.repoId.WriteTo(&sb)
 		sb.WriteRune('/')
 	}
 
-	switch objectId.genre {
+	switch id.genre {
 	case genres.Zettel:
-		sb.Write(objectId.left.Bytes())
+		sb.Write(id.left.Bytes())
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	case genres.Type:
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	default:
-		if objectId.left.Len() > 0 {
-			sb.Write(objectId.left.Bytes())
+		if id.left.Len() > 0 {
+			sb.Write(id.left.Bytes())
 		}
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		if objectId.right.Len() > 0 {
-			sb.Write(objectId.right.Bytes())
+		if id.right.Len() > 0 {
+			sb.Write(id.right.Bytes())
 		}
 	}
 
 	return sb.String()
 }
 
-func (objectId *objectId2) String() string {
+func (id *objectId2) String() string {
 	var sb strings.Builder
 
-	if objectId.repoId.Len() > 0 {
+	if id.repoId.Len() > 0 {
 		sb.WriteRune('/')
-		objectId.repoId.WriteTo(&sb)
+		id.repoId.WriteTo(&sb)
 		sb.WriteRune('/')
 	}
 
-	switch objectId.genre {
+	switch id.genre {
 	case genres.Zettel:
-		sb.Write(objectId.left.Bytes())
+		sb.Write(id.left.Bytes())
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	case genres.Type:
 		sb.WriteRune(doddish.OpType.ToRune())
-		sb.Write(objectId.right.Bytes())
+		sb.Write(id.right.Bytes())
 
 	default:
-		if objectId.left.Len() > 0 {
-			sb.Write(objectId.left.Bytes())
+		if id.left.Len() > 0 {
+			sb.Write(id.left.Bytes())
 		}
 
-		if objectId.middle != '\x00' {
-			sb.WriteByte(objectId.middle)
+		if id.middle != '\x00' {
+			sb.WriteByte(id.middle)
 		}
 
-		if objectId.right.Len() > 0 {
-			sb.Write(objectId.right.Bytes())
+		if id.right.Len() > 0 {
+			sb.Write(id.right.Bytes())
 		}
 	}
 
 	return sb.String()
 }
 
-func (objectId *objectId2) Reset() {
-	objectId.genre = genres.None
-	objectId.left.Reset()
-	objectId.middle = 0
-	objectId.right.Reset()
-	objectId.repoId.Reset()
+func (id *objectId2) Reset() {
+	id.genre = genres.None
+	id.left.Reset()
+	id.middle = 0
+	id.right.Reset()
+	id.repoId.Reset()
 }
 
-func (objectId *objectId2) ToSeq() doddish.Seq {
-	switch objectId.genre {
+func (id *objectId2) ToSeq() doddish.Seq {
+	switch id.genre {
 	case genres.Blob:
 		return doddish.Seq{
 			doddish.Token{
 				TokenType: doddish.TokenTypeOperator,
-				Contents:  []byte{objectId.middle},
+				Contents:  []byte{id.middle},
 			},
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
+				Contents:  id.right.Bytes(),
 			},
 		}
 
@@ -349,7 +345,7 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 		return doddish.Seq{
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
+				Contents:  id.right.Bytes(),
 			},
 		}
 
@@ -357,15 +353,15 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 		return doddish.Seq{
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.left.Bytes(),
+				Contents:  id.left.Bytes(),
 			},
 			doddish.Token{
 				TokenType: doddish.TokenTypeOperator,
-				Contents:  []byte{objectId.middle},
+				Contents:  []byte{id.middle},
 			},
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
+				Contents:  id.right.Bytes(),
 			},
 		}
 
@@ -373,17 +369,17 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 		return doddish.Seq{
 			doddish.Token{
 				TokenType: doddish.TokenTypeOperator,
-				Contents:  []byte{objectId.middle},
+				Contents:  []byte{id.middle},
 			},
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
+				Contents:  id.right.Bytes(),
 			},
 		}
 
 	case genres.Tag:
-		if objectId.virtual {
-			if objectId.middle == '-' {
+		if id.virtual {
+			if id.middle == '-' {
 				return doddish.Seq{
 					doddish.Token{
 						TokenType: doddish.TokenTypeOperator,
@@ -395,7 +391,7 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 					},
 					doddish.Token{
 						TokenType: doddish.TokenTypeIdentifier,
-						Contents:  objectId.right.Bytes(),
+						Contents:  id.right.Bytes(),
 					},
 				}
 			} else {
@@ -406,12 +402,12 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 					},
 					doddish.Token{
 						TokenType: doddish.TokenTypeIdentifier,
-						Contents:  objectId.right.Bytes(),
+						Contents:  id.right.Bytes(),
 					},
 				}
 			}
 		} else {
-			if objectId.middle == '-' {
+			if id.middle == '-' {
 				return doddish.Seq{
 					doddish.Token{
 						TokenType: doddish.TokenTypeOperator,
@@ -419,14 +415,14 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 					},
 					doddish.Token{
 						TokenType: doddish.TokenTypeIdentifier,
-						Contents:  objectId.right.Bytes(),
+						Contents:  id.right.Bytes(),
 					},
 				}
 			} else {
 				return doddish.Seq{
 					doddish.Token{
 						TokenType: doddish.TokenTypeIdentifier,
-						Contents:  objectId.right.Bytes(),
+						Contents:  id.right.Bytes(),
 					},
 				}
 			}
@@ -436,16 +432,16 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 		return doddish.Seq{
 			doddish.Token{
 				TokenType: doddish.TokenTypeOperator,
-				Contents:  []byte{objectId.middle},
+				Contents:  []byte{id.middle},
 			},
 			doddish.Token{
 				TokenType: doddish.TokenTypeIdentifier,
-				Contents:  objectId.right.Bytes(),
+				Contents:  id.right.Bytes(),
 			},
 		}
 
 	case genres.Zettel:
-		if objectId.IsEmpty() {
+		if id.IsEmpty() {
 			return doddish.Seq{
 				doddish.Token{
 					TokenType: doddish.TokenTypeOperator,
@@ -456,45 +452,45 @@ func (objectId *objectId2) ToSeq() doddish.Seq {
 			return doddish.Seq{
 				doddish.Token{
 					TokenType: doddish.TokenTypeIdentifier,
-					Contents:  objectId.left.Bytes(),
+					Contents:  id.left.Bytes(),
 				},
 				doddish.Token{
 					TokenType: doddish.TokenTypeOperator,
-					Contents:  []byte{objectId.middle},
+					Contents:  []byte{id.middle},
 				},
 				doddish.Token{
 					TokenType: doddish.TokenTypeIdentifier,
-					Contents:  objectId.right.Bytes(),
+					Contents:  id.right.Bytes(),
 				},
 			}
 		}
 
 	default:
-		panic(genres.MakeErrUnsupportedGenre(objectId.genre))
+		panic(genres.MakeErrUnsupportedGenre(id.genre))
 	}
 }
 
-func (objectId *objectId2) GetGenre() interfaces.Genre {
-	return objectId.genre
+func (id *objectId2) GetGenre() interfaces.Genre {
+	return id.genre
 }
 
-func (objectId *objectId2) Expand(
+func (id *objectId2) Expand(
 	a Abbr,
 ) (err error) {
-	ex := a.ExpanderFor(objectId.genre)
+	ex := a.ExpanderFor(id.genre)
 
 	if ex == nil {
 		return err
 	}
 
-	v := objectId.String()
+	v := id.String()
 
 	if v, err = ex(v); err != nil {
 		err = nil
 		return err
 	}
 
-	if err = objectId.SetWithGenre(v, objectId.genre); err != nil {
+	if err = id.SetWithGenre(v, id.genre); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -502,20 +498,20 @@ func (objectId *objectId2) Expand(
 	return err
 }
 
-func (objectId *objectId2) SetWithId(
+func (id *objectId2) SetWithId(
 	otherObjectId Id,
 ) (err error) {
-	objectId.Reset()
+	id.Reset()
 
 	switch kt := otherObjectId.(type) {
 	case *objectId2:
-		objectId.ResetWith(kt)
+		id.ResetWith(kt)
 		return err
 
 	default:
 		seq := otherObjectId.ToSeq()
 
-		if err = objectId.SetWithSeq(seq); err != nil {
+		if err = id.SetWithSeq(seq); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -524,13 +520,13 @@ func (objectId *objectId2) SetWithId(
 	return err
 }
 
-func (objectId *objectId2) SetWithGenre(
+func (id *objectId2) SetWithGenre(
 	value string,
 	genre interfaces.GenreGetter,
 ) (err error) {
-	objectId.genre = genres.Make(genre.GetGenre())
+	id.genre = genres.Make(genre.GetGenre())
 
-	if err = objectId.Set(value); err != nil {
+	if err = id.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -538,10 +534,10 @@ func (objectId *objectId2) SetWithGenre(
 	return err
 }
 
-func (objectId *objectId2) SetLeft(v string) (err error) {
-	objectId.genre = genres.Zettel
+func (id *objectId2) SetLeft(v string) (err error) {
+	id.genre = genres.Zettel
 
-	if err = objectId.left.Set(v); err != nil {
+	if err = id.left.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -550,35 +546,35 @@ func (objectId *objectId2) SetLeft(v string) (err error) {
 }
 
 // TODO switch to SetWithSeq
-func (objectId *objectId2) Set(v string) (err error) {
+func (id *objectId2) Set(v string) (err error) {
 	if v == "/" {
-		objectId.genre = genres.Zettel
+		id.genre = genres.Zettel
 		return err
 	}
 
-	var els []string
+	// var els []string
 
-	if len(v) > 0 {
-		els = strings.SplitAfterN(v[1:], "/", 2)
-	}
+	// if len(v) > 0 {
+	// 	els = strings.SplitAfterN(v[1:], "/", 2)
+	// }
 
-	if strings.HasPrefix(v, "/") && len(els) == 2 {
-		if err = objectId.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
+	// if strings.HasPrefix(v, "/") && len(els) == 2 {
+	// 	if err = id.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return err
+	// 	}
 
-		v = els[1]
-	}
+	// 	v = els[1]
+	// }
 
 	var k Id
 
-	switch objectId.genre {
+	switch id.genre {
 	case genres.None:
 		if k, err = MakeObjectId(v); err != nil {
-			objectId.genre = genres.Blob
+			id.genre = genres.Blob
 
-			if err = objectId.left.Set(v); err != nil {
+			if err = id.left.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return err
 			}
@@ -616,7 +612,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		k = &h
 
 	case genres.Blob:
-		if err = objectId.left.Set(v); err != nil {
+		if err = id.left.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -624,7 +620,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		return err
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(objectId.genre.String())
+		err = genres.MakeErrUnrecognizedGenre(id.genre.String())
 	}
 
 	if err != nil {
@@ -632,7 +628,7 @@ func (objectId *objectId2) Set(v string) (err error) {
 		return err
 	}
 
-	if err = objectId.SetWithId(k); err != nil {
+	if err = id.SetWithId(k); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -640,31 +636,31 @@ func (objectId *objectId2) Set(v string) (err error) {
 	return err
 }
 
-func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
+func (id *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 	if v == "/" {
-		objectId.genre = genres.Zettel
+		id.genre = genres.Zettel
 		return err
 	}
 
-	if strings.HasPrefix(v, "/") {
-		els := strings.SplitAfterN(v[1:], "/", 2)
+	// if strings.HasPrefix(v, "/") {
+	// 	els := strings.SplitAfterN(v[1:], "/", 2)
 
-		if len(els) != 2 {
-			err = errors.ErrorWithStackf("invalid object id format: %q", v)
-			return err
-		}
+	// 	if len(els) != 2 {
+	// 		err = errors.ErrorWithStackf("invalid object id format: %q", v)
+	// 		return err
+	// 	}
 
-		v = els[1]
+	// 	v = els[1]
 
-		if err = objectId.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-	}
+	// 	if err = id.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return err
+	// 	}
+	// }
 
 	var k Id
 
-	switch objectId.genre {
+	switch id.genre {
 	case genres.Zettel:
 		var h ZettelId
 		err = h.Set(v)
@@ -695,7 +691,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		k = &h
 
 	case genres.Blob:
-		if err = objectId.left.Set(v); err != nil {
+		if err = id.left.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -703,7 +699,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		return err
 
 	default:
-		err = genres.MakeErrUnrecognizedGenre(objectId.genre.String())
+		err = genres.MakeErrUnrecognizedGenre(id.genre.String())
 	}
 
 	if err != nil {
@@ -711,7 +707,7 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 		return err
 	}
 
-	if err = objectId.SetWithId(k); err != nil {
+	if err = id.SetWithId(k); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -719,36 +715,36 @@ func (objectId *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWith(b *objectId2) {
-	objectId.genre = b.genre
-	b.left.CopyTo(&objectId.left)
-	b.right.CopyTo(&objectId.right)
-	objectId.middle = b.middle
+func (id *objectId2) ResetWith(b *objectId2) {
+	id.genre = b.genre
+	b.left.CopyTo(&id.left)
+	b.right.CopyTo(&id.right)
+	id.middle = b.middle
 
-	if objectId.middle == '%' {
-		objectId.virtual = true
+	if id.middle == '%' {
+		id.virtual = true
 	}
 
-	b.repoId.CopyTo(&objectId.repoId)
+	b.repoId.CopyTo(&id.repoId)
 }
 
-func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
+func (id *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	if b, ok := b.(*objectId2); ok {
-		objectId.genre = b.genre
-		b.left.CopyTo(&objectId.left)
-		b.right.CopyTo(&objectId.right)
-		objectId.middle = b.middle
+		id.genre = b.genre
+		b.left.CopyTo(&id.left)
+		b.right.CopyTo(&id.right)
+		id.middle = b.middle
 
-		if objectId.middle == '%' {
-			objectId.virtual = true
+		if id.middle == '%' {
+			id.virtual = true
 		}
 
-		b.repoId.CopyTo(&objectId.repoId)
+		b.repoId.CopyTo(&id.repoId)
 
 		return err
 	}
 
-	if objectId.SetWithGenre(b.String(), b.GetGenre()); err != nil {
+	if id.SetWithGenre(b.String(), b.GetGenre()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -756,17 +752,17 @@ func (objectId *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 	return err
 }
 
-func (objectId *objectId2) ResetWithObjectId(b Id) {
-	errors.PanicIfError(objectId.SetWithId(b))
+func (id *objectId2) ResetWithObjectId(b Id) {
+	errors.PanicIfError(id.SetWithId(b))
 }
 
-func (objectId *objectId2) MarshalText() (text []byte, err error) {
-	text = []byte(FormattedString(objectId))
+func (id *objectId2) MarshalText() (text []byte, err error) {
+	text = []byte(FormattedString(id))
 	return text, err
 }
 
-func (objectId *objectId2) UnmarshalText(text []byte) (err error) {
-	if err = objectId.Set(string(text)); err != nil {
+func (id *objectId2) UnmarshalText(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -774,15 +770,15 @@ func (objectId *objectId2) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (objectId *objectId2) MarshalBinary() (text []byte, err error) {
-	text = []byte(FormattedString(objectId))
+func (id *objectId2) MarshalBinary() (text []byte, err error) {
+	text = []byte(FormattedString(id))
 	return text, err
 }
 
-func (objectId *objectId2) UnmarshalBinary(bs []byte) (err error) {
+func (id *objectId2) UnmarshalBinary(bs []byte) (err error) {
 	text := string(bs)
 
-	if err = objectId.Set(text); err != nil {
+	if err = id.Set(text); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -790,7 +786,7 @@ func (objectId *objectId2) UnmarshalBinary(bs []byte) (err error) {
 	return err
 }
 
-func (objectId *objectId2) SetWithSeq(
+func (id *objectId2) SetWithSeq(
 	seq doddish.Seq,
 ) (err error) {
 	switch {
@@ -801,18 +797,18 @@ func (objectId *objectId2) SetWithSeq(
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 	):
-		objectId.genre = genres.Zettel
-		objectId.middle = '/'
+		id.genre = genres.Zettel
+		id.middle = '/'
 
 		return err
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
-		objectId.genre = genres.Tag
-		objectId.right.WriteLower(seq.At(0).Contents)
+		id.genre = genres.Tag
+		id.right.WriteLower(seq.At(0).Contents)
 
-		if objectId.right.EqualsBytes(configBytes) {
-			objectId.genre = genres.Config
+		if id.right.EqualsBytes(configBytes) {
+			id.genre = genres.Config
 		}
 
 		return err
@@ -822,12 +818,12 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp('-'),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Tag
-		objectId.middle = '-'
-		objectId.right.WriteLower(seq.At(1).Contents)
+		id.genre = genres.Tag
+		id.middle = '-'
+		id.right.WriteLower(seq.At(1).Contents)
 
-		if objectId.right.EqualsBytes(configBytes) {
-			objectId.genre = genres.Config
+		if id.right.EqualsBytes(configBytes) {
+			id.genre = genres.Config
 		}
 
 		return err
@@ -837,9 +833,9 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp(doddish.OpType),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Type
-		objectId.middle = doddish.OpType.ToByte()
-		objectId.right.Write(seq.At(1).Contents)
+		id.genre = genres.Type
+		id.middle = doddish.OpType.ToByte()
+		id.right.Write(seq.At(1).Contents)
 		return err
 
 		// %tag
@@ -847,9 +843,9 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp(doddish.OpVirtual),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Tag
-		objectId.middle = doddish.OpVirtual.ToByte()
-		objectId.right.Write(seq.At(1).Contents)
+		id.genre = genres.Tag
+		id.middle = doddish.OpVirtual.ToByte()
+		id.right.Write(seq.At(1).Contents)
 		return err
 
 		// /repo
@@ -857,9 +853,9 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Repo
-		objectId.middle = doddish.OpPathSeparator.ToByte()
-		objectId.right.Write(seq.At(1).Contents)
+		id.genre = genres.Repo
+		id.middle = doddish.OpPathSeparator.ToByte()
+		id.right.Write(seq.At(1).Contents)
 		return err
 
 		// @digest-or-sig
@@ -867,9 +863,9 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Blob
-		objectId.middle = '@'
-		objectId.right.Write(seq.At(1).Contents)
+		id.genre = genres.Blob
+		id.middle = '@'
+		id.right.Write(seq.At(1).Contents)
 		return err
 
 		// purpose@digest-or-sig
@@ -878,10 +874,10 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Blob
-		objectId.left.Write(seq.At(0).Contents)
-		objectId.middle = '@'
-		objectId.right.Write(seq.At(2).Contents)
+		id.genre = genres.Blob
+		id.left.Write(seq.At(0).Contents)
+		id.middle = '@'
+		id.right.Write(seq.At(2).Contents)
 		return err
 
 		// zettel/id
@@ -890,10 +886,10 @@ func (objectId *objectId2) SetWithSeq(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		objectId.genre = genres.Zettel
-		objectId.left.Write(seq.At(0).Contents)
-		objectId.middle = doddish.OpPathSeparator.ToByte()
-		objectId.right.Write(seq.At(2).Contents)
+		id.genre = genres.Zettel
+		id.left.Write(seq.At(0).Contents)
+		id.middle = doddish.OpPathSeparator.ToByte()
+		id.right.Write(seq.At(2).Contents)
 		return err
 
 		// sec.asec
@@ -910,10 +906,10 @@ func (objectId *objectId2) SetWithSeq(
 			return err
 		}
 
-		objectId.genre = genres.InventoryList
-		objectId.left.Write(seq.At(0).Contents)
-		objectId.middle = doddish.OpSigilExternal.ToByte()
-		objectId.right.Write(seq.At(2).Contents)
+		id.genre = genres.InventoryList
+		id.left.Write(seq.At(0).Contents)
+		id.middle = doddish.OpSigilExternal.ToByte()
+		id.right.Write(seq.At(2).Contents)
 
 		return err
 

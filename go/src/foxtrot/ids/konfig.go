@@ -16,6 +16,7 @@ func init() {
 
 var configBytes = []byte("konfig")
 
+// TODO move to doddish
 func TokenIsConfig(token doddish.Token) bool {
 	return bytes.Equal(token.Contents, configBytes)
 }
@@ -36,7 +37,6 @@ func ErrOnConfig(v string) (err error) {
 	return nil
 }
 
-// TODO turn into singleton
 type config struct{}
 
 var Config config

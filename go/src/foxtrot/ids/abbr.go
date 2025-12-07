@@ -35,39 +35,6 @@ func (a Abbr) ExpanderFor(g genres.Genre) interfaces.FuncExpandString {
 	}
 }
 
-func (a Abbr) LenHeadAndTail(
-	in *ObjectId,
-) (head, tail int, err error) {
-	if in.GetGenre() != genres.Zettel || a.ZettelId.Abbreviate == nil {
-		head, tail = in.LenHeadAndTail()
-		return head, tail, err
-	}
-
-	var h ZettelId
-
-	if err = h.Set(in.String()); err != nil {
-		err = nil
-		return head, tail, err
-	}
-
-	var abbr string
-
-	if abbr, err = a.ZettelId.Abbreviate(h); err != nil {
-		err = errors.Wrap(err)
-		return head, tail, err
-	}
-
-	if err = h.Set(abbr); err != nil {
-		err = errors.Wrap(err)
-		return head, tail, err
-	}
-
-	head = len(h.GetHead())
-	tail = len(h.GetTail())
-
-	return head, tail, err
-}
-
 func (a Abbr) AbbreviateZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
