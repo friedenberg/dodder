@@ -78,7 +78,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 
 	seq := boxScanner.GetSeq()
 
-	if err = objectId.ReadFromSeq(seq); err != nil {
+	if err = objectId.SetWithSeq(seq); err != nil {
 		return objectId, err
 	}
 

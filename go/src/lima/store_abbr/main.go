@@ -202,7 +202,7 @@ func (index *indexAbbr) AddObjectToIdIndex(
 	if genre == genres.Zettel {
 		var zettelId ids.ZettelId
 
-		if err = zettelId.SetFromIdParts(object.GetObjectId().Parts()); err != nil {
+		if err = zettelId.SetWithSeq(object.GetObjectId().ToSeq()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

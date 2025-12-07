@@ -193,7 +193,7 @@ func (id *objectId3) ResetWith(other objectId3) {
 	id.Seq = other.Seq.Clone()
 }
 
-func (id *objectId3) ResetWithObjectId(other interfaces.ObjectId) {
+func (id *objectId3) ResetWithObjectId(other Id) {
 	switch other := other.(type) {
 	case TypeStruct:
 		id.ResetWithType(other)
@@ -203,7 +203,7 @@ func (id *objectId3) ResetWithObjectId(other interfaces.ObjectId) {
 
 	default:
 		id.Genre = genres.Must(other.GetGenre())
-		errors.PanicIfError(id.Set(other.String()))
+		id.Seq = other.ToSeq()
 	}
 }
 

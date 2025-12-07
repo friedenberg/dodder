@@ -112,7 +112,7 @@ func (format *BoxTransacted) readStringFormatBox(
 
 		seq := scanner.GetSeq()
 
-		if err = object.ObjectId.ReadFromSeq(seq); err != nil {
+		if err = object.ObjectId.SetWithSeq(seq); err != nil {
 			err = nil
 			object.ObjectId.Reset()
 

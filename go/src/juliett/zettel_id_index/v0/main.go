@@ -177,15 +177,15 @@ func (index *index) Reset() (err error) {
 	return err
 }
 
-func (index *index) AddZettelId(k1 ids.IdWithParts) (err error) {
-	if !k1.GetGenre().IsZettel() {
-		err = genres.MakeErrUnsupportedGenre(k1)
+func (index *index) AddZettelId(id ids.IdWithParts) (err error) {
+	if !id.GetGenre().IsZettel() {
+		err = genres.MakeErrUnsupportedGenre(id)
 		return err
 	}
 
 	var h ids.ZettelId
 
-	if err = h.SetFromIdParts(k1.Parts()); err != nil {
+	if err = h.SetWithSeq(id.ToSeq()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

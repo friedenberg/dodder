@@ -525,7 +525,7 @@ func (objectId *objectId2) Abbreviate(
 }
 
 func (objectId *objectId2) SetWithIdLike(
-	otherObjectId IdWithParts,
+	otherObjectId Id,
 ) (err error) {
 	objectId.Reset()
 
@@ -535,30 +535,13 @@ func (objectId *objectId2) SetWithIdLike(
 		return err
 
 	default:
-		parts := otherObjectId.Parts()
+		seq := otherObjectId.ToSeq()
 
-		if err = objectId.left.Set(parts[0]); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		mid := []byte(parts[1])
-
-		if len(mid) >= 1 {
-			objectId.middle = mid[0]
-
-			if objectId.middle == '%' {
-				objectId.virtual = true
-			}
-		}
-
-		if err = objectId.right.Set(parts[2]); err != nil {
+		if err = objectId.SetWithSeq(seq); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
 	}
-
-	objectId.SetGenre(otherObjectId)
 
 	return err
 }
@@ -835,7 +818,7 @@ func (objectId *objectId2) UnmarshalBinary(bs []byte) (err error) {
 // /browser/bookmark-1
 // /browser/!md
 // /browser/!md
-func (objectId *objectId2) ReadFromSeq(
+func (objectId *objectId2) SetWithSeq(
 	seq doddish.Seq,
 ) (err error) {
 	switch {

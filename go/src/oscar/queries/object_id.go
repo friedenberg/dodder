@@ -48,7 +48,7 @@ func (objectId *ObjectId) ReadFromSeq(seq doddish.Seq) (err error) {
 		seq = left
 	}
 
-	if err = objectId.GetObjectId().ReadFromSeq(seq); err != nil {
+	if err = objectId.GetObjectId().SetWithSeq(seq); err != nil {
 		if errors.Is(err, doddish.ErrUnsupportedSeq{}) {
 			err = errors.BadRequest(err)
 		} else {

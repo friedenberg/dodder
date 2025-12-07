@@ -182,7 +182,7 @@ func (store *Store) Create(
 
 	tai := store.GetTai()
 
-	if err = object.ObjectId.SetWithIdLike(tai); err != nil {
+	if err = object.ObjectId.SetWithSeq(tai.ToSeq()); err != nil {
 		err = errors.Wrap(err)
 		return object, err
 	}

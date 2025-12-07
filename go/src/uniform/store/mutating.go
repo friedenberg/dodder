@@ -135,7 +135,7 @@ func (commitFacilitator commitFacilitator) commit(
 			return err
 		}
 
-		if err = daughter.ObjectId.SetWithIdLike(zettelId); err != nil {
+		if err = daughter.ObjectId.SetWithSeq(zettelId.ToSeq()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

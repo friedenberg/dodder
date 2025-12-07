@@ -25,34 +25,32 @@ type Provider interface {
 	MakeZettelIdFromCoordinates(i coordinates.Int) (string, error)
 }
 
-func NewZettelIdEmpty() (h ZettelId) {
-	h = ZettelId{}
-
-	return h
+func NewZettelIdEmpty() ZettelId {
+	return ZettelId{}
 }
 
 // TODO-P3 is this really necessary?;w
 func MakeZettelIdFromProvidersAndCoordinates(
-	i coordinates.Int,
-	pl Provider,
-	pr Provider,
+	coordinate coordinates.Int,
+	leftProvider Provider,
+	rightProvider Provider,
 ) (h *ZettelId, err error) {
-	k := coordinates.ZettelIdCoordinate{}
-	k.SetInt(i)
+	id := coordinates.ZettelIdCoordinate{}
+	id.SetInt(coordinate)
 
-	var l, r string
+	var left, right string
 
-	if l, err = pl.MakeZettelIdFromCoordinates(k.Left); err != nil {
+	if left, err = leftProvider.MakeZettelIdFromCoordinates(id.Left); err != nil {
 		err = errors.ErrorWithStackf("failed to make left zettel id: %s", err)
 		return h, err
 	}
 
-	if r, err = pr.MakeZettelIdFromCoordinates(k.Right); err != nil {
+	if right, err = rightProvider.MakeZettelIdFromCoordinates(id.Right); err != nil {
 		err = errors.ErrorWithStackf("failed to make right zettel id: %s", err)
 		return h, err
 	}
 
-	return MakeZettelIdFromHeadAndTail(l, r)
+	return MakeZettelIdFromHeadAndTail(left, right)
 }
 
 func MakeZettelIdFromHeadAndTail(head, tail string) (h *ZettelId, err error) {
@@ -153,29 +151,46 @@ func (id ZettelId) Less(j ZettelId) bool {
 	return id.String() < j.String()
 }
 
-func (h *ZettelId) SetFromIdParts(parts [3]string) (err error) {
-	h.left = parts[0]
-	h.right = parts[2]
+func (id *ZettelId) SetWithSeq(seq doddish.Seq) (err error) {
+	switch {
+	case seq.MatchAll(
+		doddish.TokenMatcherOp(doddish.OpPathSeparator),
+	):
+
+	case seq.MatchAll(
+		doddish.TokenTypeIdentifier,
+		doddish.TokenMatcherOp(doddish.OpPathSeparator),
+		doddish.TokenTypeIdentifier,
+	):
+		id.left = seq.At(0).String()
+		id.right = seq.At(2).String()
+
+	default:
+		err = errors.Errorf("seq isn't a zettel id: %q", seq)
+		return
+	}
+
 	return err
 }
 
-func (id *ZettelId) Set(v string) (err error) {
-	v = strings.TrimSpace(v)
-	v = strings.ToLower(v)
+// TODO switch to doddish.Seq
+func (id *ZettelId) Set(value string) (err error) {
+	value = strings.TrimSpace(value)
+	value = strings.ToLower(value)
 
-	v = strings.TrimSuffix(v, ".zettel")
+	value = strings.TrimSuffix(value, ".zettel")
 
 	groupBuilder := errors.MakeGroupBuilder()
 
 	if strings.ContainsFunc(
-		v,
-		func(r rune) bool {
+		value,
+		func(char rune) bool {
 			switch {
-			case unicode.IsDigit(r),
-				unicode.IsLetter(r),
-				r == '_',
-				r == '/',
-				r == '%':
+			case unicode.IsDigit(char),
+				unicode.IsLetter(char),
+				char == '_',
+				char == '/',
+				char == '%':
 				return false
 
 			default:
@@ -184,11 +199,11 @@ func (id *ZettelId) Set(v string) (err error) {
 		},
 	) {
 		groupBuilder.Add(
-			errors.Errorf("contains invalid characters: %q", v),
+			errors.Errorf("contains invalid characters: %q", value),
 		)
 	}
 
-	if v == "/" {
+	if value == "/" {
 		if groupBuilder.Len() > 0 {
 			err = groupBuilder.GetError()
 		}
@@ -196,7 +211,7 @@ func (id *ZettelId) Set(v string) (err error) {
 		return err
 	}
 
-	parts := strings.Split(v, "/")
+	parts := strings.Split(value, "/")
 	count := len(parts)
 
 	switch count {
@@ -204,7 +219,7 @@ func (id *ZettelId) Set(v string) (err error) {
 		groupBuilder.Add(errors.Errorf(
 			"zettel id needs exactly 2 components, but got %d: %q",
 			count,
-			v,
+			value,
 		))
 
 	case 2:
