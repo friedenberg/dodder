@@ -32,7 +32,7 @@ var mapOperators = map[rune]bool{
 	OpSigilHidden:   true,
 }
 
-func IsOperator(r rune, dotAllowed bool) (ok bool) {
+func isOp(r rune, dotAllowed bool) (ok bool) {
 	if dotAllowed && r == '.' {
 		return ok
 	}
@@ -50,7 +50,7 @@ var mapSequenceOperators = map[rune]bool{
 	OpBlob:          true,
 }
 
-func IsSequenceOperator(r rune) (ok bool) {
+func isSeqOp(r rune) (ok bool) {
 	_, ok = mapSequenceOperators[r]
 	return ok
 }

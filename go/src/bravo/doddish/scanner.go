@@ -30,42 +30,42 @@ func MakeScanner(runeScanner io.RuneScanner) *Scanner {
 	return &scanner
 }
 
-func (ts *Scanner) Reset(r io.RuneScanner) {
-	ts.RuneScanner = r
-	ts.scanned.Reset()
-	ts.scannedOffset = 0
-	ts.tokenTypeProbably = TokenTypeIncomplete
-	ts.seq.Reset()
-	ts.err = nil
-	ts.unscan = nil
-	ts.n = 0
+func (scanner *Scanner) Reset(runeScanner io.RuneScanner) {
+	scanner.RuneScanner = runeScanner
+	scanner.scanned.Reset()
+	scanner.scannedOffset = 0
+	scanner.tokenTypeProbably = TokenTypeIncomplete
+	scanner.seq.Reset()
+	scanner.err = nil
+	scanner.unscan = nil
+	scanner.n = 0
 }
 
-func (ts *Scanner) ReadRune() (r rune, n int, err error) {
-	if ts.unscan != nil {
-		r, n, err = ts.unscan.ReadRune()
+func (scanner *Scanner) ReadRune() (char rune, n int, err error) {
+	if scanner.unscan != nil {
+		char, n, err = scanner.unscan.ReadRune()
 
 		if err == io.EOF {
-			ts.unscan = nil
+			scanner.unscan = nil
 			// pass
 		} else if err != nil {
 			err = errors.Wrap(err)
-			return r, n, err
+			return char, n, err
 		} else {
-			return r, n, err
+			return char, n, err
 		}
 	}
 
-	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
-	ts.n += int64(n)
+	scanner.lastRune, n, err = scanner.RuneScanner.ReadRune()
+	scanner.n += int64(n)
 
-	return ts.lastRune, n, err
+	return scanner.lastRune, n, err
 }
 
 // TODO remove unread entirely
-func (ts *Scanner) UnreadRune() (err error) {
-	if ts.unscan != nil {
-		if err = ts.unscan.UnreadRune(); err != nil {
+func (scanner *Scanner) UnreadRune() (err error) {
+	if scanner.unscan != nil {
+		if err = scanner.unscan.UnreadRune(); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -73,21 +73,21 @@ func (ts *Scanner) UnreadRune() (err error) {
 		return err
 	}
 
-	err = ts.RuneScanner.UnreadRune()
+	err = scanner.RuneScanner.UnreadRune()
 
 	if err == nil {
-		ts.n -= int64(utf8.RuneLen(ts.lastRune))
+		scanner.n -= int64(utf8.RuneLen(scanner.lastRune))
 	}
 
 	return err
 }
 
-func (ts *Scanner) Unscan() {
-	ts.unscan = &SeqRuneScanner{Seq: ts.seq}
+func (scanner *Scanner) Unscan() {
+	scanner.unscan = &SeqRuneScanner{Seq: scanner.seq}
 }
 
-func (ts *Scanner) CanScan() (ok bool) {
-	return ts.unscan != nil || ts.err == nil
+func (scanner *Scanner) CanScan() (ok bool) {
+	return scanner.unscan != nil || scanner.err == nil
 }
 
 func (scanner *Scanner) resetBeforeNextScan() {
@@ -97,119 +97,22 @@ func (scanner *Scanner) resetBeforeNextScan() {
 	scanner.seq.Reset()
 }
 
-// func (scanner *Scanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
-// 	if len(scanner.unscan) > 0 {
-// 		ok = true
-// 		scanner.unscan = nil
-// 		return
-// 	}
-
-// 	if scanner.err == io.EOF {
-// 		return
-// 	}
-
-// 	afterFirst := false
-// 	ok = true
-
-// 	scanner.resetBeforeNextScan()
-
-// 	for {
-// 		var r rune
-
-// 		r, _, scanner.err = scanner.ReadRune()
-
-// 		if scanner.err != nil {
-// 			if scanner.err == io.EOF {
-// 				ok = scanner.scanned.Len() > 0
-// 				scanner.seq.Add(scanner.tokenTypeProbably, scanner.scanned.Bytes())
-// 			}
-
-// 			return
-// 		}
-
-// 		isOperator := unicode.IsSpace(r) || r == '[' || r == ']'
-// 		isSpace := unicode.IsSpace(r)
-
-// 		switch {
-// 		case r == '"' || r == '\'':
-// 			if !scanner.consumeLiteralOrFieldValue(
-// 				r,
-// 				TokenTypeLiteral,
-// 			) {
-// 				ok = false
-// 				return
-// 			}
-
-// 			return
-
-// 		case !afterFirst && isOperator:
-// 			if isSpace {
-// 				if !scanner.ConsumeSpacesOrErrorOnFalse() {
-// 					ok = false
-// 					return
-// 				}
-
-// 				continue
-// 			} else {
-// 				scanner.scanned.WriteRune(r)
-// 				scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
-// 				return
-// 			}
-
-// 		case !isOperator:
-// 			scanner.tokenTypeProbably = TokenTypeIdentifier
-// 			scanner.scanned.WriteRune(r)
-// 			afterFirst = true
-// 			continue
-
-// 		default: // wasSplitRune && afterFirst
-// 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
-
-// 			if r == '=' {
-// 				if !scanner.consumeField(r) {
-// 					ok = false
-// 					return
-// 				}
-
-// 				return
-// 			}
-
-// 			if scanner.err = scanner.UnreadRune(); scanner.err != nil {
-// 				scanner.err = errors.Wrapf(scanner.err, "%c", r)
-// 				ok = false
-// 			}
-
-// 			return
-// 		}
-// 	}
-// }
-
-// func (ts *Scanner) ScanSkipSpace() (ok bool) {
-// 	if !ts.ConsumeSpacesOrErrorOnFalse() {
-// 		return
-// 	}
-
-// 	ok = ts.Scan()
-
-// 	return
-// }
-
-func (ts *Scanner) ScanSkipSpace() (ok bool) {
-	if !ts.ConsumeSpacesOrErrorOnFalse() {
+func (scanner *Scanner) ScanSkipSpace() (ok bool) {
+	if !scanner.ConsumeSpacesOrErrorOnFalse() {
 		return ok
 	}
 
-	ok = ts.Scan()
+	ok = scanner.Scan()
 
 	return ok
 }
 
-func (ts *Scanner) Scan() (ok bool) {
-	return ts.scan(true)
+func (scanner *Scanner) Scan() (ok bool) {
+	return scanner.scan(true)
 }
 
-func (ts *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
-	return ts.scan(false)
+func (scanner *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
+	return scanner.scan(false)
 }
 
 func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, error) {
@@ -225,80 +128,80 @@ func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, error) {
 }
 
 func (scanner *Scanner) appendTokenWithTypeToSeq(tokenType TokenType) {
-	if b := scanner.scanned.Bytes()[scanner.scannedOffset:]; len(b) > 0 {
-		scanner.seq.Add(tokenType, b)
-		scanner.scannedOffset += len(b)
+	if bites := scanner.scanned.Bytes()[scanner.scannedOffset:]; len(bites) > 0 {
+		scanner.seq.Add(tokenType, bites)
+		scanner.scannedOffset += len(bites)
 	}
 }
 
-func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
+func (scanner *Scanner) scan(dotOperatorAsSplit bool) (hasSeq bool) {
 	if scanner.unscan.IsFull() {
-		ok = true
+		hasSeq = true
 		scanner.unscan = nil
-		return ok
+		return hasSeq
 	}
 
 	if scanner.err == io.EOF {
-		return ok
+		return hasSeq
 	}
 
 	afterFirst := false
-	ok = true
+	hasSeq = true
 
 	scanner.resetBeforeNextScan()
 
 	for {
-		var r rune
+		var char rune
 
-		r, _, scanner.err = scanner.ReadRune()
+		char, _, scanner.err = scanner.ReadRune()
 
 		if scanner.err != nil {
 			if scanner.err == io.EOF {
-				ok = scanner.scanned.Len() > 0
+				hasSeq = scanner.scanned.Len() > 0
 				scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 			}
 
-			return ok
+			return hasSeq
 		}
 
-		isOperator := IsOperator(r, !dotOperatorAsSplit)
-		isSequenceOperator := IsSequenceOperator(r)
-		isSpace := unicode.IsSpace(r)
+		isOperator := isOp(char, !dotOperatorAsSplit)
+		isSequenceOperator := isSeqOp(char)
+		isSpace := unicode.IsSpace(char)
 
 		switch {
-		case r == '"' || r == '\'':
+		case char == '"' || char == '\'':
 			if !scanner.consumeLiteralOrFieldValue(
-				r,
+				char,
 				TokenTypeLiteral,
 			) {
-				ok = false
-				return ok
+				hasSeq = false
+				return hasSeq
 			}
 
-			return ok
+			return hasSeq
 
 		case !afterFirst && isOperator:
-			scanner.scanned.WriteRune(r)
+			scanner.scanned.WriteRune(char)
 			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 
 			if isSpace {
 				if !scanner.ConsumeSpacesOrErrorOnFalse() {
-					ok = false
-					return ok
+					hasSeq = false
+					return hasSeq
 				}
 			}
 
-			return ok
+			return hasSeq
 
 		case !isOperator && !isSequenceOperator:
 			scanner.tokenTypeProbably = TokenTypeIdentifier
-			scanner.scanned.WriteRune(r)
+			scanner.scanned.WriteRune(char)
 			afterFirst = true
 			continue
 
-		case IsSequenceOperator(r):
+		case isSeqOp(char):
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
-			scanner.scanned.WriteRune(r)
+			scanner.scanned.WriteRune(char)
 			scanner.appendTokenWithTypeToSeq(TokenTypeOperator)
 			afterFirst = true
 			continue
@@ -306,21 +209,21 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 		default: // isOperator && afterFirst
 			scanner.appendTokenWithTypeToSeq(scanner.tokenTypeProbably)
 
-			if r == '=' {
-				if !scanner.consumeField(r) {
-					ok = false
-					return ok
+			if char == '=' {
+				if !scanner.consumeField(char) {
+					hasSeq = false
+					return hasSeq
 				}
 
-				return ok
+				return hasSeq
 			}
 
 			if scanner.err = scanner.UnreadRune(); scanner.err != nil {
-				scanner.err = errors.Wrapf(scanner.err, "%c", r)
-				ok = false
+				scanner.err = errors.Wrapf(scanner.err, "%c", char)
+				hasSeq = false
 			}
 
-			return ok
+			return hasSeq
 		}
 	}
 }
@@ -328,15 +231,15 @@ func (scanner *Scanner) scan(dotOperatorAsSplit bool) (ok bool) {
 // Consumes any spaces currently available in the underlying RuneReader. If this
 // returns false, it means that a read error has occurred, not that no spaces
 // were consumed.
-func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
+func (scanner *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 	ok = true
 
 	for {
 		var r rune
 
-		r, _, ts.err = ts.ReadRune()
+		r, _, scanner.err = scanner.ReadRune()
 
-		if ts.err != nil {
+		if scanner.err != nil {
 			ok = false
 			return ok
 		}
@@ -345,9 +248,9 @@ func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 			continue
 		}
 
-		if ts.err = ts.UnreadRune(); ts.err != nil {
+		if scanner.err = scanner.UnreadRune(); scanner.err != nil {
 			ok = false
-			ts.err = errors.Wrapf(ts.err, "%c", r)
+			scanner.err = errors.Wrapf(scanner.err, "%c", r)
 		}
 
 		return ok
@@ -357,74 +260,74 @@ func (ts *Scanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 // TODO add support for ellipis
 func (scanner *Scanner) consumeLiteralOrFieldValue(
 	start rune,
-	tt TokenType,
+	tokenType TokenType,
 ) (ok bool) {
 	ok = true
 
 	lastWasBackslash := false
 
 	for {
-		var r rune
+		var char rune
 
-		r, _, scanner.err = scanner.ReadRune()
+		char, _, scanner.err = scanner.ReadRune()
 
 		if scanner.err != nil {
 			ok = false
 			return ok
 		}
 
-		currentIsBackslash := r == '\\'
+		currentIsBackslash := char == '\\'
 		escaped := lastWasBackslash && !currentIsBackslash
-		end := r == start
+		end := char == start
 		content := !lastWasBackslash && !currentIsBackslash && !end
 
 		if escaped || content {
-			scanner.scanned.WriteRune(r)
+			scanner.scanned.WriteRune(char)
 		}
 
-		if r != start || lastWasBackslash {
+		if char != start || lastWasBackslash {
 			lastWasBackslash = currentIsBackslash
 			continue
 		}
 
-		scanner.appendTokenWithTypeToSeq(tt)
+		scanner.appendTokenWithTypeToSeq(tokenType)
 
 		return ok
 	}
 }
 
-func (ts *Scanner) consumeField(start rune) bool {
-	ts.scanned.WriteRune(start)
-	ok := ts.consumeIdentifierLike(TokenTypeLiteral)
+func (scanner *Scanner) consumeField(start rune) bool {
+	scanner.scanned.WriteRune(start)
+	ok := scanner.consumeIdentifierLike(TokenTypeLiteral)
 	return ok
 }
 
 // TODO add support for ellipsis
-func (ts *Scanner) consumeIdentifierLike(
-	tt TokenType,
+func (scanner *Scanner) consumeIdentifierLike(
+	tokenType TokenType,
 ) (ok bool) {
 	ok = true
 
-	idx := ts.scanned.Len()
+	idx := scanner.scanned.Len()
 
 	for {
-		var r rune
+		var char rune
 
-		r, _, ts.err = ts.ReadRune()
+		char, _, scanner.err = scanner.ReadRune()
 
-		if ts.err != nil {
-			if ts.err == io.EOF {
-				ok = ts.scanned.Len() > 0
+		if scanner.err != nil {
+			if scanner.err == io.EOF {
+				ok = scanner.scanned.Len() > 0
 			}
 
 			return ok
 		}
 
-		isOperator := IsOperator(r, true)
+		isOperator := isOp(char, true)
 
 		switch {
-		case r == '"' || r == '\'':
-			if !ts.consumeLiteralOrFieldValue(r, tt) {
+		case char == '"' || char == '\'':
+			if !scanner.consumeLiteralOrFieldValue(char, tokenType) {
 				ok = false
 				return ok
 			}
@@ -432,17 +335,17 @@ func (ts *Scanner) consumeIdentifierLike(
 			return ok
 
 		case !isOperator:
-			ts.scanned.WriteRune(r)
+			scanner.scanned.WriteRune(char)
 			continue
 
 		default: // wasSplitRune && afterFirst
-			ts.seq.Add(
-				tt,
-				ts.scanned.Bytes()[idx:ts.scanned.Len()],
+			scanner.seq.Add(
+				tokenType,
+				scanner.scanned.Bytes()[idx:scanner.scanned.Len()],
 			)
 
-			if ts.err = ts.UnreadRune(); ts.err != nil {
-				ts.err = errors.Wrapf(ts.err, "%c", r)
+			if scanner.err = scanner.UnreadRune(); scanner.err != nil {
+				scanner.err = errors.Wrapf(scanner.err, "%c", char)
 				ok = false
 			}
 
