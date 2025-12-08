@@ -64,7 +64,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 		value,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
+		return objectId, err
 	}
 
 	objectId = GetObjectIdPool().Get()
