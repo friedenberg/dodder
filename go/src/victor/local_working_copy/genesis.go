@@ -92,14 +92,14 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 	object := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(object)
 
-	if err = object.ObjectId.SetObjectIdLike(objectIdType); err != nil {
+	if err = object.ObjectId.SetWithId(objectIdType); err != nil {
 		err = errors.Wrap(err)
 		return objectIdType, err
 	}
 
 	var objectId ids.ObjectId
 
-	if err = objectId.SetObjectIdLike(objectIdType); err != nil {
+	if err = objectId.SetWithId(objectIdType); err != nil {
 		err = errors.Wrap(err)
 		return objectIdType, err
 	}
