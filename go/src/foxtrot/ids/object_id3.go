@@ -233,11 +233,11 @@ func (id *objectId3) ResetWithType(other TypeStruct) {
 	id.Genre = genres.Type
 	id.Seq = doddish.Seq{
 		doddish.Token{
-			TokenType: doddish.TokenTypeOperator,
+			Type: doddish.TokenTypeOperator,
 			Contents:  []byte("!"),
 		},
 		doddish.Token{
-			TokenType: doddish.TokenTypeIdentifier,
+			Type: doddish.TokenTypeIdentifier,
 			Contents:  []byte(other.StringSansOp()),
 		},
 	}
@@ -289,7 +289,7 @@ func (id *objectId3) SetType(value string) (err error) {
 		id.Genre = genres.Type
 		seq = doddish.Seq{
 			doddish.Token{
-				TokenType: doddish.TokenTypeOperator,
+				Type: doddish.TokenTypeOperator,
 				Contents:  []byte("!"),
 			},
 			seq.At(0),
@@ -308,7 +308,7 @@ func (id *objectId3) SetType(value string) (err error) {
 		id.Genre = genres.Type
 		seq = doddish.Seq{
 			doddish.Token{
-				TokenType: doddish.TokenTypeOperator,
+				Type: doddish.TokenTypeOperator,
 				Contents:  []byte("!"),
 			},
 			seq.At(0),

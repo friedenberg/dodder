@@ -26,7 +26,7 @@ func (seq *Seq) GetSliceMutable() *collections_slice.Slice[Token] {
 }
 
 func (seq *Seq) Add(tokenType TokenType, contents []byte) {
-	seq.GetSliceMutable().Append(Token{TokenType: tokenType, Contents: contents})
+	seq.GetSliceMutable().Append(Token{Type: tokenType, Contents: contents})
 }
 
 func (seq Seq) StringDebug() string {
@@ -34,7 +34,7 @@ func (seq Seq) StringDebug() string {
 
 	sb.WriteString("Seq{")
 	for _, t := range seq {
-		fmt.Fprintf(&sb, "%s:%q ", t.TokenType, t.Contents)
+		fmt.Fprintf(&sb, "%s:%q ", t.Type, t.Contents)
 	}
 	sb.WriteString("}")
 
@@ -69,7 +69,7 @@ func (seq Seq) GetTokenTypes() TokenTypes {
 	out := make(TokenTypes, seq.Len())
 
 	for i := range out {
-		out[i] = seq.At(i).TokenType
+		out[i] = seq.At(i).Type
 	}
 
 	return out

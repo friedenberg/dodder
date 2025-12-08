@@ -350,15 +350,15 @@ func (id Tai) ToSeq() doddish.Seq {
 
 	return doddish.Seq{
 		doddish.Token{
-			TokenType: doddish.TokenTypeIdentifier,
+			Type: doddish.TokenTypeIdentifier,
 			Contents:  []byte(parts[0]),
 		},
 		doddish.Token{
-			TokenType: doddish.TokenTypeOperator,
+			Type: doddish.TokenTypeOperator,
 			Contents:  []byte{'.'},
 		},
 		doddish.Token{
-			TokenType: doddish.TokenTypeIdentifier,
+			Type: doddish.TokenTypeIdentifier,
 			Contents:  []byte(parts[2]),
 		},
 	}

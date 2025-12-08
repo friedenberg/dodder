@@ -11,7 +11,7 @@ const (
 )
 
 func (expected TokenType) Match(actual Token) bool {
-	return actual.TokenType == expected
+	return actual.Type == expected
 }
 
 // TODO use collections_slice

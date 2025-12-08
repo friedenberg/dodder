@@ -57,7 +57,7 @@ var (
 type TokenMatcherOp byte
 
 func (tokenMatcher TokenMatcherOp) Match(token Token) bool {
-	if token.TokenType != TokenTypeOperator {
+	if token.Type != TokenTypeOperator {
 		return false
 	}
 

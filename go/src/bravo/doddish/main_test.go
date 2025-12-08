@@ -47,7 +47,7 @@ func makeTestSeq(tokens ...any) (ts testSeq) {
 func makeTestSeqFromSeq(seq Seq) (ts testSeq) {
 	for _, t := range seq {
 		ts = append(ts, testToken{
-			TokenType: t.TokenType,
+			TokenType: t.Type,
 			Contents:  string(t.Contents),
 		})
 	}
@@ -58,7 +58,7 @@ func makeTestSeqFromSeq(seq Seq) (ts testSeq) {
 func makeSeqFromTestSeq(seq testSeq) (ts Seq) {
 	for _, t := range seq {
 		ts = append(ts, Token{
-			TokenType: t.TokenType,
+			Type: t.TokenType,
 			Contents:  []byte(t.Contents),
 		})
 	}
