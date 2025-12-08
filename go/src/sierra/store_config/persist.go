@@ -42,21 +42,21 @@ func (store *store) recompile(
 func (store *store) recompileTags() (err error) {
 	store.config.ImplicitTags = make(implicitTagMap)
 
-	for ke := range store.config.Tags.All() {
-		var e ids.TagStruct
+	for tagObject := range store.config.Tags.All() {
+		var tag ids.TagStruct
 
-		if err = e.Set(ke.String()); err != nil {
+		if err = tag.Set(tagObject.String()); err != nil {
 			err = errors.Wrapf(
 				err,
 				"Sku: %s",
 				sku.StringTaiGenreObjectIdObjectDigestBlobDigest(
-					&ke.Transacted,
+					&tagObject.Transacted,
 				),
 			)
 			return err
 		}
 
-		if err = store.config.AccumulateImplicitTags(e); err != nil {
+		if err = store.config.AccumulateImplicitTags(tag); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -77,14 +77,14 @@ func (store *store) recompileTypes(
 		)
 	}()
 
-	for ct := range store.config.Types.All() {
-		tipe := ct.GetSku().GetType()
+	for tagObject := range store.config.Types.All() {
+		tipe := tagObject.GetSku().GetType()
 		var commonBlob type_blobs.Blob
 		var repool interfaces.FuncRepool
 
 		if commonBlob, repool, _, err = blobStore.Type.ParseTypedBlob(
 			tipe,
-			ct.GetBlobDigest(),
+			tagObject.GetBlobDigest(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return err
@@ -96,24 +96,24 @@ func (store *store) recompileTypes(
 			err = errors.ErrorWithStackf(
 				"nil type blob for type: %q. Sku: %s",
 				tipe,
-				ct,
+				tagObject,
 			)
 			return err
 		}
 
-		fe := commonBlob.GetFileExtension()
+		fileExtension := commonBlob.GetFileExtension()
 
-		if fe == "" {
-			fe = ct.GetObjectId().StringSansOp()
+		if fileExtension == "" {
+			fileExtension = tagObject.GetObjectId().StringSansOp()
 		}
 
 		// TODO-P2 enforce uniqueness
-		store.config.ExtensionsToTypes[fe] = ct.GetObjectId().String()
-		store.config.TypesToExtensions[ct.GetObjectId().String()] = fe
+		store.config.ExtensionsToTypes[fileExtension] = tagObject.GetObjectId().String()
+		store.config.TypesToExtensions[tagObject.GetObjectId().String()] = fileExtension
 
 		isBinary := commonBlob.GetBinary()
 		if !isBinary {
-			inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
+			inlineTypes.Add(values.MakeString(tagObject.ObjectId.String()))
 		}
 
 	}
