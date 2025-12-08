@@ -312,13 +312,13 @@ func (store *Store) SetFilenameForTransacted(
 	return err
 }
 
-func (store *Store) PathForTransacted(dir string, sk *sku.Transacted) string {
+func (store *Store) PathForTransacted(dir string, object *sku.Transacted) string {
 	return path.Join(
 		dir,
 		fmt.Sprintf(
 			"%s.%s",
-			sk.GetObjectId().StringSansOp(),
-			store.FileExtensionForObject(sk),
+			object.GetObjectId().StringSansOp(),
+			store.FileExtensionForObject(object),
 		),
 	)
 }

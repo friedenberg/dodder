@@ -105,9 +105,9 @@ func (id *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 	return n, err
 }
 
-func (id *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
+func (id *objectId2) ReadFrom(reader io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = id.genre.ReadFrom(r)
+	n1, err = id.genre.ReadFrom(reader)
 	n += n1
 
 	if err != nil {
@@ -118,7 +118,7 @@ func (id *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [2]uint8
 
 	var n2 int
-	n2, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n2, err = ohio.ReadAllOrDieTrying(reader, b[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -138,14 +138,14 @@ func (id *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 		return n, err
 	}
 
-	if _, err = io.CopyN(&id.left, r, int64(middlePos)); err != nil {
+	if _, err = io.CopyN(&id.left, reader, int64(middlePos)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}
 
 	var bMiddle [1]uint8
 
-	n2, err = ohio.ReadAllOrDieTrying(r, bMiddle[:])
+	n2, err = ohio.ReadAllOrDieTrying(reader, bMiddle[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -155,7 +155,7 @@ func (id *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 
 	id.middle = bMiddle[0]
 
-	if _, err = io.CopyN(&id.right, r, int64(contentLength-middlePos-1)); err != nil {
+	if _, err = io.CopyN(&id.right, reader, int64(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
 		return n, err
 	}

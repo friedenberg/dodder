@@ -32,7 +32,7 @@ type objectId3 struct {
 	Seq   doddish.Seq
 }
 
-var _ interfaces.ObjectId = objectId3{}
+var _ Id = objectId3{}
 
 func (id *objectId3) GetObjectId() *objectId3 {
 	return id
@@ -44,6 +44,16 @@ func (id objectId3) GetGenre() interfaces.Genre {
 
 func (id objectId3) IsEmpty() bool {
 	return id.Seq.Len() == 0
+}
+
+func (id objectId3) Len() int {
+	var count int
+
+	for _, token := range id.Seq {
+		count += len(token.Contents)
+	}
+
+	return count
 }
 
 func (id objectId3) String() string {

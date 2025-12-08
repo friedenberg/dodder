@@ -21,31 +21,31 @@ type ExternalObjectId struct {
 
 var _ Id = &ExternalObjectId{}
 
-func (eoid *ExternalObjectId) GetExternalObjectId() interfaces.ExternalObjectId {
-	return eoid
+func (id *ExternalObjectId) GetExternalObjectId() interfaces.ExternalObjectId {
+	return id
 }
 
-func (eoid *ExternalObjectId) GetGenre() interfaces.Genre {
-	return eoid.genre
+func (id *ExternalObjectId) GetGenre() interfaces.Genre {
+	return id.genre
 }
 
-func (eoid *ExternalObjectId) IsEmpty() bool {
-	return eoid.value == ""
+func (id *ExternalObjectId) IsEmpty() bool {
+	return id.value == ""
 }
 
-func (eoid *ExternalObjectId) String() string {
-	return eoid.value
+func (id *ExternalObjectId) String() string {
+	return id.value
 }
 
-func (eoid *ExternalObjectId) SetGenre(genre interfaces.Genre) (err error) {
-	eoid.genre = genres.Must(genre)
+func (id *ExternalObjectId) SetGenre(genre interfaces.Genre) (err error) {
+	id.genre = genres.Must(genre)
 	return err
 }
 
-func (eoid *ExternalObjectId) SetBlob(v string) (err error) {
-	eoid.genre = genres.Blob
+func (id *ExternalObjectId) SetBlob(v string) (err error) {
+	id.genre = genres.Blob
 
-	if err = eoid.Set(v); err != nil {
+	if err = id.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -53,9 +53,9 @@ func (eoid *ExternalObjectId) SetBlob(v string) (err error) {
 	return err
 }
 
-func (eoid *ExternalObjectId) Set(value string) (err error) {
+func (id *ExternalObjectId) Set(value string) (err error) {
 	if value == "/" {
-		eoid.Reset()
+		id.Reset()
 		return err
 	}
 
@@ -64,51 +64,51 @@ func (eoid *ExternalObjectId) Set(value string) (err error) {
 		return err
 	}
 
-	eoid.value = value
+	id.value = value
 
 	return err
 }
 
-func (eoid *ExternalObjectId) SetWithGenre(
+func (id *ExternalObjectId) SetWithGenre(
 	value string,
 	genre interfaces.Genre,
 ) (err error) {
-	if err = eoid.Set(value); err != nil {
+	if err = id.Set(value); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	eoid.genre = genres.Must(genre)
+	id.genre = genres.Must(genre)
 	return err
 }
 
-func (eoid *ExternalObjectId) Reset() {
-	eoid.genre = genres.None
-	eoid.value = ""
+func (id *ExternalObjectId) Reset() {
+	id.genre = genres.None
+	id.value = ""
 }
 
-func (dst *ExternalObjectId) ResetWith(src *ExternalObjectId) {
-	dst.genre = src.genre
-	dst.value = src.value
+func (id *ExternalObjectId) ResetWith(src *ExternalObjectId) {
+	id.genre = src.genre
+	id.value = src.value
 }
 
-func (dst *ExternalObjectId) SetObjectIdLike(src interfaces.ObjectId) (err error) {
-	if src.IsEmpty() {
-		dst.Reset()
+func (id *ExternalObjectId) SetObjectIdLike(other Id) (err error) {
+	if other.IsEmpty() {
+		id.Reset()
 		return err
 	}
 
 	var value string
 
-	if oid, ok := src.(*ObjectId); ok {
+	if oid, ok := other.(*ObjectId); ok {
 		value = oid.StringSansOp()
 	} else {
-		value = src.String()
+		value = other.String()
 	}
 
-	if err = dst.SetWithGenre(
+	if err = id.SetWithGenre(
 		value,
-		genres.Must(src.GetGenre()),
+		genres.Must(other.GetGenre()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -117,25 +117,25 @@ func (dst *ExternalObjectId) SetObjectIdLike(src interfaces.ObjectId) (err error
 	return err
 }
 
-func (eoid *ExternalObjectId) MarshalBinary() (b []byte, err error) {
-	if b, err = eoid.genre.MarshalBinary(); err != nil {
+func (id *ExternalObjectId) MarshalBinary() (b []byte, err error) {
+	if b, err = id.genre.MarshalBinary(); err != nil {
 		err = errors.Wrap(err)
 		return b, err
 	}
 
-	b = append(b, []byte(eoid.value)...)
+	b = append(b, []byte(id.value)...)
 
 	return b, err
 }
 
-func (eoid *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
-	if err = eoid.genre.UnmarshalBinary(b[:1]); err != nil {
+func (id *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
+	if err = id.genre.UnmarshalBinary(b[:1]); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
 	if len(b) > 1 {
-		eoid.value = string(b[1:])
+		id.value = string(b[1:])
 	}
 
 	return err

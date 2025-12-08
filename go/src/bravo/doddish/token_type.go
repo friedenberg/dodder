@@ -1,7 +1,7 @@
 package doddish
 
 //go:generate stringer -type=TokenType
-type TokenType int
+type TokenType byte
 
 const (
 	TokenTypeIncomplete = TokenType(iota)
