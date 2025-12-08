@@ -1,7 +1,6 @@
 package store_browser
 
 import (
-	"bufio"
 	"encoding/gob"
 	"net/http"
 	"os"
@@ -9,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -26,9 +26,9 @@ func (store *Store) getCachePath() string {
 func (store *Store) initializeCache() (err error) {
 	store.tabCache.Rows = make(map[string]browser_items.ItemId)
 
-	var f *os.File
+	var file *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(
+	if file, err = files.OpenExclusiveReadOnly(
 		store.getCachePath(),
 	); err != nil {
 		if errors.IsNotExist(err) {
@@ -40,10 +40,12 @@ func (store *Store) initializeCache() (err error) {
 		return err
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	defer errors.DeferredCloser(&err, file)
 
-	br := bufio.NewReader(f)
-	dec := gob.NewDecoder(br)
+	bufferedReader, repool := pool.GetBufferedReader(file)
+	defer repool()
+
+	dec := gob.NewDecoder(bufferedReader)
 
 	if err = dec.Decode(&store.tabCache); err != nil {
 		ui.Err().Printf("browser tab cache parse failed: %s", err)
@@ -102,10 +104,12 @@ func (store *Store) flushCache() (err error) {
 
 	defer errors.DeferredCloser(&err, file)
 
-	bw := bufio.NewWriter(file)
-	defer errors.DeferredFlusher(&err, bw)
+	bufferedWriter, repool := pool.GetBufferedWriter(file)
+	defer repool()
 
-	dec := gob.NewEncoder(bw)
+	defer errors.DeferredFlusher(&err, bufferedWriter)
+
+	dec := gob.NewEncoder(bufferedWriter)
 
 	if err = dec.Encode(&store.tabCache); err != nil {
 		err = errors.Wrap(err)

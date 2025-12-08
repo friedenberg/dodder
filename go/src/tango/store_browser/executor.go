@@ -13,27 +13,27 @@ import (
 )
 
 type executor struct {
-	store *Store
-	qg    *queries.Query
-	out   interfaces.FuncIter[sku.SkuType]
-	co    sku.CheckedOut
+	store      *Store
+	query      *queries.Query
+	out        interfaces.FuncIter[sku.SkuType]
+	checkedOut sku.CheckedOut
 }
 
-func (c *executor) tryToEmitOneExplicitlyCheckedOut(
+func (executor *executor) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
 	item Item,
 ) (err error) {
-	c.co.GetSkuExternal().ObjectId.Reset()
+	executor.checkedOut.GetSkuExternal().ObjectId.Reset()
 
 	var uSku *url.URL
 
-	if uSku, err = c.store.getUrl(internal); err != nil {
+	if uSku, err = executor.store.getUrl(internal); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
-	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
+	sku.TransactedResetter.ResetWith(executor.checkedOut.GetSku(), internal)
+	sku.TransactedResetter.ResetWith(executor.checkedOut.GetSkuExternal().GetSku(), internal)
 
 	if *uSku == item.Url.Url() {
 		// c.co.SetState(checked_out_state.ExistsAndSame)
@@ -41,9 +41,9 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 		// c.co.SetState(checked_out_state.Changed)
 	}
 
-	c.co.GetSkuExternal().State = external_state.Tracked
+	executor.checkedOut.GetSkuExternal().State = external_state.Tracked
 
-	if err = c.tryToEmitOneCommon(item); err != nil {
+	if err = executor.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -51,28 +51,28 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	return err
 }
 
-func (c *executor) tryToEmitOneRecognized(
+func (executor *executor) tryToEmitOneRecognized(
 	internal *sku.Transacted,
 	item Item,
 ) (err error) {
-	c.co.SetState(checked_out_state.Recognized)
+	executor.checkedOut.SetState(checked_out_state.Recognized)
 
-	if !queries.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
+	if !queries.ContainsSkuCheckedOutState(executor.query, executor.checkedOut.GetState()) {
 		return err
 	}
 
-	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
-	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
+	sku.TransactedResetter.ResetWith(executor.checkedOut.GetSku(), internal)
+	sku.TransactedResetter.ResetWith(executor.checkedOut.GetSkuExternal().GetSku(), internal)
 
 	// if err = item.WriteToObjectId(&c.co.External.ObjectId); err != nil {
 	// 	err = errors.Wrap(err)
 	// 	return
 	// }
 
-	c.co.SetState(checked_out_state.Recognized)
-	c.co.GetSkuExternal().State = external_state.Recognized
+	executor.checkedOut.SetState(checked_out_state.Recognized)
+	executor.checkedOut.GetSkuExternal().State = external_state.Recognized
 
-	if err = c.tryToEmitOneCommon(item); err != nil {
+	if err = executor.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -80,26 +80,26 @@ func (c *executor) tryToEmitOneRecognized(
 	return err
 }
 
-func (c *executor) tryToEmitOneUntracked(
+func (executor *executor) tryToEmitOneUntracked(
 	item Item,
 ) (err error) {
-	c.co.SetState(checked_out_state.Untracked)
+	executor.checkedOut.SetState(checked_out_state.Untracked)
 
-	if !queries.ContainsSkuCheckedOutState(c.qg, c.co.GetState()) {
+	if !queries.ContainsSkuCheckedOutState(executor.query, executor.checkedOut.GetState()) {
 		return err
 	}
 
-	sku.TransactedResetter.Reset(c.co.GetSkuExternal().GetSku())
-	sku.TransactedResetter.Reset(c.co.GetSku())
+	sku.TransactedResetter.Reset(executor.checkedOut.GetSkuExternal().GetSku())
+	sku.TransactedResetter.Reset(executor.checkedOut.GetSku())
 
-	if err = c.co.GetSkuExternal().GetMetadataMutable().GetDescriptionMutable().Set(
+	if err = executor.checkedOut.GetSkuExternal().GetMetadataMutable().GetDescriptionMutable().Set(
 		item.Title,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = c.tryToEmitOneCommon(item); err != nil {
+	if err = executor.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -107,12 +107,12 @@ func (c *executor) tryToEmitOneUntracked(
 	return err
 }
 
-func (c *executor) tryToEmitOneCommon(
-	i Item,
+func (executor *executor) tryToEmitOneCommon(
+	item Item,
 ) (err error) {
-	external := c.co.GetSkuExternal()
+	external := executor.checkedOut.GetSkuExternal()
 
-	if err = i.WriteToExternal(external); err != nil {
+	if err = item.WriteToExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -120,13 +120,13 @@ func (c *executor) tryToEmitOneCommon(
 	external.ObjectId.SetGenre(genres.Zettel)
 	external.ExternalObjectId.SetGenre(genres.Zettel)
 
-	if !queries.ContainsExternalSku(c.qg, external, c.co.GetState()) {
+	if !queries.ContainsExternalSku(executor.query, external, executor.checkedOut.GetState()) {
 		return err
 	}
 
-	c.co.GetSkuExternal().RepoId = c.store.externalStoreInfo.RepoId
+	executor.checkedOut.GetSkuExternal().RepoId = executor.store.externalStoreInfo.RepoId
 
-	if err = c.out(&c.co); err != nil {
+	if err = executor.out(&executor.checkedOut); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

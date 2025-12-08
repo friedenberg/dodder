@@ -46,7 +46,7 @@ type Store struct {
 
 	urls map[url.URL][]Item
 
-	l       sync.Mutex
+	lock    sync.Mutex
 	deleted map[url.URL][]checkedOutWithItem
 	added   map[url.URL][]checkedOutWithItem
 
@@ -61,12 +61,12 @@ type Store struct {
 }
 
 func Make(
-	k store_config.Store,
-	s env_repo.Env,
+	configStore store_config.Store,
+	envRepo env_repo.Env,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*sku.CheckedOut],
 ) *Store {
-	c := &Store{
-		config:    k,
+	store := &Store{
+		config:    configStore,
 		tipe:      ids.MustTypeStruct("toml-bookmark"),
 		deleted:   make(map[url.URL][]checkedOutWithItem),
 		added:     make(map[url.URL][]checkedOutWithItem),
@@ -85,7 +85,7 @@ func Make(
 		itemDeletedStringFormatWriter: itemDeletedStringFormatWriter,
 	}
 
-	return c
+	return store
 }
 
 func (store *Store) GetExternalStoreLike() store_workspace.StoreLike {
@@ -97,26 +97,26 @@ func (store *Store) ReadAllExternalItems() error {
 }
 
 func (store *Store) GetObjectIdsForString(
-	v string,
-) (k []sku.ExternalObjectId, err error) {
-	item, ok := store.itemsById[v]
+	value string,
+) (ids []sku.ExternalObjectId, err error) {
+	item, ok := store.itemsById[value]
 
 	if !ok {
 		err = errors.ErrorWithStackf("not a browser item id")
-		return k, err
+		return ids, err
 	}
 
-	k = append(k, item.GetExternalObjectId())
+	ids = append(ids, item.GetExternalObjectId())
 
-	return k, err
+	return ids, err
 }
 
 func (store *Store) Flush() (err error) {
-	wg := errors.MakeWaitGroupParallel()
+	waitGropu := errors.MakeWaitGroupParallel()
 
-	wg.Do(store.flushUrls)
+	waitGropu.Do(store.flushUrls)
 
-	if err = wg.GetError(); err != nil {
+	if err = waitGropu.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -125,26 +125,28 @@ func (store *Store) Flush() (err error) {
 }
 
 // TODO limit this to being used only by *Item.ReadFromExternal
-func (store *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
-	var r interfaces.BlobReader
+func (store *Store) getUrl(object *sku.Transacted) (u *url.URL, err error) {
+	var blobReader interfaces.BlobReader
 
-	if r, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
+	if blobReader, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(
+		object.GetBlobDigest(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return u, err
 	}
 
-	defer errors.DeferredCloser(&err, r)
+	defer errors.DeferredCloser(&err, blobReader)
 
 	var tomlBookmark sku_json_fmt.TomlBookmark
 
-	dec := toml.NewDecoder(r)
+	dec := toml.NewDecoder(blobReader)
 
 	if err = dec.Decode(&tomlBookmark); err != nil {
 		err = errors.Wrapf(
 			err,
 			"Sha: %s, Object Id: %s",
-			sk.GetBlobDigest(),
-			sk.GetObjectId(),
+			object.GetBlobDigest(),
+			object.GetObjectId(),
 		)
 		return u, err
 	}
@@ -176,8 +178,7 @@ func (store *Store) CheckoutOne(
 		return checkedOut, err
 	}
 
-	co := GetCheckedOutPool().Get()
-	checkedOut = co
+	checkedOut = GetCheckedOutPool().Get()
 	var item Item
 
 	if err = item.Url.Set(yourl.String()); err != nil {
@@ -188,24 +189,24 @@ func (store *Store) CheckoutOne(
 	item.ExternalId = object.ObjectId.String()
 	item.Id.Type = "tab"
 
-	sku.TransactedResetter.ResetWith(co.GetSku(), object)
-	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), object)
-	co.SetState(checked_out_state.JustCheckedOut)
-	co.GetSkuExternal().ExternalType = ids.MustTypeStruct("!browser-tab")
+	sku.TransactedResetter.ResetWith(checkedOut.GetSku(), object)
+	sku.TransactedResetter.ResetWith(checkedOut.GetSkuExternal().GetSku(), object)
+	checkedOut.SetState(checked_out_state.JustCheckedOut)
+	checkedOut.GetSkuExternal().ExternalType = ids.MustTypeStruct("!browser-tab")
 
-	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {
+	if err = item.WriteToExternal(checkedOut.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return checkedOut, err
 	}
 
-	co.GetSkuExternal().RepoId = store.externalStoreInfo.RepoId
+	checkedOut.GetSkuExternal().RepoId = store.externalStoreInfo.RepoId
 
-	store.l.Lock()
-	defer store.l.Unlock()
+	store.lock.Lock()
+	defer store.lock.Unlock()
 
 	existing := store.added[*yourl]
 	store.added[*yourl] = append(existing, checkedOutWithItem{
-		CheckedOut: co.Clone(),
+		CheckedOut: checkedOut.Clone(),
 		Item:       item,
 	})
 
@@ -213,8 +214,8 @@ func (store *Store) CheckoutOne(
 }
 
 func (store *Store) QueryCheckedOut(
-	qg *queries.Query,
-	f interfaces.FuncIter[sku.SkuType],
+	query *queries.Query,
+	output interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// o := sku.CommitOptions{
 	// 	Mode: object_mode.ModeRealizeSansProto,
@@ -222,8 +223,8 @@ func (store *Store) QueryCheckedOut(
 
 	ex := executor{
 		store: store,
-		qg:    qg,
-		out:   f,
+		query: query,
+		out:   output,
 	}
 
 	for u, items := range store.urls {
