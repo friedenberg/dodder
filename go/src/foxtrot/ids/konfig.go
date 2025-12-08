@@ -110,8 +110,8 @@ func (config config) ToType() TypeStruct {
 func (config config) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
-			Type: doddish.TokenTypeIdentifier,
-			Contents:  configBytes,
+			Type:     doddish.TokenTypeIdentifier,
+			Contents: configBytes,
 		},
 	}
 }

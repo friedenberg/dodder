@@ -58,8 +58,8 @@ func makeTestSeqFromSeq(seq Seq) (ts testSeq) {
 func makeSeqFromTestSeq(seq testSeq) (ts Seq) {
 	for _, t := range seq {
 		ts = append(ts, Token{
-			Type: t.TokenType,
-			Contents:  []byte(t.Contents),
+			Type:     t.TokenType,
+			Contents: []byte(t.Contents),
 		})
 	}
 

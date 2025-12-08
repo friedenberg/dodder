@@ -212,48 +212,48 @@ func (tag tagStruct) ToSeq() doddish.Seq {
 	case tag.virtual && tag.dependentLeaf:
 		return doddish.Seq{
 			doddish.Token{
-				Type: doddish.TokenTypeOperator,
-				Contents:  []byte{'%'},
+				Type:     doddish.TokenTypeOperator,
+				Contents: []byte{'%'},
 			},
 			doddish.Token{
-				Type: doddish.TokenTypeOperator,
-				Contents:  []byte{'-'},
+				Type:     doddish.TokenTypeOperator,
+				Contents: []byte{'-'},
 			},
 			doddish.Token{
-				Type: doddish.TokenTypeIdentifier,
-				Contents:  []byte(tag.value),
+				Type:     doddish.TokenTypeIdentifier,
+				Contents: []byte(tag.value),
 			},
 		}
 
 	case tag.virtual:
 		return doddish.Seq{
 			doddish.Token{
-				Type: doddish.TokenTypeOperator,
-				Contents:  []byte{'%'},
+				Type:     doddish.TokenTypeOperator,
+				Contents: []byte{'%'},
 			},
 			doddish.Token{
-				Type: doddish.TokenTypeIdentifier,
-				Contents:  []byte(tag.value),
+				Type:     doddish.TokenTypeIdentifier,
+				Contents: []byte(tag.value),
 			},
 		}
 
 	case tag.dependentLeaf:
 		return doddish.Seq{
 			doddish.Token{
-				Type: doddish.TokenTypeOperator,
-				Contents:  []byte{'-'},
+				Type:     doddish.TokenTypeOperator,
+				Contents: []byte{'-'},
 			},
 			doddish.Token{
-				Type: doddish.TokenTypeIdentifier,
-				Contents:  []byte(tag.value),
+				Type:     doddish.TokenTypeIdentifier,
+				Contents: []byte(tag.value),
 			},
 		}
 
 	default:
 		return doddish.Seq{
 			doddish.Token{
-				Type: doddish.TokenTypeIdentifier,
-				Contents:  []byte(tag.value),
+				Type:     doddish.TokenTypeIdentifier,
+				Contents: []byte(tag.value),
 			},
 		}
 	}

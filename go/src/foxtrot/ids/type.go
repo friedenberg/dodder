@@ -165,12 +165,12 @@ func (typeStruct typeStruct) ToType() TypeStruct {
 func (typeStruct typeStruct) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
-			Type: doddish.TokenTypeOperator,
-			Contents:  []byte("!"),
+			Type:     doddish.TokenTypeOperator,
+			Contents: []byte("!"),
 		},
 		doddish.Token{
-			Type: doddish.TokenTypeIdentifier,
-			Contents:  []byte(typeStruct.StringSansOp()),
+			Type:     doddish.TokenTypeIdentifier,
+			Contents: []byte(typeStruct.StringSansOp()),
 		},
 	}
 }

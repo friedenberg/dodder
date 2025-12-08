@@ -231,16 +231,16 @@ func (id ZettelId) ToType() TypeStruct {
 func (id ZettelId) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
-			Type: doddish.TokenTypeIdentifier,
-			Contents:  []byte(id.left),
+			Type:     doddish.TokenTypeIdentifier,
+			Contents: []byte(id.left),
 		},
 		doddish.Token{
-			Type: doddish.TokenTypeOperator,
-			Contents:  []byte{'/'},
+			Type:     doddish.TokenTypeOperator,
+			Contents: []byte{'/'},
 		},
 		doddish.Token{
-			Type: doddish.TokenTypeIdentifier,
-			Contents:  []byte(id.right),
+			Type:     doddish.TokenTypeIdentifier,
+			Contents: []byte(id.right),
 		},
 	}
 }

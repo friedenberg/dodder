@@ -151,12 +151,12 @@ func (id RepoId) ToType() TypeStruct {
 func (id RepoId) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
-			Type: doddish.TokenTypeOperator,
-			Contents:  []byte{'/'},
+			Type:     doddish.TokenTypeOperator,
+			Contents: []byte{'/'},
 		},
 		doddish.Token{
-			Type: doddish.TokenTypeIdentifier,
-			Contents:  []byte(id.id),
+			Type:     doddish.TokenTypeIdentifier,
+			Contents: []byte(id.id),
 		},
 	}
 }
