@@ -8,7 +8,7 @@ import (
 
 type (
 	contentsTagSet struct {
-		*contents
+		*ContainedObjects
 	}
 )
 
@@ -18,12 +18,12 @@ var (
 )
 
 func (contentsTagSet contentsTagSet) Len() int {
-	return contentsTagSet.TagCount
+	return contentsTagSet.GetSlice().Len()
 }
 
 func (contentsTagSet contentsTagSet) All() interfaces.Seq[TagStruct] {
 	return func(yield func(TagStruct) bool) {
-		for id := range contentsTagSet.Elements.All() {
+		for id := range contentsTagSet.GetSlice().All() {
 			var tag TagStruct
 
 			errors.PanicIfError(tag.Set(id.GetKey().String()))
@@ -48,7 +48,7 @@ func (contentsTagSet contentsTagSet) ContainsKey(key string) bool {
 
 // TODO switch to binary search
 func (contentsTagSet contentsTagSet) Get(key string) (TagStruct, bool) {
-	for tag := range contentsTagSet.contents.Elements.All() {
+	for tag := range contentsTagSet.ContainedObjects.GetSlice().All() {
 		if tag.GetKey().String() == key {
 			return ids.MustTag(tag.GetKey().String()), true
 		}
@@ -70,13 +70,13 @@ func (contentsTagSet *contentsTagSet) Add(tag TagStruct) error {
 		return err
 	}
 
-	return contentsTagSet.contents.Add(tagId)
+	return contentsTagSet.ContainedObjects.Add(tagId)
 }
 
 func (contentsTagSet *contentsTagSet) DelKey(key string) error {
-	return contentsTagSet.contents.DelKey(key)
+	return contentsTagSet.ContainedObjects.DelKey(key)
 }
 
 func (contentsTagSet *contentsTagSet) Reset() {
-	contentsTagSet.contents.Reset()
+	contentsTagSet.ContainedObjects.Reset()
 }

@@ -21,7 +21,7 @@ type metadata struct {
 	// private once moving away from the gob entirely
 
 	Description descriptions.Description
-	Contents    contents
+	Tags        ContainedObjects
 	Type        markl.Lock[Type, TypeMutable]
 
 	DigBlob   markl.Id
@@ -85,7 +85,7 @@ func (metadata *metadata) UserInputIsEmpty() bool {
 		return false
 	}
 
-	if metadata.Contents.Len() > 0 {
+	if metadata.Tags.Len() > 0 {
 		return false
 	}
 
@@ -114,16 +114,16 @@ func (metadata *metadata) IsEmpty() bool {
 
 // TODO fix issue with GetTags being nil sometimes
 func (metadata *metadata) GetTags() TagSet {
-	return contentsTagSet{contents: &metadata.Contents}
+	return contentsTagSet{ContainedObjects: &metadata.Tags}
 }
 
 func (metadata *metadata) GetTagsMutable() TagSetMutable {
-	return &contentsTagSet{contents: &metadata.Contents}
+	return &contentsTagSet{ContainedObjects: &metadata.Tags}
 }
 
 func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
 	return func(yield func(Tag) bool) {
-		for tag := range metadata.Contents.All() {
+		for tag := range metadata.Tags.All() {
 			if !yield(tag) {
 				return
 			}
@@ -132,7 +132,7 @@ func (metadata *metadata) AllTags() interfaces.Seq[Tag] {
 }
 
 func (metadata *metadata) ResetTags() {
-	metadata.Contents.Reset()
+	metadata.Tags.Reset()
 	metadata.Index.TagPaths.Reset()
 }
 
@@ -165,7 +165,7 @@ func (metadata *metadata) AddTagPtr(tag Tag) (err error) {
 		return err
 	}
 
-	metadata.Contents.addNormalizedTag(tag)
+	metadata.Tags.addNormalizedTag(tag)
 	cs := catgut.MakeFromString(tag.String())
 	metadata.Index.TagPaths.AddTag(cs)
 
@@ -186,7 +186,7 @@ func (metadata *metadata) AddTagPtrFast(tag Tag) (err error) {
 }
 
 func (metadata *metadata) SetTagsFast(tags TagSet) {
-	metadata.Contents.Reset()
+	metadata.Tags.Reset()
 
 	if tags == nil {
 		return
@@ -225,12 +225,12 @@ func (metadata *metadata) GetTypeLockMutable() TypeLockMutable {
 }
 
 func (metadata *metadata) GetTagLock(tag Tag) TagLock {
-	lock, _ := metadata.Contents.getLock(tag.String())
+	lock, _ := metadata.Tags.getLock(tag.String())
 	return lock
 }
 
 func (metadata *metadata) GetTagLockMutable(tag Tag) TagLockMutable {
-	lock, _ := metadata.Contents.getLockMutable(tag.String())
+	lock, _ := metadata.Tags.getLockMutable(tag.String())
 	return lock
 }
 
@@ -240,7 +240,7 @@ func (metadata *metadata) Subtract(otherMetadata Metadata) {
 	}
 
 	for tag := range otherMetadata.AllTags() {
-		metadata.Contents.DelKey(tag.String())
+		metadata.Tags.DelKey(tag.String())
 	}
 }
 

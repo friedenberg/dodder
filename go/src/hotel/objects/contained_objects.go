@@ -9,27 +9,26 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 )
 
-type (
-	// TODO rename to maybe lockfile or lockedIds or id references or marklIds?
-	contents struct {
-		// required to be exported for Gob's stupid illusions
-		// TODO refactor this to use binary searches
-		TagCount int
-		Elements collections_slice.Slice[containedObject]
-	}
-)
+type ContainedObjects collections_slice.Slice[containedObject]
 
-func (contents contents) Len() int {
-	return contents.Elements.Len()
+func (contents ContainedObjects) GetSlice() collections_slice.Slice[containedObject] {
+	return collections_slice.Slice[containedObject](contents)
 }
 
-func (contents contents) All() interfaces.Seq[SeqId] {
+func (contents *ContainedObjects) GetSliceMutable() *collections_slice.Slice[containedObject] {
+	return (*collections_slice.Slice[containedObject])(contents)
+}
+
+func (contents ContainedObjects) Len() int {
+	return contents.GetSlice().Len()
+}
+
+func (contents ContainedObjects) All() interfaces.Seq[SeqId] {
 	return func(yield func(SeqId) bool) {
-		for id := range contents.Elements.All() {
+		for id := range contents.GetSlice().All() {
 			if !yield(id.GetKey()) {
 				return
 			}
@@ -37,9 +36,9 @@ func (contents contents) All() interfaces.Seq[SeqId] {
 	}
 }
 
-func (contents contents) ContainsKey(key string) bool {
+func (contents ContainedObjects) ContainsKey(key string) bool {
 	_, ok := cmp.BinarySearchFuncIndex(
-		contents.Elements,
+		contents.GetSlice(),
 		key,
 		func(left containedObject, right string) cmp.Result {
 			return cmp.CompareUTF8(
@@ -53,8 +52,8 @@ func (contents contents) ContainsKey(key string) bool {
 	return ok
 }
 
-func (contents contents) getLock(key string) (IdLock, bool) {
-	for id := range contents.Elements.All() {
+func (contents ContainedObjects) getLock(key string) (IdLock, bool) {
+	for id := range contents.GetSlice().All() {
 		if id.GetKey().String() == key {
 			return id.Lock, true
 		}
@@ -63,9 +62,9 @@ func (contents contents) getLock(key string) (IdLock, bool) {
 	return nil, false
 }
 
-func (contents contents) getLockMutable(key string) (IdLockMutable, bool) {
-	for index := range contents.Elements {
-		id := &contents.Elements[index]
+func (contents ContainedObjects) getLockMutable(key string) (IdLockMutable, bool) {
+	for index := range contents {
+		id := &contents[index]
 
 		if id.GetKey().String() == key {
 			return &id.Lock, true
@@ -75,19 +74,19 @@ func (contents contents) getLockMutable(key string) (IdLockMutable, bool) {
 	return nil, false
 }
 
-func (contents contents) Get(key string) (SeqId, bool) {
+func (contents ContainedObjects) Get(key string) (SeqId, bool) {
 	id, ok := contents.get(key, false)
 	return id.GetKey(), ok
 }
 
-func (contents contents) GetPartial(key string) (SeqId, bool) {
+func (contents ContainedObjects) GetPartial(key string) (SeqId, bool) {
 	id, ok := contents.get(key, true)
 	return id.GetKey(), ok
 }
 
-func (contents contents) get(key string, partial bool) (containedObject, bool) {
+func (contents ContainedObjects) get(key string, partial bool) (containedObject, bool) {
 	element, ok := cmp.BinarySearchFuncElement(
-		contents.Elements,
+		contents,
 		key,
 		func(left containedObject, right string) cmp.Result {
 			return cmp.CompareUTF8(
@@ -101,34 +100,30 @@ func (contents contents) get(key string, partial bool) (containedObject, bool) {
 	return element, ok
 }
 
-func (contents contents) Key(id SeqId) string {
+func (contents ContainedObjects) Key(id SeqId) string {
 	return id.String()
 }
 
-func (contents *contents) Add(id SeqId) error {
+func (contents *ContainedObjects) Add(id SeqId) error {
 	if _, alreadyExists := contents.Get(id.String()); alreadyExists {
 		return nil
 	}
 
-	contents.Elements.Append(containedObject{
+	contents.GetSliceMutable().Append(containedObject{
 		Lock: markl.MakeLockWith(id, nil),
 	})
 
-	if id.Genre == genres.Tag {
-		contents.TagCount++
-	}
-
-	contents.Elements.SortWithComparer(containedObjectCompareKey)
+	contents.GetSliceMutable().SortWithComparer(containedObjectCompareKey)
 
 	return nil
 }
 
-func (contents *contents) DelKey(key string) error {
+func (contents *ContainedObjects) DelKey(key string) error {
 	var found bool
 	var index int
 	var id containedObject
 
-	for index, id = range contents.Elements {
+	for index, id = range contents.GetSlice() {
 		if id.GetKey().String() == key {
 			found = true
 			break
@@ -136,23 +131,18 @@ func (contents *contents) DelKey(key string) error {
 	}
 
 	if found {
-		if id.GetKey().Genre == genres.Tag {
-			contents.TagCount--
-		}
-
-		contents.Elements.Delete(index, index+1)
+		contents.GetSliceMutable().Delete(index, index+1)
 	}
 
 	return nil
 }
 
-func (contents *contents) Reset() {
-	contents.TagCount = 0
-	contents.Elements.Reset()
+func (contents *ContainedObjects) Reset() {
+	contents.GetSliceMutable().Reset()
 }
 
 // TODO add optimized non-sorted path for binary decoding
-func (contents *contents) addNormalizedTag(tag Tag) {
+func (contents *ContainedObjects) addNormalizedTag(tag Tag) {
 	seq := expansion.ExpandOneIntoIds[SeqId](
 		tag.String(),
 		expansion.ExpanderRight,
@@ -164,7 +154,7 @@ func (contents *contents) addNormalizedTag(tag Tag) {
 	}
 
 	sorted := quiter.SortedValuesBy(
-		contents.Elements,
+		contents.GetSlice(),
 		containedObjectCompareKey,
 	)
 

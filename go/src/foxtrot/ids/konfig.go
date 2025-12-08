@@ -29,8 +29,8 @@ func ErrOnConfigBytes(b []byte) (err error) {
 	return nil
 }
 
-func ErrOnConfig(v string) (err error) {
-	if v == "konfig" {
+func ErrOnConfig(value string) (err error) {
+	if value == "konfig" {
 		return errors.ErrorWithStackf("cannot be %q", "konfig")
 	}
 
