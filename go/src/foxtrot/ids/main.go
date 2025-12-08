@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 )
 
@@ -54,22 +53,21 @@ func MustObjectId(idWithParts Id) (id *ObjectId) {
 }
 
 func MakeObjectId(value string) (objectId *ObjectId, err error) {
-	var boxScanner doddish.Scanner
-	reader, repool := pool.GetStringReader(value)
-	defer repool()
-	boxScanner.Reset(reader)
+	if value == "" {
+		objectId = GetObjectIdPool().Get()
+		return objectId, err
+	}
+
+	var seq doddish.Seq
+
+	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+		value,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	objectId = GetObjectIdPool().Get()
-
-	if value == "" {
-		return objectId, err
-	}
-
-	if !boxScanner.ScanDotAllowedInIdentifiers() {
-		return objectId, err
-	}
-
-	seq := boxScanner.GetSeq()
 
 	if err = objectId.SetWithSeq(seq); err != nil {
 		return objectId, err

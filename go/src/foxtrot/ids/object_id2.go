@@ -919,7 +919,7 @@ func (id *objectId2) SetWithSeq(
 	}
 }
 
-func (id objectId2) ToType() TypeStruct {
+func (id *objectId2) ToType() TypeStruct {
 	errors.PanicIfError(genres.Type.AssertGenre(id.genre))
 
 	return TypeStruct{

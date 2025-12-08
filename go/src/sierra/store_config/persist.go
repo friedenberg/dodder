@@ -104,7 +104,7 @@ func (store *store) recompileTypes(
 		fileExtension := commonBlob.GetFileExtension()
 
 		if fileExtension == "" {
-			fileExtension = tagObject.GetObjectId().StringSansOp()
+			fileExtension = tagObject.GetObjectId().ToType().StringSansOp()
 		}
 
 		// TODO-P2 enforce uniqueness

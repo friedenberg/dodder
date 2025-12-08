@@ -98,51 +98,59 @@ func (id *ExternalObjectId) SetObjectIdLike(other Id) (err error) {
 		return err
 	}
 
-	var value string
+	otherGenre := genres.Must(other.GetGenre())
 
-	if oid, ok := other.(*ObjectId); ok {
-		value = oid.StringSansOp()
+	if otherGenre.IsType() {
+		if err = id.SetWithGenre(
+			other.ToType().StringSansOp(),
+			genres.Must(other.GetGenre()),
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	} else {
-		value = other.String()
-	}
-
-	if err = id.SetWithGenre(
-		value,
-		genres.Must(other.GetGenre()),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+		if err = id.SetWithGenre(
+			other.String(),
+			genres.Must(other.GetGenre()),
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	return err
 }
 
-func (id *ExternalObjectId) MarshalBinary() (b []byte, err error) {
-	if b, err = id.genre.MarshalBinary(); err != nil {
+func (id *ExternalObjectId) MarshalBinary() (bites []byte, err error) {
+	if bites, err = id.genre.MarshalBinary(); err != nil {
 		err = errors.Wrap(err)
-		return b, err
+		return bites, err
 	}
 
-	b = append(b, []byte(id.value)...)
+	bites = append(bites, []byte(id.value)...)
 
-	return b, err
+	return bites, err
 }
 
-func (id *ExternalObjectId) UnmarshalBinary(b []byte) (err error) {
-	if err = id.genre.UnmarshalBinary(b[:1]); err != nil {
+func (id *ExternalObjectId) UnmarshalBinary(bites []byte) (err error) {
+	if err = id.genre.UnmarshalBinary(bites[:1]); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if len(b) > 1 {
-		id.value = string(b[1:])
+	if len(bites) > 1 {
+		id.value = string(bites[1:])
 	}
 
 	return err
 }
 
 func (id *ExternalObjectId) ToType() TypeStruct {
-	panic(errors.Err405MethodNotAllowed)
+	errors.PanicIfError(genres.Type.AssertGenre(id.genre))
+
+	return TypeStruct{
+		Value: id.value,
+	}
 }
 
 func (id *ExternalObjectId) ToSeq() doddish.Seq {
