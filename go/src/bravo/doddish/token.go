@@ -42,11 +42,11 @@ func (token Token) AppendBinary(bites []byte) ([]byte, error) {
 func (token *Token) UnmarshalBinary(bites []byte) (err error) {
 	if len(bites) < 2 {
 		err = errors.Errorf("expected at least two bytes but got %x", bites)
-		return
+		return err
 	}
 
 	token.Type = TokenType(bites[0])
 	token.Contents = bites[1:]
 
-	return
+	return err
 }

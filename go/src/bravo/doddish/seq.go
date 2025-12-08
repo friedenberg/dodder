@@ -138,5 +138,5 @@ func (marshaler *SeqBinaryMarshaler) UnmarshalBinary(bites []byte) (err error) {
 		marshaler.ToSeqMutable().GetSliceMutable().Append(token)
 	}
 
-	return
+	return err
 }
