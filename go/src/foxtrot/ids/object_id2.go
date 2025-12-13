@@ -474,30 +474,6 @@ func (id *objectId2) GetGenre() interfaces.Genre {
 	return id.genre
 }
 
-func (id *objectId2) Expand(
-	a Abbr,
-) (err error) {
-	ex := a.ExpanderFor(id.genre)
-
-	if ex == nil {
-		return err
-	}
-
-	v := id.String()
-
-	if v, err = ex(v); err != nil {
-		err = nil
-		return err
-	}
-
-	if err = id.SetWithGenre(v, id.genre); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
 func (id *objectId2) SetWithId(
 	otherObjectId Id,
 ) (err error) {
@@ -744,7 +720,7 @@ func (id *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
 		return err
 	}
 
-	if id.SetWithGenre(b.String(), b.GetGenre()); err != nil {
+	if SetWithGenre(id, b.String(), b.GetGenre()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

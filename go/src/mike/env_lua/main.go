@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
 	"code.linenisgreat.com/dodder/go/src/echo/catgut"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/box_format"
@@ -60,34 +61,34 @@ func (s *env) luaSearcher(ls *lua.LState) int {
 	return 1
 }
 
-func (s *env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
-	sk = sku.GetTransactedPool().Get()
+func (s *env) GetSkuFromString(lv string) (object *sku.Transacted, err error) {
+	object = sku.GetTransactedPool().Get()
 
 	defer func() {
 		if err != nil {
 			return
 		}
 
-		if err = s.objectStore.ReadOneInto(sk.GetObjectId(), sk); err != nil {
+		if err = s.objectStore.ReadOneInto(object.GetObjectId(), object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}()
 
-	if err = sk.ObjectId.SetOnlyNotUnknownGenre(lv); err == nil {
-		return sk, err
+	if err = ids.SetOnlyNotUnknownGenre(&object.ObjectId, lv); err == nil {
+		return object, err
 	}
 
 	rb := catgut.MakeRingBuffer(strings.NewReader(lv), 0)
 
 	if _, err = s.luaSkuFormat.ReadStringFormat(
-		sk,
+		object,
 		catgut.MakeRingBufferRuneScanner(rb),
 	); err == nil {
-		return sk, err
+		return object, err
 	}
 
-	return sk, err
+	return object, err
 }
 
 // TODO modify `package.loaded` to include variations of object id

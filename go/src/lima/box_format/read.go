@@ -141,7 +141,11 @@ func (format *BoxTransacted) readStringFormatBox(
 
 				// left: one/uno, right: .zettel
 				if err = genre.Set(right.At(1).String()); err == nil {
-					if err = object.ObjectId.SetWithGenre(left.String(), genre); err != nil {
+					if err = ids.SetWithGenre(
+						&object.ObjectId,
+						left.String(),
+						genre,
+					); err != nil {
 						object.ObjectId.Reset()
 						err = errors.Wrap(err)
 						return err

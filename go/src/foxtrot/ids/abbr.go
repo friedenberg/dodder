@@ -60,7 +60,7 @@ func (a Abbr) AbbreviateZettelIdOnly(
 		return err
 	}
 
-	if err = in.SetWithGenre(abbr, h); err != nil {
+	if err = SetWithGenre(in, abbr, h); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -89,7 +89,7 @@ func (a Abbr) ExpandZettelIdOnly(
 		return err
 	}
 
-	if err = in.SetWithGenre(ex, h); err != nil {
+	if err = SetWithGenre(in, ex, h); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -128,7 +128,7 @@ func (a Abbr) AbbreviateObjectId(
 		return err
 	}
 
-	if err = out.SetWithGenre(abbr, in); err != nil {
+	if err = SetWithGenre(out, abbr, in); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

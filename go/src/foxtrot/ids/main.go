@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
+	"code.linenisgreat.com/dodder/go/src/echo/genres"
 )
 
 type (
@@ -26,6 +27,8 @@ type (
 	IdMutable interface {
 		Id
 		encoding.BinaryUnmarshaler
+		// SetWithGenre(string, interfaces.GenreGetter) error
+		SetWithSeq(doddish.Seq) error
 	}
 
 	Tag         = Id
@@ -45,11 +48,6 @@ type (
 
 type ObjectId = objectId2
 
-var (
-	_ Id        = &ObjectId{}
-	_ IdMutable = &ObjectId{}
-)
-
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 	return getObjectIdPool2()
 }
@@ -59,6 +57,11 @@ func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 // func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 // 	return getObjectIdPool3()
 // }
+
+var (
+	_ Id        = &ObjectId{}
+	_ IdMutable = &ObjectId{}
+)
 
 func MustObjectId(idWithParts Id) (id *ObjectId) {
 	id = &ObjectId{}
@@ -156,4 +159,92 @@ func IsVirtual(id Id) bool {
 	} else {
 		return false
 	}
+}
+
+func Expand(
+	id *ObjectId,
+	abbr Abbr,
+) (err error) {
+	genre := genres.Must(id)
+	ex := abbr.ExpanderFor(genre)
+
+	if ex == nil {
+		return err
+	}
+
+	idString := id.String()
+
+	if idString, err = ex(idString); err != nil {
+		err = nil
+		return err
+	}
+
+	if err = SetWithGenre(id, idString, genre); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func SetWithString(
+	id *ObjectId,
+	value string,
+) (err error) {
+	var seq doddish.Seq
+
+	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+		value,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if err = id.SetWithSeq(seq); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func SetWithGenre(
+	id *ObjectId,
+	value string,
+	genre interfaces.GenreGetter,
+) (err error) {
+	return id.SetWithGenre(value, genre)
+
+	if err = SetWithString(id, value); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	{
+		genre := genres.Make(genre.GetGenre())
+
+		if err = genre.AssertGenre(id); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+	}
+
+	return err
+}
+
+func SetOnlyNotUnknownGenre(
+	id *ObjectId,
+	value string,
+) (err error) {
+	if err = SetWithString(id, value); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if id.GetGenre() == genres.None {
+		err = errors.Errorf("unknown genre for string: %q", value)
+		return
+	}
+
+	return
 }

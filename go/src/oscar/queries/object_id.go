@@ -25,7 +25,10 @@ type ObjectId struct {
 var _ ObjectId = ObjectId{}
 
 func (objectId *ObjectId) reduce(buildState *buildState) (err error) {
-	if err = objectId.GetObjectId().Expand(buildState.builder.expanders); err != nil {
+	if err = ids.Expand(
+		objectId.GetObjectId(),
+		buildState.builder.expanders,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
