@@ -75,47 +75,65 @@ func MustTypeStruct(value string) (tipe typeStruct) {
 	return tipe
 }
 
-func (typeStruct typeStruct) IsEmpty() bool {
-	return typeStruct.Value == ""
+func (id typeStruct) IsEmpty() bool {
+	return id.Value == ""
 }
 
-func (typeStruct *typeStruct) Reset() {
-	typeStruct.Value = ""
+func (id *typeStruct) Reset() {
+	id.Value = ""
 }
 
-func (typeStruct *typeStruct) ResetWith(b typeStruct) {
-	typeStruct.Value = b.Value
+func (id *typeStruct) ResetWith(b typeStruct) {
+	id.Value = b.Value
 }
 
-func (typeStruct typeStruct) Equals(b typeStruct) bool {
-	return typeStruct.Value == b.Value
+func (id typeStruct) Equals(b typeStruct) bool {
+	return id.Value == b.Value
 }
 
-func (typeStruct typeStruct) GetGenre() interfaces.Genre {
+func (id typeStruct) GetGenre() interfaces.Genre {
 	return genres.Type
 }
 
-func (typeStruct typeStruct) StringSansOp() string {
-	if typeStruct.IsEmpty() {
+func (id typeStruct) StringSansOp() string {
+	if id.IsEmpty() {
 		return ""
 	} else {
-		return typeStruct.Value
+		return id.Value
 	}
 }
 
-func (typeStruct typeStruct) String() string {
-	if typeStruct.IsEmpty() {
+func (id typeStruct) String() string {
+	if id.IsEmpty() {
 		return ""
 	} else {
-		return "!" + typeStruct.Value
+		return "!" + id.Value
 	}
 }
 
-func (typeStruct *typeStruct) TodoSetFromObjectId(v *ObjectId) (err error) {
-	return typeStruct.Set(v.String())
+func (id *typeStruct) TodoSetFromObjectId(other *ObjectId) (err error) {
+	return id.Set(other.String())
 }
 
-func (typeStruct *typeStruct) Set(value string) (err error) {
+func (id *typeStruct) SetWithSeq(seq doddish.Seq) (err error) {
+	var genre genres.Genre
+
+	if genre, err = ValidateSeqAndGetGenre(seq); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = genre.AssertGenre(genres.Type); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	id.Value = seq.String()
+
+	return
+}
+
+func (id *typeStruct) Set(value string) (err error) {
 	value = strings.ToLower(strings.TrimSpace(strings.Trim(value, ".! ")))
 
 	if err = ErrOnConfig(value); err != nil {
@@ -128,18 +146,18 @@ func (typeStruct *typeStruct) Set(value string) (err error) {
 		return err
 	}
 
-	typeStruct.Value = value
+	id.Value = value
 
 	return err
 }
 
-func (typeStruct typeStruct) MarshalText() (text []byte, err error) {
-	text = []byte(typeStruct.String())
+func (id typeStruct) MarshalText() (text []byte, err error) {
+	text = []byte(id.String())
 	return text, err
 }
 
-func (typeStruct *typeStruct) UnmarshalText(text []byte) (err error) {
-	if err = typeStruct.Set(string(text)); err != nil {
+func (id *typeStruct) UnmarshalText(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -147,17 +165,17 @@ func (typeStruct *typeStruct) UnmarshalText(text []byte) (err error) {
 	return err
 }
 
-func (typeStruct typeStruct) MarshalBinary() (text []byte, err error) {
-	return typeStruct.AppendBinary(nil)
+func (id typeStruct) MarshalBinary() (text []byte, err error) {
+	return id.AppendBinary(nil)
 }
 
-func (typeStruct typeStruct) AppendBinary(text []byte) ([]byte, error) {
-	text = append(text, []byte(typeStruct.String())...)
+func (id typeStruct) AppendBinary(text []byte) ([]byte, error) {
+	text = append(text, []byte(id.String())...)
 	return text, nil
 }
 
-func (typeStruct *typeStruct) UnmarshalBinary(text []byte) (err error) {
-	if err = typeStruct.Set(string(text)); err != nil {
+func (id *typeStruct) UnmarshalBinary(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -165,11 +183,11 @@ func (typeStruct *typeStruct) UnmarshalBinary(text []byte) (err error) {
 	return err
 }
 
-func (typeStruct typeStruct) ToType() TypeStruct {
-	return typeStruct
+func (id typeStruct) ToType() TypeStruct {
+	return id
 }
 
-func (typeStruct typeStruct) ToSeq() doddish.Seq {
+func (id typeStruct) ToSeq() doddish.Seq {
 	return doddish.Seq{
 		doddish.Token{
 			Type:     doddish.TokenTypeOperator,
@@ -177,7 +195,7 @@ func (typeStruct typeStruct) ToSeq() doddish.Seq {
 		},
 		doddish.Token{
 			Type:     doddish.TokenTypeIdentifier,
-			Contents: []byte(typeStruct.StringSansOp()),
+			Contents: []byte(id.StringSansOp()),
 		},
 	}
 }

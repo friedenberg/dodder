@@ -1,10 +1,10 @@
 package ids
 
-type IdStringerSansRepo struct {
+type StringerSansRepo struct {
 	Id Id
 }
 
-func (stringer *IdStringerSansRepo) String() string {
+func (stringer *StringerSansRepo) String() string {
 	switch objectId := stringer.Id.(type) {
 	case *ObjectId:
 		return objectId.StringSansRepo()
