@@ -31,7 +31,7 @@ func TestRingBufferReader(t1 *testing.T) {
 	actual := sb.String()
 
 	if actual != expected {
-		t.NotEqual(expected, actual)
+		t.PrintDiff(expected, actual)
 	}
 }
 

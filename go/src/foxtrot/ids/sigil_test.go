@@ -61,7 +61,7 @@ func TestSigilReadWrite(t1 *testing.T) {
 		n, err := sut.WriteTo(b)
 		t.AssertNoError(err)
 		if n != 1 {
-			t.NotEqual(1, n)
+			t.PrintDiff(1, n)
 		}
 	}
 
@@ -71,11 +71,11 @@ func TestSigilReadWrite(t1 *testing.T) {
 		n, err := actual.ReadFrom(b)
 		t.AssertNoError(err)
 		if n != 1 {
-			t.NotEqual(1, n)
+			t.PrintDiff(1, n)
 		}
 	}
 
 	if actual != sut {
-		t.NotEqual(sut, actual)
+		t.PrintDiff(sut, actual)
 	}
 }

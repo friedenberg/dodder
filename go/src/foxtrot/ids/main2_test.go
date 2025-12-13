@@ -35,8 +35,6 @@ func TestIdWriteToReadFrom(t1 *testing.T) {
 		_, err = id2.ReadFrom(&b)
 		t.AssertNoError(err)
 
-		if id.String() != id2.String() {
-			t.NotEqual(&id, &id2)
-		}
+		t.AssertEqual(id.String(), id2.String())
 	}
 }
