@@ -1,5 +1,9 @@
 package ids
 
+import (
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
+)
+
 type StringerSansRepo struct {
 	Id Id
 }
@@ -11,5 +15,23 @@ func (stringer *StringerSansRepo) String() string {
 
 	default:
 		return objectId.String()
+	}
+}
+
+type StringerSansOp struct {
+	Id Id
+}
+
+func (stringer StringerSansOp) String() string {
+	seq := stringer.Id.ToSeq()
+
+	switch {
+	case seq.MatchStart(
+		doddish.TokenMatcherOp(doddish.OpPathSeparator),
+	):
+		return seq[1:].String()
+
+	default:
+		return seq.String()
 	}
 }
