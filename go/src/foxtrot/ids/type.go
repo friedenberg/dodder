@@ -19,7 +19,10 @@ type typeStruct struct {
 	Value string
 }
 
-var _ Type = TypeStruct{}
+var (
+	_ Type        = TypeStruct{}
+	_ TypeMutable = &TypeStruct{}
+)
 
 func MakeTypeString(value string) string {
 	value = strings.TrimSpace(value)
@@ -145,8 +148,12 @@ func (typeStruct *typeStruct) UnmarshalText(text []byte) (err error) {
 }
 
 func (typeStruct typeStruct) MarshalBinary() (text []byte, err error) {
-	text = []byte(typeStruct.String())
-	return text, err
+	return typeStruct.AppendBinary(nil)
+}
+
+func (typeStruct typeStruct) AppendBinary(text []byte) ([]byte, error) {
+	text = append(text, []byte(typeStruct.String())...)
+	return text, nil
 }
 
 func (typeStruct *typeStruct) UnmarshalBinary(text []byte) (err error) {

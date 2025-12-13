@@ -771,8 +771,11 @@ func (id *objectId2) UnmarshalText(text []byte) (err error) {
 }
 
 func (id *objectId2) MarshalBinary() (text []byte, err error) {
-	text = []byte(FormattedString(id))
-	return text, err
+	return id.AppendBinary(nil)
+}
+
+func (id *objectId2) AppendBinary(text []byte) ([]byte, error) {
+	return append(text, []byte(FormattedString(id))...), nil
 }
 
 func (id *objectId2) UnmarshalBinary(bs []byte) (err error) {

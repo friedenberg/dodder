@@ -90,8 +90,11 @@ func (config *config) UnmarshalText(text []byte) (err error) {
 }
 
 func (config config) MarshalBinary() (text []byte, err error) {
-	text = []byte(config.String())
-	return text, err
+	return config.AppendBinary(nil)
+}
+
+func (config config) AppendBinary(text []byte) ([]byte, error) {
+	return append(text, []byte(config.String())...), nil
 }
 
 func (config *config) UnmarshalBinary(text []byte) (err error) {

@@ -190,8 +190,11 @@ func (tag *tagStruct) UnmarshalText(text []byte) (err error) {
 }
 
 func (tag tagStruct) MarshalBinary() (text []byte, err error) {
-	text = []byte(tag.String())
-	return text, err
+	return tag.AppendBinary(nil)
+}
+
+func (tag tagStruct) AppendBinary(text []byte) ([]byte, error) {
+	return append(text, []byte(tag.String())...), nil
 }
 
 func (tag *tagStruct) UnmarshalBinary(text []byte) (err error) {

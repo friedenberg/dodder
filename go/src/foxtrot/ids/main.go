@@ -15,16 +15,23 @@ type (
 
 	Id interface {
 		interfaces.ObjectId
+		encoding.BinaryMarshaler
+		encoding.BinaryAppender
+
 		ToSeq() doddish.Seq
 		ToType() TypeStruct
 		IsEmpty() bool
-		encoding.BinaryMarshaler
-		// encoding.BinaryAppender
 	}
 
-	Tag   = Id
-	SeqId = objectId3
-	Type  = Id
+	IdMutable interface {
+		Id
+		encoding.BinaryUnmarshaler
+	}
+
+	Tag         = Id
+	SeqId       = objectId3
+	Type        = Id
+	TypeMutable = IdMutable
 
 	// TODO rename to BinaryTypeChecker and flip uses
 	InlineTypeChecker interface {
@@ -37,6 +44,11 @@ type (
 )
 
 type ObjectId = objectId2
+
+var (
+	_ Id        = &ObjectId{}
+	_ IdMutable = &ObjectId{}
+)
 
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 	return getObjectIdPool2()

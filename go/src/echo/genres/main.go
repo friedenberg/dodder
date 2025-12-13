@@ -264,8 +264,11 @@ func (genre *Genre) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (genre Genre) MarshalBinary() (b []byte, err error) {
-	b = []byte{genre.Byte()}
-	return b, err
+	return genre.AppendBinary(nil)
+}
+
+func (genre Genre) AppendBinary(b []byte) ([]byte, error) {
+	return append(b, genre.Byte()), nil
 }
 
 func (genre *Genre) UnmarshalBinary(b []byte) (err error) {

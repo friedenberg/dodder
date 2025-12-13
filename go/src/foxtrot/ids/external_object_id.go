@@ -132,6 +132,21 @@ func (id *ExternalObjectId) MarshalBinary() (bites []byte, err error) {
 	return bites, err
 }
 
+func (id *ExternalObjectId) AppendBinary(bites []byte) ([]byte, error) {
+	{
+		var err error
+
+		if bites, err = id.genre.AppendBinary(bites); err != nil {
+			err = errors.Wrap(err)
+			return bites, err
+		}
+	}
+
+	bites = append(bites, []byte(id.value)...)
+
+	return bites, nil
+}
+
 func (id *ExternalObjectId) UnmarshalBinary(bites []byte) (err error) {
 	if err = id.genre.UnmarshalBinary(bites[:1]); err != nil {
 		err = errors.Wrap(err)

@@ -278,9 +278,11 @@ func (tai *Tai) UnmarshalText(text []byte) (err error) {
 }
 
 func (tai Tai) MarshalBinary() (text []byte, err error) {
-	text = []byte(tai.String())
+	return tai.AppendBinary(nil)
+}
 
-	return text, err
+func (tai Tai) AppendBinary(text []byte) ([]byte, error) {
+	return append(text, []byte(tai.String())...), nil
 }
 
 func (tai *Tai) UnmarshalBinary(text []byte) (err error) {

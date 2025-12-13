@@ -131,8 +131,11 @@ func (id *RepoId) UnmarshalText(text []byte) (err error) {
 }
 
 func (id RepoId) MarshalBinary() (text []byte, err error) {
-	text = []byte(id.String())
-	return text, err
+	return id.AppendBinary(nil)
+}
+
+func (id RepoId) AppendBinary(text []byte) ([]byte, error) {
+	return append(text, []byte(id.String())...), nil
 }
 
 func (id *RepoId) UnmarshalBinary(text []byte) (err error) {
