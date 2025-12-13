@@ -2,11 +2,9 @@ package doddish
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type Seq collections_slice.Slice[Token]
@@ -77,66 +75,10 @@ func (seq Seq) GetTokenTypes() TokenTypes {
 	return out
 }
 
-func (seq Seq) GetBinaryMarshaler() SeqBinaryMarshaler {
-	return (SeqBinaryMarshaler)(seq)
+func (seq Seq) GetBinaryMarshaler() SeqBinaryCoding {
+	return (SeqBinaryCoding)(seq)
 }
 
-func (seq *Seq) GetBinaryUnmarshaler() *SeqBinaryMarshaler {
-	return (*SeqBinaryMarshaler)(seq)
-}
-
-type SeqBinaryMarshaler Seq
-
-func (marshaler SeqBinaryMarshaler) ToSeq() Seq {
-	return Seq(marshaler)
-}
-
-func (marshaler *SeqBinaryMarshaler) ToSeqMutable() *Seq {
-	return (*Seq)(marshaler)
-}
-
-func (marshaler SeqBinaryMarshaler) MarshalBinary() (bites []byte, err error) {
-	return marshaler.AppendBinary(nil)
-}
-
-func (marshaler SeqBinaryMarshaler) AppendBinary(bites []byte) ([]byte, error) {
-	var byteCount int
-
-	for _, token := range marshaler.ToSeq() {
-		byteCount += len(token.Contents) + 1 + 1
-	}
-
-	bites = slices.Grow(bites, byteCount)
-
-	for _, token := range marshaler.ToSeq() {
-		bites = append(bites, byte(len(token.Contents)+1))
-
-		var err error
-
-		if bites, err = token.AppendBinary(bites); err != nil {
-			err = errors.Wrap(err)
-			return bites, err
-		}
-	}
-
-	return bites, nil
-}
-
-func (marshaler *SeqBinaryMarshaler) UnmarshalBinary(bites []byte) (err error) {
-	for len(bites) > 0 {
-		byteCount := int(bites[0])
-		next := bites[1:byteCount]
-		bites = bites[byteCount+1:]
-
-		var token Token
-
-		if err = token.UnmarshalBinary(next); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		marshaler.ToSeqMutable().GetSliceMutable().Append(token)
-	}
-
-	return err
+func (seq *Seq) GetBinaryUnmarshaler() *SeqBinaryCoding {
+	return (*SeqBinaryCoding)(seq)
 }

@@ -3,8 +3,6 @@ package doddish
 import (
 	"encoding"
 	"slices"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type Token struct {
@@ -28,23 +26,25 @@ func (token Token) Clone() (dst Token) {
 	return dst
 }
 
+func (token Token) GetBinaryByteCount() int {
+	return 1 + len(token.Contents)
+}
+
 func (token Token) MarshalBinary() ([]byte, error) {
 	return token.AppendBinary(nil)
 }
 
+// TODO remove support for empty tokens
 func (token Token) AppendBinary(bites []byte) ([]byte, error) {
 	bites = slices.Grow(bites, len(token.Contents)+1)
 	bites = append(bites, byte(token.Type))
 	bites = append(bites, token.Contents...)
+
 	return bites, nil
 }
 
+// TODO remove support for empty tokens
 func (token *Token) UnmarshalBinary(bites []byte) (err error) {
-	if len(bites) < 2 {
-		err = errors.Errorf("expected at least two bytes but got %x", bites)
-		return err
-	}
-
 	token.Type = TokenType(bites[0])
 	token.Contents = bites[1:]
 

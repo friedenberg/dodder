@@ -5,7 +5,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
 
-func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(value string) (seq Seq, err error) {
+func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+	value string,
+) (seq Seq, err error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 

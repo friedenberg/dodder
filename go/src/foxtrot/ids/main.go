@@ -1,6 +1,7 @@
 package ids
 
 import (
+	"encoding"
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -17,6 +18,8 @@ type (
 		ToSeq() doddish.Seq
 		ToType() TypeStruct
 		IsEmpty() bool
+		encoding.BinaryMarshaler
+		// encoding.BinaryAppender
 	}
 
 	Tag   = Id

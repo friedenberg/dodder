@@ -90,18 +90,30 @@ func (id *objectId3) Set(value string) (err error) {
 }
 
 func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
+	if id.Genre, err = ValidateSeqAndGetGenre(seq); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	id.Seq = seq.Clone()
+
+	return
+}
+
+func ValidateSeqAndGetGenre(
+	seq doddish.Seq,
+) (genre genres.Genre, err error) {
 	switch {
 	case seq.Len() == 0:
-		err = doddish.ErrEmptySeq
-		return err
+		return genres.None, doddish.ErrEmptySeq
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
 
 		if TokenIsConfig(seq.At(0)) {
-			id.Genre = genres.Config
+			return genres.Config, nil
 		} else {
-			id.Genre = genres.Tag
+			return genres.Tag, nil
 		}
 
 		// -tag
@@ -111,11 +123,10 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 	):
 
 		if TokenIsConfig(seq.At(1)) {
-			err = errors.Errorf("config not allowed")
-			return err
+			return genres.Tag, errors.Errorf("config not allowed for tag")
 		}
 
-		id.Genre = genres.Tag
+		return genres.Tag, nil
 
 	// %tag
 	case seq.MatchAll(
@@ -123,39 +134,38 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 		doddish.TokenTypeIdentifier,
 	):
 		if TokenIsConfig(seq.At(1)) {
-			err = errors.Errorf("unsupported seq: %q", seq)
-			return err
+			return genres.Tag, errors.Errorf("unsupported seq: %q", seq)
 		}
 
-		id.Genre = genres.Tag
+		return genres.Tag, nil
 
 		// !type
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpType),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Type
+		return genres.Type, nil
 
 		// %tag
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpVirtual),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Tag
+		return genres.Tag, nil
 
 		// /repo
 	case seq.MatchAll(
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Repo
+		return genres.Repo, nil
 
 		// @digest-or-sig
 	case seq.MatchAll(
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Blob
+		return genres.Blob, nil
 
 		// purpose@digest-or-sig
 	case seq.MatchAll(
@@ -163,7 +173,7 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 		doddish.TokenMatcherOp('@'),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Blob
+		return genres.Blob, nil
 
 		// zettel/id
 	case seq.MatchAll(
@@ -171,7 +181,7 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 		doddish.TokenMatcherOp(doddish.OpPathSeparator),
 		doddish.TokenTypeIdentifier,
 	):
-		id.Genre = genres.Zettel
+		return genres.Zettel, nil
 
 		// sec.asec
 	case seq.MatchAll(
@@ -181,26 +191,19 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 	):
 		comments.Performance("remove []byte->string conversion")
 		if _, err = strconv.ParseInt(seq.At(0).String(), 10, 64); err != nil {
-			err = errors.Wrapf(err, "failed to parse Sec time: %s", seq.At(0))
-			return err
+			return genres.InventoryList, errors.Wrapf(err, "failed to parse Sec time: %s", seq.At(0))
 		}
 
 		comments.Performance("remove []byte->string conversion")
 		if _, err = strconv.ParseInt(seq.At(2).String(), 10, 64); err != nil {
-			err = errors.Wrapf(err, "failed to parse Asec time: %s", seq.At(2))
-			return err
+			return genres.InventoryList, errors.Wrapf(err, "failed to parse Asec time: %s", seq.At(2))
 		}
 
-		id.Genre = genres.InventoryList
+		return genres.InventoryList, nil
 
 	default:
-		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
-		return err
+		return genres.None, errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
 	}
-
-	id.Seq = seq.Clone()
-
-	return err
 }
 
 func (id *objectId3) Reset() {
@@ -334,4 +337,36 @@ func (id *objectId3) SetType(value string) (err error) {
 
 func (id objectId3) ToSeq() doddish.Seq {
 	return id.Seq
+}
+
+func (id *objectId3) ToSeqMutable() *doddish.Seq {
+	return &id.Seq
+}
+
+func (id objectId3) MarshalBinary() ([]byte, error) {
+	return id.AppendBinary(nil)
+}
+
+func (id objectId3) AppendBinary(bites []byte) ([]byte, error) {
+	return id.ToSeq().GetBinaryMarshaler().AppendBinary(bites)
+}
+
+func (id *objectId3) UnmarshalBinary(bites []byte) (err error) {
+	if err = id.ToSeqMutable().GetBinaryUnmarshaler().UnmarshalBinary(
+		bites,
+	); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	if id.Genre, err = ValidateSeqAndGetGenre(id.Seq); err != nil {
+		if err == doddish.ErrEmptySeq {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return err
+		}
+	}
+
+	return nil
 }
