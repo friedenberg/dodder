@@ -768,6 +768,8 @@ func (id *objectId2) UnmarshalBinary(bs []byte) (err error) {
 func (id *objectId2) SetWithSeq(
 	seq doddish.Seq,
 ) (err error) {
+	id.Reset()
+
 	switch {
 	case seq.Len() == 0:
 		err = errors.Wrap(doddish.ErrEmptySeq)
