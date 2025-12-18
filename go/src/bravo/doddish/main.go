@@ -1,13 +1,12 @@
 package doddish
 
 import (
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
 
 func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 	value string,
-) (seq Seq, err error) {
+) (seq Seq, err pkgError) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 
@@ -15,7 +14,6 @@ func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 	boxScanner.Reset(reader)
 
 	if seq, err = boxScanner.ScanDotAllowedInIdentifiersOrError(); err != nil {
-		err = errors.Wrap(err)
 		return seq, err
 	}
 

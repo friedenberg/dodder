@@ -20,6 +20,11 @@ func IsStopIteration(err error) bool {
 }
 
 type (
+	Typed[DISAMB any] interface {
+		error
+		GetErrorType() DISAMB
+	}
+
 	errorString[DISAMB any] struct {
 		value string
 	}
@@ -30,16 +35,21 @@ func IsTyped[DISAMB any](err error) bool {
 	return Is(err, target)
 }
 
-func New(text string) error {
+func New(text string) Typed[string] {
 	return &errorString[string]{text}
 }
 
-func NewWithType[DISAMB any](text string) error {
+func NewWithType[DISAMB any](text string) Typed[DISAMB] {
 	return &errorString[DISAMB]{text}
 }
 
 func (err *errorString[_]) Error() string {
 	return err.value
+}
+
+func (err *errorString[TYPE]) GetErrorType() TYPE {
+	var disamb TYPE
+	return disamb
 }
 
 func (err *errorString[DISAMB]) Is(target error) bool {

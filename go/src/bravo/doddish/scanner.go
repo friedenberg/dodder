@@ -18,7 +18,7 @@ type Scanner struct {
 	scannedOffset int
 	seq           Seq
 
-	err      error
+	err      error // TODO switch to pkgError
 	unscan   *SeqRuneScanner
 	n        int64
 	lastRune rune
@@ -115,13 +115,13 @@ func (scanner *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
 	return scanner.scan(false)
 }
 
-func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, error) {
+func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, pkgError) {
 	if !scanner.ScanDotAllowedInIdentifiers() {
-		return nil, errors.Errorf("no seq")
+		return nil, ErrEmptySeq
 	}
 
 	if scanner.CanScan() {
-		return nil, errors.Errorf("more than one seq")
+		return nil, ErrMoreThanOneSeq
 	}
 
 	return scanner.GetSeq(), nil
