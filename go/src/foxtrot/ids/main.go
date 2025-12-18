@@ -196,7 +196,6 @@ func SetWithString(
 	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 		value,
 	); err != nil {
-		err = errors.Wrap(err)
 		return err
 	}
 
@@ -208,15 +207,44 @@ func SetWithString(
 	return err
 }
 
+func SetObjectIdLike(
+	id *ObjectId,
+	other interfaces.ObjectId,
+) (err error) {
+	if other, ok := other.(*objectId2); ok {
+		id.genre = other.genre
+		other.left.CopyTo(&id.left)
+		other.right.CopyTo(&id.right)
+		id.middle = other.middle
+
+		if id.middle == '%' {
+			id.virtual = true
+		}
+
+		other.repoId.CopyTo(&id.repoId)
+
+		return err
+	}
+
+	if err = SetWithGenre(id, other.String(), other.GetGenre()); err != nil {
+		if err == doddish.ErrEmptySeq {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return err
+		}
+	}
+
+	return err
+}
+
 func SetWithGenre(
 	id *ObjectId,
 	value string,
 	genre interfaces.GenreGetter,
 ) (err error) {
 	return id.SetWithGenre(value, genre)
-
 	if err = SetWithString(id, value); err != nil {
-		err = errors.Wrap(err)
 		return err
 	}
 

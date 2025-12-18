@@ -170,8 +170,14 @@ func (id *ZettelId) Set(value string) (err error) {
 	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 		value,
 	); err != nil {
-		err = errors.Wrap(err)
-		return err
+		if err == doddish.ErrEmptySeq {
+			err = nil
+			id.Reset()
+			return
+		} else {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	if err = id.SetWithSeq(seq); err != nil {
