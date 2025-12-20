@@ -73,6 +73,10 @@ func (cmd *Edit) Complete(
 
 func (cmd Edit) Run(req command.Request) {
 	repo := cmd.MakeLocalWorkingCopy(req)
+	envWorkspace := repo.GetEnvWorkspace()
+
+	// TODO eventually remove this once temporary edits work correctly
+	envWorkspace.AssertNotTemporaryOrOfferToCreate(repo)
 
 	queryGroup := cmd.MakeQueryIncludingWorkspace(
 		req,
