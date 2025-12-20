@@ -58,8 +58,8 @@ func (formatter textFormatter) EncodeStringTo(
 	writer io.Writer,
 ) (n int64, err error) {
 	context := object_metadata_fmt_triple_hyphen.FormatterContext{
-		EncoderContext: object,
-		FormatterOptions:           formatter.options,
+		EncoderContext:   object,
+		FormatterOptions: formatter.options,
 	}
 
 	switch {
@@ -85,8 +85,8 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
-		EncoderContext: object,
-		FormatterOptions:           tf.options,
+		EncoderContext:   object,
+		FormatterOptions: tf.options,
 	}
 
 	if object.GetGenre().IsConfig() ||

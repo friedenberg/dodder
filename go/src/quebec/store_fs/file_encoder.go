@@ -78,8 +78,8 @@ func (encoder *fileEncoder) EncodeObject(
 	lockfilePath string,
 ) (err error) {
 	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
-		EncoderContext: object.GetSku(),
-		FormatterOptions:           options,
+		EncoderContext:   object.GetSku(),
+		FormatterOptions: options,
 	}
 
 	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
