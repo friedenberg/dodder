@@ -42,6 +42,11 @@ type dirInfo struct {
 	errors interfaces.SetMutable[itemWithError]
 }
 
+type (
+	dirEntryKey = string
+	dirInfoMap  map[dirEntryKey]*sku.FSItem
+)
+
 func makeObjectsWithDir(
 	fileExtensions file_extensions.Config,
 	envRepo env_repo.Env,
@@ -63,7 +68,7 @@ func makeObjectsWithDir(
 //                                 |___/
 
 func (dirInfo *dirInfo) walkDir(
-	cache map[string]*sku.FSItem,
+	cache dirInfoMap,
 	dir string,
 	pattern string,
 ) (err error) {
@@ -144,7 +149,7 @@ func (dirInfo *dirInfo) walkDir(
 }
 
 func (dirInfo *dirInfo) addPathAndDirEntry(
-	cache map[string]*sku.FSItem,
+	cache dirInfoMap,
 	path string,
 	dirEntry fs.DirEntry,
 ) (key string, fds *sku.FSItem, err error) {
@@ -196,6 +201,9 @@ func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 		return key, err
 	}
 
+	// TODO determine why dirInfo.root can be the temporary workspace
+
+	// calculating the relative path is definitely necessary, just not sure why
 	key = dirInfo.keyForObjectIdString(rel)
 
 	if key == "" {
@@ -206,25 +214,25 @@ func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 	return key, err
 }
 
+// TODO determine if this method should key zettel id's with the parent dir too
 func (dirInfo *dirInfo) keyForObjectIdString(
-	oidString string,
+	objectIdString string,
 ) (key string) {
 	var ok bool
 
-	key, _, ok = strings.Cut(oidString, ".")
+	key, _, ok = strings.Cut(objectIdString, ".")
 
 	if !ok {
-		key = oidString
+		key = objectIdString
 	} else if key == "" {
-		key = fd.FileNameSansExt(oidString)
+		key = fd.FileNameSansExt(objectIdString)
 	}
-	// ui.DebugBatsTestBody().Print(oidString, key)
-	// ui.DebugBatsTestBody().Print(oidString, key)
+
 	return key
 }
 
 func (dirInfo *dirInfo) addFD(
-	cache map[string]*sku.FSItem,
+	cache dirInfoMap,
 	fileDescriptor *fd.FD,
 ) (key string, fds *sku.FSItem, err error) {
 	if fileDescriptor.IsDir() {
@@ -268,7 +276,7 @@ func (dirInfo *dirInfo) addFD(
 func (dirInfo *dirInfo) processDir(
 	path string,
 ) (results []*sku.FSItem, err error) {
-	cache := make(map[string]*sku.FSItem)
+	cache := make(dirInfoMap)
 
 	results = make([]*sku.FSItem, 0)
 
@@ -296,7 +304,7 @@ func (dirInfo *dirInfo) processFDPattern(
 	pattern string,
 	dir string,
 ) (fds []*sku.FSItem, err error) {
-	cache := make(map[string]*sku.FSItem)
+	cache := make(dirInfoMap)
 
 	if err = dirInfo.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)
@@ -328,7 +336,7 @@ func (dirInfo *dirInfo) processFDPattern(
 func (dirInfo *dirInfo) processFD(
 	fdee *fd.FD,
 ) (objectIdString string, fds []*sku.FSItem, err error) {
-	cache := make(map[string]*sku.FSItem)
+	cache := make(dirInfoMap)
 
 	if objectIdString, err = dirInfo.keyForFD(fdee); err != nil {
 		err = errors.Wrap(err)
