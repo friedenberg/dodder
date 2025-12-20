@@ -31,7 +31,7 @@ func (marshaler SeqBinaryCoding) AppendBinary(bites []byte) ([]byte, error) {
 	bites = slices.Grow(bites, byteCount)
 
 	for _, token := range marshaler.ToSeq() {
-		added := ohio.Int8ToByteArray(int8(token.GetBinaryByteCount()))[0]
+		added := ohio.UInt8ToByteArray(uint8(token.GetBinaryByteCount()))[0]
 		bites = append(bites, added)
 
 		var err error
@@ -47,12 +47,26 @@ func (marshaler SeqBinaryCoding) AppendBinary(bites []byte) ([]byte, error) {
 
 func (marshaler *SeqBinaryCoding) UnmarshalBinary(bites []byte) (err error) {
 	for len(bites) > 0 {
-		byteCount := ohio.ByteArrayToInt8([1]byte{bites[0]})
+		byteCount := ohio.ByteArrayToUInt8([1]byte{bites[0]})
 
 		bites = bites[1:]
 
-		var tokenBytes []byte
-		tokenBytes, bites = bites[:byteCount], bites[byteCount:]
+		if len(bites) == 0 {
+			return
+		}
+
+		if int(byteCount) > len(bites) {
+			err = errors.Errorf(
+				"expected at least %d bytes, but have %d bytes",
+				byteCount,
+				len(bites),
+			)
+
+			return
+		}
+
+		tokenBytes := bites[:byteCount]
+		bites = bites[byteCount:]
 
 		// TODO use token byte pool?
 		var token Token

@@ -107,6 +107,7 @@ func (scanner *Scanner) ScanSkipSpace() (ok bool) {
 	return ok
 }
 
+// TODO create sequence methods for Scan family
 func (scanner *Scanner) Scan() (ok bool) {
 	return scanner.scan(true)
 }

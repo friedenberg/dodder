@@ -209,6 +209,7 @@ func (encoder encoder) encodeToBufferedWriter(
 		}
 
 	case nil:
+		// TODO debug this case
 		encoder.writeOneErrorMessage(
 			input,
 			"error was nil!",

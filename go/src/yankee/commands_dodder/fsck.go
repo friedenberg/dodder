@@ -109,11 +109,12 @@ func (cmd Fsck) runVerification(
 
 					objectErrors.Append(err)
 
-					return
+					continue
 				}
 
 				if err := markl.AssertIdIsNotNull(
-					object.GetObjectDigest()); err != nil {
+					object.GetObjectDigest(),
+				); err != nil {
 					objectErrors.Append(
 						objectError{
 							err:    err,

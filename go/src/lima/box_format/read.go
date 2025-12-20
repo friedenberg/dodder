@@ -254,6 +254,13 @@ LOOP_AFTER_OBJECT_ID:
 			field.ColorType = string_format_writer.ColorTypeUserData
 			object.GetMetadataMutable().GetIndexMutable().GetFieldsMutable().Append(field)
 
+		case seq.MatchAll(
+			doddish.TokenMatcherOp(doddish.OpTagSeparator),
+			doddish.TokenTypeIdentifier,
+		):
+
+			fallthrough
+
 			// value
 		case seq.MatchAll(doddish.TokenTypeIdentifier):
 			var tag ids.TagStruct
@@ -283,8 +290,12 @@ LOOP_AFTER_OBJECT_ID:
 			}
 
 		default:
-			err = errors.Errorf("unsupported seq: %q", seq)
+			err = doddish.ErrUnsupportedSeq{
+				Seq: seq,
+			}
+
 			scanner.Unscan()
+
 			return err
 		}
 	}

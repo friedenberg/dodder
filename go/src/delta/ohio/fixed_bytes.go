@@ -8,6 +8,17 @@ func Int64ToByteArray(i int64) [8]byte {
 	return *(*[unsafe.Sizeof(i)]byte)(unsafe.Pointer(&i))
 }
 
+func ByteArrayToUInt8(arr [1]byte) uint8 {
+	val := uint8(0)
+	size := len(arr)
+
+	for i := range size {
+		*(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&val)) + uintptr(i))) = arr[i]
+	}
+
+	return val
+}
+
 func ByteArrayToInt8(arr [1]byte) int8 {
 	val := int8(0)
 	size := len(arr)
@@ -50,6 +61,10 @@ func ByteArrayToInt64(arr [8]byte) int64 {
 	}
 
 	return val
+}
+
+func UInt8ToByteArray(i uint8) [1]byte {
+	return *(*[unsafe.Sizeof(i)]byte)(unsafe.Pointer(&i))
 }
 
 func Int8ToByteArray(i int8) [1]byte {

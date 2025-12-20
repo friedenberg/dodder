@@ -50,6 +50,7 @@ func (store *Store) Reindex(context interfaces.ActiveContext) (err error) {
 
 	seq := store.GetInventoryListStore().AllInventoryListObjectsAndContents()
 
+	// TODO switch to reusing fsck command structure
 	for objectWithList, iterErr := range seq {
 		if iterErr != nil {
 			if objectWithList.List == nil {
