@@ -253,7 +253,7 @@ func (id *objectId3) UnmarshalBinary(bites []byte) (err error) {
 	}
 
 	if id.Genre, err = ValidateSeqAndGetGenre(id.Seq); err != nil {
-		if err == doddish.ErrEmptySeq {
+		if doddish.IsErrEmptySeq(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

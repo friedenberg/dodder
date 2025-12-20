@@ -6,7 +6,7 @@ import (
 
 func ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 	value string,
-) (seq Seq, err pkgError) {
+) (seq Seq, err Error) {
 	reader, repool := pool.GetStringReader(value)
 	defer repool()
 

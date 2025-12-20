@@ -66,7 +66,7 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		// at a bare minimum, the internal object ID must always be set as there
 		// are hard assumptions about internal being valid throughout the
 		// reading cycle
-		if err = ids.SetObjectIdLike(
+		if err = ids.SetObjectIdOrBlob(
 			&checkedOut.GetSku().ObjectId,
 			&item.ExternalObjectId,
 		); err != nil {
@@ -78,7 +78,7 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 		var objectId ids.ObjectId
 
-		if err = ids.SetObjectIdLike(
+		if err = ids.SetObjectIdOrBlob(
 			&objectId,
 			item.GetExternalObjectId(),
 		); err != nil {
@@ -200,7 +200,7 @@ func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return err
 	}
 
-	if err = ids.SetObjectIdLike(
+	if err = ids.SetObjectIdOrBlob(
 		&checkedOut.GetSku().ObjectId,
 		&item.ExternalObjectId,
 	); err != nil {
@@ -208,7 +208,7 @@ func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return err
 	}
 
-	if err = ids.SetObjectIdLike(
+	if err = ids.SetObjectIdOrBlob(
 		&checkedOut.GetSkuExternal().ObjectId,
 		&item.ExternalObjectId,
 	); err != nil {

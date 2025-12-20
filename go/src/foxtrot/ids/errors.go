@@ -6,6 +6,19 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
+func wrapAsPkgError(err error) pkgError {
+	return errors.WrapWithType[pkgErrDisamb](err)
+}
+
 type ErrInvalidId string
 
 func (e ErrInvalidId) Error() string {

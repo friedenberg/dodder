@@ -8,10 +8,10 @@ import (
 
 type (
 	pkgErrDisamb struct{}
-	pkgError     = errors.Typed[pkgErrDisamb]
+	Error        = errors.Typed[pkgErrDisamb]
 )
 
-func newPkgError(text string) pkgError {
+func newPkgError(text string) Error {
 	return errors.NewWithType[pkgErrDisamb](text)
 }
 
@@ -23,6 +23,14 @@ var (
 type ErrUnsupportedSeq struct {
 	For string
 	Seq
+}
+
+func IsErrEmptySeq(err error) bool {
+	return errors.Is(err, ErrEmptySeq)
+}
+
+func IsErrUnsupportedSeq(err error) bool {
+	return errors.Is(err, ErrUnsupportedSeq{})
 }
 
 func (err ErrUnsupportedSeq) Error() string {

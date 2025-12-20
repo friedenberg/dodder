@@ -522,73 +522,51 @@ func (id *objectId2) SetLeft(v string) (err error) {
 }
 
 // TODO switch to SetWithSeq
-func (id *objectId2) Set(v string) (err error) {
-	if v == "/" {
+func (id *objectId2) Set(value string) (err error) {
+	if value == "/" {
 		id.genre = genres.Zettel
 		return err
 	}
 
-	// var els []string
-
-	// if len(v) > 0 {
-	// 	els = strings.SplitAfterN(v[1:], "/", 2)
-	// }
-
-	// if strings.HasPrefix(v, "/") && len(els) == 2 {
-	// 	if err = id.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return err
-	// 	}
-
-	// 	v = els[1]
-	// }
-
-	var k Id
+	var parsedId Id
 
 	switch id.genre {
 	case genres.None:
-		if k, err = MakeObjectId(v); err != nil {
-			id.genre = genres.Blob
-
-			if err = id.left.Set(v); err != nil {
-				err = errors.Wrap(err)
-				return err
-			}
-
-			return err
+		if parsedId, err = MakeObjectId(value); err != nil {
+			return id.SetBlob(value)
 		}
 
 	case genres.Zettel:
 		var h ZettelId
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsedId = &h
 
 	case genres.Tag:
 		var h TagStruct
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsedId = &h
 
 	case genres.Type:
 		var h TypeStruct
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsedId = &h
 
 	case genres.Repo:
 		var h RepoId
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsedId = &h
 
 	case genres.Config:
-		err = Config.Set(v)
-		k = Config
+		err = Config.Set(value)
+		parsedId = Config
 
 	case genres.InventoryList:
 		var h Tai
-		err = h.Set(v)
-		k = &h
+		err = h.Set(value)
+		parsedId = &h
 
 	case genres.Blob:
-		if err = id.left.Set(v); err != nil {
+		if err = id.left.Set(value); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -600,90 +578,11 @@ func (id *objectId2) Set(v string) (err error) {
 	}
 
 	if err != nil {
-		err = errors.Wrapf(err, "String: %q", v)
+		err = errors.Wrapf(err, "String: %q", value)
 		return err
 	}
 
-	if err = id.SetWithId(k); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
-func (id *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
-	if v == "/" {
-		id.genre = genres.Zettel
-		return err
-	}
-
-	// if strings.HasPrefix(v, "/") {
-	// 	els := strings.SplitAfterN(v[1:], "/", 2)
-
-	// 	if len(els) != 2 {
-	// 		err = errors.ErrorWithStackf("invalid object id format: %q", v)
-	// 		return err
-	// 	}
-
-	// 	v = els[1]
-
-	// 	if err = id.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return err
-	// 	}
-	// }
-
-	var k Id
-
-	switch id.genre {
-	case genres.Zettel:
-		var h ZettelId
-		err = h.Set(v)
-		k = &h
-
-	case genres.Tag:
-		var h TagStruct
-		err = h.Set(v)
-		k = &h
-
-	case genres.Type:
-		var h TypeStruct
-		err = h.Set(v)
-		k = &h
-
-	case genres.Repo:
-		var h RepoId
-		err = h.Set(v)
-		k = &h
-
-	case genres.Config:
-		err = Config.Set(v)
-		k = Config
-
-	case genres.InventoryList:
-		var h Tai
-		err = h.Set(v)
-		k = &h
-
-	case genres.Blob:
-		if err = id.left.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return err
-		}
-
-		return err
-
-	default:
-		err = genres.MakeErrUnrecognizedGenre(id.genre.String())
-	}
-
-	if err != nil {
-		err = errors.Wrapf(err, "String: %q", v)
-		return err
-	}
-
-	if err = id.SetWithId(k); err != nil {
+	if err = id.SetWithId(parsedId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -730,11 +629,11 @@ func (id *objectId2) AppendBinary(text []byte) ([]byte, error) {
 	return append(text, []byte(FormattedString(id))...), nil
 }
 
-func (id *objectId2) UnmarshalBinary(bs []byte) (err error) {
-	text := string(bs)
+func (id *objectId2) UnmarshalBinary(bites []byte) (err error) {
+	text := string(bites)
 
 	if err = id.Set(text); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Bytes: %x, Bytes as String: %q", bites, text)
 		return err
 	}
 
@@ -871,9 +770,20 @@ func (id *objectId2) SetWithSeq(
 		return err
 
 	default:
-		err = errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "object id"})
+		err = doddish.ErrUnsupportedSeq{Seq: seq, For: "object id"}
 		return err
 	}
+}
+
+func (id *objectId2) SetBlob(value string) (err error) {
+	id.genre = genres.Blob
+
+	if err = id.left.Set(value); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
 }
 
 func (id *objectId2) ToType() TypeStruct {

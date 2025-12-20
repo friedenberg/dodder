@@ -109,7 +109,6 @@ func Equals(left, right interfaces.ObjectId) (ok bool) {
 	return true
 }
 
-// TODO remove
 func FormattedString(id Id) string {
 	return id.ToSeq().String()
 }
@@ -193,24 +192,27 @@ func Expand(
 func SetWithString(
 	id *ObjectId,
 	value string,
-) (err error) {
+) pkgError {
 	var seq doddish.Seq
 
-	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
-		value,
-	); err != nil {
-		return err
+	{
+		var err error
+
+		if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+			value,
+		); err != nil {
+			return wrapAsPkgError(err)
+		}
 	}
 
-	if err = id.SetWithSeq(seq); err != nil {
-		err = errors.Wrap(err)
-		return err
+	if err := id.SetWithSeq(seq); err != nil {
+		return wrapAsPkgError(err)
 	}
 
-	return err
+	return nil
 }
 
-func SetObjectIdLike(
+func SetObjectIdOrBlob(
 	id *ObjectId,
 	other interfaces.ObjectId,
 ) (err error) {
@@ -230,8 +232,10 @@ func SetObjectIdLike(
 	}
 
 	if err = SetWithGenre(id, other.String(), other.GetGenre()); err != nil {
-		if err == doddish.ErrEmptySeq {
+		if doddish.IsErrEmptySeq(err) {
 			err = nil
+		} else if doddish.IsErrUnsupportedSeq(err) {
+			return id.SetBlob(other.String())
 		} else {
 			err = errors.Wrap(err)
 			return err
@@ -254,9 +258,8 @@ func SetWithGenre(
 	{
 		genre := genres.Make(genre.GetGenre())
 
-		if err = genre.AssertGenre(id); err != nil {
-			err = errors.Wrap(err)
-			return err
+		if err := genre.AssertGenre(id); err != nil {
+			return errors.Wrapf(wrapAsPkgError(err), "Id: %q", value)
 		}
 	}
 

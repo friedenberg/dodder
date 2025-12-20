@@ -116,7 +116,7 @@ func (scanner *Scanner) ScanDotAllowedInIdentifiers() (ok bool) {
 	return scanner.scan(false)
 }
 
-func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, pkgError) {
+func (scanner *Scanner) ScanDotAllowedInIdentifiersOrError() (Seq, Error) {
 	if !scanner.ScanDotAllowedInIdentifiers() {
 		return nil, ErrEmptySeq
 	}

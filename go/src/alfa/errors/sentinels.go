@@ -28,6 +28,10 @@ type (
 	errorString[DISAMB any] struct {
 		value string
 	}
+
+	errorTypedWrapped[DISAMB any] struct {
+		wrapped error
+	}
 )
 
 func IsTyped[DISAMB any](err error) bool {
@@ -41,6 +45,23 @@ func New(text string) Typed[string] {
 
 func NewWithType[DISAMB any](text string) Typed[DISAMB] {
 	return &errorString[DISAMB]{text}
+}
+
+func WrapWithType[DISAMB any](err error) Typed[DISAMB] {
+	return &errorTypedWrapped[DISAMB]{wrapped: err}
+}
+
+func (err *errorTypedWrapped[TYPE]) Error() string {
+	return err.wrapped.Error()
+}
+
+func (err *errorTypedWrapped[TYPE]) GetErrorType() TYPE {
+	var disamb TYPE
+	return disamb
+}
+
+func (err *errorTypedWrapped[_]) Unwrap() error {
+	return err.wrapped
 }
 
 func (err *errorString[_]) Error() string {
