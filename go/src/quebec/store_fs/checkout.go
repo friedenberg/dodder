@@ -225,17 +225,21 @@ type checkoutFileNameInfo struct {
 
 func (store *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	options checkout_options.Options,
-	co *sku.CheckedOut,
+	checkedOut *sku.CheckedOut,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	if err = store.SetFilenameForTransacted(options, co.GetSku(), info); err != nil {
+	if err = store.SetFilenameForTransacted(
+		options,
+		checkedOut.GetSku(),
+		info,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	co.SetState(checked_out_state.JustCheckedOut)
+	checkedOut.SetState(checked_out_state.JustCheckedOut)
 
-	info.tipe = co.GetSku().GetType()
+	info.tipe = checkedOut.GetSku().GetType()
 	info.inlineBlob = store.config.IsInlineType(info.tipe)
 
 	return err

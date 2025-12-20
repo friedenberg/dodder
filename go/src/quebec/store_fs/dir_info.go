@@ -189,6 +189,11 @@ func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 		return key, err
 	}
 
+	if !fd.DoesDirectoryContainPath(dirInfo.root, path) {
+		err = errors.Errorf("fdee (%q) not in root (%q): rel %q", fdee, dirInfo.root, path)
+		return
+	}
+
 	var rel string
 
 	if rel, err = filepath.Rel(dirInfo.root, path); err != nil {
@@ -200,8 +205,6 @@ func (dirInfo *dirInfo) keyForFD(fdee *fd.FD) (key string, err error) {
 		err = errors.ErrorWithStackf("empty rel path")
 		return key, err
 	}
-
-	// TODO determine why dirInfo.root can be the temporary workspace
 
 	// calculating the relative path is definitely necessary, just not sure why
 	key = dirInfo.keyForObjectIdString(rel)

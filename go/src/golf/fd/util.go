@@ -2,9 +2,13 @@ package fd
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
+
+	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
 func Base(p string) string {
@@ -47,4 +51,22 @@ func FileNameSansExtRelTo(p, d string) (string, error) {
 
 func ZettelId(p string) string {
 	return fmt.Sprintf("%s/%s", DirBaseOnly(p), FileNameSansExt(p))
+}
+
+func FsRootDir() string {
+	if runtime.GOOS == "windows" {
+		return os.Getenv("SystemDrive")
+	}
+
+	return "/"
+}
+
+func DoesDirectoryContainPath(dir, path string) bool {
+	dir = filepath.Clean(dir)
+	path = filepath.Clean(path)
+	contains := strings.HasPrefix(path, dir)
+	if !contains {
+		ui.Debug().Printf("dir: %q, path: %q", dir, path)
+	}
+	return contains
 }
