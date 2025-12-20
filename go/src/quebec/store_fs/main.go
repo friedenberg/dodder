@@ -446,9 +446,16 @@ func (store *Store) WriteFSItemToExternal(
 	default:
 		externalObjectId := &item.ExternalObjectId
 
-		if err = object.ObjectId.SetObjectIdLike(externalObjectId); err != nil {
-			err = errors.Wrap(err)
-			return err
+		if err = ids.SetObjectIdLike(
+			&object.ObjectId,
+			externalObjectId,
+		); err != nil {
+			if err == doddish.ErrEmptySeq {
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "ExternalId: %q", externalObjectId)
+				return err
+			}
 		}
 
 		if err = object.ExternalObjectId.SetObjectIdLike(

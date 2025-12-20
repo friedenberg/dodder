@@ -691,41 +691,17 @@ func (id *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
 	return err
 }
 
-func (id *objectId2) ResetWith(b *objectId2) {
-	id.genre = b.genre
-	b.left.CopyTo(&id.left)
-	b.right.CopyTo(&id.right)
-	id.middle = b.middle
+func (id *objectId2) ResetWith(other *objectId2) {
+	id.genre = other.genre
+	other.left.CopyTo(&id.left)
+	other.right.CopyTo(&id.right)
+	id.middle = other.middle
 
 	if id.middle == '%' {
 		id.virtual = true
 	}
 
-	b.repoId.CopyTo(&id.repoId)
-}
-
-func (id *objectId2) SetObjectIdLike(b interfaces.ObjectId) (err error) {
-	if b, ok := b.(*objectId2); ok {
-		id.genre = b.genre
-		b.left.CopyTo(&id.left)
-		b.right.CopyTo(&id.right)
-		id.middle = b.middle
-
-		if id.middle == '%' {
-			id.virtual = true
-		}
-
-		b.repoId.CopyTo(&id.repoId)
-
-		return err
-	}
-
-	if SetWithGenre(id, b.String(), b.GetGenre()); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
+	other.repoId.CopyTo(&id.repoId)
 }
 
 func (id *objectId2) ResetWithObjectId(b Id) {

@@ -66,7 +66,8 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		// at a bare minimum, the internal object ID must always be set as there
 		// are hard assumptions about internal being valid throughout the
 		// reading cycle
-		if err = checkedOut.GetSku().ObjectId.SetObjectIdLike(
+		if err = ids.SetObjectIdLike(
+			&checkedOut.GetSku().ObjectId,
 			&item.ExternalObjectId,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -77,7 +78,10 @@ func (store *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 		var objectId ids.ObjectId
 
-		if err = objectId.SetObjectIdLike(item.GetExternalObjectId()); err != nil {
+		if err = ids.SetObjectIdLike(
+			&objectId,
+			item.GetExternalObjectId(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}
@@ -185,8 +189,8 @@ func (store *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 
 func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	item *sku.FSItem,
-	co *sku.CheckedOut,
-	f interfaces.FuncIter[sku.SkuType],
+	checkedOut *sku.CheckedOut,
+	funcOutput interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if !item.Conflict.IsEmpty() {
 		err = errors.ErrorWithStackf(
@@ -196,14 +200,16 @@ func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 		return err
 	}
 
-	if err = co.GetSku().ObjectId.SetObjectIdLike(
+	if err = ids.SetObjectIdLike(
+		&checkedOut.GetSku().ObjectId,
 		&item.ExternalObjectId,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Item: %q", item.Debug())
 		return err
 	}
 
-	if err = co.GetSkuExternal().ObjectId.SetObjectIdLike(
+	if err = ids.SetObjectIdLike(
+		&checkedOut.GetSkuExternal().ObjectId,
 		&item.ExternalObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -211,22 +217,22 @@ func (store *Store) hydrateDefinitelyNotCheckedOutUnrecognizedItem(
 	}
 
 	if err = store.readOneExternalBlob(
-		co.GetSkuExternal(),
-		co.GetSku(),
+		checkedOut.GetSkuExternal(),
+		checkedOut.GetSku(),
 		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	if err = store.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+	if err = store.WriteFSItemToExternal(item, checkedOut.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
 
-	co.SetState(checked_out_state.Untracked)
+	checkedOut.SetState(checked_out_state.Untracked)
 
-	if err = f(co); err != nil {
+	if err = funcOutput(checkedOut); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -124,32 +124,32 @@ func (store *Store) ReadTransactedFromObjectId(
 }
 
 func (store *Store) ReadExternalLikeFromObjectIdLike(
-	o sku.CommitOptions,
-	k1 interfaces.Stringer,
-	t *sku.Transacted,
-) (e sku.ExternalLike, err error) {
-	es, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
+	commitObjects sku.CommitOptions,
+	id interfaces.Stringer,
+	objectInput *sku.Transacted,
+) (objectOutput sku.ExternalLike, err error) {
+	storeLike, ok := store.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectIdLike)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(store, &store)
-		return e, err
+		return objectOutput, err
 	}
 
 	if err = store.Initialize(); err != nil {
 		err = errors.Wrap(err)
-		return e, err
+		return objectOutput, err
 	}
 
-	if e, err = es.ReadExternalLikeFromObjectIdLike(
-		o,
-		k1,
-		t,
+	if objectOutput, err = storeLike.ReadExternalLikeFromObjectIdLike(
+		commitObjects,
+		id,
+		objectInput,
 	); err != nil {
 		err = errors.Wrap(err)
-		return e, err
+		return objectOutput, err
 	}
 
-	return e, err
+	return objectOutput, err
 }
 
 func (store *Store) CheckoutOne(

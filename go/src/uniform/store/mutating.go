@@ -412,7 +412,7 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 
 	var objectId ids.ObjectId
 
-	if err = objectId.SetObjectIdLike(typeId); err != nil {
+	if err = ids.SetObjectIdLike(&objectId, typeId); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -425,7 +425,10 @@ func (commitFacilitator commitFacilitator) addTypeIfNecessary(
 
 	var typeObjectId ids.ObjectId
 
-	if err = typeObjectId.SetObjectIdLike(typeId); err != nil {
+	if err = ids.SetObjectIdLike(
+		&typeObjectId,
+		typeId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

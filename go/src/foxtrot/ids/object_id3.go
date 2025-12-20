@@ -2,7 +2,6 @@ package ids
 
 import (
 	"fmt"
-	"strconv"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
@@ -98,112 +97,6 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 	id.Seq = seq.Clone()
 
 	return
-}
-
-func ValidateSeqAndGetGenre(
-	seq doddish.Seq,
-) (genre genres.Genre, err error) {
-	switch {
-	case seq.Len() == 0:
-		return genres.None, doddish.ErrEmptySeq
-
-		// tag
-	case seq.MatchAll(doddish.TokenTypeIdentifier):
-
-		if TokenIsConfig(seq.At(0)) {
-			return genres.Config, nil
-		} else {
-			return genres.Tag, nil
-		}
-
-		// -tag
-	case seq.MatchAll(
-		doddish.TokenMatcherOp(doddish.OpTagSeparator),
-		doddish.TokenTypeIdentifier,
-	):
-
-		if TokenIsConfig(seq.At(1)) {
-			return genres.Tag, errors.Errorf("config not allowed for tag")
-		}
-
-		return genres.Tag, nil
-
-	// %tag
-	case seq.MatchAll(
-		doddish.TokenMatcherOp(doddish.OpVirtual),
-		doddish.TokenTypeIdentifier,
-	):
-		if TokenIsConfig(seq.At(1)) {
-			return genres.Tag, errors.Errorf("unsupported seq: %q", seq)
-		}
-
-		return genres.Tag, nil
-
-		// !type
-	case seq.MatchAll(
-		doddish.TokenMatcherOp(doddish.OpType),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Type, nil
-
-		// %tag
-	case seq.MatchAll(
-		doddish.TokenMatcherOp(doddish.OpVirtual),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Tag, nil
-
-		// /repo
-	case seq.MatchAll(
-		doddish.TokenMatcherOp(doddish.OpPathSeparator),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Repo, nil
-
-		// @digest-or-sig
-	case seq.MatchAll(
-		doddish.TokenMatcherOp('@'),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Blob, nil
-
-		// purpose@digest-or-sig
-	case seq.MatchAll(
-		doddish.TokenTypeIdentifier,
-		doddish.TokenMatcherOp('@'),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Blob, nil
-
-		// zettel/id
-	case seq.MatchAll(
-		doddish.TokenTypeIdentifier,
-		doddish.TokenMatcherOp(doddish.OpPathSeparator),
-		doddish.TokenTypeIdentifier,
-	):
-		return genres.Zettel, nil
-
-		// sec.asec
-	case seq.MatchAll(
-		doddish.TokenTypeIdentifier,
-		doddish.TokenMatcherOp(doddish.OpSigilExternal),
-		doddish.TokenTypeIdentifier,
-	):
-		comments.Performance("remove []byte->string conversion")
-		if _, err = strconv.ParseInt(seq.At(0).String(), 10, 64); err != nil {
-			return genres.InventoryList, errors.Wrapf(err, "failed to parse Sec time: %s", seq.At(0))
-		}
-
-		comments.Performance("remove []byte->string conversion")
-		if _, err = strconv.ParseInt(seq.At(2).String(), 10, 64); err != nil {
-			return genres.InventoryList, errors.Wrapf(err, "failed to parse Asec time: %s", seq.At(2))
-		}
-
-		return genres.InventoryList, nil
-
-	default:
-		return genres.None, errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
-	}
 }
 
 func (id *objectId3) Reset() {

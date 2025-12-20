@@ -83,13 +83,18 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 // Given a sku and an FSItem, return the overlayed external variant. Internal
 // can be nil and then only the external data is used.
 func (store *Store) ReadExternalFromItem(
-	o sku.CommitOptions,
+	commitOptions sku.CommitOptions,
 	item *sku.FSItem,
 	internal *sku.Transacted,
 ) (external *sku.Transacted, err error) {
 	external = GetExternalPool().Get()
 
-	if err = store.HydrateExternalFromItem(o, item, internal, external); err != nil {
+	if err = store.HydrateExternalFromItem(
+		commitOptions,
+		item,
+		internal,
+		external,
+	); err != nil {
 		err = errors.Wrap(err)
 		return external, err
 	}
