@@ -14,7 +14,7 @@ import (
 
 type (
 	FormatterContext interface {
-		objects.PersistentFormatterContext
+		objects.EncoderContext
 		GetObjectId() *ids.ObjectId
 	}
 )
@@ -113,7 +113,7 @@ func WriteDigest(
 ) (err error) {
 	format := GetFormatForPurpose(formatId)
 
-	metadata := context.GetMetadataMutable()
+	metadata := context.GetMetadata()
 
 	if metadata.GetTai().IsEmpty() {
 		err = ErrEmptyTai

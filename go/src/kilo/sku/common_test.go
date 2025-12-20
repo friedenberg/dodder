@@ -377,7 +377,7 @@ func writeFormat(
 	if _, err := formatter.FormatMetadata(
 		stringBuilder,
 		object_metadata_fmt_triple_hyphen.FormatterContext{
-			PersistentFormatterContext: metadata,
+			EncoderContext: metadata,
 			FormatterOptions:           options,
 		},
 	); err != nil {

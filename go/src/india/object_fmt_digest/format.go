@@ -52,7 +52,7 @@ func (format format) writeMetadataKeyStringTo(
 	context FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
-	metadata := context.GetMetadataMutable()
+	metadata := context.GetMetadata()
 
 	var n1 int
 
@@ -61,7 +61,7 @@ func (format format) writeMetadataKeyStringTo(
 		n1, err = format.writeMarklIdKeyIfNotNull(
 			writer,
 			key,
-			metadata.GetBlobDigestMutable(),
+			metadata.GetBlobDigest(),
 		)
 
 		n += int64(n1)
@@ -209,8 +209,8 @@ func (format format) writeMetadataKeyStringTo(
 		}
 
 	case key_strings.TypeLock:
-		typeLock := metadata.GetTypeLockMutable()
-		typeLockMarshaler := markl.MakeLockMarshalerValueNotRequired(typeLock)
+		typeLock := metadata.GetTypeLock()
+		typeLockMarshaler := markl.MakeLockCoderValueNotRequired(typeLock)
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			writer,

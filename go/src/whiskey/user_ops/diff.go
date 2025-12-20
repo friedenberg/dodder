@@ -67,13 +67,13 @@ func (op Diff) Run(
 
 	local := localCheckedOut.GetSku()
 	localContext := object_metadata_fmt_triple_hyphen.FormatterContext{
-		PersistentFormatterContext: local,
+		EncoderContext: local,
 		FormatterOptions:           options,
 	}
 
 	remote := remoteCheckedOut.GetSkuExternal()
 	remoteCtx := object_metadata_fmt_triple_hyphen.FormatterContext{
-		PersistentFormatterContext: remote,
+		EncoderContext: remote,
 		FormatterOptions:           options,
 	}
 

@@ -151,7 +151,7 @@ func (cmd *FormatObject) FormatFromStdin(
 
 	var blobFormatter script_config.RemoteScript
 	typeLock := markl.MakeLock[ids.SeqId]()
-	typeLockMarshaler := markl.MakeLockMarshalerValueNotRequired(&typeLock)
+	typeLockMarshaler := markl.MakeMutableLockCoderValueNotRequired(&typeLock)
 
 	switch len(args) {
 	case 1:

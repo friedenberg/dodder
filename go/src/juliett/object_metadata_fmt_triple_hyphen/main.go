@@ -22,12 +22,11 @@ type (
 	// TODO make a reliable constructor for this
 	FormatterContext struct {
 		FormatterOptions
-		objects.PersistentFormatterContext
+		objects.EncoderContext
 	}
 
 	ParserContext interface {
-		objects.PersistentParserContext
-		SetBlobDigest(interfaces.MarklId) error
+		objects.DecoderContext
 	}
 
 	FormatterFamily struct {

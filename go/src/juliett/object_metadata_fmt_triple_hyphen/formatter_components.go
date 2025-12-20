@@ -196,9 +196,9 @@ func (factory formatterComponents) writeBlobPath(
 ) (n int64, err error) {
 	var blobPath string
 
-	metadata := formatterContext.GetMetadataMutable()
+	metadata := formatterContext.GetMetadata()
 
-	for field := range metadata.GetIndexMutable().GetFields() {
+	for field := range metadata.GetIndex().GetFields() {
 		if strings.ToLower(field.Key) == "blob" {
 			blobPath = field.Value
 			break

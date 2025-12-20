@@ -78,7 +78,7 @@ func (encoder *fileEncoder) EncodeObject(
 	lockfilePath string,
 ) (err error) {
 	ctx := object_metadata_fmt_triple_hyphen.FormatterContext{
-		PersistentFormatterContext: object.GetSku(),
+		EncoderContext: object.GetSku(),
 		FormatterOptions:           options,
 	}
 

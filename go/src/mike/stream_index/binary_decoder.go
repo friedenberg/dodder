@@ -327,7 +327,7 @@ func (decoder *binaryDecoder) readFieldKey(
 		}
 
 	case key_bytes.Type:
-		marshaler := markl.MakeLockMarshalerValueRequired(
+		marshaler := markl.MakeMutableLockCoderValueRequired(
 			metadata.GetTypeLockMutable(),
 		)
 

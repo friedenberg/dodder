@@ -81,16 +81,18 @@ type (
 	GetterMutable interface {
 		GetMetadataMutable() MetadataMutable
 	}
+)
 
-	PersistentFormatterContext interface {
+// Coding
+type (
+	EncoderContext interface {
 		Getter
-		// TODO determine if this is necessary
-		GetterMutable
 		// GetObjectId() ids.Id
 	}
 
-	PersistentParserContext interface {
+	DecoderContext interface {
 		GetterMutable
+		SetBlobDigest(interfaces.MarklId) error
 		// GetObjectIdMutable() ids.IdMutable
 	}
 )
