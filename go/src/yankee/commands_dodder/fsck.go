@@ -101,7 +101,7 @@ func (cmd Fsck) runVerification(
 		func(ctx errors.Context) {
 			for object, errIter := range seq {
 				if errIter != nil {
-					err := objectError{err: errors.Wrap(errIter)}
+					err := objectError{err: errIter}
 
 					if object != nil {
 						err.object = object.CloneTransacted()

@@ -265,6 +265,12 @@ func (coder SeqErrorDecoder) DecodeFrom(
 			if err == io.EOF {
 				err = nil
 				break
+			} else if errors.Is(err, ErrAfterDecoding{}) {
+				err = nil
+
+				if !yield(object, err) {
+					break
+				}
 			} else {
 				errIter := errors.Wrap(err)
 				err = nil
@@ -276,7 +282,7 @@ func (coder SeqErrorDecoder) DecodeFrom(
 		}
 
 		if !yield(object, nil) {
-			return n, err
+			break
 		}
 	}
 

@@ -112,16 +112,8 @@ func (cmd Cat) Run(req command.Request) {
 
 	blobWriter := cmd.makeBlobWriter(envBlobStore, blobStore)
 
-	for _, blobIdString := range req.PopArgs() {
-		var blobId markl.Id
-
-		if err := markl.SetMaybeSha256(
-			&blobId,
-			blobIdString,
-		); err != nil {
-			envBlobStore.Cancel(err)
-		}
-
+	// TODO run each blob with its own child context
+	for blobId := range command.PopRequestArgs[markl.Id](req.Args, "blob id") {
 		if err := cmd.blob(blobStore, blobId, blobWriter); err != nil {
 			ui.Err().Print(err)
 		}
@@ -138,7 +130,7 @@ func (cmd Cat) copy(
 	if cmd.PrefixSha {
 		if _, err = delim_io.CopyWithPrefixOnDelim(
 			'\n',
-			markl.FormatBytesAsHex(readCloser.BlobId),
+			readCloser.BlobId.String(),
 			envBlobStore.GetUI(),
 			readCloser.ReadCloser,
 			true,
@@ -147,7 +139,10 @@ func (cmd Cat) copy(
 			return err
 		}
 	} else {
-		if _, err = io.Copy(envBlobStore.GetUIFile(), readCloser.ReadCloser); err != nil {
+		if _, err = io.Copy(
+			envBlobStore.GetUIFile(),
+			readCloser.ReadCloser,
+		); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

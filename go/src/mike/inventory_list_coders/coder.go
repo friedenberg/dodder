@@ -54,7 +54,7 @@ func (coder coder) DecodeFrom(
 
 	if coder.afterDecoding != nil {
 		if err = coder.afterDecoding(object); err != nil {
-			err = errors.Wrapf(err, "Object: %q", sku.String(object))
+			err = ErrAfterDecoding{err: err, object: object}
 			return n, err
 		}
 	}

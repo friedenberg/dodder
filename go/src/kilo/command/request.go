@@ -78,6 +78,21 @@ func (req *Args) RemainingArgCount() int {
 	return len(req.args[req.argi:])
 }
 
+func PopRequestArgs[
+	VALUE interfaces.Stringer,
+	VALUE_PTR interfaces.StringerSetterPtr[VALUE],
+](req *Args, name string) interfaces.Seq[VALUE_PTR] {
+	return func(yield func(VALUE_PTR) bool) {
+		for req.RemainingArgCount() > 0 {
+			value := PopRequestArg[VALUE, VALUE_PTR](req, name)
+
+			if !yield(value) {
+				return
+			}
+		}
+	}
+}
+
 func PopRequestArg[
 	VALUE interfaces.Stringer,
 	VALUE_PTR interfaces.StringerSetterPtr[VALUE],
