@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/delim_reader"
+	"code.linenisgreat.com/dodder/go/src/bravo/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
@@ -50,21 +51,25 @@ func (parser *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 
 		key, remainder := trimmed[0], strings.TrimSpace(trimmed[1:])
 
-		switch key {
-		case '#':
+		switch doddish.Op(key) {
+		case doddish.OpDescription:
 			err = metadata.GetDescriptionMutable().Set(remainder)
 
-		case '%':
+		case doddish.OpVirtual:
 			metadata.GetIndexMutable().GetCommentsMutable().Append(remainder)
 
-		case '-':
+		case doddish.OpTagSeparator:
 			metadata.AddTagString(remainder)
 
-		case '!':
+		case doddish.OpType:
 			err = parser.readType(metadata, remainder)
 
-		case '@':
+		case doddish.OpMarklId:
 			err = parser.readBlobDigest(metadata, remainder)
+
+		case doddish.OpExact:
+			// TODO read object id
+			err = parser.readObjectId(remainder)
 
 		default:
 			err = errors.ErrorWithStackf("unsupported entry: %q", line)
@@ -97,6 +102,19 @@ func (parser *textParser2) readType(
 
 	if err = marshaler.Set(ids.MakeTypeString(typeString)); err != nil {
 		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func (parser *textParser2) readObjectId(
+	objectIdString string,
+) (err error) {
+	err = errors.Err405MethodNotAllowed
+	return
+
+	if objectIdString == "" {
 		return err
 	}
 

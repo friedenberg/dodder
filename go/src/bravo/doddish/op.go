@@ -58,6 +58,7 @@ const (
 	OpVirtual       = Op('%')
 	OpMarklId       = Op('@')
 	OpTagSeparator  = Op('-')
+	OpDescription   = Op('#') // not really an operator?
 )
 
 func MakeOp(char rune) (Op, operatorType) {

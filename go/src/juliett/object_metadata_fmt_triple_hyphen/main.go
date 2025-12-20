@@ -19,6 +19,7 @@ type (
 
 	FormatterOptions = checkout_options.TextFormatterOptions
 
+	// TODO make a reliable constructor for this
 	FormatterContext struct {
 		FormatterOptions
 		objects.PersistentFormatterContext

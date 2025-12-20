@@ -84,10 +84,13 @@ type (
 
 	PersistentFormatterContext interface {
 		Getter
+		// TODO determine if this is necessary
 		GetterMutable
+		// GetObjectId() ids.Id
 	}
 
 	PersistentParserContext interface {
 		GetterMutable
+		// GetObjectIdMutable() ids.IdMutable
 	}
 )
