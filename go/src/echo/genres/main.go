@@ -16,7 +16,7 @@ type Genre byte
 // Do not change this order, various serialization formats rely on the
 // underlying integer values.
 const (
-	None = Genre(iota)
+	None = Genre(iota) // TODO rename to Unknown
 	Blob
 	Type
 	_ // Bezeichnung
@@ -131,9 +131,9 @@ func (genre Genre) Equals(b Genre) bool {
 	return genre == b
 }
 
-func (genre Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
-	if genre.String() != b.GetGenre().String() {
-		err = MakeErrUnsupportedGenre(b)
+func (genre Genre) AssertGenre(other interfaces.GenreGetter) (err pkgError) {
+	if genre.String() != other.GetGenre().String() {
+		err = ErrWrongGenre{Expected: genre, Actual: Must(other)}
 		return err
 	}
 
@@ -220,7 +220,7 @@ func (genre *Genre) Set(v string) (err error) {
 		*genre = Repo
 
 	default:
-		err = errors.Wrap(MakeErrUnrecognizedGenre(v))
+		err = MakeErrUnrecognizedGenre(v)
 		return err
 	}
 

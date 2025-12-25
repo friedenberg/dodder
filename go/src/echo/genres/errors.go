@@ -9,27 +9,44 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
 )
 
-var ErrNoAbbreviation = errors.New("no abbreviation")
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
+func wrapAsPkgError(err error) pkgError {
+	return errors.WrapWithType[pkgErrDisamb](err)
+}
+
+var ErrNoAbbreviation = newPkgError("no abbreviation")
 
 func MakeErrUnsupportedGenre(g interfaces.GenreGetter) error {
 	return errors.WrapSkip(1, errUnsupportedGenre{Genre: g.GetGenre()})
 }
 
 func IsErrUnsupportedGenre(err error) bool {
-	return errors.Is(err, errUnsupportedGenre{Genre: None})
+	return errors.Is(err, errUnsupportedGenre{})
 }
 
 type errUnsupportedGenre struct {
 	interfaces.Genre
 }
 
-func (e errUnsupportedGenre) Is(target error) (ok bool) {
+func (err errUnsupportedGenre) Is(target error) (ok bool) {
 	_, ok = target.(errUnsupportedGenre)
 	return ok
 }
 
-func (e errUnsupportedGenre) Error() string {
-	return fmt.Sprintf("unsupported genre: %q", e.Genre)
+func (err errUnsupportedGenre) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
+func (err errUnsupportedGenre) Error() string {
+	return fmt.Sprintf("unsupported genre: %q", err.Genre)
 }
 
 func MakeErrUnrecognizedGenre(v string) errUnrecognizedGenre {
@@ -47,6 +64,10 @@ func (err errUnrecognizedGenre) Is(target error) (ok bool) {
 	return ok
 }
 
+func (err errUnrecognizedGenre) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func (err errUnrecognizedGenre) Error() string {
 	return fmt.Sprintf(
 		"unknown genre: %q. Available genres: %q",
@@ -55,30 +76,23 @@ func (err errUnrecognizedGenre) Error() string {
 	)
 }
 
-type ErrWrongType struct {
-	ExpectedType, ActualType Genre
+type ErrWrongGenre struct {
+	Expected, Actual Genre
 }
 
-func (e ErrWrongType) Is(target error) (ok bool) {
-	_, ok = target.(ErrWrongType)
+func (err ErrWrongGenre) Is(target error) (ok bool) {
+	_, ok = target.(ErrWrongGenre)
 	return ok
 }
 
-func (e ErrWrongType) Error() string {
+func (err ErrWrongGenre) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
+func (err ErrWrongGenre) Error() string {
 	return fmt.Sprintf(
-		"expected zk_types %s but got %s",
-		e.ExpectedType,
-		e.ActualType,
+		"expected genre %q but got %q",
+		err.Expected,
+		err.Actual,
 	)
-}
-
-type ErrEmptyObjectId struct{}
-
-func (e ErrEmptyObjectId) Is(target error) (ok bool) {
-	_, ok = target.(ErrEmptyObjectId)
-	return ok
-}
-
-func (e ErrEmptyObjectId) Error() string {
-	return fmt.Sprintf("empty object id")
 }

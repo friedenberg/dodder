@@ -16,9 +16,9 @@ func ConfirmTypeFromReader(t Genre, r *bufio.Reader) (err error) {
 
 	if t1 != t {
 		err = errors.BadRequest(
-			ErrWrongType{
-				ExpectedType: t,
-				ActualType:   t,
+			ErrWrongGenre{
+				Expected: t,
+				Actual:   t,
 			},
 		)
 	}
