@@ -16,24 +16,19 @@ type Genre byte
 // Do not change this order, various serialization formats rely on the
 // underlying integer values.
 const (
-	None = Genre(iota) // TODO rename to Unknown
+	Unknown = Genre(iota)
 	Blob
 	Type
-	_ // Bezeichnung
 	Tag
-	_ // Hinweis
-	_ // Transaktion
 	Zettel
 	Config
-	_ // Kennung
 	InventoryList
-	_ // AkteTyp
 	Repo
 
 	maxGenre = Repo
 )
 
-var _ interfaces.Genre = None
+var _ interfaces.Genre = Unknown
 
 const (
 	unknown = byte(iota)
@@ -50,7 +45,7 @@ const (
 func All() (out collections_slice.Slice[Genre]) {
 	out = make([]Genre, 0, maxGenre-1)
 
-	for i := None + 1; i <= maxGenre; i++ {
+	for i := Unknown + 1; i <= maxGenre; i++ {
 		g := Genre(i)
 
 		switch g {
@@ -76,7 +71,7 @@ func Make(genre interfaces.Genre) Genre {
 
 func MakeOrUnknown(value string) (genre Genre) {
 	if err := genre.Set(value); err != nil {
-		genre = None
+		genre = Unknown
 	}
 
 	return genre
@@ -103,7 +98,7 @@ func (genre Genre) IsType() bool {
 }
 
 func (genre Genre) IsNone() bool {
-	return genre == None
+	return genre == Unknown
 }
 
 func (genre Genre) GetGenreBitInt() byte {
@@ -163,7 +158,7 @@ func (genre Genre) String() string {
 	case Repo:
 		return "Repo"
 
-	case None:
+	case Unknown:
 		return "none"
 
 	default:
@@ -228,11 +223,11 @@ func (genre *Genre) Set(v string) (err error) {
 }
 
 func (genre *Genre) Reset() {
-	*genre = None
+	*genre = Unknown
 }
 
 func (genre *Genre) ReadFrom(r io.Reader) (n int64, err error) {
-	*genre = None
+	*genre = Unknown
 
 	var b [1]byte
 

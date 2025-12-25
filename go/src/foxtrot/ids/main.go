@@ -275,7 +275,7 @@ func SetOnlyNotUnknownGenre(
 		return err
 	}
 
-	if id.GetGenre() == genres.None {
+	if id.GetGenre() == genres.Unknown {
 		err = errors.Errorf("unknown genre for string: %q", value)
 		return
 	}
@@ -288,7 +288,7 @@ func ValidateSeqAndGetGenre(
 ) (genre genres.Genre, err error) {
 	switch {
 	case seq.Len() == 0:
-		return genres.None, doddish.ErrEmptySeq
+		return genres.Unknown, doddish.ErrEmptySeq
 
 		// tag
 	case seq.MatchAll(doddish.TokenTypeIdentifier):
@@ -385,6 +385,6 @@ func ValidateSeqAndGetGenre(
 		return genres.InventoryList, nil
 
 	default:
-		return genres.None, errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
+		return genres.Unknown, errors.Wrap(doddish.ErrUnsupportedSeq{Seq: seq, For: "objectId3"})
 	}
 }

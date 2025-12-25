@@ -74,7 +74,7 @@ func (proto Proto) ApplyType(
 	ui.Log().Print(metadataLike, g)
 
 	switch g {
-	case genres.Zettel, genres.None:
+	case genres.Zettel, genres.Unknown:
 		if ids.IsEmpty(metadata.GetType()) &&
 			!ids.IsEmpty(proto.Metadata.GetType()) &&
 			!ids.Equals(metadata.GetType(), proto.Metadata.GetType()) {

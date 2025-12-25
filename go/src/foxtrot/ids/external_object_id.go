@@ -83,7 +83,7 @@ func (id *ExternalObjectId) SetWithGenre(
 }
 
 func (id *ExternalObjectId) Reset() {
-	id.genre = genres.None
+	id.genre = genres.Unknown
 	id.value = ""
 }
 

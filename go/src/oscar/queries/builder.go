@@ -179,7 +179,7 @@ func (builder *Builder) WithExternalLike(
 				},
 			)
 		} else {
-			if t.GetExternalObjectId().GetGenre() == genres.None {
+			if t.GetExternalObjectId().GetGenre() == genres.Unknown {
 				panic(
 					errors.BadRequestf(
 						"External object ID has an empty genre: %q",

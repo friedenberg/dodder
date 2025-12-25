@@ -77,26 +77,26 @@ func init() {
 	)
 	registerBuiltinTypeString(TypeLuaTagV1, genres.Tag, false)
 	registerBuiltinTypeString(TypeLuaTagV2, genres.Tag, false)
-	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.None, false)
-	registerBuiltinTypeString(TypeTomlBlobStoreConfigV1, genres.None, false)
-	registerBuiltinTypeString(TypeTomlBlobStoreConfigV2, genres.None, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigV0, genres.Unknown, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigV1, genres.Unknown, false)
+	registerBuiltinTypeString(TypeTomlBlobStoreConfigV2, genres.Unknown, false)
 	registerBuiltinTypeString(
 		TypeTomlBlobStoreConfigPointerV0,
-		genres.None,
+		genres.Unknown,
 		false,
 	)
 	registerBuiltinTypeString(
 		TypeTomlBlobStoreConfigSftpExplicitV0,
-		genres.None,
+		genres.Unknown,
 		false,
 	)
 	registerBuiltinTypeString(
 		TypeTomlBlobStoreConfigSftpViaSSHConfigV0,
-		genres.None,
+		genres.Unknown,
 		false,
 	)
-	registerBuiltinTypeString(TypeTomlConfigImmutableV1, genres.None, false)
-	registerBuiltinTypeString(TypeTomlConfigImmutableV2, genres.None, false)
+	registerBuiltinTypeString(TypeTomlConfigImmutableV1, genres.Unknown, false)
+	registerBuiltinTypeString(TypeTomlConfigImmutableV2, genres.Unknown, false)
 	registerBuiltinTypeString(TypeTomlConfigV0, genres.Config, false)
 	registerBuiltinTypeString(TypeTomlConfigV1, genres.Config, false)
 	registerBuiltinTypeString(TypeTomlConfigV2, genres.Config, true)
@@ -107,8 +107,8 @@ func init() {
 	registerBuiltinTypeString(TypeTomlTagV1, genres.Tag, true)
 	registerBuiltinTypeString(TypeTomlTypeV0, genres.Type, false)
 	registerBuiltinTypeString(TypeTomlTypeV1, genres.Type, true)
-	registerBuiltinTypeString(TypeTomlWorkspaceConfigV0, genres.None, false)
-	registerBuiltinTypeString(TypeZettelIdListV0, genres.None, false)
+	registerBuiltinTypeString(TypeTomlWorkspaceConfigV0, genres.Unknown, false)
+	registerBuiltinTypeString(TypeZettelIdListV0, genres.Unknown, false)
 }
 
 // TODO switch to isDefault being a StoreVersion

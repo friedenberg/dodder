@@ -126,7 +126,7 @@ func (commitFacilitator commitFacilitator) commit(
 	}
 
 	if options.AddToInventoryList && (daughter.ObjectId.IsEmpty() ||
-		daughter.GetGenre() == genres.None ||
+		daughter.GetGenre() == genres.Unknown ||
 		daughter.GetGenre() == genres.Blob) {
 		var zettelId *ids.ZettelId
 

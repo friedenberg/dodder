@@ -105,7 +105,7 @@ func (buildState *buildState) build(
 			buildState.workspaceStoreAcceptedQueryComponent = true
 
 			for _, externalObjectId := range externalObjectIds {
-				if externalObjectId.GetGenre() == genres.None {
+				if externalObjectId.GetGenre() == genres.Unknown {
 					err = errors.ErrorWithStackf("id with empty genre: %q", externalObjectId)
 					return err, latent
 				}
@@ -139,7 +139,7 @@ func (buildState *buildState) build(
 	}
 
 	for _, id := range buildState.pinnedExternalObjectIds {
-		if id.GetGenre() == genres.None {
+		if id.GetGenre() == genres.Unknown {
 			err = errors.ErrorWithStackf("id with empty genre: %q", id)
 			return err, latent
 		}

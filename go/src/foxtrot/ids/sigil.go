@@ -53,7 +53,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 }
 
 func (sigil Sigil) GetGenre() interfaces.Genre {
-	return genres.None
+	return genres.Unknown
 }
 
 func (sigil Sigil) Equals(b Sigil) bool {

@@ -165,7 +165,7 @@ func (id *objectId2) ReadFrom(reader io.Reader) (n int64, err error) {
 
 func (id *objectId2) SetGenre(genre interfaces.GenreGetter) {
 	if genre == nil {
-		id.genre = genres.None
+		id.genre = genres.Unknown
 	} else {
 		id.genre = genres.Must(genre.GetGenre())
 	}
@@ -177,7 +177,7 @@ func (id *objectId2) SetGenre(genre interfaces.GenreGetter) {
 
 func (id *objectId2) IsEmpty() bool {
 	switch id.genre {
-	case genres.None:
+	case genres.Unknown:
 		if id.left.String() == "/" && id.right.IsEmpty() {
 			return true
 		}
@@ -320,7 +320,7 @@ func (id *objectId2) String() string {
 }
 
 func (id *objectId2) Reset() {
-	id.genre = genres.None
+	id.genre = genres.Unknown
 	id.left.Reset()
 	id.middle = 0
 	id.right.Reset()
@@ -531,7 +531,7 @@ func (id *objectId2) Set(value string) (err error) {
 	var parsedId Id
 
 	switch id.genre {
-	case genres.None:
+	case genres.Unknown:
 		if parsedId, err = MakeObjectId(value); err != nil {
 			return id.SetBlob(value)
 		}

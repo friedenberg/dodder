@@ -100,7 +100,7 @@ func (id *objectId3) SetWithSeq(seq doddish.Seq) (err error) {
 }
 
 func (id *objectId3) Reset() {
-	id.Genre = genres.None
+	id.Genre = genres.Unknown
 	id.Seq.GetSliceMutable().Reset()
 }
 

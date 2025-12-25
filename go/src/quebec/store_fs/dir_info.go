@@ -477,7 +477,7 @@ func (dirInfo *dirInfo) processFDSet(
 		return results, err
 	}
 
-	if item.ExternalObjectId.GetGenre() != genres.None {
+	if item.ExternalObjectId.GetGenre() != genres.Unknown {
 		if blobCount > 1 {
 			err = errors.ErrorWithStackf(
 				"several blobs matching object id %q: %q",
@@ -499,11 +499,11 @@ func (dirInfo *dirInfo) processFDSet(
 		}
 	}
 
-	if item.ExternalObjectId.GetGenre() == genres.None {
+	if item.ExternalObjectId.GetGenre() == genres.Unknown {
 		item.ExternalObjectId.SetGenre(recognizedGenre)
 	}
 
-	if item.ExternalObjectId.GetGenre() == genres.None {
+	if item.ExternalObjectId.GetGenre() == genres.Unknown {
 		if results, err = dirInfo.addOneOrMoreBlobs(
 			item,
 		); err != nil {
