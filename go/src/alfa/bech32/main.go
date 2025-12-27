@@ -171,4 +171,3 @@ func Decode(s string) (hrp string, data []byte, err error) {
 	}
 	return hrp, data, nil
 }
-
