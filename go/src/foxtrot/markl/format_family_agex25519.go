@@ -5,9 +5,9 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/bech32"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/age"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 )
 
 func AgeX25519Generate(_ io.Reader) (bites []byte, err error) {
@@ -46,7 +46,7 @@ func AgeX25519GetIOWrapper(
 ) (ioWrapper interfaces.IOWrapper, err error) {
 	var ageId age.Identity
 
-	var bech32String []byte
+	var bech32String string
 
 	if bech32String, err = bech32.Encode(
 		"AGE-SECRET-KEY-",
@@ -56,7 +56,7 @@ func AgeX25519GetIOWrapper(
 		return ioWrapper, err
 	}
 
-	if err = ageId.Set(string(bech32String)); err != nil {
+	if err = ageId.Set(bech32String); err != nil {
 		err = errors.Wrap(err)
 		return ioWrapper, err
 	}

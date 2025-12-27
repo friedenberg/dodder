@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/bech32"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/ohio"
 	"code.linenisgreat.com/dodder/go/src/echo/age"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/bech32"
 	age_upstream "filippo.io/age"
 )
 

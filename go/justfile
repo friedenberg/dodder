@@ -128,7 +128,6 @@ build-go-binary tags output:
   mkdir -p '{{output}}'
   go build -tags '{{tags}}' -o '{{output}}' ./cmd/*
 
-# TODO switch the debug build output folder to be build/debug
 build-go: \
     build-go-generate \
     (build-go-binary "debug" "build/debug") \
