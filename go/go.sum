@@ -1,7 +1,7 @@
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805 h1:u2qwJeEvnypw+OCPUHmoZE3IqwfuN5kgDfo5MLzpNM0=
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805/go.mod h1:FomMrUJ2Lxt5jCLmZkG3FHa72zUprnhd3v/Z18Snm4w=
-code.linenisgreat.com/chrest/go v0.0.0-20251227140704-b21fb1f89de1 h1:mF3m8f+G9hOtfccqm5WvPH0g7Px3vCufaLBy0vPx07g=
-code.linenisgreat.com/chrest/go v0.0.0-20251227140704-b21fb1f89de1/go.mod h1:+pfaKKCkk4lFBcVkDvb0x/l7yolmXHGFS+tCh/luIsU=
+code.linenisgreat.com/chrest/go v0.0.0-20251227143500-74c5a283b63c h1:PVaOc1L0Z8tFBLDb1+Z8ZgSOWf1v50DkcsBXQnj4kuo=
+code.linenisgreat.com/chrest/go v0.0.0-20251227143500-74c5a283b63c/go.mod h1:Wi0PjYQGeK3LM0sih03Vtzgr+Mz2apcYlIvUVFiFeL8=
 filippo.io/age v1.2.1 h1:X0TZjehAZylOIj4DubWYU1vWQxv9bJpo+Uu2/LGhi1o=
 filippo.io/age v1.2.1/go.mod h1:JL9ew2lTN+Pyft4RiNGguFfOpewKwSHm5ayKD/A4004=
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=

@@ -3,7 +3,7 @@ module code.linenisgreat.com/dodder/go
 go 1.25.5
 
 require (
-	code.linenisgreat.com/chrest/go v0.0.0-20251227140704-b21fb1f89de1
+	code.linenisgreat.com/chrest/go v0.0.0-20251227143500-74c5a283b63c
 	filippo.io/age v1.2.1
 	github.com/DataDog/zstd v1.5.7
 	github.com/brandondube/tai v0.1.0
