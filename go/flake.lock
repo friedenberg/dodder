@@ -9,11 +9,11 @@
       },
       "locked": {
         "dir": "pkgs/alfa/devenv-go",
-        "lastModified": 1767108383,
-        "narHash": "sha256-hZPh7BMc4GpTooPr8GpGvsvzxAc7/uN576GTFSCz9WI=",
+        "lastModified": 1767118221,
+        "narHash": "sha256-OHyxb1nKhlb7Oq09CL4RmFnkQNNGrrjeuS+/CwcVa4g=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "cd7757aa9fcf71aa608ee9d00a0de78f8726c7aa",
+        "rev": "b5225e669aa42f059b89565d840a4d876325c3fd",
         "type": "github"
       },
       "original": {

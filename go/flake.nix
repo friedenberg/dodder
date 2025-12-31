@@ -4,7 +4,10 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/9ef261221d1e72399f2036786498d78c38185c46";
     utils.url = "https://flakehub.com/f/numtide/flake-utils/0.1.102";
 
-    devenv-go.url = "github:friedenberg/eng?dir=pkgs/alfa/devenv-go";
+    devenv-go = {
+      url = "github:friedenberg/eng?dir=pkgs/alfa/devenv-go";
+    };
+
     devenv-shell.url = "github:friedenberg/eng?dir=pkgs/alfa/devenv-shell";
   };
 
@@ -29,6 +32,10 @@
           ];
         };
 
+        pkgs-stable = import nixpkgs-stable {
+          inherit system;
+        };
+
         dodder = pkgs.buildGoApplication {
           pname = "dodder";
           version = "0.0.1";
@@ -38,6 +45,8 @@
             # "cmd/dodder"
           ];
           modules = ./gomod2nix.toml;
+          go = pkgs-stable.go_1_25;
+          GOTOOLCHAIN = "local";
         };
 
       in
