@@ -1,3 +1,4 @@
+// framework for generating digests from objects according to specific formats
 package object_fmt_digest
 
 import (

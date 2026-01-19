@@ -2,21 +2,16 @@ package repo_config_cli
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/config_cli"
 	"code.linenisgreat.com/dodder/go/src/bravo/options_tools"
-	"code.linenisgreat.com/dodder/go/src/charlie/cli"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
-	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/descriptions"
 )
 
 type Config struct {
+	config_cli.Config
 	BasePath string
 
-	Debug            debug.Options
-	Verbose          bool
-	Quiet            bool
-	Todo             bool
-	dryRun           bool
 	IgnoreHookErrors bool
 	Hooks            string
 	IgnoreWorkspace  bool
@@ -39,18 +34,9 @@ func (config Config) GetPrintOptionsOverlay() options_print.Overlay {
 // TODO add support for all flags
 // TODO move to store_config
 func (config *Config) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
+	config.Config.SetFlagDefinitions(flagSet)
+
 	flagSet.StringVar(&config.BasePath, "dir-dodder", "", "")
-
-	cli.FlagSetVarWithCompletion(
-		flagSet,
-		&config.Debug,
-		"debug",
-	)
-
-	flagSet.BoolVar(&config.Todo, "todo", false, "")
-	flagSet.BoolVar(&config.dryRun, "dry-run", false, "")
-	flagSet.BoolVar(&config.Verbose, "verbose", false, "")
-	flagSet.BoolVar(&config.Quiet, "quiet", false, "")
 
 	flagSet.BoolVar(
 		&config.IgnoreWorkspace,
@@ -89,6 +75,7 @@ func (config *Config) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) 
 }
 
 func Default() (config Config) {
+	config.Config = config_cli.Default()
 	// config.printOptionsOverlay =
 	// options_print.DefaultOverlay().GetPrintOptionsOverlay()
 
@@ -101,12 +88,4 @@ func Default() (config Config) {
 
 func (config Config) UsePredictableZettelIds() bool {
 	return config.PredictableZettelIds
-}
-
-func (config Config) IsDryRun() bool {
-	return config.dryRun
-}
-
-func (config *Config) SetDryRun(v bool) {
-	config.dryRun = v
 }

@@ -48,6 +48,14 @@ func AssertIdIsNotNull(id interfaces.MarklId) error {
 	return nil
 }
 
+func AssertIdIsNotNullWithPurpose(id interfaces.MarklId, purpose string) error {
+	if id.IsNull() {
+		return errors.WrapSkip(1, errIsNull{purpose: purpose})
+	}
+
+	return nil
+}
+
 func IsErrNull(target error) bool {
 	return errors.Is(target, errIsNull{})
 }
@@ -57,7 +65,7 @@ type errIsNull struct {
 }
 
 func (err errIsNull) Error() string {
-	return fmt.Sprintf("blob id is null for purpose %q", err.purpose)
+	return fmt.Sprintf("markl id is null for purpose %q", err.purpose)
 }
 
 func (err errIsNull) Is(target error) bool {

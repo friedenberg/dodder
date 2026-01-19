@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/india/object_fmt_digest"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/object_finalizer"
@@ -22,17 +23,24 @@ import (
 func init() {
 	utility.AddCmd(
 		"fsck",
-		&Fsck{},
+		&Fsck{
+			VerifyOptions: object_finalizer.DefaultVerifyOptions(),
+		},
 	)
 }
 
 // TODO add options to verify blobs, type formats, tags
+// TODO add option to count duplicate objects according to a list of object
+// digest formats
 type Fsck struct {
 	command_components_dodder.LocalWorkingCopy
 	command_components_dodder.InventoryLists
 	command_components_dodder.Query
 
 	InventoryListPath string
+
+	VerifyOptions object_finalizer.VerifyOptions
+	Duplicates    object_fmt_digest.CLIFlag
 }
 
 var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
@@ -46,6 +54,15 @@ func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 		"",
 		"instead of using the store's object, verify the objects at the inventory list at the given path",
 	)
+
+	flagSet.BoolVar(
+		&cmd.VerifyOptions.ObjectSigPresent,
+		"object-sig-required",
+		true,
+		"require the object signature when validating",
+	)
+
+	cmd.Duplicates.SetFlagDefinitions(flagSet)
 }
 
 func (cmd Fsck) Run(req command.Request) {
@@ -54,10 +71,9 @@ func (cmd Fsck) Run(req command.Request) {
 	var seq interfaces.SeqError[*sku.Transacted]
 
 	if cmd.InventoryListPath == "" {
-		query := cmd.MakeQueryIncludingWorkspace(
+		query := cmd.MakeQuery(
 			req,
 			queries.BuilderOptions(
-				queries.BuilderOptionWorkspace(repo),
 				queries.BuilderOptionDefaultGenres(genres.All()...),
 				queries.BuilderOptionDefaultSigil(
 					ids.SigilLatest,
@@ -97,7 +113,9 @@ func (cmd Fsck) runVerification(
 
 	var objectErrors collections_slice.Slice[objectError]
 
-	finalizer := object_finalizer.Make()
+	finalizer := object_finalizer.Builder().
+		WithVerifyOptions(cmd.VerifyOptions).
+		Build()
 
 	if err := errors.RunChildContextWithPrintTicker(
 		repo,

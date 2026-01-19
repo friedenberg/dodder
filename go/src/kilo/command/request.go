@@ -12,13 +12,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
+// TODO refactor this to have a generic config field and for the commands_madder
+// and commands_dodder packages to alias a concrete version for their own use
 type Request struct {
 	Utility Utility
 
 	errors.Context
-	repo_config_cli.Config
-	*flags.FlagSet
 	*Args
+
+	Config  repo_config_cli.Config
+	FlagSet *flags.FlagSet
 }
 
 type consumedArg struct {

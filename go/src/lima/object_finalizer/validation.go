@@ -42,38 +42,70 @@ type VerifyOptions struct {
 	ObjectSigValid      bool
 }
 
+var defaultVerifyOptions = VerifyOptions{
+	PubKeyPresent:       true,
+	ObjectDigestPresent: true,
+	ObjectSigPresent:    true,
+	ObjectSigValid:      true,
+}
+
+func DefaultVerifyOptions() VerifyOptions {
+	return defaultVerifyOptions
+}
+
 func (finalizer *Finalizer) Verify(
 	transacted *sku.Transacted,
 ) (err error) {
+	return finalizer.verify(transacted, finalizer.verifyOptions)
+}
+
+func (finalizer *Finalizer) verify(
+	transacted *sku.Transacted,
+	options VerifyOptions,
+) (err error) {
 	pubKey := transacted.GetMetadata().GetRepoPubKey()
 
-	if err = markl.AssertIdIsNotNull(
-		pubKey,
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	if options.PubKeyPresent {
+		if err = markl.AssertIdIsNotNullWithPurpose(
+			pubKey,
+			"pubkey",
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
-	if err = markl.AssertIdIsNotNull(
-		transacted.GetMetadata().GetObjectDigest(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	if options.ObjectDigestPresent {
+		if err = markl.AssertIdIsNotNullWithPurpose(
+			transacted.GetMetadata().GetObjectDigest(),
+			"object-dig",
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
-	if err = markl.AssertIdIsNotNull(
-		transacted.GetMetadata().GetObjectSig(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	if options.ObjectSigPresent {
+		if err = markl.AssertIdIsNotNullWithPurpose(
+			transacted.GetMetadata().GetObjectSig(),
+			"object-sig",
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
-	if err = pubKey.Verify(
-		transacted.GetMetadata().GetObjectDigest(),
-		transacted.GetMetadata().GetObjectSig(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
+	if options.PubKeyPresent &&
+		options.ObjectSigValid &&
+		options.ObjectSigPresent &&
+		options.ObjectDigestPresent {
+		if err = pubKey.Verify(
+			transacted.GetMetadata().GetObjectDigest(),
+			transacted.GetMetadata().GetObjectSig(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
 	}
 
 	return err

@@ -35,7 +35,7 @@ func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Debug,
+		req.Config.Debug,
 	)
 
 	ui := env_ui.Make(

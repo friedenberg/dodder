@@ -19,7 +19,8 @@ type (
 	Finalizer = finalizer
 
 	finalizer struct {
-		index sku.IndexPrimitives
+		index         sku.IndexPrimitives
+		verifyOptions VerifyOptions
 		// pubKey interfaces.MarklId
 	}
 
@@ -40,7 +41,7 @@ type (
 )
 
 func Make() Finalizer {
-	return finalizer{}
+	return Builder().Build()
 }
 
 // func Make(index sku.IndexPrimitives) Finalizer {
