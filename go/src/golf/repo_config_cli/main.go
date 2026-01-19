@@ -74,12 +74,12 @@ func (config *Config) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) 
 	flagSet.Var(&config.Description, "comment", "Comment for inventory list")
 }
 
-func Default() (config Config) {
-	config.Config = config_cli.Default()
+func Default() (config *Config) {
+	return &Config{
+		Config: *(config_cli.Default()),
+	}
 	// config.printOptionsOverlay =
 	// options_print.DefaultOverlay().GetPrintOptionsOverlay()
-
-	return config
 }
 
 // func (config Config) GetPrintOptions() options_print.Options {
@@ -88,4 +88,8 @@ func Default() (config Config) {
 
 func (config Config) UsePredictableZettelIds() bool {
 	return config.PredictableZettelIds
+}
+
+func (config Config) GetConfigCLI() config_cli.Config {
+	return config.Config
 }

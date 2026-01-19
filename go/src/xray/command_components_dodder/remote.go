@@ -137,13 +137,13 @@ func (cmd Remote) MakeRemoteFromBlob(
 	case repo_blobs.BlobXDG:
 		envDir := env_dir.MakeWithXDG(
 			req,
-			req.Config.Debug,
+			req.Utility.GetConfigDodder().Debug,
 			blob.MakeXDG(req.Utility.GetName()),
 		)
 
 		envUI := env_ui.Make(
 			req,
-			req.Config,
+			req.Utility.GetConfigDodder(),
 			env.GetOptions(),
 		)
 
@@ -157,7 +157,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 			req,
 			blob.GetOverridePath(),
 			req.Utility.GetName(),
-			req.Config.Debug,
+			req.Utility.GetConfigDodder().Debug,
 		)
 
 		envUIOptions := env.GetOptions()
@@ -165,7 +165,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 
 		envUI := env_ui.Make(
 			req,
-			req.Config,
+			req.Utility.GetConfigDodder(),
 			env.GetOptions(),
 		)
 

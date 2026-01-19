@@ -9,21 +9,29 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/config_cli"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
-type Utility struct {
-	name string
-	cmds map[string]Cmd
+type Config interface {
+	interfaces.CommandComponentWriter
+	GetConfigCLI() config_cli.Config
 }
 
-func MakeUtility(name string) Utility {
+type Utility struct {
+	name   string
+	config Config
+	cmds   map[string]Cmd
+}
+
+func MakeUtility(name string, defaultConfig Config) Utility {
 	utility := Utility{
-		name: name,
-		cmds: make(map[string]Cmd),
+		name:   name,
+		config: defaultConfig,
+		cmds:   make(map[string]Cmd),
 	}
 
 	return utility
@@ -31,6 +39,14 @@ func MakeUtility(name string) Utility {
 
 func (utility Utility) GetName() string {
 	return utility.name
+}
+
+func (utility Utility) GetConfig() config_cli.Config {
+	return utility.config.GetConfigCLI()
+}
+
+func (utility Utility) GetConfigDodder() repo_config_cli.Config {
+	return *utility.config.(*repo_config_cli.Config)
 }
 
 func (utility Utility) GetCmd(name string) (Cmd, bool) {
@@ -177,8 +193,7 @@ func (utility Utility) Run(
 
 			args = args[2:]
 
-			configCli := repo_config_cli.Default()
-			configCli.SetFlagDefinitions(flagSet)
+			utility.config.SetFlagDefinitions(flagSet)
 
 			if err := flagSet.Parse(args); err != nil {
 				ctx.Cancel(err)
@@ -187,7 +202,6 @@ func (utility Utility) Run(
 			req := Request{
 				Utility: utility,
 				Context: ctx,
-				Config:  configCli,
 				FlagSet: flagSet,
 				Args: &Args{
 					Context: ctx,

@@ -69,7 +69,7 @@ func (cmd Genesis) OnTheFirstDay(
 ) *local_working_copy.Repo {
 	envUI := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 
@@ -84,14 +84,14 @@ func (cmd Genesis) OnTheFirstDay(
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Config.Debug,
+		req.Utility.GetConfigDodder().Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	var envRepo env_repo.Env
 
 	options := env_repo.Options{
-		BasePath:                req.Config.BasePath,
+		BasePath:                req.Utility.GetConfigDodder().BasePath,
 		PermitNoDodderDirectory: true,
 	}
 

@@ -18,19 +18,19 @@ func (cmd EnvRepo) MakeEnvRepo(
 	dir := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Config.Debug,
+		req.Utility.GetConfigDodder().Debug,
 	)
 
 	envUI := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 
 	var envRepo env_repo.Env
 
 	envRepoOptions := env_repo.Options{
-		BasePath:                req.Config.BasePath,
+		BasePath:                req.Utility.GetConfigDodder().BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 

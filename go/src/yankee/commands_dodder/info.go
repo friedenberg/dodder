@@ -23,7 +23,8 @@ var _ interfaces.CommandComponentWriter = (*Info)(nil)
 func init() {
 	utility.AddCmd(
 		"info",
-		&Info{})
+		&Info{},
+	)
 }
 
 func (cmd Info) SetFlagDefinitions(
@@ -35,12 +36,12 @@ func (cmd Info) Run(req command.Request) {
 	dir := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Config.Debug,
+		req.Utility.GetConfigDodder().Debug,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 

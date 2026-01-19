@@ -23,13 +23,13 @@ func (cmd *Env) MakeEnvWithOptions(
 	layout := env_dir.MakeDefault(
 		req,
 		req.Utility.GetName(),
-		req.Config.Debug,
+		req.Utility.GetConfigDodder().Debug,
 	)
 
 	return env_local.Make(
 		env_ui.Make(
 			req,
-			req.Config,
+			req.Utility.GetConfigDodder(),
 			options,
 		),
 		layout,
@@ -44,13 +44,13 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 	dir := env_dir.MakeFromXDGDotenvPath(
 		req,
 		req.Utility.GetName(),
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		xdgDotenvPath,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		options,
 	)
 

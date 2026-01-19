@@ -53,7 +53,7 @@ type blobWriteResult struct {
 func (cmd Write) Run(req command.Request) {
 	blobStore := cmd.MakeBlobStoreLocal(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 

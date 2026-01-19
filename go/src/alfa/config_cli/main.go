@@ -24,8 +24,8 @@ func (config *Config) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) 
 	flagSet.BoolVar(&config.Quiet, "quiet", false, "")
 }
 
-func Default() (config Config) {
-	return config
+func Default() (config *Config) {
+	return &Config{}
 }
 
 func (config Config) IsDryRun() bool {
@@ -34,4 +34,8 @@ func (config Config) IsDryRun() bool {
 
 func (config *Config) SetDryRun(v bool) {
 	config.dryRun = v
+}
+
+func (config Config) GetConfigCLI() Config {
+	return config
 }

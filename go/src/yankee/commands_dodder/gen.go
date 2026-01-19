@@ -17,7 +17,8 @@ var _ interfaces.CommandComponentWriter = (*Gen)(nil)
 func init() {
 	utility.AddCmd(
 		"gen",
-		&Gen{})
+		&Gen{},
+	)
 }
 
 func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {}
@@ -25,7 +26,7 @@ func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {}
 func (cmd Gen) Run(req command.Request) {
 	envUI := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 

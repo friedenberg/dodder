@@ -16,12 +16,12 @@ func (cmd EnvBlobStore) MakeEnvBlobStore(
 	dir := env_dir.MakeDefault(
 		req,
 		req.Utility.GetName(),
-		req.Config.Debug,
+		req.Utility.GetConfigDodder().Debug,
 	)
 
 	envUI := env_ui.Make(
 		req,
-		req.Config,
+		req.Utility.GetConfigDodder(),
 		env_ui.Options{},
 	)
 

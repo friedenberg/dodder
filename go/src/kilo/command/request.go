@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
 // TODO refactor this to have a generic config field and for the commands_madder
@@ -20,7 +19,6 @@ type Request struct {
 	errors.Context
 	*Args
 
-	Config  repo_config_cli.Config
 	FlagSet *flags.FlagSet
 }
 
