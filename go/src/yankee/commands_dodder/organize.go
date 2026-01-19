@@ -39,29 +39,29 @@ type Organize struct {
 
 	complete command_components_dodder.Complete
 
-	organize_text.Flags
-	Mode organize_text_mode.Mode
+	Flags organize_text.Flags
+	Mode  organize_text_mode.Mode
 
 	Filter script_value.ScriptValue
 }
 
 var _ interfaces.CommandComponentWriter = (*Organize)(nil)
 
-func (c *Organize) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
-	c.Query.SetFlagDefinitions(f)
+func (cmd *Organize) SetFlagDefinitions(flagDef interfaces.CLIFlagDefinitions) {
+	cmd.Query.SetFlagDefinitions(flagDef)
 
-	c.Flags.SetFlagDefinitions(f)
+	cmd.Flags.SetFlagDefinitions(flagDef)
 
-	f.Var(
-		&c.Filter,
+	flagDef.Var(
+		&cmd.Filter,
 		"filter",
 		"a script to run for each file to transform it the standard zettel format",
 	)
 
-	f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
+	flagDef.Var(&cmd.Mode, "mode", "mode used for handling stdin and stdout")
 }
 
-func (c *Organize) CompletionGenres() ids.Genre {
+func (cmd *Organize) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -108,7 +108,7 @@ func (cmd *Organize) Run(req command.Request) {
 		req.PopArgs(),
 	)
 
-	repo.ApplyToOrganizeOptions(&cmd.Options)
+	repo.ApplyToOrganizeOptions(&cmd.Flags.Options)
 
 	objects := sku.MakeSkuTypeSetMutable()
 	var lock sync.Mutex
@@ -295,7 +295,7 @@ func (cmd *Organize) Run(req command.Request) {
 	}
 }
 
-func (c Organize) readFromVim(
+func (cmd Organize) readFromVim(
 	repo *local_working_copy.Repo,
 	path string,
 	results *organize_text.Text,
@@ -319,9 +319,9 @@ func (c Organize) readFromVim(
 		path,
 		queryGroup.RepoId,
 	); err != nil {
-		if c.handleReadChangesError(repo, err) {
+		if cmd.handleReadChangesError(repo, err) {
 			err = nil
-			ot, err = c.readFromVim(repo, path, results, queryGroup)
+			ot, err = cmd.readFromVim(repo, path, results, queryGroup)
 		} else {
 			ui.Err().Printf("aborting organize")
 			return ot, err

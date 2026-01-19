@@ -89,7 +89,7 @@ var coderConstructors = map[string]funcListFormatConstructor{
 
 		return coder{
 			listCoder:      jsonCoder,
-			beforeEncoding: (*sku.Transacted).Verify,
+			beforeEncoding: finalizer.Verify,
 			afterDecoding: func(object *sku.Transacted) error {
 				return finalizer.FinalizeAndVerify(
 					object,

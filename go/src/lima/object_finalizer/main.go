@@ -278,7 +278,7 @@ func (finalizer finalizer) FinalizeAndSign(
 		return err
 	}
 
-	if err = transacted.Verify(); err != nil {
+	if err = finalizer.Verify(transacted); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}
@@ -305,7 +305,7 @@ func (finalizer finalizer) FinalizeAndVerify(
 		return err
 	}
 
-	if err = transacted.Verify(); err != nil {
+	if err = finalizer.Verify(transacted); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

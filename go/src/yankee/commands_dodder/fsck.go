@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/object_finalizer"
 	"code.linenisgreat.com/dodder/go/src/oscar/queries"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
@@ -96,6 +97,8 @@ func (cmd Fsck) runVerification(
 
 	var objectErrors collections_slice.Slice[objectError]
 
+	finalizer := object_finalizer.Make()
+
 	if err := errors.RunChildContextWithPrintTicker(
 		repo,
 		func(ctx errors.Context) {
@@ -123,7 +126,7 @@ func (cmd Fsck) runVerification(
 					)
 				}
 
-				if err := object.Verify(); err != nil {
+				if err := finalizer.Verify(object); err != nil {
 					objectErrors.Append(
 						objectError{
 							err:    err,
