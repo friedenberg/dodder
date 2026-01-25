@@ -54,7 +54,7 @@ func (cmd *FormatBlob) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (cmd *FormatBlob) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 

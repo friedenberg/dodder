@@ -21,7 +21,7 @@ func (cmd Complete) GetFlagValueBlobIds(
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
-			commandLine command.CommandLine,
+			commandLine command.CommandLineInput,
 		) {
 			envBlobStore := cmd.MakeEnvBlobStore(req)
 			blobStoresAll := envBlobStore.GetBlobStores()

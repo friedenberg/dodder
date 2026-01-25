@@ -26,7 +26,7 @@ func (cmd Complete) GetFlagValueMetadataTags(
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
-			commandLine command.CommandLine,
+			commandLine command.CommandLineInput,
 		) {
 			local := LocalWorkingCopy{}.MakeLocalWorkingCopy(req)
 
@@ -47,7 +47,7 @@ func (cmd Complete) GetFlagValueStringTags(
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
-			commandLine command.CommandLine,
+			commandLine command.CommandLineInput,
 		) {
 			local := LocalWorkingCopy{}.MakeLocalWorkingCopy(req)
 
@@ -68,7 +68,7 @@ func (cmd Complete) GetFlagValueMetadataType(
 		FuncCompleter: func(
 			req command.Request,
 			envLocal env_local.Env,
-			commandLine command.CommandLine,
+			commandLine command.CommandLineInput,
 		) {
 			local := LocalWorkingCopy{}.MakeLocalWorkingCopy(req)
 

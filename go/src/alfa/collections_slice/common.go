@@ -3,6 +3,10 @@ package collections_slice
 import "unicode/utf8"
 
 type (
+	String struct {
+		Slice[string]
+	}
+
 	Byte struct {
 		Slice[byte]
 	}

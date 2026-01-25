@@ -72,7 +72,7 @@ func (cmd *Organize) CompletionGenres() ids.Genre {
 func (cmd Organize) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 

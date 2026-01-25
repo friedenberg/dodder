@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -16,38 +15,24 @@ import (
 type Request struct {
 	errors.Context
 	Utility Utility
-
-	Args *Args
-
 	FlagSet *flags.FlagSet
-}
 
-type consumedArg struct {
-	name, value string
-}
-
-func (arg consumedArg) String() string {
-	if arg.name == "" {
-		return fmt.Sprintf("%q", arg.value)
-	} else {
-		return fmt.Sprintf("%s:%q", arg.name, arg.value)
-	}
+	input *CommandLineInput
 }
 
 // TODO switch to ActiveContext
 func (req Request) PeekArgs() []string {
-	args := req.Args.args[req.Args.argi:]
-	return args
+	return req.input.Args.Shift(req.input.Argi)
 }
 
 func (req Request) PopArgs() []string {
 	args := req.PeekArgs()
 
 	for _, arg := range args {
-		req.Args.consumed = append(req.Args.consumed, consumedArg{value: arg})
+		req.input.consumed = append(req.input.consumed, consumedArg{value: arg})
 	}
 
-	req.Args.argi += len(args)
+	req.input.Argi += len(args)
 	return args
 }
 
@@ -60,15 +45,15 @@ func (req Request) PopArgsAsMutableSet() collections_value.MutableSet[string] {
 	)
 
 	for _, arg := range args {
-		req.Args.consumed = append(req.Args.consumed, consumedArg{value: arg})
+		req.input.consumed = append(req.input.consumed, consumedArg{value: arg})
 	}
 
-	req.Args.argi += len(args)
+	req.input.Argi += len(args)
 	return set
 }
 
 func (req Request) RemainingArgCount() int {
-	return len(req.Args.args[req.Args.argi:])
+	return req.input.Args.Shift(req.input.Argi).Len()
 }
 
 func PopRequestArgs[
@@ -117,15 +102,15 @@ func (req Request) PopArg(name string) string {
 		errors.ContextCancelWithBadRequestf(
 			req,
 			"expected positional argument (%d) %s, but only received %q",
-			req.Args.argi+1,
+			req.input.Argi+1,
 			name,
-			req.Args.consumed,
+			req.input.consumed,
 		)
 	}
 
-	value := req.Args.args[req.Args.argi]
-	req.Args.consumed = append(req.Args.consumed, consumedArg{name: name, value: value})
-	req.Args.argi++
+	value := req.input.Args.At(req.input.Argi)
+	req.input.consumed = append(req.input.consumed, consumedArg{name: name, value: value})
+	req.input.Argi++
 	return value
 }
 
@@ -134,9 +119,9 @@ func (req Request) PopArgOrDefault(name, defaultArg string) string {
 		return defaultArg
 	}
 
-	value := req.Args.args[req.Args.argi]
-	req.Args.consumed = append(req.Args.consumed, consumedArg{name: name, value: value})
-	req.Args.argi++
+	value := req.input.Args.At(req.input.Argi)
+	req.input.consumed = append(req.input.consumed, consumedArg{name: name, value: value})
+	req.input.Argi++
 
 	return value
 }

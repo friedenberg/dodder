@@ -64,7 +64,7 @@ func (cmd *InitWorkspace) SetFlagDefinitions(
 func (cmd InitWorkspace) Complete(
 	_ command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	searchDir := envLocal.GetCwd()
 

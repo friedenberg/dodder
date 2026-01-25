@@ -75,7 +75,7 @@ func (cmd *Checkin) SetFlagDefinitions(
 func (cmd *Checkin) Complete(
 	_ command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	searchDir := envLocal.GetCwd()
 

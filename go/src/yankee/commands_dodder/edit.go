@@ -53,7 +53,7 @@ func (cmd Edit) CompletionGenres() ids.Genre {
 func (cmd *Edit) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 

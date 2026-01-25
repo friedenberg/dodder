@@ -31,7 +31,7 @@ func (cmd *InitFrom) SetFlagDefinitions(
 func (cmd InitFrom) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	// TODO support completion for config path
 }

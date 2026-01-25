@@ -22,7 +22,7 @@ type CatIds struct {
 func (cmd CatIds) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
 	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)

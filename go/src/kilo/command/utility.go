@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/config_cli"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
@@ -170,48 +171,16 @@ func (utility Utility) Run(
 				return
 			}
 
-			var cmd Cmd
-			var ok bool
+			cmd, flagSet, ok := utility.MakeCmdAndFlagSet(ctx, args)
 
-			name := args[1]
-
-			// TODO switch to context
-			if cmd, ok = utility.GetCmd(name); !ok {
-				utility.PrintUsage(
-					ctx,
-					errors.BadRequestf("No subcommand %q", name),
-				)
-
+			if !ok {
 				return
 			}
 
-			flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
+			req, ok := utility.MakeRequest(ctx, cmd, flagSet)
 
-			if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
-				cmd.SetFlagDefinitions(flagSet)
-			}
-
-			args = args[2:]
-
-			utility.config.SetFlagDefinitions(flagSet)
-
-			if err := flagSet.Parse(args); err != nil {
-				ctx.Cancel(err)
-			}
-
-			args = flagSet.Args()
-
-			if len(args) > 0 && args[0] == "--" {
-				args = args[1:]
-			}
-
-			req := Request{
-				Utility: utility,
-				Context: ctx,
-				FlagSet: flagSet,
-				Args: &Args{
-					args: args,
-				},
+			if !ok {
+				return
 			}
 
 			cmd.Run(req)
@@ -219,4 +188,61 @@ func (utility Utility) Run(
 	); err != nil {
 		os.Exit(handleMainErrors(ctx, utilityNameWithExtension, err))
 	}
+}
+
+func (utility Utility) MakeCmdAndFlagSet(
+	ctx errors.Context,
+	args []string,
+) (cmd Cmd, flagSet *flags.FlagSet, ok bool) {
+	name := args[1]
+
+	// TODO switch to context
+	if cmd, ok = utility.GetCmd(name); !ok {
+		utility.PrintUsage(
+			ctx,
+			errors.BadRequestf("No subcommand %q", name),
+		)
+
+		return
+	}
+
+	flagSet = flags.NewFlagSet(name, flags.ContinueOnError)
+
+	if cmd, ok := cmd.(interfaces.CommandComponentWriter); ok {
+		cmd.SetFlagDefinitions(flagSet)
+	}
+
+	args = args[2:]
+
+	utility.config.SetFlagDefinitions(flagSet)
+
+	if err := flagSet.Parse(args); err != nil {
+		ctx.Cancel(err)
+	}
+
+	return cmd, flagSet, true
+}
+
+func (utility Utility) MakeRequest(
+	ctx errors.Context,
+	cmd Cmd,
+	flagSet *flags.FlagSet,
+) (request Request, ok bool) {
+	input := CommandLineInput{
+		Args: collections_slice.String{Slice: (flagSet.Args())},
+	}
+
+	if !input.Args.IsEmpty() && input.Args.First() == "--" {
+		input.ContainsDoubleHyphen = true
+		input.Args.ShiftInPlace(1)
+	}
+
+	req := Request{
+		Utility: utility,
+		Context: ctx,
+		FlagSet: flagSet,
+		input:   &input,
+	}
+
+	return req, true
 }

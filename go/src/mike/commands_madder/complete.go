@@ -49,7 +49,7 @@ func (cmd Complete) Run(req command.Request) {
 	// TODO extract into constructor
 	// TODO find double-hyphen
 	// TODO keep track of all args
-	commandLine := command.CommandLine{
+	commandLine := command.CommandLineInput{
 		FlagsOrArgs: req.PeekArgs(),
 		InProgress:  cmd.inProgress,
 	}
@@ -107,7 +107,7 @@ func (cmd Complete) Run(req command.Request) {
 
 func (cmd Complete) completeSubcommands(
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 	utility command.Utility,
 ) {
 	for name, subcmd := range utility.AllCmds() {
@@ -138,7 +138,7 @@ func (cmd Complete) completeSubcommandArgs(
 	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Cmd,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	if subcmd == nil {
 		return
@@ -157,7 +157,7 @@ func (cmd Complete) completeSubcommandFlags(
 	req command.Request,
 	envLocal env_local.Env,
 	subcmd command.Cmd,
-	flagSet *flags.FlagSet, commandLine command.CommandLine,
+	flagSet *flags.FlagSet, commandLine command.CommandLineInput,
 	lastArg string,
 ) (shouldNotCompleteArgs bool) {
 	if subcmd == nil {
@@ -199,7 +199,7 @@ func (cmd Complete) completeSubcommandFlagOnParseError(
 	envLocal env_local.Env,
 	subcmd command.Cmd,
 	flagSet *flags.FlagSet,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 	err error,
 ) {
 	if subcmd == nil {

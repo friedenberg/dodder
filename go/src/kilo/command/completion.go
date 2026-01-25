@@ -17,10 +17,10 @@ type Completion struct {
 }
 
 type Completer interface {
-	Complete(Request, env_local.Env, CommandLine)
+	Complete(Request, env_local.Env, CommandLineInput)
 }
 
-type FuncCompleter func(Request, env_local.Env, CommandLine)
+type FuncCompleter func(Request, env_local.Env, CommandLineInput)
 
 type FlagValueCompleter struct {
 	interfaces.FlagValue
@@ -41,7 +41,7 @@ func (completer FlagValueCompleter) String() string {
 func (completer FlagValueCompleter) Complete(
 	req Request,
 	envLocal env_local.Env,
-	commandLine CommandLine,
+	commandLine CommandLineInput,
 ) {
 	completer.FuncCompleter(req, envLocal, commandLine)
 }

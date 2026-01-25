@@ -36,7 +36,7 @@ func (cmd *Diff) SetFlagDefinitions(f interfaces.CLIFlagDefinitions) {
 func (cmd *Diff) Complete(
 	_ command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	searchDir := envLocal.GetCwd()
 

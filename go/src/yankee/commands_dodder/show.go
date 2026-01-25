@@ -59,7 +59,7 @@ func (cmd *Show) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 func (cmd Show) Complete(
 	req command.Request,
 	envLocal env_local.Env,
-	commandLine command.CommandLine,
+	commandLine command.CommandLineInput,
 ) {
 	repo := cmd.MakeLocalWorkingCopy(req)
 
