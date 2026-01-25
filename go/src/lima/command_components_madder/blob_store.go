@@ -145,7 +145,7 @@ func (cmd BlobStore) MakeBlobStoresFromIdsOrAll(
 
 	for range req.RemainingArgCount() {
 		blobStoreId := command.PopRequestArg[blob_store_id.Id](
-			req.Args,
+			req,
 			"blob store id",
 		)
 
@@ -155,4 +155,38 @@ func (cmd BlobStore) MakeBlobStoresFromIdsOrAll(
 	}
 
 	return blobStores
+}
+
+func (cmd BlobStore) MakeSourceAndDestinationBlobStoresFromIdsOrAll(
+	req command.Request,
+	envBlobStore env_repo.BlobStoreEnv,
+) (source blob_stores.BlobStoreInitialized, destinations blob_stores.BlobStoreMap) {
+	destinations = make(
+		blob_stores.BlobStoreMap,
+		req.RemainingArgCount(),
+	)
+
+	if req.RemainingArgCount() == 0 {
+		return envBlobStore.GetDefaultBlobStoreAndRemaining()
+	}
+
+	sourceBlobStoreId := command.PopRequestArg[blob_store_id.Id](
+		req,
+		"source blob store id",
+	)
+
+	source = envBlobStore.GetBlobStore(*sourceBlobStoreId)
+
+	for range req.RemainingArgCount() {
+		blobStoreId := command.PopRequestArg[blob_store_id.Id](
+			req,
+			"destination blob store id",
+		)
+
+		destinations[blobStoreId.String()] = envBlobStore.GetBlobStore(
+			*blobStoreId,
+		)
+	}
+
+	return
 }

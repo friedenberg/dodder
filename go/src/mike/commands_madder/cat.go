@@ -113,7 +113,7 @@ func (cmd Cat) Run(req command.Request) {
 	blobWriter := cmd.makeBlobWriter(envBlobStore, blobStore)
 
 	// TODO run each blob with its own child context
-	for blobId := range command.PopRequestArgs[markl.Id](req.Args, "blob id") {
+	for blobId := range command.PopRequestArgs[markl.Id](req, "blob id") {
 		if err := cmd.blob(blobStore, blobId, blobWriter); err != nil {
 			ui.Err().Print(err)
 		}

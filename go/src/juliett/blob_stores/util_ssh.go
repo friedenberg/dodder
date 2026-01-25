@@ -97,11 +97,13 @@ func MakeSSHClientFromSSHConfig(
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO make configurable
 	}
 
-	addr := fmt.Sprintf(
-		"%s:%s",
-		url.Hostname(),
-		url.Port(),
-	)
+	port := url.Port()
+
+	if port == "" {
+		port = "22"
+	}
+
+	addr := fmt.Sprintf("%s:%s", url.Hostname(), port)
 
 	if sshClient, err = sshDial(ctx, uiPrinter, clientConfig, addr); err != nil {
 		err = errors.Wrap(err)

@@ -6,7 +6,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
+	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/blob_transfers"
 	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
@@ -39,18 +41,26 @@ func (cmd *Sync) SetFlagDefinitions(
 // TODO add completion for blob store id's
 
 func (cmd Sync) Run(req command.Request) {
-	// blobStoreIds := req.PopArgs()
-	cmd.runAllStores(req)
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+
+	source, destinations := cmd.MakeSourceAndDestinationBlobStoresFromIdsOrAll(
+		req,
+		envBlobStore,
+	)
+
+	cmd.runStore(req, envBlobStore, source, destinations)
 }
 
-func (cmd Sync) runAllStores(req command.Request) {
-	envBlobStore := cmd.MakeEnvBlobStore(req)
-	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
-
+func (cmd Sync) runStore(
+	req command.Request,
+	envBlobStore env_repo.BlobStoreEnv,
+	source blob_stores.BlobStoreInitialized,
+	destination blob_stores.BlobStoreMap,
+) {
 	// TODO output TAP
 	ui.Out().Print("Blob Stores:")
 
-	if len(blobStores) == 1 {
+	if len(destination) == 0 {
 		errors.ContextCancelWithBadRequestf(
 			req,
 			"only one blob store, nothing to sync",
@@ -59,12 +69,10 @@ func (cmd Sync) runAllStores(req command.Request) {
 		return
 	}
 
-	primary, blobStores := envBlobStore.GetDefaultBlobStoreAndRemaining()
-
 	blobImporter := blob_transfers.MakeBlobImporter(
 		envBlobStore,
-		primary,
-		blobStores,
+		source,
+		destination,
 	)
 
 	blobImporter.CopierDelegate = sku.MakeBlobCopierDelegate(
@@ -86,7 +94,7 @@ func (cmd Sync) runAllStores(req command.Request) {
 		},
 	)
 
-	for blobId, errIter := range primary.AllBlobs() {
+	for blobId, errIter := range source.AllBlobs() {
 		if errIter != nil {
 			ui.Err().Print(errIter)
 			continue

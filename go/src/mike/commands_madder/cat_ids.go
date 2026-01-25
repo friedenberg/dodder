@@ -3,9 +3,8 @@ package commands_madder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
 	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
@@ -20,10 +19,23 @@ type CatIds struct {
 	command_components_madder.BlobStore
 }
 
-func (cmd CatIds) CompletionGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Blob,
-	)
+func (cmd CatIds) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLine,
+) {
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
+
+	// args := commandLine.FlagsOrArgs[1:]
+
+	// if commandLine.InProgress != "" {
+	// 	args = args[:len(args)-1]
+	// }
+
+	for id, blobStore := range blobStores {
+		envLocal.GetOut().Printf("%s\t%s", id, blobStore.GetBlobStoreDescription())
+	}
 }
 
 func (cmd CatIds) Run(req command.Request) {

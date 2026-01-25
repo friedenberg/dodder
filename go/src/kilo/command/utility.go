@@ -199,13 +199,18 @@ func (utility Utility) Run(
 				ctx.Cancel(err)
 			}
 
+			args = flagSet.Args()
+
+			if len(args) > 0 && args[0] == "--" {
+				args = args[1:]
+			}
+
 			req := Request{
 				Utility: utility,
 				Context: ctx,
 				FlagSet: flagSet,
 				Args: &Args{
-					Context: ctx,
-					args:    flagSet.Args(),
+					args: args,
 				},
 			}
 

@@ -14,10 +14,10 @@ import (
 // TODO refactor this to have a generic config field and for the commands_madder
 // and commands_dodder packages to alias a concrete version for their own use
 type Request struct {
+	errors.Context
 	Utility Utility
 
-	errors.Context
-	*Args
+	Args *Args
 
 	FlagSet *flags.FlagSet
 }
@@ -36,30 +36,29 @@ func (arg consumedArg) String() string {
 
 // TODO switch to ActiveContext
 type Args struct {
-	errors.Context
 	args []string
 	argi int
 
 	consumed []consumedArg
 }
 
-func (req *Args) PeekArgs() []string {
-	args := req.args[req.argi:]
+func (req Request) PeekArgs() []string {
+	args := req.Args.args[req.Args.argi:]
 	return args
 }
 
-func (req *Args) PopArgs() []string {
+func (req Request) PopArgs() []string {
 	args := req.PeekArgs()
 
 	for _, arg := range args {
-		req.consumed = append(req.consumed, consumedArg{value: arg})
+		req.Args.consumed = append(req.Args.consumed, consumedArg{value: arg})
 	}
 
-	req.argi += len(args)
+	req.Args.argi += len(args)
 	return args
 }
 
-func (req *Args) PopArgsAsMutableSet() collections_value.MutableSet[string] {
+func (req Request) PopArgsAsMutableSet() collections_value.MutableSet[string] {
 	args := req.PeekArgs()
 	set := collections_value.MakeMutableSet(
 		quiter.StringKeyer,
@@ -68,21 +67,24 @@ func (req *Args) PopArgsAsMutableSet() collections_value.MutableSet[string] {
 	)
 
 	for _, arg := range args {
-		req.consumed = append(req.consumed, consumedArg{value: arg})
+		req.Args.consumed = append(req.Args.consumed, consumedArg{value: arg})
 	}
 
-	req.argi += len(args)
+	req.Args.argi += len(args)
 	return set
 }
 
-func (req *Args) RemainingArgCount() int {
-	return len(req.args[req.argi:])
+func (req Request) RemainingArgCount() int {
+	return len(req.Args.args[req.Args.argi:])
 }
 
 func PopRequestArgs[
 	VALUE interfaces.Stringer,
 	VALUE_PTR interfaces.StringerSetterPtr[VALUE],
-](req *Args, name string) interfaces.Seq[VALUE_PTR] {
+](
+	req Request,
+	name string,
+) interfaces.Seq[VALUE_PTR] {
 	return func(yield func(VALUE_PTR) bool) {
 		for req.RemainingArgCount() > 0 {
 			value := PopRequestArg[VALUE, VALUE_PTR](req, name)
@@ -97,7 +99,7 @@ func PopRequestArgs[
 func PopRequestArg[
 	VALUE interfaces.Stringer,
 	VALUE_PTR interfaces.StringerSetterPtr[VALUE],
-](req *Args, name string) VALUE_PTR {
+](req Request, name string) VALUE_PTR {
 	var value VALUE
 
 	PopRequestArgTo(req, name, VALUE_PTR(&value))
@@ -105,11 +107,11 @@ func PopRequestArg[
 	return &value
 }
 
-func PopRequestArgTo(req *Args, name string, value interfaces.StringerSetter) {
+func PopRequestArgTo(req Request, name string, value interfaces.StringerSetter) {
 	PopRequestArgToFunc(req, name, value.Set)
 }
 
-func PopRequestArgToFunc(req *Args, name string, funcSet func(string) error) {
+func PopRequestArgToFunc(req Request, name string, funcSet func(string) error) {
 	arg := req.PopArg(name)
 
 	if err := funcSet(arg); err != nil {
@@ -117,36 +119,36 @@ func PopRequestArgToFunc(req *Args, name string, funcSet func(string) error) {
 	}
 }
 
-func (req *Args) PopArg(name string) string {
+func (req Request) PopArg(name string) string {
 	if req.RemainingArgCount() == 0 {
 		errors.ContextCancelWithBadRequestf(
 			req,
 			"expected positional argument (%d) %s, but only received %q",
-			req.argi+1,
+			req.Args.argi+1,
 			name,
-			req.consumed,
+			req.Args.consumed,
 		)
 	}
 
-	value := req.args[req.argi]
-	req.consumed = append(req.consumed, consumedArg{name: name, value: value})
-	req.argi++
+	value := req.Args.args[req.Args.argi]
+	req.Args.consumed = append(req.Args.consumed, consumedArg{name: name, value: value})
+	req.Args.argi++
 	return value
 }
 
-func (req *Args) PopArgOrDefault(name, defaultArg string) string {
+func (req Request) PopArgOrDefault(name, defaultArg string) string {
 	if req.RemainingArgCount() == 0 {
 		return defaultArg
 	}
 
-	value := req.args[req.argi]
-	req.consumed = append(req.consumed, consumedArg{name: name, value: value})
-	req.argi++
+	value := req.Args.args[req.Args.argi]
+	req.Args.consumed = append(req.Args.consumed, consumedArg{name: name, value: value})
+	req.Args.argi++
 
 	return value
 }
 
-func (req *Args) AssertNoMoreArgs() {
+func (req *Request) AssertNoMoreArgs() {
 	if req.RemainingArgCount() > 0 {
 		errors.ContextCancelWithBadRequestf(
 			req,
@@ -156,7 +158,7 @@ func (req *Args) AssertNoMoreArgs() {
 	}
 }
 
-func (req *Args) LastArg() (arg string, ok bool) {
+func (req Request) LastArg() (arg string, ok bool) {
 	if req.RemainingArgCount() > 0 {
 		ok = true
 		arg = req.PopArgs()[req.RemainingArgCount()-1]
