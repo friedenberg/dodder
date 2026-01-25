@@ -35,13 +35,6 @@ func (arg consumedArg) String() string {
 }
 
 // TODO switch to ActiveContext
-type Args struct {
-	args []string
-	argi int
-
-	consumed []consumedArg
-}
-
 func (req Request) PeekArgs() []string {
 	args := req.Args.args[req.Args.argi:]
 	return args
