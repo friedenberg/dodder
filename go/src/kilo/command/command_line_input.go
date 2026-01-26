@@ -7,16 +7,14 @@ import (
 )
 
 type CommandLineInput struct {
-	// TODO replace with collections_slice.String
-	FlagsOrArgs          []string
+	FlagsOrArgs          collections_slice.String
 	InProgress           string
 	ContainsDoubleHyphen bool
 
 	Args collections_slice.String
 	Argi int
 
-	// TODO replace with collections_slice.String
-	consumed []consumedArg
+	consumed collections_slice.Slice[consumedArg]
 }
 
 type consumedArg struct {
@@ -32,18 +30,18 @@ func (arg consumedArg) String() string {
 }
 
 func (commandLine CommandLineInput) LastArg() (arg string, ok bool) {
-	argc := len(commandLine.FlagsOrArgs)
+	argc := commandLine.FlagsOrArgs.Len()
 
 	if argc > 0 {
 		ok = true
-		arg = commandLine.FlagsOrArgs[argc-1]
+		arg = commandLine.FlagsOrArgs.Last()
 	}
 
 	return arg, ok
 }
 
 func (commandLine CommandLineInput) LastCompleteArg() (arg string, ok bool) {
-	argc := len(commandLine.FlagsOrArgs)
+	argc := commandLine.FlagsOrArgs.Len()
 
 	if commandLine.InProgress != "" {
 		argc -= 1
@@ -51,7 +49,7 @@ func (commandLine CommandLineInput) LastCompleteArg() (arg string, ok bool) {
 
 	if argc > 0 {
 		ok = true
-		arg = commandLine.FlagsOrArgs[argc-1]
+		arg = commandLine.FlagsOrArgs.Last()
 	}
 
 	return arg, ok

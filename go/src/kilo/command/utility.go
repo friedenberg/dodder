@@ -229,7 +229,7 @@ func (utility Utility) MakeRequest(
 	flagSet *flags.FlagSet,
 ) (request Request, ok bool) {
 	input := CommandLineInput{
-		Args: collections_slice.String{Slice: (flagSet.Args())},
+		Args: collections_slice.String(flagSet.Args()),
 	}
 
 	if !input.Args.IsEmpty() && input.Args.First() == "--" {

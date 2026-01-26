@@ -76,7 +76,7 @@ func (cmd Organize) Complete(
 ) {
 	localWorkingCopy := cmd.MakeLocalWorkingCopy(req)
 
-	args := commandLine.FlagsOrArgs[1:]
+	args := commandLine.FlagsOrArgs.Shift(1)
 
 	if commandLine.InProgress != "" {
 		args = args[:len(args)-1]

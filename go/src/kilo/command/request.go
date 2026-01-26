@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -21,7 +22,7 @@ type Request struct {
 }
 
 // TODO switch to ActiveContext
-func (req Request) PeekArgs() []string {
+func (req Request) PeekArgs() collections_slice.String {
 	return req.input.Args.Shift(req.input.Argi)
 }
 
@@ -29,7 +30,7 @@ func (req Request) PopArgs() []string {
 	args := req.PeekArgs()
 
 	for _, arg := range args {
-		req.input.consumed = append(req.input.consumed, consumedArg{value: arg})
+		req.input.consumed.Append(consumedArg{value: arg})
 	}
 
 	req.input.Argi += len(args)
@@ -45,7 +46,7 @@ func (req Request) PopArgsAsMutableSet() collections_value.MutableSet[string] {
 	)
 
 	for _, arg := range args {
-		req.input.consumed = append(req.input.consumed, consumedArg{value: arg})
+		req.input.consumed.Append(consumedArg{value: arg})
 	}
 
 	req.input.Argi += len(args)
@@ -109,7 +110,7 @@ func (req Request) PopArg(name string) string {
 	}
 
 	value := req.input.Args.At(req.input.Argi)
-	req.input.consumed = append(req.input.consumed, consumedArg{name: name, value: value})
+	req.input.consumed.Append(consumedArg{name: name, value: value})
 	req.input.Argi++
 	return value
 }
@@ -120,7 +121,7 @@ func (req Request) PopArgOrDefault(name, defaultArg string) string {
 	}
 
 	value := req.input.Args.At(req.input.Argi)
-	req.input.consumed = append(req.input.consumed, consumedArg{name: name, value: value})
+	req.input.consumed.Append(consumedArg{name: name, value: value})
 	req.input.Argi++
 
 	return value

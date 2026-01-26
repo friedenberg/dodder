@@ -10,6 +10,10 @@ type Slice[ELEMENT any] []ELEMENT
 
 var _ interfaces.Collection[string] = Slice[string]{}
 
+func Make[ELEMENT any](elements ...ELEMENT) Slice[ELEMENT] {
+	return Slice[ELEMENT](elements)
+}
+
 func MakeFromSeq[ELEMENT any](count int, seq interfaces.Seq[ELEMENT]) Slice[ELEMENT] {
 	slice := make(Slice[ELEMENT], count)
 
