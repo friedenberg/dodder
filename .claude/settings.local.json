@@ -15,7 +15,9 @@
       "Bash(cp:*)",
       "Bash(timeout 60 bats *.bats --tap 2 > /dev/null)",
       "Bash(grep:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(paste:*)",
+      "Bash(done)"
     ],
     "deny": []
   }

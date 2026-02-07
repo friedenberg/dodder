@@ -12,19 +12,21 @@ synchronization capabilities.
 
 ## Build and Development Commands
 
+All commands should be run from the `go/` directory.
+
 ### Core Development Tasks
 
--   **Build**: `just build` (builds binary to `build/dodder`)
+-   **Build**: `just build` (builds debug and release binaries to `build/`)
 -   **Test**: `just test` (runs Go unit tests + BATS integration tests)
--   **Unit Tests Only**: `just test-go-unit` or `go test -v ./...`
--   **Single Package Test**: `go test -v ./src/path/to/package`
+-   **Unit Tests Only**: `just test-go-unit` or `go test -v -tags test,debug ./...`
+-   **Single Package Test**: `go test -v -tags test,debug ./src/path/to/package`
 -   **Clean**: `just clean` (clears Go caches)
 -   **Check**: `just check` (vulnerability scan + vet)
 -   **Generate**: `just build-go-generate` (runs `go generate ./...`)
 
 ### Code Quality
 
--   **Format**: `just codemod-go-imports` (runs goimports on all Go files)
+-   **Format**: `just codemod-go-fmt` (runs goimports + gofumpt)
 -   **Vulnerability Check**: `just check-go-vuln`
 -   **Go Vet**: `just check-go-vet`
 
@@ -33,30 +35,23 @@ synchronization capabilities.
 -   **Nix**: `just build-nix` (requires Nix with flakes)
 -   **Docker**: `just build-docker`
 
+### BATS Integration Tests
+
+-   **Run all**: `just test-bats` (generates fixtures + runs tests)
+-   **Generate fixtures only**: `just test-bats-generate`
+-   **Run tests only**: `just test-bats-run` (requires pre-generated fixtures)
+-   **Specific test file**: `cd ../zz-tests_bats && bats clone.bats`
+-   **Filter by tag**: `cd ../zz-tests_bats && just test-tags migration`
+-   **Show failed files**: `just test-bats-failed_files`
+
 ## Architecture Overview
 
-### NATO Phonetic Module Organization
+### Module Organization
 
-The codebase uses NATO phonetic alphabet naming for layered architecture with
-strict dependency ordering (each layer can only depend on previous layers):
-
--   **alfa**: Foundation (errors, interfaces, primitives)
--   **bravo**: Basic utilities (UI, pools, values, flags)
--   **charlie**: Collections and data structures (sets, I/O, files)
--   **delta**: Data processing (SHA, strings, Lua VM, encryption)
--   **echo**: Object identification and metadata systems
--   **foxtrot**: Configuration and workspace management
--   **golf**: Command framework and object metadata
--   **hotel**: Repository and environment management
--   **india**: Indexing and search systems
--   **juliett**: SKU (core object management and storage)
--   **kilo**: Query system and object formatting
--   **lima**: Storage engines and text organization
--   **mike**: Main store implementation
--   **november**: Local working copy management
--   **oscar**: Remote operations and HTTP API
--   **papa**: User operations and command components
--   **quebec**: CLI command definitions
+The codebase uses NATO phonetic alphabet naming (alfa, bravo, charlie, etc.) to
+enforce a DAG dependency structure - each layer can only depend on previous
+layers alphabetically. This prevents circular dependencies and encourages
+modularity.
 
 ### Core Domain Model
 
@@ -88,9 +83,11 @@ strict dependency ordering (each layer can only depend on previous layers):
 
 ### Command System
 
-Commands are registered in `src/quebec/commands/` and follow a consistent
-pattern: - Flag parsing via `flag.FlagSet` - Request objects with context and
-configuration - Standardized error handling through `alfa/errors`
+Commands follow a consistent pattern:
+-   Flag parsing via `flag.FlagSet`
+-   Request objects with context and configuration
+-   Standardized error handling through `alfa/errors`
+-   Entry points: `cmd/dodder/`, `cmd/der/`, `cmd/madder/`
 
 ## Key Development Patterns
 
@@ -214,18 +211,10 @@ type TomlV2Common struct {
 
 ## Module Import Patterns
 
-When working with this codebase: - Import paths follow
-`code.linenisgreat.com/dodder/go/src/{module}/{package}` - Respect the NATO
-alphabet dependency hierarchy - Use existing interfaces rather than concrete
-types where possible - Follow established patterns in similar modules
-
-## Important Files for Understanding System
-
--   `main.go`: Application entry point and error handling
--   `src/quebec/commands/main.go`: Command dispatch system
--   `src/juliett/sku/main.go`: Core object model
--   `src/mike/store/main.go`: Primary storage implementation
--   `src/november/local_working_copy/main.go`: Working copy management
+-   Import paths follow `code.linenisgreat.com/dodder/go/src/{module}/{package}`
+-   Respect the NATO alphabet dependency hierarchy (earlier letters cannot import later letters)
+-   Use existing interfaces rather than concrete types where possible
+-   Follow established patterns in similar modules
 
 ## Common Development Pitfalls
 
