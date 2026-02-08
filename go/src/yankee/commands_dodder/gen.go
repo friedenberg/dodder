@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 )
@@ -24,9 +25,11 @@ func init() {
 func (cmd Gen) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {}
 
 func (cmd Gen) Run(req command.Request) {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	envUI := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		config,
+		config.Debug,
 		env_ui.Options{},
 	)
 

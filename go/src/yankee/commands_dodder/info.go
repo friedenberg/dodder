@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
@@ -33,15 +34,17 @@ func (cmd Info) SetFlagDefinitions(
 }
 
 func (cmd Info) Run(req command.Request) {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	dir := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Utility.GetConfigDodder().Debug,
+		config.Debug,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		config,
+		config.Debug,
 		env_ui.Options{},
 	)
 

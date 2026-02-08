@@ -1,6 +1,12 @@
 package command_components_madder
 
 import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/config_cli"
+	"code.linenisgreat.com/dodder/go/src/delta/debug"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
@@ -13,15 +19,32 @@ type EnvBlobStore struct{}
 func (cmd EnvBlobStore) MakeEnvBlobStore(
 	req command.Request,
 ) env_repo.BlobStoreEnv {
+	configAny := req.Utility.GetConfigAny()
+
+	var debugOptions debug.Options
+	var cliConfig interfaces.CLIConfigProvider
+
+	switch c := configAny.(type) {
+	case *config_cli.Config:
+		debugOptions = c.Debug
+		cliConfig = c
+	case *repo_config_cli.Config:
+		debugOptions = c.Debug
+		cliConfig = c
+	default:
+		panic(fmt.Sprintf("unsupported config type: %T", configAny))
+	}
+
 	dir := env_dir.MakeDefault(
 		req,
 		req.Utility.GetName(),
-		req.Utility.GetConfigDodder().Debug,
+		debugOptions,
 	)
 
 	envUI := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		cliConfig,
+		debugOptions,
 		env_ui.Options{},
 	)
 

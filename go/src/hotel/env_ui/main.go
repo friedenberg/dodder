@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
 // TODO explore storing buffered writer and reader
@@ -28,7 +27,7 @@ type Env interface {
 	GetOutFile() interfaces.WriterAndStringWriter
 	GetErr() fd.Std
 	GetErrFile() interfaces.WriterAndStringWriter
-	GetCLIConfig() repo_config_cli.Config
+	GetCLIConfig() interfaces.CLIConfigProvider
 
 	Confirm(title, description string) (success bool)
 	Retry(header, retry string, err error) (tryAgain bool)
@@ -60,20 +59,22 @@ type env struct {
 
 	debug *debug.Context
 
-	cliConfig repo_config_cli.Config
+	cliConfig interfaces.CLIConfigProvider
 }
 
 func MakeDefault(ctx errors.Context) *env {
 	return Make(
 		ctx,
-		repo_config_cli.Config{},
+		nil,
+		debug.Options{},
 		Options{},
 	)
 }
 
 func Make(
 	context errors.Context,
-	cliConfig repo_config_cli.Config,
+	cliConfig interfaces.CLIConfigProvider,
+	debugOptions debug.Options,
 	options Options,
 ) *env {
 	// TODO use ui printing prefix
@@ -95,18 +96,18 @@ func Make(
 	{
 		var err error
 
-		if env.debug, err = debug.MakeContext(context, cliConfig.Debug); err != nil {
+		if env.debug, err = debug.MakeContext(context, debugOptions); err != nil {
 			context.Cancel(err)
 		}
 	}
 
-	if cliConfig.Verbose && !cliConfig.Quiet {
+	if cliConfig != nil && cliConfig.GetVerbose() && !cliConfig.GetQuiet() {
 		ui.SetVerbose(true)
 	} else {
 		ui.SetOutput(io.Discard)
 	}
 
-	if cliConfig.Todo {
+	if cliConfig != nil && cliConfig.GetTodo() {
 		ui.SetTodoOn()
 	}
 
@@ -149,6 +150,6 @@ func (env *env) GetErrFile() interfaces.WriterAndStringWriter {
 	return env.err.GetFile()
 }
 
-func (env *env) GetCLIConfig() repo_config_cli.Config {
+func (env *env) GetCLIConfig() interfaces.CLIConfigProvider {
 	return env.cliConfig
 }

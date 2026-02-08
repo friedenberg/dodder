@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
@@ -53,9 +54,14 @@ func BuilderOptionWorkspace(
 
 	var builder builderOptionWorkspace
 
+	var ignoreWorkspace bool
+	if repoConfig, ok := cliConfig.(interfaces.RepoCLIConfigProvider); ok {
+		ignoreWorkspace = repoConfig.GetIgnoreWorkspace()
+	}
+
 	if isTemporaryWorkspace {
 		builder.workspaceConfig = workspaceConfig
-	} else if !cliConfig.IgnoreWorkspace {
+	} else if !ignoreWorkspace {
 		builder.workspaceConfig = workspaceConfig
 	}
 

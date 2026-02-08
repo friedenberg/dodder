@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/config_cli"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/lima/command_components"
@@ -78,7 +78,7 @@ func (cmd Complete) Run(req command.Request) {
 
 	flagSet := flags.NewFlagSet(name, flags.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
-	(&repo_config_cli.Config{}).SetFlagDefinitions(flagSet)
+	(&config_cli.Config{}).SetFlagDefinitions(flagSet)
 
 	if subcmd, ok := subcmd.(interfaces.CommandComponentWriter); ok {
 		subcmd.SetFlagDefinitions(flagSet)

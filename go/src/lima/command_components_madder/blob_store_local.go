@@ -39,6 +39,7 @@ func (cmd BlobStoreLocal) MakeBlobStoreLocal(
 	ui := env_ui.Make(
 		req,
 		config,
+		config.Debug,
 		envOptions,
 	)
 

@@ -1,10 +1,12 @@
 package local_working_copy
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/store_workspace"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
@@ -57,8 +59,13 @@ func Make(
 	env env_local.Env,
 	options Options,
 ) *Repo {
+	var basePath string
+	if repoConfig, ok := env.GetCLIConfig().(interfaces.RepoCLIConfigProvider); ok {
+		basePath = repoConfig.GetBasePath()
+	}
+
 	layoutOptions := env_repo.Options{
-		BasePath: env.GetCLIConfig().BasePath,
+		BasePath: basePath,
 	}
 
 	var envRepo env_repo.Env
@@ -127,9 +134,12 @@ func (local *Repo) initialize(
 		local.GetConfig().GetPrintOptions().WithPrintTai(true),
 	)
 
+	// Type assertion is safe here because local_working_copy is dodder-specific
+	// and always receives repo_config_cli.Config
+	cliConfig, _ := local.GetCLIConfig().(repo_config_cli.Config)
 	if err = local.config.Initialize(
 		local.envRepo,
-		local.GetCLIConfig(),
+		cliConfig,
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil

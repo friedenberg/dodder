@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
 // TODO separate read-only from write
@@ -41,8 +40,7 @@ func MakeDefaultNoInit(
 
 func MakeFromXDGDotenvPath(
 	context errors.Context,
-	utilityName string,
-	config repo_config_cli.Config,
+	debugOptions debug.Options,
 	xdgDotenvPath string,
 ) env {
 	dotenv := xdg.Dotenv{
@@ -69,7 +67,7 @@ func MakeFromXDGDotenvPath(
 
 	return MakeWithXDG(
 		context,
-		config.Debug,
+		debugOptions,
 		*dotenv.XDG,
 	)
 }

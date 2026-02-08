@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 )
 
 type Config interface {
@@ -46,8 +45,10 @@ func (utility Utility) GetConfig() config_cli.Config {
 	return utility.config.GetConfigCLI()
 }
 
-func (utility Utility) GetConfigDodder() repo_config_cli.Config {
-	return *utility.config.(*repo_config_cli.Config)
+// GetConfigAny returns the raw config as any, allowing callers to type-assert
+// to their specific config type (e.g., repo_config_cli.Config for dodder commands).
+func (utility Utility) GetConfigAny() any {
+	return utility.config
 }
 
 func (utility Utility) GetCmd(name string) (Cmd, bool) {

@@ -73,7 +73,7 @@ func (roundTripper *RoundTripperStdio) InitializeWithSSH(
 		"serve",
 	}
 
-	if envUI.GetCLIConfig().Verbose {
+	if envUI.GetCLIConfig().GetVerbose() {
 		roundTripper.Args = append(roundTripper.Args, "-verbose")
 	}
 

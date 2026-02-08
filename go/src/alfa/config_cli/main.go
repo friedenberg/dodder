@@ -39,3 +39,20 @@ func (config *Config) SetDryRun(v bool) {
 func (config Config) GetConfigCLI() Config {
 	return config
 }
+
+func (config Config) GetVerbose() bool {
+	return config.Verbose
+}
+
+func (config Config) GetQuiet() bool {
+	return config.Quiet
+}
+
+func (config Config) GetTodo() bool {
+	return config.Todo
+}
+
+// FromAny extracts a Config from an any value
+func FromAny(v any) Config {
+	return *v.(*Config)
+}

@@ -3,6 +3,7 @@ package command_components_dodder
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
@@ -67,9 +68,11 @@ func (cmd Genesis) OnTheFirstDay(
 	req command.Request,
 	repoIdString string,
 ) *local_working_copy.Repo {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	envUI := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		config,
+		config.Debug,
 		env_ui.Options{},
 	)
 
@@ -84,14 +87,14 @@ func (cmd Genesis) OnTheFirstDay(
 	dir := env_dir.MakeDefaultAndInitialize(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Utility.GetConfigDodder().Debug,
+		config.Debug,
 		cmd.OverrideXDGWithCwd,
 	)
 
 	var envRepo env_repo.Env
 
 	options := env_repo.Options{
-		BasePath:                req.Utility.GetConfigDodder().BasePath,
+		BasePath:                config.BasePath,
 		PermitNoDodderDirectory: true,
 	}
 

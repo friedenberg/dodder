@@ -228,7 +228,7 @@ func (server *Server) makeRouter(
 			)
 	}
 
-	if server.Repo.GetEnv().GetCLIConfig().Verbose {
+	if server.Repo.GetEnv().GetCLIConfig().GetVerbose() {
 		router.Use(server.loggerMiddleware)
 	}
 

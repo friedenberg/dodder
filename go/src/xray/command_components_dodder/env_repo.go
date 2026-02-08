@@ -1,6 +1,8 @@
 package command_components_dodder
 
 import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
@@ -15,22 +17,24 @@ func (cmd EnvRepo) MakeEnvRepo(
 	req command.Request,
 	permitNoDodderDirectory bool,
 ) env_repo.Env {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	dir := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Utility.GetConfigDodder().Debug,
+		config.Debug,
 	)
 
 	envUI := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		config,
+		config.Debug,
 		env_ui.Options{},
 	)
 
 	var envRepo env_repo.Env
 
 	envRepoOptions := env_repo.Options{
-		BasePath:                req.Utility.GetConfigDodder().BasePath,
+		BasePath:                config.BasePath,
 		PermitNoDodderDirectory: permitNoDodderDirectory,
 	}
 
@@ -53,8 +57,13 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 ) env_repo.Env {
 	var envRepo env_repo.Env
 
+	var basePath string
+	if repoConfig, ok := envLocal.GetCLIConfig().(interfaces.RepoCLIConfigProvider); ok {
+		basePath = repoConfig.GetBasePath()
+	}
+
 	layoutOptions := env_repo.Options{
-		BasePath: envLocal.GetCLIConfig().BasePath,
+		BasePath: basePath,
 	}
 
 	{

@@ -93,3 +93,17 @@ func (config Config) UsePredictableZettelIds() bool {
 func (config Config) GetConfigCLI() config_cli.Config {
 	return config.Config
 }
+
+func (config Config) GetBasePath() string {
+	return config.BasePath
+}
+
+func (config Config) GetIgnoreWorkspace() bool {
+	return config.IgnoreWorkspace
+}
+
+// FromAny extracts a Config from an any value (typically from command.Utility.GetConfigAny()).
+// Panics if the value is not a *Config.
+func FromAny(v any) Config {
+	return *v.(*Config)
+}

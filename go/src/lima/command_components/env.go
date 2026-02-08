@@ -1,6 +1,7 @@
 package command_components
 
 import (
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
@@ -20,16 +21,18 @@ func (cmd *Env) MakeEnvWithOptions(
 	req command.Request,
 	options env_ui.Options,
 ) env_local.Env {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	layout := env_dir.MakeDefault(
 		req,
 		env_dir.XDGUtilityNameDodder,
-		req.Utility.GetConfigDodder().Debug,
+		config.Debug,
 	)
 
 	return env_local.Make(
 		env_ui.Make(
 			req,
-			req.Utility.GetConfigDodder(),
+			config,
+			config.Debug,
 			options,
 		),
 		layout,
@@ -41,16 +44,17 @@ func (cmd *Env) MakeEnvWithXDGLayoutAndOptions(
 	xdgDotenvPath string,
 	options env_ui.Options,
 ) env_local.Env {
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	dir := env_dir.MakeFromXDGDotenvPath(
 		req,
-		req.Utility.GetName(),
-		req.Utility.GetConfigDodder(),
+		config.Debug,
 		xdgDotenvPath,
 	)
 
 	ui := env_ui.Make(
 		req,
-		req.Utility.GetConfigDodder(),
+		config,
+		config.Debug,
 		options,
 	)
 

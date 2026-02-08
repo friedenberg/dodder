@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/cli"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/repo_blobs"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
@@ -132,18 +133,20 @@ func (cmd Remote) MakeRemoteFromBlob(
 ) (remote repo.Repo) {
 	env := cmd.MakeEnv(req)
 
+	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
 	// TODO use cmd.RemoteConnectionType to determine connection type
 	switch blob := blob.(type) {
 	case repo_blobs.BlobXDG:
 		envDir := env_dir.MakeWithXDG(
 			req,
-			req.Utility.GetConfigDodder().Debug,
+			config.Debug,
 			blob.MakeXDG(req.Utility.GetName()),
 		)
 
 		envUI := env_ui.Make(
 			req,
-			req.Utility.GetConfigDodder(),
+			config,
+			config.Debug,
 			env.GetOptions(),
 		)
 
@@ -157,7 +160,7 @@ func (cmd Remote) MakeRemoteFromBlob(
 			req,
 			blob.GetOverridePath(),
 			req.Utility.GetName(),
-			req.Utility.GetConfigDodder().Debug,
+			config.Debug,
 		)
 
 		envUIOptions := env.GetOptions()
@@ -165,7 +168,8 @@ func (cmd Remote) MakeRemoteFromBlob(
 
 		envUI := env_ui.Make(
 			req,
-			req.Utility.GetConfigDodder(),
+			config,
+			config.Debug,
 			env.GetOptions(),
 		)
 
