@@ -202,8 +202,8 @@ func TestQuery(t1 *testing.T) {
 		t.Run(
 			testCase,
 			func(t *ui.T) {
-				sut := (&Builder{}).WithDefaultGenres(
-					testCase.defaultGenre,
+				sut := (&Builder{}).WithOptions(
+					BuilderOptionDefaultGenres(testCase.defaultGenre.Slice()...),
 				)
 
 				m, err := sut.BuildQueryGroup(testCase.inputs...)

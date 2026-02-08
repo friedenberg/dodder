@@ -2,6 +2,7 @@ package queries
 
 import (
 	"code.linenisgreat.com/dodder/go/src/echo/genres"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
 	"code.linenisgreat.com/dodder/go/src/india/workspace_config_blobs"
@@ -118,7 +119,7 @@ func BuilderOptionPermittedSigil(sigil ids.Sigil) builderOptionPermittedSigil {
 }
 
 func (option builderOptionPermittedSigil) Apply(builder *Builder) *Builder {
-	builder.WithPermittedSigil(ids.Sigil(option))
+	builder.options.permittedSigil.Add(ids.Sigil(option))
 	return builder
 }
 
@@ -129,7 +130,7 @@ func BuilderOptionRequireNonEmptyQuery() builderOptionRequireNonEmptyQuery {
 }
 
 func (option builderOptionRequireNonEmptyQuery) Apply(builder *Builder) *Builder {
-	builder.WithRequireNonEmptyQuery()
+	builder.requireNonEmptyQuery = true
 	return builder
 }
 
@@ -142,6 +143,65 @@ func BuilderOptionHidden(hidden sku.Query) builderOptionHidden {
 }
 
 func (option builderOptionHidden) Apply(builder *Builder) *Builder {
-	builder.WithHidden(option.hidden)
+	builder.hidden = option.hidden
+	return builder
+}
+
+type builderOptionDoNotMatchEmpty struct{}
+
+func BuilderOptionDoNotMatchEmpty() builderOptionDoNotMatchEmpty {
+	return builderOptionDoNotMatchEmpty{}
+}
+
+func (option builderOptionDoNotMatchEmpty) Apply(builder *Builder) *Builder {
+	builder.doNotMatchEmpty = true
+	return builder
+}
+
+type builderOptionDebug struct{}
+
+func BuilderOptionDebug() builderOptionDebug {
+	return builderOptionDebug{}
+}
+
+func (option builderOptionDebug) Apply(builder *Builder) *Builder {
+	builder.debug = true
+	return builder
+}
+
+type builderOptionRepoId ids.RepoId
+
+func BuilderOptionRepoId(repoId ids.RepoId) builderOptionRepoId {
+	return builderOptionRepoId(repoId)
+}
+
+func (option builderOptionRepoId) Apply(builder *Builder) *Builder {
+	builder.repoId = ids.RepoId(option)
+	return builder
+}
+
+type builderOptionFileExtensions struct {
+	fileExtensions file_extensions.Config
+}
+
+func BuilderOptionFileExtensions(config file_extensions.Config) builderOptionFileExtensions {
+	return builderOptionFileExtensions{fileExtensions: config}
+}
+
+func (option builderOptionFileExtensions) Apply(builder *Builder) *Builder {
+	builder.fileExtensions = option.fileExtensions
+	return builder
+}
+
+type builderOptionExpanders struct {
+	expanders ids.Abbr
+}
+
+func BuilderOptionExpanders(expanders ids.Abbr) builderOptionExpanders {
+	return builderOptionExpanders{expanders: expanders}
+}
+
+func (option builderOptionExpanders) Apply(builder *Builder) *Builder {
+	builder.expanders = option.expanders
 	return builder
 }

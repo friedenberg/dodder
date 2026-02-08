@@ -189,8 +189,9 @@ func (local *Repo) initialize(
 		local.envWorkspace,
 		local.sunrise,
 		local.envLua,
-		local.makeQueryBuilder().
-			WithDefaultGenres(ids.MakeGenre(genres.All()...)),
+		local.makeQueryBuilder().WithOptions(
+			queries.BuilderOptionDefaultGenres(genres.All()...),
+		),
 		boxFormatArchive,
 		local.typedBlobStore,
 		&local.dormantIndex,

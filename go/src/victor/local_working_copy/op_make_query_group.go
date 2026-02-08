@@ -54,13 +54,16 @@ func (local *Repo) MakeQueryBuilderExcludingHidden(
 		queries.BuilderOptionWorkspace(local),
 	)
 
-	return local.makeQueryBuilder().
-		WithDefaultGenres(genre).
-		WithRepoId(ids.RepoId{}).
-		WithFileExtensions(local.GetConfig().GetFileExtensions()).
-		WithExpanders(local.GetStore().GetAbbrStore().GetAbbr()).
-		WithHidden(local.GetMatcherDormant()).
-		WithOptions(options)
+	return local.makeQueryBuilder().WithOptions(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultGenres(genre.Slice()...),
+			queries.BuilderOptionRepoId(ids.RepoId{}),
+			queries.BuilderOptionFileExtensions(local.GetConfig().GetFileExtensions()),
+			queries.BuilderOptionExpanders(local.GetStore().GetAbbrStore().GetAbbr()),
+			queries.BuilderOptionHidden(local.GetMatcherDormant()),
+			options,
+		),
+	)
 }
 
 func (local *Repo) MakeQueryBuilder(
@@ -76,10 +79,13 @@ func (local *Repo) MakeQueryBuilder(
 		queries.BuilderOptionWorkspace(local),
 	)
 
-	return local.makeQueryBuilder().
-		WithDefaultGenres(genress).
-		WithRepoId(ids.RepoId{}).
-		WithFileExtensions(local.GetConfig().GetFileExtensions()).
-		WithExpanders(local.GetStore().GetAbbrStore().GetAbbr()).
-		WithOptions(options)
+	return local.makeQueryBuilder().WithOptions(
+		queries.BuilderOptions(
+			queries.BuilderOptionDefaultGenres(genress.Slice()...),
+			queries.BuilderOptionRepoId(ids.RepoId{}),
+			queries.BuilderOptionFileExtensions(local.GetConfig().GetFileExtensions()),
+			queries.BuilderOptionExpanders(local.GetStore().GetAbbrStore().GetAbbr()),
+			options,
+		),
+	)
 }

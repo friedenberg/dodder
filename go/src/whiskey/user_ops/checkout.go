@@ -51,7 +51,7 @@ func (op Checkout) RunWithRepoId(
 	).WithTransacted(
 		transactedObjects,
 		ids.SigilExternal,
-	).WithRequireNonEmptyQuery()
+	).WithOptions(queries.BuilderOptionRequireNonEmptyQuery())
 
 	var query *queries.Query
 
@@ -200,7 +200,10 @@ func (op Checkout) runOrganize(
 	).WithTransacted(
 		changeResults.After.AsTransactedSet(),
 		ids.SigilExternal,
-	).WithDoNotMatchEmpty().WithRequireNonEmptyQuery()
+	).WithOptions(queries.BuilderOptions(
+		queries.BuilderOptionDoNotMatchEmpty(),
+		queries.BuilderOptionRequireNonEmptyQuery(),
+	))
 
 	if qgModified, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
