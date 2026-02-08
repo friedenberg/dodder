@@ -9,11 +9,11 @@
       },
       "locked": {
         "dir": "pkgs/alfa/devenv-go",
-        "lastModified": 1770565714,
-        "narHash": "sha256-X/o79rxS/hriWhe6uMKWTlUe7oOE11ovdzlSyRi7AgY=",
+        "lastModified": 1770566084,
+        "narHash": "sha256-M9P+efk+iO5UdQE7xGWIIt+HoWviDxhVVisFoekN7vQ=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "ed817647d656b1812422cc7016ff78a8ad6e5b3e",
+        "rev": "dc943822b823a0ba7d35bd705177f6b7ceea8782",
         "type": "github"
       },
       "original": {
@@ -31,11 +31,11 @@
       },
       "locked": {
         "dir": "pkgs/alfa/devenv-shell",
-        "lastModified": 1770565714,
-        "narHash": "sha256-X/o79rxS/hriWhe6uMKWTlUe7oOE11ovdzlSyRi7AgY=",
+        "lastModified": 1770566084,
+        "narHash": "sha256-M9P+efk+iO5UdQE7xGWIIt+HoWviDxhVVisFoekN7vQ=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "ed817647d656b1812422cc7016ff78a8ad6e5b3e",
+        "rev": "dc943822b823a0ba7d35bd705177f6b7ceea8782",
         "type": "github"
       },
       "original": {

@@ -34,7 +34,10 @@
       "Bash(go list:*)",
       "Bash(awk:*)",
       "Bash(./bin/list_deps)",
-      "Bash(./bin/sort_packages)"
+      "Bash(./bin/sort_packages)",
+      "mcp__nix__lsp_document_symbols",
+      "mcp__nix__lsp_hover",
+      "mcp__nix__lsp_workspace_symbols"
     ],
     "deny": []
   },
