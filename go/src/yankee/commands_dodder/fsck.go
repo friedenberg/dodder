@@ -1,6 +1,7 @@
 package commands_dodder
 
 import (
+	"io"
 	"sync/atomic"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
 	"code.linenisgreat.com/dodder/go/src/india/object_fmt_digest"
+	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/kilo/sku"
 	"code.linenisgreat.com/dodder/go/src/lima/object_finalizer"
@@ -29,7 +31,7 @@ func init() {
 	)
 }
 
-// TODO add options to verify blobs, type formats, tags
+// TODO add options to verify type formats, tags
 // TODO add option to count duplicate objects according to a list of object
 // digest formats
 type Fsck struct {
@@ -42,6 +44,7 @@ type Fsck struct {
 	VerifyOptions object_finalizer.VerifyOptions
 	Duplicates    object_fmt_digest.CLIFlag
 	SkipProbes    bool
+	SkipBlobs     bool
 }
 
 var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
@@ -68,6 +71,13 @@ func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 		"skip-probes",
 		false,
 		"skip verification of probe index entries",
+	)
+
+	flagSet.BoolVar(
+		&cmd.SkipBlobs,
+		"skip-blobs",
+		false,
+		"skip verification of blob contents",
 	)
 
 	cmd.Duplicates.SetFlagDefinitions(flagSet)
@@ -171,6 +181,25 @@ func (cmd Fsck) runVerification(
 								object: object.CloneTransacted(),
 							},
 						)
+					}
+				}
+
+				if !cmd.SkipBlobs {
+					blobDigest := object.GetBlobDigest()
+					if !blobDigest.IsNull() {
+						if err := blob_stores.VerifyBlob(
+							repo,
+							repo.GetEnvRepo().GetDefaultBlobStore(),
+							blobDigest,
+							io.Discard,
+						); err != nil {
+							objectErrors.Append(
+								objectError{
+									err:    errors.Wrapf(err, "blob verification failed"),
+									object: object.CloneTransacted(),
+								},
+							)
+						}
 					}
 				}
 

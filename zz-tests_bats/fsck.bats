@@ -99,3 +99,56 @@ function fsck_from_version_skip_probes { # @test
 	assert_output --partial "verification complete"
 	assert_output --partial "objects with errors: 0"
 }
+
+function fsck_skip_blobs { # @test
+	run_dodder_init_disable_age
+
+	f=test.md
+	{
+		echo "test content"
+	} >"$f"
+
+	run_dodder add -delete "$f"
+	assert_success
+
+	run_dodder fsck -skip-blobs
+	assert_success
+	assert_output --partial "verification complete"
+	assert_output --partial "objects with errors: 0"
+}
+
+function fsck_blob_verification { # @test
+	run_dodder_init_disable_age
+
+	f=test.md
+	{
+		echo "test content for blob verification"
+	} >"$f"
+
+	run_dodder add -delete "$f"
+	assert_success
+
+	# Verify blobs are checked (default behavior)
+	run_dodder fsck
+	assert_success
+	assert_output --partial "verification complete"
+	assert_output --partial "objects with errors: 0"
+}
+
+function fsck_from_version_with_blobs { # @test
+	copy_from_version "$DIR"
+
+	run_dodder fsck
+	assert_success
+	assert_output --partial "verification complete"
+	assert_output --partial "objects with errors: 0"
+}
+
+function fsck_from_version_skip_blobs { # @test
+	copy_from_version "$DIR"
+
+	run_dodder fsck -skip-blobs
+	assert_success
+	assert_output --partial "verification complete"
+	assert_output --partial "objects with errors: 0"
+}
