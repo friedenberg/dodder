@@ -2,12 +2,12 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/fd"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata_fmt_triple_hyphen"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

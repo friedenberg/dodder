@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/india/workspace_config_blobs"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/hotel/workspace_config_blobs"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

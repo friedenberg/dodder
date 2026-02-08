@@ -6,10 +6,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
-	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/hotel/id_fmts"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/box_format"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/fd"
+	"code.linenisgreat.com/dodder/go/src/golf/id_fmts"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
 )
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut

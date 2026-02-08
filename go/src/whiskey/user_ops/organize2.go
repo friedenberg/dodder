@@ -8,10 +8,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/vim_cli_options_builder"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/file_extensions"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/papa/organize_text"
+	"code.linenisgreat.com/dodder/go/src/delta/file_extensions"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/oscar/organize_text"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

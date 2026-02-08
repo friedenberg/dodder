@@ -2,9 +2,9 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/objects"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
+	"code.linenisgreat.com/dodder/go/src/golf/objects"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
 )
 
 type ParentNegotiatorFirstAncestor struct {

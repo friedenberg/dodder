@@ -1,9 +1,9 @@
 package commands_dodder
 
 import (
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/mike/commands_madder"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/lima/commands_madder"
 )
 
 var utility = command.MakeUtility(

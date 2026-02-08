@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/charlie/comments"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/log_remote_inventory_lists"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/log_remote_inventory_lists"
 )
 
 func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {

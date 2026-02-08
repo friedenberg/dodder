@@ -10,13 +10,13 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
-	"code.linenisgreat.com/dodder/go/src/delta/ohio"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/log_remote_inventory_lists"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/log_remote_inventory_lists"
 )
 
 func (server *Server) writeInventoryList(

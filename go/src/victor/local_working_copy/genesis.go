@@ -4,12 +4,12 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/hotel/repo_configs"
-	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/type_blobs"
 )
 
 func Genesis(

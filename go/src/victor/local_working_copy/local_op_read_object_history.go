@@ -2,8 +2,8 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 func (local *Repo) ReadObjectHistory(

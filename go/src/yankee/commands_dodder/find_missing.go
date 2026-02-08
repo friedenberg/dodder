@@ -1,8 +1,8 @@
 package commands_dodder
 
 import (
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

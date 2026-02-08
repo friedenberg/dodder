@@ -2,7 +2,7 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
 )
 
 type RemoteTransfer struct {

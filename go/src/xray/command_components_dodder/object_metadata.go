@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/hotel/objects"
+	"code.linenisgreat.com/dodder/go/src/golf/objects"
 )
 
 type ObjectMetadata struct{}

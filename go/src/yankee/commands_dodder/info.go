@@ -8,13 +8,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/india/env_dir"
-	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/golf/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
+	"code.linenisgreat.com/dodder/go/src/hotel/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
 )
 
 type Info struct{}

@@ -4,7 +4,7 @@ package commands_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

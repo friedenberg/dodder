@@ -5,12 +5,12 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/format"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/sku_lua"
-	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
-	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_lua"
+	"code.linenisgreat.com/dodder/go/src/lima/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/mike/sku_fmt"
 )
 
 type (

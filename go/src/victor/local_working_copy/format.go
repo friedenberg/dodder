@@ -11,21 +11,21 @@ import (
 
 	"code.linenisgreat.com/chrest/go/src/bravo/client"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/dodder/go/src/bravo/expansion"
+	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
+	"code.linenisgreat.com/dodder/go/src/charlie/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/sku_json_fmt"
-	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
-	"code.linenisgreat.com/dodder/go/src/november/typed_blob_store"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
+	"code.linenisgreat.com/dodder/go/src/mike/sku_fmt"
+	"code.linenisgreat.com/dodder/go/src/mike/typed_blob_store"
 )
 
 type (

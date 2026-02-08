@@ -3,13 +3,13 @@ package command_components_dodder
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/hotel/objects"
-	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/november/sku_fmt"
-	pkg_query "code.linenisgreat.com/dodder/go/src/oscar/queries"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
+	"code.linenisgreat.com/dodder/go/src/golf/objects"
+	"code.linenisgreat.com/dodder/go/src/india/env_local"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/mike/sku_fmt"
+	pkg_query "code.linenisgreat.com/dodder/go/src/november/queries"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

@@ -15,13 +15,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/mcp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/delta/ohio"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/sku_json_fmt"
-	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
+	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/sku_json_fmt"
+	"code.linenisgreat.com/dodder/go/src/lima/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
 )
 
 func (server *Server) handleMCP(request Request) (response Response) {

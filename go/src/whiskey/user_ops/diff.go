@@ -10,13 +10,13 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/charlie/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
-	"code.linenisgreat.com/dodder/go/src/golf/fd"
-	"code.linenisgreat.com/dodder/go/src/juliett/object_metadata_fmt_triple_hyphen"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/quebec/store_fs"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/fd"
+	"code.linenisgreat.com/dodder/go/src/india/object_metadata_fmt_triple_hyphen"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/papa/store_fs"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

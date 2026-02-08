@@ -2,10 +2,10 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/lima/command_components"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/india/env_local"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/command_components"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

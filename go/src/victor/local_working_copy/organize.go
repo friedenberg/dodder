@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
-	"code.linenisgreat.com/dodder/go/src/papa/organize_text"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
+	"code.linenisgreat.com/dodder/go/src/oscar/organize_text"
 )
 
 func (local *Repo) MakeOrganizeOptionsWithOrganizeMetadata(

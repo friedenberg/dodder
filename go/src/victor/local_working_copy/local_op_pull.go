@@ -3,10 +3,10 @@ package local_working_copy
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
-	"code.linenisgreat.com/dodder/go/src/tango/remote_transfer"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
+	"code.linenisgreat.com/dodder/go/src/uniform/remote_transfer"
 )
 
 func (local *Repo) PullQueryGroupFromRemote(

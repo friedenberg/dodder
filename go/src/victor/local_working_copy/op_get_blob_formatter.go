@@ -8,9 +8,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
-	"code.linenisgreat.com/dodder/go/src/hotel/objects"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/mike/type_blobs"
+	"code.linenisgreat.com/dodder/go/src/golf/objects"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/lima/type_blobs"
 )
 
 // TODO add support for checked out types

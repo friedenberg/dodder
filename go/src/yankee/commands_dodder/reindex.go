@@ -2,8 +2,8 @@ package commands_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )

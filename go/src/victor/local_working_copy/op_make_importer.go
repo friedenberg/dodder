@@ -1,9 +1,9 @@
 package local_working_copy
 
 import (
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
-	"code.linenisgreat.com/dodder/go/src/tango/remote_transfer"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
+	"code.linenisgreat.com/dodder/go/src/uniform/remote_transfer"
 )
 
 func (local *Repo) MakeImporter(

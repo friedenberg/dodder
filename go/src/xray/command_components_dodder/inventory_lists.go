@@ -8,10 +8,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/charlie/options_print"
-	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/box_format"
-	"code.linenisgreat.com/dodder/go/src/mike/inventory_list_coders"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/box_format"
+	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_coders"
 )
 
 type InventoryLists struct{}

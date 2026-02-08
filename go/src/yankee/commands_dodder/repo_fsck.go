@@ -3,11 +3,11 @@ package commands_dodder
 import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/india/env_dir"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )

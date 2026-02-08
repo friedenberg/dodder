@@ -8,10 +8,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
-	"code.linenisgreat.com/dodder/go/src/golf/repo_config_cli"
-	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/lima/command_components"
+	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
+	"code.linenisgreat.com/dodder/go/src/india/env_local"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/command_components"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

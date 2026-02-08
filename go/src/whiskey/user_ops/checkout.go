@@ -7,11 +7,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
-	"code.linenisgreat.com/dodder/go/src/papa/organize_text"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
+	"code.linenisgreat.com/dodder/go/src/oscar/organize_text"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

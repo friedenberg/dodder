@@ -3,14 +3,14 @@ package commands_dodder
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/echo/genres"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
-	"code.linenisgreat.com/dodder/go/src/india/env_dir"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
+	"code.linenisgreat.com/dodder/go/src/charlie/genres"
+	"code.linenisgreat.com/dodder/go/src/echo/ids"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/kilo/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

@@ -2,8 +2,8 @@ package local_working_copy
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
-	"code.linenisgreat.com/dodder/go/src/sierra/repo"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
+	"code.linenisgreat.com/dodder/go/src/tango/repo"
 )
 
 func (local *Repo) ImportSeq(

@@ -6,10 +6,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
-	"code.linenisgreat.com/dodder/go/src/india/genesis_configs"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
+	"code.linenisgreat.com/dodder/go/src/golf/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/hotel/genesis_configs"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/kilo/command_components_madder"
 	"code.linenisgreat.com/dodder/go/src/xray/command_components_dodder"
 )
 

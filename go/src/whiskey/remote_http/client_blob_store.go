@@ -12,10 +12,10 @@ import (
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/markl"
-	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
-	"code.linenisgreat.com/dodder/go/src/india/env_dir"
-	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
+	"code.linenisgreat.com/dodder/go/src/echo/markl"
+	"code.linenisgreat.com/dodder/go/src/golf/blob_store_configs"
+	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
+	"code.linenisgreat.com/dodder/go/src/india/blob_stores"
 )
 
 func (client *client) GetBlobStore() blob_stores.BlobStoreInitialized {

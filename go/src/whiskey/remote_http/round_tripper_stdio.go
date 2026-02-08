@@ -11,9 +11,9 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/delim_io"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
-	"code.linenisgreat.com/dodder/go/src/kilo/env_repo"
-	"code.linenisgreat.com/dodder/go/src/sierra/store_config"
+	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
+	"code.linenisgreat.com/dodder/go/src/romeo/store_config"
 )
 
 type RoundTripperStdio struct {

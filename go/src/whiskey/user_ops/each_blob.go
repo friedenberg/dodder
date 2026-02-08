@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/kilo/sku"
+	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 	"github.com/google/shlex"
 )

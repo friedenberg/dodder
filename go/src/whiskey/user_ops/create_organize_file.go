@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/papa/organize_text"
+	"code.linenisgreat.com/dodder/go/src/oscar/organize_text"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 

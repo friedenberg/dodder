@@ -2,8 +2,8 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/kilo/command"
-	"code.linenisgreat.com/dodder/go/src/oscar/queries"
+	"code.linenisgreat.com/dodder/go/src/juliett/command"
+	"code.linenisgreat.com/dodder/go/src/november/queries"
 	"code.linenisgreat.com/dodder/go/src/victor/local_working_copy"
 )
 
