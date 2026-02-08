@@ -6,11 +6,14 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/script_value"
-	"code.linenisgreat.com/dodder/go/src/hotel/env_ui"
+	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
 	"code.linenisgreat.com/dodder/go/src/india/env_dir"
+	"code.linenisgreat.com/dodder/go/src/juliett/blob_stores"
+	"code.linenisgreat.com/dodder/go/src/juliett/env_local"
 	"code.linenisgreat.com/dodder/go/src/kilo/command"
 	"code.linenisgreat.com/dodder/go/src/lima/command_components_madder"
 )
@@ -20,6 +23,7 @@ func init() {
 }
 
 type Write struct {
+	command_components_madder.EnvBlobStore
 	command_components_madder.BlobStoreLocal
 
 	Check         bool
@@ -28,6 +32,25 @@ type Write struct {
 }
 
 var _ interfaces.CommandComponentWriter = (*Write)(nil)
+
+func (cmd Write) Complete(
+	req command.Request,
+	envLocal env_local.Env,
+	commandLine command.CommandLineInput,
+) {
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStores := envBlobStore.GetBlobStores()
+
+	// args := commandLine.FlagsOrArgs[1:]
+
+	// if commandLine.InProgress != "" {
+	// 	args = args[:len(args)-1]
+	// }
+
+	for id, blobStore := range blobStores {
+		envLocal.GetOut().Printf("%s\t%s", id, blobStore.GetBlobStoreDescription())
+	}
+}
 
 func (cmd *Write) SetFlagDefinitions(
 	flagSet interfaces.CLIFlagDefinitions,
@@ -51,19 +74,17 @@ type blobWriteResult struct {
 
 // TODO add support for blob store ids
 func (cmd Write) Run(req command.Request) {
-	blobStore := cmd.MakeBlobStoreLocal(
-		req,
-		req.Utility.GetConfigDodder(),
-		env_ui.Options{},
-	)
+	envBlobStore := cmd.MakeEnvBlobStore(req)
+	blobStore := envBlobStore.GetDefaultBlobStore()
 
 	var failCount atomic.Uint32
+	var blobStoreId blob_store_id.Id
 
 	sawStdin := false
 
 	for _, arg := range req.PopArgs() {
 		switch {
-		case sawStdin:
+		case arg == "-" && sawStdin:
 			ui.Err().Print("'-' passed in more than once. Ignoring")
 			continue
 
@@ -73,15 +94,34 @@ func (cmd Write) Run(req command.Request) {
 
 		result := blobWriteResult{Path: arg}
 
-		result.MarklId, result.error = cmd.doOne(blobStore, arg)
+		var blobReader interfaces.BlobReader
 
-		if result.IsNull() {
-			ui.Err().Printf("digest for arg %q was null", arg)
-			continue
+		{
+			var err error
+
+			if blobReader, err = env_dir.NewFileReaderOrErrNotExist(
+				env_dir.DefaultConfig,
+				arg,
+			); errors.IsNotExist(err) {
+				if err = blobStoreId.Set(arg); err != nil {
+					req.Cancel(err)
+					return
+				}
+
+				blobStore = envBlobStore.GetBlobStore(blobStoreId)
+				ui.Debug().Printf("remote path: %q", blobStore.Config.Blob.(blob_store_configs.ConfigSFTPRemotePath).GetRemotePath())
+				continue
+			} else if err != nil {
+				failCount.Add(1)
+				result.error = err
+				continue
+			}
 		}
 
+		result.MarklId, result.error = cmd.doOne(blobStore, blobReader)
+
 		if result.error != nil {
-			blobStore.GetErr().Printf(
+			envBlobStore.GetErr().Printf(
 				"%s: (error: %q)",
 				result.Path,
 				result.error,
@@ -90,17 +130,22 @@ func (cmd Write) Run(req command.Request) {
 			continue
 		}
 
+		if result.IsNull() {
+			ui.Err().Printf("digest for arg %q was null", arg)
+			continue
+		}
+
 		hasBlob := blobStore.HasBlob(result.MarklId)
 
 		if hasBlob {
 			if cmd.Check {
-				blobStore.GetUI().Printf(
+				envBlobStore.GetUI().Printf(
 					"%s %s (already checked in)",
 					result.MarklId,
 					result.Path,
 				)
 			} else {
-				blobStore.GetUI().Printf(
+				envBlobStore.GetUI().Printf(
 					"%s %s (checked in)",
 					result.MarklId,
 					result.Path,
@@ -123,7 +168,7 @@ func (cmd Write) Run(req command.Request) {
 
 	if fc > 0 {
 		errors.ContextCancelWithBadRequestf(
-			blobStore,
+			req,
 			"untracked objects: %d",
 			fc,
 		)
@@ -133,19 +178,9 @@ func (cmd Write) Run(req command.Request) {
 
 // TODO rewrite to just return blobWriteResult
 func (cmd Write) doOne(
-	blobStore command_components_madder.BlobStoreWithEnv,
-	path string,
+	blobStore blob_stores.BlobStoreInitialized,
+	blobReader interfaces.BlobReader,
 ) (blobId interfaces.MarklId, err error) {
-	var blobReader interfaces.BlobReader
-
-	if blobReader, err = env_dir.NewFileReaderOrErrNotExist(
-		env_dir.DefaultConfig,
-		path,
-	); err != nil {
-		err = errors.Wrap(err)
-		return blobId, err
-	}
-
 	defer errors.DeferredCloser(&err, blobReader)
 
 	var writeCloser interfaces.BlobWriter

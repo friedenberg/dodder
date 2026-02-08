@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_slice"
 )
 
+// TODO complete merging Args, consumed and FlagsOrArgs for use by Run/Complete
 type CommandLineInput struct {
 	FlagsOrArgs          collections_slice.String
 	InProgress           string

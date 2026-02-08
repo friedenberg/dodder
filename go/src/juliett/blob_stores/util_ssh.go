@@ -13,6 +13,33 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 )
 
+func MakeSSHAgent(
+	ctx interfaces.ActiveContext,
+	uiPrinter ui.Printer,
+) (sshAgent agent.ExtendedAgent, err error) {
+	socket := os.Getenv("SSH_AUTH_SOCK")
+
+	if socket == "" {
+		err = errors.Errorf("SSH_AUTH_SOCK empty or unset")
+		return
+	}
+
+	var connSshSock net.Conn
+
+	ui.Log().Print("connecting to SSH_AUTH_SOCK: %s", socket)
+	if connSshSock, err = net.Dial("unix", socket); err != nil {
+		err = errors.Wrapf(err, "failed to connect to SSH_AUTH_SOCK")
+		return
+	}
+
+	ctx.After(errors.MakeFuncContextFromFuncErr(connSshSock.Close))
+
+	ui.Log().Print("creating ssh-agent client")
+	sshAgent = agent.NewClient(connSshSock)
+
+	return
+}
+
 // TODO refactor `blob_store_configs.ConfigSFTP` for ssh-client-specific methods
 func MakeSSHClientForExplicitConfig(
 	ctx interfaces.ActiveContext,
@@ -43,8 +70,16 @@ func MakeSSHClientForExplicitConfig(
 	} else if config.GetPassword() != "" {
 		clientConfig.Auth = []ssh.AuthMethod{ssh.Password(config.GetPassword())}
 	} else {
-		err = errors.Errorf("no authentication method configured")
-		return sshClient, err
+		var clientAgent agent.ExtendedAgent
+
+		if clientAgent, err = MakeSSHAgent(ctx, uiPrinter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		clientConfig.Auth = []ssh.AuthMethod{
+			ssh.PublicKeysCallback(clientAgent.Signers),
+		}
 	}
 
 	addr := fmt.Sprintf(
@@ -66,25 +101,12 @@ func MakeSSHClientFromSSHConfig(
 	uiPrinter ui.Printer,
 	config blob_store_configs.ConfigSFTPUri,
 ) (sshClient *ssh.Client, err error) {
-	socket := os.Getenv("SSH_AUTH_SOCK")
+	var clientAgent agent.ExtendedAgent
 
-	if socket == "" {
-		err = errors.Errorf("SSH_AUTH_SOCK empty or unset")
-		return sshClient, err
+	if clientAgent, err = MakeSSHAgent(ctx, uiPrinter); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	var connSshSock net.Conn
-
-	ui.Log().Print("connecting to SSH_AUTH_SOCK: %s", socket)
-	if connSshSock, err = net.Dial("unix", socket); err != nil {
-		err = errors.Wrapf(err, "failed to connect to SSH_AUTH_SOCK")
-		return sshClient, err
-	}
-
-	ctx.After(errors.MakeFuncContextFromFuncErr(connSshSock.Close))
-
-	ui.Log().Print("creating ssh-agent client")
-	clientAgent := agent.NewClient(connSshSock)
 
 	uri := config.GetUri()
 	url := uri.GetUrl()

@@ -99,3 +99,58 @@ func (index *probeIndex) saveOneObjectLoc(
 
 	return err
 }
+
+func (index *Index) VerifyObjectProbes(
+	object *sku.Transacted,
+) (err error) {
+	for probeId := range object.AllProbeIds(
+		index.probeIndex.index.GetHashType(),
+		index.probeIndex.defaultObjectDigestMarklFormatId,
+	) {
+		if probeId.Id.IsNull() {
+			continue
+		}
+
+		loc, err := index.probeIndex.readOneMarklIdLoc(probeId.Id)
+		if err != nil {
+			return errors.Wrapf(err, "probe %q not found in index", probeId.Key)
+		}
+
+		checkObject := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(checkObject)
+
+		if !index.readOneLoc(loc, checkObject) {
+			return errors.Errorf("probe %q location invalid", probeId.Key)
+		}
+
+		// Only verify exact object match for unique probes.
+		// The "objectId" probe points to the latest version, so historical
+		// objects will not match. The "objectId+tai" probe is unique per
+		// object+timestamp and should match exactly.
+		if probeId.Key == "objectId" {
+			// For objectId probe, just verify it points to the same object ID
+			// (may be a different/newer TAI for historical objects)
+			if checkObject.GetObjectId().String() != object.GetObjectId().String() {
+				return errors.Errorf(
+					"probe %q points to wrong object id: expected %s, got %s",
+					probeId.Key,
+					object.GetObjectId(),
+					checkObject.GetObjectId(),
+				)
+			}
+		} else {
+			// For all other probes, verify exact match
+			if checkObject.GetObjectId().String() != object.GetObjectId().String() ||
+				checkObject.GetTai().String() != object.GetTai().String() {
+				return errors.Errorf(
+					"probe %q points to wrong object: expected %s@%s, got %s@%s",
+					probeId.Key,
+					object.GetObjectId(), object.GetTai(),
+					checkObject.GetObjectId(), checkObject.GetTai(),
+				)
+			}
+		}
+	}
+
+	return err
+}

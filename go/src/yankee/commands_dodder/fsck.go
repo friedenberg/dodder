@@ -41,6 +41,7 @@ type Fsck struct {
 
 	VerifyOptions object_finalizer.VerifyOptions
 	Duplicates    object_fmt_digest.CLIFlag
+	SkipProbes    bool
 }
 
 var _ interfaces.CommandComponentWriter = (*Fsck)(nil)
@@ -60,6 +61,13 @@ func (cmd *Fsck) SetFlagDefinitions(flagSet interfaces.CLIFlagDefinitions) {
 		"object-sig-required",
 		true,
 		"require the object signature when validating",
+	)
+
+	flagSet.BoolVar(
+		&cmd.SkipProbes,
+		"skip-probes",
+		false,
+		"skip verification of probe index entries",
 	)
 
 	cmd.Duplicates.SetFlagDefinitions(flagSet)
@@ -151,6 +159,19 @@ func (cmd Fsck) runVerification(
 							object: object.CloneTransacted(),
 						},
 					)
+				}
+
+				if !cmd.SkipProbes {
+					if err := repo.GetStore().GetStreamIndex().VerifyObjectProbes(
+						object,
+					); err != nil {
+						objectErrors.Append(
+							objectError{
+								err:    err,
+								object: object.CloneTransacted(),
+							},
+						)
+					}
 				}
 
 				count.Add(1)

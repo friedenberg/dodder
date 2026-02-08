@@ -25,7 +25,7 @@ func (cmd CatIds) Complete(
 	commandLine command.CommandLineInput,
 ) {
 	envBlobStore := cmd.MakeEnvBlobStore(req)
-	blobStores := cmd.MakeBlobStoresFromIdsOrAll(req, envBlobStore)
+	blobStores := envBlobStore.GetBlobStores()
 
 	// args := commandLine.FlagsOrArgs[1:]
 

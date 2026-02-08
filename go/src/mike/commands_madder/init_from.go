@@ -3,7 +3,7 @@ package commands_madder
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
-	"code.linenisgreat.com/dodder/go/src/foxtrot/ids"
+	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/golf/fd"
 	"code.linenisgreat.com/dodder/go/src/golf/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/hotel/blob_store_configs"
@@ -37,9 +37,9 @@ func (cmd InitFrom) Complete(
 }
 
 func (cmd *InitFrom) Run(req command.Request) {
-	var name ids.TagStruct
+	var blobStoreId blob_store_id.Id
 
-	if err := name.Set(req.PopArg("blob store name")); err != nil {
+	if err := blobStoreId.Set(req.PopArg("blob store name")); err != nil {
 		errors.ContextCancelWithBadRequestError(req, err)
 	}
 
@@ -80,7 +80,7 @@ func (cmd *InitFrom) Run(req command.Request) {
 	pathConfig := cmd.InitBlobStore(
 		req,
 		envBlobStore,
-		name.String(),
+		blobStoreId.String(),
 		&typedConfig,
 	)
 

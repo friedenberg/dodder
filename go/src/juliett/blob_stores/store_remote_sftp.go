@@ -377,8 +377,11 @@ func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
 	tempName := fmt.Sprintf("tmp_%x", tempNameBytes)
 	mover.tempPath = path.Join(mover.store.config.GetRemotePath(), tempName)
 
-	if mover.tempFile, err = mover.store.sftpClient.Create(mover.tempPath); err != nil {
-		err = errors.Wrap(err)
+	if mover.tempFile, err = mover.store.sftpClient.Create(
+		mover.tempPath,
+	); err != nil {
+		ui.Debug().Printf("unable to create temp file: %q", mover.tempPath)
+		err = errors.Wrapf(err, "unable to create temp file: %q", mover.tempPath)
 		return err
 	}
 
