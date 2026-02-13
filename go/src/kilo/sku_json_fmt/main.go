@@ -18,18 +18,20 @@ import (
 )
 
 type Transacted struct {
-	BlobId      string   `json:"blob-id"`
-	BlobString  string   `json:"blob-string,omitempty"`
-	Date        string   `json:"date"`
-	Description string   `json:"description"`
-	Lock        Lock     `json:"lock"`
-	ObjectId    string   `json:"object-id"`
-	RepoPubkey  markl.Id `json:"repo-pub_key"`
-	RepoSig     markl.Id `json:"repo-sig"`
-	Sha         string   `json:"sha"`
-	Tags        []string `json:"tags"`
-	Tai         string   `json:"tai"`
-	Type        string   `json:"type"`
+	BlobId         string   `json:"blob-id"`
+	BlobString     string   `json:"blob-string,omitempty"`
+	Date           string   `json:"date"`
+	Description    string   `json:"description"`
+	Lock           Lock     `json:"lock"`
+	MotherObjectSig markl.Id `json:"mother-object-sig"`
+	ObjectDigest   markl.Id `json:"object-digest"`
+	ObjectId       string   `json:"object-id"`
+	RepoPubkey     markl.Id `json:"repo-pub_key"`
+	RepoSig        markl.Id `json:"repo-sig"`
+	Sha            string   `json:"sha"`
+	Tags           []string `json:"tags"`
+	Tai            string   `json:"tai"`
+	Type           string   `json:"type"`
 }
 
 // TODO make a json factory
@@ -64,6 +66,8 @@ func (json *Transacted) FromObjectIdStringAndMetadata(
 	json.BlobId = metadata.GetBlobDigest().String()
 	json.Date = metadata.GetTai().Format(string_format_writer.StringFormatDateTime)
 	json.Description = metadata.GetDescription().String()
+	json.MotherObjectSig.ResetWithMarklId(metadata.GetMotherObjectSig())
+	json.ObjectDigest.ResetWithMarklId(metadata.GetObjectDigest())
 	json.ObjectId = objectId
 	json.RepoPubkey.ResetWithMarklId(metadata.GetRepoPubKey())
 	json.RepoSig.ResetWithMarklId(metadata.GetObjectSig())
@@ -160,6 +164,14 @@ func (json *Transacted) ToTransacted(
 
 	objects.SetTags(metadata, tagSet)
 	metadata.GenerateExpandedTags()
+
+	if !json.MotherObjectSig.IsNull() {
+		metadata.GetMotherObjectSigMutable().ResetWithMarklId(json.MotherObjectSig)
+	}
+
+	if !json.ObjectDigest.IsNull() {
+		metadata.GetObjectDigestMutable().ResetWithMarklId(json.ObjectDigest)
+	}
 
 	if !json.RepoPubkey.IsNull() {
 		metadata.GetRepoPubKeyMutable().ResetWithMarklId(json.RepoPubkey)
