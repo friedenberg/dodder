@@ -35,11 +35,6 @@ func (cmd Info) SetFlagDefinitions(
 
 func (cmd Info) Run(req command.Request) {
 	config := repo_config_cli.FromAny(req.Utility.GetConfigAny())
-	dir := env_dir.MakeDefault(
-		req,
-		env_dir.XDGUtilityNameDodder,
-		config.Debug,
-	)
 
 	ui := env_ui.Make(
 		req,
@@ -89,6 +84,7 @@ func (cmd Info) Run(req command.Request) {
 			}
 
 		case "env":
+			dir := env_dir.MakeDefault(req, env_dir.XDGUtilityNameDodder, config.Debug)
 			envVars := env_vars.Make(dir)
 			var coder env_vars.BufferedCoderDotenv
 			bufferedWriter := bufio.NewWriter(ui.GetOutFile())
@@ -102,6 +98,7 @@ func (cmd Info) Run(req command.Request) {
 			}
 
 		case "xdg":
+			dir := env_dir.MakeDefault(req, env_dir.XDGUtilityNameDodder, config.Debug)
 			ecksDeeGee := dir.GetXDG()
 			envVars := env_vars.Make(ecksDeeGee)
 			var coder env_vars.BufferedCoderDotenv
