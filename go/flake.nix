@@ -6,6 +6,7 @@
 
     devenv-go.url = "github:friedenberg/eng?dir=devenvs/go";
     devenv-shell.url = "github:friedenberg/eng?dir=devenvs/shell";
+    sandcastle.url = "github:amarbel-llc/sandcastle";
   };
 
   outputs =
@@ -15,6 +16,7 @@
     , utils
     , devenv-go
     , devenv-shell
+    , sandcastle
     ,
     }:
     (utils.lib.eachDefaultSystem
