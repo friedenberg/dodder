@@ -74,7 +74,9 @@
             gnumake
             gum
             just
-          ]);
+          ]) ++ [
+            sandcastle.packages.${system}.default
+          ];
 
           inputsFrom = [
             devenv-go.devShells.${system}.default

@@ -47,7 +47,7 @@ function remote_add_dotenv_xdg { # @test
 		---
 
 		public-key = 'dodder-repo-public_key-v1.*'
-		override-path = '/tmp/bats-run-\w+/test/.+/them'
+		override-path = '.+/them'
 	EOM
 }
 
@@ -84,6 +84,6 @@ function remote_add_local_path { # @test
 		---
 
 		public-key = 'dodder-repo-public_key-v1.*'
-		override-path = '/tmp/bats-run-\w+/test/.+/them'
+		override-path = '.+/them'
 	EOM
 }

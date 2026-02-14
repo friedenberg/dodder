@@ -23,11 +23,11 @@
       },
       "locked": {
         "dir": "devenvs/go",
-        "lastModified": 1770842783,
-        "narHash": "sha256-noPEe0v98+d5G4KY7/INYiVKg7HkLOHYiHQS+b3R2yc=",
+        "lastModified": 1771091089,
+        "narHash": "sha256-N8galET+oUCSaeI76B2RE8ro1zuTclUIBLRDOE60PhA=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "3b4ca8f09a052237f9aae4ca9ef6d6361d1d134f",
+        "rev": "14960a2844b656af96825ab39a341101a13952b2",
         "type": "github"
       },
       "original": {
@@ -96,11 +96,11 @@
       },
       "locked": {
         "dir": "devenvs/shell",
-        "lastModified": 1770842783,
-        "narHash": "sha256-noPEe0v98+d5G4KY7/INYiVKg7HkLOHYiHQS+b3R2yc=",
+        "lastModified": 1771091089,
+        "narHash": "sha256-N8galET+oUCSaeI76B2RE8ro1zuTclUIBLRDOE60PhA=",
         "owner": "friedenberg",
         "repo": "eng",
-        "rev": "3b4ca8f09a052237f9aae4ca9ef6d6361d1d134f",
+        "rev": "14960a2844b656af96825ab39a341101a13952b2",
         "type": "github"
       },
       "original": {
@@ -402,11 +402,11 @@
         "utils": "utils_5"
       },
       "locked": {
-        "lastModified": 1771087412,
-        "narHash": "sha256-m/BW4B2lZAdZqh5kdZ2HadBMNkhNQCw5hH9MXD/b1ys=",
+        "lastModified": 1771093487,
+        "narHash": "sha256-0pvaRn+XBLCFdOF4GpTyThbvkGpsY+a1iTVNKQHPe3E=",
         "owner": "amarbel-llc",
         "repo": "sandcastle",
-        "rev": "1ee29613e714eddab483bf5bd65a9fe05399c8c3",
+        "rev": "d9109a2a1e62b825ddacc1ff86c6e4ffbeae700c",
         "type": "github"
       },
       "original": {
