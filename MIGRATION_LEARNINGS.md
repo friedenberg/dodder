@@ -173,9 +173,9 @@ These are methods that objectId2 has that external code calls on ObjectId:
 | Method | Purpose | Status |
 |--------|---------|--------|
 | `SetBlob(string) error` | Set genre to Blob | DONE |
-| `StringSansRepo() string` | String without repo | TODO (Phase 0) |
-| `MarshalText() / UnmarshalText()` | Text serialization | TODO |
-| `Clone() *objectId3` | Pool-managed clone | TODO |
+| `StringSansRepo() string` | String without repo | DONE |
+| `MarshalText() / UnmarshalText()` | Text serialization | DONE |
+| `Clone() *objectId3` | Pool-managed clone | DONE |
 | `WriteTo(io.Writer) (int64, error)` | Binary stream write | DONE (genre + seq_len + seq_data) |
 | `ReadFrom(io.Reader) (int64, error)` | Binary stream read | DONE (with Seq reset) |
 | `SetWithGenre(string, GenreGetter) error` | Set with genre hint | DONE (genre dispatch) |
@@ -306,12 +306,12 @@ organize command
 4. ~~**Add StringSansRepo to objectId3:** Trivial method returning `String()`~~
    DONE
 
-### Phase 1: Add Missing Methods to objectId3
+### Phase 1: Add Missing Methods to objectId3 — COMPLETE
 - ~~SetBlob~~ DONE
 - ~~WriteTo/ReadFrom (genre byte + seq_len + seq binary)~~ DONE
 - ~~SetWithGenre with proper genre dispatch~~ DONE
-- MarshalText/UnmarshalText
-- Clone
+- ~~MarshalText/UnmarshalText~~ DONE
+- ~~Clone~~ DONE
 
 ### Phase 2: Bump Store Version
 - Change VCurrent from V12 to V13
