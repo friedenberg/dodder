@@ -2,8 +2,6 @@ package catgut
 
 import (
 	"io"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type RingBufferScanner struct {
@@ -17,7 +15,7 @@ func MakeRingBufferScanner(rb *RingBuffer) *RingBufferScanner {
 	}
 }
 
-var ErrNoMatch = errors.New("no match")
+var ErrNoMatch = newPkgError("no match")
 
 func (s *RingBufferScanner) FirstMatch(
 	mf func(rune) bool,

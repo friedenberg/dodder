@@ -229,7 +229,7 @@ func (decoder *binaryDecoder) readFormatAndMatchSigil(
 	return n, err
 }
 
-var errExpectedSigil = errors.New("expected sigil")
+var errExpectedSigil = newPkgError("expected sigil")
 
 func (decoder *binaryDecoder) readSigil(
 	object *objectWithCursorAndSigil,

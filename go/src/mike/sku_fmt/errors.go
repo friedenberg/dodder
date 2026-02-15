@@ -1,4 +1,4 @@
-package key_bytes
+package sku_fmt
 
 import "code.linenisgreat.com/dodder/go/src/alfa/errors"
 
@@ -11,4 +11,4 @@ func newPkgError(text string) pkgError {
 	return errors.NewWithType[pkgErrDisamb](text)
 }
 
-var ErrInvalid = newPkgError("invalid key")
+var errEmptySku = newPkgError("empty sku")

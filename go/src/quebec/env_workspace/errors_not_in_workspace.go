@@ -24,6 +24,10 @@ func (err ErrNotInWorkspace) ShouldShowStackTrace() bool {
 	return false
 }
 
+func (err ErrNotInWorkspace) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func (err ErrNotInWorkspace) Recover(
 	ctx errors.Context,
 	retry interfaces.FuncRetry,

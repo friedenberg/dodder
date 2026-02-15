@@ -3,8 +3,14 @@ package env_workspace
 import (
 	"fmt"
 
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/oscar/store_workspace"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
 type ErrUnsupportedType struct {
@@ -18,6 +24,10 @@ func (err ErrUnsupportedType) Is(target error) bool {
 
 func (err ErrUnsupportedType) Error() string {
 	return fmt.Sprintf("unsupported type: %q", err.Type)
+}
+
+func (err ErrUnsupportedType) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func makeErrUnsupportedOperation(s *Store, op any) error {
@@ -46,4 +56,8 @@ func (e ErrUnsupportedOperation) Error() string {
 func (e ErrUnsupportedOperation) Is(target error) bool {
 	_, ok := target.(ErrUnsupportedOperation)
 	return ok
+}
+
+func (e ErrUnsupportedOperation) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

@@ -62,8 +62,8 @@ func (bf *BinaryField) SetContentLength(v int) {
 }
 
 var (
-	errContentLengthTooLarge = errors.New("content length too large")
-	errContentLengthNegative = errors.New("content length negative")
+	errContentLengthTooLarge = newPkgError("content length too large")
+	errContentLengthNegative = newPkgError("content length negative")
 )
 
 func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
@@ -98,7 +98,7 @@ func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-var errContentLengthDoesNotMatchContent = errors.New(
+var errContentLengthDoesNotMatchContent = newPkgError(
 	"content length does not match content",
 )
 

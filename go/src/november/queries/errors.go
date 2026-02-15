@@ -7,6 +7,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 type ErrBlobMissing struct {
 	ObjectId
 	env_dir.ErrBlobMissing
@@ -24,6 +29,10 @@ func (err ErrBlobMissing) Error() string {
 func (err ErrBlobMissing) Is(target error) bool {
 	_, ok := target.(ErrBlobMissing)
 	return ok
+}
+
+func (err ErrBlobMissing) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func IsErrBlobMissing(err error) bool {

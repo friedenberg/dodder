@@ -7,18 +7,6 @@ import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
-// TODO redesign all the below
-var errStopIteration = New("stop iteration")
-
-func MakeErrStopIteration() error {
-	return errStopIteration
-}
-
-func IsStopIteration(err error) bool {
-	ok := Is(err, errStopIteration)
-	return ok
-}
-
 type (
 	Typed[DISAMB any] interface {
 		error
@@ -37,10 +25,6 @@ type (
 func IsTyped[DISAMB any](err error) bool {
 	var target *errorString[DISAMB]
 	return Is(err, target)
-}
-
-func New(text string) Typed[string] {
-	return &errorString[string]{text}
 }
 
 func NewWithType[DISAMB any](text string) Typed[DISAMB] {
@@ -78,33 +62,57 @@ func (err *errorString[DISAMB]) Is(target error) bool {
 	return ok
 }
 
-var ErrExists = New("exists")
+// Stop iteration sentinel
+type errStopIterationDisamb struct{}
+
+var errStopIteration = NewWithType[errStopIterationDisamb]("stop iteration")
+
+func MakeErrStopIteration() error {
+	return errStopIteration
+}
+
+func IsStopIteration(err error) bool {
+	ok := Is(err, errStopIteration)
+	return ok
+}
+
+// Exists sentinel
+type errExistsDisamb struct{}
+
+var ErrExists = NewWithType[errExistsDisamb]("exists")
+
+// Not found sentinel
+type errNotFoundDisamb struct{}
+
+type ErrNotFound struct {
+	Value string
+}
 
 func MakeErrNotFound(value interfaces.Stringer) error {
-	return ErrNotFound(value.String())
+	return ErrNotFound{Value: value.String()}
 }
 
 func MakeErrNotFoundString(s string) error {
-	return ErrNotFound(s)
+	return ErrNotFound{Value: s}
 }
 
 func IsErrNotFound(err error) bool {
-	return errors.Is(err, ErrNotFound(""))
+	return errors.Is(err, ErrNotFound{})
 }
 
-type ErrNotFound string
-
 func (err ErrNotFound) Error() string {
-	v := string(err)
-
-	if v == "" {
+	if err.Value == "" {
 		return "not found"
 	} else {
-		return fmt.Sprintf("not found: %q", v)
+		return fmt.Sprintf("not found: %q", err.Value)
 	}
 }
 
 func (err ErrNotFound) Is(target error) (ok bool) {
 	_, ok = target.(ErrNotFound)
 	return ok
+}
+
+func (err ErrNotFound) GetErrorType() errNotFoundDisamb {
+	return errNotFoundDisamb{}
 }

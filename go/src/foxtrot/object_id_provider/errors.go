@@ -6,6 +6,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 type ErrDoesNotExist struct {
 	Value string
 }
@@ -17,6 +22,10 @@ func (err ErrDoesNotExist) Error() string {
 func (err ErrDoesNotExist) Is(target error) bool {
 	_, ok := target.(ErrDoesNotExist)
 	return ok
+}
+
+func (err ErrDoesNotExist) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 var _ errors.Helpful = ErrZettelIdsExhausted{}
@@ -44,4 +53,8 @@ func (err ErrZettelIdsExhausted) GetErrorRecovery() []string {
 func (err ErrZettelIdsExhausted) Is(target error) bool {
 	_, ok := target.(ErrZettelIdsExhausted)
 	return ok
+}
+
+func (err ErrZettelIdsExhausted) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

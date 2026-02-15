@@ -6,14 +6,23 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
 var (
-	ErrBoundaryNotFound      = errors.New("boundary not found")
-	ErrExpectedContentRead   = errors.New("expected content read")
-	ErrExpectedBoundaryRead  = errors.New("expected boundary read")
-	ErrReadFromSmallOverflow = errors.New(
+	ErrBoundaryNotFound      = newPkgError("boundary not found")
+	ErrExpectedContentRead   = newPkgError("expected content read")
+	ErrExpectedBoundaryRead  = newPkgError("expected boundary read")
+	ErrReadFromSmallOverflow = newPkgError(
 		"reader provided more bytes than max int",
 	)
-	ErrInvalidBoundaryReaderState = errors.New("invalid boundary reader state")
+	ErrInvalidBoundaryReaderState = newPkgError("invalid boundary reader state")
 )
 
 type ErrExhaustedFuncSetStringersLine struct {
@@ -28,6 +37,10 @@ func (e ErrExhaustedFuncSetStringersLine) Error() string {
 func (e ErrExhaustedFuncSetStringersLine) Is(target error) (ok bool) {
 	_, ok = target.(ErrExhaustedFuncSetStringersLine)
 	return ok
+}
+
+func (e ErrExhaustedFuncSetStringersLine) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func IsErrExhaustedFuncSetStringers(err error) bool {

@@ -25,9 +25,9 @@ func testCLITreeForwards(t *TestContext) {
 		{
 			TestCaseInfo: MakeTestCaseInfo("error group three"),
 			input: errors.Group{
-				errors.New("one"),
-				errors.New("two"),
-				errors.New("three"),
+				newPkgError("one"),
+				newPkgError("two"),
+				newPkgError("three"),
 			},
 			expected: `error group: 3 errors
 ├── one
@@ -40,10 +40,10 @@ func testCLITreeForwards(t *TestContext) {
 				"error group three with nested child",
 			),
 			input: errors.Group{
-				errors.New("one"),
-				errors.New("two"),
+				newPkgError("one"),
+				newPkgError("two"),
 				errors.Group{
-					errors.New("three"),
+					newPkgError("three"),
 				},
 			},
 			expected: `error group: 3 errors
@@ -57,11 +57,11 @@ func testCLITreeForwards(t *TestContext) {
 				"error group three with double nested child",
 			),
 			input: errors.Group{
-				errors.New("one"),
-				errors.New("two"),
+				newPkgError("one"),
+				newPkgError("two"),
 				errors.Group{
 					errors.Err501NotImplemented.WrapIncludingHTTP(
-						errors.New("inner"),
+						newPkgError("inner"),
 					),
 				},
 			},
@@ -77,7 +77,7 @@ func testCLITreeForwards(t *TestContext) {
 				"error group with one child",
 			),
 			input: errors.Group{
-				errors.New("one"),
+				newPkgError("one"),
 			},
 			expected: "one\n",
 		},
@@ -86,7 +86,7 @@ func testCLITreeForwards(t *TestContext) {
 				"error no stack",
 			),
 			input: errors.WithoutStack(
-				errors.Wrap(errors.New("one")),
+				errors.Wrap(newPkgError("one")),
 			),
 			expected: "one\n",
 		},
@@ -95,7 +95,7 @@ func testCLITreeForwards(t *TestContext) {
 		// 	TestCaseInfo: MakeTestCaseInfo(
 		// 		"one error with stack",
 		// 	),
-		// 	input: errors.Wrap(errors.New("one")),
+		// 	input: errors.Wrap(newPkgError("one")),
 		// 	expected: `one
 		// └── # TestCLITreeForwards
 		// │     src/charlie/error_coders/cli_tree_state_test.go:94
@@ -105,7 +105,7 @@ func testCLITreeForwards(t *TestContext) {
 		// 	TestCaseInfo: MakeTestCaseInfo(
 		// 		"one in group with stack",
 		// 	),
-		// 	input: errors.Wrap(errors.Group{errors.New("one")}),
+		// 	input: errors.Wrap(errors.Group{newPkgError("one")}),
 		// 	expected: `one
 		// └── # TestCLITreeForwards
 		// │     src/charlie/error_coders/cli_tree_state_test.go:104

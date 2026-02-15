@@ -1,4 +1,4 @@
-package key_bytes
+package store_browser
 
 import "code.linenisgreat.com/dodder/go/src/alfa/errors"
 
@@ -10,5 +10,3 @@ type (
 func newPkgError(text string) pkgError {
 	return errors.NewWithType[pkgErrDisamb](text)
 }
-
-var ErrInvalid = newPkgError("invalid key")

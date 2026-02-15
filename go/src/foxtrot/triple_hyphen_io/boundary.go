@@ -17,7 +17,7 @@ func init() {
 	errors.PanicIfError(BoundaryStringValue.Set(Boundary))
 }
 
-var errBoundaryInvalid = errors.New("boundary invalid")
+var errBoundaryInvalid = newPkgError("boundary invalid")
 
 type Peeker interface {
 	io.Reader

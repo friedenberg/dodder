@@ -1,6 +1,15 @@
 package ohio_buffer
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
 
 type errLength struct {
 	expected, actual int64
@@ -22,4 +31,13 @@ func MakeErrLength(expected, actual int64, err error) error {
 
 func (e errLength) Error() string {
 	return fmt.Sprintf("expected %d but got %d. error: %s", e.expected, e.actual, e.err)
+}
+
+func (e errLength) Is(target error) bool {
+	_, ok := target.(errLength)
+	return ok
+}
+
+func (e errLength) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

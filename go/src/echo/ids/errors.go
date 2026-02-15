@@ -30,6 +30,10 @@ func (e ErrInvalidId) Is(err error) (ok bool) {
 	return ok
 }
 
+func (e ErrInvalidId) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func IsErrInvalid(err error) bool {
 	return errors.Is(err, ErrInvalidId(""))
 }
@@ -45,8 +49,12 @@ func (e errInvalidSigil) Is(err error) (ok bool) {
 	return ok
 }
 
+func (e errInvalidSigil) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func IsErrInvalidSigil(err error) bool {
 	return errors.Is(err, errInvalidSigil(""))
 }
 
-var ErrEmptyTag = errors.New("empty tag")
+var ErrEmptyTag = newPkgError("empty tag")

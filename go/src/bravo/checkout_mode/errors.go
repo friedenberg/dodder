@@ -2,6 +2,11 @@ package checkout_mode
 
 import "code.linenisgreat.com/dodder/go/src/alfa/errors"
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 type errInvalidCheckoutMode error
 
 func MakeErrInvalidCheckoutModeMode(mode Mode) errInvalidCheckoutMode {

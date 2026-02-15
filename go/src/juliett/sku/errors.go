@@ -1,8 +1,14 @@
 package sku
 
 import (
-	"errors"
 	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
 func MakeErrMergeConflict(item *FSItem) (err *ErrMergeConflict) {
@@ -30,6 +36,10 @@ func (err *ErrMergeConflict) Error() string {
 		&err.Object,
 		&err.Blob,
 	)
+}
+
+func (err *ErrMergeConflict) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func IsErrMergeConflict(err error) bool {

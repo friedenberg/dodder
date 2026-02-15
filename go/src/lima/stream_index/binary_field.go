@@ -49,7 +49,7 @@ func (binaryField *binaryField) Reset() {
 	binaryField.Content.Reset()
 }
 
-var errContentLengthTooLarge = errors.New("content length too large")
+var errContentLengthTooLarge = newPkgError("content length too large")
 
 func (binaryField *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int

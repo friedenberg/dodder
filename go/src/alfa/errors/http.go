@@ -20,6 +20,8 @@ var (
 	Err501NotImplemented      = newHttpError(hs.Code501NotImplemented)
 )
 
+type httpErrDisamb struct{}
+
 type http struct {
 	StatusCode hs.Code
 	exposeHTTP bool
@@ -75,4 +77,8 @@ func (err http) Errorf(format string, args ...any) http {
 
 func (err http) ShouldHideUnwrap() bool {
 	return !err.exposeHTTP
+}
+
+func (err http) GetErrorType() httpErrDisamb {
+	return httpErrDisamb{}
 }

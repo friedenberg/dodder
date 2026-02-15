@@ -9,7 +9,16 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-var ErrEmptyType = errors.New("type is empty")
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
+var ErrEmptyType = newPkgError("type is empty")
 
 func MakeErrEmptyType(id interfaces.MarklId) error {
 	if id.GetMarklFormat() == nil {
@@ -38,6 +47,10 @@ func (err errIsNotNull) Error() string {
 func (err errIsNotNull) Is(target error) bool {
 	_, ok := target.(errIsNotNull)
 	return ok
+}
+
+func (err errIsNotNull) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func AssertIdIsNotNull(id interfaces.MarklId) error {
@@ -73,6 +86,10 @@ func (err errIsNull) Is(target error) bool {
 	return ok
 }
 
+func (err errIsNull) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 type ErrNotEqual struct {
 	Expected, Actual interfaces.MarklId
 }
@@ -101,6 +118,10 @@ func (err ErrNotEqual) Error() string {
 func (err ErrNotEqual) Is(target error) bool {
 	_, ok := target.(ErrNotEqual)
 	return ok
+}
+
+func (err ErrNotEqual) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func (err ErrNotEqual) IsDifferentHashTypes() bool {
@@ -135,6 +156,10 @@ func (err ErrNotEqualBytes) Error() string {
 func (err ErrNotEqualBytes) Is(target error) bool {
 	_, ok := target.(ErrNotEqualBytes)
 	return ok
+}
+
+func (err ErrNotEqualBytes) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 type errLength[INTEGER constraints.Integer] [2]INTEGER
@@ -183,6 +208,10 @@ func (err errWrongType) Is(target error) bool {
 	return ok
 }
 
+func (err errWrongType) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 type ErrFormatOperationNotSupported struct {
 	Format        interfaces.MarklFormat
 	FormatId      string
@@ -209,4 +238,8 @@ func (err ErrFormatOperationNotSupported) Error() string {
 func (err ErrFormatOperationNotSupported) Is(target error) bool {
 	_, ok := target.(ErrFormatOperationNotSupported)
 	return ok
+}
+
+func (err ErrFormatOperationNotSupported) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

@@ -9,6 +9,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 type ErrLockRequired struct {
 	Operation string
 }
@@ -23,6 +28,10 @@ func (err ErrLockRequired) Error() string {
 		"lock required for operation: %q",
 		err.Operation,
 	)
+}
+
+func (err ErrLockRequired) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 type ErrUnableToAcquireLock struct {
@@ -40,6 +49,10 @@ func (err ErrUnableToAcquireLock) Error() string {
 func (err ErrUnableToAcquireLock) Is(target error) bool {
 	_, ok := target.(ErrUnableToAcquireLock)
 	return ok
+}
+
+func (err ErrUnableToAcquireLock) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func (err ErrUnableToAcquireLock) GetErrorCause() []string {

@@ -2,7 +2,11 @@ package errors
 
 import "fmt"
 
-var errContextRetry = New("context retry")
+type errContextRetryDisamb struct{}
+
+var errContextRetry = NewWithType[errContextRetryDisamb]("context retry")
+
+type errContextRetryAbortedDisamb struct{}
 
 type errContextRetryAborted struct {
 	underlying error
@@ -19,4 +23,8 @@ func (err errContextRetryAborted) Error() string {
 func (err errContextRetryAborted) Is(target error) bool {
 	_, ok := target.(errContextRetryAborted)
 	return ok
+}
+
+func (err errContextRetryAborted) GetErrorType() errContextRetryAbortedDisamb {
+	return errContextRetryAbortedDisamb{}
 }

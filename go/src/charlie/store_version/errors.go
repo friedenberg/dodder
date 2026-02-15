@@ -5,6 +5,12 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
 type ErrFutureStoreVersion struct {
@@ -27,4 +33,8 @@ func (err ErrFutureStoreVersion) Error() string {
 func (err ErrFutureStoreVersion) Is(target error) bool {
 	_, ok := target.(ErrFutureStoreVersion)
 	return ok
+}
+
+func (err ErrFutureStoreVersion) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

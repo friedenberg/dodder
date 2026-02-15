@@ -1,7 +1,7 @@
 package debug
 
-import "code.linenisgreat.com/dodder/go/src/alfa/errors"
+var errMemoryLimitNotSupported = newPkgError("memory limit not supported")
 
 func getMemoryLimit() (uint64, error) {
-	return 0, errors.New("memory limit not supported")
+	return 0, errMemoryLimitNotSupported
 }

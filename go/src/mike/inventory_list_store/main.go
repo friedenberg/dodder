@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/lima/inventory_list_coders"
 )
 
-var ErrEmptyInventoryList = errors.New("empty inventory list")
+var ErrEmptyInventoryList = newPkgError("empty inventory list")
 
 type Store struct {
 	lock sync.Mutex

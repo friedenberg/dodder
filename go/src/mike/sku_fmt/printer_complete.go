@@ -70,7 +70,7 @@ func (printer *PrinterComplete) PrintOne(
 	src *sku.Transacted,
 ) (err error) {
 	if src.GetObjectId().String() == "/" {
-		err = errors.New("empty sku")
+		err = errEmptySku
 		return err
 	}
 

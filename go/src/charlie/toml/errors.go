@@ -1,11 +1,15 @@
 package toml
 
 import (
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"github.com/pelletier/go-toml/v2"
 )
 
 type (
 	StrictMissingError = toml.StrictMissingError
+
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
 type Error struct {
@@ -21,4 +25,8 @@ func MakeError(err error) Error {
 func (err Error) Is(target error) (ok bool) {
 	_, ok = target.(Error)
 	return ok
+}
+
+func (err Error) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

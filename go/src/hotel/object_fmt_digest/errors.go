@@ -6,7 +6,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-var ErrEmptyTai = errors.New("empty tai")
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
+var ErrEmptyTai = newPkgError("empty tai")
 
 type errUnknownFormatKey string
 
@@ -17,4 +26,8 @@ func (err errUnknownFormatKey) Error() string {
 func (err errUnknownFormatKey) Is(target error) bool {
 	_, ok := target.(errUnknownFormatKey)
 	return ok
+}
+
+func (err errUnknownFormatKey) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

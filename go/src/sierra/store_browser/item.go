@@ -81,7 +81,7 @@ func (item Item) GetTai() (t ids.Tai, err error) {
 	return t, err
 }
 
-var errEmptyUrl = errors.New("empty url")
+var errEmptyUrl = newPkgError("empty url")
 
 func (item Item) GetDescription() (b descriptions.Description, err error) {
 	if err = b.Set(item.Title); err != nil {

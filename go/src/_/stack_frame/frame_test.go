@@ -1,7 +1,7 @@
 package stack_frame
 
 import (
-	"errors"
+	"errors" // stdlib: can't use alfa/errors due to import cycle (alfa/errors depends on stack_frame)
 	"testing"
 )
 

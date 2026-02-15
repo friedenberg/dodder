@@ -8,6 +8,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 func IsErrBlobAlreadyExists(err error) bool {
 	return errors.Is(err, ErrBlobAlreadyExists{})
 }
@@ -42,6 +47,10 @@ func (err ErrBlobAlreadyExists) Is(target error) bool {
 	return ok
 }
 
+func (err ErrBlobAlreadyExists) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func IsErrBlobMissing(err error) bool {
 	return errors.Is(err, ErrBlobMissing{})
 }
@@ -71,6 +80,10 @@ func (err ErrBlobMissing) Error() string {
 func (err ErrBlobMissing) Is(target error) bool {
 	_, ok := target.(ErrBlobMissing)
 	return ok
+}
+
+func (err ErrBlobMissing) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func MakeErrTempAlreadyExists(
@@ -105,4 +118,8 @@ func (err ErrTempAlreadyExists) GetErrorRecovery() []string {
 func (err ErrTempAlreadyExists) Is(target error) bool {
 	_, ok := target.(ErrTempAlreadyExists)
 	return ok
+}
+
+func (err ErrTempAlreadyExists) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

@@ -5,8 +5,14 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/fd"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
 func MakeErrBlobFormatterFailed(
@@ -36,6 +42,10 @@ func (err ErrBlobFormatterFailed) ShouldShowStackTrace() bool {
 	return false
 }
 
+func (err ErrBlobFormatterFailed) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func MakeErrHasInlineBlobAndFilePath(
 	blobFD *fd.FD,
 	inlineBlobDigest interfaces.MarklId,
@@ -60,6 +70,15 @@ func (err *ErrHasInlineBlobAndFilePath) Error() string {
 	)
 }
 
+func (err *ErrHasInlineBlobAndFilePath) Is(target error) bool {
+	_, ok := target.(*ErrHasInlineBlobAndFilePath)
+	return ok
+}
+
+func (err *ErrHasInlineBlobAndFilePath) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 func MakeErrHasInlineBlobAndMetadataBlobId(
 	inline, metadata interfaces.MarklId,
 ) (err *ErrHasInlineBlobAndMetadataDigest) {
@@ -80,4 +99,13 @@ func (err *ErrHasInlineBlobAndMetadataDigest) Error() string {
 		err.Inline,
 		err.metadata,
 	)
+}
+
+func (err *ErrHasInlineBlobAndMetadataDigest) Is(target error) bool {
+	_, ok := target.(*ErrHasInlineBlobAndMetadataDigest)
+	return ok
+}
+
+func (err *ErrHasInlineBlobAndMetadataDigest) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

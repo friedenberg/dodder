@@ -65,7 +65,7 @@ func (s *SliceRuneScanner) UnreadRune() (err error) {
 	}
 
 	if s.lastLocFirst == s.locFirst && s.lastLocSecond == s.locSecond {
-		err = errors.New("already unread")
+		err = newPkgError("already unread")
 		return err
 	}
 
@@ -75,7 +75,7 @@ func (s *SliceRuneScanner) UnreadRune() (err error) {
 	return err
 }
 
-var errInvalidRune = errors.New("invalid rune")
+var errInvalidRune = newPkgError("invalid rune")
 
 func (s *SliceRuneScanner) ReadRune() (r rune, size int, err error) {
 	ok := false

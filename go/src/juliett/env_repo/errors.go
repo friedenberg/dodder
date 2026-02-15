@@ -1,6 +1,15 @@
 package env_repo
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
+)
+
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
 
 type ErrNotInDodderDir struct {
 	Expected string
@@ -21,4 +30,8 @@ func (err ErrNotInDodderDir) ShouldShowStackTrace() bool {
 func (err ErrNotInDodderDir) Is(target error) (ok bool) {
 	_, ok = target.(ErrNotInDodderDir)
 	return ok
+}
+
+func (err ErrNotInDodderDir) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

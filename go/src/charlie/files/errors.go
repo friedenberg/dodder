@@ -1,12 +1,22 @@
 package files
 
 import (
-	"errors"
 	"fmt"
+
+	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
 var (
-	ErrEmptyFileList = errors.New("empty file list")
+	ErrEmptyFileList = newPkgError("empty file list")
 	errNotDirectory  ErrNotDirectory
 )
 
@@ -23,4 +33,8 @@ func (err ErrNotDirectory) Is(target error) bool {
 
 func (err ErrNotDirectory) Error() string {
 	return fmt.Sprintf("%q is not a directory", string(err))
+}
+
+func (err ErrNotDirectory) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

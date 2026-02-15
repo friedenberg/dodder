@@ -33,7 +33,11 @@ func (err ErrBoxParse) Error() string {
 	return fmt.Sprintf("parsing box failed: %s", err.error.Error())
 }
 
-var ErrNotABox = errors.New("not a box")
+func (err ErrBoxParse) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
+var ErrNotABox = newPkgError("not a box")
 
 type ErrBoxReadSeq struct {
 	expected string
@@ -53,6 +57,10 @@ func (err ErrBoxReadSeq) Error() string {
 	)
 }
 
+func (err ErrBoxReadSeq) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 type ErrUnsupportedDodderTag struct {
 	tag string
 }
@@ -64,4 +72,8 @@ func (err ErrUnsupportedDodderTag) Error() string {
 func (err ErrUnsupportedDodderTag) Is(target error) bool {
 	_, ok := target.(ErrUnsupportedDodderTag)
 	return ok
+}
+
+func (err ErrUnsupportedDodderTag) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

@@ -8,18 +8,27 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
 // ErrHelp is the error returned if the -help or -h flag is invoked
 // but no such flag is defined.
-var ErrHelp = errors.New("flag: help requested")
+var ErrHelp = newPkgError("flag: help requested")
 
 // errParse is returned by Set if a flag's value fails to parse, such as with an
 // invalid integer for Int.
 // It then gets wrapped through failf to provide more information.
-var errParse = errors.New("parse error")
+var errParse = newPkgError("parse error")
 
 // errRange is returned by Set if a flag's value is out of range.
 // It then gets wrapped through failf to provide more information.
-var errRange = errors.New("value out of range")
+var errRange = newPkgError("value out of range")
 
 func numError(err error) error {
 	ne, ok := err.(*strconv.NumError)
@@ -67,4 +76,8 @@ func (err ErrInvalidValue) Error() string {
 func (err ErrInvalidValue) Is(target error) bool {
 	_, ok := target.(ErrInvalidValue)
 	return ok
+}
+
+func (err ErrInvalidValue) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

@@ -5,19 +5,20 @@ import (
 )
 
 type (
-	errTypeLockDisamb struct{}
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
 )
 
-func newTypeLockError(text string) error {
-	return errors.NewWithType[errTypeLockDisamb](text)
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
 }
 
 func IsTypeLockError(err error) bool {
-	return errors.IsTyped[errTypeLockDisamb](err)
+	return errors.IsTyped[pkgErrDisamb](err)
 }
 
 var (
-	ErrFailedToReadCurrentLockObject = newTypeLockError("failed to read current lock object")
-	ErrEmptyLockKey                  = newTypeLockError("empty type")
-	ErrBuiltinType                   = newTypeLockError("builtin type")
+	ErrFailedToReadCurrentLockObject = newPkgError("failed to read current lock object")
+	ErrEmptyLockKey                  = newPkgError("empty type")
+	ErrBuiltinType                   = newPkgError("builtin type")
 )

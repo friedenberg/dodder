@@ -22,7 +22,7 @@ func (coder idCoderDoddish) MarshalDoddish() (doddish.Seq, error) {
 
 func (coder idCoderDoddish) UnmarshalDoddish(seq doddish.Seq) (err error) {
 	if !seq.MatchAll(doddish.TokenMatcherDodderTag...) {
-		err = errors.New("unsupported seq")
+		err = newPkgError("unsupported seq")
 		return err
 	}
 

@@ -6,7 +6,16 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
-var ErrBufferEmpty = errors.New("buffer empty")
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
+var ErrBufferEmpty = newPkgError("buffer empty")
 
 type errLength struct {
 	expected, actual int64
@@ -35,6 +44,10 @@ func (e errLength) Error() string {
 	return fmt.Sprintf("expected %d but got %d. error: %s", e.expected, e.actual, e.err)
 }
 
+func (e errLength) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
+}
+
 type errInvalidSliceRange [2]int
 
 func (a errInvalidSliceRange) Is(b error) (ok bool) {
@@ -44,4 +57,8 @@ func (a errInvalidSliceRange) Is(b error) (ok bool) {
 
 func (e errInvalidSliceRange) Error() string {
 	return fmt.Sprintf("invalid slice range: (%d, %d)", e[0], e[1])
+}
+
+func (e errInvalidSliceRange) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }

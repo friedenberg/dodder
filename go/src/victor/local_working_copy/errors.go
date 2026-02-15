@@ -8,6 +8,11 @@ import (
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
 type ErrUnsupportedFormatterValue interface {
 	error
 	GetFormatValue() string
@@ -47,6 +52,10 @@ func (e errUnsupportedFormatter) Error() string {
 func (e errUnsupportedFormatter) Is(err error) (ok bool) {
 	_, ok = err.(errUnsupportedFormatter)
 	return ok
+}
+
+func (e errUnsupportedFormatter) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
 
 func (e errUnsupportedFormatter) GetFormatValue() string {

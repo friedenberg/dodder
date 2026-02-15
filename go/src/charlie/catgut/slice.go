@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"io"
 	"strings"
-
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type SliceBytes struct {
@@ -136,7 +134,7 @@ func (rs Slice) WriteTo(w io.Writer) (n int64, err error) {
 
 func (rs Slice) BytesBetween(left, right int) []byte {
 	if left > right {
-		panic(errors.New("left greater than right"))
+		panic(newPkgError("left greater than right"))
 	}
 
 	switch {

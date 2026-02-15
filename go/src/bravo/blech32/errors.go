@@ -6,9 +6,18 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
+type (
+	pkgErrDisamb struct{}
+	pkgError     = errors.Typed[pkgErrDisamb]
+)
+
+func newPkgError(text string) pkgError {
+	return errors.NewWithType[pkgErrDisamb](text)
+}
+
 var (
-	ErrEmptyHRP         = errors.New("empty HRP")
-	ErrSeparatorMissing = errors.New(
+	ErrEmptyHRP         = newPkgError("empty HRP")
+	ErrSeparatorMissing = newPkgError(
 		fmt.Sprintf("separator (%q) missing", string(separator)),
 	)
 )
@@ -25,4 +34,13 @@ func (err errInvalidCharacterInData) Error() string {
 		err.pos,
 		charsetString,
 	)
+}
+
+func (err errInvalidCharacterInData) Is(target error) bool {
+	_, ok := target.(errInvalidCharacterInData)
+	return ok
+}
+
+func (err errInvalidCharacterInData) GetErrorType() pkgErrDisamb {
+	return pkgErrDisamb{}
 }
