@@ -44,7 +44,13 @@ func (id objectId3) GetGenre() interfaces.Genre {
 }
 
 func (id objectId3) IsEmpty() bool {
-	return id.Seq.Len() == 0
+	for _, token := range id.Seq {
+		if token.Type == doddish.TokenTypeIdentifier && len(token.Contents) > 0 {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (id objectId3) Len() int {
@@ -63,6 +69,16 @@ func (id objectId3) String() string {
 
 func (id objectId3) StringSansRepo() string {
 	return id.String()
+}
+
+func (id objectId3) StringSansOp() string {
+	seq := id.Seq
+
+	if seq.Len() > 0 && seq.At(0).Type == doddish.TokenTypeOperator {
+		seq = seq[1:]
+	}
+
+	return seq.String()
 }
 
 func (id objectId3) Equals(other objectId3) bool {
@@ -87,6 +103,10 @@ func (id *objectId3) Set(value string) (err error) {
 	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 		value,
 	); err != nil {
+		if id.Genre == genres.Unknown {
+			return id.SetBlob(value)
+		}
+
 		err = errors.Wrap(err)
 		return err
 	}
@@ -127,7 +147,7 @@ func (id *objectId3) ResetWithObjectId(other Id) {
 
 	default:
 		id.Genre = genres.Must(other.GetGenre())
-		id.Seq = other.ToSeq()
+		id.Seq = other.ToSeq().Clone()
 	}
 }
 
@@ -376,13 +396,35 @@ func (id *objectId3) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
+func (id *objectId3) SetGenre(genre interfaces.GenreGetter) {
+	if genre == nil {
+		id.Genre = genres.Unknown
+	} else {
+		id.Genre = genres.Must(genre.GetGenre())
+	}
+}
+
 func (id *objectId3) SetBlob(value string) (err error) {
 	id.Genre = genres.Blob
 
-	if err = id.Set(value); err != nil {
-		err = errors.Wrap(err)
-		return err
+	var seq doddish.Seq
+
+	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
+		value,
+	); err != nil {
+		// Fall back to creating a single identifier token from the raw value,
+		// matching objectId2 behavior for multi-word blob names like "to add"
+		id.Seq = doddish.Seq{
+			doddish.Token{
+				Type:     doddish.TokenTypeIdentifier,
+				Contents: []byte(value),
+			},
+		}
+
+		return nil
 	}
+
+	id.Seq = seq.Clone()
 
 	return err
 }
@@ -401,8 +443,6 @@ func (id *objectId3) SetWithGenre(
 		return id.SetBlob(value)
 
 	default:
-		id.Genre = g
-
 		if err = id.Set(value); err != nil {
 			err = errors.Wrap(err)
 			return err

@@ -19,8 +19,8 @@ var (
 	V13 = Version(values.Int(13))
 	V14 = Version(values.Int(14))
 
-	VCurrent = V12
-	VNext    = V13
+	VCurrent = V13
+	VNext    = V14
 )
 
 // TODO replace with Int

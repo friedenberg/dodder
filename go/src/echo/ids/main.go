@@ -48,17 +48,11 @@ type (
 	}
 )
 
-type ObjectId = objectId2
+type ObjectId = objectId3
 
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
-	return getObjectIdPool2()
+	return getObjectIdPool3()
 }
-
-// type ObjectId = objectId3
-
-// func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
-// 	return getObjectIdPool3()
-// }
 
 var (
 	_ Id        = &ObjectId{}
@@ -216,18 +210,8 @@ func SetObjectIdOrBlob(
 	id *ObjectId,
 	other interfaces.ObjectId,
 ) (err error) {
-	if other, ok := other.(*objectId2); ok {
-		id.genre = other.genre
-		other.left.CopyTo(&id.left)
-		other.right.CopyTo(&id.right)
-		id.middle = other.middle
-
-		if id.middle == '%' {
-			id.virtual = true
-		}
-
-		other.repoId.CopyTo(&id.repoId)
-
+	if other, ok := other.(*objectId3); ok {
+		id.ResetWith(*other)
 		return err
 	}
 

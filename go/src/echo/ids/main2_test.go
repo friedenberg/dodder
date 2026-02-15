@@ -13,7 +13,7 @@ func idWriteToReadFromData() []string {
 		"config",
 		"!md",
 		"-tag",
-		"//repo",
+		"/repo",
 		"tag",
 	}
 }
