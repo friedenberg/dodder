@@ -52,14 +52,36 @@ func (page *page) flushNew(
 		},
 	)
 
-	for row, errIter := range seq {
+	// Deduplicate consecutive rows with the same digest, keeping only the last
+	// in each group. This matches the behavior of the old heap-based merge which
+	// consumed all equal entries before writing. We must copy into a local row
+	// because the file reader reuses the same row struct across iterations.
+	equaler := page.added.GetEqualer()
+	var pending row
+	hasPending := false
+
+	for current, errIter := range seq {
 		if errIter != nil {
 			err = errors.Wrap(errIter)
 			return err
 		}
 
-		if _, err = page.writeRowTo(row, bufferedWriter); err != nil {
-			err = errors.WrapExceptSentinel(errIter, io.EOF)
+		if hasPending {
+			if !equaler.Equals(&pending, current) {
+				if _, err = page.writeRowTo(&pending, bufferedWriter); err != nil {
+					err = errors.Wrap(err)
+					return err
+				}
+			}
+		}
+
+		rowResetter{}.ResetWith(&pending, current)
+		hasPending = true
+	}
+
+	if hasPending {
+		if _, err = page.writeRowTo(&pending, bufferedWriter); err != nil {
+			err = errors.Wrap(err)
 			return err
 		}
 	}
