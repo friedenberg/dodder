@@ -2,6 +2,7 @@ package ids
 
 import (
 	"fmt"
+	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
@@ -9,6 +10,7 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_collection"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
+	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
@@ -262,4 +264,126 @@ func (id *objectId3) UnmarshalBinary(bites []byte) (err error) {
 	}
 
 	return nil
+}
+
+func (id *objectId3) WriteTo(w io.Writer) (n int64, err error) {
+	var n1 int64
+	n1, err = id.Genre.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	var seqBytes []byte
+
+	if seqBytes, err = id.Seq.GetBinaryMarshaler().MarshalBinary(); err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	b := [1]uint8{uint8(len(seqBytes))}
+
+	var n2 int
+	n2, err = ohio.WriteAllOrDieTrying(w, b[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	n2, err = ohio.WriteAllOrDieTrying(w, seqBytes)
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	return n, err
+}
+
+func (id *objectId3) ReadFrom(r io.Reader) (n int64, err error) {
+	id.Seq.GetSliceMutable().Reset()
+
+	var n1 int64
+	n1, err = id.Genre.ReadFrom(r)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	var b [1]uint8
+
+	var n2 int
+	n2, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	seqLen := b[0]
+
+	if seqLen == 0 {
+		return n, err
+	}
+
+	seqBytes := make([]byte, seqLen)
+
+	n2, err = ohio.ReadAllOrDieTrying(r, seqBytes)
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	if err = id.Seq.GetBinaryUnmarshaler().UnmarshalBinary(seqBytes); err != nil {
+		err = errors.Wrap(err)
+		return n, err
+	}
+
+	return n, err
+}
+
+func (id *objectId3) SetBlob(value string) (err error) {
+	id.Genre = genres.Blob
+
+	if err = id.Set(value); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
+func (id *objectId3) SetWithGenre(
+	value string,
+	genre interfaces.GenreGetter,
+) (err error) {
+	g := genres.Make(genre.GetGenre())
+
+	switch g {
+	case genres.Type:
+		return id.SetType(value)
+
+	case genres.Blob:
+		return id.SetBlob(value)
+
+	default:
+		id.Genre = g
+
+		if err = id.Set(value); err != nil {
+			err = errors.Wrap(err)
+			return err
+		}
+
+		return err
+	}
 }
