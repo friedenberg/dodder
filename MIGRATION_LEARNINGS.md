@@ -297,12 +297,14 @@ organize command
 ## Recommended Migration Order
 
 ### Phase 0: Preparatory PRs (on master, before the branch)
-1. **Refactor store_browser:** Replace `item.GetObjectId()` / `SetLeft()` with
-   ExternalObjectId pattern
-2. **Remove TodoSetFromObjectId:** Replace callers with `tag.Set(oid.String())`
+1. ~~**Refactor store_browser:** Replace `item.GetObjectId()` / `SetLeft()`~~
+   DONE — replaced with `i.String()`, deleted `GetObjectId()` method
+2. ~~**Remove TodoSetFromObjectId:** Replace callers with
+   `tag.Set(oid.String())`~~ DONE — deleted methods from tag.go and type.go
 3. **Add version-aware config-mutable:** Either add a version header or switch
-   to a rebuildable format
-4. **Add StringSansRepo to objectId3:** Trivial method returning `String()`
+   to a rebuildable format (DEFERRED — needs separate plan)
+4. ~~**Add StringSansRepo to objectId3:** Trivial method returning `String()`~~
+   DONE
 
 ### Phase 1: Add Missing Methods to objectId3
 - ~~SetBlob~~ DONE
