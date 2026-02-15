@@ -172,36 +172,27 @@ test-go-unit *flags:
 
 test-go: test-go-unit
 
-test-bats-generate $PATH=(dir_build + ":" + env("PATH")):
+test-bats-generate $PATH=(dir_build / "debug" + ":" + env("PATH")) $DODDER_BIN=(dir_build / "debug" / "dodder"):
   just ../zz-tests_bats/test-generate_fixtures
 
-test-bats-run $PATH=(dir_build + ":" + env("PATH")):
+test-bats-run $PATH=(dir_build / "debug" + ":" + env("PATH")) $DODDER_BIN=(dir_build / "debug" / "dodder"):
   just ../zz-tests_bats/test
 
-test-bats $PATH=(dir_build + ":" + env("PATH")):
+test-bats $PATH=(dir_build / "debug" + ":" + env("PATH")) $DODDER_BIN=(dir_build / "debug" / "dodder"):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test
 
 # Runs all bats tests but filters output to only show failed test files
-test-bats-failed_files $PATH=(dir_build + ":" + env("PATH")):
+test-bats-failed_files $PATH=(dir_build / "debug" + ":" + env("PATH")) $DODDER_BIN=(dir_build / "debug" / "dodder"):
   just ../zz-tests_bats/test-generate_fixtures
   just ../zz-tests_bats/test | \
     grep "#  in test file " | \
     grep -o '[^[:space:]]*\.bats' | \
     sort -u
 
-version_next := shell("der-next info || echo '\n\ngetting next version failed'")
-
 test-bats-next *args:
-  just \
-    --set DODDER_BIN der-next \
-    --set DODDER_VERSION v{{version_next}} \
-    ../zz-tests_bats/test-generate_fixtures
-
-  just \
-    --set DODDER_BIN der-next \
-    --set DODDER_VERSION v{{version_next}} \
-    ../zz-tests_bats/test {{args}}
+  DODDER_BIN=der-next just ../zz-tests_bats/test-generate_fixtures
+  DODDER_BIN=der-next just ../zz-tests_bats/test {{args}}
 
 test: test-go test-bats
 

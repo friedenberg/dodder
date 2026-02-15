@@ -44,6 +44,9 @@ All commands should be run from the `go/` directory.
 -   **Filter by tag**: `cd ../zz-tests_bats && just test-tags migration`
 -   **Show failed files**: `just test-bats-failed_files`
 
+See the root `CLAUDE.md` for the full fixture workflow documentation, including
+how to regenerate and commit fixtures after store format changes.
+
 ## Architecture Overview
 
 ### Module Organization

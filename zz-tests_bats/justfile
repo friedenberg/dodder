@@ -1,6 +1,5 @@
 
-export DODDER_BIN := "dodder"
-export DODDER_VERSION := "v" + shell(DODDER_BIN + " info store-version")
+export DODDER_BIN := env("DODDER_BIN", "dodder")
 export DODDER_XDG_UTILITY_OVERRIDE := ""
 
 default: test
@@ -11,7 +10,7 @@ dir_git_root := shell("git rev-parse --show-toplevel")
 clean-fixtures:
   #! /bin/bash -e
 
-  dir="migration/{{DODDER_VERSION}}"
+  dir="migration/v$({{DODDER_BIN}} info store-version)"
   git reset HEAD "$dir" >/dev/null 2>&1
   ./../bin/chflags.bash -R nouchg "$dir" >/dev/null 2>&1
   git clean -fd "$dir" >/dev/null 2>&1
@@ -22,7 +21,7 @@ clean-fixtures:
 
 
 [group("debug")]
-debug-env store_version=DODDER_VERSION:
+debug-env store_version=`echo "v$(${DODDER_BIN:-dodder} info store-version)"`:
   #! /bin/bash -ex
   dir="$(mktemp -d)"
   trap "rm -rf '$dir'" EXIT
@@ -84,8 +83,10 @@ check:
 
 [group("test")]
 test-generate_fixtures:
+  #! /bin/bash -e
   which {{DODDER_BIN}}
-  ./migration/generate_fixture.bash {{DODDER_VERSION}}
+  export DODDER_VERSION="v$({{DODDER_BIN}} info store-version)"
+  ./migration/generate_fixture.bash
 
 bats_timeout := "5"
 
