@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/url"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
@@ -20,7 +20,7 @@ func TomlBookmarkUrl(
 	object *sku.Transacted,
 	envRepo env_repo.Env,
 ) (ur *url.URL, err error) {
-	var reader interfaces.BlobReader
+	var reader domain_interfaces.BlobReader
 
 	if reader, err = envRepo.GetDefaultBlobStore().MakeBlobReader(object.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)

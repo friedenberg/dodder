@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -179,7 +179,7 @@ func testEqualityNotSelf(t *ui.TestContext) {
 
 func makeTestTextFormatFactory(
 	envDir env_dir.Env,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) object_metadata_fmt_triple_hyphen.Factory {
 	return object_metadata_fmt_triple_hyphen.Factory{
 		AllowMissingTypeSig: true,
@@ -190,7 +190,7 @@ func makeTestTextFormatFactory(
 
 func makeTestTextFormat(
 	envDir env_dir.Env,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) object_metadata_fmt_triple_hyphen.Format {
 	return makeTestTextFormatFactory(envDir, blobStore).Make()
 }
@@ -329,8 +329,8 @@ type blobReaderFactory struct {
 }
 
 func (blobStore blobReaderFactory) BlobReader(
-	digest interfaces.MarklId,
-) (readCloser interfaces.BlobReader, err error) {
+	digest domain_interfaces.MarklId,
+) (readCloser domain_interfaces.BlobReader, err error) {
 	var value string
 	var ok bool
 
@@ -358,7 +358,7 @@ func writeFormat(
 	includeBlob bool,
 	blobBody string,
 	options object_metadata_fmt_triple_hyphen.FormatterOptions,
-	hashType interfaces.FormatHash,
+	hashType domain_interfaces.FormatHash,
 ) (out string) {
 	hash := sha256.New()
 	reader, repool := pool.GetStringReader(blobBody)

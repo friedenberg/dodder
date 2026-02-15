@@ -1,7 +1,7 @@
 package repo_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
@@ -19,11 +19,11 @@ func (config TomlLocalOverridePathV0) GetRepoBlob() Blob {
 	return config
 }
 
-func (config TomlLocalOverridePathV0) GetPublicKey() interfaces.MarklId {
+func (config TomlLocalOverridePathV0) GetPublicKey() domain_interfaces.MarklId {
 	return config.PublicKey
 }
 
-func (config *TomlLocalOverridePathV0) SetPublicKey(id interfaces.MarklId) {
+func (config *TomlLocalOverridePathV0) SetPublicKey(id domain_interfaces.MarklId) {
 	config.PublicKey.ResetWithMarklId(id)
 }
 

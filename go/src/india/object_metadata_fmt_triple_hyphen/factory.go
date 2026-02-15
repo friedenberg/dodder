@@ -1,14 +1,14 @@
 package object_metadata_fmt_triple_hyphen
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
 )
 
 type Factory struct {
 	EnvDir        env_dir.Env
-	BlobStore     interfaces.BlobStore
+	BlobStore     domain_interfaces.BlobStore
 	BlobFormatter script_config.RemoteScript
 
 	AllowMissingTypeSig bool
@@ -42,7 +42,7 @@ func (factory Factory) MakeTextParser() Parser {
 	}
 }
 
-func (factory Factory) getBlobDigestType() interfaces.FormatHash {
+func (factory Factory) getBlobDigestType() domain_interfaces.FormatHash {
 	hashType := factory.BlobStore.GetDefaultHashType()
 
 	if hashType == nil {

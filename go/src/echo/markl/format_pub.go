@@ -1,11 +1,9 @@
 package markl
 
-import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-)
+import "code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 
 type (
-	FuncFormatPubVerify func(pubkey, message, sig interfaces.MarklId) error
+	FuncFormatPubVerify func(pubkey, message, sig domain_interfaces.MarklId) error
 
 	FormatPub struct {
 		Id   string
@@ -15,7 +13,7 @@ type (
 	}
 )
 
-var _ interfaces.MarklFormat = FormatPub{}
+var _ domain_interfaces.MarklFormat = FormatPub{}
 
 func (format FormatPub) GetMarklFormatId() string {
 	return format.Id

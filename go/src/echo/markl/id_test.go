@@ -6,13 +6,13 @@ import (
 	"io"
 	"testing"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 )
 
-func StringHRPCombined(id interfaces.MarklId) string {
+func StringHRPCombined(id domain_interfaces.MarklId) string {
 	format := id.GetMarklFormat()
 	data := id.GetBytes()
 
@@ -34,7 +34,7 @@ func StringHRPCombined(id interfaces.MarklId) string {
 }
 
 func SetBlechCombinedHRPAndData(
-	id interfaces.MarklIdMutable,
+	id domain_interfaces.MarklIdMutable,
 	value string,
 ) (err error) {
 	var formatId string

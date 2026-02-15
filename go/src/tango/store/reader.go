@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -13,7 +14,7 @@ import (
 )
 
 func (store *Store) ReadTransactedFromObjectId(
-	objectId interfaces.ObjectId,
+	objectId domain_interfaces.ObjectId,
 ) (object *sku.Transacted, err error) {
 	object = sku.GetTransactedPool().Get()
 
@@ -87,7 +88,7 @@ func (store *Store) ReadTypeObject(
 
 // TODO transition to a context-based panic / cancel semantic
 func (store *Store) ReadOneObjectId(
-	objectId interfaces.ObjectId,
+	objectId domain_interfaces.ObjectId,
 ) (object *sku.Transacted, err error) {
 	if objectId.IsEmpty() {
 		return object, err
@@ -109,7 +110,7 @@ func (store *Store) ReadOneObjectId(
 // TODO add support for cwd and sigil
 // TODO simplify
 func (store *Store) ReadOneInto(
-	objectId interfaces.ObjectId,
+	objectId domain_interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
 	var object *sku.Transacted

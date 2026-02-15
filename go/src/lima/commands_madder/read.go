@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/juliett/command"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
@@ -55,8 +55,8 @@ func (cmd Read) Run(dep command.Request) {
 func (Read) readOneBlob(
 	envBlobStore env_repo.BlobStoreEnv,
 	entry readBlobEntry,
-) (digest interfaces.MarklId, err error) {
-	var writeCloser interfaces.BlobWriter
+) (digest domain_interfaces.MarklId, err error) {
+	var writeCloser domain_interfaces.BlobWriter
 
 	if writeCloser, err = envBlobStore.GetDefaultBlobStore().MakeBlobWriter(
 		nil,

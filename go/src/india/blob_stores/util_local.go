@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -13,8 +14,8 @@ import (
 func localAllBlobs(
 	basePath string,
 	defaultHashType markl.FormatHash,
-) interfaces.SeqError[interfaces.MarklId] {
-	return func(yield func(interfaces.MarklId, error) bool) {
+) interfaces.SeqError[domain_interfaces.MarklId] {
+	return func(yield func(domain_interfaces.MarklId, error) bool) {
 		id, repool := defaultHashType.GetBlobId()
 		defer repool()
 
@@ -83,8 +84,8 @@ func localAllBlobs(
 
 func localAllBlobsMultihash(
 	basePath string,
-) interfaces.SeqError[interfaces.MarklId] {
-	return func(yield func(interfaces.MarklId, error) bool) {
+) interfaces.SeqError[domain_interfaces.MarklId] {
+	return func(yield func(domain_interfaces.MarklId, error) bool) {
 		dirEntries, err := files.DirEntries(basePath)
 		if err != nil {
 			yield(nil, errors.Wrap(err))

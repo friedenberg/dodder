@@ -2,6 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -32,7 +33,7 @@ type (
 		ExpandStringString(string) (string, error)
 		ExpandString(string) (ID_PTR, error)
 		Expand(ID_PTR) (ID_PTR, error)
-		Abbreviate(interfaces.Abbreviatable) (string, error)
+		Abbreviate(domain_interfaces.Abbreviatable) (string, error)
 	}
 
 	IdIndex interface {
@@ -48,18 +49,18 @@ type (
 
 	RepoStore interface {
 		Commit(*Transacted, CommitOptions) (err error)
-		ReadOneInto(interfaces.ObjectId, *Transacted) (err error)
+		ReadOneInto(domain_interfaces.ObjectId, *Transacted) (err error)
 		ReadPrimitiveQuery(
 			qg PrimitiveQueryGroup,
 			w interfaces.FuncIter[*Transacted],
 		) (err error)
 	}
 
-	ExternalObjectId       = interfaces.ExternalObjectId
-	ExternalObjectIdGetter = interfaces.ExternalObjectIdGetter
+	ExternalObjectId       = domain_interfaces.ExternalObjectId
+	ExternalObjectIdGetter = domain_interfaces.ExternalObjectIdGetter
 
 	FuncReadOneInto = func(
-		k1 interfaces.ObjectId,
+		k1 domain_interfaces.ObjectId,
 		out *Transacted,
 	) (err error)
 

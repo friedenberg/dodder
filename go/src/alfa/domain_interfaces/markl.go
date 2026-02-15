@@ -1,9 +1,11 @@
-package interfaces
+package domain_interfaces
 
 import (
 	"encoding"
 	"hash"
 	"io"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type (
@@ -18,11 +20,11 @@ type (
 		GetHash() Hash
 		PutHash(Hash)
 
-		GetMarklIdForString(input string) (MarklId, FuncRepool)
+		GetMarklIdForString(input string) (MarklId, interfaces.FuncRepool)
 		GetMarklIdFromStringFormat(
 			format string,
 			args ...any,
-		) (MarklId, FuncRepool)
+		) (MarklId, interfaces.FuncRepool)
 	}
 
 	MarklFormatGetter interface {
@@ -33,14 +35,14 @@ type (
 		hash.Hash
 		MarklFormatGetter
 		// TODO add `WriteToMarklId` method for reuse
-		GetMarklId() (MarklIdMutable, FuncRepool)
+		GetMarklId() (MarklIdMutable, interfaces.FuncRepool)
 	}
 
 	MarklId interface {
 		// TODO consider removing Stringer and Setter
 
 		// TODO add WriteString and WriteStringWithFormat
-		Stringer
+		interfaces.Stringer
 		StringWithFormat() string
 
 		encoding.BinaryMarshaler
@@ -57,7 +59,7 @@ type (
 		GetPurposeId() string
 
 		// Optional methods
-		GetIOWrapper() (IOWrapper, error)
+		GetIOWrapper() (interfaces.IOWrapper, error)
 		Verify(mes, sig MarklId) error
 		Sign(
 			mes MarklId,
@@ -68,7 +70,7 @@ type (
 
 	MarklIdMutable interface {
 		MarklId
-		Setter
+		interfaces.Setter
 		encoding.BinaryUnmarshaler
 		// encoding.TextUnmarshaler
 		// io.ReaderFrom
@@ -92,8 +94,8 @@ type (
 	DigestWriteMap map[string]MarklIdMutable
 
 	Lock[
-		KEY Value,
-		KEY_PTR ValuePtr[KEY],
+		KEY interfaces.Value,
+		KEY_PTR interfaces.ValuePtr[KEY],
 	] interface {
 		GetKey() KEY
 		GetValue() MarklId
@@ -101,8 +103,8 @@ type (
 	}
 
 	LockMutable[
-		KEY Value,
-		KEY_PTR ValuePtr[KEY],
+		KEY interfaces.Value,
+		KEY_PTR interfaces.ValuePtr[KEY],
 	] interface {
 		Lock[KEY, KEY_PTR]
 		GetKeyMutable() KEY_PTR

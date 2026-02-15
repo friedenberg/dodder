@@ -3,7 +3,7 @@ package objects
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -32,7 +32,7 @@ func SetTags[TAG ids.Tag](metadata MetadataMutable, otherTags ids.Set[TAG]) {
 func GetMarklIdForPurpose(
 	metadata Metadata,
 	purposeId string,
-) interfaces.MarklId {
+) domain_interfaces.MarklId {
 	purposeType := markl.GetPurpose(purposeId).GetPurposeType()
 
 	switch purposeType {
@@ -57,7 +57,7 @@ func GetMarklIdForPurpose(
 func GetMarklIdMutableForPurpose(
 	metadata MetadataMutable,
 	purposeId string,
-) interfaces.MarklIdMutable {
+) domain_interfaces.MarklIdMutable {
 	purposeType := markl.GetPurpose(purposeId).GetPurposeType()
 
 	switch purposeType {

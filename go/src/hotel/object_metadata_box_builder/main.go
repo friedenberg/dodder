@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -14,8 +14,8 @@ import (
 type Builder string_format_writer.Box
 
 func (builder *Builder) AddBlobDigestIfNecessary(
-	digest interfaces.MarklId,
-	funcAbbreviate interfaces.FuncAbbreviateString,
+	digest domain_interfaces.MarklId,
+	funcAbbreviate domain_interfaces.FuncAbbreviateString,
 ) {
 	value := digest.String()
 
@@ -61,7 +61,7 @@ func (builder *Builder) AddMotherSigIfNecessary(
 	builder.addMarklIdIfNotNull(metadata.GetMotherObjectSig())
 }
 
-func (builder *Builder) addMarklIdIfNotNull(id interfaces.MarklId) {
+func (builder *Builder) addMarklIdIfNotNull(id domain_interfaces.MarklId) {
 	if id.IsNull() {
 		return
 	}
@@ -69,20 +69,20 @@ func (builder *Builder) addMarklIdIfNotNull(id interfaces.MarklId) {
 	builder.addMarklId(id)
 }
 
-func (builder *Builder) addMarklId(id interfaces.MarklId) {
+func (builder *Builder) addMarklId(id domain_interfaces.MarklId) {
 	builder.addMarklIdWithColorType(id, id.GetPurposeId(), string_format_writer.ColorTypeHash)
 }
 
 func (builder *Builder) addMarklIdLockWithColorType(
 	key string,
-	value interfaces.MarklId,
+	value domain_interfaces.MarklId,
 	colorType string_format_writer.ColorType,
 ) {
 	builder.addMarklIdWithColorType(value, key, colorType)
 }
 
 func (builder *Builder) addMarklIdWithColorType(
-	value interfaces.MarklId,
+	value domain_interfaces.MarklId,
 	key string,
 	colorType string_format_writer.ColorType,
 ) {

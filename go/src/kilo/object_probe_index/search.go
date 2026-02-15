@@ -3,13 +3,13 @@ package object_probe_index
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
 func (page *page) seekToFirstBinarySearch(
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 ) (mid int64, err error) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(expected))
 
@@ -79,7 +79,7 @@ func (page *page) seekToFirstBinarySearch(
 }
 
 func (page *page) seekToFirstLinearSearch(
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 ) (loc int64, err error) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(expected))
 

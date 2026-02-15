@@ -8,6 +8,7 @@ import (
 	"math"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
@@ -273,7 +274,7 @@ func (encoder *binaryEncoder) writeFieldKey(
 }
 
 func (encoder *binaryEncoder) writeMarklId(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 	allowNull bool,
 ) (n int64, err error) {
 	if !allowNull {
@@ -314,7 +315,7 @@ func (encoder *binaryEncoder) writeFieldWriterTo(
 }
 
 func (encoder *binaryEncoder) writeFieldMerkleId(
-	merkleId interfaces.MarklId,
+	merkleId domain_interfaces.MarklId,
 	allowNull bool,
 	key string,
 ) (n int64, err error) {

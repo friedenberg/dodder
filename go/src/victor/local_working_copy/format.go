@@ -11,6 +11,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/src/bravo/client"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
@@ -744,7 +745,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			writer interfaces.WriterAndStringWriter,
 		) interfaces.FuncIter[*sku.Transacted] {
 			return func(object *sku.Transacted) (err error) {
-				var readCloser interfaces.BlobReader
+				var readCloser domain_interfaces.BlobReader
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 					object.GetBlobDigest(),
@@ -780,7 +781,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				}
 
 				if repo.GetConfig().IsInlineType(object.GetType()) {
-					var readCloser interfaces.BlobReader
+					var readCloser domain_interfaces.BlobReader
 
 					if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 						object.GetBlobDigest(),
@@ -820,7 +821,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			cliFmt := repo.SkuFormatBoxTransactedNoColor()
 
 			return func(object *sku.Transacted) (err error) {
-				var readCloser interfaces.BlobReader
+				var readCloser domain_interfaces.BlobReader
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 					object.GetBlobDigest(),
@@ -1122,7 +1123,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 			return func(object *sku.Transacted) (err error) {
 				var a map[string]any
 
-				var readCloser interfaces.BlobReader
+				var readCloser domain_interfaces.BlobReader
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 					object.GetBlobDigest(),
@@ -1162,7 +1163,7 @@ var formatters = map[string]FormatFuncConstructorEntry{
 				ui.TodoP3("limit to only zettels supporting toml")
 				var a map[string]any
 
-				var readCloser interfaces.BlobReader
+				var readCloser domain_interfaces.BlobReader
 
 				if readCloser, err = repo.GetStore().GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(
 					object.GetBlobDigest(),

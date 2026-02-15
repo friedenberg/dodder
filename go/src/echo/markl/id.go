@@ -6,19 +6,19 @@ import (
 	"slices"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 var (
-	_ interfaces.MarklId        = Id{}
-	_ interfaces.MarklIdMutable = &Id{}
+	_ domain_interfaces.MarklId        = Id{}
+	_ domain_interfaces.MarklIdMutable = &Id{}
 )
 
 type Id struct {
 	purposeId string
-	format    interfaces.MarklFormat
+	format    domain_interfaces.MarklFormat
 	data      []byte
 }
 
@@ -90,7 +90,7 @@ func (id Id) GetBytes() []byte {
 	return id.data
 }
 
-func (id Id) GetMarklFormat() interfaces.MarklFormat {
+func (id Id) GetMarklFormat() domain_interfaces.MarklFormat {
 	return id.format
 }
 
@@ -164,7 +164,7 @@ func (id *Id) setWithoutPurpose(value string) (err error) {
 	return err
 }
 
-func (id *Id) SetDigest(digest interfaces.MarklId) (err error) {
+func (id *Id) SetDigest(digest domain_interfaces.MarklId) (err error) {
 	if err = id.SetPurposeId(digest.GetPurposeId()); err != nil {
 		err = errors.Wrap(err)
 		return err
@@ -278,7 +278,7 @@ func (id *Id) ResetWithOrDefaultPurpose(src Id, purpose string) {
 	}
 }
 
-func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
+func (id *Id) ResetWithMarklId(src domain_interfaces.MarklId) {
 	marklType := src.GetMarklFormat()
 	bites := src.GetBytes()
 
@@ -304,6 +304,6 @@ func (id *Id) ResetWithMarklId(src interfaces.MarklId) {
 	)
 }
 
-func (id *Id) GetBlobId() interfaces.MarklId {
+func (id *Id) GetBlobId() domain_interfaces.MarklId {
 	return id
 }

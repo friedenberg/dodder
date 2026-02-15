@@ -2,6 +2,7 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -11,7 +12,7 @@ import (
 type (
 	Config interface {
 		GetStoreVersion() store_version.Version
-		GetPublicKey() interfaces.MarklId
+		GetPublicKey() domain_interfaces.MarklId
 		GetRepoId() ids.RepoId
 		GetInventoryListTypeId() string
 		GetObjectSigMarklTypeId() string
@@ -26,7 +27,7 @@ type (
 		Config
 		GetGenesisConfigPublic() ConfigPublic
 		GetGenesisConfig() ConfigPrivate
-		GetPrivateKey() interfaces.MarklId
+		GetPrivateKey() domain_interfaces.MarklId
 	}
 
 	ConfigPrivateMutable interface {
@@ -36,7 +37,7 @@ type (
 		SetInventoryListTypeId(string)
 		SetObjectSigMarklTypeId(string)
 		SetRepoId(ids.RepoId)
-		GetPrivateKeyMutable() interfaces.MarklIdMutable
+		GetPrivateKeyMutable() domain_interfaces.MarklIdMutable
 	}
 
 	TypedConfigPublic         = triple_hyphen_io.TypedBlob[ConfigPublic]

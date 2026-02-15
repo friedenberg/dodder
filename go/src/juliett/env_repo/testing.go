@@ -5,7 +5,7 @@ package env_repo
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -66,7 +66,7 @@ func makeTestingWithBigBang(
 	}
 
 	for expectedDigestString, content := range contents {
-		var writeCloser interfaces.BlobWriter
+		var writeCloser domain_interfaces.BlobWriter
 
 		writeCloser, err := envRepo.GetDefaultBlobStore().MakeBlobWriter(nil)
 		if err != nil {

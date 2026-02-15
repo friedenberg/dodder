@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -263,9 +264,9 @@ func (store *store) flushMutableConfig(
 
 func (store *store) loadMutableConfigBlob(
 	mutableConfigType ids.TypeStruct,
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (err error) {
-	var blobReader interfaces.BlobReader
+	var blobReader domain_interfaces.BlobReader
 
 	if blobReader, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		blobId,

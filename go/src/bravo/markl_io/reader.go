@@ -3,7 +3,7 @@ package markl_io
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -11,13 +11,13 @@ type readCloser struct {
 	tee    io.Reader
 	reader io.Reader
 	writer io.Writer
-	hash   interfaces.Hash
+	hash   domain_interfaces.Hash
 }
 
-var _ interfaces.BlobReader = readCloser{}
+var _ domain_interfaces.BlobReader = readCloser{}
 
 func MakeReadCloser(
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 	reader io.Reader,
 ) (src readCloser) {
 	switch rt := reader.(type) {
@@ -38,7 +38,7 @@ func MakeReadCloser(
 }
 
 func MakeReadCloserTee(
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 	reader io.Reader,
 	writer io.Writer,
 ) (src readCloser) {
@@ -131,22 +131,22 @@ func (readCloser readCloser) Close() (err error) {
 	return err
 }
 
-func (readCloser readCloser) GetMarklId() interfaces.MarklId {
+func (readCloser readCloser) GetMarklId() domain_interfaces.MarklId {
 	digest, _ := readCloser.hash.GetMarklId()
 	return digest
 }
 
 type nopReadCloser struct {
-	hash interfaces.Hash
+	hash domain_interfaces.Hash
 	io.ReadCloser
 }
 
-var _ interfaces.BlobReader = nopReadCloser{}
+var _ domain_interfaces.BlobReader = nopReadCloser{}
 
 func MakeNopReadCloser(
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 	readCloser io.ReadCloser,
-) interfaces.BlobReader {
+) domain_interfaces.BlobReader {
 	return nopReadCloser{
 		hash:       hash,
 		ReadCloser: readCloser,
@@ -167,7 +167,7 @@ func (readCloser nopReadCloser) WriteTo(writer io.Writer) (n int64, err error) {
 	return io.Copy(writer, readCloser.ReadCloser)
 }
 
-func (readCloser nopReadCloser) GetMarklId() interfaces.MarklId {
+func (readCloser nopReadCloser) GetMarklId() domain_interfaces.MarklId {
 	id, _ := readCloser.hash.GetMarklId()
 	return id
 }

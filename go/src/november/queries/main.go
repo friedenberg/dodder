@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -156,7 +157,7 @@ func (query *Query) isEmpty() bool {
 
 func (queryGroup *Query) getExactlyOneExternalObjectId(
 	permitInternal bool,
-) (objectId interfaces.ObjectId, sigil ids.Sigil, err error) {
+) (objectId domain_interfaces.ObjectId, sigil ids.Sigil, err error) {
 	if len(queryGroup.optimizedQueries) != 1 {
 		err = errors.ErrorWithStackf(
 			"expected exactly 1 genre query but got %d",

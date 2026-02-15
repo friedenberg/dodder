@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
@@ -23,7 +24,7 @@ func (client client) WriteInventoryListObject(t *sku.Transacted) (err error) {
 
 // TODO add progress bar
 func (client client) ImportInventoryList(
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 	listSku *sku.Transacted,
 ) (err error) {
 	logEntry := log_remote_inventory_lists.Entry{
@@ -176,7 +177,7 @@ func (client client) ReadLast() (max *sku.Transacted, err error) {
 }
 
 func (client client) AllInventoryListContents(
-	blobSha interfaces.MarklId,
+	blobSha domain_interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return nil
 }

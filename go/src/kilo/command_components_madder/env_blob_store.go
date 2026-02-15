@@ -3,7 +3,7 @@ package command_components_madder
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/delta/debug"
 	"code.linenisgreat.com/dodder/go/src/echo/config_cli"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
@@ -22,7 +22,7 @@ func (cmd EnvBlobStore) MakeEnvBlobStore(
 	configAny := req.Utility.GetConfigAny()
 
 	var debugOptions debug.Options
-	var cliConfig interfaces.CLIConfigProvider
+	var cliConfig domain_interfaces.CLIConfigProvider
 
 	switch c := configAny.(type) {
 	case *config_cli.Config:

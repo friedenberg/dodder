@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -74,7 +75,7 @@ func (store *Store) QueryCheckedOut(
 }
 
 func (store *Store) ReadAllExternalItems() (err error) {
-	esado, ok := store.StoreLike.(interfaces.WorkspaceStoreReadAllExternalItems)
+	esado, ok := store.StoreLike.(domain_interfaces.WorkspaceStoreReadAllExternalItems)
 
 	if !ok {
 		err = errors.ErrorWithStackf("store does not support %T", &esado)

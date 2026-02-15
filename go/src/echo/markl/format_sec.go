@@ -4,14 +4,15 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 )
 
 type (
 	// TODO switch to accepting bytes?
 	FuncFormatSecGenerate     func(io.Reader) ([]byte, error)
-	FuncFormatSecGetPublicKey func(private interfaces.MarklId) ([]byte, error)
-	FuncFormatSecGetIOWrapper func(private interfaces.MarklId) (interfaces.IOWrapper, error)
-	FuncFormatSecSign         func(sec, mes interfaces.MarklId, readerRand io.Reader) ([]byte, error)
+	FuncFormatSecGetPublicKey func(private domain_interfaces.MarklId) ([]byte, error)
+	FuncFormatSecGetIOWrapper func(private domain_interfaces.MarklId) (interfaces.IOWrapper, error)
+	FuncFormatSecSign         func(sec, mes domain_interfaces.MarklId, readerRand io.Reader) ([]byte, error)
 
 	FormatSec struct {
 		Id   string
@@ -29,7 +30,7 @@ type (
 	}
 )
 
-var _ interfaces.MarklFormat = FormatSec{}
+var _ domain_interfaces.MarklFormat = FormatSec{}
 
 func (format FormatSec) GetMarklFormatId() string {
 	return format.Id

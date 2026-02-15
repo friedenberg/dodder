@@ -3,7 +3,7 @@ package env_lua
 import (
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
 	"code.linenisgreat.com/dodder/go/src/charlie/catgut"
@@ -113,7 +113,7 @@ func (s *env) LuaRequire(ls *lua.LState) int {
 		panic(err)
 	}
 
-	var ar interfaces.BlobReader
+	var ar domain_interfaces.BlobReader
 
 	if ar, err = s.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		object.GetBlobDigest(),

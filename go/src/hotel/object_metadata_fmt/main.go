@@ -3,7 +3,7 @@ package object_metadata_fmt
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -12,8 +12,8 @@ import (
 
 func AddBlobDigestIfNecessary(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	digest interfaces.MarklId,
-	funcAbbreviate interfaces.FuncAbbreviateString,
+	digest domain_interfaces.MarklId,
+	funcAbbreviate domain_interfaces.FuncAbbreviateString,
 ) {
 	value := digest.String()
 
@@ -83,7 +83,7 @@ func AddReferencedObject(
 
 func addMarklIdIfNotNull(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) {
 	if id.IsNull() {
 		return
@@ -94,7 +94,7 @@ func addMarklIdIfNotNull(
 
 func addMarklId(
 	boxContents collections_slice.Slice[string_format_writer.Field],
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) {
 	boxContents.Append(
 		makeMarklIdField(id),
@@ -102,7 +102,7 @@ func addMarklId(
 }
 
 func makeMarklIdField(
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) string_format_writer.Field {
 	if id.GetPurposeId() == "" {
 		panic(fmt.Sprintf("empty format for markl id: %q", id))

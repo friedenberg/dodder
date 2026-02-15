@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
@@ -66,7 +67,7 @@ func (cmd Info) Run(req command.Request) {
 			ui.GetUI().Print(store_version.VNext)
 
 		case "compression-type":
-			if ioWrapper, ok := defaultBlobStoreConfig.(interfaces.BlobIOWrapper); ok {
+			if ioWrapper, ok := defaultBlobStoreConfig.(domain_interfaces.BlobIOWrapper); ok {
 				ui.GetUI().Print(
 					ioWrapper.GetBlobCompression(),
 				)
@@ -75,7 +76,7 @@ func (cmd Info) Run(req command.Request) {
 			}
 
 		case "age-encryption":
-			if ioWrapper, ok := defaultBlobStoreConfig.(interfaces.BlobIOWrapper); ok {
+			if ioWrapper, ok := defaultBlobStoreConfig.(domain_interfaces.BlobIOWrapper); ok {
 				ui.GetUI().Print(
 					ioWrapper.GetBlobEncryption(),
 				)

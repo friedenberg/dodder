@@ -2,14 +2,15 @@ package ids
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
 
 type (
 	Abbr struct {
-		BlobId   interfaces.Abbreviator
-		ZettelId interfaces.Abbreviator
+		BlobId   domain_interfaces.Abbreviator
+		ZettelId domain_interfaces.Abbreviator
 	}
 )
 
@@ -21,7 +22,7 @@ func DontAbbreviateString[VPtr interfaces.Stringer](k VPtr) (string, error) {
 	return k.String(), nil
 }
 
-func (a Abbr) ExpanderFor(g genres.Genre) interfaces.FuncExpandString {
+func (a Abbr) ExpanderFor(g genres.Genre) domain_interfaces.FuncExpandString {
 	switch g {
 	case genres.Zettel:
 		return a.ZettelId.Expand
@@ -42,7 +43,7 @@ func (a Abbr) AbbreviateZettelIdOnly(
 		return err
 	}
 
-	var getAbbr interfaces.FuncAbbreviateString
+	var getAbbr domain_interfaces.FuncAbbreviateString
 
 	var h ZettelId
 
@@ -101,7 +102,7 @@ func (a Abbr) AbbreviateObjectId(
 	in *ObjectId,
 	out *ObjectId,
 ) (err error) {
-	var getAbbr interfaces.FuncAbbreviateString
+	var getAbbr domain_interfaces.FuncAbbreviateString
 
 	switch in.GetGenre() {
 	case genres.Zettel:

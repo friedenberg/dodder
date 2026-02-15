@@ -2,6 +2,7 @@ package markl
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 )
 
@@ -23,7 +24,7 @@ func MakeLock[
 func MakeLockWith[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
-](key KEY, value interfaces.MarklId) Lock[KEY, KEY_PTR] {
+](key KEY, value domain_interfaces.MarklId) Lock[KEY, KEY_PTR] {
 	lock := MakeLock[KEY, KEY_PTR]()
 
 	lock.GetKeyMutable().ResetWith(key)
@@ -45,11 +46,11 @@ func (tuple *Lock[KEY, KEY_PTR]) GetKeyMutable() KEY_PTR {
 	return KEY_PTR(&tuple.Key)
 }
 
-func (tuple Lock[KEY, KEY_PTR]) GetValue() interfaces.MarklId {
+func (tuple Lock[KEY, KEY_PTR]) GetValue() domain_interfaces.MarklId {
 	return tuple.Value
 }
 
-func (tuple *Lock[KEY, KEY_PTR]) GetValueMutable() interfaces.MarklIdMutable {
+func (tuple *Lock[KEY, KEY_PTR]) GetValueMutable() domain_interfaces.MarklIdMutable {
 	return &tuple.Value
 }
 
@@ -86,7 +87,7 @@ func (tuple Lock[KEY, KEY_PTR]) Equals(
 func LockEquals[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
-](left, right interfaces.Lock[KEY, KEY_PTR]) bool {
+](left, right domain_interfaces.Lock[KEY, KEY_PTR]) bool {
 	if left.GetKey().String() != right.GetKey().String() {
 		return false
 	}

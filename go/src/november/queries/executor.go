@@ -2,6 +2,7 @@ package queries
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
@@ -18,7 +19,7 @@ type (
 	}
 
 	WorkspaceStore interface {
-		interfaces.WorkspaceStoreReadAllExternalItems
+		domain_interfaces.WorkspaceStoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
 		sku.ExternalStoreReadExternalLikeFromObjectIdLike
 		QueryCheckedOut
@@ -59,7 +60,7 @@ func (executor *Executor) ExecuteExactlyOneExternalObject(
 	permitInternal bool,
 ) (object *sku.Transacted, err error) {
 	if executor.WorkspaceStore != nil {
-		var externalObjectId interfaces.ObjectId
+		var externalObjectId domain_interfaces.ObjectId
 
 		if externalObjectId, _, err = executor.Query.getExactlyOneExternalObjectId(
 			permitInternal,

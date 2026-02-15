@@ -1,7 +1,7 @@
 package ids
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -21,11 +21,11 @@ type ExternalObjectId struct {
 
 var _ Id = &ExternalObjectId{}
 
-func (id *ExternalObjectId) GetExternalObjectId() interfaces.ExternalObjectId {
+func (id *ExternalObjectId) GetExternalObjectId() domain_interfaces.ExternalObjectId {
 	return id
 }
 
-func (id *ExternalObjectId) GetGenre() interfaces.Genre {
+func (id *ExternalObjectId) GetGenre() domain_interfaces.Genre {
 	return id.genre
 }
 
@@ -37,7 +37,7 @@ func (id *ExternalObjectId) String() string {
 	return id.value
 }
 
-func (id *ExternalObjectId) SetGenre(genre interfaces.Genre) (err error) {
+func (id *ExternalObjectId) SetGenre(genre domain_interfaces.Genre) (err error) {
 	id.genre = genres.Must(genre)
 	return err
 }
@@ -71,7 +71,7 @@ func (id *ExternalObjectId) Set(value string) (err error) {
 
 func (id *ExternalObjectId) SetWithGenre(
 	value string,
-	genre interfaces.Genre,
+	genre domain_interfaces.Genre,
 ) (err error) {
 	if err = id.Set(value); err != nil {
 		err = errors.Wrap(err)

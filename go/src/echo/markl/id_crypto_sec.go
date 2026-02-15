@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 )
@@ -156,8 +157,8 @@ func (id Id) GetIOWrapper() (ioWrapper interfaces.IOWrapper, err error) {
 }
 
 func (id Id) Sign(
-	mes interfaces.MarklId,
-	sigDst interfaces.MarklIdMutable,
+	mes domain_interfaces.MarklId,
+	sigDst domain_interfaces.MarklIdMutable,
 	sigPurpose string,
 ) (err error) {
 	var formatSec FormatSec

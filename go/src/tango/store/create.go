@@ -3,7 +3,7 @@ package store
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -49,8 +49,8 @@ func (store *Store) CreateOrUpdate(
 }
 
 func (store *Store) CreateOrUpdateBlobDigest(
-	objectId interfaces.ObjectId,
-	blobDigest interfaces.MarklId,
+	objectId domain_interfaces.ObjectId,
+	blobDigest domain_interfaces.MarklId,
 ) (object *sku.Transacted, err error) {
 	if !store.GetEnvRepo().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
@@ -100,7 +100,7 @@ func (store *Store) CreateOrUpdateBlobDigest(
 
 type RevertId struct {
 	*ids.ObjectId
-	Sig interfaces.MarklId
+	Sig domain_interfaces.MarklId
 }
 
 func (store *Store) RevertTo(

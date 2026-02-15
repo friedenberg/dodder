@@ -3,7 +3,7 @@ package store_config
 import (
 	"sort"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/expansion"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -43,7 +43,7 @@ func (compiled *compiled) getRepo(k ids.Id) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (compiled *compiled) GetApproximatedType(
-	id interfaces.ObjectId,
+	id domain_interfaces.ObjectId,
 ) (ct ApproximatedType) {
 	if id.GetGenre() != genres.Type {
 		return ct

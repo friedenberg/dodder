@@ -2,6 +2,7 @@ package zettel_id_index
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
@@ -24,7 +25,7 @@ func MakeIndex(
 	config genesis_configs.ConfigPublic,
 	configCli repo_config_cli.Config,
 	directoryLayout directory_layout.RepoMutable,
-	cacheIOFactory interfaces.NamedBlobAccess,
+	cacheIOFactory domain_interfaces.NamedBlobAccess,
 ) (i Index, err error) {
 	if false {
 		ui.TodoP3("investigate using bitsets")

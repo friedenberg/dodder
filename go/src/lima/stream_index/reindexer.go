@@ -1,7 +1,7 @@
 package stream_index
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
@@ -27,14 +27,14 @@ func (reindexer *Reindexer) ObjectExists(
 }
 
 func (reindexer *Reindexer) ReadOneMarklIdAdded(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 	object *sku.Transacted,
 ) (ok bool) {
 	return reindexer.index.ReadOneMarklIdAdded(marklId, object)
 }
 
 func (reindexer *Reindexer) ReadOneMarklId(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 	object *sku.Transacted,
 ) (ok bool) {
 	return reindexer.index.ReadOneMarklId(marklId, object)

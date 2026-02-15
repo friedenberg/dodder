@@ -4,13 +4,13 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blech32"
 )
 
 // TODO remove
-func SetMaybeSha256(id interfaces.MarklIdMutable, value string) (err error) {
+func SetMaybeSha256(id domain_interfaces.MarklIdMutable, value string) (err error) {
 	// TODO use registered format lengths
 	switch len(value) {
 	case 65:
@@ -39,7 +39,7 @@ func SetMaybeSha256(id interfaces.MarklIdMutable, value string) (err error) {
 }
 
 func SetMarklIdWithFormatBlech32(
-	id interfaces.MarklIdMutable,
+	id domain_interfaces.MarklIdMutable,
 	purposeId string,
 	blechValue string,
 ) (err error) {
@@ -89,7 +89,7 @@ func validatePurposeAndFormatId(purposeId string, formatId string) (err error) {
 }
 
 // TODO remove
-func setSha256(id interfaces.MarklIdMutable, value string) (err error) {
+func setSha256(id domain_interfaces.MarklIdMutable, value string) (err error) {
 	var decodedBytes []byte
 
 	if decodedBytes, err = hex.DecodeString(value); err != nil {

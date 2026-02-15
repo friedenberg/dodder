@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -22,7 +22,7 @@ func (item *Item) GetExternalObjectId() sku.ExternalObjectId {
 	return ids.MakeExternalObjectId(genres.Zettel, item.String())
 }
 
-func (item *Item) GetGenre() interfaces.Genre {
+func (item *Item) GetGenre() domain_interfaces.Genre {
 	return genres.Zettel
 }
 

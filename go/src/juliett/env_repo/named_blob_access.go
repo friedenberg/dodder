@@ -1,17 +1,17 @@
 package env_repo
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
 )
 
-var _ interfaces.NamedBlobAccess = Env{}
+var _ domain_interfaces.NamedBlobAccess = Env{}
 
 func MakeNamedBlobReaderOrNullReader(
-	blobAccess interfaces.NamedBlobAccess,
+	blobAccess domain_interfaces.NamedBlobAccess,
 	path string,
-) (blobReader interfaces.BlobReader, err error) {
+) (blobReader domain_interfaces.BlobReader, err error) {
 	if blobReader, err = blobAccess.MakeNamedBlobReader(path); err != nil {
 		if errors.IsNotExist(err) {
 			return env_dir.NewNopReader()
@@ -24,13 +24,13 @@ func MakeNamedBlobReaderOrNullReader(
 	return blobReader, err
 }
 
-func (env Env) MakeNamedBlobReader(path string) (interfaces.BlobReader, error) {
+func (env Env) MakeNamedBlobReader(path string) (domain_interfaces.BlobReader, error) {
 	return env_dir.NewFileReaderOrErrNotExist(env_dir.DefaultConfig, path)
 }
 
 func (env Env) MakeNamedBlobWriter(
 	path string,
-) (interfaces.BlobWriter, error) {
+) (domain_interfaces.BlobWriter, error) {
 	return env_dir.NewMover(
 		env_dir.DefaultConfig,
 		env_dir.MoveOptions{

@@ -1,12 +1,10 @@
 package ids
 
-import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-)
+import "code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 
 type ProbeId struct {
 	Key string
-	Id  interfaces.MarklId
+	Id  domain_interfaces.MarklId
 }
 
 type ProbeIdWithObjectId struct {

@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_map"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
@@ -24,7 +25,7 @@ type WorkingList struct {
 	description descriptions.Description
 
 	coder                    ListCoder
-	blobWriter               interfaces.BlobWriter
+	blobWriter               domain_interfaces.BlobWriter
 	bufferedBlobWriter       *bufio.Writer
 	bufferedBlobWriterRepool interfaces.FuncRepool
 	cursor                   ohio.Cursor
@@ -38,7 +39,7 @@ type WorkingList struct {
 
 func MakeWorkingList(
 	coder ListCoder,
-	blobWriter interfaces.BlobWriter,
+	blobWriter domain_interfaces.BlobWriter,
 	funcPreWrite interfaces.FuncIter[*Transacted],
 ) *WorkingList {
 	return &WorkingList{
@@ -158,7 +159,7 @@ func (list *WorkingList) Close() (err error) {
 	return err
 }
 
-func (list *WorkingList) GetMarklId() interfaces.MarklId {
+func (list *WorkingList) GetMarklId() domain_interfaces.MarklId {
 	if !list.lock.TryLock() {
 		panic(fmt.Sprintf("trying to get markl id from open list while lock is acquired"))
 	}

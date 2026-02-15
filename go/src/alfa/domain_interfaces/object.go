@@ -1,4 +1,4 @@
-package interfaces
+package domain_interfaces
 
 type ObjectIOFactory interface {
 	ObjectReaderFactory

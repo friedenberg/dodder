@@ -2,6 +2,7 @@ package blob_library
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -14,7 +15,7 @@ type Library[
 ] struct {
 	envRepo env_repo.Env
 	pool    interfaces.Pool[BLOB, BLOB_PTR]
-	interfaces.Format[BLOB, BLOB_PTR]
+	domain_interfaces.Format[BLOB, BLOB_PTR]
 	resetFunc func(BLOB_PTR)
 }
 
@@ -23,7 +24,7 @@ func MakeBlobStore[
 	BLOB_PTR interfaces.Ptr[BLOB],
 ](
 	envRepo env_repo.Env,
-	format interfaces.Format[BLOB, BLOB_PTR],
+	format domain_interfaces.Format[BLOB, BLOB_PTR],
 	resetFunc func(BLOB_PTR),
 ) (blobStore *Library[BLOB, BLOB_PTR]) {
 	blobStore = &Library[BLOB, BLOB_PTR]{
@@ -37,9 +38,9 @@ func MakeBlobStore[
 }
 
 func (library *Library[BLOB, BLOB_PTR]) GetBlob(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (blobPtr BLOB_PTR, repool interfaces.FuncRepool, err error) {
-	var readCloser interfaces.BlobReader
+	var readCloser domain_interfaces.BlobReader
 
 	if readCloser, err = library.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		blobId,
@@ -78,8 +79,8 @@ func (library *Library[BLOB, BLOB_PTR]) PutBlob(blob BLOB_PTR) {
 // TODO re-evaluate this strategy
 func (library *Library[BLOB, BLOB_PTR]) SaveBlobText(
 	blob BLOB_PTR,
-) (digest interfaces.MarklId, n int64, err error) {
-	var writeCloser interfaces.BlobWriter
+) (digest domain_interfaces.MarklId, n int64, err error) {
+	var writeCloser domain_interfaces.BlobWriter
 
 	if writeCloser, err = library.envRepo.GetDefaultBlobStore().MakeBlobWriter(
 		nil,

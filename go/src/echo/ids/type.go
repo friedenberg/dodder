@@ -3,7 +3,7 @@ package ids
 import (
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -91,7 +91,7 @@ func (id typeStruct) Equals(b typeStruct) bool {
 	return id.Value == b.Value
 }
 
-func (id typeStruct) GetGenre() interfaces.Genre {
+func (id typeStruct) GetGenre() domain_interfaces.Genre {
 	return genres.Type
 }
 

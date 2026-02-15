@@ -18,6 +18,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/stack_frame"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -537,7 +538,7 @@ func (server *Server) handleBlobsHeadOrGet(
 			response.StatusCode = http.StatusNotFound
 		}
 	} else {
-		var rc interfaces.BlobReader
+		var rc domain_interfaces.BlobReader
 
 		{
 			var err error
@@ -617,10 +618,10 @@ func (server *Server) handleBlobsPost(request Request) (response Response) {
 
 func (server *Server) copyBlob(
 	reader io.ReadCloser,
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 ) (copyResult blob_stores.CopyResult, err error) {
 	var progressWriter env_ui.ProgressWriter
-	var writeCloser interfaces.BlobWriter
+	var writeCloser domain_interfaces.BlobWriter
 
 	if writeCloser, err = server.Repo.GetBlobStore().MakeBlobWriter(
 		nil,

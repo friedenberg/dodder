@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
@@ -14,7 +15,7 @@ func init() {
 
 type (
 	Config interface {
-		interfaces.Config
+		domain_interfaces.Config
 		ids.InlineTypeChecker // TODO move out of konfig entirely
 	}
 

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
@@ -225,13 +225,13 @@ func (c Diff) makeDo(
 
 func (c Diff) makeDoBlob(
 	w io.WriteCloser,
-	arf interfaces.BlobReaderFactory,
-	sh interfaces.MarklId,
+	arf domain_interfaces.BlobReaderFactory,
+	sh domain_interfaces.MarklId,
 ) errors.FuncErr {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
-		var ar interfaces.BlobReader
+		var ar domain_interfaces.BlobReader
 
 		if ar, err = arf.MakeBlobReader(sh); err != nil {
 			err = errors.Wrap(err)

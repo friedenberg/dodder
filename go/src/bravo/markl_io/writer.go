@@ -3,7 +3,7 @@ package markl_io
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 )
@@ -11,7 +11,7 @@ import (
 var poolWriter = pool.Make[writer](nil, nil)
 
 func MakeWriterWithRepool(
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 	in io.Writer,
 ) (writer *writer, repool func()) {
 	writer = poolWriter.Get()
@@ -25,7 +25,7 @@ func MakeWriterWithRepool(
 }
 
 func MakeWriter(
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 	in io.Writer,
 ) (writer *writer) {
 	writer, _ = MakeWriterWithRepool(hash, in)
@@ -41,12 +41,12 @@ type writer struct {
 	in     io.Writer
 	closer io.Closer
 	writer io.Writer
-	hash   interfaces.Hash
+	hash   domain_interfaces.Hash
 }
 
-var _ interfaces.MarklIdGetter = &writer{}
+var _ domain_interfaces.MarklIdGetter = &writer{}
 
-func (writer *writer) Reset(hash interfaces.Hash, in io.Writer) {
+func (writer *writer) Reset(hash domain_interfaces.Hash, in io.Writer) {
 	if writer.hash == nil || writer.hash.GetMarklFormat() != hash.GetMarklFormat() {
 		writer.hash = hash
 	} else {
@@ -102,7 +102,7 @@ func (writer *writer) Close() (err error) {
 	return err
 }
 
-func (writer *writer) GetMarklId() interfaces.MarklId {
+func (writer *writer) GetMarklId() domain_interfaces.MarklId {
 	digest, _ := writer.hash.GetMarklId()
 	return digest
 }

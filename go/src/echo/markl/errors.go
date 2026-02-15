@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"golang.org/x/exp/constraints"
 )
@@ -20,7 +20,7 @@ func newPkgError(text string) pkgError {
 
 var ErrEmptyType = newPkgError("type is empty")
 
-func MakeErrEmptyType(id interfaces.MarklId) error {
+func MakeErrEmptyType(id domain_interfaces.MarklId) error {
 	if id.GetMarklFormat() == nil {
 		return errors.WrapSkip(1, ErrEmptyType)
 	}
@@ -28,7 +28,7 @@ func MakeErrEmptyType(id interfaces.MarklId) error {
 	return nil
 }
 
-func AssertIdIsNull(id interfaces.MarklId) error {
+func AssertIdIsNull(id domain_interfaces.MarklId) error {
 	if !id.IsNull() {
 		return errors.WrapSkip(1, errIsNotNull{id: Clone(id)})
 	}
@@ -37,7 +37,7 @@ func AssertIdIsNull(id interfaces.MarklId) error {
 }
 
 type errIsNotNull struct {
-	id interfaces.MarklId
+	id domain_interfaces.MarklId
 }
 
 func (err errIsNotNull) Error() string {
@@ -53,7 +53,7 @@ func (err errIsNotNull) GetErrorType() pkgErrDisamb {
 	return pkgErrDisamb{}
 }
 
-func AssertIdIsNotNull(id interfaces.MarklId) error {
+func AssertIdIsNotNull(id domain_interfaces.MarklId) error {
 	if id.IsNull() {
 		return errors.WrapSkip(1, errIsNull{purpose: id.GetPurposeId()})
 	}
@@ -61,7 +61,7 @@ func AssertIdIsNotNull(id interfaces.MarklId) error {
 	return nil
 }
 
-func AssertIdIsNotNullWithPurpose(id interfaces.MarklId, purpose string) error {
+func AssertIdIsNotNullWithPurpose(id domain_interfaces.MarklId, purpose string) error {
 	if id.IsNull() {
 		return errors.WrapSkip(1, errIsNull{purpose: purpose})
 	}
@@ -91,10 +91,10 @@ func (err errIsNull) GetErrorType() pkgErrDisamb {
 }
 
 type ErrNotEqual struct {
-	Expected, Actual interfaces.MarklId
+	Expected, Actual domain_interfaces.MarklId
 }
 
-func AssertEqual(expected, actual interfaces.MarklId) (err error) {
+func AssertEqual(expected, actual domain_interfaces.MarklId) (err error) {
 	if Equals(expected, actual) {
 		return err
 	}
@@ -213,7 +213,7 @@ func (err errWrongType) GetErrorType() pkgErrDisamb {
 }
 
 type ErrFormatOperationNotSupported struct {
-	Format        interfaces.MarklFormat
+	Format        domain_interfaces.MarklFormat
 	FormatId      string
 	OperationName string
 }

@@ -2,6 +2,7 @@ package command_components_madder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
@@ -22,7 +23,7 @@ func (cmd *BlobStoreLocal) SetFlagDefinitions(
 
 type BlobStoreWithEnv struct {
 	env_ui.Env
-	interfaces.BlobStore
+	domain_interfaces.BlobStore
 }
 
 func (cmd BlobStoreLocal) MakeBlobStoreLocal(

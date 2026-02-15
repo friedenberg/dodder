@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -390,7 +390,7 @@ func (decoder *binaryDecoder) readFieldKey(
 	return err
 }
 
-func unmarshalMarklId(id interfaces.MarklIdMutable, bites []byte) (err error) {
+func unmarshalMarklId(id domain_interfaces.MarklIdMutable, bites []byte) (err error) {
 	unmarshaler := markl.IdBinaryDecodingFormatTypeData{
 		MarklIdMutable: id,
 	}

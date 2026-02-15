@@ -1,7 +1,7 @@
 package blech32
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -101,7 +101,7 @@ func (value *Value) UnmarshalText(text []byte) (err error) {
 }
 
 func (value Value) WriteToMerkleId(
-	merkleId interfaces.MarklIdMutable,
+	merkleId domain_interfaces.MarklIdMutable,
 ) (err error) {
 	if err = merkleId.SetMarklId(value.HRP, value.Data); err != nil {
 		err = errors.Wrap(err)

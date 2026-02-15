@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/tridex"
@@ -13,7 +14,7 @@ import (
 
 type serverBlobCache struct {
 	ui             fd.Std
-	localBlobStore interfaces.BlobStore
+	localBlobStore domain_interfaces.BlobStore
 	shas           interfaces.TridexMutable
 	init           sync.Once
 }
@@ -41,7 +42,7 @@ func (serverBlobCache *serverBlobCache) populate() (err error) {
 }
 
 func (serverBlobCache *serverBlobCache) HasBlob(
-	blobSha interfaces.MarklId,
+	blobSha domain_interfaces.MarklId,
 ) (ok bool, err error) {
 	serverBlobCache.init.Do(
 		func() {

@@ -2,6 +2,7 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/compression_type"
@@ -53,7 +54,7 @@ func (config *V0Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config *V0Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (config *V0Common) GetBlobIOWrapper() domain_interfaces.BlobIOWrapper {
 	return &blob_store_configs.TomlV0{
 		AgeEncryption:   *config.GetAgeEncryption(),
 		CompressionType: config.CompressionType,
@@ -64,15 +65,15 @@ func (config V0Common) GetStoreVersion() store_version.Version {
 	return config.StoreVersion
 }
 
-func (config V0Common) GetPrivateKey() interfaces.MarklId {
+func (config V0Common) GetPrivateKey() domain_interfaces.MarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config *V0Common) GetPrivateKeyMutable() interfaces.MarklIdMutable {
+func (config *V0Common) GetPrivateKeyMutable() domain_interfaces.MarklIdMutable {
 	panic(errors.Err405MethodNotAllowed)
 }
 
-func (config V0Common) GetPublicKey() interfaces.MarklId {
+func (config V0Common) GetPublicKey() domain_interfaces.MarklId {
 	panic(errors.Err405MethodNotAllowed)
 }
 

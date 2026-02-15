@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
@@ -12,13 +13,13 @@ import (
 type tomlBlobParseSaver2[
 	O any,
 ] struct {
-	awf              interfaces.BlobWriterFactory
+	awf              domain_interfaces.BlobWriterFactory
 	ignoreTomlErrors bool
 }
 
 func MakeTomlBlobParseSaver2[
 	O any,
-](awf interfaces.BlobWriterFactory,
+](awf domain_interfaces.BlobWriterFactory,
 ) tomlBlobParseSaver2[O] {
 	return tomlBlobParseSaver2[O]{
 		awf: awf,
@@ -28,7 +29,7 @@ func MakeTomlBlobParseSaver2[
 func MakeTextParserIgnoreTomlErrors2[
 	O any,
 	OPtr interfaces.Ptr[O],
-](awf interfaces.BlobWriterFactory,
+](awf domain_interfaces.BlobWriterFactory,
 ) tomlBlobParseSaver2[O] {
 	return tomlBlobParseSaver2[O]{
 		awf:              awf,

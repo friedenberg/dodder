@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -318,7 +319,7 @@ func (store *Store) queryUntracked(
 
 	addRecognizedIfNecessary := func(
 		object *sku.Transacted,
-		digest interfaces.MarklId,
+		digest domain_interfaces.MarklId,
 		digestCache map[string]interfaces.SetMutable[*sku.FSItem],
 	) (item *fsItemRecognized, err error) {
 		if digest.IsNull() {

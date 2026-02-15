@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/checked_out_state"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/objects"
@@ -54,7 +54,7 @@ func (checkedOut *CheckedOut) Clone() *CheckedOut {
 	return dst
 }
 
-func (checkedOut *CheckedOut) GetExternalObjectId() interfaces.ExternalObjectId {
+func (checkedOut *CheckedOut) GetExternalObjectId() domain_interfaces.ExternalObjectId {
 	return checkedOut.GetSkuExternal().GetExternalObjectId()
 }
 

@@ -1,7 +1,7 @@
 package typed_blob_store
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -23,9 +23,9 @@ func MakeRepoStore(
 
 func (store RepoStore) ReadTypedBlob(
 	tipe ids.Type,
-	blobSha interfaces.MarklId,
+	blobSha domain_interfaces.MarklId,
 ) (common repo_blobs.Blob, n int64, err error) {
-	var reader interfaces.BlobReader
+	var reader domain_interfaces.BlobReader
 
 	if reader, err = store.envRepo.GetDefaultBlobStore().MakeBlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
@@ -57,8 +57,8 @@ func (store RepoStore) ReadTypedBlob(
 func (store RepoStore) WriteTypedBlob(
 	tipe ids.Type,
 	blob repo_blobs.Blob,
-) (sh interfaces.MarklId, n int64, err error) {
-	var writer interfaces.BlobWriter
+) (sh domain_interfaces.MarklId, n int64, err error) {
+	var writer domain_interfaces.BlobWriter
 
 	if writer, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)

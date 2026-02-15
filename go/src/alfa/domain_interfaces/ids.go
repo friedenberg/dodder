@@ -1,9 +1,13 @@
-package interfaces
+package domain_interfaces
+
+import (
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+)
 
 type (
 	Genre interface {
 		GenreGetter
-		Stringer
+		interfaces.Stringer
 		IsConfig() bool
 		IsNone() bool
 		IsTag() bool
@@ -18,7 +22,7 @@ type (
 
 	ObjectId interface {
 		GenreGetter
-		Stringer
+		interfaces.Stringer
 		IsEmpty() bool
 	}
 
@@ -32,7 +36,7 @@ type (
 	}
 
 	RepoId interface {
-		Stringer
+		interfaces.Stringer
 		GetRepoIdString() string
 	}
 
@@ -41,7 +45,7 @@ type (
 	}
 
 	Abbreviatable interface {
-		Stringer
+		interfaces.Stringer
 	}
 
 	FuncExpandString     func(string) (string, error)

@@ -1,12 +1,12 @@
 package markl
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 func (id Id) Verify(
-	mes, sig interfaces.MarklId,
+	mes, sig domain_interfaces.MarklId,
 ) (err error) {
 	var formatPub FormatPub
 

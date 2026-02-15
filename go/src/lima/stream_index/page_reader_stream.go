@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
@@ -16,9 +17,9 @@ import (
 
 type streamPageReader struct {
 	*page
-	blobReader      interfaces.BlobReader
+	blobReader      domain_interfaces.BlobReader
 	bufferedReader  *bufio.Reader
-	namedBlobAccess interfaces.NamedBlobAccess
+	namedBlobAccess domain_interfaces.NamedBlobAccess
 }
 
 func (index *Index) makeStreamPageReader(

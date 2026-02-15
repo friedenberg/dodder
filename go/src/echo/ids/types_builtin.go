@@ -3,7 +3,7 @@ package ids
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
 
@@ -150,7 +150,7 @@ func registerBuiltinType(bt BuiltinType) {
 	}
 }
 
-func ObjectIdToTypeStruct(id interfaces.ObjectId) TypeStruct {
+func ObjectIdToTypeStruct(id domain_interfaces.ObjectId) TypeStruct {
 	var tipe TypeStruct
 
 	switch id := id.(type) {
@@ -173,13 +173,13 @@ func ObjectIdToTypeStruct(id interfaces.ObjectId) TypeStruct {
 	return tipe
 }
 
-func IsBuiltin(id interfaces.ObjectId) bool {
+func IsBuiltin(id domain_interfaces.ObjectId) bool {
 	tipe := ObjectIdToTypeStruct(id)
 	_, ok := allMap[tipe]
 	return ok
 }
 
-func Get(id interfaces.ObjectId) (BuiltinType, bool) {
+func Get(id domain_interfaces.ObjectId) (BuiltinType, bool) {
 	tipe := ObjectIdToTypeStruct(id)
 	bt, ok := allMap[tipe]
 	return bt, ok

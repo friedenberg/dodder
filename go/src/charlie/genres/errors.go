@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
 )
@@ -24,7 +24,7 @@ func wrapAsPkgError(err error) pkgError {
 
 var ErrNoAbbreviation = newPkgError("no abbreviation")
 
-func MakeErrUnsupportedGenre(g interfaces.GenreGetter) error {
+func MakeErrUnsupportedGenre(g domain_interfaces.GenreGetter) error {
 	return errors.WrapSkip(1, errUnsupportedGenre{Genre: g.GetGenre()})
 }
 
@@ -33,7 +33,7 @@ func IsErrUnsupportedGenre(err error) bool {
 }
 
 type errUnsupportedGenre struct {
-	interfaces.Genre
+	domain_interfaces.Genre
 }
 
 func (err errUnsupportedGenre) Is(target error) (ok bool) {

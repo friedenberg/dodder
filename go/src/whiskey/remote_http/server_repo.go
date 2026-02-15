@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -109,7 +109,7 @@ func (server *Server) writeInventoryList(
 
 	typedInventoryListStore := server.Repo.GetInventoryListCoderCloset()
 
-	var blobWriter interfaces.BlobWriter
+	var blobWriter domain_interfaces.BlobWriter
 
 	{
 		var err error

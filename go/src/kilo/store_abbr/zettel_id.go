@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -94,7 +95,7 @@ func (ih *indexZettelId) Expand(
 }
 
 func (ih *indexZettelId) Abbreviate(
-	id interfaces.Abbreviatable,
+	id domain_interfaces.Abbreviatable,
 ) (v string, err error) {
 	var h ids.ZettelId
 

@@ -1,19 +1,19 @@
 package sku
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
 type (
 	FuncReadOne = func(
-		sh interfaces.MarklId,
+		sh domain_interfaces.MarklId,
 		sk *Transacted,
 	) (ok bool)
 
 	ObjectProbeIndex interface {
-		ReadOneObjectId(interfaces.ObjectId, *Transacted) error
+		ReadOneObjectId(domain_interfaces.ObjectId, *Transacted) error
 	}
 
 	IndexPrimitives interface {
@@ -28,12 +28,12 @@ type (
 		// ) (ok bool)
 
 		ReadOneMarklIdAdded(
-			sh interfaces.MarklId,
+			sh domain_interfaces.MarklId,
 			sk *Transacted,
 		) (ok bool)
 
 		ReadOneMarklId(
-			sh interfaces.MarklId,
+			sh domain_interfaces.MarklId,
 			sk *Transacted,
 		) (ok bool)
 	}
@@ -52,7 +52,7 @@ type (
 		) (skus []*Transacted, err error)
 
 		ReadManyMarklId(
-			sh interfaces.MarklId,
+			sh domain_interfaces.MarklId,
 		) (skus []*Transacted, err error)
 	}
 
@@ -87,7 +87,7 @@ func ReadOneObjectId(
 }
 
 func ReadOneObjectIdBespoke(
-	objectId interfaces.ObjectId,
+	objectId domain_interfaces.ObjectId,
 	object *Transacted,
 	funcs ...FuncReadOne,
 ) (ok bool) {

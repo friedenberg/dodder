@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -151,7 +152,7 @@ func (closet Closet) WriteObjectToWriter(
 // TODO consume interfaces.SeqError and expose as a coder instead
 func (closet Closet) WriteBlobToWriter(
 	ctx interfaces.ActiveContext,
-	tipe interfaces.ObjectId,
+	tipe domain_interfaces.ObjectId,
 	seq sku.Seq,
 	bufferedWriter *bufio.Writer,
 ) (n int64, err error) {
@@ -218,7 +219,7 @@ func (closet Closet) StreamInventoryListBlobSkus(
 		tipe := object.GetType()
 		blobDigest := object.GetBlobDigest()
 
-		var readCloser interfaces.BlobReader
+		var readCloser domain_interfaces.BlobReader
 
 		if blobDigest.IsNull() {
 			return
@@ -301,11 +302,11 @@ func (closet Closet) AllDecodedObjectsFromStream(
 
 func (closet Closet) IterInventoryListBlobSkusFromBlobStore(
 	tipe ids.TypeStruct,
-	blobStore interfaces.BlobStore,
-	blobId interfaces.MarklId,
+	blobStore domain_interfaces.BlobStore,
+	blobId domain_interfaces.MarklId,
 ) interfaces.SeqError[*sku.Transacted] {
 	return func(yield func(*sku.Transacted, error) bool) {
-		var readCloser interfaces.BlobReader
+		var readCloser domain_interfaces.BlobReader
 
 		{
 			var err error
@@ -371,7 +372,7 @@ func (closet Closet) IterInventoryListBlobSkusFromReader(
 
 func (closet Closet) ReadInventoryListObject(
 	ctx interfaces.ActiveContext,
-	tipe interfaces.ObjectId,
+	tipe domain_interfaces.ObjectId,
 	reader *bufio.Reader,
 ) (out *sku.Transacted, err error) {
 	if err = genres.Type.AssertGenre(tipe); err != nil {

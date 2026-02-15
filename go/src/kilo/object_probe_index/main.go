@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -104,7 +105,7 @@ func (index *Index) AddDigest(
 }
 
 func (index *Index) ReadOne(
-	originalId interfaces.MarklId,
+	originalId domain_interfaces.MarklId,
 ) (loc Loc, err error) {
 	id := originalId
 
@@ -132,7 +133,7 @@ func (index *Index) ReadOne(
 }
 
 func (index *Index) ReadMany(
-	originalId interfaces.MarklId,
+	originalId domain_interfaces.MarklId,
 	locations *[]Loc,
 ) (err error) {
 	id := originalId

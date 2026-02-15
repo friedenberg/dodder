@@ -1,13 +1,15 @@
-package interfaces
+package domain_interfaces
 
 import (
 	"io"
+
+	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 )
 
 type (
 	BlobIOWrapper interface {
 		GetBlobEncryption() MarklId
-		GetBlobCompression() IOWrapper
+		GetBlobCompression() interfaces.IOWrapper
 	}
 
 	BlobIOWrapperGetter interface {
@@ -58,23 +60,23 @@ type (
 
 		GetBlobStoreDescription() string
 		GetDefaultHashType() FormatHash
-		AllBlobs() SeqError[MarklId]
+		AllBlobs() interfaces.SeqError[MarklId]
 	}
 
 	// Blobs represent persisted files, like blobs in Git. Blobs are used by
 	// Zettels, types, tags, config, and inventory lists.
 	BlobPool[BLOB any] interface {
-		GetBlob(MarklId) (BLOB, FuncRepool, error)
+		GetBlob(MarklId) (BLOB, interfaces.FuncRepool, error)
 	}
 
-	Format[BLOB any, BLOB_PTR Ptr[BLOB]] interface {
+	Format[BLOB any, BLOB_PTR interfaces.Ptr[BLOB]] interface {
 		SavedBlobFormatter
-		CoderReadWriter[BLOB_PTR]
+		interfaces.CoderReadWriter[BLOB_PTR]
 	}
 
 	TypedStore[
 		BLOB any,
-		BLOB_PTR Ptr[BLOB],
+		BLOB_PTR interfaces.Ptr[BLOB],
 	] interface {
 		// TODO remove and replace with two-step process
 		SaveBlobText(BLOB_PTR) (MarklId, int64, error)

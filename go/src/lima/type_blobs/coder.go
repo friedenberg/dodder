@@ -2,6 +2,7 @@ package type_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
@@ -11,8 +12,8 @@ import (
 )
 
 type Coder struct {
-	toml_v0 interfaces.TypedStore[TomlV0, *TomlV0]
-	toml_v1 interfaces.TypedStore[TomlV1, *TomlV1]
+	toml_v0 domain_interfaces.TypedStore[TomlV0, *TomlV0]
+	toml_v1 domain_interfaces.TypedStore[TomlV1, *TomlV1]
 }
 
 func MakeTypeStore(
@@ -49,9 +50,9 @@ func MakeTypeStore(
 }
 
 func (store Coder) SaveBlobText(
-	tipe interfaces.ObjectId,
+	tipe domain_interfaces.ObjectId,
 	blob Blob,
-) (digest interfaces.MarklId, n int64, err error) {
+) (digest domain_interfaces.MarklId, n int64, err error) {
 	if err = genres.Type.AssertGenre(tipe); err != nil {
 		err = errors.Wrap(err)
 		return digest, n, err
@@ -79,8 +80,8 @@ func (store Coder) SaveBlobText(
 }
 
 func (store Coder) ParseTypedBlob(
-	tipe interfaces.ObjectId,
-	blobId interfaces.MarklId,
+	tipe domain_interfaces.ObjectId,
+	blobId domain_interfaces.MarklId,
 ) (common Blob, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	default:

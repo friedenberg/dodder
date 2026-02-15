@@ -1,7 +1,7 @@
 package sku_json_fmt
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/golf/objects"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -16,7 +16,7 @@ type WithDormant struct {
 func (json *WithDormant) FromStringAndMetadata(
 	objectId string,
 	metadata objects.MetadataMutable,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	if err = json.Transacted.FromObjectIdStringAndMetadata(
 		objectId,
@@ -34,7 +34,7 @@ func (json *WithDormant) FromStringAndMetadata(
 
 func (json *WithDormant) FromTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
@@ -45,7 +45,7 @@ func (json *WithDormant) FromTransacted(
 
 func (json *WithDormant) ToTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	if err = json.Transacted.ToTransacted(object, blobStore); err != nil {
 		err = errors.Wrap(err)

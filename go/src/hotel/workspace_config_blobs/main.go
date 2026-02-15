@@ -1,7 +1,7 @@
 package workspace_config_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/triple_hyphen_io"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
 )
@@ -29,7 +29,7 @@ type (
 
 	ConfigWithDryRun interface {
 		Config
-		interfaces.ConfigDryRunGetter
+		domain_interfaces.ConfigDryRunGetter
 	}
 )
 

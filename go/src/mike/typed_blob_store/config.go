@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/toml"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -14,8 +15,8 @@ import (
 )
 
 type Config struct {
-	toml_v0 interfaces.TypedStore[repo_configs.V0, *repo_configs.V0]
-	toml_v1 interfaces.TypedStore[repo_configs.V1, *repo_configs.V1]
+	toml_v0 domain_interfaces.TypedStore[repo_configs.V0, *repo_configs.V0]
+	toml_v1 domain_interfaces.TypedStore[repo_configs.V1, *repo_configs.V1]
 }
 
 func MakeConfigStore(
@@ -53,7 +54,7 @@ func MakeConfigStore(
 
 func (a Config) ParseTypedBlob(
 	tipe ids.Type,
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (common repo_configs.ConfigOverlay, repool interfaces.FuncRepool, n int64, err error) {
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
@@ -91,7 +92,7 @@ func (a Config) FormatTypedBlob(
 	tipe := object.GetType()
 	blobSha := object.GetBlobDigest()
 
-	var store interfaces.SavedBlobFormatter
+	var store domain_interfaces.SavedBlobFormatter
 	switch tipe.String() {
 	case "", ids.TypeTomlConfigV0:
 		store = a.toml_v0

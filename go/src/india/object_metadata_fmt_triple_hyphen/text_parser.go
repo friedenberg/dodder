@@ -3,7 +3,7 @@ package object_metadata_fmt_triple_hyphen
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/script_config"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
@@ -13,8 +13,8 @@ import (
 )
 
 type textParser struct {
-	hashType      interfaces.FormatHash
-	blobWriter    interfaces.BlobWriterFactory
+	hashType      domain_interfaces.FormatHash
+	blobWriter    domain_interfaces.BlobWriterFactory
 	blobFormatter script_config.RemoteScript
 }
 
@@ -33,7 +33,7 @@ func (parser textParser) ParseMetadata(
 		ParserContext:     context,
 	}
 
-	var blobWriter interfaces.BlobWriter
+	var blobWriter domain_interfaces.BlobWriter
 
 	if blobWriter, err = parser.blobWriter.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)

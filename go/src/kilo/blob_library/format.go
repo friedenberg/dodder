@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -12,7 +13,7 @@ type format[
 	BLOB_PTR interfaces.Ptr[BLOB],
 ] struct {
 	interfaces.DecoderFromReader[BLOB_PTR]
-	interfaces.SavedBlobFormatter
+	domain_interfaces.SavedBlobFormatter
 	interfaces.EncoderToWriter[BLOB_PTR]
 }
 
@@ -22,8 +23,8 @@ func MakeBlobFormat[
 ](
 	decoder interfaces.DecoderFromReader[BLOB_PTR],
 	encoder interfaces.EncoderToWriter[BLOB_PTR],
-	blobReader interfaces.BlobReaderFactory,
-) interfaces.Format[BLOB, BLOB_PTR] {
+	blobReader domain_interfaces.BlobReaderFactory,
+) domain_interfaces.Format[BLOB, BLOB_PTR] {
 	return format[BLOB, BLOB_PTR]{
 		DecoderFromReader:  decoder,
 		EncoderToWriter:    encoder,

@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -235,7 +235,7 @@ func (format format) writeMetadataKeyStringTo(
 func (format format) writeMarklIdKey(
 	writer io.Writer,
 	key *catgut.String,
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) (n int, err error) {
 	if err = markl.AssertIdIsNotNull(id); err != nil {
 		err = errors.Wrap(err)
@@ -258,7 +258,7 @@ func (format format) writeMarklIdKey(
 func (format format) writeMarklIdKeyIfNotNull(
 	writer io.Writer,
 	key *catgut.String,
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) (n int, err error) {
 	if id.IsNull() {
 		return n, err
@@ -270,7 +270,7 @@ func (format format) writeMarklIdKeyIfNotNull(
 func (format format) writeMetadata(
 	writer io.Writer,
 	context FormatterContext,
-) (blobDigest interfaces.MarklId, err error) {
+) (blobDigest domain_interfaces.MarklId, err error) {
 	if context.GetMetadata().GetTai().IsEmpty() {
 		err = ErrEmptyTai
 		return blobDigest, err

@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/checkout_mode"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -136,7 +136,7 @@ func (store *Store) readOneExternalBlob(
 
 	// TODO use cache
 	{
-		var writeCloser interfaces.BlobWriter
+		var writeCloser domain_interfaces.BlobWriter
 
 		if writeCloser, err = store.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)

@@ -2,6 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -66,7 +67,7 @@ func (proto Proto) Make() (object *Transacted) {
 
 func (proto Proto) ApplyType(
 	metadataLike objects.GetterMutable,
-	genreGetter interfaces.GenreGetter,
+	genreGetter domain_interfaces.GenreGetter,
 ) (ok bool) {
 	metadata := metadataLike.GetMetadataMutable()
 
@@ -88,7 +89,7 @@ func (proto Proto) ApplyType(
 
 func (proto Proto) Apply(
 	metadataLike objects.GetterMutable,
-	genreGetter interfaces.GenreGetter,
+	genreGetter domain_interfaces.GenreGetter,
 ) (changed bool) {
 	metadata := metadataLike.GetMetadataMutable()
 

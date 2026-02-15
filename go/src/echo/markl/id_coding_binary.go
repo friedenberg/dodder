@@ -3,12 +3,12 @@ package markl
 import (
 	"bytes"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type IdBinaryDecodingTypeData struct {
-	interfaces.MarklIdMutable
+	domain_interfaces.MarklIdMutable
 }
 
 func (id IdBinaryDecodingTypeData) UnmarshalBinary(
@@ -34,7 +34,7 @@ func (id IdBinaryDecodingTypeData) UnmarshalBinary(
 }
 
 type IdBinaryDecodingFormatTypeData struct {
-	interfaces.MarklIdMutable
+	domain_interfaces.MarklIdMutable
 }
 
 func (id *Id) UnmarshalBinary(
@@ -75,7 +75,7 @@ func (id *Id) UnmarshalBinary(
 }
 
 type IdBinaryEncodingTypeData struct {
-	interfaces.MarklId
+	domain_interfaces.MarklId
 }
 
 // structure (in bytes):
@@ -103,7 +103,7 @@ func (id IdBinaryEncodingTypeData) MarshalBinary() (bytes []byte, err error) {
 }
 
 type IdBinaryEncodingFormatTypeData struct {
-	interfaces.MarklId
+	domain_interfaces.MarklId
 }
 
 // structure (in bytes):

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_seq"
@@ -18,20 +19,20 @@ import (
 )
 
 type Transacted struct {
-	BlobId         string   `json:"blob-id"`
-	BlobString     string   `json:"blob-string,omitempty"`
-	Date           string   `json:"date"`
-	Description    string   `json:"description"`
-	Lock           Lock     `json:"lock"`
+	BlobId          string   `json:"blob-id"`
+	BlobString      string   `json:"blob-string,omitempty"`
+	Date            string   `json:"date"`
+	Description     string   `json:"description"`
+	Lock            Lock     `json:"lock"`
 	MotherObjectSig markl.Id `json:"mother-object-sig"`
-	ObjectDigest   markl.Id `json:"object-digest"`
-	ObjectId       string   `json:"object-id"`
-	RepoPubkey     markl.Id `json:"repo-pub_key"`
-	RepoSig        markl.Id `json:"repo-sig"`
-	Sha            string   `json:"sha"`
-	Tags           []string `json:"tags"`
-	Tai            string   `json:"tai"`
-	Type           string   `json:"type"`
+	ObjectDigest    markl.Id `json:"object-digest"`
+	ObjectId        string   `json:"object-id"`
+	RepoPubkey      markl.Id `json:"repo-pub_key"`
+	RepoSig         markl.Id `json:"repo-sig"`
+	Sha             string   `json:"sha"`
+	Tags            []string `json:"tags"`
+	Tai             string   `json:"tai"`
+	Type            string   `json:"type"`
 }
 
 // TODO make a json factory
@@ -39,10 +40,10 @@ type Transacted struct {
 func (json *Transacted) FromObjectIdStringAndMetadata(
 	objectId string,
 	metadata objects.MetadataMutable,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var readCloser interfaces.BlobReader
+		var readCloser domain_interfaces.BlobReader
 
 		if readCloser, err = blobStore.MakeBlobReader(
 			metadata.GetBlobDigest(),
@@ -86,7 +87,7 @@ func (json *Transacted) FromObjectIdStringAndMetadata(
 
 func (json *Transacted) FromTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	return json.FromObjectIdStringAndMetadata(
 		object.ObjectId.String(),
@@ -97,12 +98,12 @@ func (json *Transacted) FromTransacted(
 
 func (json *Transacted) ToTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	metadata := object.GetMetadataMutable()
 
 	if blobStore != nil {
-		var writeCloser interfaces.BlobWriter
+		var writeCloser domain_interfaces.BlobWriter
 
 		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)

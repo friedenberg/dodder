@@ -3,7 +3,7 @@ package store
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/lua"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -23,7 +23,7 @@ func (store *Store) MakeLuaVMPoolV1WithSku(
 		return lvp, err
 	}
 
-	var readCloser interfaces.BlobReader
+	var readCloser domain_interfaces.BlobReader
 
 	if readCloser, err = store.GetEnvRepo().GetDefaultBlobStore().MakeBlobReader(sk.GetBlobDigest()); err != nil {
 		err = errors.Wrap(err)

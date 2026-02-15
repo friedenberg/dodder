@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
@@ -38,11 +39,11 @@ func (client *client) GetBlobStoreConfig() blob_store_configs.Config {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) GetDefaultHashType() interfaces.FormatHash {
+func (client *client) GetDefaultHashType() domain_interfaces.FormatHash {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) HasBlob(blobId interfaces.MarklId) (ok bool) {
+func (client *client) HasBlob(blobId domain_interfaces.MarklId) (ok bool) {
 	var request *http.Request
 
 	{
@@ -73,8 +74,8 @@ func (client *client) HasBlob(blobId interfaces.MarklId) (ok bool) {
 }
 
 func (client *client) MakeBlobReader(
-	blobId interfaces.MarklId,
-) (reader interfaces.BlobReader, err error) {
+	blobId domain_interfaces.MarklId,
+) (reader domain_interfaces.BlobReader, err error) {
 	var request *http.Request
 
 	if request, err = client.newRequest(
@@ -122,12 +123,12 @@ func (client *client) MakeBlobReader(
 }
 
 func (client *client) WriteBlobToRemote(
-	localBlobStore interfaces.BlobStore,
-	expected interfaces.MarklId,
+	localBlobStore domain_interfaces.BlobStore,
+	expected domain_interfaces.MarklId,
 ) (err error) {
 	// Closed by the http client's transport (our roundtripper calling
 	// request.Write)
-	var reader interfaces.BlobReader
+	var reader domain_interfaces.BlobReader
 
 	if reader, err = localBlobStore.MakeBlobReader(
 		expected,
@@ -217,16 +218,16 @@ func (client *client) GetBlobStoreDescription() string {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (client *client) GetBlobIOWrapper() domain_interfaces.BlobIOWrapper {
 	panic(errors.Err501NotImplemented)
 }
 
-func (client *client) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+func (client *client) AllBlobs() interfaces.SeqError[domain_interfaces.MarklId] {
 	panic(errors.Err501NotImplemented)
 }
 
 func (client *client) MakeBlobWriter(
-	marklHashType interfaces.FormatHash,
-) (interfaces.BlobWriter, error) {
+	marklHashType domain_interfaces.FormatHash,
+) (domain_interfaces.BlobWriter, error) {
 	panic(errors.Err501NotImplemented)
 }

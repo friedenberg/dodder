@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -52,7 +52,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 	return s
 }
 
-func (sigil Sigil) GetGenre() interfaces.Genre {
+func (sigil Sigil) GetGenre() domain_interfaces.Genre {
 	return genres.Unknown
 }
 

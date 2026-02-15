@@ -1,14 +1,14 @@
 package markl_age_id
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
 type tipe struct{}
 
-var _ interfaces.MarklFormat = tipe{}
+var _ domain_interfaces.MarklFormat = tipe{}
 
 func (tipe tipe) GetMarklFormatId() string {
 	return markl.FormatIdAgeX25519Sec

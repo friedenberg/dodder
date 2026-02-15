@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter_set"
@@ -42,10 +42,10 @@ type JSON struct {
 func (json *JSON) FromStringAndMetadata(
 	objectId string,
 	metadata objects.MetadataMutable,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var readCloser interfaces.BlobReader
+		var readCloser domain_interfaces.BlobReader
 
 		if readCloser, err = blobStore.MakeBlobReader(
 			metadata.GetBlobDigest(),
@@ -108,7 +108,7 @@ func (json *JSON) FromStringAndMetadata(
 // TODO accept blob store instead of env
 func (json *JSON) FromTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	return json.FromStringAndMetadata(
 		object.ObjectId.String(),
@@ -119,10 +119,10 @@ func (json *JSON) FromTransacted(
 
 func (json *JSON) ToTransacted(
 	object *sku.Transacted,
-	blobStore interfaces.BlobStore,
+	blobStore domain_interfaces.BlobStore,
 ) (err error) {
 	if blobStore != nil {
-		var writeCloser interfaces.BlobWriter
+		var writeCloser domain_interfaces.BlobWriter
 
 		if writeCloser, err = blobStore.MakeBlobWriter(nil); err != nil {
 			err = errors.Wrap(err)

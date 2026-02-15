@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/delta/thyme"
@@ -65,7 +65,7 @@ func (fd *FD) Equals(b *FD) bool {
 func (fd *FD) SetFromPath(
 	baseDir string,
 	path string,
-	blobStore interfaces.BlobWriterFactory,
+	blobStore domain_interfaces.BlobWriterFactory,
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -103,7 +103,7 @@ func (fd *FD) SetFromPath(
 func (fd *FD) SetFromFileInfoWithDir(
 	fileInfo os.FileInfo,
 	dir string,
-	blobStore interfaces.BlobWriterFactory,
+	blobStore domain_interfaces.BlobWriterFactory,
 ) (err error) {
 	if err = fd.SetFileInfoWithDir(fileInfo, dir); err != nil {
 		err = errors.Wrap(err)
@@ -128,7 +128,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.BlobWriter
+	var writer domain_interfaces.BlobWriter
 
 	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
@@ -150,7 +150,7 @@ func (fd *FD) SetFromFileInfoWithDir(
 
 func (fd *FD) SetWithBlobWriterFactory(
 	path string,
-	blobStore interfaces.BlobWriterFactory,
+	blobStore domain_interfaces.BlobWriterFactory,
 ) (err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("empty path")
@@ -170,7 +170,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	defer errors.DeferredCloser(&err, f)
 
-	var blobWriter interfaces.BlobWriter
+	var blobWriter domain_interfaces.BlobWriter
 
 	if blobWriter, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)
@@ -376,11 +376,11 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v interfaces.MarklId) (err error) {
+func (fd *FD) SetShaLike(v domain_interfaces.MarklId) (err error) {
 	return fd.digest.SetDigest(v)
 }
 
-func (fd *FD) GetDigest() interfaces.MarklId {
+func (fd *FD) GetDigest() domain_interfaces.MarklId {
 	return &fd.digest
 }
 

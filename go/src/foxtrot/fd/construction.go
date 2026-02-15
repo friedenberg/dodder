@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -25,7 +25,7 @@ func MakeFromDirPath(
 func MakeFromPathAndDirEntry(
 	path string,
 	dirEntry fs.DirEntry,
-	blobWriter interfaces.BlobWriterFactory,
+	blobWriter domain_interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -55,7 +55,7 @@ func MakeFromPathAndDirEntry(
 func MakeFromPath(
 	baseDir string,
 	path string,
-	blobWriter interfaces.BlobWriterFactory,
+	blobWriter domain_interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	if path == "" {
 		err = errors.ErrorWithStackf("nil file desriptor")
@@ -93,7 +93,7 @@ func MakeFromPath(
 func MakeFromFileInfoWithDir(
 	fileInfo os.FileInfo,
 	dir string,
-	blobStore interfaces.BlobWriterFactory,
+	blobStore domain_interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	// TODO use pool
 	fd = &FD{}
@@ -121,7 +121,7 @@ func MakeFromFileInfoWithDir(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writer interfaces.BlobWriter
+	var writer domain_interfaces.BlobWriter
 
 	if writer, err = blobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)

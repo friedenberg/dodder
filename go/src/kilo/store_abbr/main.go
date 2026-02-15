@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -83,7 +84,7 @@ func (index *indexAbbr) Flush() (err error) {
 		return err
 	}
 
-	var namedBlobWriter interfaces.BlobWriter
+	var namedBlobWriter domain_interfaces.BlobWriter
 
 	if namedBlobWriter, err = index.envRepo.MakeNamedBlobWriter(
 		index.path,

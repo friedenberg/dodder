@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
@@ -14,7 +15,7 @@ import (
 
 type writer struct {
 	repoolBufferedWriter  interfaces.FuncRepool
-	digester              interfaces.BlobWriter
+	digester              domain_interfaces.BlobWriter
 	tee                   io.Writer
 	compressor, encrypter io.WriteCloser
 	bufferedWriter        *bufio.Writer
@@ -90,6 +91,6 @@ func (writer *writer) Close() (err error) {
 	return err
 }
 
-func (writer *writer) GetMarklId() interfaces.MarklId {
+func (writer *writer) GetMarklId() domain_interfaces.MarklId {
 	return writer.digester.GetMarklId()
 }

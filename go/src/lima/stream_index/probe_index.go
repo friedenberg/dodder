@@ -1,8 +1,8 @@
 package stream_index
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/collections_map"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -58,7 +58,7 @@ func (index *probeIndex) Flush() (err error) {
 }
 
 func (index *probeIndex) readOneMarklIdLoc(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (loc object_probe_index.Loc, err error) {
 	if loc, err = index.index.ReadOne(blobId); err != nil {
 		return loc, err
@@ -68,7 +68,7 @@ func (index *probeIndex) readOneMarklIdLoc(
 }
 
 func (index *probeIndex) readManyMarklIdLoc(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (locs []object_probe_index.Loc, err error) {
 	if err = index.index.ReadMany(blobId, &locs); err != nil {
 		return locs, err

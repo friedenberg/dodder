@@ -3,7 +3,7 @@ package blob_stores
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
@@ -12,15 +12,15 @@ import (
 // size, or full verification
 func VerifyBlob(
 	ctx errors.Context,
-	blobStore interfaces.BlobStore,
-	expected interfaces.MarklId,
+	blobStore domain_interfaces.BlobStore,
+	expected domain_interfaces.MarklId,
 	progressWriter io.Writer,
 ) (err error) {
 	// TODO check if `blobStore` implements a `VerifyBlob` method and call that
 	// instead (for expensive blob stores that may implement their own remote
 	// verification, such as ssh, sftp, or something else)
 
-	var readCloser interfaces.BlobReader
+	var readCloser domain_interfaces.BlobReader
 
 	if readCloser, err = blobStore.MakeBlobReader(expected); err != nil {
 		err = errors.Wrap(err)

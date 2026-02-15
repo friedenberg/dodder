@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/charlie/compression_type"
@@ -16,7 +16,7 @@ import (
 
 type blobReader struct {
 	readSeeker io.ReadSeeker
-	digester   interfaces.BlobWriter
+	digester   domain_interfaces.BlobWriter
 	decrypter  io.Reader
 	expander   io.ReadCloser
 	tee        io.Reader
@@ -63,7 +63,7 @@ func NewReader(
 func NewFileReaderOrErrNotExist(
 	config Config,
 	path string,
-) (blobReader interfaces.BlobReader, err error) {
+) (blobReader domain_interfaces.BlobReader, err error) {
 	var readSeeker io.ReadSeeker
 
 	if path == "-" {
@@ -93,14 +93,14 @@ func NewFileReaderOrErrNotExist(
 	return blobReader, err
 }
 
-func NewNopReader() (blobReader interfaces.BlobReader, err error) {
+func NewNopReader() (blobReader domain_interfaces.BlobReader, err error) {
 	return newFileReaderFromReadSeeker(DefaultConfig, bytes.NewReader(nil))
 }
 
 func newFileReaderFromReadSeeker(
 	config Config,
 	readSeeker io.ReadSeeker,
-) (blobReader interfaces.BlobReader, err error) {
+) (blobReader domain_interfaces.BlobReader, err error) {
 	// try the existing options. if they fail, try without encryption
 	if blobReader, err = NewReader(
 		config,
@@ -188,6 +188,6 @@ func (reader *blobReader) Close() (err error) {
 	return err
 }
 
-func (reader *blobReader) GetMarklId() interfaces.MarklId {
+func (reader *blobReader) GetMarklId() domain_interfaces.MarklId {
 	return reader.digester.GetMarklId()
 }

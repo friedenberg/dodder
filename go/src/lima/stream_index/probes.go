@@ -1,7 +1,7 @@
 package stream_index
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -11,7 +11,7 @@ import (
 )
 
 func (index *Index) ReadOneMarklIdAdded(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 	object *sku.Transacted,
 ) (ok bool) {
 	additionObject, ok := index.additionProbes.Get(string(marklId.GetBytes()))
@@ -25,7 +25,7 @@ func (index *Index) ReadOneMarklIdAdded(
 }
 
 func (index *Index) ReadOneMarklId(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 	object *sku.Transacted,
 ) (ok bool) {
 	errors.PanicIfError(markl.AssertIdIsNotNull(marklId))
@@ -51,7 +51,7 @@ func (index *Index) ReadOneMarklId(
 }
 
 func (index *Index) ReadManyMarklId(
-	marklId interfaces.MarklId,
+	marklId domain_interfaces.MarklId,
 ) (objects []*sku.Transacted, err error) {
 	// TODO read from page additions if necessary
 	var locs []object_probe_index.Loc
@@ -109,7 +109,7 @@ func (index *Index) ObjectExists(
 }
 
 func (index *Index) ReadOneObjectId(
-	objectId interfaces.ObjectId,
+	objectId domain_interfaces.ObjectId,
 	object *sku.Transacted,
 ) (err error) {
 	objectIdString := objectId.String()

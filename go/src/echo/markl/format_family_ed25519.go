@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -18,7 +18,7 @@ func Ed25519GeneratePrivateKey(rand io.Reader) (bites []byte, err error) {
 	return bites, err
 }
 
-func Ed25519GetPublicKey(private interfaces.MarklId) (bites []byte, err error) {
+func Ed25519GetPublicKey(private domain_interfaces.MarklId) (bites []byte, err error) {
 	privateBytes := private.GetBytes()
 	var privateKey ed25519.PrivateKey
 
@@ -48,7 +48,7 @@ func Ed25519GetPublicKey(private interfaces.MarklId) (bites []byte, err error) {
 	return bites, err
 }
 
-func Ed25519Verify(pub, message, sig interfaces.MarklId) (err error) {
+func Ed25519Verify(pub, message, sig domain_interfaces.MarklId) (err error) {
 	pubBites := ed25519.PublicKey(pub.GetBytes())
 
 	if err = ed25519.VerifyWithOptions(
@@ -69,8 +69,8 @@ func Ed25519Verify(pub, message, sig interfaces.MarklId) (err error) {
 }
 
 func Ed25519Sign(
-	sec interfaces.MarklId,
-	mes interfaces.MarklId,
+	sec domain_interfaces.MarklId,
+	mes domain_interfaces.MarklId,
 	readerRand io.Reader,
 ) (sigBites []byte, err error) {
 	if readerRand == nil {

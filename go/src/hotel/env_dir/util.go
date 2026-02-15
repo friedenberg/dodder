@@ -8,13 +8,14 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/unicorn"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
 
 func MakeHashBucketPathFromMerkleId(
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 	buckets []int,
 	multiHash bool,
 	pathComponents ...string,

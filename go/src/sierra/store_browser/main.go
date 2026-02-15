@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
@@ -126,7 +127,7 @@ func (store *Store) Flush() (err error) {
 
 // TODO limit this to being used only by *Item.ReadFromExternal
 func (store *Store) getUrl(object *sku.Transacted) (u *url.URL, err error) {
-	var blobReader interfaces.BlobReader
+	var blobReader domain_interfaces.BlobReader
 
 	if blobReader, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobReader(
 		object.GetBlobDigest(),
@@ -270,7 +271,7 @@ func (store *Store) QueryCheckedOut(
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
 func (store *Store) SaveBlob(object sku.ExternalLike) (err error) {
-	var blobWriter interfaces.BlobWriter
+	var blobWriter domain_interfaces.BlobWriter
 
 	if blobWriter, err = store.externalStoreInfo.GetDefaultBlobStore().MakeBlobWriter(
 		nil,

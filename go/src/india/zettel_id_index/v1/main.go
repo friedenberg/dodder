@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/dodder/go/src/_/coordinates"
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections"
@@ -20,7 +20,7 @@ import (
 )
 
 type index struct {
-	namedBlobAccess interfaces.NamedBlobAccess
+	namedBlobAccess domain_interfaces.NamedBlobAccess
 
 	lock *sync.RWMutex
 	path string
@@ -38,7 +38,7 @@ type index struct {
 func MakeIndex(
 	configCli repo_config_cli.Config,
 	directoryLayout directory_layout.RepoMutable,
-	namedBlobAccess interfaces.NamedBlobAccess,
+	namedBlobAccess domain_interfaces.NamedBlobAccess,
 ) (i *index, err error) {
 	i = &index{
 		lock:               &sync.RWMutex{},
@@ -72,7 +72,7 @@ func (index *index) Flush() (err error) {
 
 	index.lock.RUnlock()
 
-	var namedBlobWriter interfaces.BlobWriter
+	var namedBlobWriter domain_interfaces.BlobWriter
 
 	if namedBlobWriter, err = index.namedBlobAccess.MakeNamedBlobWriter(index.path); err != nil {
 		err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (index *index) readIfNecessary() (err error) {
 
 	index.didRead = true
 
-	var namedBlobReader interfaces.BlobReader
+	var namedBlobReader domain_interfaces.BlobReader
 
 	if namedBlobReader, err = index.namedBlobAccess.MakeNamedBlobReader(
 		index.path,

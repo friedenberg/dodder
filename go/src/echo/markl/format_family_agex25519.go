@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/bech32"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/age"
 )
@@ -31,7 +32,7 @@ func AgeX25519Generate(_ io.Reader) (bites []byte, err error) {
 
 // TODO verify if this is correct
 func AgeX25519GetPublicKey(
-	private interfaces.MarklId,
+	private domain_interfaces.MarklId,
 ) (bites []byte, err error) {
 	// the ed25519 package includes a public key suffix, so we need to
 	// reconstruct their version of a private key for a public key value
@@ -42,7 +43,7 @@ func AgeX25519GetPublicKey(
 }
 
 func AgeX25519GetIOWrapper(
-	private interfaces.MarklId,
+	private domain_interfaces.MarklId,
 ) (ioWrapper interfaces.IOWrapper, err error) {
 	var ageId age.Identity
 

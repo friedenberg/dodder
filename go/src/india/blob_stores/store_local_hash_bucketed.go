@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -25,7 +26,7 @@ type localHashBucketed struct {
 	tempFS   env_dir.TemporaryFS
 }
 
-var _ interfaces.BlobStore = localHashBucketed{}
+var _ domain_interfaces.BlobStore = localHashBucketed{}
 
 func makeLocalHashBucketed(
 	envDir env_dir.Env,
@@ -57,16 +58,16 @@ func (blobStore localHashBucketed) GetBlobStoreDescription() string {
 	return "local hash bucketed"
 }
 
-func (blobStore localHashBucketed) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (blobStore localHashBucketed) GetBlobIOWrapper() domain_interfaces.BlobIOWrapper {
 	return blobStore.config
 }
 
-func (blobStore localHashBucketed) GetDefaultHashType() interfaces.FormatHash {
+func (blobStore localHashBucketed) GetDefaultHashType() domain_interfaces.FormatHash {
 	return blobStore.defaultHashFormat
 }
 
 func (blobStore localHashBucketed) makeEnvDirConfig(
-	hashFormat interfaces.FormatHash,
+	hashFormat domain_interfaces.FormatHash,
 ) env_dir.Config {
 	if hashFormat == nil {
 		hashFormat = blobStore.defaultHashFormat
@@ -81,7 +82,7 @@ func (blobStore localHashBucketed) makeEnvDirConfig(
 }
 
 func (blobStore localHashBucketed) HasBlob(
-	merkleId interfaces.MarklId,
+	merkleId domain_interfaces.MarklId,
 ) (ok bool) {
 	if merkleId.IsNull() {
 		ok = true
@@ -100,7 +101,7 @@ func (blobStore localHashBucketed) HasBlob(
 	return ok
 }
 
-func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[domain_interfaces.MarklId] {
 	if blobStore.multiHash {
 		return localAllBlobsMultihash(blobStore.basePath)
 	} else {
@@ -109,8 +110,8 @@ func (blobStore localHashBucketed) AllBlobs() interfaces.SeqError[interfaces.Mar
 }
 
 func (blobStore localHashBucketed) MakeBlobReader(
-	digest interfaces.MarklId,
-) (readCloser interfaces.BlobReader, err error) {
+	digest domain_interfaces.MarklId,
+) (readCloser domain_interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashFormat.Get(),
@@ -134,8 +135,8 @@ func (blobStore localHashBucketed) MakeBlobReader(
 }
 
 func (blobStore localHashBucketed) MakeBlobWriter(
-	marklHashType interfaces.FormatHash,
-) (blobWriter interfaces.BlobWriter, err error) {
+	marklHashType domain_interfaces.FormatHash,
+) (blobWriter domain_interfaces.BlobWriter, err error) {
 	if blobWriter, err = blobStore.blobWriterTo(
 		blobStore.basePath,
 		marklHashType,
@@ -149,8 +150,8 @@ func (blobStore localHashBucketed) MakeBlobWriter(
 
 func (blobStore localHashBucketed) blobWriterTo(
 	path string,
-	hashFormat interfaces.FormatHash,
-) (mover interfaces.BlobWriter, err error) {
+	hashFormat domain_interfaces.FormatHash,
+) (mover domain_interfaces.BlobWriter, err error) {
 	if hashFormat == nil {
 		hashFormat = blobStore.defaultHashFormat
 	}
@@ -178,9 +179,9 @@ func (blobStore localHashBucketed) blobWriterTo(
 }
 
 func (blobStore localHashBucketed) blobReaderFrom(
-	digest interfaces.MarklId,
+	digest domain_interfaces.MarklId,
 	basePath string,
-) (readCloser interfaces.BlobReader, err error) {
+) (readCloser domain_interfaces.BlobReader, err error) {
 	if digest.IsNull() {
 		readCloser = markl_io.MakeNopReadCloser(
 			blobStore.defaultHashFormat.Get(),

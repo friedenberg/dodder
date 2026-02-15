@@ -2,6 +2,7 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -65,15 +66,15 @@ func (config *TomlV2Private) GetGenesisConfigPublic() ConfigPublic {
 	}
 }
 
-func (config *TomlV2Private) GetPrivateKey() interfaces.MarklId {
+func (config *TomlV2Private) GetPrivateKey() domain_interfaces.MarklId {
 	return config.PrivateKey
 }
 
-func (config *TomlV2Private) GetPrivateKeyMutable() interfaces.MarklIdMutable {
+func (config *TomlV2Private) GetPrivateKeyMutable() domain_interfaces.MarklIdMutable {
 	return &config.PrivateKey
 }
 
-func (config *TomlV2Private) GetPublicKey() interfaces.MarklId {
+func (config *TomlV2Private) GetPublicKey() domain_interfaces.MarklId {
 	public, err := config.PrivateKey.GetPublicKey(markl.PurposeRepoPrivateKeyV1)
 	errors.PanicIfError(err)
 	return public
@@ -83,7 +84,7 @@ func (config *TomlV2Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV2Public) GetPublicKey() interfaces.MarklId {
+func (config TomlV2Public) GetPublicKey() domain_interfaces.MarklId {
 	return config.PublicKey
 }
 

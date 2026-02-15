@@ -1,7 +1,7 @@
 package local_working_copy
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -60,7 +60,7 @@ func Make(
 	options Options,
 ) *Repo {
 	var basePath string
-	if repoConfig, ok := env.GetCLIConfig().(interfaces.RepoCLIConfigProvider); ok {
+	if repoConfig, ok := env.GetCLIConfig().(domain_interfaces.RepoCLIConfigProvider); ok {
 		basePath = repoConfig.GetBasePath()
 	}
 

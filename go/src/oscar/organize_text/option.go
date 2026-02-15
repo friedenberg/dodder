@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -163,7 +164,7 @@ func (ocf optionCommentHide) ApplyToWriter(
 }
 
 type OptionCommentDryRun struct {
-	interfaces.MutableConfigDryRun
+	domain_interfaces.MutableConfigDryRun
 }
 
 func (ocf *OptionCommentDryRun) CloneOptionComment() OptionComment {

@@ -2,6 +2,7 @@ package command_components_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/remote_connection_types"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -67,7 +68,7 @@ func (cmd Remote) MakeRemoteAndObject(
 
 	remote = cmd.MakeRemoteFromBlobAndSetPublicKey(req, local, blob)
 
-	var blobId interfaces.MarklId
+	var blobId domain_interfaces.MarklId
 
 	{
 		var err error
@@ -293,7 +294,7 @@ func (cmd *Remote) MakeRemoteStdioLocal(
 	env env_local.Env,
 	dir string,
 	repo *local_working_copy.Repo,
-	pubkey interfaces.MarklId,
+	pubkey domain_interfaces.MarklId,
 ) (remoteHTTP repo.Repo) {
 	envRepo := cmd.MakeEnvRepo(req, false)
 

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -92,7 +92,7 @@ func (tag tagStruct) IsEmpty() bool {
 	return tag.value == ""
 }
 
-func (tag tagStruct) GetGenre() interfaces.Genre {
+func (tag tagStruct) GetGenre() domain_interfaces.Genre {
 	return genres.Tag
 }
 

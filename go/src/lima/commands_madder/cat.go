@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -43,7 +44,7 @@ func (cmd *Cat) SetFlagDefinitions(
 }
 
 type blobIdWithReadCloser struct {
-	BlobId     interfaces.MarklId
+	BlobId     domain_interfaces.MarklId
 	ReadCloser io.ReadCloser
 }
 
@@ -153,10 +154,10 @@ func (cmd Cat) copy(
 
 func (cmd Cat) blob(
 	blobStore blob_stores.BlobStoreInitialized,
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 	blobWriter interfaces.FuncIter[blobIdWithReadCloser],
 ) (err error) {
-	var reader interfaces.BlobReader
+	var reader domain_interfaces.BlobReader
 
 	if reader, err = blobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)

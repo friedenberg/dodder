@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -33,7 +34,7 @@ type Index struct {
 	sunrise  ids.Tai
 	preWrite interfaces.FuncIter[*sku.Transacted]
 	path     string
-	interfaces.NamedBlobAccess
+	domain_interfaces.NamedBlobAccess
 
 	pages [PageCount]page
 
@@ -267,7 +268,7 @@ func (index *Index) flushEverything(
 func PageIndexForObject(
 	width PageIndex,
 	object *sku.Transacted,
-	hashType interfaces.FormatHash,
+	hashType domain_interfaces.FormatHash,
 ) (n PageIndex, err error) {
 	if n, err = PageIndexForObjectId(
 		width,
@@ -284,7 +285,7 @@ func PageIndexForObject(
 func PageIndexForObjectId(
 	width PageIndex,
 	oid *ids.ObjectId,
-	hashType interfaces.FormatHash,
+	hashType domain_interfaces.FormatHash,
 ) (n PageIndex, err error) {
 	if n, err = page_id.PageIndexForString(
 		width,

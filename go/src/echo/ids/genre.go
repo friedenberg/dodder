@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
@@ -44,16 +44,16 @@ func (genre *Genre) Add(bs ...genres.Genre) {
 	}
 }
 
-func (genre *Genre) Del(b interfaces.GenreGetter) {
+func (genre *Genre) Del(b domain_interfaces.GenreGetter) {
 	*genre &= ^Genre(b.GetGenre().GetGenreBitInt())
 }
 
-func (genre Genre) Contains(b interfaces.GenreGetter) bool {
+func (genre Genre) Contains(b domain_interfaces.GenreGetter) bool {
 	bg := Genre(b.GetGenre().GetGenreBitInt())
 	return byte(genre&bg) == byte(bg)
 }
 
-func (genre Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
+func (genre Genre) ContainsOneOf(b domain_interfaces.GenreGetter) bool {
 	bg := Genre(b.GetGenre().GetGenreBitInt())
 	return genre&bg != 0
 }

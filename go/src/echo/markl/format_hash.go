@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"golang.org/x/crypto/blake2b"
@@ -19,8 +20,8 @@ type FormatHash struct {
 }
 
 var (
-	_ interfaces.MarklFormat = FormatHash{}
-	_ interfaces.FormatHash  = FormatHash{}
+	_ domain_interfaces.MarklFormat = FormatHash{}
+	_ domain_interfaces.FormatHash  = FormatHash{}
 
 	formatHashes map[string]FormatHash = map[string]FormatHash{}
 
@@ -97,11 +98,11 @@ func GetFormatHashOrError(
 	return formatHash, err
 }
 
-func (formatHash FormatHash) GetHash() interfaces.Hash {
+func (formatHash FormatHash) GetHash() domain_interfaces.Hash {
 	return formatHash.Get()
 }
 
-func (formatHash FormatHash) PutHash(hash interfaces.Hash) {
+func (formatHash FormatHash) PutHash(hash domain_interfaces.Hash) {
 	if correctHashType, ok := hash.(*Hash); ok {
 		formatHash.Put(correctHashType)
 	} else {
@@ -135,7 +136,7 @@ func (formatHash FormatHash) GetSize() int {
 	return formatHash.null.GetSize()
 }
 
-func (formatHash FormatHash) GetBlobId() (interfaces.MarklIdMutable, interfaces.FuncRepool) {
+func (formatHash FormatHash) GetBlobId() (domain_interfaces.MarklIdMutable, interfaces.FuncRepool) {
 	hash := formatHash.Get()
 	defer formatHash.Put(hash)
 
@@ -144,7 +145,7 @@ func (formatHash FormatHash) GetBlobId() (interfaces.MarklIdMutable, interfaces.
 
 func (formatHash FormatHash) GetMarklIdForString(
 	input string,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	hash := formatHash.Get()
 	defer formatHash.Put(hash)
 
@@ -156,8 +157,8 @@ func (formatHash FormatHash) GetMarklIdForString(
 }
 
 func (formatHash FormatHash) GetMarklIdForMarklId(
-	input interfaces.MarklId,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+	input domain_interfaces.MarklId,
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	hash := formatHash.Get()
 	defer formatHash.Put(hash)
 
@@ -170,7 +171,7 @@ func (formatHash FormatHash) GetMarklIdForMarklId(
 
 func (formatHash FormatHash) FromStringContent(
 	input string,
-) interfaces.MarklId {
+) domain_interfaces.MarklId {
 	id, _ := formatHash.GetMarklIdForString(input)
 	return id
 }
@@ -178,7 +179,7 @@ func (formatHash FormatHash) FromStringContent(
 func (formatHash FormatHash) GetMarklIdFromStringFormat(
 	format string,
 	args ...any,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	hash := formatHash.Get()
 	defer formatHash.Put(hash)
 
@@ -191,7 +192,7 @@ func (formatHash FormatHash) GetMarklIdFromStringFormat(
 
 func (formatHash FormatHash) GetBlobIdForHexString(
 	input string,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	hash := formatHash.pool.Get()
 	defer formatHash.pool.Put(hash)
 

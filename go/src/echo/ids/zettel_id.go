@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/coordinates"
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -198,7 +198,7 @@ func (id *ZettelId) ResetWith(h1 ZettelId) {
 	id.right = h1.right
 }
 
-func (id ZettelId) GetGenre() interfaces.Genre {
+func (id ZettelId) GetGenre() domain_interfaces.Genre {
 	return genres.Zettel
 }
 

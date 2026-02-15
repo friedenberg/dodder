@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/env_vars"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -201,7 +202,7 @@ func (env Env) GetStoreVersion() store_version.Version {
 	}
 }
 
-func (env Env) GetInventoryListBlobStore() interfaces.BlobStore {
+func (env Env) GetInventoryListBlobStore() domain_interfaces.BlobStore {
 	return env.GetDefaultBlobStore()
 }
 

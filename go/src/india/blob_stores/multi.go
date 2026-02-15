@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
@@ -14,9 +15,9 @@ type Multi struct {
 	childStores []BlobStoreInitialized
 }
 
-var _ interfaces.BlobAccess = Multi{}
+var _ domain_interfaces.BlobAccess = Multi{}
 
-func (parentStore Multi) HasBlob(id interfaces.MarklId) bool {
+func (parentStore Multi) HasBlob(id domain_interfaces.MarklId) bool {
 	for _, childStore := range parentStore.childStores {
 		if childStore.HasBlob(id) {
 			return true
@@ -27,8 +28,8 @@ func (parentStore Multi) HasBlob(id interfaces.MarklId) bool {
 }
 
 func (parentStore Multi) MakeBlobReader(
-	id interfaces.MarklId,
-) (interfaces.BlobReader, error) {
+	id domain_interfaces.MarklId,
+) (domain_interfaces.BlobReader, error) {
 	for _, childStore := range parentStore.childStores {
 		if childStore.HasBlob(id) {
 			return childStore.MakeBlobReader(id)
@@ -41,13 +42,13 @@ func (parentStore Multi) MakeBlobReader(
 }
 
 func (parentStore Multi) MakeBlobWriter(
-	marklHashType interfaces.FormatHash,
-) (interfaces.BlobWriter, error) {
+	marklHashType domain_interfaces.FormatHash,
+) (domain_interfaces.BlobWriter, error) {
 	writers := make([]io.Writer, len(parentStore.childStores))
 
 	multiWriter := multiStoreBlobWriter{
 		blobWriters: make(
-			[]interfaces.BlobWriter,
+			[]domain_interfaces.BlobWriter,
 			len(parentStore.childStores),
 		),
 	}
@@ -72,10 +73,10 @@ func (parentStore Multi) MakeBlobWriter(
 
 type multiStoreBlobWriter struct {
 	io.Writer
-	blobWriters []interfaces.BlobWriter
+	blobWriters []domain_interfaces.BlobWriter
 }
 
-var _ interfaces.BlobWriter = multiStoreBlobWriter{}
+var _ domain_interfaces.BlobWriter = multiStoreBlobWriter{}
 
 func (parentWriter multiStoreBlobWriter) ReadFrom(
 	reader io.Reader,
@@ -99,7 +100,7 @@ func (parentWriter multiStoreBlobWriter) Close() error {
 	return nil
 }
 
-func (parentWriter multiStoreBlobWriter) GetMarklId() (first interfaces.MarklId) {
+func (parentWriter multiStoreBlobWriter) GetMarklId() (first domain_interfaces.MarklId) {
 	for _, childWriter := range parentWriter.blobWriters {
 		next := childWriter.GetMarklId()
 

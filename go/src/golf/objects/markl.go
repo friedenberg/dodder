@@ -1,45 +1,43 @@
 package objects
 
-import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-)
+import "code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 
-func (metadata *metadata) GetBlobDigest() interfaces.MarklId {
+func (metadata *metadata) GetBlobDigest() domain_interfaces.MarklId {
 	return &metadata.DigBlob
 }
 
-func (metadata *metadata) GetBlobDigestMutable() interfaces.MarklIdMutable {
+func (metadata *metadata) GetBlobDigestMutable() domain_interfaces.MarklIdMutable {
 	return &metadata.DigBlob
 }
 
-func (metadata *metadata) GetObjectDigest() interfaces.MarklId {
+func (metadata *metadata) GetObjectDigest() domain_interfaces.MarklId {
 	return &metadata.digSelf
 }
 
-func (metadata *metadata) GetObjectDigestMutable() interfaces.MarklIdMutable {
+func (metadata *metadata) GetObjectDigestMutable() domain_interfaces.MarklIdMutable {
 	return &metadata.digSelf
 }
 
-func (metadata *metadata) GetMotherObjectSig() interfaces.MarklId {
+func (metadata *metadata) GetMotherObjectSig() domain_interfaces.MarklId {
 	return &metadata.sigMother
 }
 
-func (metadata *metadata) GetMotherObjectSigMutable() interfaces.MarklIdMutable {
+func (metadata *metadata) GetMotherObjectSigMutable() domain_interfaces.MarklIdMutable {
 	return &metadata.sigMother
 }
 
-func (metadata *metadata) GetRepoPubKey() interfaces.MarklId {
+func (metadata *metadata) GetRepoPubKey() domain_interfaces.MarklId {
 	return metadata.pubRepo
 }
 
-func (metadata *metadata) GetRepoPubKeyMutable() interfaces.MarklIdMutable {
+func (metadata *metadata) GetRepoPubKeyMutable() domain_interfaces.MarklIdMutable {
 	return &metadata.pubRepo
 }
 
-func (metadata *metadata) GetObjectSig() interfaces.MarklId {
+func (metadata *metadata) GetObjectSig() domain_interfaces.MarklId {
 	return &metadata.sigRepo
 }
 
-func (metadata *metadata) GetObjectSigMutable() interfaces.MarklIdMutable {
+func (metadata *metadata) GetObjectSigMutable() domain_interfaces.MarklIdMutable {
 	return &metadata.sigRepo
 }

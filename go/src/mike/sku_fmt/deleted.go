@@ -4,20 +4,21 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/delta/string_format_writer"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type itemDeletedStringFormatWriter struct {
-	interfaces.Config
+	domain_interfaces.Config
 	rightAlignedWriter   interfaces.StringEncoderTo[string]
 	idStringFormatWriter interfaces.StringEncoderTo[string]
 	fieldsFormatWriter   interfaces.StringEncoderTo[string_format_writer.Box]
 }
 
 func MakeItemDeletedStringWriterFormat(
-	config interfaces.Config,
+	config domain_interfaces.Config,
 	co string_format_writer.ColorOptions,
 	fieldsFormatWriter interfaces.StringEncoderTo[string_format_writer.Box],
 ) *itemDeletedStringFormatWriter {

@@ -3,7 +3,7 @@ package env_dir
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
@@ -18,7 +18,7 @@ func IsErrBlobAlreadyExists(err error) bool {
 }
 
 func MakeErrBlobAlreadyExists(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 	path string,
 ) ErrBlobAlreadyExists {
 	errors.PanicIfError(markl.AssertIdIsNotNull(blobId))
@@ -30,7 +30,7 @@ func MakeErrBlobAlreadyExists(
 }
 
 type ErrBlobAlreadyExists struct {
-	BlobId interfaces.MarklId
+	BlobId domain_interfaces.MarklId
 	Path   string
 }
 
@@ -58,7 +58,7 @@ func IsErrBlobMissing(err error) bool {
 // TODO create a constructor function to enable debugging
 type ErrBlobMissing struct {
 	// TODO add blob store
-	BlobId interfaces.MarklId
+	BlobId domain_interfaces.MarklId
 	Path   string
 }
 

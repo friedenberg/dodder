@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -76,7 +76,7 @@ func (tai Tai) After(b Tai) bool {
 	return tai.tai.After(b.tai)
 }
 
-func (tai Tai) GetGenre() interfaces.Genre {
+func (tai Tai) GetGenre() domain_interfaces.Genre {
 	return genres.InventoryList
 }
 

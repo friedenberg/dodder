@@ -1,7 +1,7 @@
 package command_components_dodder
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/foxtrot/repo_config_cli"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
@@ -58,7 +58,7 @@ func (cmd EnvRepo) MakeEnvRepoFromEnvLocal(
 	var envRepo env_repo.Env
 
 	var basePath string
-	if repoConfig, ok := envLocal.GetCLIConfig().(interfaces.RepoCLIConfigProvider); ok {
+	if repoConfig, ok := envLocal.GetCLIConfig().(domain_interfaces.RepoCLIConfigProvider); ok {
 		basePath = repoConfig.GetBasePath()
 	}
 

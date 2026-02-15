@@ -4,7 +4,7 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"golang.org/x/crypto/curve25519"
 )
@@ -84,9 +84,9 @@ func init() {
 	)
 }
 
-var formats map[string]interfaces.MarklFormat = map[string]interfaces.MarklFormat{}
+var formats map[string]domain_interfaces.MarklFormat = map[string]domain_interfaces.MarklFormat{}
 
-func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
+func GetFormatOrError(formatId string) (domain_interfaces.MarklFormat, error) {
 	switch formatId {
 	case "zit-repo-private_key-v1", "dodder-repo-private_key-v1":
 		formatId = FormatIdEd25519Sec
@@ -104,7 +104,7 @@ func GetFormatOrError(formatId string) (interfaces.MarklFormat, error) {
 
 // move to Id
 func GetFormatSecOrError(
-	formatIdGetter interfaces.MarklFormatGetter,
+	formatIdGetter domain_interfaces.MarklFormatGetter,
 ) (formatSec FormatSec, err error) {
 	format := formatIdGetter.GetMarklFormat()
 
@@ -136,7 +136,7 @@ func GetFormatSecOrError(
 
 type FormatId string
 
-func (formatId FormatId) GetMarklFormat() interfaces.MarklFormat {
+func (formatId FormatId) GetMarklFormat() domain_interfaces.MarklFormat {
 	format, err := GetFormatOrError(string(formatId))
 	errors.PanicIfError(err)
 	return format
@@ -147,7 +147,7 @@ type Format struct {
 	Size int
 }
 
-var _ interfaces.MarklFormat = Format{}
+var _ domain_interfaces.MarklFormat = Format{}
 
 func (format Format) GetMarklFormatId() string {
 	return format.Id
@@ -157,7 +157,7 @@ func (format Format) GetSize() int {
 	return format.Size
 }
 
-func makeFormat(format interfaces.MarklFormat) {
+func makeFormat(format domain_interfaces.MarklFormat) {
 	if format == nil {
 		panic("nil format")
 	}

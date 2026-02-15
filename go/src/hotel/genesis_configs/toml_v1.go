@@ -2,6 +2,7 @@ package genesis_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/store_version"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -72,15 +73,15 @@ func (config *TomlV1Private) GetGenesisConfigPublic() ConfigPublic {
 	}
 }
 
-func (config *TomlV1Private) GetPrivateKey() interfaces.MarklId {
+func (config *TomlV1Private) GetPrivateKey() domain_interfaces.MarklId {
 	return markl.Id(config.PrivateKey)
 }
 
-func (config *TomlV1Private) GetPrivateKeyMutable() interfaces.MarklIdMutable {
+func (config *TomlV1Private) GetPrivateKeyMutable() domain_interfaces.MarklIdMutable {
 	return (*markl.Id)(&config.PrivateKey)
 }
 
-func (config *TomlV1Private) GetPublicKey() interfaces.MarklId {
+func (config *TomlV1Private) GetPublicKey() domain_interfaces.MarklId {
 	return markl.Id{}
 }
 
@@ -88,11 +89,11 @@ func (config *TomlV1Public) GetGenesisConfig() ConfigPublic {
 	return config
 }
 
-func (config TomlV1Public) GetPublicKey() interfaces.MarklId {
+func (config TomlV1Public) GetPublicKey() domain_interfaces.MarklId {
 	return (markl.Id)(config.PublicKey)
 }
 
-func (config *TomlV1Common) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (config *TomlV1Common) GetBlobIOWrapper() domain_interfaces.BlobIOWrapper {
 	return &config.BlobStore
 }
 

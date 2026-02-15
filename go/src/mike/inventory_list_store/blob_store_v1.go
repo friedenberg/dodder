@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -24,7 +24,7 @@ type blobStoreV1 struct {
 	inventoryListCoderCloset inventory_list_coders.Closet
 	finalizer                object_finalizer.Finalizer
 
-	interfaces.BlobStore
+	domain_interfaces.BlobStore
 }
 
 func (blobStore *blobStoreV1) GetObjectFinalizer() object_finalizer.Finalizer {
@@ -44,9 +44,9 @@ func (blobStore *blobStoreV1) GetInventoryListCoderCloset() inventory_list_coder
 }
 
 func (blobStore *blobStoreV1) ReadOneBlobId(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (object *sku.Transacted, err error) {
-	var readCloser interfaces.BlobReader
+	var readCloser domain_interfaces.BlobReader
 
 	if readCloser, err = blobStore.BlobStore.MakeBlobReader(blobId); err != nil {
 		err = errors.Wrap(err)
@@ -73,7 +73,7 @@ func (blobStore *blobStoreV1) ReadOneBlobId(
 func (blobStore *blobStoreV1) WriteInventoryListObject(
 	object *sku.Transacted,
 ) (err error) {
-	var blobStoreWriteCloser interfaces.BlobWriter
+	var blobStoreWriteCloser domain_interfaces.BlobWriter
 
 	if blobStoreWriteCloser, err = blobStore.BlobStore.MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)

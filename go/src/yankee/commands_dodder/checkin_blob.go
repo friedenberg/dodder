@@ -2,6 +2,7 @@ package commands_dodder
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_ptr"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -168,7 +169,7 @@ func (pair *externalBlobPair) SetArgs(
 	return err
 }
 
-func (pair *externalBlobPair) GetDigest() interfaces.MarklId {
+func (pair *externalBlobPair) GetDigest() domain_interfaces.MarklId {
 	if !pair.BlobFD.IsEmpty() {
 		return pair.BlobFD.GetDigest()
 	} else {

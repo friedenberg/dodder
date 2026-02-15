@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/comments"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
@@ -17,7 +18,7 @@ type (
 	TypeStruct = typeStruct
 
 	Id interface {
-		interfaces.ObjectId
+		domain_interfaces.ObjectId
 		encoding.BinaryMarshaler
 		encoding.BinaryAppender
 
@@ -91,7 +92,7 @@ func MakeObjectId(value string) (objectId *ObjectId, err error) {
 }
 
 // TODO rewrite to use ToSeq comparison
-func Equals(left, right interfaces.ObjectId) (ok bool) {
+func Equals(left, right domain_interfaces.ObjectId) (ok bool) {
 	if left.GetGenre().String() != right.GetGenre().String() {
 		return ok
 	}
@@ -208,7 +209,7 @@ func SetWithString(
 
 func SetObjectIdOrBlob(
 	id *ObjectId,
-	other interfaces.ObjectId,
+	other domain_interfaces.ObjectId,
 ) (err error) {
 	if other, ok := other.(*objectId3); ok {
 		id.ResetWith(*other)
@@ -232,7 +233,7 @@ func SetObjectIdOrBlob(
 func SetWithGenre(
 	id *ObjectId,
 	value string,
-	genre interfaces.GenreGetter,
+	genre domain_interfaces.GenreGetter,
 ) (err error) {
 	return id.SetWithGenre(value, genre)
 	if err = SetWithString(id, value); err != nil {

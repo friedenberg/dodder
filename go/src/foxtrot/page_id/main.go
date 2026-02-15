@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
@@ -38,7 +38,7 @@ func (id *PageId) Path() string {
 func PageIndexForString(
 	width uint8,
 	value string,
-	hashType interfaces.FormatHash,
+	hashType domain_interfaces.FormatHash,
 ) (n uint8, err error) {
 	digest, repool := hashType.GetMarklIdForString(value)
 	defer repool()
@@ -53,7 +53,7 @@ func PageIndexForString(
 
 func PageIndexForDigest(
 	width uint8,
-	digest interfaces.MarklId,
+	digest domain_interfaces.MarklId,
 ) (n uint8, err error) {
 	var n1 int64
 

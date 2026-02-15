@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/objects"
@@ -66,7 +66,7 @@ func StringMetadataTaiMerkle(object *Transacted) (str string) {
 
 func writeMarklIdWithFormatIfNecessary(
 	stringBuilder *strings.Builder,
-	id interfaces.MarklId,
+	id domain_interfaces.MarklId,
 ) {
 	if id.IsNull() {
 		return

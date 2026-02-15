@@ -3,16 +3,16 @@ package blob_library
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
 type savedBlobFormatter struct {
-	blobReaderFactory interfaces.BlobReaderFactory
+	blobReaderFactory domain_interfaces.BlobReaderFactory
 }
 
 func MakeSavedBlobFormatter(
-	blobReaderFactory interfaces.BlobReaderFactory,
+	blobReaderFactory domain_interfaces.BlobReaderFactory,
 ) savedBlobFormatter {
 	return savedBlobFormatter{
 		blobReaderFactory: blobReaderFactory,
@@ -21,9 +21,9 @@ func MakeSavedBlobFormatter(
 
 func (formatter savedBlobFormatter) FormatSavedBlob(
 	writer io.Writer,
-	digest interfaces.MarklId,
+	digest domain_interfaces.MarklId,
 ) (n int64, err error) {
-	var blobReader interfaces.BlobReader
+	var blobReader domain_interfaces.BlobReader
 
 	if blobReader, err = formatter.blobReaderFactory.MakeBlobReader(
 		digest,

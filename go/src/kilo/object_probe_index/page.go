@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -25,7 +26,7 @@ type page struct {
 	bufferedReader bufio.Reader
 	added          *heap.Heap[row, *row]
 	envRepo        env_repo.Env
-	searchFunc     func(interfaces.MarklId) (mid int64, err error)
+	searchFunc     func(domain_interfaces.MarklId) (mid int64, err error)
 	id             page_id.PageId
 }
 
@@ -82,7 +83,7 @@ func (page *page) open() (err error) {
 	return err
 }
 
-func (page *page) AddMarklId(id interfaces.MarklId, loc Loc) (err error) {
+func (page *page) AddMarklId(id domain_interfaces.MarklId, loc Loc) (err error) {
 	if id.IsNull() {
 		return err
 	}
@@ -117,7 +118,7 @@ func (page *page) GetRowCount() (n int64, err error) {
 	return n, err
 }
 
-func (page *page) ReadOne(id interfaces.MarklId) (loc Loc, err error) {
+func (page *page) ReadOne(id domain_interfaces.MarklId) (loc Loc, err error) {
 	page.Lock()
 	defer page.Unlock()
 
@@ -144,7 +145,7 @@ func (page *page) ReadOne(id interfaces.MarklId) (loc Loc, err error) {
 	return loc, err
 }
 
-func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
+func (page *page) ReadMany(sh domain_interfaces.MarklId, locs *[]Loc) (err error) {
 	page.Lock()
 	defer page.Unlock()
 
@@ -185,7 +186,7 @@ func (page *page) ReadMany(sh interfaces.MarklId, locs *[]Loc) (err error) {
 }
 
 func (page *page) readCurrentLoc(
-	expectedBlobId interfaces.MarklId,
+	expectedBlobId domain_interfaces.MarklId,
 	bufferedReader *bufio.Reader,
 ) (out Loc, found bool, err error) {
 	if expectedBlobId.IsNull() {

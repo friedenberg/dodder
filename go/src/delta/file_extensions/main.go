@@ -1,7 +1,7 @@
 package file_extensions
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/equals"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
@@ -92,7 +92,7 @@ func MakeConfig(base Config, overlays ...OverlayGetter) Config {
 }
 
 func (config Config) GetFileExtensionForGenre(
-	getter interfaces.GenreGetter,
+	getter domain_interfaces.GenreGetter,
 ) string {
 	genre := genres.Must(getter)
 

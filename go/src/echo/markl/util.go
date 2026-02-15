@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -18,7 +18,7 @@ import (
 )
 
 func SetHexStringFromAbsolutePath(
-	id interfaces.MarklIdMutable,
+	id domain_interfaces.MarklIdMutable,
 	absOrRelPath string,
 	base string,
 ) (err error) {
@@ -48,7 +48,7 @@ func SetHexStringFromAbsolutePath(
 }
 
 func SetHexStringFromRelPath(
-	id interfaces.MarklIdMutable,
+	id domain_interfaces.MarklIdMutable,
 	relPath string,
 ) (err error) {
 	if filepath.IsAbs(relPath) {
@@ -93,7 +93,7 @@ func ReadFrom(
 
 func CompareToReader(
 	reader io.Reader,
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 ) int {
 	actual := idPool.Get()
 	defer idPool.Put(actual)
@@ -110,7 +110,7 @@ func CompareToReader(
 func CompareToReaderAt(
 	readerAt io.ReaderAt,
 	offset int64,
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 ) int {
 	actual := idPool.Get()
 	defer idPool.Put(actual)
@@ -126,7 +126,7 @@ func CompareToReaderAt(
 
 func SetHexBytes(
 	formatId string,
-	dst interfaces.MarklIdMutable,
+	dst domain_interfaces.MarklIdMutable,
 	bites []byte,
 ) (err error) {
 	bites = bytes.TrimSpace(bites)
@@ -177,8 +177,8 @@ func SetHexBytes(
 }
 
 func SetDigester(
-	dst interfaces.MarklIdMutable,
-	src interfaces.MarklIdGetter,
+	dst domain_interfaces.MarklIdMutable,
+	src domain_interfaces.MarklIdGetter,
 ) {
 	digest := src.GetMarklId()
 	errors.PanicIfError(
@@ -190,7 +190,7 @@ func SetDigester(
 }
 
 func EqualsReader(
-	expectedBlobId interfaces.MarklId,
+	expectedBlobId domain_interfaces.MarklId,
 	bufferedReader *bufio.Reader,
 ) (ok bool, err error) {
 	var actualBytes []byte
@@ -211,7 +211,7 @@ func EqualsReader(
 	return ok, err
 }
 
-func IsNull(id interfaces.MarklId) (ok bool) {
+func IsNull(id domain_interfaces.MarklId) (ok bool) {
 	if id == nil {
 		return true
 	}
@@ -230,7 +230,7 @@ func IsNull(id interfaces.MarklId) (ok bool) {
 	return ok
 }
 
-func Equals(a, b interfaces.MarklId) (ok bool) {
+func Equals(a, b domain_interfaces.MarklId) (ok bool) {
 	aIsNull := IsNull(a)
 	bIsNull := IsNull(b)
 
@@ -256,7 +256,7 @@ func Equals(a, b interfaces.MarklId) (ok bool) {
 	return ok
 }
 
-func Clone(src interfaces.MarklId) interfaces.MarklId {
+func Clone(src domain_interfaces.MarklId) domain_interfaces.MarklId {
 	if !src.IsNull() {
 		errors.PanicIfError(MakeErrEmptyType(src))
 	}
@@ -273,11 +273,11 @@ func Clone(src interfaces.MarklId) interfaces.MarklId {
 
 // Creates a human-readable string representation of a digest.
 // TODO add type information
-func FormatBytesAsHex(merkleId interfaces.MarklId) string {
+func FormatBytesAsHex(merkleId domain_interfaces.MarklId) string {
 	return fmt.Sprintf("%x", merkleId.GetBytes())
 }
 
-func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
+func FormatOrEmptyOnNull(merkleId domain_interfaces.MarklId) string {
 	if merkleId.IsNull() {
 		return ""
 	} else {
@@ -285,7 +285,7 @@ func FormatOrEmptyOnNull(merkleId interfaces.MarklId) string {
 	}
 }
 
-func SetFromPath(id interfaces.MarklIdMutable, path string) (err error) {
+func SetFromPath(id domain_interfaces.MarklIdMutable, path string) (err error) {
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {

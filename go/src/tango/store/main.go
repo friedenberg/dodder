@@ -2,6 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/golf/repo_configs"
@@ -148,7 +149,7 @@ func (store *Store) SetUIDelegate(ud sku.UIStorePrinters) {
 }
 
 func (store *Store) UpdateKonfig(
-	blobId interfaces.MarklId,
+	blobId domain_interfaces.MarklId,
 ) (kt *sku.Transacted, err error) {
 	return store.CreateOrUpdateBlobDigest(
 		ids.Config,

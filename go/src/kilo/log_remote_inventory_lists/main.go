@@ -1,7 +1,7 @@
 package log_remote_inventory_lists
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/juliett/env_repo"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -23,7 +23,7 @@ const (
 
 type Entry struct {
 	EntryType
-	PublicKey interfaces.MarklId
+	PublicKey domain_interfaces.MarklId
 	*sku.Transacted
 }
 

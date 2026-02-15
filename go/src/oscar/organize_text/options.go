@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/flags"
@@ -26,7 +27,7 @@ var _ interfaces.CommandComponentWriter = (*Flags)(nil)
 type Options struct {
 	wasMade bool
 
-	Config interfaces.MutableConfigDryRun
+	Config domain_interfaces.MutableConfigDryRun
 
 	Metadata
 

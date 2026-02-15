@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/_/vim_cli_options_builder"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -35,7 +35,7 @@ func (cmd DormantEdit) Run(req command.Request) {
 		ui.Err().Print("Command dormant-edit ignores passed in arguments.")
 	}
 
-	var digest interfaces.MarklId
+	var digest domain_interfaces.MarklId
 
 	{
 		var err error
@@ -69,7 +69,7 @@ func (cmd DormantEdit) Run(req command.Request) {
 // TODO refactor into common
 func (cmd DormantEdit) editInVim(
 	repo *local_working_copy.Repo,
-) (digest interfaces.MarklId, err error) {
+) (digest domain_interfaces.MarklId, err error) {
 	var path string
 
 	if path, err = cmd.makeTempFile(repo); err != nil {
@@ -140,7 +140,7 @@ func (cmd DormantEdit) makeTempFile(
 func (cmd DormantEdit) readTempFile(
 	repo *local_working_copy.Repo,
 	path string,
-) (digest interfaces.MarklId, err error) {
+) (digest domain_interfaces.MarklId, err error) {
 	var file *os.File
 
 	if file, err = files.Open(path); err != nil {
@@ -150,7 +150,7 @@ func (cmd DormantEdit) readTempFile(
 
 	defer errors.DeferredCloser(&err, file)
 
-	var writeCloser interfaces.BlobWriter
+	var writeCloser domain_interfaces.BlobWriter
 
 	if writeCloser, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(
 		nil,

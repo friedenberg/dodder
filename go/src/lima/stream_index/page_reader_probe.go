@@ -3,7 +3,7 @@ package stream_index
 import (
 	"io"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -28,7 +28,7 @@ func (index *Index) makeProbePageReader(
 	}
 
 	var err error
-	var blobReader interfaces.BlobReader
+	var blobReader domain_interfaces.BlobReader
 
 	if blobReader, err = index.envRepo.MakeNamedBlobReader(
 		pageReader.pageId.Path(),

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -45,7 +45,7 @@ func (config config) IsEmpty() bool {
 	return false
 }
 
-func (config config) GetGenre() interfaces.Genre {
+func (config config) GetGenre() domain_interfaces.Genre {
 	return genres.Config
 }
 

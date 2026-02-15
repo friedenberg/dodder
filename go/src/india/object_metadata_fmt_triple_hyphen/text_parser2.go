@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/delim_reader"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
@@ -17,9 +17,9 @@ import (
 )
 
 type textParser2 struct {
-	interfaces.BlobWriterFactory
+	domain_interfaces.BlobWriterFactory
 	ParserContext
-	hashType interfaces.FormatHash
+	hashType domain_interfaces.FormatHash
 	Blob     fd.FD
 }
 

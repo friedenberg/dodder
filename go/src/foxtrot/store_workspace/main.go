@@ -1,13 +1,13 @@
 package store_workspace
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 )
 
 type (
 	Store interface {
-		GetObjectIdsForString(string) ([]interfaces.ExternalObjectId, error)
+		GetObjectIdsForString(string) ([]domain_interfaces.ExternalObjectId, error)
 	}
 
 	StoreGetter interface {

@@ -1,7 +1,7 @@
 package local_working_copy
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -104,7 +104,7 @@ func (local *Repo) initDefaultTypeIfNecessaryAfterLock(
 		return objectIdType, err
 	}
 
-	var digest interfaces.MarklId
+	var digest domain_interfaces.MarklId
 
 	if digest, _, err = local.GetStore().GetTypedBlobStore().Type.SaveBlobText(
 		tipe,
@@ -137,7 +137,7 @@ func (local *Repo) initDefaultConfigIfNecessaryAfterLock(
 		return err
 	}
 
-	var blobId interfaces.MarklId
+	var blobId domain_interfaces.MarklId
 	var typedBlob repo_configs.TypedBlob
 
 	if blobId, typedBlob, err = writeDefaultMutableConfig(
@@ -180,12 +180,12 @@ func writeDefaultMutableConfig(
 	repo *Repo,
 	defaultBlobStoreId blob_store_id.Id,
 	defaultType ids.TypeStruct,
-) (blobId interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
+) (blobId domain_interfaces.MarklId, typedBlob repo_configs.TypedBlob, err error) {
 	typedBlob = repo_configs.DefaultOverlay(defaultBlobStoreId, defaultType)
 
 	coder := repo.GetStore().GetConfigBlobCoder()
 
-	var blobWriter interfaces.BlobWriter
+	var blobWriter domain_interfaces.BlobWriter
 
 	if blobWriter, err = repo.GetEnvRepo().GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 		err = errors.Wrap(err)

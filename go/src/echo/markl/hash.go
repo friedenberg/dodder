@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -14,7 +15,7 @@ type Hash struct {
 	written    int64
 }
 
-var _ interfaces.Hash = &Hash{}
+var _ domain_interfaces.Hash = &Hash{}
 
 func (hash *Hash) Write(bites []byte) (written int, err error) {
 	written, err = hash.hash.Write(bites)
@@ -39,11 +40,11 @@ func (hash *Hash) BlockSize() int {
 	return hash.hash.BlockSize()
 }
 
-func (hash *Hash) GetMarklFormat() interfaces.MarklFormat {
+func (hash *Hash) GetMarklFormat() domain_interfaces.MarklFormat {
 	return hash.formatHash
 }
 
-func (hash *Hash) GetMarklId() (interfaces.MarklIdMutable, interfaces.FuncRepool) {
+func (hash *Hash) GetMarklId() (domain_interfaces.MarklIdMutable, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.format = hash.GetMarklFormat()
 	id.allocDataIfNecessary(hash.Size())
@@ -60,7 +61,7 @@ func (hash *Hash) GetMarklId() (interfaces.MarklIdMutable, interfaces.FuncRepool
 
 func (hash *Hash) GetBlobIdForReader(
 	reader io.Reader,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.format = hash.GetMarklFormat()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())
@@ -77,7 +78,7 @@ func (hash *Hash) GetBlobIdForReader(
 func (hash *Hash) GetBlobIdForReaderAt(
 	reader io.ReaderAt,
 	off int64,
-) (interfaces.MarklId, interfaces.FuncRepool) {
+) (domain_interfaces.MarklId, interfaces.FuncRepool) {
 	id := idPool.Get()
 	id.format = hash.GetMarklFormat()
 	id.allocDataAndSetToCapIfNecessary(hash.Size())

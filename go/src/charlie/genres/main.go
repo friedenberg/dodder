@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -28,7 +28,7 @@ const (
 	maxGenre = Repo
 )
 
-var _ interfaces.Genre = Unknown
+var _ domain_interfaces.Genre = Unknown
 
 const (
 	unknown = byte(iota)
@@ -61,11 +61,11 @@ func All() (out collections_slice.Slice[Genre]) {
 	return out
 }
 
-func Must(genre interfaces.GenreGetter) Genre {
+func Must(genre domain_interfaces.GenreGetter) Genre {
 	return genre.GetGenre().(Genre)
 }
 
-func Make(genre interfaces.Genre) Genre {
+func Make(genre domain_interfaces.Genre) Genre {
 	return Must(genre)
 }
 
@@ -77,7 +77,7 @@ func MakeOrUnknown(value string) (genre Genre) {
 	return genre
 }
 
-func (genre Genre) GetGenre() interfaces.Genre {
+func (genre Genre) GetGenre() domain_interfaces.Genre {
 	return genre
 }
 
@@ -126,7 +126,7 @@ func (genre Genre) Equals(b Genre) bool {
 	return genre == b
 }
 
-func (genre Genre) AssertGenre(other interfaces.GenreGetter) (err pkgError) {
+func (genre Genre) AssertGenre(other domain_interfaces.GenreGetter) (err pkgError) {
 	if genre.String() != other.GetGenre().String() {
 		err = ErrWrongGenre{Expected: genre, Actual: Must(other)}
 		return err

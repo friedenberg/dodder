@@ -2,6 +2,7 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/compression_type"
 	"code.linenisgreat.com/dodder/go/src/echo/directory_layout"
@@ -51,7 +52,7 @@ type (
 	ConfigLocalHashBucketed interface {
 		configLocal
 		ConfigHashType
-		interfaces.BlobIOWrapper
+		domain_interfaces.BlobIOWrapper
 		GetHashBuckets() []int
 		GetLockInternalFiles() bool
 	}

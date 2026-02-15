@@ -3,7 +3,7 @@ package command_components_madder
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
@@ -12,7 +12,7 @@ import (
 )
 
 type BlobError struct {
-	BlobId interfaces.MarklId
+	BlobId domain_interfaces.MarklId
 	Err    error
 }
 

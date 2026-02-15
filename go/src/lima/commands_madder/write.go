@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
@@ -68,7 +69,7 @@ func (cmd *Write) SetFlagDefinitions(
 
 type blobWriteResult struct {
 	error
-	interfaces.MarklId
+	domain_interfaces.MarklId
 	Path string
 }
 
@@ -94,7 +95,7 @@ func (cmd Write) Run(req command.Request) {
 
 		result := blobWriteResult{Path: arg}
 
-		var blobReader interfaces.BlobReader
+		var blobReader domain_interfaces.BlobReader
 
 		{
 			var err error
@@ -179,11 +180,11 @@ func (cmd Write) Run(req command.Request) {
 // TODO rewrite to just return blobWriteResult
 func (cmd Write) doOne(
 	blobStore blob_stores.BlobStoreInitialized,
-	blobReader interfaces.BlobReader,
-) (blobId interfaces.MarklId, err error) {
+	blobReader domain_interfaces.BlobReader,
+) (blobId domain_interfaces.MarklId, err error) {
 	defer errors.DeferredCloser(&err, blobReader)
 
-	var writeCloser interfaces.BlobWriter
+	var writeCloser domain_interfaces.BlobWriter
 
 	if cmd.Check {
 		{

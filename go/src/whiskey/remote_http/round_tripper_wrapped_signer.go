@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net/http"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 )
@@ -17,7 +17,7 @@ const (
 )
 
 type RoundTripperBufioWrappedSigner struct {
-	PublicKey interfaces.MarklId
+	PublicKey domain_interfaces.MarklId
 	roundTripperBufio
 }
 

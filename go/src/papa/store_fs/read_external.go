@@ -2,6 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
@@ -15,7 +16,7 @@ func (store *Store) ReadExternalLikeFromObjectIdLike(
 	var items []*sku.FSItem
 
 	oidString := objectIdMaybeExternal.String()
-	_, isExternal := objectIdMaybeExternal.(interfaces.ExternalObjectId)
+	_, isExternal := objectIdMaybeExternal.(domain_interfaces.ExternalObjectId)
 
 	if !isExternal {
 		oidString = store.keyForObjectIdString(oidString)

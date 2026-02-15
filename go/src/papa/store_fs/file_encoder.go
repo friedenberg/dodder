@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/checkout_options"
 	"code.linenisgreat.com/dodder/go/src/charlie/files"
@@ -84,7 +84,7 @@ func (encoder *fileEncoder) EncodeObject(
 
 	inline := encoder.inlineTypeChecker.IsInlineType(object.GetType())
 
-	var blobReader interfaces.BlobReader
+	var blobReader domain_interfaces.BlobReader
 
 	if blobReader, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobReader(
 		object.GetBlobDigest(),
@@ -104,7 +104,7 @@ func (encoder *fileEncoder) EncodeObject(
 				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
-					var blobWriter interfaces.BlobWriter
+					var blobWriter domain_interfaces.BlobWriter
 
 					if blobWriter, err = encoder.envRepo.GetDefaultBlobStore().MakeBlobWriter(nil); err != nil {
 						err = errors.Wrap(err)

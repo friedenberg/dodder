@@ -1,7 +1,7 @@
 package repo_blobs
 
 import (
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/charlie/xdg_defaults"
 	"code.linenisgreat.com/dodder/go/src/delta/xdg"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
@@ -47,11 +47,11 @@ func (blob TomlXDGV0) GetRepoBlob() Blob {
 	return blob
 }
 
-func (blob TomlXDGV0) GetPublicKey() interfaces.MarklId {
+func (blob TomlXDGV0) GetPublicKey() domain_interfaces.MarklId {
 	return blob.PublicKey
 }
 
-func (blob *TomlXDGV0) SetPublicKey(id interfaces.MarklId) {
+func (blob *TomlXDGV0) SetPublicKey(id domain_interfaces.MarklId) {
 	blob.PublicKey.ResetWithMarklId(id)
 }
 

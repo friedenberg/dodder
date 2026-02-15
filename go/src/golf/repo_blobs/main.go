@@ -2,6 +2,7 @@ package repo_blobs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/bravo/remote_connection_types"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/collections_value"
@@ -10,13 +11,13 @@ import (
 
 type (
 	Blob interface {
-		GetPublicKey() interfaces.MarklId
+		GetPublicKey() domain_interfaces.MarklId
 		IsRemote() bool
 	}
 
 	BlobMutable interface {
 		Blob
-		SetPublicKey(interfaces.MarklId)
+		SetPublicKey(domain_interfaces.MarklId)
 	}
 
 	BlobXDG interface {

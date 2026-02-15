@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 	"code.linenisgreat.com/dodder/go/src/hotel/env_dir"
 )
 
 type CopyResult struct {
-	BlobId       interfaces.MarklId // may not be nil
+	BlobId       domain_interfaces.MarklId // may not be nil
 	bytesWritten int64
 	state        copyResultState
 	err          error

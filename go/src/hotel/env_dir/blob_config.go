@@ -2,6 +2,7 @@ package env_dir
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
 	"code.linenisgreat.com/dodder/go/src/charlie/compression_type"
@@ -11,10 +12,10 @@ import (
 // TODO move into own package
 
 func MakeConfig(
-	hashFormat interfaces.FormatHash,
+	hashFormat domain_interfaces.FormatHash,
 	funcJoin func(string, ...string) string,
 	compression interfaces.IOWrapper,
-	encryption interfaces.MarklId,
+	encryption domain_interfaces.MarklId,
 ) Config {
 	var ioWrapper interfaces.IOWrapper = defaultEncryptionIOWrapper
 
@@ -43,7 +44,7 @@ var (
 )
 
 type Config struct {
-	hashFormat interfaces.FormatHash
+	hashFormat domain_interfaces.FormatHash
 	// TODO replace with path generator interface
 	funcJoin    func(string, ...string) string
 	compression interfaces.IOWrapper

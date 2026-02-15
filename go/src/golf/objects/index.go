@@ -2,6 +2,7 @@ package objects
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/collections_slice"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
@@ -19,7 +20,7 @@ type (
 		GetDormant() values.Bool
 		GetImplicitTags() TagSet
 		GetComments() interfaces.Seq[string]
-		GetSelfWithoutTai() interfaces.MarklId
+		GetSelfWithoutTai() domain_interfaces.MarklId
 	}
 
 	IndexMutable interface {
@@ -31,7 +32,7 @@ type (
 		GetTagPathsMutable() *tag_paths.Tags
 		SetImplicitTags(e TagSet)
 		GetCommentsMutable() *collections_slice.Slice[string]
-		GetSelfWithoutTaiMutable() interfaces.MarklIdMutable
+		GetSelfWithoutTaiMutable() domain_interfaces.MarklIdMutable
 	}
 )
 

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/doddish"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
@@ -49,11 +49,11 @@ func (id RepoId) IsEmpty() bool {
 	return id.id == ""
 }
 
-func (id RepoId) GetRepoId() interfaces.RepoId {
+func (id RepoId) GetRepoId() domain_interfaces.RepoId {
 	return id
 }
 
-func (id RepoId) EqualsRepoId(kg interfaces.RepoIdGetter) bool {
+func (id RepoId) EqualsRepoId(kg domain_interfaces.RepoIdGetter) bool {
 	return kg.GetRepoId().GetRepoIdString() == id.GetRepoIdString()
 }
 
@@ -73,7 +73,7 @@ func (id RepoId) Equals(b RepoId) bool {
 	return id.id == b.id
 }
 
-func (id RepoId) GetGenre() interfaces.Genre {
+func (id RepoId) GetGenre() domain_interfaces.Genre {
 	return genres.Repo
 }
 

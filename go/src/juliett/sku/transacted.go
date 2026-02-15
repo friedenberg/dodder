@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/external_state"
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
@@ -41,7 +42,7 @@ func (transacted *Transacted) GetRepoId() ids.RepoId {
 	return transacted.RepoId
 }
 
-func (transacted *Transacted) GetExternalObjectId() interfaces.ExternalObjectId {
+func (transacted *Transacted) GetExternalObjectId() domain_interfaces.ExternalObjectId {
 	return &transacted.ExternalObjectId
 }
 
@@ -155,7 +156,7 @@ func (transacted *Transacted) Equals(other *Transacted) (ok bool) {
 	return true
 }
 
-func (transacted *Transacted) GetGenre() interfaces.Genre {
+func (transacted *Transacted) GetGenre() domain_interfaces.Genre {
 	return transacted.ObjectId.GetGenre()
 }
 
@@ -167,16 +168,16 @@ func (transacted *Transacted) SetDormant(v bool) {
 	transacted.GetMetadataMutable().GetIndexMutable().GetDormantMutable().SetBool(v)
 }
 
-func (transacted *Transacted) GetObjectDigest() interfaces.MarklId {
+func (transacted *Transacted) GetObjectDigest() domain_interfaces.MarklId {
 	return transacted.GetMetadataMutable().GetObjectDigest()
 }
 
-func (transacted *Transacted) GetBlobDigest() interfaces.MarklId {
+func (transacted *Transacted) GetBlobDigest() domain_interfaces.MarklId {
 	return transacted.GetMetadata().GetBlobDigest()
 }
 
 func (transacted *Transacted) SetBlobDigest(
-	merkleId interfaces.MarklId,
+	merkleId domain_interfaces.MarklId,
 ) (err error) {
 	if err = transacted.GetMetadataMutable().GetBlobDigestMutable().SetMarklId(
 		merkleId.GetMarklFormat().GetMarklFormatId(),

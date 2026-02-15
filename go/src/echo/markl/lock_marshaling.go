@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 )
 
@@ -13,7 +14,7 @@ func MakeLockCoder[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
-	lock interfaces.Lock[KEY, KEY_PTR],
+	lock domain_interfaces.Lock[KEY, KEY_PTR],
 	requireValue bool,
 ) lockBinaryMarshaler[KEY, KEY_PTR] {
 	return lockBinaryMarshaler[KEY, KEY_PTR]{
@@ -26,7 +27,7 @@ func MakeMutableLockCoder[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
-	lock interfaces.LockMutable[KEY, KEY_PTR],
+	lock domain_interfaces.LockMutable[KEY, KEY_PTR],
 	requireValue bool,
 ) mutableLockBinaryMarshaler[KEY, KEY_PTR] {
 	return mutableLockBinaryMarshaler[KEY, KEY_PTR]{
@@ -39,7 +40,7 @@ func MakeLockCoderValueNotRequired[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
-	lock interfaces.Lock[KEY, KEY_PTR],
+	lock domain_interfaces.Lock[KEY, KEY_PTR],
 ) lockBinaryMarshaler[KEY, KEY_PTR] {
 	return MakeLockCoder[KEY, KEY_PTR](lock, false)
 }
@@ -48,7 +49,7 @@ func MakeMutableLockCoderValueNotRequired[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
-	lock interfaces.LockMutable[KEY, KEY_PTR],
+	lock domain_interfaces.LockMutable[KEY, KEY_PTR],
 ) mutableLockBinaryMarshaler[KEY, KEY_PTR] {
 	return MakeMutableLockCoder(lock, false)
 }
@@ -57,7 +58,7 @@ func MakeMutableLockCoderValueRequired[
 	KEY interfaces.Value,
 	KEY_PTR interfaces.ValuePtr[KEY],
 ](
-	lock interfaces.LockMutable[KEY, KEY_PTR],
+	lock domain_interfaces.LockMutable[KEY, KEY_PTR],
 ) mutableLockBinaryMarshaler[KEY, KEY_PTR] {
 	return MakeMutableLockCoder(lock, true)
 }
@@ -67,7 +68,7 @@ type lockBinaryMarshaler[
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool
-	lock         interfaces.Lock[KEY, KEY_PTR]
+	lock         domain_interfaces.Lock[KEY, KEY_PTR]
 }
 
 type mutableLockBinaryMarshaler[
@@ -75,7 +76,7 @@ type mutableLockBinaryMarshaler[
 	KEY_PTR interfaces.ValuePtr[KEY],
 ] struct {
 	requireValue bool
-	lock         interfaces.LockMutable[KEY, KEY_PTR]
+	lock         domain_interfaces.LockMutable[KEY, KEY_PTR]
 }
 
 func (marshaler lockBinaryMarshaler[KEY, KEY_PTR]) String() string {

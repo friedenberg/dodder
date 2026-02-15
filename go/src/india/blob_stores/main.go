@@ -5,6 +5,7 @@ import (
 	"maps"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/blob_store_id"
 	"code.linenisgreat.com/dodder/go/src/bravo/ui"
@@ -135,7 +136,7 @@ func MakeRemoteBlobStore(
 func MakeBlobStore(
 	envDir env_dir.Env,
 	configNamed blob_store_configs.ConfigNamed,
-) (store interfaces.BlobStore, err error) {
+) (store domain_interfaces.BlobStore, err error) {
 	printer := ui.MakePrefixPrinter(
 		ui.Err(),
 		fmt.Sprintf("(blob_store: %s) ", configNamed.Path.GetId()),

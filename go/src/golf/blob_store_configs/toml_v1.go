@@ -2,6 +2,7 @@ package blob_store_configs
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/values"
 	"code.linenisgreat.com/dodder/go/src/charlie/compression_type"
@@ -114,7 +115,7 @@ func (blobStoreConfig TomlV1) GetBlobCompression() interfaces.IOWrapper {
 	return &blobStoreConfig.CompressionType
 }
 
-func (blobStoreConfig TomlV1) GetBlobEncryption() interfaces.MarklId {
+func (blobStoreConfig TomlV1) GetBlobEncryption() domain_interfaces.MarklId {
 	return blobStoreConfig.Encryption
 }
 

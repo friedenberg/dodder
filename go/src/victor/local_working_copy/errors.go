@@ -3,7 +3,7 @@ package local_working_copy
 import (
 	"fmt"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/charlie/genres"
 )
@@ -16,7 +16,7 @@ type (
 type ErrUnsupportedFormatterValue interface {
 	error
 	GetFormatValue() string
-	interfaces.GenreGetter
+	domain_interfaces.GenreGetter
 }
 
 func IsErrUnsupportedFormatterValue(err error) bool {
@@ -26,7 +26,7 @@ func IsErrUnsupportedFormatterValue(err error) bool {
 
 func MakeErrUnsupportedFormatterValue(
 	formatValue string,
-	g interfaces.Genre,
+	g domain_interfaces.Genre,
 ) error {
 	return errors.Wrap(
 		errUnsupportedFormatter{
@@ -62,6 +62,6 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 	return e.format
 }
 
-func (e errUnsupportedFormatter) GetGenre() interfaces.Genre {
+func (e errUnsupportedFormatter) GetGenre() domain_interfaces.Genre {
 	return e.genres
 }

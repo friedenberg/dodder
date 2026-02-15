@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/alfa/pool"
 	"code.linenisgreat.com/dodder/go/src/alfa/quiter_collection"
@@ -39,7 +40,7 @@ func (id *objectId3) GetObjectId() *objectId3 {
 	return id
 }
 
-func (id objectId3) GetGenre() interfaces.Genre {
+func (id objectId3) GetGenre() domain_interfaces.Genre {
 	return id.Genre
 }
 
@@ -396,7 +397,7 @@ func (id *objectId3) ReadFrom(r io.Reader) (n int64, err error) {
 	return n, err
 }
 
-func (id *objectId3) SetGenre(genre interfaces.GenreGetter) {
+func (id *objectId3) SetGenre(genre domain_interfaces.GenreGetter) {
 	if genre == nil {
 		id.Genre = genres.Unknown
 	} else {
@@ -431,7 +432,7 @@ func (id *objectId3) SetBlob(value string) (err error) {
 
 func (id *objectId3) SetWithGenre(
 	value string,
-	genre interfaces.GenreGetter,
+	genre domain_interfaces.GenreGetter,
 ) (err error) {
 	g := genres.Make(genre.GetGenre())
 

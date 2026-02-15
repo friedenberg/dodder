@@ -4,7 +4,7 @@ import (
 	"io"
 	"time"
 
-	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/markl"
 	"code.linenisgreat.com/dodder/go/src/golf/env_ui"
@@ -12,11 +12,11 @@ import (
 
 func CopyBlobIfNecessary(
 	env env_ui.Env,
-	dst interfaces.BlobStore,
-	src interfaces.BlobStore,
-	expectedDigest interfaces.MarklId,
+	dst domain_interfaces.BlobStore,
+	src domain_interfaces.BlobStore,
+	expectedDigest domain_interfaces.MarklId,
 	extraWriter io.Writer,
-	hashType interfaces.FormatHash,
+	hashType domain_interfaces.FormatHash,
 ) (copyResult CopyResult) {
 	copyResult.BlobId = expectedDigest
 
@@ -43,7 +43,7 @@ func CopyBlobIfNecessary(
 
 	errors.PanicIfError(markl.AssertIdIsNotNull(expectedDigest))
 
-	var readCloser interfaces.BlobReader
+	var readCloser domain_interfaces.BlobReader
 
 	{
 		var err error
@@ -56,7 +56,7 @@ func CopyBlobIfNecessary(
 
 	defer errors.ContextMustClose(env, readCloser)
 
-	var writeCloser interfaces.BlobWriter
+	var writeCloser domain_interfaces.BlobWriter
 
 	if hashType == nil {
 		var err error
@@ -132,9 +132,9 @@ func CopyBlobIfNecessary(
 
 func CopyReaderToWriter(
 	ctx errors.Context,
-	dst interfaces.BlobWriter,
+	dst domain_interfaces.BlobWriter,
 	src io.Reader,
-	expected interfaces.MarklId,
+	expected domain_interfaces.MarklId,
 	extraWriter io.Writer,
 	heartbeats func(time time.Time),
 	pulse time.Duration,

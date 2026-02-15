@@ -16,6 +16,7 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
+	"code.linenisgreat.com/dodder/go/src/alfa/domain_interfaces"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/markl_io"
 	"code.linenisgreat.com/dodder/go/src/bravo/ohio"
@@ -39,7 +40,7 @@ type remoteSftp struct {
 
 	// TODO populate blobIOWrapper with env_repo.FileNameBlobStoreConfig at
 	// `config.GetRemotePath()`
-	blobIOWrapper        interfaces.BlobIOWrapper
+	blobIOWrapper        domain_interfaces.BlobIOWrapper
 	sshClientInitializer func() (*ssh.Client, error)
 	sshClient            *ssh.Client
 	sftpClient           *sftp.Client
@@ -49,7 +50,7 @@ type remoteSftp struct {
 	blobCache     map[string]struct{}
 }
 
-var _ interfaces.BlobStore = &remoteSftp{}
+var _ domain_interfaces.BlobStore = &remoteSftp{}
 
 func makeSftpStore(
 	ctx interfaces.ActiveContext,
@@ -83,7 +84,7 @@ func (blobStore *remoteSftp) GetBlobStoreConfig() blob_store_configs.Config {
 	return blobStore.config
 }
 
-func (blobStore *remoteSftp) GetDefaultHashType() interfaces.FormatHash {
+func (blobStore *remoteSftp) GetDefaultHashType() domain_interfaces.FormatHash {
 	return blobStore.defaultHashType
 }
 
@@ -156,12 +157,12 @@ func (blobStore *remoteSftp) GetBlobStoreDescription() string {
 	return "remote sftp hash bucketed"
 }
 
-func (blobStore *remoteSftp) GetBlobIOWrapper() interfaces.BlobIOWrapper {
+func (blobStore *remoteSftp) GetBlobIOWrapper() domain_interfaces.BlobIOWrapper {
 	blobStore.initializeOnce()
 	return blobStore.blobIOWrapper
 }
 
-func (blobStore *remoteSftp) GetLocalBlobStore() interfaces.BlobStore {
+func (blobStore *remoteSftp) GetLocalBlobStore() domain_interfaces.BlobStore {
 	return blobStore
 }
 
@@ -174,7 +175,7 @@ func (blobStore *remoteSftp) makeEnvDirConfig() env_dir.Config {
 }
 
 func (blobStore *remoteSftp) remotePathForMerkleId(
-	merkleId interfaces.MarklId,
+	merkleId domain_interfaces.MarklId,
 ) string {
 	return env_dir.MakeHashBucketPathFromMerkleId(
 		merkleId,
@@ -185,7 +186,7 @@ func (blobStore *remoteSftp) remotePathForMerkleId(
 }
 
 func (blobStore *remoteSftp) HasBlob(
-	merkleId interfaces.MarklId,
+	merkleId domain_interfaces.MarklId,
 ) (ok bool) {
 	blobStore.initializeOnce()
 
@@ -215,10 +216,10 @@ func (blobStore *remoteSftp) HasBlob(
 	return ok
 }
 
-func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] {
+func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[domain_interfaces.MarklId] {
 	blobStore.initializeOnce()
 
-	return func(yield func(interfaces.MarklId, error) bool) {
+	return func(yield func(domain_interfaces.MarklId, error) bool) {
 		basePath := strings.TrimPrefix(blobStore.config.GetRemotePath(), "/")
 
 		// Walk through the two-level directory structure (Git-like bucketing)
@@ -281,8 +282,8 @@ func (blobStore *remoteSftp) AllBlobs() interfaces.SeqError[interfaces.MarklId] 
 }
 
 func (blobStore *remoteSftp) MakeBlobWriter(
-	marklHashType interfaces.FormatHash,
-) (blobWriter interfaces.BlobWriter, err error) {
+	marklHashType domain_interfaces.FormatHash,
+) (blobWriter domain_interfaces.BlobWriter, err error) {
 	blobStore.initializeOnce()
 
 	// TODO use hash type
@@ -302,8 +303,8 @@ func (blobStore *remoteSftp) MakeBlobWriter(
 }
 
 func (blobStore *remoteSftp) MakeBlobReader(
-	digest interfaces.MarklId,
-) (readCloser interfaces.BlobReader, err error) {
+	digest domain_interfaces.MarklId,
+) (readCloser domain_interfaces.BlobReader, err error) {
 	blobStore.initializeOnce()
 
 	if digest.IsNull() {
@@ -355,7 +356,7 @@ func (blobStore *remoteSftp) MakeBlobReader(
 // sftpMover implements interfaces.Mover and interfaces.ShaWriteCloser
 // TODO explore using env_dir.Mover generically instead of this
 type sftpMover struct {
-	hash     interfaces.Hash
+	hash     domain_interfaces.Hash
 	store    *remoteSftp
 	config   env_dir.Config
 	tempFile *sftp.File
@@ -364,7 +365,7 @@ type sftpMover struct {
 	closed   bool
 }
 
-func (mover *sftpMover) initialize(hash interfaces.Hash) (err error) {
+func (mover *sftpMover) initialize(hash domain_interfaces.Hash) (err error) {
 	mover.hash = hash
 
 	// Create a temporary file on the remote server
@@ -489,7 +490,7 @@ func (mover *sftpMover) Close() (err error) {
 	return err
 }
 
-func (mover *sftpMover) GetMarklId() interfaces.MarklId {
+func (mover *sftpMover) GetMarklId() domain_interfaces.MarklId {
 	if mover.writer == nil {
 		return mover.GetMarklId()
 	}
@@ -499,7 +500,7 @@ func (mover *sftpMover) GetMarklId() interfaces.MarklId {
 
 // sftpWriter implements the streaming writer with compression/encryption
 type sftpWriter struct {
-	hash            interfaces.Hash
+	hash            domain_interfaces.Hash
 	tee             io.Writer
 	wCompress, wAge io.WriteCloser
 	wBuf            *bufio.Writer
@@ -508,7 +509,7 @@ type sftpWriter struct {
 func newSftpWriter(
 	config env_dir.Config,
 	ioWriter io.Writer,
-	hash interfaces.Hash,
+	hash domain_interfaces.Hash,
 ) (writer *sftpWriter, err error) {
 	writer = &sftpWriter{}
 
@@ -569,7 +570,7 @@ func (writer *sftpWriter) Close() (err error) {
 	return err
 }
 
-func (writer *sftpWriter) GetDigest() interfaces.MarklId {
+func (writer *sftpWriter) GetDigest() domain_interfaces.MarklId {
 	id, _ := writer.hash.GetMarklId()
 	return id
 }
@@ -582,8 +583,8 @@ type sftpStreamingReader struct {
 }
 
 func (reader *sftpStreamingReader) createReader(
-	hash interfaces.Hash,
-) (readCloser interfaces.BlobReader, err error) {
+	hash domain_interfaces.Hash,
+) (readCloser domain_interfaces.BlobReader, err error) {
 	// Create streaming reader with decompression/decryption
 	sftpReader := &sftpReader{
 		file:   reader.file,
@@ -604,13 +605,13 @@ func (reader *sftpStreamingReader) createReader(
 type sftpReader struct {
 	file      *sftp.File
 	config    env_dir.Config
-	hash      interfaces.Hash
+	hash      domain_interfaces.Hash
 	decrypter io.Reader
 	expander  io.ReadCloser
 	tee       io.Reader
 }
 
-func (reader *sftpReader) initialize(hash interfaces.Hash) (err error) {
+func (reader *sftpReader) initialize(hash domain_interfaces.Hash) (err error) {
 	// Set up decryption
 	if reader.decrypter, err = reader.config.GetBlobEncryption().WrapReader(reader.file); err != nil {
 		err = errors.Wrap(err)
@@ -673,7 +674,7 @@ func (reader *sftpReader) Close() error {
 	return err2
 }
 
-func (reader *sftpReader) GetMarklId() interfaces.MarklId {
+func (reader *sftpReader) GetMarklId() domain_interfaces.MarklId {
 	id, _ := reader.hash.GetMarklId()
 	return id
 }
