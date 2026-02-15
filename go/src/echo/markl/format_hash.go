@@ -112,6 +112,8 @@ func (formatHash FormatHash) PutHash(hash interfaces.Hash) {
 func (formatHash *FormatHash) Get() *Hash {
 	hash := formatHash.pool.Get()
 	hash.formatHash = formatHash
+	hash.written = 0
+	hash.hash.Reset()
 	return &hash
 }
 

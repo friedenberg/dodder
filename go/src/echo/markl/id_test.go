@@ -3,6 +3,7 @@ package markl
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"testing"
 
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
@@ -140,9 +141,16 @@ func TestIdEncodeDecode(t1 *testing.T) {
 func testIdEncodeDecode(t *ui.TestContext) {
 	for _, formatHash := range formatHashes {
 		hash := formatHash.Get()
+		defer formatHash.Put(hash)
+
+		if _, err := io.WriteString(hash, "test encode decode"); err != nil {
+			t.AssertNoError(err)
+		}
 
 		{
-			id, _ := hash.GetMarklId()
+			id, repool := hash.GetMarklId()
+			defer repool()
+
 			stringValue := StringHRPCombined(id)
 
 			t.Log(stringValue)
