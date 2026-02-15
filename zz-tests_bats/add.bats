@@ -197,80 +197,10 @@ function add_dot { # @test
 	EOM
 }
 
-#function add_dedupe_1 { ## @test
-#	wd="$(mktemp -d)"
-#	cd "$wd" || exit 1
-
-#	run_dodder init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-#	assert_success
-
-#	f=to_add.md
-#	{
-#		echo test file
-#	} >"$f"
-
-#	run_dodder add \
-#		-tags zz-inbox-2022-11-14 \
-#		"$f"
-
-#	assert_success
-#	assert_output - <<-EOM
-#		[-zz @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[-zz-inbox @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[-zz-inbox-2022 @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[-zz-inbox-2022-11 @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[-zz-inbox-2022-11-14 @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[one/uno @8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
-#		[one/uno @8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
-#	EOM
-
-#	run_dodder checkout o/u
-#	#TODO-P2 fix race condition
-#	assert_success
-#	assert_output - <<-EOM
-#		      checked out [one/uno.zettel @8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
-#	EOM
-
-#	{
-#		echo '---'
-#		echo '# new title'
-#		echo '- new-tag'
-#		echo '! md'
-#		echo '---'
-#		echo ''
-#		echo 'test file'
-#	} >one/uno.zettel
-
-#	run_dodder checkin -delete one/uno.zettel
-#	assert_success
-#	assert_output - <<-EOM
-#		[-new @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[-new-tag @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-#		[one/uno @d4853a453015235e41b9513f7e70d91b1a28212f9bd342daf5024b84f35d209f !md "new title"]
-#		          deleted [one/uno.zettel]
-#		          deleted [one]
-#	EOM
-
-#	run_dodder add \
-#		-predictable-zettel-ids \
-#		-delete \
-#		-tags new-etikett-2 \
-#		"$f"
-
-#	run_dodder show o/u
-#	#TODO-P2 fix race condition
-#	assert_success
-#	assert_output - <<-EOM
-#		---
-#		# new title
-#		- new-etikett-2
-#		- new-tag
-#		! md
-#		---
-
-#		test file
-#	EOM
-#}
+#TODO-P2 add_dedupe: define expected behavior when re-adding a blob that already
+# has a zettel. Current behavior: creates a new zettel (one/dos) inheriting
+# metadata from the existing zettel, but -tags flag is silently ignored.
+# Should -tags be merged? Should it reuse the existing zettel ID instead?
 
 function add_several_with_spaces_in_filename { # @test
 	run_dodder_init_disable_age
