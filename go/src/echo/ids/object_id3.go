@@ -61,6 +61,10 @@ func (id objectId3) String() string {
 	return id.Seq.String()
 }
 
+func (id objectId3) StringSansRepo() string {
+	return id.String()
+}
+
 func (id objectId3) Equals(other objectId3) bool {
 	if id.Genre != other.Genre {
 		return false

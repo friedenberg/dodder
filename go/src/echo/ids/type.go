@@ -111,10 +111,6 @@ func (id typeStruct) String() string {
 	}
 }
 
-func (id *typeStruct) TodoSetFromObjectId(other *ObjectId) (err error) {
-	return id.Set(other.String())
-}
-
 func (id *typeStruct) SetWithSeq(seq doddish.Seq) (err error) {
 	var genre genres.Genre
 

@@ -73,7 +73,7 @@ func (store *Store) initializeUrls() (err error) {
 		u := i.Url.Url()
 
 		store.urls[u] = append(store.urls[u], i)
-		store.itemsById[i.GetObjectId().String()] = i
+		store.itemsById[i.String()] = i
 	}
 
 	return err

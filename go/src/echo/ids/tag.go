@@ -141,10 +141,6 @@ func (tag tagStruct) IsDependentLeaf() bool {
 	return tag.dependentLeaf
 }
 
-func (tag *tagStruct) TodoSetFromObjectId(v *ObjectId) (err error) {
-	return tag.Set(v.String())
-}
-
 func (tag *tagStruct) Set(v string) (err error) {
 	v1 := v
 	v = strings.ToLower(strings.TrimSpace(v))

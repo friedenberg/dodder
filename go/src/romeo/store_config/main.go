@@ -194,7 +194,7 @@ func (store *store) AddTransacted(
 
 		var tag ids.TagStruct
 
-		if err = tag.TodoSetFromObjectId(daughter.GetObjectId()); err != nil {
+		if err = tag.Set(daughter.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

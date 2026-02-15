@@ -536,7 +536,7 @@ func (buildState *buildState) makeTagExp(
 	// TODO use b.blobs to read tag blob and find filter if necessary
 	var tag ids.TagStruct
 
-	if err = tag.TodoSetFromObjectId(objectId.GetObjectId()); err != nil {
+	if err = tag.Set(objectId.GetObjectId().String()); err != nil {
 		err = errors.Wrap(err)
 		return exp, err
 	}

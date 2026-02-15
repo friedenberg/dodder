@@ -34,14 +34,6 @@ func (item *Item) GetKey() string {
 	return item.Id.String()
 }
 
-// TODO replace with external id
-func (item *Item) GetObjectId() *ids.ObjectId {
-	var oid ids.ObjectId
-	errors.PanicIfError(oid.SetLeft(item.GetKey()))
-	// errors.PanicIfError(oid.SetRepoId("browser"))
-	return &oid
-}
-
 func (item *Item) GetType() (t ids.TypeStruct, err error) {
 	if err = t.Set("browser-" + item.Id.Type); err != nil {
 		err = errors.Wrap(err)
