@@ -270,6 +270,26 @@ func (id *objectId3) UnmarshalBinary(bites []byte) (err error) {
 	return nil
 }
 
+func (id *objectId3) Clone() (clone *objectId3) {
+	clone = getObjectIdPool3().Get()
+	clone.ResetWithObjectId(id)
+	return clone
+}
+
+func (id objectId3) MarshalText() (text []byte, err error) {
+	text = []byte(FormattedString(id))
+	return text, err
+}
+
+func (id *objectId3) UnmarshalText(text []byte) (err error) {
+	if err = id.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return err
+	}
+
+	return err
+}
+
 func (id *objectId3) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int64
 	n1, err = id.Genre.WriteTo(w)
