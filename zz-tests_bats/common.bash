@@ -21,9 +21,9 @@ fi
 
 pushd "$BATS_TEST_TMPDIR" >/dev/null || exit 1
 
-load "$BATS_CWD/test_helper/bats-support/load"
-load "$BATS_CWD/test_helper/bats-assert/load"
-load "$BATS_CWD/test_helper/bats-assert-additions/load"
+bats_load_library "bats-support"
+bats_load_library "bats-assert"
+bats_load_library "bats-assert-additions"
 
 set_xdg() {
   if [[ -z $1 ]]; then

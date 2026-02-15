@@ -6,7 +6,9 @@
 
     devenv-go.url = "github:friedenberg/eng?dir=devenvs/go";
     devenv-shell.url = "github:friedenberg/eng?dir=devenvs/shell";
+    devenv-bats.url = "github:friedenberg/eng?dir=devenvs/bats";
     sandcastle.url = "github:amarbel-llc/sandcastle";
+    bats-assert-additions.url = "github:amarbel-llc/bats-assert-additions";
   };
 
   outputs =
@@ -16,7 +18,9 @@
     , utils
     , devenv-go
     , devenv-shell
+    , devenv-bats
     , sandcastle
+    , bats-assert-additions
     ,
     }:
     (utils.lib.eachDefaultSystem
@@ -70,18 +74,24 @@
 
           packages = (with pkgs-master; [
             bats
+            bats.libraries.bats-support
+            bats.libraries.bats-assert
             fish
             gnumake
             gum
             just
           ]) ++ [
             sandcastle.packages.${system}.default
+            bats-assert-additions.packages.${system}.default
           ];
 
           inputsFrom = [
             devenv-go.devShells.${system}.default
             devenv-shell.devShells.${system}.default
+            devenv-bats.devShells.${system}.default
           ];
+
+          BATS_LIB_PATH = "${pkgs-master.bats.libraries.bats-support}/share/bats:${pkgs-master.bats.libraries.bats-assert}/share/bats:${bats-assert-additions.packages.${system}.default}/share/bats";
         };
       })
     );
