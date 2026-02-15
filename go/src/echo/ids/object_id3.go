@@ -412,8 +412,8 @@ func (id *objectId3) SetBlob(value string) (err error) {
 	if seq, err = doddish.ScanExactlyOneSeqWithDotAllowedInIdenfierFromString(
 		value,
 	); err != nil {
-		// Fall back to creating a single identifier token from the raw value,
-		// matching objectId2 behavior for multi-word blob names like "to add"
+		// Fall back to creating a single identifier token from the raw value
+		// for multi-word blob names like "to add"
 		id.Seq = doddish.Seq{
 			doddish.Token{
 				Type:     doddish.TokenTypeIdentifier,
