@@ -170,54 +170,43 @@ marked TODO for removal.
 
 These are methods that objectId2 has that external code calls on ObjectId:
 
-| Method | Purpose | Implementation |
-|--------|---------|---------------|
-| `SetBlob(string) error` | Set genre to Blob | Set genre, parse value as Seq |
-| `StringSansRepo() string` | String without repo | Same as `String()` (no repo in objectId3) |
-| `MarshalText() / UnmarshalText()` | Text serialization | Wrap `FormattedString(id)` / `id.Set(text)` |
-| `Clone() *objectId3` | Pool-managed clone | Get from pool, `ResetWith`, return |
-| `WriteTo(io.Writer) (int64, error)` | Binary stream write | `genre_byte + seq.MarshalBinary()` |
-| `ReadFrom(io.Reader) (int64, error)` | Binary stream read | Read genre, then seq binary |
-| `SetWithGenre(string, GenreGetter) error` | Set with genre hint | Set genre then parse |
+| Method | Purpose | Status |
+|--------|---------|--------|
+| `SetBlob(string) error` | Set genre to Blob | DONE |
+| `StringSansRepo() string` | String without repo | TODO (Phase 0) |
+| `MarshalText() / UnmarshalText()` | Text serialization | TODO |
+| `Clone() *objectId3` | Pool-managed clone | TODO |
+| `WriteTo(io.Writer) (int64, error)` | Binary stream write | DONE (genre + seq_len + seq_data) |
+| `ReadFrom(io.Reader) (int64, error)` | Binary stream read | DONE (with Seq reset) |
+| `SetWithGenre(string, GenreGetter) error` | Set with genre hint | DONE (genre dispatch) |
 
 ---
 
 ## Bugs Found and Fixed During Previous Attempt
 
-These fixes were applied to objectId3.go but the branch was not committed. They
-need to be re-applied:
+All 5 bugs have been resolved. Bugs 1 and 3 were fixed by implementing the
+missing methods with the correct behavior. Bugs 2, 4, and 5 were already
+addressed in the existing code.
 
-### Bug 1: Stream Index Corruption (ReadFrom Seq reset)
-When `ReadFrom` was called on objectId3, the Seq wasn't reset before reading,
-causing stale data from previous reads to persist.
-**Fix:** Reset `id.Seq` at the start of `ReadFrom`.
+### Bug 1: Stream Index Corruption (ReadFrom Seq reset) — FIXED
+`ReadFrom` resets `id.Seq` at the start before reading new data.
+Committed in `7d03bd7e0`.
 
-### Bug 2: Empty UnmarshalBinary
-`UnmarshalBinary([]byte{})` would call `ValidateSeqAndGetGenre` on an empty Seq
-and return an error instead of silently handling it.
-**Fix:** In `UnmarshalBinary`, if `ValidateSeqAndGetGenre` returns
-`ErrEmptySeq`, set err to nil and return.
+### Bug 2: Empty UnmarshalBinary — ALREADY FIXED
+`UnmarshalBinary` already handles `ErrEmptySeq` (object_id3.go lines 255-258).
 
-### Bug 3: SetWithGenre Genre Dispatch
-`SetWithGenre` on objectId3 was not properly dispatching to genre-specific
-parsing (e.g., `SetType` for types, `SetBlob` for blobs).
-**Fix:** Add a switch on genre in `SetWithGenre` to route to `SetType`,
-`SetBlob`, etc. before falling back to generic `Set`.
+### Bug 3: SetWithGenre Genre Dispatch — FIXED
+`SetWithGenre` dispatches to `SetType` for types, `SetBlob` for blobs, and
+falls back to generic `Set` for other genres. Committed in `7d03bd7e0`.
 
-### Bug 4: ValidateSeqAndGetGenre sec.asec Pattern
-The inventory list ID format `sec.asec` (TAI timestamps like
-`2149773475.593402545`) wasn't being recognized correctly.
-**Fix:** Match the pattern `ident.ident` where both parts are numeric as
-`genres.InventoryList`.
+### Bug 4: ValidateSeqAndGetGenre sec.asec Pattern — ALREADY FIXED
+`ValidateSeqAndGetGenre` already matches `ident.ident` with numeric parts as
+`genres.InventoryList` (main.go lines 369-385).
 
-### Bug 5: IsEmpty Semantics for "/" Placeholder
-objectId3's `IsEmpty()` checked `id.Seq.Len() == 0`. But the "/" placeholder
-(used for creating new zettels in organize) has a non-empty Seq `[op('/')]`.
-With objectId2, `IsEmpty()` checked `id.left.Len() == 0` which was true for
-"/" since "/" is only the middle byte.
-**Fix:** `IsEmpty` should check `id.Seq.Len() == 0` (current behavior is
-correct; the issue was that the organize code path expected "/" to be
-non-empty, which it is with objectId3).
+### Bug 5: IsEmpty Semantics for "/" Placeholder — NO FIX NEEDED
+Current `IsEmpty()` behavior (`id.Seq.Len() == 0`) is correct. The "/"
+placeholder has a non-empty Seq `[op('/')]` with objectId3, which is the
+desired behavior.
 
 ---
 
@@ -316,9 +305,11 @@ organize command
 4. **Add StringSansRepo to objectId3:** Trivial method returning `String()`
 
 ### Phase 1: Add Missing Methods to objectId3
-- SetBlob, MarshalText/UnmarshalText, Clone
-- WriteTo/ReadFrom (genre byte + seq binary)
-- SetWithGenre with proper genre dispatch
+- ~~SetBlob~~ DONE
+- ~~WriteTo/ReadFrom (genre byte + seq_len + seq binary)~~ DONE
+- ~~SetWithGenre with proper genre dispatch~~ DONE
+- MarshalText/UnmarshalText
+- Clone
 
 ### Phase 2: Bump Store Version
 - Change VCurrent from V12 to V13
