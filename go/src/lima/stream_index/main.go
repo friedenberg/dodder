@@ -92,13 +92,29 @@ func (index *Index) Initialize() (err error) {
 	return err
 }
 
-func (index *Index) MakeReindexer() (reindexer *Reindexer, err error) {
+func (index *Index) MakeReindexer(
+	ctx interfaces.ActiveContext,
+) (reindexer *Reindexer, err error) {
 	if err = index.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return reindexer, err
 	}
 
 	reindexer = &Reindexer{index: index}
+
+	for n := range reindexer.pages {
+		fb := &pageAdditionsFileBacked{}
+
+		if err = fb.initialize(index); err != nil {
+			err = errors.Wrap(err)
+			return reindexer, err
+		}
+
+		reindexer.pages[n] = fb
+		index.pages[n].additionsLatest = fb
+
+		errors.ContextCloseAfter(ctx, fb)
+	}
 
 	return reindexer, err
 }

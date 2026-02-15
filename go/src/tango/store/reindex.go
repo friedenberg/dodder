@@ -30,7 +30,7 @@ func (store *Store) Reindex(context interfaces.ActiveContext) (err error) {
 
 	var reindexer sku.Reindexer
 
-	if reindexer, err = store.streamIndex.MakeReindexer(); err != nil {
+	if reindexer, err = store.streamIndex.MakeReindexer(context); err != nil {
 		err = errors.Wrap(err)
 		return err
 	}

@@ -5,34 +5,44 @@ import (
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
+type additions interface {
+	add(object *sku.Transacted)
+	hasChanges() bool
+	Len() int
+	Reset()
+	All() interfaces.Seq[*sku.Transacted]
+	containsObjectId(string) bool
+}
+
+// pageAdditions is the in-memory additions implementation used for normal
+// (non-reindex) commit paths.
 type pageAdditions struct {
 	defaultObjectDigestMarklFormatId string
 	index                            *Index
 	objectIdLookup                   map[string]struct{}
 	objects                          *sku.HeapTransacted
-	// objects        *sku.OpenList
 }
 
-func (additions *pageAdditions) initialize(index *Index) {
+func (pa *pageAdditions) initialize(index *Index) {
 	index.defaultObjectDigestMarklFormatId = index.envRepo.GetObjectDigestType()
 
-	additions.index = index
-	additions.objects = sku.MakeListTransacted()
-	additions.objectIdLookup = make(map[string]struct{})
+	pa.index = index
+	pa.objects = sku.MakeListTransacted()
+	pa.objectIdLookup = make(map[string]struct{})
 }
 
-func (additions *pageAdditions) add(object *sku.Transacted) {
+func (pa *pageAdditions) add(object *sku.Transacted) {
 	objectClone := object.CloneTransacted()
 
-	additions.objects.Add(objectClone)
-	additions.objectIdLookup[object.ObjectId.String()] = struct{}{}
+	pa.objects.Add(objectClone)
+	pa.objectIdLookup[object.ObjectId.String()] = struct{}{}
 
 	seqProbeIds := object.AllProbeIds(
-		additions.index.index.GetHashType(),
-		additions.defaultObjectDigestMarklFormatId,
+		pa.index.index.GetHashType(),
+		pa.defaultObjectDigestMarklFormatId,
 	)
 
-	additionProbes := additions.index.probeIndex.additionProbes
+	additionProbes := pa.index.probeIndex.additionProbes
 
 	for probeId := range seqProbeIds {
 		idBytes := probeId.Id.GetBytes()
@@ -40,18 +50,23 @@ func (additions *pageAdditions) add(object *sku.Transacted) {
 	}
 }
 
-func (additions *pageAdditions) hasChanges() bool {
-	return additions.Len() > 0
+func (pa *pageAdditions) hasChanges() bool {
+	return pa.Len() > 0
 }
 
-func (additions *pageAdditions) Len() int {
-	return additions.objects.Len()
+func (pa *pageAdditions) Len() int {
+	return pa.objects.Len()
 }
 
-func (additions *pageAdditions) Reset() {
-	additions.objects.Reset()
+func (pa *pageAdditions) Reset() {
+	pa.objects.Reset()
 }
 
-func (additions *pageAdditions) All() interfaces.Seq[*sku.Transacted] {
-	return additions.objects.All()
+func (pa *pageAdditions) All() interfaces.Seq[*sku.Transacted] {
+	return pa.objects.All()
+}
+
+func (pa *pageAdditions) containsObjectId(objectIdString string) bool {
+	_, ok := pa.objectIdLookup[objectIdString]
+	return ok
 }

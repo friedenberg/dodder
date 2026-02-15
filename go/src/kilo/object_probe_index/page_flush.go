@@ -8,72 +8,8 @@ import (
 	"code.linenisgreat.com/dodder/go/src/alfa/cmp"
 	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/bravo/quiter"
-	"code.linenisgreat.com/dodder/go/src/charlie/heap"
 )
 
-func (page *page) makePullRowFromFile(
-	bufferedReader *bufio.Reader,
-) func() (*row, error) {
-	var current row
-
-	return func() (row *row, err error) {
-		if bufferedReader == nil {
-			err = io.EOF
-			return row, err
-		}
-
-		var n int64
-		n, err = page.readRowFrom(&current, bufferedReader)
-		if err != nil {
-			if errors.IsEOF(err) {
-				// no-op
-				// TODO why might this ever be the case
-			} else if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
-				err = io.EOF
-			}
-
-			err = errors.WrapExceptSentinel(err, io.EOF)
-			return row, err
-		}
-
-		row = &current
-
-		return row, err
-	}
-}
-
-func (page *page) flushOld(
-	bufferedReader *bufio.Reader,
-	bufferedWriter *bufio.Writer,
-) (err error) {
-	getOne := page.makePullRowFromFile(bufferedReader)
-
-	if err = heap.MergeHeapAndRestore(
-		page.added,
-		func() (row *row, err error) {
-			row, err = getOne()
-
-			lastRow := errors.IsEOF(err) || row == nil
-
-			if lastRow {
-				err = errors.MakeErrStopIteration()
-			}
-
-			return row, err
-		},
-		func(row *row) (err error) {
-			_, err = page.writeRowTo(row, bufferedWriter)
-			return err
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return err
-	}
-
-	return err
-}
-
-// confirmed this worked correctly
 func (page *page) makeSeqReadFromFile(
 	bufferedReader *bufio.Reader,
 ) interfaces.SeqError[*row] {

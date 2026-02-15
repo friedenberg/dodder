@@ -298,7 +298,7 @@ func (page *page) Flush() (err error) {
 			bufferedReader = &page.bufferedReader
 		}
 
-		if err = page.flushOld(bufferedReader, bufferedWriter); err != nil {
+		if err = page.flushNew(bufferedReader, bufferedWriter); err != nil {
 			err = errors.Wrap(err)
 			return err
 		}

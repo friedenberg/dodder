@@ -14,9 +14,8 @@ type page struct {
 	pageId         page_id.PageId
 	forceFullWrite bool
 
-	// TODO replace pageAdditions with sku.WorkingList
-	additionsHistory pageAdditions
-	additionsLatest  pageAdditions
+	additionsHistory additions
+	additionsLatest  additions
 }
 
 func (page *page) initialize(
@@ -25,16 +24,22 @@ func (page *page) initialize(
 ) {
 	page.index = index
 	page.pageId = pageId
-	page.additionsHistory.initialize(index)
-	page.additionsLatest.initialize(index)
+
+	history := &pageAdditions{}
+	history.initialize(index)
+	page.additionsHistory = history
+
+	latest := &pageAdditions{}
+	latest.initialize(index)
+	page.additionsLatest = latest
 }
 
 func (page *page) objectIdStringExists(objectIdString string) bool {
-	if _, ok := page.additionsHistory.objectIdLookup[objectIdString]; ok {
+	if page.additionsHistory.containsObjectId(objectIdString) {
 		return true
 	}
 
-	if _, ok := page.additionsLatest.objectIdLookup[objectIdString]; ok {
+	if page.additionsLatest.containsObjectId(objectIdString) {
 		return true
 	}
 
@@ -54,17 +59,14 @@ func (page *page) add(
 	object *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	additions := page.additionsHistory
-
-	// TODO write binary representation to file-backed buffered writer and then
-	// merge streams using raw binary data
+	a := page.additionsHistory
 
 	if page.index.sunrise.Less(object.GetTai()) ||
 		options.StreamIndexOptions.ForceLatest {
-		additions = page.additionsLatest
+		a = page.additionsLatest
 	}
 
-	additions.add(object)
+	a.add(object)
 
 	return err
 }

@@ -2,13 +2,13 @@ package stream_index
 
 import (
 	"code.linenisgreat.com/dodder/go/src/_/interfaces"
-	"code.linenisgreat.com/dodder/go/src/alfa/errors"
 	"code.linenisgreat.com/dodder/go/src/echo/ids"
 	"code.linenisgreat.com/dodder/go/src/juliett/sku"
 )
 
 type Reindexer struct {
 	index *Index
+	pages [PageCount]*pageAdditionsFileBacked
 }
 
 var _ sku.Reindexer = &Reindexer{}
@@ -30,7 +30,7 @@ func (reindexer *Reindexer) ReadOneMarklIdAdded(
 	marklId interfaces.MarklId,
 	object *sku.Transacted,
 ) (ok bool) {
-	panic(errors.Err405MethodNotAllowed)
+	return reindexer.index.ReadOneMarklIdAdded(marklId, object)
 }
 
 func (reindexer *Reindexer) ReadOneMarklId(
